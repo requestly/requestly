@@ -9,9 +9,19 @@ import {
   trackFeatureLimitUpgradeBannerViewed,
 } from "modules/analytics/events/common/feature-limiter";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import APP_CONSTANTS from "config/constants";
 
 const FeatureLimiterBanner = () => {
   const navigate = useNavigate();
+  const user = useSelector(getUserAuthDetails);
+  const isUserOnFreePlan =
+    !user?.details?.planDetails?.planName ||
+    user?.details?.planDetails?.planName == APP_CONSTANTS.PRICING.PLAN_NAMES.FREE
+      ? true
+      : false;
+  const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
 
   useEffect(() => {
     trackFeatureLimitUpgradeBannerViewed();
@@ -23,7 +33,9 @@ const FeatureLimiterBanner = () => {
         <Alert
           className="feature-limit-banner"
           message={
-            "You've exceeded the usage limits of the free plan. For uninterrupted usage, please upgrade to one of our paid plans."
+            isUserOnFreePlan
+              ? "You've exceeded the usage limits of the free plan. For uninterrupted usage, please upgrade to one of our paid plans."
+              : `You've exceeded the usage limits of the ${userPlan} plan. For uninterrupted usage, please upgrade to Professional plan`
           }
           icon={<TbInfoTriangle className="feature-limit-banner-icon" />}
           action={

@@ -56,7 +56,59 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
     user?.details?.profile?.email,
   ]);
 
-  const handleCreateNewTeam = () => {
+  const handleAddMembers = useCallback(
+    (newWorkspaceName?: string, newTeamId?: string) => {
+      if (!newWorkspaceName) {
+        toast.warn("Please enter the workspace name");
+        return;
+      }
+
+      if (!inviteEmails || !inviteEmails.length) {
+        toast.warn("Please add members email to invite them");
+        return;
+      }
+      setIsProcessing(true);
+
+      renameWorkspace(defaultTeamData?.teamId ?? newTeamId, newWorkspaceName);
+
+      const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
+
+      createTeamInvites({
+        teamId: defaultTeamData?.teamId ?? newTeamId,
+        emails: inviteEmails,
+        role: makeUserAdmin ? "admin" : "write",
+      })
+        .then((res: any) => {
+          if (res?.data?.success) {
+            toast.success("Invite sent successfully");
+            trackAddTeamMemberSuccess(defaultTeamData?.teamId ?? newTeamId, inviteEmails, makeUserAdmin, "onboarding");
+            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+          }
+          setIsProcessing(false);
+          switchWorkspace(
+            {
+              teamId: defaultTeamData?.teamId ?? newTeamId,
+              teamMembersCount: 1,
+            },
+            dispatch,
+            {
+              isWorkspaceMode,
+              isSyncEnabled: true,
+            },
+            appMode,
+            null,
+            "onboarding"
+          );
+        })
+        .catch((err) => {
+          toast.error("Error while sending invitations");
+          trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
+        });
+    },
+    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData?.teamId, makeUserAdmin]
+  );
+
+  const handleCreateNewTeam = useCallback(() => {
     trackCreateNewTeamClicked("onboarding");
     setIsProcessing(true);
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
@@ -70,57 +122,20 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
       }
       trackNewTeamCreateSuccess(response?.data?.teamId, newWorkspaceName, "onboarding");
+      switchWorkspace(
+        {
+          teamId: response?.data?.teamId,
+          teamName: newWorkspaceName,
+          teamMembersCount: response?.data?.accessCount,
+        },
+        dispatch,
+        { isWorkspaceMode, isSyncEnabled: true },
+        appMode,
+        null,
+        "onboarding"
+      );
     });
-  };
-
-  const handleAddMembers = (newWorkspaceName?: string, newTeamId?: string) => {
-    if (!newWorkspaceName) {
-      toast.warn("Please enter the workspace name");
-      return;
-    }
-
-    if (!inviteEmails || !inviteEmails.length) {
-      toast.warn("Please add members email to invite them");
-      return;
-    }
-    setIsProcessing(true);
-
-    renameWorkspace(defaultTeamData?.teamId ?? newTeamId, newWorkspaceName);
-
-    const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
-
-    createTeamInvites({
-      teamId: defaultTeamData?.teamId ?? newTeamId,
-      emails: inviteEmails,
-      role: makeUserAdmin ? "admin" : "write",
-    })
-      .then((res: any) => {
-        if (res?.data?.success) {
-          toast.success("Invite sent successfully");
-          trackAddTeamMemberSuccess(defaultTeamData?.teamId ?? newTeamId, inviteEmails, makeUserAdmin, "onboarding");
-          dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
-        }
-        setIsProcessing(false);
-        switchWorkspace(
-          {
-            teamId: defaultTeamData?.teamId ?? newTeamId,
-            teamMembersCount: 1,
-          },
-          dispatch,
-          {
-            isWorkspaceMode,
-            isSyncEnabled: true,
-          },
-          appMode,
-          null,
-          "onboarding"
-        );
-      })
-      .catch((err) => {
-        toast.error("Error while sending invitations");
-        trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
-      });
-  };
+  }, [appMode, dispatch, isWorkspaceMode, newWorkspaceName, inviteEmails?.length, handleAddMembers]);
 
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Col } from "antd";
 import { Modal } from "antd";
@@ -20,7 +20,7 @@ import {
 } from "store/selectors";
 //ACTIONS
 import { updateGroupOfSelectedRules, createNewGroup } from "./actions";
-import { unselectAllRules } from "../actions";
+import { unselectAllRecords } from "../actions";
 import { trackGroupChangedEvent } from "modules/analytics/events/common/groups";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import Logger from "lib/logger";
@@ -42,6 +42,8 @@ const ChangeRuleGroupModal = (props) => {
   const allGroups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
+
+  const selectedRuleIds = useMemo(() => Object.keys(selectedRules), [selectedRules]);
 
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);
@@ -74,12 +76,11 @@ const ChangeRuleGroupModal = (props) => {
       const updatedRule = { ...currentlySelectedRuleData, groupId: newGroupId };
       setCurrentlySelectedRule(dispatch, updatedRule);
     } else {
-      updateGroupOfSelectedRules(appMode, selectedRules, newGroupId, user)
+      updateGroupOfSelectedRules(appMode, selectedRuleIds, newGroupId, user)
         .then(() => {
           trackGroupChangedEvent("rules_table");
 
-          //Unselect all rules
-          unselectAllRules(dispatch);
+          unselectAllRecords(dispatch);
           props.clearSearch?.();
           //Refresh List
           dispatch(

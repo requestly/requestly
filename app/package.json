@@ -129,11 +129,12 @@
     "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
-    "@requestly-ui/resource-table": "^0.1.5",
+    "@requestly-ui/resource-table": "^0.1.6",
     "@requestly/web-sdk": "0.14.1",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.14.185",
+    "@types/react-dom": "^18.2.8",
     "@types/react-redux": "^7.1.25",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",

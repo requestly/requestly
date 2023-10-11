@@ -43,6 +43,7 @@ const INITIAL_STATE = {
     rulesToPopulate: [],
     groupwiseRulesToPopulate: {},
     selectedRules: {},
+    selectedGroups: {},
     lastBackupTimeStamp: "",
     isRulesListLoading: false,
   },

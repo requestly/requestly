@@ -25,6 +25,7 @@ export const SESSION_RECORDING = {
   NEW_SESSION_CLICKED: "new_session clicked",
   network_log_context_menu_open: "network_log_context_menu_open",
   network_log_context_menu_option_clicked: "network_log_context_menu_option_clicked",
+  bad_session_recording_viewed: "bad_session_recording_viewed",
 
   ONBAORDING: {
     onboarding_page_viewed: "session_onboarding_page_viewed",
@@ -77,6 +78,7 @@ export const RULES = {
   },
 
   CHARLES_SETTINGS: {
+    VIEWED: "charles_settings_import_viewed",
     IMPORT_STARTED: "charles_settings_import_started",
     PARSED: "charles_settings_parsed",
     IMPORT_FAILED: "charles_settings_import_failed",

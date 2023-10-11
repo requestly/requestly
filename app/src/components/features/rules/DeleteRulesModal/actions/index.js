@@ -15,6 +15,7 @@ export const deleteRulesFromStorage = async (appMode, rulesToDelete, callback) =
     return callback();
   } catch (e) {
     Logger.error(e);
+    throw e;
   }
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Col, Modal, Row, Space, Typography } from "antd";
@@ -12,10 +12,12 @@ import { deleteGroupsFromStorage, deleteRulesFromStorage } from "../DeleteRulesM
 import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import { AUTH } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
+import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
-const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData }) => {
+const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules, callback }) => {
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -27,24 +29,20 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData })
   const [loadingSomething, setLoadingSomething] = useState(false);
 
   const doMoveToUngrouped = () => {
-    if (!groupData) return null;
-
     return new Promise((resolve) => {
       // Fetch all records to get rule data
       Logger.log("Reading storage in doMoveToUngrouped");
       StorageService(appMode)
         .getAllRecords()
         .then((allRecords) => {
-          //Update Rules
-          const updatedRules = [];
-          groupData.children.forEach(async (groupRule) => {
-            const groupRuleId = groupRule.id;
-            const newRule = {
-              ...allRecords[groupRuleId],
+          const updatedRules = groupRules.map((rule) => {
+            return {
+              ...allRecords[rule.id],
+              modificationDate: generateObjectCreationDate(),
               groupId: UNGROUPED_GROUP_ID,
             };
-            updatedRules.push(newRule);
           });
+
           Logger.log("Writing storage in doMoveToUngrouped");
           StorageService(appMode)
             .saveMultipleRulesOrGroups(updatedRules)
@@ -58,9 +56,9 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData })
     doMoveToUngrouped()
       .then(() => {
         // Now delete the Group
-        deleteGroup(appMode, groupData.id, groupwiseRulesToPopulate, true)
+        deleteGroup(appMode, groupIdToDelete, groupwiseRulesToPopulate, true)
           .then(() => {
-            setData(null);
+            callback && callback();
             // Refresh the rules list
             dispatch(
               actions.updateRefreshPendingStatus({
@@ -81,17 +79,12 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData })
         setLoadingSomething(false);
       });
   };
-
-  const handleGroupsDeletion = async (groupIdsToDelete) => {
-    return deleteGroupsFromStorage(appMode, groupIdsToDelete);
-  };
+  const ruleIdsToDelete = useMemo(() => groupRules.map((rule) => rule.id), [groupRules]);
 
   const handleRulesDeletion = async (uid) => {
     if (!uid) return;
-    const ruleIdsToDelete = [];
-    groupData.children.forEach((rule) => ruleIdsToDelete.push(rule.id));
 
-    return addRecordsToTrash(uid, groupData.children).then((result) => {
+    return addRecordsToTrash(uid, groupRules).then((result) => {
       return new Promise((resolve, reject) => {
         if (result.success) {
           deleteRulesFromStorage(appMode, ruleIdsToDelete, () => resolve(true));
@@ -104,7 +97,8 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData })
 
   const handleRecordsDeletion = async (uid) => {
     await handleRulesDeletion(uid);
-    await handleGroupsDeletion([groupData.id]);
+    await deleteGroupsFromStorage(appMode, [groupIdToDelete]);
+    deleteTestReportByRuleId(appMode, ruleIdsToDelete);
   };
 
   const promptUserToSignup = (source) => {
@@ -146,7 +140,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, data: groupData, setData })
     });
   };
 
-  if (!groupData) return null;
+  if (!groupIdToDelete) return null;
 
   return (
     <Modal open={isOpen} title="Delete Group" confirmLoading={loadingSomething} onCancel={toggle} footer={null}>
