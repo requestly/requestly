@@ -1,6 +1,8 @@
 import styles from "./index.css";
-import { registerCustomElement, setInnerHTML } from "../utils";
+import { getEpochToMMSSFormat, registerCustomElement, setInnerHTML } from "../utils";
 import BinIcon from "../../../resources/icons/bin.svg";
+import StopRecordingIcon from "../../../resources/icons/stopRecording.svg";
+import InfoIcon from "../../../resources/icons/info.svg";
 import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
 
 enum RQSessionRecordingWidgetEvent {
@@ -10,8 +12,12 @@ enum RQSessionRecordingWidgetEvent {
 
 const TAG_NAME = "rq-session-recording-widget";
 const DEFAULT_POSITION = { left: 30, bottom: 30 };
+const EXPLICIT_RECORDING_LIMIT = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
 
 class RQSessionRecordingWidget extends RQDraggableWidget {
+  #currentRecordingTime = 0;
+  #recordingTimerIntervalId: NodeJS.Timer | null;
+
   constructor() {
     super(DEFAULT_POSITION);
     this.shadowRoot = this.attachShadow({ mode: "closed" });
@@ -30,6 +36,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
   addListeners() {
     this.shadowRoot.querySelector(".stop-recording").addEventListener("click", (evt) => {
       evt.stopPropagation();
+      this.resetTimer();
       this.triggerEvent(RQSessionRecordingWidgetEvent.STOP_RECORDING);
     });
 
@@ -40,7 +47,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     });
 
     this.addEventListener("show", (evt: CustomEvent) => {
-      this.show(evt.detail?.position);
+      this.show(evt.detail?.position, evt.detail?.currentRecordingTime);
     });
 
     this.addEventListener("hide", this.hide);
@@ -51,28 +58,70 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
   }
 
   _getDefaultMarkup() {
+    const tooltipContent =
+      "Session recording is limited to the most recent 5 minutes. The recording is still active, but you can only view the last 5 minutes of the session replay.";
+
     return `
       <style>${styles}</style>
       <div id="container">
-        <div>
           <span class="recording-icon"></span>
-          <span class="action stop-recording">Stop & Watch Replay</span>
-        </div>
-        <div>
-          <span class="divider"></span>
-          <span class="action discard-recording" title="Discard">${BinIcon}</span>
-        </div>
+          <span class="recording-time">00:00</span>
+          <div title="Recording info" class="recording-info-icon" data-tooltip="${tooltipContent}">
+            ${InfoIcon}
+          </div>
+          <div class="action stop-recording">${StopRecordingIcon} Stop & watch</div>
+          <div class="action discard-recording" title="Discard">${BinIcon}</div>
       </div>
     `;
   }
 
-  show(position = DEFAULT_POSITION) {
+  show(position = DEFAULT_POSITION, currentRecordingTime: number | null = null) {
     this.moveToPostion(position);
     this.setAttribute("draggable", "true");
-    this.getContainer().classList.add("visible");
+    const container = this.getContainer();
+    container.classList.add("visible");
+
+    if (currentRecordingTime === null) return;
+
+    this.#currentRecordingTime = currentRecordingTime;
+
+    if (this.#recordingTimerIntervalId) {
+      clearInterval(this.#recordingTimerIntervalId);
+    }
+
+    if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
+      container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+    }
+
+    this.#recordingTimerIntervalId = setInterval(
+      () => {
+        this.#currentRecordingTime = this.#currentRecordingTime + 1000;
+
+        if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
+          container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+        } else {
+          container.querySelector(".recording-time").innerHTML = "05:00";
+          container.querySelector(".recording-info-icon").classList.add("visible");
+          clearInterval(this.#recordingTimerIntervalId);
+        }
+      },
+      this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT ? 1000 : 0
+    );
+  }
+
+  resetTimer() {
+    if (this.#recordingTimerIntervalId) {
+      clearInterval(this.#recordingTimerIntervalId);
+    }
+
+    this.#currentRecordingTime = 0;
+    this.#recordingTimerIntervalId = null;
+    this.getContainer().querySelector(".recording-time").innerHTML = "00:00";
+    this.getContainer().querySelector(".recording-info-icon").classList.remove("visible");
   }
 
   hide() {
+    this.resetTimer();
     this.getContainer().classList.remove("visible");
   }
 

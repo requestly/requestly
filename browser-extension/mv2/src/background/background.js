@@ -1189,6 +1189,7 @@ BG.Methods.cacheRecordedSessionOnClientPageUnload = (tabId, payload) => {
       ...sessionRecordingData,
       previousSession: payload.session,
       widgetPosition: payload.widgetPosition,
+      recordingStartTime: payload.recordingStartTime,
     });
   }
 };
