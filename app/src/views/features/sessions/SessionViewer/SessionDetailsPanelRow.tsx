@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo } from "react";
-import { Divider, Typography } from "antd";
+import { Row, Typography } from "antd";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { isAppOpenedInIframe } from "utils/AppUtils";
@@ -25,7 +25,7 @@ const SessionDetailsPanelRow: React.FC<Props> = ({
 
   return (
     <>
-      <div className={`session-details-panel-row ${className}`} onClick={onClick}>
+      <Row className={`session-details-panel-row ${className}`} onClick={onClick}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "start", columnGap: "8px" }}>
             <div
@@ -40,7 +40,6 @@ const SessionDetailsPanelRow: React.FC<Props> = ({
                 {timeOffset < 0 ? "00:00" : secToMinutesAndSeconds(timeOffset)}
               </Typography.Text>
             </div>
-            <Divider type="vertical" style={{ margin: 0, height: "100%" }} />
             <div>
               <div className="primary-message" style={{ display: "flex", alignItems: "start" }}>
                 {children}
@@ -50,8 +49,7 @@ const SessionDetailsPanelRow: React.FC<Props> = ({
           </div>
           {!isInsideIframe && <div className="right-info">{rightInfo}</div>}
         </div>
-      </div>
-      <Divider style={{ margin: 0 }} />
+      </Row>
     </>
   );
 };

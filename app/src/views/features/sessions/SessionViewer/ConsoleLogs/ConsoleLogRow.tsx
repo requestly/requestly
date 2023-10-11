@@ -70,22 +70,24 @@ const ConsoleLogRow: React.FC<ConsoleLog> = ({ timeOffset, level, payload, trace
 
   return parsedPayload.length === 0 ? null : (
     <SessionDetailsPanelRow
-      className="console-log-row"
+      className={`console-log-row ${
+        parsedLevel === "error" ? "error-log" : parsedLevel === "warn" ? "warning-log" : "default-log"
+      }`}
       timeOffset={timeOffset}
       rightInfo={logSource}
       secondaryMessage={
         logSource === null && trace.length > 0 ? (
-          <div className={`trace-logs ${parsedLevel}`}>
-            {trace.map((traceRow, i) => (
-              <div key={i}>
-                <span>{traceRow}</span>
+          <div className={`trace-logs-wrapper ${parsedLevel}`}>
+            {trace.map((traceRow, index) => (
+              <div key={index} className="trace-log">
+                <span>at {traceRow}</span>
               </div>
             ))}
           </div>
         ) : null
       }
     >
-      <LogIcon level={parsedLevel} style={{ marginRight: 8 }} />
+      <LogIcon level={parsedLevel} className="log-icon" />
       <span className={`console-log-message ${parsedLevel}`}>{message}</span>
     </SessionDetailsPanelRow>
   );
