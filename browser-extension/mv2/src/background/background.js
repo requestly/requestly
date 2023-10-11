@@ -1375,13 +1375,13 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   });
 };
 
-BG.Methods.startRecordingExplicitly = (tabId, showWidget = true, recordingStartTime) => {
+BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
   const sessionRecordingDataExist = !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
   if (sessionRecordingDataExist) {
     return;
   }
 
-  const sessionRecordingData = { explicit: true, showWidget, recordingStartTime };
+  const sessionRecordingData = { explicit: true, showWidget };
 
   window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
