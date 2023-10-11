@@ -7,6 +7,7 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
     rule_type: rule.ruleType,
     rule_id: rule.id,
     platform: "extension",
+    rule_creator: rule.createdBy,
   };
   RQ.ClientUtils.sendExecutionEventToBackground(eventName, eventParams);
 };
