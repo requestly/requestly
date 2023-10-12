@@ -3,6 +3,10 @@ import { Button, Dropdown, Input, Menu, Row, Space } from "antd";
 import { CUSTOM_LAUNCH_CONSTANTS } from "../launchConstants";
 import { BiDotsVerticalRounded } from "@react-icons/all-files/bi/BiDotsVerticalRounded";
 import { RQButton } from "lib/design-system/components";
+import {
+  trackCancelledCustomArgsLaunch,
+  trackCustomLaunchOptionSelected,
+} from "modules/analytics/events/desktopApp/apps";
 
 const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClick: handleActivateAppClick }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -54,7 +58,10 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
               <div className="ml-auto launch-options-dropdown-actions">
                 <Button
                   size="small"
-                  onClick={() => handleDropdownVisibleChange(false)}
+                  onClick={() => {
+                    trackCancelledCustomArgsLaunch(appId);
+                    handleDropdownVisibleChange(false);
+                  }}
                   className="launch-options-dropdown-cancel-btn"
                 >
                   Cancel
@@ -78,25 +85,30 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
           <Menu.Item
             key="unsafe-mode"
             className="launch-options-menu-item"
-            onClick={() =>
-              handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_CONSTANTS.LAUNCH_OPTIONS["unsafe-mode"] })
-            }
+            onClick={() => {
+              trackCustomLaunchOptionSelected(appId, "unsafe-mode");
+              handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_CONSTANTS.LAUNCH_OPTIONS["unsafe-mode"] });
+            }}
           >
             <span>Launch in Unsafe Mode</span>
           </Menu.Item>
           <Menu.Item
             key="no-cors"
             className="launch-options-menu-item"
-            onClick={() =>
-              handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_CONSTANTS.LAUNCH_OPTIONS["no-cors"] })
-            }
+            onClick={() => {
+              trackCustomLaunchOptionSelected(appId, "no-cors");
+              handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_CONSTANTS.LAUNCH_OPTIONS["no-cors"] });
+            }}
           >
             <span>Launch without CORS</span>
           </Menu.Item>
           <Menu.Item
             key="custom-args"
             className="launch-options-menu-item"
-            onClick={() => setShowLaunchArgsInput(true)}
+            onClick={() => {
+              trackCustomLaunchOptionSelected(appId, "custom-args");
+              setShowLaunchArgsInput(true);
+            }}
           >
             <span>Launch with Custom Args</span>
           </Menu.Item>

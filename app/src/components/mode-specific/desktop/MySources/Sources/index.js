@@ -117,7 +117,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               })
             );
             dispatch(actions.updateHasConnectedApp(true));
-            trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId));
+            trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId), options?.launchOptions);
             toggle();
 
             // navigate to traffic table
@@ -178,7 +178,8 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       if (!isAvailable) {
         return <span className="text-primary cursor-disabled">Couldn't find it on your system</span>;
       } else if (!isActive) {
-        return CUSTOM_LAUNCH_CONSTANTS.SUPPORTED_APP_IDS[appId] ? (
+        return isFeatureCompatible(FEATURES.CUSTOM_LAUNCH_OPTIONS) &&
+          CUSTOM_LAUNCH_CONSTANTS.SUPPORTED_APP_IDS[appId] ? (
           <LaunchButtonDropdown
             appId={appId}
             isScanned={isScanned}
