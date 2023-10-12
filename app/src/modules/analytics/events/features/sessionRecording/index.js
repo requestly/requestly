@@ -4,7 +4,9 @@ import { SESSION_RECORDING } from "../constants";
 
 export const trackDemoVideoOpened = () => trackEvent(SESSION_RECORDING.session_recording_demo_video_opened);
 
-export const trackConfigurationOpened = () => trackEvent(SESSION_RECORDING.session_recordings_config_opened);
+export const trackConfigurationOpened = (source = "in_app") => {
+  trackEvent(SESSION_RECORDING.session_recordings_config_opened, { source });
+};
 
 export const trackConfigurationSaved = (params) => {
   trackEvent(SESSION_RECORDING.session_recordings_config_saved, params);

@@ -27,7 +27,9 @@
 .action {
   cursor: pointer;
   flex-shrink: 0;
-  transition: 0.2s border;
+  -webkit-transition: border 0.2s;
+  -moz-transition: border 0.2s;
+  transition: border 0.2s;
   border: 1px solid transparent;
 }
 
