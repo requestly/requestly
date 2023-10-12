@@ -194,7 +194,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         name: sessionRecordingMetadata.name,
         options: { ...recordingOptionsToSave },
         sessionAttributes: { ...sessionRecordingMetadata.sessionAttributes },
-        recordingMode: sessionRecordingMetadata?.recordingMode,
+        recordingMode: sessionRecordingMetadata?.recordingMode || null,
       };
 
       prepareSessionToExport(events, metadata)
