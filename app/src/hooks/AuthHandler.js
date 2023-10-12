@@ -15,6 +15,7 @@ import moment from "moment";
 import { getAndUpdateInstallationDate, getSignupDate } from "utils/Misc";
 import Logger from "lib/logger";
 import { getUserSubscription } from "backend/user/userSubscription";
+import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDocListener";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -57,22 +58,7 @@ const AuthHandler = (onComplete) => {
           ]);
 
           // phase-1 migration: Adaptor to convert firestore schema into old schema
-          const planDetails = {
-            planId: firestorePlanDetails?.plan,
-            status: firestorePlanDetails?.subscriptionStatus,
-            subscription: {
-              endDate:
-                firestorePlanDetails?.subscriptionCurrentPeriodEnd &&
-                new Date(firestorePlanDetails?.subscriptionCurrentPeriodEnd * 1000).toISOString().split("T")[0],
-              startDate:
-                firestorePlanDetails?.subscriptionCurrentPeriodEnd &&
-                new Date(firestorePlanDetails?.subscriptionCurrentPeriodStart * 1000).toISOString().split("T")[0],
-              id: firestorePlanDetails?.stripeActiveSubscriptionID,
-            },
-            type: firestorePlanDetails?.type,
-          };
-
-          console.log("[debug] plandetails", { planDetails });
+          const planDetails = newSchemaToOldSchemaAdapter(firestorePlanDetails);
           const isUserPremium = isPremiumUser(planDetails);
 
           // Update global state

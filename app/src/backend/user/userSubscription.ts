@@ -10,7 +10,6 @@ export const getUserSubscription = async (uid: string): Promise<UserSubscription
 
   if (snapshot.exists()) {
     const data = snapshot.data() as UserSubscription;
-    console.log("[debug] data from firestore", data);
     return data;
   } else {
     return null;
