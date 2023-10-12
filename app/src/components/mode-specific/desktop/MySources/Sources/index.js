@@ -31,6 +31,9 @@ import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshoo
 import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
+import { CUSTOM_LAUNCH_CONSTANTS } from "./launchConstants";
+import LaunchButtonDropdown from "./InstructionsModal/LaunchButtonDropDown";
+// import Search from "antd/lib/transfer/search";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -175,11 +178,19 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       if (!isAvailable) {
         return <span className="text-primary cursor-disabled">Couldn't find it on your system</span>;
       } else if (!isActive) {
-        return (
+        return CUSTOM_LAUNCH_CONSTANTS.SUPPORTED_APP_IDS[appId] ? (
+          <LaunchButtonDropdown
+            appId={appId}
+            isScanned={isScanned}
+            isAvailable={isAvailable}
+            onActivateAppClick={handleActivateAppOnClick}
+          />
+        ) : (
           <RQButton
             type="default"
             onClick={() => handleActivateAppOnClick(appId)}
             loading={!isScanned || processingApps[appId]}
+            className="launch-button"
           >
             {appId.includes("existing") ? "Open" : "Launch"}
           </RQButton>
