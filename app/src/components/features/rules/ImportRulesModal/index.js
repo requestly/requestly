@@ -90,7 +90,7 @@ const ImportRulesModal = (props) => {
         onFilesDrop={onDrop}
         loaderMessage="Processing rules..."
         isProcessing={processingDataToImport}
-        title="Drag and drop your exported file"
+        title="Drag and drop your JSON file"
       />
     );
   };
