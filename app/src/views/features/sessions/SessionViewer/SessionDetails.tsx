@@ -20,7 +20,7 @@ import {
 import { useSelector } from "react-redux";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
 import { cloneDeep } from "lodash";
-import { getConsoleLogs, getPageNavigationLogs } from "./sessionEventsUtils";
+import { getConsoleLogs, getInactiveSegments, getPageNavigationLogs } from "./sessionEventsUtils";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { RQButton } from "lib/design-system/components";
 import { removeElement } from "utils/domUtils";
@@ -31,7 +31,6 @@ import { MdOutlineReplay10 } from "@react-icons/all-files/md/MdOutlineReplay10";
 import { MdOutlineForward10 } from "@react-icons/all-files/md/MdOutlineForward10";
 import "./sessionViewer.scss";
 import PlayerFrameOverlay from "./PlayerOverlay";
-import { getInactiveSegments } from "./utils";
 
 interface SessionDetailsProps {
   isInsideIframe?: boolean;
