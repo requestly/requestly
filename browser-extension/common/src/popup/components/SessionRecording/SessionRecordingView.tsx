@@ -17,7 +17,7 @@ const SessionRecordingView: React.FC = () => {
   const [isManualMode, setIsManualMode] = useState<boolean>();
 
   const startRecordingOnClick = useCallback(() => {
-    sendEvent(EVENT.START_RECORDING_CLICKED);
+    sendEvent(EVENT.START_RECORDING_CLICKED, { type: "manual" });
     chrome.runtime.sendMessage({
       action: EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
       tabId: currentTabId,
@@ -29,7 +29,7 @@ const SessionRecordingView: React.FC = () => {
 
   const viewRecordingOnClick = useCallback(() => {
     if (isManualMode) {
-      sendEvent(EVENT.STOP_RECORDING_CLICKED, { recording_mode: isManualMode ? "manual" : "automatic" });
+      sendEvent(EVENT.STOP_RECORDING_CLICKED, { recording_mode: "manual" });
       chrome.runtime.sendMessage({
         action: EXTENSION_MESSAGES.STOP_RECORDING,
         tabId: currentTabId,
@@ -37,7 +37,7 @@ const SessionRecordingView: React.FC = () => {
       });
       setIsRecordingSession(false);
     } else {
-      sendEvent(EVENT.VIEW_RECORDING_CLICKED);
+      sendEvent(EVENT.VIEW_RECORDING_CLICKED, { recording_mode: "auto" });
       chrome.runtime.sendMessage({
         action: EXTENSION_MESSAGES.WATCH_RECORDING,
         tabId: currentTabId,
@@ -80,7 +80,7 @@ const SessionRecordingView: React.FC = () => {
         <div
           className="configure-btn"
           onClick={() => {
-            // TODO: send analytics
+            sendEvent(EVENT.SESSION_RECORDINGS_CONFIG_OPENED);
             window.open(`${config.WEB_URL}/sessions/settings?source=popup`, "_blank");
           }}
         >
