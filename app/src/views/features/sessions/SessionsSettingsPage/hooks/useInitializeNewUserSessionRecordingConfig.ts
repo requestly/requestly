@@ -17,8 +17,8 @@ export const useInitializeNewUserSessionRecordingConfig = () => {
 
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION) return;
 
-    // TODO: update release date
-    const isNewUser = dateStringToEpoch("2023-10-05") <= dateStringToEpoch(extenionInstallDate);
+    const newPopupExperienceReleaseDate = "2023-10-12"; // TODO: update release date
+    const isNewUser = dateStringToEpoch(newPopupExperienceReleaseDate) <= dateStringToEpoch(extenionInstallDate);
 
     if (!isNewUser) return;
 
