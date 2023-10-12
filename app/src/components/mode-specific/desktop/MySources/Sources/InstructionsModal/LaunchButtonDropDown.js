@@ -69,7 +69,7 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
                 <Button
                   ghost
                   size="small"
-                  type="primary"
+                  type="default"
                   onClick={() => handleActivateAppClick(appId, { launchOptions: parsedLaunchArgs })}
                   disabled={!launchArgsStrInput}
                 >
