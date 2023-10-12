@@ -4,6 +4,7 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.isInitialized = false;
   RQ.SessionRecorder.isRecording = false;
   RQ.SessionRecorder.isExplicitRecording = false;
+  RQ.SessionRecorder.notifyRecordingStarted = false;
   RQ.SessionRecorder.widgetPosition = null;
   RQ.SessionRecorder.showWidget = false;
   RQ.SessionRecorder.recordingStartTime = null;
@@ -54,7 +55,16 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const { config, previousSession, notify, explicit = false, widgetPosition, showWidget, recordingStartTime } = options;
+  const {
+    config,
+    previousSession,
+    notify,
+    explicit = false,
+    widgetPosition,
+    showWidget,
+    recordingStartTime,
+    notifyRecordingStarted = false,
+  } = options;
 
   await RQ.SessionRecorder.initialize();
 
@@ -74,6 +84,7 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
   RQ.SessionRecorder.widgetPosition = widgetPosition;
   RQ.SessionRecorder.showWidget = showWidget;
   RQ.SessionRecorder.recordingMode = explicit ? "manual" : "auto";
+  RQ.SessionRecorder.notifyRecordingStarted = notifyRecordingStarted;
 
   if (explicit) {
     RQ.SessionRecorder.recordingStartTime = recordingStartTime ?? Date.now();
@@ -114,11 +125,13 @@ RQ.SessionRecorder.addMessageListeners = () => {
     } else if (event.data.action === "sessionRecordingStarted") {
       RQ.SessionRecorder.isRecording = true;
 
-      if (RQ.SessionRecorder.showWidget) {
+      if (RQ.SessionRecorder.showWidget || RQ.SessionRecorder.notifyRecordingStarted) {
         chrome.runtime.sendMessage({
           action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
         });
+      }
 
+      if (RQ.SessionRecorder.showWidget) {
         if (RQ.SessionRecorder.isExplicitRecording) {
           RQ.SessionRecorder.showManualModeRecordingWidget();
         } else {
@@ -130,6 +143,8 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.isExplicitRecording = false;
       RQ.SessionRecorder.showWidget = false;
       RQ.SessionRecorder.recordingStartTime = null;
+      RQ.SessionRecorder.notifyRecordingStarted = false;
+
       RQ.SessionRecorder.hideManualModeWidget();
 
       chrome.runtime.sendMessage({
