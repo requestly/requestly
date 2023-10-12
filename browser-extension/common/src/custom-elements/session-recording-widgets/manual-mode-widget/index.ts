@@ -1,9 +1,9 @@
 import styles from "./index.css";
-import { getEpochToMMSSFormat, registerCustomElement, setInnerHTML } from "../utils";
-import BinIcon from "../../../resources/icons/bin.svg";
-import StopRecordingIcon from "../../../resources/icons/stopRecording.svg";
-import InfoIcon from "../../../resources/icons/info.svg";
-import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
+import { getEpochToMMSSFormat, registerCustomElement, setInnerHTML } from "../../utils";
+import BinIcon from "../../../../resources/icons/bin.svg";
+import StopRecordingIcon from "../../../../resources/icons/stopRecording.svg";
+import InfoIcon from "../../../../resources/icons/info.svg";
+import { RQDraggableWidget } from "../../abstract-classes/draggable-widget";
 
 enum RQSessionRecordingWidgetEvent {
   STOP_RECORDING = "stop",
