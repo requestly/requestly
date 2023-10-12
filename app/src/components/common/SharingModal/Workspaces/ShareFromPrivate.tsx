@@ -58,7 +58,14 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           role: TeamRole.write,
         }).then((res: any) => {
           setIsLoading(false);
-          if (res?.data?.success) trackAddTeamMemberSuccess(teamId, memberEmails, TeamRole.write, "sharing_modal");
+          if (res?.data?.success)
+            trackAddTeamMemberSuccess({
+              team_id: teamId,
+              email: memberEmails,
+              is_admin: false,
+              source: "sharing_modal",
+              num_users_added: memberEmails.length,
+            });
         });
 
         duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
