@@ -120,7 +120,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
         });
 
         if (RQ.SessionRecorder.isExplicitRecording) {
-          RQ.SessionRecorder.showRecordingWidget();
+          RQ.SessionRecorder.showManualModeRecordingWidget();
         } else {
           RQ.SessionRecorder.showAutoModeRecordingWidget();
         }
@@ -130,7 +130,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.isExplicitRecording = false;
       RQ.SessionRecorder.showWidget = false;
       RQ.SessionRecorder.recordingStartTime = null;
-      RQ.SessionRecorder.hideWidget();
+      RQ.SessionRecorder.hideManualModeWidget();
 
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -219,8 +219,8 @@ RQ.SessionRecorder.showToast = () => {
   document.documentElement.appendChild(rqToast);
 };
 
-RQ.SessionRecorder.showRecordingWidget = () => {
-  let widget = RQ.SessionRecorder.getWidget();
+RQ.SessionRecorder.showManualModeRecordingWidget = () => {
+  let widget = RQ.SessionRecorder.getManualModeWidget();
 
   if (!widget) {
     widget = document.createElement("rq-session-recording-widget");
@@ -259,12 +259,12 @@ RQ.SessionRecorder.showRecordingWidget = () => {
   );
 };
 
-RQ.SessionRecorder.hideWidget = () => {
-  const widget = RQ.SessionRecorder.getWidget();
+RQ.SessionRecorder.hideManualModeWidget = () => {
+  const widget = RQ.SessionRecorder.getManualModeWidget();
   widget?.dispatchEvent(new CustomEvent("hide"));
 };
 
-RQ.SessionRecorder.getWidget = () => {
+RQ.SessionRecorder.getManualModeWidget = () => {
   return document.querySelector("rq-session-recording-widget");
 };
 
