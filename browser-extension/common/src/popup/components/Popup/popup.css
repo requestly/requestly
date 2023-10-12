@@ -248,28 +248,6 @@
   min-height: 100px;
 }
 
-/* footer */
-.popup-footer {
-  padding: 16px;
-}
-
-.popup-footer .need-help {
-  display: inline-flex;
-  align-items: center;
-  font-size: 12px;
-  line-height: 16px;
-  text-decoration-line: underline;
-  color: var(--text-light);
-  cursor: pointer;
-}
-
-.popup-footer .need-help svg {
-  width: 16px;
-  height: 16px;
-  margin-right: 5px;
-  color: var(--text-light);
-}
-
 /* utils */
 .icon-wrapper {
   padding: 6px;
