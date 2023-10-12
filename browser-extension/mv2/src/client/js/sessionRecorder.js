@@ -114,16 +114,16 @@ RQ.SessionRecorder.addMessageListeners = () => {
     } else if (event.data.action === "sessionRecordingStarted") {
       RQ.SessionRecorder.isRecording = true;
 
-      if (!RQ.SessionRecorder.showWidget) return;
+      if (RQ.SessionRecorder.showWidget) {
+        chrome.runtime.sendMessage({
+          action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
+        });
 
-      chrome.runtime.sendMessage({
-        action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
-      });
-
-      if (RQ.SessionRecorder.isExplicitRecording) {
-        RQ.SessionRecorder.showRecordingWidget();
-      } else {
-        RQ.SessionRecorder.showAutoModeRecordingWidget();
+        if (RQ.SessionRecorder.isExplicitRecording) {
+          RQ.SessionRecorder.showRecordingWidget();
+        } else {
+          RQ.SessionRecorder.showAutoModeRecordingWidget();
+        }
       }
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
