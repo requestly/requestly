@@ -148,7 +148,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               sessionRecordingActions.setSessionRecordingMetadata({
                 sessionAttributes: tabSession.attributes,
                 name: generateDraftSessionTitle(tabSession.attributes?.url),
-                recordingMode: tabSession.recordingMode,
+                recordingMode: tabSession.recordingMode || null,
               })
             );
 
