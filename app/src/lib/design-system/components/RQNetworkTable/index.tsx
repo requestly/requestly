@@ -5,6 +5,7 @@ import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { getOffset } from "views/features/sessions/SessionViewer/NetworkLogs/helpers";
 import { RQNetworkLog } from "./types";
 import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
+import usePointerAutoScroll from "./hooks/usePointerAutoScroll";
 import "./RQNetworkTable.css";
 
 export interface RQNetworkTableProps {
@@ -27,6 +28,8 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   autoScroll = false,
 }) => {
   const [activeLogId, setActiveLogId] = useState(null);
+  const [containerRef, onScroll] = usePointerAutoScroll(activeLogId);
+
   const extraColumns: GenericNetworkTableProps<RQNetworkLog>["extraColumns"] = useMemo(
     () => [
       {
@@ -84,6 +87,9 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
         emptyView={emptyView}
         rowStyle={(log: RQNetworkLog) => (isLogPending(log) ? { opacity: 0.45 } : {})}
         autoScroll={autoScroll}
+        tableRef={containerRef}
+        onTableScroll={onScroll}
+        rowAttributes={(log: RQNetworkLog) => ({ "data-log-id": log.id })}
       />
     </div>
   );
