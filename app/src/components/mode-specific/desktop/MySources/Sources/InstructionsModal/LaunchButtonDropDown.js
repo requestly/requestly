@@ -64,9 +64,8 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
                   Cancel
                 </Button>
                 <Button
-                  ghost
                   size="small"
-                  type="default"
+                  type="primary"
                   onClick={() => handleActivateAppClick(appId, { launchOptions: parsedLaunchArgs })}
                   disabled={!launchArgsStrInput}
                 >
@@ -87,7 +86,7 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
               handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_CONSTANTS.LAUNCH_OPTIONS["unsafe-mode"] });
             }}
           >
-            <span>Launch in Unsafe Mode</span>
+            <span>Without Safety Checks</span>
           </Menu.Item>
           <Menu.Item
             key="no-cors"
@@ -97,7 +96,7 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
               handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_CONSTANTS.LAUNCH_OPTIONS["no-cors"] });
             }}
           >
-            <span>Launch without CORS</span>
+            <span>Without CORS</span>
           </Menu.Item>
           <Menu.Item
             key="custom-args"
@@ -107,7 +106,7 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
               setShowLaunchArgsInput(true);
             }}
           >
-            <span>Launch with Custom Args</span>
+            <span>With Custom Arguments</span>
           </Menu.Item>
         </div>
       )}
