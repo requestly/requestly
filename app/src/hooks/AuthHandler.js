@@ -1,11 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  checkUserBackupState,
-  getAuthData,
-  getOrUpdateUserSyncState,
-  getValueAsPromise,
-} from "actions/FirebaseActions";
+import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
 import APP_CONSTANTS from "config/constants";
 import firebaseApp from "firebase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -19,6 +14,8 @@ import { getUsername } from "backend/auth/username";
 import moment from "moment";
 import { getAndUpdateInstallationDate, getSignupDate } from "utils/Misc";
 import Logger from "lib/logger";
+import { getUserSubscription } from "backend/user/userSubscription";
+import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDocListener";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -54,12 +51,14 @@ const AuthHandler = (onComplete) => {
         });
         try {
           // Fetch plan details
-          const [planDetails, isSyncEnabled, isBackupEnabled] = await Promise.all([
-            getValueAsPromise(["userSubscriptions", user.uid, "planDetails"]),
+          const [firestorePlanDetails, isSyncEnabled, isBackupEnabled] = await Promise.all([
+            getUserSubscription(user.uid),
             getOrUpdateUserSyncState(user.uid, appMode),
             checkUserBackupState(user.uid),
           ]);
 
+          // phase-1 migration: Adaptor to convert firestore schema into old schema
+          const planDetails = newSchemaToOldSchemaAdapter(firestorePlanDetails);
           const isUserPremium = isPremiumUser(planDetails);
 
           // Update global state
