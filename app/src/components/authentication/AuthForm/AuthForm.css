@@ -6,7 +6,7 @@
   padding: 40px;
 }
 .signup-form-wrapper {
-  background: var(--background);
+  background: #19191d; /* TODO: replace this with CSS variable*/
   padding: 40px 50px;
   border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
 }
