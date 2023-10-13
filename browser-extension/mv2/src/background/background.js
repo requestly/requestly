@@ -1262,8 +1262,14 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
 
     if (sessionRecordingConfig) {
       sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
+      const recordingMode = sessionRecordingConfig?.autoRecording?.mode;
 
-      sessionRecordingData.showWidget = sessionRecordingConfig?.autoRecording?.mode === "custom";
+      sessionRecordingData.showWidget = recordingMode === "custom";
+
+      if (recordingMode === "allPages") {
+        sessionRecordingData.markRecordingIcon = false;
+      }
+
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   } else if (!sessionRecordingData.explicit) {
@@ -1385,7 +1391,7 @@ BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
     return;
   }
 
-  const sessionRecordingData = { explicit: true, showWidget, markRecordingIcon: true };
+  const sessionRecordingData = { explicit: true, showWidget };
 
   window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 

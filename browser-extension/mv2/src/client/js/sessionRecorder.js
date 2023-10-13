@@ -63,7 +63,7 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
     widgetPosition,
     showWidget,
     recordingStartTime,
-    markRecordingIcon = false,
+    markRecordingIcon = true,
   } = options;
 
   await RQ.SessionRecorder.initialize();
@@ -127,7 +127,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
 
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
-        markRecordingIcon: RQ.SessionRecorder.showWidget || RQ.SessionRecorder.markRecordingIcon,
+        markRecordingIcon: RQ.SessionRecorder.markRecordingIcon,
       });
 
       if (RQ.SessionRecorder.showWidget) {
