@@ -33,7 +33,6 @@ import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
 import { CUSTOM_LAUNCH_CONSTANTS } from "./launchConstants";
 import LaunchButtonDropdown from "./InstructionsModal/LaunchButtonDropDown";
-// import Search from "antd/lib/transfer/search";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();

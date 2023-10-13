@@ -17,7 +17,7 @@
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn,
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab-btn:hover,
 .source-tabs-container .ant-tabs-nav .ant-tabs-tab:hover {
-  color: var(--white);
+  color: var(--neutrals-white);
 }
 
 .source-tabs-container .ant-tabs-nav .ant-tabs-nav-wrap {
@@ -74,7 +74,7 @@
   margin-left: auto;
 }
 .connected-apps-modal .source-modal-footer-link:hover {
-  color: var(--white);
+  color: var(--neutrals-white);
   text-decoration: underline;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .setup-instructions-body.ant-row .ant-steps .ant-steps-item-container .ant-steps-icon {
-  color: var(--primary);
+  color: var(--blue-blue-500);
   font-size: 2.25rem;
 }
 
@@ -144,7 +144,7 @@
 
 .connected-apps-secondary-link,
 .connected-apps-secondary-link:hover {
-  color: var(--white);
+  color: var(--neutrals-white);
   text-decoration: underline;
 }
 
@@ -193,7 +193,7 @@
 }
 
 .launch-options-menu-item-active.ant-dropdown-menu-item span {
-  color: var(--white);
+  color: var(--neutrals-white);
 }
 .launch-options-menu-item.ant-dropdown-menu-item:not(.launch-options-menu-item-active) {
   background-color: transparent;
@@ -201,12 +201,12 @@
 
 .launch-options-menu-item.ant-dropdown-menu-item:not(.launch-options-menu-item-active):hover,
 .launch-options-menu-item-active.ant-dropdown-menu-item {
-  background-color: var(--hover-color);
+  background-color: var(--surface-2);
 }
 
 .launch-options-menu-item.ant-dropdown-menu-item-danger span {
   user-select: none;
-  color: var(--danger);
+  color: var(--red-red-500);
 }
 
 .launch-options-menu-item.ant-dropdown-menu-item-danger.ant-dropdown-menu-item-disabled {
@@ -221,7 +221,7 @@
   white-space: nowrap;
   max-width: 24ch;
   text-overflow: ellipsis;
-  color: var(--white);
+  color: var(--neutrals-white);
 }
 
 .launch-options-menu-item .ant-dropdown-menu-title-content span {
@@ -239,7 +239,7 @@
   width: 250px;
   max-height: 400px;
   position: relative;
-  color: var(--white);
+  color: var(--neutrals-white);
 }
 
 .launch-button {

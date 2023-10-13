@@ -19,8 +19,6 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
       setLaunchArgsStrInput("");
     }
     setShowDropdown(isVisible);
-
-    console.log("isVisible", isVisible);
   }, []);
 
   const parsedLaunchArgs = useMemo(() => {
@@ -33,7 +31,6 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
       const parsedValue = value ?? null;
       parsedArgs[parsedKey] = parsedValue;
     });
-    console.log("parsedARgs now", parsedArgs);
     return parsedArgs;
   }, [launchArgsStrInput]);
 
