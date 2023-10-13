@@ -78,6 +78,7 @@ export const RULES = {
   },
 
   CHARLES_SETTINGS: {
+    VIEWED: "charles_settings_import_viewed",
     IMPORT_STARTED: "charles_settings_import_started",
     PARSED: "charles_settings_parsed",
     IMPORT_FAILED: "charles_settings_import_failed",
