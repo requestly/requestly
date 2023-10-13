@@ -1014,7 +1014,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
-        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id);
+        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id, message.markRecordingIcon);
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
@@ -1026,11 +1026,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        BG.Methods.startRecordingExplicitly(
-          message.tabId ?? sender.tab.id,
-          message.showWidget,
-          message.notifyRecordingStarted
-        );
+        BG.Methods.startRecordingExplicitly(message.tabId ?? sender.tab.id, message.showWidget);
         break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
@@ -1177,8 +1173,10 @@ BG.Methods.getSessionRecordingConfig = async (url) => {
   return shouldRecord ? sessionRecordingConfig : null;
 };
 
-BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
-  RQ.extensionIconManager.markRecording(tabId);
+BG.Methods.onSessionRecordingStartedNotification = (tabId, markRecordingIcon = true) => {
+  if (markRecordingIcon) {
+    RQ.extensionIconManager.markRecording(tabId);
+  }
 };
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
@@ -1381,13 +1379,13 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   });
 };
 
-BG.Methods.startRecordingExplicitly = (tabId, showWidget = true, notifyRecordingStarted = true) => {
+BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
   const sessionRecordingDataExist = !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
   if (sessionRecordingDataExist) {
     return;
   }
 
-  const sessionRecordingData = { explicit: true, showWidget, notifyRecordingStarted };
+  const sessionRecordingData = { explicit: true, showWidget, markRecordingIcon: true };
 
   window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
