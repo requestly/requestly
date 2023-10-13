@@ -1014,7 +1014,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
-        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id);
+        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id, message.markRecordingIcon);
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
@@ -1173,8 +1173,10 @@ BG.Methods.getSessionRecordingConfig = async (url) => {
   return shouldRecord ? sessionRecordingConfig : null;
 };
 
-BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
-  RQ.extensionIconManager.markRecording(tabId);
+BG.Methods.onSessionRecordingStartedNotification = (tabId, markRecordingIcon = true) => {
+  if (markRecordingIcon) {
+    RQ.extensionIconManager.markRecording(tabId);
+  }
 };
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
@@ -1260,8 +1262,14 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
 
     if (sessionRecordingConfig) {
       sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
+      const recordingMode = sessionRecordingConfig?.autoRecording?.mode;
 
-      sessionRecordingData.showWidget = sessionRecordingConfig?.autoRecording?.mode === "custom";
+      sessionRecordingData.showWidget = recordingMode === "custom";
+
+      if (recordingMode === "allPages") {
+        sessionRecordingData.markRecordingIcon = false;
+      }
+
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   } else if (!sessionRecordingData.explicit) {

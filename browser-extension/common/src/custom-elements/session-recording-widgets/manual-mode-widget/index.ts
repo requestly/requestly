@@ -16,7 +16,7 @@ const EXPLICIT_RECORDING_LIMIT = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
 
 class RQSessionRecordingWidget extends RQDraggableWidget {
   #currentRecordingTime = 0;
-  #recordingTimerIntervalId: NodeJS.Timer | null;
+  #recordingTimerIntervalId: NodeJS.Timeout | null;
 
   constructor() {
     super(DEFAULT_POSITION);
