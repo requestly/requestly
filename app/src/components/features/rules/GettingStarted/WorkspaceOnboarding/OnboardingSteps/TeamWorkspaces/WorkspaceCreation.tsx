@@ -81,7 +81,13 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         .then((res: any) => {
           if (res?.data?.success) {
             toast.success("Invite sent successfully");
-            trackAddTeamMemberSuccess(defaultTeamData?.teamId ?? newTeamId, inviteEmails, makeUserAdmin, "onboarding");
+            trackAddTeamMemberSuccess({
+              team_id: defaultTeamData?.teamId ?? newTeamId,
+              email: inviteEmails,
+              is_admin: makeUserAdmin,
+              source: "onboarding",
+              num_users_added: inviteEmails.length,
+            });
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }
           setIsProcessing(false);
