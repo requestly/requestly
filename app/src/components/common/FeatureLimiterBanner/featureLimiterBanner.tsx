@@ -18,7 +18,7 @@ const FeatureLimiterBanner = () => {
   const user = useSelector(getUserAuthDetails);
   const isUserOnFreePlan =
     !user?.details?.planDetails?.planName ||
-    user?.details?.planDetails?.planName == APP_CONSTANTS.PRICING.PLAN_NAMES.FREE
+    user?.details?.planDetails?.planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE
       ? true
       : false;
   const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
