@@ -94,7 +94,13 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
             await upsertTeamCommonInvite({ teamId, domainEnabled: isNotifyAllSelected });
             if (inviteRes.data.success) {
               toast.success(`All users from ${domain} have been invited to join this workspace.`);
-              trackAddTeamMemberSuccess(teamId, user?.details?.profile?.email, true, "notify_all_teammates");
+              trackAddTeamMemberSuccess({
+                team_id: teamId,
+                emails: user?.details?.profile?.email,
+                is_admin: true,
+                source: "notify_all_teammates",
+                num_users_added: 1,
+              });
             } else {
               switch (inviteRes.data.errCode) {
                 case "no-users-in-same-domain":
