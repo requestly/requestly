@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 import { Button, Dropdown, Input, Menu, Row, Space } from "antd";
-import { CUSTOM_LAUNCH_CONSTANTS } from "../launchConstants";
+import { CUSTOM_LAUNCH_OPTIONS } from "./launchConstants";
 import { BiDotsVerticalRounded } from "@react-icons/all-files/bi/BiDotsVerticalRounded";
 import { RQButton } from "lib/design-system/components";
 import {
   trackCancelledCustomArgsLaunch,
   trackCustomLaunchOptionSelected,
 } from "modules/analytics/events/desktopApp/apps";
+import "./index.css";
 
 const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClick: handleActivateAppClick }) => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -83,7 +84,7 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
             className="launch-options-menu-item"
             onClick={() => {
               trackCustomLaunchOptionSelected(appId, "unsafe-mode");
-              handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_CONSTANTS.LAUNCH_OPTIONS["unsafe-mode"] });
+              handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_OPTIONS["unsafe-mode"] });
             }}
           >
             <span>Without Safety Checks</span>
@@ -93,7 +94,7 @@ const LaunchButtonDropdown = ({ appId, isScanned, isAvailable, onActivateAppClic
             className="launch-options-menu-item"
             onClick={() => {
               trackCustomLaunchOptionSelected(appId, "no-cors");
-              handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_CONSTANTS.LAUNCH_OPTIONS["no-cors"] });
+              handleActivateAppClick(appId, { launchOptions: CUSTOM_LAUNCH_OPTIONS["no-cors"] });
             }}
           >
             <span>Without CORS</span>

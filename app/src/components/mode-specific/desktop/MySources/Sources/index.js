@@ -31,8 +31,7 @@ import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshoo
 import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
-import { CUSTOM_LAUNCH_CONSTANTS } from "./launchConstants";
-import LaunchButtonDropdown from "./InstructionsModal/LaunchButtonDropDown";
+import LaunchButtonDropdown from "./LaunchButtonDropDown";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -173,12 +172,11 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   );
 
   const renderChangeAppStatusBtn = useCallback(
-    (appId, isScanned, isActive, isAvailable) => {
+    (appId, isScanned, isActive, isAvailable, canLaunchWithCustomArgs) => {
       if (!isAvailable) {
         return <span className="text-primary cursor-disabled">Couldn't find it on your system</span>;
       } else if (!isActive) {
-        return isFeatureCompatible(FEATURES.CUSTOM_LAUNCH_OPTIONS) &&
-          CUSTOM_LAUNCH_CONSTANTS.SUPPORTED_APP_IDS[appId] ? (
+        return isFeatureCompatible(FEATURES.CUSTOM_LAUNCH_OPTIONS) && canLaunchWithCustomArgs ? (
           <LaunchButtonDropdown
             appId={appId}
             isScanned={isScanned}
@@ -221,7 +219,15 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                 Setup Instructions
               </RQButton>
             ) : (
-              <>{renderChangeAppStatusBtn(app.id, app.isScanned, app.isActive, app.isAvailable)}</>
+              <>
+                {renderChangeAppStatusBtn(
+                  app.id,
+                  app.isScanned,
+                  app.isActive,
+                  app.isAvailable,
+                  app.canLaunchWithCustomArgs
+                )}
+              </>
             )}
           </>
         </Row>
