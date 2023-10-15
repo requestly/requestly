@@ -1,13 +1,16 @@
 import { trackEvent } from "modules/analytics";
-import { APPS } from "../constants";
+import { APPS, CUSTOM_LAUNCH_OPTIONS } from "../constants";
 
 export const trackAppDetectedEvent = (appName) => {
   const params = { app_name: appName };
   trackEvent(APPS.APP_DETECTED, params);
 };
 
-export const trackAppConnectedEvent = (appName, app_count, app_type) => {
+export const trackAppConnectedEvent = (appName, app_count, app_type, customLaunchOptions) => {
   const params = { app_name: appName, app_count, app_type };
+  if (customLaunchOptions) {
+    params.custom_launch_options = customLaunchOptions;
+  }
   trackEvent(APPS.APP_CONNECTED, params);
 };
 
@@ -34,6 +37,15 @@ export const trackConnectAppsViewed = (source) => {
 export const trackSystemWideConnected = (source) => {
   const params = { source };
   trackEvent(APPS.SYSTEMWIDE_CONNECTED, params);
+};
+
+export const trackCustomLaunchOptionSelected = (appId, launchOptionName) => {
+  const params = { app_id: appId, launch_option_name: launchOptionName };
+  trackEvent(CUSTOM_LAUNCH_OPTIONS.LAUNCH_OPTIONS_SELECTED, params);
+};
+
+export const trackCancelledCustomArgsLaunch = (appId) => {
+  trackEvent(CUSTOM_LAUNCH_OPTIONS.CUSTOM_ARGS_LAUNCH_CANCELLED, { app_id: appId });
 };
 
 export const trackAppSetupInstructionsViewed = (app_name, app_count) => {
