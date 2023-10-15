@@ -8,7 +8,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "existing-chrome": {
     "id": "existing-chrome",
@@ -41,7 +42,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "existing-chrome-beta": {
     "id": "existing-chrome-beta",
@@ -62,7 +64,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "existing-chrome-dev": {
     "id": "existing-chrome-dev",
@@ -83,7 +86,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-chromium": {
     "id": "fresh-chromium",
@@ -94,7 +98,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-chromium-dev": {
     "id": "fresh-chromium-dev",
@@ -105,7 +110,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-edge": {
     "id": "fresh-edge",
@@ -116,7 +122,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "existing-edge": {
     "id": "existing-edge",
@@ -137,7 +144,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-edge-dev": {
     "id": "fresh-edge-dev",
@@ -148,7 +156,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-edge-canary": {
     "id": "fresh-edge-canary",
@@ -159,7 +168,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-brave": {
     "id": "fresh-brave",
@@ -170,7 +180,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-opera": {
     "id": "fresh-opera",
@@ -181,7 +192,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-opera-gx": {
     "id": "fresh-opera-gx",
@@ -192,7 +204,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-opera-crypto": {
     "id": "fresh-opera-crypto",
@@ -203,7 +216,8 @@
     "isActive": false,
     "comingSoon": false,
     "isScanned": false,
-    "isAvailable": false
+    "isAvailable": false,
+    "canLaunchWithCustomArgs": true
   },
   "fresh-firefox": {
     "id": "fresh-firefox",
