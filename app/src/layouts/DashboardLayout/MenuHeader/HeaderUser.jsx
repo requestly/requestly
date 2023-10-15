@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Divider, Spin, Button, Menu } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
@@ -14,7 +14,7 @@ import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/h
 
 export default function HeaderUser() {
   const navigate = useNavigate();
-
+  const location = useLocation();
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -28,10 +28,10 @@ export default function HeaderUser() {
   const userPhoto = useMemo(
     () =>
       user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null,
-    [user.details.profile.photoURL, user.loggedIn]
+    [user?.details?.profile?.photoURL, user.loggedIn]
   );
 
-  const userEmail = useMemo(() => user?.details?.profile?.email, [user.details.profile.email]);
+  const userEmail = useMemo(() => user?.details?.profile?.email, [user?.details?.profile?.email]);
 
   // Component State
   const [loading, setLoading] = useState(false);
@@ -39,12 +39,19 @@ export default function HeaderUser() {
 
   useEffect(() => {
     Object.values(APP_CONSTANTS.PATHS.AUTH).forEach((AUTH_PATH) => {
+      console.log("AUTH_PATH", AUTH_PATH);
       // SO THAT USER CANNOT TRIGGER OTHER AUTH ACTIONS DURING CURRENT AUTH FLOW
-      if (window.location.pathname === AUTH_PATH.ABSOLUTE) {
-        setHideUserDropdown(true);
-      }
+      // if (location.pathname === AUTH_PATH.ABSOLUTE) {
+      //   setHideUserDropdown(true);
+      // }
     });
-  }, []);
+
+    setHideUserDropdown(
+      Object.values(APP_CONSTANTS.PATHS.AUTH).some((AUTH_PATH) => location.pathname === AUTH_PATH.ABSOLUTE)
+    );
+  }, [location]);
+
+  console.log("hideUserDropDown", hideUserDropDown);
 
   const renderUserDetails = useCallback(() => {
     const menu = (
