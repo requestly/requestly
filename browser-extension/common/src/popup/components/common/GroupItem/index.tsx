@@ -68,7 +68,7 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
       </Row>
 
       {isExpanded && (
-        <Row className="group-rules">
+        <Row>
           <Col span={24}>
             {group.children.length > 0 ? (
               group.children.map((rule: Rule) => <RuleItem key={rule.id} rule={rule} isChildren={true} />)

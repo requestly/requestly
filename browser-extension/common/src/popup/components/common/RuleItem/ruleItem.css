@@ -11,6 +11,11 @@
   height: 20px;
 }
 
+.rule-name-container.child-rule .rule-type-icons svg {
+  width: 16px;
+  height: 16px;
+}
+
 .rule-name-container .rule-name {
   white-space: nowrap;
   overflow: hidden;
