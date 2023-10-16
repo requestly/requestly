@@ -259,11 +259,8 @@
 
 /* popover */
 .ant-popover.ant-popconfirm .ant-popover-inner {
+  max-width: 424px;
   background-color: var(--background);
-}
-
-.ant-popover.ant-popconfirm .ant-popover-content {
-  margin-right: 10px;
 }
 
 /* tooltip */
