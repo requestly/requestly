@@ -31,6 +31,7 @@ import TroubleshootLink from "./InstructionsModal/common/InstructionsTroubleshoo
 import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
+import LaunchButtonDropdown from "./LaunchButtonDropDown";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
               })
             );
             dispatch(actions.updateHasConnectedApp(true));
-            trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId));
+            trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId), options?.launchOptions);
             toggle();
 
             // navigate to traffic table
@@ -171,15 +172,23 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   );
 
   const renderChangeAppStatusBtn = useCallback(
-    (appId, isScanned, isActive, isAvailable) => {
+    (appId, isScanned, isActive, isAvailable, canLaunchWithCustomArgs) => {
       if (!isAvailable) {
         return <span className="text-primary cursor-disabled">Couldn't find it on your system</span>;
       } else if (!isActive) {
-        return (
+        return isFeatureCompatible(FEATURES.CUSTOM_LAUNCH_OPTIONS) && canLaunchWithCustomArgs ? (
+          <LaunchButtonDropdown
+            appId={appId}
+            isScanned={isScanned}
+            isAvailable={isAvailable}
+            onActivateAppClick={handleActivateAppOnClick}
+          />
+        ) : (
           <RQButton
             type="default"
             onClick={() => handleActivateAppOnClick(appId)}
             loading={!isScanned || processingApps[appId]}
+            className="launch-button"
           >
             {appId.includes("existing") ? "Open" : "Launch"}
           </RQButton>
@@ -210,7 +219,15 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                 Setup Instructions
               </RQButton>
             ) : (
-              <>{renderChangeAppStatusBtn(app.id, app.isScanned, app.isActive, app.isAvailable)}</>
+              <>
+                {renderChangeAppStatusBtn(
+                  app.id,
+                  app.isScanned,
+                  app.isActive,
+                  app.isAvailable,
+                  app.canLaunchWithCustomArgs
+                )}
+              </>
             )}
           </>
         </Row>
