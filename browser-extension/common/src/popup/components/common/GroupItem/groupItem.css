@@ -24,11 +24,6 @@
   color: var(--color-secondary);
 }
 
-.group-rules .record-item .rule-type-icons.icon-wrapper svg {
-  width: 16px;
-  height: 16px;
-}
-
 .record-name-container .group-expand-icon.group-expanded svg,
 .record-name-container .group-icon-wrapper.group-expanded svg {
   color: var(--color-primary);
