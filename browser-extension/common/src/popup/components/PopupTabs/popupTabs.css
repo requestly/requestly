@@ -41,15 +41,22 @@
 }
 
 .popup-tab-badge .ant-badge-count.ant-scroll-number {
-  width: 23px;
-  height: 16px;
-  padding: 0 8px;
+  min-width: 23px;
+  min-height: 16px;
+  padding: 2px 8px;
   font-size: 12px;
   font-weight: 500;
   color: var(--text-default);
   background-color: var(--success);
   border-radius: 100px;
   border: none;
+}
+
+.popup-tab-badge .ant-badge-count.ant-scroll-number,
+.popup-tab-badge .ant-badge-count.ant-scroll-number .ant-scroll-number-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rule-type-dropdown ul.ant-dropdown-menu {

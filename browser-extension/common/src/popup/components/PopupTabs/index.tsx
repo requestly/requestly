@@ -52,7 +52,7 @@ const PopupTabs: React.FC = () => {
           <span>
             <CheckCircleOutlined />
             Executed rules
-            <Badge size="small" count={executedRulesCount} className="popup-tab-badge" />
+            <Badge size="small" count={executedRulesCount} overflowCount={20} className="popup-tab-badge" />
           </span>
         ),
         children: <ExecutedRules setExecutedRulesCount={setExecutedRulesCount} />,
