@@ -277,12 +277,12 @@
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.48);
 }
 
-.action-btn-tooltip.ant-tooltip {
+.ant-tooltip.action-btn-tooltip {
   margin-top: 3px;
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.48);
 }
 
-.action-btn-tooltip.action-btn-tooltip .ant-tooltip-inner {
+.ant-tooltip.action-btn-tooltip .ant-tooltip-inner {
   max-width: 232px;
   padding: 8px 12px;
   border-radius: var(--border-radius-sm);

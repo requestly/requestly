@@ -45,3 +45,34 @@
   line-height: 16px;
   letter-spacing: 0.4px;
 }
+
+/* tooltip */
+.ant-tooltip.action-btn-tooltip.watch-replay-btn .ant-tooltip-inner {
+  max-width: 239px;
+}
+
+.ant-tooltip .watch-replay-btn-tooltip-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ant-tooltip .watch-replay-btn-tooltip-content svg {
+  flex-shrink: 0;
+  align-self: flex-start;
+  width: 20px;
+  height: 20px;
+}
+
+.ant-tooltip .watch-replay-btn-tooltip-content button {
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  border: none;
+  text-decoration: underline;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
