@@ -1,0 +1,93 @@
+.launch-options-dropdown-cancel-btn {
+  margin-right: 8px;
+}
+
+.launch-options-dropdown-input-container {
+  padding: 6px;
+  font-size: 13px;
+  min-width: 150px;
+}
+
+.launch-options-input-title {
+  font-size: 10px;
+  font-weight: 500;
+  margin: 0 0 8px 6px;
+  letter-spacing: 1px;
+}
+
+.launch-options-dropdown-input.ant-input {
+  margin: 0 6px;
+  height: 30px;
+  width: calc(13.625rem - 25px);
+  display: inline-block;
+}
+
+.launch-options-menu-container {
+  overflow: auto;
+  max-height: 11rem;
+}
+
+.launch-options-menu-item.ant-dropdown-menu-item {
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+}
+
+.launch-options-menu-item-active.ant-dropdown-menu-item span {
+  color: var(--white);
+}
+.launch-options-menu-item.ant-dropdown-menu-item:not(.launch-options-menu-item-active) {
+  background-color: transparent;
+}
+
+.launch-options-menu-item.ant-dropdown-menu-item:not(.launch-options-menu-item-active):hover,
+.launch-options-menu-item-active.ant-dropdown-menu-item {
+  background-color: var(--surface-2);
+}
+
+.launch-options-menu-item.ant-dropdown-menu-item-danger span {
+  user-select: none;
+  color: var(--danger);
+}
+
+.launch-options-menu-item.ant-dropdown-menu-item-danger.ant-dropdown-menu-item-disabled {
+  opacity: 0.7;
+}
+
+.launch-options-menu-item .ant-dropdown-menu-title-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 24ch;
+  text-overflow: ellipsis;
+  color: var(--white);
+}
+
+.launch-options-menu-item .ant-dropdown-menu-title-content span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.launch-options-dropdown-actions {
+  font-size: 13px;
+  margin: 12px 6px 0px auto;
+}
+
+.launch-options-dropdown-menu.ant-dropdown-menu {
+  width: 250px;
+  max-height: 400px;
+  position: relative;
+  color: var(--white);
+}
+
+.launch-button {
+  width: 104px;
+  height: 30px;
+}
+
+.launch-button-with-dropdown {
+  width: 74px;
+  height: 30px;
+}
