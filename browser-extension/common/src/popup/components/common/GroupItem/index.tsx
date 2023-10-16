@@ -57,7 +57,7 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
         </Col>
 
         <Col span={2} className="icon-container">
-          <Row align="middle" justify="center">
+          <Row align="middle">
             <PinAction record={group} updateRecord={updateGroup} />
           </Row>
         </Col>
@@ -68,7 +68,7 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
       </Row>
 
       {isExpanded && (
-        <Row>
+        <Row className="group-rules">
           <Col span={24}>
             {group.children.length > 0 ? (
               group.children.map((rule: Rule) => <RuleItem key={rule.id} rule={rule} isChildren={true} />)
