@@ -23,6 +23,13 @@
 
 .primary-action-btn.ant-btn:hover,
 .primary-action-btn-small.ant-btn:hover {
+  color: var(--text-default);
+  background: var(--surface-2);
+  border: 1px solid var(--surface-3);
+}
+
+.primary-action-btn.ant-btn:active,
+.primary-action-btn-small.ant-btn:active {
   box-shadow: none;
   color: var(--neutrals-white);
   border: 1px solid var(--background);
