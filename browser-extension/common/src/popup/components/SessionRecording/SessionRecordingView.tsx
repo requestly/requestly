@@ -103,7 +103,7 @@ const SessionRecordingView: React.FC = () => {
         <Tooltip
           placement="top"
           color="#000000"
-          title="Capture mouse movement, console, network, and more."
+          title="Capture mouse movement, console, network and more."
           overlayClassName="action-btn-tooltip"
         >
           <PrimaryActionButton
