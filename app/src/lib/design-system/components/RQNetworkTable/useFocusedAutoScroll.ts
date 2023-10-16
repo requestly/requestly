@@ -30,7 +30,7 @@ const useFocusedAutoScroll = <T extends HTMLDivElement>(containerRef: RefObject<
       const recentLog = document.querySelector('[data-resource-id="' + logId + '"]');
       recentLogRef.current = recentLog;
     }
-  }, [logId, containerRef.current]);
+  }, [logId, containerRef]);
 
   return onScroll;
 };
