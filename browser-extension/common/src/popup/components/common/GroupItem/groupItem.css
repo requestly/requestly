@@ -1,8 +1,7 @@
 .group-expand-icon {
   font-size: 14px;
   cursor: pointer;
-  margin: 0 8px;
-  margin-right: 14px;
+  margin: 0 12px 0 3px;
   color: var(--text-light);
 }
 
@@ -11,7 +10,7 @@
 }
 
 .record-name-container .record-name {
-  max-width: 320px;
+  max-width: 36ch;
 }
 
 .record-name-container .group-icon-wrapper {
@@ -29,6 +28,10 @@
   color: var(--text-default);
 }
 
+.group-rules {
+  margin-left: 24px;
+}
+
 .empty-group-message {
-  margin: 6px 0 6px 68px;
+  margin-left: 68px;
 }
