@@ -1,4 +1,4 @@
-import { CSSProperties, ReactElement, useCallback, useMemo, useState } from "react";
+import { CSSProperties, ReactElement, RefObject, UIEventHandler, useCallback, useMemo, useState } from "react";
 import {
   ColorScheme,
   ContextMenuOption,
@@ -43,6 +43,10 @@ export interface GenericNetworkTableProps<NetworkLog> {
   rowStyle?: (log: NetworkLog) => CSSProperties | CSSProperties;
 
   autoScroll?: boolean;
+
+  tableRef?: RefObject<HTMLDivElement>;
+
+  onTableScroll?: UIEventHandler<HTMLElement>;
 }
 
 /**
@@ -59,6 +63,8 @@ export const GenericNetworkTable = <NetworkLog,>({
   emptyView,
   rowStyle,
   autoScroll = false,
+  tableRef,
+  onTableScroll,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
   const [filters, setFilters] = useState<NetworkFilters>({ search: "", method: [], statusCode: [] });
@@ -131,6 +137,8 @@ export const GenericNetworkTable = <NetworkLog,>({
           emptyView={emptyView}
           rowStyle={rowStyle}
           autoScroll={autoScroll}
+          tableRef={tableRef}
+          onTableScroll={onTableScroll}
         />
       </div>
     </div>

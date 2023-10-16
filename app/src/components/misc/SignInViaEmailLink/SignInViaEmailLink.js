@@ -73,7 +73,6 @@ const SignInViaEmailLink = () => {
     (emailToUseForLogin) => {
       const loginEmail = emailToUseForLogin;
       if (loginEmail) {
-        console.log("hit here somehow");
         setIsProcessing(true);
         if (user.loggedIn) {
           renderAlreadyLoggedInWarning();
