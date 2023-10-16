@@ -42,8 +42,6 @@ export interface GenericNetworkTableProps<NetworkLog> {
 
   rowStyle?: (log: NetworkLog) => CSSProperties | CSSProperties;
 
-  rowAttributes?: (log: NetworkLog) => object | object;
-
   autoScroll?: boolean;
 
   tableRef?: RefObject<HTMLDivElement>;
@@ -67,7 +65,6 @@ export const GenericNetworkTable = <NetworkLog,>({
   autoScroll = false,
   tableRef,
   onTableScroll,
-  rowAttributes,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
   const [filters, setFilters] = useState<NetworkFilters>({ search: "", method: [], statusCode: [] });
@@ -142,7 +139,6 @@ export const GenericNetworkTable = <NetworkLog,>({
           autoScroll={autoScroll}
           tableRef={tableRef}
           onTableScroll={onTableScroll}
-          rowAttributes={rowAttributes}
         />
       </div>
     </div>
