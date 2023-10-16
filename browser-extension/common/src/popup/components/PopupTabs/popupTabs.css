@@ -59,6 +59,7 @@
 .rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item {
   padding: 12px 14px;
 }
+
 .rule-type-dropdown ul.ant-dropdown-menu .ant-dropdown-menu-item .ant-dropdown-menu-title-content {
   font-size: 14px;
   display: flex;
@@ -81,7 +82,7 @@
 }
 
 .popup-tabs-wrapper .empty-tab-view-container {
-  height: 185px;
+  height: 235px;
 }
 
 .empty-tab-view-title {
