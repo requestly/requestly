@@ -260,7 +260,6 @@
 /* popover */
 .ant-popover.ant-popconfirm .ant-popover-inner {
   max-width: 424px;
-  background-color: var(--background);
 }
 
 /* tooltip */

@@ -92,6 +92,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
           <Popconfirm
             trigger="hover"
             placement="topRight"
+            color="#000000"
             disabled={!isGroupInactive}
             title={
               <span>
