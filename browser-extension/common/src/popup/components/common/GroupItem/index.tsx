@@ -62,7 +62,7 @@ const GroupItem: React.FC<GroupItemProps> = ({ group }) => {
           </Row>
         </Col>
 
-        <Col span={3} className="record-switch-container">
+        <Col span={3}>
           <Switch checkedChildren="ON" unCheckedChildren="OFF" onChange={handleToggleStatus} checked={isGroupActive} />
         </Col>
       </Row>
