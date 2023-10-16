@@ -277,8 +277,7 @@
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.48);
 }
 
-.ant-tooltip.action-btn-tooltip {
-  margin-top: 3px;
+.action-btn-tooltip.ant-tooltip {
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.48);
 }
 
