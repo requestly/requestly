@@ -27,7 +27,7 @@ const usePointerAutoScroll = <T extends HTMLDivElement>(
 
   useEffect(() => {
     if (containerRef.current && autoScrollRef.current && activeLogRef.current) {
-      containerRef.current.scrollTop = activeLogRef.current.offsetTop;
+      containerRef.current.scrollTop = activeLogRef.current.offsetTop - 50;
     }
     if (logId) {
       const activeLog = document.querySelector('[data-log-id="' + logId + '"]');
