@@ -16,7 +16,12 @@ import SSLProxyingModal from "components/mode-specific/desktop/SSLProxyingModal"
 import { convertProxyLogToUILog } from "./utils/logUtils";
 import APPNAMES from "./Tables/GROUPBYAPP_CONSTANTS";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
-import { getAllFilters, getAllLogs, getLogResponseById } from "store/features/desktop-traffic-table/selectors";
+import {
+  getAllFilters,
+  getAllLogs,
+  getIsInterceptionPaused,
+  getLogResponseById,
+} from "store/features/desktop-traffic-table/selectors";
 import Logger from "lib/logger";
 import { getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
@@ -38,7 +43,6 @@ import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode"
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { doesStatusCodeMatchLabels } from "./utils";
-import { track } from "@amplitude/analytics-browser";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 
@@ -59,14 +63,13 @@ const CurrentTrafficTable = ({
   const newLogs = useSelector(getAllLogs);
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
+  const isInterceptingTraffic = !useSelector(getIsInterceptionPaused);
 
   // Component State
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
-
-  const [isInterceptingTraffic, setIsInterceptingTraffic] = useState(true);
 
   const selectedRequestResponse =
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
@@ -544,7 +547,6 @@ const CurrentTrafficTable = ({
               isFiltersCollapsed={isFiltersCollapsed}
               showDeviceSelector={showDeviceSelector}
               setIsFiltersCollapsed={setIsFiltersCollapsed}
-              setIsInterceptingTraffic={setIsInterceptingTraffic}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
             >
               {isStaticPreview ? (
