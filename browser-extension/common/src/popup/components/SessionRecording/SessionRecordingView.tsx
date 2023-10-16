@@ -6,6 +6,7 @@ import SettingIcon from "../../../../resources/icons/setting.svg";
 import PlayRecordingIcon from "../../../../resources/icons/playRecording.svg";
 import StopRecordingIcon from "../../../../resources/icons/stopRecording.svg";
 import ReplayLastFiveMinuteIcon from "../../../../resources/icons/replayLastFiveMinute.svg";
+import InfoIcon from "../../../../resources/icons/info.svg";
 import ShieldIcon from "../../../../resources/icons/shield.svg";
 import config from "../../../config";
 import { EVENT, sendEvent } from "../../events";
@@ -15,6 +16,8 @@ const SessionRecordingView: React.FC = () => {
   const [currentTabId, setCurrentTabId] = useState<number>();
   const [isRecordingSession, setIsRecordingSession] = useState<boolean>();
   const [isManualMode, setIsManualMode] = useState<boolean>();
+  const isRecordingInManualMode = isRecordingSession && isManualMode;
+  const isRecordingInAutoMode = isRecordingSession && !isManualMode;
 
   const startRecordingOnClick = useCallback(() => {
     sendEvent(EVENT.START_RECORDING_CLICKED, { type: "manual" });
@@ -70,20 +73,29 @@ const SessionRecordingView: React.FC = () => {
     }
   }, [currentTabId]);
 
-  const isRecordingInManualMode = isRecordingSession && isManualMode;
-  const isRecordingInAutoMode = isRecordingSession && !isManualMode;
+  const handleConfigureBtnClick = useCallback(() => {
+    sendEvent(EVENT.SESSION_RECORDINGS_CONFIG_OPENED);
+    window.open(`${config.WEB_URL}/sessions/settings?source=popup`, "_blank");
+  }, []);
+
+  const watchReplayBtnTooltipContent =
+    isRecordingInManualMode || !isRecordingSession ? (
+      <div className="watch-replay-btn-tooltip-content">
+        <InfoIcon />
+        <div>
+          <span>Auto recording is disabled. Please enable it in session replay settings.</span>{" "}
+          <button onClick={handleConfigureBtnClick}>Enable now</button>
+        </div>
+      </div>
+    ) : (
+      <>Instantly play last 5 min auto recorded session for this tab.</>
+    );
 
   return (
     <div className="session-view-content">
       <Row align="middle" justify="space-between">
         <div className="title">Record session for sharing & debugging</div>
-        <div
-          className="configure-btn"
-          onClick={() => {
-            sendEvent(EVENT.SESSION_RECORDINGS_CONFIG_OPENED);
-            window.open(`${config.WEB_URL}/sessions/settings?source=popup`, "_blank");
-          }}
-        >
+        <div className="configure-btn" onClick={handleConfigureBtnClick}>
           <SettingIcon /> Configure
         </div>
       </Row>
@@ -108,17 +120,19 @@ const SessionRecordingView: React.FC = () => {
         <Tooltip
           placement="top"
           color="#000000"
-          title="Instantly play last 5 min auto recorded session for this tab."
-          overlayClassName="action-btn-tooltip"
+          title={watchReplayBtnTooltipContent}
+          overlayClassName="action-btn-tooltip watch-replay-btn"
         >
-          <PrimaryActionButton
-            block
-            icon={<ReplayLastFiveMinuteIcon />}
-            disabled={isRecordingInManualMode || !isRecordingSession}
-            onClick={viewRecordingOnClick}
-          >
-            Watch last 5 min replay
-          </PrimaryActionButton>
+          <span>
+            <PrimaryActionButton
+              block
+              icon={<ReplayLastFiveMinuteIcon />}
+              disabled={isRecordingInManualMode || !isRecordingSession}
+              onClick={viewRecordingOnClick}
+            >
+              Watch last 5 min replay
+            </PrimaryActionButton>
+          </span>
         </Tooltip>
       </Row>
       <div className="session-replay-security-msg">
