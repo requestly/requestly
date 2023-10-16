@@ -19,9 +19,14 @@
 }
 
 .record-name-container .group-icon-wrapper svg {
-  color: var(--text-deafult);
   width: 20px;
   height: 20px;
+  color: var(--text-default);
+}
+
+.group-rules .record-item .rule-type-icons.icon-wrapper svg {
+  width: 16px;
+  height: 16px;
 }
 
 .empty-group-message {

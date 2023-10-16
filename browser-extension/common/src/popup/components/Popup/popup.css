@@ -191,22 +191,18 @@
   margin-left: 42px;
 }
 
-.record-name-container.link,
+.record-name-container.link {
+  color: var(--text-default);
+}
+
 .rule-name-container .rule-type-icons.icon-wrapper svg {
-  color: var(--blue-400);
+  color: var(--color-secondary);
 }
 
 .record-name-container.link:hover {
   text-decoration-line: underline;
-  text-decoration-color: var(--blue-400);
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
-}
-
-.record-name-container .icon-wrapper svg {
-  width: 16px;
-  height: 16px;
-  color: var(--color-secondary);
 }
 
 .record-list {
