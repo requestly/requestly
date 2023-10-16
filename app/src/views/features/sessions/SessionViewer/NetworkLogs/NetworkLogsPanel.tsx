@@ -177,6 +177,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
               if (isOpen) trackSessionRecordingNetworkLogContextMenuOpen();
             }}
             emptyView={emptyTableView}
+            autoScroll
           />
 
           {isApiClientModalOpen && (
