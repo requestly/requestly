@@ -3,7 +3,7 @@
   cursor: pointer;
   margin: 0 8px;
   margin-right: 14px;
-  color: var(--color-secondary);
+  color: var(--text-light);
 }
 
 .record-name-container {
@@ -21,12 +21,12 @@
 .record-name-container .group-icon-wrapper svg {
   width: 20px;
   height: 20px;
-  color: var(--color-secondary);
+  color: var(--text-light);
 }
 
 .record-name-container .group-expand-icon.group-expanded svg,
 .record-name-container .group-icon-wrapper.group-expanded svg {
-  color: var(--color-primary);
+  color: var(--text-default);
 }
 
 .empty-group-message {

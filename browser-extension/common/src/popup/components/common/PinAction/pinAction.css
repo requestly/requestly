@@ -1,6 +1,6 @@
 .pin-icon {
   font-size: 15px;
-  color: var(--color-secondary);
+  color: var(--text-light);
   padding: 14px;
   cursor: pointer;
 }
