@@ -1,8 +1,15 @@
 .pin-icon {
   font-size: 15px;
-  color: var(--text-light);
-  padding: 14px;
+  padding: 10px;
   cursor: pointer;
+  color: var(--text-light);
+}
+
+.pin-icon:hover {
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: var(--background);
+  transition: background-color 0.2s ease;
 }
 
 .pin-icon.active {
