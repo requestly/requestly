@@ -36,6 +36,7 @@ export interface SessionRecordingMetadata {
   createdTs?: number;
   updatedTs?: number;
   lastUpdatedBy?: string;
+  recordingMode?: SessionRecordingMode;
 }
 
 export interface RecordingOptions {
@@ -63,4 +64,9 @@ export enum PlayerState {
   PLAYING = "playing",
   PAUSED = "paused",
   SKIPPING = "skipping",
+}
+
+export enum SessionRecordingMode {
+  AUTO = "auto",
+  MANUAL = "manual",
 }

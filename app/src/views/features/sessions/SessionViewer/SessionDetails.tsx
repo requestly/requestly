@@ -50,7 +50,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
 
   const [player, setPlayer] = useState<Replayer>();
   const [playerTimeOffset, setPlayerTimeOffset] = useState<number>(0); // in seconds
-  const [visibleConsoleLogsCount, setVisibleConsoleLogsCount] = useState(0);
   const [expandLogsPanel, setExpandLogsPanel] = useState(false);
   const [RQControllerButtonContainer, setRQControllerButtonContainer] = useState<Element>(null);
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
@@ -289,19 +288,13 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             Console
             <Badge
               size="small"
-              count={visibleConsoleLogsCount || undefined}
-              dot={visibleConsoleLogsCount === 0 && consoleLogs.length > 0}
+              count={consoleLogs.length || undefined}
+              dot={consoleLogs.length === 0 && consoleLogs.length > 0}
               style={{ margin: "0 5px" }}
             />
           </span>
         ),
-        children: (
-          <ConsoleLogsPanel
-            consoleLogs={consoleLogs}
-            playerTimeOffset={playerTimeOffset}
-            updateCount={setVisibleConsoleLogsCount}
-          />
-        ),
+        children: <ConsoleLogsPanel consoleLogs={consoleLogs} playerTimeOffset={playerTimeOffset} />,
       },
       {
         key: "networkLogs",
@@ -339,7 +332,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     consoleLogs,
     rqNetworkLogs,
     playerTimeOffset,
-    visibleConsoleLogsCount,
     networkLogs.length,
   ]);
 

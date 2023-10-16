@@ -96,7 +96,13 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
         if (res?.data?.success) {
           toast.success("Sent invites successfully");
           callback?.();
-          trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin, "add_member_modal");
+          trackAddTeamMemberSuccess({
+            team_id: teamId,
+            emails: userEmail,
+            is_admin: makeUserAdmin,
+            source: "add_member_modal",
+            num_users_added: userEmail.length,
+          });
           setIsProcessing(false);
           toggleModal();
         } else {
