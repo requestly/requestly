@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getExtensionInstallDate } from "store/selectors";
-import { dateStringToEpoch } from "utils/DateTimeUtils";
 import { AutoRecordingMode, SessionRecordingConfig } from "../../types";
 import { defaultSessionRecordingConfig } from "../";
 import { StorageService } from "init";
@@ -16,11 +15,6 @@ export const useInitializeNewUserSessionRecordingConfig = () => {
     if (!extenionInstallDate) return;
 
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION) return;
-
-    const newPopupExperienceReleaseDate = "2023-10-13"; // TODO: update release date
-    const isNewUser = dateStringToEpoch(newPopupExperienceReleaseDate) <= dateStringToEpoch(extenionInstallDate);
-
-    if (!isNewUser) return;
 
     StorageService(appMode)
       .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG)
