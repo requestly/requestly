@@ -30,6 +30,7 @@ interface DesktopTrafficTableState {
   logs: EntityState<any>;
   responses: ResponsesState; // Stores all the bodies in different state key
   filters: TrafficTableFilters;
+  isInterceptionPaused: boolean;
 }
 
 export const logsAdapter = createEntityAdapter<any>({
@@ -51,6 +52,7 @@ const initialState: DesktopTrafficTableState = {
       regex: false,
     },
   },
+  isInterceptionPaused: false,
 };
 
 const slice = createSlice({
@@ -119,6 +121,10 @@ const slice = createSlice({
         resourceType: initialState.filters.resourceType,
         statusCode: initialState.filters.statusCode,
       };
+    },
+    toggleIsInterceptionPaused: (state: DesktopTrafficTableState) => {
+      console.log("status", state.isInterceptionPaused);
+      state.isInterceptionPaused = !state.isInterceptionPaused;
     },
   },
 });
