@@ -56,7 +56,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
 
   return (
     <li>
-      <Row align="middle" className="record-item" wrap={false}>
+      <Row align="middle" className={`record-item ${isChildren ? "child-record" : ""}`} wrap={false}>
         <Col
           span={isChildren ? 21 : 19}
           className="record-name-container link"
@@ -65,7 +65,7 @@ const RuleItem: React.FC<RuleItemProps> = ({
             window.open(`${config.WEB_URL}/rules/editor/edit/${rule.id}`, "_blank");
           }}
         >
-          <Row wrap={false} align="middle" className={`rule-name-container ${isChildren ? "child-rule" : ""}`}>
+          <Row wrap={false} align="middle" className="rule-name-container">
             <Tooltip
               placement="topRight"
               title={(RULE_TITLES as any)[rule.ruleType.toUpperCase()]}

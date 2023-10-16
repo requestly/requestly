@@ -187,28 +187,30 @@
   margin-left: 6px;
 }
 
+.record-item {
+  margin-top: 4px;
+}
+
 .record-name.rule-name {
   margin-left: 42px;
 }
 
 .record-name-container.link {
+  padding: 2px;
+  border-radius: 4px;
   color: var(--text-default);
-}
-
-.rule-name-container .rule-type-icons.icon-wrapper svg {
-  color: var(--text-light);
 }
 
 .record-name-container.link:hover {
   text-decoration-line: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
+  text-underline-offset: 2px;
   background-color: var(--background);
 }
 
 .record-list {
   overflow: auto;
   height: 235px;
+  margin-left: 5px;
 }
 
 .record-list::-webkit-scrollbar {
@@ -225,12 +227,12 @@
   border-radius: var(--border-radius);
 }
 
-.record-list li {
+.record-list > li:first-child {
   margin-top: 12px;
 }
 
-.record-list .record-item {
-  height: 22px;
+.record-list > li:last-child {
+  margin-bottom: 12px;
 }
 
 .record-status-text {
