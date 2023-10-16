@@ -123,7 +123,6 @@ const slice = createSlice({
       };
     },
     toggleIsInterceptionPaused: (state: DesktopTrafficTableState) => {
-      console.log("status", state.isInterceptionPaused);
       state.isInterceptionPaused = !state.isInterceptionPaused;
     },
   },
