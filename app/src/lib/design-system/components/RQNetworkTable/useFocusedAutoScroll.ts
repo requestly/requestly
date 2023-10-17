@@ -12,6 +12,7 @@ const useFocusedAutoScroll = <T extends HTMLDivElement>(containerRef: RefObject<
       const containerBottom = container.getBoundingClientRect().bottom;
       const recentLogTop = recentLog.getBoundingClientRect().top;
       const recentLogBottom = recentLog.getBoundingClientRect().bottom;
+
       if (recentLogTop < containerTop || recentLogBottom > containerBottom) {
         // active log is not visible, stop auto scrolling
         autoScrollRef.current = false;
@@ -24,13 +25,13 @@ const useFocusedAutoScroll = <T extends HTMLDivElement>(containerRef: RefObject<
 
   useEffect(() => {
     if (containerRef.current && autoScrollRef.current && recentLogRef.current) {
-      containerRef.current.scrollTop = recentLogRef.current.offsetTop - 50;
+      containerRef.current.scrollTop = recentLogRef.current.offsetTop;
     }
     if (logId) {
       const recentLog = document.querySelector('[data-resource-id="' + logId + '"]');
       recentLogRef.current = recentLog;
     }
-  }, [logId, containerRef.current]);
+  }, [logId, containerRef]);
 
   return onScroll;
 };
