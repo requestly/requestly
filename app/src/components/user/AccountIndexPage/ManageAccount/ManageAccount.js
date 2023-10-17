@@ -7,7 +7,6 @@ import ActiveLicenseInfo from "./ActiveLicenseInfo";
 import UserInfo from "./UserInfo";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
-import DataStoreUtils from "../../../../utils/DataStoreUtils";
 import {
   redirectToDeleteAccount,
   redirectToSignDPA,
