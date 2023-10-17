@@ -18,7 +18,7 @@ import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
-import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
+import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode, validateHeaders } from "../utils";
 import "./index.css";
 import {
   trackAiResponseButtonClicked,
@@ -32,6 +32,7 @@ import { APIClient, APIClientRequest } from "components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
+import HeaderSection from "./HeaderSection";
 
 interface Props {
   isNew?: boolean;
@@ -41,6 +42,12 @@ interface Props {
   onSave: Function;
   onClose: Function;
   mockType?: MockType;
+}
+
+interface Header {
+  name: string;
+  value: string;
+  index: number;
 }
 
 const MockEditor: React.FC<Props> = ({
@@ -70,6 +77,7 @@ const MockEditor: React.FC<Props> = ({
   const [contentType, setContentType] = useState<string>(mockData.contentType);
   const [endpoint, setEndpoint] = useState<string>(mockData.endpoint);
   const [headersString, setHeadersString] = useState<string>(JSON.stringify(mockData.headers));
+  const [mappedHeader, setMappedHeader] = useState<Header[]>([]);
   const [body, setBody] = useState<string>(mockData.body);
 
   const [fileType] = useState<FileType>(mockData?.fileType || null);
@@ -77,6 +85,7 @@ const MockEditor: React.FC<Props> = ({
     name: null,
     statusCode: null,
     endpoint: null,
+    headers: [],
   });
 
   const [isAiResponseModalOpen, setIsAiResponseModalOpen] = useState(false);
@@ -103,6 +112,23 @@ const MockEditor: React.FC<Props> = ({
   useEffect(() => {
     trackMockEditorOpened(mockType);
   }, [mockType]);
+
+  useEffect(() => {
+    try {
+      const headersObject = JSON.parse(headersString);
+      const headersArray: Header[] = Object.values(headersObject);
+      const mappedHeaders = headersArray.map((header, index) => {
+        return {
+          name: header.name,
+          value: header.value,
+          index: index,
+        };
+      });
+      setMappedHeader(mappedHeaders);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [headersString]);
 
   const handleMockLatencyChange = (value: number) => {
     if (Number.isInteger(value)) {
@@ -154,6 +180,15 @@ const MockEditor: React.FC<Props> = ({
     if (statusCodeValidationError) {
       updatedErrors.statusCode = statusCodeValidationError;
       if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
+    }
+
+    const { HeaderErrors } = validateHeaders(data.headers);
+    if (HeaderErrors.length > 0) {
+      updatedErrors.headers = [];
+
+      HeaderErrors.forEach((error: { typeOfError: string; errorIndex: number }) => {
+        updatedErrors.headers.push({ indexError: error.errorIndex, valueError: error.typeOfError });
+      });
     }
 
     // TODO: Add more validations here for special characters, //, etc.
@@ -320,21 +355,73 @@ const MockEditor: React.FC<Props> = ({
     if (type === MockType.FILE) {
       return null;
     }
+
+    const createHeadersString = (headersArray: Header[]): string => {
+      const headersString: { [key: string]: Header } = {};
+
+      headersArray.forEach((header, index) => {
+        headersString[index.toString()] = {
+          name: header.name,
+          value: header.value,
+          index: index + 1,
+        };
+      });
+
+      return JSON.stringify(headersString);
+    };
+
+    const addHeader = () => {
+      const newHeader: Header = {
+        name: "",
+        value: "",
+        index: mappedHeader.length,
+      };
+      const updatedHeaders: Header[] = [...mappedHeader, newHeader];
+      setMappedHeader(updatedHeaders);
+      setHeadersString(createHeadersString(updatedHeaders));
+    };
+
+    const removeHeader = (indexNum: number) => {
+      const updatedHeaders = [...mappedHeader];
+      updatedHeaders.splice(indexNum, 1);
+
+      const updatedHeadersString = createHeadersString(updatedHeaders);
+      setHeadersString(updatedHeadersString);
+      if (errors && errors.headers && errors.headers.length > 0) {
+        const newError = errors.headers.filter((item) => {
+          if (item.indexError === indexNum) {
+            return false;
+          } else if (item.indexError > indexNum) {
+            item.indexError--;
+          }
+          return true;
+        });
+        setErrors({ ...errors, headers: newError });
+      }
+    };
+
+    const updateHeaders = (value: string, index: number, fieldToUpdate: string) => {
+      const updatedHeaders = [...mappedHeader];
+      if (fieldToUpdate === "name") {
+        updatedHeaders[index].name = value;
+      } else if (fieldToUpdate === "value") {
+        updatedHeaders[index].value = value;
+      }
+      setMappedHeader(updatedHeaders);
+      setHeadersString(JSON.stringify(updatedHeaders));
+    };
+
     return (
-      <Row className="editor-row">
-        <Col span={24}>
-          {/* @ts-ignore */}
-          <CodeEditor
-            height={220}
-            language="json"
-            value={headersString}
-            readOnly={false}
-            handleChange={setHeadersString}
-          />
-        </Col>
-      </Row>
+      <HeaderSection
+        mappedHeader={mappedHeader}
+        //@ts-ignore
+        errors={errors}
+        updateHeaders={updateHeaders}
+        removeHeader={removeHeader}
+        addHeader={addHeader}
+      />
     );
-  }, [headersString, type]);
+  }, [type, mappedHeader, errors]);
 
   const renderBodyRow = useCallback((): ReactNode => {
     return (
