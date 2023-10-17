@@ -45,7 +45,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const playerContainer = useRef<HTMLDivElement>();
   const currentTimeRef = useRef<number>(0);
   const offsetTimeRef = useRef<number>(startTimeOffset ?? 0);
-  const isSkippingInactivity = useRef(false);
+  const isPlayerSkippingInactivity = useRef(false);
   const skipInactiveSegments = useRef(true);
 
   const [player, setPlayer] = useState<Replayer>();
@@ -162,26 +162,39 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     };
   }, [player]);
 
+  const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
+
+  const resetPlayerSkippingState = () => {
+    clearTimeout(skippingTimeoutRef.current);
+    setPlayerState(PlayerState.PLAYING);
+    isPlayerSkippingInactivity.current = false;
+    skippingTimeoutRef.current = null;
+  };
+
   const updateCurrentTimeHandler = useCallback(
-    ({ payload }: { payload: number }) => {
-      const currentTime = startTime + payload;
+    ({ payload: currentPlayerTime }: { payload: number }) => {
+      const currentTime = startTime + currentPlayerTime;
       currentTimeRef.current = currentTime;
-      setPlayerTimeOffset(payload / 1000); // millis -> secs
+      setPlayerTimeOffset(currentPlayerTime / 1000); // millis -> secs
 
-      if (!isSkippingInactivity.current && skipInactiveSegments.current) {
-        const skipEvent = inactiveSegments?.find(([startTime, endTime]) => {
-          return currentTime >= startTime && currentTime < endTime - 2000;
-        });
+      if (!skipInactiveSegments.current) return;
 
+      const skipEvent = inactiveSegments?.find(([startTime, endTime]) => {
+        return currentTime >= startTime && currentTime < endTime - 2000;
+      });
+
+      if (!isPlayerSkippingInactivity.current) {
         if (skipEvent) {
           setPlayerState(PlayerState.SKIPPING);
-          isSkippingInactivity.current = true;
-
-          setTimeout(() => {
+          isPlayerSkippingInactivity.current = true;
+          skippingTimeoutRef.current = setTimeout(() => {
             player.goto(skipEvent[1] - startTime - 2000);
-            setPlayerState(PlayerState.PLAYING);
-            isSkippingInactivity.current = false;
+            resetPlayerSkippingState();
           }, 2000);
+        }
+      } else {
+        if (!skipEvent) {
+          resetPlayerSkippingState();
         }
       }
     },
@@ -191,7 +204,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   const eventCastHandler = useCallback(
     (event: RRWebEventData) => {
       if (!skipInactiveSegments.current) return;
-      if (isSkippingInactivity.current) return;
+      if (isPlayerSkippingInactivity.current) return;
       // rrweb adds a delay to the events, so we need to add that delay to the timestamp to compare with the current time
       if (event.timestamp + (event.delay ?? 0) < currentTimeRef.current) return;
 
@@ -201,11 +214,10 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
 
       if (skipEvent) {
         setPlayerState(PlayerState.SKIPPING);
-        isSkippingInactivity.current = true;
-        setTimeout(() => {
+        isPlayerSkippingInactivity.current = true;
+        skippingTimeoutRef.current = setTimeout(() => {
           player.goto(skipEvent[1] - startTime - 2000);
-          setPlayerState(PlayerState.PLAYING);
-          isSkippingInactivity.current = false;
+          resetPlayerSkippingState();
         }, 2000);
       }
     },
@@ -213,7 +225,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   );
 
   const playerStateChangeHandler = useCallback((event: { payload: PlayerState }) => {
-    if (isSkippingInactivity.current) {
+    if (isPlayerSkippingInactivity.current) {
       setPlayerState(PlayerState.SKIPPING);
     } else {
       setPlayerState(event.payload);
