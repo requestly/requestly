@@ -201,11 +201,23 @@ const WorkspaceSelector = () => {
 
   const handleJoinWorkspaceMenuItemClick = () => {
     if (user.loggedIn) {
-      dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "joinWorkspaceModal",
+          newValue: true,
+          newProps: { source: "workspaces_dropdown" },
+        })
+      );
       trackWorkspaceJoiningModalOpened(teamInvites?.length, "workspaces_dropdown");
     } else {
       promptUserSignupModal(() => {
-        dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true }));
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "joinWorkspaceModal",
+            newValue: true,
+            newProps: { source: "workspaces_dropdown" },
+          })
+        );
         trackWorkspaceJoiningModalOpened(teamInvites?.length, "workspaces_dropdown");
       }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }

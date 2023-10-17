@@ -11,6 +11,7 @@ import AcceptTeamInvite from "components/user/Teams/AcceptTeamInvite";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { Home } from "components/landing/Home";
 import AppSumoModal from "components/landing/Appsumo/Appsumo";
+import { ImportFromCharlesWrapperView } from "components/features/rules/ImportFromCharlesModal";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -49,6 +50,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.ACCEPT_TEAM_INVITE.RELATIVE,
     element: <ProtectedRoute component={AcceptTeamInvite} />,
+  },
+  {
+    path: PATHS.IMPORT_FROM_CHARLES.RELATIVE,
+    element: <ImportFromCharlesWrapperView />,
   },
   {
     path: PATHS.HOME.RELATIVE,

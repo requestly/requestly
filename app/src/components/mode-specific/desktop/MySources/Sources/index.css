@@ -118,7 +118,7 @@
 }
 
 .setup-instructions-body.ant-row .ant-steps .ant-steps-item-container .ant-steps-icon {
-  color: var(--primary);
+  color: var(--brand-color);
   font-size: 2.25rem;
 }
 

@@ -5,7 +5,6 @@ import { getAppMode, getUserAuthDetails } from "../../store/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
-import userSubscriptionNodeListener from "./userSubscriptionNodeListener";
 import { teamsActions } from "store/features/teams/slice";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import { getAuth } from "firebase/auth";
@@ -14,6 +13,7 @@ import Logger from "lib/logger";
 import { actions } from "store";
 import { isArray } from "lodash";
 import { useHasChanged } from "hooks/useHasChanged";
+import { userSubscriptionDocListener } from "./userSubscriptionDocListener";
 
 window.isFirstSyncComplete = false;
 
@@ -34,8 +34,7 @@ const DBListeners = () => {
     if (unsubscribeUserNodeRef.current) unsubscribeUserNodeRef.current(); // Unsubscribe existing user node listener before creating a new one
     if (user?.loggedIn) {
       unsubscribeUserNodeRef.current = userNodeListener(dispatch, user?.details?.profile.uid, appMode);
-
-      userSubscriptionNodeListener(dispatch, user?.loggedIn);
+      userSubscriptionDocListener(dispatch, user?.details?.profile.uid);
     }
   }, [dispatch, user?.details?.profile.uid, user?.loggedIn, appMode]);
 
