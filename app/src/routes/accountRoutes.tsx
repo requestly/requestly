@@ -6,7 +6,6 @@ import PersonalSubscription from "components/user/AccountIndexPage/ManageAccount
 import UpdateSubscriptionContactUs from "components/payments/UpdateSubscriptionContactUs";
 import RefreshSubscription from "components/payments/RefreshSubscription";
 import UpdatePaymentMethod from "components/payments/UpdatePaymentMethod";
-import BackupPage from "components/user/BackupPage";
 import ManageAccount from "components/user/AccountIndexPage/ManageAccount";
 import TeamViewer from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer";
 import APP_CONSTANTS from "config/constants";
@@ -62,22 +61,8 @@ export const accountRoutes: RouteObject[] = [
     element: <ProtectedRoute component={ManageAccount} />,
   },
   {
-    path: PATHS.ACCOUNT.MY_BACKUPS.RELATIVE,
-    element: (
-      <ProtectedRoute
-        premiumRequired
-        component={BackupPage}
-        premiumMessage="Get Requestly Premium to auto backup your data at periodic intervals so that you don't ever lose them while switching devices."
-      />
-    ),
-  },
-  {
     path: PATHS.ACCOUNT.RELATIVE,
     element: <Navigate to={PATHS.ACCOUNT.MY_ACCOUNT.ABSOLUTE} />,
-  },
-  {
-    path: PATHS.BACKUP.RELATIVE,
-    element: <Navigate to={PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE} />,
   },
   {
     path: PATHS.ACCOUNT.SUPPORT.RELATIVE,

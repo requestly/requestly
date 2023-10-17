@@ -14,3 +14,7 @@ export const getLogResponseById = (id: string) => (state: any) => {
 export const getAllFilters = (state: RootState) => {
   return state[storeKey].filters;
 };
+
+export const getIsInterceptionPaused = (state: RootState) => {
+  return state[storeKey].isInterceptionPaused;
+};
