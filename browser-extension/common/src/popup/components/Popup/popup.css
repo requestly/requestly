@@ -202,8 +202,6 @@
 }
 
 .record-name-container.link:hover {
-  text-decoration-line: underline;
-  text-underline-offset: 2px;
   background-color: var(--background);
 }
 
