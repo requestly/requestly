@@ -16,7 +16,9 @@ class RQSessionRecordingAutoModeWidget extends RQDraggableWidget {
     super(DEFAULT_POSITION);
     this.shadowRoot = this.attachShadow({ mode: "closed" });
     setInnerHTML(this.shadowRoot, this._getDefaultMarkup());
+
     this.show = this.show.bind(this);
+    this.hide = this.hide.bind(this);
   }
 
   connectedCallback() {
@@ -34,6 +36,8 @@ class RQSessionRecordingAutoModeWidget extends RQDraggableWidget {
     this.addEventListener("show", (evt: CustomEvent) => {
       this.show(evt.detail?.position);
     });
+
+    this.addEventListener("hide", this.hide);
   }
 
   triggerEvent(name: RQSessionAutoModeRecordingWidgetEvent, detail?: unknown) {
@@ -55,6 +59,15 @@ class RQSessionRecordingAutoModeWidget extends RQDraggableWidget {
   show(position = DEFAULT_POSITION) {
     this.moveToPostion(position);
     this.setAttribute("draggable", "true");
+    this.getContainer().classList.add("visible");
+  }
+
+  hide() {
+    this.getContainer().classList.remove("visible");
+  }
+
+  getContainer() {
+    return this.shadowRoot.getElementById("container");
   }
 }
 
