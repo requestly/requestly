@@ -145,6 +145,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.markRecordingIcon = false;
 
       RQ.SessionRecorder.hideManualModeWidget();
+      RQ.SessionRecorder.hideAutoModeWidget();
 
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -309,4 +310,9 @@ RQ.SessionRecorder.showAutoModeRecordingWidget = () => {
       },
     })
   );
+};
+
+RQ.SessionRecorder.hideAutoModeWidget = () => {
+  let widget = document.querySelector("rq-session-recording-auto-mode-widget");
+  widget?.dispatchEvent(new CustomEvent("hide"));
 };
