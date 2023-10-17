@@ -35,14 +35,15 @@
           justify-content: center;
           align-items: center;
           position: absolute;
-          color: rgba(0, 0, 0, 0.6);
+          color: rgba(255, 255, 255, 0.8);
           font-size: 4rem;
           .blur {
             height: 100%;
             width: 100%;
             position: absolute;
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(4px);
             z-index: 1;
+            background-color: rgba(0, 0, 0, 0.4);
           }
           .overlay-content {
             z-index: 10;
