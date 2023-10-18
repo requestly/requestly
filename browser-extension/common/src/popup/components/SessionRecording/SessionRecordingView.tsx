@@ -17,7 +17,6 @@ const SessionRecordingView: React.FC = () => {
   const [isRecordingSession, setIsRecordingSession] = useState<boolean>();
   const [isManualMode, setIsManualMode] = useState<boolean>();
   const isRecordingInManualMode = isRecordingSession && isManualMode;
-  const isRecordingInAutoMode = isRecordingSession && !isManualMode;
 
   const startRecordingOnClick = useCallback(() => {
     sendEvent(EVENT.START_RECORDING_CLICKED, { type: "manual" });
@@ -108,7 +107,6 @@ const SessionRecordingView: React.FC = () => {
         >
           <PrimaryActionButton
             block
-            disabled={isRecordingInAutoMode}
             className={isRecordingInManualMode ? "stop-btn" : ""}
             icon={isRecordingInManualMode ? <StopRecordingIcon /> : <PlayRecordingIcon />}
             onClick={isRecordingInManualMode ? viewRecordingOnClick : startRecordingOnClick}
