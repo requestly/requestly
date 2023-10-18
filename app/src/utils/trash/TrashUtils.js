@@ -46,13 +46,15 @@ export const addRecordsToTrash = async (uid, records) => {
 
     records.forEach(async (recordData) => {
       const record = { ...recordData };
-      record.deletedDate = deletedDate;
-      record.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
-      record.status = GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE;
+      if (record.objectType === GLOBAL_CONSTANTS.OBJECT_TYPES.RULE) {
+        record.deletedDate = deletedDate;
+        record.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
+        record.status = GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE;
 
-      const recordRef = doc(collection(database, `trash/${uid}/rules`), record.id);
+        const recordRef = doc(collection(database, `trash/${uid}/rules`), record.id);
 
-      batch.set(recordRef, record);
+        batch.set(recordRef, record);
+      }
     });
 
     await batch.commit();

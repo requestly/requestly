@@ -42,6 +42,7 @@ export const BUSINESS = {
   TRIAL_MODE_EXPIRED_UPGRADE_BUTTON_CLICKED: "trial_mode_expired_upgrade_button_clicked",
   UPGRADE_CLICKED: "upgrade_clicked",
   VIEW_GITHUB_CLICKED: "view_github_clicked",
+  APPSUMO_CODE_REDEEMED: "appsumo_code_redeemed",
 };
 
 export const INTEREST_CAPTURED = "interest_captured";

@@ -15,7 +15,7 @@ export const PricingFeatures = {
           enabled: true,
         },
         {
-          title: "Unlimited header modification",
+          title: "Unlimited header modifications",
           enabled: true,
         },
         {
@@ -36,6 +36,10 @@ export const PricingFeatures = {
         },
         {
           title: "Community Support",
+          enabled: true,
+        },
+        {
+          title: "Non-Commercial Use Only",
           enabled: true,
         },
       ],

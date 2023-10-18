@@ -21,6 +21,7 @@ import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { DRAFT_SESSION_VIEWED_SOURCE } from "./constants";
 import {
   trackDraftSessionDiscarded,
   trackDraftSessionViewed,
@@ -28,7 +29,11 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./sessionViewer.scss";
 import LINKS from "config/constants/sub/links";
-import { trackTestRuleSessionDraftSaved, trackTroubleshootClicked } from "modules/analytics/events/features/ruleEditor";
+import {
+  trackTestRuleSessionDraftViewed,
+  trackTroubleshootClicked,
+} from "modules/analytics/events/features/ruleEditor";
+import { SessionRecordingMode } from "./types";
 
 export interface DraftSessionViewerProps {
   testRuleDraftSession?: {
@@ -37,9 +42,13 @@ export interface DraftSessionViewerProps {
     closeModal: () => void;
     appliedRuleStatus: boolean;
   };
+  source?: string;
 }
 
-const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSession }) => {
+const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
+  testRuleDraftSession,
+  source = DRAFT_SESSION_VIEWED_SOURCE.DEFAULT,
+}) => {
   const tabId = useParams().tabId ?? testRuleDraftSession.draftSessionTabId;
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -48,6 +57,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const isImportedSession = tabId === "imported";
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
@@ -107,12 +117,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
   }, [navigate, isImportedSession, sessionRecordingMetadata]);
 
   useEffect(() => {
-    trackDraftSessionViewed();
-
-    if (testRuleDraftSession) {
-      trackTestRuleSessionDraftSaved();
-    }
-
     setIsLoading(true);
 
     if (tabId === "imported") {
@@ -132,7 +136,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
         if (typeof payload === "string") {
           setLoadingError(payload);
         } else {
-          const tabSession = payload as RQSession;
+          const tabSession = payload as RQSession & { recordingMode?: SessionRecordingMode };
           if (!tabSession) {
             return;
           }
@@ -144,6 +148,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
               sessionRecordingActions.setSessionRecordingMetadata({
                 sessionAttributes: tabSession.attributes,
                 name: generateDraftSessionTitle(tabSession.attributes?.url),
+                recordingMode: tabSession.recordingMode || null,
               })
             );
 
@@ -154,7 +159,15 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession]);
+  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession, source]);
+
+  useEffect(() => {
+    trackDraftSessionViewed(source, sessionRecordingMetadata?.recordingMode);
+
+    if (testRuleDraftSession) {
+      trackTestRuleSessionDraftViewed();
+    }
+  }, [sessionRecordingMetadata?.recordingMode, source, testRuleDraftSession]);
 
   const confirmDiscard = useCallback(() => {
     setIsDiscardSessionClicked(true);
@@ -215,6 +228,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ testRuleDraftSe
               onClose={() => setIsSavePopupVisible(false)}
               setIsSaveSessionClicked={setIsSaveSessionClicked}
               testRuleDraftSession={testRuleDraftSession}
+              source={source}
             />
           )}
         </div>

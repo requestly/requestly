@@ -36,12 +36,18 @@ interface Props {
   onClose: (e?: React.MouseEvent) => void;
   setIsSaveSessionClicked?: (value: boolean) => void;
   testRuleDraftSession?: DraftSessionViewerProps["testRuleDraftSession"];
+  source?: string;
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionClicked, testRuleDraftSession }) => {
+const SaveRecordingConfigPopup: React.FC<Props> = ({
+  onClose,
+  setIsSaveSessionClicked,
+  testRuleDraftSession,
+  source,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { tabId } = useParams();
@@ -123,16 +129,19 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
         workspace?.id,
         sessionRecordingMetadata,
         compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
-        recordingOptionsToSave
+        recordingOptionsToSave,
+        source
       ).then((response) => {
         if (response?.success) {
           onClose();
           toast.success("Recording saved successfully");
-          trackDraftSessionSaved(
-            sessionRecordingMetadata?.sessionAttributes?.duration,
-            recordingOptionsToSave,
-            SessionSaveMode.ONLINE
-          );
+          trackDraftSessionSaved({
+            session_length: sessionRecordingMetadata?.sessionAttributes?.duration,
+            options: recordingOptionsToSave,
+            type: SessionSaveMode.ONLINE,
+            source,
+            recording_mode: sessionRecordingMetadata?.recordingMode,
+          });
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
           trackSessionsCreatedCount();
           if (testRuleDraftSession) {
@@ -172,6 +181,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       testRuleDraftSession,
       appMode,
       navigate,
+      source,
     ]
   );
 
@@ -184,6 +194,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
         name: sessionRecordingMetadata.name,
         options: { ...recordingOptionsToSave },
         sessionAttributes: { ...sessionRecordingMetadata.sessionAttributes },
+        recordingMode: sessionRecordingMetadata?.recordingMode || null,
       };
 
       prepareSessionToExport(events, metadata)
@@ -192,11 +203,13 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
           toast.success("Recording downloaded successfully.");
           onClose();
           setIsSaving(false);
-          trackDraftSessionSaved(
-            sessionRecordingMetadata.sessionAttributes?.duration,
-            recordingOptionsToSave,
-            SessionSaveMode.LOCAL
-          );
+          trackDraftSessionSaved({
+            session_length: sessionRecordingMetadata?.sessionAttributes?.duration,
+            options: recordingOptionsToSave,
+            type: SessionSaveMode.LOCAL,
+            source,
+            recording_mode: sessionRecordingMetadata?.recordingMode,
+          });
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.LOCAL);
           trackSessionsCreatedCount(true);
         });
@@ -208,6 +221,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({ onClose, setIsSaveSessionCl
       onClose,
       trackSessionsCreatedCount,
       testRuleDraftSession,
+      source,
     ]
   );
 

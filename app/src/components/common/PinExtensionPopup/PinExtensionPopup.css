@@ -1,0 +1,152 @@
+.pin-extension-popup-container.rq-modal.ant-modal {
+  margin: 0px;
+  top: 16px;
+  left: calc(100% - 373px - 16px); /* whole screen - container width - spacing */
+  transform-origin: top right !important;
+  min-width: 370px !important;
+}
+
+.pin-extension-popup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--component-background);
+}
+
+.pin-extension-popup .title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 27px;
+}
+
+.pin-extension-popup .title span {
+  position: relative;
+}
+
+.pin-extension-popup .title span svg {
+  position: absolute;
+  top: 24px;
+  left: -6px;
+  width: 114px;
+  height: 6px;
+}
+
+.pin-extension-popup img {
+  max-inline-size: 100%;
+  block-size: auto;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  background-color: var(--component-background);
+}
+
+.pin-extension-popup .pin-extension-gif {
+  width: 338px;
+  height: 195.58px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-dark);
+}
+
+.pin-extension-popup .subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 21px;
+  margin-bottom: 8px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item {
+  padding: 12px 0;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--gray-dark);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header {
+  height: 16px;
+  display: flex;
+  align-items: center;
+  padding-left: 0;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text span.header-text {
+  color: var(--white);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-arrow {
+  right: 12px;
+  color: var(--text-gray);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .header-down-caret {
+  transition: transform 0.3s;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .header-down-caret.rotate {
+  transform: rotate(180deg) translateY(6px);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text {
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text > div {
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text > div > svg {
+  width: 14px;
+  height: 15px;
+  color: var(--text-gray);
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .ant-collapse-content .ant-collapse-content-box {
+  padding: 8px 12px 0 12px;
+}
+
+.pin-extension-popup .ant-collapse .ant-collapse-item .feature-gif {
+  height: 169px;
+  border-radius: var(--border-radius-sm);
+}
+
+.pin-extension-popup .action-btns {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.pin-extension-popup .action-btns .ant-btn {
+  padding: 0;
+  height: 16px;
+  color: var(--white);
+  font-family: Roboto;
+  font-size: 14px;
+  line-height: 16px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pin-extension-popup .action-btns .ant-btn:hover {
+  opacity: 0.7;
+}
+
+.pin-extension-popup .action-btns .ant-btn svg {
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  color: var(--text-gray);
+}

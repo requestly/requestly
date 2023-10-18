@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import {
   CheckOutlined,
   CloseOutlined,
@@ -30,15 +29,13 @@ import {
   getIsRefreshRulesPending,
   getRulesSearchKeyword,
   getRulesSelection,
+  getGroupsSelection,
   getRulesToPopulate,
   getUserAuthDetails,
-  getUserAttributes,
-  getIsMiscTourCompleted,
 } from "store/selectors";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Typography, Tag } from "antd";
 import Text from "antd/lib/typography/Text";
-import { getSelectedRules, unselectAllRules } from "../../actions";
 import { deleteGroup, ungroupSelectedRules, updateRulesListRefreshPendingStatus } from "./actions";
 import { actions } from "store";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -53,7 +50,6 @@ import { toast } from "utils/Toast.js";
 import { InfoTag } from "components/misc/InfoTag";
 import ReactHoverObserver from "react-hover-observer";
 import { UserIcon } from "components/common/UserIcon";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -73,10 +69,10 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import LINKS from "config/constants/sub/links";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import Logger from "lib/logger";
 import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
+import { unselectAllRecords } from "../../actions";
 
 //Lodash
 const set = require("lodash/set");
@@ -135,21 +131,17 @@ const RulesTable = ({
   const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] = useState(false);
   const [isUngroupOrDeleteRulesModalActive, setIsUngroupOrDeleteRulesModalActive] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
-  const [ungroupOrDeleteRulesModalData, setUngroupOrDeleteRulesModalData] = useState(null);
+  // const [ungroupOrDeleteRulesModalData, setUngroupOrDeleteRulesModalData] = useState(null);
   const [ruleToDelete, setRuleToDelete] = useState([]);
-  const [ruleIdToDelete, setRuleIdToDelete] = useState([]);
+  const [groupToEmpty, setGroupToEmpty] = useState(null);
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [size, setSize] = useState(window.innerWidth);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
-  const [startFirstRuleWalkthrough, setStartFirstRuleWalkthrough] = useState(false);
-  const [startFifthRuleWalkthrough, setStartFifthRuleWalkthrough] = useState(false);
-  const [startSharingWalkthrough, setStartSharingWalkthrough] = useState(false);
 
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
   const searchByRuleName = useSelector(getRulesSearchKeyword);
   const rulesData = useSelector(getAllRules);
   const rules = rulesFromProps ? rulesFromProps : rulesData;
@@ -160,12 +152,15 @@ const RulesTable = ({
   const appMode = useSelector(getAppMode);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const rulesSelection = useSelector(getRulesSelection);
+  const selectedGroups = useSelector(getGroupsSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const groupingAndRuleActivationExp = useFeatureValue("grouping_and_rule_activation", null);
 
-  const selectedRules = getSelectedRules(rulesSelection);
+  const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
+  const selectedGroupIds = useMemo(() => Object.keys(selectedGroups), [selectedGroups]);
+  const rulesOfGroupsToEmptyFrom = useMemo(() => {
+    return rules.filter((rule) => rule.groupId === groupToEmpty);
+  }, [groupToEmpty, rules]);
 
   const isRemoveFromGroupDisabled = useMemo(
     () => rules.filter((rule) => rulesSelection[rule.id]).every((rule) => rule.groupId === UNGROUPED_GROUP_ID),
@@ -175,7 +170,7 @@ const RulesTable = ({
   const showGroupPinIcon = isFeatureCompatible(FEATURES.EXTENSION_GROUP_PIN_ICON);
 
   // Component State
-  const selectedRowKeys = selectedRules;
+  const selectedRowKeys = useMemo(() => [...selectedRuleIds, ...selectedGroupIds], [selectedRuleIds, selectedGroupIds]);
 
   const expandedGroupRowKeys = useMemo(() => {
     return JSON.parse(window.localStorage.getItem("expandedGroups")) ?? [];
@@ -237,6 +232,7 @@ const RulesTable = ({
   ]);
 
   const generateGroupwiseRulesToPopulate = () => {
+    // so soo messsy and unnecessary
     const GroupwiseRulesToPopulateWIP = {};
     //Populate it with empty group (ungrouped)
     set(GroupwiseRulesToPopulateWIP, `${UNGROUPED_GROUP_ID}.${GROUP_DETAILS}`, {});
@@ -318,12 +314,11 @@ const RulesTable = ({
 
   const ungroupSelectedRulesOnClickHandler = (event) => {
     event.stopPropagation();
-    ungroupSelectedRules(appMode, selectedRules, user)
+    ungroupSelectedRules(appMode, selectedRuleIds, user)
       .then(() => {
         clearSearch();
 
-        //Unselect all rules
-        unselectAllRules(dispatch);
+        unselectAllRecords(dispatch);
 
         //Refresh List
         updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
@@ -335,25 +330,28 @@ const RulesTable = ({
       .catch(() => toast.warn("Please select rules first", { hideProgressBar: true }));
   };
 
-  const deleteGroupOnClickHandler = (event, groupData) => {
-    event.stopPropagation();
+  const deleteGroupOnClickHandler = useCallback(
+    (event, groupData) => {
+      setGroupToEmpty(groupData.id);
+      event.stopPropagation();
 
-    deleteGroup(appMode, groupData.id, groupwiseRulesToPopulate)
-      .then(async (args) => {
-        if (args && args.err) {
-          if (args.err === "ungroup-rules-first") {
-            setUngroupOrDeleteRulesModalData(groupData);
-            setIsUngroupOrDeleteRulesModalActive(true);
+      deleteGroup(appMode, groupData.id, groupwiseRulesToPopulate)
+        .then(async (args) => {
+          if (args && args.err) {
+            if (args.err === "ungroup-rules-first") {
+              setIsUngroupOrDeleteRulesModalActive(true);
+            }
+
+            return;
           }
-
-          return;
-        }
-        updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
-        toast.info("Group deleted");
-        trackGroupDeleted();
-      })
-      .catch((err) => toast.warn(err, { hideProgressBar: true }));
-  };
+          updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
+          toast.info("Group deleted");
+          trackGroupDeleted();
+        })
+        .catch((err) => toast.warn(err, { hideProgressBar: true }));
+    },
+    [appMode, dispatch, groupwiseRulesToPopulate, isRulesListRefreshPending]
+  );
 
   const renameGroupOnClickHandler = (event, groupData) => {
     event.stopPropagation();
@@ -524,25 +522,23 @@ const RulesTable = ({
 
   const deleteIconOnClickHandler = async (event, rule) => {
     event.stopPropagation();
-    setRuleToDelete([rule]);
-    setRuleIdToDelete([rule.id]);
+    setRuleToDelete(rule);
     setIsDeleteConfirmationModalActive(true);
   };
 
   const onSelectChange = (selectedRowKeys) => {
     // Update the global state so that it could be consumed by other components as well
-
-    // selectedRowKeys also contains the group ids, which we don't need, ProTable will handle it internally!
-    const selectedRuleIds = selectedRowKeys.filter((objectId) => {
-      return !objectId.startsWith("Group_") && objectId !== UNGROUPED_GROUP_ID;
-    });
-
+    const newSelectedGroupObject = {};
     const newSelectedRulesObject = {};
 
-    selectedRuleIds.forEach((ruleId) => {
-      newSelectedRulesObject[ruleId] = true;
+    selectedRowKeys.forEach((objectId) => {
+      if (!objectId.startsWith("Group_") && objectId !== UNGROUPED_GROUP_ID) {
+        newSelectedRulesObject[objectId] = true;
+      } else {
+        newSelectedGroupObject[objectId] = true;
+      }
     });
-
+    dispatch(actions.updateSelectedGroups(newSelectedGroupObject));
     dispatch(actions.updateSelectedRules(newSelectedRulesObject));
   };
 
@@ -721,7 +717,7 @@ const RulesTable = ({
       render: (_, record) => {
         // Actions must not be visible when selectedRules array is not empty
         const isPinned = record.isFavourite;
-        const hideActionButtons = !isEmpty(selectedRules);
+        const hideActionButtons = !isEmpty(selectedRuleIds);
 
         if (record.objectType && record.objectType === "group") {
           if (areActionsEnabled && record.id !== UNGROUPED_GROUP_ID) {
@@ -921,7 +917,7 @@ const RulesTable = ({
 
   const cleanup = () => {
     //Unselect all rules
-    unselectAllRules(dispatch);
+    unselectAllRecords(dispatch);
   };
 
   const EscFn = (event) => {
@@ -1065,8 +1061,8 @@ const RulesTable = ({
     return rowKeys;
   };
 
-  const handleClearSelectedRules = () => {
-    dispatch(actions.clearSelectedRules());
+  const handleClearSelectedRecords = () => {
+    unselectAllRecords(dispatch);
   };
 
   const dropdownOverlay = useMemo(
@@ -1089,59 +1085,8 @@ const RulesTable = ({
     [handleNewRuleOnClick]
   );
 
-  useEffect(() => {
-    if (groupingAndRuleActivationExp === "variant1") {
-      if (!isMiscTourCompleted?.firstRule && userAttributes?.num_rules === 1) setStartFirstRuleWalkthrough(true);
-      if (!isMiscTourCompleted?.fifthRule && !userAttributes?.num_groups && userAttributes?.num_rules === 5)
-        setStartFifthRuleWalkthrough(true);
-    }
-  }, [
-    isMiscTourCompleted?.fifthRule,
-    isMiscTourCompleted?.firstRule,
-    userAttributes?.num_groups,
-    userAttributes?.num_rules,
-    groupingAndRuleActivationExp,
-  ]);
-
-  useEffect(() => {
-    if (
-      !isMiscTourCompleted.rulesListSharingOnboarding &&
-      userAttributes?.num_rules >= 1 &&
-      new Date(userAttributes?.install_date) < new Date("2023-09-07")
-    ) {
-      setStartSharingWalkthrough(true);
-    }
-  }, [userAttributes?.num_rules, userAttributes?.install_date, isMiscTourCompleted.rulesListSharingOnboarding]);
-
   return (
     <>
-      <ProductWalkthrough
-        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE}
-        startWalkthrough={startFifthRuleWalkthrough}
-        onTourComplete={() =>
-          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "fifthRule" }))
-        }
-      />
-      <ProductWalkthrough
-        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE}
-        startWalkthrough={startFirstRuleWalkthrough}
-        onTourComplete={() =>
-          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstRule" }))
-        }
-      />
-      <ProductWalkthrough
-        tourFor={MISC_TOURS.SHARING.RULES_LIST_SHARING_ONBOARDING}
-        startWalkthrough={startSharingWalkthrough && !isMiscTourCompleted.rulesListSharingOnboarding}
-        completeTourOnUnmount={false}
-        onTourComplete={() =>
-          dispatch(
-            actions.updateProductTourCompleted({
-              tour: TOUR_TYPES.MISCELLANEOUS,
-              subTour: "rulesListSharingOnboarding",
-            })
-          )
-        }
-      />
       <ProTable
         scroll={{ x: 900 }}
         className="records-table"
@@ -1187,10 +1132,10 @@ const RulesTable = ({
                   size="small"
                   icon={<CloseOutlined />}
                   style={{ margin: "0 8px 0 -14px" }}
-                  onClick={handleClearSelectedRules}
+                  onClick={handleClearSelectedRecords}
                 />
               </Tooltip>
-              <span>{`${_.selectedRowKeys.length} Rules selected`}</span>
+              <span>{`${selectedRuleIds.length} Rules selected`}</span>
             </div>
           );
         }}
@@ -1210,6 +1155,7 @@ const RulesTable = ({
               </Tooltip>
               <Tooltip title={isScreenSmall ? "Change Group" : null}>
                 <Button
+                  disabled={selectedGroupIds.length > 0 && selectedRuleIds.length === 0}
                   onClick={handleChangeGroupOnClick}
                   shape={isScreenSmall ? "circle" : null}
                   icon={<FolderOpenOutlined />}
@@ -1312,15 +1258,7 @@ const RulesTable = ({
                     authSource: AUTH.SOURCE.SHARE_RULES,
                     icon: <UsergroupAddOutlined />,
                     tourId: "rule-list-share-btn",
-                    onClickHandler: () => {
-                      handleShareRulesOnClick();
-                      dispatch(
-                        actions.updateProductTourCompleted({
-                          tour: TOUR_TYPES.MISCELLANEOUS,
-                          subTour: "rulesListSharingOnboarding",
-                        })
-                      );
-                    },
+                    onClickHandler: handleShareRulesOnClick,
                   },
                   {
                     shape: null,
@@ -1386,8 +1324,8 @@ const RulesTable = ({
         <DeleteRulesModal
           isOpen={isDeleteConfirmationModalActive}
           toggle={toggleDeleteConfirmationModal}
-          recordsToDelete={ruleToDelete}
-          ruleIdsToDelete={ruleIdToDelete}
+          rulesToDelete={[ruleToDelete]}
+          groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
         />
       ) : null}
@@ -1395,8 +1333,11 @@ const RulesTable = ({
         <UngroupOrDeleteRulesModal
           isOpen={isUngroupOrDeleteRulesModalActive}
           toggle={toggleUngroupOrDeleteRulesModal}
-          data={ungroupOrDeleteRulesModalData}
-          setData={setUngroupOrDeleteRulesModalData}
+          groupIdToDelete={groupToEmpty ?? null}
+          groupRules={rulesOfGroupsToEmptyFrom}
+          callback={() => {
+            setGroupToEmpty(null);
+          }}
         />
       ) : null}
       {isDuplicateRuleModalActive ? (

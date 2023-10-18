@@ -47,6 +47,11 @@ export const getRulesSelection = (state) => {
   return rulesNode["selectedRules"];
 };
 
+export const getGroupsSelection = (state) => {
+  const rulesNode = getRulesNode(state);
+  return rulesNode["selectedGroups"];
+};
+
 export const getCurrentlySelectedRule = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["currentlySelectedRule"];
@@ -193,6 +198,13 @@ export const getUserPersonaSurveyDetails = (state) => {
 
 export const getUserAttributes = (state) => {
   return getGlobalState(state)["userAttributes"];
+};
+
+// Had to make a separate selector, since consuming
+// "userAttributes" directly in <RulesListContainer/> component goes into infinite re-renders
+// TODO: fix above
+export const getUserRulesCount = (state) => {
+  return getUserAttributes(state)?.num_rules ?? 0;
 };
 
 export const getIsProductHuntLaunchedBannerClosed = (state) => {

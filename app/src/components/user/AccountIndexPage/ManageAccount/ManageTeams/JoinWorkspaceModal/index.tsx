@@ -21,14 +21,16 @@ interface JoinWorkspaceModalProps {
   isOpen: boolean;
   toggleModal: () => void;
   callback?: () => void;
+  source: string;
 }
 
 interface InviteRowProps {
   team: TeamInviteMetadata;
   callback: () => void;
+  modalSrc: string;
 }
 
-const InviteRow: React.FC<InviteRowProps> = ({ team, callback }) => {
+const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -36,7 +38,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback }) => {
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
   const handleJoinClick = (team: TeamInviteMetadata) => {
-    trackWorkspaceJoinClicked(team?.teamId, "join_workspace_modal");
+    trackWorkspaceJoinClicked(team?.teamId, modalSrc);
     setIsJoining(true);
 
     acceptTeamInvite(team?.inviteId)
@@ -97,7 +99,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ team, callback }) => {
   );
 };
 
-const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleModal, callback }) => {
+const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleModal, callback, source }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [teamInvites, setTeamInvites] = useState<Invite[]>([]);
@@ -165,7 +167,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
         {teamInvites?.length > 0 ? (
           <ul className="teams-invite-list">
             {getUniqueTeamsFromInvites(teamInvites).map((team: TeamInviteMetadata, index) => {
-              return <InviteRow team={team} callback={callback} />;
+              return <InviteRow team={team} callback={callback} modalSrc={source} />;
             })}
           </ul>
         ) : (

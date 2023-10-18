@@ -75,7 +75,7 @@ export const convertSessionRecordingNetworkLogsToRQNetworkLogs = (networkLogs: N
 };
 
 export const getOffset = (log: RQNetworkLog, sessionRecordingStartTime: RQSessionAttributes["startTime"]) => {
-  let offset = Math.floor((new Date(Number(log.entry.startedDateTime)).getTime() - sessionRecordingStartTime) / 1000);
+  let offset = (new Date(Number(log.entry.startedDateTime)).getTime() - sessionRecordingStartTime) / 1000;
   offset = offset >= 0 ? offset : 0; // Sometimes offset comes out negative.
   return offset;
 };

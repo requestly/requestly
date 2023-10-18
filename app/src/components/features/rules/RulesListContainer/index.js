@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ProCard from "@ant-design/pro-card";
@@ -15,18 +15,18 @@ import {
   getAllRules,
   getActiveModals,
   getAppMode,
+  getGroupsSelection,
 } from "../../../../store/selectors";
 import { submitAttrUtil, trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { isSignUpRequired } from "utils/AuthUtils";
 //ACTIONS
-import { getSelectedRules } from "../actions";
 import { fetchSharedLists } from "../../sharedLists/SharedListsIndexPage/actions";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import RulesTable from "./RulesTable";
-import "./RulesListContainer.css";
+import { PinExtensionPopup, usePinExtensionPopup } from "components/common/PinExtensionPopup";
 import {
   trackNewRuleButtonClicked,
   trackRuleCreationWorkflowStartedEvent,
@@ -35,6 +35,8 @@ import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import "./RulesListContainer.css";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -44,14 +46,18 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   //Global State
   const dispatch = useDispatch();
   const rulesSelection = useSelector(getRulesSelection);
+  const groupsSelection = useSelector(getGroupsSelection);
   const user = useSelector(getUserAuthDetails);
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const availableRuleTypeArray = Object.values(GLOBAL_CONSTANTS.RULE_TYPES);
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
 
   //Component State
-  const [selectedRules, setSelectedRules] = useState(getSelectedRules(rulesSelection));
+  const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
+  const rulesToDelete = useMemo(() => allRules.filter((rule) => !!rulesSelection[rule.id]), [allRules, rulesSelection]);
+  const selectedGroupIds = useMemo(() => Object.keys(groupsSelection), [groupsSelection]);
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -66,6 +72,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const [isChangeGroupModalActive, setIsChangeGroupModalActive] = useState(false);
   const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
+  const { isPinExtensionPopupActive, closePinExtensionPopup } = usePinExtensionPopup();
 
   const toggleCreateNewRuleGroupModal = () => {
     setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);
@@ -161,9 +168,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
   const verifySharedListsLimit = () => {
     //Continue creating new shared list
-    const newSelectedRules = getSelectedRules(rulesSelection);
-    setSelectedRules(newSelectedRules);
-    toggleSharingModal(newSelectedRules);
+    toggleSharingModal(selectedRuleIds);
     trackRQLastActivity("sharedList_created");
   };
 
@@ -217,8 +222,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     setTotalRulesCount(allRules.length);
   }, [allRules]);
 
-  const recordsToDelete = allRules.filter((rule) => selectedRules.some((ruleId) => ruleId === rule.id));
-
   const clearSearch = useCallback(() => {
     setSearch(false);
     setSearchValue("");
@@ -227,7 +230,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   return (
     <>
       {/* Page content */}
-      {user?.loggedIn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
+      {isFeatureLimiterOn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
       {/* Table */}
       <ProCard title={null} className="rules-table-container rules-list-container">
         <RulesTable
@@ -238,18 +241,15 @@ const RulesListContainer = ({ isTableLoading = false }) => {
           clearSearch={clearSearch}
           isTableLoading={isTableLoading}
           handleChangeGroupOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsChangeGroupModalActive(true);
           }}
           handleShareRulesOnClick={handleShareRulesOnClick}
           handleDeleteRulesOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsDeleteRulesModalActive(true);
           }}
           handleImportRulesOnClick={handleImportRulesOnClick}
           totalRulesCount={totalRulesCount}
           handleNewGroupOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsCreateNewRuleGroupModalActive(true);
           }}
           handleNewRuleOnClick={handleNewRuleOnClick}
@@ -271,6 +271,10 @@ const RulesListContainer = ({ isTableLoading = false }) => {
         <CreateNewRuleGroupModal isOpen={isCreateNewRuleGroupModalActive} toggle={toggleCreateNewRuleGroupModal} />
       ) : null}
 
+      {isPinExtensionPopupActive && (
+        <PinExtensionPopup isOpen={isPinExtensionPopupActive} onCancel={closePinExtensionPopup} />
+      )}
+
       {isChangeGroupModalActive ? (
         <ChangeRuleGroupModal
           clearSearch={clearSearch}
@@ -283,8 +287,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
         <DeleteRulesModal
           isOpen={isDeleteRulesModalActive}
           toggle={toggleDeleteRulesModal}
-          ruleIdsToDelete={selectedRules}
-          recordsToDelete={recordsToDelete}
+          rulesToDelete={rulesToDelete}
+          groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
         />
       ) : null}

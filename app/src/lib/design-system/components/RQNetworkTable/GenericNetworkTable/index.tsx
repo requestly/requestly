@@ -1,14 +1,16 @@
-import { ReactElement, useCallback, useMemo, useState } from "react";
+import { CSSProperties, ReactElement, RefObject, UIEventHandler, useCallback, useMemo, useState } from "react";
 import {
   ColorScheme,
   ContextMenuOption,
   DetailsTab,
-  ResourceTable,
   ResourceTableProps,
+  ResourceTable,
 } from "@requestly-ui/resource-table";
 import { Column, NetworkEntry } from "./types";
 import { getDefaultColumns } from "./columns";
 import { getDefaultDetailsTabs } from "./detailsTabs";
+import FiltersToolbar from "./components/FiltersToolbar/FiltersToolbar";
+import { NetworkFilters } from "./components/FiltersToolbar/types";
 
 export interface GenericNetworkTableProps<NetworkLog> {
   logs: NetworkLog[];
@@ -33,6 +35,18 @@ export interface GenericNetworkTableProps<NetworkLog> {
   onContextMenuOpenChange?: ResourceTableProps<NetworkLog>["onContextMenuOpenChange"];
 
   contextMenuOptions?: ContextMenuOption<NetworkLog>[];
+
+  emptyView?: ResourceTableProps<NetworkLog>["emptyView"];
+
+  isRowPending?: (log: NetworkLog) => boolean;
+
+  rowStyle?: (log: NetworkLog) => CSSProperties | CSSProperties;
+
+  autoScroll?: boolean;
+
+  tableRef?: RefObject<HTMLDivElement>;
+
+  onTableScroll?: UIEventHandler<HTMLElement>;
 }
 
 /**
@@ -46,8 +60,14 @@ export const GenericNetworkTable = <NetworkLog,>({
   contextMenuOptions = [],
   networkEntrySelector = (log) => log as NetworkEntry,
   onContextMenuOpenChange = (isOpen) => {},
+  emptyView,
+  rowStyle,
+  autoScroll = false,
+  tableRef,
+  onTableScroll,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
+  const [filters, setFilters] = useState<NetworkFilters>({ search: "", method: [], statusCode: [] });
 
   const finalColumns = useMemo(
     () =>
@@ -57,10 +77,10 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector, excludeColumns, extraColumns]
   );
 
-  const finalDetailsTabs = useMemo(
-    () => [...getDefaultDetailsTabs(networkEntrySelector), ...extraDetailsTabs],
-    [networkEntrySelector, extraDetailsTabs]
-  );
+  const finalDetailsTabs = useMemo(() => [...getDefaultDetailsTabs(networkEntrySelector), ...extraDetailsTabs], [
+    networkEntrySelector,
+    extraDetailsTabs,
+  ]);
 
   const isFailed = useCallback(
     (log: NetworkLog) => {
@@ -71,17 +91,56 @@ export const GenericNetworkTable = <NetworkLog,>({
     [networkEntrySelector]
   );
 
+  const statusCodeFilter = useCallback(
+    (logEntry: NetworkEntry) => {
+      if (!filters.statusCode.length) return true;
+      return filters.statusCode.some((code) => code[0] === logEntry?.response?.status.toString()[0]);
+    },
+    [filters.statusCode]
+  );
+
+  const methodsFilter = useCallback(
+    (logEntry: NetworkEntry) => {
+      if (!filters.method.length) return true;
+      return filters.method.some((method) => method === logEntry?.request.method);
+    },
+    [filters.method]
+  );
+
+  const filterLog = useCallback(
+    (networkLog: NetworkLog) => {
+      let includeLog = false;
+      const entry = networkEntrySelector(networkLog);
+      includeLog =
+        !!entry?.request?.url.toLowerCase()?.includes(filters.search.toLowerCase()) &&
+        statusCodeFilter(entry) &&
+        methodsFilter(entry); // TODO: add checks for other filters here
+      return includeLog;
+    },
+    [networkEntrySelector, filters.search, statusCodeFilter, methodsFilter]
+  );
+
   return (
-    <ResourceTable
-      resources={logs}
-      isFailed={isFailed}
-      columns={finalColumns}
-      detailsTabs={finalDetailsTabs}
-      primaryColumnKeys={["timeOffset", "url"]}
-      colorScheme={ColorScheme.DARK}
-      onRowSelection={setSelectedLog}
-      contextMenuOptions={contextMenuOptions}
-      onContextMenuOpenChange={onContextMenuOpenChange}
-    />
+    <div className="network-container">
+      <FiltersToolbar filters={filters} setFilters={setFilters} />
+      <div className="rq-resource-table-wrapper">
+        <ResourceTable
+          resources={logs}
+          isFailed={isFailed}
+          columns={finalColumns}
+          detailsTabs={finalDetailsTabs}
+          primaryColumnKeys={["timeOffset", "url"]}
+          colorScheme={ColorScheme.DARK}
+          onRowSelection={setSelectedLog}
+          contextMenuOptions={contextMenuOptions}
+          filter={filterLog}
+          emptyView={emptyView}
+          rowStyle={rowStyle}
+          autoScroll={autoScroll}
+          tableRef={tableRef}
+          onTableScroll={onTableScroll}
+        />
+      </div>
+    </div>
   );
 };

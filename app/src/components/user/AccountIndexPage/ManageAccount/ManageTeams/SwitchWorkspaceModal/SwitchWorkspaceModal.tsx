@@ -26,6 +26,10 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
 
+  const sortedTeams: Team[] = availableTeams
+    ? [...availableTeams].sort((a: Team, b: Team) => b.accessCount - a.accessCount)
+    : [];
+
   const handleCreateNewWorkspaceClick = () => {
     trackCreateNewTeamClicked("switch_workspace_modal");
     toggleModal();
@@ -71,7 +75,7 @@ const SwitchWorkspaceModal: React.FC<SwitchWorkspaceModalProps> = ({ isOpen, tog
 
         {availableTeams?.length > 0 ? (
           <ul className="teams-list">
-            {availableTeams.map((team: Team) => (
+            {sortedTeams.map((team: Team) => (
               <li key={team.inviteId}>
                 <div className="w-full teams-list-row">
                   <Col>

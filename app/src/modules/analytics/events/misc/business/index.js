@@ -17,3 +17,8 @@ export const trackUpgradeNowClickedEvent = (reason, source) => {
 export const trackViewGithubClicked = () => {
   trackEvent(BUSINESS.VIEW_GITHUB_CLICKED);
 };
+
+export const trackAppsumoCodeRedeemed = (number_of_codes) => {
+  const params = { number_of_codes };
+  trackEvent(BUSINESS.APPSUMO_CODE_REDEEMED, params);
+};

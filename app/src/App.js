@@ -17,7 +17,7 @@ import LocalUserAttributesHelperComponent from "hooks/LocalUserAttributesHelperC
 import PreLoadRemover from "hooks/PreLoadRemover";
 import AppModeInitializer from "hooks/AppModeInitializer";
 import DBListeners from "hooks/DbListenerInit/DBListeners";
-import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
+// import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
 import FeatureUsageEvent from "hooks/FeatureUsageEvent";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
@@ -65,7 +65,7 @@ const App = () => {
       <PreLoadRemover />
       <AppModeInitializer />
       <DBListeners />
-      <RuleExecutionsSyncer />
+      {/* <RuleExecutionsSyncer /> */}
       <ActiveWorkspace />
       <ThirdPartyIntegrationsHandler />
 

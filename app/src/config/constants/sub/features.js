@@ -43,6 +43,7 @@ FEATURES.DESKTOP_USER_PREFERENCES = "desktop_user_preferences";
 FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE = "create-rule-from-traffic-table";
 FEATURES.CONNECTED_APPS = "connected-apps";
 FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR = "graphql-payload-filter-operator";
+FEATURES.CUSTOM_LAUNCH_OPTIONS = "custom-launch-options";
 
 // MARKETING
 FEATURES.INTERCEPTOR = {};

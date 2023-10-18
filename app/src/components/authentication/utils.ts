@@ -57,6 +57,7 @@ const getSignUpErrorMessage = (errorCode: string) => {
     case "auth/operation-not-allowed":
       return "Sorry but your account is disabled. Please write us to " + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL;
     default:
+      console.error("Unknown error code", errorCode);
       return "Sorry, we couldn't sign you up. Please write us to " + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL;
   }
 };

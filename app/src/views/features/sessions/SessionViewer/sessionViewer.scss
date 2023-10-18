@@ -29,6 +29,18 @@
       .rr-player .rr-player_frame {
         width: auto;
       }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
+      }
     }
 
     .session-recording-properties {
@@ -75,6 +87,7 @@
         border-radius: var(--border-radius-sm);
         background: var(--component-background);
         padding: 1rem;
+        white-space: pre-wrap;
       }
     }
   }
@@ -199,7 +212,9 @@
       bottom: 20px;
       transform: translate(-50%, 0);
     }
-
+    & .ant-tabs-top > .ant-tabs-nav {
+      margin-bottom: 6px;
+    }
     /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
     .ant-tabs-ink-bar {
       display: none;
@@ -256,17 +271,16 @@
           }
         }
 
-        .right-info {
-          max-width: 180px;
-          margin-left: 8px;
-          text-align: right;
-          flex-shrink: 0;
-        }
-
         .secondary-message {
           word-break: break-word;
           padding-left: 40px;
         }
+      }
+      .empty-table-view {
+        background: var(--component-dark-background);
+        height: 100%;
+        border: 1px solid var(--border-dark);
+        border-radius: var(--border-radius-sm);
       }
     }
   }
@@ -549,6 +563,9 @@ body.dark {
         min-height: auto;
       }
     }
+    .right-info {
+      display: none;
+    }
   }
 }
 
@@ -565,10 +582,6 @@ body.dark {
         .primary-message,
         .secondary-message {
           width: 28rem;
-        }
-
-        .right-info {
-          display: none;
         }
       }
     }
@@ -638,7 +651,7 @@ body.dark {
       &.console-log-row {
         .primary-message,
         .secondary-message {
-          width: 60rem;
+          width: 64rem;
         }
       }
     }

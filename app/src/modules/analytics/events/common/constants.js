@@ -51,6 +51,7 @@ export const AUTH = {
   AUTH_MODAL: {
     SHOWN: "auth_modal_shown",
     EMAIL_LOGIN_LINK_GENERATED: "email_login_link_generated",
+    GENERATE_MAGIC_LINK_FAILED: "magic_link_generation_failed",
   },
   AUTH_ONE_TAP_PROMPT: {
     VISIBLE: "auth_one_tap_prompt_visible",
@@ -150,6 +151,9 @@ export const ONBOARDING = {
   PRODUCT_HUNT_BANNER_CLICKED: "product_hunt_banner_clicked",
   PRODUCTS_DROPDOWN_CLICKED: "products_dropdown_clicked",
   PRODUCT_CLICKED: "product_clicked",
+  PIN_EXTENSION_POPUP_VIEWED: "pin_extension_popup_viewed",
+  PIN_EXTENSION_POPUP_EXPANDED: "pin_extension_popup_expanded",
+  PIN_EXTENSION_POPUP_CLOSED: "pin_extension_popup_closed",
 };
 
 export const TEAMS = {

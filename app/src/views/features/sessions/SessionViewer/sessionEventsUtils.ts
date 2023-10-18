@@ -65,7 +65,7 @@ export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number)
       return (
         logData && {
           ...logData,
-          timeOffset: Math.floor((event.timestamp - startTime) / 1000),
+          timeOffset: (event.timestamp - startTime) / 1000,
         }
       );
     })

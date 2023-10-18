@@ -415,6 +415,7 @@ const MockEditor: React.FC<Props> = ({
       <div className="mock-editor-title-container">
         <RQEditorTitle
           name={name}
+          mode={isNew ? "create" : "edit"}
           description={desc}
           namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
           descriptionPlaceholder="Add your description here."

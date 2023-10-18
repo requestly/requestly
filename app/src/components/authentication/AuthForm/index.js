@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
 import { Typography, Row, Col } from "antd";
@@ -16,16 +16,17 @@ import GoogleIcon from "../../../assets/img/icons/common/google.svg";
 //UTILS
 // import { syncUserPersona } from "components/features/rules/GettingStarted/WorkspaceOnboarding/OnboardingSteps/PersonaSurvey/utils";
 import { getGreeting } from "utils/FormattingHelper";
-// import { getAuthErrorMessage, AuthTypes } from "../utils";
+import { getAuthErrorMessage, AuthTypes } from "../utils";
 
 //CONSTANTS
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../config/constants";
 import PATHS from "config/constants/sub/paths";
 
 //ACTIONS
 import {
-  // handleEmailSignIn,
-  // handleEmailSignUp,
+  handleEmailSignIn,
+  handleEmailSignUp,
   handleForgotPasswordButtonOnClick,
   handleGoogleSignIn,
   handleResetPasswordOnClick,
@@ -55,6 +56,7 @@ const AuthForm = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
@@ -102,7 +104,8 @@ const AuthForm = ({
     handleGoogleSignIn(appMode, MODE, eventSource)
       .then((result) => {
         if (result && result.uid) {
-          !isOnboardingForm && toast.info(`${getGreeting()}, ${result.displayName.split(" ")[0]}`);
+          const greatingName = result.user.displayName?.split(" ")?.[0];
+          !isOnboardingForm && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
           // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
           onSignInSuccess && onSignInSuccess(result.uid, result.isNewUser);
         }
@@ -113,62 +116,65 @@ const AuthForm = ({
       });
   };
 
-  // const handleEmailSignUpButtonClick = (event) => {
-  //   event.preventDefault();
-  //   setActionPending(true);
-  //   handleEmailSignUp(name, email, password, referralCode, eventSource)
-  //     .then(({ status, errorCode }) => {
-  //       if (status) {
-  //         handleEmailSignIn(email, password, true, eventSource)
-  //           .then(({ result }) => {
-  //             if (result.user.uid) {
-  //               !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
-  //               setEmail("");
-  //               setPassword("");
-  //               // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
-  //               onSignInSuccess && onSignInSuccess(result.user.uid, true);
-  //             }
-  //           })
-  //           .catch(({ errorCode }) => {
-  //             toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-  //             setActionPending(false);
-  //             setEmail("");
-  //             setPassword("");
-  //           });
-  //       } else {
-  //         toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-  //         setActionPending(false);
-  //       }
-  //     })
-  //     .catch(({ errorCode }) => {
-  //       toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
-  //       setActionPending(false);
-  //     });
-  // };
+  const handleEmailSignUpButtonClick = (event) => {
+    event.preventDefault();
+    setActionPending(true);
+    handleEmailSignUp(email, password, referralCode, eventSource)
+      .then(({ status, errorCode }) => {
+        if (status) {
+          handleEmailSignIn(email, password, true, eventSource)
+            .then(({ result }) => {
+              if (result.user.uid) {
+                const greatingName = result.user.displayName?.split(" ")?.[0];
+                !isOnboardingForm &&
+                  toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
+                setEmail("");
+                setPassword("");
+                // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
+                onSignInSuccess && onSignInSuccess(result.user.uid, true);
+              }
+            })
+            .catch((err) => {
+              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, err.errorCode));
+              setActionPending(false);
+              setEmail("");
+              setPassword("");
+            });
+        } else {
+          toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, errorCode));
+          setActionPending(false);
+        }
+      })
+      .catch((err) => {
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, err.errorCode));
+        setActionPending(false);
+      });
+  };
 
-  // const handleEmailSignInButtonClick = (event) => {
-  //   event.preventDefault();
-  //   setActionPending(true);
-  //   handleEmailSignIn(email, password, false, eventSource)
-  //     .then(({ result }) => {
-  //       if (result.user.uid) {
-  //         !isOnboardingForm && toast.info(`${getGreeting()}, ${result.user.displayName.split(" ")[0]}`);
-  //         setEmail("");
-  //         setPassword("");
-  //         // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
-  //         onSignInSuccess && onSignInSuccess(result.user.uid, false);
-  //       } else {
-  //         toast.error("Sorry we couldn't log you in. Can you please retry?");
-  //         setActionPending(true);
-  //       }
-  //     })
-  //     .catch(({ errorCode }) => {
-  //       toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, errorCode));
-  //       setActionPending(false);
-  //       setEmail("");
-  //       setPassword("");
-  //     });
-  // };
+  const handleEmailSignInButtonClick = (event) => {
+    event.preventDefault();
+    setActionPending(true);
+    handleEmailSignIn(email, password, false, eventSource)
+      .then(({ result }) => {
+        if (result.user.uid) {
+          const greatingName = result.user.displayName?.split(" ")?.[0];
+          !isOnboardingForm && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
+          setEmail("");
+          setPassword("");
+          // syncUserPersona(result.user.uid, dispatch, userPersona); TEMP DISABLED
+          onSignInSuccess && onSignInSuccess(result.user.uid, false);
+        } else {
+          toast.error("Sorry we couldn't log you in. Can you please retry?");
+          setActionPending(true);
+        }
+      })
+      .catch((err) => {
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, err.errorcode));
+        setActionPending(false);
+        setEmail("");
+        setPassword("");
+      });
+  };
 
   const SocialAuthButtons = () => {
     switch (MODE) {
@@ -229,6 +235,13 @@ const AuthForm = ({
     switch (MODE) {
       default:
       case AUTH_ACTION_LABELS.LOG_IN:
+        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+          return (
+            <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignInButtonClick}>
+              Sign In with Email
+            </RQButton>
+          );
+        }
         return (
           <GenerateLoginLinkBtn
             email={email}
@@ -241,6 +254,13 @@ const AuthForm = ({
         );
 
       case AUTH_ACTION_LABELS.SIGN_UP:
+        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+          return (
+            <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignUpButtonClick}>
+              Create Account
+            </RQButton>
+          );
+        }
         return (
           <GenerateLoginLinkBtn
             email={email}
@@ -255,7 +275,7 @@ const AuthForm = ({
         return (
           <RQButton
             type="primary"
-            className="form-elements-margin w-full"
+            className="form-elements-margin w-full mt-16"
             onClick={(event) =>
               handleForgotPasswordButtonOnClick(event, email, setActionPending, onRequestPasswordResetSuccess)
             }
@@ -428,7 +448,9 @@ const AuthForm = ({
 
             <Col span={11} className="signup-modal-section-wrapper signup-form-wrapper">
               <Typography.Text type="primary" className="text-bold w-full header">
-                Create your Requestly account
+                {location.pathname === PATHS.APPSUMO.RELATIVE
+                  ? "Signup to redeem your AppSumo code"
+                  : "Create your Requestly account"}
               </Typography.Text>
 
               <Row align={"middle"} className="mt-1">
@@ -443,6 +465,7 @@ const AuthForm = ({
                 <div className="auth-modal-message w-full">Sign Up with email</div>
 
                 {renderEmailField()}
+                {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && renderPasswordField()}
                 <FormSubmitButton />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
@@ -475,6 +498,7 @@ const AuthForm = ({
             <div className="auth-modal-divider w-full">or</div>
             <div className="auth-modal-message w-full">Sign In with email</div>
             {renderEmailField()}
+            {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && renderPasswordField()}
             <FormSubmitButton />
           </Row>
         </Col>
@@ -498,7 +522,7 @@ const AuthForm = ({
               </>
             )}
             <div className="w-full mt-20">{renderEmailField()}</div>
-            {renderPasswordField()}
+            {renderPasswordField()} {/* NOT SHOWN WHEN REQUESTING RESET */}
             <FormSubmitButton />
           </Row>
         </Col>

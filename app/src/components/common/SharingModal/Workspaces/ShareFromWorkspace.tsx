@@ -43,7 +43,13 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);
 
       if (hasSuccessfulInvite) {
-        trackAddTeamMemberSuccess(currentlyActiveWorkspace.id, memberEmails, TeamRole.write, "sharing_modal");
+        trackAddTeamMemberSuccess({
+          team_id: currentlyActiveWorkspace.id,
+          email: memberEmails,
+          is_admin: false,
+          source: "sharing_modal",
+          num_users_added: memberEmails.length,
+        });
         setPostShareViewData({
           type: WorkspaceSharingTypes.USERS_INVITED,
         });
