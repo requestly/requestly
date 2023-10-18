@@ -21,8 +21,9 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, moveToNe
       <div className="survey-footer w-full rq-modal-footer">
         <Row justify="end" align="middle">
           <Col>
-            {typeof userPersona[currentQuestionnaire as QuestionnaireType] === "object" &&
-            userPersona[currentQuestionnaire as QuestionnaireType]?.value?.length ? (
+            {(typeof userPersona[currentQuestionnaire as QuestionnaireType] === "object" &&
+              userPersona[currentQuestionnaire as QuestionnaireType]?.value?.length) ||
+            currentPage === SurveyPage.GETTING_STARTED ? (
               <RQButton
                 type="primary"
                 className="text-bold"
