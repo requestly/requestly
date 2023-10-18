@@ -8,7 +8,7 @@ import "./index.css";
 interface OptionProps {
   option: Option;
   questionnaire: QuestionnaireType;
-  moveToNextPage: () => void;
+  moveToNextPage: (response: string) => void;
   action?: (dispatch: any, value: string | OtherOption, doClear: boolean) => void;
 }
 
@@ -50,7 +50,7 @@ export const SurveyOption: React.FC<OptionProps> = ({ option, action, questionna
           className={`survey-option survey-select ${isActive && "outline-active-option"}`}
           onClick={() => {
             action(dispatch, title, isActive);
-            moveToNextPage();
+            moveToNextPage(title);
           }}
         >
           <div className="white text-bold survey-option-title">

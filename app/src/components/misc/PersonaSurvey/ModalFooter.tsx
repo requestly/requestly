@@ -9,7 +9,7 @@ import "./index.css";
 
 interface FooterProps {
   currentPage: SurveyPage;
-  moveToNextPage: () => void;
+  moveToNextPage: (response: string) => void;
 }
 
 export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, moveToNextPage }) => {
@@ -23,7 +23,11 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, moveToNe
           <Col>
             {typeof userPersona[currentQuestionnaire as QuestionnaireType] === "object" &&
             userPersona[currentQuestionnaire as QuestionnaireType]?.value?.length ? (
-              <RQButton type="primary" className="text-bold" onClick={moveToNextPage}>
+              <RQButton
+                type="primary"
+                className="text-bold"
+                onClick={() => moveToNextPage(userPersona[currentQuestionnaire as QuestionnaireType])}
+              >
                 Continue
               </RQButton>
             ) : null}

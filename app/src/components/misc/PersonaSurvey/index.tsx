@@ -10,14 +10,14 @@ import { handleSurveyNavigation } from "./actions";
 import { Option, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
 import { RQButton, RQModal } from "lib/design-system/components";
-import { submitAttrUtil } from "utils/AnalyticsUtils";
+// import { submitAttrUtil } from "utils/AnalyticsUtils";
 import {
-  trackPersonaQ1Completed,
+  // trackPersonaQ1Completed,
   trackPersonaSurveySignInClicked,
   trackPersonaSurveyViewed,
 } from "modules/analytics/events/misc/onboarding";
 import { AUTH } from "modules/analytics/events/common/constants";
-import PATHS from "config/constants/sub/paths";
+// import PATHS from "config/constants/sub/paths";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -67,35 +67,6 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const currentPage = useMemo(() => getSurveyPage(userPersona.page), [userPersona.page]);
 
-  const handleMoveToNextPage = useCallback(() => {
-    const index = Object.keys(SurveyConfig).indexOf(currentPage);
-    const surveyLength = Object.keys(SurveyConfig).length;
-    const currentQuestionnaire = SurveyConfig[currentPage]?.render;
-    const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
-
-    switch (currentQuestionnaire) {
-      case QuestionnaireType.PERSONA:
-        trackPersonaQ1Completed(userPersona.persona);
-        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, userPersona.persona);
-        break;
-    }
-
-    if (isSurveyModal || index !== surveyLength - 1) {
-      handleSurveyNavigation(currentPage, dispatch);
-
-      if (isSurveyModal && index === surveyLength - 1) {
-        if (isSharedListUser || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-          //don’t show recommendation screen for shared list users or desktop users
-          dispatch(actions.updateIsPersonaSurveyCompleted(true));
-          return;
-        }
-        dispatch(actions.toggleActiveModal({ modalName: "personaSurveyModal", newValue: false }));
-      }
-    } else {
-      callback?.();
-    }
-  }, [appMode, dispatch, callback, currentPage, isSurveyModal, userPersona.persona]);
-
   const shuffledQuestionnaire = useMemo(() => {
     if (currentPage === SurveyPage.RECOMMENDATIONS || currentPage === SurveyPage.GETTING_STARTED) return;
     const options = OptionsConfig[currentPage]?.options;
@@ -112,13 +83,15 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
               option={option}
               action={OptionsConfig[questionnaire].questionResponseAction}
               questionnaire={questionnaire}
-              moveToNextPage={handleMoveToNextPage}
+              moveToNextPage={(response) =>
+                handleSurveyNavigation(dispatch, appMode, currentPage, isSurveyModal, response, callback)
+              }
             />
           ))}
         </div>
       );
     },
-    [handleMoveToNextPage]
+    [currentPage, appMode, dispatch, isSurveyModal, callback]
   );
 
   const renderQuestionnaire = useCallback(
@@ -142,17 +115,17 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
           <>{typeof page?.render === "function" ? page?.render() : renderQuestionnaire(page?.render)}</>
         </>
       );
-    } else handleSurveyNavigation(currentPage, dispatch);
-  }, [renderQuestionnaire, currentPage, dispatch, userPersona]);
+    } else handleSurveyNavigation(dispatch, appMode, currentPage, isSurveyModal);
+  }, [renderQuestionnaire, currentPage, dispatch, appMode, userPersona, isSurveyModal]);
 
   useEffect(() => {
     if (
       SurveyConfig[currentPage as SurveyPage]?.skip ||
       (!isSurveyModal && currentPage === SurveyPage.GETTING_STARTED)
     ) {
-      handleSurveyNavigation(currentPage, dispatch);
+      handleSurveyNavigation(dispatch, appMode, currentPage, isSurveyModal);
     }
-  }, [currentPage, dispatch, isSurveyModal]);
+  }, [currentPage, dispatch, isSurveyModal, appMode]);
 
   useEffect(() => {
     if (isSurveyModal) {
@@ -201,13 +174,23 @@ export const PersonaSurvey: React.FC<SurveyProps> = ({ callback, isSurveyModal, 
         >
           <div className="persona-survey-container">
             {surveyPages}
-            <SurveyModalFooter currentPage={currentPage} moveToNextPage={handleMoveToNextPage} />
+            <SurveyModalFooter
+              currentPage={currentPage}
+              moveToNextPage={(response) =>
+                handleSurveyNavigation(dispatch, appMode, currentPage, isSurveyModal, response, callback)
+              }
+            />
           </div>
         </RQModal>
       ) : (
         <div className="persona-survey-container">
           {surveyPages}
-          <SurveyModalFooter currentPage={currentPage} moveToNextPage={handleMoveToNextPage} />
+          <SurveyModalFooter
+            currentPage={currentPage}
+            moveToNextPage={(response) =>
+              handleSurveyNavigation(dispatch, appMode, currentPage, isSurveyModal, response, callback)
+            }
+          />
         </div>
       )}
     </>
