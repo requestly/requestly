@@ -21,3 +21,12 @@
 .graphql-operation-name-input.ant-input {
   background-color: var(--component-dark-background);
 }
+
+.graphql-operation-filter-operator {
+  height: 100%;
+  width: 100%;
+}
+
+.graphql-operation-filter-reset-button.ant-btn {
+  height: 38px;
+}

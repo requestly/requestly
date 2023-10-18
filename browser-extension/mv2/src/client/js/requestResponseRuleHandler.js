@@ -178,12 +178,21 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
         if (Object.keys(requestData).length === 0) return false;
 
         requestPayloadFilter = requestPayloadFilter || {};
-        const targettedKey = requestPayloadFilter?.key;
+        const targetedKey = requestPayloadFilter?.key;
+        const targetedValue = requestPayloadFilter?.value;
 
-        // tagettedKey is the json path e.g. a.b.0.c
-        if (targettedKey) {
-          const valueInRequestData = traverseJsonByPath(requestData, targettedKey);
-          return valueInRequestData == requestPayloadFilter?.value;
+        // tagetedKey is the json path e.g. a.b.0.c
+        if (targetedKey && typeof targetedValue !== undefined) {
+          const valueInRequestData = traverseJsonByPath(requestData, targetedKey);
+          const operator = requestPayloadFilter?.operator;
+
+          if (!operator || operator === "Equals") {
+            return valueInRequestData === targetedValue;
+          }
+
+          if (operator === "Contains") {
+            return valueInRequestData.includes(targetedValue);
+          }
         }
 
         return false;
