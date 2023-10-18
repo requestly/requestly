@@ -21,7 +21,7 @@ export const SurveyModalFooter: React.FC<FooterProps> = ({ currentPage, moveToNe
       <div className="survey-footer w-full rq-modal-footer">
         <Row justify="end" align="middle">
           <Col>
-            {/* Only show conitnue button if other option has some value or for getting started page */}
+            {/* Only show continue button if other option has some value or for getting started page */}
             {(typeof userPersona[currentQuestionnaire as QuestionnaireType] === "object" &&
               userPersona[currentQuestionnaire as QuestionnaireType]?.value?.length) ||
             currentPage === SurveyPage.GETTING_STARTED ? (
