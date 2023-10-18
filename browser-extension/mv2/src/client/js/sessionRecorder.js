@@ -28,10 +28,6 @@ RQ.SessionRecorder.setup = () => {
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
         RQ.SessionRecorder.sendMessageToClient("stopRecording", null);
         break;
-
-      case RQ.CLIENT_MESSAGES.RESET_RECORDING_STATE:
-        RQ.SessionRecorder.resetRecordingState();
-        break;
     }
 
     // messages for only the top document
@@ -56,17 +52,6 @@ RQ.SessionRecorder.setup = () => {
       }
     }
   });
-};
-
-RQ.SessionRecorder.resetRecordingState = () => {
-  RQ.SessionRecorder.isRecording = false;
-  RQ.SessionRecorder.isExplicitRecording = false;
-  RQ.SessionRecorder.showWidget = false;
-  RQ.SessionRecorder.recordingStartTime = null;
-  RQ.SessionRecorder.markRecordingIcon = false;
-
-  RQ.SessionRecorder.hideManualModeWidget();
-  RQ.SessionRecorder.hideAutoModeWidget();
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
@@ -103,6 +88,7 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
 
   if (explicit) {
     RQ.SessionRecorder.recordingStartTime = recordingStartTime ?? Date.now();
+    RQ.SessionRecorder.hideAutoModeWidget();
   }
 };
 
@@ -153,7 +139,14 @@ RQ.SessionRecorder.addMessageListeners = () => {
         }
       }
     } else if (event.data.action === "sessionRecordingStopped") {
-      RQ.SessionRecorder.resetRecordingState();
+      RQ.SessionRecorder.isRecording = false;
+      RQ.SessionRecorder.isExplicitRecording = false;
+      RQ.SessionRecorder.showWidget = false;
+      RQ.SessionRecorder.recordingStartTime = null;
+      RQ.SessionRecorder.markRecordingIcon = false;
+
+      RQ.SessionRecorder.hideManualModeWidget();
+      RQ.SessionRecorder.hideAutoModeWidget();
 
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
