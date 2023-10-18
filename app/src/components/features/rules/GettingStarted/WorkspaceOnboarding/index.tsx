@@ -114,8 +114,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
             "onboarding"
           );
           setTimeout(() => {
-            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
-          }, 50);
+            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+          }, 100);
         });
       } else {
         dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));

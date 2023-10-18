@@ -140,7 +140,7 @@ const RULE_TYPES_CONFIG = {
     ID: 4,
     TYPE: GLOBAL_CONSTANTS.RULE_TYPES.HEADERS,
     NAME: "Modify Headers",
-    DESCRIPTION: "Modify HTTP headers in request and response",
+    DESCRIPTION: "Override API request body with static or programmatic data",
     ICON: () => <RuleIcon ruleType={GLOBAL_CONSTANTS.RULE_TYPES.HEADERS} />,
     PRIMARY_COLOR: "#dd9d12",
     SECONDARY_COLOR: "#C58C10",
