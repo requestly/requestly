@@ -14,6 +14,7 @@ import "./sessionRecordingView.css";
 
 const SessionRecordingView: React.FC = () => {
   const [currentTabId, setCurrentTabId] = useState<number>();
+  const [currentTabUrl, setCurrentTabUrl] = useState<string>("");
   const [isRecordingSession, setIsRecordingSession] = useState<boolean>();
   const [isManualMode, setIsManualMode] = useState<boolean>();
   const isRecordingInManualMode = isRecordingSession && isManualMode;
@@ -24,10 +25,11 @@ const SessionRecordingView: React.FC = () => {
       action: EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
       tabId: currentTabId,
       showWidget: true,
+      url: currentTabUrl,
     });
     setIsManualMode(true);
     setIsRecordingSession(true);
-  }, [currentTabId]);
+  }, [currentTabId, currentTabUrl]);
 
   const viewRecordingOnClick = useCallback(() => {
     if (isManualMode) {
@@ -50,6 +52,7 @@ const SessionRecordingView: React.FC = () => {
   useEffect(() => {
     chrome.tabs.query({ currentWindow: true, active: true }, ([activeTab]) => {
       setCurrentTabId(activeTab.id);
+      setCurrentTabUrl(activeTab.url);
       chrome.tabs.sendMessage(
         activeTab.id,
         { action: CLIENT_MESSAGES.IS_RECORDING_SESSION },
