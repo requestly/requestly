@@ -40,6 +40,7 @@ RQ.CLIENT_MESSAGES = {
   GET_APPLIED_RULE_IDS: "getAppliedRuleIds",
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
+  RESET_RECORDING_STATE: "resetRecordingState",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   SYNC_APPLIED_RULES: "syncAppliedRules",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
