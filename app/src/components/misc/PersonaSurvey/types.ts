@@ -3,11 +3,10 @@ import { ReactNode } from "react";
 export interface UserPersona {
   page: number | SurveyPage;
   isSurveyCompleted: boolean;
-  persona: string;
+  persona: string | OtherOption;
   referralChannel?: string;
   useCases?: string[];
   numberOfEmployees?: string;
-  industry?: string | OtherOption;
 }
 
 export type OtherOption = {
@@ -43,10 +42,12 @@ export interface SurveyOptionsConfig {
 }
 
 export enum PersonaType {
-  FRONTEND = "Front-end developer",
-  BACKEND = "Back-end developer",
+  FRONTEND = "Front-End developer",
+  BACKEND = "Back-End developer",
   FULLSTACK = "Full-stack developer",
-  MARKETER = "Digital Marketer",
+  FOUNDER = "Founder/CEO",
+  MANAGER = "Engineering Lead/Manager",
+  IT = "IT Procurement/Administrator",
   QUALITY = "QA engineer",
   PRODUCT = "Product manager",
   SALES = "Sales",
@@ -54,12 +55,10 @@ export enum PersonaType {
 
 export enum QuestionnaireType {
   PERSONA = "persona",
-  INDUSTRY = "industry",
 }
 
 export enum SurveyPage {
   GETTING_STARTED = "getting_started",
   PERSONA = "persona",
-  INDUSTRY = "industry",
   RECOMMENDATIONS = "recommendations",
 }

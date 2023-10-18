@@ -29,7 +29,15 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
         icon: "🏗",
       },
       {
-        title: PersonaType.MARKETER,
+        title: PersonaType.FOUNDER,
+        icon: "📈",
+      },
+      {
+        title: PersonaType.IT,
+        icon: "📈",
+      },
+      {
+        title: PersonaType.MANAGER,
         icon: "📈",
       },
       {
@@ -44,43 +52,7 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
         title: PersonaType.SALES,
         icon: "💵",
       },
-    ],
-  },
-  [QuestionnaireType.INDUSTRY]: {
-    questionResponseAction: (dispatch, value, doClear = false) =>
-      setUserPersona(dispatch, value, doClear, QuestionnaireType.INDUSTRY),
-    options: [
-      {
-        title: "Ad-Tech",
-      },
-      {
-        title: "E-commerce",
-      },
-      {
-        title: "Gaming",
-      },
-      {
-        title: "Ed-Tech",
-      },
-      {
-        title: "IT services",
-      },
-      {
-        title: "Financial services",
-      },
-      {
-        title: "Healthcare",
-      },
-      {
-        title: "SaaS",
-      },
-      {
-        title: "Travel",
-      },
-      {
-        type: "other",
-        title: null,
-      },
+      { type: "other", title: null },
     ],
   },
 };

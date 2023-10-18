@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { RQInput } from "lib/design-system/components";
+import { RQButton, RQInput } from "lib/design-system/components";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserPersonaSurveyDetails } from "store/selectors";
 import { Option, OtherOption, QuestionnaireType } from "../types";
@@ -8,10 +8,11 @@ import "./index.css";
 interface OptionProps {
   option: Option;
   questionnaire: QuestionnaireType;
+  moveToNextPage: () => void;
   action?: (dispatch: any, value: string | OtherOption, doClear: boolean) => void;
 }
 
-export const SurveyOption: React.FC<OptionProps> = ({ option, action, questionnaire }) => {
+export const SurveyOption: React.FC<OptionProps> = ({ option, action, questionnaire, moveToNextPage }) => {
   const dispatch = useDispatch();
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const [otherValue, setOtherValue] = useState<OtherOption>({ type: "other", value: "" });
@@ -44,15 +45,19 @@ export const SurveyOption: React.FC<OptionProps> = ({ option, action, questionna
           />
         </div>
       ) : (
-        <div
+        <RQButton
+          type="default"
           className={`survey-option survey-select ${isActive && "outline-active-option"}`}
-          onClick={() => action(dispatch, title, isActive)}
+          onClick={() => {
+            action(dispatch, title, isActive);
+            moveToNextPage();
+          }}
         >
           <div className="white text-bold survey-option-title">
             {<span className={`${typeof icon === "string" && "survey-modal-emoji"}`}>{icon}</span>}
             {title}
           </div>
-        </div>
+        </RQButton>
       )}
     </>
   );

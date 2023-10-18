@@ -12,9 +12,9 @@ export const GettingStartedWithSurvey = () => {
 
   return (
     <div className="persona-survey-banner">
-      <Typography.Title className="onboarding-banner-title">Welcome to Requestly!</Typography.Title>
+      <Typography.Title className="onboarding-banner-title">Help us personalise your experience</Typography.Title>
       <Typography.Paragraph className="survey-banner-subtitle">
-        Help us personalise your experience by answering the following questionnaire
+        Please select the role that describes you the best
       </Typography.Paragraph>
       <div className="survey-lottie-animation-container">
         <WelcomeAnimation className="survey-lottie-animation" animationName="persona-survey-welcome" />

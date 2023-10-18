@@ -13,10 +13,6 @@ const INITIAL_STATE = {
   userPersona: {
     page: "getting_started",
     persona: "",
-    industry: "",
-    // useCases: [],
-    // referralChannel: "",
-    // numberOfEmployees: "",
     isSurveyCompleted: false,
   },
 
