@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import {
   CheckOutlined,
   CloseOutlined,
@@ -33,8 +32,6 @@ import {
   getGroupsSelection,
   getRulesToPopulate,
   getUserAuthDetails,
-  getUserAttributes,
-  getIsMiscTourCompleted,
 } from "store/selectors";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Typography, Tag } from "antd";
@@ -53,7 +50,6 @@ import { toast } from "utils/Toast.js";
 import { InfoTag } from "components/misc/InfoTag";
 import ReactHoverObserver from "react-hover-observer";
 import { UserIcon } from "components/common/UserIcon";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
@@ -73,7 +69,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import LINKS from "config/constants/sub/links";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import Logger from "lib/logger";
 import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
@@ -143,14 +138,10 @@ const RulesTable = ({
   const [size, setSize] = useState(window.innerWidth);
   const [expandedGroups, setExpandedGroups] = useState([UNGROUPED_GROUP_ID]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
-  const [startFirstRuleWalkthrough, setStartFirstRuleWalkthrough] = useState(false);
-  const [startFifthRuleWalkthrough, setStartFifthRuleWalkthrough] = useState(false);
-  const [startSharingWalkthrough, setStartSharingWalkthrough] = useState(false);
 
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
   const searchByRuleName = useSelector(getRulesSearchKeyword);
   const rulesData = useSelector(getAllRules);
   const rules = rulesFromProps ? rulesFromProps : rulesData;
@@ -164,8 +155,6 @@ const RulesTable = ({
   const selectedGroups = useSelector(getGroupsSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const groupingAndRuleActivationExp = useFeatureValue("grouping_and_rule_activation", null);
 
   const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
   const selectedGroupIds = useMemo(() => Object.keys(selectedGroups), [selectedGroups]);
@@ -1096,59 +1085,8 @@ const RulesTable = ({
     [handleNewRuleOnClick]
   );
 
-  useEffect(() => {
-    if (groupingAndRuleActivationExp === "variant1") {
-      if (!isMiscTourCompleted?.firstRule && userAttributes?.num_rules === 1) setStartFirstRuleWalkthrough(true);
-      if (!isMiscTourCompleted?.fifthRule && !userAttributes?.num_groups && userAttributes?.num_rules === 5)
-        setStartFifthRuleWalkthrough(true);
-    }
-  }, [
-    isMiscTourCompleted?.fifthRule,
-    isMiscTourCompleted?.firstRule,
-    userAttributes?.num_groups,
-    userAttributes?.num_rules,
-    groupingAndRuleActivationExp,
-  ]);
-
-  useEffect(() => {
-    if (
-      !isMiscTourCompleted.rulesListSharingOnboarding &&
-      userAttributes?.num_rules >= 1 &&
-      new Date(userAttributes?.install_date) < new Date("2023-09-07")
-    ) {
-      setStartSharingWalkthrough(true);
-    }
-  }, [userAttributes?.num_rules, userAttributes?.install_date, isMiscTourCompleted.rulesListSharingOnboarding]);
-
   return (
     <>
-      <ProductWalkthrough
-        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIFTH_RULE}
-        startWalkthrough={startFifthRuleWalkthrough}
-        onTourComplete={() =>
-          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "fifthRule" }))
-        }
-      />
-      <ProductWalkthrough
-        tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_RULE}
-        startWalkthrough={startFirstRuleWalkthrough}
-        onTourComplete={() =>
-          dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstRule" }))
-        }
-      />
-      <ProductWalkthrough
-        tourFor={MISC_TOURS.SHARING.RULES_LIST_SHARING_ONBOARDING}
-        startWalkthrough={startSharingWalkthrough && !isMiscTourCompleted.rulesListSharingOnboarding}
-        completeTourOnUnmount={false}
-        onTourComplete={() =>
-          dispatch(
-            actions.updateProductTourCompleted({
-              tour: TOUR_TYPES.MISCELLANEOUS,
-              subTour: "rulesListSharingOnboarding",
-            })
-          )
-        }
-      />
       <ProTable
         scroll={{ x: 900 }}
         className="records-table"
@@ -1320,15 +1258,7 @@ const RulesTable = ({
                     authSource: AUTH.SOURCE.SHARE_RULES,
                     icon: <UsergroupAddOutlined />,
                     tourId: "rule-list-share-btn",
-                    onClickHandler: () => {
-                      handleShareRulesOnClick();
-                      dispatch(
-                        actions.updateProductTourCompleted({
-                          tour: TOUR_TYPES.MISCELLANEOUS,
-                          subTour: "rulesListSharingOnboarding",
-                        })
-                      );
-                    },
+                    onClickHandler: handleShareRulesOnClick,
                   },
                   {
                     shape: null,
