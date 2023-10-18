@@ -63,3 +63,13 @@
   padding: 0;
   background: none;
 }
+
+.onboarding-auth-form {
+  position: relative;
+}
+
+.skip-onboarding-btn.ant-btn {
+  position: absolute;
+  right: -100px;
+  top: -140px;
+}

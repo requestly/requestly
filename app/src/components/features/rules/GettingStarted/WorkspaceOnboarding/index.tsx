@@ -213,24 +213,22 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     switch (step) {
       case OnboardingSteps.AUTH:
         return (
-          <div>
+          <div className="onboarding-auth-form">
+            <RQButton
+              className="display-block text-gray m-auto skip-onboarding-btn"
+              type="text"
+              onClick={() => {
+                trackOnboardingWorkspaceSkip(OnboardingSteps.AUTH);
+                dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+              }}
+            >
+              Skip for now
+            </RQButton>
             <OnboardingAuthForm
               callback={{
                 onSignInSuccess: (uid, isNewUser) => handleAuthCompletion(isNewUser),
               }}
             />
-            <div className="display-row-center mt-20">
-              <RQButton
-                className="display-block text-gray m-auto"
-                type="text"
-                onClick={() => {
-                  trackOnboardingWorkspaceSkip(OnboardingSteps.AUTH);
-                  dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
-                }}
-              >
-                Skip for now
-              </RQButton>
-            </div>
           </div>
         );
       case OnboardingSteps.PERSONA_SURVEY:
