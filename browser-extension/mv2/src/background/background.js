@@ -1027,7 +1027,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
         BG.Methods.startRecordingExplicitly(message.tabId ?? sender.tab.id, message.showWidget);
-        break;
+        return true;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
         BG.Methods.stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
@@ -1385,15 +1385,28 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   });
 };
 
-BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
+BG.Methods.startRecordingExplicitly = async (tabId, showWidget = true) => {
+  let forceStart = false;
+  const sessionRecordingConfig = await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG);
+
+  if (sessionRecordingConfig?.autoRecording?.isActive) {
+    forceStart = true;
+    sessionRecordingConfig.autoRecording.isActive = false;
+    await RQ.StorageService.saveRecord({ [RQ.STORAGE_KEYS.SESSION_RECORDING_CONFIG]: sessionRecordingConfig });
+    window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  }
+
   const sessionRecordingDataExist = !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
   if (sessionRecordingDataExist) {
     return;
   }
 
   const sessionRecordingData = { explicit: true, showWidget };
-
   window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
+
+  if (forceStart) {
+    BG.Methods.sendMessageToClient(tabId, { action: RQ.CLIENT_MESSAGES.RESET_RECORDING_STATE });
+  }
 
   BG.Methods.sendMessageToClient(tabId, {
     action: RQ.CLIENT_MESSAGES.START_RECORDING,
