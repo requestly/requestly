@@ -60,6 +60,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
     []
   );
+  const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
 
   const isPendingEmailInvite = useMemo(() => pendingInvites?.some((invite) => invite.usage === InviteUsage.once), [
     pendingInvites,
@@ -96,6 +97,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
           teamName: newTeamName,
           generatePublicLink: true,
         }).then((response: any) => {
+          upsertTeamCommonInvite({ teamId: response?.data?.teamId, domainEnabled: true });
           setDefaultTeamData({ name: newTeamName, ...response?.data });
           dispatch(
             actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
@@ -115,7 +117,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
           );
           setTimeout(() => {
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
-          }, 100);
+          }, 50);
         });
       } else {
         dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
@@ -133,6 +135,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     dispatch,
     appMode,
     isWorkspaceMode,
+    upsertTeamCommonInvite,
   ]);
 
   useEffect(() => {
