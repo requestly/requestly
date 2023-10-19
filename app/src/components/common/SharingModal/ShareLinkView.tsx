@@ -6,7 +6,7 @@ import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
 import { getSharedListIdFromImportURL } from "components/features/sharedLists/SharedListViewerIndexPage/actions";
 import { createSharedList } from "./actions";
-import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
+// import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { getSharedListURL } from "utils/PathUtils";
 import { toast } from "utils/Toast";
@@ -19,6 +19,7 @@ import { Rule } from "types";
 import Logger from "lib/logger";
 import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import "./index.css";
+import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
 
 interface ShareLinkProps {
   selectedRules: string[];
@@ -32,7 +33,6 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
   const rules = useSelector(getAllRules);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
-  const [permittedEmailsList, setPermittedEmailsList] = useState([]);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
   const [shareableLinkData, setShareableLinkData] = useState(null);
@@ -103,42 +103,25 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
     </div>
   );
 
+  const handleAddRecipient = useCallback((recipients: string[]) => {
+    const newRecipients = recipients.map((recipient) => ({
+      label: recipient,
+      value: recipient,
+    }));
+    setSharedListRecipients(newRecipients);
+  }, []);
+
   const emailInputField = useMemo(
     () => (
       <div className="mt-8 sharing-modal-email-input-wrapper">
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
         </label>
-        <ReactMultiEmail
-          className="sharing-modal-email-input"
-          // placeholder="john@example.com"
-          //@ts-ignore
-          type="email"
-          emails={permittedEmailsList}
-          onChange={(email) => handleAddRecipient(email)}
-          validateEmail={validateEmail}
-          getLabel={(email, index, removeEmail) => (
-            <div data-tag key={index} className="multi-email-tag">
-              {email}
-              <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-              </span>
-            </div>
-          )}
-        />
+        <EmailInputWithDomainBasedSuggestions onChange={handleAddRecipient} />
       </div>
     ),
-    [permittedEmailsList]
+    [handleAddRecipient]
   );
-
-  const handleAddRecipient = (recipients: string[]) => {
-    setPermittedEmailsList(recipients);
-    const newRecipients = recipients.map((recipient) => ({
-      label: recipient,
-      value: recipient,
-    }));
-    setSharedListRecipients(newRecipients);
-  };
 
   const validateSharedListName = useCallback(() => {
     //eslint-disable-next-line

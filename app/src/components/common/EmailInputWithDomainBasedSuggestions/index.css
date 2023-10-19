@@ -1,0 +1,16 @@
+.email-input > input {
+  width: 100% !important;
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.email-input-container {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.email-input-container > span[data-placeholder] {
+  color: var(--text-gray) !important;
+}

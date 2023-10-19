@@ -5,7 +5,6 @@ import { Row, Checkbox } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import isEmail from "validator/lib/isEmail";
-import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
@@ -19,8 +18,8 @@ import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import APP_CONSTANTS from "config/constants";
-import "react-multi-email/style.css";
 import "./AddMemberModal.css";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -186,22 +185,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
               <div className="title mt-16">Email address</div>
               <div className="email-invites-wrapper">
                 <div className="emails-input-wrapper">
-                  <ReactMultiEmail
-                    className="members-email-input"
-                    placeholder="Email Address"
-                    type="email"
-                    value={userEmail}
-                    onChange={setUserEmail}
-                    validateEmail={validateEmail}
-                    getLabel={(email, index, removeEmail) => (
-                      <div data-tag key={index} className="multi-email-tag">
-                        {email}
-                        <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                          <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-                        </span>
-                      </div>
-                    )}
-                  />
+                  <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} />
                   <div className="access-dropdown-container">
                     <MemberRoleDropdown
                       placement="bottomRight"
