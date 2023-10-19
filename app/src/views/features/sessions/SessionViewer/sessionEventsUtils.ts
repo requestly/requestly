@@ -125,3 +125,28 @@ export const downloadSession = (fileContent: string, fileName: string): void => 
 export const getSessionRecordingOptions = (options: RecordingOptions): string[] => {
   return Object.keys(options ?? {}).filter((key: DebugInfo) => options?.[key]);
 };
+
+export function isUserInteractionEvent(event: RRWebEventData): boolean {
+  if (event.type !== EventType.IncrementalSnapshot) {
+    return false;
+  }
+  return event.data.source > IncrementalSource.Mutation && event.data.source <= IncrementalSource.Input;
+}
+
+export const getInactiveSegments = (events: RRWebEventData[]): [number, number][] => {
+  const SKIP_TIME_THRESHOLD = 10 * 1000;
+  const inactiveSegments: [number, number][] = [];
+  let lastActiveTime = events[0].timestamp;
+
+  events.forEach((event) => {
+    if (!isUserInteractionEvent(event)) {
+      return;
+    }
+    if (event.timestamp - lastActiveTime > SKIP_TIME_THRESHOLD) {
+      inactiveSegments.push([lastActiveTime, event.timestamp]);
+    }
+    lastActiveTime = event.timestamp;
+  });
+
+  return inactiveSegments;
+};
