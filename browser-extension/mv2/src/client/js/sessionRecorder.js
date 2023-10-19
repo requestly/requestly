@@ -26,8 +26,8 @@ RQ.SessionRecorder.setup = () => {
         return true;
 
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
-        RQ.SessionRecorder.sendMessageToClient("stopRecording", null);
-        break;
+        RQ.SessionRecorder.sendMessageToClient("stopRecording", null, sendResponse);
+        return true;
     }
 
     // messages for only the top document
@@ -66,7 +66,12 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
     markRecordingIcon = true,
   } = options;
 
+  console.log("start called");
+
   await RQ.SessionRecorder.initialize();
+
+  console.log("after initialize called");
+  console.log({ explicit, showWidget });
 
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
     relayEventsToTop: RQ.SessionRecorder.isIframe(),
@@ -139,6 +144,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
         }
       }
     } else if (event.data.action === "sessionRecordingStopped") {
+      console.log("stop called");
       RQ.SessionRecorder.isRecording = false;
       RQ.SessionRecorder.isExplicitRecording = false;
       RQ.SessionRecorder.showWidget = false;
@@ -209,6 +215,7 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
     } else if (event.data.action === "stopRecording") {
       window[namespace].sessionRecorder.stop();
       sendMessageToExtension("sessionRecordingStopped");
+      sendResponseToExtension(event.data.action);
     } else if (event.data.action === "getSessionData") {
       try {
         sendResponseToExtension(event.data.action, window[namespace].sessionRecorder.getSession());
