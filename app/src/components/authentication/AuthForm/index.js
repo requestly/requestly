@@ -104,7 +104,7 @@ const AuthForm = ({
     handleGoogleSignIn(appMode, MODE, eventSource)
       .then((result) => {
         if (result && result.uid) {
-          const greatingName = result.user.displayName?.split(" ")?.[0];
+          const greatingName = result.displayName?.split(" ")?.[0];
           !isOnboardingForm && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
           // syncUserPersona(result.uid, dispatch, userPersona); TEMP DISABLED
           onSignInSuccess && onSignInSuccess(result.uid, result.isNewUser);

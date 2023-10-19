@@ -3,11 +3,10 @@ import { ReactNode } from "react";
 export interface UserPersona {
   page: number | SurveyPage;
   isSurveyCompleted: boolean;
-  persona: string;
+  persona: string | OtherOption;
   referralChannel?: string;
   useCases?: string[];
   numberOfEmployees?: string;
-  industry?: string | OtherOption;
 }
 
 export type OtherOption = {
@@ -28,7 +27,7 @@ export interface PageConfig {
   page?: number;
   pageId: SurveyPage;
   title: string;
-  subTitle: string;
+  subTitle?: string;
   /**
    *  If skip true then don't show the page in survey
    */
@@ -43,23 +42,22 @@ export interface SurveyOptionsConfig {
 }
 
 export enum PersonaType {
-  FRONTEND = "Front-end developer",
-  BACKEND = "Back-end developer",
-  FULLSTACK = "Full-stack developer",
-  MARKETER = "Digital Marketer",
-  QUALITY = "QA engineer",
-  PRODUCT = "Product manager",
+  FRONTEND = "Front-End Developer",
+  BACKEND = "Back-End Developer",
+  FOUNDER = "Founder/CEO",
+  MANAGER = "Engineering Lead/Manager",
+  IT = "IT Procurement/Administrator",
+  QUALITY = "QA Engineer",
+  PRODUCT = "Product Manager",
   SALES = "Sales",
 }
 
 export enum QuestionnaireType {
   PERSONA = "persona",
-  INDUSTRY = "industry",
 }
 
 export enum SurveyPage {
   GETTING_STARTED = "getting_started",
   PERSONA = "persona",
-  INDUSTRY = "industry",
   RECOMMENDATIONS = "recommendations",
 }
