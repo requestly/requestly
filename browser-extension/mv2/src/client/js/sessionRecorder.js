@@ -68,6 +68,10 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
 
   await RQ.SessionRecorder.initialize();
 
+  if (!explicit && RQ.SessionRecorder.isExplicitRecording) {
+    return;
+  }
+
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
     relayEventsToTop: RQ.SessionRecorder.isIframe(),
     console: true,
