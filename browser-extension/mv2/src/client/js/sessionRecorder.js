@@ -88,6 +88,7 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
 
   if (explicit) {
     RQ.SessionRecorder.recordingStartTime = recordingStartTime ?? Date.now();
+    RQ.SessionRecorder.hideAutoModeWidget();
   }
 };
 
@@ -145,6 +146,7 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.markRecordingIcon = false;
 
       RQ.SessionRecorder.hideManualModeWidget();
+      RQ.SessionRecorder.hideAutoModeWidget();
 
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -201,6 +203,7 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
     }
 
     if (event.data.action === "startRecording") {
+      window[namespace]?.sessionRecorder?.stop?.();
       window[namespace].sessionRecorder = new Requestly.SessionRecorder(event.data.payload);
       window[namespace].sessionRecorder.start();
       sendMessageToExtension("sessionRecordingStarted");
@@ -309,4 +312,9 @@ RQ.SessionRecorder.showAutoModeRecordingWidget = () => {
       },
     })
   );
+};
+
+RQ.SessionRecorder.hideAutoModeWidget = () => {
+  let widget = document.querySelector("rq-session-recording-auto-mode-widget");
+  widget?.dispatchEvent(new CustomEvent("hide"));
 };
