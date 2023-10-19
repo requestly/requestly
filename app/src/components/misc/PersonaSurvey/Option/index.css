@@ -1,5 +1,5 @@
 .persona-survey-container .survey-input-option {
-  width: 100%;
+  width: 48%;
 }
 .persona-survey-container .survey-input-option .ant-input-affix-wrapper,
 .persona-survey-container .survey-input-option .ant-input-affix-wrapper:focus {
@@ -7,6 +7,7 @@
   border: none;
   outline: none;
   box-shadow: none;
+  padding: 0;
 }
 .persona-survey-container .survey-input-option .ant-input-affix-wrapper .ant-input {
   border-bottom: 1px solid var(--border-dark);
@@ -32,7 +33,13 @@
   width: 48%;
   justify-content: space-between;
   align-items: center;
+  padding: 22px 10px;
 }
+.persona-survey-container .survey-option.survey-select.ant-btn:hover {
+  background: var(--hover-color);
+  border: 1px solid var(--border);
+}
+
 .persona-survey-container .survey-option.survey-text {
   width: 98%;
 }
