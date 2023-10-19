@@ -49,10 +49,8 @@
 .persona-survey-container .survey-footer {
   margin-top: 40px;
 }
-.persona-survey-container .survey-footer .survey-disable-continue {
-  opacity: 0.4;
-  pointer-events: none;
-  cursor: not-allowed;
+.persona-survey-container .survey-footer {
+  min-height: 50px;
 }
 .persona-survey-container .survey-lottie-animation-container {
   position: relative;

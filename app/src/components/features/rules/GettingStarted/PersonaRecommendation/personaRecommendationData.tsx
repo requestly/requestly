@@ -4,7 +4,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import { FiVideo } from "@react-icons/all-files/fi/FiVideo";
 import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
-import { MdOutlineUploadFile } from "@react-icons/all-files/md/MdOutlineUploadFile";
 import { FeatureSection } from "./types";
 import { ApiOutlined } from "@ant-design/icons";
 import { FeatureReleaseTag } from "./types";
@@ -14,7 +13,7 @@ const { RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
 export const personaRecommendationData: FeatureSection[] = [
   {
-    section: "URL Rewrites",
+    section: "Modify HTTP Requests",
     features: [
       {
         id: "redirect_request",
@@ -24,6 +23,20 @@ export const personaRecommendationData: FeatureSection[] = [
         link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.REDIRECT}`,
       },
       {
+        id: "modify_existing_api_response",
+        title: "Modify API response",
+        icon: RULE_TYPES_CONFIG[RULE_TYPES.RESPONSE].ICON,
+        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.RESPONSE].DESCRIPTION,
+        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.RESPONSE}`,
+      },
+      {
+        id: "request_response_headers",
+        title: "Modify HTTP headers",
+        icon: RULE_TYPES_CONFIG[RULE_TYPES.HEADERS].ICON,
+        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.HEADERS].DESCRIPTION,
+        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.HEADERS}`,
+      },
+      {
         id: "replace_string",
         title: "Replace string",
         icon: RULE_TYPES_CONFIG[RULE_TYPES.REPLACE].ICON,
@@ -31,35 +44,16 @@ export const personaRecommendationData: FeatureSection[] = [
         link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.REPLACE}`,
       },
       {
-        id: "query_params",
-        title: "Query params",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.QUERYPARAM].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.QUERYPARAM].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.QUERYPARAM}`,
+        id: "modify_existing_api_payload",
+        title: "Modify request body",
+        icon: RULE_TYPES_CONFIG[RULE_TYPES.REQUEST].ICON,
+        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.REQUEST].DESCRIPTION,
+        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.REQUEST}`,
       },
     ],
   },
   {
-    section: "Headers",
-    features: [
-      {
-        id: "request_response_headers",
-        title: "Request/Response headers",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.HEADERS].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.HEADERS].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.HEADERS}`,
-      },
-      {
-        id: "user_agent",
-        title: "User agent",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.USERAGENT].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.USERAGENT].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.USERAGENT}`,
-      },
-    ],
-  },
-  {
-    section: "Page HTML",
+    section: "Others",
     features: [
       {
         id: "record_session",
@@ -70,25 +64,6 @@ export const personaRecommendationData: FeatureSection[] = [
         tag: FeatureReleaseTag.NEW,
       },
       {
-        id: "inject_script",
-        title: "Inject script",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.SCRIPT}`,
-      },
-      {
-        id: "host_js_css",
-        title: "Host JS/CSS",
-        icon: () => <MdOutlineUploadFile />,
-        subTitle: "Host your JS/CSS/HTML files and use them anywhere for debugging",
-        link: PATHS.FILE_SERVER_V2.ABSOLUTE,
-      },
-    ],
-  },
-  {
-    section: "API's",
-    features: [
-      {
         id: "new_api_end_point",
         title: "New API endpoint",
         icon: () => <IoDocumentTextOutline />,
@@ -96,45 +71,11 @@ export const personaRecommendationData: FeatureSection[] = [
         link: PATHS.MOCK_SERVER_V2.ABSOLUTE,
       },
       {
-        id: "modify_existing_api_response",
-        title: "Modify existing API response",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.RESPONSE].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.RESPONSE].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.RESPONSE}`,
-      },
-      {
-        id: "modify_existing_api_payload",
-        title: "Modify existing API payload",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.REQUEST].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.REQUEST].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.REQUEST}`,
-        disabled: true,
-      },
-      {
         id: "test_api_endpoints",
         title: "Test API endpoints",
         icon: () => <ApiOutlined />,
         subTitle: "Test responses quickly using API Client",
         link: PATHS.API_CLIENT.ABSOLUTE,
-      },
-    ],
-  },
-  {
-    section: "URL blocking and throttles",
-    features: [
-      {
-        id: "block_url_pages",
-        title: "Block URL/Pages",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.CANCEL].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.CANCEL].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.CANCEL}`,
-      },
-      {
-        id: "delay_network_request",
-        title: "Delay network request",
-        icon: RULE_TYPES_CONFIG[RULE_TYPES.DELAY].ICON,
-        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.DELAY].DESCRIPTION,
-        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.DELAY}`,
       },
     ],
   },

@@ -251,7 +251,7 @@ const RULE_TYPES_CONFIG = {
     ID: 10,
     TYPE: GLOBAL_CONSTANTS.RULE_TYPES.REQUEST,
     NAME: "Modify Request Body",
-    DESCRIPTION: "Modify Body of POST Requests",
+    DESCRIPTION: "Override API request body with static or programmatic data",
     ICON: () => <RuleIcon ruleType={GLOBAL_CONSTANTS.RULE_TYPES.REQUEST} />,
     PRIMARY_COLOR: "#880e4f",
     SECONDARY_COLOR: "#710C42",
