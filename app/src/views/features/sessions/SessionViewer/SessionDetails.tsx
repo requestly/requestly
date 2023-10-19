@@ -201,29 +201,6 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     [inactiveSegments, player, startTime]
   );
 
-  const eventCastHandler = useCallback(
-    (event: RRWebEventData) => {
-      if (!skipInactiveSegments.current) return;
-      if (isPlayerSkippingInactivity.current) return;
-      // rrweb adds a delay to the events, so we need to add that delay to the timestamp to compare with the current time
-      if (event.timestamp + (event.delay ?? 0) < currentTimeRef.current) return;
-
-      const skipEvent = inactiveSegments?.find(([startTime]) => {
-        return event.timestamp === startTime;
-      });
-
-      if (skipEvent) {
-        setPlayerState(PlayerState.SKIPPING);
-        isPlayerSkippingInactivity.current = true;
-        skippingTimeoutRef.current = setTimeout(() => {
-          player.goto(skipEvent[1] - startTime - 2000);
-          resetPlayerSkippingState();
-        }, 2000);
-      }
-    },
-    [inactiveSegments, player, startTime]
-  );
-
   const playerStateChangeHandler = useCallback((event: { payload: PlayerState }) => {
     if (isPlayerSkippingInactivity.current) {
       setPlayerState(PlayerState.SKIPPING);
@@ -237,8 +214,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
 
     player.addEventListener("ui-update-current-time", updateCurrentTimeHandler);
     player.addEventListener("ui-update-player-state", playerStateChangeHandler);
-    player.addEventListener("event-cast", eventCastHandler);
-  }, [eventCastHandler, player, playerStateChangeHandler, updateCurrentTimeHandler]);
+  }, [player, playerStateChangeHandler, updateCurrentTimeHandler]);
 
   useEffect(() => {
     if (!player) {
