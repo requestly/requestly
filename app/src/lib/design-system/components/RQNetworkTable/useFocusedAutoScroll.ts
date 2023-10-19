@@ -25,7 +25,7 @@ const useFocusedAutoScroll = <T extends HTMLDivElement>(containerRef: RefObject<
 
   useEffect(() => {
     if (containerRef.current && autoScrollRef.current && recentLogRef.current) {
-      containerRef.current.scrollTop = recentLogRef.current.offsetTop;
+      containerRef.current.scrollTop = recentLogRef.current.offsetTop - 50;
     }
     if (logId) {
       const recentLog = document.querySelector('[data-resource-id="' + logId + '"]');
