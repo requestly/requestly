@@ -27,7 +27,7 @@ export interface PageConfig {
   page?: number;
   pageId: SurveyPage;
   title: string;
-  subTitle: string;
+  subTitle?: string;
   /**
    *  If skip true then don't show the page in survey
    */
@@ -42,14 +42,13 @@ export interface SurveyOptionsConfig {
 }
 
 export enum PersonaType {
-  FRONTEND = "Front-End developer",
-  BACKEND = "Back-End developer",
-  FULLSTACK = "Full-stack developer",
+  FRONTEND = "Front-End Developer",
+  BACKEND = "Back-End Developer",
   FOUNDER = "Founder/CEO",
   MANAGER = "Engineering Lead/Manager",
   IT = "IT Procurement/Administrator",
-  QUALITY = "QA engineer",
-  PRODUCT = "Product manager",
+  QUALITY = "QA Engineer",
+  PRODUCT = "Product Manager",
   SALES = "Sales",
 }
 

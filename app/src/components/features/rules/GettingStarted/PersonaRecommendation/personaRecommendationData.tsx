@@ -49,7 +49,6 @@ export const personaRecommendationData: FeatureSection[] = [
         icon: RULE_TYPES_CONFIG[RULE_TYPES.REQUEST].ICON,
         subTitle: RULE_TYPES_CONFIG[RULE_TYPES.REQUEST].DESCRIPTION,
         link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.REQUEST}`,
-        disabled: true,
       },
     ],
   },

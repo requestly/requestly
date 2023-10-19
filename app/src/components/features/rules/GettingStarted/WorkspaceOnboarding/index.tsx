@@ -225,7 +225,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
                 dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
               }}
             >
-              Skip for now
+              Skip
             </RQButton>
             <OnboardingAuthForm
               callback={{

@@ -45,10 +45,6 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
         icon: "📊",
       },
       {
-        title: PersonaType.FULLSTACK,
-        icon: "👨🏽‍💻",
-      },
-      {
         title: PersonaType.SALES,
         icon: "💵",
       },
@@ -70,8 +66,8 @@ export const SurveyConfig: Partial<Record<SurveyPage, PageConfig>> = {
   [SurveyPage.PERSONA]: {
     page: 1,
     pageId: SurveyPage.PERSONA,
-    title: "Which role describes you the best?",
-    subTitle: "Please select one you closely relate to",
+    title: "Help us personalise your experience",
+    subTitle: "Please select the role that describes you the best",
     visibility: () => true,
     render: QuestionnaireType.PERSONA,
   },

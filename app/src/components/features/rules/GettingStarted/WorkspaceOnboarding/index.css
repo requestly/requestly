@@ -72,4 +72,5 @@
   position: absolute;
   right: -100px;
   top: -140px;
+  color: var(--text-gray);
 }
