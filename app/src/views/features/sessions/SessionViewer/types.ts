@@ -60,6 +60,12 @@ export interface PageNavigationLog {
   timeOffset: number;
 }
 
+export enum PlayerState {
+  PLAYING = "playing",
+  PAUSED = "paused",
+  SKIPPING = "skipping",
+}
+
 export enum SessionRecordingMode {
   AUTO = "auto",
   MANUAL = "manual",
