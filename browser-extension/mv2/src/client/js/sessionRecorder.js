@@ -203,6 +203,7 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
     }
 
     if (event.data.action === "startRecording") {
+      window[namespace]?.sessionRecorder?.stop?.();
       window[namespace].sessionRecorder = new Requestly.SessionRecorder(event.data.payload);
       window[namespace].sessionRecorder.start();
       sendMessageToExtension("sessionRecordingStarted");
