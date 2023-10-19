@@ -10,14 +10,8 @@ import { handleSurveyNavigation } from "./actions";
 import { Option, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
 import { RQButton, RQModal } from "lib/design-system/components";
-// import { submitAttrUtil } from "utils/AnalyticsUtils";
-import {
-  // trackPersonaQ1Completed,
-  trackPersonaSurveySignInClicked,
-  trackPersonaSurveyViewed,
-} from "modules/analytics/events/misc/onboarding";
+import { trackPersonaSurveySignInClicked, trackPersonaSurveyViewed } from "modules/analytics/events/misc/onboarding";
 import { AUTH } from "modules/analytics/events/common/constants";
-// import PATHS from "config/constants/sub/paths";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";

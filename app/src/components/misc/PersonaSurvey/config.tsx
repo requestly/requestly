@@ -30,15 +30,15 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
       },
       {
         title: PersonaType.FOUNDER,
-        icon: "👨🏽‍💼",
+        icon: "🧑🏽‍💼",
       },
       {
         title: PersonaType.IT,
-        icon: "👨🏽‍💻",
+        icon: "📂",
       },
       {
         title: PersonaType.MANAGER,
-        icon: "👨🏽‍💼",
+        icon: "👨🏽‍💻",
       },
       {
         title: PersonaType.PRODUCT,
