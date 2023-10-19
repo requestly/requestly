@@ -12,7 +12,7 @@ import APP_CONSTANTS from "config/constants";
 import "./ResponseRulePair.css";
 
 const {
-  PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE },
+  PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE, SOURCE_REQUEST_PAYLOAD_OPERATOR },
 } = APP_CONSTANTS;
 
 const ResponseRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
@@ -23,6 +23,11 @@ const ResponseRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => 
     [pairIndex, currentlySelectedRuleData]
   );
 
+  const currentPayloadOperator = useMemo(
+    () => getObjectValue(currentlySelectedRuleData, pairIndex, SOURCE_REQUEST_PAYLOAD_OPERATOR),
+    [pairIndex, currentlySelectedRuleData]
+  );
+
   const currentPayloadValue = useMemo(
     () => getObjectValue(currentlySelectedRuleData, pairIndex, SOURCE_REQUEST_PAYLOAD_VALUE),
     [pairIndex, currentlySelectedRuleData]
@@ -30,6 +35,7 @@ const ResponseRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => 
 
   const [gqlOperationFilter, setGqlOperationFilter] = useState({
     key: currentPayloadKey,
+    operator: currentPayloadOperator,
     value: currentPayloadValue,
   });
 
@@ -46,19 +52,19 @@ const ResponseRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => 
           />
         </Col>
       </Row>
-
-      <Row wrap={false} gutter={[20]} className="response-rule-inputs">
-        {responseRuleResourceType === ResponseRuleResourceType.GRAPHQL_API && (
-          <Col span={12}>
+      {responseRuleResourceType === ResponseRuleResourceType.GRAPHQL_API && (
+        <Row className="response-rule-inputs-row">
+          <Col span={24}>
             <GraphqlRequestPayload
               pairIndex={pairIndex}
               gqlOperationFilter={gqlOperationFilter}
               setGqlOperationFilter={setGqlOperationFilter}
             />
           </Col>
-        )}
-
-        <Col span={12}>
+        </Row>
+      )}
+      <Row className="response-rule-inputs-row">
+        <Col span={24}>
           <ResponseStatusCodeRow rowIndex={2} pair={pair} pairIndex={pairIndex} isInputDisabled={isInputDisabled} />
         </Col>
       </Row>

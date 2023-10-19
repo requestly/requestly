@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlySelectedRuleData } from "store/selectors";
-import { Input, Row, Col, Tooltip } from "antd";
+import { Input, Row, Col, Tooltip, Select, Button } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -11,19 +11,29 @@ import { debounce, snakeCase } from "lodash";
 import { ResponseRuleResourceType } from "types/rules";
 import {
   trackRequestPayloadKeyFilterModifiedEvent,
+  trackRequestPayloadOperatorFilterModifiedEvent,
   trackRequestPayloadValueFilterModifiedEvent,
 } from "modules/analytics/events/common/rules/filters";
 import "./GraphqlRequestPayload.css";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
 const {
-  PATH_FROM_PAIR: { SOURCE_REQUEST_PAYLOAD, SOURCE_REQUEST_PAYLOAD_KEY, SOURCE_REQUEST_PAYLOAD_VALUE },
-} = APP_CONSTANTS;
+  SOURCE_REQUEST_PAYLOAD,
+  SOURCE_REQUEST_PAYLOAD_KEY,
+  SOURCE_REQUEST_PAYLOAD_OPERATOR,
+  SOURCE_REQUEST_PAYLOAD_VALUE,
+} = APP_CONSTANTS.PATH_FROM_PAIR;
 
 const debouncedTrackPayloadKeyModifiedEvent = debounce(trackRequestPayloadKeyFilterModifiedEvent, 500);
 
 const debouncedTrackPayloadValueModifiedEvent = debounce(trackRequestPayloadValueFilterModifiedEvent, 500);
 
-type RequestPayload = { key: string; value: string };
+interface RequestPayload {
+  key: string;
+  operator?: string;
+  value: string;
+}
 
 interface GraphqlRequestPayloadProps {
   pairIndex: number;
@@ -55,6 +65,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   }, [dispatch, pairIndex, gqlOperationFilter.key, gqlOperationFilter.value]);
 
   const clearRequestPayload = () => {
+    setGqlOperationFilter({ key: "", value: "" });
     deleteObjectAtPath(
       currentlySelectedRuleData,
       setCurrentlySelectedRule,
@@ -65,39 +76,48 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   };
 
   const handleRequestPayloadKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPayloadKey = e?.target?.value ?? "";
+
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: { [SOURCE_REQUEST_PAYLOAD_KEY]: e?.target?.value },
+        updates: { [SOURCE_REQUEST_PAYLOAD_KEY]: newPayloadKey },
       })
     );
-    const key = e.target.value;
 
-    if (key === "" && gqlOperationFilter.value === "") {
-      clearRequestPayload();
-    }
-
-    setGqlOperationFilter((prev) => ({ ...prev, key }));
+    setGqlOperationFilter((prev) => ({ ...prev, key: newPayloadKey }));
     debouncedTrackPayloadKeyModifiedEvent(
       currentlySelectedRuleData.ruleType,
       snakeCase(ResponseRuleResourceType.GRAPHQL_API)
     );
   };
 
-  const handleRequestPayloadValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRequestPayloadOperatorChange = (operator: string) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: { [SOURCE_REQUEST_PAYLOAD_VALUE]: e?.target?.value },
+        updates: { [SOURCE_REQUEST_PAYLOAD_OPERATOR]: operator },
       })
     );
-    const value = e.target.value;
 
-    if (value === "" && gqlOperationFilter.key === "") {
-      clearRequestPayload();
-    }
+    setGqlOperationFilter((prev) => ({ ...prev, operator }));
+    trackRequestPayloadOperatorFilterModifiedEvent(
+      currentlySelectedRuleData.ruleType,
+      snakeCase(ResponseRuleResourceType.GRAPHQL_API)
+    );
+  };
 
-    setGqlOperationFilter((prev) => ({ ...prev, value }));
+  const handleRequestPayloadValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPayloadValue = e?.target?.value ?? "";
+
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: { [SOURCE_REQUEST_PAYLOAD_VALUE]: newPayloadValue },
+      })
+    );
+
+    setGqlOperationFilter((prev) => ({ ...prev, value: newPayloadValue }));
     debouncedTrackPayloadValueModifiedEvent(
       currentlySelectedRuleData.ruleType,
       snakeCase(ResponseRuleResourceType.GRAPHQL_API)
@@ -105,44 +125,66 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   };
 
   return (
-    <Col span={24} data-tour-id="rule-editor-response-graphql-payload">
-      <label className="subtitle graphql-operation-label">
-        GraphQL Operation (Request Payload Filter)
-        <Tooltip
-          overlayInnerStyle={{ width: "302px" }}
-          title={
-            <span>
-              Target rule based on GraphQL operation name in request.{" "}
-              <a target="_blank" rel="noreferrer" href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_GRAPHQL}>
-                Learn more
-              </a>
-            </span>
-          }
-        >
-          <InfoCircleOutlined />
-        </Tooltip>
-      </label>
-      <Row wrap={false}>
-        <Input
-          name="key"
-          type="text"
-          autoComplete="off"
-          placeholder="Key e.g. operationName"
-          className="graphql-operation-key-input"
-          value={gqlOperationFilter.key}
-          onChange={handleRequestPayloadKeyChange}
-        />
-        <Input
-          name="value"
-          type="text"
-          autoComplete="off"
-          placeholder="value e.g. getUsers"
-          className="graphql-operation-name-input"
-          value={gqlOperationFilter.value}
-          onChange={handleRequestPayloadValueChange}
-        />
-      </Row>
-    </Col>
+    <Row className="w-full" wrap={false}>
+      <Col span={24} data-tour-id="rule-editor-response-graphql-payload">
+        <label className="subtitle graphql-operation-label">
+          GraphQL Operation (Request Payload Filter)
+          <Tooltip
+            overlayInnerStyle={{ width: "302px" }}
+            title={
+              <span>
+                Target rule based on GraphQL operation name in request.{" "}
+                <a target="_blank" rel="noreferrer" href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_MOCK_GRAPHQL}>
+                  Learn more
+                </a>
+              </span>
+            }
+          >
+            <InfoCircleOutlined />
+          </Tooltip>
+        </label>
+        <Row wrap={false} gutter={6}>
+          <Col span={8}>
+            <Input
+              name="key"
+              type="text"
+              autoComplete="off"
+              placeholder="Key e.g. operationName"
+              className="graphql-operation-key-input"
+              value={gqlOperationFilter.key}
+              onChange={handleRequestPayloadKeyChange}
+            />
+          </Col>
+          {isFeatureCompatible(FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR) && (
+            <Col span={4}>
+              <Select
+                className="graphql-operation-filter-operator"
+                options={[
+                  { value: "Equals", label: "Equals" },
+                  { value: "Contains", label: "Contains" },
+                ]}
+                value={gqlOperationFilter.operator || "Equals"}
+                onChange={handleRequestPayloadOperatorChange}
+              />
+            </Col>
+          )}
+          <Col span={8}>
+            <Input
+              name="value"
+              type="text"
+              autoComplete="off"
+              placeholder="value e.g. getUsers"
+              className="graphql-operation-name-input"
+              value={gqlOperationFilter.value}
+              onChange={handleRequestPayloadValueChange}
+            />
+          </Col>
+          <Button type="link" className="graphql-operation-filter-reset-button" onClick={clearRequestPayload}>
+            Reset
+          </Button>
+        </Row>
+      </Col>
+    </Row>
   );
 };
 
