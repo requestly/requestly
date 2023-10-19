@@ -66,6 +66,8 @@ import {
   trackLogoutSuccess,
 } from "modules/analytics/events/common/auth/logout";
 import { toast } from "utils/Toast";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import * as Sentry from "@sentry/react";
 
 const { getUserProfilePath } = DB_UTILS;
 
@@ -460,6 +462,14 @@ export const signInWithEmailLink = async (email, callback) => {
     const database = getDatabase();
     // firebase.database().ref(getUserProfilePath(authData.uid)).update(authData);
     update(ref(database, getUserProfilePath(authData.uid)), authData);
+
+    // update isVerified flag in db
+    const functions = getFunctions();
+    const markUserAsVerified = httpsCallable(functions, "auth-markUserAsVerified");
+
+    markUserAsVerified().catch((e) => {
+      Sentry.captureException(e);
+    });
 
     //  Analytics - Track event
     trackLoginSuccessEvent({
