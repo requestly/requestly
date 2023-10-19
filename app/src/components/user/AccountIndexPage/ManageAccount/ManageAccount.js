@@ -7,19 +7,23 @@ import ActiveLicenseInfo from "./ActiveLicenseInfo";
 import UserInfo from "./UserInfo";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
-import { redirectToUpdateSubscriptionContactUs } from "../../../../utils/RedirectionUtils";
+import {
+  redirectToDeleteAccount,
+  redirectToSignDPA,
+  redirectToUpdateSubscriptionContactUs,
+} from "../../../../utils/RedirectionUtils";
 // ACTIONS
 import { handleForgotPasswordButtonOnClick } from "../../../authentication/AuthForm/actions";
-// CONSTANTS
-import APP_CONSTANTS from "../../../../config/constants";
 import ProCard from "@ant-design/pro-card";
 
 import { useSelector } from "react-redux";
 import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 const ManageAccount = () => {
   //Global State
   const user = useSelector(getUserAuthDetails);
+  const navigate = useNavigate();
 
   //Component State
   const [isChangePasswordLoading, setIsChangePasswordLoading] = useState(false);
@@ -108,9 +112,9 @@ const ManageAccount = () => {
                         <AntButton
                           type="secondary"
                           size="small"
-                          onClick={() => window.open(APP_CONSTANTS.LINKS.GDPR.EXPORT_DATA, "_blank")}
+                          onClick={() => redirectToSignDPA(navigate, { newTab: true })}
                         >
-                          Request Data Download
+                          Request DPA
                         </AntButton>
                       </Col>
                     </Row>
@@ -119,7 +123,7 @@ const ManageAccount = () => {
                         <AntButton
                           type="secondary"
                           size="small"
-                          onClick={() => window.open(APP_CONSTANTS.LINKS.GDPR.DELETE_ACCOUNT, "_blank")}
+                          onClick={() => redirectToDeleteAccount(navigate, { newTab: true })}
                         >
                           Request Account Deletion
                         </AntButton>

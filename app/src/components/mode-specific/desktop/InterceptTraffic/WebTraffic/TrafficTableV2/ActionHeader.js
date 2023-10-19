@@ -23,7 +23,7 @@ import {
 import { downloadHar } from "../TrafficExporter/harLogs/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { desktopTrafficTableActions } from "store/features/desktop-traffic-table/slice";
-import { getAllFilters } from "store/features/desktop-traffic-table/selectors";
+import { getAllFilters, getIsInterceptionPaused } from "store/features/desktop-traffic-table/selectors";
 import {
   trackTrafficInterceptionPaused,
   trackTrafficInterceptionResumed,
@@ -34,7 +34,6 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
-import { track } from "@amplitude/analytics-browser";
 import { useDebounce } from "hooks/useDebounce";
 
 const { Text } = Typography;
@@ -52,10 +51,11 @@ const ActionHeader = ({
   isFiltersCollapsed,
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
-  setIsInterceptingTraffic,
   setIsSSLProxyingModalVisible,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
+  const isPaused = useSelector(getIsInterceptionPaused);
+
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
 
   const closeSaveModal = useCallback(() => {
@@ -176,14 +176,30 @@ const ActionHeader = ({
               </Col>
 
               <Col>
-                <PauseAndPlayButton
-                  logsCount={logsCount}
-                  defaultIsPaused={false}
-                  isAnyAppConnected={isAnyAppConnected}
-                  onChange={(isPaused) => {
-                    setIsInterceptingTraffic(!isPaused);
-                  }}
-                />
+                {isPaused ? (
+                  <RQButton
+                    icon={<CaretRightOutlined />}
+                    onClick={() => {
+                      trackTrafficInterceptionResumed();
+                      trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_RESUMED);
+                      dispatch(desktopTrafficTableActions.toggleIsInterceptionPaused());
+                    }}
+                  >
+                    Resume
+                  </RQButton>
+                ) : (
+                  <RQButton
+                    danger
+                    icon={<PauseOutlined />}
+                    onClick={() => {
+                      trackTrafficInterceptionPaused();
+                      trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_PAUSED);
+                      dispatch(desktopTrafficTableActions.toggleIsInterceptionPaused());
+                    }}
+                  >
+                    Pause
+                  </RQButton>
+                )}
               </Col>
 
               {isFeatureCompatible(FEATURES.DESKTOP_APP_SSL_PROXYING) ? (
@@ -257,35 +273,3 @@ const ActionHeader = ({
 };
 
 export default ActionHeader;
-
-function PauseAndPlayButton({ defaultIsPaused, onChange, logsCount, isAnyAppConnected }) {
-  const [isPaused, setIsPaused] = useState(defaultIsPaused);
-  const buttonText = isPaused ? "Resume" : "Pause";
-
-  return isPaused ? (
-    <Button
-      icon={<CaretRightOutlined />}
-      onClick={() => {
-        setIsPaused(false);
-        onChange(false); // isPaused
-        trackTrafficInterceptionResumed();
-        trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_RESUMED);
-      }}
-    >
-      {buttonText}
-    </Button>
-  ) : (
-    <Button
-      danger
-      icon={<PauseOutlined />}
-      onClick={() => {
-        setIsPaused(true);
-        onChange(true); // isPaused
-        trackTrafficInterceptionPaused();
-        trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_INTERCEPTION_PAUSED);
-      }}
-    >
-      {buttonText}
-    </Button>
-  );
-}
