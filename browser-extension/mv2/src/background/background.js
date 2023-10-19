@@ -1026,11 +1026,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        BG.Methods.startRecordingExplicitly(
-          message.tabId ?? sender.tab.id,
-          message.showWidget,
-          message.url ?? sender.tab.url
-        );
+        BG.Methods.startRecordingExplicitly(message.tab ?? sender.tab, message.showWidget);
         return true;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
@@ -1389,18 +1385,20 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   });
 };
 
-BG.Methods.startRecordingExplicitly = async (tabId, showWidget = true, url) => {
-  const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(url);
+BG.Methods.startRecordingExplicitly = async (tab, showWidget = true) => {
+  const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
 
-  const sessionRecordingDataExist = !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  const sessionRecordingDataExist = !!window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  // Auto recording is on for current tab if sessionRecordingConfig exist,
+  // so forcefully start explicit recording.
   if (!sessionRecordingConfig && sessionRecordingDataExist) {
     return;
   }
 
   const sessionRecordingData = { explicit: true, showWidget };
-  window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
+  window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
-  BG.Methods.sendMessageToClient(tabId, {
+  BG.Methods.sendMessageToClient(tab.id, {
     action: RQ.CLIENT_MESSAGES.START_RECORDING,
     payload: sessionRecordingData,
   });
