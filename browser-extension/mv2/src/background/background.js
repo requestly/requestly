@@ -1027,7 +1027,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
         BG.Methods.startRecordingExplicitly(message.tab ?? sender.tab, message.showWidget);
-        return true;
+        break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
         BG.Methods.stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
