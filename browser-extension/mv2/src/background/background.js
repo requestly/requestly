@@ -1257,6 +1257,7 @@ BG.Methods.onPageLoadedFromCacheNotification = async (tab, payload = {}) => {
 BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
   let sessionRecordingData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
 
+  console.log("handleSessionRecordingOnClientPageLoad");
   if (!sessionRecordingData) {
     const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
 
@@ -1387,6 +1388,7 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
 
 BG.Methods.startRecordingExplicitly = async (tab, showWidget = true) => {
   const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
+  console.log("startRecordingExplicitly");
 
   const sessionRecordingDataExist = !!window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
   // Auto recording is on for current tab if sessionRecordingConfig exist,
@@ -1395,13 +1397,24 @@ BG.Methods.startRecordingExplicitly = async (tab, showWidget = true) => {
     return;
   }
 
+  console.log({ sessionRecordingConfig, showWidget });
+
   const sessionRecordingData = { explicit: true, showWidget };
   window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
-  BG.Methods.sendMessageToClient(tab.id, {
-    action: RQ.CLIENT_MESSAGES.START_RECORDING,
-    payload: sessionRecordingData,
-  });
+  if (sessionRecordingConfig) {
+    BG.Methods.sendMessageToClient(tab.id, { action: RQ.CLIENT_MESSAGES.STOP_RECORDING }, () => {
+      BG.Methods.sendMessageToClient(tab.id, {
+        action: RQ.CLIENT_MESSAGES.START_RECORDING,
+        payload: sessionRecordingData,
+      });
+    });
+  } else {
+    BG.Methods.sendMessageToClient(tab.id, {
+      action: RQ.CLIENT_MESSAGES.START_RECORDING,
+      payload: sessionRecordingData,
+    });
+  }
 };
 
 BG.Methods.launchUrlAndStartRecording = (url) => {
