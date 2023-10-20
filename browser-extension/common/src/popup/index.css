@@ -66,14 +66,14 @@
   --success: var(--green-500);
   --disable: var(--neutrals-gray-500);
 
-  --surface-1: var(--neutrals-gray-800);
-  --surface-2: var(--neutrals-gray-700);
+  --surface-1: #282828;
+  --surface-2: #383838;
   --surface-3: var(--neutrals-gray-600);
 
-  --text-light: var(--neutrals-gray-200);
+  --text-light: var(--neutrals-gray-300);
   --text-default: var(--neutrals-white);
 
-  --background: var(--neutrals-gray-900);
+  --background: #1b1b1b;
 
   --border-radius-sm: 4px;
 }
