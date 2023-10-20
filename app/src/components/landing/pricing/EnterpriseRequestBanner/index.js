@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Row, Col, Alert } from "antd";
 import { toast } from "utils/Toast.js";
-//Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
-// UTILS
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { LoadingOutlined } from "@ant-design/icons";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
 import "./index.css";
 import { trackTeamPlanCardClicked, trackTeamPlanCardShown } from "modules/analytics/events/common/teams";
+import { getUserAuthDetails } from "store/selectors";
+import { useSelector } from "react-redux";
 
-export default function EnterpriseRequestBanner({ user }) {
-  const [enterpriseContactDetails, setEnterpriseContactDetails] = useState({});
+export default function EnterpriseRequestBanner() {
+  const user = useSelector(getUserAuthDetails);
+  const [orgContactDetails, setOrgContactDetails] = useState(null);
   const [enterpriseRequestedState, setEnterpriseRequestedState] = useState(0); // 1 is clicked, 2 is sent
 
   // FIREBASE FUNCTIONS
@@ -19,13 +20,13 @@ export default function EnterpriseRequestBanner({ user }) {
   const getEnterpriseAdminDetails = httpsCallable(functions, "getEnterpriseAdminDetails");
   const requestEnterprisePlanFromAdmin = httpsCallable(functions, "requestEnterprisePlanFromAdmin");
 
-  function requestPremiumToAdmin() {
+  const requestPremiumToAdmin = useCallback(() => {
     setEnterpriseRequestedState(1);
-    const enterpriseAdmin = enterpriseContactDetails.data.enterpriseData.admin;
+    const enterpriseAdmin = orgContactDetails?.admin;
     const domain = enterpriseAdmin.email.split("@")[1];
     trackTeamPlanCardClicked(domain);
     requestEnterprisePlanFromAdmin({
-      userEmail: user.details.profile.email,
+      userEmail: user?.details?.profile?.email,
       adminEmail: enterpriseAdmin.email,
       adminName: enterpriseAdmin.name,
     })
@@ -38,26 +39,27 @@ export default function EnterpriseRequestBanner({ user }) {
         toast.error("Unable to send email");
         toast.info(`Contact directly at: ${enterpriseAdmin.email}`);
       });
-  }
+  }, [orgContactDetails?.admin, requestEnterprisePlanFromAdmin, user?.details?.profile?.email]);
 
   useEffect(() => {
     if (user?.details?.isLoggedIn) {
-      if (Object.keys(enterpriseContactDetails).length === 0) {
+      if (!orgContactDetails) {
         getEnterpriseAdminDetails({}).then((response) => {
-          setEnterpriseContactDetails(response);
           if (response.data.success) {
-            trackTeamPlanCardShown(response.data?.enterpriseData?.admin?.email?.split("@")?.[1]);
+            const contactDetails = response.data.enterpriseData;
+            setOrgContactDetails(contactDetails);
+            trackTeamPlanCardShown(contactDetails?.admin?.email?.split("@")?.[1]);
           }
         });
       }
     }
-  }, [enterpriseContactDetails, getEnterpriseAdminDetails, user?.details?.isLoggedIn]);
+  }, [orgContactDetails, getEnterpriseAdminDetails, user?.details?.isLoggedIn]);
 
   if (user?.details?.isPremium) return null;
 
   return (
     <React.Fragment>
-      {enterpriseContactDetails && enterpriseContactDetails.data && enterpriseContactDetails.data.success ? (
+      {orgContactDetails !== null ? (
         enterpriseRequestedState === 1 ? (
           <>
             <br />
@@ -80,8 +82,8 @@ export default function EnterpriseRequestBanner({ user }) {
                     color="secondary"
                     message={
                       <>
-                        {enterpriseContactDetails.data.enterpriseData.admin.name} has been notified. Please get in touch
-                        with them for further details.
+                        {orgContactDetails?.admin?.name} has been notified. Please get in touch with them for further
+                        details.
                       </>
                     }
                   ></Alert>
@@ -93,7 +95,7 @@ export default function EnterpriseRequestBanner({ user }) {
                     message={
                       <>
                         Your organization is already on Requestly Professional Plan managed by{" "}
-                        {enterpriseContactDetails.data.enterpriseData.admin.name}
+                        {orgContactDetails?.admin?.name}
                         . <br />
                         <span onClick={requestPremiumToAdmin} className="text-white text-underline cursor-pointer">
                           Click here
