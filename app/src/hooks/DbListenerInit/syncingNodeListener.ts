@@ -24,6 +24,8 @@ import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
 import { SyncType } from "utils/syncing/SyncUtils";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 type NodeRef = DatabaseReference;
 type Snapshot = DataSnapshot;
@@ -196,8 +198,11 @@ export const doSync = async (
 
   // Fetch Session Recording
   const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
+  const localSessionRecordingConfig = await StorageService(appMode).getRecord(
+    GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG
+  );
   saveSessionRecordingPageConfigLocallyWithoutSync(
-    sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : {},
+    sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : localSessionRecordingConfig,
     appMode
   );
 
