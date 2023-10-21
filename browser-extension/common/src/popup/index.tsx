@@ -6,7 +6,7 @@ import { RecordsProvider } from "./contexts/RecordsContext";
 import "./index.css";
 
 const aliasToken = {
-  fontSize: 13,
+  fontSize: 14,
   borderRadius: 4,
   controlHeight: 30,
   colorText: "#ffffff",
