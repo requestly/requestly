@@ -255,18 +255,27 @@ const FreeAndEnterprisePlanTable = () => {
                     </div>
                     {renderButtonsForPlans(planName)}
                   </div>
-                  {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE &&
-                    product !== APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && (
-                      <div className="pro-basic-feature-title text-left">
+                  <div className="feature-title text-left">
+                    {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
+                      <>
+                        <span>
+                          All you need
+                          <img src={underlineIcon} alt="highlight" />
+                        </span>{" "}
+                        to get started
+                      </>
+                    ) : (
+                      <>
                         <span>
                           Everything <img src={underlineIcon} alt="highlight" />
                         </span>{" "}
                         in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
-                      </div>
+                      </>
                     )}
+                  </div>
                   <div>
                     {planDetails.features.map((feature, index) => (
-                      <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
+                      <FeatureRepresentation key={index} feature={feature} />
                     ))}
                   </div>
                 </Col>
