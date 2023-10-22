@@ -8,6 +8,19 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.10.22",
+    logs: [
+      "[RQ-944]: new extension popup experience #1117",
+      "#643: Modify Response rule: Support for equals/contains operators in GraphQL payload filter",
+      "chore: add event param executor_is_creator (#1148)",
+      "[RQ-905] added recording_mode to session events (#1143)",
+      "[RQ-973] fix: cache position of draggable widgets (#1144)",
+      "[RQ-934] fix: icon issue in session replay player (#1113)",
+      "[RQ-896] chore: fix analytics event in popup (#1070)",
+      "fix: stop recording widget not visible when recording from launch URL #1073",
+    ],
+  },
+  {
     version: "23.9.20",
     logs: [
       "chore: removed ph-asset (#1018)",
