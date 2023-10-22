@@ -1,0 +1,34 @@
+.https-rule-options-container {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: var(--surface-1);
+  border-radius: var(--border-radius-sm);
+}
+
+.https-rule-options-container .title {
+  line-height: 20px;
+}
+
+.https-rule-options-container .options {
+  margin: 12px 0;
+  display: grid;
+  gap: 12px;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.https-rule-options-container .view-more-options-link {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 4px;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+}
+
+.https-rule-options-container .view-more-options-link svg {
+  width: 16px;
+  height: 16px;
+}

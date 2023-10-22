@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import PopupTabs from "../PopupTabs";
 import { EXTENSION_MESSAGES } from "../../../constants";
-import OnboardingScreen from "../OnboardingScreen";
 import PopupHeader from "./PopupHeader";
-import PopupFooter from "./PopupFooter";
+import { HttpsRuleOptions } from "../HttpsRuleOptions";
 import { EVENT, sendEvent } from "../../events";
+import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import "./popup.css";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
-  const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(false);
+  const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(true);
 
   useEffect(() => {
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT }, (noRulesPresent) => {
@@ -36,11 +36,13 @@ const Popup: React.FC = () => {
           isExtensionEnabled={isExtensionEnabled}
           handleToggleExtensionStatus={handleToggleExtensionStatus}
         />
-        <div className="popup-content">{ifNoRulesPresent ? <OnboardingScreen /> : <PopupTabs />}</div>
-        <PopupFooter
-          isExtensionEnabled={isExtensionEnabled}
-          handleToggleExtensionStatus={handleToggleExtensionStatus}
-        />
+        <div className="popup-body">
+          {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
+          <div className="popup-content">
+            {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
+            <SessionRecordingView />
+          </div>
+        </div>
       </div>
     </>
   );
