@@ -128,7 +128,7 @@ describe("sessionRecorder", () => {
       window.runtimeMessageListener({ action: "isRecordingSession" }, null, testIsRecording2);
       expect(testIsRecording2).toHaveBeenCalledWith(true);
 
-      const testSessionData = { events: { rrweb: [] } };
+      const testSessionData = { events: { rrweb: [] }, recordingMode: "auto" };
       const testGetSessionData = jasmine.createSpy();
       // extension asks content script for session data
       window.runtimeMessageListener({ action: "getTabSession" }, null, testGetSessionData);

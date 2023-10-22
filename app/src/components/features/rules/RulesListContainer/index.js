@@ -143,7 +143,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
   const handleNewRuleOnClick = async (_e, ruleType) => {
     if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
-    else trackNewRuleButtonClicked();
+    else trackNewRuleButtonClicked("in_app");
     if (!user.loggedIn) {
       if (await isSignUpRequired(allRules, appMode, user)) {
         promptUserToSignup(() => redirectToCreateNewRule(navigate, ruleType, "my_rules"));
