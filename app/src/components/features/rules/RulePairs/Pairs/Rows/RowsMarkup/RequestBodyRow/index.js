@@ -7,6 +7,9 @@ import { Popconfirm } from "antd";
 import CodeEditor from "components/misc/CodeEditor";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { actions } from "store";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumIcon } from "components/common/PremiumIcon";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -21,6 +24,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   );
 
   const codeFormattedFlag = useRef(null);
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const onChangeRequestType = (requestType) => {
     if (Object.values(GLOBAL_CONSTANTS.REQUEST_BODY_TYPES).includes(requestType)) {
@@ -104,6 +108,8 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     }
   }, [pair.request.type]);
 
+  const isPremiumFeature = getFeatureLimitValue(FeatureLimitType.dynamic_request_body);
+
   return (
     <Col span={24} data-tour-id="code-editor">
       <div className="subtitle response-body-row-header">Request Body</div>
@@ -128,7 +134,9 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
               className="response-body-type-radio-group"
             >
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
-              <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>Programmatic (JavaScript)</Radio>
+              <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>
+                <Row align="middle">Programmatic (JavaScript){isPremiumFeature ? <PremiumIcon /> : null}</Row>
+              </Radio>
             </Radio.Group>
           </Popconfirm>
         </Col>
