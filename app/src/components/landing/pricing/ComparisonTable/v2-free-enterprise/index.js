@@ -20,6 +20,9 @@ import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/Work
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getPlanNameFromId } from "utils/PremiumUtils";
+import { actions } from "store";
+import { useDispatch } from "react-redux";
+import { AUTH } from "modules/analytics/events/common/constants";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -28,14 +31,13 @@ const PRIVATE_WORKSPACE = {
 };
 
 const FreeAndEnterprisePlanTable = () => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
   const [duration, setDuration] = useState(APP_CONSTANTS.PRICING.DURATION.ANNUALLY);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
-
-  // const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
 
   const renderButtonsForPlans = useCallback(
     (planName) => {
@@ -48,6 +50,31 @@ const FreeAndEnterprisePlanTable = () => {
       const isPrivateWorksapceSelected = workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id;
 
       if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
+        if (!user?.details?.isLoggedIn) {
+          return (
+            <>
+              <RQButton
+                onClick={() =>
+                  dispatch(
+                    actions.toggleActiveModal({
+                      modalName: "authModal",
+                      newValue: true,
+                      newProps: {
+                        redirectURL: window.location.href,
+                        authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                        eventSource: AUTH.SOURCE.PRICING_PAGE,
+                      },
+                    })
+                  )
+                }
+                type="primary"
+              >
+                Signup
+              </RQButton>
+            </>
+          );
+        }
+
         return (
           <>
             <RQButton onClick={() => (window.location.href = "/")} type="primary">
@@ -159,6 +186,8 @@ const FreeAndEnterprisePlanTable = () => {
       user?.details?.planDetails?.status,
       user?.details?.planDetails?.type,
       workspaceToUpgrade,
+      user?.details?.isLoggedIn,
+      dispatch,
     ]
   );
 

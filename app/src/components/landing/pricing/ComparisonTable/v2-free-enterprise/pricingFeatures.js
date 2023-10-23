@@ -4,7 +4,7 @@ export const PricingFeatures = {
   [APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]: {
     free: {
       planTitle: "Free",
-      heading: "Starter Plan",
+      heading: "Starter plan",
       features: [
         {
           title: "5 rules (3 active)",
