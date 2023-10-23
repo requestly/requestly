@@ -54,7 +54,7 @@ export const PricingFeatures = {
           enabled: true,
         },
         {
-          title: "Programmatically modify API request/response",
+          title: "Programmatically modify API request and response",
           enabled: true,
           tooltip: "Statically and programmatically override the response without any character limits.",
         },
@@ -78,6 +78,10 @@ export const PricingFeatures = {
         },
         {
           title: "Unlimited active rules",
+          enabled: true,
+        },
+        {
+          title: "Collaborate with teammates",
           enabled: true,
         },
         {
@@ -145,7 +149,7 @@ export const PricingFeatures = {
           enabled: true,
         },
         {
-          title: "Integraions : Jira, Linear (coming soon)",
+          title: "Integrations : Jira, Linear (coming soon)",
           enabled: true,
         },
         {
