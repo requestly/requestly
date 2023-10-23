@@ -70,6 +70,8 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import LINKS from "config/constants/sub/links";
 import Logger from "lib/logger";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { PremiumIcon } from "components/common/PremiumIcon";
 import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
 import { unselectAllRecords } from "../../actions";
@@ -155,6 +157,7 @@ const RulesTable = ({
   const selectedGroups = useSelector(getGroupsSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
   const selectedGroupIds = useMemo(() => Object.keys(selectedGroups), [selectedGroups]);
@@ -1065,8 +1068,13 @@ const RulesTable = ({
     unselectAllRecords(dispatch);
   };
 
-  const dropdownOverlay = useMemo(
-    () => (
+  const dropdownOverlay = useMemo(() => {
+    const checkIsPremiumRule = (ruleType) => {
+      const featureName = `${ruleType.toLowerCase()}_rule`;
+      return !!getFeatureLimitValue(featureName);
+    };
+
+    return (
       <Menu>
         {Object.values(RULE_TYPES_CONFIG)
           .filter((ruleConfig) => ruleConfig.ID !== 11)
@@ -1078,12 +1086,12 @@ const RulesTable = ({
               className="rule-selection-dropdown-btn-overlay-item"
             >
               {NAME}
+              {checkIsPremiumRule(TYPE) ? <PremiumIcon placement="topLeft" /> : null}
             </Menu.Item>
           ))}
       </Menu>
-    ),
-    [handleNewRuleOnClick]
-  );
+    );
+  }, [handleNewRuleOnClick, getFeatureLimitValue]);
 
   return (
     <>

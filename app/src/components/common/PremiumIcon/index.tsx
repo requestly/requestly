@@ -1,13 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Tooltip } from "antd";
+import { Tooltip, TooltipProps } from "antd";
 import { ReactComponent as PremiumIconSvg } from "assets/icons/premium.svg";
 import PATHS from "config/constants/sub/paths";
 import "./premiumIcon.css";
 
-export const PremiumIcon: React.FC = () => {
+export const PremiumIcon: React.FC<TooltipProps> = (props) => {
   return (
     <Tooltip
+      {...props}
       title={
         <div>
           This is a paid feature. Consider upgrading for uninterrupted usage.{" "}
