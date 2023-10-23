@@ -10,8 +10,8 @@ export const featureLimits: PlanFeatureLimits = {
     [FeatureLimitType.script_rule]: true,
     [FeatureLimitType.add_new_rule_pair]: true,
     [FeatureLimitType.graphql_resource_type]: true,
-    [FeatureLimitType.dynamic_response]: true,
-    [FeatureLimitType.dynamic_request]: true,
+    [FeatureLimitType.dynamic_response_body]: true,
+    [FeatureLimitType.dynamic_request_body]: true,
     [FeatureLimitType.rules_sharing]: true,
   },
   [APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]: {

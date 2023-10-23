@@ -1,15 +1,17 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Radio, Tooltip } from "antd";
+import { Radio, Row, Tooltip } from "antd";
 import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "store/selectors";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
 import { isDesktopMode } from "utils/AppUtils";
-//@ts-ignore
 import { ReactComponent as DesktopIcon } from "assets/icons/desktop.svg";
 import { omit, set } from "lodash";
 import { ResponseRuleResourceType } from "types/rules";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumIcon } from "components/common/PremiumIcon";
 import "./ResponseRuleResourceTypes.css";
 
 const DownloadDesktopAppLink: React.FC = () => (
@@ -28,6 +30,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
   const isDesktop = useMemo(isDesktopMode, []);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const requestPayloadFilter = currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
 
@@ -68,13 +71,17 @@ const ResponseRuleResourceTypes: React.FC = () => {
     updateResourceType(type, clearGraphqlRequestPayload);
   };
 
+  const isPremiumFeature = getFeatureLimitValue(FeatureLimitType.graphql_resource_type);
+
   return isNewResponseRule && responseRuleResourceType !== ResponseRuleResourceType.UNKNOWN ? (
     <div className="resource-types-container" data-tour-id="rule-editor-response-resource-type">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
         <Radio.Group value={responseRuleResourceType} onChange={(e) => handleResourceTypeChange(e.target.value)}>
           <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
-          <Radio value={ResponseRuleResourceType.GRAPHQL_API}>GraphQL API</Radio>
+          <Radio value={ResponseRuleResourceType.GRAPHQL_API} className="graphql-radio-item">
+            <Row align="middle">GraphQL API {isPremiumFeature ? <PremiumIcon /> : null}</Row>
+          </Radio>
           {isDesktop ? (
             <Radio value={ResponseRuleResourceType.STATIC}>HTML / JS / CSS</Radio>
           ) : (

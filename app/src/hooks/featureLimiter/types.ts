@@ -6,8 +6,8 @@ export enum FeatureLimitType {
   script_rule = "script_rule",
   add_new_rule_pair = "add_new_rule_pair",
   graphql_resource_type = "graphql_resource_type",
-  dynamic_response = "dynamic_response",
-  dynamic_request = "dynamic_request",
+  dynamic_response_body = "dynamic_response_body",
+  dynamic_request_body = "dynamic_request_body",
   rules_sharing = "rules_sharing",
 }
 
