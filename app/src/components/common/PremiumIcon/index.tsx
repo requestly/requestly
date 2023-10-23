@@ -1,0 +1,25 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import { Tooltip } from "antd";
+import { ReactComponent as PremiumIconSvg } from "assets/icons/premium.svg";
+import PATHS from "config/constants/sub/paths";
+import "./premiumIcon.css";
+
+export const PremiumIcon: React.FC = () => {
+  return (
+    <Tooltip
+      title={
+        <div>
+          This is a paid feature. Consider upgrading for uninterrupted usage.{" "}
+          <Link to={PATHS.PRICING.RELATIVE} className="see-plans-link">
+            See plans
+          </Link>
+        </div>
+      }
+    >
+      <span className="premium-icon">
+        <PremiumIconSvg />
+      </span>
+    </Tooltip>
+  );
+};
