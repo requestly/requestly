@@ -268,7 +268,12 @@ const FreeAndEnterprisePlanTable = () => {
                         <span>
                           Everything <img src={underlineIcon} alt="highlight" />
                         </span>{" "}
-                        in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
+                        in{" "}
+                        {product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY ||
+                        planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC
+                          ? "Free"
+                          : "Basic"}{" "}
+                        plan, and
                       </>
                     )}
                   </div>
