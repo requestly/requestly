@@ -183,8 +183,7 @@ const FreeAndEnterprisePlanTable = () => {
           <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
         </div>
         <Row className="pricing-table-product-wrapper" align={"middle"} justify={"center"}>
-          {/* <div className="pricing-table-product-wrapper"> */}
-          <Col className="pricing-table-product-view" xs={24} lg={6}>
+          <Col className="pricing-table-product-view" xs={24} lg={5}>
             <Row>
               <Col xs={8} sm={8} lg={24}>
                 <h1>Products</h1>
@@ -234,7 +233,7 @@ const FreeAndEnterprisePlanTable = () => {
               </Row>
             </Row>
           </Col>
-          <Col className="pricing-table-row" xs={24} lg={18}>
+          <Col className="pricing-table-row" xs={24} lg={18} xxl={16}>
             <Space sm={18} lg={24} wrap={true}>
               {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => (
                 <Col className="pricing-table-col" key={planName}>
@@ -282,7 +281,6 @@ const FreeAndEnterprisePlanTable = () => {
               ))}
             </Space>
           </Col>
-          {/* </div> */}
         </Row>
         <EnterpriseBanner openContactUsModal={() => setIsContactUsModalOpen(true)} />
         <div className="note-container text-gray text-center">

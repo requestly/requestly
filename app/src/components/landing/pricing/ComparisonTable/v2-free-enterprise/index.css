@@ -1,7 +1,5 @@
 .pricing-table-product-wrapper {
-  display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   width: 100%;
 }
 .pricing-table-product-view-icon {
@@ -39,9 +37,7 @@
 .pricing-table-product-view-para p {
   color: var(--text-gray);
 }
-.pricing-table-row {
-  display: flex;
-}
+
 .pricing-table-row .ant-space-item {
   align-self: stretch;
   flex: 1;
@@ -160,4 +156,11 @@
 .enterprise-features-grid span {
   vertical-align: middle;
   padding-left: 4px;
+}
+
+@media (min-width: 2000px) {
+  .pricing-table-row {
+    max-width: 50%;
+    flex: 0 0 50%;
+  }
 }
