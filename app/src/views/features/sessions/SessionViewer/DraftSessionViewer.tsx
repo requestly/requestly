@@ -11,7 +11,6 @@ import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession } from "@requestly/web-sdk";
 import mockSession from "./mockData/mockSession";
 import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
-import { filterOutLargeNetworkResponses } from "./sessionEventsUtils";
 import PageLoader from "components/misc/PageLoader";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
@@ -152,7 +151,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               })
             );
 
-            filterOutLargeNetworkResponses(tabSession.events);
             dispatch(sessionRecordingActions.setEvents(tabSession.events));
           }
         }
