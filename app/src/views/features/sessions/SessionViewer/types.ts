@@ -46,6 +46,7 @@ export interface RecordingOptions {
 
 export interface ConsoleLog extends LogData {
   timeOffset: number;
+  id: string;
 }
 
 export interface NetworkLog extends NetworkEventData {

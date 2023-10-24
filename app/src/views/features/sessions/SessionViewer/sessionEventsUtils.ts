@@ -52,7 +52,7 @@ export const getPageNavigationLogs = (rrwebEvents: RRWebEventData[], startTime: 
 
 export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number): ConsoleLog[] => {
   return rrwebEvents
-    .map((event) => {
+    .map((event, index) => {
       let logData: LogData = null;
       if (isConsoleLogEvent(event)) {
         if (event.type === EventType.IncrementalSnapshot) {
@@ -65,6 +65,7 @@ export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number)
       return (
         logData && {
           ...logData,
+          id: `resource-${index}`,
           timeOffset: (event.timestamp - startTime) / 1000,
         }
       );
