@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Empty, Typography } from "antd";
 import { ConsoleLog } from "../types";
 import ConsoleLogRow from "./ConsoleLogRow";
@@ -6,6 +6,7 @@ import { ThemeProvider } from "@devtools-ds/themes";
 import { useSelector } from "react-redux";
 import { getIncludeConsoleLogs } from "store/features/session-recording/selectors";
 import { trackSampleSessionClicked } from "modules/analytics/events/features/sessionRecording";
+import useFocusedAutoScroll from "lib/design-system/components/RQNetworkTable/useFocusedAutoScroll";
 import "./console.scss";
 
 interface Props {
@@ -14,7 +15,9 @@ interface Props {
 }
 
 const ConsoleLogsPanel: React.FC<Props> = ({ consoleLogs, playerTimeOffset }) => {
-  const [recentLogOffset, setRecentLogOffset] = useState(null);
+  const [recentLogId, setRecentLogId] = useState(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const onScroll = useFocusedAutoScroll(containerRef, recentLogId);
 
   const isLogPending = (log: ConsoleLog) => {
     return log.timeOffset > playerTimeOffset;
@@ -37,15 +40,20 @@ const ConsoleLogsPanel: React.FC<Props> = ({ consoleLogs, playerTimeOffset }) =>
       { log: null, minTimeDifference: Infinity }
     );
 
-    setRecentLogOffset(closestLog.log?.timeOffset);
+    setRecentLogId(closestLog.log?.id);
   }, [consoleLogs, playerTimeOffset]);
 
   return (
-    <div className="session-panel-content">
+    <div className="session-panel-content" ref={containerRef} onScroll={onScroll}>
       {consoleLogs.length ? (
         <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
           {consoleLogs.map((log, index) => (
-            <ConsoleLogRow key={index} {...log} isPending={() => isLogPending(log)} recentLogOffset={recentLogOffset} />
+            <ConsoleLogRow
+              key={index}
+              {...log}
+              isPending={() => isLogPending(log)}
+              isRecentLog={recentLogId === log.id}
+            />
           ))}
         </ThemeProvider>
       ) : includeConsoleLogs === false ? (
