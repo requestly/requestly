@@ -170,9 +170,11 @@ const ConsoleLogRow: React.FC<LogRowProps> = ({
                     {parsedPayload.map((line, index) => (
                       <div key={index}>{line}</div>
                     ))}
-                    <RQButton type="link" onClick={toggleFullMessage} className="see-more-button">
-                      (See less)
-                    </RQButton>
+                    {parsedPayload.length > 2 && (
+                      <RQButton type="link" onClick={toggleFullMessage} className="see-more-button">
+                        (See less)
+                      </RQButton>
+                    )}
                   </>
                 )}
               </span>
