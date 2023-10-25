@@ -41,7 +41,6 @@ const PricingTable: React.FC<PricingTableProps> = ({
     (planName: string) => {
       const { details } = user || {};
       const userPlanType = details?.planDetails?.type;
-      const isSelectedWorkspacePremium = workspaceToUpgrade?.subscriptionStatus === "active";
       const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id;
       const userPlanName = details?.planDetails?.planName;
 
@@ -129,18 +128,6 @@ const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
-      if (
-        user?.details?.isPremium &&
-        (isSelectedWorkspacePremium || isPrivateWorkspaceSelected) &&
-        planName === userPlanName
-      ) {
-        return (
-          <RQButton disabled type="primary">
-            Current Plan
-          </RQButton>
-        );
-      }
-
       return (
         <RQButton
           onClick={() =>
@@ -162,6 +149,37 @@ const PricingTable: React.FC<PricingTableProps> = ({
     [duration, product, user, workspaceToUpgrade, dispatch]
   );
 
+  const renderFeaturesListHeader = (planName: string) => {
+    return (
+      <Row className="pro-basic-feature-title text-left">
+        {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+          <Col>
+            <span>
+              All you need
+              <img src={underlineIcon} alt="highlight" />
+            </span>{" "}
+            to get started
+          </Col>
+        )}
+        {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+          <Col>
+            <span>
+              Everything <img src={underlineIcon} alt="highlight" />
+            </span>{" "}
+            in{" "}
+            {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ||
+            product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY
+              ? "Free"
+              : planName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL
+              ? "Basic"
+              : "Pro"}{" "}
+            plan, and
+          </Col>
+        )}
+      </Row>
+    );
+  };
+
   return (
     <Row wrap={false} className="pricing-table">
       {Object.entries(PricingFeatures[APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]).map(([planName, planDetails]) => {
@@ -175,7 +193,9 @@ const PricingTable: React.FC<PricingTableProps> = ({
                   <Typography.Text strong className="plan-price">
                     ${planPrice / 12}
                   </Typography.Text>
-                  <Typography.Text>/ month per member</Typography.Text> {/*TODO: Hide this for free plan */}
+                  {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+                    <Typography.Text>/ month per member</Typography.Text>
+                  )}
                 </Space>
               </Row>
             )}
@@ -192,30 +212,7 @@ const PricingTable: React.FC<PricingTableProps> = ({
               </Row>
             )}
             <Row className="mt-16">{renderButtonsForPlans(planName)}</Row>
-            <Row>
-              {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
-                <div className="pro-basic-feature-title text-left">
-                  <span>
-                    All you need
-                    <img src={underlineIcon} alt="highlight" />
-                  </span>{" "}
-                  to get started
-                </div>
-              )}
-              {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
-                <div className="pro-basic-feature-title text-left">
-                  <span>
-                    Everything <img src={underlineIcon} alt="highlight" />
-                  </span>{" "}
-                  in{" "}
-                  {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ||
-                  product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY
-                    ? "Free"
-                    : "Basic"}{" "}
-                  plan, and
-                </div>
-              )}
-            </Row>
+            <>{renderFeaturesListHeader(planName)}</>
             <Space direction="vertical" className="plan-features-list">
               {planDetails.features.map((feature, index) => (
                 <div className="text-left text-gray plan-feature-item" key={index}>

@@ -1,3 +1,18 @@
+.pricing-modal-wrapper {
+  position: relative;
+}
+
+.pricing-modal-inset-shadow {
+  position: absolute;
+  width: 45px;
+  height: 97%;
+  right: 0;
+  top: 20px;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(14, 14, 14, 0) 0%, #0e0e0e 100%);
+  z-index: 2;
+}
+
 .pricing-modal {
   background: var(--black);
   border-radius: 1rem;
