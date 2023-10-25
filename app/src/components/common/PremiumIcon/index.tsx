@@ -4,6 +4,7 @@ import { Tooltip, TooltipProps } from "antd";
 import { ReactComponent as PremiumIconSvg } from "assets/icons/premium.svg";
 import PATHS from "config/constants/sub/paths";
 import "./premiumIcon.css";
+import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
 export const PremiumIcon: React.FC<TooltipProps> = (props) => {
   return (
@@ -12,7 +13,11 @@ export const PremiumIcon: React.FC<TooltipProps> = (props) => {
       title={
         <div>
           This is a paid feature. Consider upgrading for uninterrupted usage.{" "}
-          <Link to={PATHS.PRICING.RELATIVE} className="see-plans-link">
+          <Link
+            to={PATHS.PRICING.RELATIVE}
+            className="see-plans-link"
+            onClick={() => trackViewPricingPlansClicked("crown")}
+          >
             See plans
           </Link>
         </div>
