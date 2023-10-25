@@ -9,7 +9,7 @@ import { FiVideo } from "@react-icons/all-files/fi/FiVideo";
 import { FaToggleOff } from "@react-icons/all-files/fa6/FaToggleOff";
 import { ReactComponent as BlueUnderline } from "./assets/blue-underline.svg";
 import pinExtensionGif from "./assets/pin-ext-guide.gif";
-import activateDeactivateGif from "./assets/activate-deactivate.gif";
+import activateDeactivateRuleGif from "./assets/activate-deactivate-rule.gif";
 import executedRulesGif from "./assets/executed-rules.gif";
 import recordAndReplayGif from "./assets/record-browser-activity.gif";
 import pauseRequestlyGif from "./assets/pause-rq.gif";
@@ -56,7 +56,7 @@ export const PinExtensionPopup: React.FC<Props> = ({ isOpen, onCancel }) => {
         ),
         image: {
           alt: "Activate/Deactivate rules",
-          src: activateDeactivateGif,
+          src: activateDeactivateRuleGif,
         },
       },
       {
