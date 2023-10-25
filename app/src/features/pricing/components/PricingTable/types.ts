@@ -7,6 +7,7 @@ export type PlanFeatures = {
       features: {
         title: string;
         enabled: boolean;
+        tooltip?: string;
       }[];
     };
   };
