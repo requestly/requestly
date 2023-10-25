@@ -5,6 +5,18 @@ export const featureLimits: PlanFeatureLimits = {
   [APP_CONSTANTS.PRICING.PLAN_NAMES.FREE]: {
     [FeatureLimitType.num_rules]: 10,
     [FeatureLimitType.num_active_rules]: 3,
+    [FeatureLimitType.response_rule]: false,
+    [FeatureLimitType.request_rule]: false,
+    [FeatureLimitType.script_rule]: false,
+    [FeatureLimitType.add_new_rule_pair]: false,
+    [FeatureLimitType.graphql_resource_type]: false,
+    [FeatureLimitType.dynamic_response_body]: false,
+    [FeatureLimitType.dynamic_request_body]: false,
+    [FeatureLimitType.share_rules]: false,
+  },
+  [APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]: {
+    [FeatureLimitType.num_rules]: 25,
+    [FeatureLimitType.num_active_rules]: 10,
     [FeatureLimitType.response_rule]: true,
     [FeatureLimitType.request_rule]: true,
     [FeatureLimitType.script_rule]: true,
@@ -13,9 +25,5 @@ export const featureLimits: PlanFeatureLimits = {
     [FeatureLimitType.dynamic_response_body]: true,
     [FeatureLimitType.dynamic_request_body]: true,
     [FeatureLimitType.share_rules]: true,
-  },
-  [APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]: {
-    [FeatureLimitType.num_rules]: 25,
-    [FeatureLimitType.num_active_rules]: 10,
   },
 };

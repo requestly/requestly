@@ -19,7 +19,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const { getFeatureLimitValue } = useFeatureLimiter();
-  const isPremiumFeature = getFeatureLimitValue(FeatureLimitType.share_rules);
+  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.share_rules);
 
   const shareRuleClickHandler = () => {
     trackShareButtonClicked("rule_editor");

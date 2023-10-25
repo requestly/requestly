@@ -20,7 +20,7 @@ const RuleItem: React.FC<RuleItemProps> = ({ type, name, icon, subtitle, selecte
   const { getFeatureLimitValue } = useFeatureLimiter();
 
   const featureName = `${type.toLowerCase()}_rule` as FeatureLimitType;
-  const isPremiumRule = getFeatureLimitValue(featureName);
+  const isPremiumRule = !getFeatureLimitValue(featureName);
 
   return (
     <Row

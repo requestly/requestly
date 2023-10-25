@@ -1072,7 +1072,7 @@ const RulesTable = ({
   const dropdownOverlay = useMemo(() => {
     const checkIsPremiumRule = (ruleType) => {
       const featureName = `${ruleType.toLowerCase()}_rule`;
-      return !!getFeatureLimitValue(featureName);
+      return !getFeatureLimitValue(featureName);
     };
 
     return (
@@ -1268,7 +1268,7 @@ const RulesTable = ({
                     icon: <UsergroupAddOutlined />,
                     tourId: "rule-list-share-btn",
                     onClickHandler: handleShareRulesOnClick,
-                    isPremium: getFeatureLimitValue(FeatureLimitType.share_rules),
+                    isPremium: !getFeatureLimitValue(FeatureLimitType.share_rules),
                   },
                   {
                     shape: null,

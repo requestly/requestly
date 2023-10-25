@@ -71,7 +71,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
     updateResourceType(type, clearGraphqlRequestPayload);
   };
 
-  const isPremiumFeature = getFeatureLimitValue(FeatureLimitType.graphql_resource_type);
+  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.graphql_resource_type);
 
   return isNewResponseRule && responseRuleResourceType !== ResponseRuleResourceType.UNKNOWN ? (
     <div className="resource-types-container" data-tour-id="rule-editor-response-resource-type">

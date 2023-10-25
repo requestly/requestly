@@ -18,7 +18,7 @@ const AddPairButton = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const { getFeatureLimitValue } = useFeatureLimiter();
-  const isPremiumFeature = getFeatureLimitValue(FeatureLimitType.add_new_rule_pair);
+  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.add_new_rule_pair);
 
   //STATE TO MAINTAIN CURRENTLY SELECTED RULE PAIR COUNT
   const [currentlySelectedRuleCount, setCurrentlySelectedRuleCount] = useState(0);

@@ -108,7 +108,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     }
   }, [pair.request.type]);
 
-  const isPremiumFeature = getFeatureLimitValue(FeatureLimitType.dynamic_request_body);
+  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.dynamic_request_body);
 
   return (
     <Col span={24} data-tour-id="code-editor">

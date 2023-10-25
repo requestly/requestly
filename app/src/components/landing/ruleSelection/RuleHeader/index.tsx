@@ -19,7 +19,7 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
   const { getFeatureLimitValue } = useFeatureLimiter();
 
   const featureName = `${selectedRuleType.toLowerCase()}_rule` as FeatureLimitType;
-  const isPremiumRule = getFeatureLimitValue(featureName);
+  const isPremiumRule = !getFeatureLimitValue(featureName);
 
   const handleCreateRuleClick = (ruleType: RuleType) => {
     trackRuleCreationWorkflowStartedEvent(ruleType, "screen");

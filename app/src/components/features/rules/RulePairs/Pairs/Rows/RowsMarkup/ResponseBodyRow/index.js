@@ -212,7 +212,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }
   }, [pair.response.type]);
 
-  const isPremiumFeature = getFeatureLimitValue(FeatureLimitType.dynamic_response_body);
+  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.dynamic_response_body);
 
   return (
     <Col span={24} data-tour-id="code-editor" key={rowIndex}>
