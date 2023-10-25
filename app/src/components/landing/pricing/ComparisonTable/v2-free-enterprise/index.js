@@ -20,6 +20,9 @@ import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/Work
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getPlanNameFromId } from "utils/PremiumUtils";
+import { actions } from "store";
+import { useDispatch } from "react-redux";
+import { AUTH } from "modules/analytics/events/common/constants";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -28,14 +31,13 @@ const PRIVATE_WORKSPACE = {
 };
 
 const FreeAndEnterprisePlanTable = () => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
 
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES);
   const [duration, setDuration] = useState(APP_CONSTANTS.PRICING.DURATION.ANNUALLY);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
-
-  // const useRQwith = ["Web browsers & desktop apps", "Android & iOS", "Selenium & Cypress"];
 
   const renderButtonsForPlans = useCallback(
     (planName) => {
@@ -48,6 +50,31 @@ const FreeAndEnterprisePlanTable = () => {
       const isPrivateWorksapceSelected = workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id;
 
       if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
+        if (!user?.details?.isLoggedIn) {
+          return (
+            <>
+              <RQButton
+                onClick={() =>
+                  dispatch(
+                    actions.toggleActiveModal({
+                      modalName: "authModal",
+                      newValue: true,
+                      newProps: {
+                        redirectURL: window.location.href,
+                        authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                        eventSource: AUTH.SOURCE.PRICING_PAGE,
+                      },
+                    })
+                  )
+                }
+                type="primary"
+              >
+                Signup
+              </RQButton>
+            </>
+          );
+        }
+
         return (
           <>
             <RQButton onClick={() => (window.location.href = "/")} type="primary">
@@ -159,6 +186,8 @@ const FreeAndEnterprisePlanTable = () => {
       user?.details?.planDetails?.status,
       user?.details?.planDetails?.type,
       workspaceToUpgrade,
+      user?.details?.isLoggedIn,
+      dispatch,
     ]
   );
 
@@ -183,8 +212,7 @@ const FreeAndEnterprisePlanTable = () => {
           <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
         </div>
         <Row className="pricing-table-product-wrapper" align={"middle"} justify={"center"}>
-          {/* <div className="pricing-table-product-wrapper"> */}
-          <Col className="pricing-table-product-view" xs={24} lg={6}>
+          <Col className="pricing-table-product-view" xs={24} lg={5}>
             <Row>
               <Col xs={8} sm={8} lg={24}>
                 <h1>Products</h1>
@@ -234,7 +262,7 @@ const FreeAndEnterprisePlanTable = () => {
               </Row>
             </Row>
           </Col>
-          <Col className="pricing-table-row" xs={24} lg={18}>
+          <Col className="pricing-table-row" xs={24} lg={18} xxl={16}>
             <Space sm={18} lg={24} wrap={true}>
               {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => (
                 <Col className="pricing-table-col" key={planName}>
@@ -255,25 +283,38 @@ const FreeAndEnterprisePlanTable = () => {
                     </div>
                     {renderButtonsForPlans(planName)}
                   </div>
-                  {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE &&
-                    product !== APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && (
-                      <div className="pro-basic-feature-title text-left">
+                  <div className="feature-title text-left">
+                    {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE ? (
+                      <>
+                        <span>
+                          All you need
+                          <img src={underlineIcon} alt="highlight" />
+                        </span>{" "}
+                        to get started
+                      </>
+                    ) : (
+                      <>
                         <span>
                           Everything <img src={underlineIcon} alt="highlight" />
                         </span>{" "}
-                        in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
-                      </div>
+                        in{" "}
+                        {product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY ||
+                        planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC
+                          ? "Free"
+                          : "Basic"}{" "}
+                        plan, and
+                      </>
                     )}
+                  </div>
                   <div>
                     {planDetails.features.map((feature, index) => (
-                      <FeatureRepresentation key={index} title={feature.title} enabled={feature.enabled} />
+                      <FeatureRepresentation key={index} feature={feature} />
                     ))}
                   </div>
                 </Col>
               ))}
             </Space>
           </Col>
-          {/* </div> */}
         </Row>
         <EnterpriseBanner openContactUsModal={() => setIsContactUsModalOpen(true)} />
         <div className="note-container text-gray text-center">
