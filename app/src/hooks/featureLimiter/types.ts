@@ -8,7 +8,7 @@ export enum FeatureLimitType {
   graphql_resource_type = "graphql_resource_type",
   dynamic_response_body = "dynamic_response_body",
   dynamic_request_body = "dynamic_request_body",
-  rules_sharing = "rules_sharing",
+  share_rules = "share_rules",
 }
 
 export type FeatureLimits = Partial<Record<FeatureLimitType, number | boolean>>;

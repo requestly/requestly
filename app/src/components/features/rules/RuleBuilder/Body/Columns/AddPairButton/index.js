@@ -36,9 +36,11 @@ const AddPairButton = (props) => {
 
   return (
     <Button block type="dashed" className="add-pair-btn" onClick={handleRulePairsOnClick} icon={<PlusOutlined />}>
-      <Row align="middle" className="shrink-0">
-        Add a new condition{isPremiumFeature ? <PremiumIcon /> : null}
-      </Row>
+      <span>
+        <Row align="middle" wrap={false} className="shrink-0">
+          Add a new condition{isPremiumFeature ? <PremiumIcon /> : null}
+        </Row>
+      </span>
     </Button>
   );
 };

@@ -75,6 +75,7 @@ import { PremiumIcon } from "components/common/PremiumIcon";
 import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
 import { unselectAllRecords } from "../../actions";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 
 //Lodash
 const set = require("lodash/set");
@@ -1267,6 +1268,7 @@ const RulesTable = ({
                     icon: <UsergroupAddOutlined />,
                     tourId: "rule-list-share-btn",
                     onClickHandler: handleShareRulesOnClick,
+                    isPremium: getFeatureLimitValue(FeatureLimitType.share_rules),
                   },
                   {
                     shape: null,
@@ -1291,10 +1293,11 @@ const RulesTable = ({
                       isDropdown = false,
                       overlay,
                       tourId = null,
+                      isPremium = false,
                     },
                     index
                   ) => (
-                    <Tooltip key={buttonText} title={isTooltipShown && isScreenSmall ? buttonText : null}>
+                    <Tooltip key={index} title={isTooltipShown && isScreenSmall ? buttonText : null}>
                       <>
                         {isDropdown ? (
                           <Dropdown.Button
