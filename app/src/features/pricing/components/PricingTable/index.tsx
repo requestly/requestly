@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Col, Row, Space, Tag, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
@@ -10,7 +11,9 @@ import { redirectToCheckout } from "utils/RedirectionUtils";
 import underlineIcon from "../../assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { CloseOutlined } from "@ant-design/icons";
+import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
 interface PricingTableProps {
@@ -30,6 +33,7 @@ const PricingTable: React.FC<PricingTableProps> = ({
   workspaceToUpgrade = PRIVATE_WORKSPACE,
   product = APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES,
 }) => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [, setIsContactUsModalOpen] = useState(false);
 
@@ -47,6 +51,33 @@ const PricingTable: React.FC<PricingTableProps> = ({
         (user?.details?.isPremium && userPlanType === "team" && !isPrivateWorkspaceSelected) ||
         (user?.details?.isPremium && userPlanType !== "team" && isPrivateWorkspaceSelected) ||
         (!user?.details?.isPremium && shouldRenew);
+
+      if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
+        if (!user?.details?.isLoggedIn) {
+          return (
+            <>
+              <RQButton
+                onClick={() =>
+                  dispatch(
+                    actions.toggleActiveModal({
+                      modalName: "authModal",
+                      newValue: true,
+                      newProps: {
+                        redirectURL: window.location.href,
+                        authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                        eventSource: AUTH.SOURCE.PRICING_PAGE,
+                      },
+                    })
+                  )
+                }
+                type="primary"
+              >
+                Signup
+              </RQButton>
+            </>
+          );
+        }
+      }
 
       if (planName === userPlanName) {
         return <div className="current-pricing-plan-tag">Current Plan</div>;
@@ -86,10 +117,7 @@ const PricingTable: React.FC<PricingTableProps> = ({
         if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
           return (
             <>
-              <RQButton onClick={() => (window.location.href = "/")} type="primary">
-                Use now
-              </RQButton>
-              <Tag className="current-plan">Current Plan</Tag>
+              <div className="current-pricing-plan-tag">Current Plan</div>
             </>
           );
         }
@@ -131,7 +159,7 @@ const PricingTable: React.FC<PricingTableProps> = ({
         </RQButton>
       );
     },
-    [duration, product, user, workspaceToUpgrade]
+    [duration, product, user, workspaceToUpgrade, dispatch]
   );
 
   return (
@@ -165,15 +193,28 @@ const PricingTable: React.FC<PricingTableProps> = ({
             )}
             <Row className="mt-16">{renderButtonsForPlans(planName)}</Row>
             <Row>
-              {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE &&
-                product !== APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY && (
-                  <div className="pro-basic-feature-title text-left">
-                    <span>
-                      Everything <img src={underlineIcon} alt="highlight" />
-                    </span>{" "}
-                    in {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ? "Free" : "Basic"} plan, and
-                  </div>
-                )}
+              {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+                <div className="pro-basic-feature-title text-left">
+                  <span>
+                    All you need
+                    <img src={underlineIcon} alt="highlight" />
+                  </span>{" "}
+                  to get started
+                </div>
+              )}
+              {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+                <div className="pro-basic-feature-title text-left">
+                  <span>
+                    Everything <img src={underlineIcon} alt="highlight" />
+                  </span>{" "}
+                  in{" "}
+                  {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ||
+                  product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY
+                    ? "Free"
+                    : "Basic"}{" "}
+                  plan, and
+                </div>
+              )}
             </Row>
             <Space direction="vertical" className="plan-features-list">
               {planDetails.features.map((feature, index) => (
