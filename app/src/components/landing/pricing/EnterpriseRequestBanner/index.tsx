@@ -29,7 +29,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
     functions,
     "getEnterpriseAdminDetails"
   );
-  const requestEnterprisePlanFromAdmin = httpsCallable<{ adminDetails: OrgContactDetails["workspaces"] }, null>(
+  const requestEnterprisePlanFromAdmin = httpsCallable<{ workspaceDetails: OrgContactDetails["workspaces"] }, null>(
     functions,
     "requestEnterprisePlanFromAdmin"
   );
@@ -40,7 +40,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
     const domain = enterpriseAdmin.adminEmail.split("@")[1];
     trackTeamPlanCardClicked(domain);
     requestEnterprisePlanFromAdmin({
-      adminDetails: orgContactDetails?.workspaces,
+      workspaceDetails: orgContactDetails?.workspaces,
     })
       .then(() => {
         //GA4
