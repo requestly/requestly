@@ -31,3 +31,35 @@
   font-size: 13px;
   color: var(--text-light);
 }
+
+.pro-basic-feature-title {
+  font-size: 1rem;
+  color: var(--white);
+  font-weight: 500;
+  margin-top: 24px;
+
+  & span {
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  & span img {
+    width: 75px;
+    height: 8px;
+  }
+}
+
+.plan-features-list {
+  margin-top: 24px;
+}
+
+.plan-feature-item {
+  display: flex;
+  gap: 8px;
+
+  & img {
+    width: 16px;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+}

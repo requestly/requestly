@@ -6,6 +6,7 @@ import "./index.scss";
 const PricingModal: React.FC = () => {
   return (
     <Modal
+      centered
       open={true}
       footer={null}
       width={1130}
