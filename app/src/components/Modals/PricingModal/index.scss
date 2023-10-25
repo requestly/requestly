@@ -1,0 +1,9 @@
+.pricing-modal {
+  background: var(--black);
+  border-radius: 1rem;
+
+  .ant-modal-content {
+    background: none;
+    border-radius: 1rem;
+  }
+}
