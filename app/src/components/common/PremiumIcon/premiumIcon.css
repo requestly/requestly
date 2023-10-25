@@ -13,6 +13,7 @@
 
 .ant-tooltip .see-plans-link {
   color: var(--link-color);
+  text-decoration: underline;
 }
 
 .ant-tooltip .see-plans-link:hover {
