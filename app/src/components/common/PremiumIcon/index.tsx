@@ -16,7 +16,10 @@ export const PremiumIcon: React.FC<TooltipProps> = (props) => {
           <Link
             to={PATHS.PRICING.RELATIVE}
             className="see-plans-link"
-            onClick={() => trackViewPricingPlansClicked("crown")}
+            onClick={(e) => {
+              e.stopPropagation();
+              trackViewPricingPlansClicked("crown");
+            }}
           >
             See plans
           </Link>
