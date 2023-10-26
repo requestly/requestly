@@ -16,6 +16,18 @@
 .pricing-modal {
   background: var(--black);
   border-radius: 1rem;
+  height: 85vh;
+  max-height: 700px;
+  overflow: hidden;
+
+  .pricing-table {
+    margin: 0 24px;
+    margin-top: 24px;
+  }
+
+  .ant-modal-body {
+    padding: 0;
+  }
 
   .ant-modal-content {
     background: none;
@@ -32,11 +44,34 @@
     gap: 8px;
   }
 
-  .pricing-modal-title {
-    font-size: 20px;
-  }
-
   .pricing-modal-close-icon {
     color: var(--white);
+  }
+
+  .embed-checkout {
+    border-radius: var(--border-radius-md);
+  }
+  .checkout-embed-wrapper {
+    height: 625px;
+    overflow: auto;
+  }
+
+  .checkout-screen-wrapper {
+    & .ant-divider-horizontal {
+      margin: 1rem 0;
+      margin-bottom: 0;
+    }
+  }
+
+  .checkout-screen-header {
+    padding: 0 24px;
+    padding-top: 1rem;
+
+    & h4 {
+      margin-bottom: 0;
+    }
+  }
+  .checkout-back-btn-icon {
+    transform: scale(1.3);
   }
 }
