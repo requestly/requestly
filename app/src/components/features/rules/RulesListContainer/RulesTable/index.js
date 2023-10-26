@@ -19,7 +19,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
-import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu } from "antd";
+import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu, Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import {
   getAllGroups,
@@ -1183,7 +1183,14 @@ const RulesTable = ({
                     shape={isScreenSmall ? "circle" : null}
                     icon={<UsergroupAddOutlined />}
                   >
-                    {isScreenSmall ? null : "Share"}
+                    {isScreenSmall ? null : (
+                      <span>
+                        <Row align="middle" wrap={false}>
+                          Share
+                          {!getFeatureLimitValue(FeatureLimitType.share_rules) ? <PremiumIcon /> : null}
+                        </Row>
+                      </span>
+                    )}
                   </Button>
                 </Tooltip>
               </AuthConfirmationPopover>
