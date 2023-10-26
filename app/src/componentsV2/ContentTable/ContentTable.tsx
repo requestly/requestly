@@ -9,16 +9,21 @@ export interface ContentTableProps<DataType> {
   columns: ColumnsType<DataType>;
   data: DataType[];
   bulkActionBarConfig?: BulkActionBarConfig;
-  filterHeaderConfig?: FilterHeaderConfig
+  filterHeaderConfig?: FilterHeaderConfig;
 }
 
 // Contains common design and colors for app
-const ContentTable = <DataType,>({ columns, data, bulkActionBarConfig, filterHeaderConfig }: ContentTableProps<DataType>): ReactElement => {
+const ContentTable = <DataType,>({
+  columns,
+  data,
+  bulkActionBarConfig,
+  filterHeaderConfig,
+}: ContentTableProps<DataType>): ReactElement => {
   // Fetch ContentTableProps
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<DataType[]>([]);
-  
-  const [filters, setFilters] = useState<{[key:string]: any[]}>({})
+
+  const [filters, setFilters] = useState<{ [key: string]: any[] }>({});
 
   const [filteredRowsData, setFilteredRowsData] = useState(data);
 
@@ -50,7 +55,7 @@ const ContentTable = <DataType,>({ columns, data, bulkActionBarConfig, filterHea
         rowSelection={{
           selectedRowKeys,
           onChange: (selectedRowKeys, selectedRows) => {
-            console.log({selectedRowKeys});
+            console.log({ selectedRowKeys });
             setSelectedRowKeys(selectedRowKeys);
             // @ts-ignore
             setSelectedRowsData(selectedRows);

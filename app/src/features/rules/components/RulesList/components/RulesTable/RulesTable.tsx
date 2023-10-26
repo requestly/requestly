@@ -54,7 +54,7 @@ const RulesTable: React.FC<Props> = ({}) => {
               key: "status",
               label: "Active",
               onFilter: (value: string, data: any) => data?.status === value,
-            }
+            },
           ],
         }}
       />

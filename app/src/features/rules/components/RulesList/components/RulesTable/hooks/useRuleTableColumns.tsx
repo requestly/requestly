@@ -13,7 +13,8 @@ const useRuleTableColumns = () => {
       // dataIndex: "",
       key: "name",
       render: (rule: RuleTableDataType) => rule.name,
-      sorter: { // Fix. Descend logic sending groups to bottom
+      sorter: {
+        // Fix. Descend logic sending groups to bottom
         compare: (a, b) => {
           if (a.objectType === "group" && b.objectType !== "group") {
             return -1;

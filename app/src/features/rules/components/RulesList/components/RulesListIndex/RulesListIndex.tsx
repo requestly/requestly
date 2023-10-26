@@ -4,7 +4,7 @@ import rules from "./rules.json";
 import RulesTable from "../RulesTable/RulesTable";
 import ContentHeader from "componentsV2/ContentHeader/ContentHeader";
 
-interface Props {};
+interface Props {}
 
 const RulesListIndex: React.FC<Props> = ({}) => {
   return (
