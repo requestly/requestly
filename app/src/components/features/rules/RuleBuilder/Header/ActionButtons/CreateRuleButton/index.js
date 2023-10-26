@@ -32,6 +32,22 @@ import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
 import "../RuleEditorActionButtons.css";
 
+const getNumCharacters = (rule) => {
+  switch (rule.ruleType) {
+    case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
+      return rule.pairs[0].scripts.reduce((max, currentScript) => {
+        const currentScriptLen = currentScript.value.length;
+        return currentScriptLen > max ? currentScriptLen : max;
+      }, rule.pairs[0].scripts[0]?.value?.length);
+    case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
+      return rule.pairs[0].response?.value?.length;
+    case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
+      return rule.pairs[0].request?.value?.length;
+    default:
+      return null;
+  }
+};
+
 // This is also the save rule button
 const CreateRuleButton = ({
   location,
@@ -100,11 +116,10 @@ const CreateRuleButton = ({
           }
           if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
             ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
-
             trackRuleCreatedEvent({
               rule_type,
               description: currentlySelectedRuleData.description,
-              destinationTypes:
+              destination_types:
                 currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
                   ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
                   : null,
@@ -113,16 +128,19 @@ const CreateRuleButton = ({
                 currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
                   ? getAllResponseBodyTypes(currentlySelectedRuleData)
                   : null,
+              num_characters: getNumCharacters(currentlySelectedRuleData),
             });
           } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
-            trackRuleEditedEvent(
+            trackRuleEditedEvent({
               rule_type,
-              currentlySelectedRuleData.description,
-              currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-                ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
-                : null,
-              analyticEventRuleCreatedSource
-            );
+              description: currentlySelectedRuleData.description,
+              destination_types:
+                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+                  ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+                  : null,
+              source: analyticEventRuleCreatedSource,
+              num_characters: getNumCharacters(currentlySelectedRuleData),
+            });
           }
           ruleModifiedAnalytics(user);
           trackRQLastActivity("rule_saved");
