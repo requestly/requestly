@@ -47,7 +47,7 @@ const FilterHeader: React.FC<Props> = ({ filters, setFilters, config }) => {
           return (
             <Button onClick={() => setQuickFilter(q)} type={q === quickFilter ? "primary" : "default"}>
               {/* @ts-ignore */}
-              {filter?.label } 
+              {filter?.label}
             </Button>
           );
         })}
