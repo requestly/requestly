@@ -6,14 +6,24 @@ import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { FeatureLimitType } from "./types";
 
-const premiumPlansToCheckLimit = [APP_CONSTANTS.PRICING.PLAN_NAMES.LITE, APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC];
+const premiumPlansToCheckLimit = [
+  APP_CONSTANTS.PRICING.PLAN_NAMES.LITE,
+  APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC,
+  APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2,
+];
+
+const isBasicV2Plan = (planID: string) => {
+  return planID === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2;
+};
 
 export const useFeatureLimiter = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const isUserPremium = user?.details?.isPremium;
-  const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+  const userPlan = isBasicV2Plan(user?.details?.planDetails?.planId)
+    ? APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2
+    : user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
 
   const checkFeatureLimits = () => {
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
@@ -48,14 +58,14 @@ export const useFeatureLimiter = () => {
   const getFeatureLimitValue = (featureLimitType: FeatureLimitType) => {
     return (
       featureLimits[userPlan]?.[featureLimitType] ??
-      featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
+      featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
     );
   };
 
   const getIsFeatureEnabled = (featureLimitType: FeatureLimitType) => {
     return (
       featureLimits[userPlan]?.[featureLimitType] ??
-      featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]?.[featureLimitType]
+      featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2]?.[featureLimitType]
     );
   };
 

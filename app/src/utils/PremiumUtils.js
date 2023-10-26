@@ -99,13 +99,6 @@ export const isTrialPlan = (planType) => {
   return planType?.toLowerCase() === APP_CONSTANTS.PRICING.CHECKOUT.MODES.TRIAL;
 };
 
-export const getPlanHeader = (planId) => {
-  if (!planId) return " ";
-  const planName = getPlanNameFromId(planId);
-
-  return APP_CONSTANTS.PRICING.PLAN_HEADERS[planName] || " ";
-};
-
 export const getEndDate = (planDetails) => {
   if (!planDetails || !planDetails.subscription) {
     return null;
