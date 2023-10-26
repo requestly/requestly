@@ -6,6 +6,7 @@ import { Button, Space } from "antd";
 import { redirectToPricingPlans } from "../../../../../../utils/RedirectionUtils";
 // CONSTANTS
 import APP_CONSTANTS from "../../../../../../config/constants";
+import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
 const GetASubscription = ({ hideShadow }) => {
   const navigate = useNavigate();
@@ -17,7 +18,13 @@ const GetASubscription = ({ hideShadow }) => {
             <div style={{ textAlign: "center" }} className="mb-2">
               <p>Get the most out of Requestly. Upgrade to one of our premium plans.</p>
               <Space>
-                <Button type="primary" onClick={() => redirectToPricingPlans(navigate)}>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    trackViewPricingPlansClicked("my_profile");
+                    redirectToPricingPlans(navigate);
+                  }}
+                >
                   View Plans
                 </Button>
                 <Button

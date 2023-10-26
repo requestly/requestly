@@ -16,6 +16,16 @@
   color: var(--text-gray);
 }
 
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item .ant-dropdown-menu-title-content {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item .ant-dropdown-menu-title-content .premium-icon {
+  display: inline-flex;
+  padding: 0 8px;
+}
+
 .rule-selection-dropdown-btn .ant-btn.ant-btn-icon-only {
   height: 30px;
 }

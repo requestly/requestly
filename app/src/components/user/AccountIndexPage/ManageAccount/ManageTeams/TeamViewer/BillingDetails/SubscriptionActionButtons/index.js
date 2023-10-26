@@ -3,7 +3,7 @@ import { Button } from "antd";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
 import ContactUsModal from "components/landing/contactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
-import { trackUpgradeWorkspaceClicked } from "modules/analytics/events/common/teams";
+import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 import { redirectToPricingPlans } from "utils/RedirectionUtils";
 
 const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
@@ -28,8 +28,8 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
         <Button
           type="primary"
           onClick={() => {
+            trackViewPricingPlansClicked("workspace_upgrade");
             redirectToPricingPlans();
-            trackUpgradeWorkspaceClicked();
           }}
         >
           Upgrade

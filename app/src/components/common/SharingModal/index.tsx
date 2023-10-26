@@ -12,6 +12,9 @@ import { ShareInWorkspaces } from "./Workspaces";
 import type { TabsProps } from "antd";
 import { SharingOptions } from "./types";
 import { trackShareModalViewed, trackSharingTabSwitched } from "modules/analytics/events/misc/sharing";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumIcon } from "../PremiumIcon";
 import "./index.css";
 
 interface ModalProps {
@@ -24,6 +27,7 @@ interface ModalProps {
 export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source, selectedRules = null }) => {
   const availableTeams = useSelector(getAvailableTeams);
   const [activeTab, setActiveTab] = useState(SharingOptions.WORKSPACE);
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const sharingOptions: TabsProps["items"] = useMemo(
     () => [
@@ -91,6 +95,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
       <div className="rq-modal-content">
         <div className="sharing-modal-header">
           <HiOutlineShare /> Share rule
+          {!getFeatureLimitValue(FeatureLimitType.share_rules) ? <PremiumIcon onSeePlansClick={toggleModal} /> : null}
         </div>
         <Tabs
           defaultActiveKey={SharingOptions.WORKSPACE}
