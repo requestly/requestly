@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 //UTILS
 import {
@@ -43,6 +43,8 @@ const CreateRuleButton = ({
 }) => {
   //Constants
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const ruleCreatedEventSource = searchParams.get("source") ?? analyticEventRuleCreatedSource;
   const MODE = isRuleEditorModal ? ruleEditorModalMode : getModeData(location).MODE;
 
   //Global State
@@ -108,7 +110,7 @@ const CreateRuleButton = ({
                 currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
                   ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
                   : null,
-              source: analyticEventRuleCreatedSource,
+              source: ruleCreatedEventSource,
               body_types:
                 currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
                   ? getAllResponseBodyTypes(currentlySelectedRuleData)
@@ -121,7 +123,7 @@ const CreateRuleButton = ({
               currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
                 ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
                 : null,
-              analyticEventRuleCreatedSource
+              ruleCreatedEventSource
             );
           }
           ruleModifiedAnalytics(user);
@@ -174,7 +176,7 @@ const CreateRuleButton = ({
           onClick={handleBtnOnClick}
         >
           {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-          {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText}
+          {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText} ---
         </Button>
       </Tooltip>
     </>
