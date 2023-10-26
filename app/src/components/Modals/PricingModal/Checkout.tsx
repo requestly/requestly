@@ -1,20 +1,22 @@
 import React from "react";
-import { Col, Divider, Row, Typography } from "antd";
+import { Col, Divider, Row, Spin, Typography } from "antd";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { RQButton } from "lib/design-system/components";
+import { LoadingOutlined } from "@ant-design/icons";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import "./index.scss";
 
 interface CheckoutProps {
   clientSecret: string;
+  isLoading: boolean;
   onCancel: () => void;
 }
 const stripePromise = loadStripe(
   "pk_test_51KflXlDiNNz2hbmOUApXI81Y1qQu3F9dt0xmoC79bnNjJnYU1tRr7YpkjSMOqI5kVKesBVv4HEfa5m6NMjSmolC600bkl82JE6"
 );
 
-export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, onCancel }) => {
+export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, isLoading, onCancel }) => {
   const options = {
     clientSecret,
   };
@@ -30,13 +32,20 @@ export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, onCancel }) =>
         </Col>
       </Row>
       <Divider />
-      <div className="checkout-embed-wrapper">
-        {clientSecret ? (
-          <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
-            <EmbeddedCheckout className="embed-checkout" />
-          </EmbeddedCheckoutProvider>
-        ) : null}
-      </div>
+      {isLoading ? (
+        <Col className="pricing-modal-loading-overlay">
+          <Spin size="large" indicator={<LoadingOutlined className="text-white" spin />} />
+          <Typography.Text> Please wait for a moment while we get your payment options ready.</Typography.Text>
+        </Col>
+      ) : (
+        <div className="checkout-embed-wrapper">
+          {clientSecret ? (
+            <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
+              <EmbeddedCheckout className="embed-checkout" />
+            </EmbeddedCheckoutProvider>
+          ) : null}
+        </div>
+      )}
     </Col>
   );
 };
