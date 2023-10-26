@@ -1,0 +1,674 @@
+[
+  {
+    "createdBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "creationDate": 1677577867681,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "Group_jmn20",
+    "id": "Headers_km672",
+    "isSample": false,
+    "lastModifiedBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "modificationDate": 1677681144043,
+    "name": "Non Existent Response Headers",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "nfkih",
+        "modifications": {
+          "Response": [
+            {
+              "header": "foo",
+              "id": "pt47o",
+              "type": "Add",
+              "value": "headerValue1"
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "non-existent-url"
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "status": "Inactive",
+    "version": 2
+  },
+  {
+    "createdBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "creationDate": 1677575171832,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "Group_jmn20",
+    "id": "Response_ceov7",
+    "isSample": false,
+    "lastModifiedBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "modificationDate": 1677681134069,
+    "name": "Programmatic -Non existent Domain",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "4cogd",
+        "response": {
+          "statusCode": "202",
+          "statusText": "Accepted",
+          "type": "code",
+          "value": "async function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  \n  console.log(\"Programmatic rule with non existent url\");\n  const testResponse = await fetch(\"https://example.com\").then((response) => response.text());\n  \n  return testResponse;\n}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "non-existent-url.com"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "status": "Inactive"
+  },
+  {
+    "createdBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "creationDate": 1677651845293,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "Group_jmn20",
+    "id": "Response_r7j6z",
+    "isSample": false,
+    "lastModifiedBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "modificationDate": 1677680097144,
+    "name": "Static - Non existing Domain Response",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "4cogd",
+        "response": {
+          "statusCode": "200",
+          "statusText": "OK",
+          "type": "static",
+          "value": "{\"foo\":\"bar\"}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://non-existent-url.com"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "status": "Inactive"
+  },
+  {
+    "createdBy": "9cxfwgyBXKQxj9lU14GiTO5KTNY2",
+    "creationDate": 1677652962618,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "Group_jmn20",
+    "id": "Response_ehu7p",
+    "isSample": false,
+    "lastModifiedBy": "9cxfwgyBXKQxj9lU14GiTO5KTNY2",
+    "modificationDate": 1677652988038,
+    "name": "Local| Non existing api host (DNS Error DNS_PROBE_FINISHED_NXDOMAIN",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "4cogd",
+        "response": {
+          "statusCode": "202",
+          "statusText": "Accepted",
+          "type": "local_file",
+          "value": "/Users/sahilgupta/Documents/dev/playground/test.js"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "non-existent-url.com"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "status": "Inactive"
+  },
+  {
+    "creationDate": 1696968237876,
+    "description": "Turn this on and see content-security-policy header being removed",
+    "groupId": "",
+    "id": "Headers_yo355",
+    "isSample": false,
+    "modificationDate": 1696968237876,
+    "name": "Remove Content-Security-Policy Header Copy Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "7tg21",
+        "modifications": {
+          "Response": [
+            {
+              "header": "content-security-policy",
+              "type": "Remove",
+              "value": ""
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": ""
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "status": "Active",
+    "version": 2
+  },
+  {
+    "creationDate": 1696968231760,
+    "description": "Turn this on and see content-security-policy header being removed",
+    "groupId": "",
+    "id": "Headers_6cio7",
+    "isSample": false,
+    "modificationDate": 1696968231760,
+    "name": "Remove Content-Security-Policy Header Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "7tg21",
+        "modifications": {
+          "Response": [
+            {
+              "header": "content-security-policy",
+              "type": "Remove",
+              "value": ""
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": ""
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "status": "Active",
+    "version": 2
+  },
+  {
+    "creationDate": 1696968227792,
+    "description": "Turn this on and see content-security-policy header being removed",
+    "groupId": "",
+    "id": "Headers_53pjt",
+    "isSample": false,
+    "modificationDate": 1696968227793,
+    "name": "Remove Content-Security-Policy Header Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "7tg21",
+        "modifications": {
+          "Response": [
+            {
+              "header": "content-security-policy",
+              "type": "Remove",
+              "value": ""
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": ""
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "status": "Active",
+    "version": 2
+  },
+  {
+    "creationDate": 1643724819721,
+    "description": "Turn this on and see content-security-policy header being removed",
+    "groupId": "",
+    "id": "Headers_ykgzb",
+    "isSample": false,
+    "modificationDate": 1696968222980,
+    "name": "Remove Content-Security-Policy Header",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "7tg21",
+        "modifications": {
+          "Response": [
+            {
+              "header": "content-security-policy",
+              "type": "Remove",
+              "value": ""
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": ""
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "status": "Active",
+    "version": 2
+  },
+  {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1696917143724,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_g7ws2",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1696917143724,
+    "name": "private rule Copy Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://1111",
+        "destinationType": "url",
+        "id": "9l49f",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "1111"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "status": "Active"
+  },
+  {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1696917143724,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_zk2w4",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1696917143724,
+    "name": "private rule Copy Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://1111",
+        "destinationType": "url",
+        "id": "9l49f",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "1111"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "status": "Active"
+  },
+  {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1696917136681,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_i0jhy",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1696917136681,
+    "name": "private rule Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://1111",
+        "destinationType": "url",
+        "id": "9l49f",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "1111"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "status": "Active"
+  },
+  {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1696917136681,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_xossp",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1696917136681,
+    "name": "private rule Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://1111",
+        "destinationType": "url",
+        "id": "9l49f",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "1111"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "status": "Active"
+  },
+  {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1695835505272,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_ejnrz",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1696502763135,
+    "name": "private rule",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://1111",
+        "destinationType": "url",
+        "id": "9l49f",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "1111"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "status": "Active"
+  },
+  {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1695835505272,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_xmwy5",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1696502763135,
+    "name": "private rule",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://1111",
+        "destinationType": "url",
+        "id": "9l49f",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "1111"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "status": "Active"
+  },
+  {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1695835478763,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_28x8d",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1696499978174,
+    "name": "Team Workspace Rule",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://111",
+        "destinationType": "url",
+        "id": "2e2zj",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "ghkmaasdasdfasdffasdfsdfasdfasadf12123123123123asss"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "status": "Active"
+  },
+  {
+    "createdBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "creationDate": 1695835478763,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_bzwqh",
+    "isSample": false,
+    "lastModifiedBy": "qaXxGx5db4PAkDfQZMlWtUlbUhH3",
+    "modificationDate": 1696499978174,
+    "name": "Team Workspace Rule",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://111",
+        "destinationType": "url",
+        "id": "2e2zj",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "ghkmaasdasdfasdffasdfsdfasdfasadf12123123123123asss"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "status": "Active"
+  },
+  {
+    "createdBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "creationDate": 1695976142624,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_b7klk",
+    "isSample": false,
+    "lastModifiedBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "modificationDate": 1695976481791,
+    "name": "Testing Requestly Rule",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://asdf",
+        "destinationType": "url",
+        "id": "3tex3",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "Testing Requestlyasdf"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect"
+  },
+  {
+    "createdBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "creationDate": 1695976288249,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_xfnjv",
+    "isSample": false,
+    "lastModifiedBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "modificationDate": 1695976470270,
+    "name": "Testing Requestly 2",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://asdf",
+        "destinationType": "url",
+        "id": "1g189",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "asdafasdfasdf"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect"
+  },
+  {
+    "createdBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "creationDate": 1695976276981,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "",
+    "id": "Redirect_4wrsu",
+    "isSample": false,
+    "lastModifiedBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "modificationDate": 1695976279413,
+    "name": "Testing Requestly Rule Copy",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "http://asdf",
+        "destinationType": "url",
+        "id": "3tex3",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "Testing Requestly"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect"
+  },
+  {
+    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "creationDate": 1694601983847,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "deletedDate": 1694602054271,
+    "description": "Modify Response Body of https://en.wikipedia.org/api/rest_v1/page/summary/Hypermedia",
+    "disabled": false,
+    "groupId": "",
+    "id": "Response_64mk0",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1694602017752,
+    "name": "Change quickpeek to stevejobs on wikipedia",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "1keaw",
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "",
+          "type": "static",
+          "value": "{\"type\":\"standard\",\"title\":\"Steve Jobs\",\"displaytitle\":\"<span class=\\\"mw-page-title-main\\\">Steve Jobs</span>\",\"namespace\":{\"id\":0,\"text\":\"\"},\"wikibase_item\":\"Q19837\",\"titles\":{\"canonical\":\"Steve_Jobs\",\"normalized\":\"Steve Jobs\",\"display\":\"<span class=\\\"mw-page-title-main\\\">Steve Jobs</span>\"},\"pageid\":7412236,\"thumbnail\":{\"source\":\"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg/320px-Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg\",\"width\":320,\"height\":310},\"originalimage\":{\"source\":\"https://upload.wikimedia.org/wikipedia/commons/d/dc/Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg\",\"width\":3026,\"height\":2929},\"lang\":\"en\",\"dir\":\"ltr\",\"revision\":\"1175171557\",\"tid\":\"b8fead80-5200-11ee-a182-818d74084f48\",\"timestamp\":\"2023-09-13T06:42:27Z\",\"description\":\"American business magnate and inventor (1955–2011)\",\"description_source\":\"local\",\"content_urls\":{\"desktop\":{\"page\":\"https://en.wikipedia.org/wiki/Steve_Jobs\",\"revisions\":\"https://en.wikipedia.org/wiki/Steve_Jobs?action=history\",\"edit\":\"https://en.wikipedia.org/wiki/Steve_Jobs?action=edit\",\"talk\":\"https://en.wikipedia.org/wiki/Talk:Steve_Jobs\"},\"mobile\":{\"page\":\"https://en.m.wikipedia.org/wiki/Steve_Jobs\",\"revisions\":\"https://en.m.wikipedia.org/wiki/Special:History/Steve_Jobs\",\"edit\":\"https://en.m.wikipedia.org/wiki/Steve_Jobs?action=edit\",\"talk\":\"https://en.m.wikipedia.org/wiki/Talk:Steve_Jobs\"}},\"extract\":\"Steven Paul Jobs was an American business magnate, inventor, and investor. He was the co-founder, chairman, and CEO of Apple; the chairman and majority shareholder of Pixar; a member of The Walt Disney Company's board of directors following its acquisition of Pixar; and the founder, chairman, and CEO of NeXT. He was a pioneer of the personal computer revolution of the 1970s and 1980s, along with his early business partner and fellow Apple co-founder Steve Wozniak.\",\"extract_html\":\"<p><b>Steven Paul Jobs</b> was an American business magnate, inventor, and investor. He was the co-founder, chairman, and CEO of Apple; the chairman and majority shareholder of Pixar; a member of The Walt Disney Company's board of directors following its acquisition of Pixar; and the founder, chairman, and CEO of NeXT. He was a pioneer of the personal computer revolution of the 1970s and 1980s, along with his early business partner and fellow Apple co-founder Steve Wozniak.</p>\"}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://en.wikipedia.org/api/rest_v1/page/summary/Hypermedia"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "status": "Active"
+  },
+  {
+    "creationDate": 1669662646808,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "",
+    "id": "Headers_opurk",
+    "isSample": false,
+    "lastModified": 1669662707695,
+    "modificationDate": 1669662707695,
+    "name": "Hack - Linkedin Sales API",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "y0tm7",
+        "modifications": {
+          "Response": [
+            {
+              "header": "Content-Type",
+              "id": "4p0tr",
+              "type": "Modify",
+              "value": "text/x-json"
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://www.linkedin.com/sales-api/salesApiNotifications?count=50"
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "status": "Inactive",
+    "version": 2
+  },
+  {
+    "creationDate": 1669659137727,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "groupId": "",
+    "id": "Response_o1dwg",
+    "isSample": false,
+    "lastModified": 1669661160085,
+    "modificationDate": 1669661160085,
+    "name": "CustomerIssue_LinkedinSales",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "x8qog",
+        "response": {
+          "statusCode": "",
+          "type": "code",
+          "value": "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\nconsole.log('### Requestly', url);\nreturn response;\n//return new Blob([response], { type: \"application/json;charset=utf-8\" });\n}"
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://www.linkedin.com/sales-api/salesApiNotifications?count=50"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "status": "Inactive"
+  },
+  {
+    "createdBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "creationDate": 1677679716793,
+    "currentOwner": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "description": "",
+    "id": "Group_jmn20",
+    "lastModifiedBy": "Ujnruoo9HPMn86Y3X9WhhOFs5323",
+    "modificationDate": 1677681144067,
+    "name": "DO NOT DELETE - Demo Rules",
+    "objectType": "group",
+    "status": "Active",
+    "children": []
+  }
+]
