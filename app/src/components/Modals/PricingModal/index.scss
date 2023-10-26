@@ -9,7 +9,7 @@
   right: 0;
   top: 20px;
   bottom: 0;
-  background: linear-gradient(90deg, rgba(14, 14, 14, 0) 0%, #0e0e0e 100%);
+  background: linear-gradient(90deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
   z-index: 2;
 }
 
@@ -26,5 +26,17 @@
     border-radius: 4px;
     background: var(--surface-2, #383838);
     padding: 5px 12px;
+  }
+
+  .plan-duration-switch-container {
+    gap: 8px;
+  }
+
+  .pricing-modal-title {
+    font-size: 20px;
+  }
+
+  .pricing-modal-close-icon {
+    color: var(--white);
   }
 }
