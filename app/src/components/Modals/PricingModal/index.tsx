@@ -2,11 +2,11 @@ import React, { useCallback, useState } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
 import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
 import { CloseOutlined } from "@ant-design/icons";
-import APP_CONSTANTS from "config/constants";
-import "./index.scss";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
+import APP_CONSTANTS from "config/constants";
+import "./index.scss";
 
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
@@ -32,7 +32,7 @@ const PricingModal: React.FC = () => {
         functions,
         "createIndividualSubscriptionUsingStripeCheckout"
       );
-
+      setIsCheckoutScreenVisible(true);
       setIsLoading(true);
       if (workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id) {
         createIndividualSubscriptionUsingStripeCheckout({
@@ -44,7 +44,6 @@ const PricingModal: React.FC = () => {
         }).then((data: any) => {
           setStripeClientSecret(data?.data?.payload.clientSecret);
           setIsLoading(false);
-          setIsCheckoutScreenVisible(true);
         });
       } else {
         createTeamSubscriptionUsingStripeCheckout({
@@ -56,7 +55,6 @@ const PricingModal: React.FC = () => {
         }).then((data: any) => {
           setStripeClientSecret(data?.data?.payload.clientSecret);
           setIsLoading(false);
-          setIsCheckoutScreenVisible(true);
         });
       }
     },
@@ -74,10 +72,12 @@ const PricingModal: React.FC = () => {
       closeIcon={<RQButton iconOnly icon={<CloseOutlined className="pricing-modal-close-icon" />} />}
     >
       <div className="pricing-modal-wrapper">
-        {isLoading ? (
-          <div className="pricing-modal-loading-overlay">Loading...</div>
-        ) : isCheckoutScreenVisible ? (
-          <Checkout clientSecret={stripeClientSecret} onCancel={() => setIsCheckoutScreenVisible(false)} />
+        {isCheckoutScreenVisible ? (
+          <Checkout
+            clientSecret={stripeClientSecret}
+            onCancel={() => setIsCheckoutScreenVisible(false)}
+            isLoading={isLoading}
+          />
         ) : (
           <>
             <Col span={24} className="display-row-center" style={{ paddingTop: "1rem" }}>

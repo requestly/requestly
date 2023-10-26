@@ -74,4 +74,12 @@
   .checkout-back-btn-icon {
     transform: scale(1.3);
   }
+
+  .pricing-modal-loading-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 90px;
+  }
 }
