@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Button } from "antd";
+import { Button, Row } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { PremiumIcon } from "components/common/PremiumIcon";
 
 interface Props {
   icon: React.ReactNode;
@@ -15,6 +16,7 @@ interface Props {
   isScreenSmall: boolean;
   isLoggedIn: boolean;
   authSource?: string;
+  isPremium?: boolean;
 }
 
 const AuthPopoverButton: React.FC<Props> = ({
@@ -30,6 +32,7 @@ const AuthPopoverButton: React.FC<Props> = ({
   isLoggedIn,
   isScreenSmall,
   authSource,
+  isPremium = false,
 }) => {
   const [isChinaUser, setIsChinaUser] = useState<boolean>(false);
 
@@ -61,7 +64,16 @@ const AuthPopoverButton: React.FC<Props> = ({
         icon={icon}
         data-tour-id={tourId}
       >
-        {!isTooltipShown ? buttonText : isScreenSmall ? null : buttonText}
+        {!isTooltipShown ? (
+          buttonText
+        ) : isScreenSmall ? null : (
+          <span>
+            <Row align="middle" wrap={false}>
+              {buttonText}
+              {isPremium ? <PremiumIcon /> : null}
+            </Row>
+          </span>
+        )}
       </Button>
     </AuthConfirmationPopover>
   );

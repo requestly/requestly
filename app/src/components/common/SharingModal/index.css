@@ -17,6 +17,10 @@
   padding-bottom: 0;
 }
 
+.sharing-modal-header .premium-icon {
+  padding-left: 0;
+}
+
 .sharing-modal-body {
   padding: 1.2rem;
   font-size: 13px;

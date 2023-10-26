@@ -80,8 +80,8 @@ export default function EnterpriseRequestBanner({ user }) {
                     color="secondary"
                     message={
                       <>
-                        {enterpriseContactDetails.data.enterpriseData.admin.name} has been notified. Please get in touch
-                        with them for further details.
+                        {enterpriseContactDetails.data.enterpriseData?.admin?.name} has been notified. Please get in
+                        touch with them for further details.
                       </>
                     }
                   ></Alert>
@@ -93,7 +93,7 @@ export default function EnterpriseRequestBanner({ user }) {
                     message={
                       <>
                         Your organization is already on Requestly Professional Plan managed by{" "}
-                        {enterpriseContactDetails.data.enterpriseData.admin.name}
+                        {enterpriseContactDetails.data.enterpriseData?.admin?.name}
                         . <br />
                         <span onClick={requestPremiumToAdmin} className="text-white text-underline cursor-pointer">
                           Click here

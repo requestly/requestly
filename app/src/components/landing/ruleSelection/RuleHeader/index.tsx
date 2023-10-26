@@ -4,6 +4,9 @@ import PATHS from "config/constants/sub/paths";
 import { NavLink } from "react-router-dom";
 import { RuleType } from "types/rules";
 import { getRuleDetails } from "../utils";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumIcon } from "components/common/PremiumIcon";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import "./ruleHeader.css";
 
@@ -13,6 +16,10 @@ interface RuleHeaderProps {
 
 const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
   const { icon, name, subtitle, header } = useMemo(() => getRuleDetails(selectedRuleType), [selectedRuleType]);
+  const { getFeatureLimitValue } = useFeatureLimiter();
+
+  const featureName = `${selectedRuleType.toLowerCase()}_rule` as FeatureLimitType;
+  const isPremiumRule = !getFeatureLimitValue(featureName);
 
   const handleCreateRuleClick = (ruleType: RuleType) => {
     trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
@@ -25,7 +32,10 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
       </Col>
       <Col className="rule-header-name-container" span={18}>
         <Row>
-          <div className="header">{name}</div>
+          <div className="header">
+            {name}
+            {isPremiumRule ? <PremiumIcon /> : null}
+          </div>
         </Row>
         <Row className="text-gray line-clamp-2">{header?.description ?? subtitle}</Row>
       </Col>
