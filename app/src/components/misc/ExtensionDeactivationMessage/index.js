@@ -1,6 +1,6 @@
 import React from "react";
 import { Row } from "antd";
-import resumeRequestly from "assets/img/screenshots/resume_requestly.png";
+import resumeRequestly from "./assets/resume_requestly.gif";
 import { WarningOutlined } from "@ant-design/icons";
 import "./extensionDeactivationMessage.css";
 
@@ -14,8 +14,7 @@ const ExtensionDeactivationMessage = () => {
         <ol start="0">
           <li>Please resume the extension by following below steps:</li>
           <li>Open extension popup by clicking on Requestly icon on the browser's toolbar.</li>
-          <li>Hover over the dropdown menu on the popup that says "Requestly paused".</li>
-          <li>Click on "Resume requestly" to resume again.</li>
+          <li>Click on the toggle button which says "Requestly paused".</li>
           <li>Refresh the page to start using Requestly again.</li>
         </ol>
 

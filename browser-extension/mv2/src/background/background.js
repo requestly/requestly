@@ -1014,7 +1014,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
-        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id);
+        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id, message.markRecordingIcon);
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
@@ -1026,7 +1026,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        BG.Methods.startRecordingExplicitly(message.tabId ?? sender.tab.id, message.showWidget);
+        BG.Methods.startRecordingExplicitly(message.tab ?? sender.tab, message.showWidget);
         break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
@@ -1173,8 +1173,10 @@ BG.Methods.getSessionRecordingConfig = async (url) => {
   return shouldRecord ? sessionRecordingConfig : null;
 };
 
-BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
-  RQ.extensionIconManager.markRecording(tabId);
+BG.Methods.onSessionRecordingStartedNotification = (tabId, markRecordingIcon = true) => {
+  if (markRecordingIcon) {
+    RQ.extensionIconManager.markRecording(tabId);
+  }
 };
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
@@ -1189,6 +1191,7 @@ BG.Methods.cacheRecordedSessionOnClientPageUnload = (tabId, payload) => {
       ...sessionRecordingData,
       previousSession: payload.session,
       widgetPosition: payload.widgetPosition,
+      recordingStartTime: payload.recordingStartTime,
     });
   }
 };
@@ -1259,6 +1262,14 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
 
     if (sessionRecordingConfig) {
       sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
+      const recordingMode = sessionRecordingConfig?.autoRecording?.mode;
+
+      sessionRecordingData.showWidget = recordingMode === "custom";
+
+      if (recordingMode === "allPages") {
+        sessionRecordingData.markRecordingIcon = false;
+      }
+
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   } else if (!sessionRecordingData.explicit) {
@@ -1374,17 +1385,20 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   });
 };
 
-BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
-  const sessionRecordingDataExist = !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
-  if (sessionRecordingDataExist) {
+BG.Methods.startRecordingExplicitly = async (tab, showWidget = true) => {
+  const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
+
+  const sessionRecordingDataExist = !!window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  // Auto recording is on for current tab if sessionRecordingConfig exist,
+  // so forcefully start explicit recording.
+  if (!sessionRecordingConfig && sessionRecordingDataExist) {
     return;
   }
 
   const sessionRecordingData = { explicit: true, showWidget };
+  window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
-  window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
-
-  BG.Methods.sendMessageToClient(tabId, {
+  BG.Methods.sendMessageToClient(tab.id, {
     action: RQ.CLIENT_MESSAGES.START_RECORDING,
     payload: sessionRecordingData,
   });

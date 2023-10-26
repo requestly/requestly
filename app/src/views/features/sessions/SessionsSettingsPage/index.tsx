@@ -38,7 +38,7 @@ const allPagesSourceData = {
   operator: SourceOperator.WILDCARD_MATCHES,
 };
 
-const defaultSessionRecordingConfig: SessionRecordingConfig = {
+export const defaultSessionRecordingConfig: SessionRecordingConfig = {
   maxDuration: 5,
   pageSources: [],
   autoRecording: {

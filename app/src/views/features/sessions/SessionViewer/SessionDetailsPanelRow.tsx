@@ -6,6 +6,7 @@ import { isAppOpenedInIframe } from "utils/AppUtils";
 import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
 
 interface Props {
+  id: string;
   timeOffset: number;
   children: ReactNode;
   rightInfo?: ReactNode;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const SessionDetailsPanelRow: React.FC<Props> = ({
+  id,
   timeOffset,
   children,
   rightInfo,
@@ -28,7 +30,7 @@ const SessionDetailsPanelRow: React.FC<Props> = ({
 
   return (
     <>
-      <Row className={`session-details-panel-row ${className}`} onClick={onClick}>
+      <Row className={`session-details-panel-row ${className}`} onClick={onClick} data-resource-id={id}>
         <Col span={24} className="display-flex">
           <Col>
             <Row align="middle" className="log-offset-row">

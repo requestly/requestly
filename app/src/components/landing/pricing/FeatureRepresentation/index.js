@@ -1,11 +1,15 @@
 import React from "react";
-import { CloseOutlined } from "@ant-design/icons";
-import checkIcon from "../../../../assets/img/icons/common/check.svg";
+import { Tooltip } from "antd";
+import { AiOutlineCheck } from "@react-icons/all-files/ai/AiOutlineCheck";
+import { AiOutlineClose } from "@react-icons/all-files/ai/AiOutlineClose";
 
-export default function FeatureRepresentation({ title, enabled }) {
+export default function FeatureRepresentation({ feature }) {
   return (
-    <div className="text-left text-gray plan-feature">
-      {enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />} {title}
+    <div className={`text-left text-gray plan-feature`}>
+      <Tooltip title={feature.tooltip} placement="top">
+        {feature.enabled ? <AiOutlineCheck /> : <AiOutlineClose />}
+        <span className={`${feature.tooltip ? "plan-feature-tooltip-active" : ""}`}>{feature.title}</span>
+      </Tooltip>
     </div>
   );
 }

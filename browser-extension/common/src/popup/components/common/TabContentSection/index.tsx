@@ -10,11 +10,7 @@ interface Props {
 const TabContentSection: React.FC<Props> = ({ heading = "", children }) => {
   return (
     <div className="tab-content-section">
-      {heading.length > 0 && (
-        <Typography.Title level={5} type="secondary">
-          {heading}
-        </Typography.Title>
-      )}
+      {heading.length > 0 && <Typography.Title level={5}>{heading}</Typography.Title>}
       <div>{children}</div>
     </div>
   );

@@ -12,6 +12,7 @@ const useFocusedAutoScroll = <T extends HTMLDivElement>(containerRef: RefObject<
       const containerBottom = container.getBoundingClientRect().bottom;
       const recentLogTop = recentLog.getBoundingClientRect().top;
       const recentLogBottom = recentLog.getBoundingClientRect().bottom;
+
       if (recentLogTop < containerTop || recentLogBottom > containerBottom) {
         // active log is not visible, stop auto scrolling
         autoScrollRef.current = false;
