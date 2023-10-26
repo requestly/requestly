@@ -32,20 +32,50 @@ import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
 import "../RuleEditorActionButtons.css";
 
-const getNumCharacters = (rule) => {
+const getEventParams = (rule) => {
+  const eventParams = {};
   switch (rule.ruleType) {
     case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
-      return rule.pairs[0].scripts.reduce((max, currentScript) => {
+      eventParams.num_characters = rule.pairs[0].scripts.reduce((max, currentScript) => {
         const currentScriptLen = currentScript.value.length;
         return currentScriptLen > max ? currentScriptLen : max;
       }, rule.pairs[0].scripts[0]?.value?.length);
+      break;
     case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
-      return rule.pairs[0].response?.value?.length;
+      eventParams.num_characters = rule.pairs[0].response?.value?.length;
+      break;
     case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
-      return rule.pairs[0].request?.value?.length;
+      eventParams.num_characters = rule.pairs[0].request?.value?.length;
+      break;
+    case GLOBAL_CONSTANTS.RULE_TYPES.HEADERS: {
+      const headerTypes = new Set();
+      const headerActions = new Set();
+      rule.pairs.some((pair) => {
+        if (pair.modifications?.Response?.length > 0) {
+          headerTypes.add("Response");
+        }
+        if (pair.modifications?.Request?.length > 0) {
+          headerTypes.add("Request");
+        }
+        pair.modifications?.Response?.forEach((responseHeader) => {
+          headerActions.add(responseHeader.type);
+        });
+        pair.modifications?.Request?.forEach((requestHeader) => {
+          headerActions.add(requestHeader.type);
+        });
+        if (headerTypes.size === 2 && headerActions.size === 3) {
+          return true;
+        }
+        return false;
+      });
+      eventParams.header_types = Array.from(headerTypes);
+      eventParams.header_actions = Array.from(headerActions);
+      break;
+    }
     default:
-      return null;
+      return eventParams;
   }
+  return eventParams;
 };
 
 // This is also the save rule button
@@ -128,7 +158,7 @@ const CreateRuleButton = ({
                 currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
                   ? getAllResponseBodyTypes(currentlySelectedRuleData)
                   : null,
-              num_characters: getNumCharacters(currentlySelectedRuleData),
+              ...getEventParams(currentlySelectedRuleData),
             });
           } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
             trackRuleEditedEvent({
@@ -139,7 +169,7 @@ const CreateRuleButton = ({
                   ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
                   : null,
               source: analyticEventRuleCreatedSource,
-              num_characters: getNumCharacters(currentlySelectedRuleData),
+              ...getEventParams(currentlySelectedRuleData),
             });
           }
           ruleModifiedAnalytics(user);

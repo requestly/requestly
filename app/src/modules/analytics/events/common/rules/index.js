@@ -8,6 +8,8 @@ export const trackRuleCreatedEvent = ({
   source,
   body_types,
   num_characters,
+  header_types,
+  header_actions,
 }) => {
   const params = {
     rule_type,
@@ -17,11 +19,21 @@ export const trackRuleCreatedEvent = ({
   if (source) params.source = source;
   if (body_types) params.body_types = body_types;
   if (num_characters != null) params.num_characters = num_characters;
+  if (header_types) params.header_types = header_types;
+  if (header_actions) params.header_actions = header_actions;
 
   trackEvent(RULES.RULE_CREATED, params);
 };
 
-export const trackRuleEditedEvent = ({ rule_type, description, destination_types, source, num_characters }) => {
+export const trackRuleEditedEvent = ({
+  rule_type,
+  description,
+  destination_types,
+  source,
+  num_characters,
+  header_types,
+  header_actions,
+}) => {
   const params = {
     rule_type,
   };
@@ -29,6 +41,8 @@ export const trackRuleEditedEvent = ({ rule_type, description, destination_types
   if (destination_types) params.destination_types = destination_types;
   if (source) params.source = source;
   if (num_characters != null) params.num_characters = num_characters;
+  if (header_types) params.header_types = header_types;
+  if (header_actions) params.header_actions = header_actions;
 
   trackEvent(RULES.RULE_EDITED, params);
 };
