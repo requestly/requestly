@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { PricingFeatures } from "../../constants/pricingFeatures";
 import { PricingPlans } from "../../constants/pricingPlans";
+import { PRICING } from "../../constants/pricing";
 import { capitalize } from "lodash";
 import { redirectToCheckout } from "utils/RedirectionUtils";
 import underlineIcon from "../../assets/yellow-highlight.svg";
@@ -28,8 +29,8 @@ const PRIVATE_WORKSPACE = {
   accessCount: 1,
 };
 
-const PricingTable: React.FC<PricingTableProps> = ({
-  duration = "annually",
+export const PricingTable: React.FC<PricingTableProps> = ({
+  duration = PRICING.DURATION.ANNUALLY,
   workspaceToUpgrade = PRIVATE_WORKSPACE,
   product = APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES,
 }) => {
@@ -183,7 +184,10 @@ const PricingTable: React.FC<PricingTableProps> = ({
   return (
     <Row wrap={false} className="pricing-table">
       {Object.entries(PricingFeatures[APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]).map(([planName, planDetails]) => {
-        const planPrice = PricingPlans[planName as keyof typeof PricingPlans]?.plans["annually"]?.usd?.price;
+        const planPrice =
+          PricingPlans[planName as keyof typeof PricingPlans]?.plans[
+            duration as keyof typeof PricingPlans[keyof typeof PricingPlans]["plans"]
+          ]?.usd?.price;
         return (
           <Col key={planName} className="plan-card">
             <Typography.Text className="plan-name">{capitalize(planName)}</Typography.Text>
@@ -191,7 +195,7 @@ const PricingTable: React.FC<PricingTableProps> = ({
               <Row align="middle">
                 <Space size="small">
                   <Typography.Text strong className="plan-price">
-                    ${planPrice / 12}
+                    ${duration === PRICING.DURATION.ANNUALLY ? planPrice / 12 : planPrice}
                   </Typography.Text>
                   {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
                     <Typography.Text>/ month per member</Typography.Text>
@@ -207,7 +211,7 @@ const PricingTable: React.FC<PricingTableProps> = ({
               </Row>
             )}
             {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE && (
-              <Row className="mt-8">
+              <Row className={`mt-8 ${duration === PRICING.DURATION.MONTHLY ? "not-visible" : ""}`}>
                 <Typography.Text type="secondary">Billed annually</Typography.Text>
               </Row>
             )}
@@ -226,5 +230,3 @@ const PricingTable: React.FC<PricingTableProps> = ({
     </Row>
   );
 };
-
-export default PricingTable;
