@@ -14,7 +14,7 @@ const PRIVATE_WORKSPACE = {
   accessCount: 1,
 };
 
-const PricingModal: React.FC = () => {
+export const PricingModal: React.FC = () => {
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
   const [stripeClientSecret, setStripeClientSecret] = useState(null);
@@ -117,5 +117,3 @@ const PricingModal: React.FC = () => {
     </Modal>
   );
 };
-
-export default PricingModal;

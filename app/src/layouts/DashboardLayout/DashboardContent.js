@@ -30,7 +30,7 @@ import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/M
 import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
-import { PricingModal } from "components/Modals";
+import { PricingModal } from "features/pricing";
 import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
