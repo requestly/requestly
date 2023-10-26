@@ -21,6 +21,8 @@ interface PricingTableProps {
   product?: string;
   workspaceToUpgrade?: any;
   duration?: string;
+  isOpenedFromModal?: boolean;
+  handleOnSubscribe?: (planName: string) => void;
 }
 
 const PRIVATE_WORKSPACE = {
@@ -33,6 +35,8 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   duration = PRICING.DURATION.ANNUALLY,
   workspaceToUpgrade = PRIVATE_WORKSPACE,
   product = APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES,
+  handleOnSubscribe,
+  isOpenedFromModal = false,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -131,14 +135,8 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
       return (
         <RQButton
-          onClick={() =>
-            redirectToCheckout({
-              mode: isPrivateWorkspaceSelected ? "individual" : "team",
-              planName: planName,
-              duration: duration,
-              quantity: workspaceToUpgrade?.accessCount,
-              teamId: isPrivateWorkspaceSelected ? null : workspaceToUpgrade?.id,
-            })
+          onClick={
+            () => (isOpenedFromModal ? handleOnSubscribe(planName) : null) //TODO: handle here for pricing page
           }
           disabled={userPlanName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL}
           type="primary"
@@ -147,7 +145,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         </RQButton>
       );
     },
-    [duration, product, user, workspaceToUpgrade, dispatch]
+    [duration, product, user, workspaceToUpgrade, dispatch, handleOnSubscribe, isOpenedFromModal]
   );
 
   const renderFeaturesListHeader = (planName: string) => {
