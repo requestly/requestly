@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { Tooltip, TooltipProps } from "antd";
 import { ReactComponent as PremiumIconSvg } from "assets/icons/premium.svg";
 import PATHS from "config/constants/sub/paths";
-import "./premiumIcon.css";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
+import "./premiumIcon.css";
 
-export const PremiumIcon: React.FC<TooltipProps> = (props) => {
+export const PremiumIcon: React.FC<TooltipProps & { onSeePlansClick?: () => void }> = (props) => {
   return (
     <Tooltip
       {...props}
@@ -19,6 +19,7 @@ export const PremiumIcon: React.FC<TooltipProps> = (props) => {
             onClick={(e) => {
               e.stopPropagation();
               trackViewPricingPlansClicked("crown");
+              props.onSeePlansClick?.();
             }}
           >
             See plans
