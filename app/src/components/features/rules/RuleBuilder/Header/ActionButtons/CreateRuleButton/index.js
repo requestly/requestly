@@ -176,7 +176,7 @@ const CreateRuleButton = ({
           onClick={handleBtnOnClick}
         >
           {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-          {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText} ---
+          {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText}
         </Button>
       </Tooltip>
     </>
