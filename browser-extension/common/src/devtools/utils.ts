@@ -1,6 +1,7 @@
 import config from "../config";
 import { Rule } from "../types";
 import { ResourceTypeFilterValue } from "./components/ResourceTypeFilter";
+import { EVENT, sendEvent } from "./events";
 import { RuleEditorUrlFragment, ColorScheme, NetworkResourceType } from "./types";
 
 interface PostMessageData {
@@ -18,6 +19,7 @@ export const createRule = <T extends Rule>(
   initRuleData: (rule: T) => void,
   inputSelectorToFocus?: string
 ) => {
+  sendEvent(EVENT.RULE_CREATION_WORKFLOW_STARTED, { rule_type: ruleTypeUrlFragment });
   const editorUrl = `${config.WEB_URL}/rules/editor/create/${ruleTypeUrlFragment}?source=devtool`;
   let editorWindow: Window;
   const onMessageReceived = (event: MessageEvent<PostMessageData>) => {
