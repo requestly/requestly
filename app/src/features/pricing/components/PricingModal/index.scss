@@ -53,7 +53,14 @@
   }
   .checkout-embed-wrapper {
     height: 625px;
+    width: 100%;
     overflow: auto;
+    display: flex;
+    align-items: center;
+
+    & .embed-checkout {
+      width: 100%;
+    }
   }
 
   .checkout-screen-wrapper {

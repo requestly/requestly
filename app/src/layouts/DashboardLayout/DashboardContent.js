@@ -197,7 +197,14 @@ const DashboardContent = () => {
             <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
           ) : null}
 
-          <PricingModal />
+          {activeModals.pricingModal.isActive ? (
+            <PricingModal
+              isOpen={activeModals.pricingModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "pricingModal" }))}
+              {...activeModals.pricingModal.props}
+            />
+          ) : null}
+
           {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
         </>
       )}

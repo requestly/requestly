@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
 import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
 import { CloseOutlined } from "@ant-design/icons";
@@ -8,14 +8,26 @@ import { Checkout } from "./Checkout";
 import APP_CONSTANTS from "config/constants";
 import "./index.scss";
 
+interface PricingModalProps {
+  isOpen: boolean;
+  toggleModal: () => void;
+  selectedPlan?: string;
+  workspace?: any;
+}
+
 const PRIVATE_WORKSPACE = {
   name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
   id: "private_workspace",
   accessCount: 1,
 };
 
-export const PricingModal: React.FC = () => {
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
+export const PricingModal: React.FC<PricingModalProps> = ({
+  isOpen,
+  toggleModal,
+  workspace = PRIVATE_WORKSPACE,
+  selectedPlan = null,
+}) => {
+  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(workspace);
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
   const [stripeClientSecret, setStripeClientSecret] = useState(null);
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);
@@ -61,10 +73,19 @@ export const PricingModal: React.FC = () => {
     [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount]
   );
 
+  useEffect(() => {
+    if (selectedPlan) {
+      setIsCheckoutScreenVisible(true);
+      setIsLoading(true);
+      handleSubscribe(selectedPlan);
+    }
+  }, [selectedPlan, handleSubscribe]);
+
   return (
     <Modal
       centered
-      open={true}
+      open={isOpen}
+      onCancel={toggleModal}
       footer={null}
       width={1130}
       className="pricing-modal"

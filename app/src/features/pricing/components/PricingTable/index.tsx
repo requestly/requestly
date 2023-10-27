@@ -135,8 +135,16 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
       return (
         <RQButton
-          onClick={
-            () => (isOpenedFromModal ? handleOnSubscribe(planName) : null) //TODO: handle here for pricing page
+          onClick={() =>
+            isOpenedFromModal
+              ? handleOnSubscribe(planName)
+              : dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "pricingModal",
+                    newValue: true,
+                    newProps: { selectedPlan: planName, workspace: workspaceToUpgrade },
+                  })
+                )
           }
           disabled={userPlanName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL}
           type="primary"
@@ -181,14 +189,17 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
   return (
     <Row wrap={false} className="pricing-table">
-      {Object.entries(PricingFeatures[APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]).map(([planName, planDetails]) => {
+      {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => {
         const planPrice =
           PricingPlans[planName as keyof typeof PricingPlans]?.plans[
             duration as keyof typeof PricingPlans[keyof typeof PricingPlans]["plans"]
           ]?.usd?.price;
+
+        if (!isOpenedFromModal && planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) return null;
+
         return (
           <Col key={planName} className="plan-card">
-            <Typography.Text className="plan-name">{capitalize(planName)}</Typography.Text>
+            <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
             {planPrice !== undefined && (
               <Row align="middle">
                 <Space size="small">

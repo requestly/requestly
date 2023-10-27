@@ -158,6 +158,16 @@
   padding-left: 4px;
 }
 
+.pricing-table-wrapper .pricing-table {
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pricing-table-wrapper .pricing-table .plan-card {
+  width: 300px;
+  background: var(--surface-2);
+}
+
 @media (min-width: 2000px) {
   .pricing-table-row {
     max-width: 50%;
