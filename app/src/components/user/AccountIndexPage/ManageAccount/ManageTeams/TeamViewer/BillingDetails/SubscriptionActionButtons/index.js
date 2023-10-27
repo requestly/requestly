@@ -1,12 +1,15 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Button } from "antd";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
 import ContactUsModal from "components/landing/contactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
 import { trackUpgradeWorkspaceClicked } from "modules/analytics/events/common/teams";
 import { redirectToPricingPlans } from "utils/RedirectionUtils";
+import { actions } from "store";
 
 const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
+  const dispatch = useDispatch();
   const [isContactUsModalActive, setIsContactUsModalActive] = useState(false);
   const [isCancelPlanModalActive, setIsCancelPlanModalActive] = useState(false);
 
@@ -28,7 +31,7 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
         <Button
           type="primary"
           onClick={() => {
-            redirectToPricingPlans();
+            dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
             trackUpgradeWorkspaceClicked();
           }}
         >

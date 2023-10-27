@@ -121,14 +121,6 @@ export const UpgradeWorkspaceMenu: React.FC<{
           </RQButton>
         </Dropdown>
       </Col>
-      {workspaceToUpgrade?.id !== "private_workspace" && (
-        <Col className="upgrade-workspace-members-display-text">
-          <Typography.Text type="secondary">
-            Your workspace has {workspaceToUpgrade?.accessCount} active{" "}
-            {workspaceToUpgrade?.accessCount > 1 ? "members" : "member"}.
-          </Typography.Text>
-        </Col>
-      )}
     </Row>
   ) : null;
 };
