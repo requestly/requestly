@@ -1,10 +1,11 @@
+import { RuleTableDataType } from "../types";
+
 const useRuleTableActions = () => {
-  // FIXME: Fetch actualRulesData from storage service context here;
-  const handlePin = (rules: any[]) => {
+  const handlePin = (rules: RuleTableDataType[]) => {
     console.log("Pinning Rules", { rules });
   };
 
-  const handleStatusToggle = (rules: any, checked: boolean) => {
+  const handleStatusToggle = (rules: RuleTableDataType[], checked: boolean) => {
     console.log("handleStatusToggle", { rules, checked });
     // TODO: Add logic to propogate the changes to storageservice;
 

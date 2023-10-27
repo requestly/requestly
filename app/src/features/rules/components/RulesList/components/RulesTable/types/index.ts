@@ -1,14 +1,5 @@
-export interface RuleTableDataType {
-  createdBy: string;
-  currentOwner: string;
-  lastModifiedBy: string;
-  creationDate: number;
-  modificationDate: number;
-  description: string;
-  groupId: string;
-  id: string;
-  name: string;
-  objectType: string;
-  ruleType: string;
-  status: string;
-}
+import { Rule, RuleObj } from "features/rules/types/rules";
+
+export type RuleTableDataType = RuleObj & {
+  children?: Rule[];
+};

@@ -4,17 +4,17 @@ import { Button, Switch } from "antd";
 import useRuleTableActions from "./useRuleTableActions";
 
 const useRuleTableColumns = () => {
-  // FIXME: Fetch actualRulesData from storage service context here;
-  const { handlePin, handleStatusToggle } = useRuleTableActions();
+  const { handleStatusToggle } = useRuleTableActions();
 
   const columns: ContentTableProps<RuleTableDataType>["columns"] = [
     {
       title: "Rules",
-      // dataIndex: "",
       key: "name",
       render: (rule: RuleTableDataType) => rule.name,
+      defaultSortOrder: "ascend",
       sorter: {
         // Fix. Descend logic sending groups to bottom
+        // Fix: Default/No sort logic. Group should stay at top
         compare: (a, b) => {
           if (a.objectType === "group" && b.objectType !== "group") {
             return -1;
@@ -28,7 +28,6 @@ const useRuleTableColumns = () => {
     },
     {
       title: "Status",
-      // dataIndex: "",
       key: "status",
       render: (rule: RuleTableDataType) => {
         const checked = rule?.status === "Active" ? true : false;
@@ -38,7 +37,6 @@ const useRuleTableColumns = () => {
     },
     {
       title: "Actions",
-      // dataIndex: "",
       key: "actions",
       render: (rule: RuleTableDataType) => (
         <>
