@@ -1,4 +1,5 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody } from "reactstrap";
 import { Button, Space } from "antd";
@@ -6,8 +7,10 @@ import { Button, Space } from "antd";
 import { redirectToPricingPlans } from "../../../../../../utils/RedirectionUtils";
 // CONSTANTS
 import APP_CONSTANTS from "../../../../../../config/constants";
+import { actions } from "store";
 
 const GetASubscription = ({ hideShadow }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   return (
     <Row className="my-4">
@@ -17,7 +20,10 @@ const GetASubscription = ({ hideShadow }) => {
             <div style={{ textAlign: "center" }} className="mb-2">
               <p>Get the most out of Requestly. Upgrade to one of our premium plans.</p>
               <Space>
-                <Button type="primary" onClick={() => redirectToPricingPlans(navigate)}>
+                <Button
+                  type="primary"
+                  onClick={() => dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }))}
+                >
                   View Plans
                 </Button>
                 <Button
