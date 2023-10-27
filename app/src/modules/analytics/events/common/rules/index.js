@@ -18,7 +18,7 @@ export const trackRuleCreatedEvent = ({
   if (destination_types) params.destination_types = destination_types;
   if (source) params.source = source;
   if (body_types) params.body_types = body_types;
-  if (num_characters != null) params.num_characters = num_characters;
+  if (num_characters !== undefined) params.num_characters = num_characters;
   if (header_types) params.header_types = header_types;
   if (header_actions) params.header_actions = header_actions;
 
