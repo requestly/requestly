@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from "react";
-// @ts-ignore
-import rules from "./rules.json";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
-import { rulesListToContentTableAdapter } from "features/rules/utils/rulesList";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
+import { rulesToContentTableDataAdapter } from "./utils";
+import { RuleObj } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 
-const actualRulesData = rules as RuleTableDataType[];
+interface Props {
+  rules: RuleObj[];
+}
 
-interface Props {}
-
-const RulesTable: React.FC<Props> = ({}) => {
-  const [rulesData, setRulesData] = useState([]);
+const RulesTable: React.FC<Props> = ({ rules }) => {
   const columns = useRuleTableColumns();
 
-  useEffect(() => {
-    const finalRulesData = rulesListToContentTableAdapter(actualRulesData);
-    setRulesData(finalRulesData);
-  }, [actualRulesData]);
+  const [contentTableData, setContentTableAdaptedRules] = useState<RuleTableDataType[]>([]);
 
-  // Fetch Rules Here
-  console.log(rules);
+  useEffect(() => {
+    const contentTableAdaptedRules = rulesToContentTableDataAdapter(rules);
+    setContentTableAdaptedRules(contentTableAdaptedRules);
+  }, [rules]);
 
   return (
     <>
       <ContentTable
         columns={columns}
-        data={rulesData}
+        data={contentTableData}
+        rowKey="id"
         bulkActionBarConfig={{
           type: "default",
           options: {
@@ -40,22 +38,6 @@ const RulesTable: React.FC<Props> = ({}) => {
               },
             ],
           },
-        }}
-        filterHeaderConfig={{
-          search: true,
-          quickFilters: ["status"],
-          filters: [
-            {
-              key: "search",
-              label: "Search",
-              onFilter: (value: string, data: any) => data?.name.toLowerCase().includes(value),
-            },
-            {
-              key: "status",
-              label: "Active",
-              onFilter: (value: string, data: any) => data?.status === value,
-            },
-          ],
         }}
       />
     </>

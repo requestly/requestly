@@ -1,55 +1,37 @@
-import { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import type { ColumnsType } from "antd/es/table";
 import { Table } from "antd";
-import { BulkActionBarConfig, FilterConfig, FilterHeaderConfig } from "./types";
+import { BulkActionBarConfig } from "./types";
 import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
-import FilterHeader from "./components/FilterHeader/FilterHeader";
 
 export interface ContentTableProps<DataType> {
   columns: ColumnsType<DataType>;
   data: DataType[];
+  rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
+
   bulkActionBarConfig?: BulkActionBarConfig;
-  filterHeaderConfig?: FilterHeaderConfig;
 }
 
-// Contains common design and colors for app
-const ContentTable = <DataType,>({
+const ContentTable = <DataType extends object>({
   columns,
   data,
   bulkActionBarConfig,
-  filterHeaderConfig,
+  rowKey = "key",
 }: ContentTableProps<DataType>): ReactElement => {
-  // Fetch ContentTableProps
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<DataType[]>([]);
-
-  const [filters, setFilters] = useState<{ [key: string]: any[] }>({});
-
   const [filteredRowsData, setFilteredRowsData] = useState(data);
 
-  // useEffect(() => {
-  //   // Search Filter
-  //   let finalRowsData = data;
-
-  //   filterHeaderConfig?.filters.forEach((filterConfig) => {
-  //     console.log(filters[filterConfig.key]);
-  //     if (filters[filterConfig.key]) {
-  //       finalRowsData = finalRowsData.filter((row) => filterConfig.onFilter(filters[filterConfig.key] || "", row))
-  //     }
-  //   })
-
-  //   setFilteredRowsData([...finalRowsData]);
-  // }, [filters, data, filterHeaderConfig])
+  useEffect(() => {
+    setFilteredRowsData([...data]);
+  }, [data]);
 
   return (
     <>
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRowsData} />}
-      {/* TODO */}
-      {/* <FilterHeader config={filterHeaderConfig} filters={filters} setFilters={setFilters} /> */}
       <Table
-        // @ts-ignore
+        rowKey={rowKey}
         columns={columns}
-        // @ts-ignore
         dataSource={filteredRowsData}
         pagination={false}
         rowSelection={{
@@ -57,7 +39,6 @@ const ContentTable = <DataType,>({
           onChange: (selectedRowKeys, selectedRows) => {
             console.log({ selectedRowKeys });
             setSelectedRowKeys(selectedRowKeys);
-            // @ts-ignore
             setSelectedRowsData(selectedRows);
           },
         }}
