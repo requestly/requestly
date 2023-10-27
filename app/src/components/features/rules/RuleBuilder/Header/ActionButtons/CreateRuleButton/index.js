@@ -191,9 +191,7 @@ const CreateRuleButton = ({
           }
         });
     } else {
-      toast.warn(ruleValidation.message, {
-        hideProgressBar: true,
-      });
+      toast.warn(ruleValidation.message);
       trackErrorInRuleCreation(snakeCase(ruleValidation.error), currentlySelectedRuleData.ruleType);
     }
   };
