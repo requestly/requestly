@@ -24,7 +24,7 @@ import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
 import { SyncType } from "utils/syncing/SyncUtils";
-import { Span, startSpanManual } from "@sentry/react";
+import { startTransaction } from "@sentry/react";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -249,46 +249,63 @@ export const invokeSyncingIfRequired = async ({
   appMode?: "EXTENSION" | "DESKTOP";
   isSyncEnabled?: boolean;
 }): Promise<void> => {
-  startSpanManual({ name: "records_syncing" }, async (syncingSpan: Span, finishSpan: () => void) => {
-    try {
-      syncingSpan?.setData("isFirstSync", !window.isFirstSyncComplete);
-      syncingSpan?.setData("recordsCount", Object.keys(latestFirebaseRecords)?.length);
+  const transaction = startTransaction({ name: "recordsSyncing" });
 
-      if (!uid || (!team_id && !isSyncEnabled)) return;
+  try {
+    const syncingSpan = transaction?.startChild({
+      op: "syncing",
+      data: {
+        isFirstSync: !window.isFirstSyncComplete,
+        recordsCount: Object.keys(latestFirebaseRecords)?.length,
+      },
+    });
 
-      if (window.skipSyncListenerForNextOneTime) {
-        window.skipSyncListenerForNextOneTime = false;
-        window.isFirstSyncComplete = true; // Just in case!
-        dispatch(actions.updateIsRulesListLoading(false));
-        finishSpan?.();
-        return;
-      }
+    const finishTransaction = () => {
+      syncingSpan?.finish();
+      transaction?.finish();
+    };
 
-      const syncTarget = getSyncTarget(team_id);
-      // If latestFirebaseRecords are given, means invoked for the newer time. If not given, means sync is invoked for the first time
-      let updatedFirebaseRecords = latestFirebaseRecords
-        ? latestFirebaseRecords
-        : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
-
-      if (!isLocalStoragePresent(appMode)) {
-        // Just refresh the rules table in this case
-        dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
-        window.isFirstSyncComplete = true;
-        dispatch(actions.updateIsRulesListLoading(false));
-        finishSpan?.();
-        return;
-      }
-      if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-        console.log("DEBUG", "doSyncDebounced");
-        doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id).then(() => finishSpan?.());
-      } else {
-        resetSyncDebounce();
-        doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id).then(() => finishSpan?.());
-      }
-    } catch (error) {
-      Logger.log(error);
+    if (!uid || (!team_id && !isSyncEnabled)) {
+      finishTransaction();
+      return;
     }
-  });
+
+    if (window.skipSyncListenerForNextOneTime) {
+      window.skipSyncListenerForNextOneTime = false;
+      window.isFirstSyncComplete = true; // Just in case!
+      dispatch(actions.updateIsRulesListLoading(false));
+      finishTransaction();
+      return;
+    }
+
+    const syncTarget = getSyncTarget(team_id);
+    // If latestFirebaseRecords are given, means invoked for the newer time. If not given, means sync is invoked for the first time
+    let updatedFirebaseRecords = latestFirebaseRecords
+      ? latestFirebaseRecords
+      : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
+
+    if (!isLocalStoragePresent(appMode)) {
+      // Just refresh the rules table in this case
+      dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+      window.isFirstSyncComplete = true;
+      dispatch(actions.updateIsRulesListLoading(false));
+      finishTransaction();
+      return;
+    }
+    if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
+      console.log("DEBUG", "doSyncDebounced");
+      doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id).then(() => {
+        finishTransaction();
+      });
+    } else {
+      resetSyncDebounce();
+      doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id).then(() => {
+        finishTransaction();
+      });
+    }
+  } catch (error) {
+    Logger.log(error);
+  }
 };
 
 /**
