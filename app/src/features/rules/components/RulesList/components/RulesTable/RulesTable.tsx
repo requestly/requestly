@@ -33,6 +33,7 @@ const RulesTable: React.FC<Props> = ({ rules }) => {
               {
                 text: "Activate",
                 onClick: (selectedRows: any) => {
+                  // Get action from useRuleTableActions hook
                   console.log("Activate Bulk Action", { selectedRows });
                 },
               },
