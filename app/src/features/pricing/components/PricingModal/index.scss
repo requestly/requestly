@@ -16,8 +16,8 @@
 .pricing-modal {
   background: var(--black);
   border-radius: 1rem;
-  height: 85vh;
-  max-height: 700px;
+  height: 95vh;
+  max-height: 750px;
   overflow: hidden;
 
   .pricing-table {
@@ -61,6 +61,9 @@
     & .embed-checkout {
       width: 100%;
     }
+    // & iframe {
+    //   width: 100%;
+    // }
   }
 
   .checkout-screen-wrapper {

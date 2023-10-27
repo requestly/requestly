@@ -7,8 +7,8 @@ import { getUserAuthDetails } from "store/selectors";
 import { PricingFeatures } from "../../constants/pricingFeatures";
 import { PricingPlans } from "../../constants/pricingPlans";
 import { PRICING } from "../../constants/pricing";
+import ContactUsModal from "components/landing/contactUsModal";
 import { capitalize } from "lodash";
-import { redirectToCheckout } from "utils/RedirectionUtils";
 import underlineIcon from "../../assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { CloseOutlined } from "@ant-design/icons";
@@ -40,7 +40,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const [, setIsContactUsModalOpen] = useState(false);
+  const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
 
   const renderButtonsForPlans = useCallback(
     (planName: string) => {
@@ -100,13 +100,15 @@ export const PricingTable: React.FC<PricingTableProps> = ({
           <>
             <RQButton
               onClick={() =>
-                redirectToCheckout({
-                  mode: isPrivateWorkspaceSelected ? "individual" : "team",
-                  planName: planName,
-                  duration: duration,
-                  quantity: workspaceToUpgrade?.accessCount,
-                  teamId: isPrivateWorkspaceSelected ? null : workspaceToUpgrade?.id,
-                })
+                isOpenedFromModal
+                  ? handleOnSubscribe(planName)
+                  : dispatch(
+                      actions.toggleActiveModal({
+                        modalName: "pricingModal",
+                        newValue: true,
+                        newProps: { selectedPlan: planName, workspace: workspaceToUpgrade },
+                      })
+                    )
               }
               type="primary"
             >
@@ -117,13 +119,17 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
+      if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) {
+        return (
+          <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+            Contact us
+          </RQButton>
+        );
+      }
+
       if (product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY) {
         if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
-          return (
-            <>
-              <div className="current-pricing-plan-tag">Current Plan</div>
-            </>
-          );
+          return <div className="current-pricing-plan-tag">Current Plan</div>;
         }
 
         return (
@@ -188,54 +194,60 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   };
 
   return (
-    <Row wrap={false} className="pricing-table">
-      {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => {
-        const planPrice =
-          PricingPlans[planName as keyof typeof PricingPlans]?.plans[
-            duration as keyof typeof PricingPlans[keyof typeof PricingPlans]["plans"]
-          ]?.usd?.price;
+    <>
+      <Row wrap={false} className="pricing-table">
+        {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => {
+          const planPrice =
+            PricingPlans[planName as keyof typeof PricingPlans]?.plans[
+              duration as keyof typeof PricingPlans[keyof typeof PricingPlans]["plans"]
+            ]?.usd?.price;
 
-        if (!isOpenedFromModal && planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) return null;
+          if (!isOpenedFromModal && planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) return null;
 
-        return (
-          <Col key={planName} className="plan-card">
-            <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
-            {planPrice !== undefined && (
-              <Row align="middle">
-                <Space size="small">
-                  <Typography.Text strong className="plan-price">
-                    ${duration === PRICING.DURATION.ANNUALLY ? planPrice / 12 : planPrice}
+          return (
+            <Col key={planName} className="plan-card">
+              <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
+              {planPrice !== undefined && (
+                <Row align="middle">
+                  <Space size="small">
+                    <Typography.Text strong className="plan-price">
+                      ${duration === PRICING.DURATION.ANNUALLY ? planPrice / 12 : planPrice}
+                    </Typography.Text>
+                    {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+                      <Typography.Text>/ month per member</Typography.Text>
+                    )}
+                  </Space>
+                </Row>
+              )}
+              {planDetails?.planDescription && (
+                <Row>
+                  <Typography.Text type="secondary" className="plan-description">
+                    {planDetails.planDescription}
                   </Typography.Text>
-                  {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
-                    <Typography.Text>/ month per member</Typography.Text>
-                  )}
-                </Space>
-              </Row>
-            )}
-            {planDetails?.planDescription && (
-              <Row>
-                <Typography.Text type="secondary" className="plan-description">
-                  {planDetails.planDescription}
-                </Typography.Text>
-              </Row>
-            )}
-            {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE && (
-              <Row className={`mt-8 ${duration === PRICING.DURATION.MONTHLY ? "not-visible" : ""}`}>
-                <Typography.Text type="secondary">Billed annually</Typography.Text>
-              </Row>
-            )}
-            <Row className="mt-16">{renderButtonsForPlans(planName)}</Row>
-            <>{renderFeaturesListHeader(planName)}</>
-            <Space direction="vertical" className="plan-features-list">
-              {planDetails.features.map((feature, index) => (
-                <div className="text-left text-gray plan-feature-item" key={index}>
-                  {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />} {feature.title}
-                </div>
-              ))}
-            </Space>
-          </Col>
-        );
-      })}
-    </Row>
+                </Row>
+              )}
+              {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE && (
+                <Row className={`mt-8 ${duration === PRICING.DURATION.MONTHLY ? "not-visible" : ""}`}>
+                  <Typography.Text type="secondary">Billed annually</Typography.Text>
+                </Row>
+              )}
+              <Row className="mt-16">{renderButtonsForPlans(planName)}</Row>
+              <>{renderFeaturesListHeader(planName)}</>
+              <Space direction="vertical" className="plan-features-list">
+                {planDetails.features.map((feature, index) => (
+                  <div className="text-left text-gray plan-feature-item" key={index}>
+                    {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />} {feature.title}
+                  </div>
+                ))}
+              </Space>
+            </Col>
+          );
+        })}
+      </Row>
+      <ContactUsModal
+        isOpen={isContactUsModalOpen}
+        handleToggleModal={() => setIsContactUsModalOpen(!isContactUsModalOpen)}
+      />
+    </>
   );
 };
