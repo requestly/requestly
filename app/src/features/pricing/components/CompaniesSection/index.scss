@@ -1,0 +1,10 @@
+.companies-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.companies-section-header.ant-typography {
+  color: #555963; //TODO: should be var(--surface-3) according to design file but assigned some other color
+  font-weight: 500;
+}

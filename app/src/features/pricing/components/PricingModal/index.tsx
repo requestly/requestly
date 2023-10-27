@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
 import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
+import { CompaniesSection } from "../CompaniesSection";
 import { CloseOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -132,6 +133,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               isOpenedFromModal
               handleOnSubscribe={handleSubscribe}
             />
+            <CompaniesSection />
           </>
         )}
       </div>
