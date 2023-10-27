@@ -254,6 +254,7 @@ export const invokeSyncingIfRequired = async ({
   try {
     const syncingSpan = transaction?.startChild({
       op: "syncing",
+      name: "records syncing",
       data: {
         isFirstSync: !window.isFirstSyncComplete,
         recordsCount: Object.keys(latestFirebaseRecords)?.length,
