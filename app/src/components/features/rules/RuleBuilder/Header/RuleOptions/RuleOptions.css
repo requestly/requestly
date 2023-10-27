@@ -33,6 +33,11 @@
   justify-content: flex-start;
 }
 
+.editor-rule-options-menu-item.ant-dropdown-menu-item .ant-btn-text .premium-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
 .editor-rule-options-menu .editor-rule-options-menu-divider {
   margin: 4px 0px 6px 0px;
 }
