@@ -46,9 +46,6 @@ export const trackWorkspaceDropdownClicked = (action) => {
   const params = { action };
   trackEvent(TEAMS.WORKSPACE_DROPDOWN_CLICKED, params);
 };
-export const trackUpgradeWorkspaceClicked = () => {
-  trackEvent(TEAMS.UPGRADE_WORKSPACE_CLICKED);
-};
 
 export const trackAddWorkspaceNameModalViewed = (source) => {
   const params = { source };

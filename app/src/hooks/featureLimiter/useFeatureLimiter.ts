@@ -56,6 +56,8 @@ export const useFeatureLimiter = () => {
   };
 
   const getFeatureLimitValue = (featureLimitType: FeatureLimitType) => {
+    if (!(featureLimitType in FeatureLimitType)) return true; // free feature
+
     return (
       featureLimits[userPlan]?.[featureLimitType] ??
       featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
