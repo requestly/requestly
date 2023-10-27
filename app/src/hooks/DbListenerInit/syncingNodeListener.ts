@@ -24,6 +24,7 @@ import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
 import { SyncType } from "utils/syncing/SyncUtils";
+import { Span, startSpanManual } from "@sentry/react";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -217,7 +218,7 @@ export const doSync = async (
 /** Debounced version of the doSync function */
 export const doSyncDebounced = _.debounce((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
   console.log("[DEBUG] doSyncDebounced in action");
-  doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+  return doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
 }, 5000);
 
 /**
@@ -248,35 +249,46 @@ export const invokeSyncingIfRequired = async ({
   appMode?: "EXTENSION" | "DESKTOP";
   isSyncEnabled?: boolean;
 }): Promise<void> => {
-  if (!uid || (!team_id && !isSyncEnabled)) return;
+  startSpanManual({ name: "rules syncing" }, async (syncingSpan: Span, finishSpan: () => void) => {
+    try {
+      syncingSpan?.setData("isFirstSync", !window.isFirstSyncComplete);
+      syncingSpan?.setData("recordsCount", Object.keys(latestFirebaseRecords)?.length);
 
-  if (window.skipSyncListenerForNextOneTime) {
-    window.skipSyncListenerForNextOneTime = false;
-    window.isFirstSyncComplete = true; // Just in case!
-    dispatch(actions.updateIsRulesListLoading(false));
-    return;
-  }
+      if (!uid || (!team_id && !isSyncEnabled)) return;
 
-  const syncTarget = getSyncTarget(team_id);
-  // If latestFirebaseRecords are given, means invoked for the newer time. If not given, means sync is invoked for the first time
-  let updatedFirebaseRecords = latestFirebaseRecords
-    ? latestFirebaseRecords
-    : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
+      if (window.skipSyncListenerForNextOneTime) {
+        window.skipSyncListenerForNextOneTime = false;
+        window.isFirstSyncComplete = true; // Just in case!
+        dispatch(actions.updateIsRulesListLoading(false));
+        finishSpan?.();
+        return;
+      }
 
-  if (!isLocalStoragePresent(appMode)) {
-    // Just refresh the rules table in this case
-    dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
-    window.isFirstSyncComplete = true;
-    dispatch(actions.updateIsRulesListLoading(false));
-    return;
-  }
-  if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-    console.log("DEBUG", "doSyncDebounced");
-    doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
-  } else {
-    resetSyncDebounce();
-    doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
-  }
+      const syncTarget = getSyncTarget(team_id);
+      // If latestFirebaseRecords are given, means invoked for the newer time. If not given, means sync is invoked for the first time
+      let updatedFirebaseRecords = latestFirebaseRecords
+        ? latestFirebaseRecords
+        : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
+
+      if (!isLocalStoragePresent(appMode)) {
+        // Just refresh the rules table in this case
+        dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+        window.isFirstSyncComplete = true;
+        dispatch(actions.updateIsRulesListLoading(false));
+        finishSpan?.();
+        return;
+      }
+      if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
+        console.log("DEBUG", "doSyncDebounced");
+        doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id).then(() => finishSpan?.());
+      } else {
+        resetSyncDebounce();
+        doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id).then(() => finishSpan?.());
+      }
+    } catch (error) {
+      Logger.log(error);
+    }
+  });
 };
 
 /**
