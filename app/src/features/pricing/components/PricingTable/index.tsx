@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Col, Row, Space, Tag, Typography } from "antd";
+import { Col, Row, Space, Tag, Tooltip, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
@@ -236,7 +236,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               <Space direction="vertical" className="plan-features-list">
                 {planDetails.features.map((feature, index) => (
                   <div className="text-left text-gray plan-feature-item" key={index}>
-                    {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />} {feature.title}
+                    {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
+                    <Tooltip title={feature?.tooltip} color="var(--black)">
+                      <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
+                    </Tooltip>
                   </div>
                 ))}
               </Space>
