@@ -135,6 +135,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    pricingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {

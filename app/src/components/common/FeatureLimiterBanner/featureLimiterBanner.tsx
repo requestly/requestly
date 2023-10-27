@@ -1,20 +1,19 @@
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { Alert, Col, Row } from "antd";
-import { TbInfoTriangle } from "@react-icons/all-files/tb/TbInfoTriangle";
-import "./styles.scss";
 import { RQButton } from "lib/design-system/components";
-import { redirectToPricingPlans } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
+import { TbInfoTriangle } from "@react-icons/all-files/tb/TbInfoTriangle";
+import { actions } from "store";
+import APP_CONSTANTS from "config/constants";
 import {
   trackFeatureLimitUpgradeBannerClicked,
   trackFeatureLimitUpgradeBannerViewed,
 } from "modules/analytics/events/common/feature-limiter";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
-import APP_CONSTANTS from "config/constants";
+import "./styles.scss";
 
 const FeatureLimiterBanner = () => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isUserOnFreePlan =
     !user?.details?.planDetails?.planName ||
@@ -43,7 +42,7 @@ const FeatureLimiterBanner = () => {
               className="feature-limit-banner-btn"
               onClick={() => {
                 trackFeatureLimitUpgradeBannerClicked();
-                redirectToPricingPlans(navigate);
+                dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
               }}
             >
               Upgrade
