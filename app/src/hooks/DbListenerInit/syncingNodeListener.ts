@@ -249,7 +249,7 @@ export const invokeSyncingIfRequired = async ({
   appMode?: "EXTENSION" | "DESKTOP";
   isSyncEnabled?: boolean;
 }): Promise<void> => {
-  startSpanManual({ name: "rules syncing" }, async (syncingSpan: Span, finishSpan: () => void) => {
+  startSpanManual({ name: "records_syncing" }, async (syncingSpan: Span, finishSpan: () => void) => {
     try {
       syncingSpan?.setData("isFirstSync", !window.isFirstSyncComplete);
       syncingSpan?.setData("recordsCount", Object.keys(latestFirebaseRecords)?.length);
