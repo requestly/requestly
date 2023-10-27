@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipProps } from "antd";
-import { ReactComponent as PremiumIconSvg } from "assets/icons/premium.svg";
+import { ReactComponent as CrownIcon } from "assets/icons/crown.svg";
 import PATHS from "config/constants/sub/paths";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 import "./premiumIcon.css";
@@ -28,7 +28,7 @@ export const PremiumIcon: React.FC<TooltipProps & { onSeePlansClick?: () => void
       }
     >
       <span className="premium-icon">
-        <PremiumIconSvg />
+        <CrownIcon />
       </span>
     </Tooltip>
   );
