@@ -30,7 +30,13 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
         <Button
           type="primary"
           onClick={() => {
-            dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "pricingModal",
+                newValue: true,
+                newProps: { selectedPlan: null },
+              })
+            );
             trackUpgradeWorkspaceClicked();
           }}
         >

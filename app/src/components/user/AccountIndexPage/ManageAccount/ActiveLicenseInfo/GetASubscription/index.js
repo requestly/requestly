@@ -19,7 +19,15 @@ const GetASubscription = ({ hideShadow }) => {
               <Space>
                 <Button
                   type="primary"
-                  onClick={() => dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }))}
+                  onClick={() =>
+                    dispatch(
+                      actions.toggleActiveModal({
+                        modalName: "pricingModal",
+                        newValue: true,
+                        newProps: { selectedPlan: null },
+                      })
+                    )
+                  }
                 >
                   View Plans
                 </Button>

@@ -41,7 +41,13 @@ const FeatureLimiterBanner = () => {
               className="feature-limit-banner-btn"
               onClick={() => {
                 trackFeatureLimitUpgradeBannerClicked();
-                dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "pricingModal",
+                    newValue: true,
+                    newProps: { selectedPlan: null },
+                  })
+                );
               }}
             >
               Upgrade
