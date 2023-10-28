@@ -5,22 +5,21 @@ import { Alert, Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { TbInfoTriangle } from "@react-icons/all-files/tb/TbInfoTriangle";
 import { actions } from "store";
-import APP_CONSTANTS from "config/constants";
 import {
   trackFeatureLimitUpgradeBannerClicked,
   trackFeatureLimitUpgradeBannerViewed,
 } from "modules/analytics/events/common/feature-limiter";
+import { PRICING } from "features/pricing";
 import "./styles.scss";
 
 const FeatureLimiterBanner = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isUserOnFreePlan =
-    !user?.details?.planDetails?.planName ||
-    user?.details?.planDetails?.planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE
+    !user?.details?.planDetails?.planName || user?.details?.planDetails?.planName === PRICING.PLAN_NAMES.FREE
       ? true
       : false;
-  const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+  const userPlan = user?.details?.planDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
 
   useEffect(() => {
     trackFeatureLimitUpgradeBannerViewed();

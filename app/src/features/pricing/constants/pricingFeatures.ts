@@ -1,8 +1,8 @@
-import APP_CONSTANTS from "config/constants";
+import { PRICING } from "./pricing";
 import { PlanFeatures } from "../components/PricingTable/types";
 
 export const PricingFeatures: PlanFeatures = {
-  [APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]: {
+  [PRICING.PRODUCTS.HTTP_RULES]: {
     free: {
       planTitle: "Free",
       heading: "Starter plan",
@@ -135,7 +135,7 @@ export const PricingFeatures: PlanFeatures = {
       ],
     },
   },
-  [APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY]: {
+  [PRICING.PRODUCTS.SESSION_REPLAY]: {
     free: {
       planTitle: "Free",
       features: [

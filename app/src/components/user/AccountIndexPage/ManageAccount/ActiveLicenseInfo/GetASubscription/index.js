@@ -1,17 +1,14 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody } from "reactstrap";
 import { Button, Space } from "antd";
 // UTILS
-import { redirectToPricingPlans } from "../../../../../../utils/RedirectionUtils";
 // CONSTANTS
 import APP_CONSTANTS from "../../../../../../config/constants";
 import { actions } from "store";
 
 const GetASubscription = ({ hideShadow }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   return (
     <Row className="my-4">
       <Col>
