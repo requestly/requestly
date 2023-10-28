@@ -1,6 +1,7 @@
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
+import { PRICING } from "features/pricing";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -22,9 +23,9 @@ export const getPrettyString = (string) => {
 
 export const getPrettyPlanName = (planName) => {
   if (!planName) return "Free";
-  if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE) return "Free";
-  if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.GOLD) return "Professional";
-  if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) return "Professional";
+  if (planName === PRICING.PLAN_NAMES.BRONZE) return "Free";
+  if (planName === PRICING.PLAN_NAMES.GOLD) return "Professional";
+  if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Professional";
 
   return planName
     .toLowerCase()
@@ -107,7 +108,7 @@ export const filterUniqueObjects = (myArr) => {
 };
 
 export const getCountryNameFromISOCode = (ISOCode) => {
-  const countryCodeObject = APP_CONSTANTS.PRICING.COUNTRY_CODES.find((object) => object.value === ISOCode);
+  const countryCodeObject = PRICING.COUNTRY_CODES.find((object) => object.value === ISOCode);
 
   if (countryCodeObject) {
     return countryCodeObject.label;

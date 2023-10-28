@@ -34,7 +34,7 @@ const PRIVATE_WORKSPACE = {
 export const PricingTable: React.FC<PricingTableProps> = ({
   duration = PRICING.DURATION.ANNUALLY,
   workspaceToUpgrade = PRIVATE_WORKSPACE,
-  product = APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES,
+  product = PRICING.PRODUCTS.HTTP_RULES,
   handleOnSubscribe,
   isOpenedFromModal = false,
 }) => {
@@ -56,7 +56,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         (user?.details?.isPremium && userPlanType !== "team" && isPrivateWorkspaceSelected) ||
         (!user?.details?.isPremium && shouldRenew);
 
-      if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
+      if (planName === PRICING.PLAN_NAMES.FREE) {
         if (!user?.details?.isLoggedIn) {
           return (
             <>
@@ -119,7 +119,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
-      if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) {
+      if (planName === PRICING.PLAN_NAMES.ENTERPRISE) {
         return (
           <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
             Contact us
@@ -127,8 +127,8 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
-      if (product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY) {
-        if (planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE) {
+      if (product === PRICING.PRODUCTS.SESSION_REPLAY) {
+        if (planName === PRICING.PLAN_NAMES.FREE) {
           return <div className="current-pricing-plan-tag">Current Plan</div>;
         }
 
@@ -152,20 +152,20 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   })
                 )
           }
-          disabled={userPlanName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL}
+          disabled={userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL}
           type="primary"
         >
           Upgrade now
         </RQButton>
       );
     },
-    [duration, product, user, workspaceToUpgrade, dispatch, handleOnSubscribe, isOpenedFromModal]
+    [product, user, workspaceToUpgrade, dispatch, handleOnSubscribe, isOpenedFromModal]
   );
 
   const renderFeaturesListHeader = (planName: string) => {
     return (
       <Row className="pro-basic-feature-title text-left">
-        {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+        {planName === PRICING.PLAN_NAMES.FREE && (
           <Col>
             <span>
               All you need
@@ -174,16 +174,15 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             to get started
           </Col>
         )}
-        {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
+        {planName !== PRICING.PLAN_NAMES.FREE && (
           <Col>
             <span>
               Everything <img src={underlineIcon} alt="highlight" />
             </span>{" "}
             in{" "}
-            {planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC ||
-            product === APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY
+            {planName === PRICING.PLAN_NAMES.BASIC || product === PRICING.PRODUCTS.SESSION_REPLAY
               ? "Free"
-              : planName === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL
+              : planName === PRICING.PLAN_NAMES.PROFESSIONAL
               ? "Basic"
               : "Pro"}{" "}
             plan, and
@@ -202,7 +201,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               duration as keyof typeof PricingPlans[keyof typeof PricingPlans]["plans"]
             ]?.usd?.price;
 
-          if (!isOpenedFromModal && planName === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE) return null;
+          if (!isOpenedFromModal && planName === PRICING.PLAN_NAMES.ENTERPRISE) return null;
 
           return (
             <Col key={planName} className="plan-card">
@@ -213,9 +212,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                     <Typography.Text strong className="plan-price">
                       ${duration === PRICING.DURATION.ANNUALLY ? planPrice / 12 : planPrice}
                     </Typography.Text>
-                    {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.FREE && (
-                      <Typography.Text>/ month per member</Typography.Text>
-                    )}
+                    {planName !== PRICING.PLAN_NAMES.FREE && <Typography.Text>/ month per member</Typography.Text>}
                   </Space>
                 </Row>
               )}
@@ -226,7 +223,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   </Typography.Text>
                 </Row>
               )}
-              {planName !== APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE && (
+              {planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
                 <Row className={`mt-8 ${duration === PRICING.DURATION.MONTHLY ? "not-visible" : ""}`}>
                   <Typography.Text type="secondary">Billed annually</Typography.Text>
                 </Row>

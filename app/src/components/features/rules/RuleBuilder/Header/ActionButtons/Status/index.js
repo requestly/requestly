@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentlySelectedRule } from "../../../actions";
-import APP_CONSTANTS from "../../../../../../../config/constants";
+import { PRICING } from "features/pricing";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import {
   getAllRules,
@@ -27,7 +27,7 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
 
   // fetch planName from global state
-  const planNameFromState = user.details?.planDetails?.planName || APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+  const planNameFromState = user.details?.planDetails?.planName || PRICING.PRICING.PLAN_NAMES.FREE;
 
   const isRuleCurrentlyActive = () => {
     return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;

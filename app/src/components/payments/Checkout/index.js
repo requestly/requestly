@@ -15,7 +15,7 @@ import * as RedirectionUtils from "../../../utils/RedirectionUtils";
 // Static Asset
 import RQIcon from "assets/img/brand/rq_logo.svg";
 import Text from "antd/lib/typography/Text";
-import APP_CONSTANTS from "config/constants";
+import { PRICING } from "features/pricing";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ const Checkout = () => {
     if (!duration) {
       return redirectTo404WithError("Plan duration not set");
     }
-    if (![APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC, APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL].includes(planName)) {
+    if (![PRICING.PLAN_NAMES.BASIC, PRICING.PLAN_NAMES.PROFESSIONAL].includes(planName)) {
       return redirectTo404WithError("Invalid plan type");
     }
     if (mode === "team" && !teamId && !quantity) {

@@ -5,7 +5,6 @@ import APP_CONSTANTS from "../../../../../../../../config/constants";
 import ContactUsModal from "components/landing/contactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
 import { trackUpgradeWorkspaceClicked } from "modules/analytics/events/common/teams";
-import { redirectToPricingPlans } from "utils/RedirectionUtils";
 import { actions } from "store";
 
 const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
