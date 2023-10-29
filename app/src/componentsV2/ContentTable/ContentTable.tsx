@@ -8,6 +8,7 @@ export interface ContentTableProps<DataType> {
   columns: ColumnsType<DataType>;
   data: DataType[];
   rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
+  loading?: boolean;
 
   bulkActionBarConfig?: BulkActionBarConfig;
 }
@@ -15,8 +16,9 @@ export interface ContentTableProps<DataType> {
 const ContentTable = <DataType extends object>({
   columns,
   data,
-  bulkActionBarConfig,
   rowKey = "key",
+  loading = false,
+  bulkActionBarConfig,
 }: ContentTableProps<DataType>): ReactElement => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<DataType[]>([]);
@@ -30,6 +32,7 @@ const ContentTable = <DataType extends object>({
     <>
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRowsData} />}
       <Table
+        loading={loading}
         rowKey={rowKey}
         columns={columns}
         dataSource={filteredRowsData}

@@ -14,9 +14,13 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
 
   groupRules.forEach((rule) => {
     if (ruleTableDataTypeMap[rule.groupId]) {
-      ruleTableDataTypeMap[rule.groupId]["children"] = ruleTableDataTypeMap[rule.groupId]?.children
-        ? [...ruleTableDataTypeMap[rule.groupId].children, rule]
-        : [rule];
+      const updatedGroup = {
+        ...ruleTableDataTypeMap[rule.groupId],
+        children: ruleTableDataTypeMap[rule.groupId]?.children
+          ? [...ruleTableDataTypeMap[rule.groupId].children, rule]
+          : [rule],
+      };
+      ruleTableDataTypeMap[rule.groupId] = updatedGroup;
     } else {
       // GroupId doesn't exist
       ruleTableDataTypeMap[rule.id] = rule;

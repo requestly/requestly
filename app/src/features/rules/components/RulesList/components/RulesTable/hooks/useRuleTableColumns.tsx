@@ -21,7 +21,7 @@ const useRuleTableColumns = () => {
           } else if (a.objectType !== "group" && b.objectType === "group") {
             return 1;
           } else {
-            return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
+            return a.name?.toLowerCase() > b.name?.toLowerCase() ? 1 : -1;
           }
         },
       },

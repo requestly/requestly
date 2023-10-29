@@ -7,9 +7,10 @@ import { RuleTableDataType } from "./types";
 
 interface Props {
   rules: RuleObj[];
+  loading: boolean;
 }
 
-const RulesTable: React.FC<Props> = ({ rules }) => {
+const RulesTable: React.FC<Props> = ({ rules, loading }) => {
   const columns = useRuleTableColumns();
 
   const [contentTableData, setContentTableAdaptedRules] = useState<RuleTableDataType[]>([]);
@@ -25,6 +26,7 @@ const RulesTable: React.FC<Props> = ({ rules }) => {
         columns={columns}
         data={contentTableData}
         rowKey="id"
+        loading={loading}
         bulkActionBarConfig={{
           type: "default",
           options: {
