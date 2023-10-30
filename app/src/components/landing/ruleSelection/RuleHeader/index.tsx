@@ -7,7 +7,6 @@ import { getRuleDetails } from "../utils";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
-import { UpgradePopup } from "features/pricing";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import "./ruleHeader.css";
 
@@ -27,36 +26,39 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
   };
 
   return (
-    <>
-      <UpgradePopup />
-      <Row align="middle" className="rule-header" wrap={false}>
-        <Col className="rule-header-icon" span={3}>
-          {icon}
-        </Col>
-        <Col className="rule-header-name-container" span={18}>
-          <Row>
-            <div className="header">
-              {name}
-              {isPremiumRule ? <PremiumIcon /> : null}
-            </div>
-          </Row>
-          <Row className="text-gray line-clamp-2">{header?.description ?? subtitle}</Row>
-        </Col>
-        <Col span={3} className="ml-auto">
-          <Row align="middle" justify="end">
-            <NavLink
-              replace
-              to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${selectedRuleType}`}
-              state={{ source: "rule_selection" }}
-            >
-              <Button size="large" type="primary" onClick={() => handleCreateRuleClick(selectedRuleType)}>
-                Create Rule
-              </Button>
-            </NavLink>
-          </Row>
-        </Col>
-      </Row>
-    </>
+    <Row align="middle" className="rule-header" wrap={false}>
+      <Col className="rule-header-icon" span={3}>
+        {icon}
+      </Col>
+      <Col className="rule-header-name-container" span={18}>
+        <Row>
+          <div className="header">
+            {name}
+            {isPremiumRule ? <PremiumIcon /> : null}
+          </div>
+        </Row>
+        <Row className="text-gray line-clamp-2">{header?.description ?? subtitle}</Row>
+      </Col>
+      <Col span={3} className="ml-auto">
+        <Row
+          align="middle"
+          justify="end"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <NavLink
+            replace
+            to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${selectedRuleType}`}
+            state={{ source: "rule_selection" }}
+          >
+            <Button size="large" type="primary" onClick={() => handleCreateRuleClick(selectedRuleType)}>
+              Create Rule
+            </Button>
+          </NavLink>
+        </Row>
+      </Col>
+    </Row>
   );
 };
 

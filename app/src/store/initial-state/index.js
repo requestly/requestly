@@ -139,6 +139,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    upgradePlanPopup: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {

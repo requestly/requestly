@@ -1,4 +1,4 @@
-.request-feature-modal {
+.request-feature-modal.ant-modal {
   background: var(--black);
   border-radius: 1rem;
   padding-bottom: 0;
@@ -20,6 +20,7 @@
 
   .ant-modal-content {
     background: none;
+    border-radius: 1rem;
 
     .request-modal-default-btn {
       background: none;
@@ -29,5 +30,24 @@
       rotate: (90deg);
       margin-right: 8px;
     }
+  }
+
+  .enterprise-admin-details {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.post-request-message-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+
+  & svg {
+    width: 40px;
+    height: 40px;
   }
 }
