@@ -34,7 +34,7 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
         <Row>
           <div className="header">
             {name}
-            {isPremiumRule ? <PremiumIcon /> : null}
+            {isPremiumRule ? <PremiumIcon featureType={featureName} source="rule_selection_screen" /> : null}
           </div>
         </Row>
         <Row className="text-gray line-clamp-2">{header?.description ?? subtitle}</Row>

@@ -70,7 +70,7 @@ const AuthPopoverButton: React.FC<Props> = ({
           <span>
             <Row align="middle" wrap={false}>
               {buttonText}
-              {isPremium ? <PremiumIcon /> : null}
+              {isPremium ? <PremiumIcon featureType="share_rules" source="share_button" /> : null}
             </Row>
           </span>
         )}
