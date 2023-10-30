@@ -234,6 +234,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
     </div>
   );
 };
+
 const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage, openDownloadedSessionModalBtn }) => {
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
