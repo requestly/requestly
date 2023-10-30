@@ -1,0 +1,33 @@
+.request-feature-modal {
+  background: var(--black);
+  border-radius: 1rem;
+  padding-bottom: 0;
+
+  .ant-modal-header {
+    background: none;
+    border: none;
+
+    & .ant-modal-title {
+      color: var(--white);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+  }
+
+  .ant-modal-body {
+    padding-top: 0;
+  }
+
+  .ant-modal-content {
+    background: none;
+
+    .request-modal-default-btn {
+      background: none;
+    }
+
+    .send-icon {
+      rotate: (90deg);
+      margin-right: 8px;
+    }
+  }
+}

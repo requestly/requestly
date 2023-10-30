@@ -4,3 +4,5 @@ import { PRICING } from "./constants/pricing";
 import { PricingModal } from "./components/PricingModal";
 
 export { PricingTable, UpgradeWorkspaceMenu, PricingModal, PRICING };
+
+export { UpgradePopup } from "./components/UpgradePopup";
