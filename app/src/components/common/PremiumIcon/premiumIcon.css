@@ -1,0 +1,21 @@
+.premium-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.premium-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ant-tooltip .see-plans-link {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.ant-tooltip .see-plans-link:hover {
+  color: var(--link-color);
+}

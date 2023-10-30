@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "antd";
-//ACTIONS
+import { Button, Row } from "antd";
 import { addEmptyPair } from "./actions";
-//UTILITIES
 import { getCurrentlySelectedRuleData } from "../../../../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../../../../utils/AnalyticsUtils";
-//CONSTANTS
 import { PlusOutlined } from "@ant-design/icons";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumIcon } from "components/common/PremiumIcon";
 import { trackRulePairCreated } from "modules/analytics/events/common/rules";
 import "./AddPairButton.css";
 
@@ -17,6 +17,8 @@ const AddPairButton = (props) => {
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const { getFeatureLimitValue } = useFeatureLimiter();
+  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.add_new_rule_pair);
 
   //STATE TO MAINTAIN CURRENTLY SELECTED RULE PAIR COUNT
   const [currentlySelectedRuleCount, setCurrentlySelectedRuleCount] = useState(0);
@@ -34,7 +36,11 @@ const AddPairButton = (props) => {
 
   return (
     <Button block type="dashed" className="add-pair-btn" onClick={handleRulePairsOnClick} icon={<PlusOutlined />}>
-      <span className="shrink-0">Add a new condition</span>
+      <span>
+        <Row align="middle" wrap={false} className="shrink-0">
+          Add a new condition{isPremiumFeature ? <PremiumIcon /> : null}
+        </Row>
+      </span>
     </Button>
   );
 };

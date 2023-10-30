@@ -5,11 +5,9 @@ import { Alert, Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { TbInfoTriangle } from "@react-icons/all-files/tb/TbInfoTriangle";
 import { actions } from "store";
-import {
-  trackFeatureLimitUpgradeBannerClicked,
-  trackFeatureLimitUpgradeBannerViewed,
-} from "modules/analytics/events/common/feature-limiter";
 import { PRICING } from "features/pricing";
+import { trackFeatureLimitUpgradeBannerViewed } from "modules/analytics/events/common/feature-limiter";
+import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 import "./styles.scss";
 
 const FeatureLimiterBanner = () => {
@@ -40,7 +38,7 @@ const FeatureLimiterBanner = () => {
             <RQButton
               className="feature-limit-banner-btn"
               onClick={() => {
-                trackFeatureLimitUpgradeBannerClicked();
+                trackViewPricingPlansClicked("feature_limiter_banner");
                 dispatch(
                   actions.toggleActiveModal({
                     modalName: "pricingModal",

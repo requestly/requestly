@@ -6,6 +6,7 @@ import { Button, Space } from "antd";
 // CONSTANTS
 import APP_CONSTANTS from "../../../../../../config/constants";
 import { actions } from "store";
+import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
 const GetASubscription = ({ hideShadow }) => {
   const dispatch = useDispatch();
@@ -19,15 +20,16 @@ const GetASubscription = ({ hideShadow }) => {
               <Space>
                 <Button
                   type="primary"
-                  onClick={() =>
+                  onClick={() => {
                     dispatch(
                       actions.toggleActiveModal({
                         modalName: "pricingModal",
                         newValue: true,
                         newProps: { selectedPlan: null },
                       })
-                    )
-                  }
+                    );
+                    trackViewPricingPlansClicked("my_profile");
+                  }}
                 >
                   View Plans
                 </Button>
