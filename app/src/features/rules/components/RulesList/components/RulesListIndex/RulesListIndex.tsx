@@ -5,6 +5,7 @@ import { RuleObj } from "features/rules/types/rules";
 import { useSelector } from "react-redux";
 import { getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
+import { Button } from "antd";
 
 interface Props {}
 
@@ -20,7 +21,13 @@ const RulesListIndex: React.FC<Props> = () => {
 
   return (
     <>
-      <ContentHeader />
+      {/* TODO: Add Feature Limiter Banner Here */}
+      {/* TODO: Add Modals Required in Rules List here */}
+      <ContentHeader
+        title="My Rules"
+        subtitle="Create and manage your rules from here"
+        actions={[<Button type="primary">New Rule</Button>]}
+      />
       <RulesTable rules={ruleObjs as RuleObj[]} loading={isLoading} />
     </>
   );
