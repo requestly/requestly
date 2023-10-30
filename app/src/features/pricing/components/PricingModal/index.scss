@@ -16,7 +16,7 @@
 .pricing-modal {
   background: var(--black);
   border-radius: 1rem;
-  height: 95vh;
+  height: 100vh;
   max-height: 750px;
   overflow: hidden;
 
@@ -48,22 +48,30 @@
     color: var(--white);
   }
 
-  .embed-checkout {
-    border-radius: var(--border-radius-md);
-  }
   .checkout-embed-wrapper {
-    height: 625px;
     width: 100%;
-    overflow: auto;
+    overflow: hidden;
     display: flex;
+    justify-content: center;
     align-items: center;
 
     & .embed-checkout {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 100%;
+      height: 550px;
+      overflow: auto;
+      margin: 3rem;
+
+      & ::-webkit-scrollbar {
+        width: 0.5rem;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: var(--surface-3, #383838);
+        border-radius: var(--border-radius-sm);
+      }
     }
-    // & iframe {
-    //   width: 100%;
-    // }
   }
 
   .checkout-screen-wrapper {
