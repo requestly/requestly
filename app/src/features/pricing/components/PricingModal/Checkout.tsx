@@ -12,9 +12,7 @@ interface CheckoutProps {
   isLoading: boolean;
   onCancel: () => void;
 }
-const stripePromise = loadStripe(
-  "pk_test_51KflXlDiNNz2hbmOUApXI81Y1qQu3F9dt0xmoC79bnNjJnYU1tRr7YpkjSMOqI5kVKesBVv4HEfa5m6NMjSmolC600bkl82JE6"
-);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
 export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, isLoading, onCancel }) => {
   const options = {
