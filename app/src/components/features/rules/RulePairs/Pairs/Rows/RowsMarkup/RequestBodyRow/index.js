@@ -135,7 +135,10 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             >
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>
-                <Row align="middle">Programmatic (JavaScript){isPremiumFeature ? <PremiumIcon /> : null}</Row>
+                <Row align="middle">
+                  Programmatic (JavaScript)
+                  {isPremiumFeature ? <PremiumIcon featureType="dynamic_request_body" /> : null}
+                </Row>
               </Radio>
             </Radio.Group>
           </Popconfirm>
