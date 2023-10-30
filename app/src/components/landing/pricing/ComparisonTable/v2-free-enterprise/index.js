@@ -42,10 +42,7 @@ const FreeAndEnterprisePlanTable = () => {
   const renderButtonsForPlans = useCallback(
     (planName) => {
       const isUserPremium = user?.details?.isPremium;
-      const userPlanName =
-        user?.details?.planDetails?.planName === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2
-          ? APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC
-          : user?.details?.planDetails?.planName;
+      const userPlanName = user?.details?.planDetails?.planName;
       const userPlanType = user?.details?.planDetails?.type;
       const userExpiredPlanName =
         user?.details?.planDetails?.status !== "active" ? getPlanNameFromId(user?.details?.planDetails?.planId) : null;

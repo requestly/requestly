@@ -72,6 +72,10 @@ export const getPlanName = (planDetails) => {
     return APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
   }
 
+  if (planDetails.planId === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2) {
+    return APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC;
+  }
+
   if (planDetails.planId) {
     return getPlanNameFromId(planDetails.planId);
   }

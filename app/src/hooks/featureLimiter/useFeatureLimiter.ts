@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { FeatureLimitType } from "./types";
+import { getPlanNameFromId } from "utils/PremiumUtils";
 
 const premiumPlansToCheckLimit = [
   APP_CONSTANTS.PRICING.PLAN_NAMES.LITE,
@@ -17,7 +18,9 @@ export const useFeatureLimiter = () => {
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const isUserPremium = user?.details?.isPremium;
-  const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+  const userPlan = isUserPremium
+    ? getPlanNameFromId(user?.details?.planDetails?.planId)
+    : APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
 
   const checkFeatureLimits = () => {
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
