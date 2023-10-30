@@ -4,8 +4,8 @@ import { Button } from "antd";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
 import ContactUsModal from "components/landing/contactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
-import { trackUpgradeWorkspaceClicked } from "modules/analytics/events/common/teams";
 import { actions } from "store";
+import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
 const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
   const dispatch = useDispatch();
@@ -37,7 +37,7 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
                 newProps: { selectedPlan: null },
               })
             );
-            trackUpgradeWorkspaceClicked();
+            trackViewPricingPlansClicked("workspace_upgrade");
           }}
         >
           Upgrade

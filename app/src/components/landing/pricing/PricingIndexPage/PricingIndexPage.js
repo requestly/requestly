@@ -1,8 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Layout } from "antd";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
 import { redirectToRules } from "utils/RedirectionUtils";
 //SUB COMPONENTS
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
@@ -17,8 +15,6 @@ import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
 import "./index.css";
 
 const PricingIndexPage = () => {
-  //Global State
-  const user = useSelector(getUserAuthDetails);
   const navigate = useNavigate();
 
   return (
@@ -33,7 +29,7 @@ const PricingIndexPage = () => {
       </Layout.Header>
       <div className="pricing-page-container">
         <Row className="pricing-page-body">
-          <EnterpriseRequestBanner user={user} />
+          <EnterpriseRequestBanner />
           <PricingTable />
           <div>
             <ChromeStoreStats />
