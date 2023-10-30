@@ -27,7 +27,7 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
 
   // fetch planName from global state
-  const planNameFromState = user.details?.planDetails?.planName || PRICING.PRICING.PLAN_NAMES.FREE;
+  const planNameFromState = user.details?.planDetails?.planName || PRICING.PLAN_NAMES.FREE;
 
   const isRuleCurrentlyActive = () => {
     return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
