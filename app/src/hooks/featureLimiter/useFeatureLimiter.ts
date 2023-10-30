@@ -12,18 +12,12 @@ const premiumPlansToCheckLimit = [
   APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2,
 ];
 
-const isBasicV2Plan = (planID: string) => {
-  return planID === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2;
-};
-
 export const useFeatureLimiter = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const isUserPremium = user?.details?.isPremium;
-  const userPlan = isBasicV2Plan(user?.details?.planDetails?.planId)
-    ? APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2
-    : user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+  const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
 
   const checkFeatureLimits = () => {
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
