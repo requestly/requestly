@@ -95,7 +95,9 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
       <div className="rq-modal-content">
         <div className="sharing-modal-header">
           <HiOutlineShare /> Share rule
-          {!getFeatureLimitValue(FeatureLimitType.share_rules) ? <PremiumIcon onSeePlansClick={toggleModal} /> : null}
+          {!getFeatureLimitValue(FeatureLimitType.share_rules) ? (
+            <PremiumIcon featureType="share_rules" source="share_modal" onSeePlansClick={toggleModal} />
+          ) : null}
         </div>
         <Tabs
           defaultActiveKey={SharingOptions.WORKSPACE}

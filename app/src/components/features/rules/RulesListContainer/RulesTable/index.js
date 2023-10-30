@@ -1087,7 +1087,9 @@ const RulesTable = ({
               className="rule-selection-dropdown-btn-overlay-item"
             >
               {NAME}
-              {checkIsPremiumRule(TYPE) ? <PremiumIcon placement="topLeft" /> : null}
+              {checkIsPremiumRule(TYPE) ? (
+                <PremiumIcon placement="topLeft" featureType={`${TYPE.toLowerCase()}_rule`} source="rule_dropdown" />
+              ) : null}
             </Menu.Item>
           ))}
       </Menu>
@@ -1187,7 +1189,9 @@ const RulesTable = ({
                       <span>
                         <Row align="middle" wrap={false}>
                           Share
-                          {!getFeatureLimitValue(FeatureLimitType.share_rules) ? <PremiumIcon /> : null}
+                          {!getFeatureLimitValue(FeatureLimitType.share_rules) ? (
+                            <PremiumIcon featureType="share_rules" source="share_button" />
+                          ) : null}
                         </Row>
                       </span>
                     )}
