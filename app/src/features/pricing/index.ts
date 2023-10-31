@@ -1,6 +1,4 @@
-import { PricingTable } from "./components/PricingTable";
-import { UpgradeWorkspaceMenu } from "./components/UpgradeWorkspaceMenu";
-import { PRICING } from "./constants/pricing";
-import { PricingModal } from "./components/PricingModal";
-
-export { PricingTable, UpgradeWorkspaceMenu, PricingModal, PRICING };
+export { PRICING } from "./constants/pricing";
+export { PricingTable } from "./components/PricingTable";
+export { PricingModal } from "./components/PricingModal";
+export { UpgradeWorkspaceMenu } from "./components/UpgradeWorkspaceMenu";

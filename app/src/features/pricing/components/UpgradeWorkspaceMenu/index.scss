@@ -6,12 +6,6 @@
   .upgrade-workspace-selector-dropdown-container {
     margin-bottom: 4px;
 
-    .upgrade-workspace-selector-dropdown {
-      &.ant-dropdown-menu-root {
-        overflow: auto;
-      }
-    }
-
     .upgrade-workspace-selector-dropdown-btn.ant-btn.rq-btn {
       background-color: var(--background);
       border: none;
