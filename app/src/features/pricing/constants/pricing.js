@@ -1,5 +1,4 @@
 import countryCodes from "config/constants/sub/static/countryCodes";
-import APP_CONSTANTS from "config/constants";
 
 export const PRICING = {};
 
@@ -49,12 +48,4 @@ PRICING.PREMIUM_PLANS = [
 PRICING.DURATION = {
   MONTHLY: "monthly",
   ANNUALLY: "annually",
-};
-
-PRICING.WORKSPACES = {};
-PRICING.WORKSPACES.PRIVATE_WORKSPACE = {
-  name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-  id: "private_workspace",
-  accessCount: 1,
-  color: "#1E69FF",
 };
