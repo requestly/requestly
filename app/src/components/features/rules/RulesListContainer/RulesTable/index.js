@@ -76,6 +76,7 @@ import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
 import { unselectAllRecords } from "../../actions";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumFeature } from "features/pricing";
 
 //Lodash
 const set = require("lodash/set");
@@ -1080,17 +1081,18 @@ const RulesTable = ({
         {Object.values(RULE_TYPES_CONFIG)
           .filter((ruleConfig) => ruleConfig.ID !== 11)
           .map(({ ID, TYPE, ICON, NAME }) => (
-            <Menu.Item
-              key={ID}
-              icon={<ICON />}
-              onClick={(e) => handleNewRuleOnClick(e, TYPE)}
-              className="rule-selection-dropdown-btn-overlay-item"
+            <PremiumFeature
+              popoverPlacement="topLeft"
+              onContinue={(e) => handleNewRuleOnClick(e, TYPE)}
+              feature={`${TYPE.toLowerCase()}_rule`}
             >
-              {NAME}
-              {checkIsPremiumRule(TYPE) ? (
-                <PremiumIcon placement="topLeft" featureType={`${TYPE.toLowerCase()}_rule`} source="rule_dropdown" />
-              ) : null}
-            </Menu.Item>
+              <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
+                {NAME}
+                {checkIsPremiumRule(TYPE) ? (
+                  <PremiumIcon placement="topLeft" featureType={`${TYPE.toLowerCase()}_rule`} source="rule_dropdown" />
+                ) : null}
+              </Menu.Item>
+            </PremiumFeature>
           ))}
       </Menu>
     );
@@ -1314,6 +1316,7 @@ const RulesTable = ({
                           <Dropdown.Button
                             icon={icon}
                             type={type}
+                            trigger={["click"]}
                             onClick={onClickHandler}
                             overlay={overlay}
                             data-tour-id={tourId}

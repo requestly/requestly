@@ -1,5 +1,6 @@
 import React from "react";
-import { Button, Row } from "antd";
+import { Row } from "antd";
+import { RQButton } from "lib/design-system/components";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { PremiumIcon } from "components/common/PremiumIcon";
@@ -56,7 +57,7 @@ const AuthPopoverButton: React.FC<Props> = ({
         callback={onClickHandler}
         source={authSource}
       >
-        <Button>
+        <RQButton icon={icon}>
           {!isTooltipShown ? (
             buttonText
           ) : isScreenSmall ? null : (
@@ -69,7 +70,7 @@ const AuthPopoverButton: React.FC<Props> = ({
               </Row>
             </span>
           )}
-        </Button>
+        </RQButton>
       </AuthConfirmationPopover>
     </PremiumFeature>
   );
