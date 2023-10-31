@@ -9,8 +9,7 @@ import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
 import { Col, Row, Switch } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
-import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
-import { PricingTable } from "features/pricing";
+import { PricingTable, UpgradeWorkspaceMenu } from "features/pricing";
 import APP_CONSTANTS from "config/constants";
 import { PRICING } from "features/pricing";
 
@@ -40,7 +39,11 @@ const FreeAndEnterprisePlanTable = () => {
           <span>{"  "}Annual pricing (save 20%)</span>
         </div>
         <div className="text-center">
-          <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
+          <UpgradeWorkspaceMenu
+            workspaceToUpgrade={workspaceToUpgrade}
+            setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+            className="upgrade-workspace-menu-btn"
+          />
         </div>
         <Row>
           <Col className="pricing-table-product-view" xs={24} lg={6}>

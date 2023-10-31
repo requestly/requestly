@@ -35,6 +35,10 @@
         font-size: 12px;
         font-weight: 500;
         color: var(--white);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
       }
 
       & .workspace-members {
