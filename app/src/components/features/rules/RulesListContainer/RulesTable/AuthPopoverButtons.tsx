@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Row } from "antd";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { PremiumIcon } from "components/common/PremiumIcon";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumFeature } from "features/pricing";
 
 interface Props {
   icon: React.ReactNode;
@@ -16,7 +19,7 @@ interface Props {
   isScreenSmall: boolean;
   isLoggedIn: boolean;
   authSource?: string;
-  isPremium?: boolean;
+  feature?: FeatureLimitType;
 }
 
 const AuthPopoverButton: React.FC<Props> = ({
@@ -32,50 +35,41 @@ const AuthPopoverButton: React.FC<Props> = ({
   isLoggedIn,
   isScreenSmall,
   authSource,
-  isPremium = false,
+  feature = null,
 }) => {
-  const [isChinaUser, setIsChinaUser] = useState<boolean>(false);
+  const isChinaUser = window.isChinaUser ?? false;
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
   return (
-    <AuthConfirmationPopover
-      title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
-      disabled={!hasPopconfirm || isChinaUser}
-      callback={onClickHandler}
-      source={authSource}
+    <PremiumFeature
+      disabled={!isLoggedIn}
+      feature={feature}
+      onContinue={() => {
+        trackClickEvent();
+        onClickHandler();
+      }}
+      popoverPlacement="bottomLeft"
     >
-      <Button
-        type={type || "default"}
-        shape={isScreenSmall ? shape : null}
-        onClick={() => {
-          trackClickEvent();
-          if (isChinaUser) {
-            onClickHandler();
-            return;
-          }
-          if (hasPopconfirm) {
-            isLoggedIn && onClickHandler();
-          } else {
-            onClickHandler();
-          }
-        }}
-        onMouseEnter={() => {
-          setIsChinaUser(window.isChinaUser ?? false);
-        }}
-        icon={icon}
-        data-tour-id={tourId}
+      <AuthConfirmationPopover
+        title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
+        disabled={!hasPopconfirm || isChinaUser}
+        callback={onClickHandler}
+        source={authSource}
       >
-        {!isTooltipShown ? (
-          buttonText
-        ) : isScreenSmall ? null : (
-          <span>
-            <Row align="middle" wrap={false}>
-              {buttonText}
-              {isPremium ? <PremiumIcon /> : null}
-            </Row>
-          </span>
-        )}
-      </Button>
-    </AuthConfirmationPopover>
+        <Button type={type || "default"} shape={isScreenSmall ? shape : null} icon={icon} data-tour-id={tourId}>
+          {!isTooltipShown ? (
+            buttonText
+          ) : isScreenSmall ? null : (
+            <span>
+              <Row align="middle" wrap={false}>
+                {buttonText}
+                {feature && !getFeatureLimitValue(feature) ? <PremiumIcon /> : null}
+              </Row>
+            </span>
+          )}
+        </Button>
+      </AuthConfirmationPopover>
+    </PremiumFeature>
   );
 };
 

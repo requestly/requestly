@@ -23,20 +23,9 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
   const featureName = `${selectedRuleType.toLowerCase()}_rule` as FeatureLimitType;
   const isPremiumRule = !getFeatureLimitValue(featureName);
 
-  const handleCreateRuleClick = (ruleType: RuleType) => {
-    trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
+  const handleCreateRuleClick = () => {
+    trackRuleCreationWorkflowStartedEvent(selectedRuleType, "screen");
     redirectToCreateNewRule(navigate, selectedRuleType, "rule_selection");
-  };
-
-  const premiumRule = (): FeatureLimitType => {
-    switch (selectedRuleType) {
-      case RuleType.RESPONSE:
-        return FeatureLimitType.response_rule;
-      case RuleType.REQUEST:
-        return FeatureLimitType.request_rule;
-      case RuleType.SCRIPT:
-        return FeatureLimitType.script_rule;
-    }
   };
 
   return (
@@ -67,14 +56,15 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
                 trackRuleCreationWorkflowStartedEvent(selectedRuleType, "screen");
                 redirectToCreateNewRule(navigate, selectedRuleType, "rule_selection");
               }}
-              feature={premiumRule()}
+              feature={featureName}
+              popoverPlacement="bottomLeft"
             >
               <Button size="large" type="primary">
                 Create Rule
               </Button>
             </PremiumFeature>
           ) : (
-            <Button size="large" type="primary" onClick={() => handleCreateRuleClick(selectedRuleType)}>
+            <Button size="large" type="primary" onClick={handleCreateRuleClick}>
               Create Rule
             </Button>
           )}

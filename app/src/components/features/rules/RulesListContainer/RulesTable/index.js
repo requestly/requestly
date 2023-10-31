@@ -1275,7 +1275,7 @@ const RulesTable = ({
                     icon: <UsergroupAddOutlined />,
                     tourId: "rule-list-share-btn",
                     onClickHandler: handleShareRulesOnClick,
-                    isPremium: !getFeatureLimitValue(FeatureLimitType.share_rules),
+                    feature: FeatureLimitType.share_rules,
                   },
                   {
                     shape: null,
@@ -1300,7 +1300,7 @@ const RulesTable = ({
                       isDropdown = false,
                       overlay,
                       tourId = null,
-                      isPremium = false,
+                      feature = null,
                     },
                     index
                   ) => (

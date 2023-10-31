@@ -5,7 +5,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { OrganizationsDetails } from "./types";
-import { Col, Popconfirm, Typography } from "antd";
+import { Col, Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
 import "./index.scss";
@@ -14,21 +14,22 @@ interface PremiumFeatureProps {
   onContinue?: () => void;
   feature: FeatureLimitType;
   children?: React.ReactNode;
+  popoverPlacement: PopconfirmProps["placement"];
+  disabled?: boolean;
 }
 
-export const PremiumFeature: React.FC<PremiumFeatureProps> = ({ onContinue, children, feature }) => {
+export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
+  onContinue,
+  children,
+  feature,
+  popoverPlacement,
+  disabled = false,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const { getFeatureLimitValue } = useFeatureLimiter();
   const [organizationsData, setOrganizationsData] = useState(null);
   const [openPopup, setOpenPopup] = useState(false);
-
-  useEffect(() => {
-    if (openPopup && getFeatureLimitValue(feature)) {
-      setOpenPopup(false);
-      onContinue();
-    }
-  }, [openPopup, onContinue, getFeatureLimitValue, feature]);
 
   const getEnterpriseAdminDetails = useMemo(
     () =>
@@ -43,7 +44,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({ onContinue, chil
     if (user.loggedIn) {
       getEnterpriseAdminDetails().then((response) => {
         if (response.data.success) {
-          setOrganizationsData(response.data.enterpriseData);
+          setOrganizationsData(null);
         }
       });
     }
@@ -51,28 +52,25 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({ onContinue, chil
 
   return (
     <>
-      {organizationsData && (
+      {openPopup && organizationsData && !disabled && (
         <RequestFeatureModal
-          isOpen={openPopup}
           setOpenPopup={setOpenPopup}
           organizationsData={organizationsData}
           onContinue={onContinue}
         />
       )}
       <Popconfirm
-        open={openPopup && !organizationsData && !getFeatureLimitValue(feature)}
+        disabled={(getFeatureLimitValue(feature) && !organizationsData) || !feature || disabled}
         overlayClassName="premium-feature-popover"
         autoAdjustOverflow
         showArrow={false}
-        placement="bottomLeft"
+        placement={popoverPlacement}
         okText="See upgrade plans"
         cancelText="Use for free now"
         onConfirm={() => {
-          setOpenPopup(false);
           dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
         }}
         onCancel={() => {
-          setOpenPopup(false);
           onContinue();
         }}
         title={
@@ -84,7 +82,15 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({ onContinue, chil
           </>
         }
       >
-        <Col onClick={() => setOpenPopup(true)}>{children}</Col>
+        <Col
+          onClick={() => {
+            if (getFeatureLimitValue(feature) || !feature) {
+              onContinue();
+            } else setOpenPopup(true);
+          }}
+        >
+          {children}
+        </Col>
       </Popconfirm>
     </>
   );

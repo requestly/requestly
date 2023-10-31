@@ -12,6 +12,7 @@ import { getModeData } from "../../../actions";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
+import { PremiumFeature } from "features/pricing";
 
 const ShareRuleButton = ({ isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
@@ -52,9 +53,9 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   return (
     <>
       {isRuleEditorModal ? (
-        <Button
-          type="text"
-          onClick={() => {
+        <PremiumFeature
+          popoverPlacement="bottomLeft"
+          onContinue={() => {
             shareRuleClickHandler();
             trackRuleEditorHeaderClicked(
               "share_button",
@@ -63,11 +64,14 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
               "rule_editor_modal_header"
             );
           }}
+          feature={FeatureLimitType.share_rules}
         >
-          <Row align="middle" wrap={false}>
-            Share rule{isPremiumFeature ? <PremiumIcon /> : null}
-          </Row>
-        </Button>
+          <Button type="text">
+            <Row align="middle" wrap={false}>
+              Share rule{isPremiumFeature ? <PremiumIcon /> : null}
+            </Row>
+          </Button>
+        </PremiumFeature>
       ) : (
         <Tooltip title="Share rule" placement="bottom">
           <RQButton
