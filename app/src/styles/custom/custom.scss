@@ -575,4 +575,11 @@ div.react-multi-email .multi-email-tag {
     overflow: auto;
     max-height: 400px;
   }
+
+  & .ant-dropdown-menu-item .ant-dropdown-menu-title-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+  }
 }

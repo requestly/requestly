@@ -168,6 +168,10 @@
   background: var(--surface-2);
 }
 
+.upgrade-workspace-menu-btn .upgrade-workspace-selector-dropdown-btn.ant-dropdown-trigger.rq-btn.ant-btn {
+  background-color: var(--surface-2);
+}
+
 @media (min-width: 2000px) {
   .pricing-table-row {
     max-width: 50%;
