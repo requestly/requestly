@@ -5,7 +5,6 @@ import ProCard from "@ant-design/pro-card";
 import { CalendarOutlined } from "@ant-design/icons";
 // Sub Components
 import ActiveLicenseInfo from "../ActiveLicenseInfo";
-import CurrentPersonalSubscription from "./CurrentPersonalSubscription";
 import InvoiceTable from "../ManageTeams/TeamViewer/BillingDetails/InvoiceTable";
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -106,14 +105,10 @@ const PersonalSubscription = () => {
                     hideShadow={true}
                     customHeading={"Currently Selected Subscription"}
                     hideManagePersonalSubscriptionButton={true}
-                    hideIfSubscriptionIsPersonal={true}
+                    hideIfSubscriptionIsPersonal={false}
                     hideIfNoSubscription={true}
                   />
-                  <br />
-                  <CurrentPersonalSubscription hideShadow={true} customHeading={"Personal Subscription"} />
-                  <br />
                   {renderBillingDetails()}
-
                   <Row>
                     <Col style={{ fontSize: "0.8125rem" }} className="text-center fix-dark-mode-color">
                       Any questions? Reach our payment support team at{" "}
