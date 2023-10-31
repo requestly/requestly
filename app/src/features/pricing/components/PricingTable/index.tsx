@@ -175,10 +175,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             </span>{" "}
             in{" "}
             {planName === PRICING.PLAN_NAMES.BASIC || product === PRICING.PRODUCTS.SESSION_REPLAY
-              ? PRICING.PLAN_HEADERS[PRICING.PLAN_NAMES.FREE as keyof typeof PRICING.PLAN_HEADERS]
+              ? capitalize(PRICING.PLAN_NAMES.FREE)
               : planName === PRICING.PLAN_NAMES.PROFESSIONAL
-              ? PRICING.PLAN_HEADERS[PRICING.PLAN_NAMES.BASIC as keyof typeof PRICING.PLAN_HEADERS]
-              : PRICING.PLAN_HEADERS[PRICING.PLAN_NAMES.PROFESSIONAL as keyof typeof PRICING.PLAN_HEADERS]}{" "}
+              ? capitalize(PRICING.PLAN_NAMES.BASIC)
+              : capitalize(PRICING.PLAN_NAMES.PROFESSIONAL)}{" "}
             plan, and
           </Col>
         )}

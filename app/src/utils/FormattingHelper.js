@@ -1,6 +1,6 @@
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "../config/constants";
+import APP_CONSTANTS from "config/constants";
 import { PRICING } from "features/pricing";
 
 export const generateObjectId = () => {
@@ -26,6 +26,7 @@ export const getPrettyPlanName = (planName) => {
   if (planName === PRICING.PLAN_NAMES.BRONZE) return "Free";
   if (planName === PRICING.PLAN_NAMES.GOLD) return "Professional";
   if (planName === PRICING.PLAN_NAMES.ENTERPRISE) return "Professional";
+  if (planName === PRICING.PLAN_NAMES.BASIC_V2) return "Basic";
 
   return planName
     .toLowerCase()

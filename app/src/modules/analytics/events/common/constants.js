@@ -191,5 +191,6 @@ export const FEATURE_LIMITER = {
 };
 
 export const PRICING = {
+  PAID_FEATURE_NUDGE_VIEWED: "paid_feature_nudge_viewed",
   VIEW_PRICING_PLANS_CLICKED: "view_pricing_plans_clicked",
 };

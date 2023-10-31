@@ -239,7 +239,9 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             >
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>Static Data</Radio>
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
-                <Row align="middle">Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon /> : null}</Row>
+                <Row align="middle">
+                  Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}
+                </Row>
               </Radio>
               {getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
                 isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) ? (
