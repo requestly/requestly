@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { LockOutlined } from "@ant-design/icons";
 import { MdExpandMore } from "@react-icons/all-files/md/MdExpandMore";
 import { Avatar, Dropdown, Row, Typography, Col } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import { getUserAuthDetails, getIsMiscTourCompleted } from "store/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getUniqueColorForWorkspace } from "utils/teams";
 import APP_CONSTANTS from "config/constants";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { actions } from "store";
 import "./index.scss";
 
 const getWorkspaceIcon = (workspaceName: string) => {
@@ -21,9 +24,11 @@ export const UpgradeWorkspaceMenu: React.FC<{
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
   className?: string;
 }> = ({ workspaceToUpgrade, setWorkspaceToUpgrade, className }) => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
 
   const filteredAvailableTeams = useMemo(() => {
     return (
@@ -90,38 +95,68 @@ export const UpgradeWorkspaceMenu: React.FC<{
   };
 
   return user.loggedIn ? (
-    <Row className={`upgrade-workspace-selector-container ${className ?? ""}`}>
-      <Col className="upgrade-workspace-selector-dropdown-container">
-        Select workspace to upgrade
-        <Dropdown menu={workspaceMenuItems} trigger={["click"]} overlayClassName="upgrade-workspace-selector-dropdown">
-          <RQButton className="upgrade-workspace-selector-dropdown-btn">
-            <Row className="cursor-pointer items-center">
-              <Avatar
-                size={28}
-                shape="square"
-                icon={getWorkspaceIcon(
-                  workspaceToUpgrade?.name ?? APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                )}
-                className="workspace-avatar"
-                style={{
-                  backgroundColor:
-                    !workspaceToUpgrade ||
-                    workspaceToUpgrade?.name === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                      ? TEAM_WORKSPACES.PRIVATE_WORKSPACE.color
-                      : getUniqueColorForWorkspace(workspaceToUpgrade?.id, workspaceToUpgrade?.name),
-                }}
-              />
-              <Col className="upgrade-workspace-dropdown-btn-info">
-                <Typography.Text className="workspace-name">{workspaceToUpgrade?.name}</Typography.Text>
-                <Typography.Text className="workspace-members">
-                  {workspaceToUpgrade?.accessCount} active {workspaceToUpgrade?.accessCount > 1 ? "members" : "member"}
-                </Typography.Text>
-              </Col>
-              <MdExpandMore className="upgrade-workspace-selector-dropdown-icon" />
-            </Row>
-          </RQButton>
-        </Dropdown>
-      </Col>
-    </Row>
+    <>
+      <ProductWalkthrough
+        tourFor={MISC_TOURS.PRICING.UPGRADE_WORKSPACE_MENU}
+        startWalkthrough={!isMiscTourCompleted?.upgradeWorkspaceMenu}
+        onTourComplete={() =>
+          dispatch(
+            actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "upgradeWorkspaceMenu" })
+          )
+        }
+        completeTourOnUnmount={false}
+      />
+      <Row className={`upgrade-workspace-selector-container ${className ?? ""}`}>
+        <Col className="upgrade-workspace-selector-dropdown-container">
+          Select workspace to upgrade
+          <Dropdown
+            menu={workspaceMenuItems}
+            trigger={["click"]}
+            overlayClassName="upgrade-workspace-selector-dropdown"
+          >
+            <RQButton
+              className="upgrade-workspace-selector-dropdown-btn"
+              data-tour-id="upgrade-workspace-menu"
+              onClick={() => {
+                if (!isMiscTourCompleted?.upgradeWorkspaceMenu) {
+                  dispatch(
+                    actions.updateProductTourCompleted({
+                      tour: TOUR_TYPES.MISCELLANEOUS,
+                      subTour: "upgradeWorkspaceMenu",
+                    })
+                  );
+                }
+              }}
+            >
+              <Row className="cursor-pointer items-center">
+                <Avatar
+                  size={28}
+                  shape="square"
+                  icon={getWorkspaceIcon(
+                    workspaceToUpgrade?.name ?? APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                  )}
+                  className="workspace-avatar"
+                  style={{
+                    backgroundColor:
+                      !workspaceToUpgrade ||
+                      workspaceToUpgrade?.name === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
+                        ? TEAM_WORKSPACES.PRIVATE_WORKSPACE.color
+                        : getUniqueColorForWorkspace(workspaceToUpgrade?.id, workspaceToUpgrade?.name),
+                  }}
+                />
+                <Col className="upgrade-workspace-dropdown-btn-info">
+                  <Typography.Text className="workspace-name">{workspaceToUpgrade?.name}</Typography.Text>
+                  <Typography.Text className="workspace-members">
+                    {workspaceToUpgrade?.accessCount} active{" "}
+                    {workspaceToUpgrade?.accessCount > 1 ? "members" : "member"}
+                  </Typography.Text>
+                </Col>
+                <MdExpandMore className="upgrade-workspace-selector-dropdown-icon" />
+              </Row>
+            </RQButton>
+          </Dropdown>
+        </Col>
+      </Row>
+    </>
   ) : null;
 };
