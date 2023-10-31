@@ -5,7 +5,7 @@ enum RuleObjType {
   GROUP = "group",
 }
 
-enum RuleObjStatus {
+export enum RuleObjStatus {
   ACTIVE = "Active",
   INACTIVE = "Inactive",
 }

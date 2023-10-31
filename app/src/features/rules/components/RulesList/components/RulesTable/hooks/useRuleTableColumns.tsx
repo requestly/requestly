@@ -2,9 +2,12 @@ import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
 import { Button, Switch } from "antd";
 import useRuleTableActions from "./useRuleTableActions";
+import { RuleObjStatus } from "features/rules/types/rules";
+
+import { BsShare } from "@react-icons/all-files/bs/BsShare";
 
 const useRuleTableColumns = () => {
-  const { handleStatusToggle } = useRuleTableActions();
+  const { handleStatusToggle, handleRuleShare } = useRuleTableActions();
 
   const columns: ContentTableProps<RuleTableDataType>["columns"] = [
     {
@@ -30,7 +33,7 @@ const useRuleTableColumns = () => {
       title: "Status",
       key: "status",
       render: (rule: RuleTableDataType) => {
-        const checked = rule?.status === "Active" ? true : false;
+        const checked = rule?.status === RuleObjStatus.ACTIVE ? true : false;
 
         return <Switch checked={checked} onChange={(checked: boolean) => handleStatusToggle([rule], checked)} />;
       },
@@ -42,11 +45,11 @@ const useRuleTableColumns = () => {
         <>
           <Button
             onClick={() => {
-              console.log(rule);
+              handleRuleShare(rule);
             }}
-          >
-            Log
-          </Button>
+            type={"text"}
+            icon={<BsShare />}
+          />
         </>
       ),
     },
