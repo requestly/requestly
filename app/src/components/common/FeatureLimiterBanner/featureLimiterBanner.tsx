@@ -8,15 +8,14 @@ import { actions } from "store";
 import { PRICING } from "features/pricing";
 import { trackFeatureLimitUpgradeBannerViewed } from "modules/analytics/events/common/feature-limiter";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
+import { getPrettyPlanName } from "utils/FormattingHelper";
 import "./styles.scss";
 
 const FeatureLimiterBanner = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isUserOnFreePlan =
-    !user?.details?.planDetails?.planName || user?.details?.planDetails?.planName === PRICING.PLAN_NAMES.FREE
-      ? true
-      : false;
+    !user?.details?.planDetails?.planName || user?.details?.planDetails?.planName === PRICING.PLAN_NAMES.FREE;
   const userPlan = user?.details?.planDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
 
   useEffect(() => {
@@ -31,7 +30,9 @@ const FeatureLimiterBanner = () => {
           message={
             isUserOnFreePlan
               ? "You've exceeded the usage limits of the free plan. For uninterrupted usage, please upgrade to one of our paid plans."
-              : `You've exceeded the usage limits of the ${userPlan} plan. For uninterrupted usage, please upgrade to Professional plan`
+              : `You've exceeded the usage limits of the ${getPrettyPlanName(
+                  userPlan
+                )} plan. For uninterrupted usage, please upgrade to Professional plan`
           }
           icon={<TbInfoTriangle className="feature-limit-banner-icon" />}
           action={

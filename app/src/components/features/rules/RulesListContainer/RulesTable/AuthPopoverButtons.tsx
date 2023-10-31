@@ -56,14 +56,16 @@ const AuthPopoverButton: React.FC<Props> = ({
         callback={onClickHandler}
         source={authSource}
       >
-        <Button type={type || "default"} shape={isScreenSmall ? shape : null} icon={icon} data-tour-id={tourId}>
+        <Button>
           {!isTooltipShown ? (
             buttonText
           ) : isScreenSmall ? null : (
             <span>
               <Row align="middle" wrap={false}>
                 {buttonText}
-                {feature && !getFeatureLimitValue(feature) ? <PremiumIcon /> : null}
+                {!getFeatureLimitValue(feature) ? (
+                  <PremiumIcon featureType="share_rules" source="share_button" />
+                ) : null}
               </Row>
             </span>
           )}

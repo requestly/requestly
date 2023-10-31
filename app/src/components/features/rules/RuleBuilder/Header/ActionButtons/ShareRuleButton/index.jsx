@@ -68,7 +68,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
         >
           <Button type="text">
             <Row align="middle" wrap={false}>
-              Share rule{isPremiumFeature ? <PremiumIcon /> : null}
+              Share rule{isPremiumFeature ? <PremiumIcon featureType="share_rules" source="share_button" /> : null}
             </Row>
           </Button>
         </PremiumFeature>

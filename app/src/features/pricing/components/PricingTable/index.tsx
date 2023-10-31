@@ -14,6 +14,7 @@ import checkIcon from "assets/img/icons/common/check.svg";
 import { CloseOutlined } from "@ant-design/icons";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
@@ -27,7 +28,7 @@ interface PricingTableProps {
 
 export const PricingTable: React.FC<PricingTableProps> = ({
   duration = PRICING.DURATION.ANNUALLY,
-  workspaceToUpgrade = PRICING.WORKSPACES.PRIVATE_WORKSPACE,
+  workspaceToUpgrade = TEAM_WORKSPACES.PRIVATE_WORKSPACE,
   product = PRICING.PRODUCTS.HTTP_RULES,
   handleOnSubscribe,
   isOpenedFromModal = false,
@@ -40,7 +41,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
     (planName: string) => {
       const { details } = user || {};
       const userPlanType = details?.planDetails?.type;
-      const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === PRICING.WORKSPACES.PRIVATE_WORKSPACE.id;
+      const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
       const userPlanName = details?.planDetails?.planName;
 
       const shouldRenew = details?.planDetails?.status !== "active" && details?.planDetails?.planName === planName;
@@ -175,10 +176,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             </span>{" "}
             in{" "}
             {planName === PRICING.PLAN_NAMES.BASIC || product === PRICING.PRODUCTS.SESSION_REPLAY
-              ? PRICING.PLAN_HEADERS[PRICING.PLAN_NAMES.FREE as keyof typeof PRICING.PLAN_HEADERS]
+              ? capitalize(PRICING.PLAN_NAMES.FREE)
               : planName === PRICING.PLAN_NAMES.PROFESSIONAL
-              ? PRICING.PLAN_HEADERS[PRICING.PLAN_NAMES.BASIC as keyof typeof PRICING.PLAN_HEADERS]
-              : PRICING.PLAN_HEADERS[PRICING.PLAN_NAMES.PROFESSIONAL as keyof typeof PRICING.PLAN_HEADERS]}{" "}
+              ? capitalize(PRICING.PLAN_NAMES.BASIC)
+              : capitalize(PRICING.PLAN_NAMES.PROFESSIONAL)}{" "}
             plan, and
           </Col>
         )}
@@ -190,10 +191,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
     <>
       <Row wrap={false} className="pricing-table">
         {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => {
-          const planPrice =
-            PricingPlans[planName as keyof typeof PricingPlans]?.plans[
-              duration as keyof typeof PricingPlans[keyof typeof PricingPlans]["plans"]
-            ]?.usd?.price;
+          const planPrice = PricingPlans[planName]?.plans[duration]?.usd?.price;
 
           if (!isOpenedFromModal && planName === PRICING.PLAN_NAMES.ENTERPRISE) return null;
 

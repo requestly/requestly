@@ -16,7 +16,6 @@ import Logger from "lib/logger";
 import { getUserSubscription } from "backend/user/userSubscription";
 import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDocListener";
 import APP_CONSTANTS from "config/constants";
-import { PRICING } from "features/pricing";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -75,7 +74,7 @@ const AuthHandler = (onComplete) => {
                 isLoggedIn: true,
                 planDetails: {
                   ...planDetails,
-                  planName: isUserPremium ? getPlanName(planDetails) : PRICING.PLAN_NAMES.FREE,
+                  planName: getPlanName(planDetails),
                 },
                 isBackupEnabled,
                 isSyncEnabled,

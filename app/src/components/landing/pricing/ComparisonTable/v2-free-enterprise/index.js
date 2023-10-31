@@ -9,22 +9,15 @@ import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
 import { Col, Row, Switch } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
-import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
-import { PricingTable } from "features/pricing";
-import APP_CONSTANTS from "config/constants";
+import { PricingTable, UpgradeWorkspaceMenu } from "features/pricing";
 import { PRICING } from "features/pricing";
-
-const PRIVATE_WORKSPACE = {
-  name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-  id: "private_workspace",
-  accessCount: 1,
-};
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 
 const FreeAndEnterprisePlanTable = () => {
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(PRICING.PRODUCTS.HTTP_RULES);
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
+  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(TEAM_WORKSPACES.PRIVATE_WORKSPACE);
 
   return (
     <>
@@ -40,7 +33,11 @@ const FreeAndEnterprisePlanTable = () => {
           <span>{"  "}Annual pricing (save 20%)</span>
         </div>
         <div className="text-center">
-          <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
+          <UpgradeWorkspaceMenu
+            workspaceToUpgrade={workspaceToUpgrade}
+            setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+            className="upgrade-workspace-menu-btn"
+          />
         </div>
         <Row>
           <Col className="pricing-table-product-view" xs={24} lg={6}>

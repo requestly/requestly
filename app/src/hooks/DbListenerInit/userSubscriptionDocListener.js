@@ -3,7 +3,6 @@ import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import { actions } from "store";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import Logger from "lib/logger";
-import { PRICING } from "features/pricing";
 
 export const userSubscriptionDocListener = (dispatch, uid) => {
   if (uid) {
@@ -22,7 +21,7 @@ export const userSubscriptionDocListener = (dispatch, uid) => {
               actions.updateUserPlanDetails({
                 userPlanDetails: {
                   ...planDetails,
-                  planName: isUserPremium ? getPlanName(planDetails) : PRICING.PLAN_NAMES.FREE,
+                  planName: getPlanName(planDetails),
                 },
                 isUserPremium,
               })
