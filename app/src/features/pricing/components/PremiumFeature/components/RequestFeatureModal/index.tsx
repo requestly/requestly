@@ -7,7 +7,7 @@ import { HiOutlinePaperAirplane } from "@react-icons/all-files/hi/HiOutlinePaper
 import { RiCloseCircleLine } from "@react-icons/all-files/ri/RiCloseCircleLine";
 import { RiCheckboxCircleLine } from "@react-icons/all-files/ri/RiCheckboxCircleLine";
 import { CloseOutlined } from "@ant-design/icons";
-import { OrganizationsDetails } from "../types";
+import { OrganizationsDetails } from "../../types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { actions } from "store";
@@ -16,14 +16,14 @@ import "./index.scss";
 interface RequestFeatureModalProps {
   isOpen: boolean;
   organizationsData: OrganizationsDetails;
-  toggleModal: () => void;
+  setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
 }
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   isOpen,
   organizationsData,
-  toggleModal,
+  setOpenPopup,
   onContinue,
 }) => {
   const dispatch = useDispatch();
@@ -77,7 +77,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
     <>
       <Modal
         open={isOpen}
-        onCancel={toggleModal}
+        onCancel={() => setOpenPopup(false)}
         footer={null}
         className="request-feature-modal"
         title={!postRequestMessage && "Send request to admin"}
@@ -93,7 +93,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               <RiCloseCircleLine className="danger" />
             )}
             <Typography.Text>{postRequestMessage.message}</Typography.Text>
-            <RQButton type="primary" onClick={toggleModal}>
+            <RQButton type="primary" onClick={() => setOpenPopup(false)}>
               Close
             </RQButton>
           </Col>
@@ -113,7 +113,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                   className="request-modal-default-btn"
                   disabled={isLoading}
                   onClick={() => {
-                    toggleModal();
+                    setOpenPopup(false);
                     onContinue();
                   }}
                 >

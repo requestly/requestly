@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Col, Row } from "antd";
-import PATHS from "config/constants/sub/paths";
-import { NavLink } from "react-router-dom";
 import { RuleType } from "types/rules";
 import { getRuleDetails } from "../utils";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
@@ -9,12 +8,15 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import "./ruleHeader.css";
+import { PremiumFeature } from "features/pricing";
+import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 
 interface RuleHeaderProps {
   selectedRuleType: RuleType;
 }
 
 const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
+  const navigate = useNavigate();
   const { icon, name, subtitle, header } = useMemo(() => getRuleDetails(selectedRuleType), [selectedRuleType]);
   const { getFeatureLimitValue } = useFeatureLimiter();
 
@@ -23,6 +25,18 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
 
   const handleCreateRuleClick = (ruleType: RuleType) => {
     trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
+    redirectToCreateNewRule(navigate, selectedRuleType, "rule_selection");
+  };
+
+  const premiumRule = (): FeatureLimitType => {
+    switch (selectedRuleType) {
+      case RuleType.RESPONSE:
+        return FeatureLimitType.response_rule;
+      case RuleType.REQUEST:
+        return FeatureLimitType.request_rule;
+      case RuleType.SCRIPT:
+        return FeatureLimitType.script_rule;
+    }
   };
 
   return (
@@ -47,15 +61,23 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
             e.stopPropagation();
           }}
         >
-          <NavLink
-            replace
-            to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${selectedRuleType}`}
-            state={{ source: "rule_selection" }}
-          >
+          {isPremiumRule ? (
+            <PremiumFeature
+              onContinue={() => {
+                trackRuleCreationWorkflowStartedEvent(selectedRuleType, "screen");
+                redirectToCreateNewRule(navigate, selectedRuleType, "rule_selection");
+              }}
+              feature={premiumRule()}
+            >
+              <Button size="large" type="primary">
+                Create Rule
+              </Button>
+            </PremiumFeature>
+          ) : (
             <Button size="large" type="primary" onClick={() => handleCreateRuleClick(selectedRuleType)}>
               Create Rule
             </Button>
-          </NavLink>
+          )}
         </Row>
       </Col>
     </Row>
