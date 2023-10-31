@@ -14,18 +14,18 @@ interface EndpointProps {
   mockType: MockType;
   endpoint: string;
   setEndpoint: (endpoint: string) => void;
-  rulePassword: string;
+  password: string;
 }
 
 const MockEditorEndpoint = forwardRef(
-  ({ isNew, errors, mockType, endpoint, setEndpoint, rulePassword }: EndpointProps, ref) => {
+  ({ isNew, errors, mockType, endpoint, setEndpoint, password }: EndpointProps, ref) => {
     const user = useSelector(getUserAuthDetails);
     const username = user?.details?.username;
     const uid = user?.details?.profile?.uid;
     const workspace = useSelector(getCurrentlyActiveWorkspace);
     const teamId = workspace?.id;
 
-    const { url } = generateFinalUrlParts(endpoint, uid, username, teamId, rulePassword);
+    const { url } = generateFinalUrlParts(endpoint, uid, username, teamId, password);
 
     const renderAddonAfter = () => {
       return <CopyButton type="ghost" title="Copy URL" copyText={url} disabled={isNew} />;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Row, Layout, Col, Tooltip, Dropdown, Menu, Input, Button } from "antd";
+import { Row, Layout, Col, Tooltip, Dropdown, Menu, Button } from "antd";
 import { ExperimentOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { RQButton, RQBreadcrumb } from "lib/design-system/components";
 import { MockType } from "components/features/mocksV2/types";
@@ -8,6 +8,7 @@ import { trackMockEditorClosed } from "modules/analytics/events/features/mocksV2
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useLocation } from "react-router-dom";
+import PasswordPopup from "./PasswordPopup/PasswordPopup";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -16,8 +17,8 @@ interface HeaderProps {
   handleClose: Function;
   handleSave: Function;
   handleTest: () => void;
-  setRulePassword: (password: string) => void;
-  rulePassword: string;
+  setPassword: (password: string) => void;
+  password: string;
 }
 
 export const MockEditorHeader: React.FC<HeaderProps> = ({
@@ -27,79 +28,38 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   handleClose,
   handleSave,
   handleTest,
-  setRulePassword,
-  rulePassword,
+  setPassword,
+  password,
 }) => {
   const location = useLocation();
 
   // Component State
-  const [showInput, setShowInput] = useState(false);
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const handleRulePasswordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRulePassword(e.target.value);
-  };
-
   const handleDropdownVisibleChange = (isVisible: boolean) => {
-    if (isVisible) {
-      setShowInput(false);
+    if (!isVisible) {
+      setShowPasswordPopup(false);
     }
     setShowDropdown(isVisible);
   };
 
-  const handleUpdatePassword = () => {
-    setShowDropdown(false);
-  };
-
-  const handlePasswordDelete = () => {
-    setRulePassword("");
-    setShowDropdown(false);
-  };
-
   const dropdownOverlay = (
-    <Menu className={`editor-group-dropdown-menu ${showInput ? "show-group-input" : ""}`}>
+    <Menu>
       <div>
-        {showInput && (
-          <div className="editor-group-dropdown-input-container">
-            <div className="text-gray editor-group-input-title">PASSWORD</div>
-            <Input
-              autoFocus
-              value={rulePassword}
-              onChange={handleRulePasswordInputChange}
-              onPressEnter={handleUpdatePassword}
-              placeholder="Enter rule password"
-              className="editor-group-dropdown-input"
-            />
-
-            <Row align="middle">
-              <div className="ml-auto editor-group-dropdown-actions">
-                <Button size="small" onClick={handlePasswordDelete} className="editor-group-dropdown-cancel-btn">
-                  Delete
-                </Button>
-                <Button
-                  ghost
-                  size="small"
-                  type="primary"
-                  onClick={handleUpdatePassword}
-                  disabled={rulePassword.length === 0}
-                >
-                  Save
-                </Button>
-              </div>
-            </Row>
-          </div>
+        {showPasswordPopup && (
+          <PasswordPopup setPassword={setPassword} password={password} setVisible={handleDropdownVisibleChange} />
         )}
 
-        {!showInput && (
+        {!showPasswordPopup && (
           <>
             <div>
               <Button
                 type="text"
-                icon={rulePassword.length > 0 ? <LockOutlined /> : <UnlockOutlined />}
-                onClick={() => setShowInput(true)}
-                className="editor-dropdown-add-new-group"
+                icon={password.length > 0 ? <LockOutlined /> : <UnlockOutlined />}
+                onClick={() => setShowPasswordPopup(true)}
               >
-                {rulePassword.length > 0 ? "Update Password" : "Add Password"}
+                {password.length > 0 ? "Update Password" : "Add Password"}
               </Button>
             </div>
           </>
@@ -164,12 +124,7 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           >
             Cancel
           </RQButton>
-          <RQButton
-            type="primary"
-            loading={savingInProgress}
-            disabled={savingInProgress}
-            onClick={() => handleSave({ password: rulePassword })}
-          >
+          <RQButton type="primary" loading={savingInProgress} disabled={savingInProgress} onClick={() => handleSave()}>
             {isNewMock ? (savingInProgress ? "Creating" : "Create") : savingInProgress ? "Saving" : "Save"}
           </RQButton>
         </Col>
