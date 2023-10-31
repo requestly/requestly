@@ -39,7 +39,7 @@
   max-inline-size: 100%;
   block-size: auto;
   object-fit: cover;
-  object-position: center;
+  object-position: top;
   user-select: none;
   background-color: var(--component-background);
 }

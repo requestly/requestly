@@ -19,7 +19,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
-import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu } from "antd";
+import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu, Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import {
   getAllGroups,
@@ -70,9 +70,12 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import LINKS from "config/constants/sub/links";
 import Logger from "lib/logger";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { PremiumIcon } from "components/common/PremiumIcon";
 import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
 import { unselectAllRecords } from "../../actions";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 
 //Lodash
 const set = require("lodash/set");
@@ -155,6 +158,7 @@ const RulesTable = ({
   const selectedGroups = useSelector(getGroupsSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
   const selectedGroupIds = useMemo(() => Object.keys(selectedGroups), [selectedGroups]);
@@ -1065,8 +1069,13 @@ const RulesTable = ({
     unselectAllRecords(dispatch);
   };
 
-  const dropdownOverlay = useMemo(
-    () => (
+  const dropdownOverlay = useMemo(() => {
+    const checkIsPremiumRule = (ruleType) => {
+      const featureName = `${ruleType.toLowerCase()}_rule`;
+      return !getFeatureLimitValue(featureName);
+    };
+
+    return (
       <Menu>
         {Object.values(RULE_TYPES_CONFIG)
           .filter((ruleConfig) => ruleConfig.ID !== 11)
@@ -1078,12 +1087,14 @@ const RulesTable = ({
               className="rule-selection-dropdown-btn-overlay-item"
             >
               {NAME}
+              {checkIsPremiumRule(TYPE) ? (
+                <PremiumIcon placement="topLeft" featureType={`${TYPE.toLowerCase()}_rule`} source="rule_dropdown" />
+              ) : null}
             </Menu.Item>
           ))}
       </Menu>
-    ),
-    [handleNewRuleOnClick]
-  );
+    );
+  }, [handleNewRuleOnClick, getFeatureLimitValue]);
 
   return (
     <>
@@ -1174,7 +1185,16 @@ const RulesTable = ({
                     shape={isScreenSmall ? "circle" : null}
                     icon={<UsergroupAddOutlined />}
                   >
-                    {isScreenSmall ? null : "Share"}
+                    {isScreenSmall ? null : (
+                      <span>
+                        <Row align="middle" wrap={false}>
+                          Share
+                          {!getFeatureLimitValue(FeatureLimitType.share_rules) ? (
+                            <PremiumIcon featureType="share_rules" source="share_button" />
+                          ) : null}
+                        </Row>
+                      </span>
+                    )}
                   </Button>
                 </Tooltip>
               </AuthConfirmationPopover>
@@ -1259,6 +1279,7 @@ const RulesTable = ({
                     icon: <UsergroupAddOutlined />,
                     tourId: "rule-list-share-btn",
                     onClickHandler: handleShareRulesOnClick,
+                    isPremium: !getFeatureLimitValue(FeatureLimitType.share_rules),
                   },
                   {
                     shape: null,
@@ -1283,10 +1304,11 @@ const RulesTable = ({
                       isDropdown = false,
                       overlay,
                       tourId = null,
+                      isPremium = false,
                     },
                     index
                   ) => (
-                    <Tooltip key={buttonText} title={isTooltipShown && isScreenSmall ? buttonText : null}>
+                    <Tooltip key={index} title={isTooltipShown && isScreenSmall ? buttonText : null}>
                       <>
                         {isDropdown ? (
                           <Dropdown.Button

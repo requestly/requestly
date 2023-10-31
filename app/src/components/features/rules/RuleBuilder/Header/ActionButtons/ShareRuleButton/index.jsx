@@ -3,18 +3,23 @@ import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
-import { Button, Tooltip } from "antd";
+import { Button, Row, Tooltip } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { AUTH } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../actions";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumIcon } from "components/common/PremiumIcon";
 
 const ShareRuleButton = ({ isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const { getFeatureLimitValue } = useFeatureLimiter();
+  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.share_rules);
 
   const shareRuleClickHandler = () => {
     trackShareButtonClicked("rule_editor");
@@ -59,7 +64,9 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
             );
           }}
         >
-          Share rule
+          <Row align="middle" wrap={false}>
+            Share rule{isPremiumFeature ? <PremiumIcon featureType="share_rules" source="share_button" /> : null}
+          </Row>
         </Button>
       ) : (
         <Tooltip title="Share rule" placement="bottom">

@@ -4,23 +4,23 @@ export const PricingFeatures = {
   [APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]: {
     free: {
       planTitle: "Free",
-      heading: "Starter Plan",
+      heading: "Starter plan",
       features: [
         {
-          title: "10 rules",
+          title: "5 rules (3 active)",
           enabled: true,
-        },
-        {
-          title: "Upto 3 active rules",
-          enabled: true,
+          tooltip: "You can create upto 5 rules where 3 rules can be active at a time.",
         },
         {
           title: "Unlimited header modifications",
           enabled: true,
+          tooltip:
+            "There is no limit on header modification rules; they only count as one towards your total rule limit.",
         },
         {
           title: "Modify API request and response",
           enabled: true,
+          tooltip: "Statically override the payload with content of up to 1500 characters",
         },
         {
           title: "Mock Server",
@@ -28,10 +28,6 @@ export const PricingFeatures = {
         },
         {
           title: "API Client",
-          enabled: true,
-        },
-        {
-          title: "Team Workspace(in beta)",
           enabled: true,
         },
         {
@@ -49,31 +45,21 @@ export const PricingFeatures = {
       heading: "For individuals",
       features: [
         {
-          title: "Upto 25 rules",
+          title: "10 rules (5 active)",
           enabled: true,
-        },
-        {
-          title: "Upto 10 active rules",
-          enabled: true,
-        },
-        {
-          title: "Shared list",
-          enabled: true,
-        },
-        {
-          title: "File import/exports",
-          enabled: true,
+          tooltip: "You can create upto 10 rules where 5 rules can be active at a time.",
         },
         {
           title: "GraphQL API Modifications",
           enabled: true,
         },
         {
-          title: "Script injection",
+          title: "Programmatically modify API request and response",
           enabled: true,
+          tooltip: "Statically and programmatically override the response without any character limits.",
         },
         {
-          title: "API request/response body(Programmatic override)",
+          title: "Script injection",
           enabled: true,
         },
         {
@@ -84,7 +70,7 @@ export const PricingFeatures = {
     },
     professional: {
       planTitle: "Professional",
-      heading: "For collaboration in QA & dev teams",
+      heading: "For collaboration in teams",
       features: [
         {
           title: "Unlimited rules",
@@ -92,6 +78,10 @@ export const PricingFeatures = {
         },
         {
           title: "Unlimited active rules",
+          enabled: true,
+        },
+        {
+          title: "Collaborate with teammates",
           enabled: true,
         },
         {
@@ -122,11 +112,7 @@ export const PricingFeatures = {
           enabled: true,
         },
         {
-          title: "Complete network logs",
-          enabled: true,
-        },
-        {
-          title: "Share a link",
+          title: "Network logs",
           enabled: true,
         },
         {
@@ -159,11 +145,11 @@ export const PricingFeatures = {
           enabled: true,
         },
         {
-          title: "Team Workspace (beta)",
+          title: "Collaborate with teammates",
           enabled: true,
         },
         {
-          title: "Integraions : Jira, Linear (coming soon)",
+          title: "Integrations : Jira, Linear (coming soon)",
           enabled: true,
         },
         {

@@ -4,14 +4,12 @@ import "./styles.scss";
 import { RQButton } from "lib/design-system/components";
 import { redirectToPricingPlans } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
-import {
-  trackFeatureLimitUpgradeBannerClicked,
-  trackFeatureLimitUpgradeBannerViewed,
-} from "modules/analytics/events/common/feature-limiter";
+import { trackFeatureLimitUpgradeBannerViewed } from "modules/analytics/events/common/feature-limiter";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
+import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
 const FeatureLimiterBanner = () => {
   const navigate = useNavigate();
@@ -42,7 +40,7 @@ const FeatureLimiterBanner = () => {
             <RQButton
               className="feature-limit-banner-btn"
               onClick={() => {
-                trackFeatureLimitUpgradeBannerClicked();
+                trackViewPricingPlansClicked("feature_limiter_banner");
                 redirectToPricingPlans(navigate);
               }}
             >
