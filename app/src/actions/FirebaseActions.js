@@ -206,7 +206,7 @@ export async function sendEmailLinkForSignin(
     })
     .catch((err) => {
       toast.error("Failed to send login link. Please try again, or contact support if the problem persists");
-      trackGenerateMagicLinkFailed(email, source);
+      trackGenerateMagicLinkFailed(email, source, err?.message);
       console.log(err);
     });
 }

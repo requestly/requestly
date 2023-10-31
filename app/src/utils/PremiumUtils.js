@@ -14,6 +14,8 @@ export const getPlanNameFromId = (planId) => {
       return PRICING.PLAN_NAMES.PROFESSIONAL;
     case PRICING.PLAN_NAMES.LITE:
       return PRICING.PLAN_NAMES.BASIC;
+    case PRICING.PLAN_NAMES.BASIC_V2:
+      return PRICING.PLAN_NAMES.BASIC_V2;
     default:
       return PRICING.PLAN_NAMES.PROFESSIONAL;
   }
@@ -66,8 +68,12 @@ export const getPlanName = (planDetails) => {
     return PRICING.PLAN_NAMES.FREE;
   }
 
-  if (isPlanExpired(planDetails)) {
+  if (!isPremiumUser(planDetails)) {
     return PRICING.PLAN_NAMES.FREE;
+  }
+
+  if (planDetails.planId === PRICING.PLAN_NAMES.BASIC_V2) {
+    return PRICING.PLAN_NAMES.BASIC;
   }
 
   if (planDetails.planId) {
@@ -97,13 +103,6 @@ export const isEnterprisePlan = (planId) => {
 
 export const isTrialPlan = (planType) => {
   return planType?.toLowerCase() === PRICING.CHECKOUT.MODES.TRIAL;
-};
-
-export const getPlanHeader = (planId) => {
-  if (!planId) return " ";
-  const planName = getPlanNameFromId(planId);
-
-  return PRICING.PLAN_HEADERS[planName] || " ";
 };
 
 export const getEndDate = (planDetails) => {
