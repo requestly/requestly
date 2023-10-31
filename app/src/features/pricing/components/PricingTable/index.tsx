@@ -14,6 +14,7 @@ import checkIcon from "assets/img/icons/common/check.svg";
 import { CloseOutlined } from "@ant-design/icons";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
@@ -27,7 +28,7 @@ interface PricingTableProps {
 
 export const PricingTable: React.FC<PricingTableProps> = ({
   duration = PRICING.DURATION.ANNUALLY,
-  workspaceToUpgrade = PRICING.WORKSPACES.PRIVATE_WORKSPACE,
+  workspaceToUpgrade = TEAM_WORKSPACES.PRIVATE_WORKSPACE,
   product = PRICING.PRODUCTS.HTTP_RULES,
   handleOnSubscribe,
   isOpenedFromModal = false,
@@ -40,7 +41,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
     (planName: string) => {
       const { details } = user || {};
       const userPlanType = details?.planDetails?.type;
-      const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === PRICING.WORKSPACES.PRIVATE_WORKSPACE.id;
+      const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
       const userPlanName = details?.planDetails?.planName;
 
       const shouldRenew = details?.planDetails?.status !== "active" && details?.planDetails?.planName === planName;

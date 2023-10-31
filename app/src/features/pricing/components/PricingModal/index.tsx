@@ -6,6 +6,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import "./index.scss";
 
 interface PricingModalProps {
@@ -18,7 +19,7 @@ interface PricingModalProps {
 export const PricingModal: React.FC<PricingModalProps> = ({
   isOpen,
   toggleModal,
-  workspace = PRICING.WORKSPACES.PRIVATE_WORKSPACE,
+  workspace = TEAM_WORKSPACES.PRIVATE_WORKSPACE,
   selectedPlan = null,
 }) => {
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(workspace);
@@ -42,12 +43,12 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       setIsLoading(true);
       const subscriptionData = {
         currency: "usd",
-        teamId: workspaceToUpgrade?.id === PRICING.WORKSPACES.PRIVATE_WORKSPACE.id ? null : workspaceToUpgrade?.id,
+        teamId: workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id ? null : workspaceToUpgrade?.id,
         quantity: workspaceToUpgrade?.accessCount || 1,
         planName: planName,
         duration: duration,
       };
-      if (workspaceToUpgrade?.id === PRICING.WORKSPACES.PRIVATE_WORKSPACE.id) {
+      if (workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id) {
         createIndividualSubscriptionUsingStripeCheckout(subscriptionData).then((data: any) => {
           setStripeClientSecret(data?.data?.payload.clientSecret);
           setIsLoading(false);

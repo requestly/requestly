@@ -574,6 +574,10 @@ div.react-multi-email .multi-email-tag {
   & .ant-dropdown-menu {
     overflow: auto;
     max-height: 400px;
+
+    &::-webkit-scrollbar-track {
+      background-color: var(--surface-1);
+    }
   }
 
   & .ant-dropdown-menu-item .ant-dropdown-menu-title-content {
