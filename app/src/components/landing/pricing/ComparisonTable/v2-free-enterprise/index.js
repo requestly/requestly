@@ -34,11 +34,7 @@ const FreeAndEnterprisePlanTable = () => {
             size="small"
             checked={duration === PRICING.DURATION.ANNUALLY}
             onChange={(checked) => {
-              if (checked) {
-                setDuration(PRICING.DURATION.ANNUALLY);
-              } else {
-                setDuration(PRICING.DURATION.MONTHLY);
-              }
+              setDuration(checked ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY);
             }}
           />
           <span>{"  "}Annual pricing (save 20%)</span>

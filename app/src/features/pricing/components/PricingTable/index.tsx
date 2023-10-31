@@ -25,15 +25,9 @@ interface PricingTableProps {
   handleOnSubscribe?: (planName: string) => void;
 }
 
-const PRIVATE_WORKSPACE = {
-  name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-  id: "private_workspace",
-  accessCount: 1,
-};
-
 export const PricingTable: React.FC<PricingTableProps> = ({
   duration = PRICING.DURATION.ANNUALLY,
-  workspaceToUpgrade = PRIVATE_WORKSPACE,
+  workspaceToUpgrade = PRICING.WORKSPACES.PRIVATE_WORKSPACE,
   product = PRICING.PRODUCTS.HTTP_RULES,
   handleOnSubscribe,
   isOpenedFromModal = false,
@@ -46,7 +40,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
     (planName: string) => {
       const { details } = user || {};
       const userPlanType = details?.planDetails?.type;
-      const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id;
+      const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === PRICING.WORKSPACES.PRIVATE_WORKSPACE.id;
       const userPlanName = details?.planDetails?.planName;
 
       const shouldRenew = details?.planDetails?.status !== "active" && details?.planDetails?.planName === planName;

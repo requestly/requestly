@@ -6,7 +6,6 @@ import { CloseOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
-import APP_CONSTANTS from "config/constants";
 import "./index.scss";
 
 interface PricingModalProps {
@@ -16,16 +15,10 @@ interface PricingModalProps {
   workspace?: any;
 }
 
-const PRIVATE_WORKSPACE = {
-  name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-  id: "private_workspace",
-  accessCount: 1,
-};
-
 export const PricingModal: React.FC<PricingModalProps> = ({
   isOpen,
   toggleModal,
-  workspace = PRIVATE_WORKSPACE,
+  workspace = PRICING.WORKSPACES.PRIVATE_WORKSPACE,
   selectedPlan = null,
 }) => {
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(workspace);
@@ -47,25 +40,20 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       );
       setIsCheckoutScreenVisible(true);
       setIsLoading(true);
-      if (workspaceToUpgrade?.id === PRIVATE_WORKSPACE.id) {
-        createIndividualSubscriptionUsingStripeCheckout({
-          currency: "usd",
-          teamId: null,
-          quantity: 1,
-          planName: planName,
-          duration: duration,
-        }).then((data: any) => {
+      const subscriptionData = {
+        currency: "usd",
+        teamId: workspaceToUpgrade?.id === PRICING.WORKSPACES.PRIVATE_WORKSPACE.id ? null : workspaceToUpgrade?.id,
+        quantity: workspaceToUpgrade?.accessCount || 1,
+        planName: planName,
+        duration: duration,
+      };
+      if (workspaceToUpgrade?.id === PRICING.WORKSPACES.PRIVATE_WORKSPACE.id) {
+        createIndividualSubscriptionUsingStripeCheckout(subscriptionData).then((data: any) => {
           setStripeClientSecret(data?.data?.payload.clientSecret);
           setIsLoading(false);
         });
       } else {
-        createTeamSubscriptionUsingStripeCheckout({
-          currency: "usd",
-          teamId: workspaceToUpgrade?.id,
-          quantity: workspaceToUpgrade?.accessCount || 1,
-          planName: planName,
-          duration: duration,
-        }).then((data: any) => {
+        createTeamSubscriptionUsingStripeCheckout(subscriptionData).then((data: any) => {
           setStripeClientSecret(data?.data?.payload.clientSecret);
           setIsLoading(false);
         });
@@ -90,6 +78,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       footer={null}
       width={1130}
       className="pricing-modal"
+      maskClosable={false}
       maskStyle={{ backdropFilter: "blur(4px)", background: "none" }}
       closeIcon={<RQButton iconOnly icon={<CloseOutlined className="pricing-modal-close-icon" />} />}
     >
@@ -117,8 +106,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                   size="small"
                   checked={duration === PRICING.DURATION.ANNUALLY}
                   onChange={(checked) => {
-                    if (checked) setDuration(PRICING.DURATION.ANNUALLY);
-                    else setDuration(PRICING.DURATION.MONTHLY);
+                    setDuration(checked ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY);
                   }}
                 />{" "}
                 <span>

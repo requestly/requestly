@@ -569,3 +569,10 @@ div.react-multi-email .multi-email-tag {
   border: 1px solid #343434;
   background-color: var(--hover-color);
 }
+
+.upgrade-workspace-selector-dropdown {
+  & .ant-dropdown-menu {
+    overflow: auto;
+    max-height: 400px;
+  }
+}

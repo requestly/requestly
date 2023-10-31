@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
+import { PRICING } from "../../constants/pricing";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import "./index.scss";
 
@@ -106,7 +107,7 @@ export const UpgradeWorkspaceMenu: React.FC<{
                   backgroundColor:
                     !workspaceToUpgrade ||
                     workspaceToUpgrade?.name === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE
-                      ? "#1E69FF"
+                      ? PRICING.WORKSPACES.PRIVATE_WORKSPACE.color
                       : getUniqueColorForWorkspace(workspaceToUpgrade?.id, workspaceToUpgrade?.name),
                 }}
               />
