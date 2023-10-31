@@ -56,13 +56,10 @@
     align-items: center;
 
     & .embed-checkout {
-      display: flex;
-      justify-content: center;
-      align-items: center;
       width: 100%;
       height: 600px;
       overflow: auto;
-      margin: 3rem;
+      margin: 2.5rem;
 
       & ::-webkit-scrollbar {
         width: 0.5rem;
