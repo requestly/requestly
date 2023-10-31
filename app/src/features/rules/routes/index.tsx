@@ -20,14 +20,6 @@ export const ruleRoutes: RouteObject[] = [
     element: <RulesContainer />,
     children: [
       {
-        path: "my-rules-v2", // FIXME: Move to constants and remove old path
-        element: <RulesListIndex />,
-      },
-      {
-        path: joinPaths(`${PATHS.SHARED_LISTS.VIEWER.RELATIVE}-v2`, ":sharedListParam"),
-        element: <SharedListViewer />,
-      },
-      {
         path: "",
         element: <Navigate to={PATHS.RULES.MY_RULES.RELATIVE} />,
       },
@@ -67,6 +59,20 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: PATHS.RULES.TRASH.RELATIVE,
         element: <TrashIndexPage />,
+      },
+    ],
+  },
+  {
+    path: `/v2${PATHS.RULES.INDEX}`,
+    element: <RulesContainer />,
+    children: [
+      {
+        path: "my-rules", // FIXME: Move to constants and remove old path
+        element: <RulesListIndex />,
+      },
+      {
+        path: joinPaths(`${PATHS.SHARED_LISTS.VIEWER.RELATIVE}`, ":sharedListParam"),
+        element: <SharedListViewer />,
       },
     ],
   },

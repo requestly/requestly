@@ -7,6 +7,8 @@ import { getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { Button } from "antd";
 
+import "./rulesListIndex.scss";
+
 interface Props {}
 
 const RulesListIndex: React.FC<Props> = () => {
@@ -20,7 +22,7 @@ const RulesListIndex: React.FC<Props> = () => {
   useFetchAndUpdateRules({ setIsLoading: setIsLoading });
 
   return (
-    <>
+    <div className="rq-rules-list-container">
       {/* TODO: Add Feature Limiter Banner Here */}
       {/* TODO: Add Modals Required in Rules List here */}
       <ContentHeader
@@ -28,8 +30,10 @@ const RulesListIndex: React.FC<Props> = () => {
         subtitle="Create and manage your rules from here"
         actions={[<Button type="primary">New Rule</Button>]}
       />
-      <RulesTable rules={ruleObjs as RuleObj[]} loading={isLoading} />
-    </>
+      <div className="rq-rules-table">
+        <RulesTable rules={ruleObjs as RuleObj[]} loading={isLoading} />
+      </div>
+    </div>
   );
 };
 
