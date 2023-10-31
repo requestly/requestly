@@ -195,10 +195,8 @@ const INITIAL_STATE = {
       isRuleEditorTourCompleted: false,
       extensionInstallSource: null,
       isMiscTourCompleted: {
-        firstRule: false,
-        fifthRule: false,
         firstDraftSession: false,
-        rulesListSharingOnboarding: false,
+        upgradeWorkspaceMenu: false,
       },
 
       hasConnectedApp: false,
