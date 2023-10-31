@@ -7,6 +7,14 @@ import zalandoLogo from "../../assets/zalando.svg";
 import "./index.scss";
 
 export const CompaniesSection = () => {
+  const companies = [
+    { src: adobeLogo, alt: "adobe" },
+    { src: atlassianLogo, alt: "atlassian" },
+    { src: indeedLogo, alt: "indeed" },
+    { src: verizonLogo, alt: "verizon" },
+    { src: zalandoLogo, alt: "zalando" },
+  ];
+
   return (
     <Row justify="center" align="middle" className="mt-16 w-full">
       <Space direction="vertical" className="companies-wrapper">
@@ -15,11 +23,9 @@ export const CompaniesSection = () => {
         </Typography.Text>
         <Col>
           <Space direction="horizontal" size={24}>
-            <img src={adobeLogo} alt="adobe" />
-            <img src={atlassianLogo} alt="atlassian" />
-            <img src={indeedLogo} alt="indeed" />
-            <img src={verizonLogo} alt="verizon" />
-            <img src={zalandoLogo} alt="zalando" />
+            {companies.map((company) => (
+              <img key={company.alt} src={company.src} alt={company.alt} />
+            ))}
           </Space>
         </Col>
       </Space>
