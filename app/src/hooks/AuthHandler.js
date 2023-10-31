@@ -74,7 +74,7 @@ const AuthHandler = (onComplete) => {
                 isLoggedIn: true,
                 planDetails: {
                   ...planDetails,
-                  planName: isUserPremium ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.FREE,
+                  planName: getPlanName(planDetails),
                 },
                 isBackupEnabled,
                 isSyncEnabled,
