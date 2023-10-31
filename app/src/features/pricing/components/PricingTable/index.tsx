@@ -190,10 +190,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
     <>
       <Row wrap={false} className="pricing-table">
         {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => {
-          const planPrice =
-            PricingPlans[planName as keyof typeof PricingPlans]?.plans[
-              duration as keyof typeof PricingPlans[keyof typeof PricingPlans]["plans"]
-            ]?.usd?.price;
+          const planPrice = PricingPlans[planName]?.plans[duration]?.usd?.price;
 
           if (!isOpenedFromModal && planName === PRICING.PLAN_NAMES.ENTERPRISE) return null;
 
