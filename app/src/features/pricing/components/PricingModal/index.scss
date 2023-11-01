@@ -2,15 +2,30 @@
   position: relative;
 }
 
-.pricing-modal-inset-shadow {
+.pricing-modal-right-inset-shadow,
+.pricing-modal-left-inset-shadow {
   position: absolute;
-  width: 45px;
+  width: 70px;
   height: 97%;
   right: 0;
   top: 20px;
   bottom: 0;
   background: linear-gradient(90deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & svg {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+}
+
+.pricing-modal-left-inset-shadow {
+  left: 0;
+  background: linear-gradient(270deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
 }
 
 .pricing-modal {

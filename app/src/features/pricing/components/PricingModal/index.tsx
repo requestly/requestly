@@ -1,14 +1,16 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
 import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
 import { CloseOutlined } from "@ant-design/icons";
+import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
+import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import "./index.scss";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
+import "./index.scss";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -28,6 +30,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [stripeClientSecret, setStripeClientSecret] = useState(null);
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
+  const tableRef = useRef(null);
 
   const handleSubscribe = useCallback(
     (planName: string) => {
@@ -121,12 +125,32 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 </span>
               </Col>
             </Row>
-            <div className="pricing-modal-inset-shadow"></div>
+            {isTableScrolledToRight ? (
+              <div className="pricing-modal-left-inset-shadow">
+                <IoIosArrowDropleft
+                  onClick={() => {
+                    tableRef.current.scrollLeft = 0;
+                    setIsTableScrolledToRight(false);
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="pricing-modal-right-inset-shadow">
+                <IoIosArrowDropright
+                  onClick={() => {
+                    tableRef.current.scrollLeft = tableRef.current.scrollWidth;
+                    setIsTableScrolledToRight(true);
+                  }}
+                />
+              </div>
+            )}
+
             <PricingTable
               workspaceToUpgrade={workspaceToUpgrade}
               duration={duration}
               isOpenedFromModal
               handleOnSubscribe={handleSubscribe}
+              tableRef={tableRef}
             />
             <CompaniesSection />
           </>

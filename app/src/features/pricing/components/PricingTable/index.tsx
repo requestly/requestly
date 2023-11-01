@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { RefObject, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Col, Row, Space, Tooltip, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -24,6 +24,7 @@ interface PricingTableProps {
   workspaceToUpgrade?: any;
   duration?: string;
   isOpenedFromModal?: boolean;
+  tableRef?: RefObject<HTMLDivElement>;
   handleOnSubscribe?: (planName: string) => void;
 }
 
@@ -32,6 +33,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   workspaceToUpgrade = TEAM_WORKSPACES.PRIVATE_WORKSPACE,
   product = PRICING.PRODUCTS.HTTP_RULES,
   handleOnSubscribe,
+  tableRef = null,
   isOpenedFromModal = false,
 }) => {
   const dispatch = useDispatch();
@@ -225,7 +227,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
   return (
     <>
-      <Row wrap={false} className="pricing-table">
+      <Row wrap={false} className="pricing-table" ref={tableRef}>
         {Object.entries(PricingFeatures[product]).map(([planName, planDetails]) => {
           const planPrice = PricingPlans[planName]?.plans[duration]?.usd?.price;
 

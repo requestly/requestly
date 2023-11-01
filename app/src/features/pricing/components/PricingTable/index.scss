@@ -1,10 +1,11 @@
 .pricing-table {
   margin-top: 24px;
   gap: 24px;
-  overflow: auto;
+  overflow: scroll;
+  scroll-behavior: smooth;
 
   &::-webkit-scrollbar {
-    display: none; //TODO: should not hide scrollbar
+    display: none;
   }
 }
 
