@@ -17,6 +17,7 @@ interface PricingModalProps {
   toggleModal: () => void;
   selectedPlan?: string;
   workspace?: any;
+  title?: string;
 }
 
 export const PricingModal: React.FC<PricingModalProps> = ({
@@ -24,6 +25,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   toggleModal,
   workspace = TEAM_WORKSPACES.PRIVATE_WORKSPACE,
   selectedPlan = null,
+  title = "Upgrade your plan to get the most out of Requestly",
 }) => {
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(workspace);
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
@@ -102,7 +104,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         ) : (
           <>
             <Col span={24} className="display-row-center" style={{ paddingTop: "1rem" }}>
-              <Typography.Title level={4}>Upgrade your plan for unlimited active rules</Typography.Title>
+              <Typography.Title level={4}>{title}</Typography.Title>
             </Col>
             <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
               <Col>
