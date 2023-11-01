@@ -12,6 +12,7 @@ import APP_CONSTANTS from "config/constants";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { actions } from "store";
+import { trackPricingWorkspaceSwitched } from "features/pricing/analytics";
 import "./index.scss";
 
 const getWorkspaceIcon = (workspaceName: string) => {
@@ -22,8 +23,9 @@ const getWorkspaceIcon = (workspaceName: string) => {
 export const UpgradeWorkspaceMenu: React.FC<{
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
+  isOpenedFromModal?: boolean;
   className?: string;
-}> = ({ workspaceToUpgrade, setWorkspaceToUpgrade, className }) => {
+}> = ({ workspaceToUpgrade, setWorkspaceToUpgrade, className, isOpenedFromModal = false }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
@@ -91,6 +93,10 @@ export const UpgradeWorkspaceMenu: React.FC<{
         });
       }
       setWorkspaceToUpgrade(populateWorkspaceDetails(teamId));
+      trackPricingWorkspaceSwitched(
+        teamId === "private_workspace" ? "individual" : "team",
+        isOpenedFromModal ? "pricing_modal" : "pricing_page"
+      );
     },
   };
 

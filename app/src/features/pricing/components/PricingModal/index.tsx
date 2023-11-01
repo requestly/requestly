@@ -1,12 +1,18 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
+import { useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
 import { CloseOutlined } from "@ant-design/icons";
+import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
+import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
+import { trackPricingModalPlansViewed } from "features/pricing/analytics";
+import { isNull } from "lodash";
 import "./index.scss";
 
 interface PricingModalProps {
@@ -14,19 +20,32 @@ interface PricingModalProps {
   toggleModal: () => void;
   selectedPlan?: string;
   workspace?: any;
+  title?: string;
 }
 
 export const PricingModal: React.FC<PricingModalProps> = ({
   isOpen,
   toggleModal,
-  workspace = TEAM_WORKSPACES.PRIVATE_WORKSPACE,
+  workspace,
   selectedPlan = null,
+  title = "Upgrade your plan to get the most out of Requestly",
 }) => {
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(workspace);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(
+    workspace?.id
+      ? workspace
+      : isNull(currentlyActiveWorkspace.id)
+      ? TEAM_WORKSPACES.PRIVATE_WORKSPACE
+      : currentlyActiveWorkspace
+  );
+
+  console.log("MODAL", { workspaceToUpgrade, workspace });
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
   const [stripeClientSecret, setStripeClientSecret] = useState(null);
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
+  const tableRef = useRef(null);
 
   const handleSubscribe = useCallback(
     (planName: string) => {
@@ -71,6 +90,10 @@ export const PricingModal: React.FC<PricingModalProps> = ({
     }
   }, [selectedPlan, handleSubscribe]);
 
+  useEffect(() => {
+    if (!isCheckoutScreenVisible) trackPricingModalPlansViewed();
+  }, [isCheckoutScreenVisible]);
+
   return (
     <Modal
       centered
@@ -93,13 +116,14 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         ) : (
           <>
             <Col span={24} className="display-row-center" style={{ paddingTop: "1rem" }}>
-              <Typography.Title level={4}>Upgrade your plan for unlimited active rules</Typography.Title>
+              <Typography.Title level={4}>{title}</Typography.Title>
             </Col>
-            <Row justify="center" className="display-row-center w-full mt-16" gutter={24}>
+            <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
               <Col>
                 <UpgradeWorkspaceMenu
                   workspaceToUpgrade={workspaceToUpgrade}
                   setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+                  isOpenedFromModal
                 />
               </Col>
               <Col className="display-row-center plan-duration-switch-container">
@@ -115,12 +139,32 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 </span>
               </Col>
             </Row>
-            <div className="pricing-modal-inset-shadow"></div>
+            {isTableScrolledToRight ? (
+              <div className="pricing-modal-left-inset-shadow">
+                <IoIosArrowDropleft
+                  onClick={() => {
+                    tableRef.current.scrollLeft = 0;
+                    setIsTableScrolledToRight(false);
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="pricing-modal-right-inset-shadow">
+                <IoIosArrowDropright
+                  onClick={() => {
+                    tableRef.current.scrollLeft = tableRef.current.scrollWidth;
+                    setIsTableScrolledToRight(true);
+                  }}
+                />
+              </div>
+            )}
+
             <PricingTable
               workspaceToUpgrade={workspaceToUpgrade}
               duration={duration}
               isOpenedFromModal
               handleOnSubscribe={handleSubscribe}
+              tableRef={tableRef}
             />
             <CompaniesSection />
           </>

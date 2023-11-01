@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Col, Divider, Row, Spin, Typography } from "antd";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { RQButton } from "lib/design-system/components";
 import { LoadingOutlined } from "@ant-design/icons";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
+import { trackPricingModalStripeWindowOpened } from "features/pricing/analytics";
 import "./index.scss";
 
 interface CheckoutProps {
@@ -18,6 +19,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, isLoading, onC
   const options = {
     clientSecret,
   };
+
+  useEffect(() => {
+    if (!isLoading) trackPricingModalStripeWindowOpened();
+  }, [isLoading]);
 
   return (
     <Col className="checkout-screen-wrapper">

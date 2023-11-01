@@ -2,23 +2,38 @@
   position: relative;
 }
 
-.pricing-modal-inset-shadow {
+.pricing-modal-right-inset-shadow,
+.pricing-modal-left-inset-shadow {
   position: absolute;
-  width: 45px;
+  width: 70px;
   height: 97%;
   right: 0;
   top: 20px;
   bottom: 0;
   background: linear-gradient(90deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & svg {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+}
+
+.pricing-modal-left-inset-shadow {
+  left: 0;
+  background: linear-gradient(270deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
 }
 
 .pricing-modal {
   background: var(--black);
   border-radius: 1rem;
   height: 100vh;
-  max-height: 750px;
-  overflow: hidden;
+  max-height: 780px;
+  overflow: auto;
 
   .pricing-table {
     margin: 0 24px;
@@ -32,12 +47,6 @@
   .ant-modal-content {
     background: none;
     border-radius: 1rem;
-  }
-
-  .current-pricing-plan-tag {
-    border-radius: 4px;
-    background: var(--surface-2);
-    padding: 5px 12px;
   }
 
   .plan-duration-switch-container {

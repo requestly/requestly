@@ -1,10 +1,23 @@
 .pricing-table {
   margin-top: 24px;
   gap: 24px;
-  overflow: auto;
+  overflow: scroll;
+  scroll-behavior: smooth;
 
   &::-webkit-scrollbar {
-    display: none; //TODO: should not hide scrollbar
+    display: none;
+  }
+
+  .recommended-plan-card {
+    border: 1px solid var(--success);
+  }
+  .recommended-tag {
+    padding: 4px;
+    border-radius: var(--border-radius-sm);
+    background: var(--success);
+    font-weight: 700;
+    color: var(--black);
+    font-size: 11px;
   }
 }
 
@@ -32,6 +45,12 @@
   color: var(--text-light);
 }
 
+.current-pricing-plan-tag {
+  border-radius: 4px;
+  background: var(--surface-3);
+  padding: 5px 12px;
+}
+
 .pro-basic-feature-title {
   font-size: 1rem;
   color: var(--white);
@@ -56,6 +75,7 @@
 .plan-feature-item {
   display: flex;
   gap: 8px;
+  color: var(--neutrals-gray-300);
 
   & img {
     width: 16px;
