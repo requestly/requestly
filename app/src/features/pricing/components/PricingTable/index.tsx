@@ -216,15 +216,17 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                 </Row>
               )}
               {planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
-                <Row className={`mt-8 ${duration === PRICING.DURATION.MONTHLY ? "not-visible" : ""}`}>
-                  <Typography.Text type="secondary">Billed annually</Typography.Text>
+                <Row className="mt-8">
+                  <Typography.Text type="secondary">
+                    {duration === PRICING.DURATION.MONTHLY ? "Billed monthly" : "Billed annually"}
+                  </Typography.Text>
                 </Row>
               )}
               <Row className="mt-16">{renderButtonsForPlans(planName)}</Row>
               <>{renderFeaturesListHeader(planName)}</>
               <Space direction="vertical" className="plan-features-list">
                 {planDetails.features.map((feature, index) => (
-                  <div className="text-left text-gray plan-feature-item" key={index}>
+                  <div className="text-left plan-feature-item" key={index}>
                     {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
                     <Tooltip title={feature?.tooltip} color="var(--black)">
                       <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>

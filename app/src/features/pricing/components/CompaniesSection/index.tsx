@@ -16,7 +16,7 @@ export const CompaniesSection = () => {
   ];
 
   return (
-    <Row justify="center" align="middle" className="mt-16 w-full">
+    <Row justify="center" align="middle" className="w-full" style={{ margin: "30px 0" }}>
       <Space direction="vertical" className="companies-wrapper">
         <Typography.Text className="companies-section-header">
           Trusted by developer & QA teams from 5000+ organizations
