@@ -78,9 +78,11 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
         return (
           <Space size={8}>
-            <RQButton onClick={() => (window.location.href = "/")} type="primary">
-              Use now
-            </RQButton>
+            {userPlanName === PRICING.PLAN_NAMES.FREE && (
+              <RQButton onClick={() => (window.location.href = "/")} type="primary">
+                Use now
+              </RQButton>
+            )}
             {!isUserPremium && <div className="current-pricing-plan-tag">Current Plan</div>}
           </Space>
         );
@@ -234,7 +236,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
           if (!isOpenedFromModal && planName === PRICING.PLAN_NAMES.ENTERPRISE) return null;
 
           return (
-            <Col key={planName} className="plan-card">
+            <Col
+              key={planName}
+              className={`plan-card ${planName === PRICING.PLAN_NAMES.PROFESSIONAL ? "recommended-plan-card" : ""}`}
+            >
               <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
               {planPrice !== undefined && (
                 <Row align="middle">
