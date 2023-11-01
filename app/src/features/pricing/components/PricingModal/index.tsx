@@ -8,6 +8,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import "./index.scss";
+import { trackPricingModalPlansViewed } from "features/pricing/analytics";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -71,6 +72,10 @@ export const PricingModal: React.FC<PricingModalProps> = ({
     }
   }, [selectedPlan, handleSubscribe]);
 
+  useEffect(() => {
+    if (!isCheckoutScreenVisible) trackPricingModalPlansViewed();
+  }, [isCheckoutScreenVisible]);
+
   return (
     <Modal
       centered
@@ -100,6 +105,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 <UpgradeWorkspaceMenu
                   workspaceToUpgrade={workspaceToUpgrade}
                   setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+                  isOpenedFromModal
                 />
               </Col>
               <Col className="display-row-center plan-duration-switch-container">
