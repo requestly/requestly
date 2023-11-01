@@ -1,5 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
+import { useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
 import { CloseOutlined } from "@ant-design/icons";
@@ -10,6 +12,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
+import { isNull } from "lodash";
 import "./index.scss";
 
 interface PricingModalProps {
@@ -23,11 +26,20 @@ interface PricingModalProps {
 export const PricingModal: React.FC<PricingModalProps> = ({
   isOpen,
   toggleModal,
-  workspace = TEAM_WORKSPACES.PRIVATE_WORKSPACE,
+  workspace,
   selectedPlan = null,
   title = "Upgrade your plan to get the most out of Requestly",
 }) => {
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(workspace);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(
+    workspace?.id
+      ? workspace
+      : isNull(currentlyActiveWorkspace.id)
+      ? TEAM_WORKSPACES.PRIVATE_WORKSPACE
+      : currentlyActiveWorkspace
+  );
+
+  console.log("MODAL", { workspaceToUpgrade, workspace });
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
   const [stripeClientSecret, setStripeClientSecret] = useState(null);
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);

@@ -19,6 +19,8 @@ const FreeAndEnterprisePlanTable = () => {
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(TEAM_WORKSPACES.PRIVATE_WORKSPACE);
 
+  console.log("PAGE", { workspaceToUpgrade });
+
   return (
     <>
       <div className="pricing-table-wrapper">
