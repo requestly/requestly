@@ -14,12 +14,14 @@ import { actions } from "store";
 import "./index.scss";
 
 interface RequestFeatureModalProps {
+  isOpen: boolean;
   organizationsData: OrganizationsDetails;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
 }
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
+  isOpen,
   organizationsData,
   setOpenPopup,
   onContinue,
@@ -74,7 +76,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   return (
     <>
       <Modal
-        open={true}
+        open={isOpen}
         onCancel={() => setOpenPopup(false)}
         footer={null}
         className="request-feature-modal"

@@ -41,6 +41,12 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   );
 
   useEffect(() => {
+    return () => {
+      setOpenPopup(false);
+    };
+  }, []);
+
+  useEffect(() => {
     if (user.loggedIn) {
       getEnterpriseAdminDetails().then((response) => {
         if (response.data.success) {
@@ -52,46 +58,51 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 
   return (
     <>
-      {openPopup && organizationsData && !disabled && (
-        <RequestFeatureModal
-          setOpenPopup={setOpenPopup}
-          organizationsData={organizationsData}
-          onContinue={onContinue}
-        />
-      )}
-      <Popconfirm
-        disabled={(getFeatureLimitValue(feature) && !organizationsData) || !feature || disabled}
-        overlayClassName="premium-feature-popover"
-        autoAdjustOverflow
-        showArrow={false}
-        placement={popoverPlacement}
-        okText="See upgrade plans"
-        cancelText="Use for free now"
-        onConfirm={() => {
-          dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
-        }}
-        onCancel={() => {
-          onContinue();
-        }}
-        title={
-          <>
-            <Typography.Title level={4}>Premium feature</Typography.Title>
-            <Typography.Text>
-              This feature is a part of our paid offering. Consider upgrading for uninterrupted usage.
-            </Typography.Text>
-          </>
-        }
-      >
-        <Col
-          onClick={() => {
-            if (getFeatureLimitValue(feature) || !feature) {
-              onContinue();
-            } else setOpenPopup(true);
+      {organizationsData && !disabled && feature ? (
+        <>
+          <RequestFeatureModal
+            isOpen={openPopup}
+            setOpenPopup={setOpenPopup}
+            organizationsData={organizationsData}
+            onContinue={onContinue}
+          />
+          <Col onClick={() => setOpenPopup(true)}>{children}</Col>
+        </>
+      ) : (
+        <Popconfirm
+          disabled={!!getFeatureLimitValue(feature) || !feature || disabled}
+          overlayClassName="premium-feature-popover"
+          autoAdjustOverflow
+          showArrow={false}
+          placement={popoverPlacement}
+          okText="See upgrade plans"
+          cancelText="Use for free now"
+          onConfirm={() => {
+            dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
           }}
+          onCancel={() => {
+            onContinue();
+          }}
+          title={
+            <>
+              <Typography.Title level={4}>Premium feature</Typography.Title>
+              <Typography.Text>
+                This feature is a part of our paid offering. Consider upgrading for uninterrupted usage.
+              </Typography.Text>
+            </>
+          }
         >
-          {children}
-        </Col>
-      </Popconfirm>
+          <Col
+            onClick={() => {
+              if (getFeatureLimitValue(feature) || !feature) {
+                onContinue();
+              }
+            }}
+          >
+            {children}
+          </Col>
+        </Popconfirm>
+      )}
     </>
   );
 };
