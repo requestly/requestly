@@ -240,7 +240,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               key={planName}
               className={`plan-card ${planName === PRICING.PLAN_NAMES.PROFESSIONAL ? "recommended-plan-card" : ""}`}
             >
-              <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
+              <Space size={8}>
+                <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
+                {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">RECOMMENDED</span>}
+              </Space>
               {planPrice !== undefined && (
                 <Row align="middle">
                   <Space size="small">

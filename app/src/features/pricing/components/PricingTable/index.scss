@@ -11,6 +11,14 @@
   .recommended-plan-card {
     border: 1px solid var(--success);
   }
+  .recommended-tag {
+    padding: 4px;
+    border-radius: var(--border-radius-sm);
+    background: var(--success);
+    font-weight: 700;
+    color: var(--black);
+    font-size: 11px;
+  }
 }
 
 .plan-card {
