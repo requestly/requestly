@@ -7,6 +7,10 @@
   &::-webkit-scrollbar {
     display: none;
   }
+
+  .recommended-plan-card {
+    border: 1px solid var(--success);
+  }
 }
 
 .plan-card {
