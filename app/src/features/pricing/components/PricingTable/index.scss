@@ -32,6 +32,12 @@
   color: var(--text-light);
 }
 
+.current-pricing-plan-tag {
+  border-radius: 4px;
+  background: var(--surface-3);
+  padding: 5px 12px;
+}
+
 .pro-basic-feature-title {
   font-size: 1rem;
   color: var(--white);
