@@ -1,10 +1,8 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { OrganizationsDetails } from "./types";
 import { Col, Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
@@ -28,17 +26,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const { getFeatureLimitValue } = useFeatureLimiter();
-  const [organizationsData, setOrganizationsData] = useState(null);
   const [openPopup, setOpenPopup] = useState(false);
-
-  const getEnterpriseAdminDetails = useMemo(
-    () =>
-      httpsCallable<null, { enterpriseData: OrganizationsDetails; success: boolean }>(
-        getFunctions(),
-        "getEnterpriseAdminDetails"
-      ),
-    []
-  );
 
   useEffect(() => {
     return () => {
@@ -46,24 +34,14 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (user.loggedIn) {
-      getEnterpriseAdminDetails().then((response) => {
-        if (response.data.success) {
-          setOrganizationsData(null);
-        }
-      });
-    }
-  }, [user.loggedIn, getEnterpriseAdminDetails]);
-
   return (
     <>
-      {organizationsData && !disabled && feature ? (
+      {user?.details?.organization && !disabled && feature ? (
         <>
           <RequestFeatureModal
             isOpen={openPopup}
             setOpenPopup={setOpenPopup}
-            organizationsData={organizationsData}
+            organizationsData={user?.details?.organization}
             onContinue={onContinue}
           />
           <Col onClick={() => setOpenPopup(true)}>{children}</Col>
@@ -92,7 +70,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             </>
           }
         >
-          <Col
+          {/* <Col
             onClick={() => {
               if (getFeatureLimitValue(feature) || !feature) {
                 onContinue();
@@ -100,9 +78,18 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             }}
           >
             {children}
-          </Col>
+          </Col>*/}
+          {React.Children.map(children, (child) => {
+            return React.cloneElement(child as React.ReactElement, {
+              onClick: () => {
+                if (getFeatureLimitValue(feature) || !feature) {
+                  onContinue();
+                }
+              },
+            });
+          })}
         </Popconfirm>
-      )}
+      )}{" "}
     </>
   );
 };

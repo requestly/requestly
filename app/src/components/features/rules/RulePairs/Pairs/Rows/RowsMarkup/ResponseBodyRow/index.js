@@ -23,6 +23,7 @@ import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import "./ResponseBodyRow.css";
+import { PremiumFeature } from "features/pricing";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -228,7 +229,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             onCancel={() => setResponseTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            open={responseTypePopupVisible}
+            open={responseTypePopupVisible && responseTypePopupSelection !== GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}
           >
             <Radio.Group
               onChange={showPopup}
@@ -238,11 +239,17 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
               data-tour-id="rule-editor-responsebody-types"
             >
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>Static Data</Radio>
-              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
-                <Row align="middle">
-                  Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}
-                </Row>
-              </Radio>
+              <PremiumFeature
+                feature={FeatureLimitType.dynamic_response_body}
+                popoverPlacement="top"
+                onContinue={() => onChangeResponseType(responseTypePopupSelection)}
+              >
+                <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
+                  <Row align="middle">
+                    Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}
+                  </Row>
+                </Radio>
+              </PremiumFeature>
               {getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
                 isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) ? (
                   <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE}>Local File</Radio>
