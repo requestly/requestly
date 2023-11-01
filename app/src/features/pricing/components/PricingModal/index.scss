@@ -17,8 +17,8 @@
   background: var(--black);
   border-radius: 1rem;
   height: 100vh;
-  max-height: 750px;
-  overflow: hidden;
+  max-height: 780px;
+  overflow: auto;
 
   .pricing-table {
     margin: 0 24px;
@@ -36,7 +36,7 @@
 
   .current-pricing-plan-tag {
     border-radius: 4px;
-    background: var(--surface-2);
+    background: var(--surface-3);
     padding: 5px 12px;
   }
 
