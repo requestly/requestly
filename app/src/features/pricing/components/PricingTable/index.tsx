@@ -35,7 +35,6 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   tableRef = null,
   isOpenedFromModal = false,
 }) => {
-  console.log("TABLE", { workspaceToUpgrade });
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
@@ -163,7 +162,6 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       return (
         <RQButton
           onClick={() => {
-            console.log("CICKED", { workspaceToUpgrade });
             !user?.details?.isLoggedIn
               ? dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }))
               : isOpenedFromModal
