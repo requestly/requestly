@@ -1,6 +1,6 @@
-import countryCodes from "./static/countryCodes";
+import countryCodes from "config/constants/sub/static/countryCodes";
 
-const PRICING = {};
+export const PRICING = {};
 
 PRICING.CHECKOUT = {};
 
@@ -49,5 +49,3 @@ PRICING.DURATION = {
   MONTHLY: "monthly",
   ANNUALLY: "annually",
 };
-
-export default PRICING;

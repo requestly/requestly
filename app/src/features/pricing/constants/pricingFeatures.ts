@@ -1,7 +1,8 @@
-import APP_CONSTANTS from "config/constants";
+import { PRICING } from "./pricing";
+import { PlanFeatures } from "../components/PricingTable/types";
 
-export const PricingFeatures = {
-  [APP_CONSTANTS.PRICING.PRODUCTS.HTTP_RULES]: {
+export const PricingFeatures: PlanFeatures = {
+  [PRICING.PRODUCTS.HTTP_RULES]: {
     free: {
       planTitle: "Free",
       heading: "Starter plan",
@@ -102,8 +103,39 @@ export const PricingFeatures = {
         },
       ],
     },
+    enterprise: {
+      planTitle: "Enterprise",
+      planDescription:
+        "Empower your team with our Enterprise Plan, designed to seamlessly scale with your ambitions and drive collaborative success",
+      features: [
+        {
+          title: "API access",
+          enabled: true,
+        },
+        {
+          title: "Single Sign On",
+          enabled: true,
+        },
+        {
+          title: "Unlimited Everything",
+          enabled: true,
+        },
+        {
+          title: "User management & access control",
+          enabled: true,
+        },
+        {
+          title: "On Premise support",
+          enabled: true,
+        },
+        {
+          title: "Priority Support - Slack Connect, Email, Chat",
+          enabled: true,
+        },
+      ],
+    },
   },
-  [APP_CONSTANTS.PRICING.PRODUCTS.SESSION_REPLAY]: {
+  [PRICING.PRODUCTS.SESSION_REPLAY]: {
     free: {
       planTitle: "Free",
       features: [

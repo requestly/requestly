@@ -2,7 +2,7 @@ import React from "react";
 import { Alert, Typography, Button } from "antd";
 import { getCurrencySymbol } from "../../../../utils/PricingUtils";
 import { redirectToCheckout } from "../../../../utils/RedirectionUtils";
-import APP_CONSTANTS from "../../../../config/constants";
+import { PRICING } from "features/pricing";
 import { trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
 
 const { Text, Title } = Typography;
@@ -17,9 +17,9 @@ const LitePlanMessage = () => {
 
 const LitePlanDescription = ({ currency, price }) => {
   const checkoutLitePlan = () => {
-    trackCheckoutInitiatedEvent("monthly", APP_CONSTANTS.PRICING.PLAN_NAMES.LITE, 1);
+    trackCheckoutInitiatedEvent("monthly", PRICING.PLAN_NAMES.LITE, 1);
     redirectToCheckout({
-      planType: APP_CONSTANTS.PRICING.PLAN_NAMES.LITE,
+      planType: PRICING.PLAN_NAMES.LITE,
       mode: "individual",
       days: "30",
     });

@@ -1,0 +1,50 @@
+.upgrade-workspace-selector-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .upgrade-workspace-selector-dropdown-container {
+    margin-bottom: 4px;
+
+    .upgrade-workspace-selector-dropdown-btn.ant-btn.rq-btn {
+      background-color: var(--background);
+      border: none;
+      margin-left: 4px;
+      padding: 6px 8px;
+      height: auto;
+      width: auto;
+
+      &:hover {
+        border: none;
+      }
+
+      .upgrade-workspace-selector-dropdown-icon {
+        margin-left: 2px;
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+    .upgrade-workspace-dropdown-btn-info {
+      margin: 0 8px;
+      margin-right: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      & .workspace-name {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--white);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+      }
+
+      & .workspace-members {
+        font-size: 11px;
+        color: var(--text-light);
+      }
+    }
+  }
+}

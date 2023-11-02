@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
-import APP_CONSTANTS from "config/constants";
 import firebaseApp from "firebase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { actions } from "store";
@@ -16,6 +15,7 @@ import { getAndUpdateInstallationDate, getSignupDate } from "utils/Misc";
 import Logger from "lib/logger";
 import { getUserSubscription } from "backend/user/userSubscription";
 import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDocListener";
+import APP_CONSTANTS from "config/constants";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
