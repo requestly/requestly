@@ -10,6 +10,7 @@ import { actions } from "store";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
+import { PremiumFeature } from "features/pricing";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -124,7 +125,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             onCancel={() => setRequestTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            open={requestTypePopupVisible}
+            open={requestTypePopupVisible && requestTypePopupSelection !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}
           >
             <Radio.Group
               onChange={showPopup}
@@ -134,12 +135,18 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
               className="response-body-type-radio-group"
             >
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
-              <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>
-                <Row align="middle">
-                  Programmatic (JavaScript)
-                  {isPremiumFeature ? <PremiumIcon featureType="dynamic_request_body" /> : null}
-                </Row>
-              </Radio>
+              <PremiumFeature
+                feature={FeatureLimitType.dynamic_request_body}
+                popoverPlacement="top"
+                onContinue={() => onChangeRequestType(GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE)}
+              >
+                <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>
+                  <Row align="middle">
+                    Programmatic (JavaScript)
+                    {isPremiumFeature ? <PremiumIcon featureType="dynamic_request_body" /> : null}
+                  </Row>
+                </Radio>
+              </PremiumFeature>
             </Radio.Group>
           </Popconfirm>
         </Col>

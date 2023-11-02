@@ -242,7 +242,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
               <PremiumFeature
                 feature={FeatureLimitType.dynamic_response_body}
                 popoverPlacement="top"
-                onContinue={() => onChangeResponseType(responseTypePopupSelection)}
+                onContinue={() => onChangeResponseType(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE)}
               >
                 <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
                   <Row align="middle">

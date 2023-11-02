@@ -12,6 +12,7 @@ interface PremiumFeatureProps {
   onContinue?: () => void;
   feature: FeatureLimitType;
   children?: React.ReactNode;
+  className?: string;
   popoverPlacement: PopconfirmProps["placement"];
   disabled?: boolean;
 }
@@ -19,6 +20,7 @@ interface PremiumFeatureProps {
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   onContinue,
   children,
+  className = "",
   feature,
   popoverPlacement,
   disabled = false,
