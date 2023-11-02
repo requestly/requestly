@@ -104,7 +104,7 @@ export const UpgradeWorkspaceMenu: React.FC<{
     <>
       <ProductWalkthrough
         tourFor={MISC_TOURS.PRICING.UPGRADE_WORKSPACE_MENU}
-        startWalkthrough={!isMiscTourCompleted?.upgradeWorkspaceMenu}
+        startWalkthrough={!isOpenedFromModal && !isMiscTourCompleted?.upgradeWorkspaceMenu}
         onTourComplete={() =>
           dispatch(
             actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "upgradeWorkspaceMenu" })
