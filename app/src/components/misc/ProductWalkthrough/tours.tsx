@@ -357,4 +357,23 @@ export const productTours: Record<string, CustomSteps[]> = {
       customNextButtonText: "Got it!",
     },
   ],
+  [MISC_TOURS.PRICING.UPGRADE_WORKSPACE_MENU]: [
+    {
+      ...tourTooltipPresets,
+      title: "Select workspace to upgrade",
+      target: getTourTarget("upgrade-workspace-menu"),
+      content: (
+        <>
+          💡 Choose the workspace you want to upgrade. For instance, you can choose a private workspace for a personal
+          upgrade.
+        </>
+      ),
+      placement: "bottom",
+      spotlightPadding: 0,
+      offset: 20,
+      pointerPlacement: PointerPlacement.TOP_50,
+      customNextButtonText: "Got it!",
+      disableOverlay: true,
+    },
+  ],
 };

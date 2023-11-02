@@ -1,4 +1,6 @@
-export const PricingPlans = {
+import { PricingPlansType } from "../types";
+
+export const PricingPlans: PricingPlansType = {
   free: {
     plans: {
       monthly: {

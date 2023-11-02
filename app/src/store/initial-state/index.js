@@ -135,6 +135,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    pricingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {
@@ -191,10 +195,8 @@ const INITIAL_STATE = {
       isRuleEditorTourCompleted: false,
       extensionInstallSource: null,
       isMiscTourCompleted: {
-        firstRule: false,
-        fifthRule: false,
         firstDraftSession: false,
-        rulesListSharingOnboarding: false,
+        upgradeWorkspaceMenu: false,
       },
 
       hasConnectedApp: false,
