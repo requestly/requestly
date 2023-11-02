@@ -39,9 +39,9 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       : currentlyActiveWorkspace
   );
 
-  console.log("MODAL", { workspaceToUpgrade, workspace });
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
   const [stripeClientSecret, setStripeClientSecret] = useState(null);
+  const [stripeError, setStripeError] = useState(null);
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
@@ -68,15 +68,25 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         duration: duration,
       };
       if (workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id) {
-        createIndividualSubscriptionUsingStripeCheckout(subscriptionData).then((data: any) => {
-          setStripeClientSecret(data?.data?.payload.clientSecret);
-          setIsLoading(false);
-        });
+        createIndividualSubscriptionUsingStripeCheckout(subscriptionData)
+          .then((data: any) => {
+            setStripeClientSecret(data?.data?.payload.clientSecret);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            setStripeError(err);
+            setIsLoading(false);
+          });
       } else {
-        createTeamSubscriptionUsingStripeCheckout(subscriptionData).then((data: any) => {
-          setStripeClientSecret(data?.data?.payload.clientSecret);
-          setIsLoading(false);
-        });
+        createTeamSubscriptionUsingStripeCheckout(subscriptionData)
+          .then((data: any) => {
+            setStripeClientSecret(data?.data?.payload.clientSecret);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            setStripeError(err);
+            setIsLoading(false);
+          });
       }
     },
     [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount]
@@ -110,8 +120,10 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         {isCheckoutScreenVisible ? (
           <Checkout
             clientSecret={stripeClientSecret}
+            stripeError={stripeError}
             onCancel={() => setIsCheckoutScreenVisible(false)}
             isLoading={isLoading}
+            toggleModal={toggleModal}
           />
         ) : (
           <>
