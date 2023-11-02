@@ -37,7 +37,7 @@ const RuleItem: React.FC<RuleItemProps> = ({ type, name, icon, subtitle, selecte
       <Col span={20} className="ruleItem-name-container">
         <Row className="ruleItem-title line-clamp">
           {name}
-          {isPremiumRule ? <PremiumIcon /> : null}
+          {isPremiumRule ? <PremiumIcon featureType={featureName} source="rule_selection_screen" /> : null}
         </Row>
         <Row className="text-gray ruleItem-description line-clamp">{subtitle}</Row>
       </Col>

@@ -80,7 +80,9 @@ const ResponseRuleResourceTypes: React.FC = () => {
         <Radio.Group value={responseRuleResourceType} onChange={(e) => handleResourceTypeChange(e.target.value)}>
           <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
           <Radio value={ResponseRuleResourceType.GRAPHQL_API} className="graphql-radio-item">
-            <Row align="middle">GraphQL API {isPremiumFeature ? <PremiumIcon /> : null}</Row>
+            <Row align="middle">
+              GraphQL API {isPremiumFeature ? <PremiumIcon featureType="graphql_resource_type" /> : null}
+            </Row>
           </Radio>
           {isDesktop ? (
             <Radio value={ResponseRuleResourceType.STATIC}>HTML / JS / CSS</Radio>
