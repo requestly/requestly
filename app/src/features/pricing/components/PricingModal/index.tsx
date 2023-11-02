@@ -13,20 +13,23 @@ import { Checkout } from "./Checkout";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
 import { isNull } from "lodash";
+import { TeamWorkspace } from "types";
 import "./index.scss";
 
 interface PricingModalProps {
   isOpen: boolean;
   toggleModal: () => void;
   selectedPlan?: string;
-  workspace?: any;
+  workspace?: TeamWorkspace;
   title?: string;
+  planDuration?: string;
 }
 
 export const PricingModal: React.FC<PricingModalProps> = ({
   isOpen,
   toggleModal,
   workspace,
+  planDuration,
   selectedPlan = null,
   title = "Upgrade your plan to get the most out of Requestly",
 }) => {
@@ -39,7 +42,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       : currentlyActiveWorkspace
   );
 
-  const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
+  const [duration, setDuration] = useState(planDuration || PRICING.DURATION.ANNUALLY);
   const [stripeClientSecret, setStripeClientSecret] = useState(null);
   const [stripeError, setStripeError] = useState(null);
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);
