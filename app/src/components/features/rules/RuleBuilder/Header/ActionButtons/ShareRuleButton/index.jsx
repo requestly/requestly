@@ -64,7 +64,7 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
               "rule_editor_modal_header"
             );
           }}
-          feature={FeatureLimitType.share_rules}
+          feature={[FeatureLimitType.share_rules]}
         >
           <Button type="text">
             <Row align="middle" wrap={false}>

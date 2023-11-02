@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { getUserAuthDetails } from "store/selectors";
@@ -10,7 +10,7 @@ import "./index.scss";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
-  feature: FeatureLimitType;
+  feature: FeatureLimitType[];
   children?: React.ReactNode;
   className?: string;
   popoverPlacement: PopconfirmProps["placement"];
@@ -27,8 +27,19 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const { getFeatureLimitValue } = useFeatureLimiter();
+  const { getFeatureLimitValue, checkIfFeatureLimitBreached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
+
+  ////
+
+  const showPremiumPopovers = useMemo(
+    () => feature.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitBreached(feat))),
+    [feature, getFeatureLimitValue, checkIfFeatureLimitBreached]
+  );
+
+  const isBreachingLimit = feature.some((feat) => checkIfFeatureLimitBreached(feat));
+
+  ////
 
   useEffect(() => {
     return () => {
@@ -50,7 +61,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         </>
       ) : (
         <Popconfirm
-          disabled={!!getFeatureLimitValue(feature) || !feature || disabled}
+          disabled={!showPremiumPopovers || !feature || disabled}
           overlayClassName="premium-feature-popover"
           autoAdjustOverflow
           showArrow={false}
@@ -65,26 +76,19 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           }}
           title={
             <>
-              <Typography.Title level={4}>Premium feature</Typography.Title>
+              <Typography.Title level={4}>{isBreachingLimit ? "Limits reached" : "Premium feature"}</Typography.Title>
               <Typography.Text>
-                This feature is a part of our paid offering. Consider upgrading for uninterrupted usage.
+                {isBreachingLimit
+                  ? "You've exceeded the usage limits of the free plan. Consider upgrading for uninterrupted usage. CTAs to be same"
+                  : " This feature is a part of our paid offering. Consider upgrading for uninterrupted usage."}
               </Typography.Text>
             </>
           }
         >
-          {/* <Col
-            onClick={() => {
-              if (getFeatureLimitValue(feature) || !feature) {
-                onContinue();
-              }
-            }}
-          >
-            {children}
-          </Col>*/}
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (getFeatureLimitValue(feature) || !feature) {
+                if (!showPremiumPopovers || !feature) {
                   onContinue();
                 }
               },

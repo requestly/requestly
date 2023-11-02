@@ -81,7 +81,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
         <Radio.Group value={responseRuleResourceType} onChange={(e) => handleResourceTypeChange(e.target.value)}>
           <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
           <PremiumFeature
-            feature={FeatureLimitType.graphql_resource_type}
+            feature={[FeatureLimitType.graphql_resource_type]}
             popoverPlacement="top"
             onContinue={() => {
               handleResourceTypeChange(ResponseRuleResourceType.GRAPHQL_API);

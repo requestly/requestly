@@ -469,9 +469,9 @@ const RulesTable = ({
       });
   };
 
-  const toggleRuleStatus = (event, rule) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const toggleRuleStatus = (rule) => {
+    // event.preventDefault();
+    // event.stopPropagation();
 
     if (checkIfRuleIsActive(rule)) {
       changeRuleStatus(GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE, rule);
@@ -683,14 +683,20 @@ const RulesTable = ({
 
         if (isEditingEnabled) {
           return (
-            <Switch
-              size="small"
-              // When Rule's group is OFF, this switch must be disabled
-              disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
-              checked={checkIfRuleIsActive(record)}
-              onClick={(_, event) => toggleRuleStatus(event, record)}
-              data-tour-id={index === 0 ? "rule-table-switch-status" : null}
-            />
+            <PremiumFeature
+              disabled={checkIfRuleIsActive(record)}
+              feature={[FeatureLimitType.num_active_rules]}
+              popoverPlacement="left"
+              onContinue={() => toggleRuleStatus(record)}
+            >
+              <Switch
+                size="small"
+                // When Rule's group is OFF, this switch must be disabled
+                disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
+                checked={checkIfRuleIsActive(record)}
+                data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+              />
+            </PremiumFeature>
           );
         }
         return <Text>{checkIfRuleIsActive(record) ? "On" : "Off"}</Text>;
@@ -1084,7 +1090,7 @@ const RulesTable = ({
             <PremiumFeature
               popoverPlacement="topLeft"
               onContinue={(e) => handleNewRuleOnClick(e, TYPE)}
-              feature={`${TYPE.toLowerCase()}_rule`}
+              feature={[`${TYPE.toLowerCase()}_rule`, FeatureLimitType.num_rules]}
             >
               <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
                 {NAME}

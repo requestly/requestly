@@ -42,20 +42,20 @@ const AuthPopoverButton: React.FC<Props> = ({
   const { getFeatureLimitValue } = useFeatureLimiter();
 
   return (
-    <PremiumFeature
-      disabled={!isLoggedIn}
-      feature={feature}
-      onContinue={() => {
-        trackClickEvent();
-        onClickHandler();
-      }}
-      popoverPlacement="bottomLeft"
+    <AuthConfirmationPopover
+      title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
+      disabled={!hasPopconfirm || isChinaUser}
+      callback={onClickHandler}
+      source={authSource}
     >
-      <AuthConfirmationPopover
-        title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
-        disabled={!hasPopconfirm || isChinaUser}
-        callback={onClickHandler}
-        source={authSource}
+      <PremiumFeature
+        disabled={!isLoggedIn}
+        feature={[feature]}
+        onContinue={() => {
+          trackClickEvent();
+          onClickHandler();
+        }}
+        popoverPlacement="bottomLeft"
       >
         <RQButton icon={icon}>
           {!isTooltipShown ? (
@@ -71,8 +71,8 @@ const AuthPopoverButton: React.FC<Props> = ({
             </span>
           )}
         </RQButton>
-      </AuthConfirmationPopover>
-    </PremiumFeature>
+      </PremiumFeature>
+    </AuthConfirmationPopover>
   );
 };
 

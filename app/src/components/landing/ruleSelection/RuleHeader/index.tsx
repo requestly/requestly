@@ -50,24 +50,17 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
             e.stopPropagation();
           }}
         >
-          {isPremiumRule ? (
-            <PremiumFeature
-              onContinue={() => {
-                trackRuleCreationWorkflowStartedEvent(selectedRuleType, "screen");
-                redirectToCreateNewRule(navigate, selectedRuleType, "rule_selection");
-              }}
-              feature={featureName}
-              popoverPlacement="bottomLeft"
-            >
-              <Button size="large" type="primary">
-                Create Rule
-              </Button>
-            </PremiumFeature>
-          ) : (
-            <Button size="large" type="primary" onClick={handleCreateRuleClick}>
+          <PremiumFeature
+            onContinue={() => {
+              handleCreateRuleClick();
+            }}
+            feature={[featureName, FeatureLimitType.num_rules]}
+            popoverPlacement="bottomLeft"
+          >
+            <Button size="large" type="primary">
               Create Rule
             </Button>
-          )}
+          </PremiumFeature>
         </Row>
       </Col>
     </Row>
