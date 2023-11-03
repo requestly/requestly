@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { toast } from "utils/Toast";
-import { Typography, Row, Col } from "antd";
+import { Typography, Row, Col, Button } from "antd";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { HiArrowLeft } from "@react-icons/all-files/hi/HiArrowLeft";
 
@@ -43,6 +43,8 @@ import "./AuthForm.css";
 import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
+import { loginWithSSO } from "actions/FirebaseActions";
+import { getSSOProviderId } from "backend/auth/sso";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS, METHODS: AUTH_METHODS } = APP_CONSTANTS.AUTH;
 
@@ -58,6 +60,7 @@ const AuthForm = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const [SSOErrorMessage, setSSOErrorMessage] = useState("");
   //LOAD PROPS
   const callbackFromProps = callbacks || {};
   const { onSignInSuccess, onRequestPasswordResetSuccess } = callbackFromProps;
@@ -228,6 +231,18 @@ const AuthForm = ({
     }
   };
 
+  const handleLoginWithSSO = async () => {
+    console.log({ email });
+    const providerId = await getSSOProviderId(email);
+    setSSOErrorMessage("");
+
+    if (providerId) {
+      loginWithSSO(providerId);
+    } else {
+      setSSOErrorMessage("No SAML SSO enabled workspace could be found");
+    }
+  };
+
   const FormSubmitButton = () => {
     if (actionPending) {
       return (
@@ -299,6 +314,12 @@ const AuthForm = ({
             }
           >
             Create new password
+          </RQButton>
+        );
+      case AUTH_ACTION_LABELS.SSO:
+        return (
+          <RQButton type="primary" className="form-elements-margin w-full" onClick={(event) => handleLoginWithSSO()}>
+            Continue with SAML
           </RQButton>
         );
     }
@@ -410,6 +431,7 @@ const AuthForm = ({
               {MODE === AUTH_ACTION_LABELS.SIGN_UP ? "Enter your work email" : "Email"}
             </label>
             <RQInput
+              status={SSOErrorMessage ? "error" : ""}
               id="email"
               className="auth-modal-input "
               required={true}
@@ -429,6 +451,14 @@ const AuthForm = ({
 
   const onSignInClick = useCallback(() => {
     SET_MODE(AUTH_ACTION_LABELS.LOG_IN);
+    SET_POPOVER(true);
+    setEmail("");
+    setPassword("");
+    dispatch(actions.updateTimeToResendEmailLogin(0));
+  }, [SET_MODE, SET_POPOVER, dispatch]);
+
+  const onSSOClick = useCallback(() => {
+    SET_MODE(AUTH_ACTION_LABELS.SSO);
     SET_POPOVER(true);
     setEmail("");
     setPassword("");
@@ -464,6 +494,11 @@ const AuthForm = ({
                 </RQButton>
               </Row>
               <Row className="auth-wrapper mt-1">
+                <Button type="default" className="w-full" onClick={() => onSSOClick()}>
+                  Sign Up With SAML SSO
+                </Button>
+                <div className="auth-modal-divider w-full">or</div>
+                <br />
                 <SocialAuthButtons />
                 <div className="auth-modal-divider w-full">or</div>
                 <div className="auth-modal-message w-full">Sign Up with email</div>
@@ -503,6 +538,23 @@ const AuthForm = ({
             <div className="auth-modal-message w-full">Sign In with email</div>
             {renderEmailField()}
             {showPasswordSignInOptionInstead && renderPasswordField()}
+            <FormSubmitButton />
+          </Row>
+        </Col>
+      ) : MODE === AUTH_ACTION_LABELS.SSO ? (
+        <Col span={24} className="login-modal-wrapper">
+          <Typography.Text type="primary" className="text-bold w-full header">
+            SAML SSO
+          </Typography.Text>
+          <Row align={"middle"} className="mt-1">
+            <Typography.Text className="secondary-text">or</Typography.Text>
+            <RQButton className="btn-default text-bold caption modal-signin-btn" onClick={onCreateAccountClick}>
+              Create a new account
+            </RQButton>
+          </Row>
+          <Row className="auth-wrapper mt-1">
+            {renderEmailField()}
+            <span style={{ color: "red" }}>{SSOErrorMessage}</span>
             <FormSubmitButton />
           </Row>
         </Col>

@@ -18,6 +18,7 @@ import {
   signOut as signOutFirebaseFunction,
   sendEmailVerification,
   sendSignInLinkToEmail,
+  SAMLAuthProvider,
 } from "firebase/auth";
 import { getDatabase, ref, update, onValue, remove, get, set, child } from "firebase/database";
 import md5 from "md5";
@@ -676,3 +677,28 @@ export async function updateUserInFirebaseAuthUser(data) {
       });
   });
 }
+
+export const loginWithSSO = async (providerId) => {
+  const provider = new SAMLAuthProvider(providerId);
+
+  const auth = getAuth(firebaseApp);
+
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      console.log({ result });
+      result.user
+        .getIdToken()
+        .then((tokenValue) => {
+          console.log({ tokenValue });
+        })
+        .catch((err) => console.log(err));
+      // User is signed in.
+      // Provider data available in result.additionalUserInfo.profile,
+      // or from the user's ID token obtained from result.user.getIdToken()
+      // as an object in the firebase.sign_in_attributes custom claim.
+    })
+    .catch((error) => {
+      console.log(error);
+      // Handle error.
+    });
+};
