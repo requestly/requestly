@@ -20,7 +20,7 @@ const PremiumPlanBadge = () => {
     const planEndDate = new Date(planEndDateString);
     const currentDate = new Date();
     // @ts-ignore
-    const diffTime: any = Math.abs(planEndDate - currentDate);
+    let diffTime: any = planEndDate - currentDate;
     daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   } catch (err) {
     Logger.log(err);
@@ -30,7 +30,11 @@ const PremiumPlanBadge = () => {
     return (
       <div className="premium-plan-badge-container">
         <div className="premium-plan-name">{planName.toUpperCase()}</div>
-        <div className="premium-plan-days-left">{daysLeft} days left in trial</div>
+        {daysLeft >= 0 ? (
+          <div className="premium-plan-days-left">{daysLeft} days left in trial</div>
+        ) : (
+          <div className="premium-plan-days-left">Trial Expired</div>
+        )}
       </div>
     );
   }
