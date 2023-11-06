@@ -132,7 +132,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           return null;
         }
         const dateToDisplay = rule.modificationDate ? rule.modificationDate : rule.creationDate;
-        const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
+        const beautifiedDate = moment(dateToDisplay).format("MMM DD");
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
             <span>
