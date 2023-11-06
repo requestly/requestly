@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import Modal from "antd/lib/modal/Modal";
 import { Col, Row, Space, Typography } from "antd";
@@ -11,6 +11,7 @@ import { OrganizationsDetails } from "../../types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { actions } from "store";
+import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "../../analytics";
 import "./index.scss";
 
 interface RequestFeatureModalProps {
@@ -40,6 +41,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   );
 
   const handleSendRequest = useCallback(() => {
+    trackUpgradeOptionClicked("send_request_to_admin");
     setIsLoading(true);
     const enterpriseAdmin = organizationsData?.workspaces?.[0];
     const domain = enterpriseAdmin.adminEmail.split("@")[1];
@@ -72,6 +74,10 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         });
       });
   }, [organizationsData?.workspaces, requestEnterprisePlanFromAdmin]);
+
+  useEffect(() => {
+    trackUpgradePopoverViewed("send_request");
+  }, []);
 
   return (
     <>
@@ -113,11 +119,12 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                   className="request-modal-default-btn"
                   disabled={isLoading}
                   onClick={() => {
+                    trackUpgradeOptionClicked("use_for_free_now");
                     setOpenPopup(false);
                     onContinue();
                   }}
                 >
-                  Use now for free
+                  Use for free now
                 </RQButton>
               </Col>
               <Col>
@@ -126,15 +133,16 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     type="default"
                     className="request-modal-default-btn"
                     disabled={isLoading}
-                    onClick={() =>
+                    onClick={() => {
+                      trackUpgradeOptionClicked("upgrade_yourself");
                       dispatch(
                         actions.toggleActiveModal({
                           modalName: "pricingModal",
                           newValue: true,
                           newProps: { selectedPlan: null },
                         })
-                      )
-                    }
+                      );
+                    }}
                   >
                     Upgrade yourself
                   </RQButton>

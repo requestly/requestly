@@ -6,6 +6,7 @@ import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Col, Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
+import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import "./index.scss";
 
 interface PremiumFeatureProps {
@@ -69,9 +70,11 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           okText="See upgrade plans"
           cancelText="Use for free now"
           onConfirm={() => {
+            trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
           }}
           onCancel={() => {
+            trackUpgradeOptionClicked("use_for_free_now");
             onContinue();
           }}
           title={
@@ -84,6 +87,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
               </Typography.Text>
             </>
           }
+          onOpenChange={(open) => {
+            if (open) trackUpgradePopoverViewed("default");
+          }}
         >
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
