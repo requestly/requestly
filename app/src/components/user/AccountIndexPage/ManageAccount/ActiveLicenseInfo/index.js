@@ -7,7 +7,7 @@ import GetASubscription from "./GetASubscription";
 import SubscriptionInfo from "./SubscriptionInfo";
 import { useSelector } from "react-redux";
 import { getAttrFromFirebase } from "utils/AnalyticsUtils";
-import { Button, Row, Space } from "antd";
+import { Row, Space } from "antd";
 import ManageSubscription from "./ManageSubscription/ManageSubscription";
 
 const ActiveLicenseInfo = ({
@@ -97,7 +97,7 @@ const ActiveLicenseInfo = ({
         <Row>
           <Space>
             <h3 style={{ marginBottom: "0" }}>{customHeading}</h3>
-            <ManageSubscription />
+            {doesSubscriptionExist ? <ManageSubscription /> : null}
           </Space>
         </Row>
       }
