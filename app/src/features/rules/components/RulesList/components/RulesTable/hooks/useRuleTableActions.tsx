@@ -1,4 +1,4 @@
-import React from "react";
+import { useCallback } from "react";
 import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { useSelector } from "react-redux";
@@ -154,6 +154,51 @@ const useRuleTableActions = () => {
   const closeRenameGroupModal = () => {
     setIsRenameGroupModalActive(false);
     setIdOfGroupToRename(null);
+  const handleDuplicateRuleClick = useCallback(
+    (rule: RuleObj) => {
+      dispatch(
+        rulesActions.toggleRuleModal({
+          isActive: true,
+          modalName: "duplicateRuleModal",
+          props: {
+            ruleToDuplicate: rule,
+          },
+        })
+      );
+    },
+    [dispatch]
+  );
+
+  const closeDuplicateRuleModal = useCallback(() => {
+    dispatch(
+      rulesActions.toggleRuleModal({
+        isActive: false,
+        modalName: "duplicateRuleModal",
+        props: {
+          ruleToDuplicate: null,
+        },
+      })
+    );
+  }, [dispatch]);
+
+  const handleDeleteRecordClick = (record: RuleObj) => {};
+
+  const handleRenameGroupClick = (group: RuleObj) => {
+    console.log({ group });
+
+    dispatch(
+      rulesActions.toggleRuleModal({
+        modalName: "renameGroupModal",
+        isActive: true,
+        props: {
+          groupId: group.id,
+        },
+      })
+    );
+  };
+
+  const closeRenameGroupModal = () => {
+    dispatch(rulesActions.toggleRuleModal({ modalName: "renameGroupModal" }));
   };
 
   const handleChangeRuleGroupClick = (record: RuleObj) => {};

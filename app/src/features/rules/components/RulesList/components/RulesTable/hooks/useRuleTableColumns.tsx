@@ -147,14 +147,14 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       key: "actions",
       width: 104,
       align: "right",
-      render: (record: RuleTableDataType) => {
-        const isRule = record.objectType === RuleObjType.RULE;
+      render: (rule: RuleTableDataType) => {
+        const isRule = rule.objectType === RuleObjType.RULE;
 
         const recordActions: MenuProps["items"] = [
           {
-            key: 0,
+            key: "0",
             onClick: () => {
-              isRule ? handleChangeRuleGroupClick(record) : handleRenameGroupClick(record);
+              isRule ? handleChangeRuleGroupClick(rule) : handleRenameGroupClick(rule);
             },
             label: (
               <Row>
@@ -171,24 +171,35 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             ),
           },
           {
-            key: 1,
+            key: "1",
             onClick: () => {
-              handleDuplicateRuleClick(record);
+              isRule ? handleDuplicateRuleClick(rule) : console.log("Ungroup selected rules");
             },
             label: (
+              // FIXME: add ungroup rules action
               <Row>
-                <RiFileCopy2Line />
-                Duplicate
+                {isRule ? (
+                  <>
+                    <RiFileCopy2Line />
+                    Duplicate
+                  </>
+                ) : (
+                  <>
+                    <RiFileCopy2Line />
+                    Ungroup rules
+                  </>
+                )}
               </Row>
             ),
           },
           {
             key: 2,
             danger: true,
-            onClick: () => handleDeleteRecordClick(record),
+            onClick: () => handleDeleteRecordClick(rule),
             label: (
               <Row>
-                <RiDeleteBinLine />
+                {/* change icons */}
+                <RiFileCopy2Line />
                 Delete
               </Row>
             ),

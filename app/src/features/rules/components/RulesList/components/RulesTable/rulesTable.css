@@ -1,5 +1,6 @@
 .rules-actions-container {
   column-gap: 4px;
+  justify-content: flex-end;
 }
 
 .rules-actions-container > button {
