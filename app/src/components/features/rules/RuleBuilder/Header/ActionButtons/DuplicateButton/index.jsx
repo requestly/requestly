@@ -7,6 +7,8 @@ import { actions } from "store";
 import { getModeData } from "../../../actions";
 import { toast } from "utils/Toast";
 import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 
 const DuplicateButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) => {
   const { MODE } = getModeData(window.location);
@@ -42,9 +44,16 @@ const DuplicateButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) =
 
   return (
     <>
-      <Button type="text" disabled={isDisabled} onClick={handleDuplicateRuleClick}>
-        Duplicate
-      </Button>
+      <PremiumFeature
+        disabled={isDisabled}
+        popoverPlacement="bottom"
+        onContinue={handleDuplicateRuleClick}
+        feature={[FeatureLimitType.num_rules]}
+      >
+        <Button type="text" disabled={isDisabled}>
+          Duplicate
+        </Button>
+      </PremiumFeature>
       {isDuplicateRuleModalActive ? (
         <DuplicateRuleModal
           isOpen={isDuplicateRuleModalActive}

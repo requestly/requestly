@@ -13,6 +13,8 @@ import { toast } from "utils/Toast.js";
 import { StorageService } from "init";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import "./RuleEditorStatus.css";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 
 const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   //Global State
@@ -87,13 +89,11 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   return (
     <div className="display-row-center ml-2 rule-editor-header-switch" data-tour-id="rule-editor-status-toggle">
       <span className="rule-editor-header-switch-text text-gray">{isChecked ? "Enabled" : "Disabled"}</span>
-      <Switch
-        size="small"
-        className="ml-3"
-        checked={isChecked}
-        onChange={toggleRuleStatus}
-        disabled={isDisabled}
-        onClick={() => {
+      <PremiumFeature
+        disabled={isDisabled || isChecked}
+        popoverPlacement="bottom"
+        onContinue={() => {
+          toggleRuleStatus();
           trackRuleEditorHeaderClicked(
             "toggle_status",
             currentlySelectedRuleData.ruleType,
@@ -101,7 +101,10 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
             isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
           );
         }}
-      />
+        feature={[FeatureLimitType.num_active_rules]}
+      >
+        <Switch size="small" className="ml-3" checked={isChecked} disabled={isDisabled} />
+      </PremiumFeature>
     </div>
   );
 };

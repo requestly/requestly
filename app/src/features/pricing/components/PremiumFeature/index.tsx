@@ -79,7 +79,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
               <Typography.Title level={4}>{isBreachingLimit ? "Limits reached" : "Premium feature"}</Typography.Title>
               <Typography.Text>
                 {isBreachingLimit
-                  ? "You've exceeded the usage limits of the free plan. Consider upgrading for uninterrupted usage. CTAs to be same"
+                  ? "You've exceeded the usage limits of the free plan. Consider upgrading for uninterrupted usage."
                   : " This feature is a part of our paid offering. Consider upgrading for uninterrupted usage."}
               </Typography.Text>
             </>
