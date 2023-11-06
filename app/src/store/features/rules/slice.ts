@@ -2,8 +2,27 @@ import { createSlice, createEntityAdapter, EntityState, PayloadAction } from "@r
 import { RuleObj } from "features/rules/types/rules";
 import { ReducerKeys } from "store/constants";
 
-interface RulesState {
+type ModalName =
+  | "authModal"
+  | "deleteRuleModal"
+  | "deleteGroupModal"
+  | "duplicateRuleModal"
+  | "importRulesModal"
+  | "shareRulesModal"
+  | "renameGroupModal"
+  | "ungroupRuleModal";
+
+type RuleModalPayload = {
+  isActive?: boolean;
+  modalName: ModalName;
+  props?: Record<string, unknown>;
+};
+
+type RuleModal = Partial<Record<ModalName, RuleModalPayload>>;
+
+export interface RulesState {
   ruleObjs: EntityState<any>;
+  ruleActiveModals: RuleModal;
 }
 
 export const rulesAdapter = createEntityAdapter<RuleObj>({
@@ -13,6 +32,7 @@ export const rulesAdapter = createEntityAdapter<RuleObj>({
 
 const initialState: RulesState = {
   ruleObjs: rulesAdapter.getInitialState(),
+  ruleActiveModals: {},
 };
 
 const slice = createSlice({
@@ -33,6 +53,17 @@ const slice = createSlice({
     },
     ruleObjsClearAll: (state: RulesState, action: PayloadAction<any>) => {
       rulesAdapter.removeAll(state.ruleObjs);
+    },
+    toggleRuleModal: (state: RulesState, action: PayloadAction<RuleModalPayload>) => {
+      const modalName = action.payload.modalName;
+
+      if (!state.ruleActiveModals[modalName]) {
+        state.ruleActiveModals[modalName] = { isActive: false, modalName };
+      }
+
+      state.ruleActiveModals[modalName].isActive =
+        action.payload.isActive ?? !state.ruleActiveModals[modalName].isActive;
+      state.ruleActiveModals[modalName].props = action.payload.props ?? state.ruleActiveModals[modalName].props;
     },
   },
 });
