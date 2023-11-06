@@ -22,7 +22,7 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
     handleRuleShare,
     handleDuplicateRuleClick,
     handleDeleteRecordClick,
-    handleGroupRenameClick,
+    handleRenameGroupClick,
     handleChangeRuleGroupClick,
   } = useRuleTableActions();
 
@@ -78,8 +78,9 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
       },
     },
     {
-      title: "Status",
       key: "status",
+      title: "Status",
+      width: 120,
       render: (rule: RuleTableDataType) => {
         const checked = rule?.status === RuleObjStatus.ACTIVE ? true : false;
         return <Switch checked={checked} onChange={(checked: boolean) => handleStatusToggle([rule], checked)} />;
@@ -109,14 +110,19 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
     {
       title: "",
       key: "actions",
+      width: 104,
+      align: "right",
       render: (rule: RuleTableDataType) => {
         const isRule = rule.objectType === RuleObjType.RULE;
 
         const ruleActions: MenuProps["items"] = [
           {
             key: "0",
+            onClick: () => {
+              isRule ? handleChangeRuleGroupClick(rule) : handleRenameGroupClick(rule);
+            },
             label: (
-              <Row onClick={(e) => (isRule ? handleChangeRuleGroupClick(e, rule) : handleGroupRenameClick(e, rule))}>
+              <Row>
                 {isRule ? (
                   <>
                     <RiFolderSharedLine /> Change group
@@ -131,18 +137,32 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
           },
           {
             key: "1",
+            onClick: () => {
+              isRule ? handleDuplicateRuleClick(rule) : console.log("Ungroup selected rules");
+            },
             label: (
-              <Row onClick={(e) => handleDuplicateRuleClick(e, rule)}>
-                <RiFileCopy2Line />
-                Duplicate
+              // FIXME: add ungroup rules action
+              <Row>
+                {isRule ? (
+                  <>
+                    <RiFileCopy2Line />
+                    Duplicate
+                  </>
+                ) : (
+                  <>
+                    <RiFileCopy2Line />
+                    Ungroup rules
+                  </>
+                )}
               </Row>
             ),
           },
           {
             key: "2",
             danger: true,
+            onClick: () => handleDeleteRecordClick(rule),
             label: (
-              <Row onClick={(e) => handleDeleteRecordClick(e, rule)}>
+              <Row>
                 {/* change icons */}
                 <RiFileCopy2Line />
                 Delete
@@ -173,9 +193,8 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
   // FIXME: Extend the column type to also support custom fields eg hidden property to hide the column
   if (isWorkspaceMode && !options.hideCreatedBy) {
     columns.splice(3, 0, {
-      title: "Created by",
-      align: "center",
-      width: 100,
+      title: "Author",
+      width: 96,
       responsive: ["lg"],
       key: "createdBy",
       render: (rule: RuleTableDataType) => {

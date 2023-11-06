@@ -1,4 +1,4 @@
-import React from "react";
+import { useCallback } from "react";
 import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { useSelector } from "react-redux";
@@ -13,6 +13,8 @@ import { toast } from "utils/Toast";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
+import { isEmpty } from "lodash";
+import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
@@ -115,22 +117,110 @@ const useRuleTableActions = () => {
       });
   };
 
-  const handleDuplicateRuleClick = (event: React.MouseEvent, rule: RuleObj) => {};
+  const handleDuplicateRuleClick = useCallback(
+    (rule: RuleObj) => {
+      dispatch(
+        rulesActions.toggleRuleModal({
+          isActive: true,
+          modalName: "duplicateRuleModal",
+          props: {
+            ruleToDuplicate: rule,
+          },
+        })
+      );
+    },
+    [dispatch]
+  );
 
-  const handleDeleteRecordClick = (event: React.MouseEvent, record: RuleObj) => {};
+  const closeDuplicateRuleModal = useCallback(() => {
+    dispatch(
+      rulesActions.toggleRuleModal({
+        isActive: false,
+        modalName: "duplicateRuleModal",
+        props: {
+          ruleToDuplicate: null,
+        },
+      })
+    );
+  }, [dispatch]);
 
-  const handleGroupRenameClick = (event: React.MouseEvent, record: RuleObj) => {};
+  const handleDeleteRecordClick = (record: RuleObj) => {};
 
-  const handleChangeRuleGroupClick = (event: React.MouseEvent, record: RuleObj) => {};
+  const handleRenameGroupClick = (group: RuleObj) => {
+    console.log({ group });
+
+    dispatch(
+      rulesActions.toggleRuleModal({
+        modalName: "renameGroupModal",
+        isActive: true,
+        props: {
+          groupId: group.id,
+        },
+      })
+    );
+  };
+
+  const closeRenameGroupModal = () => {
+    dispatch(rulesActions.toggleRuleModal({ modalName: "renameGroupModal" }));
+  };
+
+  const handleChangeRuleGroupClick = (record: RuleObj) => {};
+
+  const ungroupSelectedRules = (selectedRuleIds: string[]) => {
+    // @ts-ignore
+    const allPromises = [];
+
+    return new Promise((resolve, reject) => {
+      if (isEmpty(selectedRuleIds)) {
+        reject(new Error("No Rules were Selected"));
+      } else {
+        Logger.log("Reading storage in RulesTable ungroupSelectedRules");
+        StorageService(appMode)
+          .getAllRecords()
+          .then((allRules) => {
+            selectedRuleIds.forEach(async (ruleId) => {
+              const updatedRule = {
+                ...allRules[ruleId],
+                groupId: RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
+              };
+              Logger.log("Writing to storage in RulesTable ungroupSelectedRules");
+              allPromises.push(StorageService(appMode).saveRuleOrGroup(updatedRule));
+            });
+
+            // @ts-ignore
+            Promise.all(allPromises).then(() => resolve());
+          });
+      }
+    });
+  };
+
+  const handleUngroupSelectedRulesClick = (selectedRuleIds: string[]) => {
+    return ungroupSelectedRules(selectedRuleIds)
+      .then(() => {
+        // clearSearch();
+        // unselectAllRecords(dispatch);
+        //Refresh List
+        // updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
+      })
+      .then(() => {
+        toast.info("Rules Ungrouped");
+        // trackRulesUngrouped();
+      })
+      .catch(() => toast.warn("Please select rules first", { hideProgressBar: true }));
+  };
 
   return {
     handlePin,
     handleStatusToggle,
     handleRuleShare,
     handleDuplicateRuleClick,
+    closeDuplicateRuleModal,
     handleDeleteRecordClick,
-    handleGroupRenameClick,
+    closeRenameGroupModal,
+    handleRenameGroupClick,
     handleChangeRuleGroupClick,
+    ungroupSelectedRules,
+    handleUngroupSelectedRulesClick,
   };
 };
 
