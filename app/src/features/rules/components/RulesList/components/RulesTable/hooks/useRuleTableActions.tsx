@@ -1,3 +1,4 @@
+import React from "react";
 import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { useSelector } from "react-redux";

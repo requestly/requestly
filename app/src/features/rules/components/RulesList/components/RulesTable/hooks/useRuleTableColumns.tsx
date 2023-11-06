@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Button, Dropdown, MenuProps, Row, Switch } from "antd";
+import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
@@ -13,8 +13,9 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
+import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 
-const useRuleTableColumns = (options?: Record<string, boolean>) => {
+const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const {
@@ -23,7 +24,15 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
     handleDuplicateRuleClick,
     handleDeleteRecordClick,
     handleRenameGroupClick,
+    handleChangeRuleGroupClick,
+    handlePinRecordClick,
   } = useRuleTableActions();
+
+  // const isStatusEnabled = !(options && options.disableStatus);
+  const isEditingEnabled = !(options && options.disableEditing);
+  // const areActionsEnabled = !(options && options.disableActions);
+  // const isFavouritingAllowed = !(options && options.disableFavourites);
+  // const isAlertOptionsAllowed = !(options && options.disableAlertActions);
 
   /**
    * - have a action which does the pinning of the record pick form old rules table
@@ -31,11 +40,38 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
    *
    * - make rule name clickable and navigate to editor.
    */
+
   const columns: ContentTableProps<RuleTableDataType>["columns"] = [
+    Table.SELECTION_COLUMN,
+    {
+      title: "",
+      key: "pin",
+      width: 70,
+      render: (record: RuleTableDataType) => {
+        const isPinned = record.isFavourite;
+
+        return (
+          <Tooltip title={isPinned ? "Unpin Record" : "Pin Record"}>
+            <Button
+              type="text"
+              className="pin-record-btn"
+              icon={<RiPushpin2Line className={`${record.isFavourite ? "record-pinned" : "record-unpinned"}`} />}
+              onClick={() => {
+                if (isEditingEnabled) {
+                  handlePinRecordClick(record);
+                }
+              }}
+            />
+          </Tooltip>
+        );
+      },
+    },
+    Table.EXPAND_COLUMN,
     {
       title: "Rules",
       key: "name",
-      width: 384,
+      width: 376,
+      ellipsis: true,
       render: (rule: RuleTableDataType) => rule.name,
       onCell: (rule: RuleTableDataType) => {
         if (rule.objectType === "group") {
@@ -88,7 +124,7 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
     {
       title: "Updated on",
       key: "modificationDate",
-      align: "left",
+      align: "center",
       width: 152,
       responsive: ["lg"],
       render: (rule: RuleTableDataType) => {
@@ -96,7 +132,7 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
           return null;
         }
         const dateToDisplay = rule.modificationDate ? rule.modificationDate : rule.creationDate;
-        const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
+        const beautifiedDate = moment(dateToDisplay).format("MMM DD");
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
             <span>
@@ -118,11 +154,19 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
           {
             key: 0,
             onClick: () => {
-              handleRenameGroupClick(record);
+              isRule ? handleChangeRuleGroupClick(record) : handleRenameGroupClick(record);
             },
             label: (
               <Row>
-                <RiEdit2Line /> Rename
+                {isRule ? (
+                  <>
+                    <RiEdit2Line /> Change Group
+                  </>
+                ) : (
+                  <>
+                    <RiEdit2Line /> Rename
+                  </>
+                )}
               </Row>
             ),
           },
@@ -149,7 +193,7 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
               </Row>
             ),
           },
-        ].filter((option) => (!isRule ? option.key !== 1 : option.key !== 0));
+        ].filter((option) => (!isRule ? option.key !== 1 : true));
 
         return (
           <Row align="middle" wrap={false} className="rules-actions-container">
