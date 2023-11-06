@@ -28,11 +28,9 @@ const PremiumPlanBadge = () => {
     return (
       <div className="premium-plan-badge-container">
         <div className="premium-plan-name">{planName.toUpperCase()}</div>
-        {daysLeft >= 0 ? (
-          <div className="premium-plan-days-left">{daysLeft} days left in trial</div>
-        ) : (
-          <div className="premium-plan-days-left">Trial Expired</div>
-        )}
+        <div className="premium-plan-days-left">
+          {daysLeft >= 0 ? `${daysLeft} days left in trial` : "Trial Expired"}
+        </div>
       </div>
     );
   }
