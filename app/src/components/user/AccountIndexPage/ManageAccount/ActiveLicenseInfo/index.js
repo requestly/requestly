@@ -7,6 +7,8 @@ import GetASubscription from "./GetASubscription";
 import SubscriptionInfo from "./SubscriptionInfo";
 import { useSelector } from "react-redux";
 import { getAttrFromFirebase } from "utils/AnalyticsUtils";
+import { Button, Row, Space } from "antd";
+import ManageSubscription from "./ManageSubscription/ManageSubscription";
 
 const ActiveLicenseInfo = ({
   hideShadow,
@@ -90,7 +92,17 @@ const ActiveLicenseInfo = ({
   };
 
   return (
-    <ProCard title={<h3 style={{ marginBottom: "0" }}>{customHeading}</h3>} className="primary-card github-like-border">
+    <ProCard
+      title={
+        <Row>
+          <Space>
+            <h3 style={{ marginBottom: "0" }}>{customHeading}</h3>
+            <ManageSubscription />
+          </Space>
+        </Row>
+      }
+      className="primary-card github-like-border"
+    >
       {renderSessionReplayProSubscription()}
       {doesSubscriptionExist ? renderSubscriptionInfo() : renderGetASubscription()}
     </ProCard>
