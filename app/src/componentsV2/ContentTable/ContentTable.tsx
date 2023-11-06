@@ -3,7 +3,6 @@ import type { ColumnsType } from "antd/es/table";
 import { Table } from "antd";
 import { BulkActionBarConfig } from "./types";
 import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
-
 import "./contentTable.scss";
 
 export interface ContentTableProps<DataType> {
@@ -35,11 +34,9 @@ const ContentTable = <DataType extends object>({
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRowsData} />}
       <Table
         className="rq-content-table"
-        onHeaderRow={() => {
-          return {
-            className: "rq-content-table-header",
-          };
-        }}
+        onHeaderRow={() => ({
+          className: "rq-content-table-header",
+        })}
         rowClassName="rq-content-table-row"
         loading={loading}
         rowKey={rowKey}
