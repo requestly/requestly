@@ -61,6 +61,7 @@
   --success: var(--green-green-500);
   --text-default: var(--neutrals-white);
   --text-light: #b0b0b5b3;
+  --surface-0_5: #212121;
   --surface-1: #282828;
   --surface-2: #383838;
   --surface-3: var(--neutrals-gray-600);
