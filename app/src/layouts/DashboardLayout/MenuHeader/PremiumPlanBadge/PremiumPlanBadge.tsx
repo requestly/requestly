@@ -14,8 +14,6 @@ const PremiumPlanBadge = () => {
   const planEndDateString = userPlanDetails?.subscription?.endDate;
   let daysLeft = 0;
 
-  console.log(userPlanDetails);
-
   try {
     const planEndDate = new Date(planEndDateString);
     const currentDate = new Date();
