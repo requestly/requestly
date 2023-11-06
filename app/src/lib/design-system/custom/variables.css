@@ -61,10 +61,10 @@
   --success: var(--green-green-500);
   --text-default: var(--neutrals-white);
   --text-light: #b0b0b5b3;
-  --surface-3: #3b3b3b;
-  --surface-2: #2d2d2d;
-  --surface-1: #262626;
-  --background: #212121;
+  --surface-1: #282828;
+  --surface-2: #383838;
+  --surface-3: var(--neutrals-gray-600);
+  --background: #1b1b1b;
   --brand-color: var(--blue-blue-500);
   --black: var(--neutrals-black);
   --white: var(--neutrals-white);

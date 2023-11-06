@@ -1,3 +1,4 @@
+import React from "react";
 import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { useSelector } from "react-redux";
@@ -6,7 +7,7 @@ import { rulesActions } from "store/features/rules/slice";
 import { useDispatch } from "react-redux";
 import Logger from "lib/logger";
 import { StorageService } from "init";
-
+// @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { toast } from "utils/Toast";
 import { actions } from "store";
@@ -14,9 +15,9 @@ import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 
 const useRuleTableActions = () => {
-  const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
   const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
 
   const handlePin = (rules: RuleTableDataType[]) => {
     console.log("Pinning Rules", { rules });
@@ -98,7 +99,7 @@ const useRuleTableActions = () => {
     // TODO
     // trackShareButtonClicked("rules_list");
     user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
-  }
+  };
 
   // Generic
   const updateRuleInStorage = async (updatedRule: RuleObj, originalRule: RuleObj) => {
@@ -114,7 +115,23 @@ const useRuleTableActions = () => {
       });
   };
 
-  return { handlePin, handleStatusToggle, handleRuleShare };
+  const handleDuplicateRuleClick = (event: React.MouseEvent, rule: RuleObj) => {};
+
+  const handleDeleteRecordClick = (event: React.MouseEvent, record: RuleObj) => {};
+
+  const handleGroupRenameClick = (event: React.MouseEvent, record: RuleObj) => {};
+
+  const handleChangeRuleGroupClick = (event: React.MouseEvent, record: RuleObj) => {};
+
+  return {
+    handlePin,
+    handleStatusToggle,
+    handleRuleShare,
+    handleDuplicateRuleClick,
+    handleDeleteRecordClick,
+    handleGroupRenameClick,
+    handleChangeRuleGroupClick,
+  };
 };
 
 export default useRuleTableActions;

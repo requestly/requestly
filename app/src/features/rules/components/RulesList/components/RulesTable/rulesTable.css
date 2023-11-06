@@ -1,0 +1,66 @@
+.rules-actions-container {
+  column-gap: 4px;
+}
+
+.rules-actions-container > button {
+  flex-shrink: 0;
+  padding: 8px 11px;
+}
+
+.rules-actions-container > button.ant-btn-icon-only {
+  width: auto;
+  height: 32px;
+}
+
+.rules-actions-container > button.ant-btn-icon-only svg {
+  width: 16px;
+  height: 16px;
+  color: var(--text-light);
+  transition: inherit;
+}
+
+.rules-actions-container > button.ant-btn-icon-only:hover svg,
+.rules-actions-container .more-rule-actions-btn.ant-btn-icon-only svg {
+  color: var(--text-default);
+}
+
+.rule-more-actions-dropdown .ant-dropdown-menu {
+  padding: 4px;
+  border-radius: 4px;
+  background: var(--surface-1);
+  border: 1px solid var(--surface-2);
+  box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.24);
+
+  border-radius: 4px;
+  border: 1px solid var(--surface-2);
+  background: var(--surface-1);
+  box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.24);
+}
+
+.rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+  width: 160px;
+  height: 36px;
+  margin: 0;
+  padding: 8px 12px;
+  color: var(--text-default);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  display: flex;
+  align-items: center;
+}
+
+.rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:hover {
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+.rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
+  color: var(--danger);
+}
