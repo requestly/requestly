@@ -4,6 +4,12 @@
   margin: 0 8px;
   padding: 10px 8px;
 }
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item {
+  background: none;
+}
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item:hover {
+  background: var(--surface-3);
+}
 
 .ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item .rule-type-icon {
   padding: 1px;

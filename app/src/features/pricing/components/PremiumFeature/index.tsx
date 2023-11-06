@@ -88,7 +88,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (!showPremiumPopovers || !feature) {
+                if (!showPremiumPopovers || !feature || disabled) {
                   onContinue();
                 }
               },
