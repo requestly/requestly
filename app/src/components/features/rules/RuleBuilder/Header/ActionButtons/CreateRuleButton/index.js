@@ -30,6 +30,8 @@ import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -213,18 +215,19 @@ const CreateRuleButton = ({
 
   return (
     <>
-      <Tooltip title={tooltipText} placement="top">
-        <Button
-          data-tour-id="rule-editor-create-btn"
-          type="primary"
-          className="text-bold"
-          disabled={isDisabled}
-          onClick={handleBtnOnClick}
-        >
-          {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-          {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText}
-        </Button>
-      </Tooltip>
+      <PremiumFeature
+        popoverPlacement="bottomLeft"
+        feature={[FeatureLimitType.num_rules]}
+        onContinue={handleBtnOnClick}
+        disabled={isDisabled}
+      >
+        <Tooltip title={tooltipText} placement="top">
+          <Button data-tour-id="rule-editor-create-btn" type="primary" className="text-bold" disabled={isDisabled}>
+            {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
+            {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText}
+          </Button>
+        </Tooltip>
+      </PremiumFeature>
     </>
   );
 };
