@@ -61,9 +61,10 @@ const RulesList: React.FC<Props> = () => {
   // Fetch Rules here from Redux
   const allRecords = useSelector(getAllRuleObjs);
   const pinnedRecords = useMemo(() => allRecords?.filter((record) => record.isFavourite), [allRecords]);
-  const activeRecords = useMemo(() => allRecords?.filter((record) => record.status === RuleObjStatus.ACTIVE), [
-    allRecords,
-  ]);
+  const activeRecords = useMemo(
+    () => allRecords?.filter((record) => record.status === RuleObjStatus.ACTIVE),
+    [allRecords]
+  );
 
   const getFilteredRecords = useCallback(
     (filterType: FilterType) => {
