@@ -65,7 +65,6 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
    *
    *
    * MODALS
-   * - Delete
    * - change group
    */
 
