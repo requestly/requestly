@@ -87,6 +87,14 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
+      if (planName === PRICING.PLAN_NAMES.ENTERPRISE) {
+        return (
+          <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+            Contact us
+          </RQButton>
+        );
+      }
+
       if (isUserPremium) {
         if (userPlanType === "team") {
           if (isPrivateWorksapceSelected || !isSelectedWorkspacePremium) {
@@ -121,7 +129,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                           actions.toggleActiveModal({
                             modalName: "pricingModal",
                             newValue: true,
-                            newProps: { selectedPlan: planName, workspace: workspaceToUpgrade },
+                            newProps: { selectedPlan: planName, workspace: workspaceToUpgrade, planDuration: duration },
                           })
                         )
                   }
@@ -170,7 +178,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   actions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,
-                    newProps: { selectedPlan: planName, workspace: workspaceToUpgrade },
+                    newProps: { selectedPlan: planName, workspace: workspaceToUpgrade, planDuration: duration },
                   })
                 );
           }}
@@ -182,6 +190,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       );
     },
     [
+      duration,
       product,
       user?.details?.isPremium,
       user?.details?.planDetails?.planId,
