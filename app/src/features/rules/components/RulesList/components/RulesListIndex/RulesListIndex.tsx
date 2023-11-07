@@ -11,13 +11,6 @@ import "./rulesListIndex.scss";
 
 interface Props {}
 
-/**
- * - delete modal
- * - ungroup modal
- * - bulk action
- * - rule name click
- */
-
 const RulesListIndex: React.FC<Props> = () => {
   const [isLoading, setIsLoading] = useState(true);
 
