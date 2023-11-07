@@ -511,8 +511,7 @@ const RulesTable = ({
     );
   };
 
-  const shareIconOnClickHandler = (event, rule) => {
-    event.stopPropagation();
+  const shareIconOnClickHandler = (rule) => {
     trackShareButtonClicked("rules_list");
     user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
@@ -849,11 +848,17 @@ const RulesTable = ({
                       </Text>
                     )}
                     <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
-                      <Tooltip title="Share with your Teammates">
-                        <Tag onClick={(e) => shareIconOnClickHandler(e, record)}>
-                          <UsergroupAddOutlined />
-                        </Tag>
-                      </Tooltip>
+                      <PremiumFeature
+                        feature={[FeatureLimitType.share_rules]}
+                        popoverPlacement="bottom"
+                        onContinue={() => shareIconOnClickHandler(record)}
+                      >
+                        <Tooltip title="Share with your Teammates">
+                          <Tag>
+                            <UsergroupAddOutlined />
+                          </Tag>
+                        </Tooltip>
+                      </PremiumFeature>
                     </Text>
                     <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
                       <Tooltip title="Duplicate Rule">
@@ -1185,12 +1190,29 @@ const RulesTable = ({
                   {isScreenSmall ? null : "Change Group"}
                 </Button>
               </Tooltip>
-              <PremiumFeature
-                disabled={!user.loggedIn}
-                feature={[FeatureLimitType.share_rules]}
-                onContinue={handleShareRulesOnClick}
-                popoverPlacement="bottomLeft"
-              >
+              {user.loggedIn ? (
+                <PremiumFeature
+                  disabled={!user.loggedIn}
+                  feature={[FeatureLimitType.share_rules]}
+                  onContinue={handleShareRulesOnClick}
+                  popoverPlacement="bottomLeft"
+                >
+                  <Tooltip title={isScreenSmall ? "Share Rules" : null}>
+                    <Button shape={isScreenSmall ? "circle" : null} icon={<UsergroupAddOutlined />}>
+                      {isScreenSmall ? null : (
+                        <span>
+                          <Row align="middle" wrap={false}>
+                            Share
+                            {!getFeatureLimitValue(FeatureLimitType.share_rules) ? (
+                              <PremiumIcon featureType="share_rules" source="share_button" />
+                            ) : null}
+                          </Row>
+                        </span>
+                      )}
+                    </Button>
+                  </Tooltip>
+                </PremiumFeature>
+              ) : (
                 <AuthConfirmationPopover
                   title="You need to sign up to share rules"
                   callback={handleShareRulesOnClick}
@@ -1211,7 +1233,7 @@ const RulesTable = ({
                     </Button>
                   </Tooltip>
                 </AuthConfirmationPopover>
-              </PremiumFeature>
+              )}
               <Tooltip
                 title={
                   isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null

@@ -131,7 +131,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             onCancel={() => setRequestTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            open={requestTypePopupVisible}
+            open={requestTypePopupVisible && requestTypePopupSelection !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}
           >
             <Radio.Group
               onChange={showPopup}

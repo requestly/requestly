@@ -41,16 +41,35 @@ const AuthPopoverButton: React.FC<Props> = ({
   const isChinaUser = window.isChinaUser ?? false;
   const { getFeatureLimitValue } = useFeatureLimiter();
 
-  return (
-    <PremiumFeature
-      disabled={!isLoggedIn}
-      feature={[feature]}
-      onContinue={() => {
-        trackClickEvent();
-        onClickHandler();
-      }}
-      popoverPlacement="bottomLeft"
-    >
+  if (isLoggedIn) {
+    return (
+      <PremiumFeature
+        disabled={!isLoggedIn}
+        feature={[feature]}
+        onContinue={() => {
+          trackClickEvent();
+          onClickHandler();
+        }}
+        popoverPlacement="bottomLeft"
+      >
+        <RQButton icon={icon}>
+          {!isTooltipShown ? (
+            buttonText
+          ) : isScreenSmall ? null : (
+            <span>
+              <Row align="middle" wrap={false}>
+                {buttonText}
+                {!getFeatureLimitValue(feature) ? (
+                  <PremiumIcon featureType="share_rules" source="share_button" />
+                ) : null}
+              </Row>
+            </span>
+          )}
+        </RQButton>
+      </PremiumFeature>
+    );
+  } else {
+    return (
       <AuthConfirmationPopover
         title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
         disabled={!hasPopconfirm || isChinaUser}
@@ -72,8 +91,8 @@ const AuthPopoverButton: React.FC<Props> = ({
           )}
         </RQButton>
       </AuthConfirmationPopover>
-    </PremiumFeature>
-  );
+    );
+  }
 };
 
 export default AuthPopoverButton;
