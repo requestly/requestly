@@ -25,7 +25,8 @@
     "test": "craco test --watchAll=false --passWithNoTests",
     "lint": "eslint --fix --ext .js,.jsx .",
     "dev": "REACT_APP_ENV=DEV npm start",
-    "emulated-dev": "REACT_APP_ENV=EMULATOR npm start"
+    "emulated-dev": "REACT_APP_ENV=EMULATOR npm start",
+    "postinstall": "patch-package"
   },
   "browserslist": [
     ">0.2%",
@@ -56,7 +57,7 @@
     "@requestly/rq-common": "^1.0.2",
     "@sentry/react": "^7.54.0",
     "@sentry/tracing": "^7.54.0",
-    "@stripe/react-stripe-js": "^1.7.0",
+    "@stripe/react-stripe-js": "^2.3.0",
     "@stripe/stripe-js": "^1.24.0",
     "@tanstack/react-virtual": "^3.0.0-beta.54",
     "@typeform/embed-react": "^1.15.0",
@@ -112,8 +113,8 @@
     "redux-deep-persist": "^1.0.6",
     "redux-persist": "^6.0.0",
     "rehype-raw": "^7.0.0",
-    "rrweb": "2.0.0-alpha.9",
-    "rrweb-player": "2.0.0-alpha.9",
+    "rrweb": "2.0.0-alpha.11",
+    "rrweb-player": "2.0.0-alpha.11",
     "semver": "^7.5.4",
     "stream-browserify": "^3.0.0",
     "timers-browserify": "^2.0.12",
@@ -129,7 +130,7 @@
   },
   "devDependencies": {
     "@requestly-ui/resource-table": "^0.1.7",
-    "@requestly/web-sdk": "0.14.1",
+    "@requestly/web-sdk": "0.14.2",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.14.185",
@@ -143,6 +144,7 @@
     "@types/xml2js": "^0.4.11",
     "craco-esbuild": "^0.5.2",
     "monaco-editor-webpack-plugin": "^7.0.1",
+    "patch-package": "^8.0.0",
     "process": "^0.11.10",
     "react-scripts": "^5.0.1",
     "sass": "^1.58.3",

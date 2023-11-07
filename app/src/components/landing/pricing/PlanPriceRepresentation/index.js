@@ -3,7 +3,7 @@ import { Typography } from "antd";
 // UTILS
 import { getCurrencySymbol } from "../../../../utils/PricingUtils";
 // CONST
-import APP_CONSTANTS from "../../../../config/constants";
+import { PRICING } from "features/pricing";
 
 const { Text } = Typography;
 
@@ -55,7 +55,7 @@ export default function PlanPriceRepresentation({ currency, price, duration, sho
           >
             {getCurrencySymbol(null, currency)}
           </span>
-          {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? (
+          {plan.id === PRICING.PLAN_NAMES.ENTERPRISE ? (
             <span style={{ fontSize: "3rem" }}>{getEnterprisePrice()}</span>
           ) : (
             <span style={{ fontSize: "3rem" }}>{+price}</span>
@@ -63,12 +63,12 @@ export default function PlanPriceRepresentation({ currency, price, duration, sho
           <span>
             /month
             {/* TO SHOW '/user' ONLY TO ENTERPRISE PLAN COLUMN */}
-            {/* {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE
+            {/* {plan.id === PRICING.PLAN_NAMES.ENTERPRISE
               ? "/user"
               : null} */}
           </span>
         </h1>
-        {/* {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? (
+        {/* {plan.id === PRICING.PLAN_NAMES.ENTERPRISE ? (
           <>
             <div style={{ textAlign: "center" }}>
               <Text type="secondary">
@@ -197,24 +197,24 @@ export default function PlanPriceRepresentation({ currency, price, duration, sho
                 {getCurrencySymbol(null, currency)}
               </span>
               <span style={{ fontSize: "3rem" }}>
-                {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE
+                {plan.id === PRICING.PLAN_NAMES.ENTERPRISE
                   ? +Math.floor(getEnterprisePrice() / 12)
                   : +Math.floor(+price / 12)}
               </span>
               <span>
                 /month
                 {/* TO SHOW '/user' ONLY TO ENTERPRISE PLAN COLUMN */}
-                {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? "/user" : null}
+                {plan.id === PRICING.PLAN_NAMES.ENTERPRISE ? "/user" : null}
               </span>
             </h1>
             <h4 style={{ textAlign: "center" }}>
               ~ {getCurrencySymbol(null, currency)}
-              <b>{plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? getEnterprisePrice() : +price}</b>
+              <b>{plan.id === PRICING.PLAN_NAMES.ENTERPRISE ? getEnterprisePrice() : +price}</b>
               /year
               {/* TO SHOW '/user' ONLY TO ENTERPRISE PLAN COLUMN */}
-              {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? "/user" : null}
+              {plan.id === PRICING.PLAN_NAMES.ENTERPRISE ? "/user" : null}
             </h4>
-            {/* {plan.id === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE ? (
+            {/* {plan.id === PRICING.PLAN_NAMES.ENTERPRISE ? (
               <>
                 <div style={{ textAlign: "center" }}>
                   <Text type="secondary">

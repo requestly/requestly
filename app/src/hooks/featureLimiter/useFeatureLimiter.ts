@@ -3,17 +3,18 @@ import { getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { featureLimits } from "./featureLimitTypes";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
-import APP_CONSTANTS from "config/constants";
 import { FeatureLimitType } from "./types";
+import { getPlanNameFromId } from "utils/PremiumUtils";
+import { PRICING } from "features/pricing";
 
-const premiumPlansToCheckLimit = [APP_CONSTANTS.PRICING.PLAN_NAMES.LITE, APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC];
+const premiumPlansToCheckLimit = [PRICING.PLAN_NAMES.LITE, PRICING.PLAN_NAMES.BASIC, PRICING.PLAN_NAMES.BASIC_V2];
 
 export const useFeatureLimiter = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const isUserPremium = user?.details?.isPremium;
-  const userPlan = user?.details?.planDetails?.planName ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+  const userPlan = isUserPremium ? getPlanNameFromId(user?.details?.planDetails?.planId) : PRICING.PLAN_NAMES.FREE;
 
   const checkFeatureLimits = () => {
     if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) {
@@ -49,15 +50,13 @@ export const useFeatureLimiter = () => {
     if (!(featureLimitType in FeatureLimitType)) return true; // free feature
 
     return (
-      featureLimits[userPlan]?.[featureLimitType] ??
-      featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
+      featureLimits[userPlan]?.[featureLimitType] ?? featureLimits[PRICING.PLAN_NAMES.BASIC_V2]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
     );
   };
 
   const getIsFeatureEnabled = (featureLimitType: FeatureLimitType) => {
     return (
-      featureLimits[userPlan]?.[featureLimitType] ??
-      featureLimits[APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC]?.[featureLimitType]
+      featureLimits[userPlan]?.[featureLimitType] ?? featureLimits[PRICING.PLAN_NAMES.BASIC_V2]?.[featureLimitType]
     );
   };
 
