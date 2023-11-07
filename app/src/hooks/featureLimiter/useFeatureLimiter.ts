@@ -38,7 +38,6 @@ export const useFeatureLimiter = () => {
   };
 
   const getFeatureCurrentValue = (featureLimitType: FeatureLimitType) => {
-    console.log({ featureLimitType });
     switch (featureLimitType) {
       case FeatureLimitType.num_rules:
         return userAttributes?.num_rules;

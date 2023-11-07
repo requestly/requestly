@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { Row, Col, Radio, Button } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
@@ -14,6 +16,7 @@ import { PremiumFeature } from "features/pricing";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const [requestTypePopupVisible, setRequestTypePopupVisible] = useState(false);
   const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
     pair?.request?.type ?? GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
@@ -117,6 +120,9 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
       <Row key={rowIndex} align="middle" className="code-editor-header-row">
         <Col span={24}>
           <Popconfirm
+            disabled={
+              requestTypePopupSelection !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE && !user?.details?.isPremium
+            }
             title="This will clear the existing body content"
             onConfirm={() => {
               onChangeRequestType(requestTypePopupSelection);
@@ -125,7 +131,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             onCancel={() => setRequestTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            open={requestTypePopupVisible && requestTypePopupSelection !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}
+            open={requestTypePopupVisible}
           >
             <Radio.Group
               onChange={showPopup}

@@ -14,6 +14,7 @@ import { AppNotificationBanner } from "./AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { actions } from "store";
 import "./DashboardLayout.css";
+import Logger from "lib/logger";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -39,15 +40,17 @@ const DashboardLayout = () => {
     removeElement(".app-footer");
   }, []);
 
-  console.log(user);
-
   useEffect(() => {
     if (user.loggedIn) {
-      getEnterpriseAdminDetails().then((response) => {
-        if (response.data.success) {
-          dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
-        }
-      });
+      try {
+        getEnterpriseAdminDetails().then((response) => {
+          if (response.data.success) {
+            dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
+          }
+        });
+      } catch (e) {
+        Logger.log(e);
+      }
     }
   }, [getEnterpriseAdminDetails, user.loggedIn, dispatch]);
 

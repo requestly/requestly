@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Popover, Button, Popconfirm, Space, Checkbox } from "antd";
 import { actions } from "store";
+import { getUserAuthDetails } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import CodeEditor from "components/misc/CodeEditor";
@@ -22,11 +24,13 @@ import LINKS from "config/constants/sub/links";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
-import "./ResponseBodyRow.css";
 import { PremiumFeature } from "features/pricing";
+import "./ResponseBodyRow.css";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
+
   const isServeWithoutRequestSupported = useMemo(
     () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
     []
@@ -221,6 +225,9 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       <Row key={rowIndex} span={24} align="middle" className="code-editor-header-row">
         <Col span={24}>
           <Popconfirm
+            disabled={
+              responseTypePopupSelection !== GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE && !user?.details?.isPremium
+            }
             title="This will clear the existing body content"
             onConfirm={() => {
               onChangeResponseType(responseTypePopupSelection);
@@ -229,7 +236,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             onCancel={() => setResponseTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            open={responseTypePopupVisible && responseTypePopupSelection !== GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}
+            open={responseTypePopupVisible}
           >
             <Radio.Group
               onChange={showPopup}
