@@ -31,16 +31,11 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
-  ////
-
   const showPremiumPopovers = useMemo(
     () => feature.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat))),
     [feature, getFeatureLimitValue, checkIfFeatureLimitReached]
   );
-
-  const isBreachingLimit = feature.some((feat) => checkIfFeatureLimitReached(feat));
-
-  ////
+  const isBreachingLimit = feature.some(checkIfFeatureLimitReached);
 
   const hideUseForNowCTA = new Date() > new Date("2023-11-30");
 
