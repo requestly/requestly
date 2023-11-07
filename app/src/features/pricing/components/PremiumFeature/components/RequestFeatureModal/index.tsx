@@ -58,10 +58,10 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         setPostRequestMessage({
           status: "success",
           message: (
-            <Typography.Text>
+            <>
               {enterpriseAdmin.adminName} has been notified. Please get in touch with them at{" "}
               <span className="enterprise-admin-details">{enterpriseAdmin.adminEmail} for futher details.</span>
-            </Typography.Text>
+            </>
           ),
         });
       })
@@ -70,10 +70,10 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         setPostRequestMessage({
           status: "error",
           message: (
-            <Typography.Text>
+            <>
               Unable to send request, contact directly at{" "}
               <span className="enterprise-admin-details">{enterpriseAdmin.adminEmail} for futher details.</span>.
-            </Typography.Text>
+            </>
           ),
         });
       });
@@ -102,7 +102,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
             ) : (
               <RiCloseCircleLine className="danger" />
             )}
-            <Typography.Text>{postRequestMessage.message}</Typography.Text>
+            <Typography.Text className="post-request-message">{postRequestMessage.message}</Typography.Text>
             <RQButton type="primary" onClick={() => setOpenPopup(false)}>
               Close
             </RQButton>
