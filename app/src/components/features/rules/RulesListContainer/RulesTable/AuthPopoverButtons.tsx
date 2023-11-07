@@ -49,7 +49,6 @@ const AuthPopoverButton: React.FC<Props> = ({
       source={authSource}
     >
       <PremiumFeature
-        disabled={!isLoggedIn}
         feature={[feature]}
         onContinue={() => {
           trackClickEvent();
