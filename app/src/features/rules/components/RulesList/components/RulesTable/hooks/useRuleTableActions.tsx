@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { useSelector } from "react-redux";
@@ -15,11 +14,20 @@ import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { isEmpty } from "lodash";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
+import { useRules } from "../../RulesListIndex/context";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const {
+    setRuleToDuplicate,
+    setIsDuplicateRuleModalActive,
+    setIsRenameGroupModalActive,
+    setIdOfGroupToRename,
+    setIsDeleteConfirmationModalActive,
+    setRuleToDelete,
+  } = useRules();
 
   const handlePin = (rules: RuleTableDataType[]) => {
     console.log("Pinning Rules", { rules });
@@ -117,51 +125,34 @@ const useRuleTableActions = () => {
       });
   };
 
-  const handleDuplicateRuleClick = useCallback(
-    (rule: RuleObj) => {
-      dispatch(
-        rulesActions.toggleRuleModal({
-          isActive: true,
-          modalName: "duplicateRuleModal",
-          props: {
-            ruleToDuplicate: rule,
-          },
-        })
-      );
-    },
-    [dispatch]
-  );
+  const handleDuplicateRuleClick = (rule: RuleObj) => {
+    setRuleToDuplicate(rule);
+    setIsDuplicateRuleModalActive(true);
+  };
 
-  const closeDuplicateRuleModal = useCallback(() => {
-    dispatch(
-      rulesActions.toggleRuleModal({
-        isActive: false,
-        modalName: "duplicateRuleModal",
-        props: {
-          ruleToDuplicate: null,
-        },
-      })
-    );
-  }, [dispatch]);
+  const closeDuplicateRuleModal = () => {
+    setRuleToDuplicate(null);
+    setIsDuplicateRuleModalActive(false);
+  };
 
-  const handleDeleteRecordClick = (record: RuleObj) => {};
+  const handleDeleteRecordClick = (rule: RuleObj) => {
+    setRuleToDelete(rule);
+    setIsDeleteConfirmationModalActive(true);
+  };
+
+  const closeDeleteRuleModal = () => {
+    setRuleToDelete(null);
+    setIsDeleteConfirmationModalActive(false);
+  };
 
   const handleRenameGroupClick = (group: RuleObj) => {
-    console.log({ group });
-
-    dispatch(
-      rulesActions.toggleRuleModal({
-        modalName: "renameGroupModal",
-        isActive: true,
-        props: {
-          groupId: group.id,
-        },
-      })
-    );
+    setIsRenameGroupModalActive(true);
+    setIdOfGroupToRename(group.id);
   };
 
   const closeRenameGroupModal = () => {
-    dispatch(rulesActions.toggleRuleModal({ modalName: "renameGroupModal" }));
+    setIsRenameGroupModalActive(false);
+    setIdOfGroupToRename(null);
   };
 
   const handleChangeRuleGroupClick = (record: RuleObj) => {};
@@ -216,8 +207,9 @@ const useRuleTableActions = () => {
     handleDuplicateRuleClick,
     closeDuplicateRuleModal,
     handleDeleteRecordClick,
-    closeRenameGroupModal,
+    closeDeleteRuleModal,
     handleRenameGroupClick,
+    closeRenameGroupModal,
     handleChangeRuleGroupClick,
     ungroupSelectedRules,
     handleUngroupSelectedRulesClick,
