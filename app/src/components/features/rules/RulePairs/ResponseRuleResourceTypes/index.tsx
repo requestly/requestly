@@ -78,7 +78,12 @@ const ResponseRuleResourceTypes: React.FC = () => {
     <div className="resource-types-container" data-tour-id="rule-editor-response-resource-type">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
-        <Radio.Group value={responseRuleResourceType} onChange={(e) => handleResourceTypeChange(e.target.value)}>
+        <Radio.Group
+          value={responseRuleResourceType}
+          onChange={(e) => {
+            if (e.target.value !== ResponseRuleResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);
+          }}
+        >
           <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
           <PremiumFeature
             feature={[FeatureLimitType.graphql_resource_type]}

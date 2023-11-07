@@ -114,7 +114,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               <span className="enterprise-admin-details">
                 {organizationsData?.workspaces?.map((workspace) => workspace.adminName)?.join(", ")}
               </span>
-              . If you need a Requestly Professional subscription for yourself, just ask for it.
+              . If you need a Requestly Professional subscription for yourself, send request to admin.
             </Typography.Text>
             <Row className="mt-16" justify="space-between" align="middle">
               <Col>
