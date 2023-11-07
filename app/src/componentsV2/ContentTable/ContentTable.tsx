@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useState } from "react";
 import type { ColumnsType } from "antd/es/table";
 import { Table } from "antd";
 import { BulkActionBarConfig } from "./types";
@@ -29,9 +29,24 @@ const ContentTable = <DataType extends object>({
     setFilteredRowsData([...data]);
   }, [data]);
 
+  useEffect(() => {
+    bulkActionBarConfig?.options?.getSelectedRowsData?.(selectedRowsData);
+  }, [bulkActionBarConfig?.options, selectedRowsData]);
+
+  const clearSelectedRowsData = useCallback(() => {
+    setSelectedRowKeys([]);
+    setSelectedRowsData([]);
+  }, []);
+
   return (
     <>
-      {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRowsData} />}
+      {bulkActionBarConfig && (
+        <BulkActionBar
+          config={bulkActionBarConfig}
+          selectedRows={selectedRowsData}
+          clearSelectedRowsData={clearSelectedRowsData}
+        />
+      )}
       <Table
         className="rq-content-table"
         onHeaderRow={() => ({
@@ -46,7 +61,6 @@ const ContentTable = <DataType extends object>({
         rowSelection={{
           selectedRowKeys,
           onChange: (selectedRowKeys, selectedRows) => {
-            console.log({ selectedRowKeys });
             setSelectedRowKeys(selectedRowKeys);
             setSelectedRowsData(selectedRows);
           },
