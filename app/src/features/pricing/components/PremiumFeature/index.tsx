@@ -28,17 +28,17 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const { getFeatureLimitValue, checkIfFeatureLimitBreached } = useFeatureLimiter();
+  const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
   ////
 
   const showPremiumPopovers = useMemo(
-    () => feature.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitBreached(feat))),
-    [feature, getFeatureLimitValue, checkIfFeatureLimitBreached]
+    () => feature.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat))),
+    [feature, getFeatureLimitValue, checkIfFeatureLimitReached]
   );
 
-  const isBreachingLimit = feature.some((feat) => checkIfFeatureLimitBreached(feat));
+  const isBreachingLimit = feature.some((feat) => checkIfFeatureLimitReached(feat));
 
   ////
 

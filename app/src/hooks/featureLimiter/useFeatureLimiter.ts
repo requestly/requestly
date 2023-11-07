@@ -37,6 +37,13 @@ export const useFeatureLimiter = () => {
     return currentFeatureValue > featureLimitValue;
   };
 
+  const checkIfFeatureLimitReached = (featureLimitType: FeatureLimitType) => {
+    const currentFeatureValue = getFeatureCurrentValue(featureLimitType);
+    const featureLimitValue = getFeatureLimitValue(featureLimitType);
+
+    return currentFeatureValue >= featureLimitValue;
+  };
+
   const getFeatureCurrentValue = (featureLimitType: FeatureLimitType) => {
     switch (featureLimitType) {
       case FeatureLimitType.num_rules:
@@ -64,6 +71,6 @@ export const useFeatureLimiter = () => {
     checkFeatureLimits,
     getFeatureLimitValue,
     getIsFeatureEnabled,
-    checkIfFeatureLimitBreached,
+    checkIfFeatureLimitReached,
   };
 };
