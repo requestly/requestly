@@ -12,6 +12,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { actions } from "store";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "../../analytics";
+import { trackTeamPlanCardClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
 
 interface RequestFeatureModalProps {
@@ -41,10 +42,13 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   );
 
   const handleSendRequest = useCallback(() => {
-    trackUpgradeOptionClicked("send_request_to_admin");
     setIsLoading(true);
     const enterpriseAdmin = organizationsData?.workspaces?.[0];
     const domain = enterpriseAdmin.adminEmail.split("@")[1];
+
+    trackTeamPlanCardClicked(domain, "in_app");
+    trackUpgradeOptionClicked("send_request_to_admin");
+
     requestEnterprisePlanFromAdmin({
       workspaceDetails: organizationsData?.workspaces,
     })
