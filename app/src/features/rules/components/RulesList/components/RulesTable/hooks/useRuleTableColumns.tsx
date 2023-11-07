@@ -13,7 +13,6 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
-import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -24,8 +23,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     handleDuplicateRuleClick,
     handleDeleteRecordClick,
     handleRenameGroupClick,
-    handleChangeRuleGroupClick,
-    handlePinRecordClick,
   } = useRuleTableActions();
 
   // const isStatusEnabled = !(options && options.disableStatus);
@@ -147,26 +144,18 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       key: "actions",
       width: 104,
       align: "right",
-      render: (rule: RuleTableDataType) => {
-        const isRule = rule.objectType === RuleObjType.RULE;
+      render: (record: RuleTableDataType) => {
+        const isRule = record.objectType === RuleObjType.RULE;
 
         const recordActions: MenuProps["items"] = [
           {
             key: 0,
             onClick: () => {
-              isRule ? handleChangeRuleGroupClick(rule) : handleRenameGroupClick(rule);
+              handleRenameGroupClick(record);
             },
             label: (
               <Row>
-                {isRule ? (
-                  <>
-                    <RiEdit2Line /> Change Group
-                  </>
-                ) : (
-                  <>
-                    <RiEdit2Line /> Rename
-                  </>
-                )}
+                <RiEdit2Line /> Rename
               </Row>
             ),
           },
@@ -174,7 +163,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             key: 1,
             disabled: !isRule,
             onClick: () => {
-              handleDuplicateRuleClick(rule);
+              handleDuplicateRuleClick(record);
             },
             label: (
               <Row>
@@ -186,11 +175,10 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           {
             key: 2,
             danger: true,
-            onClick: () => handleDeleteRecordClick(rule),
+            onClick: () => handleDeleteRecordClick(record),
             label: (
               <Row>
-                {/* change icons */}
-                <RiFileCopy2Line />
+                <RiDeleteBinLine />
                 Delete
               </Row>
             ),
