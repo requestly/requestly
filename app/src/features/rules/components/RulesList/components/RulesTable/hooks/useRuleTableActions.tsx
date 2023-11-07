@@ -174,51 +174,6 @@ const useRuleTableActions = () => {
   const closeRenameGroupModal = () => {
     setIsRenameGroupModalActive(false);
     setIdOfGroupToRename(null);
-  const handleDuplicateRuleClick = useCallback(
-    (rule: RuleObj) => {
-      dispatch(
-        rulesActions.toggleRuleModal({
-          isActive: true,
-          modalName: "duplicateRuleModal",
-          props: {
-            ruleToDuplicate: rule,
-          },
-        })
-      );
-    },
-    [dispatch]
-  );
-
-  const closeDuplicateRuleModal = useCallback(() => {
-    dispatch(
-      rulesActions.toggleRuleModal({
-        isActive: false,
-        modalName: "duplicateRuleModal",
-        props: {
-          ruleToDuplicate: null,
-        },
-      })
-    );
-  }, [dispatch]);
-
-  const handleDeleteRecordClick = (record: RuleObj) => {};
-
-  const handleRenameGroupClick = (group: RuleObj) => {
-    console.log({ group });
-
-    dispatch(
-      rulesActions.toggleRuleModal({
-        modalName: "renameGroupModal",
-        isActive: true,
-        props: {
-          groupId: group.id,
-        },
-      })
-    );
-  };
-
-  const closeRenameGroupModal = () => {
-    dispatch(rulesActions.toggleRuleModal({ modalName: "renameGroupModal" }));
   };
 
   const handleUngroupSelectedRulesClick = useCallback(
