@@ -32,9 +32,10 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
 
   const rulesToDelete = useMemo(() => selectedRows.filter((row) => !row.id?.startsWith("Group")), [selectedRows]);
 
-  const selectedGroupIds = useMemo(() => selectedRows.map((row) => row.id).filter((id) => id?.startsWith("Group")), [
-    selectedRows,
-  ]);
+  const selectedGroupIds = useMemo(
+    () => selectedRows.map((row) => row.id).filter((id) => id?.startsWith("Group")),
+    [selectedRows]
+  );
 
   useEffect(() => {
     const contentTableAdaptedRules = rulesToContentTableDataAdapter(rules);
@@ -64,6 +65,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
    *
    *
    * MODALS
+   * - Delete
    * - change group
    */
 
