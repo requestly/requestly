@@ -1185,30 +1185,33 @@ const RulesTable = ({
                   {isScreenSmall ? null : "Change Group"}
                 </Button>
               </Tooltip>
-              <AuthConfirmationPopover
-                title="You need to sign up to share rules"
-                callback={handleShareRulesOnClick}
-                source={AUTH.SOURCE.SHARE_RULES}
+              <PremiumFeature
+                disabled={!user.loggedIn}
+                feature={[FeatureLimitType.share_rules]}
+                onContinue={handleShareRulesOnClick}
+                popoverPlacement="bottomLeft"
               >
-                <Tooltip title={isScreenSmall ? "Share Rules" : null}>
-                  <Button
-                    onClick={user?.details?.isLoggedIn && handleShareRulesOnClick}
-                    shape={isScreenSmall ? "circle" : null}
-                    icon={<UsergroupAddOutlined />}
-                  >
-                    {isScreenSmall ? null : (
-                      <span>
-                        <Row align="middle" wrap={false}>
-                          Share
-                          {!getFeatureLimitValue(FeatureLimitType.share_rules) ? (
-                            <PremiumIcon featureType="share_rules" source="share_button" />
-                          ) : null}
-                        </Row>
-                      </span>
-                    )}
-                  </Button>
-                </Tooltip>
-              </AuthConfirmationPopover>
+                <AuthConfirmationPopover
+                  title="You need to sign up to share rules"
+                  callback={handleShareRulesOnClick}
+                  source={AUTH.SOURCE.SHARE_RULES}
+                >
+                  <Tooltip title={isScreenSmall ? "Share Rules" : null}>
+                    <Button shape={isScreenSmall ? "circle" : null} icon={<UsergroupAddOutlined />}>
+                      {isScreenSmall ? null : (
+                        <span>
+                          <Row align="middle" wrap={false}>
+                            Share
+                            {!getFeatureLimitValue(FeatureLimitType.share_rules) ? (
+                              <PremiumIcon featureType="share_rules" source="share_button" />
+                            ) : null}
+                          </Row>
+                        </span>
+                      )}
+                    </Button>
+                  </Tooltip>
+                </AuthConfirmationPopover>
+              </PremiumFeature>
               <Tooltip
                 title={
                   isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null
