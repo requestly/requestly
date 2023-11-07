@@ -42,6 +42,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 
   ////
 
+  const hideUseForNowCTA = new Date() > new Date("2023-11-30");
+
   useEffect(() => {
     return () => {
       setOpenPopup(false);
@@ -74,9 +76,12 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
           }}
           onCancel={() => {
-            trackUpgradeOptionClicked("use_for_free_now");
-            onContinue();
+            if (!hideUseForNowCTA) {
+              trackUpgradeOptionClicked("use_for_free_now");
+              onContinue();
+            }
           }}
+          cancelButtonProps={{ style: { display: hideUseForNowCTA ? "none" : "inline-flex" } }}
           title={
             <>
               <Typography.Title level={4}>{isBreachingLimit ? "Limits reached" : "Premium feature"}</Typography.Title>
