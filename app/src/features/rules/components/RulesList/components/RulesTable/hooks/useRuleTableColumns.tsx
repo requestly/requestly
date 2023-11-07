@@ -152,7 +152,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
 
         const recordActions: MenuProps["items"] = [
           {
-            key: "0",
+            key: 0,
             onClick: () => {
               isRule ? handleChangeRuleGroupClick(rule) : handleRenameGroupClick(rule);
             },
@@ -174,22 +174,12 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             key: 1,
             disabled: !isRule,
             onClick: () => {
-              isRule ? handleDuplicateRuleClick(rule) : console.log("Ungroup selected rules");
+              handleDuplicateRuleClick(rule);
             },
             label: (
-              // FIXME: add ungroup rules action
               <Row>
-                {isRule ? (
-                  <>
-                    <RiFileCopy2Line />
-                    Duplicate
-                  </>
-                ) : (
-                  <>
-                    <RiFileCopy2Line />
-                    Ungroup rules
-                  </>
-                )}
+                <RiFileCopy2Line />
+                Duplicate
               </Row>
             ),
           },
