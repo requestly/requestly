@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
-import { Col, Popconfirm, PopconfirmProps, Typography } from "antd";
+import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
@@ -60,7 +60,14 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             organizationsData={user?.details?.organization}
             onContinue={onContinue}
           />
-          <Col onClick={() => setOpenPopup(true)}>{children}</Col>
+          {React.Children.map(children, (child) => {
+            return React.cloneElement(child as React.ReactElement, {
+              onClick: () => {
+                if (user?.details?.isPremium) onContinue();
+                else setOpenPopup(true);
+              },
+            });
+          })}
         </>
       ) : (
         <Popconfirm

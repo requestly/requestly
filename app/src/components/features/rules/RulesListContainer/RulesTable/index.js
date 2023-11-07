@@ -32,6 +32,7 @@ import {
   getGroupsSelection,
   getRulesToPopulate,
   getUserAuthDetails,
+  getUserAttributes,
 } from "store/selectors";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Typography, Tag } from "antd";
@@ -41,7 +42,7 @@ import { actions } from "store";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { compareRuleByModificationDate, isDesktopOnlyRule } from "utils/rules/misc";
 import { isFeatureCompatible } from "../../../../../utils/CompatibilityUtils";
-import { trackRQLastActivity } from "utils/AnalyticsUtils";
+import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import SharedListRuleViewerModal from "../../SharedListRuleViewerModal";
 import { isEmpty } from "lodash";
 import moment from "moment";
@@ -146,6 +147,7 @@ const RulesTable = ({
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const searchByRuleName = useSelector(getRulesSearchKeyword);
   const rulesData = useSelector(getAllRules);
   const rules = rulesFromProps ? rulesFromProps : rulesData;
@@ -454,13 +456,14 @@ const RulesTable = ({
         newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
           ? toast.success(`Rule is now ${newStatus.toLowerCase()}`)
           : toast.success(`Rule is now ${newStatus.toLowerCase()}`);
-
         //Analytics
         if (newStatus.toLowerCase() === "active") {
           trackRQLastActivity("rule_activated");
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
           trackRuleActivatedStatusEvent(rule.ruleType);
         } else {
           trackRQLastActivity("rule_deactivated");
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
           trackRuleDeactivatedStatus(rule.ruleType);
         }
       })

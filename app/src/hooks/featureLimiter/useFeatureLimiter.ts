@@ -40,7 +40,6 @@ export const useFeatureLimiter = () => {
   const checkIfFeatureLimitReached = (featureLimitType: FeatureLimitType) => {
     const currentFeatureValue = getFeatureCurrentValue(featureLimitType);
     const featureLimitValue = getFeatureLimitValue(featureLimitType);
-
     return currentFeatureValue >= featureLimitValue;
   };
 

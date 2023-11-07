@@ -41,7 +41,7 @@ const DashboardLayout = () => {
   }, []);
 
   useEffect(() => {
-    if (user.loggedIn) {
+    if (user.loggedIn && !user?.details?.organization) {
       try {
         getEnterpriseAdminDetails().then((response) => {
           if (response.data.success) {
@@ -52,7 +52,7 @@ const DashboardLayout = () => {
         Logger.log(e);
       }
     }
-  }, [getEnterpriseAdminDetails, user.loggedIn, dispatch]);
+  }, [getEnterpriseAdminDetails, user.loggedIn, user?.details?.organization, dispatch]);
 
   return (
     <>
