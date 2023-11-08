@@ -1,4 +1,9 @@
 import { Button, Input, Row } from "antd";
+import {
+  trackMockPasswordDeleted,
+  trackMockPasswordSaveError,
+  trackMockPasswordSaved,
+} from "modules/analytics/events/features/mocksV2";
 import { useState } from "react";
 import { toast } from "utils/Toast";
 
@@ -21,17 +26,20 @@ const PasswordPopup = ({ setVisible, password, setPassword }: Props) => {
 
   const handleUpdatePassword = () => {
     if (validatePassword()) {
+      trackMockPasswordSaved();
       setIsValidPassword(true);
       setPassword(inputPassword);
       toast.success("Mock Password Saved");
       setVisible(false);
     } else {
+      trackMockPasswordSaveError();
       toast.error("Password should be >=8 characters and alphanumeric");
       setIsValidPassword(false);
     }
   };
 
   const handlePasswordDelete = () => {
+    trackMockPasswordDeleted();
     setPassword("");
     toast.success("Mock Password Deleted");
     setVisible(false);

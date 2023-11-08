@@ -4,7 +4,7 @@ import { ExperimentOutlined, LockOutlined, UnlockOutlined } from "@ant-design/ic
 import { RQButton, RQBreadcrumb } from "lib/design-system/components";
 import { MockType } from "components/features/mocksV2/types";
 import "./index.css";
-import { trackMockEditorClosed } from "modules/analytics/events/features/mocksV2";
+import { trackMockEditorClosed, trackMockPasswordGenerateClicked } from "modules/analytics/events/features/mocksV2";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useLocation } from "react-router-dom";
@@ -56,10 +56,13 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
             <div>
               <Button
                 type="text"
-                icon={password.length > 0 ? <LockOutlined /> : <UnlockOutlined />}
-                onClick={() => setShowPasswordPopup(true)}
+                icon={password?.length > 0 ? <LockOutlined /> : <UnlockOutlined />}
+                onClick={() => {
+                  trackMockPasswordGenerateClicked(password?.length > 0);
+                  setShowPasswordPopup(true);
+                }}
               >
-                {password.length > 0 ? "Update Password" : "Add Password"}
+                {password?.length > 0 ? "Update Password" : "Add Password"}
               </Button>
             </div>
           </>

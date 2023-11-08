@@ -90,3 +90,23 @@ export const trackAiResponseGenerateFailed = (prompt: string) => {
   const params = { prompt };
   trackEvent(MOCKSV2.AI_MOCK_RESPONSE_GENERATE_FAILED, params);
 };
+
+export const trackMockPasswordGenerateClicked = (update: boolean) => {
+  const params = { update };
+  trackEvent(MOCKSV2.MOCK_PASSWORD_GENERATE_CLICKED, params);
+};
+
+export const trackMockPasswordSaved = () => {
+  const params = {};
+  trackEvent(MOCKSV2.MOCK_PASSWORD_SAVED, params);
+};
+
+export const trackMockPasswordSaveError = () => {
+  const params = {};
+  trackEvent(MOCKSV2.MOCK_PASSWORD_SAVE_ERROR, params);
+};
+
+export const trackMockPasswordDeleted = () => {
+  const params = {};
+  trackEvent(MOCKSV2.MOCK_PASSWORD_DELETED, params);
+};
