@@ -1,7 +1,7 @@
-import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
+import { RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
 import { rulesActions } from "store/features/rules/slice";
 import { useDispatch } from "react-redux";
 import Logger from "lib/logger";
@@ -15,11 +15,14 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { isEmpty } from "lodash";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 import { useRules } from "../../RulesListIndex/context";
+import { updateRulesListRefreshPendingStatus } from "components/features/rules/RulesListContainer/RulesTable/actions";
+import { useCallback } from "react";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const {
     setRuleToDuplicate,
     setIsDuplicateRuleModalActive,
@@ -157,48 +160,58 @@ const useRuleTableActions = () => {
 
   const handleChangeRuleGroupClick = (record: RuleObj) => {};
 
-  const ungroupSelectedRules = (selectedRuleIds: string[]) => {
-    // @ts-ignore
-    const allPromises = [];
+  const ungroupSelectedRules = useCallback(
+    (selectedRuleIds: string[]) => {
+      // @ts-ignore
+      const allPromises = [];
 
-    return new Promise((resolve, reject) => {
-      if (isEmpty(selectedRuleIds)) {
-        reject(new Error("No Rules were Selected"));
-      } else {
-        Logger.log("Reading storage in RulesTable ungroupSelectedRules");
-        StorageService(appMode)
-          .getAllRecords()
-          .then((allRules) => {
-            selectedRuleIds.forEach(async (ruleId) => {
-              const updatedRule = {
-                ...allRules[ruleId],
-                groupId: RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
-              };
-              Logger.log("Writing to storage in RulesTable ungroupSelectedRules");
-              allPromises.push(StorageService(appMode).saveRuleOrGroup(updatedRule));
+      return new Promise((resolve, reject) => {
+        if (isEmpty(selectedRuleIds)) {
+          reject(new Error("No Rules were Selected"));
+        } else {
+          Logger.log("Reading storage in RulesTable ungroupSelectedRules");
+          StorageService(appMode)
+            .getAllRecords()
+            .then((allRules) => {
+              selectedRuleIds.forEach(async (ruleId) => {
+                const updatedRule = {
+                  ...allRules[ruleId],
+                  groupId: RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
+                };
+                Logger.log("Writing to storage in RulesTable ungroupSelectedRules");
+                allPromises.push(StorageService(appMode).saveRuleOrGroup(updatedRule));
+              });
+
+              // @ts-ignore
+              Promise.all(allPromises).then(() => resolve());
             });
+        }
+      });
+    },
+    [appMode]
+  );
 
-            // @ts-ignore
-            Promise.all(allPromises).then(() => resolve());
-          });
-      }
-    });
-  };
+  const handleUngroupSelectedRulesClick = useCallback(
+    (selectedRecords: RuleObj[]) => {
+      const selectedRuleIds = selectedRecords.reduce(
+        (ruleIds, record) =>
+          record.objectType === RuleObjType.RULE && record.groupId !== "" ? [...ruleIds, record.id] : ruleIds,
+        []
+      );
 
-  const handleUngroupSelectedRulesClick = (selectedRuleIds: string[]) => {
-    return ungroupSelectedRules(selectedRuleIds)
-      .then(() => {
-        // clearSearch();
-        // unselectAllRecords(dispatch);
-        //Refresh List
-        // updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
-      })
-      .then(() => {
-        toast.info("Rules Ungrouped");
-        // trackRulesUngrouped();
-      })
-      .catch(() => toast.warn("Please select rules first", { hideProgressBar: true }));
-  };
+      return ungroupSelectedRules(selectedRuleIds)
+        .then(() => {
+          // Refresh List
+          updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
+        })
+        .then(() => {
+          toast.info("Rules Ungrouped");
+          // trackRulesUngrouped();
+        })
+        .catch(() => toast.warn("Please select rules first", { hideProgressBar: true }));
+    },
+    [dispatch, ungroupSelectedRules, isRulesListRefreshPending]
+  );
 
   return {
     handlePin,
