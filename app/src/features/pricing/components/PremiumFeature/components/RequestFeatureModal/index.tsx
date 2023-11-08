@@ -80,14 +80,19 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   }, [organizationsData?.workspaces, requestEnterprisePlanFromAdmin]);
 
   useEffect(() => {
-    trackUpgradePopoverViewed("send_request");
-  }, []);
+    if (isOpen) {
+      trackUpgradePopoverViewed("send_request");
+    }
+  }, [isOpen]);
 
   return (
     <>
       <Modal
         open={isOpen}
-        onCancel={() => setOpenPopup(false)}
+        onCancel={() => {
+          setOpenPopup(false);
+          setPostRequestMessage(null);
+        }}
         footer={null}
         className="request-feature-modal"
         title={!postRequestMessage && "Send request to admin"}
@@ -103,7 +108,13 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               <RiCloseCircleLine className="danger" />
             )}
             <Typography.Text className="post-request-message">{postRequestMessage.message}</Typography.Text>
-            <RQButton type="primary" onClick={() => setOpenPopup(false)}>
+            <RQButton
+              type="primary"
+              onClick={() => {
+                setOpenPopup(false);
+                setPostRequestMessage(null);
+              }}
+            >
               Close
             </RQButton>
           </Col>
