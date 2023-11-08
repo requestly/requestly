@@ -1,7 +1,53 @@
 .bulk-action-bar-container {
-  width: 55%;
-  background-color: black;
-  position: absolute;
-  bottom: 64px;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  flex-wrap: nowrap;
+  gap: 8px;
+  position: fixed;
+  left: calc(50% + 80px + 78px); // FIXME: center align to rules table
+  transform: translateX(-50%);
+  bottom: 23px;
   z-index: 10;
+  border-radius: 4px;
+  background: var(--black, #0e0e0e);
+  box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.5);
+
+  .info-text {
+    flex-shrink: 0;
+    min-width: 110px;
+    margin-right: auto;
+    color: var(--text-light);
+    text-align: center;
+    font-size: 13px;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+  }
+
+  .action-btns {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .action-btn.ant-btn {
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0.25px;
+    color: var(--text-default);
+
+    svg {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+    }
+
+    &.ant-btn-dangerous {
+      color: var(--danger);
+      border-radius: 4px;
+      border: 1px solid var(--danger);
+      background: var(--danger-darkest, #271111);
+    }
+  }
 }

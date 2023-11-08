@@ -1,5 +1,6 @@
-import { Button, Col, Row } from "antd";
+import { Button } from "antd";
 import { BulkActionBarConfig } from "../../types";
+import { RiCloseLine } from "@react-icons/all-files/ri/RiCloseLine";
 import "./bulkActionBar.scss";
 
 export interface Props<DataType> {
@@ -16,32 +17,34 @@ const BulkActionBar = <DataType,>({ config, selectedRows, clearSelectedRowsData 
 
   return (
     <div className="bulk-action-bar-container">
-      <Row justify={"space-evenly"}>
-        <Col span={8}>
-          {typeof config.options.infoText === "function"
-            ? config.options?.infoText(selectedRows)
-            : config.options.infoText}
-        </Col>
+      <div className="info-text">
+        {typeof config.options.infoText === "function"
+          ? config.options?.infoText(selectedRows)
+          : config.options.infoText}
+      </div>
+
+      <div className="action-btns">
         {config.options.actions.map((actionConfig) => {
           return (
-            <Col>
-              <Button
-                danger={actionConfig.danger ?? false}
-                type={actionConfig.actionType ?? "default"}
-                onClick={() => {
-                  actionConfig?.onClick(selectedRows);
-                  clearSelectedRowsData();
-                }}
-              >
-                {typeof actionConfig.label === "function" ? actionConfig.label(selectedRows) : actionConfig.label}
-              </Button>
-            </Col>
+            <Button
+              className="action-btn"
+              icon={actionConfig.icon ?? null}
+              danger={actionConfig.danger ?? false}
+              type={actionConfig.type ?? "default"}
+              disabled={actionConfig.disabled ?? false}
+              onClick={() => {
+                actionConfig?.onClick(selectedRows);
+              }}
+            >
+              {typeof actionConfig.label === "function" ? actionConfig.label(selectedRows) : actionConfig.label}
+            </Button>
           );
         })}
-        <Col>
-          <Button type="default">Cancel</Button>
-        </Col>
-      </Row>
+      </div>
+
+      <Button type="text" icon={<RiCloseLine />} className="cancel-btn action-btn" onClick={clearSelectedRowsData}>
+        Cancel
+      </Button>
     </div>
   );
 };
