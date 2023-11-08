@@ -54,7 +54,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
 
   useEffect(() => {
     if (!rulesToDownload) {
-      prepareContentToExport(appMode, selectedRules, groupwiseRulesToPopulate).then((result: any) => {
+      prepareContentToExport(appMode, selectedRules).then((result: any) => {
         setRulesToDownload(result);
       });
     }

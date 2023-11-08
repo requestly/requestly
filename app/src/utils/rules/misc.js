@@ -37,7 +37,7 @@ export const getRuleConfigInEditMode = (rule) => {
   return RULE_TYPES_CONFIG[rule.ruleType];
 };
 
-export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds, groupwiseRules) => {
+export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds) => {
   return new Promise((resolve) => {
     const groupIdsArr = [];
     const isGroupIdAlreadyAdded = {};
@@ -54,7 +54,7 @@ export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds, groupwise
         const groups = [];
         //Fetch Required Groups
         groupIdsArr.forEach((groupId) => {
-          groups.push(groupwiseRules[groupId][RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS]);
+          groups.push(allRecords?.[groupId]);
         });
 
         resolve({
