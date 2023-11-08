@@ -45,6 +45,7 @@ export const editorDataToMockDataConverter = (mockEditorData: MockEditorDataSche
         body: mockEditorData.body,
       },
     ],
+    password: mockEditorData.password ?? null,
   };
 
   return mockData;
@@ -74,6 +75,7 @@ export const mockDataToEditorDataAdapter = (mockData: RQMockSchema): MockEditorD
     contentType: contentType,
     body: mockData.responses[0]?.body || "",
     responseId: mockData.responses[0]?.id,
+    password: mockData.password ?? "",
   };
 
   return mockEditorData;
@@ -99,21 +101,33 @@ const generateEndpointPrefix = (username: string = null, teamId?: string) => {
   return prefix;
 };
 
-const generateEndpointSuffix = (username: string, uid?: string, teamId?: string) => {
+const generateEndpointSuffix = (username: string, uid?: string, teamId?: string, password?: string) => {
+  const searchParamsObj: Record<string, string> = {};
+
   if (teamId) {
-    return `?teamId=${teamId}`;
+    searchParamsObj["teamId"] = teamId;
+  } else if (!username || isEnvBeta() || isEnvDevWithBeta() || isEnvEmulator()) {
+    searchParamsObj["rq_uid"] = uid;
   }
-  // username replacement from subdomain to query param doesn't work in beta and dev
-  else if (username && !(isEnvBeta() || isEnvDevWithBeta() || isEnvEmulator())) {
-    return "";
-  } else {
-    return `?rq_uid=${uid}`;
+
+  if (password && password.length > 0) {
+    searchParamsObj["rq_password"] = password;
   }
+
+  const searchParams = new URLSearchParams(searchParamsObj);
+
+  return `?${searchParams.toString()}`;
 };
 
-export const generateFinalUrlParts = (endpoint: string, uid: string, username: string = null, teamId?: string) => {
+export const generateFinalUrlParts = (
+  endpoint: string,
+  uid: string,
+  username: string = null,
+  teamId?: string,
+  password?: string
+) => {
   let prefix = generateEndpointPrefix(username, teamId);
-  let suffix = generateEndpointSuffix(username, uid, teamId);
+  let suffix = generateEndpointSuffix(username, uid, teamId, password);
 
   return {
     prefix: prefix,
@@ -123,8 +137,14 @@ export const generateFinalUrlParts = (endpoint: string, uid: string, username: s
   };
 };
 
-export const generateFinalUrl = (endpoint: string, uid: string, username: string = null, teamId?: string) => {
-  return generateFinalUrlParts(endpoint, uid, username, teamId).url;
+export const generateFinalUrl = (
+  endpoint: string,
+  uid: string,
+  username: string = null,
+  teamId?: string,
+  password?: string
+) => {
+  return generateFinalUrlParts(endpoint, uid, username, teamId, password).url;
 };
 
 const getMockEditorDataForFile = (fileType: string, name: string, data: string) => {

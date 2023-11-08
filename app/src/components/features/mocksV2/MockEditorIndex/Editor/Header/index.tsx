@@ -1,13 +1,14 @@
-import React from "react";
-import { Row, Layout, Col, Tooltip } from "antd";
-import { ExperimentOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Row, Layout, Col, Tooltip, Dropdown, Menu, Button } from "antd";
+import { ExperimentOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { RQButton, RQBreadcrumb } from "lib/design-system/components";
 import { MockType } from "components/features/mocksV2/types";
 import "./index.css";
-import { trackMockEditorClosed } from "modules/analytics/events/features/mocksV2";
+import { trackMockEditorClosed, trackMockPasswordGenerateClicked } from "modules/analytics/events/features/mocksV2";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useLocation } from "react-router-dom";
+import PasswordPopup from "./PasswordPopup/PasswordPopup";
 
 interface HeaderProps {
   isNewMock: boolean;
@@ -16,6 +17,8 @@ interface HeaderProps {
   handleClose: Function;
   handleSave: Function;
   handleTest: () => void;
+  setPassword: (password: string) => void;
+  password: string;
 }
 
 export const MockEditorHeader: React.FC<HeaderProps> = ({
@@ -25,8 +28,49 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
   handleClose,
   handleSave,
   handleTest,
+  setPassword,
+  password,
 }) => {
   const location = useLocation();
+
+  // Component State
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const handleDropdownVisibleChange = (isVisible: boolean) => {
+    if (!isVisible) {
+      setShowPasswordPopup(false);
+    }
+    setShowDropdown(isVisible);
+  };
+
+  const dropdownOverlay = (
+    <Menu>
+      <div>
+        {showPasswordPopup && (
+          <PasswordPopup setPassword={setPassword} password={password} setVisible={handleDropdownVisibleChange} />
+        )}
+
+        {!showPasswordPopup && (
+          <>
+            <div>
+              <Button
+                type="text"
+                icon={password?.length > 0 ? <LockOutlined /> : <UnlockOutlined />}
+                onClick={() => {
+                  trackMockPasswordGenerateClicked(password?.length > 0);
+                  setShowPasswordPopup(true);
+                }}
+              >
+                {password?.length > 0 ? "Update Password" : "Add Password"}
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </Menu>
+  );
+
   return (
     <Layout.Header className="mock-editor-layout-header">
       <Row className="w-full">
@@ -45,6 +89,30 @@ export const MockEditorHeader: React.FC<HeaderProps> = ({
           {!location.pathname.includes("rules") && <RQBreadcrumb />}
         </Col>
         <Col className="header-right-section">
+          <div className="mock-edtior-options-container">
+            <Dropdown
+              destroyPopupOnHide
+              trigger={["click"]}
+              open={showDropdown}
+              placement="bottomRight"
+              overlay={dropdownOverlay}
+              onOpenChange={handleDropdownVisibleChange}
+              className={`mock-editor-options-dropdown-trigger ${
+                showDropdown ? "mock-editor-options-dropdown-active" : ""
+              }`}
+            >
+              <span className="text-gray">
+                More
+                <img
+                  width={10}
+                  height={6}
+                  alt="down arrow"
+                  src="/assets/icons/downArrow.svg"
+                  className="mock-editor-options-trigger-icon"
+                />
+              </span>
+            </Dropdown>
+          </div>
           {!isNewMock && isFeatureCompatible(FEATURES.API_CLIENT) && (
             <RQButton type="default" icon={<ExperimentOutlined />} onClick={handleTest}>
               Test
