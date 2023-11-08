@@ -118,6 +118,11 @@ export const MOCKSV2 = {
   AI_MOCK_RESPONSE_USE_CLICKED: "ai_mock_response_use_clicked",
   AI_MOCK_RESPONSE_GENERATED: "ai_mock_response_generated",
   AI_MOCK_RESPONSE_GENERATE_FAILED: "ai_mock_response_generate_failed",
+
+  MOCK_PASSWORD_GENERATE_CLICKED: "mock_password_generate_clicked",
+  MOCK_PASSWORD_SAVED: "mock_password_saved",
+  MOCK_PASSWORD_SAVE_ERROR: "mock_password_save_error",
+  MOCK_PASSWORD_DELETED: "mock_password_deleted",
 };
 
 export const API_CLIENT = {
