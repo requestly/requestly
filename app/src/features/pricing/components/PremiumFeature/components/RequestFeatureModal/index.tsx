@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import Modal from "antd/lib/modal/Modal";
 import { Col, Row, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -9,8 +10,10 @@ import { RiCheckboxCircleLine } from "@react-icons/all-files/ri/RiCheckboxCircle
 import { CloseOutlined } from "@ant-design/icons";
 import { OrganizationsDetails } from "../../types";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
+import { getPlanNameFromId } from "utils/PremiumUtils";
+import { capitalize } from "lodash";
 import { actions } from "store";
+import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "../../analytics";
 import { trackTeamPlanCardClicked } from "modules/analytics/events/common/teams";
 import "./index.scss";
@@ -18,6 +21,8 @@ import "./index.scss";
 interface RequestFeatureModalProps {
   isOpen: boolean;
   organizationsData: OrganizationsDetails;
+  hasReachedLimit?: boolean;
+  source: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
 }
@@ -25,10 +30,13 @@ interface RequestFeatureModalProps {
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   isOpen,
   organizationsData,
+  hasReachedLimit,
+  source,
   setOpenPopup,
   onContinue,
 }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
 
@@ -59,8 +67,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
           status: "success",
           message: (
             <>
-              {enterpriseAdmin.adminName} has been notified. Please get in touch with them at{" "}
-              <span className="enterprise-admin-details">{enterpriseAdmin.adminEmail} for futher details.</span>
+              Workspace {organizationsData?.workspaces?.length > 1 ? "admins have" : "admin has"} been notified. Please
+              get in touch with them for further details.
             </>
           ),
         });
@@ -79,11 +87,32 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
       });
   }, [organizationsData?.workspaces, requestEnterprisePlanFromAdmin]);
 
+  const renderModalTitle = () => {
+    if (!postRequestMessage) {
+      return (
+        <>
+          {hasReachedLimit ? (
+            <Typography.Title level={5}>
+              {capitalize(getPlanNameFromId(user?.details?.planDetails?.planId)) || "Free"} plan limits reached!
+            </Typography.Title>
+          ) : (
+            <Typography.Title level={5}>This feature is a part of our paid offering</Typography.Title>
+          )}
+          <Typography.Title level={5} style={{ marginTop: 0 }}>
+            Request admin to add you to the Professional plan
+          </Typography.Title>
+        </>
+      );
+    }
+
+    return null;
+  };
+
   useEffect(() => {
     if (isOpen) {
-      trackUpgradePopoverViewed("send_request");
+      trackUpgradePopoverViewed("send_request", source);
     }
-  }, [isOpen]);
+  }, [isOpen, source]);
 
   return (
     <>
@@ -95,7 +124,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         }}
         footer={null}
         className="request-feature-modal"
-        title={!postRequestMessage && "Send request to admin"}
+        title={renderModalTitle()}
         maskStyle={{ backdropFilter: "blur(4px)", background: "none" }}
         closeIcon={<RQButton type="default" iconOnly icon={<CloseOutlined />} />}
         maskClosable={false}

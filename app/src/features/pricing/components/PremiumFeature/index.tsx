@@ -8,6 +8,8 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import "./index.scss";
+import { capitalize } from "lodash";
+import { getPlanNameFromId } from "utils/PremiumUtils";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -16,6 +18,7 @@ interface PremiumFeatureProps {
   className?: string;
   popoverPlacement: PopconfirmProps["placement"];
   disabled?: boolean;
+  source: string;
 }
 
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
@@ -25,6 +28,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   feature,
   popoverPlacement,
   disabled = false,
+  source,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -54,6 +58,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             setOpenPopup={setOpenPopup}
             organizationsData={user?.details?.organization}
             onContinue={onContinue}
+            hasReachedLimit={isBreachingLimit}
+            source={source}
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
@@ -86,16 +92,24 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           cancelButtonProps={{ style: { display: hideUseForNowCTA ? "none" : "inline-flex" } }}
           title={
             <>
-              <Typography.Title level={4}>{isBreachingLimit ? "Limits reached" : "Premium feature"}</Typography.Title>
+              <Typography.Title level={4}>
+                {isBreachingLimit
+                  ? `${
+                      capitalize(getPlanNameFromId(user?.details?.planDetails?.planId)) || "Free"
+                    } plan limits reached!`
+                  : "Premium feature"}
+              </Typography.Title>
               <Typography.Text>
                 {isBreachingLimit
-                  ? "You've exceeded the usage limits of the free plan. Consider upgrading for uninterrupted usage."
+                  ? `You've exceeded the usage limits of the ${
+                      getPlanNameFromId(user?.details?.planDetails?.planId) || "free"
+                    } plan. Consider upgrading for uninterrupted usage.`
                   : " This feature is a part of our paid offering. Consider upgrading for uninterrupted usage."}
               </Typography.Text>
             </>
           }
           onOpenChange={(open) => {
-            if (open) trackUpgradePopoverViewed("default");
+            if (open) trackUpgradePopoverViewed("default", source);
           }}
         >
           {React.Children.map(children, (child) => {

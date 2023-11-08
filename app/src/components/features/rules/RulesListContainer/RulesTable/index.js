@@ -690,6 +690,7 @@ const RulesTable = ({
               feature={[FeatureLimitType.num_active_rules]}
               popoverPlacement="left"
               onContinue={() => toggleRuleStatus(record)}
+              source="rule_list_status_switch"
             >
               <Switch
                 size="small"
@@ -852,6 +853,7 @@ const RulesTable = ({
                         feature={[FeatureLimitType.share_rules]}
                         popoverPlacement="bottom"
                         onContinue={() => shareIconOnClickHandler(record)}
+                        source="rule_list_share_button"
                       >
                         <Tooltip title="Share with your Teammates">
                           <Tag>
@@ -1099,6 +1101,7 @@ const RulesTable = ({
               popoverPlacement="topLeft"
               onContinue={(e) => handleNewRuleOnClick(e, TYPE)}
               feature={[`${TYPE.toLowerCase()}_rule`, FeatureLimitType.num_rules]}
+              source="rule_selection_dropdown"
             >
               <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
                 {NAME}
@@ -1196,6 +1199,7 @@ const RulesTable = ({
                   feature={[FeatureLimitType.share_rules]}
                   onContinue={handleShareRulesOnClick}
                   popoverPlacement="bottomLeft"
+                  source="share_button"
                 >
                   <Tooltip title={isScreenSmall ? "Share Rules" : null}>
                     <Button shape={isScreenSmall ? "circle" : null} icon={<UsergroupAddOutlined />}>

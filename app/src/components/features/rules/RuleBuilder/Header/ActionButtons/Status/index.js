@@ -102,6 +102,7 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
           );
         }}
         feature={[FeatureLimitType.num_active_rules]}
+        source={currentlySelectedRuleData.ruleType}
       >
         <Switch size="small" className="ml-3" checked={isChecked} disabled={isDisabled} />
       </PremiumFeature>

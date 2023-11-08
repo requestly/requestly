@@ -220,6 +220,7 @@ const CreateRuleButton = ({
         feature={[FeatureLimitType.num_rules]}
         onContinue={handleBtnOnClick}
         disabled={isDisabled || location?.state?.source === "my_rules" || location?.state?.source === "rule_selection"}
+        source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">
           <Button data-tour-id="rule-editor-create-btn" type="primary" className="text-bold" disabled={isDisabled}>

@@ -51,6 +51,7 @@ const AuthPopoverButton: React.FC<Props> = ({
           onClickHandler();
         }}
         popoverPlacement="bottomLeft"
+        source="share_button"
       >
         <RQButton icon={icon}>
           {!isTooltipShown ? (

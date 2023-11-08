@@ -244,6 +244,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 feature={[FeatureLimitType.dynamic_response_body]}
                 popoverPlacement="top"
                 onContinue={() => onChangeResponseType(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE)}
+                source="dynamic_response_body"
               >
                 <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
                   <Row align="middle">

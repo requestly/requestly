@@ -91,6 +91,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
             onContinue={() => {
               handleResourceTypeChange(ResponseRuleResourceType.GRAPHQL_API);
             }}
+            source="graphql_resource_type"
           >
             <Radio value={ResponseRuleResourceType.GRAPHQL_API} className="graphql-radio-item">
               <Row align="middle">
