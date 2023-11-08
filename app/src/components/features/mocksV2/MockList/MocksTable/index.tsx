@@ -225,7 +225,13 @@ const MocksTable: React.FC<Props> = ({
                 copyText={
                   record.isOldMock
                     ? record.url
-                    : generateFinalUrl(record.endpoint, user?.details?.profile?.uid, user?.details?.username, teamId)
+                    : generateFinalUrl(
+                        record.endpoint,
+                        user?.details?.profile?.uid,
+                        user?.details?.username,
+                        teamId,
+                        record?.password
+                      )
                 }
                 disableTooltip={true}
                 showIcon={false}
@@ -244,7 +250,13 @@ const MocksTable: React.FC<Props> = ({
                     url = record.url;
                   } else {
                     // Not sending username as it might change
-                    url = generateFinalUrl(record.endpoint, user?.details?.profile?.uid, null, teamId);
+                    url = generateFinalUrl(
+                      record.endpoint,
+                      user?.details?.profile?.uid,
+                      null,
+                      teamId,
+                      record?.password
+                    );
                   }
                   handleSelectAction(url);
                 }}
