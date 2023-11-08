@@ -1,11 +1,7 @@
-import React from "react";
-import { Row } from "antd";
-import { RQButton } from "lib/design-system/components";
-import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import React, { useState } from "react";
+import { Button, Row } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { PremiumIcon } from "components/common/PremiumIcon";
-import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { PremiumFeature } from "features/pricing";
 
 interface Props {
   icon: React.ReactNode;
@@ -20,7 +16,7 @@ interface Props {
   isScreenSmall: boolean;
   isLoggedIn: boolean;
   authSource?: string;
-  feature?: FeatureLimitType;
+  isPremium?: boolean;
 }
 
 const AuthPopoverButton: React.FC<Props> = ({
@@ -36,64 +32,51 @@ const AuthPopoverButton: React.FC<Props> = ({
   isLoggedIn,
   isScreenSmall,
   authSource,
-  feature = null,
+  isPremium = false,
 }) => {
-  const isChinaUser = window.isChinaUser ?? false;
-  const { getFeatureLimitValue } = useFeatureLimiter();
+  const [isChinaUser, setIsChinaUser] = useState<boolean>(false);
 
-  if (isLoggedIn) {
-    return (
-      <PremiumFeature
-        disabled={!isLoggedIn}
-        feature={[feature]}
-        onContinue={() => {
+  return (
+    <AuthConfirmationPopover
+      title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
+      disabled={!hasPopconfirm || isChinaUser}
+      callback={onClickHandler}
+      source={authSource}
+    >
+      <Button
+        type={type || "default"}
+        shape={isScreenSmall ? shape : null}
+        onClick={() => {
           trackClickEvent();
-          onClickHandler();
+          if (isChinaUser) {
+            onClickHandler();
+            return;
+          }
+          if (hasPopconfirm) {
+            isLoggedIn && onClickHandler();
+          } else {
+            onClickHandler();
+          }
         }}
-        popoverPlacement="bottomLeft"
-        source="share_button"
+        onMouseEnter={() => {
+          setIsChinaUser(window.isChinaUser ?? false);
+        }}
+        icon={icon}
+        data-tour-id={tourId}
       >
-        <RQButton icon={icon}>
-          {!isTooltipShown ? (
-            buttonText
-          ) : isScreenSmall ? null : (
-            <span>
-              <Row align="middle" wrap={false}>
-                {buttonText}
-                {!getFeatureLimitValue(feature) ? (
-                  <PremiumIcon featureType="share_rules" source="share_button" />
-                ) : null}
-              </Row>
-            </span>
-          )}
-        </RQButton>
-      </PremiumFeature>
-    );
-  } else {
-    return (
-      <AuthConfirmationPopover
-        title={`You need to sign up to ${buttonText.toLowerCase()} rules`}
-        disabled={!hasPopconfirm || isChinaUser}
-        callback={onClickHandler}
-        source={authSource}
-      >
-        <RQButton icon={icon}>
-          {!isTooltipShown ? (
-            buttonText
-          ) : isScreenSmall ? null : (
-            <span>
-              <Row align="middle" wrap={false}>
-                {buttonText}
-                {!getFeatureLimitValue(feature) ? (
-                  <PremiumIcon featureType="share_rules" source="share_button" />
-                ) : null}
-              </Row>
-            </span>
-          )}
-        </RQButton>
-      </AuthConfirmationPopover>
-    );
-  }
+        {!isTooltipShown ? (
+          buttonText
+        ) : isScreenSmall ? null : (
+          <span>
+            <Row align="middle" wrap={false}>
+              {buttonText}
+              {isPremium ? <PremiumIcon featureType="share_rules" source="share_button" /> : null}
+            </Row>
+          </span>
+        )}
+      </Button>
+    </AuthConfirmationPopover>
+  );
 };
 
 export default AuthPopoverButton;

@@ -241,7 +241,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             >
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>Static Data</Radio>
               <PremiumFeature
-                feature={[FeatureLimitType.dynamic_response_body]}
+                features={[FeatureLimitType.dynamic_response_body]}
                 popoverPlacement="top"
                 onContinue={() => onChangeResponseType(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE)}
                 source="dynamic_response_body"

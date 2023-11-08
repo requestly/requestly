@@ -101,7 +101,7 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
             isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
           );
         }}
-        feature={[FeatureLimitType.num_active_rules]}
+        features={[FeatureLimitType.num_active_rules]}
         source={currentlySelectedRuleData.ruleType}
       >
         <Switch size="small" className="ml-3" checked={isChecked} disabled={isDisabled} />

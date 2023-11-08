@@ -128,11 +128,13 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
       footer={
         <Row justify="end" align="middle">
           <Space size={8}>
-            <RQButton type="default">Cancel</RQButton>
+            <RQButton type="default" onClick={() => close()}>
+              Cancel
+            </RQButton>
             <PremiumFeature
               popoverPlacement="top"
               onContinue={duplicateRule}
-              feature={[FeatureLimitType.num_rules]}
+              features={[FeatureLimitType.num_rules]}
               source="duplicate_rule"
             >
               <RQButton disabled={!newRuleName} type="primary">

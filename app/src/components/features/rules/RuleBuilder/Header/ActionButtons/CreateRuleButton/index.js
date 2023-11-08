@@ -217,7 +217,7 @@ const CreateRuleButton = ({
     <>
       <PremiumFeature
         popoverPlacement="bottomLeft"
-        feature={[FeatureLimitType.num_rules]}
+        features={[FeatureLimitType.num_rules]}
         onContinue={handleBtnOnClick}
         disabled={isDisabled || location?.state?.source === "my_rules" || location?.state?.source === "rule_selection"}
         source={currentlySelectedRuleData.ruleType}

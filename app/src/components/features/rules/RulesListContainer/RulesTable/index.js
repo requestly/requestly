@@ -72,12 +72,12 @@ import RuleTypeTag from "components/common/RuleTypeTag";
 import LINKS from "config/constants/sub/links";
 import Logger from "lib/logger";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { PremiumIcon } from "components/common/PremiumIcon";
-import "./rulesTable.css";
 import AuthPopoverButton from "./AuthPopoverButtons";
 import { unselectAllRecords } from "../../actions";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumFeature } from "features/pricing";
+import { PremiumIcon } from "components/common/PremiumIcon";
+import "./rulesTable.css";
 
 //Lodash
 const set = require("lodash/set");
@@ -687,7 +687,7 @@ const RulesTable = ({
           return (
             <PremiumFeature
               disabled={checkIfRuleIsActive(record)}
-              feature={[FeatureLimitType.num_active_rules]}
+              features={[FeatureLimitType.num_active_rules]}
               popoverPlacement="left"
               onContinue={() => toggleRuleStatus(record)}
               source="rule_list_status_switch"
@@ -849,18 +849,11 @@ const RulesTable = ({
                       </Text>
                     )}
                     <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
-                      <PremiumFeature
-                        feature={[FeatureLimitType.share_rules]}
-                        popoverPlacement="bottom"
-                        onContinue={() => shareIconOnClickHandler(record)}
-                        source="rule_list_share_button"
-                      >
-                        <Tooltip title="Share with your Teammates">
-                          <Tag>
-                            <UsergroupAddOutlined />
-                          </Tag>
-                        </Tooltip>
-                      </PremiumFeature>
+                      <Tooltip title="Share with your Teammates">
+                        <Tag onClick={() => shareIconOnClickHandler(record)}>
+                          <UsergroupAddOutlined />
+                        </Tag>
+                      </Tooltip>
                     </Text>
                     <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
                       <Tooltip title="Duplicate Rule">
@@ -1100,7 +1093,7 @@ const RulesTable = ({
             <PremiumFeature
               popoverPlacement="topLeft"
               onContinue={(e) => handleNewRuleOnClick(e, TYPE)}
-              feature={[`${TYPE.toLowerCase()}_rule`, FeatureLimitType.num_rules]}
+              features={[`${TYPE.toLowerCase()}_rule`, FeatureLimitType.num_rules]}
               source="rule_selection_dropdown"
             >
               <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
@@ -1193,51 +1186,23 @@ const RulesTable = ({
                   {isScreenSmall ? null : "Change Group"}
                 </Button>
               </Tooltip>
-              {user.loggedIn ? (
-                <PremiumFeature
-                  disabled={!user.loggedIn}
-                  feature={[FeatureLimitType.share_rules]}
-                  onContinue={handleShareRulesOnClick}
-                  popoverPlacement="bottomLeft"
-                  source="share_button"
-                >
-                  <Tooltip title={isScreenSmall ? "Share Rules" : null}>
-                    <Button shape={isScreenSmall ? "circle" : null} icon={<UsergroupAddOutlined />}>
-                      {isScreenSmall ? null : (
-                        <span>
-                          <Row align="middle" wrap={false}>
-                            Share
-                            {!getFeatureLimitValue(FeatureLimitType.share_rules) ? (
-                              <PremiumIcon featureType="share_rules" source="share_button" />
-                            ) : null}
-                          </Row>
-                        </span>
-                      )}
-                    </Button>
-                  </Tooltip>
-                </PremiumFeature>
-              ) : (
-                <AuthConfirmationPopover
-                  title="You need to sign up to share rules"
-                  callback={handleShareRulesOnClick}
-                  source={AUTH.SOURCE.SHARE_RULES}
-                >
-                  <Tooltip title={isScreenSmall ? "Share Rules" : null}>
-                    <Button shape={isScreenSmall ? "circle" : null} icon={<UsergroupAddOutlined />}>
-                      {isScreenSmall ? null : (
-                        <span>
-                          <Row align="middle" wrap={false}>
-                            Share
-                            {!getFeatureLimitValue(FeatureLimitType.share_rules) ? (
-                              <PremiumIcon featureType="share_rules" source="share_button" />
-                            ) : null}
-                          </Row>
-                        </span>
-                      )}
-                    </Button>
-                  </Tooltip>
-                </AuthConfirmationPopover>
-              )}
+              <AuthConfirmationPopover
+                title="You need to sign up to share rules"
+                callback={handleShareRulesOnClick}
+                source={AUTH.SOURCE.SHARE_RULES}
+              >
+                <Tooltip title={isScreenSmall ? "Share Rules" : null}>
+                  <Button shape={isScreenSmall ? "circle" : null} icon={<UsergroupAddOutlined />}>
+                    {isScreenSmall ? null : (
+                      <span>
+                        <Row align="middle" wrap={false}>
+                          Share
+                        </Row>
+                      </span>
+                    )}
+                  </Button>
+                </Tooltip>
+              </AuthConfirmationPopover>
               <Tooltip
                 title={
                   isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null
@@ -1319,7 +1284,6 @@ const RulesTable = ({
                     icon: <UsergroupAddOutlined />,
                     tourId: "rule-list-share-btn",
                     onClickHandler: handleShareRulesOnClick,
-                    feature: FeatureLimitType.share_rules,
                   },
                   {
                     shape: null,

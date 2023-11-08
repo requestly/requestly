@@ -25,6 +25,14 @@
     .request-modal-default-btn {
       background: none;
     }
+    .request-modal-link-btn {
+      color: var(--text-light);
+      text-decoration: underline;
+      padding-left: 0;
+    }
+    .request-modal-link-btn:hover {
+      color: var(--white);
+    }
 
     .send-icon {
       rotate: (90deg);

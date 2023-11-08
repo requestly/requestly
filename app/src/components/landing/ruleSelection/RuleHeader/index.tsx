@@ -54,7 +54,7 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
             onContinue={() => {
               handleCreateRuleClick();
             }}
-            feature={[featureName, FeatureLimitType.num_rules]}
+            features={[featureName, FeatureLimitType.num_rules]}
             popoverPlacement="bottomLeft"
             source={selectedRuleType}
           >

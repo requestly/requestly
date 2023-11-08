@@ -98,9 +98,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
           ) : (
             <Typography.Title level={5}>This feature is a part of our paid offering</Typography.Title>
           )}
-          <Typography.Title level={5} style={{ marginTop: 0 }}>
-            Request admin to add you to the Professional plan
-          </Typography.Title>
         </>
       );
     }
@@ -159,8 +156,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
             <Row className="mt-16" justify="space-between" align="middle">
               <Col>
                 <RQButton
-                  type="default"
-                  className="request-modal-default-btn"
+                  type="link"
+                  className="request-modal-link-btn"
                   disabled={isLoading}
                   onClick={() => {
                     trackUpgradeOptionClicked("use_for_free_now");
@@ -168,7 +165,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     onContinue();
                   }}
                 >
-                  Use for free now
+                  Use for now
                 </RQButton>
               </Col>
               <Col>

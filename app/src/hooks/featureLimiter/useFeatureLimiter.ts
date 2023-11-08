@@ -55,6 +55,8 @@ export const useFeatureLimiter = () => {
   const getFeatureLimitValue = (featureLimitType: FeatureLimitType) => {
     if (!(featureLimitType in FeatureLimitType)) return true; // free feature
 
+    if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) return Infinity;
+
     return (
       featureLimits[userPlan]?.[featureLimitType] ?? featureLimits[PRICING.PLAN_NAMES.BASIC_V2]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
     );

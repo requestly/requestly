@@ -39,7 +39,7 @@ const AddPairButton = (props) => {
     <PremiumFeature
       popoverPlacement="top"
       onContinue={handleRulePairsOnClick}
-      feature={[FeatureLimitType.add_new_rule_pair]}
+      features={[FeatureLimitType.add_new_rule_pair]}
       source="add_new_rule_pair"
     >
       <Button block type="dashed" className="add-pair-btn" icon={<PlusOutlined />}>

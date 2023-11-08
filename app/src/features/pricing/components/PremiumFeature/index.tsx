@@ -7,13 +7,13 @@ import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
-import "./index.scss";
 import { capitalize } from "lodash";
 import { getPlanNameFromId } from "utils/PremiumUtils";
+import "./index.scss";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
-  feature: FeatureLimitType[];
+  features: FeatureLimitType[];
   children?: React.ReactNode;
   className?: string;
   popoverPlacement: PopconfirmProps["placement"];
@@ -25,7 +25,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   onContinue,
   children,
   className = "",
-  feature,
+  features,
   popoverPlacement,
   disabled = false,
   source,
@@ -36,10 +36,10 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const [openPopup, setOpenPopup] = useState(false);
 
   const showPremiumPopovers = useMemo(
-    () => feature.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat))),
-    [feature, getFeatureLimitValue, checkIfFeatureLimitReached]
+    () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat))),
+    [features, getFeatureLimitValue, checkIfFeatureLimitReached]
   );
-  const isBreachingLimit = feature.some(checkIfFeatureLimitReached);
+  const isBreachingLimit = features.some(checkIfFeatureLimitReached);
 
   const hideUseForNowCTA = new Date() > new Date("2023-11-30");
 
@@ -51,7 +51,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 
   return (
     <>
-      {user?.details?.organization && !disabled && feature ? (
+      {user?.details?.organization && !disabled && features ? (
         <>
           <RequestFeatureModal
             isOpen={openPopup}
@@ -72,13 +72,13 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         </>
       ) : (
         <Popconfirm
-          disabled={!showPremiumPopovers || !feature || disabled}
+          disabled={!showPremiumPopovers || !features || disabled}
           overlayClassName="premium-feature-popover"
           autoAdjustOverflow
           showArrow={false}
           placement={popoverPlacement}
           okText="See upgrade plans"
-          cancelText="Use for free now"
+          cancelText="Use for now"
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
@@ -115,7 +115,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (!showPremiumPopovers || !feature || disabled) {
+                if (!showPremiumPopovers || !features || disabled) {
                   onContinue();
                 }
               },
