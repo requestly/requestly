@@ -8,6 +8,14 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.11.8",
+    logs: [
+      "chore: bump web-sdk version v0.14.2. Fixed custom elements not visible in Session Replay (#1209)",
+      "[RQ-1031] changed Requestly icon (#1207)",
+      "[RQ-1025] chore: update rule_created event source property for devtools #1188",
+    ],
+  },
+  {
     version: "23.10.22",
     logs: [
       "[RQ-944]: new extension popup experience #1117",
