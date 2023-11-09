@@ -14,6 +14,7 @@ import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
+import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 
 const useRuleTableColumns = (
   options: Record<string, boolean>,
@@ -28,6 +29,7 @@ const useRuleTableColumns = (
     handleDeleteRecordClick,
     handleRenameGroupClick,
     handleChangeRuleGroupClick,
+    handlePinRecordClick,
   } = useRuleTableActions(setSelectedRows);
 
   // const isStatusEnabled = !(options && options.disableStatus);
@@ -48,7 +50,7 @@ const useRuleTableColumns = (
     {
       title: "",
       key: "pin",
-      width: 70,
+      width: 40,
       render: (record: RuleTableDataType) => {
         const isPinned = record.isFavourite;
 
