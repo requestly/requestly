@@ -136,12 +136,10 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
 
       dispatch(rulesActions.ruleObjUpsertMany(updatedRecords));
 
-      return new Promise((resolve) => {
-        StorageService(appMode)
-          .saveMultipleRulesOrGroups(updatedRecords)
-          .then(() => resolve("Records updated in Storage Service"))
-          .catch(() => dispatch(rulesActions.ruleObjUpsertMany(originalRecords)));
-      });
+      return StorageService(appMode)
+        .saveMultipleRulesOrGroups(updatedRecords)
+        .then(() => console.log("Records updated in Storage Service"))
+        .catch(() => dispatch(rulesActions.ruleObjUpsertMany(originalRecords)));
     },
     [appMode, dispatch]
   );
@@ -208,6 +206,26 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
     const updatedRecords = records.map((record) => ({ ...record, status: RuleObjStatus.ACTIVE }));
     return updateMultipleRecordsInStorage(updatedRecords, records);
   };
+
+  // const handlePinRecordClick = (record: RuleObj) => {
+  //   let currentOwner;
+
+  //   if (record.currentOwner) {
+  //     currentOwner = user?.details?.profile?.uid || null;
+  //   } else {
+  //     currentOwner = record.currentOwner;
+  //   }
+
+  //   const updatedRecord = {
+  //     ...record,
+  //     currentOwner,
+  //     isFavourite: !record.isFavourite,
+  //   };
+
+  //   return updateRuleInStorage(updatedRecord, record).then(() => {
+  //     // trackRulePinToggled(newValue);
+  //   });
+  // };
 
   return {
     handlePin,
