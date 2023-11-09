@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
 import Footer from "../../components/sections/Footer";
@@ -8,13 +10,18 @@ import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import "./DashboardLayout.css";
 import { AppNotificationBanner } from "./AppNotificationBanner";
+import { httpsCallable, getFunctions } from "firebase/functions";
+import { actions } from "store";
+import "./DashboardLayout.css";
+import Logger from "lib/logger";
 
 const DashboardLayout = () => {
+  const dispatch = useDispatch();
   const location = useLocation();
   const { pathname } = location;
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
+  const user = useSelector(getUserAuthDetails);
 
   promptOneTapOnLoad();
 
@@ -23,6 +30,8 @@ const DashboardLayout = () => {
     [pathname]
   );
 
+  const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
+
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
 
@@ -30,6 +39,20 @@ const DashboardLayout = () => {
     removeElement(".app-header");
     removeElement(".app-footer");
   }, []);
+
+  useEffect(() => {
+    if (user.loggedIn && !user?.details?.organization) {
+      try {
+        getEnterpriseAdminDetails().then((response) => {
+          if (response.data.success) {
+            dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
+          }
+        });
+      } catch (e) {
+        Logger.log(e);
+      }
+    }
+  }, [getEnterpriseAdminDetails, user.loggedIn, user?.details?.organization, dispatch]);
 
   return (
     <>

@@ -8,6 +8,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
+import { PremiumFeature } from "features/pricing";
 import { trackRulePairCreated } from "modules/analytics/events/common/rules";
 import "./AddPairButton.css";
 
@@ -35,16 +36,20 @@ const AddPairButton = (props) => {
   };
 
   return (
-    <Button block type="dashed" className="add-pair-btn" onClick={handleRulePairsOnClick} icon={<PlusOutlined />}>
-      <span>
-        <Row align="middle" wrap={false} className="shrink-0">
-          Add a new condition
-          {isPremiumFeature ? (
-            <PremiumIcon featureType="add_new_rule_pair" source={currentlySelectedRuleData?.ruleType} />
-          ) : null}
-        </Row>
-      </span>
-    </Button>
+    <PremiumFeature
+      popoverPlacement="top"
+      onContinue={handleRulePairsOnClick}
+      features={[FeatureLimitType.add_new_rule_pair]}
+      source="add_new_rule_pair"
+    >
+      <Button block type="dashed" className="add-pair-btn" icon={<PlusOutlined />}>
+        <span>
+          <Row align="middle" wrap={false} className="shrink-0">
+            Add a new condition{isPremiumFeature ? <PremiumIcon /> : null}
+          </Row>
+        </span>
+      </Button>
+    </PremiumFeature>
   );
 };
 
