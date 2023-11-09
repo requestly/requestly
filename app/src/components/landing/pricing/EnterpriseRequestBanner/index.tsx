@@ -38,7 +38,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
     setEnterpriseRequestedState(1);
     const enterpriseAdmin = orgContactDetails?.workspaces?.[0];
     const domain = enterpriseAdmin.adminEmail.split("@")[1];
-    trackTeamPlanCardClicked(domain);
+    trackTeamPlanCardClicked(domain, "pricing_page");
     requestEnterprisePlanFromAdmin({
       workspaceDetails: orgContactDetails?.workspaces,
     })

@@ -33,8 +33,8 @@ export const trackTeamPlanCardShown = (domain) => {
   trackEvent(TEAMS.REQUEST_TEAM_PLAN_CARD_SHOWN, params);
 };
 
-export const trackTeamPlanCardClicked = (domain) => {
-  const params = { domain };
+export const trackTeamPlanCardClicked = (domain, source) => {
+  const params = { domain, source };
   trackEvent(TEAMS.REQUEST_TEAM_PLAN_CARD_CLICKED, params);
 };
 
