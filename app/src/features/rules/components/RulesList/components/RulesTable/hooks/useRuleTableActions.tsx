@@ -16,7 +16,7 @@ import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-co
 import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
 
-const useRuleTableActions = () => {
+const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateAction<unknown>>) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);

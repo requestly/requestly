@@ -1,3 +1,4 @@
+import React from "react";
 import { useSelector } from "react-redux";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
@@ -14,7 +15,10 @@ import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 
-const useRuleTableColumns = (options: Record<string, boolean>) => {
+const useRuleTableColumns = (
+  options: Record<string, boolean>,
+  setSelectedRows: React.Dispatch<React.SetStateAction<unknown>>
+) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const {
@@ -23,7 +27,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     handleDuplicateRuleClick,
     handleDeleteRecordClick,
     handleRenameGroupClick,
-  } = useRuleTableActions();
+    handleChangeRuleGroupClick,
+  } = useRuleTableActions(setSelectedRows);
 
   // const isStatusEnabled = !(options && options.disableStatus);
   const isEditingEnabled = !(options && options.disableEditing);
@@ -153,11 +158,19 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           {
             key: 0,
             onClick: () => {
-              handleRenameGroupClick(record);
+              isRule ? handleChangeRuleGroupClick(record) : handleRenameGroupClick(record);
             },
             label: (
               <Row>
-                <RiEdit2Line /> Rename
+                {isRule ? (
+                  <>
+                    <RiEdit2Line /> Change Group
+                  </>
+                ) : (
+                  <>
+                    <RiEdit2Line /> Rename
+                  </>
+                )}
               </Row>
             ),
           },

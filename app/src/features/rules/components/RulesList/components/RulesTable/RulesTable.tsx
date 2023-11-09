@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { rulesToContentTableDataAdapter } from "./utils";
@@ -34,6 +34,10 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     handleUngroupSelectedRulesClick,
   } = useRuleTableActions();
 
+  const clearSelectedRows = useCallback(() => {
+    setSelectedRows([]);
+  }, []);
+
   useEffect(() => {
     const contentTableAdaptedRules = rulesToContentTableDataAdapter(rules);
     setContentTableAdaptedRules(contentTableAdaptedRules);
@@ -64,6 +68,16 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
       <RenameGroupModalWrapper />
       <DeleteRulesModalWrapper />
       <ChangeRuleGroupModalWrapper />
+
+      {isChangeGroupModalActive ? (
+        <ChangeRuleGroupModal
+          clearSearch={clearSelectedRows} // FIXME
+          isOpen={isChangeGroupModalActive}
+          toggle={closeChangeRuleGroupModal}
+          mode="SELECTED_RULES"
+          selectedRules={selectedRows}
+        />
+      ) : null}
 
       <ContentTable
         columns={columns}
