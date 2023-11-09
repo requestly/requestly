@@ -50,7 +50,7 @@ export default function GenerateEmailAuthLinkBtn({ email, authMode, eventSource,
       Send link again in {timeToResendEmailLogin} seconds
     </RQButton>
   ) : (
-    <RQButton className="form-elements-margin w-full" onClick={handleBtnClick}>
+    <RQButton type="primary" className="form-elements-margin w-full" onClick={handleBtnClick}>
       {" "}
       Continue with Email
     </RQButton>

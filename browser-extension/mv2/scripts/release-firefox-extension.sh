@@ -3,7 +3,7 @@
 set -e
 
 shopt -s expand_aliases
-source $HOME/personal/repo/scripts/alias.sh
+source $HOME/Documents/dev/requestly/scripts/alias.sh
 
 cd dist
 

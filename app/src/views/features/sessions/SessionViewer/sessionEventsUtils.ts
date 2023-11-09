@@ -52,7 +52,7 @@ export const getPageNavigationLogs = (rrwebEvents: RRWebEventData[], startTime: 
 
 export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number): ConsoleLog[] => {
   return rrwebEvents
-    .map((event) => {
+    .map((event, index) => {
       let logData: LogData = null;
       if (isConsoleLogEvent(event)) {
         if (event.type === EventType.IncrementalSnapshot) {
@@ -65,6 +65,7 @@ export const getConsoleLogs = (rrwebEvents: RRWebEventData[], startTime: number)
       return (
         logData && {
           ...logData,
+          id: `resource-${index}`,
           timeOffset: (event.timestamp - startTime) / 1000,
         }
       );
@@ -124,4 +125,29 @@ export const downloadSession = (fileContent: string, fileName: string): void => 
 
 export const getSessionRecordingOptions = (options: RecordingOptions): string[] => {
   return Object.keys(options ?? {}).filter((key: DebugInfo) => options?.[key]);
+};
+
+export function isUserInteractionEvent(event: RRWebEventData): boolean {
+  if (event.type !== EventType.IncrementalSnapshot) {
+    return false;
+  }
+  return event.data.source > IncrementalSource.Mutation && event.data.source <= IncrementalSource.Input;
+}
+
+export const getInactiveSegments = (events: RRWebEventData[]): [number, number][] => {
+  const SKIP_TIME_THRESHOLD = 10 * 1000;
+  const inactiveSegments: [number, number][] = [];
+  let lastActiveTime = events[0].timestamp;
+
+  events.forEach((event) => {
+    if (!isUserInteractionEvent(event)) {
+      return;
+    }
+    if (event.timestamp - lastActiveTime > SKIP_TIME_THRESHOLD) {
+      inactiveSegments.push([lastActiveTime, event.timestamp]);
+    }
+    lastActiveTime = event.timestamp;
+  });
+
+  return inactiveSegments;
 };

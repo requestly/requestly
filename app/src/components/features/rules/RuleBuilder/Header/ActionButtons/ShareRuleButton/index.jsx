@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
-import { Button, Tooltip } from "antd";
+import { Button, Row, Tooltip } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -47,19 +47,22 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   return (
     <>
       {isRuleEditorModal ? (
-        <Button
-          type="text"
-          onClick={() => {
-            shareRuleClickHandler();
-            trackRuleEditorHeaderClicked(
-              "share_button",
-              currentlySelectedRuleData.ruleType,
-              MODE,
-              "rule_editor_modal_header"
-            );
-          }}
-        >
-          Share rule
+        <Button type="text">
+          <Row
+            align="middle"
+            wrap={false}
+            onClick={() => {
+              shareRuleClickHandler();
+              trackRuleEditorHeaderClicked(
+                "share_button",
+                currentlySelectedRuleData.ruleType,
+                MODE,
+                "rule_editor_modal_header"
+              );
+            }}
+          >
+            Share rule
+          </Row>
         </Button>
       ) : (
         <Tooltip title="Share rule" placement="bottom">

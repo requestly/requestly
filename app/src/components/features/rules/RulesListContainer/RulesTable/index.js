@@ -19,7 +19,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
-import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu } from "antd";
+import { Space, Tooltip, Button, Switch, Input, Empty, Dropdown, Menu, Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import {
   getAllGroups,
@@ -32,6 +32,7 @@ import {
   getGroupsSelection,
   getRulesToPopulate,
   getUserAuthDetails,
+  getUserAttributes,
 } from "store/selectors";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Typography, Tag } from "antd";
@@ -41,7 +42,7 @@ import { actions } from "store";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { compareRuleByModificationDate, isDesktopOnlyRule } from "utils/rules/misc";
 import { isFeatureCompatible } from "../../../../../utils/CompatibilityUtils";
-import { trackRQLastActivity } from "utils/AnalyticsUtils";
+import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import SharedListRuleViewerModal from "../../SharedListRuleViewerModal";
 import { isEmpty } from "lodash";
 import moment from "moment";
@@ -70,9 +71,13 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import LINKS from "config/constants/sub/links";
 import Logger from "lib/logger";
-import "./rulesTable.css";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import AuthPopoverButton from "./AuthPopoverButtons";
 import { unselectAllRecords } from "../../actions";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumFeature } from "features/pricing";
+import { PremiumIcon } from "components/common/PremiumIcon";
+import "./rulesTable.css";
 
 //Lodash
 const set = require("lodash/set");
@@ -142,6 +147,7 @@ const RulesTable = ({
   //Global State
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const searchByRuleName = useSelector(getRulesSearchKeyword);
   const rulesData = useSelector(getAllRules);
   const rules = rulesFromProps ? rulesFromProps : rulesData;
@@ -155,6 +161,7 @@ const RulesTable = ({
   const selectedGroups = useSelector(getGroupsSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
   const selectedGroupIds = useMemo(() => Object.keys(selectedGroups), [selectedGroups]);
@@ -449,13 +456,14 @@ const RulesTable = ({
         newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
           ? toast.success(`Rule is now ${newStatus.toLowerCase()}`)
           : toast.success(`Rule is now ${newStatus.toLowerCase()}`);
-
         //Analytics
         if (newStatus.toLowerCase() === "active") {
           trackRQLastActivity("rule_activated");
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
           trackRuleActivatedStatusEvent(rule.ruleType);
         } else {
           trackRQLastActivity("rule_deactivated");
+          submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
           trackRuleDeactivatedStatus(rule.ruleType);
         }
       })
@@ -464,9 +472,9 @@ const RulesTable = ({
       });
   };
 
-  const toggleRuleStatus = (event, rule) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const toggleRuleStatus = (rule) => {
+    // event.preventDefault();
+    // event.stopPropagation();
 
     if (checkIfRuleIsActive(rule)) {
       changeRuleStatus(GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE, rule);
@@ -503,8 +511,7 @@ const RulesTable = ({
     );
   };
 
-  const shareIconOnClickHandler = (event, rule) => {
-    event.stopPropagation();
+  const shareIconOnClickHandler = (rule) => {
     trackShareButtonClicked("rules_list");
     user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
@@ -678,14 +685,21 @@ const RulesTable = ({
 
         if (isEditingEnabled) {
           return (
-            <Switch
-              size="small"
-              // When Rule's group is OFF, this switch must be disabled
-              disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
-              checked={checkIfRuleIsActive(record)}
-              onClick={(_, event) => toggleRuleStatus(event, record)}
-              data-tour-id={index === 0 ? "rule-table-switch-status" : null}
-            />
+            <PremiumFeature
+              disabled={checkIfRuleIsActive(record)}
+              features={[FeatureLimitType.num_active_rules]}
+              popoverPlacement="left"
+              onContinue={() => toggleRuleStatus(record)}
+              source="rule_list_status_switch"
+            >
+              <Switch
+                size="small"
+                // When Rule's group is OFF, this switch must be disabled
+                disabled={isGroupSwitchDisabled(record, groupwiseRulesToPopulate)}
+                checked={checkIfRuleIsActive(record)}
+                data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+              />
+            </PremiumFeature>
           );
         }
         return <Text>{checkIfRuleIsActive(record) ? "On" : "Off"}</Text>;
@@ -836,7 +850,7 @@ const RulesTable = ({
                     )}
                     <Text type={isHovering ? "primary" : "secondary"} style={{ cursor: "pointer" }}>
                       <Tooltip title="Share with your Teammates">
-                        <Tag onClick={(e) => shareIconOnClickHandler(e, record)}>
+                        <Tag onClick={() => shareIconOnClickHandler(record)}>
                           <UsergroupAddOutlined />
                         </Tag>
                       </Tooltip>
@@ -1065,25 +1079,34 @@ const RulesTable = ({
     unselectAllRecords(dispatch);
   };
 
-  const dropdownOverlay = useMemo(
-    () => (
+  const dropdownOverlay = useMemo(() => {
+    const checkIsPremiumRule = (ruleType) => {
+      const featureName = `${ruleType.toLowerCase()}_rule`;
+      return !getFeatureLimitValue(featureName);
+    };
+
+    return (
       <Menu>
         {Object.values(RULE_TYPES_CONFIG)
           .filter((ruleConfig) => ruleConfig.ID !== 11)
           .map(({ ID, TYPE, ICON, NAME }) => (
-            <Menu.Item
-              key={ID}
-              icon={<ICON />}
-              onClick={(e) => handleNewRuleOnClick(e, TYPE)}
-              className="rule-selection-dropdown-btn-overlay-item"
+            <PremiumFeature
+              popoverPlacement="topLeft"
+              onContinue={(e) => handleNewRuleOnClick(e, TYPE)}
+              features={[`${TYPE.toLowerCase()}_rule`, FeatureLimitType.num_rules]}
+              source="rule_selection_dropdown"
             >
-              {NAME}
-            </Menu.Item>
+              <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
+                {NAME}
+                {checkIsPremiumRule(TYPE) ? (
+                  <PremiumIcon placement="topLeft" featureType={`${TYPE.toLowerCase()}_rule`} source="rule_dropdown" />
+                ) : null}
+              </Menu.Item>
+            </PremiumFeature>
           ))}
       </Menu>
-    ),
-    [handleNewRuleOnClick]
-  );
+    );
+  }, [handleNewRuleOnClick, getFeatureLimitValue]);
 
   return (
     <>
@@ -1170,11 +1193,17 @@ const RulesTable = ({
               >
                 <Tooltip title={isScreenSmall ? "Share Rules" : null}>
                   <Button
-                    onClick={user?.details?.isLoggedIn && handleShareRulesOnClick}
                     shape={isScreenSmall ? "circle" : null}
                     icon={<UsergroupAddOutlined />}
+                    onClick={user?.details?.isLoggedIn && handleShareRulesOnClick}
                   >
-                    {isScreenSmall ? null : "Share"}
+                    {isScreenSmall ? null : (
+                      <span>
+                        <Row align="middle" wrap={false}>
+                          Share
+                        </Row>
+                      </span>
+                    )}
                   </Button>
                 </Tooltip>
               </AuthConfirmationPopover>
@@ -1283,15 +1312,17 @@ const RulesTable = ({
                       isDropdown = false,
                       overlay,
                       tourId = null,
+                      feature = null,
                     },
                     index
                   ) => (
-                    <Tooltip key={buttonText} title={isTooltipShown && isScreenSmall ? buttonText : null}>
+                    <Tooltip key={index} title={isTooltipShown && isScreenSmall ? buttonText : null}>
                       <>
                         {isDropdown ? (
                           <Dropdown.Button
                             icon={icon}
                             type={type}
+                            trigger={["click"]}
                             onClick={onClickHandler}
                             overlay={overlay}
                             data-tour-id={tourId}

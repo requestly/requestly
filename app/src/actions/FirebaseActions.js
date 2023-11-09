@@ -206,7 +206,7 @@ export async function sendEmailLinkForSignin(
     })
     .catch((err) => {
       toast.error("Failed to send login link. Please try again, or contact support if the problem persists");
-      trackGenerateMagicLinkFailed(email, source);
+      trackGenerateMagicLinkFailed(email, source, err?.message);
       console.log(err);
     });
 }
@@ -466,6 +466,8 @@ export const signInWithEmailLink = async (email, callback) => {
       auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
       uid: authData.uid,
       email,
+      email_type: getEmailType(email),
+      domain: email.split("@")[1],
     });
 
     callback && callback.call(null, true);
@@ -483,6 +485,8 @@ export const signInWithEmailLink = async (email, callback) => {
           auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
           uid: authData.uid,
           email,
+          email_type: getEmailType(email),
+          domain: email.split("@")[1],
         });
 
         return {

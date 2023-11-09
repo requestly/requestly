@@ -1,4 +1,3 @@
-import APP_CONSTANTS from "config/constants";
 import firebaseApp from "../../firebase";
 import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import { actions } from "store";
@@ -22,7 +21,7 @@ export const userSubscriptionDocListener = (dispatch, uid) => {
               actions.updateUserPlanDetails({
                 userPlanDetails: {
                   ...planDetails,
-                  planName: isUserPremium ? getPlanName(planDetails) : APP_CONSTANTS.PRICING.PLAN_NAMES.FREE,
+                  planName: getPlanName(planDetails),
                 },
                 isUserPremium,
               })

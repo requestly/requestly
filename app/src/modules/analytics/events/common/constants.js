@@ -82,6 +82,7 @@ export const AUTH = {
     RULES_LIST: "rules_list",
     PERSONA_SURVEY: "persona-survey",
     PERSONA_RECOMMENDATION_SCREEN: "persona_recommendation_screen",
+    PRICING_PAGE: "pricing_page",
   },
   POPOVER: {
     SHOWN: "popover_at_signup_shown",
@@ -169,7 +170,6 @@ export const TEAMS = {
   REQUEST_TEAM_PLAN_CARD_CLICKED: "request_team_plan_card_clicked",
   WORKSPACE_SETTING_TOGGLED: "workspace_setting_toggled",
   WORKSPACE_DROPDOWN_CLICKED: "workspace_dropdown_clicked",
-  UPGRADE_WORKSPACE_CLICKED: "upgrade_workspace_clicked",
   ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
   ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED: "add_members_in_worskpace_modal_viewed",
   WORKSPACE_INVITE_LINK_COPIED: "workspace_invite_link_copied",
@@ -187,6 +187,10 @@ export const TRAFFIC_TABLE = {
 };
 
 export const FEATURE_LIMITER = {
-  UPGRADE_BANNER_CLICKED: "feature_limiter_upgrade_banner_clicked",
   UPGRADE_BANNER_VIEWED: "feature_limiter_upgrade_banner_viewed",
+};
+
+export const PRICING = {
+  PAID_FEATURE_NUDGE_VIEWED: "paid_feature_nudge_viewed",
+  VIEW_PRICING_PLANS_CLICKED: "view_pricing_plans_clicked",
 };

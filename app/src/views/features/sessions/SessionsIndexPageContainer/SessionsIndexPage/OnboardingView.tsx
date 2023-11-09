@@ -11,7 +11,7 @@ import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActi
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { prefixUrlWithHttps } from "utils/URLUtils";
-import StartSessionRecordingGif from "assets/img/screenshots/sessions-banner.gif";
+import StartSessionRecordingGif from "./assets/sessions-banner.gif";
 import {
   trackInstallExtensionDialogShown,
   trackOnboardingToSettingsNavigate,
@@ -234,6 +234,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
     </div>
   );
 };
+
 const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage, openDownloadedSessionModalBtn }) => {
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;

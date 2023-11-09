@@ -175,7 +175,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
 
   return (
     <>
-      <div className="header text-center ">Invite teammates</div>
+      <div className="header text-center ">{defaultTeamData ? "Invite teammates" : "Create new workspace"}</div>
       <div className="mt-20">
         <label htmlFor="workspace-name" className="text-bold text-white">
           Name of your workspace

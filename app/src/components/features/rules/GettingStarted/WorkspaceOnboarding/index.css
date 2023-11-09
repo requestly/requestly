@@ -35,10 +35,10 @@
   padding: 40px 60px;
 }
 .onboarding-content-banner .onboarding-banner-title {
-  font-size: 36px;
+  font-size: 35px;
   color: var(--white);
   font-weight: 500;
-  line-height: 56px;
+  line-height: 40px;
   max-width: 580px;
 }
 /* AUTH BANNER */
@@ -62,4 +62,15 @@
   max-width: none;
   padding: 0;
   background: none;
+}
+
+.onboarding-auth-form {
+  position: relative;
+}
+
+.skip-onboarding-btn.ant-btn {
+  position: absolute;
+  right: -100px;
+  top: -140px;
+  color: var(--text-gray);
 }

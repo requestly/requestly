@@ -13,7 +13,6 @@ import SHARED_LISTS_TABLE_CONSTANTS from "./sub/shared-lists-table-constants";
 import FILES_TABLE_CONSTANTS from "./sub/files-table-constants";
 import THEME_COLORS from "./sub/theme-colors";
 import AUTH from "./sub/auth";
-import PRICING from "./sub/pricing";
 import LIMIT_REACHED_MODAL from "./sub/limit-reached-modal";
 import EMAIL_DOMAINS from "./sub/email-domains";
 import STYLES from "./sub/styles";
@@ -27,9 +26,6 @@ const APP_CONSTANTS = {};
 
 /** FEATURES */
 APP_CONSTANTS.FEATURES = FEATURES;
-
-/** PRICING */
-APP_CONSTANTS.PRICING = PRICING;
 
 /** STORAGE KEYS */
 APP_CONSTANTS.LAST_BACKUP_TIMESTAMP = "last-backup-timestamp";
@@ -138,6 +134,7 @@ APP_CONSTANTS.PATH_FROM_PAIR = {
   SOURCE_REQUEST_METHOD: "source.filters.requestMethod",
   SOURCE_REQUEST_PAYLOAD: "source.filters.requestPayload",
   SOURCE_REQUEST_PAYLOAD_KEY: "source.filters.requestPayload.key",
+  SOURCE_REQUEST_PAYLOAD_OPERATOR: "source.filters.requestPayload.operator",
   SOURCE_REQUEST_PAYLOAD_VALUE: "source.filters.requestPayload.value",
 };
 

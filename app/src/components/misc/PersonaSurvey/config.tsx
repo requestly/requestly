@@ -29,58 +29,26 @@ export const OptionsConfig: Record<QuestionnaireType, SurveyOptionsConfig> = {
         icon: "🏗",
       },
       {
-        title: PersonaType.MARKETER,
-        icon: "📈",
+        title: PersonaType.FOUNDER,
+        icon: "🧑🏽‍💼",
+      },
+      {
+        title: PersonaType.IT,
+        icon: "📂",
+      },
+      {
+        title: PersonaType.MANAGER,
+        icon: "👨🏽‍💻",
       },
       {
         title: PersonaType.PRODUCT,
         icon: "📊",
       },
       {
-        title: PersonaType.FULLSTACK,
-        icon: "👨🏽‍💻",
-      },
-      {
         title: PersonaType.SALES,
         icon: "💵",
       },
-    ],
-  },
-  [QuestionnaireType.INDUSTRY]: {
-    questionResponseAction: (dispatch, value, doClear = false) =>
-      setUserPersona(dispatch, value, doClear, QuestionnaireType.INDUSTRY),
-    options: [
-      {
-        title: "Ad-Tech",
-      },
-      {
-        title: "E-commerce",
-      },
-      {
-        title: "Gaming",
-      },
-      {
-        title: "Ed-Tech",
-      },
-      {
-        title: "IT services",
-      },
-      {
-        title: "Financial services",
-      },
-      {
-        title: "Healthcare",
-      },
-      {
-        title: "SaaS",
-      },
-      {
-        title: "Travel",
-      },
-      {
-        type: "other",
-        title: null,
-      },
+      { type: "other", title: null },
     ],
   },
 };
@@ -98,8 +66,8 @@ export const SurveyConfig: Partial<Record<SurveyPage, PageConfig>> = {
   [SurveyPage.PERSONA]: {
     page: 1,
     pageId: SurveyPage.PERSONA,
-    title: "Which role describes you the best?",
-    subTitle: "Please select one you closely relate to",
+    title: "Help us personalise your experience",
+    subTitle: "Please select the role that describes you the best",
     visibility: () => true,
     render: QuestionnaireType.PERSONA,
   },

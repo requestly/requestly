@@ -46,6 +46,7 @@ export interface RecordingOptions {
 
 export interface ConsoleLog extends LogData {
   timeOffset: number;
+  id: string;
 }
 
 export interface NetworkLog extends NetworkEventData {
@@ -58,6 +59,12 @@ export interface PageNavigationLog {
   height: number;
   timestamp: number;
   timeOffset: number;
+}
+
+export enum PlayerState {
+  PLAYING = "playing",
+  PAUSED = "paused",
+  SKIPPING = "skipping",
 }
 
 export enum SessionRecordingMode {
