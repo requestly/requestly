@@ -52,12 +52,12 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 
   return (
     <>
-      {user?.organization && !disabled && features ? (
+      {user?.details?.organization && !disabled && features ? (
         <>
           <RequestFeatureModal
             isOpen={openPopup}
             setOpenPopup={setOpenPopup}
-            organizationsData={user?.organization}
+            organizationsData={user?.details?.organization}
             onContinue={onContinue}
             hasReachedLimit={isBreachingLimit}
             source={source}
