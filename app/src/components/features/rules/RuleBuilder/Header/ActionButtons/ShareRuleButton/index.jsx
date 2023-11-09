@@ -9,17 +9,12 @@ import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { AUTH } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../actions";
-import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { PremiumIcon } from "components/common/PremiumIcon";
 
 const ShareRuleButton = ({ isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const { getFeatureLimitValue } = useFeatureLimiter();
-  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.share_rules);
 
   const shareRuleClickHandler = () => {
     trackShareButtonClicked("rule_editor");
@@ -52,20 +47,21 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
   return (
     <>
       {isRuleEditorModal ? (
-        <Button
-          type="text"
-          onClick={() => {
-            shareRuleClickHandler();
-            trackRuleEditorHeaderClicked(
-              "share_button",
-              currentlySelectedRuleData.ruleType,
-              MODE,
-              "rule_editor_modal_header"
-            );
-          }}
-        >
-          <Row align="middle" wrap={false}>
-            Share rule{isPremiumFeature ? <PremiumIcon featureType="share_rules" source="share_button" /> : null}
+        <Button type="text">
+          <Row
+            align="middle"
+            wrap={false}
+            onClick={() => {
+              shareRuleClickHandler();
+              trackRuleEditorHeaderClicked(
+                "share_button",
+                currentlySelectedRuleData.ruleType,
+                MODE,
+                "rule_editor_modal_header"
+              );
+            }}
+          >
+            Share rule
           </Row>
         </Button>
       ) : (
