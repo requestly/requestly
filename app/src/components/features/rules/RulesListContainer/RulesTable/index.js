@@ -1192,7 +1192,11 @@ const RulesTable = ({
                 source={AUTH.SOURCE.SHARE_RULES}
               >
                 <Tooltip title={isScreenSmall ? "Share Rules" : null}>
-                  <Button shape={isScreenSmall ? "circle" : null} icon={<UsergroupAddOutlined />}>
+                  <Button
+                    shape={isScreenSmall ? "circle" : null}
+                    icon={<UsergroupAddOutlined />}
+                    onClick={user?.details?.isLoggedIn && handleShareRulesOnClick}
+                  >
                     {isScreenSmall ? null : (
                       <span>
                         <Row align="middle" wrap={false}>

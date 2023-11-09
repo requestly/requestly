@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
@@ -35,6 +36,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
+  const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
   const showPremiumPopovers = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat))),
     [features, getFeatureLimitValue, checkIfFeatureLimitReached]
@@ -64,15 +66,15 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (!showPremiumPopovers) onContinue();
-                else setOpenPopup(true);
+                if (showPremiumPopovers && isUpgradePopoverEnabled) setOpenPopup(true);
+                else onContinue();
               },
             });
           })}
         </>
       ) : (
         <Popconfirm
-          disabled={!showPremiumPopovers || !features || disabled}
+          disabled={!showPremiumPopovers || !features || disabled || !isUpgradePopoverEnabled}
           overlayClassName="premium-feature-popover"
           autoAdjustOverflow
           showArrow={false}
@@ -115,7 +117,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (!showPremiumPopovers || !features || disabled) {
+                if (!showPremiumPopovers || !features || disabled || !isUpgradePopoverEnabled) {
                   onContinue();
                 }
               },

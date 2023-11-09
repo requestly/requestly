@@ -48,7 +48,19 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
     <>
       {isRuleEditorModal ? (
         <Button type="text">
-          <Row align="middle" wrap={false}>
+          <Row
+            align="middle"
+            wrap={false}
+            onClick={() => {
+              shareRuleClickHandler();
+              trackRuleEditorHeaderClicked(
+                "share_button",
+                currentlySelectedRuleData.ruleType,
+                MODE,
+                "rule_editor_modal_header"
+              );
+            }}
+          >
             Share rule
           </Row>
         </Button>
