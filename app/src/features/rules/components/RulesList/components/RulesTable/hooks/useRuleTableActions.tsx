@@ -245,6 +245,26 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
     });
   };
 
+  // const handlePinRecordClick = (record: RuleObj) => {
+  //   let currentOwner;
+
+  //   if (record.currentOwner) {
+  //     currentOwner = user?.details?.profile?.uid || null;
+  //   } else {
+  //     currentOwner = record.currentOwner;
+  //   }
+
+  //   const updatedRecord = {
+  //     ...record,
+  //     currentOwner,
+  //     isFavourite: !record.isFavourite,
+  //   };
+
+  //   return updateRuleInStorage(updatedRecord, record).then(() => {
+  //     // trackRulePinToggled(newValue);
+  //   });
+  // };
+
   return {
     clearSelectedRows,
     handleStatusToggle,
