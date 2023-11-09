@@ -6,7 +6,7 @@ interface RulesProviderProps {
   children: React.ReactElement;
 }
 
-export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
+export const RulesListProvider: React.FC<RulesProviderProps> = ({ children }) => {
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [ruleToViewInModal, setRuleToViewInModal] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
@@ -42,4 +42,4 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
   return <RulesContext.Provider value={value}>{children}</RulesContext.Provider>;
 };
 
-export const useRules = () => useContext(RulesContext);
+export const useRulesContext = () => useContext(RulesContext);

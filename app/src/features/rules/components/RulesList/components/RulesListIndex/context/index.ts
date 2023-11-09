@@ -1,1 +1,1 @@
-export { useRules, RulesProvider } from "./rules-context";
+export { useRulesContext, RulesListProvider } from "./rules-context";
