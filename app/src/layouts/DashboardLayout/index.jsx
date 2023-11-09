@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from "react";
-import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
 import Footer from "../../components/sections/Footer";
@@ -10,15 +9,9 @@ import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { AppNotificationBanner } from "./AppNotificationBanner";
-import { httpsCallable, getFunctions } from "firebase/functions";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import firebaseApp from "../../firebase";
-import { actions } from "store";
-import Logger from "lib/logger";
 import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
-  const dispatch = useDispatch();
   const location = useLocation();
   const { pathname } = location;
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
@@ -29,8 +22,6 @@ const DashboardLayout = () => {
     [pathname]
   );
 
-  const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
-
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
 
@@ -38,25 +29,6 @@ const DashboardLayout = () => {
     removeElement(".app-header");
     removeElement(".app-footer");
   }, []);
-
-  useEffect(() => {
-    const auth = getAuth(firebaseApp);
-    try {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          getEnterpriseAdminDetails().then((response) => {
-            if (response.data.success) {
-              dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
-            }
-          });
-        } else {
-          dispatch(actions.updateOrganizationDetails(null));
-        }
-      });
-    } catch (e) {
-      Logger.log(e);
-    }
-  }, [getEnterpriseAdminDetails, dispatch]);
 
   return (
     <>
