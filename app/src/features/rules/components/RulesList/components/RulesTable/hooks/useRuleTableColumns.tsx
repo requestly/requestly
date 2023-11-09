@@ -1,4 +1,3 @@
-import React from "react";
 import { useSelector } from "react-redux";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
@@ -16,10 +15,7 @@ import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 
-const useRuleTableColumns = (
-  options: Record<string, boolean>,
-  setSelectedRows: React.Dispatch<React.SetStateAction<unknown>>
-) => {
+const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const {
@@ -30,7 +26,7 @@ const useRuleTableColumns = (
     handleRenameGroupClick,
     handleChangeRuleGroupClick,
     handlePinRecordClick,
-  } = useRuleTableActions(setSelectedRows);
+  } = useRuleTableActions();
 
   // const isStatusEnabled = !(options && options.disableStatus);
   const isEditingEnabled = !(options && options.disableEditing);

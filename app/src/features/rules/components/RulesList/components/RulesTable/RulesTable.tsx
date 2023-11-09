@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { rulesToContentTableDataAdapter } from "./utils";
 import { RuleObj } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
-import RenameGroupModal from "components/features/rules/RenameGroupModal";
-import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
-import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
-import ChangeRuleGroupModal from "components/features/rules/ChangeRuleGroupModal";
+import {
+  DeleteRulesModalWrapper,
+  RenameGroupModalWrapper,
+  DuplicateRuleModalWrapper,
+  ChangeRuleGroupModalWrapper,
+} from "./components";
 import useRuleTableActions from "./hooks/useRuleTableActions";
-import { useRulesContext } from "../RulesListIndex/context";
-import { Rule } from "types";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiToggleFill } from "@react-icons/all-files/ri/RiToggleFill";
@@ -24,38 +24,15 @@ interface Props {
 }
 
 const RulesTable: React.FC<Props> = ({ rules, loading }) => {
-  const [selectedRows, setSelectedRows] = useState<RuleTableDataType[]>([]);
   const [contentTableData, setContentTableAdaptedRules] = useState<RuleTableDataType[]>([]);
   const {
-    closeDuplicateRuleModal,
-    closeRenameGroupModal,
-    closeDeleteRuleModal,
-    closeChangeRuleGroupModal,
-    handleUngroupSelectedRulesClick,
-    handleChangeRuleGroupClick,
-    handleActivateRecords,
+    clearSelectedRows,
     handleRuleShare,
+    handleActivateRecords,
     handleDeleteRecordClick,
-  } = useRuleTableActions(setSelectedRows);
-  const {
-    ruleToDuplicate,
-    isChangeGroupModalActive,
-    isDuplicateRuleModalActive,
-    isRenameGroupModalActive,
-    idOfGroupToRename,
-    isDeleteConfirmationModalActive,
-  } = useRulesContext();
-
-  const rulesToDelete = useMemo(() => selectedRows.filter((row) => !row.id?.startsWith("Group")), [selectedRows]);
-
-  const selectedGroupIds = useMemo(
-    () => selectedRows.map((row) => row.id).filter((id) => id?.startsWith("Group")),
-    [selectedRows]
-  );
-
-  const clearSelectedRows = useCallback(() => {
-    setSelectedRows([]);
-  }, []);
+    handleChangeRuleGroupClick,
+    handleUngroupSelectedRulesClick,
+  } = useRuleTableActions();
 
   useEffect(() => {
     const contentTableAdaptedRules = rulesToContentTableDataAdapter(rules);
@@ -94,65 +71,35 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
    *    - delete [DONE]
    *    - cancel [DONE]
    *
-   * - pin rules
+   * - pin rules [DONE]
    * - rule name click PR
    * - sorting + icon changes
    * - searching
    */
 
   // FIXME: cleanup this
-  const options = {
-    disableSelection: false,
-    disableEditing: false,
-    disableActions: false,
-    disableFavourites: false,
-    disableStatus: false,
-    disableAlertActions: false,
-    hideLastModifiedBy: false,
-    hideCreatedBy: false,
-  };
+  const options = useMemo(() => {
+    return {
+      disableSelection: false,
+      disableEditing: false,
+      disableActions: false,
+      disableFavourites: false,
+      disableStatus: false,
+      disableAlertActions: false,
+      hideLastModifiedBy: false,
+      hideCreatedBy: false,
+    };
+  }, []);
 
-  const columns = useRuleTableColumns(options, setSelectedRows);
+  const columns = useRuleTableColumns(options);
 
   return (
     <>
       {/* Add Modals Required in Rules List here */}
-      {isDuplicateRuleModalActive ? (
-        <DuplicateRuleModal
-          close={closeDuplicateRuleModal}
-          onDuplicate={closeDuplicateRuleModal}
-          isOpen={isDuplicateRuleModalActive as boolean}
-          rule={ruleToDuplicate as Rule}
-        />
-      ) : null}
-
-      {isRenameGroupModalActive ? (
-        <RenameGroupModal
-          toggle={closeRenameGroupModal}
-          isOpen={isRenameGroupModalActive}
-          groupId={idOfGroupToRename}
-        />
-      ) : null}
-
-      {isDeleteConfirmationModalActive ? (
-        <DeleteRulesModal
-          toggle={closeDeleteRuleModal}
-          rulesToDelete={rulesToDelete}
-          groupIdsToDelete={selectedGroupIds}
-          clearSearch={clearSelectedRows} // FIXME
-          isOpen={isDeleteConfirmationModalActive}
-        />
-      ) : null}
-
-      {isChangeGroupModalActive ? (
-        <ChangeRuleGroupModal
-          clearSearch={clearSelectedRows} // FIXME
-          isOpen={isChangeGroupModalActive}
-          toggle={closeChangeRuleGroupModal}
-          mode="SELECTED_RULES"
-          selectedRules={selectedRows}
-        />
-      ) : null}
+      <DuplicateRuleModalWrapper />
+      <RenameGroupModalWrapper />
+      <DeleteRulesModalWrapper />
+      <ChangeRuleGroupModalWrapper />
 
       <ContentTable
         columns={columns}

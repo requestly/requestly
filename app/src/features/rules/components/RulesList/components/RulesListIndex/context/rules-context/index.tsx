@@ -1,12 +1,16 @@
 import React, { createContext, useContext, useState } from "react";
+import { RuleObj } from "features/rules/types/rules";
 
-const RulesContext = createContext(null);
+type RulesListContext = { selectedRows: RuleObj[] } & Record<string, any>;
+
+const RulesContext = createContext<RulesListContext>(null);
 
 interface RulesProviderProps {
   children: React.ReactElement;
 }
 
 export const RulesListProvider: React.FC<RulesProviderProps> = ({ children }) => {
+  const [selectedRows, setSelectedRows] = useState<RuleObj[]>([]);
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [ruleToViewInModal, setRuleToViewInModal] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
@@ -19,6 +23,8 @@ export const RulesListProvider: React.FC<RulesProviderProps> = ({ children }) =>
 
   // FIXME: add proper types
   const value = {
+    selectedRows,
+    setSelectedRows,
     isChangeGroupModalActive,
     setIsChangeGroupModalActive,
     ruleToViewInModal,

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
@@ -16,7 +16,7 @@ import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-co
 import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
 
-const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateAction<unknown>>) => {
+const useRuleTableActions = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
@@ -28,7 +28,12 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
     setIdOfGroupToRename,
     setIsDeleteConfirmationModalActive,
     setIsChangeGroupModalActive,
+    setSelectedRows,
   } = useRulesContext();
+
+  const clearSelectedRows = useCallback(() => {
+    setSelectedRows([]);
+  }, []);
 
   const handleStatusToggle = (rules: RuleTableDataType[], checked: boolean) => {
     console.log("handleStatusToggle", { rules, checked });
@@ -224,6 +229,7 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
   };
 
   return {
+    clearSelectedRows,
     handleStatusToggle,
     handleRuleShare,
     handleDuplicateRuleClick,
