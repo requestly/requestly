@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { rulesToContentTableDataAdapter } from "./utils";
@@ -7,9 +7,15 @@ import { RuleTableDataType } from "./types";
 import RenameGroupModal from "components/features/rules/RenameGroupModal";
 import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
 import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
+import ChangeRuleGroupModal from "components/features/rules/ChangeRuleGroupModal";
 import useRuleTableActions from "./hooks/useRuleTableActions";
 import { useRules } from "../RulesListIndex/context";
 import { Rule } from "types";
+import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
+import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
+import { RiToggleFill } from "@react-icons/all-files/ri/RiToggleFill";
+import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
+import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import "./rulesTable.css";
 
 interface Props {
@@ -19,11 +25,21 @@ interface Props {
 
 const RulesTable: React.FC<Props> = ({ rules, loading }) => {
   const [selectedRows, setSelectedRows] = useState<RuleTableDataType[]>([]);
-  const { closeDuplicateRuleModal, closeRenameGroupModal, closeDeleteRuleModal } = useRuleTableActions();
   const [contentTableData, setContentTableAdaptedRules] = useState<RuleTableDataType[]>([]);
   const {
-    ruleToDelete,
+    closeDuplicateRuleModal,
+    closeRenameGroupModal,
+    closeDeleteRuleModal,
+    closeChangeRuleGroupModal,
+    handleUngroupSelectedRulesClick,
+    handleChangeRuleGroupClick,
+    handleActivateRecords,
+    handleRuleShare,
+    handleDeleteRecordClick,
+  } = useRuleTableActions(setSelectedRows);
+  const {
     ruleToDuplicate,
+    isChangeGroupModalActive,
     isDuplicateRuleModalActive,
     isRenameGroupModalActive,
     idOfGroupToRename,
@@ -36,6 +52,10 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     () => selectedRows.map((row) => row.id).filter((id) => id?.startsWith("Group")),
     [selectedRows]
   );
+
+  const clearSelectedRows = useCallback(() => {
+    setSelectedRows([]);
+  }, []);
 
   useEffect(() => {
     const contentTableAdaptedRules = rulesToContentTableDataAdapter(rules);
@@ -64,8 +84,18 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
    * - hover effects
    *
    *
-   * MODALS
-   * - change group
+   * NEXT
+   * - bulk action PR
+   *    - ungroup [DONE]
+   *    - change group [DONE]
+   *    - activate all [DONE]
+   *    - deactive all
+   *    - share [DONE]
+   *    - delete [DONE]
+   *    - cancel [DONE]
+   *
+   * - pin rules
+   * - rule name click PR
    */
 
   // FIXME: cleanup this
@@ -80,11 +110,11 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     hideCreatedBy: false,
   };
 
-  const columns = useRuleTableColumns(options);
+  const columns = useRuleTableColumns(options, setSelectedRows);
 
   return (
     <>
-      {/* TODO: Add Modals Required in Rules List here */}
+      {/* Add Modals Required in Rules List here */}
       {isDuplicateRuleModalActive ? (
         <DuplicateRuleModal
           close={closeDuplicateRuleModal}
@@ -105,10 +135,20 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
       {isDeleteConfirmationModalActive ? (
         <DeleteRulesModal
           toggle={closeDeleteRuleModal}
-          rulesToDelete={rulesToDelete?.length > 0 ? rulesToDelete : [ruleToDelete]}
+          rulesToDelete={rulesToDelete}
           groupIdsToDelete={selectedGroupIds}
-          clearSearch={() => {}} // FIXME
+          clearSearch={clearSelectedRows} // FIXME
           isOpen={isDeleteConfirmationModalActive}
+        />
+      ) : null}
+
+      {isChangeGroupModalActive ? (
+        <ChangeRuleGroupModal
+          clearSearch={clearSelectedRows} // FIXME
+          isOpen={isChangeGroupModalActive}
+          toggle={closeChangeRuleGroupModal}
+          mode="SELECTED_RULES"
+          selectedRules={selectedRows}
         />
       ) : null}
 
@@ -117,19 +157,37 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         data={contentTableData}
         rowKey="id"
         loading={loading}
-        // bulk action here
         bulkActionBarConfig={{
           type: "default",
           options: {
-            getSelectedRowsData: (selectedRows) => setSelectedRows(selectedRows),
+            clearSelectedRows,
             infoText: (selectedRules) => `${selectedRules.length} Rules Selected`,
             actions: [
               {
+                label: "Ungroup",
+                icon: <ImUngroup />,
+                onClick: (selectedRows) => handleUngroupSelectedRulesClick(selectedRows),
+              },
+              {
+                label: "Change group",
+                icon: <RiFolderSharedLine />,
+                onClick: (selectedRows) => handleChangeRuleGroupClick(selectedRows),
+              },
+              {
                 label: "Activate",
-                onClick: (selectedRows: any) => {
-                  // Get action from useRuleTableActions hook
-                  console.log("Activate Bulk Action", { selectedRows });
-                },
+                icon: <RiToggleFill />,
+                onClick: (selectedRows) => handleActivateRecords(selectedRows),
+              },
+              {
+                label: "Share",
+                icon: <RiUserSharedLine />,
+                onClick: (selectedRows) => handleRuleShare(selectedRows),
+              },
+              {
+                danger: true,
+                label: "Delete",
+                icon: <RiDeleteBin2Line />,
+                onClick: (selectedRows) => handleDeleteRecordClick(selectedRows),
               },
             ],
           },

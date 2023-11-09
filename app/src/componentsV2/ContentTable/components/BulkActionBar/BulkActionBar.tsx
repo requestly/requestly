@@ -24,9 +24,10 @@ const BulkActionBar = <DataType,>({ config, selectedRows, clearSelectedRowsData 
       </div>
 
       <div className="action-btns">
-        {config.options.actions.map((actionConfig) => {
+        {config.options.actions.map((actionConfig, index) => {
           return (
             <Button
+              key={index}
               className="action-btn"
               icon={actionConfig.icon ?? null}
               danger={actionConfig.danger ?? false}

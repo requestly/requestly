@@ -29,14 +29,11 @@ const ContentTable = <DataType extends object>({
     setFilteredRowsData([...data]);
   }, [data]);
 
-  useEffect(() => {
-    bulkActionBarConfig?.options?.getSelectedRowsData?.(selectedRowsData);
-  }, [bulkActionBarConfig?.options, selectedRowsData]);
-
   const clearSelectedRowsData = useCallback(() => {
     setSelectedRowKeys([]);
     setSelectedRowsData([]);
-  }, []);
+    bulkActionBarConfig?.options?.clearSelectedRows?.();
+  }, [bulkActionBarConfig?.options]);
 
   return (
     <>

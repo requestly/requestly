@@ -1,9 +1,9 @@
-import { RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import React, { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
-import { useSelector } from "react-redux";
-import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { rulesActions } from "store/features/rules/slice";
-import { useDispatch } from "react-redux";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 // @ts-ignore
@@ -12,24 +12,22 @@ import { toast } from "utils/Toast";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { isEmpty } from "lodash";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 import { useRules } from "../../RulesListIndex/context";
-import { updateRulesListRefreshPendingStatus } from "components/features/rules/RulesListContainer/RulesTable/actions";
-import { useCallback } from "react";
+import { isRule } from "../utils";
 
-const useRuleTableActions = () => {
+const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateAction<unknown>>) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
+  const { UNGROUPED_GROUP_ID } = RULES_LIST_TABLE_CONSTANTS;
   const {
     setRuleToDuplicate,
     setIsDuplicateRuleModalActive,
     setIsRenameGroupModalActive,
     setIdOfGroupToRename,
     setIsDeleteConfirmationModalActive,
-    setRuleToDelete,
+    setIsChangeGroupModalActive,
   } = useRules();
 
   const handlePin = (rules: RuleTableDataType[]) => {
@@ -80,13 +78,17 @@ const useRuleTableActions = () => {
     });
   };
 
-  const toggleSharingModal = (rule: RuleObj) => {
+  const toggleSharingModal = (rules: RuleObj | RuleObj[]) => {
+    const updatedRules = Array.isArray(rules) ? rules : [rules];
+    const rulesToShare = updatedRules.filter(isRule);
+    const ruleIds = rulesToShare.map((rule) => rule.id);
+
     dispatch(
       actions.toggleActiveModal({
         modalName: "sharingModal",
         newValue: true,
         newProps: {
-          selectedRules: [rule.id],
+          selectedRules: ruleIds,
         },
       })
     );
@@ -108,10 +110,10 @@ const useRuleTableActions = () => {
     );
   };
 
-  const handleRuleShare = (rule: RuleObj) => {
+  const handleRuleShare = (rules: RuleObj | RuleObj[]) => {
     // TODO
     // trackShareButtonClicked("rules_list");
-    user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    user.loggedIn ? toggleSharingModal(rules) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
   // Generic
@@ -128,6 +130,22 @@ const useRuleTableActions = () => {
       });
   };
 
+  const updateMultipleRecordsInStorage = useCallback(
+    (updatedRecords: RuleObj[], originalRecords: RuleObj[]) => {
+      if (updatedRecords.length === 0) return;
+
+      dispatch(rulesActions.ruleObjUpsertMany(updatedRecords));
+
+      return new Promise((resolve) => {
+        StorageService(appMode)
+          .saveMultipleRulesOrGroups(updatedRecords)
+          .then(() => resolve("Records updated in Storage Service"))
+          .catch(() => dispatch(rulesActions.ruleObjUpsertMany(originalRecords)));
+      });
+    },
+    [appMode, dispatch]
+  );
+
   const handleDuplicateRuleClick = (rule: RuleObj) => {
     setRuleToDuplicate(rule);
     setIsDuplicateRuleModalActive(true);
@@ -138,13 +156,14 @@ const useRuleTableActions = () => {
     setIsDuplicateRuleModalActive(false);
   };
 
-  const handleDeleteRecordClick = (rule: RuleObj) => {
-    setRuleToDelete(rule);
+  const handleDeleteRecordClick = (records: RuleObj | RuleObj[]) => {
+    const updatedRecords = Array.isArray(records) ? records : [records];
+    setSelectedRows(updatedRecords);
     setIsDeleteConfirmationModalActive(true);
   };
 
   const closeDeleteRuleModal = () => {
-    setRuleToDelete(null);
+    setSelectedRows([]);
     setIsDeleteConfirmationModalActive(false);
   };
 
@@ -158,60 +177,37 @@ const useRuleTableActions = () => {
     setIdOfGroupToRename(null);
   };
 
-  const handleChangeRuleGroupClick = (record: RuleObj) => {};
-
-  const ungroupSelectedRules = useCallback(
-    (selectedRuleIds: string[]) => {
-      // @ts-ignore
-      const allPromises = [];
-
-      return new Promise((resolve, reject) => {
-        if (isEmpty(selectedRuleIds)) {
-          reject(new Error("No Rules were Selected"));
-        } else {
-          Logger.log("Reading storage in RulesTable ungroupSelectedRules");
-          StorageService(appMode)
-            .getAllRecords()
-            .then((allRules) => {
-              selectedRuleIds.forEach(async (ruleId) => {
-                const updatedRule = {
-                  ...allRules[ruleId],
-                  groupId: RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
-                };
-                Logger.log("Writing to storage in RulesTable ungroupSelectedRules");
-                allPromises.push(StorageService(appMode).saveRuleOrGroup(updatedRule));
-              });
-
-              // @ts-ignore
-              Promise.all(allPromises).then(() => resolve());
-            });
-        }
-      });
-    },
-    [appMode]
-  );
-
   const handleUngroupSelectedRulesClick = useCallback(
     (selectedRecords: RuleObj[]) => {
-      const selectedRuleIds = selectedRecords.reduce(
-        (ruleIds, record) =>
-          record.objectType === RuleObjType.RULE && record.groupId !== "" ? [...ruleIds, record.id] : ruleIds,
+      const updateRules = selectedRecords.reduce(
+        (rules, record) =>
+          isRule(record) && record.groupId !== UNGROUPED_GROUP_ID
+            ? [...rules, { ...record, groupId: UNGROUPED_GROUP_ID }]
+            : rules,
         []
       );
 
-      return ungroupSelectedRules(selectedRuleIds)
-        .then(() => {
-          // Refresh List
-          updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
-        })
-        .then(() => {
-          toast.info("Rules Ungrouped");
-          // trackRulesUngrouped();
-        })
-        .catch(() => toast.warn("Please select rules first", { hideProgressBar: true }));
+      return updateMultipleRecordsInStorage(updateRules, selectedRecords);
     },
-    [dispatch, ungroupSelectedRules, isRulesListRefreshPending]
+    [UNGROUPED_GROUP_ID, updateMultipleRecordsInStorage]
   );
+
+  const handleChangeRuleGroupClick = (records: RuleObj | RuleObj[]) => {
+    const updatedRecords = Array.isArray(records) ? records : [records];
+    const selectedRules = updatedRecords.filter(isRule);
+    setSelectedRows(selectedRules);
+    setIsChangeGroupModalActive(true);
+  };
+
+  const closeChangeRuleGroupModal = () => {
+    setSelectedRows([]);
+    setIsChangeGroupModalActive(false);
+  };
+
+  const handleActivateRecords = (records: RuleObj[]) => {
+    const updatedRecords = records.map((record) => ({ ...record, status: RuleObjStatus.ACTIVE }));
+    return updateMultipleRecordsInStorage(updatedRecords, records);
+  };
 
   return {
     handlePin,
@@ -224,8 +220,9 @@ const useRuleTableActions = () => {
     handleRenameGroupClick,
     closeRenameGroupModal,
     handleChangeRuleGroupClick,
-    ungroupSelectedRules,
+    closeChangeRuleGroupModal,
     handleUngroupSelectedRulesClick,
+    handleActivateRecords,
   };
 };
 
