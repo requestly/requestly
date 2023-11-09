@@ -3,6 +3,8 @@ import { Rule, RuleObj, RuleObjType } from "features/rules/types/rules";
 
 export const isRule = (record: RuleObj) => record.objectType === RuleObjType.RULE;
 
+export const convertToArray = <T>(record: T | T[]): T[] => (Array.isArray(record) ? record : [record]);
+
 // FIXME: Performance Improvements
 export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataType[] => {
   const ruleTableDataTypeMap: { [id: string]: RuleTableDataType } = {};

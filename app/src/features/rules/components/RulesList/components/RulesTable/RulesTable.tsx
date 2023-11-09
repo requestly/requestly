@@ -9,7 +9,7 @@ import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
 import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
 import ChangeRuleGroupModal from "components/features/rules/ChangeRuleGroupModal";
 import useRuleTableActions from "./hooks/useRuleTableActions";
-import { useRules } from "../RulesListIndex/context";
+import { useRulesContext } from "../RulesListIndex/context";
 import { Rule } from "types";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
@@ -44,7 +44,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     isRenameGroupModalActive,
     idOfGroupToRename,
     isDeleteConfirmationModalActive,
-  } = useRules();
+  } = useRulesContext();
 
   const rulesToDelete = useMemo(() => selectedRows.filter((row) => !row.id?.startsWith("Group")), [selectedRows]);
 
@@ -96,6 +96,8 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
    *
    * - pin rules
    * - rule name click PR
+   * - sorting + icon changes
+   * - searching
    */
 
   // FIXME: cleanup this
@@ -157,6 +159,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         data={contentTableData}
         rowKey="id"
         loading={loading}
+        customRowClassName={(record) => (record.isFavourite ? "record-pinned" : "")}
         bulkActionBarConfig={{
           type: "default",
           options: {

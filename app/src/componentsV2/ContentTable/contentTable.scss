@@ -55,4 +55,29 @@ tr.rq-content-table-row.ant-table-row {
       background: inherit;
     }
   }
+
+  .ant-table-selection-column {
+    border-left: 4px solid transparent;
+  }
+
+  &.record-pinned .ant-table-selection-column {
+    border-left: 4px solid var(--warning);
+  }
+
+  button.ant-btn.ant-btn-icon-only {
+    width: 40px;
+    height: 32px;
+  }
+
+  button.ant-btn.ant-btn-icon-only svg {
+    width: 16px;
+    height: 16px;
+    color: var(--text-light);
+    transition: inherit;
+  }
+
+  button.ant-btn.ant-btn-icon-only:hover svg,
+  .rules-actions-container .more-rule-actions-btn.ant-btn-icon-only svg {
+    color: var(--text-default);
+  }
 }

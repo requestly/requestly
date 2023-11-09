@@ -60,6 +60,7 @@
   --danger: var(--red-red-500);
   --success: var(--green-green-500);
   --text-default: var(--neutrals-white);
+  --warning: #e09400;
   --text-light: #b0b0b5b3;
   --surface-0_5: #212121;
   --surface-1: #282828;
@@ -78,7 +79,6 @@
   --gray-light: var(--text-light);
   --border: #4f5053;
   --border-dark: #303030;
-  --warning: #958602;
   --danger-rgb: 252, 95, 95;
   --primary: var(--brand-color);
   --link-color: #3ba0ff;

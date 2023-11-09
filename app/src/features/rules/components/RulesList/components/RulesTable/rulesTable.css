@@ -3,25 +3,20 @@
   justify-content: flex-end;
 }
 
-.rules-actions-container > button {
+.rq-content-table-row > button {
   flex-shrink: 0;
-  padding: 8px 11px;
+  padding: 8px 12px;
 }
 
-.rules-actions-container > button.ant-btn-icon-only {
-  width: auto;
-  height: 32px;
+.rq-content-table-row .rules-actions-container .more-rule-actions-btn.ant-btn-icon-only svg {
+  color: var(--text-default);
 }
 
-.rules-actions-container > button.ant-btn-icon-only svg {
-  width: 16px;
-  height: 16px;
-  color: var(--text-light);
-  transition: inherit;
+.rq-content-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-pinned {
+  color: var(--warning);
 }
 
-.rules-actions-container > button.ant-btn-icon-only:hover svg,
-.rules-actions-container .more-rule-actions-btn.ant-btn-icon-only svg {
+.rq-content-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-unpinned {
   color: var(--text-default);
 }
 

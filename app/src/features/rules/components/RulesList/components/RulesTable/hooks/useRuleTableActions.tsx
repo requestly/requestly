@@ -13,8 +13,8 @@ import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
-import { useRules } from "../../RulesListIndex/context";
-import { isRule } from "../utils";
+import { useRulesContext } from "../../RulesListIndex/context";
+import { convertToArray, isRule } from "../utils";
 
 const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateAction<unknown>>) => {
   const dispatch = useDispatch();
@@ -28,11 +28,7 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
     setIdOfGroupToRename,
     setIsDeleteConfirmationModalActive,
     setIsChangeGroupModalActive,
-  } = useRules();
-
-  const handlePin = (rules: RuleTableDataType[]) => {
-    console.log("Pinning Rules", { rules });
-  };
+  } = useRulesContext();
 
   const handleStatusToggle = (rules: RuleTableDataType[], checked: boolean) => {
     console.log("handleStatusToggle", { rules, checked });
@@ -79,7 +75,7 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
   };
 
   const toggleSharingModal = (rules: RuleObj | RuleObj[]) => {
-    const updatedRules = Array.isArray(rules) ? rules : [rules];
+    const updatedRules = convertToArray<RuleObj>(rules);
     const rulesToShare = updatedRules.filter(isRule);
     const ruleIds = rulesToShare.map((rule) => rule.id);
 
@@ -155,7 +151,7 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
   };
 
   const handleDeleteRecordClick = (records: RuleObj | RuleObj[]) => {
-    const updatedRecords = Array.isArray(records) ? records : [records];
+    const updatedRecords = convertToArray<RuleObj>(records);
     setSelectedRows(updatedRecords);
     setIsDeleteConfirmationModalActive(true);
   };
@@ -191,7 +187,7 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
   );
 
   const handleChangeRuleGroupClick = (records: RuleObj | RuleObj[]) => {
-    const updatedRecords = Array.isArray(records) ? records : [records];
+    const updatedRecords = convertToArray<RuleObj>(records);
     const selectedRules = updatedRecords.filter(isRule);
     setSelectedRows(selectedRules);
     setIsChangeGroupModalActive(true);
@@ -207,28 +203,27 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
     return updateMultipleRecordsInStorage(updatedRecords, records);
   };
 
-  // const handlePinRecordClick = (record: RuleObj) => {
-  //   let currentOwner;
+  const handlePinRecordClick = (record: RuleObj) => {
+    let currentOwner;
 
-  //   if (record.currentOwner) {
-  //     currentOwner = user?.details?.profile?.uid || null;
-  //   } else {
-  //     currentOwner = record.currentOwner;
-  //   }
+    if (record.currentOwner) {
+      currentOwner = user?.details?.profile?.uid || null;
+    } else {
+      currentOwner = record.currentOwner;
+    }
 
-  //   const updatedRecord = {
-  //     ...record,
-  //     currentOwner,
-  //     isFavourite: !record.isFavourite,
-  //   };
+    const updatedRecord = {
+      ...record,
+      currentOwner,
+      isFavourite: !record.isFavourite,
+    };
 
-  //   return updateRuleInStorage(updatedRecord, record).then(() => {
-  //     // trackRulePinToggled(newValue);
-  //   });
-  // };
+    updateRuleInStorage(updatedRecord, record).then(() => {
+      // trackRulePinToggled(newValue);
+    });
+  };
 
   return {
-    handlePin,
     handleStatusToggle,
     handleRuleShare,
     handleDuplicateRuleClick,
@@ -241,6 +236,7 @@ const useRuleTableActions = (setSelectedRows: React.Dispatch<React.SetStateActio
     closeChangeRuleGroupModal,
     handleUngroupSelectedRulesClick,
     handleActivateRecords,
+    handlePinRecordClick,
   };
 };
 

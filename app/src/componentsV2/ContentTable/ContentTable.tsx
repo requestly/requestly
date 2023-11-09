@@ -10,7 +10,7 @@ export interface ContentTableProps<DataType> {
   data: DataType[];
   rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
   loading?: boolean;
-
+  customRowClassName?: (record: DataType) => string;
   bulkActionBarConfig?: BulkActionBarConfig;
 }
 
@@ -19,6 +19,7 @@ const ContentTable = <DataType extends object>({
   data,
   rowKey = "key",
   loading = false,
+  customRowClassName = (record: DataType) => "",
   bulkActionBarConfig,
 }: ContentTableProps<DataType>): ReactElement => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -49,7 +50,7 @@ const ContentTable = <DataType extends object>({
         onHeaderRow={() => ({
           className: "rq-content-table-header",
         })}
-        rowClassName="rq-content-table-row"
+        rowClassName={(record) => `rq-content-table-row ${customRowClassName?.(record)}`}
         loading={loading}
         rowKey={rowKey}
         columns={columns}
