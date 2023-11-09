@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
 import Footer from "../../components/sections/Footer";
@@ -12,17 +11,17 @@ import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { AppNotificationBanner } from "./AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import firebaseApp from "../../firebase";
 import { actions } from "store";
-import "./DashboardLayout.css";
 import Logger from "lib/logger";
+import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { pathname } = location;
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
-  const user = useSelector(getUserAuthDetails);
-
   promptOneTapOnLoad();
 
   const isSidebarVisible = useMemo(
@@ -41,18 +40,23 @@ const DashboardLayout = () => {
   }, []);
 
   useEffect(() => {
-    if (user.loggedIn && !user?.details?.organization) {
-      try {
-        getEnterpriseAdminDetails().then((response) => {
-          if (response.data.success) {
-            dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
-          }
-        });
-      } catch (e) {
-        Logger.log(e);
+    const auth = getAuth(firebaseApp);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        try {
+          getEnterpriseAdminDetails().then((response) => {
+            if (response.data.success) {
+              dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
+            }
+          });
+        } catch (e) {
+          Logger.log(e);
+        }
+      } else {
+        dispatch(actions.updateOrganizationDetails(null));
       }
-    }
-  }, [getEnterpriseAdminDetails, user.loggedIn, user?.details?.organization, dispatch]);
+    });
+  }, [getEnterpriseAdminDetails, dispatch]);
 
   return (
     <>
