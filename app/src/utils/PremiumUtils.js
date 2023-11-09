@@ -21,26 +21,6 @@ export const getPlanNameFromId = (planId) => {
   }
 };
 
-export const getPrettyPlanNameFromId = (planId) => {
-  if (!planId) return null;
-  const planName = planId.split("_")[0];
-
-  switch (planName) {
-    case PRICING.PLAN_NAMES.BASIC:
-      return PRICING.PLAN_NAMES.BASIC;
-    case PRICING.PLAN_NAMES.PROFESSIONAL:
-      return PRICING.PLAN_NAMES.PROFESSIONAL;
-    case PRICING.PLAN_NAMES.GOLD:
-      return PRICING.PLAN_NAMES.PROFESSIONAL;
-    case PRICING.PLAN_NAMES.LITE:
-      return PRICING.PLAN_NAMES.BASIC;
-    case PRICING.PLAN_NAMES.BASIC_V2:
-      return PRICING.PLAN_NAMES.BASIC;
-    default:
-      return PRICING.PLAN_NAMES.PROFESSIONAL;
-  }
-};
-
 export const isPremiumPlan = (planId) => {
   if (!planId) return false;
   const planName = planId.split("_")[0];

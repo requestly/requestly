@@ -9,7 +9,6 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import { capitalize } from "lodash";
-import { getPrettyPlanNameFromId } from "utils/PremiumUtils";
 import "./index.scss";
 
 interface PremiumFeatureProps {
@@ -96,15 +95,13 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             <>
               <Typography.Title level={4}>
                 {isBreachingLimit
-                  ? `${
-                      capitalize(getPrettyPlanNameFromId(user?.details?.planDetails?.planId)) || "Free"
-                    } plan limits reached!`
+                  ? `${capitalize(user?.details?.planDetails?.planName) || "Free"} plan limits reached!`
                   : "Premium feature"}
               </Typography.Title>
               <Typography.Text>
                 {isBreachingLimit
                   ? `You've exceeded the usage limits of the ${
-                      getPrettyPlanNameFromId(user?.details?.planDetails?.planId) || "free"
+                      user?.details?.planDetails?.planName || "free"
                     } plan. Consider upgrading for uninterrupted usage.`
                   : " This feature is a part of our paid offering. Consider upgrading for uninterrupted usage."}
               </Typography.Text>

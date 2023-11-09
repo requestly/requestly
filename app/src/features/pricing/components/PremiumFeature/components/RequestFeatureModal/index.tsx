@@ -10,7 +10,6 @@ import { RiCheckboxCircleLine } from "@react-icons/all-files/ri/RiCheckboxCircle
 import { CloseOutlined } from "@ant-design/icons";
 import { OrganizationsDetails } from "../../types";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { getPrettyPlanNameFromId } from "utils/PremiumUtils";
 import { capitalize } from "lodash";
 import { actions } from "store";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
@@ -93,7 +92,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         <>
           {hasReachedLimit ? (
             <Typography.Title level={5}>
-              {capitalize(getPrettyPlanNameFromId(user?.details?.planDetails?.planId)) || "Free"} plan limits reached!
+              {capitalize(user?.details?.planDetails?.planName) || "Free"} plan limits reached!
             </Typography.Title>
           ) : (
             <Typography.Title level={5}>This feature is a part of our paid offering</Typography.Title>
