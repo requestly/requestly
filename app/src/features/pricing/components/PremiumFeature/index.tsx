@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+// import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
@@ -36,12 +36,12 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
-  const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
+  const isUpgradePopoverEnabled = true;
   const showPremiumPopovers = useMemo(
-    () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat))),
+    () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
     [features, getFeatureLimitValue, checkIfFeatureLimitReached]
   );
-  const isBreachingLimit = features.some(checkIfFeatureLimitReached);
+  const isBreachingLimit = features.some((feat) => checkIfFeatureLimitReached(feat, "reached"));
 
   const hideUseForNowCTA = new Date() > new Date("2023-11-30");
 

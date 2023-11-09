@@ -25,22 +25,16 @@ export const useFeatureLimiter = () => {
     }
 
     const isLimitReached = Object.values(FeatureLimitType).some((featureLimitType) =>
-      checkIfFeatureLimitBreached(featureLimitType)
+      checkIfFeatureLimitReached(featureLimitType, "breached")
     );
     dispatch(actions.updateUserLimitReached(isLimitReached));
   };
 
-  const checkIfFeatureLimitBreached = (featureLimitType: FeatureLimitType, currentValue?: number) => {
-    const currentFeatureValue = currentValue || getFeatureCurrentValue(featureLimitType);
-    const featureLimitValue = getFeatureLimitValue(featureLimitType);
-
-    return currentFeatureValue > featureLimitValue;
-  };
-
-  const checkIfFeatureLimitReached = (featureLimitType: FeatureLimitType) => {
+  const checkIfFeatureLimitReached = (featureLimitType: FeatureLimitType, checkType: "breached" | "reached") => {
     const currentFeatureValue = getFeatureCurrentValue(featureLimitType);
     const featureLimitValue = getFeatureLimitValue(featureLimitType);
-    return currentFeatureValue >= featureLimitValue;
+    if (checkType === "breached") return currentFeatureValue > featureLimitValue;
+    else return currentFeatureValue >= featureLimitValue;
   };
 
   const getFeatureCurrentValue = (featureLimitType: FeatureLimitType) => {
