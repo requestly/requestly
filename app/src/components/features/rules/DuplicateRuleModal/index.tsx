@@ -128,7 +128,7 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
       footer={
         <Row justify="end" align="middle">
           <Space size={8}>
-            <RQButton type="default" onClick={() => close()}>
+            <RQButton type="default" onClick={close}>
               Cancel
             </RQButton>
             <PremiumFeature
