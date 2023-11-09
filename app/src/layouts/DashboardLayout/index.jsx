@@ -41,21 +41,21 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     const auth = getAuth(firebaseApp);
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        try {
+    try {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
           getEnterpriseAdminDetails().then((response) => {
             if (response.data.success) {
               dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
             }
           });
-        } catch (e) {
-          Logger.log(e);
+        } else {
+          dispatch(actions.updateOrganizationDetails(null));
         }
-      } else {
-        dispatch(actions.updateOrganizationDetails(null));
-      }
-    });
+      });
+    } catch (e) {
+      Logger.log(e);
+    }
   }, [getEnterpriseAdminDetails, dispatch]);
 
   return (
