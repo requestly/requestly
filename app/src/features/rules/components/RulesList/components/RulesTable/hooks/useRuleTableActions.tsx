@@ -216,6 +216,7 @@ const useRuleTableActions = () => {
     // setSelectedRows(records);
     updateMultipleRecordsInStorage(updatedRecords, records).then(() => {
       // add analytics
+      toast.success(`Rules activated!`);
     });
   };
 
