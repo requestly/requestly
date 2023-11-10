@@ -65,11 +65,13 @@ tr.rq-content-table-row.ant-table-row {
   }
 
   button.ant-btn.ant-btn-icon-only {
+    flex-shrink: 0;
     width: 40px;
     height: 32px;
   }
 
   button.ant-btn.ant-btn-icon-only svg {
+    flex-shrink: 0;
     width: 16px;
     height: 16px;
     color: var(--text-light);
