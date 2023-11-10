@@ -1,16 +1,14 @@
-.email-input > input {
-  width: 100% !important;
-  outline: none;
-  border: none;
-  box-shadow: none;
+.email-suggestion-dropdown {
+  overflow: auto;
+  max-height: 200px;
+  background-color: var(--background);
+  border-radius: var(--border-radius-md);
 }
 
-.email-input-container {
-  outline: none;
+.email-suggestion-dropdown .ant-dropdown-menu {
   border: none;
-  box-shadow: none;
 }
 
-.email-input-container > span[data-placeholder] {
-  color: var(--text-gray) !important;
+.react-multi-email.empty > span[data-placeholder] {
+  color: var(--text-light);
 }

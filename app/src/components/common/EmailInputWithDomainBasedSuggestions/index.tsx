@@ -1,47 +1,48 @@
-import { Dropdown, MenuProps } from "antd";
+import { MenuProps } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ReactMultiEmail, isEmail } from "react-multi-email";
-import * as _ from "lodash";
+import _ from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-// import { BiCheck } from '@react-icons/all-files/bi/BiCheck';
 import "react-multi-email/dist/style.css";
 import "./index.css";
+import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { RQDropdown } from "lib/design-system/components";
 
-interface EmailInputWithDomainBasedSuggestionsProps {
+interface Props {
   onChange: (emails: string[]) => void;
 }
 
-const EmailInputWithDomainBasedSuggestions: React.FC<EmailInputWithDomainBasedSuggestionsProps> = ({ onChange }) => {
+const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange }) => {
   const user = useSelector(getUserAuthDetails);
-  const [userEmail, userEmailDomain] = useMemo(() => {
-    return [user?.details?.profile?.email, user?.details?.profile?.email?.split("@")[1]];
-  }, [user?.details?.profile?.email]);
+  const userEmail = user?.details?.profile?.email;
 
-  const [emailInp, setEmailInp] = useState("");
+  const [emailInput, setEmailInput] = useState("");
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [allSuggestions, setAllSuggestions] = useState<string[]>([]);
 
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
 
   useEffect(() => {
-    if (!userEmailDomain) return;
+    if (!isCompanyEmail(userEmail)) return;
 
-    getOrganizationUsers({ domain: userEmailDomain }).then((res: any) => {
+    getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((res: any) => {
       const users = res.data.users;
+      console.log("!!!debug", "users::", res.data);
       const emails = users.map((user: any) => user.email);
+      console.log("!!!debug", "suggestions::", _.without(emails, userEmail));
       setAllSuggestions(_.without(emails, userEmail));
     });
-  }, [userEmailDomain, getOrganizationUsers, userEmail]);
+  }, [getOrganizationUsers, userEmail]);
 
   const suggestions: string[] = useMemo(() => {
-    if (!emailInp) return allSuggestions;
+    if (!emailInput) return allSuggestions;
 
     return allSuggestions.filter((suggestion) => {
-      return suggestion.includes(emailInp);
+      return suggestion.includes(emailInput);
     });
-  }, [emailInp, allSuggestions]);
+  }, [emailInput, allSuggestions]);
 
   const optionsFromSuggestions: MenuProps["items"] = useMemo(() => {
     return suggestions.map((suggestion) => {
@@ -61,8 +62,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<EmailInputWithDomainBasedSu
   );
 
   return (
-    <Dropdown
-      className="email-input-container"
+    <RQDropdown
       menu={{
         multiple: true,
         items: optionsFromSuggestions,
@@ -74,21 +74,22 @@ const EmailInputWithDomainBasedSuggestions: React.FC<EmailInputWithDomainBasedSu
           } else {
             handleEmailChange([...selectedEmails, email]);
           }
+          setEmailInput("");
         },
       }}
-      // trigger={[]}
-      open={!!suggestions.length && !!emailInp}
+      open={!!suggestions.length && !!emailInput}
+      overlayClassName="email-suggestion-dropdown"
+      placement="top"
     >
       <ReactMultiEmail
-        className="email-input"
         emails={selectedEmails}
         onChange={handleEmailChange}
-        initialInputValue={emailInp}
+        initialInputValue={emailInput}
         validateEmail={(emailInp) => {
           return isEmail(emailInp);
         }}
         onChangeInput={(value) => {
-          return setEmailInp(value);
+          return setEmailInput(value);
         }}
         placeholder="sam@amazon.com, tom@google.com"
         getLabel={(email, index, removeEmail) => (
@@ -100,7 +101,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<EmailInputWithDomainBasedSu
           </div>
         )}
       />
-    </Dropdown>
+    </RQDropdown>
   );
 };
 
