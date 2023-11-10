@@ -33,7 +33,7 @@ const useRuleTableActions = () => {
 
   const clearSelectedRows = useCallback(() => {
     setSelectedRows([]);
-  }, []);
+  }, [setSelectedRows]);
 
   const handleStatusToggle = (rules: RuleTableDataType[], checked: boolean) => {
     console.log("handleStatusToggle", { rules, checked });
@@ -203,9 +203,20 @@ const useRuleTableActions = () => {
     setIsChangeGroupModalActive(false);
   };
 
-  const handleActivateRecords = (records: RuleObj[]) => {
-    const updatedRecords = records.map((record) => ({ ...record, status: RuleObjStatus.ACTIVE }));
-    return updateMultipleRecordsInStorage(updatedRecords, records);
+  // FIXME: Add Deactivate all rules support
+  const handleActivateOrDeactivateRecords = (records: RuleObj[]) => {
+    // const activeRulesCount = getActiveRules(records).length;
+    // const inactiveRulesCount = records.length - activeRulesCount;
+
+    const updatedRecords = records.map((record) => ({
+      ...record,
+      status: RuleObjStatus.ACTIVE,
+    }));
+
+    // setSelectedRows(records);
+    updateMultipleRecordsInStorage(updatedRecords, records).then(() => {
+      // add analytics
+    });
   };
 
   const handlePinRecordClick = (record: RuleObj) => {
@@ -241,7 +252,7 @@ const useRuleTableActions = () => {
     handleChangeRuleGroupClick,
     closeChangeRuleGroupModal,
     handleUngroupSelectedRulesClick,
-    handleActivateRecords,
+    handleActivateOrDeactivateRecords,
     handlePinRecordClick,
   };
 };

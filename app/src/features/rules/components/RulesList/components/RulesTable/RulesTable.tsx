@@ -28,7 +28,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
   const {
     clearSelectedRows,
     handleRuleShare,
-    handleActivateRecords,
+    handleActivateOrDeactivateRecords,
     handleDeleteRecordClick,
     handleChangeRuleGroupClick,
     handleUngroupSelectedRulesClick,
@@ -92,6 +92,8 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
   }, []);
 
   const columns = useRuleTableColumns(options);
+  // const activeRulesCount = useMemo(() => getActiveRules(selectedRows).length, [selectedRows]);
+  // const inactiveRulesCount = selectedRows.length - activeRulesCount;
 
   return (
     <>
@@ -126,7 +128,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
               {
                 label: "Activate",
                 icon: <RiToggleFill />,
-                onClick: (selectedRows) => handleActivateRecords(selectedRows),
+                onClick: (selectedRows) => handleActivateOrDeactivateRecords(selectedRows),
               },
               {
                 label: "Share",
