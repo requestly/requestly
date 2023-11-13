@@ -147,7 +147,7 @@ APP_CONSTANTS.url = {
 };
 
 APP_CONSTANTS.mock_base_url = {
-  prod: "https://requestly.dev/api/mockv2",
+  prod: "https://requestly.tech/api/mockv2",
   beta: "https://beta.requestly.io/api/mockv2",
   local: "http://localhost:5001/requestly-dev/us-central1/handleMockRequest/api/mockv2", // Change port depending upon you firebase functions emulator port
 };
