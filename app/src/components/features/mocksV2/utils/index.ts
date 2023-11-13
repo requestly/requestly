@@ -90,11 +90,11 @@ const generateEndpointPrefix = (username: string = null, teamId?: string) => {
     prefix = `${APP_CONSTANTS.mock_base_url.local}/`;
   } else {
     if (teamId) {
-      prefix = `https://requestly.dev/api/mockv2/`;
+      prefix = `https://requestly.tech/api/mockv2/`;
     } else if (username) {
-      prefix = `https://${username}.requestly.dev/`;
+      prefix = `https://${username}.requestly.tech/`;
     } else {
-      prefix = "https://requestly.dev/api/mockv2/";
+      prefix = "https://requestly.tech/api/mockv2/";
     }
   }
 
