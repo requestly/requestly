@@ -4,6 +4,16 @@
   margin: 0 8px;
   padding: 10px 8px;
 }
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item,
+.ant-dropdown-menu-item-active.rule-selection-dropdown-btn-overlay-item {
+  background: none !important; /* override antd's default background, after wrapping with premium feature component */
+}
+.ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item:hover,
+.ant-dropdown-menu-item-active.rule-selection-dropdown-btn-overlay-item:hover {
+  background: var(
+    --surface-3
+  ) !important; /* override antd's default background, after wrapping with premium feature component */
+}
 
 .ant-dropdown-menu-item.rule-selection-dropdown-btn-overlay-item .rule-type-icon {
   padding: 1px;
