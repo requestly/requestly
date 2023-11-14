@@ -44,7 +44,7 @@ const FeatureLimiterBanner = () => {
                   actions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,
-                    newProps: { selectedPlan: null },
+                    newProps: { selectedPlan: null, source: "feature_limiter_banner" },
                   })
                 );
               }}

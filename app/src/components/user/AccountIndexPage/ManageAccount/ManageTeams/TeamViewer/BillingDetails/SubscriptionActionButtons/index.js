@@ -34,7 +34,7 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
               actions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,
-                newProps: { selectedPlan: null },
+                newProps: { selectedPlan: null, source: "workspace_upgrade" },
               })
             );
             trackViewPricingPlansClicked("workspace_upgrade");
