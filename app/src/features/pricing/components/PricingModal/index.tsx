@@ -14,6 +14,7 @@ import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
 import { isNull } from "lodash";
 import { TeamWorkspace } from "types";
+import { redirectToUrl } from "utils/RedirectionUtils";
 import "./index.scss";
 
 interface PricingModalProps {
@@ -73,7 +74,11 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       if (workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id) {
         createIndividualSubscriptionUsingStripeCheckout(subscriptionData)
           .then((data: any) => {
-            setStripeClientSecret(data?.data?.payload.clientSecret);
+            if (data?.data?.payload?.url) {
+              redirectToUrl(data?.data?.payload?.url);
+              toggleModal();
+            } else setStripeClientSecret(data?.data?.payload?.clientSecret);
+
             setIsLoading(false);
           })
           .catch((err) => {
@@ -83,7 +88,10 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       } else {
         createTeamSubscriptionUsingStripeCheckout(subscriptionData)
           .then((data: any) => {
-            setStripeClientSecret(data?.data?.payload.clientSecret);
+            if (data?.data?.payload?.url) {
+              redirectToUrl(data?.data?.payload?.url);
+              toggleModal();
+            } else setStripeClientSecret(data?.data?.payload?.clientSecret);
             setIsLoading(false);
           })
           .catch((err) => {
@@ -92,7 +100,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           });
       }
     },
-    [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount]
+    [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount, toggleModal]
   );
 
   useEffect(() => {
