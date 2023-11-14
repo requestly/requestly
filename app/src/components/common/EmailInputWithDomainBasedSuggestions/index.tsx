@@ -29,9 +29,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange }) => 
 
     getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((res: any) => {
       const users = res.data.users;
-      console.log("!!!debug", "users::", res.data);
       const emails = users.map((user: any) => user.email);
-      console.log("!!!debug", "suggestions::", _.without(emails, userEmail));
       setAllSuggestions(_.without(emails, userEmail));
     });
   }, [getOrganizationUsers, userEmail]);
