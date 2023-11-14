@@ -22,7 +22,6 @@ import FeatureUsageEvent from "hooks/FeatureUsageEvent";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/ExtensionContextInvalidationNotice";
-import { useInitializeNewUserSessionRecordingConfig } from "views/features/sessions/SessionsSettingsPage/hooks";
 import { useIsExtensionEnabled } from "hooks";
 
 const { PATHS } = APP_CONSTANTS;
@@ -37,7 +36,7 @@ const App = () => {
 
   useGeoLocation();
   useIsExtensionEnabled();
-  useInitializeNewUserSessionRecordingConfig();
+  // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();
 
