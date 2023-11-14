@@ -179,7 +179,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                         actions.toggleActiveModal({
                           modalName: "pricingModal",
                           newValue: true,
-                          newProps: { selectedPlan: null },
+                          newProps: { selectedPlan: null, source: "request_feature_modal" },
                         })
                       );
                     }}

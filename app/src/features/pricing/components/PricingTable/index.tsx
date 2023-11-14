@@ -129,7 +129,12 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                           actions.toggleActiveModal({
                             modalName: "pricingModal",
                             newValue: true,
-                            newProps: { selectedPlan: planName, workspace: workspaceToUpgrade, planDuration: duration },
+                            newProps: {
+                              selectedPlan: planName,
+                              workspace: workspaceToUpgrade,
+                              planDuration: duration,
+                              source: "pricing_table",
+                            },
                           })
                         )
                   }
@@ -178,7 +183,12 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   actions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,
-                    newProps: { selectedPlan: planName, workspace: workspaceToUpgrade, planDuration: duration },
+                    newProps: {
+                      selectedPlan: planName,
+                      workspace: workspaceToUpgrade,
+                      planDuration: duration,
+                      source: "pricing_table",
+                    },
                   })
                 );
           }}

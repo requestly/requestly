@@ -17,18 +17,19 @@ export const handleSurveyNavigation = (
   appMode: string,
   currentPage: SurveyPage,
   isSurveyModal: boolean,
-  response?: string,
+  response?: string | OtherOption,
   callback?: () => void
 ) => {
   const index = Object.keys(SurveyConfig).indexOf(currentPage);
   const surveyLength = Object.keys(SurveyConfig).length;
   const currentQuestionnaire = SurveyConfig[currentPage]?.render;
   const isSharedListUser = window.location.href.includes(PATHS.SHARED_LISTS.VIEWER.RELATIVE);
+  const questionnaireResponse = typeof response === "object" ? response.value : response;
 
   switch (currentQuestionnaire) {
     case QuestionnaireType.PERSONA:
-      trackPersonaQ1Completed(response);
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, response);
+      trackPersonaQ1Completed(questionnaireResponse);
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, questionnaireResponse);
       break;
   }
 

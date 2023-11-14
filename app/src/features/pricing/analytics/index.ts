@@ -1,8 +1,8 @@
 import { trackEvent } from "modules/analytics";
 import { PRICING_MODAL, PRICING_WORKSPACE } from "./constants";
 
-export const trackPricingModalPlansViewed = () => {
-  trackEvent(PRICING_MODAL.PRICING_MODAL_PLANS_VIEWED);
+export const trackPricingModalPlansViewed = (source: string) => {
+  trackEvent(PRICING_MODAL.PRICING_MODAL_PLANS_VIEWED, { source });
 };
 
 export const trackPricingWorkspaceSwitched = (selection: "team" | "individual", source: string) => {
