@@ -13,7 +13,6 @@ const ManageSubscription = () => {
     const manageSubscription = httpsCallable(getFunctions(), "subscription-manageSubscription");
     manageSubscription({})
       .then((res: any) => {
-        console.log(res);
         if (res?.data?.success) {
           redirectToUrl(res?.data?.data?.portalUrl);
         }
