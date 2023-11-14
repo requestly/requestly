@@ -50,6 +50,7 @@ const PremiumPlanBadge = () => {
   if (planId && planStatus === "trialing") {
     return (
       <Tooltip
+        overlayInnerStyle={{ padding: "16px 10px" }}
         title={
           <RQButton disabled={isLoading} type="primary" onClick={handleManageSubscription}>
             Manage subscription
@@ -58,7 +59,7 @@ const PremiumPlanBadge = () => {
         placement="bottom"
         color="var(--black)"
       >
-        <div className="premium-plan-badge-container">
+        <div className="premium-plan-badge-container cursor-pointer">
           <div className="premium-plan-name">{planName.toUpperCase()}</div>
           <div className="premium-plan-days-left">
             {daysLeft >= 0 ? `${daysLeft} days left in trial` : "Trial Expired"}
