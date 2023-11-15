@@ -458,7 +458,6 @@ export const signInWithEmailLink = async (email, callback) => {
     // Update details in db
     const authData = getAuthData(result.user);
     const database = getDatabase();
-    // firebase.database().ref(getUserProfilePath(authData.uid)).update(authData);
     update(ref(database, getUserProfilePath(authData.uid)), authData);
 
     //  Analytics - Track event
