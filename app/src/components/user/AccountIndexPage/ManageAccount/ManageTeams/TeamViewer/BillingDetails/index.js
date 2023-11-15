@@ -57,7 +57,7 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
   //   });
   // };
 
-  const isSubscriptionActive = subscriptionInfo.subscriptionStatus in ["active", "trialing", "past_due"];
+  const isSubscriptionActive = ["active", "trialing", "past_due"].includes(subscriptionInfo.subscriptionStatus);
 
   return isLoading ? (
     <SpinnerColumn skeletonCount={2} message="Fetching subscription details" />
