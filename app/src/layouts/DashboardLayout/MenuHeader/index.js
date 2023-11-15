@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Layout, Button, Row, Col, Tooltip, Divider, Tag, Badge } from "antd";
+import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import { getAppMode } from "store/selectors";
 import { actions } from "store";
 import HeaderUser from "./HeaderUser";
