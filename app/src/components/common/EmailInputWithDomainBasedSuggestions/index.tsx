@@ -1,14 +1,12 @@
-import { MenuProps } from "antd";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ReactMultiEmail, isEmail } from "react-multi-email";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import _ from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import "react-multi-email/dist/style.css";
-import "./index.css";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
-import { RQDropdown } from "lib/design-system/components";
+import { getDomainFromEmail, isCompanyEmail, isEmailValid } from "utils/FormattingHelper";
+import CreatableSelect from "react-select/creatable";
+import { MultiValue } from "react-select";
 
 interface Props {
   onChange: (emails: string[]) => void;
@@ -18,8 +16,6 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange }) => 
   const user = useSelector(getUserAuthDetails);
   const userEmail = user?.details?.profile?.email;
 
-  const [emailInput, setEmailInput] = useState("");
-  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [allSuggestions, setAllSuggestions] = useState<string[]>([]);
 
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
@@ -34,72 +30,66 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange }) => 
     });
   }, [getOrganizationUsers, userEmail]);
 
-  const suggestions: string[] = useMemo(() => {
-    if (!emailInput) return allSuggestions;
-
-    return allSuggestions.filter((suggestion) => {
-      return suggestion.includes(emailInput);
-    });
-  }, [emailInput, allSuggestions]);
-
-  const optionsFromSuggestions: MenuProps["items"] = useMemo(() => {
-    return suggestions.map((suggestion) => {
+  const optionsFromSuggestions = useMemo(() => {
+    return allSuggestions.map((suggestion) => {
       return {
         label: suggestion,
-        key: suggestion,
+        value: suggestion,
       };
     });
-  }, [suggestions]);
+  }, [allSuggestions]);
 
   const handleEmailChange = useCallback(
-    (newEmails: string[]) => {
-      setSelectedEmails(newEmails);
+    (
+      emails: MultiValue<{
+        label: string;
+        value: string;
+      }>
+    ) => {
+      const newEmails = emails.map((email) => email.value);
       onChange(newEmails);
     },
     [onChange]
   );
 
+  const emailInputRef = useRef(null);
+
   return (
-    <RQDropdown
-      menu={{
-        multiple: true,
-        items: optionsFromSuggestions,
-        selectedKeys: selectedEmails,
-        onClick: (e) => {
-          const email = e.key;
-          if (selectedEmails.includes(email)) {
-            handleEmailChange(_.without(selectedEmails, email));
-          } else {
-            handleEmailChange([...selectedEmails, email]);
-          }
-          setEmailInput("");
+    <CreatableSelect
+      isMulti={true}
+      isClearable={false}
+      options={optionsFromSuggestions}
+      theme={(theme) => ({
+        ...theme,
+        borderRadius: 4,
+        colors: {
+          ...theme.colors,
+          primary: "#141414",
+          primary25: "#2b2b2b",
+          neutral0: "#141414",
+          neutral10: "#323337", // tag background color
+          neutral80: "whitesmoke", // tag text color
+          danger: "whitesmoke", // tag cancel icon color
+          dangerLight: "#323337", // tag cancel background color
         },
+      })}
+      styles={{
+        indicatorSeparator: (provided) => ({
+          ...provided,
+          display: "none",
+        }),
+        dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
       }}
-      open={!!suggestions.length && !!emailInput}
-      overlayClassName="email-suggestion-dropdown"
-      placement="top"
-    >
-      <ReactMultiEmail
-        emails={selectedEmails}
-        onChange={handleEmailChange}
-        initialInputValue={emailInput}
-        validateEmail={(emailInp) => {
-          return isEmail(emailInp);
-        }}
-        onChangeInput={(value) => {
-          return setEmailInput(value);
-        }}
-        placeholder="sam@amazon.com, tom@google.com"
-        getLabel={(email, index, removeEmail) => (
-          <div data-tag key={index} className="multi-email-tag">
-            {email}
-            <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-              <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-            </span>
-          </div>
-        )}
-      />
-    </RQDropdown>
+      isValidNewOption={(email) => isEmailValid(email)}
+      noOptionsMessage={() => null}
+      placeholder={"Enter emails to share"}
+      onChange={(value) => {
+        handleEmailChange(value);
+      }}
+      menuPlacement="top"
+      formatCreateLabel={(email) => `Share with ${email}`}
+      ref={emailInputRef}
+    />
   );
 };
 
