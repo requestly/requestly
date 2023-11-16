@@ -23,6 +23,7 @@ interface PricingModalProps {
   workspace?: TeamWorkspace;
   title?: string;
   planDuration?: string;
+  source: string;
 }
 
 export const PricingModal: React.FC<PricingModalProps> = ({
@@ -32,6 +33,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   planDuration,
   selectedPlan = null,
   title = "Upgrade your plan to get the most out of Requestly",
+  source,
 }) => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(
@@ -104,8 +106,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   }, [selectedPlan, handleSubscribe]);
 
   useEffect(() => {
-    if (!isCheckoutScreenVisible) trackPricingModalPlansViewed();
-  }, [isCheckoutScreenVisible]);
+    if (!isCheckoutScreenVisible) trackPricingModalPlansViewed(source);
+  }, [isCheckoutScreenVisible, source]);
 
   return (
     <Modal
