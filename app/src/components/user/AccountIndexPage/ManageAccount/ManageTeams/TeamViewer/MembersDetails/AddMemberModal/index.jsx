@@ -185,7 +185,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
               <div className="title mt-16">Email address</div>
               <div className="email-invites-wrapper">
                 <div className="emails-input-wrapper">
-                  <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} />
+                  <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
                   <div className="access-dropdown-container">
                     <MemberRoleDropdown
                       placement="bottomRight"

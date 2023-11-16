@@ -10,9 +10,10 @@ import { MultiValue } from "react-select";
 
 interface Props {
   onChange: (emails: string[]) => void;
+  transparentBackground?: boolean;
 }
 
-const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange }) => {
+const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, transparentBackground = false }) => {
   const user = useSelector(getUserAuthDetails);
   const userEmail = user?.details?.profile?.email;
 
@@ -62,11 +63,12 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange }) => 
       theme={(theme) => ({
         ...theme,
         borderRadius: 4,
+        border: "none",
         colors: {
           ...theme.colors,
-          primary: "#141414",
+          primary: "#212121",
           primary25: "#2b2b2b",
-          neutral0: "#141414",
+          neutral0: "#212121",
           neutral10: "#323337", // tag background color
           neutral80: "whitesmoke", // tag text color
           danger: "whitesmoke", // tag cancel icon color
@@ -79,6 +81,16 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange }) => 
           display: "none",
         }),
         dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
+        control: (provided) => ({
+          ...provided,
+          boxShadow: "none",
+          border: transparentBackground ? "none" : "1px solid #4f5053",
+          backgroundColor: transparentBackground ? "transparent" : "#212121",
+        }),
+        container: (provided) => ({
+          ...provided,
+          flexGrow: 1,
+        }),
       }}
       isValidNewOption={(email) => isEmailValid(email)}
       noOptionsMessage={() => null}
