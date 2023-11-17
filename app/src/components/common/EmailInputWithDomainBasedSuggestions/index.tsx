@@ -3,7 +3,6 @@ import _ from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import "react-multi-email/dist/style.css";
 import { getDomainFromEmail, isCompanyEmail, isEmailValid } from "utils/FormattingHelper";
 import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
