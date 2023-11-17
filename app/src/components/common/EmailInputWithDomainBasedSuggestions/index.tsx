@@ -66,15 +66,24 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
         border: "none",
         colors: {
           ...theme.colors,
-          primary: "#212121",
+          primary: "#2d2d2d",
           primary25: "#2b2b2b",
-          neutral0: "#212121",
+          neutral0: "#2d2d2d",
           neutral10: "#323337", // tag background color
           neutral80: "whitesmoke", // tag text color
           danger: "whitesmoke", // tag cancel icon color
           dangerLight: "#323337", // tag cancel background color
         },
       })}
+      isValidNewOption={(email) => isEmailValid(email)}
+      noOptionsMessage={() => null}
+      placeholder={"Enter emails"}
+      onChange={(value) => {
+        handleEmailChange(value);
+      }}
+      menuPlacement="top"
+      formatCreateLabel={(email) => email}
+      ref={emailInputRef}
       styles={{
         indicatorSeparator: (provided) => ({
           ...provided,
@@ -92,15 +101,6 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
           flexGrow: 1,
         }),
       }}
-      isValidNewOption={(email) => isEmailValid(email)}
-      noOptionsMessage={() => null}
-      placeholder={"Enter emails to share"}
-      onChange={(value) => {
-        handleEmailChange(value);
-      }}
-      menuPlacement="top"
-      formatCreateLabel={(email) => `Share with ${email}`}
-      ref={emailInputRef}
     />
   );
 };
