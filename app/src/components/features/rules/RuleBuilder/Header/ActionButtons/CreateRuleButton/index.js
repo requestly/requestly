@@ -225,7 +225,7 @@ const CreateRuleButton = ({
         <Tooltip title={tooltipText} placement="top">
           <Button data-tour-id="rule-editor-create-btn" type="primary" className="text-bold" disabled={isDisabled}>
             {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-            {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText}
+            {`Save rule`}
           </Button>
         </Tooltip>
       </PremiumFeature>
