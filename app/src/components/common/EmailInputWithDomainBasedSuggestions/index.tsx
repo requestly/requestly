@@ -16,7 +16,12 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
   const user = useSelector(getUserAuthDetails);
   const userEmail = user?.details?.profile?.email;
 
-  const [allSuggestions, setAllSuggestions] = useState<string[]>([]);
+  const [suggestionOptions, setSuggestionOptions] = useState<
+    MultiValue<{
+      label: string;
+      value: string;
+    }>
+  >([]);
 
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
 
@@ -26,18 +31,15 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
     getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((res: any) => {
       const users = res.data.users;
       const emails = users.map((user: any) => user.email);
-      setAllSuggestions(_.without(emails, userEmail));
+      const suggestionOptionsFromEmails = _.without(emails, userEmail).map((suggestion) => {
+        return {
+          label: suggestion,
+          value: suggestion,
+        };
+      });
+      setSuggestionOptions(suggestionOptionsFromEmails);
     });
   }, [getOrganizationUsers, userEmail]);
-
-  const optionsFromSuggestions = useMemo(() => {
-    return allSuggestions.map((suggestion) => {
-      return {
-        label: suggestion,
-        value: suggestion,
-      };
-    });
-  }, [allSuggestions]);
 
   const handleEmailChange = useCallback(
     (
@@ -58,7 +60,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
     <CreatableSelect
       isMulti={true}
       isClearable={false}
-      options={optionsFromSuggestions}
+      options={suggestionOptions}
       theme={(theme) => ({
         ...theme,
         borderRadius: 4,
@@ -92,8 +94,8 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
         control: (provided) => ({
           ...provided,
           boxShadow: "none",
-          border: transparentBackground ? "none" : "1px solid #4f5053",
-          backgroundColor: transparentBackground ? "transparent" : "#212121",
+          border: transparentBackground ? "none" : "1px solid var(--border)",
+          backgroundColor: transparentBackground ? "transparent" : "var(--background)",
         }),
         container: (provided) => ({
           ...provided,
