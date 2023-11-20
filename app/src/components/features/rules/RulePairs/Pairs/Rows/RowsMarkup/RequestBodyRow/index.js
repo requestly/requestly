@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { Row, Col, Radio, Button } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
@@ -10,9 +12,11 @@ import { actions } from "store";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
+import { PremiumFeature } from "features/pricing";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const [requestTypePopupVisible, setRequestTypePopupVisible] = useState(false);
   const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
     pair?.request?.type ?? GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
@@ -116,6 +120,9 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
       <Row key={rowIndex} align="middle" className="code-editor-header-row">
         <Col span={24}>
           <Popconfirm
+            disabled={
+              requestTypePopupSelection !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE && !user?.details?.isPremium
+            }
             title="This will clear the existing body content"
             onConfirm={() => {
               onChangeRequestType(requestTypePopupSelection);
@@ -124,7 +131,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             onCancel={() => setRequestTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            open={requestTypePopupVisible}
+            open={requestTypePopupVisible && requestTypePopupSelection !== GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}
           >
             <Radio.Group
               onChange={showPopup}
@@ -134,12 +141,19 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
               className="response-body-type-radio-group"
             >
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
-              <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>
-                <Row align="middle">
-                  Programmatic (JavaScript)
-                  {isPremiumFeature ? <PremiumIcon featureType="dynamic_request_body" /> : null}
-                </Row>
-              </Radio>
+              <PremiumFeature
+                features={[FeatureLimitType.dynamic_request_body]}
+                popoverPlacement="top"
+                onContinue={() => onChangeRequestType(GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE)}
+                source="dynamic_request_body"
+              >
+                <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE}>
+                  <Row align="middle">
+                    Programmatic (JavaScript)
+                    {isPremiumFeature ? <PremiumIcon featureType="dynamic_request_body" /> : null}
+                  </Row>
+                </Radio>
+              </PremiumFeature>
             </Radio.Group>
           </Popconfirm>
         </Col>

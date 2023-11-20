@@ -125,22 +125,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     );
   };
 
-  const promptUserToLogInWithoutCallback = (source) => {
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: true,
-        newProps: {
-          redirectURL: window.location.href,
-          src: APP_CONSTANTS.FEATURES.RULES,
-          userActionMessage: "Sign up to generate a public shareable link",
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: source,
-        },
-      })
-    );
-  };
-
   const handleNewRuleOnClick = async (_e, ruleType) => {
     if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
     else trackNewRuleButtonClicked("in_app");
@@ -155,7 +139,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const handleShareRulesOnClick = () => {
-    user.loggedIn ? verifySharedListsLimit() : promptUserToLogInWithoutCallback(AUTH.SOURCE.SHARE_RULES);
+    toggleSharingModal(selectedRuleIds);
+    trackRQLastActivity("sharedList_created");
   };
 
   const getCurrentSharedListsCount = (result) => {
@@ -164,12 +149,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     } else {
       return 0;
     }
-  };
-
-  const verifySharedListsLimit = () => {
-    //Continue creating new shared list
-    toggleSharingModal(selectedRuleIds);
-    trackRQLastActivity("sharedList_created");
   };
 
   const handleImportRulesOnClick = (e) => {

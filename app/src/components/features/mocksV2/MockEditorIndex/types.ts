@@ -14,6 +14,7 @@ export interface MockEditorDataSchema {
   headers: { [key: string]: string };
   body: string;
   responseId?: string; // Keeping it separate as we only support 1 response
+  password?: string;
   // TODO: Response should ideally be an array
 }
 

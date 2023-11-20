@@ -37,7 +37,7 @@ export default function HeaderUser() {
 
   const menuPropItems = [
     {
-      icon: <Avatar size={42} src={userPhoto} shape="square" className="cursor-pointer" />,
+      icon: <Avatar size={42} src={userPhoto} shape="square" className="cursor-pointer header-user-avatar" />,
       onClick: () => redirectToAccountDetails(navigate),
       label: (
         <div className="profile-details">
@@ -89,7 +89,7 @@ export default function HeaderUser() {
 
   return hideUserDropDown ? null : (
     <>
-      {user.loggedIn && user.details && user.details.profile && user.details.profile.photoURL ? (
+      {user.loggedIn && user?.details?.profile ? (
         <>
           <Col>
             <Dropdown

@@ -57,7 +57,7 @@ export const isPremiumUser = (userPlanDetails) => {
 
   // For all other types eg Unlock, Team, Individual, Paypal
   return (
-    (userPlanDetails.status === "active" || userPlanDetails.status === "trialing") &&
+    ["active", "trialing", "past_due"].includes(userPlanDetails.status) &&
     isPremiumPlan(userPlanDetails.planId) &&
     !isPlanExpired(userPlanDetails)
   );

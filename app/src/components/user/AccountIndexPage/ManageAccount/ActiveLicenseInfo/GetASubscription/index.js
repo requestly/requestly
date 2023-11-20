@@ -25,7 +25,7 @@ const GetASubscription = ({ hideShadow }) => {
                       actions.toggleActiveModal({
                         modalName: "pricingModal",
                         newValue: true,
-                        newProps: { selectedPlan: null },
+                        newProps: { selectedPlan: null, source: "my_profile" },
                       })
                     );
                     trackViewPricingPlansClicked("my_profile");
