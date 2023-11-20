@@ -10,7 +10,7 @@ import "./ruleInfoBanner.css";
 const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleType, appMode }) => {
   const ruleInfoBannerContent: Record<
     string,
-    { title: React.ReactNode; description: React.ReactNode; appMode?: string[] }
+    { title: React.ReactNode; description?: React.ReactNode; appMode?: string[] }
   > = useMemo(
     () => ({
       [GLOBAL_CONSTANTS.RULE_TYPES.DELAY]: {
@@ -35,6 +35,40 @@ const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleT
           </div>
         ),
       },
+      [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: {
+        appMode: [GLOBAL_CONSTANTS.APP_MODES.EXTENSION],
+        title: (
+          <div>
+            In the recent version of Chrome v119, the Authorization header is not forwarded when cross-origin fetch
+            requests are redirected. Read more about the solution{" "}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={"https://github.com/requestly/requestly/issues/1208#issuecomment-1801505984"}
+            >
+              here
+            </a>
+            .
+          </div>
+        ),
+      },
+      [GLOBAL_CONSTANTS.RULE_TYPES.REPLACE]: {
+        appMode: [GLOBAL_CONSTANTS.APP_MODES.EXTENSION],
+        title: (
+          <div>
+            In the recent version of Chrome v119, the Authorization header is not forwarded when cross-origin fetch
+            requests are redirected. Read more about the solution{" "}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={"https://github.com/requestly/requestly/issues/1208#issuecomment-1801505984"}
+            >
+              here
+            </a>
+            .
+          </div>
+        ),
+      },
     }),
     []
   );
@@ -54,10 +88,14 @@ const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleT
               <Typography.Text className="rule-info-banner-text">
                 {ruleInfoBannerContent[ruleType].title}
               </Typography.Text>
-              <br />
-              <Typography.Text className="rule-info-banner-text">
-                {ruleInfoBannerContent[ruleType].description}
-              </Typography.Text>
+              {ruleInfoBannerContent[ruleType]?.description && (
+                <>
+                  <br />
+                  <Typography.Text className="rule-info-banner-text">
+                    {ruleInfoBannerContent[ruleType].description}
+                  </Typography.Text>
+                </>
+              )}
             </>
           }
           icon={
