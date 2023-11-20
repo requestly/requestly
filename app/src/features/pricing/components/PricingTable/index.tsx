@@ -77,11 +77,13 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
         return (
           <Space size={8}>
-            {userPlanName === PRICING.PLAN_NAMES.FREE && (
-              <RQButton onClick={() => (window.location.href = "/")} type="primary">
-                Use now
-              </RQButton>
-            )}
+            <RQButton
+              onClick={() => (window.location.href = "/")}
+              type="primary"
+              className={userPlanName !== PRICING.PLAN_NAMES.FREE ? "visibility-hidden" : ""}
+            >
+              Use now
+            </RQButton>
             {!isUserPremium && <div className="current-pricing-plan-tag">Current Plan</div>}
           </Space>
         );
@@ -194,6 +196,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
           }}
           disabled={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL}
           type="primary"
+          className={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL ? "visibility-hidden" : ""}
         >
           Upgrade now
         </RQButton>

@@ -19,11 +19,6 @@ export const PricingFeatures: PlanFeatures = {
             "There is no limit on header modification rules; they only count as one towards your total rule limit.",
         },
         {
-          title: "Modify API request and response",
-          enabled: true,
-          tooltip: "Statically override the payload with content of up to 1500 characters",
-        },
-        {
           title: "Mock Server",
           enabled: true,
         },
@@ -51,13 +46,13 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "You can create upto 10 rules where 5 rules can be active at a time.",
         },
         {
-          title: "GraphQL API Modifications",
+          title: "Modify API request and response",
           enabled: true,
+          tooltip: "Statically override the payload with content of up to 1500 characters",
         },
         {
-          title: "Programmatically modify API request and response",
+          title: "GraphQL API Modifications",
           enabled: true,
-          tooltip: "Statically and programmatically override the response without any character limits.",
         },
         {
           title: "Script injection",
