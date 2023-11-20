@@ -4,7 +4,6 @@ import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "sto
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
-import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { RQButton } from "lib/design-system/components";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import puzzleImg from "assets/images/illustrations/puzzle.svg";
@@ -17,6 +16,7 @@ import { WorkspaceSharingTypes, PostShareViewData } from "../types";
 import { Team, TeamRole } from "types";
 import "./index.scss";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 
 interface Props {
   selectedRules: string[];
@@ -134,20 +134,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
         </label>
-        <ReactMultiEmail
-          className="sharing-modal-email-input"
-          emails={memberEmails}
-          onChange={setMemberEmails}
-          validateEmail={validateEmail}
-          getLabel={(email, index, removeEmail) => (
-            <div data-tag key={index} className="multi-email-tag">
-              {email}
-              <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-              </span>
-            </div>
-          )}
-        />
+        <EmailInputWithDomainBasedSuggestions onChange={setMemberEmails} />
       </div>
       <RQButton
         className="mt-1 text-bold sharing-primary-btn"
