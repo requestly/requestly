@@ -25,16 +25,16 @@ export const useFeatureLimiter = () => {
     }
 
     const isLimitReached = Object.values(FeatureLimitType).some((featureLimitType) =>
-      checkIfFeatureLimitBreached(featureLimitType)
+      checkIfFeatureLimitReached(featureLimitType, "breached")
     );
     dispatch(actions.updateUserLimitReached(isLimitReached));
   };
 
-  const checkIfFeatureLimitBreached = (featureLimitType: FeatureLimitType, currentValue?: number) => {
-    const currentFeatureValue = currentValue || getFeatureCurrentValue(featureLimitType);
+  const checkIfFeatureLimitReached = (featureLimitType: FeatureLimitType, checkType: "breached" | "reached") => {
+    const currentFeatureValue = getFeatureCurrentValue(featureLimitType);
     const featureLimitValue = getFeatureLimitValue(featureLimitType);
-
-    return currentFeatureValue > featureLimitValue;
+    if (checkType === "breached") return currentFeatureValue > featureLimitValue;
+    else return currentFeatureValue >= featureLimitValue;
   };
 
   const getFeatureCurrentValue = (featureLimitType: FeatureLimitType) => {
@@ -48,6 +48,8 @@ export const useFeatureLimiter = () => {
 
   const getFeatureLimitValue = (featureLimitType: FeatureLimitType) => {
     if (!(featureLimitType in FeatureLimitType)) return true; // free feature
+
+    if (isUserPremium && !premiumPlansToCheckLimit.includes(userPlan)) return Infinity;
 
     return (
       featureLimits[userPlan]?.[featureLimitType] ?? featureLimits[PRICING.PLAN_NAMES.BASIC_V2]?.[featureLimitType] // if plan is not found, return basic plan limit eg: for lite plan
@@ -64,5 +66,6 @@ export const useFeatureLimiter = () => {
     checkFeatureLimits,
     getFeatureLimitValue,
     getIsFeatureEnabled,
+    checkIfFeatureLimitReached,
   };
 };
