@@ -65,13 +65,13 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
         border: "none",
         colors: {
           ...theme.colors,
-          primary: "#2d2d2d",
-          primary25: "#2b2b2b",
-          neutral0: "#2d2d2d",
-          neutral10: "#323337", // tag background color
-          neutral80: "whitesmoke", // tag text color
-          danger: "whitesmoke", // tag cancel icon color
-          dangerLight: "#323337", // tag cancel background color
+          primary: "var(--surface-1)",
+          primary25: "var(--surface-2)",
+          neutral0: "var(--surface-1)",
+          neutral10: "var(--surface-3)", // tag background color
+          neutral80: "var(--text-default)", // tag text color
+          danger: "var(--text-default)", // tag cancel icon color
+          dangerLight: "var(--surface-3)", // tag cancel background color
         },
       })}
       isValidNewOption={(email) => isEmailValid(email)}
