@@ -82,7 +82,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           cancelText="Use for now"
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
-            dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true }));
+            dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true, newProps: { source } }));
           }}
           onCancel={() => {
             if (!hideUseForNowCTA) {

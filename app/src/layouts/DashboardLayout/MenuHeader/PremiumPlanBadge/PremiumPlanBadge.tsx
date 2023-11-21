@@ -16,7 +16,7 @@ const PremiumPlanBadge = () => {
   const userPlanDetails = user?.details?.planDetails;
   const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status;
-  const planName = getPrettyPlanName(planId);
+  const planName = getPrettyPlanName(userPlanDetails?.planName);
   const planEndDateString = userPlanDetails?.subscription?.endDate;
   let daysLeft = 0;
 
