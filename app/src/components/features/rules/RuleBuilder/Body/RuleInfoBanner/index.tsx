@@ -6,6 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import LINKS from "config/constants/sub/links";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import "./ruleInfoBanner.css";
+import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 
 const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleType, appMode }) => {
   const ruleInfoBannerContent: Record<
@@ -45,6 +46,9 @@ const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleT
               target="_blank"
               rel="noreferrer"
               href={"https://github.com/requestly/requestly/issues/1208#issuecomment-1801505984"}
+              onClick={() =>
+                trackMoreInfoClicked("authorization_header_not_forwarding", GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT)
+              }
             >
               here
             </a>
@@ -62,6 +66,9 @@ const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleT
               target="_blank"
               rel="noreferrer"
               href={"https://github.com/requestly/requestly/issues/1208#issuecomment-1801505984"}
+              onClick={() =>
+                trackMoreInfoClicked("authorization_header_not_forwarding", GLOBAL_CONSTANTS.RULE_TYPES.REPLACE)
+              }
             >
               here
             </a>
