@@ -56,6 +56,33 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
       const isUserTrialing = user?.details?.planDetails?.status === "trialing";
 
+      const redirectToManageSubscription = () => {
+        manageSubscription({
+          planName,
+          duration,
+        })
+          .then((res: any) => {
+            if (res?.data?.success) {
+              redirectToUrl(res?.data?.data?.portalUrl);
+            }
+          })
+          .catch((err) => {
+            toast.error("Error in managing subscription. Please contact support contact@requestly.io");
+          });
+      };
+
+      const handleOnUpgrade = () => {
+        if (!user?.details?.isLoggedIn) {
+          dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+        } else if (isUserPremium) {
+          redirectToManageSubscription();
+        } else if (isOpenedFromModal) {
+          handleOnSubscribe(planName);
+        } else {
+          redirectToManageSubscription();
+        }
+      };
+
       if (planName === PRICING.PLAN_NAMES.FREE) {
         if (!user?.details?.isLoggedIn) {
           return (
@@ -170,23 +197,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       if (isUserTrialing) {
         return (
           <Space size={8}>
-            <RQButton
-              onClick={() => {
-                manageSubscription({
-                  planName,
-                  duration,
-                })
-                  .then((res: any) => {
-                    if (res?.data?.success) {
-                      redirectToUrl(res?.data?.data?.portalUrl);
-                    }
-                  })
-                  .catch((err) => {
-                    toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-                  });
-              }}
-              type="primary"
-            >
+            <RQButton onClick={redirectToManageSubscription} type="primary">
               Upgrade now
             </RQButton>
             {planName === userPlanName && <div className="current-pricing-plan-tag">On Trial</div>}
@@ -200,24 +211,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
       return (
         <RQButton
-          onClick={() => {
-            !user?.details?.isLoggedIn
-              ? dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }))
-              : isOpenedFromModal
-              ? handleOnSubscribe(planName)
-              : dispatch(
-                  actions.toggleActiveModal({
-                    modalName: "pricingModal",
-                    newValue: true,
-                    newProps: {
-                      selectedPlan: planName,
-                      workspace: workspaceToUpgrade,
-                      planDuration: duration,
-                      source: "pricing_table",
-                    },
-                  })
-                );
-          }}
+          onClick={handleOnUpgrade}
           disabled={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && !isUserTrialing}
           type="primary"
           className={
