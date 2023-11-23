@@ -19,7 +19,7 @@ const BadSessionError = () => {
 
         <Row className="text-center" align="middle">
           <Col span={24}>
-            <h1 className="display-3">There is some error in this session replay</h1>
+            <h1 className="display-3">There is some error in this SessionBook</h1>
             <p className="lead">
               Please contact support at <a href="mailto:contact@requestly.io">contact@requestly.io</a>
             </p>

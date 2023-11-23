@@ -77,9 +77,9 @@ const BillingDetails = ({ teamId, isTeamAdmin }) => {
       {appSumoSubscriptionInfo && (
         <>
           <Divider className="manage-workspace-divider" />
-          <div className="title billing-title">Session Replay Lifetime Pro</div>
+          <div className="title billing-title">SessionBook Lifetime Pro</div>
           <p className="text-dark-gray billing-subscription-info">
-            {`This workspace has an active Session Replay Lifetime Pro subscription for ${
+            {`This workspace has an active SessionBook Lifetime Pro subscription for ${
               appSumoSubscriptionInfo?.codes?.length
             } ${appSumoSubscriptionInfo?.codes?.length > 1 ? "members" : "member"}.`}
           </p>

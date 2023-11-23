@@ -140,7 +140,7 @@ export const config: PageConfig[] = [
       {
         id: "session recording",
         type: CommandItemType.GROUP,
-        title: "Session Recording",
+        title: "SessionBook",
         children: [
           {
             id: "record a session",
