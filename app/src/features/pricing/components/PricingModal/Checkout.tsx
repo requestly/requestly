@@ -17,10 +17,18 @@ interface CheckoutProps {
   isLoading: boolean;
   onCancel: () => void;
   toggleModal: () => void;
+  source: string;
 }
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
-export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, stripeError, isLoading, onCancel, toggleModal }) => {
+export const Checkout: React.FC<CheckoutProps> = ({
+  clientSecret,
+  stripeError,
+  isLoading,
+  onCancel,
+  toggleModal,
+  source,
+}) => {
   const navigate = useNavigate();
   const options = {
     clientSecret,
@@ -30,8 +38,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, stripeError, i
   };
 
   useEffect(() => {
-    if (!isLoading) trackPricingModalStripeWindowOpened();
-  }, [isLoading]);
+    if (!isLoading) trackPricingModalStripeWindowOpened(source);
+  }, [isLoading, source]);
 
   return (
     <Col className="checkout-screen-wrapper">

@@ -140,6 +140,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
             onCancel={() => setIsCheckoutScreenVisible(false)}
             isLoading={isLoading}
             toggleModal={toggleModal}
+            source={source}
           />
         ) : (
           <>
