@@ -146,7 +146,13 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       if (isUserTrialing && isPrivateWorkspaceSelected) {
         return (
           <Space size={8}>
-            <RQButton onClick={redirectToManageSubscription} type="primary">
+            <RQButton
+              onClick={() => {
+                redirectToManageSubscription();
+                trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount, isUserTrialing);
+              }}
+              type="primary"
+            >
               Upgrade
             </RQButton>
             {planName === userPlanName && <div className="current-pricing-plan-tag">30 days trial active</div>}
