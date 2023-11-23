@@ -97,7 +97,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             })
           );
         }
-        trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount);
+        trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount, isUserTrialing);
       };
 
       if (planName === PRICING.PLAN_NAMES.FREE) {

@@ -9,6 +9,7 @@ import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { trackPricingModalStripeWindowOpened } from "features/pricing/analytics";
 import { redirectToAccountDetails } from "utils/RedirectionUtils";
 import "./index.scss";
+import { trackCheckoutCompletedEvent } from "modules/analytics/events/misc/business/checkout";
 
 interface CheckoutProps {
   clientSecret: string;
@@ -23,6 +24,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, stripeError, i
   const navigate = useNavigate();
   const options = {
     clientSecret,
+    onComplete: () => {
+      trackCheckoutCompletedEvent();
+    },
   };
 
   useEffect(() => {
