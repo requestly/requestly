@@ -53,7 +53,6 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       const userExpiredPlanName = !["active", "trialing", "past_due"].includes(user?.details?.planDetails?.status)
         ? getPlanNameFromId(user?.details?.planDetails?.planId)
         : null;
-      // const isSelectedWorkspacePremium = workspaceToUpgrade?.subscriptionStatus === "active";
       const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
       const isUserTrialing = user?.details?.planDetails?.status === "trialing";
 
