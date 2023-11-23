@@ -78,7 +78,7 @@ const ActiveLicenseInfo = ({
               validTill: new Date("2099-08-16T00:00:00Z").getTime(),
               status: "active",
               type: sessionReplayLifeTimeDetails.type ?? "producthunt",
-              planName: "Session Replay Pro",
+              planName: "SessionBook Plus",
             }}
           />
           <br />

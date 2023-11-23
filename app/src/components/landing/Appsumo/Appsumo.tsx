@@ -225,7 +225,7 @@ const AppSumoModal: React.FC = () => {
               <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
             </div>
             <div className="header mt-16">Please enter your AppSumo code</div>
-            <p className="text-gray">Unlock lifetime deal for Session Replay Pro</p>
+            <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>
             <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
             <div className="title mt-16">AppSumo email address</div>
             <div className="items-center mt-8">
@@ -294,7 +294,7 @@ const AppSumoModal: React.FC = () => {
                   .then(() => {
                     trackAppsumoCodeRedeemed(appsumoCodes.length);
                     toast.success(
-                      `Lifetime access to Session Replay Pro unlocked for ${
+                      `Lifetime access to SessionBook Plus unlocked for ${
                         appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
                       }`,
                       10
