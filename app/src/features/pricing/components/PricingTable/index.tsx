@@ -71,10 +71,12 @@ export const PricingTable: React.FC<PricingTableProps> = ({
           });
       };
 
-      const handleOnUpgrade = () => {
+      const handleOnUpgradeClick = () => {
         if (!user?.details?.isLoggedIn) {
           dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
-        } else if (isUserPremium) {
+        } else if (userPlanType === "team") {
+          setIsContactUsModalOpen(true);
+        } else if (isUserPremium && isPrivateWorkspaceSelected) {
           redirectToManageSubscription();
         } else if (isOpenedFromModal) {
           handleOnSubscribe(planName);
@@ -110,15 +112,22 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         }
 
         return (
-          <Space size={8}>
-            <RQButton
-              onClick={() => (window.location.href = "/")}
-              type="primary"
-              className={userPlanName !== PRICING.PLAN_NAMES.FREE ? "visibility-hidden" : ""}
-            >
+          <Space size={8} className={userPlanName !== PRICING.PLAN_NAMES.FREE ? "visibility-hidden" : ""}>
+            <RQButton onClick={() => (window.location.href = "/")} type="primary">
               Use now
             </RQButton>
-            {!isUserPremium && <div className="current-pricing-plan-tag">Current Plan</div>}
+            <div className="current-pricing-plan-tag">Current Plan</div>
+          </Space>
+        );
+      }
+
+      if (isUserTrialing && isPrivateWorkspaceSelected) {
+        return (
+          <Space size={8}>
+            <RQButton onClick={redirectToManageSubscription} type="primary">
+              Upgrade now
+            </RQButton>
+            {planName === userPlanName && <div className="current-pricing-plan-tag">30 days trial active</div>}
           </Space>
         );
       }
@@ -131,7 +140,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
-      if (isUserPremium) {
+      if (isUserPremium && !isUserTrialing) {
         if (userPlanType !== "team" && !isPrivateWorkspaceSelected) {
           return (
             <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
@@ -194,24 +203,17 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
-      if (isUserTrialing) {
+      if (isUserPremium && planName === userPlanName && !isUserTrialing) {
         return (
-          <Space size={8}>
-            <RQButton onClick={redirectToManageSubscription} type="primary">
-              Upgrade now
-            </RQButton>
-            {planName === userPlanName && <div className="current-pricing-plan-tag">On Trial</div>}
-          </Space>
+          <div className="current-pricing-plan-tag">
+            {userPlanType === "team" && isPrivateWorkspaceSelected ? "Already included in team plan" : "Current plan"}
+          </div>
         );
-      }
-
-      if (isUserPremium && planName === userPlanName) {
-        return <div className="current-pricing-plan-tag">Current plan</div>;
       }
 
       return (
         <RQButton
-          onClick={handleOnUpgrade}
+          onClick={handleOnUpgradeClick}
           disabled={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && !isUserTrialing}
           type="primary"
           className={

@@ -4,6 +4,7 @@ import { getPrettyPlanName } from "utils/FormattingHelper";
 import Logger from "lib/logger";
 import "./premiumPlanBadge.scss";
 import { actions } from "store";
+import { Tooltip } from "antd";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
@@ -28,23 +29,25 @@ const PremiumPlanBadge = () => {
 
   if (planId && planStatus === "trialing") {
     return (
-      <div
-        className="premium-plan-badge-container cursor-pointer"
-        onClick={() => {
-          dispatch(
-            actions.toggleActiveModal({
-              modalName: "pricingModal",
-              newValue: true,
-              newProps: { selectedPlan: null, source: "trial_badge" },
-            })
-          );
-        }}
-      >
-        <div className="premium-plan-name">{planName.toUpperCase()}</div>
-        <div className="premium-plan-days-left">
-          {daysLeft >= 0 ? `${daysLeft} days left in trial` : "Trial Expired"}
+      <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
+        <div
+          className="premium-plan-badge-container cursor-pointer"
+          onClick={() => {
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "pricingModal",
+                newValue: true,
+                newProps: { selectedPlan: null, source: "trial_badge" },
+              })
+            );
+          }}
+        >
+          <div className="premium-plan-name">{planName.toUpperCase()}</div>
+          <div className="premium-plan-days-left">
+            {daysLeft >= 0 ? `${daysLeft} days left in trial` : "Trial Expired"}
+          </div>
         </div>
-      </div>
+      </Tooltip>
     );
   }
 
