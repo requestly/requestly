@@ -16,6 +16,7 @@ import { isNull } from "lodash";
 import { TeamWorkspace } from "types";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import "./index.scss";
+import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -86,6 +87,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           .catch((err) => {
             setStripeError(err);
             setIsLoading(false);
+            trackCheckoutFailedEvent("individual");
           });
       } else {
         createTeamSubscriptionUsingStripeCheckout(subscriptionData)
@@ -99,6 +101,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           .catch((err) => {
             setStripeError(err);
             setIsLoading(false);
+            trackCheckoutFailedEvent("team");
           });
       }
     },

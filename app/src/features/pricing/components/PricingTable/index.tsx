@@ -20,6 +20,7 @@ import "./index.scss";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
+import { trackCheckoutFailedEvent, trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
 
 interface PricingTableProps {
   product?: string;
@@ -68,12 +69,14 @@ export const PricingTable: React.FC<PricingTableProps> = ({
           })
           .catch((err) => {
             toast.error("Error in managing subscription. Please contact support contact@requestly.io");
+            trackCheckoutFailedEvent();
           });
       };
 
       const handleOnUpgradeClick = () => {
         if (!user?.details?.isLoggedIn) {
           dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+          return;
         } else if (userPlanType === "team") {
           setIsContactUsModalOpen(true);
         } else if (isUserPremium && isPrivateWorkspaceSelected) {
@@ -83,6 +86,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         } else {
           redirectToManageSubscription();
         }
+        trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount);
       };
 
       if (planName === PRICING.PLAN_NAMES.FREE) {
