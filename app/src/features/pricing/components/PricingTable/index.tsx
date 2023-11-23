@@ -121,22 +121,22 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
-      if (isUserTrialing && isPrivateWorkspaceSelected) {
-        return (
-          <Space size={8}>
-            <RQButton onClick={redirectToManageSubscription} type="primary">
-              Upgrade now
-            </RQButton>
-            {planName === userPlanName && <div className="current-pricing-plan-tag">30 days trial active</div>}
-          </Space>
-        );
-      }
-
       if (planName === PRICING.PLAN_NAMES.ENTERPRISE) {
         return (
           <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
             Contact us
           </RQButton>
+        );
+      }
+
+      if (isUserTrialing && isPrivateWorkspaceSelected) {
+        return (
+          <Space size={8}>
+            <RQButton onClick={redirectToManageSubscription} type="primary">
+              Upgrade
+            </RQButton>
+            {planName === userPlanName && <div className="current-pricing-plan-tag">30 days trial active</div>}
+          </Space>
         );
       }
 
@@ -222,7 +222,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               : ""
           }
         >
-          Upgrade now
+          Upgrade
         </RQButton>
       );
     },
