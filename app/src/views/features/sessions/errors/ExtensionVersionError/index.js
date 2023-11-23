@@ -36,8 +36,8 @@ const ExtensionVersionError = () => {
             <Jumbotron style={{ background: "transparent" }} className="text-center">
               <h1 className="display-3">Update Required</h1>
               <p className="lead">
-                Your extension version needs to be higher to use Session Recordings. Please download the latest version
-                from official website.
+                Your extension version needs to be higher to use SessionBook. Please download the latest version from
+                official website.
               </p>
               <center>
                 <Button type="primary" onClick={redirectToDownloadPage}>

@@ -83,7 +83,7 @@ const SessionRecordingView: React.FC = () => {
       <div className="watch-replay-btn-tooltip-content">
         <InfoIcon />
         <div>
-          <span>Auto recording is disabled for this page. Please Enable it in session replay settings.</span>{" "}
+          <span>Auto recording is disabled for this page. Please Enable it in SessionBook settings.</span>{" "}
           <button onClick={handleConfigureBtnClick}>Enable now.</button>
         </div>
       </div>

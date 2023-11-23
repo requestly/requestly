@@ -19,7 +19,7 @@ const getRequestObject = (networkLog: NetworkLog) => {
     const { searchParams } = new URL(networkLog.url);
     searchParams.forEach((value: string, key: string) => queryString.push({ name: key, value }));
   } catch (error) {
-    captureException(new Error("Invalid URL in Session Replay"), {
+    captureException(new Error("Invalid URL in session"), {
       extra: {
         url: networkLog.url,
       },
