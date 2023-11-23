@@ -84,7 +84,18 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         } else if (isOpenedFromModal) {
           handleOnSubscribe(planName);
         } else {
-          redirectToManageSubscription();
+          dispatch(
+            actions.toggleActiveModal({
+              modalName: "pricingModal",
+              newValue: true,
+              newProps: {
+                selectedPlan: planName,
+                workspace: workspaceToUpgrade,
+                planDuration: duration,
+                source: "pricing_table",
+              },
+            })
+          );
         }
         trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount);
       };
