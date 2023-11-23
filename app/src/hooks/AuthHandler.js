@@ -105,6 +105,7 @@ const AuthHandler = (onComplete) => {
           if (planDetails) {
             submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type || "Missing Value");
             submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId || "Missing Value");
+            submitAttrUtil(TRACKING.ATTR.IS_TRIAL, planDetails.status === "trialing");
 
             if (planDetails.subscription) {
               submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate || "Missing Value");

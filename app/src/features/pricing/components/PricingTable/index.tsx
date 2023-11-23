@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback, useState } from "react";
+import React, { RefObject, useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Col, Row, Space, Tooltip, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -17,6 +17,10 @@ import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import "./index.scss";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { redirectToUrl } from "utils/RedirectionUtils";
+import { toast } from "utils/Toast";
+import { trackCheckoutFailedEvent, trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
 
 interface PricingTableProps {
   product?: string;
@@ -39,15 +43,61 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   const user = useSelector(getUserAuthDetails);
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
 
+  const manageSubscription = useMemo(() => httpsCallable(getFunctions(), "subscription-manageSubscription"), []);
+
   const renderButtonsForPlans = useCallback(
     (planName: string) => {
       const isUserPremium = user?.details?.isPremium;
       const userPlanName = user?.details?.planDetails?.planName;
       const userPlanType = user?.details?.planDetails?.type;
-      const userExpiredPlanName =
-        user?.details?.planDetails?.status !== "active" ? getPlanNameFromId(user?.details?.planDetails?.planId) : null;
-      const isSelectedWorkspacePremium = workspaceToUpgrade?.subscriptionStatus === "active";
-      const isPrivateWorksapceSelected = workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
+      const userExpiredPlanName = !["active", "trialing", "past_due"].includes(user?.details?.planDetails?.status)
+        ? getPlanNameFromId(user?.details?.planDetails?.planId)
+        : null;
+      const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
+      const isUserTrialing = user?.details?.planDetails?.status === "trialing";
+
+      const redirectToManageSubscription = () => {
+        manageSubscription({
+          planName,
+          duration,
+        })
+          .then((res: any) => {
+            if (res?.data?.success) {
+              redirectToUrl(res?.data?.data?.portalUrl);
+            }
+          })
+          .catch((err) => {
+            toast.error("Error in managing subscription. Please contact support contact@requestly.io");
+            trackCheckoutFailedEvent();
+          });
+      };
+
+      const handleOnUpgradeClick = () => {
+        if (!user?.details?.isLoggedIn) {
+          dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+          return;
+        } else if (userPlanType === "team" && isUserPremium) {
+          setIsContactUsModalOpen(true);
+        } else if (isUserPremium && isPrivateWorkspaceSelected) {
+          redirectToManageSubscription();
+        } else if (isOpenedFromModal) {
+          handleOnSubscribe(planName);
+        } else {
+          dispatch(
+            actions.toggleActiveModal({
+              modalName: "pricingModal",
+              newValue: true,
+              newProps: {
+                selectedPlan: planName,
+                workspace: workspaceToUpgrade,
+                planDuration: duration,
+                source: "pricing_table",
+              },
+            })
+          );
+        }
+        trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount, isUserTrialing);
+      };
 
       if (planName === PRICING.PLAN_NAMES.FREE) {
         if (!user?.details?.isLoggedIn) {
@@ -76,15 +126,11 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         }
 
         return (
-          <Space size={8}>
-            <RQButton
-              onClick={() => (window.location.href = "/")}
-              type="primary"
-              className={userPlanName !== PRICING.PLAN_NAMES.FREE ? "visibility-hidden" : ""}
-            >
+          <Space size={8} className={userPlanName !== PRICING.PLAN_NAMES.FREE ? "visibility-hidden" : ""}>
+            <RQButton onClick={() => (window.location.href = "/")} type="primary">
               Use now
             </RQButton>
-            {!isUserPremium && <div className="current-pricing-plan-tag">Current Plan</div>}
+            <div className="current-pricing-plan-tag">Current Plan</div>
           </Space>
         );
       }
@@ -97,29 +143,30 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
-      if (isUserPremium) {
-        if (userPlanType === "team") {
-          if (isPrivateWorksapceSelected || !isSelectedWorkspacePremium) {
-            return (
-              <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
-                Contact us
-              </RQButton>
-            );
-          }
-        } else {
-          if (!isPrivateWorksapceSelected) {
-            return (
-              <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
-                Contact us
-              </RQButton>
-            );
-          }
+      if (isUserTrialing && isPrivateWorkspaceSelected) {
+        return (
+          <Space size={8}>
+            <RQButton onClick={redirectToManageSubscription} type="primary">
+              Upgrade
+            </RQButton>
+            {planName === userPlanName && <div className="current-pricing-plan-tag">30 days trial active</div>}
+          </Space>
+        );
+      }
+
+      if (isUserPremium && !isUserTrialing) {
+        if (userPlanType !== "team" && !isPrivateWorkspaceSelected) {
+          return (
+            <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
+              Contact us
+            </RQButton>
+          );
         }
       } else {
         if (userExpiredPlanName === planName) {
           if (
-            (userPlanType === "individual" && isPrivateWorksapceSelected) ||
-            (userPlanType === "team" && !isPrivateWorksapceSelected)
+            (userPlanType === "individual" && isPrivateWorkspaceSelected) ||
+            (userPlanType === "team" && !isPrivateWorkspaceSelected)
           ) {
             return (
               <Space size={8}>
@@ -170,51 +217,43 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         );
       }
 
-      if (isUserPremium && (isSelectedWorkspacePremium || isPrivateWorksapceSelected) && planName === userPlanName) {
-        return <div className="current-pricing-plan-tag">Current plan</div>;
+      if (isUserPremium && planName === userPlanName && !isUserTrialing) {
+        return (
+          <div className="current-pricing-plan-tag">
+            {userPlanType === "team" && isPrivateWorkspaceSelected ? "Already included in team plan" : "Current plan"}
+          </div>
+        );
       }
 
       return (
         <RQButton
-          onClick={() => {
-            !user?.details?.isLoggedIn
-              ? dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }))
-              : isOpenedFromModal
-              ? handleOnSubscribe(planName)
-              : dispatch(
-                  actions.toggleActiveModal({
-                    modalName: "pricingModal",
-                    newValue: true,
-                    newProps: {
-                      selectedPlan: planName,
-                      workspace: workspaceToUpgrade,
-                      planDuration: duration,
-                      source: "pricing_table",
-                    },
-                  })
-                );
-          }}
-          disabled={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL}
+          onClick={handleOnUpgradeClick}
+          disabled={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && !isUserTrialing}
           type="primary"
-          className={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL ? "visibility-hidden" : ""}
+          className={
+            isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && !isUserTrialing
+              ? "visibility-hidden"
+              : ""
+          }
         >
-          Upgrade now
+          Upgrade
         </RQButton>
       );
     },
     [
-      duration,
-      product,
       user?.details?.isPremium,
-      user?.details?.planDetails?.planId,
       user?.details?.planDetails?.planName,
-      user?.details?.planDetails?.status,
       user?.details?.planDetails?.type,
-      workspaceToUpgrade,
+      user?.details?.planDetails?.status,
+      user?.details?.planDetails?.planId,
       user?.details?.isLoggedIn,
+      workspaceToUpgrade,
+      product,
       dispatch,
-      handleOnSubscribe,
       isOpenedFromModal,
+      handleOnSubscribe,
+      duration,
+      manageSubscription,
     ]
   );
 
