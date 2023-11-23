@@ -168,7 +168,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
       <Row justify="space-between" className="onboarding-banner">
         <Col span={isModalView ? 24 : 12} className="banner-text-container">
           <Row className="banner-header">
-            <Title className="banner-title">Debug issues faster with Session Replay</Title>
+            <Title className="banner-title">Debug issues faster with SessionBook</Title>
           </Row>
           <Row className="banner-description">
             <Text type="secondary" className="banner-text w-full">
@@ -184,7 +184,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
             </Text>
             {!isModalView && (
               <Text type="secondary" className="banner-message banner-text">
-                <GreenVerifiedCheck /> Session Replays are not automatically saved to the cloud; they require manual
+                <GreenVerifiedCheck /> session recordings are not automatically saved to the cloud; they require manual
                 saving
               </Text>
             )}
