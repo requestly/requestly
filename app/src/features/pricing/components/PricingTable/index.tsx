@@ -76,7 +76,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         if (!user?.details?.isLoggedIn) {
           dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
           return;
-        } else if (userPlanType === "team") {
+        } else if (userPlanType === "team" && isUserPremium) {
           setIsContactUsModalOpen(true);
         } else if (isUserPremium && isPrivateWorkspaceSelected) {
           redirectToManageSubscription();
