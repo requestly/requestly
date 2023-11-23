@@ -1,6 +1,6 @@
 # UI Application
 
-Front-end application which provides UI to manage rules, mocks, session recordings, user profile and workspaces.
+Front-end application which provides UI to manage rules, mocks, SessionBooks, user profile and workspaces.
 
 It currently supports three modes:
 1. Browser Extension - when website is opened in a browser where Requestly extension is installed

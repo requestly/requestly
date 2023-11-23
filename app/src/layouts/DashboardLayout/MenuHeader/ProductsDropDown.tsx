@@ -99,7 +99,7 @@ const Products: React.FC<ProductsProps> = (props) => {
     {
       title: (
         <>
-          Session Replay <RQBadge badgeText="NEW" />
+          SessionBook <RQBadge badgeText="NEW" />
         </>
       ),
       icon: SessionImg,

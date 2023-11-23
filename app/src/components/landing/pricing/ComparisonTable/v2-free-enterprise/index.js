@@ -71,10 +71,10 @@ const FreeAndEnterprisePlanTable = () => {
               }}
             >
               <div className="pricing-table-product-view-icon">
-                <img src={sessionImg} alt="session replay" />
+                <img src={sessionImg} alt="SessionBook" />
               </div>
               <div className="pricing-table-product-view-para">
-                <h3>Session Replay</h3>
+                <h3>SessionBook</h3>
                 <p>Capture Screen, mouse movement, network, console and more of any browser session</p>
               </div>
             </Col>

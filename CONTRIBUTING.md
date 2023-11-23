@@ -35,7 +35,7 @@ Requestly is composed of multiple modules:
 - [UI application](./app)
 - [Desktop application](https://github.com/requestly/requestly-desktop-app) (Electron-based application for MacOS, Linux, Windows)
 - [Mobile SDK](https://github.com/requestly/requestly-android-sdk) (to debug mobile apps)
-- [Web SDK](https://github.com/requestly/requestly-web-sdk) (facilitates Session Recording)
+- [Web SDK](https://github.com/requestly/requestly-web-sdk) (facilitates SessionBook)
 - [Mock Server](https://github.com/requestly/requestly-mock-server)
 - [Backend](https://github.com/requestly/requestly-backend)
 

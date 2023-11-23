@@ -161,7 +161,7 @@ export const PricingFeatures: PlanFeatures = {
       ],
     },
     session_professional: {
-      planTitle: "Professional",
+      planTitle: "Plus",
       features: [
         {
           title: "Unlimited sessions",
