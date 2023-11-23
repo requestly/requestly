@@ -14,7 +14,9 @@ import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
 import { isNull } from "lodash";
 import { TeamWorkspace } from "types";
+import { redirectToUrl } from "utils/RedirectionUtils";
 import "./index.scss";
+import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -75,26 +77,35 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       if (workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id) {
         createIndividualSubscriptionUsingStripeCheckout(subscriptionData)
           .then((data: any) => {
-            setStripeClientSecret(data?.data?.payload.clientSecret);
+            if (data?.data?.payload?.url) {
+              redirectToUrl(data?.data?.payload?.url);
+              toggleModal();
+            } else setStripeClientSecret(data?.data?.payload?.clientSecret);
+
             setIsLoading(false);
           })
           .catch((err) => {
             setStripeError(err);
             setIsLoading(false);
+            trackCheckoutFailedEvent("individual");
           });
       } else {
         createTeamSubscriptionUsingStripeCheckout(subscriptionData)
           .then((data: any) => {
-            setStripeClientSecret(data?.data?.payload.clientSecret);
+            if (data?.data?.payload?.url) {
+              redirectToUrl(data?.data?.payload?.url);
+              toggleModal();
+            } else setStripeClientSecret(data?.data?.payload?.clientSecret);
             setIsLoading(false);
           })
           .catch((err) => {
             setStripeError(err);
             setIsLoading(false);
+            trackCheckoutFailedEvent("team");
           });
       }
     },
-    [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount]
+    [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount, toggleModal]
   );
 
   useEffect(() => {
@@ -129,6 +140,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
             onCancel={() => setIsCheckoutScreenVisible(false)}
             isLoading={isLoading}
             toggleModal={toggleModal}
+            source={source}
           />
         ) : (
           <>
