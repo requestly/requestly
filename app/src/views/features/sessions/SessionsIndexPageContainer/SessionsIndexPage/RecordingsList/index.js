@@ -204,7 +204,7 @@ const RecordingsList = ({
         headerTitle={
           <>
             <Typography.Title level={4} style={{ marginBottom: 0 }}>
-              Session Replays
+              SessionBook
             </Typography.Title>
           </>
         }

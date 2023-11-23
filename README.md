@@ -132,7 +132,7 @@ Start working on individual modules:
 - [Browser extension](./browser-extension)
 - [UI application](./app)
 - [Desktop application](https://github.com/requestly/requestly-desktop-app) (Electron-based application for MacOS, Linux, Windows)
-- [Web SDK](https://github.com/requestly/requestly-web-sdk) (facilitates Session Recording)
+- [Web SDK](https://github.com/requestly/requestly-web-sdk) (facilitates SessionBook)
 - [Mock Server](https://github.com/requestly/requestly-mock-server)
 - [Backend](https://github.com/requestly/requestly-backend)
 

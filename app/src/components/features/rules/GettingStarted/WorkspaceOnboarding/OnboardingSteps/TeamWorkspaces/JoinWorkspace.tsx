@@ -109,7 +109,7 @@ export const JoinWorkspace: React.FC<{
       </div>
       <div className="display-row-center mt-20">
         <div className="text-gray text-center" style={{ width: "380px" }}>
-          Join your teams workspace and get access to shared rules, mock APIs & session replays.
+          Join your teams workspace and get access to shared rules, mock APIs & SessionBook.
         </div>
       </div>
       <div className="mt-20 onboarding-invites-list">
