@@ -8,6 +8,12 @@ class SaturnIntegration implements IAnalyticsIntegration {
   startTime = Date.now();
 
   init = (user: any) => {
+    if (!user) {
+      window.removeEventListener("saturn:ready", () => {});
+      window.$saturn.reset();
+      return;
+    }
+
     console.log("Saturn Integration Start");
     const userData = buildBasicUserProperties(user);
     console.log({ userData });
@@ -21,16 +27,16 @@ class SaturnIntegration implements IAnalyticsIntegration {
       });
     }
 
-    window.addEventListener("saturn:ready", function () {
-      if (userData) {
-        console.log("saturn:ready");
+    // window.addEventListener("saturn:ready", function () {
+    //   if (userData) {
+    //     console.log("saturn:ready");
 
-        window.$saturn.setUser(userData.uid, {
-          email: userData.email,
-          name: userData.name,
-        });
-      }
-    });
+    //     window.$saturn.setUser(userData.uid, {
+    //       email: userData.email,
+    //       name: userData.name,
+    //     });
+    //   }
+    // });
   };
 }
 
