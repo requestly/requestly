@@ -18,7 +18,6 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import "./index.scss";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { redirectToUrl } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { trackCheckoutFailedEvent, trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
 
@@ -41,7 +40,9 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
+  const [clickedPlanName, setClickedPlanName] = useState("");
 
   const manageSubscription = useMemo(() => httpsCallable(getFunctions(), "subscription-manageSubscription"), []);
 
@@ -57,18 +58,21 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       const isUserTrialing = user?.details?.planDetails?.status === "trialing";
 
       const redirectToManageSubscription = () => {
+        setClickedPlanName(planName);
         manageSubscription({
           planName,
           duration,
         })
           .then((res: any) => {
             if (res?.data?.success) {
-              redirectToUrl(res?.data?.data?.portalUrl);
+              window.location.href = res?.data?.data?.portalUrl;
             }
+            setClickedPlanName("");
           })
           .catch((err) => {
             toast.error("Error in managing subscription. Please contact support contact@requestly.io");
             trackCheckoutFailedEvent();
+            setClickedPlanName("");
           });
       };
 
@@ -147,6 +151,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
         return (
           <Space size={8}>
             <RQButton
+              loading={clickedPlanName === planName}
               onClick={() => {
                 redirectToManageSubscription();
                 trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount, isUserTrialing);
@@ -233,6 +238,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 
       return (
         <RQButton
+          loading={clickedPlanName === planName}
           onClick={handleOnUpgradeClick}
           disabled={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && !isUserTrialing}
           type="primary"
@@ -255,11 +261,12 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       user?.details?.isLoggedIn,
       workspaceToUpgrade,
       product,
-      dispatch,
-      isOpenedFromModal,
-      handleOnSubscribe,
-      duration,
+      clickedPlanName,
       manageSubscription,
+      duration,
+      isOpenedFromModal,
+      dispatch,
+      handleOnSubscribe,
     ]
   );
 
