@@ -15,6 +15,7 @@ import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 import { unselectAllRecords } from "../actions";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
@@ -26,7 +27,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
 
-  const enableTrash = false;
+  const enableTrash = useFeatureIsOn("enable-trash");
 
   // Component State
   const [loadingSomething, setLoadingSomething] = useState(false);

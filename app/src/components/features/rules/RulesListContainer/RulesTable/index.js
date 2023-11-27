@@ -78,6 +78,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumFeature } from "features/pricing";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import "./rulesTable.css";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 //Lodash
 const set = require("lodash/set");
@@ -163,7 +164,7 @@ const RulesTable = ({
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
   const { getFeatureLimitValue } = useFeatureLimiter();
-  const enableTrash = false;
+  const enableTrash = useFeatureIsOn("enable-trash");
 
   const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
   const selectedGroupIds = useMemo(() => Object.keys(selectedGroups), [selectedGroups]);

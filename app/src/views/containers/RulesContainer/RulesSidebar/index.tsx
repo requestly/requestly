@@ -7,6 +7,7 @@ import { ReactComponent as TemplatesIcon } from "assets/icons/http-rules/templat
 import { ReactComponent as SharedListIcon } from "assets/icons/http-rules/shared-list.svg";
 import { ReactComponent as TrashIcon } from "assets/icons/http-rules/trash.svg";
 import "./RulesSidebar.css";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const ruleRoutes = [
   {
@@ -33,7 +34,7 @@ const ruleRoutes = [
 
 export const RulesSidebar: React.FC = () => {
   const { pathname } = useLocation();
-  const enableTrash = false;
+  const enableTrash = useFeatureIsOn("enable-trash");
 
   const isActiveLink = useCallback(
     (isActive: boolean, path: string) => {

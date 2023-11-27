@@ -11,6 +11,7 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
 import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const DeleteRulesModal = ({
   toggle: toggleDeleteRulesModal,
@@ -29,7 +30,7 @@ const DeleteRulesModal = ({
   const [areRulesBeingDeleted, setAreRulesBeingDeleted] = useState(false);
 
   const ruleIdsToDelete = useMemo(() => rulesToDelete.map((rule) => rule.id), [rulesToDelete]);
-  const enableTrash = false;
+  const enableTrash = useFeatureIsOn("enable-trash");
 
   const handleDeleteRuleTestReports = useCallback(async () => {
     deleteTestReportByRuleId(appMode, ruleIdsToDelete);

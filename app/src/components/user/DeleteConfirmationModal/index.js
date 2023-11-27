@@ -4,6 +4,7 @@ import { Button, Modal } from "antd";
 import { getUserAuthDetails } from "store/selectors";
 import { DeleteOutlined } from "@ant-design/icons";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const DeleteConfirmationModal = ({
   isOpen,
@@ -17,7 +18,7 @@ const DeleteConfirmationModal = ({
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
-  const enableTrash = false;
+  const enableTrash = useFeatureIsOn("enable-trash");
 
   const tryMoveToTrash = useCallback(() => {
     if (!user.loggedIn) {
