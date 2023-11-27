@@ -17,6 +17,8 @@ const DeleteConfirmationModal = ({
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
+  const enableTrash = false;
+
   const tryMoveToTrash = useCallback(() => {
     if (!user.loggedIn) {
       handleDeleteRulesPermanently();
@@ -46,7 +48,7 @@ const DeleteConfirmationModal = ({
         <div className="modal-body">
           <div className="py-3 text-center">
             <h3 className="heading">
-              {user.loggedIn && !isWorkspaceMode ? (
+              {enableTrash && user.loggedIn && !isWorkspaceMode ? (
                 <>
                   Are you sure you want to move selected {ruleIdsToDelete.length}{" "}
                   {ruleIdsToDelete.length === 1 ? "rule" : "rules"} into trash?

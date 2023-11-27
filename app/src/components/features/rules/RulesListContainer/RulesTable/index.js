@@ -161,7 +161,9 @@ const RulesTable = ({
   const selectedGroups = useSelector(getGroupsSelection);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+
   const { getFeatureLimitValue } = useFeatureLimiter();
+  const enableTrash = false;
 
   const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
   const selectedGroupIds = useMemo(() => Object.keys(selectedGroups), [selectedGroups]);
@@ -1209,7 +1211,11 @@ const RulesTable = ({
               </AuthConfirmationPopover>
               <Tooltip
                 title={
-                  isScreenSmall ? (user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently") : null
+                  isScreenSmall
+                    ? enableTrash && user.loggedIn && !isWorkspaceMode
+                      ? "Move to Trash"
+                      : "Delete Permanently"
+                    : null
                 }
               >
                 <Button
@@ -1218,7 +1224,11 @@ const RulesTable = ({
                   onClick={handleDeleteRulesOnClick}
                   icon={<DeleteOutlined />}
                 >
-                  {isScreenSmall ? null : user.loggedIn && !isWorkspaceMode ? "Move to Trash" : "Delete Permanently"}
+                  {isScreenSmall
+                    ? null
+                    : enableTrash && user.loggedIn && !isWorkspaceMode
+                    ? "Move to Trash"
+                    : "Delete Permanently"}
                 </Button>
               </Tooltip>
             </Space>

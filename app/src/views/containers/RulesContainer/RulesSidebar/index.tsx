@@ -33,6 +33,7 @@ const ruleRoutes = [
 
 export const RulesSidebar: React.FC = () => {
   const { pathname } = useLocation();
+  const enableTrash = false;
 
   const isActiveLink = useCallback(
     (isActive: boolean, path: string) => {
@@ -44,11 +45,16 @@ export const RulesSidebar: React.FC = () => {
   return (
     <div className="rules-sidebar-container">
       <ul>
-        {ruleRoutes.map(({ path, title, icon }) => (
-          <li key={title}>
-            <SecondarySidebarLink icon={icon} path={path} title={title} isActiveLink={isActiveLink} />
-          </li>
-        ))}
+        {ruleRoutes.map(({ path, title, icon }) => {
+          if (title === "Trash" && !enableTrash) {
+            return null;
+          }
+          return (
+            <li key={title}>
+              <SecondarySidebarLink icon={icon} path={path} title={title} isActiveLink={isActiveLink} />
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

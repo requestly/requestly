@@ -14,6 +14,7 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
+import { unselectAllRecords } from "../actions";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
@@ -24,6 +25,8 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
   const appMode = useSelector(getAppMode);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
+
+  const enableTrash = false;
 
   // Component State
   const [loadingSomething, setLoadingSomething] = useState(false);
@@ -66,9 +69,9 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
                 newValue: !isRulesListRefreshPending,
               })
             );
+            unselectAllRecords(dispatch);
             // Notify user
             toast.success("Group deleted");
-            // STFU and close the modal!
             toggle();
           })
           .catch(() => {
@@ -82,17 +85,21 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
   const ruleIdsToDelete = useMemo(() => groupRules.map((rule) => rule.id), [groupRules]);
 
   const handleRulesDeletion = async (uid) => {
-    if (!uid) return;
+    if (enableTrash) {
+      if (!uid) return;
 
-    return addRecordsToTrash(uid, groupRules).then((result) => {
-      return new Promise((resolve, reject) => {
-        if (result.success) {
-          deleteRulesFromStorage(appMode, ruleIdsToDelete, () => resolve(true));
-        } else {
-          reject();
-        }
+      return addRecordsToTrash(uid, groupRules).then((result) => {
+        return new Promise((resolve, reject) => {
+          if (result.success) {
+            deleteRulesFromStorage(appMode, ruleIdsToDelete, () => resolve(true));
+          } else {
+            reject();
+          }
+        });
       });
-    });
+    } else {
+      deleteRulesFromStorage(appMode, ruleIdsToDelete);
+    }
   };
 
   const handleRecordsDeletion = async (uid) => {
@@ -135,7 +142,6 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
       dispatch(actions.updateHardRefreshPendingStatus({ type: "rules" }));
       // Notify user
       toast.success("Group deleted");
-      // STFU and close the modal!
       toggle();
     });
   };

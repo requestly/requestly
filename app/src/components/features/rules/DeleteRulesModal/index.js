@@ -29,6 +29,7 @@ const DeleteRulesModal = ({
   const [areRulesBeingDeleted, setAreRulesBeingDeleted] = useState(false);
 
   const ruleIdsToDelete = useMemo(() => rulesToDelete.map((rule) => rule.id), [rulesToDelete]);
+  const enableTrash = false;
 
   const handleDeleteRuleTestReports = useCallback(async () => {
     deleteTestReportByRuleId(appMode, ruleIdsToDelete);
@@ -62,31 +63,6 @@ const DeleteRulesModal = ({
     handleDeleteRuleTestReports,
   ]);
 
-  const handleRulesDeletion = useCallback(
-    async (uid) => {
-      if (!uid) return;
-      setAreRulesMovingToTrash(true);
-      return addRecordsToTrash(uid, rulesToDelete).then((result) => {
-        return new Promise((resolve, reject) => {
-          if (result.success) {
-            deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
-              toast.info(`Moved selected rules to trash`);
-              trackRulesTrashedEvent(ruleIdsToDelete.length);
-              trackRQLastActivity("rules_deleted");
-              trackRulesDeletedEvent(ruleIdsToDelete.length);
-              return resolve();
-            });
-          } else {
-            toast.info(`Could not delete rule, please try again later.`);
-            setAreRulesMovingToTrash(false);
-            reject();
-          }
-        });
-      });
-    },
-    [appMode, ruleIdsToDelete, rulesToDelete]
-  );
-
   const handleDeleteRulesPermanently = useCallback(async () => {
     await deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
       toast.info(`Rules deleted permanently!`);
@@ -94,6 +70,35 @@ const DeleteRulesModal = ({
       trackRulesDeletedEvent(ruleIdsToDelete.length);
     });
   }, [appMode, ruleIdsToDelete]);
+
+  const handleRulesDeletion = useCallback(
+    async (uid) => {
+      if (enableTrash) {
+        if (!uid) return;
+        setAreRulesMovingToTrash(true);
+        return addRecordsToTrash(uid, rulesToDelete).then((result) => {
+          return new Promise((resolve, reject) => {
+            if (result.success) {
+              deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
+                toast.info(`Moved selected rules to trash`);
+                trackRulesTrashedEvent(ruleIdsToDelete.length);
+                trackRQLastActivity("rules_deleted");
+                trackRulesDeletedEvent(ruleIdsToDelete.length);
+                return resolve();
+              });
+            } else {
+              toast.info(`Could not delete rule, please try again later.`);
+              setAreRulesMovingToTrash(false);
+              reject();
+            }
+          });
+        });
+      } else {
+        handleDeleteRulesPermanently();
+      }
+    },
+    [appMode, enableTrash, handleDeleteRulesPermanently, ruleIdsToDelete, rulesToDelete]
+  );
 
   const handleRecordsDeletion = useCallback(
     async (uid) => {
