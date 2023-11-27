@@ -21,17 +21,10 @@ const DeleteConfirmationModal = ({
   const enableTrash = useFeatureIsOn("enable-trash");
 
   const tryMoveToTrash = useCallback(() => {
-    if (enableTrash) {
-      if (!user.loggedIn) {
-        handleDeleteRulesPermanently();
-      }
-      if (isWorkspaceMode) {
-        handleDeleteRulesPermanently();
-      } else {
-        handleRecordsDeletion(user?.details?.profile?.uid);
-      }
-    } else {
+    if (!enableTrash || !user.loggedIn || isWorkspaceMode) {
       handleDeleteRulesPermanently();
+    } else {
+      handleRecordsDeletion(user?.details?.profile?.uid);
     }
   }, [user, isWorkspaceMode, handleDeleteRulesPermanently, handleRecordsDeletion, enableTrash]);
 
