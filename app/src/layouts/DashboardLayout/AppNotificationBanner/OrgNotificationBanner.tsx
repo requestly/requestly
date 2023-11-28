@@ -6,7 +6,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import "./appNotificationBanner.scss";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
-import { Avatar, Divider, Row, Typography } from "antd";
+import { Avatar, Divider, Row, Space, Typography } from "antd";
 import { parseGravatarImage } from "utils/Misc";
 import { toast } from "utils/Toast";
 
@@ -26,13 +26,17 @@ const UsersModal: React.FC<{
           <div className="title">
             <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
             <div className="mt-8">
-              Thank you for showing interest in the Requestly team plan. We will reach out to you shortly via email.
+              Thank you for showing interest in the Requestly team plan.
+              <br />
+              We will reach out to you shortly via email.
             </div>
           </div>
         ) : (
           <>
             <Row justify={"space-between"}>
-              <Typography.Title level={4}> {`${users.length} ${users?.[0]?.domain}  users`}</Typography.Title>
+              <Typography.Title level={4}>
+                {users.length} <span className="text-capitalize">{users[0]?.domain?.split(".")[0]}</span> users{" "}
+              </Typography.Title>
               <RQButton type="primary" onClick={sendRequestEmail}>
                 Get a team subscription
               </RQButton>
@@ -96,23 +100,28 @@ export const OrgNotificationBanner = () => {
   return (
     <>
       <span className="app-banner" style={{ backgroundColor: "#621F56" }}>
-        <div className="app-banner-text">
-          {`${userDetails.length} users from ${userDetails[0]?.domain} are using Requestly and are facing limits. You won't be able to use the premium features for
-          free from 30th November.`}
-        </div>
-        <RQButton onClick={() => setOpenModal(true)} className="view-users-button">
-          View Users
-        </RQButton>
-        <RQButton
-          type="primary"
-          onClick={() => {
-            setShowSuccess(true);
-            setOpenModal(true);
-            sendRequestEmail();
-          }}
-        >
-          Get a team subscription
-        </RQButton>
+        <Space size="middle">
+          <div className="app-banner-text">
+            <span className="text-bold">{`${userDetails.length} users `}</span>from
+            <span className="text-bold text-capitalize">{` ${userDetails[0]?.domain?.split(".")[0]}`}</span>
+            {` are using Requestly and are facing limits. You won't be able to use the premium features for
+          free from `}
+            <span className="text-bold">30th November</span>
+          </div>
+          <RQButton onClick={() => setOpenModal(true)} className="view-users-button">
+            View Users
+          </RQButton>
+          <RQButton
+            type="primary"
+            onClick={() => {
+              setShowSuccess(true);
+              setOpenModal(true);
+              sendRequestEmail();
+            }}
+          >
+            Get a team subscription
+          </RQButton>
+        </Space>
       </span>
       <UsersModal
         users={userDetails}
