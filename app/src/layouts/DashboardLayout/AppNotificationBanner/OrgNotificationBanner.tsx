@@ -2,7 +2,7 @@ import React from "react";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getIsOrgBannerDismissed, getUserAuthDetails } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import "./appNotificationBanner.scss";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
@@ -10,6 +10,9 @@ import { Avatar, Divider, Row, Space, Typography } from "antd";
 import { parseGravatarImage } from "utils/Misc";
 import { toast } from "utils/Toast";
 import { trackTeamPlanBannerClicked, trackTeamPlanBannerViewed } from "modules/analytics/events/common/teams";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import { actions } from "store";
+import { useDispatch } from "react-redux";
 
 const UsersModal: React.FC<{
   users: any[];
@@ -72,14 +75,24 @@ const UsersModal: React.FC<{
 };
 
 export const OrgNotificationBanner = () => {
+  const dispatch = useDispatch();
+
+  const isOrgBannerDismissed = useSelector(getIsOrgBannerDismissed) ?? false;
   const user = useSelector(getUserAuthDetails);
   const userEmail = user?.details?.profile?.email;
+  const isUserSubscribed = user?.details?.isPremium && user?.details?.planDetails?.status !== "trialing";
 
   const [userDetails, setUserDetails] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const showOrgNotificationBanner = true;
+  const orgBannerConfig = useFeatureValue("team_plan_banner", null);
+
+  const handleCloseBannerClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(actions.updateIsOrgBannerDismissed(true));
+  };
 
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
   const sendTeamSubscriptionRequestEmail = useMemo(
@@ -96,6 +109,10 @@ export const OrgNotificationBanner = () => {
   }, [sendTeamSubscriptionRequestEmail, userDetails.length]);
 
   useEffect(() => {
+    if (isOrgBannerDismissed || isUserSubscribed) {
+      return;
+    }
+
     if (isCompanyEmail(userEmail)) {
       getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((result: any) => {
         setUserDetails(result.data.users);
@@ -104,9 +121,9 @@ export const OrgNotificationBanner = () => {
         }
       });
     }
-  }, [getOrganizationUsers, userEmail]);
+  }, [getOrganizationUsers, isOrgBannerDismissed, isUserSubscribed, userEmail]);
 
-  if (!showOrgNotificationBanner || userDetails.length === 0) return null;
+  if (isOrgBannerDismissed || !orgBannerConfig || userDetails.length === 0) return null;
 
   return (
     <>
@@ -140,6 +157,23 @@ export const OrgNotificationBanner = () => {
             Get a team subscription
           </RQButton>
         </Space>
+        {orgBannerConfig?.isDismissable === false ? null : (
+          <div className="close-button-container">
+            <RQButton
+              iconOnly
+              className="close-btn"
+              onClick={handleCloseBannerClick}
+              icon={
+                <svg width="11.67" height="11.67" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    fill="#ffffff"
+                    d="M1.08736 1.08492C1.31516 0.857111 1.68451 0.857111 1.91232 1.08492L4.99984 4.17244L8.08736 1.08492C8.31517 0.857111 8.68451 0.857111 8.91232 1.08492C9.14012 1.31272 9.14012 1.68207 8.91232 1.90988L5.8248 4.9974L8.91232 8.08492C9.14012 8.31272 9.14012 8.68207 8.91232 8.90988C8.68451 9.13768 8.31517 9.13768 8.08736 8.90988L4.99984 5.82235L1.91232 8.90988C1.68451 9.13768 1.31516 9.13768 1.08736 8.90988C0.859552 8.68207 0.859552 8.31272 1.08736 8.08492L4.17488 4.9974L1.08736 1.90988C0.859552 1.68207 0.859552 1.31272 1.08736 1.08492Z"
+                  />
+                </svg>
+              }
+            />
+          </div>
+        )}
       </span>
       <UsersModal
         users={userDetails}
