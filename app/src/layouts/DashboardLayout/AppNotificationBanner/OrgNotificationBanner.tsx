@@ -9,6 +9,7 @@ import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { Avatar, Divider, Row, Space, Typography } from "antd";
 import { parseGravatarImage } from "utils/Misc";
 import { toast } from "utils/Toast";
+import { trackTeamPlanBannerClicked, trackTeamPlanBannerViewed } from "modules/analytics/events/common/teams";
 
 const UsersModal: React.FC<{
   users: any[];
@@ -37,7 +38,13 @@ const UsersModal: React.FC<{
               <Typography.Title level={4}>
                 {users.length} <span className="text-capitalize">{users[0]?.domain?.split(".")[0]}</span> users{" "}
               </Typography.Title>
-              <RQButton type="primary" onClick={sendRequestEmail}>
+              <RQButton
+                type="primary"
+                onClick={() => {
+                  trackTeamPlanBannerClicked("get_subscription", "view_users_modal");
+                  sendRequestEmail();
+                }}
+              >
                 Get a team subscription
               </RQButton>
             </Row>
@@ -89,10 +96,14 @@ export const OrgNotificationBanner = () => {
   }, [sendTeamSubscriptionRequestEmail, userDetails.length]);
 
   useEffect(() => {
-    if (!isCompanyEmail(userEmail)) return;
-    getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((result: any) => {
-      setUserDetails(result.data.users);
-    });
+    if (isCompanyEmail(userEmail)) {
+      getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((result: any) => {
+        setUserDetails(result.data.users);
+        if (result.data.users.length > 0) {
+          trackTeamPlanBannerViewed();
+        }
+      });
+    }
   }, [getOrganizationUsers, userEmail]);
 
   if (!showOrgNotificationBanner || userDetails.length === 0) return null;
@@ -108,7 +119,13 @@ export const OrgNotificationBanner = () => {
           free from `}
             <span className="text-bold">30th November</span>
           </div>
-          <RQButton onClick={() => setOpenModal(true)} className="view-users-button">
+          <RQButton
+            onClick={() => {
+              trackTeamPlanBannerClicked("view_users", "banner");
+              setOpenModal(true);
+            }}
+            className="view-users-button"
+          >
             View Users
           </RQButton>
           <RQButton
@@ -116,6 +133,7 @@ export const OrgNotificationBanner = () => {
             onClick={() => {
               setShowSuccess(true);
               setOpenModal(true);
+              trackTeamPlanBannerClicked("get_subscription", "banner");
               sendRequestEmail();
             }}
           >
