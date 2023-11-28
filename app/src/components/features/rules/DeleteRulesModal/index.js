@@ -11,6 +11,7 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
 import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const DeleteRulesModal = ({
   toggle: toggleDeleteRulesModal,
@@ -23,6 +24,8 @@ const DeleteRulesModal = ({
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+
+  const enableTrash = useFeatureIsOn("enable-trash");
 
   //Component State
   const [areRulesMovingToTrash, setAreRulesMovingToTrash] = useState(false);
@@ -72,27 +75,31 @@ const DeleteRulesModal = ({
 
   const handleRulesDeletion = useCallback(
     async (uid) => {
-      if (!uid) return;
-      setAreRulesMovingToTrash(true);
-      return addRecordsToTrash(uid, rulesToDelete).then((result) => {
-        return new Promise((resolve, reject) => {
-          if (result.success) {
-            deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
-              toast.info(`Moved selected rules to trash`);
-              trackRulesTrashedEvent(ruleIdsToDelete.length);
-              trackRQLastActivity("rules_deleted");
-              trackRulesDeletedEvent(ruleIdsToDelete.length);
-              return resolve();
-            });
-          } else {
-            toast.info(`Could not delete rule, please try again later.`);
-            setAreRulesMovingToTrash(false);
-            reject();
-          }
+      if (enableTrash) {
+        if (!uid) return;
+        setAreRulesMovingToTrash(true);
+        return addRecordsToTrash(uid, rulesToDelete).then((result) => {
+          return new Promise((resolve, reject) => {
+            if (result.success) {
+              deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
+                toast.info(`Moved selected rules to trash`);
+                trackRulesTrashedEvent(ruleIdsToDelete.length);
+                trackRQLastActivity("rules_deleted");
+                trackRulesDeletedEvent(ruleIdsToDelete.length);
+                return resolve();
+              });
+            } else {
+              toast.info(`Could not delete rule, please try again later.`);
+              setAreRulesMovingToTrash(false);
+              reject();
+            }
+          });
         });
-      });
+      } else {
+        handleDeleteRulesPermanently();
+      }
     },
-    [appMode, ruleIdsToDelete, rulesToDelete]
+    [appMode, enableTrash, handleDeleteRulesPermanently, ruleIdsToDelete, rulesToDelete]
   );
 
   const handleRecordsDeletion = useCallback(
