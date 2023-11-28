@@ -68,6 +68,8 @@ export const OrgNotificationBanner = () => {
   const [openModal, setOpenModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const showOrgNotificationBanner = true;
+
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
   const sendTeamSubscriptionRequestEmail = useMemo(
     () => httpsCallable(getFunctions(), "internalNotifications-sendTeamSubscriptionRequestEmail"),
@@ -89,7 +91,7 @@ export const OrgNotificationBanner = () => {
     });
   }, [getOrganizationUsers, userEmail]);
 
-  if (userDetails.length === 0) return null;
+  if (!showOrgNotificationBanner || userDetails.length === 0) return null;
 
   return (
     <>
@@ -104,6 +106,7 @@ export const OrgNotificationBanner = () => {
         <RQButton
           type="primary"
           onClick={() => {
+            setShowSuccess(true);
             setOpenModal(true);
             sendRequestEmail();
           }}
