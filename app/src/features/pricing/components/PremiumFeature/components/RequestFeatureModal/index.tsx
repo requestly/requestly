@@ -53,7 +53,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
     const enterpriseAdmin = organizationsData?.workspaces?.[0];
     const domain = enterpriseAdmin.adminEmail.split("@")[1];
 
-    trackTeamPlanCardClicked(domain, "in_app");
+    trackTeamPlanCardClicked(domain, source);
     trackUpgradeOptionClicked("send_request_to_admin");
 
     requestEnterprisePlanFromAdmin({
