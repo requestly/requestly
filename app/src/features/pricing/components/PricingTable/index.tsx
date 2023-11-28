@@ -27,6 +27,7 @@ interface PricingTableProps {
   duration?: string;
   isOpenedFromModal?: boolean;
   tableRef?: RefObject<HTMLDivElement>;
+  source: string;
   handleOnSubscribe?: (planName: string) => void;
 }
 
@@ -34,6 +35,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   duration = PRICING.DURATION.ANNUALLY,
   workspaceToUpgrade = TEAM_WORKSPACES.PRIVATE_WORKSPACE,
   product = PRICING.PRODUCTS.HTTP_RULES,
+  source,
   handleOnSubscribe,
   tableRef = null,
   isOpenedFromModal = false,
@@ -71,7 +73,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
           })
           .catch((err) => {
             toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-            trackCheckoutFailedEvent();
+            trackCheckoutFailedEvent(isPrivateWorkspaceSelected ? "individual" : "team", source);
             setClickedPlanName("");
           });
       };
@@ -100,7 +102,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             })
           );
         }
-        trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount, isUserTrialing);
+        trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount, isUserTrialing, source);
       };
 
       if (planName === PRICING.PLAN_NAMES.FREE) {
@@ -154,7 +156,13 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               loading={clickedPlanName === planName}
               onClick={() => {
                 redirectToManageSubscription();
-                trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount, isUserTrialing);
+                trackCheckoutInitiatedEvent(
+                  duration,
+                  planName,
+                  workspaceToUpgrade?.accessCount,
+                  isUserTrialing,
+                  source
+                );
               }}
               type="primary"
             >

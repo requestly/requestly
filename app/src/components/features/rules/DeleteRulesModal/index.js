@@ -62,6 +62,14 @@ const DeleteRulesModal = ({
     handleDeleteRuleTestReports,
   ]);
 
+  const handleDeleteRulesPermanently = useCallback(async () => {
+    await deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
+      toast.info(`Rules deleted permanently!`);
+      trackRQLastActivity("rules_deleted");
+      trackRulesDeletedEvent(ruleIdsToDelete.length);
+    });
+  }, [appMode, ruleIdsToDelete]);
+
   const handleRulesDeletion = useCallback(
     async (uid) => {
       if (!uid) return;
@@ -86,14 +94,6 @@ const DeleteRulesModal = ({
     },
     [appMode, ruleIdsToDelete, rulesToDelete]
   );
-
-  const handleDeleteRulesPermanently = useCallback(async () => {
-    await deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
-      toast.info(`Rules deleted permanently!`);
-      trackRQLastActivity("rules_deleted");
-      trackRulesDeletedEvent(ruleIdsToDelete.length);
-    });
-  }, [appMode, ruleIdsToDelete]);
 
   const handleRecordsDeletion = useCallback(
     async (uid) => {
