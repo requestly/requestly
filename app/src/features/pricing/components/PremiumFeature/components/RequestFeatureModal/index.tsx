@@ -22,6 +22,7 @@ interface RequestFeatureModalProps {
   organizationsData: OrganizationsDetails;
   hasReachedLimit?: boolean;
   source: string;
+  isDeadlineCrossed: boolean;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
 }
@@ -31,6 +32,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   organizationsData,
   hasReachedLimit,
   source,
+  isDeadlineCrossed,
   setOpenPopup,
   onContinue,
 }) => {
@@ -53,7 +55,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
     const enterpriseAdmin = organizationsData?.workspaces?.[0];
     const domain = enterpriseAdmin.adminEmail.split("@")[1];
 
-    trackTeamPlanCardClicked(domain, "in_app");
+    trackTeamPlanCardClicked(domain, source);
     trackUpgradeOptionClicked("send_request_to_admin");
 
     requestEnterprisePlanFromAdmin({
@@ -154,18 +156,20 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
             </Typography.Text>
             <Row className="mt-16" justify="space-between" align="middle">
               <Col>
-                <RQButton
-                  type="link"
-                  className="request-modal-link-btn"
-                  disabled={isLoading}
-                  onClick={() => {
-                    trackUpgradeOptionClicked("use_for_free_now");
-                    setOpenPopup(false);
-                    onContinue();
-                  }}
-                >
-                  Use for now
-                </RQButton>
+                {!isDeadlineCrossed && (
+                  <RQButton
+                    type="link"
+                    className="request-modal-link-btn"
+                    disabled={isLoading}
+                    onClick={() => {
+                      trackUpgradeOptionClicked("use_for_free_now");
+                      setOpenPopup(false);
+                      onContinue();
+                    }}
+                  >
+                    Use free till 30 November
+                  </RQButton>
+                )}
               </Col>
               <Col>
                 <Space direction="horizontal" size={8}>
