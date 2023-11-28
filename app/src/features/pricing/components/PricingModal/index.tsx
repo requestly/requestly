@@ -87,7 +87,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           .catch((err) => {
             setStripeError(err);
             setIsLoading(false);
-            trackCheckoutFailedEvent("individual");
+            trackCheckoutFailedEvent("individual", source);
           });
       } else {
         createTeamSubscriptionUsingStripeCheckout(subscriptionData)
@@ -101,7 +101,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           .catch((err) => {
             setStripeError(err);
             setIsLoading(false);
-            trackCheckoutFailedEvent("team");
+            trackCheckoutFailedEvent("team", source);
           });
       }
     },
@@ -152,6 +152,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 <UpgradeWorkspaceMenu
                   workspaceToUpgrade={workspaceToUpgrade}
                   setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+                  source={source}
                   isOpenedFromModal
                 />
               </Col>
@@ -194,6 +195,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               isOpenedFromModal
               handleOnSubscribe={handleSubscribe}
               tableRef={tableRef}
+              source={source}
             />
             <CompaniesSection />
           </>
