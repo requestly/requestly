@@ -42,7 +42,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   );
   const isBreachingLimit = features.some((feat) => checkIfFeatureLimitReached(feat, "reached"));
 
-  const hideUseForNowCTA = new Date() > new Date("2023-11-30");
+  const hasCrossedDeadline = new Date() > new Date("2023-11-30");
 
   useEffect(() => {
     return () => {
@@ -60,6 +60,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             organizationsData={user?.details?.organization}
             onContinue={onContinue}
             hasReachedLimit={isBreachingLimit}
+            isDeadlineCrossed={hasCrossedDeadline}
             source={source}
           />
           {React.Children.map(children, (child) => {
@@ -79,18 +80,23 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           showArrow={false}
           placement={popoverPlacement}
           okText="See upgrade plans"
-          cancelText="Use for now"
+          cancelText={
+            !hasCrossedDeadline ? "Use free till 30 November" : !user.loggedIn && "Sign up for 30-day free trial"
+          }
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true, newProps: { source } }));
           }}
           onCancel={() => {
-            if (!hideUseForNowCTA) {
+            if (!hasCrossedDeadline) {
               trackUpgradeOptionClicked("use_for_free_now");
               onContinue();
+            } else if (!user.loggedIn) {
+              trackUpgradeOptionClicked("sign_up_for_trial");
+              dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
             }
           }}
-          cancelButtonProps={{ style: { display: hideUseForNowCTA ? "none" : "inline-flex" } }}
+          cancelButtonProps={{ style: { display: hasCrossedDeadline && user.loggedIn ? "none" : "inline-flex" } }}
           title={
             <>
               <Typography.Title level={4}>
