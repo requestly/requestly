@@ -21,12 +21,8 @@ const DeleteConfirmationModal = ({
   const enableTrash = useFeatureIsOn("enable-trash");
 
   const tryMoveToTrash = useCallback(() => {
-    if (!enableTrash || !user.loggedIn || isWorkspaceMode) {
-      handleDeleteRulesPermanently();
-    } else {
-      handleRecordsDeletion(user?.details?.profile?.uid);
-    }
-  }, [user, isWorkspaceMode, handleDeleteRulesPermanently, handleRecordsDeletion, enableTrash]);
+    handleRecordsDeletion(user?.details?.profile?.uid);
+  }, [user, handleRecordsDeletion]);
 
   const handleDeleteClick = useCallback(() => {
     tryMoveToTrash();
