@@ -115,7 +115,7 @@ export const OrgNotificationBanner = () => {
       const getOrganizationUsers = httpsCallable(getFunctions(), "users-getOrganizationUsers");
       getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((result: any) => {
         setUserDetails(result.data.users);
-        if (result.data.users.length > 0) {
+        if (result.data.users.length > 0 && orgBannerConfig && !isOrgBannerDismissed) {
           trackTeamPlanBannerViewed();
         }
       });
