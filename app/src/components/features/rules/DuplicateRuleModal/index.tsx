@@ -102,7 +102,17 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
     submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
     onDuplicate(newRule);
     close();
-  }, [rule, newRuleName, appMode, selectedWorkspaceId, currentlyActiveWorkspace.id, onDuplicate, close, navigate]);
+  }, [
+    rule,
+    newRuleName,
+    appMode,
+    selectedWorkspaceId,
+    currentlyActiveWorkspace.id,
+    onDuplicate,
+    close,
+    navigate,
+    userAttributes.num_rules,
+  ]);
 
   useEffect(() => {
     if (isOpen) {
