@@ -1,6 +1,6 @@
 import React from "react";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getIsOrgBannerDismissed, getUserAuthDetails } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
@@ -94,26 +94,25 @@ export const OrgNotificationBanner = () => {
     dispatch(actions.updateIsOrgBannerDismissed(true));
   };
 
-  const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
-  const sendTeamSubscriptionRequestEmail = useMemo(
-    () => httpsCallable(getFunctions(), "internalNotifications-sendTeamSubscriptionRequestEmail"),
-    []
-  );
-
   const sendRequestEmail = useCallback(() => {
+    const sendTeamSubscriptionRequestEmail = httpsCallable(
+      getFunctions(),
+      "internalNotifications-sendTeamSubscriptionRequestEmail"
+    );
     sendTeamSubscriptionRequestEmail({ userCount: userDetails.length })
       .then(() => {
         setShowSuccess(true);
       })
       .catch(() => toast.error("Error while sending email. Please try again later."));
-  }, [sendTeamSubscriptionRequestEmail, userDetails.length]);
+  }, [userDetails.length]);
 
   useEffect(() => {
-    if (isOrgBannerDismissed || isUserSubscribed) {
+    if (isOrgBannerDismissed || isUserSubscribed || !orgBannerConfig) {
       return;
     }
 
     if (isCompanyEmail(userEmail)) {
+      const getOrganizationUsers = httpsCallable(getFunctions(), "users-getOrganizationUsers");
       getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((result: any) => {
         setUserDetails(result.data.users);
         if (result.data.users.length > 0) {
@@ -121,7 +120,7 @@ export const OrgNotificationBanner = () => {
         }
       });
     }
-  }, [getOrganizationUsers, isOrgBannerDismissed, isUserSubscribed, userEmail]);
+  }, [isOrgBannerDismissed, isUserSubscribed, orgBannerConfig, userEmail]);
 
   if (isOrgBannerDismissed || !orgBannerConfig || userDetails.length === 0) return null;
 
