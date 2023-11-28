@@ -33,7 +33,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
   const options = {
     clientSecret,
     onComplete: () => {
-      trackCheckoutCompletedEvent();
+      trackCheckoutCompletedEvent(source);
     },
   };
 

@@ -15,17 +15,26 @@ import { actions } from "store";
 import { trackPricingWorkspaceSwitched } from "features/pricing/analytics";
 import "./index.scss";
 
+interface MenuProps {
+  workspaceToUpgrade: { name: string; id: string; accessCount: number };
+  setWorkspaceToUpgrade: (workspaceDetails: any) => void;
+  isOpenedFromModal?: boolean;
+  className?: string;
+  source: string;
+}
+
 const getWorkspaceIcon = (workspaceName: string) => {
   if (workspaceName === APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE) return <LockOutlined />;
   return workspaceName ? workspaceName[0].toUpperCase() : "?";
 };
 
-export const UpgradeWorkspaceMenu: React.FC<{
-  workspaceToUpgrade: { name: string; id: string; accessCount: number };
-  setWorkspaceToUpgrade: (workspaceDetails: any) => void;
-  isOpenedFromModal?: boolean;
-  className?: string;
-}> = ({ workspaceToUpgrade, setWorkspaceToUpgrade, className, isOpenedFromModal = false }) => {
+export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
+  workspaceToUpgrade,
+  setWorkspaceToUpgrade,
+  className,
+  isOpenedFromModal = false,
+  source,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
@@ -93,10 +102,7 @@ export const UpgradeWorkspaceMenu: React.FC<{
         });
       }
       setWorkspaceToUpgrade(populateWorkspaceDetails(teamId));
-      trackPricingWorkspaceSwitched(
-        teamId === "private_workspace" ? "individual" : "team",
-        isOpenedFromModal ? "pricing_modal" : "pricing_page"
-      );
+      trackPricingWorkspaceSwitched(teamId === "private_workspace" ? "individual" : "team", source);
     },
   };
 
