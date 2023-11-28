@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
-import { trackProductHuntBannerClicked } from "modules/analytics/events/common/onboarding/appBanner";
 import { useDispatch } from "react-redux";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./appNotificationBanner.scss";
@@ -10,6 +9,7 @@ import { useSelector } from "react-redux";
 import { getAppNotificationBannerDismissTs } from "store/selectors";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import { OrgNotificationBanner } from "./OrgNotificationBanner";
 
 interface Banner {
   id: string;
@@ -24,17 +24,8 @@ interface Banner {
 export const AppNotificationBanner = () => {
   const dispatch = useDispatch();
   const lastAppBannerDismissTs = useSelector(getAppNotificationBannerDismissTs);
-  const [isVisible, setIsVisible] = useState(true);
   const banners = useFeatureValue("app_banner", []);
   const newBanners = banners.filter((banner: Banner) => banner.createdTs > (lastAppBannerDismissTs || 0));
-
-  useEffect(() => {
-    if (newBanners?.length > 0) {
-      return setIsVisible(true);
-    }
-
-    setIsVisible(false);
-  }, [newBanners]);
 
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -51,7 +42,6 @@ export const AppNotificationBanner = () => {
           target="_blank"
           rel="noreferrer"
           className="app-banner"
-          onClick={() => trackProductHuntBannerClicked()}
           href={banner?.cta ? banner.cta : null}
           style={{ backgroundColor: banner?.backgroundColor || "000000" }}
         >
@@ -80,14 +70,12 @@ export const AppNotificationBanner = () => {
       );
     }
 
-    return null;
+    return <OrgNotificationBanner />;
   };
 
   if (isAppOpenedInIframe()) {
     return null;
   }
 
-  if (isVisible) {
-    return <>{renderAppBanner()}</>;
-  }
+  return <>{renderAppBanner()}</>;
 };
