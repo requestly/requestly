@@ -134,7 +134,7 @@ export const OrgNotificationBanner = () => {
             <span className="text-bold text-capitalize">{` ${userDetails[0]?.domain?.split(".")[0]}`}</span>
             {` are using Requestly and are facing limits. You won't be able to use the premium features for
           free from `}
-            <span className="text-bold">30th November</span>
+            <span className="text-bold">30th November.</span>
           </div>
           <RQButton
             onClick={() => {
