@@ -83,3 +83,11 @@ export const trackWorkspaceOrganizationCardClicked = (action) => {
 export const trackWorkspaceInviteAnimationViewed = () => {
   trackEvent(TEAMS.WORKSPACE_INVITE_ANIMATION_VIEWED);
 };
+
+export const trackTeamPlanBannerViewed = () => {
+  trackEvent(TEAMS.GET_TEAM_PLAN_BANNER_VIEWED);
+};
+
+export const trackTeamPlanBannerClicked = (action, source) => {
+  trackEvent(TEAMS.GET_TEAM_PLAN_BANNER_CLICKED, { action, source });
+};

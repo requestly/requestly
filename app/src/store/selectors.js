@@ -284,3 +284,7 @@ export const getTimeToResendEmailLogin = (state) => {
 export const getAppNotificationBannerDismissTs = (state) => {
   return getGlobalState(state).misc.persist?.appNotificationBannerDismissTs;
 };
+
+export const getIsOrgBannerDismissed = (state) => {
+  return getGlobalState(state).misc.persist?.isOrgBannerDismissed;
+};

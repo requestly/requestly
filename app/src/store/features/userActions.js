@@ -141,3 +141,7 @@ export const updateTimeToResendEmailLogin = (prevState, action) => {
 export const updateAppNotificationBannerDismissTs = (prevState, action) => {
   prevState.misc.persist.appNotificationBannerDismissTs = action.payload;
 };
+
+export const updateIsOrgBannerDismissed = (prevState, action) => {
+  prevState.misc.persist.isOrgBannerDismissed = action.payload;
+};
