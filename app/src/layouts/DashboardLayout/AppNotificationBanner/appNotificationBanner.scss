@@ -45,4 +45,25 @@
   .close-btn:focus {
     background: transparent;
   }
+
+  .rq-btn.ant-btn.view-users-button {
+    background-color: rgb(179 60 157);
+    border: rgb(179 60 157);
+    &:hover {
+      background-color: rgb(179 60 157);
+      border: rgb(179 60 157);
+      opacity: 0.6;
+    }
+  }
+}
+
+.rq-modal-content .user-list {
+  overflow: auto;
+  max-height: 300px;
+}
+
+.user-list-card {
+  align-items: center;
+  padding: 6px;
+  margin: 8px 0;
 }
