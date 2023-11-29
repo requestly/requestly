@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { actions } from "store";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
+import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
 
 const pricingButtonsMap: Record<string, any> = {
   individual: {
@@ -312,6 +313,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   const user = useSelector(getUserAuthDetails);
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
   const isUserPremium = user?.details?.isPremium;
   const userPlanName = user?.details?.planDetails?.planName;
@@ -367,6 +369,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       }
       case "switch-plan": {
         console.log("!!!debug", "switch plan");
+        setIsConfirmationModalOpen(true);
         break;
       }
       case "contact-us": {
@@ -421,20 +424,26 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   }
 
   return (
-    <Space size={8}>
-      {buttonConfig?.text && (
-        <RQButton
-          onClick={() => {
-            onButtonClick(buttonConfig.onClick);
-          }}
-          type="primary"
-          className={!buttonConfig.visible ? "visibility-hidden" : ""}
-          loading={isButtonLoading}
-        >
-          {buttonConfig?.text}
-        </RQButton>
-      )}
-      {buttonConfig.tag && <div className="current-pricing-plan-tag">{buttonConfig.tag}</div>}
-    </Space>
+    <>
+      <Space size={8}>
+        {buttonConfig?.text && (
+          <RQButton
+            onClick={() => {
+              onButtonClick(buttonConfig.onClick);
+            }}
+            type="primary"
+            className={!buttonConfig.visible ? "visibility-hidden" : ""}
+            loading={isButtonLoading}
+          >
+            {buttonConfig?.text}
+          </RQButton>
+        )}
+        {buttonConfig.tag && <div className="current-pricing-plan-tag">{buttonConfig.tag}</div>}
+      </Space>
+      <ChangePlanRequestConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        handleToggle={() => setIsConfirmationModalOpen(false)}
+      />
+    </>
   );
 };

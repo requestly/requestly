@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card } from "reactstrap";
@@ -8,6 +8,7 @@ import { redirectToPricingPlans } from "../../../../../..//utils/RedirectionUtil
 import { getPrettyPlanName } from "../../../../../../utils/FormattingHelper";
 import { getUserAuthDetails } from "../../../../../../store/selectors";
 import { beautifySubscriptionType } from "../../../../../../utils/PricingUtils";
+import { ChangePlanRequestConfirmationModal } from "features/pricing/components/ChangePlanRequestConfirmationModal";
 
 const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, subscriptionDetails }) => {
   //Global State
@@ -15,6 +16,7 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
   const navigate = useNavigate();
   const { validFrom, validTill, status, type, planName } = subscriptionDetails;
   const isUserPremium = user.details?.isPremium || status === "active";
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
   const handleRenewOnClick = (e) => {
     e.preventDefault();
@@ -22,11 +24,11 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
   };
 
   const cancelPlanClicked = () => {
-    console.log("cancel plan clicked");
+    setIsConfirmationModalOpen(true);
   };
 
   const renderCancelButton = useMemo(() => {
-    if (!isUserPremium || status !== "trialing") {
+    if (!isUserPremium || status === "trialing") {
       return null;
     }
     return (
@@ -92,6 +94,10 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
           </AntRow>
         </Card>
       </Col>
+      <ChangePlanRequestConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        handleToggle={() => setIsConfirmationModalOpen(false)}
+      />
     </Row>
   );
 };
