@@ -13,6 +13,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
 
+// Maps userPlanType/userPlanName -> columnPlanType/columnPlanName -> buttonConfig
 const pricingButtonsMap: Record<string, any> = {
   individual: {
     [PRICING.PLAN_NAMES.FREE]: {
@@ -317,7 +318,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
   const isUserPremium = user?.details?.isPremium;
-  const userPlanName = user?.details?.planDetails?.planName;
+  const userPlanName = user?.details?.planDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
   const userPlanType = user?.details?.planDetails?.type ?? "individual";
   const isPrivateWorkspaceSelected = selectedWorkspace?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
   const isUserTrialing = isUserPremium && user?.details?.planDetails?.status === "trialing";
