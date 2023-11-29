@@ -31,7 +31,7 @@ export const WorkspaceOnboardingStep: React.FC<WorkspaceOnboardingStepProps> = (
     if (!defaultTeamData && !createNewTeam && !availableTeams.length) {
       dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
     }
-  }, [defaultTeamData, createNewTeam, availableTeams.length]);
+  }, [defaultTeamData, createNewTeam, availableTeams.length, dispatch]);
 
   return (
     <div className="workspace-onboarding-wrapper">
