@@ -105,7 +105,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           });
       }
     },
-    [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount, toggleModal]
+    [workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount, duration, toggleModal, source]
   );
 
   useEffect(() => {
