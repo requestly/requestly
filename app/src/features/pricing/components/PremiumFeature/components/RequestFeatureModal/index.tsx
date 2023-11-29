@@ -45,7 +45,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
     () =>
       httpsCallable<{ workspaceDetails: OrganizationsDetails["workspaces"] }, null>(
         getFunctions(),
-        "requestEnterprisePlanFromAdmin"
+        "premiumNotifications-requestEnterprisePlanFromAdmin"
       ),
     []
   );
