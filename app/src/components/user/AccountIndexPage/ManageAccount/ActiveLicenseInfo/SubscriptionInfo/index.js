@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card } from "reactstrap";
-import { Button, Col as AntCol, Row as AntRow, Descriptions, Badge, Space } from "antd";
+import { Button, Col as AntCol, Row as AntRow, Descriptions, Badge, Space, Popconfirm } from "antd";
 // UTILS
 import { redirectToPricingPlans } from "../../../../../..//utils/RedirectionUtils";
 import { getPrettyPlanName } from "../../../../../../utils/FormattingHelper";
@@ -21,9 +21,31 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
     redirectToPricingPlans(navigate);
   };
 
+  const cancelPlanClicked = () => {
+    console.log("cancel plan clicked");
+  };
+
+  const renderCancelButton = useMemo(() => {
+    if (!isUserPremium || status !== "trialing") {
+      return null;
+    }
+    return (
+      <Popconfirm
+        icon={null}
+        cancelText="No"
+        okText="Yes"
+        title="Are you sure you want to cancel your plan?"
+        onConfirm={cancelPlanClicked}
+      >
+        <span className="text-underline cursor-pointer">Cancel plan</span>
+      </Popconfirm>
+    );
+  }, [isUserPremium, status]);
+
   if (!subscriptionDetails) {
     return <React.Fragment></React.Fragment>;
   }
+
   return (
     <Row className="my-4">
       <Col>
@@ -55,7 +77,10 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
                   </Descriptions.Item>
                 )}
                 <Descriptions.Item label="Current Plan" className="primary-card github-like-border">
-                  {getPrettyPlanName(planName)}
+                  <AntRow justify="space-between">
+                    {getPrettyPlanName(planName)}
+                    {renderCancelButton}
+                  </AntRow>
                 </Descriptions.Item>
                 {isUserPremium && (
                   <Descriptions.Item label="Valid Till" className="primary-card github-like-border">
