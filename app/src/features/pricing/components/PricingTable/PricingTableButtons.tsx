@@ -310,6 +310,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   setIsContactUsModalOpen,
 }) => {
   const dispatch = useDispatch();
+  const firebaseFunction = getFunctions();
   const user = useSelector(getUserAuthDetails);
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -351,7 +352,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       }
       case "manage-subscription": {
         trackCheckoutInitiatedEvent(duration, columnPlanName, selectedWorkspace?.accessCount, isUserTrialing, source);
-        const manageSubscription = httpsCallable(getFunctions(), "subscription-manageSubscription");
+        const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
         manageSubscription({
           planName: columnPlanName,
           duration,
@@ -368,8 +369,22 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case "switch-plan": {
-        console.log("!!!debug", "switch plan");
-        setIsConfirmationModalOpen(true);
+        const requestPlanSwitch = httpsCallable(firebaseFunction, "premiumNotifications-requestPlanSwitch");
+        requestPlanSwitch({
+          currentPlan: userPlanName,
+          currentPlanType: userPlanType,
+          planToSwitch: columnPlanName,
+          planToSwitchType: isPrivateWorkspaceSelected ? "individual" : "team",
+        })
+          .then(() => {
+            setIsConfirmationModalOpen(true);
+          })
+          .catch(() => {
+            toast.error("Error in switching plan. Please contact support");
+          })
+          .finally(() => {
+            setIsButtonLoading(false);
+          });
         break;
       }
       case "contact-us": {

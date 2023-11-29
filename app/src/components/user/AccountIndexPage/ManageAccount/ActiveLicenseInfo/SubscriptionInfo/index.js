@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card } from "reactstrap";
@@ -9,6 +9,8 @@ import { getPrettyPlanName } from "../../../../../../utils/FormattingHelper";
 import { getUserAuthDetails } from "../../../../../../store/selectors";
 import { beautifySubscriptionType } from "../../../../../../utils/PricingUtils";
 import { ChangePlanRequestConfirmationModal } from "features/pricing/components/ChangePlanRequestConfirmationModal";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { toast } from "utils/Toast";
 
 const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, subscriptionDetails }) => {
   //Global State
@@ -23,9 +25,18 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
     redirectToPricingPlans(navigate);
   };
 
-  const cancelPlanClicked = () => {
-    setIsConfirmationModalOpen(true);
-  };
+  const cancelPlanClicked = useCallback(() => {
+    const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
+    requestPlanCancellation({
+      currentPlan: planName,
+    })
+      .then(() => {
+        setIsConfirmationModalOpen(true);
+      })
+      .catch((err) => {
+        toast.error("Error in cancelling plan. Please contact support");
+      });
+  }, [planName]);
 
   const renderCancelButton = useMemo(() => {
     if (!isUserPremium || status === "trialing") {
@@ -42,7 +53,7 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
         <span className="text-underline cursor-pointer">Cancel plan</span>
       </Popconfirm>
     );
-  }, [isUserPremium, status]);
+  }, [cancelPlanClicked, isUserPremium, status]);
 
   if (!subscriptionDetails) {
     return <React.Fragment></React.Fragment>;
