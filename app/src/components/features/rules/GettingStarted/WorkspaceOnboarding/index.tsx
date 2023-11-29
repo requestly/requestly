@@ -35,6 +35,7 @@ import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onbo
 import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import Logger from "lib/logger";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -96,29 +97,34 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
         createTeam({
           teamName: newTeamName,
           generatePublicLink: true,
-        }).then((response: any) => {
-          upsertTeamCommonInvite({ teamId: response?.data?.teamId, domainEnabled: true });
-          setDefaultTeamData({ name: newTeamName, ...response?.data });
-          dispatch(
-            actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
-          );
-          trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "onboarding");
-          switchWorkspace(
-            {
-              teamId: response?.data?.teamId,
-              teamName: newTeamName,
-              teamMembersCount: response?.data?.accessCount,
-            },
-            dispatch,
-            { isWorkspaceMode, isSyncEnabled: true },
-            appMode,
-            null,
-            "onboarding"
-          );
-          setTimeout(() => {
+        })
+          .then((response: any) => {
+            upsertTeamCommonInvite({ teamId: response?.data?.teamId, domainEnabled: true });
+            setDefaultTeamData({ name: newTeamName, ...response?.data });
+            dispatch(
+              actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
+            );
+            trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "onboarding");
+            switchWorkspace(
+              {
+                teamId: response?.data?.teamId,
+                teamName: newTeamName,
+                teamMembersCount: response?.data?.accessCount,
+              },
+              dispatch,
+              { isWorkspaceMode, isSyncEnabled: true },
+              appMode,
+              null,
+              "onboarding"
+            );
+            setTimeout(() => {
+              dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+            }, 50);
+          })
+          .catch((e) => {
+            Logger.log(e);
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
-          }, 50);
-        });
+          });
       } else {
         dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
       }
@@ -162,7 +168,8 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
           dispatch(actions.updateWorkspaceOnboardingTeamDetails({ pendingInvites: res?.pendingInvites ?? [] }));
         })
         .catch((e) => {
-          setPendingInvites([]);
+          Logger.log(e);
+          dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
         });
     }
   }, [dispatch, user?.loggedIn]);

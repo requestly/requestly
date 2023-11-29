@@ -1,11 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Skeleton } from "antd";
 import { CreateWorkspace } from "./WorkspaceCreation";
 import { JoinWorkspace } from "./JoinWorkspace";
-import "./index.css";
 import { Invite, TeamInviteMetadata } from "types";
-import { NewTeamData } from "../../types";
+import { NewTeamData, OnboardingSteps } from "../../types";
 import { getUniqueTeamsFromInvites } from "utils/teams";
+import { actions } from "store";
+import "./index.css";
 
 interface WorkspaceOnboardingStepProps {
   defaultTeamData: NewTeamData | null;
@@ -18,11 +20,18 @@ export const WorkspaceOnboardingStep: React.FC<WorkspaceOnboardingStepProps> = (
   pendingInvites,
   isPendingInvite,
 }) => {
+  const dispatch = useDispatch();
   const [createNewTeam, setCreatNewTeam] = useState<boolean>(false);
 
   const availableTeams: TeamInviteMetadata[] = useMemo(() => {
     return getUniqueTeamsFromInvites(pendingInvites);
   }, [pendingInvites]);
+
+  useEffect(() => {
+    if (!defaultTeamData && !createNewTeam && !availableTeams.length) {
+      dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+    }
+  }, [defaultTeamData, createNewTeam, availableTeams.length]);
 
   return (
     <div className="workspace-onboarding-wrapper">
