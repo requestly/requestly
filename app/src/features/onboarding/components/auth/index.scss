@@ -1,6 +1,8 @@
 .onboarding-auth-screen-wrapper {
   display: flex;
   justify-content: center;
+  align-items: center;
+  // height: 100%;
   margin-top: 3rem;
 
   .onboarding-auth-screen {
@@ -16,8 +18,8 @@
   }
   .onboarding-auth-banner-wrapper {
     width: 100%;
-    max-width: 376px;
-    background: green; //temp
-    margin-left: 96px;
+    max-width: 396px;
+    margin-left: 76px;
+    padding-top: 40px;
   }
 }
