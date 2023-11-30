@@ -1,0 +1,37 @@
+.persona-input {
+  width: 100% !important;
+  margin-top: 4px !important;
+
+  & .ant-select-selector {
+    background: #2b2b2b !important;
+    border: 1px solid var(--neutrals-gray-600) !important;
+  }
+
+  & .ant-select-selector {
+    height: 40px !important;
+  }
+
+  & .ant-select-selector .ant-select-selection-search input {
+    height: 100% !important;
+    font-weight: 500;
+  }
+
+  & .ant-select-selector .ant-select-selection-placeholder {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: var(--neutrals-gray-400);
+  }
+}
+.persona-input-label {
+  font-weight: 500;
+  font-size: 13px;
+}
+.persona-input-menu.ant-select-dropdown {
+  background-color: #383838;
+
+  & .ant-select-item {
+    font-size: 14px;
+    color: var(--white);
+  }
+}
