@@ -16,7 +16,11 @@ app/src/config/pricing/plans/plans.json
 app/src/config/pricing/features/features.json
 app/.env.local
 !app/public/*
+browser-extension/config/configs/env/custom.json
 .DS_Store
 /requestly-1.0.0.tgz
 package
 *.code-workspace
+.firebaserc
+firebase.json
+*.cache
