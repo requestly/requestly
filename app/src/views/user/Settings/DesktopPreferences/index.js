@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { Alert, Button, Col, Input, Popconfirm, Row } from "antd";
+import { Alert, Button, Col, Input, Popconfirm, Row, Tooltip } from "antd";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { LinkOutlined } from "@ant-design/icons";
@@ -13,6 +13,7 @@ import {
 import { toast } from "utils/Toast";
 import "./DesktopPreference.css";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
+import { RQButton } from "lib/design-system/components";
 
 const DesktopPreference = ({ appMode }) => {
   const [portInput, setPortInput] = useState("");
@@ -54,6 +55,10 @@ const DesktopPreference = ({ appMode }) => {
     trackSettingsToggled("port_changed", newPort);
     setPortSubmitLoading(false);
   };
+
+  const regenerateRootCa = useCallback(() => {
+    window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("renew-ssl-certificates");
+  }, [])
 
   // add loader
   return appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
@@ -113,6 +118,20 @@ const DesktopPreference = ({ appMode }) => {
           </Row>
         )}
       </div>
+
+      {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) || true ? <>
+        <Row align="middle" className="w-full mt-16 setting-item-container">
+          <Col span={22}>
+            <div className="title">Regenerate SSL Certificate</div>
+            <p className="setting-item-caption">If you face certificate trust issues, regenerating the proxy certificates will reset the trust settings in your certificate store.</p>
+          </Col>
+          <Col span={2}>
+            <Tooltip title="The app needs to be relaunched after this">
+              <RQButton type="default" onClick={regenerateRootCa}> Regenerate </RQButton>
+            </Tooltip>
+          </Col>
+        </Row>
+      </> : null}
     </>
   ) : null;
 };
