@@ -1,0 +1,23 @@
+.onboarding-auth-screen-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+
+  .onboarding-auth-screen {
+    max-width: 912px;
+    display: flex;
+  }
+  .onboarding-auth-form-wrapper {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface-1);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 2rem;
+  }
+  .onboarding-auth-banner-wrapper {
+    width: 100%;
+    max-width: 376px;
+    background: green; //temp
+    margin-left: 96px;
+  }
+}
