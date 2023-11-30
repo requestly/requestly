@@ -132,6 +132,8 @@ export const beautifySubscriptionType = (subscriptionType) => {
       return "Producthunt Unlock";
     case "appsumo":
       return "AppSumo";
+    case "appsumo-team":
+      return "AppSumo (Team Subscription)";
     default:
       return "Premium Plan";
   }
