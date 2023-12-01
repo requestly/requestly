@@ -4,7 +4,8 @@ import { RQSessionAttributes } from "@requestly/web-sdk";
 import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { getOffset } from "views/features/sessions/SessionViewer/NetworkLogs/helpers";
 import { RQNetworkLog } from "./types";
-import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
+import { BiRightArrow } from "@react-icons/all-files/bi/BiRightArrow";
+import { BiSolidRightArrow } from "@react-icons/all-files/bi/BiSolidRightArrow";
 import useFocusedAutoScroll from "./useFocusedAutoScroll";
 import "./RQNetworkTable.css";
 
@@ -12,6 +13,7 @@ export interface RQNetworkTableProps {
   logs: RQNetworkLog[];
   contextMenuOptions?: GenericNetworkTableProps<RQNetworkLog>["contextMenuOptions"];
   onContextMenuOpenChange?: GenericNetworkTableProps<RQNetworkLog>["onContextMenuOpenChange"];
+  onPointerClick?: (offset: number) => void;
   sessionRecordingStartTime?: RQSessionAttributes["startTime"];
   emptyView?: GenericNetworkTableProps<RQNetworkLog>["emptyView"];
   sessionCurrentOffset?: number;
@@ -23,6 +25,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   contextMenuOptions = [],
   sessionRecordingStartTime = 0,
   onContextMenuOpenChange = (isOpen) => {},
+  onPointerClick,
   emptyView,
   sessionCurrentOffset,
   autoScroll = false,
@@ -42,14 +45,28 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
           const offset = Math.floor(getOffset(log, sessionRecordingStartTime));
           return (
             <div className="offset-cell">
-              <span className="row-pointer">{activeLogId === log.id && <AiFillCaretRight color="var(--white)" />}</span>
+              {activeLogId === log.id ? (
+                <span className="row-pointer active-row-pointer">
+                  <BiSolidRightArrow color="var(--white)" />
+                </span>
+              ) : (
+                <span className="row-pointer">
+                  <BiRightArrow
+                    color="var(--white)"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPointerClick(getOffset(log, sessionRecordingStartTime) * 1000);
+                    }}
+                  />
+                </span>
+              )}
               <span>{secToMinutesAndSeconds(offset)}</span>
             </div>
           );
         },
       },
     ],
-    [sessionRecordingStartTime, activeLogId]
+    [sessionRecordingStartTime, activeLogId, onPointerClick]
   );
 
   const isLogPending = (log: RQNetworkLog) => {

@@ -22,9 +22,10 @@ interface Props {
   startTime: number;
   networkLogs: RQNetworkLog[];
   playerTimeOffset: number;
+  sessionPlayer: any;
 }
 
-const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset }) => {
+const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset, sessionPlayer }) => {
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
   const [isApiClientModalOpen, setIsApiClientModalOpen] = useState(false);
@@ -175,6 +176,11 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
             sessionCurrentOffset={playerTimeOffset}
             onContextMenuOpenChange={(isOpen) => {
               if (isOpen) trackSessionRecordingNetworkLogContextMenuOpen();
+            }}
+            onPointerClick={(offset: number) => {
+              if (sessionPlayer) {
+                sessionPlayer.goto(offset);
+              }
             }}
             emptyView={emptyTableView}
             autoScroll

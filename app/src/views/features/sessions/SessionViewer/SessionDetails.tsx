@@ -298,6 +298,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             startTime={attributes?.startTime ?? 0}
             networkLogs={rqNetworkLogs}
             playerTimeOffset={playerTimeOffset}
+            sessionPlayer={player}
           />
         ),
       },
