@@ -91,4 +91,14 @@
 
 .rq-network-table-container .offset-cell .row-pointer {
   margin-top: 2px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rq-network-table-container .rq-resource-table-row:hover .offset-cell .row-pointer:not(.active-row-pointer) {
+  opacity: 0.4;
+}
+
+.rq-network-table-container .offset-cell .row-pointer.active-row-pointer {
+  opacity: 1;
 }
