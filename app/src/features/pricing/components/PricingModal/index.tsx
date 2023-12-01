@@ -57,14 +57,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const handleSubscribe = useCallback(
     (planName: string) => {
       const functions = getFunctions();
-      const createTeamSubscriptionUsingStripeCheckout = httpsCallable(
-        functions,
-        "createTeamSubscriptionUsingStripeCheckout"
-      );
-      const createIndividualSubscriptionUsingStripeCheckout = httpsCallable(
-        functions,
-        "createIndividualSubscriptionUsingStripeCheckout"
-      );
+      const createSubscriptionUsingCheckout = httpsCallable(functions, "subscription-createSubscriptionUsingCheckout");
+
       setIsCheckoutScreenVisible(true);
       setIsLoading(true);
       const subscriptionData = {
@@ -74,38 +68,22 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         planName: planName,
         duration: duration,
       };
-      if (workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id) {
-        createIndividualSubscriptionUsingStripeCheckout(subscriptionData)
-          .then((data: any) => {
-            if (data?.data?.payload?.url) {
-              redirectToUrl(data?.data?.payload?.url);
-              toggleModal();
-            } else setStripeClientSecret(data?.data?.payload?.clientSecret);
+      createSubscriptionUsingCheckout(subscriptionData)
+        .then((res: any) => {
+          if (res?.data?.payload?.url) {
+            redirectToUrl(res?.data?.payload?.url);
+            toggleModal();
+          } else setStripeClientSecret(res?.data?.payload?.clientSecret);
 
-            setIsLoading(false);
-          })
-          .catch((err) => {
-            setStripeError(err);
-            setIsLoading(false);
-            trackCheckoutFailedEvent("individual", source);
-          });
-      } else {
-        createTeamSubscriptionUsingStripeCheckout(subscriptionData)
-          .then((data: any) => {
-            if (data?.data?.payload?.url) {
-              redirectToUrl(data?.data?.payload?.url);
-              toggleModal();
-            } else setStripeClientSecret(data?.data?.payload?.clientSecret);
-            setIsLoading(false);
-          })
-          .catch((err) => {
-            setStripeError(err);
-            setIsLoading(false);
-            trackCheckoutFailedEvent("team", source);
-          });
-      }
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setStripeError(err);
+          setIsLoading(false);
+          trackCheckoutFailedEvent("individual", source);
+        });
     },
-    [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount, toggleModal]
+    [workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount, duration, toggleModal, source]
   );
 
   useEffect(() => {
