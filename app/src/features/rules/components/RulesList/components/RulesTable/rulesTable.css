@@ -20,12 +20,43 @@
   color: var(--text-default);
 }
 
+.rq-content-table-row .ant-table-cell-with-append:nth-child(2) {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  padding: 16px 0;
+}
+
+.rq-content-table-row .ant-table-cell:nth-child(2) {
+  width: 72px;
+  padding: 1rem 0;
+}
+
+.rq-content-table-row td.ant-table-cell:nth-child(2) > button.ant-table-row-expand-icon,
+.rq-content-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
+  flex-shrink: 0;
+}
+
+.rq-content-table-row td.ant-table-cell:nth-child(2) > button.ant-table-row-expand-icon {
+  margin-top: 0px;
+}
+
+.rq-content-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
+  margin-left: 4px;
+  margin-right: 8px;
+}
+
+.rq-content-table-row .ant-table-row .ant-table-row-level-1 td {
+  background: var(--black);
+  border-bottom: 1px solid var(--surface-1);
+}
+
 .rule-more-actions-dropdown .ant-dropdown-menu {
   padding: 4px;
   background: var(--surface-1);
   border: 1px solid var(--surface-2);
   border-radius: var(--border-radius-sm);
-  box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.24);
+  box-shadow: 0px 8px 12px 0px #0000003d;
 }
 
 .rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {

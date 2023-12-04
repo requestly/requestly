@@ -37,6 +37,21 @@
 tr.rq-content-table-row.ant-table-row {
   background: var(--background);
 
+  &.ant-table-row-level-1 {
+    &:hover > .ant-table-cell {
+      background: var(--surface-0_5);
+    }
+
+    .ant-table-cell {
+      background: var(--black);
+      border-bottom: 1px solid var(--surface-1);
+
+      .ant-table-row-expand-icon {
+        display: none;
+      }
+    }
+  }
+
   &.ant-table-row-selected {
     background: var(--highlight-dark-bg);
     border-bottom: 1px solid var(--surface-1);
