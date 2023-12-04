@@ -63,6 +63,17 @@ export const PricingTable: React.FC<PricingTableProps> = ({
     );
   };
 
+  const getPricingPlanAnnualBillingSubtitle = (planName: string) => {
+    switch (planName) {
+      case PRICING.PLAN_NAMES.BASIC:
+        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price} annually`;
+      case PRICING.PLAN_NAMES.PROFESSIONAL:
+        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price} annually`;
+      default:
+        return "";
+    }
+  };
+
   return (
     <>
       <Row wrap={false} className="pricing-table" ref={tableRef}>
@@ -97,13 +108,13 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   </Typography.Text>
                 </Row>
               )}
-              {planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
-                <Row className="mt-8">
-                  <Typography.Text type="secondary">
-                    {duration === PRICING.DURATION.MONTHLY ? "Billed monthly" : "Billed annually"}
-                  </Typography.Text>
-                </Row>
-              )}
+              <Row className={`mt-8 ${getPricingPlanAnnualBillingSubtitle(planName) ? "" : "visibility-hidden"}`}>
+                <Typography.Text type="secondary">
+                  {duration === PRICING.DURATION.MONTHLY
+                    ? "Billed monthly"
+                    : getPricingPlanAnnualBillingSubtitle(planName) || "dummy"}
+                </Typography.Text>
+              </Row>
               <Row className="mt-16">
                 <PricingTableButtons
                   key={planName + duration + workspaceToUpgrade?.id}
