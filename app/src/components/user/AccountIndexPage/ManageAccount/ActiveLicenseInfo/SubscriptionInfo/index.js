@@ -33,8 +33,11 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
               <Descriptions title={false} bordered size="small" column={2}>
                 <Descriptions.Item label="Status" className="primary-card github-like-border">
                   <Space>
-                    <Badge status={isUserPremium ? "success" : "error"} text={isUserPremium ? "Active" : "Inactive"} />
-                    {status === "canceled" || status === "incomplete_expired" ? (
+                    <Badge
+                      status={isUserPremium ? "success" : "error"}
+                      text={<span className="text-capitalize">{status}</span>}
+                    />
+                    {!isUserPremium ? (
                       <React.Fragment>
                         <Button size="small" type="link" onClick={handleRenewOnClick}>
                           Renew

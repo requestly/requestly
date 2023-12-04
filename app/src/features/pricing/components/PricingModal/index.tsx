@@ -14,7 +14,9 @@ import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
 import { isNull } from "lodash";
 import { TeamWorkspace } from "types";
+import { redirectToUrl } from "utils/RedirectionUtils";
 import "./index.scss";
+import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -23,6 +25,7 @@ interface PricingModalProps {
   workspace?: TeamWorkspace;
   title?: string;
   planDuration?: string;
+  source: string;
 }
 
 export const PricingModal: React.FC<PricingModalProps> = ({
@@ -32,6 +35,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   planDuration,
   selectedPlan = null,
   title = "Upgrade your plan to get the most out of Requestly",
+  source,
 }) => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(
@@ -73,26 +77,35 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       if (workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id) {
         createIndividualSubscriptionUsingStripeCheckout(subscriptionData)
           .then((data: any) => {
-            setStripeClientSecret(data?.data?.payload.clientSecret);
+            if (data?.data?.payload?.url) {
+              redirectToUrl(data?.data?.payload?.url);
+              toggleModal();
+            } else setStripeClientSecret(data?.data?.payload?.clientSecret);
+
             setIsLoading(false);
           })
           .catch((err) => {
             setStripeError(err);
             setIsLoading(false);
+            trackCheckoutFailedEvent("individual", source);
           });
       } else {
         createTeamSubscriptionUsingStripeCheckout(subscriptionData)
           .then((data: any) => {
-            setStripeClientSecret(data?.data?.payload.clientSecret);
+            if (data?.data?.payload?.url) {
+              redirectToUrl(data?.data?.payload?.url);
+              toggleModal();
+            } else setStripeClientSecret(data?.data?.payload?.clientSecret);
             setIsLoading(false);
           })
           .catch((err) => {
             setStripeError(err);
             setIsLoading(false);
+            trackCheckoutFailedEvent("team", source);
           });
       }
     },
-    [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount]
+    [duration, workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount, toggleModal]
   );
 
   useEffect(() => {
@@ -104,8 +117,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   }, [selectedPlan, handleSubscribe]);
 
   useEffect(() => {
-    if (!isCheckoutScreenVisible) trackPricingModalPlansViewed();
-  }, [isCheckoutScreenVisible]);
+    if (!isCheckoutScreenVisible) trackPricingModalPlansViewed(source);
+  }, [isCheckoutScreenVisible, source]);
 
   return (
     <Modal
@@ -127,6 +140,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
             onCancel={() => setIsCheckoutScreenVisible(false)}
             isLoading={isLoading}
             toggleModal={toggleModal}
+            source={source}
           />
         ) : (
           <>
@@ -138,6 +152,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                 <UpgradeWorkspaceMenu
                   workspaceToUpgrade={workspaceToUpgrade}
                   setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+                  source={source}
                   isOpenedFromModal
                 />
               </Col>
@@ -180,6 +195,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               isOpenedFromModal
               handleOnSubscribe={handleSubscribe}
               tableRef={tableRef}
+              source={source}
             />
             <CompaniesSection />
           </>

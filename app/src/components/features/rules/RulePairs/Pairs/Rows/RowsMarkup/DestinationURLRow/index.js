@@ -108,7 +108,8 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     } else if (
       /* check for both new and old mocks */
       destination.includes("requestly.dev/api/mockv2/") ||
-      destination.includes("requestly.me")
+      destination.includes("requestly.me") ||
+      destination.includes("requestly.tech/api/mockv2/")
     ) {
       return RedirectDestinationType.MOCK_OR_FILE_PICKER;
     } else {

@@ -13,7 +13,7 @@ const PricingFAQs = () => {
         <React.Fragment>
           No, developers working individually without a team are not required to pay for Requestly. The Free plan
           provides liberal limits and includes many features you know and love, including capturing requests and
-          modifying requests, mocking APIs, session replays, and much more.
+          modifying requests, mocking APIs, SessionBook, and much more.
         </React.Fragment>
       ),
     },

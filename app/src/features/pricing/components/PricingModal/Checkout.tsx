@@ -9,6 +9,7 @@ import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { trackPricingModalStripeWindowOpened } from "features/pricing/analytics";
 import { redirectToAccountDetails } from "utils/RedirectionUtils";
 import "./index.scss";
+import { trackCheckoutCompletedEvent } from "modules/analytics/events/misc/business/checkout";
 
 interface CheckoutProps {
   clientSecret: string;
@@ -16,18 +17,29 @@ interface CheckoutProps {
   isLoading: boolean;
   onCancel: () => void;
   toggleModal: () => void;
+  source: string;
 }
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
-export const Checkout: React.FC<CheckoutProps> = ({ clientSecret, stripeError, isLoading, onCancel, toggleModal }) => {
+export const Checkout: React.FC<CheckoutProps> = ({
+  clientSecret,
+  stripeError,
+  isLoading,
+  onCancel,
+  toggleModal,
+  source,
+}) => {
   const navigate = useNavigate();
   const options = {
     clientSecret,
+    onComplete: () => {
+      trackCheckoutCompletedEvent(source);
+    },
   };
 
   useEffect(() => {
-    if (!isLoading) trackPricingModalStripeWindowOpened();
-  }, [isLoading]);
+    if (!isLoading) trackPricingModalStripeWindowOpened(source);
+  }, [isLoading, source]);
 
   return (
     <Col className="checkout-screen-wrapper">

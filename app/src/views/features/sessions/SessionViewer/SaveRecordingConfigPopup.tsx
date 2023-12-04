@@ -228,7 +228,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   return (
     <div className="save-recording-config-popup">
       <Row align="middle" justify="space-between" className="w-full header-container">
-        <div className="header">{isDraftSession ? "Save" : "Download"} your session replay</div>
+        <div className="header">{isDraftSession ? "Save" : "Download"} your session</div>
         <Button onClick={onClose}>
           <CloseOutlined />
         </Button>

@@ -196,6 +196,10 @@
   border: none !important;
 }
 
+.header-user-avatar.ant-avatar {
+  margin-right: 8px;
+}
+
 @media screen and (max-width: 1300px) {
   .desktop .header-left-section > a {
     display: none;

@@ -7,6 +7,14 @@ import GetASubscription from "./GetASubscription";
 import SubscriptionInfo from "./SubscriptionInfo";
 import { useSelector } from "react-redux";
 import { getAttrFromFirebase } from "utils/AnalyticsUtils";
+import { Row, Space } from "antd";
+import ManageSubscription from "./ManageSubscription/ManageSubscription";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import firebaseApp from "../../../../../firebase";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import Logger from "lib/logger";
+
+const db = getFirestore(firebaseApp);
 
 const ActiveLicenseInfo = ({
   hideShadow,
@@ -17,6 +25,8 @@ const ActiveLicenseInfo = ({
 }) => {
   //Global State
   const user = useSelector(getUserAuthDetails);
+  const teamId = useSelector(getCurrentlyActiveWorkspace)?.id;
+
   const [isSessionReplayLifetimeActive, setIsSessionReplayLifetimeActive] = useState(false);
   const [sessionReplayLifeTimeDetails, setSessionReplayLifeTimeDetails] = useState({});
 
@@ -25,17 +35,34 @@ const ActiveLicenseInfo = ({
   const doesSubscriptionExist = !!type && !!status && !!planName;
 
   useEffect(() => {
-    getAttrFromFirebase("session_replay_lifetime_pro")
-      .then((val) => {
-        if (val) {
-          setIsSessionReplayLifetimeActive(true);
-          setSessionReplayLifeTimeDetails(val);
-        }
-      })
-      .catch(() => {
-        // do nothing
-      });
-  }, []);
+    if (teamId) {
+      const teamsRef = doc(db, "teams", teamId);
+      getDoc(teamsRef)
+        .then((docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data?.appsumo) {
+              setIsSessionReplayLifetimeActive(true);
+              setSessionReplayLifeTimeDetails({ ...data.appsumo, type: "appsumo-team" });
+            }
+          }
+        })
+        .catch(() => {
+          Logger.log("Error while fetching appsumo details for team");
+        });
+    } else {
+      getAttrFromFirebase("session_replay_lifetime_pro")
+        .then((val) => {
+          if (val) {
+            setIsSessionReplayLifetimeActive(true);
+            setSessionReplayLifeTimeDetails(val);
+          }
+        })
+        .catch(() => {
+          Logger.log("Error while fetching appsumo details for individual");
+        });
+    }
+  }, [teamId]);
 
   const renderSubscriptionInfo = () => {
     return (
@@ -78,7 +105,7 @@ const ActiveLicenseInfo = ({
               validTill: new Date("2099-08-16T00:00:00Z").getTime(),
               status: "active",
               type: sessionReplayLifeTimeDetails.type ?? "producthunt",
-              planName: "Session Replay Pro",
+              planName: "SessionBook Plus",
             }}
           />
           <br />
@@ -90,7 +117,17 @@ const ActiveLicenseInfo = ({
   };
 
   return (
-    <ProCard title={<h3 style={{ marginBottom: "0" }}>{customHeading}</h3>} className="primary-card github-like-border">
+    <ProCard
+      title={
+        <Row>
+          <Space>
+            <h3 style={{ marginBottom: "0" }}>{customHeading}</h3>
+            {doesSubscriptionExist ? <ManageSubscription /> : null}
+          </Space>
+        </Row>
+      }
+      className="primary-card github-like-border"
+    >
       {renderSessionReplayProSubscription()}
       {doesSubscriptionExist ? renderSubscriptionInfo() : renderGetASubscription()}
     </ProCard>
