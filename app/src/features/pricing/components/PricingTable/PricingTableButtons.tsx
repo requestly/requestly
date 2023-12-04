@@ -1,5 +1,5 @@
 import React from "react";
-import { Space } from "antd";
+import { Modal, Space } from "antd";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { PRICING } from "features/pricing/constants/pricing";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -81,8 +81,8 @@ const pricingButtonsMap: Record<string, any> = {
       },
       team: {
         [PRICING.PLAN_NAMES.FREE]: {
-          text: "",
-          tag: "Current Plan",
+          text: "Use now",
+          tag: "",
           onClick: () => {},
           visible: false,
         },
@@ -333,6 +333,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     switch (functionName) {
       case "use-now": {
         window.location.href = "/";
+        setIsButtonLoading(false);
         break;
       }
       case "checkout": {
@@ -349,6 +350,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             },
           })
         );
+        setIsButtonLoading(false);
         break;
       }
       case "manage-subscription": {
@@ -366,26 +368,41 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
           .catch((err) => {
             toast.error("Error in managing subscription. Please contact support contact@requestly.io");
             trackCheckoutFailedEvent(isPrivateWorkspaceSelected ? "individual" : "team", source);
-          });
-        break;
-      }
-      case "switch-plan": {
-        const requestPlanSwitch = httpsCallable(firebaseFunction, "premiumNotifications-requestPlanSwitch");
-        requestPlanSwitch({
-          currentPlan: userPlanName,
-          currentPlanType: userPlanType,
-          planToSwitch: columnPlanName,
-          planToSwitchType: isPrivateWorkspaceSelected ? "individual" : "team",
-        })
-          .then(() => {
-            setIsConfirmationModalOpen(true);
-          })
-          .catch(() => {
-            toast.error("Error in switching plan. Please contact support");
           })
           .finally(() => {
             setIsButtonLoading(false);
           });
+        break;
+      }
+      case "switch-plan": {
+        Modal.confirm({
+          title: "Switch Plan",
+          content: `You are about to switch from ${userPlanName} to ${columnPlanName} plan.`,
+          okText: "Yes",
+          okType: "danger",
+          cancelText: "No",
+          onOk: () => {
+            const requestPlanSwitch = httpsCallable(firebaseFunction, "premiumNotifications-requestPlanSwitch");
+            requestPlanSwitch({
+              currentPlan: userPlanName,
+              currentPlanType: userPlanType,
+              planToSwitch: columnPlanName,
+              planToSwitchType: isPrivateWorkspaceSelected ? "individual" : "team",
+            })
+              .then(() => {
+                setIsConfirmationModalOpen(true);
+              })
+              .catch(() => {
+                toast.error("Error in switching plan. Please contact support");
+              })
+              .finally(() => {
+                setIsButtonLoading(false);
+              });
+          },
+          onCancel: () => {
+            setIsButtonLoading(false);
+          },
+        });
         break;
       }
       case "contact-us": {
