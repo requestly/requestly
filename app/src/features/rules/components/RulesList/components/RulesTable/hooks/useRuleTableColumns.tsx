@@ -88,7 +88,7 @@ const useRuleTableColumns = (options?: Record<string, boolean>) => {
     {
       title: "Updated on",
       key: "modificationDate",
-      align: "center",
+      align: "left",
       width: 152,
       responsive: ["lg"],
       render: (rule: RuleTableDataType) => {
