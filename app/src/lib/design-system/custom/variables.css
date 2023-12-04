@@ -69,6 +69,7 @@
   --brand-color: var(--blue-blue-500);
   --black: var(--neutrals-black);
   --white: var(--neutrals-white);
+  --highlight-dark-bg: #111a2c;
 
   /* old tokens */
   --text-gray: var(--text-light);
