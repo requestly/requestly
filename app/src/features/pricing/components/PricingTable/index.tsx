@@ -308,6 +308,17 @@ export const PricingTable: React.FC<PricingTableProps> = ({
     );
   };
 
+  const getPricingPlanAnnualBillingSubtitle = (planName: string) => {
+    switch (planName) {
+      case PRICING.PLAN_NAMES.BASIC:
+        return "Billed $144 annually";
+      case PRICING.PLAN_NAMES.PROFESSIONAL:
+        return "Billed $240 annually";
+      default:
+        return "";
+    }
+  };
+
   return (
     <>
       <Row wrap={false} className="pricing-table" ref={tableRef}>
@@ -342,13 +353,15 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   </Typography.Text>
                 </Row>
               )}
-              {planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
+              {getPricingPlanAnnualBillingSubtitle(planName) ? (
                 <Row className="mt-8">
                   <Typography.Text type="secondary">
-                    {duration === PRICING.DURATION.MONTHLY ? "Billed monthly" : "Billed annually"}
+                    {duration === PRICING.DURATION.MONTHLY
+                      ? "Billed monthly"
+                      : getPricingPlanAnnualBillingSubtitle(planName)}
                   </Typography.Text>
                 </Row>
-              )}
+              ) : null}
               <Row className="mt-16">{renderButtonsForPlans(planName)}</Row>
               <>{renderFeaturesListHeader(planName)}</>
               <Space direction="vertical" className="plan-features-list">
