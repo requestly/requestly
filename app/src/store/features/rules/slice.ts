@@ -2,7 +2,25 @@ import { createSlice, createEntityAdapter, EntityState, PayloadAction } from "@r
 import { RuleObj } from "features/rules/types/rules";
 import { ReducerKeys } from "store/constants";
 
-interface RulesState {
+// type ModalName =
+//   | "authModal"
+//   | "deleteRulesModal"
+//   | "deleteGroupModal"
+//   | "duplicateRuleModal"
+//   | "importRulesModal"
+//   | "shareRulesModal"
+//   | "renameGroupModal"
+//   | "ungroupRuleModal";
+
+// type RuleModalPayload = {
+//   isActive?: boolean;
+//   modalName: ModalName;
+//   props?: Record<string, unknown>;
+// };
+
+// type RuleModal = Partial<Record<ModalName, RuleModalPayload>>;
+
+export interface RulesState {
   ruleObjs: EntityState<any>;
 }
 

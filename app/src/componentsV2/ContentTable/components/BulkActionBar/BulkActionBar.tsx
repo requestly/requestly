@@ -1,15 +1,15 @@
 import { Button, Col, Row } from "antd";
 import { BulkActionBarConfig } from "../../types";
-
 import "./bulkActionBar.scss";
 
 export interface Props<DataType> {
   config: BulkActionBarConfig;
   selectedRows: DataType[]; // FIXME: Add proper data type here
+  clearSelectedRowsData: () => void;
 }
 
 // Contains common design and colors for app
-const BulkActionBar = <DataType,>({ config, selectedRows }: Props<DataType>) => {
+const BulkActionBar = <DataType,>({ config, selectedRows, clearSelectedRowsData }: Props<DataType>) => {
   if (selectedRows.length === 0) {
     return null;
   }
@@ -25,8 +25,12 @@ const BulkActionBar = <DataType,>({ config, selectedRows }: Props<DataType>) => 
         {config.options.actions.map((actionConfig) => {
           return (
             <Col>
-              <Button onClick={() => actionConfig?.onClick(selectedRows)}>
-                {typeof actionConfig.text === "function" ? actionConfig.text(selectedRows) : actionConfig.text}
+              <Button
+                danger={actionConfig.danger ?? false}
+                type={actionConfig.actionType ?? "default"}
+                onClick={() => actionConfig?.onClick(selectedRows)}
+              >
+                {typeof actionConfig.label === "function" ? actionConfig.label(selectedRows) : actionConfig.label}
               </Button>
             </Col>
           );

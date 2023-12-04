@@ -1,6 +1,6 @@
 import { HttpRequestMethod, ResourceType } from "types/network";
 
-enum RuleObjType {
+export enum RuleObjType {
   RULE = "rule",
   GROUP = "group",
 }
@@ -58,6 +58,7 @@ interface BaseRuleObj extends BaseObj {
   groupId?: string;
   objectType: RuleObjType;
   status: RuleObjStatus;
+  isFavourite?: boolean;
 }
 
 interface BaseRulePair {
