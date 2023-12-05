@@ -333,14 +333,8 @@ const CurrentTrafficTable = ({
     [filterLog]
   );
 
-  /* HACKY WAY TO GET ALL LOG RESPONSES FROM REDUX FOR EXPORT */
   const allResponses = useSelector(getAllResponses);
-  const allResponsesRef = useRef(allResponses);
-  useEffect(() => {
-    allResponsesRef.current = allResponses;
-  }, [allResponses]);
-
-  const getResponseById = (id) => allResponsesRef.current[id];
+  const getResponseById = useCallback((id) => allResponses[id], [allResponses]);
 
   const getFilteredLogsWithResponses = useCallback(
     (logs) => {
@@ -353,7 +347,7 @@ const CurrentTrafficTable = ({
         };
       });
     },
-    [getFilteredLogs]
+    [getFilteredLogs, getResponseById]
   );
 
   const renderLogs = useMemo(
