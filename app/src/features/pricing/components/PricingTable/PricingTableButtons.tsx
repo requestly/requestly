@@ -346,6 +346,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [isConfirmationModalLoading, setIsConfirmationModalLoading] = useState(false);
 
   const isUserPremium = user?.details?.isPremium;
   const userPlanName = user?.details?.planDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
@@ -412,6 +413,8 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
           okType: "danger",
           cancelText: "No",
           onOk: () => {
+            setIsConfirmationModalOpen(true);
+            setIsConfirmationModalLoading(true);
             const requestPlanSwitch = httpsCallable(firebaseFunction, "premiumNotifications-requestPlanSwitch");
             requestPlanSwitch({
               currentPlan: userPlanName,
@@ -420,7 +423,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
               planToSwitchType: isPrivateWorkspaceSelected ? "individual" : "team",
             })
               .then(() => {
-                setIsConfirmationModalOpen(true);
+                setIsConfirmationModalLoading(false);
               })
               .catch(() => {
                 toast.error("Error in switching plan. Please contact support");
@@ -506,6 +509,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       <ChangePlanRequestConfirmationModal
         isOpen={isConfirmationModalOpen}
         handleToggle={() => setIsConfirmationModalOpen(false)}
+        isLoading={isConfirmationModalLoading}
       />
     </>
   );

@@ -20,6 +20,7 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
   const { validFrom, validTill, status, type, planName } = subscriptionDetails;
   const isUserPremium = user.details?.isPremium || status === "active";
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [isConfirmationModalLoading, setIsConfirmationModalLoading] = useState(false);
 
   const handleRenewOnClick = (e) => {
     e.preventDefault();
@@ -27,12 +28,14 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
   };
 
   const cancelPlanClicked = useCallback(() => {
+    setIsConfirmationModalOpen(true);
+    setIsConfirmationModalLoading(true);
     const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
     requestPlanCancellation({
       currentPlan: planName,
     })
       .then(() => {
-        setIsConfirmationModalOpen(true);
+        setIsConfirmationModalLoading(false);
       })
       .catch((err) => {
         toast.error("Error in cancelling plan. Please contact support");
@@ -111,6 +114,7 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
       <ChangePlanRequestConfirmationModal
         isOpen={isConfirmationModalOpen}
         handleToggle={() => setIsConfirmationModalOpen(false)}
+        isLoading={isConfirmationModalLoading}
       />
     </Row>
   );
