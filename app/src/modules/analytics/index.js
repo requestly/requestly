@@ -3,7 +3,6 @@ import { SYNCING } from "./events/features/constants";
 import Logger from "lib/logger";
 import posthogIntegration from "./integrations/posthog";
 import localIntegration from "./integrations/local";
-import saturnIntegration from "./integrations/saturn";
 
 // These are mostly not user-triggered
 const BLACKLISTED_EVENTS = [
@@ -52,6 +51,5 @@ export const initIntegrations = (user, dispatch) => {
   if (window.top === window.self) {
     posthogIntegration.init(user);
     localIntegration.init(null, dispatch);
-    saturnIntegration.init(user);
   }
 };
