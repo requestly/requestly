@@ -13,18 +13,17 @@
   .login-success-icon {
     border-radius: 50%;
     background: var(--success);
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
 
     & svg {
-      transform: scale(1.4);
+      transform: scale(1.3);
     }
   }
 
   .login-success-message {
     font-weight: 500;
     font-size: 20px;
-    margin-top: 3px;
   }
   .ant-btn.persona-save-btn {
     font-weight: 500;
