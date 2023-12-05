@@ -12,6 +12,7 @@ import { actions } from "store";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
+import { getPrettyPlanName } from "utils/FormattingHelper";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -21,304 +22,151 @@ const CTA_ONCLICK_FUNCTIONS = {
   CONTACT_US: "contact-us",
 };
 
+const CTA_BUTTONS_CONFIG = {
+  "use-now": {
+    text: "Use Now",
+    tag: "Current Plan",
+    onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
+    visible: true,
+  },
+  checkout: {
+    text: "Upgrade",
+    tag: "",
+    onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
+    visible: true,
+  },
+  "not-visible": {
+    text: "Use Now",
+    tag: "",
+    onClick: () => {},
+    visible: false,
+  },
+  "current-plan": {
+    text: "",
+    tag: "Current Plan",
+    onClick: () => {},
+    visible: false,
+  },
+  "manage-subscription": {
+    text: "Upgrade",
+    tag: "",
+    onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
+    visible: true,
+  },
+  "switch-plan": {
+    text: "Switch Plan",
+    tag: "",
+    onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
+    visible: true,
+  },
+  "upgrade-email": {
+    text: "Upgrade",
+    tag: "",
+    onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
+    visible: true,
+  },
+  "already-included": {
+    text: "",
+    tag: "Already included in team license",
+    onClick: () => {},
+    visible: false,
+  },
+  "trial-active": {
+    text: "Upgrade",
+    tag: "30 day trial active",
+    onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
+    visible: true,
+  },
+};
+
 // Maps userPlanType/userPlanName -> columnPlanType/columnPlanName -> buttonConfig
 const pricingButtonsMap: Record<string, any> = {
   individual: {
     [PRICING.PLAN_NAMES.FREE]: {
       individual: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Use Now",
-          tag: "Current Plan",
-          onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
       },
       team: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Use Now",
-          tag: "Current Plan",
-          onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
       },
     },
     [PRICING.PLAN_NAMES.BASIC]: {
       individual: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Use Now",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "",
-          tag: "Current Plan",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["current-plan"],
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["manage-subscription"],
       },
       team: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Use now",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["upgrade-email"],
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["upgrade-email"],
       },
     },
     [PRICING.PLAN_NAMES.PROFESSIONAL]: {
       individual: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Switch Plan",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "",
-          tag: "Current Plan",
-          onClick: () => {},
-          visible: false,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["switch-plan"],
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["current-plan"],
       },
       team: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["upgrade-email"],
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["upgrade-email"],
       },
     },
   },
   team: {
     [PRICING.PLAN_NAMES.FREE]: {
       individual: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Use Now",
-          tag: "Current Plan",
-          onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
       },
       team: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Use Now",
-          tag: "Current Plan",
-          onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
       },
     },
     [PRICING.PLAN_NAMES.BASIC]: {
       individual: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "",
-          tag: "Already included in team license",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["already-included"],
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["upgrade-email"],
       },
       team: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "",
-          tag: "Current Plan",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-          visible: true,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["current-plan"],
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["upgrade-email"],
       },
     },
     [PRICING.PLAN_NAMES.PROFESSIONAL]: {
       individual: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "",
-          tag: "Already included in team license",
-          onClick: () => {},
-          visible: false,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["already-included"],
       },
       team: {
-        [PRICING.PLAN_NAMES.FREE]: {
-          text: "Upgrade",
-          tag: "",
-          onClick: () => {},
-          visible: false,
-        },
-        [PRICING.PLAN_NAMES.BASIC]: {
-          text: "Switch Plan",
-          tag: "",
-          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
-          visible: true,
-        },
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-          text: "",
-          tag: "Current Plan",
-          onClick: () => {},
-          visible: false,
-        },
+        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["switch-plan"],
+        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["current-plan"],
       },
     },
   },
   trial: {
     individual: {
-      [PRICING.PLAN_NAMES.FREE]: {
-        text: "Upgrade",
-        tag: "",
-        onClick: () => {},
-        visible: false,
-      },
-      [PRICING.PLAN_NAMES.BASIC]: {
-        text: "Upgrade",
-        tag: "",
-        onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
-        visible: true,
-      },
-      [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-        text: "Upgrade",
-        tag: "30 day trial on",
-        onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
-        visible: true,
-      },
+      [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["manage-subscription"],
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["trial-active"],
     },
     team: {
-      [PRICING.PLAN_NAMES.FREE]: {
-        text: "Upgrade",
-        tag: "",
-        onClick: () => {},
-        visible: false,
-      },
-      [PRICING.PLAN_NAMES.BASIC]: {
-        text: "Upgrade",
-        tag: "",
-        onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-        visible: true,
-      },
-      [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-        text: "Upgrade",
-        tag: "30 day trial on",
-        onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-        visible: true,
-      },
+      [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
     },
   },
 };
@@ -408,9 +256,13 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       case CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN: {
         Modal.confirm({
           title: "Switch Plan",
-          content: `You are about to switch from ${userPlanName} to ${columnPlanName} plan.`,
+          content: `You are about to switch from ${getPrettyPlanName(
+            userPlanName
+          )} (${userPlanType}) plan to ${getPrettyPlanName(columnPlanName)} (${
+            isPrivateWorkspaceSelected ? "individual" : "team"
+          }) plan.`,
           okText: "Yes",
-          okType: "danger",
+          okType: "primary",
           cancelText: "No",
           onOk: () => {
             setIsConfirmationModalOpen(true);
@@ -422,13 +274,12 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
               planToSwitch: columnPlanName,
               planToSwitchType: isPrivateWorkspaceSelected ? "individual" : "team",
             })
-              .then(() => {
-                setIsConfirmationModalLoading(false);
-              })
               .catch(() => {
                 toast.error("Error in switching plan. Please contact support");
+                setIsConfirmationModalOpen(false);
               })
               .finally(() => {
+                setIsConfirmationModalLoading(false);
                 setIsButtonLoading(false);
               });
           },

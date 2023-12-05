@@ -34,11 +34,12 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
     requestPlanCancellation({
       currentPlan: planName,
     })
-      .then(() => {
-        setIsConfirmationModalLoading(false);
-      })
       .catch((err) => {
         toast.error("Error in cancelling plan. Please contact support");
+        setIsConfirmationModalOpen(false);
+      })
+      .finally(() => {
+        setIsConfirmationModalLoading(false);
       });
   }, [planName]);
 
