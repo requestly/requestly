@@ -2,8 +2,15 @@ import React, { ReactNode } from "react";
 import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
-import "./index.scss";
 import { PersonaInput } from "../PersonaInput";
+import { AUTH_MODE } from "features/onboarding/types";
+import { m, AnimatePresence } from "framer-motion";
+import "./index.scss";
+
+interface AuthFormProps {
+  authMode: AUTH_MODE;
+  setAuthMode: (mode: AUTH_MODE) => void;
+}
 
 interface InputProps {
   id?: string;
@@ -22,20 +29,27 @@ const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onChan
   );
 };
 
-export const AuthForm = () => {
+export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => {
   return (
     <div className="w-full">
-      <h2 className="onboarding-auth-form-header">Create your account</h2>
+      <h2 className="onboarding-auth-form-header">
+        {authMode === AUTH_MODE.SIGNUP ? "Create your account" : "Sign in to your Requestly account"}
+      </h2>
       <Row align="middle" className="text-bold onboarding-auth-mode-switch-wrapper">
         <span>Already using Requestly? </span>
-        <span className="text-white onboarding-auth-mode-switcher">Sign in</span>
+        <span
+          onClick={() => setAuthMode(authMode === AUTH_MODE.SIGNUP ? AUTH_MODE.LOGIN : AUTH_MODE.SIGNUP)}
+          className="text-white onboarding-auth-mode-switcher"
+        >
+          {authMode === AUTH_MODE.SIGNUP ? "Sign in" : "Sign up now"}
+        </span>
       </Row>
       <RQButton type="default" className="onboarding-google-auth-button">
         <img src={googleLogo} alt="google" />
-        Sign up with Google
+        {authMode === AUTH_MODE.SIGNUP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
       <Divider plain className="onboarding-auth-form-divider">
-        or sign up with email
+        or {authMode === AUTH_MODE.SIGNUP ? "sign up with email" : "sign in with email"}
       </Divider>
 
       <FormInput
@@ -58,13 +72,25 @@ export const AuthForm = () => {
           </label>
         }
       />
-      <div className="mt-16">
-        <PersonaInput />
-        <div className="persona-input-byline">Help us optimizing your Requestly experience</div>
-      </div>
-      <div className="mt-16">
-        <FormInput id="full-name" value="" onChange={() => {}} placeholder="E.g., John Doe" label="Your full name" />
-      </div>
+      <AnimatePresence>
+        {authMode === AUTH_MODE.SIGNUP && (
+          <m.div exit={{ opacity: 0, height: 0 }} initial={{ opacity: 1, height: "0" }} animate={{ height: "auto" }}>
+            <div className="mt-16">
+              <PersonaInput />
+              <div className="persona-input-byline">Help us optimizing your Requestly experience</div>
+            </div>
+            <div className="mt-16">
+              <FormInput
+                id="full-name"
+                value=""
+                onChange={() => {}}
+                placeholder="E.g., John Doe"
+                label="Your full name"
+              />
+            </div>
+          </m.div>
+        )}
+      </AnimatePresence>
       <RQButton type="primary" size="large" className="w-full mt-16 onboarding-continue-button">
         Continue
       </RQButton>
