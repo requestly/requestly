@@ -13,6 +13,14 @@ import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
 
+const CTA_ONCLICK_FUNCTIONS = {
+  MANAGE_SUBSCRIPTION: "manage-subscription",
+  SWITCH_PLAN: "switch-plan",
+  CHECKOUT: "checkout",
+  USE_NOW: "use-now",
+  CONTACT_US: "contact-us",
+};
+
 // Maps userPlanType/userPlanName -> columnPlanType/columnPlanName -> buttonConfig
 const pricingButtonsMap: Record<string, any> = {
   individual: {
@@ -21,19 +29,19 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.FREE]: {
           text: "Use Now",
           tag: "Current Plan",
-          onClick: "use-now",
+          onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
           visible: true,
         },
         [PRICING.PLAN_NAMES.BASIC]: {
           text: "Upgrade",
           tag: "",
-          onClick: "checkout",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "checkout",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
       },
@@ -41,19 +49,19 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.FREE]: {
           text: "Use Now",
           tag: "Current Plan",
-          onClick: "use-now",
+          onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
           visible: true,
         },
         [PRICING.PLAN_NAMES.BASIC]: {
           text: "Upgrade",
           tag: "",
-          onClick: "checkout",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "checkout",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
       },
@@ -75,7 +83,7 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "manange-subscription",
+          onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
           visible: true,
         },
       },
@@ -89,13 +97,13 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.BASIC]: {
           text: "Upgrade",
           tag: "",
-          onClick: "switch-plan",
+          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
           visible: true,
         },
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "switch-plan",
+          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
           visible: true,
         },
       },
@@ -111,7 +119,7 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.BASIC]: {
           text: "Switch Plan",
           tag: "",
-          onClick: "switch-plan",
+          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
           visible: true,
         },
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
@@ -131,13 +139,13 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.BASIC]: {
           text: "Upgrade",
           tag: "",
-          onClick: "switch-plan",
+          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
           visible: true,
         },
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "switch-plan",
+          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
           visible: true,
         },
       },
@@ -149,19 +157,19 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.FREE]: {
           text: "Use Now",
           tag: "Current Plan",
-          onClick: "use-now",
+          onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
           visible: true,
         },
         [PRICING.PLAN_NAMES.BASIC]: {
           text: "Upgrade",
           tag: "",
-          onClick: "checkout",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "checkout",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
       },
@@ -169,19 +177,19 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.FREE]: {
           text: "Use Now",
           tag: "Current Plan",
-          onClick: "use-now",
+          onClick: CTA_ONCLICK_FUNCTIONS.USE_NOW,
           visible: true,
         },
         [PRICING.PLAN_NAMES.BASIC]: {
           text: "Upgrade",
           tag: "",
-          onClick: "checkout",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "checkout",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
       },
@@ -203,7 +211,7 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "switch-plan",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
       },
@@ -223,7 +231,7 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
           text: "Upgrade",
           tag: "",
-          onClick: "switch-plan",
+          onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
           visible: true,
         },
       },
@@ -259,7 +267,7 @@ const pricingButtonsMap: Record<string, any> = {
         [PRICING.PLAN_NAMES.BASIC]: {
           text: "Switch Plan",
           tag: "",
-          onClick: "switch-plan",
+          onClick: CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN,
           visible: true,
         },
         [PRICING.PLAN_NAMES.PROFESSIONAL]: {
@@ -282,13 +290,13 @@ const pricingButtonsMap: Record<string, any> = {
       [PRICING.PLAN_NAMES.BASIC]: {
         text: "Upgrade",
         tag: "",
-        onClick: "manage-subscription",
+        onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
         visible: true,
       },
       [PRICING.PLAN_NAMES.PROFESSIONAL]: {
         text: "Upgrade",
         tag: "30 day trial on",
-        onClick: "manage-subscription",
+        onClick: CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION,
         visible: true,
       },
     },
@@ -302,13 +310,13 @@ const pricingButtonsMap: Record<string, any> = {
       [PRICING.PLAN_NAMES.BASIC]: {
         text: "Upgrade",
         tag: "",
-        onClick: "checkout",
+        onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
         visible: true,
       },
       [PRICING.PLAN_NAMES.PROFESSIONAL]: {
         text: "Upgrade",
         tag: "30 day trial on",
-        onClick: "checkout",
+        onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
         visible: true,
       },
     },
@@ -353,12 +361,12 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       return;
     }
     switch (functionName) {
-      case "use-now": {
+      case CTA_ONCLICK_FUNCTIONS.USE_NOW: {
         window.location.href = "/";
         setIsButtonLoading(false);
         break;
       }
-      case "checkout": {
+      case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
         trackCheckoutInitiatedEvent(duration, columnPlanName, selectedWorkspace?.accessCount, isUserTrialing, source);
         dispatch(
           actions.toggleActiveModal({
@@ -375,7 +383,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         setIsButtonLoading(false);
         break;
       }
-      case "manage-subscription": {
+      case CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION: {
         trackCheckoutInitiatedEvent(duration, columnPlanName, selectedWorkspace?.accessCount, isUserTrialing, source);
         const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
         manageSubscription({
@@ -396,7 +404,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
           });
         break;
       }
-      case "switch-plan": {
+      case CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN: {
         Modal.confirm({
           title: "Switch Plan",
           content: `You are about to switch from ${userPlanName} to ${columnPlanName} plan.`,
@@ -427,7 +435,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         });
         break;
       }
-      case "contact-us": {
+      case CTA_ONCLICK_FUNCTIONS.CONTACT_US: {
         setIsContactUsModalOpen(true);
         break;
       }
@@ -456,7 +464,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     return (
       <RQButton
         onClick={() => {
-          onButtonClick("contact-us");
+          onButtonClick(CTA_ONCLICK_FUNCTIONS.CONTACT_US);
         }}
         type="primary"
       >
@@ -469,7 +477,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     return (
       <RQButton
         onClick={() => {
-          onButtonClick("contact-us");
+          onButtonClick(CTA_ONCLICK_FUNCTIONS.CHECKOUT);
         }}
         type="primary"
       >
