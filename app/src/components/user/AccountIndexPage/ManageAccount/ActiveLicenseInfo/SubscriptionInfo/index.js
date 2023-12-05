@@ -11,6 +11,7 @@ import { beautifySubscriptionType } from "../../../../../../utils/PricingUtils";
 import { ChangePlanRequestConfirmationModal } from "features/pricing/components/ChangePlanRequestConfirmationModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
+import { RQButton } from "lib/design-system/components";
 
 const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, subscriptionDetails }) => {
   //Global State
@@ -50,7 +51,9 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
         title="Are you sure you want to cancel your plan?"
         onConfirm={cancelPlanClicked}
       >
-        <span className="text-underline cursor-pointer">Cancel plan</span>
+        <RQButton size="small" type="link" className="text-underline cursor-pointer">
+          Cancel plan
+        </RQButton>
       </Popconfirm>
     );
   }, [cancelPlanClicked, isUserPremium, status]);

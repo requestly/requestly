@@ -376,7 +376,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
               selectedPlan: columnPlanName,
               workspace: selectedWorkspace,
               planDuration: duration,
-              source: "pricing_table",
+              source,
             },
           })
         );
@@ -477,7 +477,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     return (
       <RQButton
         onClick={() => {
-          onButtonClick(CTA_ONCLICK_FUNCTIONS.CHECKOUT);
+          onButtonClick(CTA_ONCLICK_FUNCTIONS.CONTACT_US);
         }}
         type="primary"
       >
