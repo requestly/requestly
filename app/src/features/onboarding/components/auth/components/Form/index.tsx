@@ -1,9 +1,12 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
-import { PersonaInput } from "../PersonaInput";
-import { AUTH_MODE } from "features/onboarding/types";
+import { PersonaInput } from "../../../persona/components/PersonaInput";
+import { AUTH_MODE, ONBOARDING_STEPS } from "features/onboarding/types";
+import { googleSignIn } from "actions/FirebaseActions";
+import { actions } from "store";
 import "./index.scss";
 
 interface AuthFormProps {
@@ -29,6 +32,25 @@ const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onChan
 };
 
 export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleGoogleSignIn = () => {
+    setIsLoading(true);
+    googleSignIn(() => {}, authMode, "app_onboarding")
+      .then((result) => {
+        if (result.uid) {
+          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
     <div className="w-full">
       <h2 className="onboarding-auth-form-header">
@@ -43,7 +65,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
           {authMode === AUTH_MODE.SIGNUP ? "Sign in" : "Sign up now"}
         </span>
       </Row>
-      <RQButton type="default" className="onboarding-google-auth-button">
+      <RQButton
+        type="default"
+        className="onboarding-google-auth-button"
+        onClick={handleGoogleSignIn}
+        loading={isLoading}
+      >
         <img src={googleLogo} alt="google" />
         {authMode === AUTH_MODE.SIGNUP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
@@ -93,8 +120,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
         Continue
       </RQButton>
       <div className="onboarding-terms-text">
-        I agree to the Requestly <a>terms</a>. Learn about how we use and protect your data in our <a>privacy policy</a>
-        .
+        I agree to the Requestly <a href="#">terms</a>. Learn about how we use and protect your data in our{" "}
+        <a href="#">privacy policy</a>.
       </div>
     </div>
   );

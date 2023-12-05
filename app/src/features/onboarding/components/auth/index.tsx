@@ -13,7 +13,7 @@ export const OnboardingAuthScreen: React.FC = () => {
         <div className="onboarding-auth-form-wrapper">
           <AuthForm authMode={authMode} setAuthMode={setAuthMode} />
         </div>
-        {authMode == AUTH_MODE.SIGNUP && (
+        {authMode === AUTH_MODE.SIGNUP && (
           <div className="onboarding-auth-banner-wrapper">
             <OnboardingAuthBanner />
           </div>
