@@ -272,23 +272,45 @@ const pricingButtonsMap: Record<string, any> = {
     },
   },
   trial: {
-    [PRICING.PLAN_NAMES.FREE]: {
-      text: "Upgrade",
-      tag: "",
-      onClick: () => {},
-      visible: false,
+    individual: {
+      [PRICING.PLAN_NAMES.FREE]: {
+        text: "Upgrade",
+        tag: "",
+        onClick: () => {},
+        visible: false,
+      },
+      [PRICING.PLAN_NAMES.BASIC]: {
+        text: "Upgrade",
+        tag: "",
+        onClick: "manage-subscription",
+        visible: true,
+      },
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: {
+        text: "Upgrade",
+        tag: "30 day trial on",
+        onClick: "manage-subscription",
+        visible: true,
+      },
     },
-    [PRICING.PLAN_NAMES.BASIC]: {
-      text: "Upgrade",
-      tag: "",
-      onClick: "manage-subscription",
-      visible: true,
-    },
-    [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-      text: "Upgrade",
-      tag: "30 day trial on",
-      onClick: "manage-subscription",
-      visible: true,
+    team: {
+      [PRICING.PLAN_NAMES.FREE]: {
+        text: "Upgrade",
+        tag: "",
+        onClick: () => {},
+        visible: false,
+      },
+      [PRICING.PLAN_NAMES.BASIC]: {
+        text: "Upgrade",
+        tag: "",
+        onClick: "checkout",
+        visible: true,
+      },
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: {
+        text: "Upgrade",
+        tag: "30 day trial on",
+        onClick: "checkout",
+        visible: true,
+      },
     },
   },
 };
@@ -416,7 +438,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     pricingButtonsMap[userPlanType][userPlanName][isPrivateWorkspaceSelected ? "individual" : "team"][columnPlanName];
 
   if (isUserTrialing) {
-    buttonConfig = pricingButtonsMap.trial[columnPlanName];
+    buttonConfig = pricingButtonsMap.trial[isPrivateWorkspaceSelected ? "individual" : "team"][columnPlanName];
   }
 
   if (product === PRICING.PRODUCTS.SESSION_REPLAY) {
