@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAllRules, getAppMode } from "store/selectors";
+import { getAppMode } from "store/selectors";
 import { Radio, Space, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
@@ -14,8 +14,9 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { AiFillCheckCircle } from "@react-icons/all-files/ai/AiFillCheckCircle";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
 import { SharedLinkVisibility } from "./types";
-import { Rule } from "types";
 import Logger from "lib/logger";
+import { getAllRuleObjs } from "store/features/rules/selectors";
+import { RuleObj } from "features/rules/types/rules";
 import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import "./index.css";
 import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
@@ -29,7 +30,7 @@ interface ShareLinkProps {
 
 export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source }) => {
   const appMode = useSelector(getAppMode);
-  const rules = useSelector(getAllRules);
+  const rules = useSelector(getAllRuleObjs);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
@@ -41,7 +42,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
   const sendSharedListShareEmail = useMemo(() => httpsCallable(getFunctions(), "sharedLists-sendShareEmail"), []);
   const singleRuleData = useMemo(
     () =>
-      selectedRules && selectedRules?.length === 1 ? rules.find((rule: Rule) => rule.id === selectedRules[0]) : null,
+      selectedRules && selectedRules?.length === 1 ? rules.find((rule: RuleObj) => rule.id === selectedRules[0]) : null,
     [rules, selectedRules]
   );
 

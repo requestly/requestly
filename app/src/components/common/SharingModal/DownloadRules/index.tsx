@@ -2,15 +2,16 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "antd";
 import fileDownload from "js-file-download";
-import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
+import { getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { prepareContentToExport } from "../actions";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
-import { Rule } from "types";
 import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
-import "./DownloadRules.css";
 import { unselectAllRecords } from "components/features/rules/actions";
+import { getAllRuleObjs } from "store/features/rules/selectors";
+import { RuleObj } from "features/rules/types/rules";
+import "./DownloadRules.css";
 
 interface DownloadRulesProps {
   selectedRules: string[];
@@ -20,7 +21,7 @@ interface DownloadRulesProps {
 export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = [], toggleModal }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const rules = useSelector(getAllRules);
+  const rules = useSelector(getAllRuleObjs);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [rulesToDownload, setRulesToDownload] = useState<{
     fileContent: string;
@@ -29,7 +30,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
   } | null>(null);
 
   const singleRuleData = useMemo(
-    () => (selectedRules.length === 1 ? rules.find((rule: Rule) => rule.id === selectedRules[0]) : null),
+    () => (selectedRules.length === 1 ? rules.find((rule: RuleObj) => rule.id === selectedRules[0]) : null),
     [rules, selectedRules]
   );
 
