@@ -4,7 +4,6 @@ import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
 import { PersonaInput } from "../PersonaInput";
 import { AUTH_MODE } from "features/onboarding/types";
-import { m, AnimatePresence } from "framer-motion";
 import "./index.scss";
 
 interface AuthFormProps {
@@ -49,7 +48,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
         {authMode === AUTH_MODE.SIGNUP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
       <Divider plain className="onboarding-auth-form-divider">
-        or {authMode === AUTH_MODE.SIGNUP ? "sign up with email" : "sign in with email"}
+        or {authMode === AUTH_MODE.SIGNUP ? " sign up with email" : "sign in with email"}
       </Divider>
 
       <FormInput
@@ -72,25 +71,24 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
           </label>
         }
       />
-      <AnimatePresence>
-        {authMode === AUTH_MODE.SIGNUP && (
-          <m.div exit={{ opacity: 0, height: 0 }} initial={{ opacity: 1, height: "0" }} animate={{ height: "auto" }}>
-            <div className="mt-16">
-              <PersonaInput />
-              <div className="persona-input-byline">Help us optimizing your Requestly experience</div>
-            </div>
-            <div className="mt-16">
-              <FormInput
-                id="full-name"
-                value=""
-                onChange={() => {}}
-                placeholder="E.g., John Doe"
-                label="Your full name"
-              />
-            </div>
-          </m.div>
-        )}
-      </AnimatePresence>
+      {authMode === AUTH_MODE.SIGNUP && (
+        <>
+          <div className="mt-16">
+            <PersonaInput />
+            <div className="persona-input-byline">Help us optimizing your Requestly experience</div>
+          </div>
+          <div className="mt-16">
+            <FormInput
+              id="full-name"
+              value=""
+              onChange={() => {}}
+              placeholder="E.g., John Doe"
+              label="Your full name"
+            />
+          </div>
+        </>
+      )}
+
       <RQButton type="primary" size="large" className="w-full mt-16 onboarding-continue-button">
         Continue
       </RQButton>

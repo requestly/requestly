@@ -23,7 +23,6 @@ import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/ExtensionContextInvalidationNotice";
 import { useIsExtensionEnabled } from "hooks";
-import { LazyMotion, domAnimation } from "framer-motion";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -73,21 +72,19 @@ const App = () => {
 
       <ConfigProvider locale={enUS}>
         <GrowthBookProvider growthbook={growthbook}>
-          <LazyMotion features={domAnimation} strict>
-            <LocalUserAttributesHelperComponent />
-            <FeatureUsageEvent />
-            <div id="requestly-dashboard-layout">
-              <CommandBar />
-              {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
-                <FullScreenLayout />
-              ) : (
-                <>
-                  <UpdateDialog />
-                  <DashboardLayout />
-                </>
-              )}
-            </div>
-          </LazyMotion>
+          <LocalUserAttributesHelperComponent />
+          <FeatureUsageEvent />
+          <div id="requestly-dashboard-layout">
+            <CommandBar />
+            {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
+              <FullScreenLayout />
+            ) : (
+              <>
+                <UpdateDialog />
+                <DashboardLayout />
+              </>
+            )}
+          </div>
         </GrowthBookProvider>
       </ConfigProvider>
     </>
