@@ -31,7 +31,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
   );
   const requestEnterprisePlanFromAdmin = httpsCallable<{ workspaceDetails: OrgContactDetails["workspaces"] }, null>(
     functions,
-    "requestEnterprisePlanFromAdmin"
+    "premiumNotifications-requestEnterprisePlanFromAdmin"
   );
 
   const requestPremiumToAdmin = useCallback(() => {

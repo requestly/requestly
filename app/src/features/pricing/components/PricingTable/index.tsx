@@ -1,8 +1,5 @@
-import React, { RefObject, useCallback, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { RefObject, useState } from "react";
 import { Col, Row, Space, Tooltip, Typography } from "antd";
-import { RQButton } from "lib/design-system/components";
-import { getUserAuthDetails } from "store/selectors";
 import { PricingFeatures } from "../../constants/pricingFeatures";
 import { PricingPlans } from "../../constants/pricingPlans";
 import { PRICING } from "../../constants/pricing";
@@ -11,15 +8,9 @@ import { capitalize } from "lodash";
 import underlineIcon from "../../assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { CloseOutlined } from "@ant-design/icons";
-import { actions } from "store";
-import APP_CONSTANTS from "config/constants";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
-import { AUTH } from "modules/analytics/events/common/constants";
-import { getPlanNameFromId } from "utils/PremiumUtils";
 import "./index.scss";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { toast } from "utils/Toast";
-import { trackCheckoutFailedEvent, trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
+import { PricingTableButtons } from "./PricingTableButtons";
 
 interface PricingTableProps {
   product?: string;
@@ -40,243 +31,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   tableRef = null,
   isOpenedFromModal = false,
 }) => {
-  const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
-
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
-  const [clickedPlanName, setClickedPlanName] = useState("");
-
-  const manageSubscription = useMemo(() => httpsCallable(getFunctions(), "subscription-manageSubscription"), []);
-
-  const renderButtonsForPlans = useCallback(
-    (planName: string) => {
-      const isUserPremium = user?.details?.isPremium;
-      const userPlanName = user?.details?.planDetails?.planName;
-      const userPlanType = user?.details?.planDetails?.type;
-      const userExpiredPlanName = !["active", "trialing", "past_due"].includes(user?.details?.planDetails?.status)
-        ? getPlanNameFromId(user?.details?.planDetails?.planId)
-        : null;
-      const isPrivateWorkspaceSelected = workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
-      const isUserTrialing = user?.details?.planDetails?.status === "trialing";
-
-      const redirectToManageSubscription = () => {
-        setClickedPlanName(planName);
-        manageSubscription({
-          planName,
-          duration,
-        })
-          .then((res: any) => {
-            if (res?.data?.success) {
-              window.location.href = res?.data?.data?.portalUrl;
-            }
-            setClickedPlanName("");
-          })
-          .catch((err) => {
-            toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-            trackCheckoutFailedEvent(isPrivateWorkspaceSelected ? "individual" : "team", source);
-            setClickedPlanName("");
-          });
-      };
-
-      const handleOnUpgradeClick = () => {
-        if (!user?.details?.isLoggedIn) {
-          dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
-          return;
-        } else if (userPlanType === "team" && isUserPremium) {
-          setIsContactUsModalOpen(true);
-        } else if (isUserPremium && isPrivateWorkspaceSelected) {
-          redirectToManageSubscription();
-        } else if (isOpenedFromModal) {
-          handleOnSubscribe(planName);
-        } else {
-          dispatch(
-            actions.toggleActiveModal({
-              modalName: "pricingModal",
-              newValue: true,
-              newProps: {
-                selectedPlan: planName,
-                workspace: workspaceToUpgrade,
-                planDuration: duration,
-                source: "pricing_table",
-              },
-            })
-          );
-        }
-        trackCheckoutInitiatedEvent(duration, planName, workspaceToUpgrade?.accessCount, isUserTrialing, source);
-      };
-
-      if (planName === PRICING.PLAN_NAMES.FREE) {
-        if (!user?.details?.isLoggedIn) {
-          return (
-            <>
-              <RQButton
-                onClick={() =>
-                  dispatch(
-                    actions.toggleActiveModal({
-                      modalName: "authModal",
-                      newValue: true,
-                      newProps: {
-                        redirectURL: window.location.href,
-                        authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-                        eventSource: AUTH.SOURCE.PRICING_PAGE,
-                      },
-                    })
-                  )
-                }
-                type="primary"
-              >
-                Signup
-              </RQButton>
-            </>
-          );
-        }
-
-        return (
-          <Space size={8} className={userPlanName !== PRICING.PLAN_NAMES.FREE ? "visibility-hidden" : ""}>
-            <RQButton onClick={() => (window.location.href = "/")} type="primary">
-              Use now
-            </RQButton>
-            <div className="current-pricing-plan-tag">Current Plan</div>
-          </Space>
-        );
-      }
-
-      if (planName === PRICING.PLAN_NAMES.ENTERPRISE) {
-        return (
-          <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
-            Contact us
-          </RQButton>
-        );
-      }
-
-      if (isUserTrialing && isPrivateWorkspaceSelected) {
-        return (
-          <Space size={8}>
-            <RQButton
-              loading={clickedPlanName === planName}
-              onClick={() => {
-                redirectToManageSubscription();
-                trackCheckoutInitiatedEvent(
-                  duration,
-                  planName,
-                  workspaceToUpgrade?.accessCount,
-                  isUserTrialing,
-                  source
-                );
-              }}
-              type="primary"
-            >
-              Upgrade
-            </RQButton>
-            {planName === userPlanName && <div className="current-pricing-plan-tag">30 days trial active</div>}
-          </Space>
-        );
-      }
-
-      if (isUserPremium && !isUserTrialing) {
-        if (userPlanType !== "team" && !isPrivateWorkspaceSelected) {
-          return (
-            <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
-              Contact us
-            </RQButton>
-          );
-        }
-      } else {
-        if (userExpiredPlanName === planName) {
-          if (
-            (userPlanType === "individual" && isPrivateWorkspaceSelected) ||
-            (userPlanType === "team" && !isPrivateWorkspaceSelected)
-          ) {
-            return (
-              <Space size={8}>
-                <RQButton
-                  onClick={() =>
-                    isOpenedFromModal
-                      ? handleOnSubscribe(planName)
-                      : dispatch(
-                          actions.toggleActiveModal({
-                            modalName: "pricingModal",
-                            newValue: true,
-                            newProps: {
-                              selectedPlan: planName,
-                              workspace: workspaceToUpgrade,
-                              planDuration: duration,
-                              source: "pricing_table",
-                            },
-                          })
-                        )
-                  }
-                  type="primary"
-                >
-                  Renew
-                </RQButton>
-                {<div className="current-pricing-plan-tag">Expired</div>}
-              </Space>
-            );
-          }
-        }
-      }
-
-      if (product === PRICING.PRODUCTS.SESSION_REPLAY) {
-        if (planName === PRICING.PLAN_NAMES.FREE) {
-          return (
-            <Space size={8}>
-              <RQButton onClick={() => (window.location.href = "/")} type="primary">
-                Use now
-              </RQButton>
-              <div className="current-pricing-plan-tag">Current Plan</div>
-            </Space>
-          );
-        }
-
-        return (
-          <RQButton onClick={() => setIsContactUsModalOpen(true)} type="primary">
-            Contact us
-          </RQButton>
-        );
-      }
-
-      if (isUserPremium && planName === userPlanName && !isUserTrialing) {
-        return (
-          <div className="current-pricing-plan-tag">
-            {userPlanType === "team" && isPrivateWorkspaceSelected ? "Already included in team plan" : "Current plan"}
-          </div>
-        );
-      }
-
-      return (
-        <RQButton
-          loading={clickedPlanName === planName}
-          onClick={handleOnUpgradeClick}
-          disabled={isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && !isUserTrialing}
-          type="primary"
-          className={
-            isUserPremium && userPlanName === PRICING.PLAN_NAMES.PROFESSIONAL && !isUserTrialing
-              ? "visibility-hidden"
-              : ""
-          }
-        >
-          Upgrade
-        </RQButton>
-      );
-    },
-    [
-      user?.details?.isPremium,
-      user?.details?.planDetails?.planName,
-      user?.details?.planDetails?.type,
-      user?.details?.planDetails?.status,
-      user?.details?.planDetails?.planId,
-      user?.details?.isLoggedIn,
-      workspaceToUpgrade,
-      product,
-      clickedPlanName,
-      manageSubscription,
-      duration,
-      isOpenedFromModal,
-      dispatch,
-      handleOnSubscribe,
-    ]
-  );
 
   const renderFeaturesListHeader = (planName: string) => {
     return (
@@ -311,9 +66,9 @@ export const PricingTable: React.FC<PricingTableProps> = ({
   const getPricingPlanAnnualBillingSubtitle = (planName: string) => {
     switch (planName) {
       case PRICING.PLAN_NAMES.BASIC:
-        return "Billed $144 annually";
+        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price} annually`;
       case PRICING.PLAN_NAMES.PROFESSIONAL:
-        return "Billed $240 annually";
+        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price} annually`;
       default:
         return "";
     }
@@ -353,16 +108,24 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   </Typography.Text>
                 </Row>
               )}
-              {getPricingPlanAnnualBillingSubtitle(planName) ? (
-                <Row className="mt-8">
-                  <Typography.Text type="secondary">
-                    {duration === PRICING.DURATION.MONTHLY
-                      ? "Billed monthly"
-                      : getPricingPlanAnnualBillingSubtitle(planName)}
-                  </Typography.Text>
-                </Row>
-              ) : null}
-              <Row className="mt-16">{renderButtonsForPlans(planName)}</Row>
+              <Row className={`mt-8 ${getPricingPlanAnnualBillingSubtitle(planName) ? "" : "visibility-hidden"}`}>
+                <Typography.Text type="secondary">
+                  {duration === PRICING.DURATION.MONTHLY
+                    ? "Billed monthly"
+                    : getPricingPlanAnnualBillingSubtitle(planName) || "dummy"}
+                </Typography.Text>
+              </Row>
+              <Row className="mt-16">
+                <PricingTableButtons
+                  key={planName + duration + workspaceToUpgrade?.id}
+                  columnPlanName={planName}
+                  selectedWorkspace={workspaceToUpgrade}
+                  product={product}
+                  duration={duration}
+                  source={source}
+                  setIsContactUsModalOpen={setIsContactUsModalOpen}
+                />
+              </Row>
               <>{renderFeaturesListHeader(planName)}</>
               <Space direction="vertical" className="plan-features-list">
                 {planDetails.features.map((feature, index) => (
