@@ -1,15 +1,15 @@
 import React from "react";
 import { Col, Modal, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { OnboardingAuthScreen } from "./auth";
+import { OnboardingAuthScreen } from "../auth";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
-import RQLogo from "../../../assets/images/logo/newRQlogo.svg";
-import { ONBOARDING_STEPS } from "../types";
+import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
+import { ONBOARDING_STEPS } from "../../types";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails } from "store/selectors";
-import { PersonaScreen } from "./persona";
+import { PersonaScreen } from "../persona";
 import PATHS from "config/constants/sub/paths";
-import "./onboarding.scss";
+import "./index.scss";
 
 const shouldShowOnboarding = () => {
   if (

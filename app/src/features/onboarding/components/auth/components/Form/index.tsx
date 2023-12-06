@@ -42,7 +42,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
   const [fullName, setFullName] = useState("");
   const [persona, setPersona] = useState("");
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = useCallback(() => {
     setIsLoading(true);
     googleSignIn(() => {}, authMode, "app_onboarding")
       .then((result) => {
@@ -56,7 +56,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [authMode, dispatch]);
 
   const handleContinueClick = useCallback(() => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
