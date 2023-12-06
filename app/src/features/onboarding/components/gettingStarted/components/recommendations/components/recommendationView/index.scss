@@ -1,0 +1,12 @@
+.recommendation-title {
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--white);
+}
+
+.recommendation-row {
+  margin-top: 8px;
+  display: grid;
+  column-gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}

@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
 import { Col, Row, Typography } from "antd";
+import { RecommendationView } from "../recommendations/components/recommendationView";
 import "./index.scss";
 
 export const GettingStartedView: React.FC = () => {
@@ -25,7 +26,9 @@ export const GettingStartedView: React.FC = () => {
       </Col>
       <Row className="getting-started-body">
         <Col className="getting-started-teams-wrapper">TEAMS</Col>
-        <Col className="getting-started-recommendations-wrapper">RECOMMENDATIONS</Col>
+        <Col className="getting-started-recommendations-wrapper">
+          <RecommendationView />
+        </Col>
       </Row>
     </Col>
   );
