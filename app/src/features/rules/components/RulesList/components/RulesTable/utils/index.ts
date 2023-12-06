@@ -26,7 +26,9 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
   const ruleTableDataTypeMap: { [id: string]: RuleTableDataType } = {};
 
   const groupRules = rules.filter((rule) => !!rule.groupId) as Rule[];
-  const nonGroupRules: RuleObj[] = rules.filter((rule) => !rule.groupId);
+  const nonGroupRules: RuleObj[] = rules
+    .filter((rule) => !rule.groupId)
+    .map((rule) => (rule.objectType === RuleObjType.GROUP ? { ...rule, children: [] } : rule));
 
   nonGroupRules.forEach((rule) => {
     ruleTableDataTypeMap[rule.id] = rule;
@@ -36,10 +38,9 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
     if (ruleTableDataTypeMap[rule.groupId]) {
       const updatedGroup = {
         ...ruleTableDataTypeMap[rule.groupId],
-        children: ruleTableDataTypeMap[rule.groupId]?.children
-          ? [...ruleTableDataTypeMap[rule.groupId].children, rule]
-          : [rule],
+        children: [...ruleTableDataTypeMap[rule.groupId].children, rule],
       };
+
       ruleTableDataTypeMap[rule.groupId] = updatedGroup;
     } else {
       // GroupId doesn't exist
