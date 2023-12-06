@@ -43,22 +43,18 @@ export const PersonaScreen = () => {
   useEffect(() => {
     getUserPersona()
       .then((res: any) => {
-        if (res.data.persona) {
+        if (res.data.persona || appOnboardingDetails.persona) {
           dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
         } else setIsLoading(false);
       })
       .catch((error) => {
         Logger.log(error);
+        if (appOnboardingDetails.persona) {
+          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+        }
         setIsLoading(false);
       });
-  }, [getUserPersona, dispatch]);
-
-  useEffect(() => {
-    //If user has already set persona, then skip this step
-    if (appOnboardingDetails.persona) {
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
-    }
-  }, [appOnboardingDetails.persona, dispatch]);
+  }, [getUserPersona, dispatch, appOnboardingDetails.persona]);
 
   return (
     <div className="persona-form-wrapper">
