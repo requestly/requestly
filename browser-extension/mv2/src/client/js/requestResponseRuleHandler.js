@@ -24,7 +24,11 @@ RQ.RequestResponseRuleHandler.setup = () => {
       return [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(rule.ruleType);
     });
 
-    if (doRequestResponseRulesExist) {
+    const doRedirectRulesExist = rules.some((rule) => {
+      return [RQ.RULE_TYPES.REDIRECT, RQ.RULE_TYPES.REPLACE].includes(rule.ruleType);
+    });
+
+    if (doRequestResponseRulesExist || doRedirectRulesExist) {
       RQ.RequestResponseRuleHandler.init();
     }
   });

@@ -282,8 +282,10 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
       const customHeaderValue = BG.Methods.getHeaderValue(originalHeaders, customHeaderName);
       const originalHeaderValue = BG.Methods.getHeaderValue(originalHeaders, headerName);
 
-      if (customHeaderValue && !originalHeaderValue) {
-        BG.Methods.addHeader(originalHeaders, { name: headerName, value: customHeaderValue });
+      if (customHeaderValue) {
+        if (!originalHeaderValue) {
+          BG.Methods.addHeader(originalHeaders, { name: headerName, value: customHeaderValue });
+        }
         BG.Methods.removeHeader(originalHeaders, customHeaderName);
         hasModifiedHeaders = true;
       }
