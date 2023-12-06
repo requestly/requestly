@@ -43,44 +43,6 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     setContentTableAdaptedRules(contentTableAdaptedRules);
   }, [rules]);
 
-  /**
-   * - table header (revisit for icons)
-   *
-   * - group and rules name overflows
-   * - group row
-   *    - expanded version
-   * - rule row
-   *
-   * - icon fixes
-   *
-   * - actions
-   *    - styles
-   *
-   * - bulk actions
-   *    - action
-   *    - styling
-   *
-   * general
-   * - tooltips
-   * - hover effects
-   *
-   *
-   * NEXT
-   * - bulk action PR
-   *    - ungroup [DONE]
-   *    - change group [DONE]
-   *    - activate all [DONE]
-   *    - deactive all
-   *    - share [DONE]
-   *    - delete [DONE]
-   *    - cancel [DONE]
-   *
-   * - pin rules [DONE]
-   * - rule name click PR
-   * - sorting + icon changes
-   * - searching
-   */
-
   // FIXME: cleanup this
   const options = useMemo(() => {
     return {

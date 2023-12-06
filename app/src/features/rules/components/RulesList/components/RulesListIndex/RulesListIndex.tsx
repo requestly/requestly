@@ -7,7 +7,7 @@ import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { RulesListProvider } from "./context";
-import { DownOutlined, DownloadOutlined, GroupOutlined } from "@ant-design/icons";
+import { DownOutlined, DownloadOutlined } from "@ant-design/icons";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { RuleType } from "types";
@@ -33,8 +33,9 @@ import CreateNewRuleGroupModal from "components/features/rules/CreateNewRuleGrou
 import ContentHeader, { FilterType } from "componentsV2/ContentHeader";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { RiCheckLine } from "@react-icons/all-files/ri/RiCheckLine";
-import "./rulesListIndex.scss";
+import { RiFolderAddLine } from "@react-icons/all-files/ri/RiFolderAddLine";
 import { isRule } from "../RulesTable/utils";
+import "./rulesListIndex.scss";
 
 interface Props {}
 
@@ -176,7 +177,7 @@ const RulesList: React.FC<Props> = () => {
       isTooltipShown: true,
       tourId: "rule-table-create-group-btn",
       buttonText: "New Group",
-      icon: <GroupOutlined />,
+      icon: <RiFolderAddLine className="anticon" />,
       onClickHandler: handleNewGroupClick,
     },
     {
