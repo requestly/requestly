@@ -199,7 +199,9 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
 
   const isUserPremium = user?.details?.isPremium;
   const userPlanName = user?.details?.planDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
-  const userPlanType = user?.details?.planDetails?.type ?? "individual";
+  const userPlanType = ["team", "individual"].includes(user?.details?.planDetails?.type)
+    ? user?.details?.planDetails?.type
+    : "individual";
   const isPrivateWorkspaceSelected = selectedWorkspace?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
   const isUserTrialing = isUserPremium && user?.details?.planDetails?.status === "trialing";
 
