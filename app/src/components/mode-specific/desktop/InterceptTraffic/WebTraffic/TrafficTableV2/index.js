@@ -19,6 +19,7 @@ import { desktopTrafficTableActions } from "store/features/desktop-traffic-table
 import {
   getAllFilters,
   getAllLogs,
+  getAllResponses,
   getIsInterceptionPaused,
   getLogResponseById,
 } from "store/features/desktop-traffic-table/selectors";
@@ -332,6 +333,23 @@ const CurrentTrafficTable = ({
     [filterLog]
   );
 
+  const allResponses = useSelector(getAllResponses);
+  const getResponseById = useCallback((id) => allResponses[id], [allResponses]);
+
+  const getFilteredLogsWithResponses = useCallback(
+    (logs) => {
+      const filteredLogs = getFilteredLogs(logs);
+      return filteredLogs.map((log) => {
+        const responseBody = getResponseById(log.id);
+        return {
+          ...log,
+          response: { ...log.response, body: responseBody },
+        };
+      });
+    },
+    [getFilteredLogs, getResponseById]
+  );
+
   const renderLogs = useMemo(
     () => () => {
       const logsToRender = getFilteredLogs(requestLogs);
@@ -488,9 +506,9 @@ const CurrentTrafficTable = ({
   ]);
 
   const stableGetLogsToExport = useMemo(() => {
-    const logsToExport = getFilteredLogs(newLogs);
+    const logsToExport = getFilteredLogsWithResponses(newLogs);
     return createLogsHar(logsToExport);
-  }, [getFilteredLogs, newLogs]);
+  }, [getFilteredLogsWithResponses, newLogs]);
 
   const handleSidebarMenuItemClick = useCallback(
     (e) => {
