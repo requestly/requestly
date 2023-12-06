@@ -4,14 +4,15 @@ import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
 import { PersonaInput } from "../../../persona/components/PersonaInput";
-import { AUTH_MODE, ONBOARDING_STEPS } from "features/onboarding/types";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
+import AUTH from "config/constants/sub/auth";
 import { googleSignIn } from "actions/FirebaseActions";
 import { actions } from "store";
 import "./index.scss";
 
 interface AuthFormProps {
-  authMode: AUTH_MODE;
-  setAuthMode: (mode: AUTH_MODE) => void;
+  authMode: string;
+  setAuthMode: (mode: string) => void;
 }
 
 interface InputProps {
@@ -54,15 +55,19 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
   return (
     <div className="w-full">
       <h2 className="onboarding-auth-form-header">
-        {authMode === AUTH_MODE.SIGNUP ? "Create your account" : "Sign in to your Requestly account"}
+        {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your Requestly account"}
       </h2>
       <Row align="middle" className="text-bold onboarding-auth-mode-switch-wrapper">
         <span>Already using Requestly? </span>
         <span
-          onClick={() => setAuthMode(authMode === AUTH_MODE.SIGNUP ? AUTH_MODE.LOGIN : AUTH_MODE.SIGNUP)}
+          onClick={() =>
+            setAuthMode(
+              authMode === AUTH.ACTION_LABELS.SIGN_UP ? AUTH.ACTION_LABELS.LOG_IN : AUTH.ACTION_LABELS.SIGN_UP
+            )
+          }
           className="text-white onboarding-auth-mode-switcher"
         >
-          {authMode === AUTH_MODE.SIGNUP ? "Sign in" : "Sign up now"}
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign in" : "Sign up now"}
         </span>
       </Row>
       <RQButton
@@ -72,10 +77,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
         loading={isLoading}
       >
         <img src={googleLogo} alt="google" />
-        {authMode === AUTH_MODE.SIGNUP ? "Sign up with Google" : "Sign in with Google"}
+        {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
       <Divider plain className="onboarding-auth-form-divider">
-        or {authMode === AUTH_MODE.SIGNUP ? " sign up with email" : "sign in with email"}
+        or {authMode === AUTH.ACTION_LABELS.SIGN_UP ? " sign up with email" : "sign in with email"}
       </Divider>
 
       <FormInput
@@ -98,7 +103,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
           </label>
         }
       />
-      {authMode === AUTH_MODE.SIGNUP && (
+      {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <>
           <div className="mt-16">
             <PersonaInput onValueChange={(value) => {}} />
