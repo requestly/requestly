@@ -71,6 +71,7 @@
   --black: var(--neutrals-black);
   --white: var(--neutrals-white);
   --highlight-dark-bg: #111a2c;
+  --primary-light: #3c7ff3;
 
   /* old tokens */
   --text-gray: var(--text-light);
@@ -93,7 +94,6 @@
   --input-hover-border-color: #2051b4;
   --input-focus-border-color: #1e69ff;
   --input-focus-box-shadow: 0 0 0 2px rgb(30 105 255 / 20%);
-  --primary-light: #3c7ff3;
 
   /* utils */
   --space: 2px;
