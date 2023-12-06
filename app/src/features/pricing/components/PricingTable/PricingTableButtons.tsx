@@ -13,6 +13,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
 import { getPrettyPlanName } from "utils/FormattingHelper";
+import { trackPricingPlanCTAClicked } from "modules/analytics/events/misc/business";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -203,6 +204,14 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   const isUserTrialing = isUserPremium && user?.details?.planDetails?.status === "trialing";
 
   const onButtonClick = (functionName: string) => {
+    trackPricingPlanCTAClicked(
+      {
+        current_plan: `${userPlanName} ${userPlanType}`,
+        selected_plan: `${columnPlanName} ${isPrivateWorkspaceSelected ? "individual" : "team"}`,
+        action: functionName,
+      },
+      source
+    );
     setIsButtonLoading(true);
     if (!user?.details?.isLoggedIn) {
       dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));

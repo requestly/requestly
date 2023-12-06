@@ -43,6 +43,8 @@ export const BUSINESS = {
   UPGRADE_CLICKED: "upgrade_clicked",
   VIEW_GITHUB_CLICKED: "view_github_clicked",
   APPSUMO_CODE_REDEEMED: "appsumo_code_redeemed",
+  PRICING_PLAN_CTA_CLICKED: "pricing_plan_cta_clicked",
+  PRICING_PLAN_CANCELLATION_REQUESTED: "pricing_plan_cancellation_requested",
 };
 
 export const INTEREST_CAPTURED = "interest_captured";

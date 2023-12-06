@@ -12,6 +12,7 @@ import { ChangePlanRequestConfirmationModal } from "features/pricing/components/
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
+import { trackPricingPlanCancellationRequested } from "modules/analytics/events/misc/business";
 
 const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, subscriptionDetails }) => {
   //Global State
@@ -30,6 +31,11 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
   const cancelPlanClicked = useCallback(() => {
     setIsConfirmationModalOpen(true);
     setIsConfirmationModalLoading(true);
+    trackPricingPlanCancellationRequested({
+      current_plan: planName,
+      end_date: validTill,
+      type: type,
+    });
     const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
     requestPlanCancellation({
       currentPlan: planName,
@@ -41,7 +47,7 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
       .finally(() => {
         setIsConfirmationModalLoading(false);
       });
-  }, [planName]);
+  }, [planName, type, validTill]);
 
   const renderCancelButton = useMemo(() => {
     if (!isUserPremium || status === "trialing") {
