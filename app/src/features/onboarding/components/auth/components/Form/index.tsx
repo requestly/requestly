@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
-import { PersonaInput } from "../../../persona/components/PersonaInput";
+import { PersonaInput } from "../../../persona/components/personaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
 import { googleSignIn } from "actions/FirebaseActions";
@@ -13,6 +13,7 @@ import "./index.scss";
 interface AuthFormProps {
   authMode: string;
   setAuthMode: (mode: string) => void;
+  onSendEmailLink?: (email: string) => void;
 }
 
 interface InputProps {
@@ -20,21 +21,24 @@ interface InputProps {
   value: string;
   label: ReactNode | string;
   placeholder: string;
-  onChange: () => void;
+  onValueChange: (value: string) => void;
 }
 
-const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onChange }) => {
+const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onValueChange }) => {
   return (
     <div className="onboarding-form-input">
       {typeof label === "string" ? <label htmlFor={id}>{label}</label> : label}
-      <RQInput placeholder={placeholder} id={id} />
+      <RQInput placeholder={placeholder} id={id} value={value} onChange={(e) => onValueChange(e.target.value)} />
     </div>
   );
 };
 
-export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => {
-  const [isLoading, setIsLoading] = useState(false);
+export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSendEmailLink }) => {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [persona, setPersona] = useState("");
 
   const handleGoogleSignIn = () => {
     setIsLoading(true);
@@ -85,8 +89,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
 
       <FormInput
         id="work-email"
-        value=""
-        onChange={() => {}}
+        value={email}
+        onValueChange={(email) => setEmail(email)}
         placeholder="E.g., you@company.com"
         label={
           <label>
@@ -106,14 +110,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
       {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <>
           <div className="mt-16">
-            <PersonaInput onValueChange={(value) => {}} />
+            <PersonaInput onValueChange={(value) => setPersona(value)} />
             <div className="persona-input-byline">Help us optimizing your Requestly experience</div>
           </div>
           <div className="mt-16">
             <FormInput
               id="full-name"
-              value=""
-              onChange={() => {}}
+              value={fullName}
+              onValueChange={(name) => setFullName(name)}
               placeholder="E.g., John Doe"
               label="Your full name"
             />
@@ -121,7 +125,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode }) => 
         </>
       )}
 
-      <RQButton type="primary" size="large" className="w-full mt-16 onboarding-continue-button">
+      <RQButton
+        type="primary"
+        size="large"
+        className="w-full mt-16 onboarding-continue-button"
+        onClick={() => {
+          dispatch(actions.updateAppOnboardingPersona(persona));
+          onSendEmailLink?.(email);
+        }}
+      >
         Continue
       </RQButton>
       <div className="onboarding-terms-text">

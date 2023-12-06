@@ -118,6 +118,10 @@ export const updateAppOnboardingStep = (prevState, action) => {
   prevState.appOnboarding.step = action.payload;
 };
 
+export const updateAppOnboardingPersona = (prevState, action) => {
+  prevState.appOnboarding.persona = action.payload;
+};
+
 export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
   prevState.workspaceOnboarding.workspace = { ...prevState.workspaceOnboarding.workspace, ...action.payload };
 };

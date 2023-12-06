@@ -1,15 +1,18 @@
+import { useEffect, useState } from "react";
 import { Row, Space, Typography } from "antd";
-import AUTH from "config/constants/sub/auth";
 import { useSelector } from "react-redux";
+import AUTH from "config/constants/sub/auth";
 import { getTimeToResendEmailLogin } from "store/selectors";
 import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { updateTimeToResendEmailLogin } from "./actions";
 import { useDispatch } from "react-redux";
-import { MailOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { PiEnvelope } from "@react-icons/all-files/pi/PiEnvelope";
+import { RQButton } from "lib/design-system/components";
 import { FaSpinner } from "@react-icons/all-files/fa/FaSpinner";
 import { fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
 import firebaseApp from "firebase.js";
+import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
 // HACKY WAY FOR CHECKING IF USER EXISTS
 async function doesUserExist(email) {
@@ -25,8 +28,8 @@ async function doesUserExist(email) {
 
 export default function MagicLinkModalContent({ email, authMode, eventSource }) {
   const dispatch = useDispatch();
-
   const [loading, setLoading] = useState(true);
+  const [isSendingMail, setIsSendingMail] = useState(false);
   const [isLogin, setIsLogin] = useState(authMode === AUTH.ACTION_LABELS.LOG_IN);
 
   useEffect(() => {
@@ -37,9 +40,20 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
   }, [email]);
 
   const handleEmailSend = () => {
-    sendEmailLinkForSignin(email, "resend-from-modal", "The email has been resent.");
-    updateTimeToResendEmailLogin(dispatch, 30);
+    setIsSendingMail(true);
+    sendEmailLinkForSignin(email, "resend-from-modal", "The email has been resent.")
+      .then(() => {
+        updateTimeToResendEmailLogin(dispatch, 30);
+      })
+      .catch((error) => {
+        Logger.log(error);
+        toast.error("There was an error sending the email. Please try again later.");
+      })
+      .finally(() => {
+        setIsSendingMail(false);
+      });
   };
+
   const timeToResendEmailLogin = useSelector(getTimeToResendEmailLogin);
   return loading ? (
     <Row className="modal-loader" justify="center">
@@ -47,50 +61,39 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
     </Row>
   ) : (
     <div className="mail-link-modal-content">
-      <div className="mail-icon">
-        <MailOutlined />
-      </div>
+      <PiEnvelope className="mail-icon" />
       {isLogin ? (
-        <div>
-          <Typography.Title level={2} className="mail-sent-title">
-            Welcome Back
-          </Typography.Title>
-          <Space direction="vertical" className="mail-link-modal-message">
-            <Typography.Text>We just sent a magic link to</Typography.Text>
-            <Typography.Text strong>{email}</Typography.Text>
-            <Typography.Text>for you to access your account</Typography.Text>
-          </Space>
-        </div>
+        <Typography.Title level={3} className="mail-sent-title">
+          Welcome Back
+        </Typography.Title>
       ) : (
-        <div>
-          <Typography.Title level={2} className="mail-sent-title">
-            Verify your email
-          </Typography.Title>
-          <Space direction="vertical" className="mail-link-modal-message">
-            <Typography.Text>We just sent you an email at</Typography.Text>
-            <Typography.Text strong>{email}</Typography.Text>
-            <Typography.Text> It contains a link that will sign you super quick!</Typography.Text>
-          </Space>
-        </div>
+        <Typography.Title level={3} className="mail-sent-title">
+          Please verify your email
+        </Typography.Title>
       )}
+      <Space direction="vertical" className="mail-link-modal-message">
+        <Typography.Text className="text-white">
+          We just sent you an email at <strong>{email}</strong>
+        </Typography.Text>
+        <Typography.Text className="text-white">It contains a link that will sign you super quick!</Typography.Text>
+      </Space>
       <br />
-      <Typography.Text>
-        Didn't recieve the email?{" "}
-        {timeToResendEmailLogin > 0 ? (
-          <Typography.Text strong>{`Send again in ${timeToResendEmailLogin} seconds`}</Typography.Text>
-        ) : (
-          <Typography.Text strong underline>
-            <span
-              className="resend-email-cta"
-              onClick={() => {
-                handleEmailSend();
-              }}
-            >
-              Click to Resend
-            </span>
-          </Typography.Text>
-        )}
-      </Typography.Text>
+      <Typography.Text className="text-white">Didn't recieve the email? </Typography.Text>
+      {timeToResendEmailLogin > 0 ? (
+        <Row className="resend-timeout-text">
+          <Typography.Text>{`Send again in ${timeToResendEmailLogin} seconds`}</Typography.Text>
+        </Row>
+      ) : (
+        <RQButton
+          loading={isSendingMail}
+          className="mt-8"
+          onClick={() => {
+            handleEmailSend();
+          }}
+        >
+          Click to Resend
+        </RQButton>
+      )}
     </div>
   );
 }

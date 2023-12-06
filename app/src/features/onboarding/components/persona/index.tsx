@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { getAppOnboardingDetails } from "store/selectors";
 import { Col, Row, Typography } from "antd";
-import { PersonaInput } from "./components/PersonaInput";
+import { PersonaInput } from "./components/personaInput";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { actions } from "store";
@@ -13,6 +15,7 @@ import "./index.scss";
 
 export const PersonaScreen = () => {
   const dispatch = useDispatch();
+  const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [persona, setPersona] = useState("");
@@ -20,6 +23,7 @@ export const PersonaScreen = () => {
   const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
 
   const handleSaveClick = () => {
+    if (persona) dispatch(actions.updateAppOnboardingPersona(persona));
     setIsSaving(true);
     setUserPersona({ persona })
       .then((res: any) => {
@@ -37,12 +41,24 @@ export const PersonaScreen = () => {
   };
 
   useEffect(() => {
-    getUserPersona().then((res: any) => {
-      if (res.data.persona) {
-        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
-      } else setIsLoading(false);
-    });
+    getUserPersona()
+      .then((res: any) => {
+        if (res.data.persona) {
+          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+        } else setIsLoading(false);
+      })
+      .catch((error) => {
+        Logger.log(error);
+        setIsLoading(false);
+      });
   }, [getUserPersona, dispatch]);
+
+  useEffect(() => {
+    //If user has already set persona, then skip this step
+    if (appOnboardingDetails.persona) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+    }
+  }, [appOnboardingDetails.persona, dispatch]);
 
   return (
     <div className="persona-form-wrapper">

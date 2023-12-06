@@ -9,6 +9,7 @@
     max-width: 912px;
     display: flex;
   }
+
   .onboarding-auth-form-wrapper {
     width: 100%;
     max-width: 440px;
@@ -16,10 +17,37 @@
     border-radius: var(--border-radius-md);
     padding: 1rem 2rem;
   }
+
   .onboarding-auth-banner-wrapper {
     width: 100%;
     max-width: 396px;
     margin-left: 76px;
     padding-top: 40px;
   }
+}
+
+.verify-email-wrapper {
+  background: var(--surface-1);
+  border-radius: var(--border-radius-md);
+  width: 440px;
+}
+
+.verify-email-back-btn {
+  color: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: none;
+  position: relative;
+  top: 1rem;
+  left: 8px;
+}
+
+.verify-email-wrapper .mail-link-modal-content {
+  padding: 0 32px;
+  padding-bottom: 24px;
 }
