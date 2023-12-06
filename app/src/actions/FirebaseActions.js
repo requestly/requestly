@@ -457,7 +457,6 @@ export const signInWithEmailLink = async (email, callback) => {
 
     // Update details in db
     const authData = getAuthData(result.user);
-    console.log({ authData });
     const database = getDatabase();
     update(ref(database, getUserProfilePath(authData.uid)), authData);
 
