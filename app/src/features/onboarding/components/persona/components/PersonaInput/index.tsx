@@ -18,14 +18,6 @@ const options = [
 ];
 
 export const PersonaInput: React.FC<Props> = ({ onValueChange }) => {
-  const onSelect = (data: string) => {
-    onValueChange(data);
-  };
-
-  const onChange = (data: string) => {
-    onValueChange(data);
-  };
-
   return (
     <Col>
       <label htmlFor="persona-input" className="persona-input-label">
@@ -37,8 +29,12 @@ export const PersonaInput: React.FC<Props> = ({ onValueChange }) => {
         popupClassName="persona-input-menu"
         options={options}
         style={{ width: 200 }}
-        onSelect={onSelect}
-        onChange={onChange}
+        onSelect={(data: string) => {
+          onValueChange(data);
+        }}
+        onChange={(data: string) => {
+          onValueChange(data);
+        }}
         placeholder="Start typing or select from the list"
       />
     </Col>
