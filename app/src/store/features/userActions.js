@@ -122,6 +122,10 @@ export const updateAppOnboardingPersona = (prevState, action) => {
   prevState.appOnboarding.persona = action.payload;
 };
 
+export const updateAppOnboardingFullName = (prevState, action) => {
+  prevState.appOnboarding.fullName = action.payload;
+};
+
 export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
   prevState.workspaceOnboarding.workspace = { ...prevState.workspaceOnboarding.workspace, ...action.payload };
 };

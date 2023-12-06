@@ -1,25 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Typography } from "antd";
 import SpinnerColumn from "../SpinnerColumn";
 import { RQButton, RQInput } from "lib/design-system/components";
-// ACTIONS
 import { actions } from "store";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode, getUserAuthDetails } from "../../../store/selectors";
+import { getAppMode, getAppOnboardingDetails, getUserAuthDetails } from "../../../store/selectors";
 import { isEmailValid } from "../../../utils/FormattingHelper";
-
-import { signInWithEmailLink } from "../../../actions/FirebaseActions";
+import { signInWithEmailLink, updateValueAsPromise } from "../../../actions/FirebaseActions";
 import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions";
 import { redirectToRules } from "utils/RedirectionUtils";
-
-import "./index.css";
 import { toast } from "utils/Toast";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import {
   trackSignInWithLinkCustomFormSeen,
   trackSignInWithLinkCustomFormSubmitted,
 } from "modules/analytics/events/common/auth/emailLinkSignin";
+import "./index.css";
+import Logger from "lib/logger";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -33,9 +32,12 @@ const SignInViaEmailLink = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [isEmailLoginLinkDone, setIsEmailLoginLinkDone] = useState(false);
   const navigate = useNavigate();
+
+  const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
 
   const logOutUser = useCallback(() => {
     handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
@@ -57,6 +59,17 @@ const SignInViaEmailLink = () => {
     return <SpinnerColumn />;
   }, [user.email, userEmailfromLocalStorage, logOutUser]);
 
+  const updateUserFullName = useCallback(() => {
+    if (user.details?.profile?.displayName === "User" && appOnboardingDetails.fullName) {
+      const newName = appOnboardingDetails.fullName;
+      try {
+        updateValueAsPromise(["users", user.details?.profile?.uid, "profile", "displayName"], newName);
+      } catch (e) {
+        Logger.log(e);
+      }
+    }
+  }, [user.details?.profile?.displayName, appOnboardingDetails.fullName, user.details?.profile?.uid]);
+
   useEffect(() => {
     if (user.loggedIn && isEmailLoginLinkDone) {
       const name = user?.displayName?.split(" ")[0];
@@ -64,10 +77,26 @@ const SignInViaEmailLink = () => {
       if (name) {
         message = isLogin ? `Welcome back ${name}!` : `Welcome to Requestly ${name}!`;
       }
+      try {
+        if (appOnboardingDetails.persona) setUserPersona({ persona: appOnboardingDetails.persona });
+        updateUserFullName();
+      } catch (e) {
+        Logger.log(e);
+      }
       toast.success(message);
       redirectToRules(navigate);
     }
-  }, [user.loggedIn, isEmailLoginLinkDone, navigate, isLogin, user.displayName, user.email]);
+  }, [
+    user.loggedIn,
+    isEmailLoginLinkDone,
+    navigate,
+    isLogin,
+    user.displayName,
+    user.email,
+    setUserPersona,
+    appOnboardingDetails.persona,
+    updateUserFullName,
+  ]);
 
   const handleLogin = useCallback(
     (emailToUseForLogin) => {

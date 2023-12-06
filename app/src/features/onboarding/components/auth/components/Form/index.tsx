@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
@@ -9,6 +9,8 @@ import AUTH from "config/constants/sub/auth";
 import { googleSignIn } from "actions/FirebaseActions";
 import { actions } from "store";
 import "./index.scss";
+import { isEmailValid } from "utils/FormattingHelper";
+import { toast } from "utils/Toast";
 
 interface AuthFormProps {
   authMode: string;
@@ -55,6 +57,35 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
         setIsLoading(false);
       });
   };
+
+  const handleContinueClick = useCallback(() => {
+    if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
+      if (!email) {
+        toast.error("Please enter your email address");
+        return;
+      }
+
+      if (!isEmailValid(email)) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
+    }
+
+    if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
+      if (!persona) {
+        toast.error("Please select or type your role");
+        return;
+      }
+
+      if (!fullName) {
+        toast.error("Please enter your full name");
+        return;
+      }
+    }
+    setIsLoading(true);
+    dispatch(actions.updateAppOnboardingPersona(persona));
+    onSendEmailLink?.(email);
+  }, [authMode, email, fullName, persona, onSendEmailLink, dispatch]);
 
   return (
     <div className="w-full">
@@ -129,10 +160,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
         type="primary"
         size="large"
         className="w-full mt-16 onboarding-continue-button"
-        onClick={() => {
-          dispatch(actions.updateAppOnboardingPersona(persona));
-          onSendEmailLink?.(email);
-        }}
+        onClick={handleContinueClick}
+        loading={isLoading}
       >
         Continue
       </RQButton>
