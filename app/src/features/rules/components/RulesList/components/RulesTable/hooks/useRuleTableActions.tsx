@@ -191,7 +191,12 @@ const useRuleTableActions = () => {
     [UNGROUPED_GROUP_ID, updateMultipleRecordsInStorage]
   );
 
-  const handleChangeRuleGroupClick = (records: RuleObj | RuleObj[]) => {
+  const handleChangeRuleGroupClick = (records?: RuleObj | RuleObj[]) => {
+    if (!records) {
+      setIsChangeGroupModalActive(true);
+      return;
+    }
+
     const updatedRecords = convertToArray<RuleObj>(records);
     const selectedRules = updatedRecords.filter(isRule);
     setSelectedRows(selectedRules);
