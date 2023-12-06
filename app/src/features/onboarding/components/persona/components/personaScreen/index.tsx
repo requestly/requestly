@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
 import { Col, Row, Typography } from "antd";
-import { PersonaInput } from "./components/personaInput";
+import { PersonaInput } from "../personaInput";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { actions } from "store";

@@ -7,7 +7,7 @@ import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
 import { ONBOARDING_STEPS } from "../../types";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails } from "store/selectors";
-import { PersonaScreen } from "../persona";
+import { PersonaScreen } from "../persona/components/personaScreen";
 import PATHS from "config/constants/sub/paths";
 import "./index.scss";
 
