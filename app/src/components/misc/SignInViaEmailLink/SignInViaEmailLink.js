@@ -63,7 +63,7 @@ const SignInViaEmailLink = () => {
     if (user.details?.profile?.displayName === "User" && appOnboardingDetails.fullName) {
       const newName = appOnboardingDetails.fullName;
       try {
-        updateValueAsPromise(["users", user.details?.profile?.uid, "profile", "displayName"], newName);
+        updateValueAsPromise(["users", user.details?.profile?.uid, "profile"], { displayName: newName });
       } catch (e) {
         Logger.log(e);
       }
