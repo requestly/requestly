@@ -22,3 +22,13 @@ export const trackAppsumoCodeRedeemed = (number_of_codes) => {
   const params = { number_of_codes };
   trackEvent(BUSINESS.APPSUMO_CODE_REDEEMED, params);
 };
+
+export const trackPricingPlanCTAClicked = ({ current_plan, selected_plan, action }, source) => {
+  const params = { current_plan, selected_plan, action, source };
+  trackEvent(BUSINESS.PRICING_PLAN_CTA_CLICKED, params);
+};
+
+export const trackPricingPlanCancellationRequested = ({ current_plan, end_date, type }) => {
+  const params = { current_plan, end_date, type };
+  trackEvent(BUSINESS.PRICING_PLAN_CANCELLATION_REQUESTED, params);
+};
