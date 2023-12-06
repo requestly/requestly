@@ -1,0 +1,46 @@
+.getting-started-screen-wrapper {
+  padding: 24px 0;
+}
+
+.getting-started-screen-banner {
+  padding: 28px 0;
+  padding-left: 40px;
+  background: var(--blue-blue-500);
+  border-radius: var(--border-radius-md);
+  background-image: url("../../assets/banner-art.svg");
+
+  & .get-started-title {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--white);
+    letter-spacing: 1.5px;
+  }
+
+  & .welcome-title.ant-typography {
+    font-weight: 500;
+    margin-top: 12px;
+    margin-bottom: 0;
+    color: var(--white);
+  }
+
+  & .getting-started-banner-by-line.ant-typography {
+    font-weight: normal;
+    margin-bottom: 0;
+    margin-top: 4px;
+  }
+}
+
+.getting-started-body {
+  margin-top: 24px;
+  gap: 24px;
+}
+
+.getting-started-teams-wrapper {
+  width: 360px;
+  background: green;
+}
+
+.getting-started-recommendations-wrapper {
+  flex: 1;
+  background: red;
+}
