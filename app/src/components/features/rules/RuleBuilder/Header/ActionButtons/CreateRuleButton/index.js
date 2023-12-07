@@ -219,7 +219,12 @@ const CreateRuleButton = ({
         popoverPlacement="bottomLeft"
         features={[FeatureLimitType.num_rules]}
         onContinue={handleBtnOnClick}
-        disabled={isDisabled || location?.state?.source === "my_rules" || location?.state?.source === "rule_selection"}
+        disabled={
+          isDisabled ||
+          location?.state?.source === "my_rules" ||
+          location?.state?.source === "rule_selection" ||
+          MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT
+        }
         source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">
