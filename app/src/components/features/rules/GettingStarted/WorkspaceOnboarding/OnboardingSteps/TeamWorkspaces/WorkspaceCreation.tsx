@@ -77,6 +77,9 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         teamId: defaultTeamData?.teamId ?? newTeamId,
         emails: inviteEmails,
         role: makeUserAdmin ? "admin" : "write",
+        teamName: defaultTeamData?.name ?? newWorkspaceName,
+        numberOfMembers: 1,
+        source: "onboarding",
       })
         .then((res: any) => {
           if (res?.data?.success) {
@@ -111,7 +114,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
         });
     },
-    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData?.teamId, makeUserAdmin]
+    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData, makeUserAdmin]
   );
 
   const handleCreateNewTeam = useCallback(() => {

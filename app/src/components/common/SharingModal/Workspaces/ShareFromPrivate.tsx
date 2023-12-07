@@ -45,8 +45,9 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       user?.details?.profile?.uid
     );
     try {
+      const teamName = isBusinessUser ? getDomainFromEmail(user?.details?.profile?.email) : "My Team";
       createTeam({
-        teamName: isBusinessUser ? getDomainFromEmail(user?.details?.profile?.email) : "My Team",
+        teamName: teamName,
       }).then((res: any) => {
         const teamId = res.data.teamId;
         const teamData = res.data;
@@ -56,6 +57,9 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           teamId,
           emails: memberEmails,
           role: TeamRole.write,
+          teamName,
+          source: "sharing_modal_new_team",
+          numberOfMembers: 1,
         }).then((res: any) => {
           setIsLoading(false);
           if (res?.data?.success)
