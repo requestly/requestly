@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useEffect, useState } from "react";
+import React, { ReactElement, useCallback, useState } from "react";
 import type { ColumnsType } from "antd/es/table";
 import { Table } from "antd";
 import { BulkActionBarConfig } from "./types";
@@ -24,11 +24,8 @@ const ContentTable = <DataType extends object>({
 }: ContentTableProps<DataType>): ReactElement => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<DataType[]>([]);
-  const [filteredRowsData, setFilteredRowsData] = useState(data);
 
-  useEffect(() => {
-    setFilteredRowsData([...data]);
-  }, [data]);
+  console.log("from bulk actions", { selectedRowKeys });
 
   const clearSelectedRowsData = useCallback(() => {
     setSelectedRowKeys([]);
@@ -54,7 +51,7 @@ const ContentTable = <DataType extends object>({
         loading={loading}
         rowKey={rowKey}
         columns={columns}
-        dataSource={filteredRowsData}
+        dataSource={data}
         pagination={false}
         rowSelection={{
           selectedRowKeys,
