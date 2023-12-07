@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
+import { Button, Dropdown, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
@@ -14,6 +14,9 @@ import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
+import { ItemType } from "antd/lib/menu/hooks/useItems";
+
+type RecordAction = ItemType & { hide?: boolean };
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -152,7 +155,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       render: (record: RuleTableDataType) => {
         const isRule = record.objectType === RuleObjType.RULE;
 
-        const recordActions: MenuProps["items"] = [
+        const recordActions: RecordAction[] = [
           {
             key: 0,
             onClick: () => {
