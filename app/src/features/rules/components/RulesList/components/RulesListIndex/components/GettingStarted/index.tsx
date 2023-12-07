@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import ImportRulesModal from "../ImportRulesModal";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
+import { ImportRulesModal } from "../ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -12,7 +12,7 @@ import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "sto
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "./PersonaRecommendation";
-import { shouldShowRecommendationScreen } from "components/misc/PersonaSurvey/utils";
+import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
 import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
 import {
   trackRulesImportStarted,

@@ -22,7 +22,7 @@ import {
 } from "modules/analytics/events/features/rules";
 import { FilePicker } from "components/common/FilePicker";
 
-const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
+export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -310,5 +310,3 @@ const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
     </>
   );
 };
-
-export default ImportRulesModal;

@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Col, Button, Space } from "antd";
-//Sub Components
-import NewRuleSelector from "../NewRuleSelector";
-import ImportRulesModal from "../ImportRulesModal";
-// Constants
+import { NewRuleSelector } from "../../NewRuleSelector";
+import { ImportRulesModal } from "../../ImportRulesModal";
 import ProCard from "@ant-design/pro-card";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
-import TeamSolvingPuzzleAnimation from "components/misc/LottieAnimation/TeamSolvingPuzzleAnimation";
+import TeamSolvingPuzzleAnimation from "componentsV2/LottieAnimation/TeamSolvingPuzzleAnimation";
 import { actions } from "store";
+import "./CreateTeamRuleCTA.css";
 
-const CreateTeamRuleCTA = () => {
+export const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();
   //Global State
   const dispatch = useDispatch();
@@ -32,7 +31,7 @@ const CreateTeamRuleCTA = () => {
 
   return (
     <React.Fragment>
-      <ProCard className="primary-card github-like-border">
+      <ProCard className="primary-card github-like-border create-team-rule-container">
         <Row style={{ textAlign: "center" }} align="center">
           <Col span={24}>
             <Jumbotron style={{ background: "transparent" }} className="text-center">
@@ -98,5 +97,3 @@ const CreateTeamRuleCTA = () => {
     </React.Fragment>
   );
 };
-
-export default CreateTeamRuleCTA;
