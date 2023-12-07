@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Button, Dropdown, Row, Switch, Table, Tooltip } from "antd";
+import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
@@ -14,9 +14,6 @@ import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
-import { ItemType } from "antd/lib/menu/hooks/useItems";
-
-type RecordAction = ItemType & { hide?: boolean };
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -153,7 +150,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       render: (record: RuleTableDataType) => {
         const isRule = record.objectType === RuleObjType.RULE;
 
-        const recordActions: RecordAction[] = [
+        const recordActions: MenuProps["items"] = [
           {
             key: 0,
             onClick: () => {
@@ -175,7 +172,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           },
           {
             key: 1,
-            hide: true,
+            disabled: !isRule,
             onClick: () => {
               handleDuplicateRuleClick(record);
             },
@@ -197,7 +194,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               </Row>
             ),
           },
-        ].filter((option) => (!isRule ? !option.hide : true));
+        ].filter((option) => !option.disabled);
 
         return (
           <Row align="middle" wrap={false} className="rules-actions-container">

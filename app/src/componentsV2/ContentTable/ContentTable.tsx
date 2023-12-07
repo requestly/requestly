@@ -25,8 +25,6 @@ const ContentTable = <DataType extends object>({
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<DataType[]>([]);
 
-  console.log("from bulk actions", { selectedRowKeys });
-
   const clearSelectedRowsData = useCallback(() => {
     setSelectedRowKeys([]);
     setSelectedRowsData([]);
