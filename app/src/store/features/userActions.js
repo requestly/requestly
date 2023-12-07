@@ -126,6 +126,13 @@ export const updateAppOnboardingFullName = (prevState, action) => {
   prevState.appOnboarding.fullName = action.payload;
 };
 
+export const updateAppOnboardingTeamDetails = (prevState, action) => {
+  prevState.appOnboarding.createdWorkspace = {
+    ...prevState.appOnboarding.createdWorkspace,
+    ...action.payload,
+  };
+};
+
 export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
   prevState.workspaceOnboarding.workspace = { ...prevState.workspaceOnboarding.workspace, ...action.payload };
 };

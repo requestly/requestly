@@ -192,6 +192,7 @@ const INITIAL_STATE = {
     step: "auth",
     persona: null,
     fullName: null,
+    createdWorkspace: null,
     isOnboardingCompleted: false,
   },
 
