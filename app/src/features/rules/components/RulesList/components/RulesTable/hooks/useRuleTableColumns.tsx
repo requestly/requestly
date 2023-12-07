@@ -46,7 +46,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "",
       key: "pin",
-      width: 70,
+      width: 54,
       render: (record: RuleTableDataType) => {
         const isPinned = record.isFavourite;
 

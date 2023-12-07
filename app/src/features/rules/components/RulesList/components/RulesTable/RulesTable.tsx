@@ -66,6 +66,8 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
       <ChangeRuleGroupModalWrapper />
 
       <ContentTable
+        size="middle"
+        scroll={{ y: "calc(100vh - 277px)" }}
         columns={columns}
         data={contentTableData}
         rowKey="id"
