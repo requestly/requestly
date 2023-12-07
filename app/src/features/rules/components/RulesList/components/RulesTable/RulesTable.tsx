@@ -4,12 +4,18 @@ import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { rulesToContentTableDataAdapter } from "./utils";
 import { RuleObj } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
-import RenameGroupModal from "components/features/rules/RenameGroupModal";
-import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
-import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
+import {
+  DeleteRulesModalWrapper,
+  RenameGroupModalWrapper,
+  DuplicateRuleModalWrapper,
+  ChangeRuleGroupModalWrapper,
+} from "./components";
 import useRuleTableActions from "./hooks/useRuleTableActions";
-import { useRules } from "../RulesListIndex/context";
-import { Rule } from "types";
+import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
+import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
+import { RiToggleFill } from "@react-icons/all-files/ri/RiToggleFill";
+import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
+import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import "./rulesTable.css";
 
 interface Props {
@@ -18,23 +24,15 @@ interface Props {
 }
 
 const RulesTable: React.FC<Props> = ({ rules, loading }) => {
-  const [selectedRows, setSelectedRows] = useState<RuleTableDataType[]>([]);
-  const { closeDuplicateRuleModal, closeRenameGroupModal, closeDeleteRuleModal } = useRuleTableActions();
   const [contentTableData, setContentTableAdaptedRules] = useState<RuleTableDataType[]>([]);
   const {
-    ruleToDelete,
-    ruleToDuplicate,
-    isDuplicateRuleModalActive,
-    isRenameGroupModalActive,
-    idOfGroupToRename,
-    isDeleteConfirmationModalActive,
-  } = useRules();
-
-  const rulesToDelete = useMemo(() => selectedRows.filter((row) => !row.id?.startsWith("Group")), [selectedRows]);
-
-  const selectedGroupIds = useMemo(() => selectedRows.map((row) => row.id).filter((id) => id?.startsWith("Group")), [
-    selectedRows,
-  ]);
+    clearSelectedRows,
+    handleRuleShare,
+    handleActivateOrDeactivateRecords,
+    handleDeleteRecordClick,
+    handleChangeRuleGroupClick,
+    handleUngroupSelectedRulesClick,
+  } = useRuleTableActions();
 
   useEffect(() => {
     const contentTableAdaptedRules = rulesToContentTableDataAdapter(rules);
@@ -63,72 +61,85 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
    * - hover effects
    *
    *
-   * MODALS
-   * - change group
+   * NEXT
+   * - bulk action PR
+   *    - ungroup [DONE]
+   *    - change group [DONE]
+   *    - activate all [DONE]
+   *    - deactive all
+   *    - share [DONE]
+   *    - delete [DONE]
+   *    - cancel [DONE]
+   *
+   * - pin rules [DONE]
+   * - rule name click PR
+   * - sorting + icon changes
+   * - searching
    */
 
   // FIXME: cleanup this
-  const options = {
-    disableSelection: false,
-    disableEditing: false,
-    disableActions: false,
-    disableFavourites: false,
-    disableStatus: false,
-    disableAlertActions: false,
-    hideLastModifiedBy: false,
-    hideCreatedBy: false,
-  };
+  const options = useMemo(() => {
+    return {
+      disableSelection: false,
+      disableEditing: false,
+      disableActions: false,
+      disableFavourites: false,
+      disableStatus: false,
+      disableAlertActions: false,
+      hideLastModifiedBy: false,
+      hideCreatedBy: false,
+    };
+  }, []);
 
   const columns = useRuleTableColumns(options);
+  // const activeRulesCount = useMemo(() => getActiveRules(selectedRows).length, [selectedRows]);
+  // const inactiveRulesCount = selectedRows.length - activeRulesCount;
 
   return (
     <>
-      {/* TODO: Add Modals Required in Rules List here */}
-      {isDuplicateRuleModalActive ? (
-        <DuplicateRuleModal
-          close={closeDuplicateRuleModal}
-          onDuplicate={closeDuplicateRuleModal}
-          isOpen={isDuplicateRuleModalActive as boolean}
-          rule={ruleToDuplicate as Rule}
-        />
-      ) : null}
-
-      {isRenameGroupModalActive ? (
-        <RenameGroupModal
-          toggle={closeRenameGroupModal}
-          isOpen={isRenameGroupModalActive}
-          groupId={idOfGroupToRename}
-        />
-      ) : null}
-
-      {isDeleteConfirmationModalActive ? (
-        <DeleteRulesModal
-          toggle={closeDeleteRuleModal}
-          rulesToDelete={rulesToDelete?.length > 0 ? rulesToDelete : [ruleToDelete]}
-          groupIdsToDelete={selectedGroupIds}
-          clearSearch={() => {}} // FIXME
-          isOpen={isDeleteConfirmationModalActive}
-        />
-      ) : null}
+      {/* Add Modals Required in Rules List here */}
+      <DuplicateRuleModalWrapper />
+      <RenameGroupModalWrapper />
+      <DeleteRulesModalWrapper />
+      <ChangeRuleGroupModalWrapper />
 
       <ContentTable
         columns={columns}
         data={contentTableData}
         rowKey="id"
         loading={loading}
-        // bulk action here
+        customRowClassName={(record) => (record.isFavourite ? "record-pinned" : "")}
         bulkActionBarConfig={{
           type: "default",
           options: {
-            getSelectedRowsData: (selectedRows) => setSelectedRows(selectedRows),
+            clearSelectedRows,
             infoText: (selectedRules) => `${selectedRules.length} Rules Selected`,
             actions: [
               {
+                label: "Ungroup",
+                icon: <ImUngroup />,
+                onClick: (selectedRows) => handleUngroupSelectedRulesClick(selectedRows),
+              },
+              {
+                label: "Change group",
+                icon: <RiFolderSharedLine />,
+                onClick: (selectedRows) => handleChangeRuleGroupClick(selectedRows),
+              },
+              {
                 label: "Activate",
-                onClick: (selectedRows: any) => {
-                  // Get action from useRuleTableActions hook
-                  console.log("Activate Bulk Action", { selectedRows });
-                },
+                icon: <RiToggleFill />,
+                onClick: (selectedRows) => handleActivateOrDeactivateRecords(selectedRows),
+              },
+              {
+                label: "Share",
+                icon: <RiUserSharedLine />,
+                onClick: (selectedRows) => handleRuleShare(selectedRows),
+              },
+              {
+                danger: true,
+                label: "Delete",
+                icon: <RiDeleteBin2Line />,
+                onClick: (selectedRows) => handleDeleteRecordClick(selectedRows),
               },
             ],
           },

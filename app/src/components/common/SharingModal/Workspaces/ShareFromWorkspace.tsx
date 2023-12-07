@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
+import { getAppMode } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import { Tooltip } from "antd";
@@ -27,7 +27,6 @@ interface Props {
 
 export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShareViewData }) => {
   const appMode = useSelector(getAppMode);
-  const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +64,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Team) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
         setIsLoading(false);
         trackSharingModalRulesDuplicated("team", selectedRules.length);
         setPostShareViewData({
@@ -75,7 +74,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
         });
       });
     },
-    [appMode, selectedRules, groupwiseRules, currentlyActiveWorkspace, setPostShareViewData]
+    [appMode, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
   );
 
   return (

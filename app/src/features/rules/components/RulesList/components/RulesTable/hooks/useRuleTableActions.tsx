@@ -1,9 +1,9 @@
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
-import { useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { rulesActions } from "store/features/rules/slice";
-import { useDispatch } from "react-redux";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 // @ts-ignore
@@ -12,26 +12,28 @@ import { toast } from "utils/Toast";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { isEmpty } from "lodash";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
-import { useRules } from "../../RulesListIndex/context";
+import { useRulesContext } from "../../RulesListIndex/context";
+import { convertToArray, isRule } from "../utils";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const { UNGROUPED_GROUP_ID } = RULES_LIST_TABLE_CONSTANTS;
   const {
     setRuleToDuplicate,
     setIsDuplicateRuleModalActive,
     setIsRenameGroupModalActive,
     setIdOfGroupToRename,
     setIsDeleteConfirmationModalActive,
-    setRuleToDelete,
-  } = useRules();
+    setIsChangeGroupModalActive,
+    setSelectedRows,
+  } = useRulesContext();
 
-  const handlePin = (rules: RuleTableDataType[]) => {
-    console.log("Pinning Rules", { rules });
-  };
+  const clearSelectedRows = useCallback(() => {
+    setSelectedRows([]);
+  }, [setSelectedRows]);
 
   const handleStatusToggle = (rules: RuleTableDataType[], checked: boolean) => {
     console.log("handleStatusToggle", { rules, checked });
@@ -77,13 +79,17 @@ const useRuleTableActions = () => {
     });
   };
 
-  const toggleSharingModal = (rule: RuleObj) => {
+  const toggleSharingModal = (rules: RuleObj | RuleObj[]) => {
+    const updatedRules = convertToArray<RuleObj>(rules);
+    const rulesToShare = updatedRules.filter(isRule);
+    const ruleIds = rulesToShare.map((rule) => rule.id);
+
     dispatch(
       actions.toggleActiveModal({
         modalName: "sharingModal",
         newValue: true,
         newProps: {
-          selectedRules: [rule.id],
+          selectedRules: ruleIds,
         },
       })
     );
@@ -105,10 +111,10 @@ const useRuleTableActions = () => {
     );
   };
 
-  const handleRuleShare = (rule: RuleObj) => {
+  const handleRuleShare = (rules: RuleObj | RuleObj[]) => {
     // TODO
     // trackShareButtonClicked("rules_list");
-    user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    user.loggedIn ? toggleSharingModal(rules) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
   // Generic
@@ -125,6 +131,20 @@ const useRuleTableActions = () => {
       });
   };
 
+  const updateMultipleRecordsInStorage = useCallback(
+    (updatedRecords: RuleObj[], originalRecords: RuleObj[]) => {
+      if (updatedRecords.length === 0) return;
+
+      dispatch(rulesActions.ruleObjUpsertMany(updatedRecords));
+
+      return StorageService(appMode)
+        .saveMultipleRulesOrGroups(updatedRecords)
+        .then(() => console.log("Records updated in Storage Service"))
+        .catch(() => dispatch(rulesActions.ruleObjUpsertMany(originalRecords)));
+    },
+    [appMode, dispatch]
+  );
+
   const handleDuplicateRuleClick = (rule: RuleObj) => {
     setRuleToDuplicate(rule);
     setIsDuplicateRuleModalActive(true);
@@ -135,13 +155,14 @@ const useRuleTableActions = () => {
     setIsDuplicateRuleModalActive(false);
   };
 
-  const handleDeleteRecordClick = (rule: RuleObj) => {
-    setRuleToDelete(rule);
+  const handleDeleteRecordClick = (records: RuleObj | RuleObj[]) => {
+    const updatedRecords = convertToArray<RuleObj>(records);
+    setSelectedRows(updatedRecords);
     setIsDeleteConfirmationModalActive(true);
   };
 
   const closeDeleteRuleModal = () => {
-    setRuleToDelete(null);
+    setSelectedRows([]);
     setIsDeleteConfirmationModalActive(false);
   };
 
@@ -155,53 +176,72 @@ const useRuleTableActions = () => {
     setIdOfGroupToRename(null);
   };
 
-  const handleChangeRuleGroupClick = (record: RuleObj) => {};
+  const handleUngroupSelectedRulesClick = useCallback(
+    (selectedRecords: RuleObj[]) => {
+      const updateRules = selectedRecords.reduce(
+        (rules, record) =>
+          isRule(record) && record.groupId !== UNGROUPED_GROUP_ID
+            ? [...rules, { ...record, groupId: UNGROUPED_GROUP_ID }]
+            : rules,
+        []
+      );
 
-  const ungroupSelectedRules = (selectedRuleIds: string[]) => {
-    // @ts-ignore
-    const allPromises = [];
+      return updateMultipleRecordsInStorage(updateRules, selectedRecords);
+    },
+    [UNGROUPED_GROUP_ID, updateMultipleRecordsInStorage]
+  );
 
-    return new Promise((resolve, reject) => {
-      if (isEmpty(selectedRuleIds)) {
-        reject(new Error("No Rules were Selected"));
-      } else {
-        Logger.log("Reading storage in RulesTable ungroupSelectedRules");
-        StorageService(appMode)
-          .getAllRecords()
-          .then((allRules) => {
-            selectedRuleIds.forEach(async (ruleId) => {
-              const updatedRule = {
-                ...allRules[ruleId],
-                groupId: RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID,
-              };
-              Logger.log("Writing to storage in RulesTable ungroupSelectedRules");
-              allPromises.push(StorageService(appMode).saveRuleOrGroup(updatedRule));
-            });
+  const handleChangeRuleGroupClick = (records: RuleObj | RuleObj[]) => {
+    const updatedRecords = convertToArray<RuleObj>(records);
+    const selectedRules = updatedRecords.filter(isRule);
+    setSelectedRows(selectedRules);
+    setIsChangeGroupModalActive(true);
+  };
 
-            // @ts-ignore
-            Promise.all(allPromises).then(() => resolve());
-          });
-      }
+  const closeChangeRuleGroupModal = () => {
+    setSelectedRows([]);
+    setIsChangeGroupModalActive(false);
+  };
+
+  // FIXME: Add Deactivate all rules support
+  const handleActivateOrDeactivateRecords = (records: RuleObj[]) => {
+    // const activeRulesCount = getActiveRules(records).length;
+    // const inactiveRulesCount = records.length - activeRulesCount;
+
+    const updatedRecords = records.map((record) => ({
+      ...record,
+      status: RuleObjStatus.ACTIVE,
+    }));
+
+    // setSelectedRows(records);
+    updateMultipleRecordsInStorage(updatedRecords, records).then(() => {
+      // add analytics
+      toast.success(`Rules activated!`);
     });
   };
 
-  const handleUngroupSelectedRulesClick = (selectedRuleIds: string[]) => {
-    return ungroupSelectedRules(selectedRuleIds)
-      .then(() => {
-        // clearSearch();
-        // unselectAllRecords(dispatch);
-        //Refresh List
-        // updateRulesListRefreshPendingStatus(dispatch, isRulesListRefreshPending);
-      })
-      .then(() => {
-        toast.info("Rules Ungrouped");
-        // trackRulesUngrouped();
-      })
-      .catch(() => toast.warn("Please select rules first", { hideProgressBar: true }));
+  const handlePinRecordClick = (record: RuleObj) => {
+    let currentOwner;
+
+    if (record.currentOwner) {
+      currentOwner = user?.details?.profile?.uid || null;
+    } else {
+      currentOwner = record.currentOwner;
+    }
+
+    const updatedRecord = {
+      ...record,
+      currentOwner,
+      isFavourite: !record.isFavourite,
+    };
+
+    updateRuleInStorage(updatedRecord, record).then(() => {
+      // trackRulePinToggled(newValue);
+    });
   };
 
   return {
-    handlePin,
+    clearSelectedRows,
     handleStatusToggle,
     handleRuleShare,
     handleDuplicateRuleClick,
@@ -211,8 +251,10 @@ const useRuleTableActions = () => {
     handleRenameGroupClick,
     closeRenameGroupModal,
     handleChangeRuleGroupClick,
-    ungroupSelectedRules,
+    closeChangeRuleGroupModal,
     handleUngroupSelectedRulesClick,
+    handleActivateOrDeactivateRecords,
+    handlePinRecordClick,
   };
 };
 
