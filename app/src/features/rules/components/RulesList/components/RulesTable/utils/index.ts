@@ -1,5 +1,17 @@
 import { RuleTableDataType } from "../types";
-import { Rule, RuleObj } from "features/rules/types/rules";
+import { Rule, RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+
+export const isRule = (record: RuleObj) => {
+  return record.objectType === RuleObjType.RULE;
+};
+
+export const convertToArray = <T>(record: T | T[]): T[] => {
+  return Array.isArray(record) ? record : [record];
+};
+
+export const getActiveRules = (records: RuleObj[]) => {
+  return records.filter((record) => record.status === RuleObjStatus.ACTIVE);
+};
 
 // FIXME: Performance Improvements
 export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataType[] => {

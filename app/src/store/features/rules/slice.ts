@@ -43,6 +43,9 @@ const slice = createSlice({
     ruleObjUpsert: (state: RulesState, action: PayloadAction<any>) => {
       rulesAdapter.upsertOne(state.ruleObjs, action.payload);
     },
+    ruleObjUpsertMany: (state: RulesState, action: PayloadAction<any>) => {
+      rulesAdapter.upsertMany(state.ruleObjs, action.payload);
+    },
     ruleObjUpdate: (state: RulesState, action: PayloadAction<any>) => {
       rulesAdapter.updateOne(state.ruleObjs, action.payload);
     },
