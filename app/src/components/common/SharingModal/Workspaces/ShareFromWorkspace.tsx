@@ -38,6 +38,9 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       teamId: currentlyActiveWorkspace.id,
       emails: memberEmails,
       role: TeamRole.write,
+      teamName: currentlyActiveWorkspace.name,
+      numberOfMembers: currentlyActiveWorkspace.membersCount,
+      source: "sharing_modal_from_workspace",
     }).then((res: any) => {
       const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);
 
@@ -59,7 +62,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       }
       setIsLoading(false);
     });
-  }, [memberEmails, currentlyActiveWorkspace.id, setPostShareViewData]);
+  }, [memberEmails, currentlyActiveWorkspace, setPostShareViewData]);
 
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Team) => {
