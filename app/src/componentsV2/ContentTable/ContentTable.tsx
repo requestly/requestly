@@ -70,6 +70,7 @@ const ContentTable = <DataType extends object>({
         }}
         rowSelection={{
           selectedRowKeys,
+          checkStrictly: false,
           onChange: (selectedRowKeys, selectedRows) => {
             setSelectedRowKeys(selectedRowKeys);
             setSelectedRowsData(selectedRows);
