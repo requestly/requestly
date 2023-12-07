@@ -37,13 +37,14 @@ const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onValu
 
 export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSendEmailLink }) => {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
+  const [isMagicLinkLoading, setIsMagicLinkLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [persona, setPersona] = useState("");
 
   const handleGoogleSignIn = useCallback(() => {
-    setIsLoading(true);
+    setIsGoogleSignInLoading(true);
     googleSignIn(() => {}, authMode, "app_onboarding")
       .then((result) => {
         if (result.uid) {
@@ -54,7 +55,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
         console.log(error);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsGoogleSignInLoading(false);
       });
   }, [authMode, dispatch]);
 
@@ -82,7 +83,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
         return;
       }
     }
-    setIsLoading(true);
+    setIsMagicLinkLoading(true);
     if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
       dispatch(actions.updateAppOnboardingPersona(persona));
       dispatch(actions.updateAppOnboardingFullName(fullName));
@@ -96,7 +97,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your Requestly account"}
       </h2>
       <Row align="middle" className="text-bold onboarding-auth-mode-switch-wrapper">
-        <span>Already using Requestly? </span>
+        <span>
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Already using Requestly?" : "Don't have an account yet?"}{" "}
+        </span>
         <span
           onClick={() =>
             setAuthMode(
@@ -112,7 +115,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
         type="default"
         className="onboarding-google-auth-button"
         onClick={handleGoogleSignIn}
-        loading={isLoading}
+        loading={isGoogleSignInLoading}
+        disabled={isMagicLinkLoading}
       >
         <img src={googleLogo} alt="google" />
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
@@ -164,7 +168,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
         size="large"
         className="w-full mt-16 onboarding-continue-button"
         onClick={handleContinueClick}
-        loading={isLoading}
+        loading={isMagicLinkLoading}
+        disabled={isGoogleSignInLoading}
       >
         Continue
       </RQButton>
