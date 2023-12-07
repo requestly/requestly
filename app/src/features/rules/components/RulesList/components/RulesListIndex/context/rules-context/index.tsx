@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useState } from "react";
+import { RuleObj } from "features/rules/types/rules";
 
-const RulesContext = createContext(null);
+type RulesListContext = { selectedRows: RuleObj[] } & Record<string, any>;
+
+const RulesContext = createContext<RulesListContext>(null);
 
 interface RulesProviderProps {
   children: React.ReactElement;
 }
 
-export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
-  const [ruleToDelete, setRuleToDelete] = useState([]);
+export const RulesListProvider: React.FC<RulesProviderProps> = ({ children }) => {
+  const [selectedRows, setSelectedRows] = useState<RuleObj[]>([]);
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [ruleToViewInModal, setRuleToViewInModal] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
@@ -16,11 +19,14 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
   const [isUngroupOrDeleteRulesModalActive, setIsUngroupOrDeleteRulesModalActive] = useState(false);
   const [isRenameGroupModalActive, setIsRenameGroupModalActive] = useState(false);
   const [idOfGroupToRename, setIdOfGroupToRename] = useState<number>(null);
+  const [isChangeGroupModalActive, setIsChangeGroupModalActive] = useState(false);
 
   // FIXME: add proper types
   const value = {
-    ruleToDelete,
-    setRuleToDelete,
+    selectedRows,
+    setSelectedRows,
+    isChangeGroupModalActive,
+    setIsChangeGroupModalActive,
     ruleToViewInModal,
     ruleToDuplicate,
     isRenameGroupModalActive,
@@ -42,4 +48,4 @@ export const RulesProvider: React.FC<RulesProviderProps> = ({ children }) => {
   return <RulesContext.Provider value={value}>{children}</RulesContext.Provider>;
 };
 
-export const useRules = () => useContext(RulesContext);
+export const useRulesContext = () => useContext(RulesContext);

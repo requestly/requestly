@@ -6,7 +6,7 @@ import ContentHeader from "componentsV2/ContentHeader/ContentHeader";
 import { RuleObj } from "features/rules/types/rules";
 import { getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
-import { RulesProvider } from "./context";
+import { RulesListProvider } from "./context";
 import "./rulesListIndex.scss";
 
 interface Props {}
@@ -21,7 +21,7 @@ const RulesListIndex: React.FC<Props> = () => {
   useFetchAndUpdateRules({ setIsLoading: setIsLoading });
 
   return (
-    <RulesProvider>
+    <RulesListProvider>
       <div className="rq-rules-list-container">
         {/* TODO: Add Feature Limiter Banner Here */}
 
@@ -34,7 +34,7 @@ const RulesListIndex: React.FC<Props> = () => {
           <RulesTable rules={ruleObjs as RuleObj[]} loading={isLoading} />
         </div>
       </div>
-    </RulesProvider>
+    </RulesListProvider>
   );
 };
 

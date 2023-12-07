@@ -37,6 +37,21 @@
 tr.rq-content-table-row.ant-table-row {
   background: var(--background);
 
+  &.ant-table-row-level-1 {
+    &:hover > .ant-table-cell {
+      background: var(--surface-0_5);
+    }
+
+    .ant-table-cell {
+      background: var(--black);
+      border-bottom: 1px solid var(--surface-1);
+
+      .ant-table-row-expand-icon {
+        display: none;
+      }
+    }
+  }
+
   &.ant-table-row-selected {
     background: var(--highlight-dark-bg);
     border-bottom: 1px solid var(--surface-1);
@@ -54,5 +69,32 @@ tr.rq-content-table-row.ant-table-row {
     &:hover {
       background: inherit;
     }
+  }
+
+  .ant-table-selection-column {
+    border-left: 4px solid transparent;
+  }
+
+  &.record-pinned .ant-table-selection-column {
+    border-left: 4px solid var(--warning);
+  }
+
+  button.ant-btn.ant-btn-icon-only {
+    flex-shrink: 0;
+    width: 40px;
+    height: 32px;
+  }
+
+  button.ant-btn.ant-btn-icon-only svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: var(--text-light);
+    transition: inherit;
+  }
+
+  button.ant-btn.ant-btn-icon-only:hover svg,
+  .rules-actions-container .more-rule-actions-btn.ant-btn-icon-only svg {
+    color: var(--text-default);
   }
 }

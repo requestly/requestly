@@ -1,16 +1,14 @@
 import React from "react";
 import type { BaseButtonProps } from "antd/lib/button/button";
-interface BulkActionBarAction {
-  danger?: boolean;
+interface BulkActionBarAction extends BaseButtonProps {
   onClick: (selectedRows: any) => void;
-  actionType?: BaseButtonProps["type"];
   label: React.ReactNode | ((selectedRows: any) => string);
 }
 
 export interface BulkActionBarConfig {
   type: "default" | "custom";
   options: {
-    getSelectedRowsData?: (selectedRowsData: any) => void;
+    clearSelectedRows?: () => void;
     infoText?: string | ((selectedRows: any) => string);
     actions?: BulkActionBarAction[];
   };
