@@ -35,6 +35,9 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { RiCheckLine } from "@react-icons/all-files/ri/RiCheckLine";
 import { RiFolderAddLine } from "@react-icons/all-files/ri/RiFolderAddLine";
 import { isRule } from "../RulesTable/utils";
+import CreateTeamRuleCTA from "components/features/rules/CreateTeamRuleCTA";
+import { GettingStarted } from "./components";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import "./rulesListIndex.scss";
 
 interface Props {}
@@ -44,6 +47,7 @@ const RulesList: React.FC<Props> = () => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
@@ -230,7 +234,11 @@ const RulesList: React.FC<Props> = () => {
     )
   );
 
-  return (
+  const CreateFirstRule = () => {
+    return isWorkspaceMode ? <CreateTeamRuleCTA /> : <GettingStarted />;
+  };
+
+  return allRecords?.length > 0 ? (
     <>
       <div className="rq-rules-list-container">
         {/* TODO: Add Feature Limiter Banner Here */}
@@ -302,6 +310,8 @@ const RulesList: React.FC<Props> = () => {
         </div>
       </div>
     </>
+  ) : (
+    <CreateFirstRule />
   );
 };
 
