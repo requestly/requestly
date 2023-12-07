@@ -458,7 +458,8 @@ export const signInWithEmailLink = async (email, callback) => {
     // Update details in db
     const authData = getAuthData(result.user);
     const database = getDatabase();
-    update(ref(database, getUserProfilePath(authData.uid)), authData);
+
+    if (isNewUser) update(ref(database, getUserProfilePath(authData.uid)), authData);
 
     //  Analytics - Track event
     trackLoginSuccessEvent({
@@ -565,6 +566,7 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
 
 export function getAuthData(user) {
   const userProfile = Object.assign({}, user.providerData[0]);
+  console.log({ userProfile });
 
   // Update uid inside providerData to user's uid
   userProfile.uid = user.uid;
@@ -637,4 +639,18 @@ export async function signOut() {
   } catch {
     trackLogoutFailed();
   }
+}
+
+export async function updateUserInFirebaseAuthUser(data) {
+  const auth = getAuth(firebaseApp);
+  const user = auth.currentUser;
+  return new Promise((resolve) => {
+    updateProfile(user, data)
+      .then(() => {
+        resolve({ success: true });
+      })
+      .catch((e) => {
+        Logger.log(e);
+      });
+  });
 }

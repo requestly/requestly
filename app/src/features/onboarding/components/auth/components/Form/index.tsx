@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
-import { PersonaInput } from "../../../persona/components/personaInput";
+import { PersonaInput } from "../../../persona/components/PersonaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
 import { googleSignIn } from "actions/FirebaseActions";
@@ -83,7 +83,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
       }
     }
     setIsLoading(true);
-    dispatch(actions.updateAppOnboardingPersona(persona));
+    if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
+      dispatch(actions.updateAppOnboardingPersona(persona));
+      dispatch(actions.updateAppOnboardingFullName(fullName));
+    }
     onSendEmailLink?.(email);
   }, [authMode, email, fullName, persona, onSendEmailLink, dispatch]);
 

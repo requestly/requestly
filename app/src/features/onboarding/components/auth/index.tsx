@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { AuthForm } from "./components/form";
-import { OnboardingAuthBanner } from "./components/banner";
+import { AuthForm } from "./components/Form";
+import { OnboardingAuthBanner } from "./components/Banner";
 import AUTH from "config/constants/sub/auth";
 import MagicLinkModalContent from "components/authentication/AuthForm/MagicAuthLinkModal/MagicLinkModalContent";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
