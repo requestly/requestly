@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "antd";
 import fileDownload from "js-file-download";
-import { getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
+import { getAppMode } from "store/selectors";
 import { prepareContentToExport } from "../actions";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
@@ -22,7 +22,6 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const rules = useSelector(getAllRuleObjs);
-  const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [rulesToDownload, setRulesToDownload] = useState<{
     fileContent: string;
     rulesCount: number;
@@ -59,7 +58,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
         setRulesToDownload(result);
       });
     }
-  }, [selectedRules, groupwiseRulesToPopulate, rulesToDownload, appMode, dispatch]);
+  }, [selectedRules, rulesToDownload, appMode, dispatch]);
 
   return (
     <div className="sharing-modal-body">
