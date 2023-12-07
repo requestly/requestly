@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
 import { Col, Row, Typography } from "antd";
-import { PersonaInput } from "../personaInput";
+import { PersonaInput } from "../PersonaInput";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { actions } from "store";
@@ -11,7 +11,7 @@ import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
-import { updateValueAsPromise } from "actions/FirebaseActions";
+import { updateUserInFirebaseAuthUser, updateValueAsPromise } from "actions/FirebaseActions";
 import "./index.scss";
 
 export const PersonaScreen = () => {
@@ -23,7 +23,7 @@ export const PersonaScreen = () => {
   const [persona, setPersona] = useState("");
   const [fullName, setFullName] = useState("");
   const [shouldShowPersonaInput, setShouldShowPersonaInput] = useState(false);
-  const shouldShowFullNameInput = user.details?.profile?.displayName === "User";
+  const [shouldShowFullNameInput, setShouldShowFullNameInput] = useState(false);
 
   const getUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-getUserPersona"), []);
   const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
@@ -64,13 +64,18 @@ export const PersonaScreen = () => {
 
   const handleSaveClick = () => {
     setIsSaving(true);
-    Promise.all([handleSetPersona(), handleSetFullName()])
+    Promise.all([
+      handleSetPersona(),
+      handleSetFullName(),
+      updateUserInFirebaseAuthUser({ displayName: fullName || user.details?.profile?.displayName }),
+    ])
       .then(() => {
         dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
       })
       .catch((error) => {
         Logger.log(error);
-        toast.error("Something went wrong. Please try again later.");
+        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+        toast.error("Something went wrong.");
       })
       .finally(() => {
         setIsSaving(false);
@@ -78,12 +83,10 @@ export const PersonaScreen = () => {
   };
 
   const shouldProceedToGettingStarted = useCallback(() => {
-    return (
-      (!shouldShowFullNameInput || appOnboardingDetails.fullName) &&
-      (!shouldShowPersonaInput || appOnboardingDetails.persona)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldShowPersonaInput, appOnboardingDetails.fullName, appOnboardingDetails.persona]);
+    if (!shouldShowFullNameInput && !shouldShowPersonaInput) {
+      return true;
+    } else return false;
+  }, [shouldShowPersonaInput, shouldShowFullNameInput]);
 
   useEffect(() => {
     getUserPersona()
@@ -99,9 +102,18 @@ export const PersonaScreen = () => {
         }
       })
       .finally(() => {
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2000);
       });
   }, [getUserPersona, dispatch, appOnboardingDetails.persona]);
+
+  useEffect(() => {
+    if (user.loggedIn && user.details?.profile?.displayName === "User") {
+      setShouldShowFullNameInput(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.loggedIn]);
 
   useEffect(() => {
     if (!isLoading && shouldProceedToGettingStarted()) {
@@ -109,13 +121,17 @@ export const PersonaScreen = () => {
     }
   }, [dispatch, isLoading, shouldProceedToGettingStarted]);
 
+  console.log(shouldProceedToGettingStarted());
+
+  console.log({ shouldShowFullNameInput, shouldShowPersonaInput });
+
   return (
     <div className="persona-form-wrapper">
       {isLoading ? (
         <h2>SETTING UP...</h2> //TODO: ADD LOADER HERE
       ) : (
         <>
-          {shouldShowPersonaInput || shouldShowFullNameInput ? (
+          {!shouldProceedToGettingStarted() ? (
             <div className="persona-form">
               <Row gutter={16} align="middle">
                 <Col className="login-success-icon display-row-center">

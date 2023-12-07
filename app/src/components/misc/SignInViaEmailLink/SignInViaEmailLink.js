@@ -8,7 +8,11 @@ import { actions } from "store";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode, getAppOnboardingDetails, getUserAuthDetails } from "../../../store/selectors";
 import { isEmailValid } from "../../../utils/FormattingHelper";
-import { signInWithEmailLink, updateValueAsPromise } from "../../../actions/FirebaseActions";
+import {
+  signInWithEmailLink,
+  updateUserInFirebaseAuthUser,
+  updateValueAsPromise,
+} from "../../../actions/FirebaseActions";
 import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
@@ -19,6 +23,7 @@ import {
 } from "modules/analytics/events/common/auth/emailLinkSignin";
 import "./index.css";
 import Logger from "lib/logger";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -59,16 +64,36 @@ const SignInViaEmailLink = () => {
     return <SpinnerColumn />;
   }, [user.email, userEmailfromLocalStorage, logOutUser]);
 
-  const updateUserFullName = useCallback(() => {
+  const updateUserFullName = useCallback(async () => {
     if (user.details?.profile?.displayName === "User" && appOnboardingDetails.fullName) {
       const newName = appOnboardingDetails.fullName;
-      try {
-        updateValueAsPromise(["users", user.details?.profile?.uid, "profile"], { displayName: newName });
-      } catch (e) {
-        Logger.log(e);
-      }
+      return new Promise((resolve, reject) => {
+        updateValueAsPromise(["users", user.details?.profile?.uid, "profile"], { displayName: newName })
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      });
     }
+    return Promise.resolve({ success: true });
   }, [user.details?.profile?.displayName, appOnboardingDetails.fullName, user.details?.profile?.uid]);
+
+  const updateUserPersona = useCallback(async () => {
+    if (appOnboardingDetails.persona) {
+      return new Promise((resolve, reject) => {
+        setUserPersona({ persona: appOnboardingDetails.persona })
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      });
+    }
+    return Promise.resolve({ success: true });
+  }, [appOnboardingDetails.persona, setUserPersona]);
 
   useEffect(() => {
     if (user.loggedIn && isEmailLoginLinkDone) {
@@ -77,16 +102,28 @@ const SignInViaEmailLink = () => {
       if (name) {
         message = isLogin ? `Welcome back ${name}!` : `Welcome to Requestly ${name}!`;
       }
-      try {
-        if (appOnboardingDetails.persona) setUserPersona({ persona: appOnboardingDetails.persona });
-        updateUserFullName();
-      } catch (e) {
-        Logger.log(e);
-      }
-      toast.success(message);
-      redirectToRules(navigate);
+      //TODO: ONLY DO THIS FOR USERS WHO ARE ASSIGNED THE EXPERIMENT
+      Promise.all([
+        updateUserPersona(),
+        updateUserFullName(),
+        updateUserInFirebaseAuthUser({
+          displayName: appOnboardingDetails.fullName || user.details?.profile?.displayName,
+        }),
+      ])
+        .then(() => {
+          //DO NOTHING
+        })
+        .catch((e) => {
+          Logger.error(e);
+        })
+        .finally(() => {
+          toast.success(message);
+          redirectToRules(navigate);
+          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+        });
     }
   }, [
+    dispatch,
     user.loggedIn,
     isEmailLoginLinkDone,
     navigate,
@@ -96,6 +133,9 @@ const SignInViaEmailLink = () => {
     setUserPersona,
     appOnboardingDetails.persona,
     updateUserFullName,
+    updateUserPersona,
+    appOnboardingDetails.fullName,
+    user.details?.profile?.displayName,
   ]);
 
   const handleLogin = useCallback(
@@ -114,6 +154,7 @@ const SignInViaEmailLink = () => {
                 window.localStorage.removeItem("RQEmailForSignIn");
                 setIsLogin(!isNewUser);
                 if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
+
                 setIsProcessing(false);
                 setIsEmailLoginLinkDone(true);
               } else throw new Error("Failed");

@@ -34,7 +34,7 @@ import { PricingModal } from "features/pricing";
 import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
-import { Onboarding } from "features/onboarding";
+import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -49,6 +49,8 @@ const DashboardContent = () => {
   const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
+
+  console.log({ user });
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -205,8 +207,7 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
-          <Onboarding />
-
+          {shouldShowOnboarding() && <Onboarding />}
           {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
         </>
       )}
