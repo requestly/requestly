@@ -245,26 +245,6 @@ const useRuleTableActions = () => {
     });
   };
 
-  const handlePinRecordClick = (record: RuleObj) => {
-    let currentOwner;
-
-    if (record.currentOwner) {
-      currentOwner = user?.details?.profile?.uid || null;
-    } else {
-      currentOwner = record.currentOwner;
-    }
-
-    const updatedRecord = {
-      ...record,
-      currentOwner,
-      isFavourite: !record.isFavourite,
-    };
-
-    updateRuleInStorage(updatedRecord, record).then(() => {
-      // trackRulePinToggled(newValue);
-    });
-  };
-
   return {
     clearSelectedRows,
     handleStatusToggle,

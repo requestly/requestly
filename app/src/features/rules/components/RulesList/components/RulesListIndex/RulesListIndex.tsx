@@ -248,11 +248,6 @@ const RulesList: React.FC<Props> = () => {
           />
         ) : null}
 
-  return (
-    <RulesProvider>
-      <div className="rq-rules-list-container">
-        {/* TODO: Add Feature Limiter Banner Here */}
-
         <ContentHeader
           title="My Rules"
           subtitle="Create and manage your rules from here"
