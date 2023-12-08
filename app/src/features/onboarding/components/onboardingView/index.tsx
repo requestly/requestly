@@ -1,17 +1,19 @@
 import React from "react";
 import { Col, Modal, Row } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getAppOnboardingDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { OnboardingAuthScreen } from "../auth";
 import { ONBOARDING_STEPS } from "../../types";
-import { GettingStartedView } from "../gettingStarted/components/gettingStartedView";
+import { GettingStartedView } from "../gettingStarted";
 import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
+import { actions } from "store";
 import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
 import "./index.scss";
 
 export const Onboarding: React.FC = () => {
+  const dispatch = useDispatch();
   const { step } = useSelector(getAppOnboardingDetails);
 
   return (
@@ -32,7 +34,11 @@ export const Onboarding: React.FC = () => {
             </Col>
             {step !== ONBOARDING_STEPS.PERSONA && (
               <Col>
-                <RQButton type="default" className="onboarding-skip-button">
+                <RQButton
+                  type="default"
+                  className="onboarding-skip-button"
+                  onClick={() => dispatch(actions.updateAppOnboardingCompleted())}
+                >
                   Skip for now <MdOutlineArrowForward style={{ fontSize: "1rem" }} />
                 </RQButton>
               </Col>
@@ -40,7 +46,6 @@ export const Onboarding: React.FC = () => {
           </Row>
 
           {/* BODY */}
-
           {step === ONBOARDING_STEPS.AUTH ? (
             <OnboardingAuthScreen />
           ) : step === ONBOARDING_STEPS.PERSONA ? (
