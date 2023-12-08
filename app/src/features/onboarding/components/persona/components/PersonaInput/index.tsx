@@ -1,6 +1,10 @@
-import { useState } from "react";
+import React from "react";
 import { AutoComplete, Col } from "antd";
 import "./index.scss";
+
+interface Props {
+  onValueChange: (data: string) => void;
+}
 
 const options = [
   { value: "Front-End Developer" },
@@ -13,19 +17,7 @@ const options = [
   { value: "IT Procurement/Administrator" },
 ];
 
-export const PersonaInput = () => {
-  const [value, setValue] = useState("");
-
-  const onSelect = (data: string) => {
-    setValue(data);
-  };
-
-  const onChange = (data: string) => {
-    setValue(data);
-  };
-
-  console.log({ value });
-
+export const PersonaInput: React.FC<Props> = ({ onValueChange }) => {
   return (
     <Col>
       <label htmlFor="persona-input" className="persona-input-label">
@@ -37,8 +29,12 @@ export const PersonaInput = () => {
         popupClassName="persona-input-menu"
         options={options}
         style={{ width: 200 }}
-        onSelect={onSelect}
-        onChange={onChange}
+        onSelect={(data: string) => {
+          onValueChange(data);
+        }}
+        onChange={(data: string) => {
+          onValueChange(data);
+        }}
         placeholder="Start typing or select from the list"
       />
     </Col>

@@ -111,6 +111,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    appOnboardingModal: {
+      isActive: false,
+      props: {},
+    },
     createWorkspaceModal: {
       isActive: false,
       props: {},
@@ -182,6 +186,13 @@ const INITIAL_STATE = {
     step: "auth",
     isOnboardingCompleted: false,
     workspace: {},
+  },
+
+  appOnboarding: {
+    step: "auth",
+    persona: null,
+    fullName: null,
+    isOnboardingCompleted: false,
   },
 
   misc: {

@@ -34,7 +34,7 @@ import { PricingModal } from "features/pricing";
 import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
-import { Onboarding } from "features/onboarding";
+import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -205,8 +205,7 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
-          <Onboarding />
-
+          {shouldShowOnboarding() && <Onboarding />}
           {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
         </>
       )}
