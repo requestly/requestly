@@ -7,6 +7,7 @@
 .onboarding-modal-wrapper .onboarding-modal .ant-modal-content .ant-modal-body {
   padding: 0;
   height: 100%;
+  overflow-y: auto;
   background: var(--surface-0);
 }
 
@@ -23,7 +24,7 @@
   .onboarding-modal-body-wrapper {
     display: flex;
     justify-content: center;
-    padding: 0 120px;
+    padding: 0 20px;
     width: 100%;
 
     .onboarding-modal-body {

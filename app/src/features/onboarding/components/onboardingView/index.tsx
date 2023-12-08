@@ -1,13 +1,14 @@
 import React from "react";
 import { Col, Modal, Row } from "antd";
-import { RQButton } from "lib/design-system/components";
-import { OnboardingAuthScreen } from "../auth";
-import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
-import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
-import { ONBOARDING_STEPS } from "../../types";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails } from "store/selectors";
+import { RQButton } from "lib/design-system/components";
+import { OnboardingAuthScreen } from "../auth";
+import { ONBOARDING_STEPS } from "../../types";
+import { GettingStartedView } from "../gettingStarted/components/gettingStartedView";
 import { PersonaScreen } from "../persona/components/personaScreen";
+import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
+import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
 import "./index.scss";
 
 export const Onboarding: React.FC = () => {
@@ -45,7 +46,7 @@ export const Onboarding: React.FC = () => {
           ) : step === ONBOARDING_STEPS.PERSONA ? (
             <PersonaScreen />
           ) : (
-            <>GETTING STARTED SCREEN HERE</>
+            <GettingStartedView />
           )}
         </div>
       </div>

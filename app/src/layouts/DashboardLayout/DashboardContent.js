@@ -50,6 +50,8 @@ const DashboardContent = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
+  console.log({ user });
+
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
   };
