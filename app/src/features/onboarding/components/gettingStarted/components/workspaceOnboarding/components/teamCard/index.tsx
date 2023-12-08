@@ -7,6 +7,7 @@ import { toast } from "utils/Toast";
 import Logger from "lib/logger";
 import { LoadingOutlined } from "@ant-design/icons";
 import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
+import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import "./index.scss";
 
 interface TeamCardProps {
@@ -18,12 +19,21 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
   const [hasJoined, setHasJoined] = useState<boolean>(false);
 
   const handleJoining = useCallback(() => {
+    trackWorkspaceJoinClicked(invite?.metadata?.teamId, "app_onboarding");
     setIsJoining(true);
     acceptTeamInvite(invite.id)
       .then((res) => {
         if (res?.data?.success) {
           toast.success("Team joined successfully");
           setHasJoined(true);
+          trackWorkspaceInviteAccepted(
+            invite?.metadata?.teamId,
+            invite?.metadata?.teamName,
+            invite?.id,
+            "app_onboarding",
+            res?.data?.data?.invite?.usage,
+            res?.data?.data?.invite?.metadata?.teamAccessCount
+          );
         }
       })
       .catch((e) => {
@@ -33,7 +43,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
       .finally(() => {
         setIsJoining(false);
       });
-  }, [invite.id]);
+  }, [invite.id, invite?.metadata?.teamId, invite?.metadata?.teamName]);
 
   return (
     <div className="team-card-wrapper">

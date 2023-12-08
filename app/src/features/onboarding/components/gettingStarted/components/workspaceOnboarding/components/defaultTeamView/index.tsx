@@ -7,6 +7,7 @@ import { actions } from "store";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import groupIcon from "../../assets/group.svg";
+import { trackAppOnboardingManageWorkspaceClicked } from "features/onboarding/analytics";
 import "./index.scss";
 
 export const DefaultTeamView = () => {
@@ -54,6 +55,8 @@ export const DefaultTeamView = () => {
           type="text"
           className="getting-started-manage-workspace-btn"
           onClick={() => {
+            dispatch(actions.updateAppOnboardingCompleted());
+            trackAppOnboardingManageWorkspaceClicked();
             redirectToTeam(navigate, createdWorkspaceData.teamId);
           }}
         >

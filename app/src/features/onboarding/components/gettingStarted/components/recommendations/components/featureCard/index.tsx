@@ -1,16 +1,27 @@
 import React, { useCallback } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Feature } from "../../types";
+import { actions } from "store";
+import {
+  trackAppOnboardingRecommendationSelected,
+  trackAppOnboardingStepCompleted,
+} from "features/onboarding/analytics";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
 
 export const FeatureCard: React.FC<Feature> = ({ id, icon: Icon, title, subTitle, link, tag = "" }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleNavigation = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
+      trackAppOnboardingStepCompleted(ONBOARDING_STEPS.GETTING_STARTED);
+      trackAppOnboardingRecommendationSelected(id);
+      dispatch(actions.updateAppOnboardingCompleted());
       navigate(link, { replace: true });
     },
-    [navigate, link]
+    [navigate, link, dispatch, id]
   );
 
   return (

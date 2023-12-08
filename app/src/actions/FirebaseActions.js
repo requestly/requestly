@@ -566,7 +566,6 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
 
 export function getAuthData(user) {
   const userProfile = Object.assign({}, user.providerData[0]);
-  console.log({ userProfile });
 
   // Update uid inside providerData to user's uid
   userProfile.uid = user.uid;

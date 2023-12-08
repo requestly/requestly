@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Col, Modal, Row } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppOnboardingDetails } from "store/selectors";
@@ -10,11 +10,16 @@ import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
 import { actions } from "store";
 import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
+import { trackAppOnboardingSkipped, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import "./index.scss";
 
 export const Onboarding: React.FC = () => {
   const dispatch = useDispatch();
   const { step } = useSelector(getAppOnboardingDetails);
+
+  useEffect(() => {
+    trackAppOnboardingViewed();
+  }, []);
 
   return (
     <Modal
@@ -37,7 +42,10 @@ export const Onboarding: React.FC = () => {
                 <RQButton
                   type="default"
                   className="onboarding-skip-button"
-                  onClick={() => dispatch(actions.updateAppOnboardingCompleted())}
+                  onClick={() => {
+                    trackAppOnboardingSkipped(step);
+                    dispatch(actions.updateAppOnboardingCompleted());
+                  }}
                 >
                   Skip for now <MdOutlineArrowForward style={{ fontSize: "1rem" }} />
                 </RQButton>

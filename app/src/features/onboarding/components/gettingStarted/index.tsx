@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -31,20 +31,23 @@ export const GettingStartedView: React.FC = () => {
     []
   );
 
-  const handleSwitchWorkspace = (teamId: string, newTeamName: string) => {
-    switchWorkspace(
-      {
-        teamId: teamId,
-        teamName: newTeamName,
-        teamMembersCount: 1,
-      },
-      dispatch,
-      { isWorkspaceMode, isSyncEnabled: true },
-      appMode,
-      null,
-      "app_onboarding"
-    );
-  };
+  const handleSwitchWorkspace = useCallback(
+    (teamId: string, newTeamName: string) => {
+      switchWorkspace(
+        {
+          teamId: teamId,
+          teamName: newTeamName,
+          teamMembersCount: 1,
+        },
+        dispatch,
+        { isWorkspaceMode, isSyncEnabled: true },
+        appMode,
+        null,
+        "app_onboarding"
+      );
+    },
+    [dispatch, isWorkspaceMode, appMode]
+  );
 
   useEffect(() => {
     if (!isCompanyEmail(user?.details?.profile?.email)) return;
@@ -76,7 +79,13 @@ export const GettingStartedView: React.FC = () => {
         setIsLoading(false);
         setPendingInvites([]);
       });
-  }, [user?.details?.profile?.email, dispatch, createTeam, appOnboardingDetails.createdWorkspace]);
+  }, [
+    user?.details?.profile?.email,
+    dispatch,
+    createTeam,
+    appOnboardingDetails.createdWorkspace,
+    handleSwitchWorkspace,
+  ]);
 
   return (
     <Col className="getting-started-screen-wrapper">

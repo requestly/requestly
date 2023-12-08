@@ -12,6 +12,11 @@ import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { updateUserInFirebaseAuthUser, updateValueAsPromise } from "actions/FirebaseActions";
+import {
+  trackAppOnboardingNameUpdated,
+  trackAppOnboardingPersonaUpdated,
+  trackAppOnboardingStepCompleted,
+} from "features/onboarding/analytics";
 import "./index.scss";
 
 export const PersonaScreen = () => {
@@ -35,6 +40,7 @@ export const PersonaScreen = () => {
         setUserPersona({ persona })
           .then((res: any) => {
             if (res.data.success) {
+              trackAppOnboardingPersonaUpdated(persona);
               resolve(res);
             }
           })
@@ -53,6 +59,7 @@ export const PersonaScreen = () => {
         updateValueAsPromise(["users", user.details?.profile?.uid, "profile"], { displayName: fullName })
           .then((res: any) => {
             resolve(res);
+            trackAppOnboardingNameUpdated();
           })
           .catch((error) => {
             Logger.log(error);
@@ -70,10 +77,12 @@ export const PersonaScreen = () => {
       updateUserInFirebaseAuthUser({ displayName: fullName || user.details?.profile?.displayName }),
     ])
       .then(() => {
+        trackAppOnboardingStepCompleted(ONBOARDING_STEPS.PERSONA);
         dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
       })
       .catch((error) => {
         Logger.log(error);
+        trackAppOnboardingStepCompleted(ONBOARDING_STEPS.PERSONA);
         dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
         toast.error("Something went wrong.");
       })
@@ -120,10 +129,6 @@ export const PersonaScreen = () => {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
     }
   }, [dispatch, isLoading, shouldProceedToGettingStarted]);
-
-  console.log(shouldProceedToGettingStarted());
-
-  console.log({ shouldShowFullNameInput, shouldShowPersonaInput });
 
   return (
     <div className="persona-form-wrapper">

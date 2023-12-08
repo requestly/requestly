@@ -21,9 +21,10 @@ import {
   trackSignInWithLinkCustomFormSeen,
   trackSignInWithLinkCustomFormSubmitted,
 } from "modules/analytics/events/common/auth/emailLinkSignin";
-import "./index.css";
 import Logger from "lib/logger";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
+import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
+import "./index.css";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -119,6 +120,7 @@ const SignInViaEmailLink = () => {
         .finally(() => {
           toast.success(message);
           redirectToRules(navigate);
+          trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
           dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
         });
     }

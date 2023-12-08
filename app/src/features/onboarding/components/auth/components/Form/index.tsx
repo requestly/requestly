@@ -8,9 +8,10 @@ import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
 import { googleSignIn } from "actions/FirebaseActions";
 import { actions } from "store";
-import "./index.scss";
 import { isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
+import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
+import "./index.scss";
 
 interface AuthFormProps {
   authMode: string;
@@ -48,6 +49,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
     googleSignIn(() => {}, authMode, "app_onboarding")
       .then((result) => {
         if (result.uid) {
+          trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
           dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
         }
       })
