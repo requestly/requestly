@@ -13,6 +13,7 @@ import { fetchSignInMethodsForEmail, getAuth } from "firebase/auth";
 import firebaseApp from "firebase.js";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
+import * as Sentry from "@sentry/react";
 
 // HACKY WAY FOR CHECKING IF USER EXISTS
 async function doesUserExist(email) {
@@ -47,6 +48,11 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
       })
       .catch((error) => {
         Logger.log(error);
+        Sentry.captureException(new Error(`Error sending email link for signin: ${error}`), {
+          extra: {
+            email,
+          },
+        });
         toast.error("There was an error sending the email. Please try again later.");
       })
       .finally(() => {

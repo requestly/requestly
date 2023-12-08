@@ -8,9 +8,11 @@ import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
 import { googleSignIn } from "actions/FirebaseActions";
 import { actions } from "store";
-import "./index.scss";
 import { isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
+import "./index.scss";
 
 interface AuthFormProps {
   authMode: string;
@@ -86,6 +88,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
     setIsMagicLinkLoading(true);
     if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
       dispatch(actions.updateAppOnboardingPersona(persona));
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, persona);
       dispatch(actions.updateAppOnboardingFullName(fullName));
     }
     onSendEmailLink?.(email);
