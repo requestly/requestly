@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import type { ColumnsType } from "antd/es/table";
 import { Table, TableProps } from "antd";
 import { BulkActionBarConfig } from "./types";
@@ -13,6 +13,7 @@ export interface ContentTableProps<DataType> extends Partial<Pick<TableProps<Dat
   loading?: boolean;
   customRowClassName?: (record: DataType) => string;
   bulkActionBarConfig?: BulkActionBarConfig;
+  filterSelection?: (records: DataType[]) => DataType[];
 }
 
 const ContentTable = <DataType extends object>({
@@ -24,12 +25,11 @@ const ContentTable = <DataType extends object>({
   bulkActionBarConfig,
   size = "middle",
   scroll = { y: "calc(100vh - 277px)" },
+  filterSelection = (records) => records,
 }: ContentTableProps<DataType>): ReactElement => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<DataType[]>([]);
 
   const clearSelectedRowsData = useCallback(() => {
-    setSelectedRowKeys([]);
     setSelectedRowsData([]);
     bulkActionBarConfig?.options?.clearSelectedRows?.();
   }, [bulkActionBarConfig?.options]);
@@ -69,11 +69,11 @@ const ContentTable = <DataType extends object>({
           ),
         }}
         rowSelection={{
-          selectedRowKeys,
           checkStrictly: false,
+          selectedRowKeys: selectedRowsData.map((record) => (record as any).id),
           onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedRowKeys(selectedRowKeys);
-            setSelectedRowsData(selectedRows);
+            const selectedRowsData = filterSelection(selectedRows);
+            setSelectedRowsData(selectedRowsData);
           },
         }}
       />

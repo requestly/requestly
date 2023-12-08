@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { rulesToContentTableDataAdapter } from "./utils";
-import { RuleObj } from "features/rules/types/rules";
+import { RuleObj, RuleObjType } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
   DeleteRulesModalWrapper,
@@ -73,6 +73,9 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         rowKey="id"
         loading={loading}
         customRowClassName={(record) => (record.isFavourite ? "record-pinned" : "")}
+        filterSelection={(selectedRows) => {
+          return selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
+        }}
         bulkActionBarConfig={{
           type: "default",
           options: {
