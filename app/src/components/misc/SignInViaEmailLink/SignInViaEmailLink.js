@@ -64,6 +64,10 @@ const SignInViaEmailLink = () => {
     return <SpinnerColumn />;
   }, [user.email, userEmailfromLocalStorage, logOutUser]);
 
+  /**
+   * Updates user displayName information during onboarding.
+   * This function is not directly linked with the authentication flow.
+   */
   const updateUserFullName = useCallback(async () => {
     if (user.details?.profile?.displayName === "User" && appOnboardingDetails.fullName) {
       const newName = appOnboardingDetails.fullName;
@@ -80,6 +84,10 @@ const SignInViaEmailLink = () => {
     return Promise.resolve({ success: true });
   }, [user.details?.profile?.displayName, appOnboardingDetails.fullName, user.details?.profile?.uid]);
 
+  /**
+   * Updates user persona information during onboarding.
+   * This function is not directly linked with the authentication flow.
+   */
   const updateUserPersona = useCallback(async () => {
     if (appOnboardingDetails.persona) {
       return new Promise((resolve, reject) => {
@@ -102,7 +110,7 @@ const SignInViaEmailLink = () => {
       if (name) {
         message = isLogin ? `Welcome back ${name}!` : `Welcome to Requestly ${name}!`;
       }
-      //TODO: ONLY DO THIS FOR USERS WHO ARE ASSIGNED THE EXPERIMENT
+      //TODO: ONLY DO THIS FOR USERS WHO ARE ASSIGNED THE EXPERIMENT AND ONBOARDING IS NOT COMPLETED
       Promise.all([
         updateUserPersona(),
         updateUserFullName(),
@@ -112,6 +120,7 @@ const SignInViaEmailLink = () => {
       ])
         .then(() => {
           //DO NOTHING
+          Logger.log("User Persona and Full Name updated successfully");
         })
         .catch((e) => {
           Logger.error(e);
