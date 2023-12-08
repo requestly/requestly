@@ -241,7 +241,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
 
   // FIXME: Extend the column type to also support custom fields eg hidden property to hide the column
   if (isWorkspaceMode && !options.hideCreatedBy) {
-    columns.splice(3, 0, {
+    columns.splice(6, 0, {
       title: "Author",
       width: 96,
       responsive: ["lg"],
