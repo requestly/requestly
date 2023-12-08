@@ -17,6 +17,8 @@ import {
   trackAppOnboardingPersonaUpdated,
   trackAppOnboardingStepCompleted,
 } from "features/onboarding/analytics";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import APP_CONSTANTS from "config/constants";
 import "./index.scss";
 
 export const PersonaScreen = () => {
@@ -35,6 +37,7 @@ export const PersonaScreen = () => {
 
   const handleSetPersona = useCallback(() => {
     if (persona) {
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, persona);
       dispatch(actions.updateAppOnboardingPersona(persona));
       return new Promise((resolve, reject) => {
         setUserPersona({ persona })
@@ -69,7 +72,18 @@ export const PersonaScreen = () => {
     } else return Promise.resolve();
   }, [dispatch, fullName, user.details?.profile?.uid]);
 
-  const handleSaveClick = () => {
+  const handleSaveClick = useCallback(() => {
+    //VALIDATION
+    if (shouldShowPersonaInput && !persona) {
+      toast.error("Please select a persona");
+      return;
+    }
+
+    if (shouldShowFullNameInput && !fullName) {
+      toast.error("Please enter your full name");
+      return;
+    }
+
     setIsSaving(true);
     Promise.all([
       handleSetPersona(),
@@ -89,7 +103,16 @@ export const PersonaScreen = () => {
       .finally(() => {
         setIsSaving(false);
       });
-  };
+  }, [
+    shouldShowFullNameInput,
+    shouldShowPersonaInput,
+    persona,
+    fullName,
+    dispatch,
+    handleSetPersona,
+    handleSetFullName,
+    user.details?.profile?.displayName,
+  ]);
 
   const shouldProceedToGettingStarted = useCallback(() => {
     if (!shouldShowFullNameInput && !shouldShowPersonaInput) {
@@ -111,9 +134,7 @@ export const PersonaScreen = () => {
         }
       })
       .finally(() => {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 2000);
+        setIsLoading(false);
       });
   }, [getUserPersona, dispatch, appOnboardingDetails.persona]);
 
@@ -171,7 +192,6 @@ export const PersonaScreen = () => {
                 </div>
               )}
               <RQButton
-                // disabled={!persona}
                 loading={isSaving}
                 onClick={handleSaveClick}
                 type="primary"

@@ -32,7 +32,6 @@ export const Onboarding: React.FC = () => {
     >
       <div className="onboarding-modal-body-wrapper">
         <div className="onboarding-modal-body">
-          {/* HEADER */}
           <Row justify="space-between" className="w-full onboarding-modal-header">
             <Col>
               <img src={RQLogo} alt="requestly logo" style={{ width: "90px" }} />
@@ -53,7 +52,6 @@ export const Onboarding: React.FC = () => {
             )}
           </Row>
 
-          {/* BODY */}
           {step === ONBOARDING_STEPS.AUTH ? (
             <OnboardingAuthScreen />
           ) : step === ONBOARDING_STEPS.PERSONA ? (

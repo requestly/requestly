@@ -566,6 +566,7 @@ export async function getOrUpdateUserSyncState(uid, appMode) {
 
 export function getAuthData(user) {
   const userProfile = Object.assign({}, user.providerData[0]);
+  console.log({ userProfile });
 
   // Update uid inside providerData to user's uid
   userProfile.uid = user.uid;
@@ -639,6 +640,16 @@ export async function signOut() {
     trackLogoutFailed();
   }
 }
+
+/**
+ * Updates user profile information in Firebase Authentication.
+ * @param {Object} data - The data object containing fields to update in the Firebase user auth object.
+ * Possible fields in the 'data' object like:
+ * - displayName: (string) User's display name.
+ * - photoURL: (string) URL of the user's profile picture.
+ * Note: Ensure the user is signed in before calling this function.
+ * @returns {Promise<Object>} A promise that resolves with { success: true } on successful update.
+ */
 
 export async function updateUserInFirebaseAuthUser(data) {
   const auth = getAuth(firebaseApp);
