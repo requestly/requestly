@@ -26,6 +26,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     handleRenameGroupClick,
     handleChangeRuleGroupClick,
     handlePinRecordClick,
+    handleUngroupOrDeleteRulesClick,
   } = useRuleTableActions();
 
   // const isStatusEnabled = !(options && options.disableStatus);
@@ -35,9 +36,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   // const isAlertOptionsAllowed = !(options && options.disableAlertActions);
 
   /**
-   * - have a action which does the pinning of the record pick form old rules table
-   * - render pins + style them
-   *
    * - make rule name clickable and navigate to editor.
    */
 
@@ -56,7 +54,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               type="text"
               className="pin-record-btn"
               icon={<RiPushpin2Line className={`${record.isFavourite ? "record-pinned" : "record-unpinned"}`} />}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (isEditingEnabled) {
                   handlePinRecordClick(record);
                 }
@@ -119,7 +118,14 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       render: (rule: RuleTableDataType) => {
         const checked = rule?.status === RuleObjStatus.ACTIVE ? true : false;
         return (
-          <Switch size="small" checked={checked} onChange={(checked: boolean) => handleStatusToggle([rule], checked)} />
+          <Switch
+            size="small"
+            checked={checked}
+            onChange={(checked: boolean, e) => {
+              e.stopPropagation();
+              handleStatusToggle([rule], checked);
+            }}
+          />
         );
       },
     },
@@ -152,10 +158,11 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       render: (record: RuleTableDataType) => {
         const isRule = record.objectType === RuleObjType.RULE;
 
-        const recordActions: MenuProps["items"] = [
+        const recordActions = ([
           {
             key: 0,
-            onClick: () => {
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
               isRule ? handleChangeRuleGroupClick(record) : handleRenameGroupClick(record);
             },
             label: (
@@ -175,7 +182,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           {
             key: 1,
             disabled: !isRule,
-            onClick: () => {
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
               handleDuplicateRuleClick(record);
             },
             label: (
@@ -188,7 +196,10 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           {
             key: 2,
             danger: true,
-            onClick: () => handleDeleteRecordClick(record),
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              isRule ? handleDeleteRecordClick(record) : handleUngroupOrDeleteRulesClick(record);
+            },
             label: (
               <Row>
                 <RiDeleteBinLine />
@@ -196,20 +207,31 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               </Row>
             ),
           },
-        ].filter((option) => !option.disabled);
+        ] as MenuProps["items"]).filter((option) => {
+          // @ts-ignore
+          return !option.disabled;
+        });
 
         return (
           <Row align="middle" wrap={false} className="rules-actions-container">
-            <Button
-              type="text"
-              icon={<MdOutlineShare />}
-              onClick={() => {
-                handleRuleShare(record);
-              }}
-            />
+            {isRule ? (
+              <Button
+                type="text"
+                icon={<MdOutlineShare />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRuleShare(record);
+                }}
+              />
+            ) : null}
 
             <Dropdown menu={{ items: recordActions }} trigger={["click"]} overlayClassName="rule-more-actions-dropdown">
-              <Button type="text" className="more-rule-actions-btn" icon={<MdOutlineMoreHoriz />} />
+              <Button
+                type="text"
+                className="more-rule-actions-btn"
+                icon={<MdOutlineMoreHoriz />}
+                onClick={(e) => e.stopPropagation()}
+              />
             </Dropdown>
           </Row>
         );
