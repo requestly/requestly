@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Col, Row, Typography } from "antd";
 import { RecommendationView } from "../recommendations/components/recommendationView";
 import { WorkspaceOnboardingView } from "../workspaceOnboarding";
@@ -10,12 +11,15 @@ import { Invite } from "types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { capitalize } from "lodash";
 import { actions } from "store";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import Logger from "lib/logger";
 import "./index.scss";
 
 export const GettingStartedView: React.FC = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const [isLoading, setIsLoading] = useState(true);
   const [pendingInvites, setPendingInvites] = useState<Invite[]>([]);
@@ -26,6 +30,21 @@ export const GettingStartedView: React.FC = () => {
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
     []
   );
+
+  const handleSwitchWorkspace = (teamId: string, newTeamName: string) => {
+    switchWorkspace(
+      {
+        teamId: teamId,
+        teamName: newTeamName,
+        teamMembersCount: 1,
+      },
+      dispatch,
+      { isWorkspaceMode, isSyncEnabled: true },
+      appMode,
+      null,
+      "app_onboarding"
+    );
+  };
 
   useEffect(() => {
     if (!isCompanyEmail(user?.details?.profile?.email)) return;
@@ -41,6 +60,7 @@ export const GettingStartedView: React.FC = () => {
             )}<My team>`;
             createTeam({ teamName: newTeamName, generatePublicLink: false })
               .then((response: any) => {
+                handleSwitchWorkspace(response?.data?.teamId, newTeamName);
                 dispatch(actions.updateAppOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
                 setIsLoading(false);
               })
