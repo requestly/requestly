@@ -9,6 +9,7 @@ import {
   RenameGroupModalWrapper,
   DuplicateRuleModalWrapper,
   ChangeRuleGroupModalWrapper,
+  UngroupOrDeleteRulesModalWrapper,
 } from "./components";
 import useRuleTableActions from "./hooks/useRuleTableActions";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
@@ -64,6 +65,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
       <RenameGroupModalWrapper />
       <DeleteRulesModalWrapper />
       <ChangeRuleGroupModalWrapper />
+      <UngroupOrDeleteRulesModalWrapper />
 
       <ContentTable
         size="middle"

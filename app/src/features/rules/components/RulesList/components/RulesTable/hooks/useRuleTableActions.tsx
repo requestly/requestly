@@ -29,6 +29,8 @@ const useRuleTableActions = () => {
     setIsDeleteConfirmationModalActive,
     setIsChangeGroupModalActive,
     setSelectedRows,
+    setIsUngroupOrDeleteRulesModalActive,
+    setGroupToEmpty,
   } = useRulesContext();
 
   const clearSelectedRows = useCallback(() => {
@@ -155,6 +157,16 @@ const useRuleTableActions = () => {
     setIsDuplicateRuleModalActive(false);
   };
 
+  const handleUngroupOrDeleteRulesClick = (record: RuleObj) => {
+    setGroupToEmpty(record);
+    setIsUngroupOrDeleteRulesModalActive(true);
+  };
+
+  const closeUngroupOrDeleteRulesModal = () => {
+    setGroupToEmpty(null);
+    setIsUngroupOrDeleteRulesModalActive(false);
+  };
+
   const handleDeleteRecordClick = (records: RuleObj | RuleObj[]) => {
     const updatedRecords = convertToArray<RuleObj>(records);
     setSelectedRows(updatedRecords);
@@ -251,6 +263,8 @@ const useRuleTableActions = () => {
     handleRuleShare,
     handleDuplicateRuleClick,
     closeDuplicateRuleModal,
+    handleUngroupOrDeleteRulesClick,
+    closeUngroupOrDeleteRulesModal,
     handleDeleteRecordClick,
     closeDeleteRuleModal,
     handleRenameGroupClick,
