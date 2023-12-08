@@ -7,6 +7,8 @@ import LINKS from "config/constants/sub/links";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import "./ruleInfoBanner.css";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleType, appMode }) => {
   const ruleInfoBannerContent: Record<
@@ -83,6 +85,13 @@ const RuleInfoBanner: React.FC<{ ruleType: string; appMode: string }> = ({ ruleT
   if (!(ruleType in ruleInfoBannerContent)) return null;
 
   if (ruleInfoBannerContent[ruleType]?.appMode && !ruleInfoBannerContent[ruleType]?.appMode?.includes(appMode))
+    return null;
+
+  // Specific case - remove these banners after 1 more release than compatible version
+  if (
+    [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT, GLOBAL_CONSTANTS.RULE_TYPES.REPLACE].includes(ruleType) &&
+    isFeatureCompatible(FEATURES.RELAY_AUTH_HEADER)
+  )
     return null;
 
   return (
