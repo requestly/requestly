@@ -275,6 +275,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       isOpenedFromModal,
       dispatch,
       handleOnSubscribe,
+      source,
     ]
   );
 
