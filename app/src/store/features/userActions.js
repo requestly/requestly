@@ -110,7 +110,7 @@ export const updateWorkspaceOnboardingStep = (prevState, action) => {
   prevState.workspaceOnboarding.step = action.payload;
 };
 
-export const updateIsAppOnboardingCompleted = (prevState) => {
+export const updateAppOnboardingCompleted = (prevState) => {
   prevState.appOnboarding.isOnboardingCompleted = true;
 };
 
@@ -124,6 +124,13 @@ export const updateAppOnboardingPersona = (prevState, action) => {
 
 export const updateAppOnboardingFullName = (prevState, action) => {
   prevState.appOnboarding.fullName = action.payload;
+};
+
+export const updateAppOnboardingTeamDetails = (prevState, action) => {
+  prevState.appOnboarding.createdWorkspace = {
+    ...prevState.appOnboarding.createdWorkspace,
+    ...action.payload,
+  };
 };
 
 export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
