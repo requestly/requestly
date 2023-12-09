@@ -12,6 +12,8 @@ import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { updateUserInFirebaseAuthUser, updateValueAsPromise } from "actions/FirebaseActions";
+import { OnboardingLoader } from "features/onboarding/components/loader";
+import { m, AnimatePresence } from "framer-motion";
 import {
   trackAppOnboardingNameUpdated,
   trackAppOnboardingPersonaUpdated,
@@ -152,58 +154,66 @@ export const PersonaScreen = () => {
   }, [dispatch, isLoading, shouldProceedToGettingStarted]);
 
   return (
-    <div className="persona-form-wrapper">
+    <>
       {isLoading ? (
-        <h2>SETTING UP...</h2> //TODO: ADD LOADER HERE
+        <OnboardingLoader />
       ) : (
-        <>
-          {!shouldProceedToGettingStarted() ? (
-            <div className="persona-form">
-              <Row gutter={16} align="middle">
-                <Col className="login-success-icon display-row-center">
-                  <MdCheck className="text-white" />
-                </Col>
-                <Col>
-                  <Typography.Title level={4} style={{ fontWeight: 500, marginBottom: 0 }}>
-                    You’re logged in successfully!
-                  </Typography.Title>
-                </Col>
-              </Row>
-              <Typography.Title level={5} style={{ marginTop: "24px", fontWeight: 500 }}>
-                Helps us in optimizing your experience
-              </Typography.Title>
-              {shouldShowPersonaInput && (
-                <Col className="mt-16">
-                  <PersonaInput onValueChange={(value) => setPersona(value)} />
-                </Col>
-              )}
-
-              {shouldShowFullNameInput && (
-                <div className="onboarding-form-input mt-8">
-                  <label htmlFor="full-name">Your full name</label>
-                  <RQInput
-                    placeholder="E.g. John Doe"
-                    id="full-name"
-                    value={fullName}
-                    onChange={(e) => {
-                      setFullName(e.target.value);
-                    }}
-                  />
-                </div>
-              )}
-              <RQButton
-                loading={isSaving}
-                onClick={handleSaveClick}
-                type="primary"
-                size="large"
-                className="persona-save-btn w-full mt-16"
+        <div className="persona-form-wrapper">
+          <AnimatePresence>
+            {!shouldProceedToGettingStarted() ? (
+              <m.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0 }}
+                transition={{ type: "linear", duration: 0.2 }}
+                className="persona-form"
               >
-                Save
-              </RQButton>
-            </div>
-          ) : null}
-        </>
+                <Row gutter={16} align="middle">
+                  <Col className="login-success-icon display-row-center">
+                    <MdCheck className="text-white" />
+                  </Col>
+                  <Col>
+                    <Typography.Title level={4} style={{ fontWeight: 500, marginBottom: 0 }}>
+                      You’re logged in successfully!
+                    </Typography.Title>
+                  </Col>
+                </Row>
+                <Typography.Title level={5} style={{ marginTop: "24px", fontWeight: 500 }}>
+                  Helps us in optimizing your experience
+                </Typography.Title>
+                {shouldShowPersonaInput && (
+                  <Col className="mt-16">
+                    <PersonaInput onValueChange={(value) => setPersona(value)} />
+                  </Col>
+                )}
+
+                {shouldShowFullNameInput && (
+                  <div className="onboarding-form-input mt-8">
+                    <label htmlFor="full-name">Your full name</label>
+                    <RQInput
+                      placeholder="E.g. John Doe"
+                      id="full-name"
+                      value={fullName}
+                      onChange={(e) => {
+                        setFullName(e.target.value);
+                      }}
+                    />
+                  </div>
+                )}
+                <RQButton
+                  loading={isSaving}
+                  onClick={handleSaveClick}
+                  type="primary"
+                  size="large"
+                  className="persona-save-btn w-full mt-16"
+                >
+                  Save
+                </RQButton>
+              </m.div>
+            ) : null}
+          </AnimatePresence>
+        </div>
       )}
-    </div>
+    </>
   );
 };

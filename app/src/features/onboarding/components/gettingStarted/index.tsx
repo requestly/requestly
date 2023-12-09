@@ -13,6 +13,8 @@ import { capitalize } from "lodash";
 import { actions } from "store";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import Logger from "lib/logger";
+import { OnboardingLoader } from "../loader";
+import { m, AnimatePresence } from "framer-motion";
 import "./index.scss";
 
 export const GettingStartedView: React.FC = () => {
@@ -88,12 +90,17 @@ export const GettingStartedView: React.FC = () => {
   ]);
 
   return (
-    <Col className="getting-started-screen-wrapper">
-      {/* BANNER */}
+    <AnimatePresence>
       {isLoading ? (
-        <h1>SETTING UP...</h1> //TODO: Add loader
+        <OnboardingLoader />
       ) : (
-        <>
+        <m.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="getting-started-screen-wrapper"
+        >
           <Col className="getting-started-screen-banner">
             <div className="get-started-title">GET STARTED</div>
             <Typography.Title level={3} className="welcome-title">
@@ -113,8 +120,8 @@ export const GettingStartedView: React.FC = () => {
               <RecommendationView />
             </Col>
           </Row>
-        </>
+        </m.div>
       )}
-    </Col>
+    </AnimatePresence>
   );
 };
