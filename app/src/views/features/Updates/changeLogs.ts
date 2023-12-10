@@ -8,6 +8,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.12.10",
+    logs: ["#1208 Relay auth header to redirected request"],
+  },
+  {
     version: "23.11.8",
     logs: [
       "chore: bump web-sdk version v0.14.2. Fixed custom elements not visible in Session Replay (#1209)",
