@@ -13,8 +13,6 @@ export const GettingStartedView: React.FC = () => {
 
   return (
     <Col className="getting-started-screen-wrapper">
-      {/* BANNER */}
-
       <Col className="getting-started-screen-banner">
         <div className="get-started-title">GET STARTED</div>
         <Typography.Title level={3} className="welcome-title">

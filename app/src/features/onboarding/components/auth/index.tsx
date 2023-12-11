@@ -12,6 +12,7 @@ import { actions } from "store";
 import Logger from "lib/logger";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
+import { m } from "framer-motion";
 import "./index.scss";
 
 export const OnboardingAuthScreen: React.FC = () => {
@@ -59,16 +60,20 @@ export const OnboardingAuthScreen: React.FC = () => {
           <MagicLinkModalContent email={email} authMode={authMode} eventSource="app_onboarding" />
         </div>
       ) : (
-        <div className={`onboarding-auth-screen ${authMode === AUTH.ACTION_LABELS.SIGN_UP ? "w-full" : ""}`}>
-          <div className="onboarding-auth-form-wrapper">
+        <m.div
+          transition={{ type: "linear" }}
+          layout
+          className={`onboarding-auth-screen ${authMode === AUTH.ACTION_LABELS.SIGN_UP ? "w-full" : ""}`}
+        >
+          <m.div transition={{ type: "linear" }} layout className="onboarding-auth-form-wrapper">
             <AuthForm authMode={authMode} setAuthMode={setAuthMode} onSendEmailLink={handleSendEmailLink} />
-          </div>
+          </m.div>
           {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
-            <div className="onboarding-auth-banner-wrapper">
+            <m.div transition={{ type: "linear" }} layout className="onboarding-auth-banner-wrapper">
               <OnboardingAuthBanner />
-            </div>
+            </m.div>
           )}
-        </div>
+        </m.div>
       )}
     </div>
   );
