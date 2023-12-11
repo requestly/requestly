@@ -25,8 +25,11 @@ export const GettingStartedView: React.FC = () => {
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const [isLoading, setIsLoading] = useState(true);
   const [pendingInvites, setPendingInvites] = useState<Invite[]>([]);
-  const name =
-    user.details.profile.displayName !== "User" ? user.details.profile.displayName : appOnboardingDetails.fullName;
+  const name = user.loggedIn
+    ? user.details?.profile?.displayName !== "User"
+      ? user.details?.profile?.displayName
+      : appOnboardingDetails?.fullName ?? "User"
+    : "User";
 
   const createTeam = useMemo(
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
@@ -52,7 +55,15 @@ export const GettingStartedView: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!isCompanyEmail(user?.details?.profile?.email)) return;
+    if (!user.loggedIn) {
+      setIsLoading(false);
+      return;
+    }
+
+    if (!isCompanyEmail(user?.details?.profile?.email)) {
+      setIsLoading(false);
+      return;
+    }
 
     getPendingInvites({ email: true, domain: true })
       .then((res: any) => {
@@ -83,6 +94,7 @@ export const GettingStartedView: React.FC = () => {
       });
   }, [
     user?.details?.profile?.email,
+    user.loggedIn,
     dispatch,
     createTeam,
     appOnboardingDetails.createdWorkspace,

@@ -8,8 +8,11 @@ import "./index.scss";
 export const GettingStartedView: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
-  const name =
-    user.details.profile.displayName !== "User" ? user.details.profile.displayName : appOnboardingDetails.fullName;
+  const name = user.loggedIn
+    ? user.details?.profile?.displayName !== "User"
+      ? user.details?.profile?.displayName
+      : appOnboardingDetails.fullName
+    : "User";
 
   return (
     <Col className="getting-started-screen-wrapper">

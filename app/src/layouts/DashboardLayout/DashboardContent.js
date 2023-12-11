@@ -36,7 +36,7 @@ import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLink
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+// import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -52,7 +52,8 @@ const DashboardContent = () => {
   const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
-  const isNewOnboardingFeatureOn = useFeatureIsOn("new_onboarding");
+  // const isNewOnboardingFeatureOn = useFeatureIsOn("new_onboarding");
+  const isNewOnboardingFeatureOn = true;
 
   console.log({ user });
 
