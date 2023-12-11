@@ -66,6 +66,8 @@ const RulesList: React.FC<Props> = () => {
     [allRecords]
   );
 
+  // FIX: rules loading state
+
   const getFilteredRecords = useCallback(
     (filterType: FilterType) => {
       switch (filterType) {
