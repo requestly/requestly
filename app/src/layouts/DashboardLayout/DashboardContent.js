@@ -145,13 +145,13 @@ const DashboardContent = () => {
           {!userPersona.isSurveyCompleted && !user?.loggedIn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
           ) : null}
-          {!isWorkspaceOnboardingCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+          {/* {!isWorkspaceOnboardingCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <WorkspaceOnboarding
               isOpen={activeModals.workspaceOnboardingModal.isActive}
               handleUploadRulesModalClick={toggleImportRulesModal}
               toggle={toggleWorkspaceOnboardingModal}
             />
-          ) : null}
+          ) : null} */}
           {activeModals.createWorkspaceModal.isActive ? (
             <CreateWorkspaceModal
               isOpen={activeModals.createWorkspaceModal.isActive}
@@ -209,7 +209,9 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
-          {shouldShowOnboarding() && !appOnboardingDetails.isOnboardingCompleted && <Onboarding />}
+          {shouldShowOnboarding() &&
+            appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+            !appOnboardingDetails.isOnboardingCompleted && <Onboarding />}
           {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
         </>
       )}
