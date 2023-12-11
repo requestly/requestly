@@ -90,6 +90,9 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
       teamId: teamId,
       emails: userEmail,
       role: makeUserAdmin ? "admin" : "write",
+      teamName: teamDetails?.name,
+      numberOfMembers: teamDetails?.accessCount,
+      source: "add_member_modal",
     })
       .then((res) => {
         if (res?.data?.success) {

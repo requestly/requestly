@@ -58,7 +58,7 @@ const DesktopPreference = ({ appMode }) => {
 
   const regenerateRootCa = useCallback(() => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("renew-ssl-certificates");
-  }, [])
+  }, []);
 
   // add loader
   return appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
@@ -119,19 +119,27 @@ const DesktopPreference = ({ appMode }) => {
         )}
       </div>
 
-      {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) || true ? <>
-        <Row align="middle" className="w-full mt-16 setting-item-container">
-          <Col span={22}>
-            <div className="title">Regenerate SSL Certificate</div>
-            <p className="setting-item-caption">If you face certificate trust issues, regenerating the proxy certificates will reset the trust settings in your certificate store.</p>
-          </Col>
-          <Col span={2}>
-            <Tooltip title="The app needs to be relaunched after this">
-              <RQButton type="default" onClick={regenerateRootCa}> Regenerate </RQButton>
-            </Tooltip>
-          </Col>
-        </Row>
-      </> : null}
+      {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) ? (
+        <>
+          <Row align="middle" className="w-full mt-16 setting-item-container">
+            <Col span={22}>
+              <div className="title">Regenerate SSL Certificate</div>
+              <p className="setting-item-caption">
+                If you face certificate trust issues, regenerating the proxy certificates will reset the trust settings
+                in your certificate store.
+              </p>
+            </Col>
+            <Col span={2}>
+              <Tooltip title="The app needs to be relaunched after this">
+                <RQButton type="default" onClick={regenerateRootCa}>
+                  {" "}
+                  Regenerate{" "}
+                </RQButton>
+              </Tooltip>
+            </Col>
+          </Row>
+        </>
+      ) : null}
     </>
   ) : null;
 };
