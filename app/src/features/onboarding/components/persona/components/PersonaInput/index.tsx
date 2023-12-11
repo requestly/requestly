@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AutoComplete, Col } from "antd";
 import "./index.scss";
 
@@ -6,7 +6,7 @@ interface Props {
   onValueChange: (data: string) => void;
 }
 
-const options = [
+const personaOptions = [
   { value: "Front-End Developer" },
   { value: "Back-End Developer" },
   { value: "QA Engineer" },
@@ -18,6 +18,7 @@ const options = [
 ];
 
 export const PersonaInput: React.FC<Props> = ({ onValueChange }) => {
+  const [personas, setPersonas] = useState(personaOptions);
   return (
     <Col>
       <label htmlFor="persona-input" className="persona-input-label">
@@ -27,13 +28,23 @@ export const PersonaInput: React.FC<Props> = ({ onValueChange }) => {
         id="persona-input"
         className="persona-input"
         popupClassName="persona-input-menu"
-        options={options}
+        options={personas}
         style={{ width: 200 }}
         onSelect={(data: string) => {
           onValueChange(data);
         }}
         onChange={(data: string) => {
           onValueChange(data);
+        }}
+        onSearch={(data: string) => {
+          if (data) {
+            const filtered = personaOptions.filter((option) =>
+              option.value.toLocaleLowerCase().startsWith(data.toLocaleLowerCase())
+            );
+            setPersonas(filtered);
+          } else {
+            setPersonas(personaOptions);
+          }
         }}
         placeholder="Start typing or select from the list"
       />
