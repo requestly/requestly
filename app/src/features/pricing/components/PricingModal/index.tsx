@@ -87,12 +87,12 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   );
 
   useEffect(() => {
-    if (selectedPlan) {
+    if (selectedPlan && !stripeClientSecret) {
       setIsCheckoutScreenVisible(true);
       setIsLoading(true);
       handleSubscribe(selectedPlan);
     }
-  }, [selectedPlan, handleSubscribe]);
+  }, [selectedPlan, handleSubscribe, stripeClientSecret]);
 
   useEffect(() => {
     if (!isCheckoutScreenVisible) trackPricingModalPlansViewed(source);
