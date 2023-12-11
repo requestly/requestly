@@ -19,6 +19,12 @@ export const FeatureCard: React.FC<Feature> = ({ id, icon: Icon, title, subTitle
       trackAppOnboardingStepCompleted(ONBOARDING_STEPS.GETTING_STARTED);
       trackAppOnboardingRecommendationSelected(id);
       dispatch(actions.updateAppOnboardingCompleted());
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "appOnboardingModal",
+          newValue: false,
+        })
+      );
       navigate(link, { replace: true });
     },
     [navigate, link, dispatch, id]

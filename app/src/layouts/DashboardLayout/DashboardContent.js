@@ -36,6 +36,7 @@ import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLink
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -51,6 +52,7 @@ const DashboardContent = () => {
   const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
+  const isNewOnboardingFeatureOn = useFeatureIsOn("new_onboarding");
 
   console.log({ user });
 
@@ -145,13 +147,15 @@ const DashboardContent = () => {
           {!userPersona.isSurveyCompleted && !user?.loggedIn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
           ) : null}
-          {/* {!isWorkspaceOnboardingCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+          {!isWorkspaceOnboardingCompleted &&
+          !isNewOnboardingFeatureOn &&
+          appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <WorkspaceOnboarding
               isOpen={activeModals.workspaceOnboardingModal.isActive}
               handleUploadRulesModalClick={toggleImportRulesModal}
               toggle={toggleWorkspaceOnboardingModal}
             />
-          ) : null} */}
+          ) : null}
           {activeModals.createWorkspaceModal.isActive ? (
             <CreateWorkspaceModal
               isOpen={activeModals.createWorkspaceModal.isActive}
@@ -210,8 +214,12 @@ const DashboardContent = () => {
             />
           ) : null}
           {shouldShowOnboarding() &&
+            isNewOnboardingFeatureOn &&
             appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-            !appOnboardingDetails.isOnboardingCompleted && <Onboarding />}
+            !appOnboardingDetails.isOnboardingCompleted && (
+              <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
+            )}
+
           {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
         </>
       )}

@@ -56,6 +56,12 @@ export const DefaultTeamView = () => {
           className="getting-started-manage-workspace-btn"
           onClick={() => {
             dispatch(actions.updateAppOnboardingCompleted());
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "appOnboardingModal",
+                newValue: false,
+              })
+            );
             trackAppOnboardingManageWorkspaceClicked();
             redirectToTeam(navigate, createdWorkspaceData.teamId);
           }}
