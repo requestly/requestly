@@ -40,7 +40,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
       .catch((err) => {
         Logger.log(err);
       });
-  }, [appMode]);
+  }, [appMode, dispatch]);
 
   return (
     <Modal

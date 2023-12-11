@@ -15,7 +15,7 @@ export const OnboardingLoader = () => {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [index]);
+  }, [index, texts.length]);
 
   return (
     <AnimatePresence>
