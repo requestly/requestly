@@ -193,14 +193,14 @@
     <script>
       var scriptElem = document.createElement("script"),
       s = document.getElementsByTagName("script")[0];
-      var BASE_URL = "https://app.saturnhq.io";
-      scriptElem.src = BASE_URL + "/assets/sdk.js";
+      var BASE_URL = "http://localhost:8081";
+      scriptElem.src = BASE_URL + "/sdk.js";
       scriptElem.defer = true;
       scriptElem.async = true;
       s.parentNode.insertBefore(scriptElem, s);
       scriptElem.onload = function () {
         window.saturnSDK.run({
-          integrationId: "requestly",
+          integrationId: "test",
         });
       };
     </script>
