@@ -11,7 +11,7 @@ import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
-import { updateUserInFirebaseAuthUser, updateValueAsPromise } from "actions/FirebaseActions";
+import { getValueAsPromise, updateUserInFirebaseAuthUser, updateValueAsPromise } from "actions/FirebaseActions";
 import { OnboardingLoader } from "features/onboarding/components/loader";
 import { m, AnimatePresence } from "framer-motion";
 import {
@@ -141,11 +141,14 @@ export const PersonaScreen = () => {
   }, [getUserPersona, dispatch, appOnboardingDetails.persona]);
 
   useEffect(() => {
-    if (user.loggedIn && user.details?.profile?.displayName === "User") {
-      setShouldShowFullNameInput(true);
+    if (user.loggedIn) {
+      getValueAsPromise(["users", user.details?.profile?.uid, "profile", "displayName"]).then((name) => {
+        if (name === "User") {
+          setShouldShowFullNameInput(true);
+        }
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user.loggedIn]);
+  }, [user.loggedIn, user.details?.profile?.uid]);
 
   useEffect(() => {
     if (!isLoading && shouldProceedToGettingStarted()) {

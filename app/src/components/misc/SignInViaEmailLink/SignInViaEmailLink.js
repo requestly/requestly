@@ -33,15 +33,16 @@ const SignInViaEmailLink = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCustomLoginFlow, setIsCustomLoginFlow] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const isNewOnboardingFeatureOn = true;
 
   //Global State
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [isEmailLoginLinkDone, setIsEmailLoginLinkDone] = useState(false);
-  const navigate = useNavigate();
 
   const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
 
@@ -69,21 +70,24 @@ const SignInViaEmailLink = () => {
    * Updates user displayName information during onboarding.
    * This function is not directly linked with the authentication flow.
    */
-  const updateUserFullName = useCallback(async () => {
-    if (user.details?.profile?.displayName === "User" && appOnboardingDetails.fullName) {
-      const newName = appOnboardingDetails.fullName;
-      return new Promise((resolve, reject) => {
-        updateValueAsPromise(["users", user.details?.profile?.uid, "profile"], { displayName: newName })
-          .then(() => {
-            resolve({ success: true });
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      });
-    }
-    return Promise.resolve({ success: true });
-  }, [user.details?.profile?.displayName, appOnboardingDetails.fullName, user.details?.profile?.uid]);
+  const updateUserFullName = useCallback(
+    async (data) => {
+      if (data?.displayName === "User" && appOnboardingDetails.fullName) {
+        const newName = appOnboardingDetails.fullName;
+        return new Promise((resolve, reject) => {
+          updateValueAsPromise(["users", data.uid, "profile"], { displayName: newName })
+            .then(() => {
+              resolve({ success: true });
+            })
+            .catch((e) => {
+              reject(e);
+            });
+        });
+      }
+      return Promise.resolve({ success: true });
+    },
+    [appOnboardingDetails.fullName]
+  );
 
   /**
    * Updates user persona information during onboarding.
@@ -111,27 +115,8 @@ const SignInViaEmailLink = () => {
       if (name) {
         message = isLogin ? `Welcome back ${name}!` : `Welcome to Requestly ${name}!`;
       }
-      //TODO: ONLY DO THIS FOR USERS WHO ARE ASSIGNED THE EXPERIMENT AND ONBOARDING IS NOT COMPLETED
-      Promise.all([
-        updateUserPersona(),
-        updateUserFullName(),
-        updateUserInFirebaseAuthUser({
-          displayName: appOnboardingDetails.fullName || user.details?.profile?.displayName,
-        }),
-      ])
-        .then(() => {
-          //DO NOTHING
-          Logger.log("User Persona and Full Name updated successfully");
-        })
-        .catch((e) => {
-          Logger.error(e);
-        })
-        .finally(() => {
-          toast.success(message);
-          redirectToRules(navigate);
-          trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
-          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
-        });
+      toast.success(message);
+      redirectToRules(navigate);
     }
   }, [
     dispatch,
@@ -166,8 +151,31 @@ const SignInViaEmailLink = () => {
                 setIsLogin(!isNewUser);
                 if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
 
-                setIsProcessing(false);
-                setIsEmailLoginLinkDone(true);
+                if (isNewOnboardingFeatureOn) {
+                  Promise.all([
+                    updateUserPersona(),
+                    updateUserInFirebaseAuthUser({
+                      displayName: appOnboardingDetails.fullName || authData?.displayName,
+                    }),
+                    updateUserFullName(authData),
+                  ])
+                    .then(() => {
+                      //DO NOTHING
+                      Logger.log("User Persona and Full Name updated successfully");
+                    })
+                    .catch((e) => {
+                      Logger.error(e);
+                    })
+                    .finally(() => {
+                      trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+                      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+                      setIsProcessing(false);
+                      setIsEmailLoginLinkDone(true);
+                    });
+                } else {
+                  setIsProcessing(false);
+                  setIsEmailLoginLinkDone(true);
+                }
               } else throw new Error("Failed");
             }
           })
@@ -179,7 +187,15 @@ const SignInViaEmailLink = () => {
         window.alert("Could not get the email to log into, please try again. If the problem persists, contact support");
       }
     },
-    [user.loggedIn, renderAlreadyLoggedInWarning]
+    [
+      user.loggedIn,
+      renderAlreadyLoggedInWarning,
+      updateUserPersona,
+      updateUserFullName,
+      appOnboardingDetails.fullName,
+      dispatch,
+      appOnboardingDetails.persona,
+    ]
   );
 
   const renderEmailInputForm = () => {

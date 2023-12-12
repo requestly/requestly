@@ -25,10 +25,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   const { step, disableSkip } = useSelector(getAppOnboardingDetails);
 
   useEffect(() => {
+    if (isOpen) trackAppOnboardingViewed();
+  }, [isOpen]);
+
+  useEffect(() => {
     //   getAndUpdateInstallationDate(appMode, false, false)
     //     .then((install_date) => {
     //       if (new Date(install_date) > new Date("2023-12-10")) {
-    trackAppOnboardingViewed();
     dispatch(actions.updateIsAppOnboardingStepDisabled(false));
     //         dispatch(
     //           actions.toggleActiveModal({
