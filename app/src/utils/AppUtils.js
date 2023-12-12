@@ -24,7 +24,7 @@ export const getAppDetails = () => {
 export const isDesktopMode = () => {
   return getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 };
-export const isProductionUI = true ||
+export const isProductionUI =
   (window.location.host.includes("app.requestly.io") || window.location.host.includes("beta.requestly.io")) &&
   !window.testMode;
 
