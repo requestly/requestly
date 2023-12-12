@@ -8,6 +8,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.12.12",
+    logs: ["Revert #1208 Relay auth header to redirected request"],
+  },
+  {
     version: "23.12.10",
     logs: ["#1208 Relay auth header to redirected request"],
   },
