@@ -459,7 +459,7 @@ export const signInWithEmailLink = async (email, callback) => {
     const authData = getAuthData(result.user);
     const database = getDatabase();
 
-    if (isNewUser) update(ref(database, getUserProfilePath(authData.uid)), authData);
+    if (isNewUser) await update(ref(database, getUserProfilePath(authData.uid)), authData);
 
     //  Analytics - Track event
     trackLoginSuccessEvent({

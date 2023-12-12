@@ -152,10 +152,11 @@ const SignInViaEmailLink = () => {
                 if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
 
                 if (isNewOnboardingFeatureOn) {
+                  const name = authData?.displayName !== "User" ? authData.displayName : appOnboardingDetails.fullName;
                   Promise.all([
                     updateUserPersona(),
                     updateUserInFirebaseAuthUser({
-                      displayName: appOnboardingDetails.fullName || authData?.displayName,
+                      displayName: name ?? "User",
                     }),
                     updateUserFullName(authData),
                   ])

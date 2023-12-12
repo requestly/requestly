@@ -143,7 +143,7 @@ export const PersonaScreen = () => {
   useEffect(() => {
     if (user.loggedIn) {
       getValueAsPromise(["users", user.details?.profile?.uid, "profile", "displayName"]).then((name) => {
-        if (name === "User") {
+        if (name === "User" || !name) {
           setShouldShowFullNameInput(true);
         }
       });
