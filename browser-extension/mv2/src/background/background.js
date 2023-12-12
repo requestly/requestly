@@ -252,11 +252,6 @@ BG.Methods.replaceHeader = function (headers, newHeader) {
   BG.Methods.addHeader(headers, newHeader);
 };
 
-BG.Methods.getHeaderValue = (headers, headerName) => {
-  const header = headers.find(({ name }) => name.toLowerCase() === headerName.toLowerCase());
-  return header?.value;
-};
-
 /**
  *
  * @param originalHeaders Original Headers present in the HTTP(s) request
@@ -269,28 +264,12 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     ruleType,
     rulePairs,
     rulePair,
-    hasModifiedHeaders = false,
+    isRuleApplied = false,
     modifications,
     modification,
     url = details.url,
     mainFrameUrl = BG.Methods.getMainFrameUrl(details),
     enabledRules = BG.Methods.getEnabledRules();
-
-  if (headersTarget === RQ.HEADERS_TARGET.REQUEST) {
-    RQ.IGNORED_HEADERS_ON_REDIRECT.forEach((headerName) => {
-      const customHeaderName = RQ.CUSTOM_HEADER_PREFIX + headerName;
-      const customHeaderValue = BG.Methods.getHeaderValue(originalHeaders, customHeaderName);
-      const originalHeaderValue = BG.Methods.getHeaderValue(originalHeaders, headerName);
-
-      if (customHeaderValue) {
-        if (!originalHeaderValue) {
-          BG.Methods.addHeader(originalHeaders, { name: headerName, value: customHeaderValue });
-        }
-        BG.Methods.removeHeader(originalHeaders, customHeaderName);
-        hasModifiedHeaders = true;
-      }
-    });
-  }
 
   for (var i = 0; i < enabledRules.length; i++) {
     rule = enabledRules[i];
@@ -345,7 +324,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
           continue;
         }
 
-        hasModifiedHeaders = true;
+        isRuleApplied = true;
 
         // Check if user has used predefinedFunction in (add/modify) header value
         var valueWithPreDefFunctionsApplied = RuleMatcher.matchValueForPredefinedFunctions(modification.value, details);
@@ -390,7 +369,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
 
   // If rule is not applied and we return headers object without any change, then chrome treats them as modification
   // And some websites break due to this.
-  return hasModifiedHeaders ? originalHeaders : null;
+  return isRuleApplied ? originalHeaders : null;
 };
 
 BG.Methods.getMainFrameUrl = function (details) {
