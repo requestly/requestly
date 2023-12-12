@@ -145,14 +145,16 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       if (isVerified) {
         setIsVerifiedBusinessUser(isVerified);
         setIsNotifyAllSelected(true);
-        const defaultTeamName = `${getDomainFromEmail(user?.details?.profile?.email).split(".")[0]} <team name>`;
+        const defaultTeamName = `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
+          getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
+        })`;
         form.setFieldValue("workspaceName", defaultTeamName);
         setCreateWorkspaceFormData((prev) => {
           return { ...prev, workspaceName: defaultTeamName };
         });
       }
     });
-  }, [user?.details?.profile?.email, user?.details?.profile?.uid, form]);
+  }, [user?.details?.profile?.email, user?.details?.profile?.uid, user.details?.profile?.displayName, form]);
 
   useEffect(() => {
     if (isOpen) trackAddWorkspaceNameModalViewed(source);

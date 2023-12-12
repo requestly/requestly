@@ -45,7 +45,11 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       user?.details?.profile?.uid
     );
     try {
-      const teamName = isBusinessUser ? getDomainFromEmail(user?.details?.profile?.email) : "My Team";
+      const teamName = isBusinessUser
+        ? `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
+            getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
+          })`
+        : "My Team";
       createTeam({
         teamName: teamName,
       }).then((res: any) => {
@@ -90,6 +94,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
     memberEmails,
     selectedRules,
     setPostShareViewData,
+    user.details?.profile?.displayName,
     user?.details?.profile?.email,
     user?.details?.profile?.uid,
   ]);
