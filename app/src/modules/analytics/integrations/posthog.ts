@@ -2,13 +2,9 @@
 import Logger from "lib/logger";
 // @ts-ignore
 import posthog from "posthog-js";
-import featureFlag from "utils/feature-flag";
-import { getEmailType, getDomainFromEmail } from "utils/FormattingHelper";
-import { buildBasicUserProperties } from "../utils";
 import { IAnalyticsIntegration } from "./common";
 import { maxRetryDuration, retryDuration } from "../config";
 import { PAGE_VIEW } from "../events/misc/constants";
-import { getCookie } from "utils/CookieUtils";
 
 const blacklisted_events = [PAGE_VIEW];
 
@@ -24,24 +20,18 @@ class PosthogIntegration implements IAnalyticsIntegration {
     // @ts-ignore
     if (window.POSTHOG_INTEGRATION_DONE) {
       posthog.reset();
-      initPosthogUser(user);
-      featureFlag.init();
     }
 
     // @ts-ignore
     if (!window.POSTHOG_INTEGRATION_DONE) {
-      posthog.init("phc_MhqVyU0ZOCTwShM1pg9WaiE29hBD1EjxERGe5vX3E0k", {
+      posthog.init("phc_uNIYhy7rJ7GZF0H7aYtHvCOHIaCjB6wKICG9dkNUEDy", {
         api_host: "https://app.posthog.com",
+        persistence: "memory",
         disable_session_recording: true,
         opt_in_site_apps: true,
         autocapture: false,
-        loaded: function (posthog: any) {
-          initPosthogUser(user);
-          featureFlag.init();
-          fetchPosthogId();
-        },
         session_recording: {
-          maskAllInputs: false,
+          maskAllInputs: true,
           maskInputOptions: {
             password: true,
           },
@@ -60,21 +50,22 @@ class PosthogIntegration implements IAnalyticsIntegration {
       return;
     }
 
-    // Disabling events Tracking for posthog
-    return;
+    // Disabling events Tracking for posthog.
+    // TODO: Move to new account
+    /*
+    if (true) return;
 
     if (this.isIntegrationDone) {
       posthog.capture(eventName, eventParams);
     } else {
       if (Date.now() - this.startTime > maxRetryDuration) return;
 
-      Logger.log(
-        `Oops! Posthog init is still pending, will retry after 2s. Retry=${retry}`
-      );
+      Logger.log(`Oops! Posthog init is still pending, will retry after 2s. Retry=${retry}`);
       setTimeout(() => {
         this.trackEvent(eventName, eventParams, retry + 1);
       }, retryDuration);
     }
+    */
   };
 
   trackAttr = (name: string, value: string, retry: number = 0) => {
@@ -83,8 +74,7 @@ class PosthogIntegration implements IAnalyticsIntegration {
         // @ts-ignore
         window.rq_posthog = window.rq_posthog || {};
         // @ts-ignore
-        window.rq_posthog.attributesToSync =
-          window.rq_posthog.attributesToSync || {};
+        window.rq_posthog.attributesToSync = window.rq_posthog.attributesToSync || {};
         // @ts-ignore
         window.rq_posthog.attributesToSync[name] = value;
       } catch (_e) {
@@ -93,9 +83,7 @@ class PosthogIntegration implements IAnalyticsIntegration {
     } else {
       if (Date.now() - this.startTime > maxRetryDuration) return;
 
-      Logger.log(
-        `Oops! Posthog init is still pending, will retry after 2s. Retry=${retry}`
-      );
+      Logger.log(`Oops! Posthog init is still pending, will retry after 2s. Retry=${retry}`);
       setTimeout(() => {
         this.trackAttr(name, value, retry + 1);
       }, retryDuration);
@@ -108,10 +96,7 @@ class PosthogIntegration implements IAnalyticsIntegration {
       if (window.rq_posthog && window.rq_posthog.attributesToSync) {
         try {
           // @ts-ignore
-          Logger.log(
-            `[Analytics] Batch Syncing Posthog Attributes`,
-            window.rq_posthog.attributesToSync
-          );
+          Logger.log(`[Analytics] Batch Syncing Posthog Attributes`, window.rq_posthog.attributesToSync);
           // @ts-ignore
           posthog.people.set(window.rq_posthog.attributesToSync);
           // @ts-ignore
@@ -123,45 +108,6 @@ class PosthogIntegration implements IAnalyticsIntegration {
     }, 20000);
   };
 }
-
-export const fetchPosthogId = () => {
-  const posthogCookieString = getCookie(
-    "ph_phc_MhqVyU0ZOCTwShM1pg9WaiE29hBD1EjxERGe5vX3E0k_posthog"
-  );
-
-  let distinctId = null;
-
-  try {
-    distinctId = JSON.parse(posthogCookieString).distinct_id;
-  } catch (e) {
-    Logger.error(e);
-  }
-
-  window.posthogDistinctId = distinctId;
-  return distinctId;
-};
-
-const initPosthogUser = (user: any) => {
-  if (!user) {
-    return;
-  }
-
-  const userData = buildBasicUserProperties(user);
-  const emailType = getEmailType(userData.email);
-  const emailDomain = getDomainFromEmail(userData.email);
-
-  posthog.identify(userData.uid);
-  posthog.people.set({ email: userData.email });
-  if (emailType === "BUSINESS") {
-    posthog.group("BUSINESS", emailDomain, {
-      company_domain: emailDomain,
-    });
-  }
-
-  // Start Session Recording for only logged in users
-  // Disabling session recording for limit breach
-  // posthog.startSessionRecording();
-};
 
 const posthogIntegration = new PosthogIntegration();
 export default posthogIntegration;

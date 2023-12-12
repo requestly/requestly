@@ -8,7 +8,7 @@ class LocalIntegration implements IAnalyticsIntegration {
   dispatchBuffer = {};
 
   init = (user: any, dispatch: any) => {
-    if(dispatch) {
+    if (dispatch) {
       this.dispatch = dispatch;
       this.isIntegrationDone = true;
     }
@@ -19,8 +19,8 @@ class LocalIntegration implements IAnalyticsIntegration {
   };
 
   trackAttr = (name: string, value: string, retry: number = 0) => {
-    if(this.isIntegrationDone && this.dispatch) {
-      this.dispatch(actions.updateUserAttributes({...this.dispatchBuffer, [name]: value }));
+    if (this.isIntegrationDone && this.dispatch) {
+      this.dispatch(actions.updateUserAttributes({ ...this.dispatchBuffer, [name]: value }));
       this.dispatchBuffer = {};
     } else {
       this.dispatchBuffer = { ...this.dispatchBuffer, [name]: value };
