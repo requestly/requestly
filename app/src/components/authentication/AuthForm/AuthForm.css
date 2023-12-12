@@ -6,7 +6,7 @@
   padding: 40px;
 }
 .signup-form-wrapper {
-  background: var(--background);
+  background: #19191d; /* TODO: replace this with CSS variable*/
   padding: 40px 50px;
   border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
 }
@@ -51,8 +51,9 @@
 .auth-modal-input-label {
   margin-bottom: 4px;
 }
-.auth-modal-input {
+.auth-modal-input.ant-input {
   box-shadow: var(--input-box-shadow);
+  background: var(--component-dark-background);
   border: 0 !important;
   min-height: 38px;
 }

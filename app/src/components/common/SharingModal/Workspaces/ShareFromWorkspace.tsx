@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
-import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
@@ -19,6 +18,7 @@ import {
 } from "modules/analytics/events/misc/sharing";
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 
 interface Props {
   selectedRules: string[];
@@ -39,11 +39,20 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       teamId: currentlyActiveWorkspace.id,
       emails: memberEmails,
       role: TeamRole.write,
+      teamName: currentlyActiveWorkspace.name,
+      numberOfMembers: currentlyActiveWorkspace.membersCount,
+      source: "sharing_modal_from_workspace",
     }).then((res: any) => {
       const hasSuccessfulInvite = res?.data.results.some((result: any) => result.success);
 
       if (hasSuccessfulInvite) {
-        trackAddTeamMemberSuccess(currentlyActiveWorkspace.id, memberEmails, TeamRole.write, "sharing_modal");
+        trackAddTeamMemberSuccess({
+          team_id: currentlyActiveWorkspace.id,
+          email: memberEmails,
+          is_admin: false,
+          source: "sharing_modal",
+          num_users_added: memberEmails.length,
+        });
         setPostShareViewData({
           type: WorkspaceSharingTypes.USERS_INVITED,
         });
@@ -54,7 +63,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       }
       setIsLoading(false);
     });
-  }, [memberEmails, currentlyActiveWorkspace.id, setPostShareViewData]);
+  }, [memberEmails, currentlyActiveWorkspace, setPostShareViewData]);
 
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Team) => {
@@ -79,20 +88,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShar
       <div className="mt-8 text-gray">Collaborate in real-time with your teammates within a shared workspace.</div>
       <div className="mt-1">
         <label className="caption text-gray">Email addresses</label>
-        <ReactMultiEmail
-          className="sharing-modal-email-input"
-          emails={memberEmails}
-          onChange={setMemberEmails}
-          validateEmail={validateEmail}
-          getLabel={(email, index, removeEmail) => (
-            <div data-tag key={index} className="multi-email-tag">
-              {email}
-              <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-              </span>
-            </div>
-          )}
-        />
+        <EmailInputWithDomainBasedSuggestions onChange={setMemberEmails} />
         <div className="items-center space-between w-full mt-1">
           <RQButton
             type="primary"

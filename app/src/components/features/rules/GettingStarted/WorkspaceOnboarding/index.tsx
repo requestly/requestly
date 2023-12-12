@@ -8,7 +8,7 @@ import {
   getWorkspaceOnboardingTeamDetails,
   getUserPersonaSurveyDetails,
 } from "store/selectors";
-import { getAvailableTeams } from "store/features/teams/selectors";
+import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { FullPageHeader } from "components/common/FullPageHeader";
 import { AuthFormHero } from "components/authentication/AuthForm/AuthFormHero";
@@ -34,6 +34,7 @@ import "./index.css";
 import { trackOnboardingWorkspaceSkip } from "modules/analytics/events/misc/onboarding";
 import { trackNewTeamCreateSuccess, trackWorkspaceOnboardingViewed } from "modules/analytics/events/features/teams";
 import { capitalize } from "lodash";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentTeams = useSelector(getAvailableTeams);
   const step = useSelector(getWorkspaceOnboardingStep);
   const workspaceOnboardingTeamDetails = useSelector(getWorkspaceOnboardingTeamDetails);
@@ -58,6 +60,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
     []
   );
+  const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
 
   const isPendingEmailInvite = useMemo(() => pendingInvites?.some((invite) => invite.usage === InviteUsage.once), [
     pendingInvites,
@@ -94,13 +97,26 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
           teamName: newTeamName,
           generatePublicLink: true,
         }).then((response: any) => {
+          upsertTeamCommonInvite({ teamId: response?.data?.teamId, domainEnabled: true });
           setDefaultTeamData({ name: newTeamName, ...response?.data });
           dispatch(
             actions.updateWorkspaceOnboardingTeamDetails({ createdTeam: { name: newTeamName, ...response?.data } })
           );
           trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "onboarding");
+          switchWorkspace(
+            {
+              teamId: response?.data?.teamId,
+              teamName: newTeamName,
+              teamMembersCount: response?.data?.accessCount,
+            },
+            dispatch,
+            { isWorkspaceMode, isSyncEnabled: true },
+            appMode,
+            null,
+            "onboarding"
+          );
           setTimeout(() => {
-            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.CREATE_JOIN_WORKSPACE));
+            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }, 50);
         });
       } else {
@@ -117,6 +133,9 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     userEmailDomain,
     createTeam,
     dispatch,
+    appMode,
+    isWorkspaceMode,
+    upsertTeamCommonInvite,
   ]);
 
   useEffect(() => {
@@ -197,24 +216,22 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
     switch (step) {
       case OnboardingSteps.AUTH:
         return (
-          <div>
+          <div className="onboarding-auth-form">
+            <RQButton
+              className="display-block text-gray m-auto skip-onboarding-btn"
+              type="text"
+              onClick={() => {
+                trackOnboardingWorkspaceSkip(OnboardingSteps.AUTH);
+                dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
+              }}
+            >
+              Skip
+            </RQButton>
             <OnboardingAuthForm
               callback={{
                 onSignInSuccess: (uid, isNewUser) => handleAuthCompletion(isNewUser),
               }}
             />
-            <div className="display-row-center mt-20">
-              <RQButton
-                className="display-block text-gray m-auto"
-                type="text"
-                onClick={() => {
-                  trackOnboardingWorkspaceSkip(OnboardingSteps.AUTH);
-                  dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.PERSONA_SURVEY));
-                }}
-              >
-                Skip for now
-              </RQButton>
-            </div>
           </div>
         );
       case OnboardingSteps.PERSONA_SURVEY:

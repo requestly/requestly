@@ -55,6 +55,10 @@
   text-transform: uppercase;
 }
 
+.text-capitalize {
+  text-transform: capitalize;
+}
+
 .text-white {
   color: var(--white);
 }
@@ -149,6 +153,9 @@
 
 .w-full {
   width: 100%;
+}
+.h-full {
+  height: 100%;
 }
 
 .shrink-0 {

@@ -76,12 +76,12 @@ const HOME_FEATURES: HomeFeature[] = [
   {
     featureHeader: {
       title: "Debugging",
-      description: "Validate your solutions using tools like session replay",
+      description: "Validate your solutions using tools like SessionBook",
       icon: debuggingIcon,
     },
     featureCards: [
       {
-        title: "Debug faster with Session Replay",
+        title: "Debug faster with SessionBook",
         description: "Replay screen, mouse movement, network, console and more of any browser session.",
         tag: FEATURES.SESSION_RECORDING,
         navigateTo: PATHS.SESSIONS.RELATIVE,
@@ -105,7 +105,7 @@ export const Home: React.FC = () => {
       <div className="home-v2-container">
         <div className="home-v2-welcome-message">
           <Typography.Title className="welcome-title">
-            Hello, {user?.loggedIn ? user.details.profile.displayName : "User"}
+            Hello, {user.details?.profile?.displayName ?? "User"}
           </Typography.Title>
           <Typography.Text className="welcome-subtitle">Where do you want to start today?</Typography.Text>
         </div>

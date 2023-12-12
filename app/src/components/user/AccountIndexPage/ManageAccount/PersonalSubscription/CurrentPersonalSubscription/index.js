@@ -7,7 +7,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import SpinnerColumn from "../../../../../misc/SpinnerColumn";
 import GetASubscription from "../../ActiveLicenseInfo/GetASubscription";
 import SubscriptionInfo from "../../ActiveLicenseInfo/SubscriptionInfo";
-import APP_CONSTANTS from "config/constants";
+import { PRICING } from "features/pricing";
 
 const CurrentPersonalSubscription = ({ customHeading, hideShadow }) => {
   const mountedRef = useRef(true);
@@ -36,7 +36,7 @@ const CurrentPersonalSubscription = ({ customHeading, hideShadow }) => {
         if (userSubscriptionDetails.status === "canceled") {
           setShowGetAPlan(true);
         }
-        setPlanName(userSubscriptionDetails.plan ?? APP_CONSTANTS.PRICING.PLAN_NAMES.FREE);
+        setPlanName(userSubscriptionDetails.plan ?? PRICING.PLAN_NAMES.FREE);
         setEndDate(new Date(userSubscriptionDetails.endDate * 1000).toDateString());
         setStartDate(new Date(userSubscriptionDetails.startDate * 1000).toDateString());
         setIsLoading(false);

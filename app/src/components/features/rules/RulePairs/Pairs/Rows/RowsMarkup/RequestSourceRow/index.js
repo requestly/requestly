@@ -14,7 +14,7 @@ import { TestURLModal } from "components/common/TestURLModal";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import PATHS from "config/constants/sub/paths";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
-import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+import { getModeData, setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import Filters from "components/features/rules/RulePairs/Filters";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import {
@@ -35,6 +35,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
   const isTestURLFeatureFlagOn = useFeatureIsOn("test_url_modal");
   const hasSeenTestURLAnimation = useRef(false);
+  const { MODE } = getModeData(window.location);
 
   const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
     return Array.isArray(rule.pairs[pairIndex].source.filters);
@@ -264,6 +265,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
           </Col>
           <Col className="w-full">
             <Input
+              autoFocus={MODE === "create"}
               placeholder={
                 ruleDetails.ALLOW_APPLY_RULE_TO_ALL_URLS
                   ? "Enter url here or leave this field empty to apply rule to all url’s..."

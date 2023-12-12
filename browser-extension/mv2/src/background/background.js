@@ -560,8 +560,59 @@ BG.Methods.onBeforeRequest = (details) => {
   return BG.Methods.modifyUrl(details);
 };
 
+BG.Methods.modifyHeadersForSessionReplayPlayer = ({
+  headersToUpdate,
+  ruleModifiedHeaders,
+  requestDetails,
+  originalHeaders,
+}) => {
+  try {
+    const requestInitiator = new URL(requestDetails.initiator ?? requestDetails.originUrl); // firefox does not contain "initiator"
+    const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
+    const fontTypes = ["woff", "woff2", "otf", "ttf", "eot"];
+    const requestURL = new URL(requestDetails.url);
+    const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
+
+    if (isAppInitiator && (requestDetails.type === "font" || isFontResourceLink)) {
+      const formattedHeaders = Object.keys(headersToUpdate).map((key) => ({
+        name: key,
+        value: headersToUpdate[key],
+      }));
+
+      const modifyHeaders = (headers) => {
+        return headers
+          .filter((header) => !(header?.name?.toLowerCase() in headersToUpdate))
+          .concat(...formattedHeaders);
+      };
+
+      return !ruleModifiedHeaders ? modifyHeaders(originalHeaders) : modifyHeaders(ruleModifiedHeaders);
+    }
+  } catch (e) {
+    // do nothing
+  }
+
+  return ruleModifiedHeaders;
+};
+
 BG.Methods.modifyRequestHeadersListener = function (details) {
   var modifiedHeaders = BG.Methods.modifyHeaders(details.requestHeaders, RQ.HEADERS_TARGET.REQUEST, details);
+
+  try {
+    const requestURL = new URL(details.url);
+
+    // Overriding referer header since for session replay player
+    // it's value is app.requestly.io, which break some websites eg apple.com
+    const requestHeaders = { referer: requestURL.origin + "/" };
+
+    modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
+      requestDetails: details,
+      headersToUpdate: requestHeaders,
+      ruleModifiedHeaders: modifiedHeaders,
+      originalHeaders: details.requestHeaders,
+    });
+  } catch (e) {
+    // do nothing
+  }
 
   if (modifiedHeaders !== null) {
     return { requestHeaders: modifiedHeaders };
@@ -573,26 +624,21 @@ BG.Methods.onHeadersReceived = function (details) {
 
   try {
     const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
-    const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
-    const fontTypes = ["woff", "woff2", "otf", "ttf"];
-    const requestURL = new URL(details.url);
-    const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
 
     // This bypasses the CORS error in session replay player
-    if (isAppInitiator && (details.type === "font" || isFontResourceLink)) {
-      const corsHeaders = {
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Origin": requestInitiator.origin,
-      };
+    const corsHeaders = {
+      "access-control-allow-methods": "*",
+      "access-control-allow-headers": "*",
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": requestInitiator.origin,
+    };
 
-      const formattedCorsHeaders = Object.keys(corsHeaders).map((key) => ({ name: key, value: corsHeaders[key] }));
-
-      modifiedHeaders = !modifiedHeaders
-        ? formattedCorsHeaders
-        : modifiedHeaders.filter((header) => !(header?.name in corsHeaders)).concat(...formattedCorsHeaders);
-    }
+    modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
+      requestDetails: details,
+      headersToUpdate: corsHeaders,
+      ruleModifiedHeaders: modifiedHeaders,
+      originalHeaders: details.responseHeaders,
+    });
   } catch (e) {
     // do nothing
   }
@@ -968,7 +1014,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
-        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id);
+        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id, message.markRecordingIcon);
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
@@ -980,7 +1026,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        BG.Methods.startRecordingExplicitly(message.tabId ?? sender.tab.id, message.showWidget);
+        BG.Methods.startRecordingExplicitly(message.tab ?? sender.tab, message.showWidget);
         break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
@@ -1127,8 +1173,10 @@ BG.Methods.getSessionRecordingConfig = async (url) => {
   return shouldRecord ? sessionRecordingConfig : null;
 };
 
-BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
-  RQ.extensionIconManager.markRecording(tabId);
+BG.Methods.onSessionRecordingStartedNotification = (tabId, markRecordingIcon = true) => {
+  if (markRecordingIcon) {
+    RQ.extensionIconManager.markRecording(tabId);
+  }
 };
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
@@ -1143,6 +1191,7 @@ BG.Methods.cacheRecordedSessionOnClientPageUnload = (tabId, payload) => {
       ...sessionRecordingData,
       previousSession: payload.session,
       widgetPosition: payload.widgetPosition,
+      recordingStartTime: payload.recordingStartTime,
     });
   }
 };
@@ -1213,6 +1262,14 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
 
     if (sessionRecordingConfig) {
       sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
+      const recordingMode = sessionRecordingConfig?.autoRecording?.mode;
+
+      sessionRecordingData.showWidget = recordingMode === "custom";
+
+      if (recordingMode === "allPages") {
+        sessionRecordingData.markRecordingIcon = false;
+      }
+
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   } else if (!sessionRecordingData.explicit) {
@@ -1328,17 +1385,20 @@ BG.Methods.saveTestRuleResult = (payload, senderTab) => {
   });
 };
 
-BG.Methods.startRecordingExplicitly = (tabId, showWidget = true) => {
-  const sessionRecordingDataExist = !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
-  if (sessionRecordingDataExist) {
+BG.Methods.startRecordingExplicitly = async (tab, showWidget = true) => {
+  const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
+
+  const sessionRecordingDataExist = !!window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  // Auto recording is on for current tab if sessionRecordingConfig exist,
+  // so forcefully start explicit recording.
+  if (!sessionRecordingConfig && sessionRecordingDataExist) {
     return;
   }
 
   const sessionRecordingData = { explicit: true, showWidget };
+  window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
-  window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
-
-  BG.Methods.sendMessageToClient(tabId, {
+  BG.Methods.sendMessageToClient(tab.id, {
     action: RQ.CLIENT_MESSAGES.START_RECORDING,
     payload: sessionRecordingData,
   });

@@ -36,6 +36,7 @@
     "@types/uuid": "^9.0.1",
     "archiver": "^5.3.1",
     "node-sass": "^8.0.0",
+    "postcss": "^8.4.30",
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-postcss": "^4.0.2",

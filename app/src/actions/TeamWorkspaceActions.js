@@ -4,7 +4,11 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "./ExtensionActions";
 import { actions } from "store";
 import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
-import { mergeRecordsAndSaveToFirebase, resetSyncDebounceTimerStart } from "hooks/DbListenerInit/syncingNodeListener";
+import {
+  mergeRecordsAndSaveToFirebase,
+  resetSyncDebounce,
+  resetSyncDebounceTimerStart,
+} from "hooks/DbListenerInit/syncingNodeListener";
 import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
 import Logger from "lib/logger";
@@ -70,6 +74,7 @@ export const switchWorkspace = async (
 
   let skipStorageClearing = false;
   resetSyncDebounceTimerStart();
+  resetSyncDebounce();
 
   // Don't clear when appMode is Extension but user has not installed it!
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) skipStorageClearing = true;

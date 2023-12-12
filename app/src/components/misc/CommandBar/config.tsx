@@ -54,7 +54,13 @@ export const config: PageConfig[] = [
             title: "Join workspace",
             icon: <IoPersonAddOutline />,
             action: ({ dispatch }) =>
-              dispatch(actions.toggleActiveModal({ modalName: "joinWorkspaceModal", newValue: true })),
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "joinWorkspaceModal",
+                  newValue: true,
+                  newProps: { source: "command_bar" },
+                })
+              ),
           },
           {
             id: "create new workspace",
@@ -134,7 +140,7 @@ export const config: PageConfig[] = [
       {
         id: "session recording",
         type: CommandItemType.GROUP,
-        title: "Session Recording",
+        title: "SessionBook",
         children: [
           {
             id: "record a session",

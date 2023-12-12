@@ -33,8 +33,8 @@ export const trackTeamPlanCardShown = (domain) => {
   trackEvent(TEAMS.REQUEST_TEAM_PLAN_CARD_SHOWN, params);
 };
 
-export const trackTeamPlanCardClicked = (domain) => {
-  const params = { domain };
+export const trackTeamPlanCardClicked = (domain, source) => {
+  const params = { domain, source };
   trackEvent(TEAMS.REQUEST_TEAM_PLAN_CARD_CLICKED, params);
 };
 
@@ -45,9 +45,6 @@ export const trackWorkspaceSettingToggled = (active_tab) => {
 export const trackWorkspaceDropdownClicked = (action) => {
   const params = { action };
   trackEvent(TEAMS.WORKSPACE_DROPDOWN_CLICKED, params);
-};
-export const trackUpgradeWorkspaceClicked = () => {
-  trackEvent(TEAMS.UPGRADE_WORKSPACE_CLICKED);
 };
 
 export const trackAddWorkspaceNameModalViewed = (source) => {
@@ -85,4 +82,12 @@ export const trackWorkspaceOrganizationCardClicked = (action) => {
 };
 export const trackWorkspaceInviteAnimationViewed = () => {
   trackEvent(TEAMS.WORKSPACE_INVITE_ANIMATION_VIEWED);
+};
+
+export const trackTeamPlanBannerViewed = () => {
+  trackEvent(TEAMS.GET_TEAM_PLAN_BANNER_VIEWED);
+};
+
+export const trackTeamPlanBannerClicked = (action, source) => {
+  trackEvent(TEAMS.GET_TEAM_PLAN_BANNER_CLICKED, { action, source });
 };

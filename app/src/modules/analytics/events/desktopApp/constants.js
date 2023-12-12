@@ -6,6 +6,11 @@ export const PROXY_PORT_CHANGED = "proxy_port_changed";
 export const INVALID_PROXY_PORT_INPUT = "invalid_proxy_port_input";
 export const USER_DENIED_CLOSING_LAUNCHED_APPS = "user_denied_closing_launched_apps";
 export const PROXY_PORT_CHANGE_REQUESTED = "proxy_port_change_requested";
+
+export const CUSTOM_LAUNCH_OPTIONS = {
+  LAUNCH_OPTIONS_SELECTED: "launch_options_selected",
+  CUSTOM_ARGS_LAUNCH_CANCELLED: "custom_args_launch_cancelled",
+};
 export const APPS = {
   APP_CONNECTED: "app_connected",
   APP_CONNECT_FAILURE: "app_connect_failure",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ProCard from "@ant-design/pro-card";
@@ -15,11 +15,11 @@ import {
   getAllRules,
   getActiveModals,
   getAppMode,
+  getGroupsSelection,
 } from "../../../../store/selectors";
 import { submitAttrUtil, trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { isSignUpRequired } from "utils/AuthUtils";
 //ACTIONS
-import { getSelectedRules } from "../actions";
 import { fetchSharedLists } from "../../sharedLists/SharedListsIndexPage/actions";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
@@ -46,6 +46,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   //Global State
   const dispatch = useDispatch();
   const rulesSelection = useSelector(getRulesSelection);
+  const groupsSelection = useSelector(getGroupsSelection);
   const user = useSelector(getUserAuthDetails);
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
@@ -54,7 +55,9 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
 
   //Component State
-  const [selectedRules, setSelectedRules] = useState(getSelectedRules(rulesSelection));
+  const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
+  const rulesToDelete = useMemo(() => allRules.filter((rule) => !!rulesSelection[rule.id]), [allRules, rulesSelection]);
+  const selectedGroupIds = useMemo(() => Object.keys(groupsSelection), [groupsSelection]);
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -122,25 +125,9 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     );
   };
 
-  const promptUserToLogInWithoutCallback = (source) => {
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: true,
-        newProps: {
-          redirectURL: window.location.href,
-          src: APP_CONSTANTS.FEATURES.RULES,
-          userActionMessage: "Sign up to generate a public shareable link",
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: source,
-        },
-      })
-    );
-  };
-
   const handleNewRuleOnClick = async (_e, ruleType) => {
     if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
-    else trackNewRuleButtonClicked();
+    else trackNewRuleButtonClicked("in_app");
     if (!user.loggedIn) {
       if (await isSignUpRequired(allRules, appMode, user)) {
         promptUserToSignup(() => redirectToCreateNewRule(navigate, ruleType, "my_rules"));
@@ -152,7 +139,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const handleShareRulesOnClick = () => {
-    user.loggedIn ? verifySharedListsLimit() : promptUserToLogInWithoutCallback(AUTH.SOURCE.SHARE_RULES);
+    toggleSharingModal(selectedRuleIds);
+    trackRQLastActivity("sharedList_created");
   };
 
   const getCurrentSharedListsCount = (result) => {
@@ -161,14 +149,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     } else {
       return 0;
     }
-  };
-
-  const verifySharedListsLimit = () => {
-    //Continue creating new shared list
-    const newSelectedRules = getSelectedRules(rulesSelection);
-    setSelectedRules(newSelectedRules);
-    toggleSharingModal(newSelectedRules);
-    trackRQLastActivity("sharedList_created");
   };
 
   const handleImportRulesOnClick = (e) => {
@@ -221,8 +201,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     setTotalRulesCount(allRules.length);
   }, [allRules]);
 
-  const recordsToDelete = allRules.filter((rule) => selectedRules.some((ruleId) => ruleId === rule.id));
-
   const clearSearch = useCallback(() => {
     setSearch(false);
     setSearchValue("");
@@ -242,18 +220,15 @@ const RulesListContainer = ({ isTableLoading = false }) => {
           clearSearch={clearSearch}
           isTableLoading={isTableLoading}
           handleChangeGroupOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsChangeGroupModalActive(true);
           }}
           handleShareRulesOnClick={handleShareRulesOnClick}
           handleDeleteRulesOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsDeleteRulesModalActive(true);
           }}
           handleImportRulesOnClick={handleImportRulesOnClick}
           totalRulesCount={totalRulesCount}
           handleNewGroupOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsCreateNewRuleGroupModalActive(true);
           }}
           handleNewRuleOnClick={handleNewRuleOnClick}
@@ -291,8 +266,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
         <DeleteRulesModal
           isOpen={isDeleteRulesModalActive}
           toggle={toggleDeleteRulesModal}
-          ruleIdsToDelete={selectedRules}
-          recordsToDelete={recordsToDelete}
+          rulesToDelete={rulesToDelete}
+          groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
         />
       ) : null}

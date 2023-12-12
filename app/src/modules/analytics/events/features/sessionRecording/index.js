@@ -4,7 +4,9 @@ import { SESSION_RECORDING } from "../constants";
 
 export const trackDemoVideoOpened = () => trackEvent(SESSION_RECORDING.session_recording_demo_video_opened);
 
-export const trackConfigurationOpened = () => trackEvent(SESSION_RECORDING.session_recordings_config_opened);
+export const trackConfigurationOpened = (source = "in_app") => {
+  trackEvent(SESSION_RECORDING.session_recordings_config_opened, { source });
+};
 
 export const trackConfigurationSaved = (params) => {
   trackEvent(SESSION_RECORDING.session_recordings_config_saved, params);
@@ -17,8 +19,8 @@ export const trackInstallExtensionDialogShown = (params) =>
 export const trackSessionRecordingFailed = (reason) =>
   trackEvent(SESSION_RECORDING.session_recording_failed, { reason });
 
-export const trackDraftSessionViewed = () => {
-  trackEvent(SESSION_RECORDING.draft_session_recording_viewed);
+export const trackDraftSessionViewed = (source, recording_mode) => {
+  trackEvent(SESSION_RECORDING.draft_session_recording_viewed, { source, recording_mode });
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_viewed);
 };
 
@@ -26,11 +28,13 @@ export const trackDraftSessionDiscarded = () => trackEvent(SESSION_RECORDING.dra
 
 export const trackDraftSessionNamed = () => trackEvent(SESSION_RECORDING.draft_session_recording_named);
 
-export const trackDraftSessionSaved = (sessionLength, options, type) => {
+export const trackDraftSessionSaved = ({ session_length, options, type, source, recording_mode }) => {
   trackEvent(SESSION_RECORDING.draft_session_recording_saved, {
     type,
-    sessionLength,
+    session_length,
     options,
+    source,
+    recording_mode,
   });
 
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_saved);
@@ -41,6 +45,8 @@ export const trackDraftSessionSaveFailed = (reason) =>
 
 export const trackSavedSessionViewed = (source) =>
   trackEvent(SESSION_RECORDING.saved_session_recording_viewed, { source });
+
+export const trackBadSessionRecordingViewed = () => trackEvent(SESSION_RECORDING.bad_session_recording_viewed);
 
 export const trackSessionRecordingShareClicked = () => {
   trackEvent(SESSION_RECORDING.session_recording_share_clicked);

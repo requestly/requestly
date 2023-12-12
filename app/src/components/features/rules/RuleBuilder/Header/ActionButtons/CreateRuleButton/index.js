@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 //UTILS
 import {
@@ -30,7 +30,55 @@ import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 import "../RuleEditorActionButtons.css";
+
+const getEventParams = (rule) => {
+  const eventParams = {};
+  switch (rule.ruleType) {
+    case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
+      eventParams.num_characters = rule.pairs[0].scripts.reduce((max, currentScript) => {
+        const currentScriptLen = currentScript.value.length;
+        return currentScriptLen > max ? currentScriptLen : max;
+      }, rule.pairs[0].scripts[0]?.value?.length);
+      break;
+    case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
+      eventParams.num_characters = rule.pairs[0].response?.value?.length;
+      break;
+    case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
+      eventParams.num_characters = rule.pairs[0].request?.value?.length;
+      break;
+    case GLOBAL_CONSTANTS.RULE_TYPES.HEADERS: {
+      const headerTypes = new Set();
+      const headerActions = new Set();
+      rule.pairs.some((pair) => {
+        if (pair.modifications?.Response?.length > 0) {
+          headerTypes.add("Response");
+        }
+        if (pair.modifications?.Request?.length > 0) {
+          headerTypes.add("Request");
+        }
+        pair.modifications?.Response?.forEach((responseHeader) => {
+          headerActions.add(responseHeader.type);
+        });
+        pair.modifications?.Request?.forEach((requestHeader) => {
+          headerActions.add(requestHeader.type);
+        });
+        if (headerTypes.size === 2 && headerActions.size === 3) {
+          return true;
+        }
+        return false;
+      });
+      eventParams.header_types = Array.from(headerTypes);
+      eventParams.header_actions = Array.from(headerActions);
+      break;
+    }
+    default:
+      return eventParams;
+  }
+  return eventParams;
+};
 
 // This is also the save rule button
 const CreateRuleButton = ({
@@ -43,6 +91,8 @@ const CreateRuleButton = ({
 }) => {
   //Constants
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const ruleCreatedEventSource = searchParams.get("source") ?? analyticEventRuleCreatedSource;
   const MODE = isRuleEditorModal ? ruleEditorModalMode : getModeData(location).MODE;
 
   //Global State
@@ -100,29 +150,31 @@ const CreateRuleButton = ({
           }
           if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
             ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
-
             trackRuleCreatedEvent({
               rule_type,
               description: currentlySelectedRuleData.description,
-              destinationTypes:
+              destination_types:
                 currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
                   ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
                   : null,
-              source: analyticEventRuleCreatedSource,
+              source: ruleCreatedEventSource,
               body_types:
                 currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
                   ? getAllResponseBodyTypes(currentlySelectedRuleData)
                   : null,
+              ...getEventParams(currentlySelectedRuleData),
             });
           } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
-            trackRuleEditedEvent(
+            trackRuleEditedEvent({
               rule_type,
-              currentlySelectedRuleData.description,
-              currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-                ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
-                : null,
-              analyticEventRuleCreatedSource
-            );
+              description: currentlySelectedRuleData.description,
+              destination_types:
+                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+                  ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+                  : null,
+              source: ruleCreatedEventSource,
+              ...getEventParams(currentlySelectedRuleData),
+            });
           }
           ruleModifiedAnalytics(user);
           trackRQLastActivity("rule_saved");
@@ -141,9 +193,7 @@ const CreateRuleButton = ({
           }
         });
     } else {
-      toast.warn(ruleValidation.message, {
-        hideProgressBar: true,
-      });
+      toast.warn(ruleValidation.message);
       trackErrorInRuleCreation(snakeCase(ruleValidation.error), currentlySelectedRuleData.ruleType);
     }
   };
@@ -165,18 +215,25 @@ const CreateRuleButton = ({
 
   return (
     <>
-      <Tooltip title={tooltipText} placement="top">
-        <Button
-          data-tour-id="rule-editor-create-btn"
-          type="primary"
-          className="text-bold"
-          disabled={isDisabled}
-          onClick={handleBtnOnClick}
-        >
-          {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
-          {currentActionText === "Create" ? `${currentActionText} rule` : currentActionText}
-        </Button>
-      </Tooltip>
+      <PremiumFeature
+        popoverPlacement="bottomLeft"
+        features={[FeatureLimitType.num_rules]}
+        onContinue={handleBtnOnClick}
+        disabled={
+          isDisabled ||
+          location?.state?.source === "my_rules" ||
+          location?.state?.source === "rule_selection" ||
+          MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT
+        }
+        source={currentlySelectedRuleData.ruleType}
+      >
+        <Tooltip title={tooltipText} placement="top">
+          <Button data-tour-id="rule-editor-create-btn" type="primary" className="text-bold" disabled={isDisabled}>
+            {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
+            {`Save rule`}
+          </Button>
+        </Tooltip>
+      </PremiumFeature>
     </>
   );
 };

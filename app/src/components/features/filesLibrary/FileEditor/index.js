@@ -31,7 +31,7 @@ export const RESOURCE_TYPE_LIST = {
 };
 
 const FileEditor = (props) => {
-  const { newFile } = props;
+  const { newFile = false } = props;
   // navigate
   const navigate = useNavigate();
 
@@ -413,6 +413,7 @@ const FileEditor = (props) => {
       <RQEditorTitle
         name={name}
         description={description}
+        mode={newFile ? "create" : "edit"}
         namePlaceholder={mockType === RESOURCE_TYPE_LIST.MOCK ? "Mock name" : "File name"}
         descriptionPlaceholder="Add your description here."
         nameChangeCallback={onNameChange}

@@ -12,9 +12,10 @@ export const deleteRulesFromStorage = async (appMode, rulesToDelete, callback) =
     Logger.log("Removing from storage in deleteRulesFromStorage");
     await StorageService(appMode).removeRecordsWithoutSyncing(executionLogsToDelete);
 
-    return callback();
+    return callback?.();
   } catch (e) {
     Logger.error(e);
+    throw e;
   }
 };
 

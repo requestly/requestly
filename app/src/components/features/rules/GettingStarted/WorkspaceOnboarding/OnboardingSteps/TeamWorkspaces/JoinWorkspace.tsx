@@ -16,7 +16,7 @@ import {
   trackOnboardingWorkspaceSkip,
   trackWorkspaceOnboardingPageViewed,
 } from "modules/analytics/events/misc/onboarding";
-import { trackWorkspaceInviteAccepted } from "modules/analytics/events/features/teams";
+import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { OnboardingSteps } from "../../types";
 import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
@@ -30,6 +30,7 @@ const Workspace: React.FC<{ team: TeamInviteMetadata }> = ({ team }) => {
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
   const handleJoinWorkspace = () => {
+    trackWorkspaceJoinClicked(team?.teamId, "workspace_onboarding");
     setIsJoining(true);
     acceptTeamInvite(team.inviteId)
       .then((res: any) => {
@@ -108,7 +109,7 @@ export const JoinWorkspace: React.FC<{
       </div>
       <div className="display-row-center mt-20">
         <div className="text-gray text-center" style={{ width: "380px" }}>
-          Join your teams workspace and get access to shared rules, mock APIs & session replays.
+          Join your teams workspace and get access to shared rules, mock APIs & SessionBook.
         </div>
       </div>
       <div className="mt-20 onboarding-invites-list">

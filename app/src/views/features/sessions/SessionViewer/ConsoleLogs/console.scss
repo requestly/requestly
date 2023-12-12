@@ -1,0 +1,118 @@
+.console-log-row {
+  margin: 6px;
+  border-radius: var(--border-radius-sm);
+
+  &.error-log {
+    background: #5f2d3559;
+  }
+
+  &.warning-log {
+    background: #9c8b1536;
+  }
+
+  &.default-log {
+    border-radius: 0;
+    border-bottom: 1px solid var(--gray-dark);
+  }
+
+  &.pending-log {
+    opacity: 0.45;
+  }
+
+  &.recent-log-border {
+    border-left: 2px solid var(--white);
+    border-radius: 2px;
+  }
+
+  .right-info {
+    text-align: right;
+  }
+  .right-info a {
+    text-decoration: underline;
+    color: var(--text-gray);
+  }
+
+  .right-info a:hover {
+    color: var(--white);
+  }
+
+  .trace-logs-wrapper {
+    margin-top: 5px;
+    .trace-log {
+      margin: 3px 0;
+      line-height: 13px;
+    }
+  }
+
+  .log-icon {
+    margin-right: 8px;
+    min-width: 12px;
+    min-height: 12px;
+  }
+
+  .recent-log-pointer {
+    color: var(--white);
+    font-size: 1rem;
+  }
+
+  .log-offset-row {
+    display: grid;
+    width: 80px;
+    grid-template-columns: 0.5fr 1fr;
+    align-items: center;
+    margin-left: -8px;
+    // TODO: add cursor pointer here after adding autoscroll
+
+    .log-offset {
+      margin-left: -5px;
+    }
+  }
+  .console-log-message {
+    font-size: 12px;
+  }
+
+  .see-more-button,
+  .see-more-button:hover {
+    display: inline;
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+.session-details-panel-row {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px 4px 10px;
+
+  span,
+  a,
+  .right-info,
+  .secondary-message {
+    line-height: 12px;
+  }
+
+  .primary-message {
+    word-break: break-word;
+
+    li > div {
+      line-height: 12px;
+      width: auto !important; // overriding inline style
+    }
+  }
+
+  .secondary-message {
+    word-break: break-word;
+    padding-left: 40px;
+    font-size: 12px;
+  }
+
+  .console-log-collapse {
+    .ant-collapse-expand-icon {
+      margin-top: -5px;
+      opacity: 0.6;
+    }
+    .ant-collapse-content-box {
+      padding: 0 !important;
+    }
+  }
+}

@@ -13,10 +13,6 @@ const INITIAL_STATE = {
   userPersona: {
     page: "getting_started",
     persona: "",
-    industry: "",
-    // useCases: [],
-    // referralChannel: "",
-    // numberOfEmployees: "",
     isSurveyCompleted: false,
   },
 
@@ -43,6 +39,7 @@ const INITIAL_STATE = {
     rulesToPopulate: [],
     groupwiseRulesToPopulate: {},
     selectedRules: {},
+    selectedGroups: {},
     lastBackupTimeStamp: "",
     isRulesListLoading: false,
   },
@@ -138,6 +135,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    pricingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {
@@ -194,10 +195,8 @@ const INITIAL_STATE = {
       isRuleEditorTourCompleted: false,
       extensionInstallSource: null,
       isMiscTourCompleted: {
-        firstRule: false,
-        fifthRule: false,
         firstDraftSession: false,
-        rulesListSharingOnboarding: false,
+        upgradeWorkspaceMenu: false,
       },
 
       hasConnectedApp: false,

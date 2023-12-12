@@ -51,6 +51,7 @@ export const AUTH = {
   AUTH_MODAL: {
     SHOWN: "auth_modal_shown",
     EMAIL_LOGIN_LINK_GENERATED: "email_login_link_generated",
+    GENERATE_MAGIC_LINK_FAILED: "magic_link_generation_failed",
   },
   AUTH_ONE_TAP_PROMPT: {
     VISIBLE: "auth_one_tap_prompt_visible",
@@ -81,6 +82,7 @@ export const AUTH = {
     RULES_LIST: "rules_list",
     PERSONA_SURVEY: "persona-survey",
     PERSONA_RECOMMENDATION_SCREEN: "persona_recommendation_screen",
+    PRICING_PAGE: "pricing_page",
   },
   POPOVER: {
     SHOWN: "popover_at_signup_shown",
@@ -168,7 +170,6 @@ export const TEAMS = {
   REQUEST_TEAM_PLAN_CARD_CLICKED: "request_team_plan_card_clicked",
   WORKSPACE_SETTING_TOGGLED: "workspace_setting_toggled",
   WORKSPACE_DROPDOWN_CLICKED: "workspace_dropdown_clicked",
-  UPGRADE_WORKSPACE_CLICKED: "upgrade_workspace_clicked",
   ADD_WORKSPACE_NAME_MODAL_VIEWED: "add_workspace_name_modal_viewed",
   ADD_MEMBERS_IN_WORKSPACE_MODAL_VIEWED: "add_members_in_worskpace_modal_viewed",
   WORKSPACE_INVITE_LINK_COPIED: "workspace_invite_link_copied",
@@ -176,6 +177,8 @@ export const TEAMS = {
   TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED: "team_workspace_organization_card_cancelled",
   TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED: "team_workspace_organization_card_clicked",
   WORKSPACE_INVITE_ANIMATION_VIEWED: "workspace_invite_animation_viewed",
+  GET_TEAM_PLAN_BANNER_VIEWED: "get_team_plan_banner_viewed",
+  GET_TEAM_PLAN_BANNER_CLICKED: "get_team_plan_banner_clicked",
 };
 
 export const TRAFFIC_TABLE = {
@@ -186,6 +189,10 @@ export const TRAFFIC_TABLE = {
 };
 
 export const FEATURE_LIMITER = {
-  UPGRADE_BANNER_CLICKED: "feature_limiter_upgrade_banner_clicked",
   UPGRADE_BANNER_VIEWED: "feature_limiter_upgrade_banner_viewed",
+};
+
+export const PRICING = {
+  PAID_FEATURE_NUDGE_VIEWED: "paid_feature_nudge_viewed",
+  VIEW_PRICING_PLANS_CLICKED: "view_pricing_plans_clicked",
 };

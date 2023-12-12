@@ -1,10 +1,11 @@
 import { trackEvent } from "..";
 // @ts-ignore
 import { CONSTANTS } from "@requestly/requestly-core";
+import { RULES } from "./common/constants";
 
 interface Event {
   eventName: string;
-  eventParams: object;
+  eventParams: Record<string, any>;
   eventTs: number;
 }
 
@@ -17,6 +18,19 @@ interface EventBatch {
 const sendEventsBatch = (eventBatch: EventBatch): void => {
   eventBatch.events.forEach((event) => {
     const eventConfig = { time: event.eventTs };
+
+    /* ADDING EXTRA INFO FOR RULE EXECUTION EVENTS */
+    if (event.eventName === RULES.RULE_EXECUTED) {
+      const currentUserId = window.uid;
+      const ruleCreator = event.eventParams?.["rule_creator"];
+
+      if (ruleCreator && currentUserId) {
+        const isExecutorCreator = currentUserId === ruleCreator;
+        event.eventParams["is_executor_creator"] = isExecutorCreator;
+      }
+      delete event.eventParams["rule_creator"];
+    }
+
     trackEvent(event.eventName, event.eventParams, eventConfig);
   });
 };

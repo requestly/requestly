@@ -47,6 +47,11 @@ export const getRulesSelection = (state) => {
   return rulesNode["selectedRules"];
 };
 
+export const getGroupsSelection = (state) => {
+  const rulesNode = getRulesNode(state);
+  return rulesNode["selectedGroups"];
+};
+
 export const getCurrentlySelectedRule = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["currentlySelectedRule"];
@@ -202,6 +207,10 @@ export const getUserRulesCount = (state) => {
   return getUserAttributes(state)?.num_rules ?? 0;
 };
 
+export const getExtensionInstallDate = (state) => {
+  return getUserAttributes(state).install_date;
+};
+
 export const getIsProductHuntLaunchedBannerClosed = (state) => {
   return getGlobalState(state).misc?.persist?.isProductHuntLaunchedBannerClosed;
 };
@@ -274,4 +283,8 @@ export const getTimeToResendEmailLogin = (state) => {
 
 export const getAppNotificationBannerDismissTs = (state) => {
   return getGlobalState(state).misc.persist?.appNotificationBannerDismissTs;
+};
+
+export const getIsOrgBannerDismissed = (state) => {
+  return getGlobalState(state).misc.persist?.isOrgBannerDismissed;
 };

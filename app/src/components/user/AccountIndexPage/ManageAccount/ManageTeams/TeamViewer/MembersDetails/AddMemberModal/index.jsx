@@ -5,7 +5,6 @@ import { Row, Checkbox } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import isEmail from "validator/lib/isEmail";
-import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
 import MemberRoleDropdown from "../../common/MemberRoleDropdown";
@@ -19,8 +18,8 @@ import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import APP_CONSTANTS from "config/constants";
-import "react-multi-email/style.css";
 import "./AddMemberModal.css";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -91,12 +90,21 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
       teamId: teamId,
       emails: userEmail,
       role: makeUserAdmin ? "admin" : "write",
+      teamName: teamDetails?.name,
+      numberOfMembers: teamDetails?.accessCount,
+      source: "add_member_modal",
     })
       .then((res) => {
         if (res?.data?.success) {
           toast.success("Sent invites successfully");
           callback?.();
-          trackAddTeamMemberSuccess(teamId, userEmail, makeUserAdmin, "add_member_modal");
+          trackAddTeamMemberSuccess({
+            team_id: teamId,
+            emails: userEmail,
+            is_admin: makeUserAdmin,
+            source: "add_member_modal",
+            num_users_added: userEmail.length,
+          });
           setIsProcessing(false);
           toggleModal();
         } else {
@@ -180,22 +188,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
               <div className="title mt-16">Email address</div>
               <div className="email-invites-wrapper">
                 <div className="emails-input-wrapper">
-                  <ReactMultiEmail
-                    className="members-email-input"
-                    placeholder="Email Address"
-                    type="email"
-                    value={userEmail}
-                    onChange={setUserEmail}
-                    validateEmail={validateEmail}
-                    getLabel={(email, index, removeEmail) => (
-                      <div data-tag key={index} className="multi-email-tag">
-                        {email}
-                        <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                          <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-                        </span>
-                      </div>
-                    )}
-                  />
+                  <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
                   <div className="access-dropdown-container">
                     <MemberRoleDropdown
                       placement="bottomRight"

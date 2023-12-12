@@ -9,7 +9,6 @@ import { Typography, Switch, Divider, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/common/MemberRoleDropdown";
-import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { renameWorkspace } from "backend/workspace";
@@ -25,6 +24,7 @@ import {
 } from "modules/analytics/events/features/teams";
 import { actions } from "store";
 import { NewTeamData, OnboardingSteps } from "../../types";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -56,7 +56,68 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
     user?.details?.profile?.email,
   ]);
 
-  const handleCreateNewTeam = () => {
+  const handleAddMembers = useCallback(
+    (newWorkspaceName?: string, newTeamId?: string) => {
+      if (!newWorkspaceName) {
+        toast.warn("Please enter the workspace name");
+        return;
+      }
+
+      if (!inviteEmails || !inviteEmails.length) {
+        toast.warn("Please add members email to invite them");
+        return;
+      }
+      setIsProcessing(true);
+
+      renameWorkspace(defaultTeamData?.teamId ?? newTeamId, newWorkspaceName);
+
+      const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
+
+      createTeamInvites({
+        teamId: defaultTeamData?.teamId ?? newTeamId,
+        emails: inviteEmails,
+        role: makeUserAdmin ? "admin" : "write",
+        teamName: defaultTeamData?.name ?? newWorkspaceName,
+        numberOfMembers: 1,
+        source: "onboarding",
+      })
+        .then((res: any) => {
+          if (res?.data?.success) {
+            toast.success("Invite sent successfully");
+            trackAddTeamMemberSuccess({
+              team_id: defaultTeamData?.teamId ?? newTeamId,
+              email: inviteEmails,
+              is_admin: makeUserAdmin,
+              source: "onboarding",
+              num_users_added: inviteEmails.length,
+            });
+            dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
+          }
+          setIsProcessing(false);
+          switchWorkspace(
+            {
+              teamId: defaultTeamData?.teamId ?? newTeamId,
+              teamMembersCount: 1,
+            },
+            dispatch,
+            {
+              isWorkspaceMode,
+              isSyncEnabled: true,
+            },
+            appMode,
+            null,
+            "onboarding"
+          );
+        })
+        .catch((err) => {
+          toast.error("Error while sending invitations");
+          trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
+        });
+    },
+    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData, makeUserAdmin]
+  );
+
+  const handleCreateNewTeam = useCallback(() => {
     trackCreateNewTeamClicked("onboarding");
     setIsProcessing(true);
     const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
@@ -70,57 +131,20 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
       }
       trackNewTeamCreateSuccess(response?.data?.teamId, newWorkspaceName, "onboarding");
+      switchWorkspace(
+        {
+          teamId: response?.data?.teamId,
+          teamName: newWorkspaceName,
+          teamMembersCount: response?.data?.accessCount,
+        },
+        dispatch,
+        { isWorkspaceMode, isSyncEnabled: true },
+        appMode,
+        null,
+        "onboarding"
+      );
     });
-  };
-
-  const handleAddMembers = (newWorkspaceName?: string, newTeamId?: string) => {
-    if (!newWorkspaceName) {
-      toast.warn("Please enter the workspace name");
-      return;
-    }
-
-    if (!inviteEmails || !inviteEmails.length) {
-      toast.warn("Please add members email to invite them");
-      return;
-    }
-    setIsProcessing(true);
-
-    renameWorkspace(defaultTeamData?.teamId ?? newTeamId, newWorkspaceName);
-
-    const createTeamInvites = httpsCallable(getFunctions(), "invites-createTeamInvites");
-
-    createTeamInvites({
-      teamId: defaultTeamData?.teamId ?? newTeamId,
-      emails: inviteEmails,
-      role: makeUserAdmin ? "admin" : "write",
-    })
-      .then((res: any) => {
-        if (res?.data?.success) {
-          toast.success("Invite sent successfully");
-          trackAddTeamMemberSuccess(defaultTeamData?.teamId ?? newTeamId, inviteEmails, makeUserAdmin, "onboarding");
-          dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
-        }
-        setIsProcessing(false);
-        switchWorkspace(
-          {
-            teamId: defaultTeamData?.teamId ?? newTeamId,
-            teamMembersCount: 1,
-          },
-          dispatch,
-          {
-            isWorkspaceMode,
-            isSyncEnabled: true,
-          },
-          appMode,
-          null,
-          "onboarding"
-        );
-      })
-      .catch((err) => {
-        toast.error("Error while sending invitations");
-        trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
-      });
-  };
+  }, [appMode, dispatch, isWorkspaceMode, newWorkspaceName, inviteEmails?.length, handleAddMembers]);
 
   const handleDomainToggle = useCallback(
     (enabled: boolean) => {
@@ -154,7 +178,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
 
   return (
     <>
-      <div className="header text-center ">Invite teammates</div>
+      <div className="header text-center ">{defaultTeamData ? "Invite teammates" : "Create new workspace"}</div>
       <div className="mt-20">
         <label htmlFor="workspace-name" className="text-bold text-white">
           Name of your workspace
@@ -172,25 +196,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         <label htmlFor="email-address" className="text-bold text-white">
           Email address
         </label>
-        <ReactMultiEmail
-          className="mt-8"
-          placeholder="Add multiple email address separated by commas"
-          //@ts-ignore
-          type="email"
-          value={inviteEmails}
-          onChange={(email) => {
-            setInviteEmails(email);
-          }}
-          validateEmail={validateEmail}
-          getLabel={(email, index, removeEmail) => (
-            <div data-tag key={index} className="multi-email-tag">
-              {email}
-              <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-              </span>
-            </div>
-          )}
-        />
+        <EmailInputWithDomainBasedSuggestions onChange={setInviteEmails} />
         <Row justify="end" className="mt-8">
           <MemberRoleDropdown
             placement="bottomRight"

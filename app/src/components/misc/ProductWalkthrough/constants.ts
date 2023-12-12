@@ -8,11 +8,9 @@ export const TOUR_TYPES = {
 
 export const MISC_TOURS = {
   APP_ENGAGEMENT: {
-    FIRST_RULE: "first_rule_created",
-    FIFTH_RULE: "fifth_rule_created",
     FIRST_DRAFT_SESSION: "first_draft_session",
   },
-  SHARING: {
-    RULES_LIST_SHARING_ONBOARDING: "rules_list_onboarding",
+  PRICING: {
+    UPGRADE_WORKSPACE_MENU: "upgrade_workspace_menu",
   },
 };

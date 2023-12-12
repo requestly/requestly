@@ -1,6 +1,5 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import AppMode from "components/misc/AppMode";
 import Updates from "views/features/Updates";
 import PricingIndexPage from "components/landing/pricing/PricingIndexPage";
 import Goodbye from "components/misc/Goodbye";
@@ -12,6 +11,7 @@ import AcceptTeamInvite from "components/user/Teams/AcceptTeamInvite";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { Home } from "components/landing/Home";
 import AppSumoModal from "components/landing/Appsumo/Appsumo";
+import { ImportFromCharlesWrapperView } from "components/features/rules/ImportFromCharlesModal";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -22,10 +22,6 @@ export const miscRoutes: RouteObject[] = [
     path: PATHS.INSTALL_EXTENSION.RELATIVE,
     // @ts-ignore: takes few props
     element: <InstallExtensionCTA />,
-  },
-  {
-    path: PATHS.APP_MODE.RELATIVE,
-    element: <AppMode />,
   },
   {
     path: PATHS.UPDATES.RELATIVE,
@@ -54,6 +50,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.ACCEPT_TEAM_INVITE.RELATIVE,
     element: <ProtectedRoute component={AcceptTeamInvite} />,
+  },
+  {
+    path: PATHS.IMPORT_FROM_CHARLES.RELATIVE,
+    element: <ImportFromCharlesWrapperView />,
   },
   {
     path: PATHS.HOME.RELATIVE,

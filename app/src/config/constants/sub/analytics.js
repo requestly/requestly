@@ -142,13 +142,7 @@ export const GA_EVENTS = {
 
     SESSION_REPLAY_ENABLED: "session_replay_enabled",
 
-    ONBOARDING_V1_DONE: "ONBOARDING_V1_DONE",
-
     PERSONA: "persona",
-    INDUSTRY: "industry",
-    // USE_CASES: "use_cases",
-    // REFERRAL_CHANNEL: "referral_channel",
-    // NUMBER_OF_EMPLOYEES: "number_of_employees",
 
     SIGNUP_DATE: "SIGNUP_DATE",
     DAYS_SINCE_SIGNUP: "days_since_signup",
@@ -162,11 +156,8 @@ export const GA_EVENTS = {
     EMAIL_DOMAIN: "EMAIL_DOMAIN",
     EMAIL_VERIFIED: "email_verified",
     IS_PREMIUM: "IS_PREMIUM",
+    IS_TRIAL: "is_trial",
 
-    HAS_AVAILED_TWITTER_TRIAL: "HAS_AVAILED_TWITTER_TRIAL",
-    HAS_AVAILED_CHROME_STORE_TRIAL: "HAS_AVAILED_CHROME_STORE_TRIAL",
-    HAS_AVAILED_GITHUB_TRIAL: "HAS_AVAILED_GITHUB_TRIAL",
-    TRIAL_MODE_ENABLED: "trial_mode_enabled",
     NUM_WORKSPACES: "num_workspaces",
     SESSION_REPLAY_LIFETIME_REDEEMED: "session_replay_lifetime_redeemed",
   },

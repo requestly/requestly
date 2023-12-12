@@ -26,8 +26,53 @@
       iframe {
         background: white;
       }
-      .rr-player .rr-player_frame {
+      .rr-player .rr-player__frame {
         width: auto;
+        .overlay-frame {
+          display: flex;
+          height: 100%;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          position: absolute;
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 4rem;
+          .blur {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            backdrop-filter: blur(4px);
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.4);
+          }
+          .overlay-content {
+            z-index: 10;
+          }
+        }
+      }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
+      }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
       }
     }
 
@@ -200,7 +245,9 @@
       bottom: 20px;
       transform: translate(-50%, 0);
     }
-
+    & .ant-tabs-top > .ant-tabs-nav {
+      margin-bottom: 6px;
+    }
     /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
     .ant-tabs-ink-bar {
       display: none;
@@ -235,39 +282,11 @@
         font-size: 14px;
       }
 
-      .session-details-panel-row {
-        display: flex;
-        flex-direction: column;
-        padding: 6px 10px 4px 10px;
-
-        span,
-        a,
-        .right-info,
-        .secondary-message {
-          line-height: 12px;
-        }
-
-        .primary-message {
-          // object-inspector button
-          word-break: break-word;
-
-          li > div {
-            line-height: 12px;
-            width: auto !important; // overriding inline style
-          }
-        }
-
-        .right-info {
-          max-width: 180px;
-          margin-left: 8px;
-          text-align: right;
-          flex-shrink: 0;
-        }
-
-        .secondary-message {
-          word-break: break-word;
-          padding-left: 40px;
-        }
+      .empty-table-view {
+        background: var(--component-dark-background);
+        height: 100%;
+        border: 1px solid var(--border-dark);
+        border-radius: var(--border-radius-sm);
       }
     }
   }
@@ -550,6 +569,9 @@ body.dark {
         min-height: auto;
       }
     }
+    .right-info {
+      display: none;
+    }
   }
 }
 
@@ -566,10 +588,6 @@ body.dark {
         .primary-message,
         .secondary-message {
           width: 28rem;
-        }
-
-        .right-info {
-          display: none;
         }
       }
     }
@@ -639,7 +657,7 @@ body.dark {
       &.console-log-row {
         .primary-message,
         .secondary-message {
-          width: 60rem;
+          width: 64rem;
         }
       }
     }

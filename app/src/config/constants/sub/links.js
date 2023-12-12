@@ -32,7 +32,8 @@ const LINKS = {
     "https://docs.requestly.io/browser-extension/chrome/troubleshooting/rules-not-working",
 
   // Docs - Mock GraphQL API response
-  REQUESTLY_DOCS_MOCK_GRAPHQL: "https://docs.requestly.io/using-rules/mock-graphql-api-response",
+  REQUESTLY_DOCS_MOCK_GRAPHQL: "https://developers.requestly.io/http-rules/graphql-support",
+
   // Docs - Android Debugger Overview
   REQUESTLY_DOCS_ANDROID_DEBUGGER: "https://docs.requestly.io/android-debugger/overview",
 
@@ -96,11 +97,6 @@ const LINKS = {
     SIGN_DPA: "https://privacy.requestly.io/dpa",
   },
 
-  /** MARKETTING */
-  PRODUCT_HUNT: {
-    MOBILE_INTERCEPTOR: "https://www.producthunt.com/posts/requestly-for-android",
-  },
-
   /** TUTORIALS */
   YOUTUBE_TUTORIALS: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
 
@@ -117,6 +113,8 @@ const LINKS = {
     WINDOWS: "https://bit.ly/rq-windows",
     LINUX: "https://bit.ly/rq-linux",
   },
+
+  PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
 };
 
 export default LINKS;

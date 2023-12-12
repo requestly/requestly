@@ -135,7 +135,3 @@ export const getModeData = (location, isSharedListViewRule) => {
     RULE_TO_EDIT_ID: URL_PARTS[URL_PARTS.length - 1],
   };
 };
-
-export const getSelectedRules = (rulesSelection) => {
-  return Object.keys(rulesSelection).filter((ruleId) => rulesSelection[ruleId]);
-};
