@@ -88,6 +88,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
       }
     }
     setIsMagicLinkLoading(true);
+    dispatch(actions.updateIsAppOnboardingStepDisabled(true));
     if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
       dispatch(actions.updateAppOnboardingPersona(persona));
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, persona);

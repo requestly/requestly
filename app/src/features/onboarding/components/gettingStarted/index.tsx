@@ -5,7 +5,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Col, Row, Typography } from "antd";
 import { RecommendationView } from "./components/recommendations/components/recommendationView";
 import { WorkspaceOnboardingView } from "./components/workspaceOnboarding";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { Invite } from "types";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -71,9 +71,7 @@ export const GettingStartedView: React.FC = () => {
         if (res?.pendingInvites?.length > 0) setIsLoading(false);
         else {
           if (!appOnboardingDetails.createdWorkspace) {
-            const newTeamName = `${capitalize(
-              getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
-            )}<My team>`;
+            const newTeamName = `${capitalize(user.details?.profile?.displayName.split(" ")[0])}'s team`;
             createTeam({ teamName: newTeamName, generatePublicLink: false })
               .then((response: any) => {
                 handleSwitchWorkspace(response?.data?.teamId, newTeamName);
@@ -93,7 +91,8 @@ export const GettingStartedView: React.FC = () => {
         setPendingInvites([]);
       });
   }, [
-    user?.details?.profile?.email,
+    user.details?.profile?.email,
+    user?.details?.profile?.displayName,
     user.loggedIn,
     dispatch,
     createTeam,

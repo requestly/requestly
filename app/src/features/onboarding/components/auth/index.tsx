@@ -50,6 +50,7 @@ export const OnboardingAuthScreen: React.FC = () => {
           <button
             className="verify-email-back-btn"
             onClick={() => {
+              dispatch(actions.updateIsAppOnboardingStepDisabled(false));
               setEmail("");
               setIsVerifyEmailPopupVisible(false);
             }}

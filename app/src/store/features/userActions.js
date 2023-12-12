@@ -116,6 +116,11 @@ export const updateAppOnboardingCompleted = (prevState) => {
 
 export const updateAppOnboardingStep = (prevState, action) => {
   prevState.appOnboarding.step = action.payload;
+  prevState.appOnboarding.disableSkip = false;
+};
+
+export const updateIsAppOnboardingStepDisabled = (prevState, action) => {
+  prevState.appOnboarding.disableSkip = action.payload;
 };
 
 export const updateAppOnboardingPersona = (prevState, action) => {

@@ -22,13 +22,14 @@ interface OnboardingProps {
 export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
   // const appMode = useSelector(getAppMode);
-  const { step } = useSelector(getAppOnboardingDetails);
+  const { step, disableSkip } = useSelector(getAppOnboardingDetails);
 
   useEffect(() => {
     //   getAndUpdateInstallationDate(appMode, false, false)
     //     .then((install_date) => {
     //       if (new Date(install_date) > new Date("2023-12-10")) {
     trackAppOnboardingViewed();
+    dispatch(actions.updateIsAppOnboardingStepDisabled(false));
     //         dispatch(
     //           actions.toggleActiveModal({
     //             modalName: "appOnboardingModal",
@@ -40,7 +41,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
     //     .catch((err) => {
     //       Logger.log(err);
     //     });
-  }, []);
+  }, [dispatch]);
 
   return (
     <Modal
@@ -58,7 +59,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
             <Col>
               <img src={RQLogo} alt="requestly logo" style={{ width: "90px" }} />
             </Col>
-            {step !== ONBOARDING_STEPS.PERSONA && (
+            {step === ONBOARDING_STEPS.PERSONA || disableSkip ? null : (
               <Col>
                 <RQButton
                   type="default"
