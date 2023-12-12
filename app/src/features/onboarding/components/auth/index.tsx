@@ -20,11 +20,12 @@ export const OnboardingAuthScreen: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const [authMode, setAuthMode] = useState(AUTH.ACTION_LABELS.SIGN_UP);
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [persona, setPersona] = useState("");
   const [isVerifyEmailPopupVisible, setIsVerifyEmailPopupVisible] = useState(false);
 
-  const handleSendEmailLink = (email: string) => {
+  const handleSendEmailLink = () => {
     if (email) {
-      setEmail(email);
       sendEmailLinkForSignin(email, "app_onboarding")
         .then(() => {
           updateTimeToResendEmailLogin(dispatch, 30);
@@ -51,7 +52,6 @@ export const OnboardingAuthScreen: React.FC = () => {
             className="verify-email-back-btn"
             onClick={() => {
               dispatch(actions.updateIsAppOnboardingStepDisabled(false));
-              setEmail("");
               setIsVerifyEmailPopupVisible(false);
             }}
           >
@@ -67,7 +67,17 @@ export const OnboardingAuthScreen: React.FC = () => {
           className={`onboarding-auth-screen ${authMode === AUTH.ACTION_LABELS.SIGN_UP ? "w-full" : ""}`}
         >
           <m.div transition={{ type: "linear" }} layout className="onboarding-auth-form-wrapper">
-            <AuthForm authMode={authMode} setAuthMode={setAuthMode} onSendEmailLink={handleSendEmailLink} />
+            <AuthForm
+              authMode={authMode}
+              setAuthMode={setAuthMode}
+              onSendEmailLink={handleSendEmailLink}
+              email={email}
+              setEmail={setEmail}
+              fullName={fullName}
+              setFullName={setFullName}
+              persona={persona}
+              setPersona={setPersona}
+            />
           </m.div>
           {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
             <m.div transition={{ type: "linear" }} layout className="onboarding-auth-banner-wrapper">

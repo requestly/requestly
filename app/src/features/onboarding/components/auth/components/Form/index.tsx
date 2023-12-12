@@ -19,6 +19,12 @@ interface AuthFormProps {
   authMode: string;
   setAuthMode: (mode: string) => void;
   onSendEmailLink?: (email: string) => void;
+  email?: string;
+  fullName?: string;
+  persona?: string;
+  setEmail?: (email: string) => void;
+  setFullName?: (fullName: string) => void;
+  setPersona?: (persona: string) => void;
 }
 
 interface InputProps {
@@ -38,13 +44,20 @@ const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onValu
   );
 };
 
-export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSendEmailLink }) => {
+export const AuthForm: React.FC<AuthFormProps> = ({
+  authMode,
+  setAuthMode,
+  onSendEmailLink,
+  email,
+  fullName,
+  persona,
+  setEmail,
+  setFullName,
+  setPersona,
+}) => {
   const dispatch = useDispatch();
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isMagicLinkLoading, setIsMagicLinkLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [persona, setPersona] = useState("");
 
   const handleGoogleSignIn = useCallback(() => {
     setIsGoogleSignInLoading(true);
@@ -154,7 +167,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ authMode, setAuthMode, onSen
       {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <>
           <div className="mt-16">
-            <PersonaInput onValueChange={(value) => setPersona(value)} />
+            <PersonaInput value={persona} onValueChange={(value) => setPersona(value)} />
             <div className="persona-input-byline">Help us optimizing your Requestly experience</div>
           </div>
           <div className="mt-16">

@@ -183,7 +183,7 @@ export const PersonaScreen = () => {
                 </Typography.Title>
                 {shouldShowPersonaInput && (
                   <Col className="mt-16">
-                    <PersonaInput onValueChange={(value) => setPersona(value)} />
+                    <PersonaInput value={persona} onValueChange={(value) => setPersona(value)} />
                   </Col>
                 )}
 

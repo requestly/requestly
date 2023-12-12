@@ -3,6 +3,7 @@ import { AutoComplete, Col } from "antd";
 import "./index.scss";
 
 interface Props {
+  value: string;
   onValueChange: (data: string) => void;
 }
 
@@ -17,7 +18,7 @@ const personaOptions = [
   { value: "IT Procurement/Administrator" },
 ];
 
-export const PersonaInput: React.FC<Props> = ({ onValueChange }) => {
+export const PersonaInput: React.FC<Props> = ({ onValueChange, value }) => {
   const [personas, setPersonas] = useState(personaOptions);
   return (
     <Col>
@@ -29,6 +30,7 @@ export const PersonaInput: React.FC<Props> = ({ onValueChange }) => {
         className="persona-input"
         popupClassName="persona-input-menu"
         options={personas}
+        value={value}
         style={{ width: 200 }}
         onSelect={(data: string) => {
           onValueChange(data);
