@@ -162,6 +162,10 @@
   flex-shrink: 0;
 }
 
+.flex-1 {
+  flex: 1;
+}
+
 .ml-auto {
   margin-left: auto;
 }
