@@ -26,14 +26,14 @@ export const DefaultTeamView = () => {
             Collaborate better with the team using workspaces
           </Typography.Title>
           <Typography.Text className="text-center getting-started-default-team-description">
-            Your workspace <span>{createdWorkspaceData.name}</span> is set up automatically! You can use it for
-            yourself, switch to your private workspace, or invite your team to join.
+            We have setup your workspace <span>{createdWorkspaceData.name}</span>. You can use it for yourself or invite
+            your team for real-time collaboration.
           </Typography.Text>
-          {/* TODO : ADD ACTION FOR THIS BUTTON */}
-          <RQButton style={{ marginTop: "32px" }}>Switch to private workspace</RQButton>
           <RQButton
             type="primary"
-            className="mt-16"
+            style={{
+              marginTop: "32px",
+            }}
             onClick={() => {
               dispatch(
                 actions.toggleActiveModal({

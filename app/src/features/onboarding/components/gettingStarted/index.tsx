@@ -5,11 +5,10 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Col, Row, Typography } from "antd";
 import { RecommendationView } from "./components/recommendations/components/recommendationView";
 import { WorkspaceOnboardingView } from "./components/workspaceOnboarding";
-import { isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getPendingInvites } from "backend/workspace";
 import { Invite } from "types";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { capitalize } from "lodash";
 import { actions } from "store";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import Logger from "lib/logger";
@@ -71,7 +70,9 @@ export const GettingStartedView: React.FC = () => {
         if (res?.pendingInvites?.length > 0) setIsLoading(false);
         else {
           if (!appOnboardingDetails.createdWorkspace) {
-            const newTeamName = `${capitalize(user.details?.profile?.displayName.split(" ")[0])}'s team`;
+            const newTeamName = `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
+              getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
+            })`;
             createTeam({ teamName: newTeamName, generatePublicLink: false })
               .then((response: any) => {
                 handleSwitchWorkspace(response?.data?.teamId, newTeamName);
