@@ -163,7 +163,7 @@ const AppSumoModal: React.FC = () => {
           "appsumo.date": Date.now(),
         });
       } catch (error) {
-        console.error("from appsumo", error);
+        console.error("From appsumo flow", error);
       } finally {
         setIsUpdatingSubscription(false);
       }
