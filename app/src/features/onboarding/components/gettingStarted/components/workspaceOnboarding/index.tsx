@@ -11,6 +11,7 @@ interface WorkspaceOnboardingViewProps {
 
 export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = ({ pendingInvites }) => {
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
-  if (pendingInvites.length) return <JoinTeamView pendngInvites={pendingInvites} />;
+
+  if (pendingInvites?.length) return <JoinTeamView pendngInvites={pendingInvites} />;
   if (appOnboardingDetails.createdWorkspace) return <DefaultTeamView />;
 };

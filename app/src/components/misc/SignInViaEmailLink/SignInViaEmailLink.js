@@ -24,7 +24,6 @@ import {
 import Logger from "lib/logger";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./index.css";
 
 const SignInViaEmailLink = () => {
@@ -34,7 +33,6 @@ const SignInViaEmailLink = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCustomLoginFlow, setIsCustomLoginFlow] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const isNewOnboardingFeatureOn = useFeatureIsOn("new_onboarding");
 
   //Global State
   const dispatch = useDispatch();
@@ -152,32 +150,27 @@ const SignInViaEmailLink = () => {
                 setIsLogin(!isNewUser);
                 if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
 
-                if (isNewOnboardingFeatureOn) {
-                  const name = authData?.displayName !== "User" ? authData.displayName : appOnboardingDetails.fullName;
-                  Promise.all([
-                    updateUserPersona(),
-                    updateUserInFirebaseAuthUser({
-                      displayName: name ?? "User",
-                    }),
-                    updateUserFullName(authData),
-                  ])
-                    .then(() => {
-                      //DO NOTHING
-                      Logger.log("User Persona and Full Name updated successfully");
-                    })
-                    .catch((e) => {
-                      Logger.error(e);
-                    })
-                    .finally(() => {
-                      trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
-                      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
-                      setIsProcessing(false);
-                      setIsEmailLoginLinkDone(true);
-                    });
-                } else {
-                  setIsProcessing(false);
-                  setIsEmailLoginLinkDone(true);
-                }
+                const name = authData?.displayName !== "User" ? authData.displayName : appOnboardingDetails.fullName;
+                Promise.all([
+                  updateUserPersona(),
+                  updateUserInFirebaseAuthUser({
+                    displayName: name ?? "User",
+                  }),
+                  updateUserFullName(authData),
+                ])
+                  .then(() => {
+                    //DO NOTHING
+                    Logger.log("User Persona and Full Name updated successfully");
+                  })
+                  .catch((e) => {
+                    Logger.error(e);
+                  })
+                  .finally(() => {
+                    trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+                    dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+                    setIsProcessing(false);
+                    setIsEmailLoginLinkDone(true);
+                  });
               } else throw new Error("Failed");
             }
           })
@@ -196,7 +189,6 @@ const SignInViaEmailLink = () => {
       updateUserFullName,
       appOnboardingDetails.fullName,
       dispatch,
-      isNewOnboardingFeatureOn,
     ]
   );
 

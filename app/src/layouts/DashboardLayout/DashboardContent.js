@@ -36,7 +36,7 @@ import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLink
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -52,7 +52,7 @@ const DashboardContent = () => {
   const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
-  const isNewOnboardingFeatureOn = useFeatureIsOn("new_onboarding");
+  const onboardingFeatureValue = useFeatureValue("new_onboarding", null);
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -146,7 +146,7 @@ const DashboardContent = () => {
             <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
           ) : null}
           {!isWorkspaceOnboardingCompleted &&
-          !isNewOnboardingFeatureOn &&
+          onboardingFeatureValue === "control" &&
           appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <WorkspaceOnboarding
               isOpen={activeModals.workspaceOnboardingModal.isActive}
@@ -212,7 +212,7 @@ const DashboardContent = () => {
             />
           ) : null}
           {shouldShowOnboarding() &&
-            isNewOnboardingFeatureOn &&
+            onboardingFeatureValue === "variant" &&
             appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
             !isWorkspaceOnboardingCompleted &&
             !appOnboardingDetails.isOnboardingCompleted && (
