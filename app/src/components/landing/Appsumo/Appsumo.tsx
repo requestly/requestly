@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAvailableTeams } from "store/features/teams/selectors";
+import { getAppMode } from "store/selectors";
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
@@ -21,6 +22,7 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { isNull } from "lodash";
 import "./index.scss";
 
 const PRIVATE_WORKSPACE = {
@@ -47,8 +49,8 @@ const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const availableTeams = useSelector(getAvailableTeams);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
   const [emailValidationError, setEmailValidationError] = useState(null);
@@ -192,32 +194,30 @@ const AppSumoModal: React.FC = () => {
   }, [workspaceToUpgrade]);
 
   useEffect(() => {
-    if (!user.loggedIn) return;
-
-    if (isNewTeamCreated.current) return;
-
-    isNewTeamCreated.current = true;
-    setIsLoading(true);
-    const newTeamName = "Team Workspace";
-    createTeam({ teamName: newTeamName }).then((response: any) => {
-      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
-      switchWorkspace(
-        {
-          teamId: response?.data?.teamId,
-          teamMembersCount: 1,
-        },
-        dispatch,
-        {
-          isWorkspaceMode: false,
-          isSyncEnabled: true,
-        },
-        appMode,
-        null,
-        "appsumo"
-      );
-      setIsLoading(false);
-    });
-  }, [appMode, dispatch, user.loggedIn]);
+    if (!isNewTeamCreated.current && !isNull(availableTeams)) {
+      setIsLoading(true);
+      isNewTeamCreated.current = true;
+      const newTeamName = "Team Workspace";
+      createTeam({ teamName: newTeamName }).then((response: any) => {
+        trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
+        switchWorkspace(
+          {
+            teamId: response?.data?.teamId,
+            teamMembersCount: 1,
+          },
+          dispatch,
+          {
+            isWorkspaceMode: false,
+            isSyncEnabled: true,
+          },
+          appMode,
+          null,
+          "appsumo"
+        );
+        setIsLoading(false);
+      });
+    }
+  }, [availableTeams, appMode, dispatch]);
 
   return (
     <RQModal
