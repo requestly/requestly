@@ -153,6 +153,7 @@ const AppSumoModal: React.FC = () => {
         await createTeamSubscriptionForAppSumo({
           teamId: workspaceToUpgrade.id,
           appsumoCodeCount: appsumoCodes.length,
+          startDate: Date.now(),
         });
 
         const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
