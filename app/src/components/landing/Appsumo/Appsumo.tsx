@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { RQButton, RQInput, RQModal } from "lib/design-system/components";
@@ -47,6 +47,7 @@ const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
 const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
@@ -191,6 +192,8 @@ const AppSumoModal: React.FC = () => {
   }, [workspaceToUpgrade]);
 
   useEffect(() => {
+    if (!user.loggedIn) return;
+
     if (isNewTeamCreated.current) return;
 
     isNewTeamCreated.current = true;
@@ -214,7 +217,7 @@ const AppSumoModal: React.FC = () => {
       );
       setIsLoading(false);
     });
-  }, [appMode, dispatch]);
+  }, [appMode, dispatch, user.loggedIn]);
 
   return (
     <RQModal
