@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
@@ -22,7 +21,6 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { isNull } from "lodash";
 import "./index.scss";
 
 const PRIVATE_WORKSPACE = {
@@ -50,7 +48,6 @@ const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const availableTeams = useSelector(getAvailableTeams);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
   const [emailValidationError, setEmailValidationError] = useState(null);
@@ -194,7 +191,7 @@ const AppSumoModal: React.FC = () => {
   }, [workspaceToUpgrade]);
 
   useEffect(() => {
-    if (!isCreatingTeam.current && !isNull(availableTeams) && !availableTeams.length) {
+    if (!isCreatingTeam.current) {
       setIsLoading(true);
       isCreatingTeam.current = true;
       const newTeamName = "Team Workspace";
@@ -217,7 +214,7 @@ const AppSumoModal: React.FC = () => {
         setIsLoading(false);
       });
     }
-  }, [availableTeams, appMode, dispatch]);
+  }, [appMode, dispatch]);
 
   return (
     <RQModal
