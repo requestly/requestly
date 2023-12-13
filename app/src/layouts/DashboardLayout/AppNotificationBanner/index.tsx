@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import { useDispatch } from "react-redux";
@@ -10,6 +10,7 @@ import { getAppNotificationBannerDismissTs } from "store/selectors";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { OrgNotificationBanner } from "./OrgNotificationBanner";
+import { trackAppNotificationBannerViewed } from "modules/analytics/events/common/onboarding/appBanner";
 
 interface Banner {
   id: string;
@@ -32,6 +33,12 @@ export const AppNotificationBanner = () => {
     e.stopPropagation();
     dispatch(actions.updateAppNotificationBannerDismissTs(new Date().getTime()));
   };
+
+  useEffect(() => {
+    if (newBanners?.length > 0) {
+      trackAppNotificationBannerViewed();
+    }
+  }, [newBanners?.length]);
 
   const renderAppBanner = () => {
     const banner: Banner = newBanners ? newBanners[0] : null;

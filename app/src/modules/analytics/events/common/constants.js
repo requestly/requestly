@@ -155,6 +155,7 @@ export const ONBOARDING = {
   PIN_EXTENSION_POPUP_VIEWED: "pin_extension_popup_viewed",
   PIN_EXTENSION_POPUP_EXPANDED: "pin_extension_popup_expanded",
   PIN_EXTENSION_POPUP_CLOSED: "pin_extension_popup_closed",
+  APP_NOTIFICATION_BANNER_VIEWED: "app_notification_banner_viewed",
 };
 
 export const TEAMS = {
