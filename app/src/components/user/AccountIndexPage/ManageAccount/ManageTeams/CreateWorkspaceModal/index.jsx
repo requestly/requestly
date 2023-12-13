@@ -11,6 +11,7 @@ import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
+import { generateDefaultTeamName } from "utils/teams";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import {
   trackAddTeamMemberSuccess,
@@ -145,9 +146,10 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       if (isVerified) {
         setIsVerifiedBusinessUser(isVerified);
         setIsNotifyAllSelected(true);
-        const defaultTeamName = `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
-          getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
-        })`;
+        const defaultTeamName = generateDefaultTeamName(
+          user.details?.profile?.displayName,
+          user?.details?.profile?.email
+        );
         form.setFieldValue("workspaceName", defaultTeamName);
         setCreateWorkspaceFormData((prev) => {
           return { ...prev, workspaceName: defaultTeamName };

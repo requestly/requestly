@@ -9,7 +9,6 @@ import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import puzzleImg from "assets/images/illustrations/puzzle.svg";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
-import { getDomainFromEmail } from "utils/FormattingHelper";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
@@ -17,6 +16,7 @@ import { Team, TeamRole } from "types";
 import "./index.scss";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
+import { generateDefaultTeamName } from "utils/teams";
 
 interface Props {
   selectedRules: string[];
@@ -46,9 +46,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
     );
     try {
       const teamName = isBusinessUser
-        ? `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
-            getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
-          })`
+        ? generateDefaultTeamName(user.details?.profile?.displayName, user?.details?.profile?.email)
         : "My Team";
       createTeam({
         teamName: teamName,
