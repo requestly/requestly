@@ -56,6 +56,7 @@ const AppSumoModal: React.FC = () => {
   const [emailValidationError, setEmailValidationError] = useState(null);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
   const isCreatingTeam = useRef(false);
 
   const addAppSumoCodeInput = () => {
@@ -150,12 +151,27 @@ const AppSumoModal: React.FC = () => {
       });
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
     } else {
-      const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
-      updateDoc(teamsRef, {
-        "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
-        "appsumo.date": Date.now(),
-      });
+      const createTeamSubscriptionForAppSumo = httpsCallable(getFunctions(), "createTeamSubscriptionForAppSumo");
+
+      try {
+        setIsUpdatingSubscription(true);
+        await createTeamSubscriptionForAppSumo({
+          teamId: workspaceToUpgrade.id,
+          appsumoCodeCount: appsumoCodes.length,
+        });
+
+        const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
+        updateDoc(teamsRef, {
+          "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
+          "appsumo.date": Date.now(),
+        });
+      } catch (error) {
+        console.error("from appsumo", error);
+      } finally {
+        setIsUpdatingSubscription(false);
+      }
     }
+
     await redeemSubmittedCodes();
   }, [appsumoCodes, emailValidationError, isAllCodeCheckPassed, redeemSubmittedCodes, workspaceToUpgrade.id]);
 
@@ -226,7 +242,11 @@ const AppSumoModal: React.FC = () => {
             </div>
             <div className="header mt-16">Please enter your AppSumo code</div>
             <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>
-            <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
+            <WorkspaceDropdown
+              isAppSumo
+              workspaceToUpgrade={workspaceToUpgrade}
+              setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+            />
             <div className="title mt-16">AppSumo email address</div>
             <div className="items-center mt-8">
               <div className="w-full">
@@ -289,6 +309,7 @@ const AppSumoModal: React.FC = () => {
             <RQButton
               type="primary"
               disabled={!isAllCodeCheckPassed || emailValidationError}
+              loading={isUpdatingSubscription}
               onClick={() => {
                 onSubmit()
                   .then(() => {
@@ -299,6 +320,11 @@ const AppSumoModal: React.FC = () => {
                       }`,
                       10
                     );
+                    if (3 <= appsumoCodes.length && appsumoCodes.length <= 9) {
+                      toast.success(`Lifetime access to SessionBook Plus and HTTP rules Basic plan`, 10);
+                    } else if (10 <= appsumoCodes.length) {
+                      toast.success(`Lifetime access to SessionBook Plus and HTTP rules Professional plan`, 10);
+                    }
                     redirectToRoot(navigate);
                   })
                   .catch(() => {
