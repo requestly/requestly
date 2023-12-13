@@ -292,6 +292,15 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     });
   }
 
+  if (headersTarget === RQ.HEADERS_TARGET.RESPONSE) {
+    RQ.IGNORED_HEADERS_ON_REDIRECT.forEach((headerName) => {
+      console.log("!!!debug", "request details::", details);
+      const customHeaderName = RQ.CUSTOM_HEADER_PREFIX + headerName;
+      BG.Methods.addHeader(originalHeaders, { name: "access-control-allow-headers", value: customHeaderName });
+      hasModifiedHeaders = true;
+    });
+  }
+
   for (var i = 0; i < enabledRules.length; i++) {
     rule = enabledRules[i];
     ruleType = rule.ruleType;
