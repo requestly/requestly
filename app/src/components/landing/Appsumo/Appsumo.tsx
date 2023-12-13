@@ -112,7 +112,7 @@ const AppSumoModal: React.FC = () => {
       updateAppSumoCode(index, "error", "");
       updateAppSumoCode(index, "verified", true);
     },
-    [appsumoCodes, workspaceToUpgrade?.id]
+    [db, appsumoCodes, workspaceToUpgrade?.id]
   );
 
   const redeemSubmittedCodes = useCallback(async () => {
@@ -122,7 +122,7 @@ const AppSumoModal: React.FC = () => {
       batch.update(docRef, { redeemed: true });
     });
     await batch.commit();
-  }, [appsumoCodes]);
+  }, [db, appsumoCodes]);
 
   const onSubmit = useCallback(async () => {
     if (!isAllCodeCheckPassed || emailValidationError) {
@@ -168,7 +168,7 @@ const AppSumoModal: React.FC = () => {
     }
 
     await redeemSubmittedCodes();
-  }, [appsumoCodes, emailValidationError, isAllCodeCheckPassed, redeemSubmittedCodes, workspaceToUpgrade.id]);
+  }, [db, appsumoCodes, emailValidationError, isAllCodeCheckPassed, redeemSubmittedCodes, workspaceToUpgrade.id]);
 
   const handleEmailValidation = (email: string) => {
     if (!email) {
