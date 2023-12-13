@@ -253,6 +253,10 @@ export const getWorkspaceOnboardingStep = (state) => {
   return getGlobalState(state)?.workspaceOnboarding?.step;
 };
 
+export const getAppOnboardingDetails = (state) => {
+  return getGlobalState(state)?.appOnboarding;
+};
+
 export const getIsSecondarySidebarCollapsed = (state) => {
   return getGlobalState(state).userPreferences.isSecondarySidebarCollapsed;
 };

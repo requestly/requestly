@@ -1,0 +1,18 @@
+.getting-started-join-teams-view {
+  padding: 1rem 24px;
+}
+.getting-started-join-teams-description {
+  color: var(--neutrals-gray-300);
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.getting-started-join-teams-list {
+  overflow-y: auto;
+  max-height: 355px;
+  padding: 0 4px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+}
