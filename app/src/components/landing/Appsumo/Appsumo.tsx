@@ -146,10 +146,10 @@ const AppSumoModal: React.FC = () => {
       });
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
     } else {
+      setIsUpdatingSubscription(true);
       const createTeamSubscriptionForAppSumo = httpsCallable(getFunctions(), "createTeamSubscriptionForAppSumo");
 
       try {
-        setIsUpdatingSubscription(true);
         await createTeamSubscriptionForAppSumo({
           teamId: workspaceToUpgrade.id,
           appsumoCodeCount: appsumoCodes.length,
@@ -162,12 +162,11 @@ const AppSumoModal: React.FC = () => {
         });
       } catch (error) {
         console.error("from appsumo", error);
-      } finally {
-        setIsUpdatingSubscription(false);
       }
     }
 
     await redeemSubmittedCodes();
+    setIsUpdatingSubscription(false);
   }, [db, appsumoCodes, emailValidationError, isAllCodeCheckPassed, redeemSubmittedCodes, workspaceToUpgrade.id]);
 
   const handleEmailValidation = (email: string) => {
