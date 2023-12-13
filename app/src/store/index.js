@@ -45,7 +45,6 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   "userPersona",
   "country",
   "mobileDebugger",
-  "initializations",
   "userPreferences",
   "userAttributes",
   "misc.persist",
