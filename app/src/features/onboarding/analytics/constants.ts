@@ -6,4 +6,5 @@ export const APP_ONBOARDING = {
   APP_ONBOARDING_PERSONA_UPDATED: "app_onboarding_persona_updated",
   APP_ONBOARDING_NAME_UPDATED: "app_onboarding_name_updated",
   APP_ONBOARDING_MANAGE_WORKSPACE_CLICKED: "app_onboarding_manage_workspace_clicked",
+  APP_ONBOARDING_GETTING_STARTED_VIEWED: "app_onboarding_getting_started_viewed",
 };

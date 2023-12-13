@@ -14,6 +14,9 @@ import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import Logger from "lib/logger";
 import { OnboardingLoader } from "../loader";
 import { m, AnimatePresence } from "framer-motion";
+import { isNull } from "lodash";
+import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
+import { trackAppOnboardingGettingStartedViewed } from "features/onboarding/analytics";
 import "./index.scss";
 
 export const GettingStartedView: React.FC = () => {
@@ -23,7 +26,7 @@ export const GettingStartedView: React.FC = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const [isLoading, setIsLoading] = useState(true);
-  const [pendingInvites, setPendingInvites] = useState<Invite[]>([]);
+  const [pendingInvites, setPendingInvites] = useState<Invite[] | null>(null);
   const name = user.loggedIn
     ? user.details?.profile?.displayName !== "User"
       ? user.details?.profile?.displayName
@@ -75,6 +78,7 @@ export const GettingStartedView: React.FC = () => {
             })`;
             createTeam({ teamName: newTeamName, generatePublicLink: false })
               .then((response: any) => {
+                trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "app_onboarding", false);
                 handleSwitchWorkspace(response?.data?.teamId, newTeamName);
                 dispatch(actions.updateAppOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
                 setIsLoading(false);
@@ -101,6 +105,23 @@ export const GettingStartedView: React.FC = () => {
     handleSwitchWorkspace,
   ]);
 
+  useEffect(() => {
+    if (!isNull(pendingInvites)) {
+      if (!isCompanyEmail(user?.details?.profile?.email)) {
+        trackAppOnboardingGettingStartedViewed("no_workspaces");
+        return;
+      }
+      if (pendingInvites.length) {
+        trackAppOnboardingGettingStartedViewed("available_to_join");
+        return;
+      }
+      if (appOnboardingDetails.createdWorkspace) {
+        trackAppOnboardingGettingStartedViewed("created_workspace");
+        return;
+      }
+    }
+  }, [pendingInvites, user?.details?.profile?.email, appOnboardingDetails.createdWorkspace]);
+
   return (
     <AnimatePresence>
       {isLoading ? (
@@ -123,7 +144,7 @@ export const GettingStartedView: React.FC = () => {
             </Typography.Title>
           </Col>
           <Row className="getting-started-body">
-            {isCompanyEmail(user?.details?.profile?.email) && (
+            {isCompanyEmail(user?.details?.profile?.email) && !isNull(pendingInvites) && (
               <Col className="getting-started-teams-wrapper">
                 <WorkspaceOnboardingView pendingInvites={pendingInvites} />
               </Col>

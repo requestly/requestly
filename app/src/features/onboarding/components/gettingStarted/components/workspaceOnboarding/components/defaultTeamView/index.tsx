@@ -50,7 +50,7 @@ export const DefaultTeamView = () => {
             Invite team members
           </RQButton>
         </Row>
-        <Divider style={{ marginTop: "70px" }} />
+        <Divider style={{ marginTop: "100px" }} />
         <RQButton
           type="text"
           className="getting-started-manage-workspace-btn"

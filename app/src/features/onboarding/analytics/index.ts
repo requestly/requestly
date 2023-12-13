@@ -1,8 +1,8 @@
 import { trackEvent } from "modules/analytics";
 import { APP_ONBOARDING } from "./constants";
 
-export const trackAppOnboardingViewed = () => {
-  trackEvent(APP_ONBOARDING.APP_ONBOARDING_VIEWED);
+export const trackAppOnboardingViewed = (step: string) => {
+  trackEvent(APP_ONBOARDING.APP_ONBOARDING_VIEWED, { step });
 };
 
 export const trackAppOnboardingStepCompleted = (step: string) => {
@@ -27,4 +27,8 @@ export const trackAppOnboardingNameUpdated = () => {
 
 export const trackAppOnboardingManageWorkspaceClicked = () => {
   trackEvent(APP_ONBOARDING.APP_ONBOARDING_MANAGE_WORKSPACE_CLICKED);
+};
+
+export const trackAppOnboardingGettingStartedViewed = (isWorkspaceAvailable: string) => {
+  trackEvent(APP_ONBOARDING.APP_ONBOARDING_GETTING_STARTED_VIEWED, { isWorkspaceAvailable });
 };

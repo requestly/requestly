@@ -24,6 +24,7 @@ import {
 import Logger from "lib/logger";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./index.css";
 
 const SignInViaEmailLink = () => {
@@ -33,7 +34,7 @@ const SignInViaEmailLink = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCustomLoginFlow, setIsCustomLoginFlow] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const isNewOnboardingFeatureOn = true;
+  const isNewOnboardingFeatureOn = useFeatureIsOn("new_onboarding");
 
   //Global State
   const dispatch = useDispatch();
@@ -195,7 +196,7 @@ const SignInViaEmailLink = () => {
       updateUserFullName,
       appOnboardingDetails.fullName,
       dispatch,
-      appOnboardingDetails.persona,
+      isNewOnboardingFeatureOn,
     ]
   );
 
