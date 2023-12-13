@@ -533,7 +533,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
     ignoredHeadersOnRedirect.forEach((header) => {
       const originalHeaderValue = request.headers.get(header);
-      if (originalHeaderValue) {
+      if (isExtensionEnabled() && originalHeaderValue) {
         hasModifiedHeaders = true;
         request.headers.set(customHeaderPrefix + header, originalHeaderValue);
       }
