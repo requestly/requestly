@@ -188,6 +188,7 @@ const AppSumoModal: React.FC = () => {
     if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) setAppsumoCodes([{ ...DEFAULT_APPSUMO_INPUT }]);
   }, [workspaceToUpgrade]);
 
+  // TODO: Refactor this and only create team if user clicks on Unlock deal
   useEffect(() => {
     if (isNewTeamCreated.current) return;
 
