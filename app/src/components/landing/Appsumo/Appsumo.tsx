@@ -150,16 +150,15 @@ const AppSumoModal: React.FC = () => {
       const createTeamSubscriptionForAppSumo = httpsCallable(getFunctions(), "createTeamSubscriptionForAppSumo");
 
       try {
-        await createTeamSubscriptionForAppSumo({
-          teamId: workspaceToUpgrade.id,
-          appsumoCodeCount: appsumoCodes.length,
-          startDate: Date.now(),
-        });
-
         const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
-        updateDoc(teamsRef, {
+        await updateDoc(teamsRef, {
           "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
           "appsumo.date": Date.now(),
+        });
+
+        await createTeamSubscriptionForAppSumo({
+          teamId: workspaceToUpgrade.id,
+          startDate: Date.now(),
         });
       } catch (error) {
         console.error("from appsumo", error);
