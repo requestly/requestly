@@ -13,12 +13,18 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackPricingPlanCancellationRequested } from "modules/analytics/events/misc/business";
+import "./SubscriptionInfo.css";
 
-const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, subscriptionDetails }) => {
+const SubscriptionInfo = ({
+  isLifeTimeActive = false,
+  hideShadow,
+  hideManagePersonalSubscriptionButton,
+  subscriptionDetails,
+}) => {
   //Global State
   const user = useSelector(getUserAuthDetails);
   const navigate = useNavigate();
-  const { validFrom, validTill, status, type, planName } = subscriptionDetails;
+  const { planId, validFrom, validTill, status, type, planName } = subscriptionDetails;
   const isUserPremium = user.details?.isPremium || status === "active";
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [isConfirmationModalLoading, setIsConfirmationModalLoading] = useState(false);
@@ -75,11 +81,11 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
   return (
     <Row className="my-4">
       <Col>
-        <Card className={hideShadow ? "has-no-border has-no-box-shadow" : "shadow"}>
+        <Card className={`subscription-info ${hideShadow ? "has-no-border has-no-box-shadow" : "shadow"}`}>
           <AntRow>
             <AntCol span={24}>
               <Descriptions title={false} bordered size="small" column={2}>
-                <Descriptions.Item label="Status" className="primary-card github-like-border">
+                <Descriptions.Item label="Status">
                   <Space>
                     <Badge
                       status={isUserPremium ? "success" : "error"}
@@ -94,23 +100,21 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
                     ) : null}
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Type" className="primary-card github-like-border">
-                  {beautifySubscriptionType(type)}
-                </Descriptions.Item>
+                <Descriptions.Item label="Type">{beautifySubscriptionType(type)}</Descriptions.Item>
                 {isUserPremium && (
-                  <Descriptions.Item label="Valid From" className="primary-card github-like-border">
-                    {new Date(validFrom).toDateString()}
-                  </Descriptions.Item>
+                  <Descriptions.Item label="Valid From">{new Date(validFrom).toDateString()}</Descriptions.Item>
                 )}
-                <Descriptions.Item label="Current Plan" className="primary-card github-like-border">
+                <Descriptions.Item label="Current Plan">
                   <AntRow justify="space-between">
-                    {getPrettyPlanName(planName)}
+                    {isLifeTimeActive && planId !== "session_book_plus"
+                      ? `HTTP Rules ${getPrettyPlanName(planName)}`
+                      : getPrettyPlanName(planName)}
                     {renderCancelButton}
                   </AntRow>
                 </Descriptions.Item>
                 {isUserPremium && (
-                  <Descriptions.Item label="Valid Till" className="primary-card github-like-border">
-                    {new Date(validTill).toDateString()}
+                  <Descriptions.Item label="Valid Till">
+                    {isLifeTimeActive ? "Lifetime" : new Date(validTill).toDateString()}
                   </Descriptions.Item>
                 )}
               </Descriptions>

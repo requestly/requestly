@@ -56,7 +56,7 @@ const ActiveLicenseInfo = ({
                 ...data.appsumo,
                 startDate: data.appsumo.date,
                 endDate: getSubscriptionEndDateForAppsumo(new Date(data.appsumo.date)),
-                type: "appsumo-team",
+                type: "appsumo",
               });
             }
           }
@@ -82,6 +82,7 @@ const ActiveLicenseInfo = ({
     return (
       <SubscriptionInfo
         hideShadow={hideShadow}
+        isLifeTimeActive={type === "appsumo"}
         hideManagePersonalSubscriptionButton={hideManagePersonalSubscriptionButton}
         subscriptionDetails={{
           validFrom,
@@ -111,6 +112,7 @@ const ActiveLicenseInfo = ({
         <>
           <SubscriptionInfo
             hideShadow={hideShadow}
+            isLifeTimeActive={isSessionReplayLifetimeActive}
             subscriptionDetails={{
               validFrom:
                 typeof sessionReplayLifeTimeDetails === "string"
@@ -119,7 +121,8 @@ const ActiveLicenseInfo = ({
               validTill: sessionReplayLifeTimeDetails.endDate,
               status: "active",
               type: sessionReplayLifeTimeDetails.type ?? "producthunt",
-              planName: "SessionBook Plus",
+              planName: "Session Book Plus",
+              planId: "session_book_plus",
             }}
           />
           <br />
