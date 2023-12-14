@@ -11,11 +11,15 @@ import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm
 import { actions } from "store";
 import Logger from "lib/logger";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
-import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
+import { trackAppOnboardingStepCompleted, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { m } from "framer-motion";
 import "./index.scss";
 
-export const OnboardingAuthScreen: React.FC = () => {
+interface Props {
+  isOpen: boolean;
+}
+
+export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [authMode, setAuthMode] = useState(AUTH.ACTION_LABELS.SIGN_UP);
@@ -43,6 +47,12 @@ export const OnboardingAuthScreen: React.FC = () => {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
     }
   }, [dispatch, user.loggedIn]);
+
+  useEffect(() => {
+    if (isOpen) {
+      trackAppOnboardingViewed(ONBOARDING_STEPS.AUTH);
+    }
+  }, [isOpen]);
 
   return (
     <div className="onboarding-auth-screen-wrapper">
