@@ -10,7 +10,7 @@ import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
 import { actions } from "store";
 import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
-import { trackAppOnboardingSkipped, trackAppOnboardingViewed } from "features/onboarding/analytics";
+import { trackAppOnboardingSkipped } from "features/onboarding/analytics";
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import Logger from "lib/logger";
 import "./index.scss";
@@ -23,10 +23,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const { step, disableSkip } = useSelector(getAppOnboardingDetails);
-
-  useEffect(() => {
-    if (isOpen) trackAppOnboardingViewed(step);
-  }, [isOpen, step]);
 
   useEffect(() => {
     dispatch(actions.updateIsAppOnboardingStepDisabled(false));
@@ -91,11 +87,11 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
           </Row>
 
           {step === ONBOARDING_STEPS.AUTH ? (
-            <OnboardingAuthScreen />
+            <OnboardingAuthScreen isOpen={isOpen} />
           ) : step === ONBOARDING_STEPS.PERSONA ? (
-            <PersonaScreen />
+            <PersonaScreen isOpen={isOpen} />
           ) : (
-            <GettingStartedView />
+            <GettingStartedView isOpen={isOpen} />
           )}
         </div>
       </div>
