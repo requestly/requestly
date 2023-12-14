@@ -319,11 +319,6 @@ const AppSumoModal: React.FC = () => {
                       }`,
                       10
                     );
-                    if (3 <= appsumoCodes.length && appsumoCodes.length <= 9) {
-                      toast.success(`Lifetime access to SessionBook Plus and HTTP rules Basic plan`, 10);
-                    } else if (10 <= appsumoCodes.length) {
-                      toast.success(`Lifetime access to SessionBook Plus and HTTP rules Professional plan`, 10);
-                    }
                     redirectToRoot(navigate);
                   })
                   .catch(() => {
