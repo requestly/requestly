@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
@@ -22,7 +21,6 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { isNull } from "lodash";
 import "./index.scss";
 
 const PRIVATE_WORKSPACE = {
@@ -43,20 +41,18 @@ const DEFAULT_APPSUMO_INPUT: AppSumoCode = {
   verified: false,
 };
 
-const db = getFirestore(firebaseApp);
-const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
-
 const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const availableTeams = useSelector(getAvailableTeams);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
   const [emailValidationError, setEmailValidationError] = useState(null);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
   const [isLoading, setIsLoading] = useState(false);
-  const isCreatingTeam = useRef(false);
+  const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
+  const isNewTeamCreated = useRef(false);
+  const db = getFirestore(firebaseApp);
 
   const addAppSumoCodeInput = () => {
     setAppsumoCodes((prev) => [...prev, { ...DEFAULT_APPSUMO_INPUT }]);
@@ -116,7 +112,7 @@ const AppSumoModal: React.FC = () => {
       updateAppSumoCode(index, "error", "");
       updateAppSumoCode(index, "verified", true);
     },
-    [appsumoCodes, workspaceToUpgrade?.id]
+    [db, appsumoCodes, workspaceToUpgrade?.id]
   );
 
   const redeemSubmittedCodes = useCallback(async () => {
@@ -126,7 +122,7 @@ const AppSumoModal: React.FC = () => {
       batch.update(docRef, { redeemed: true });
     });
     await batch.commit();
-  }, [appsumoCodes]);
+  }, [db, appsumoCodes]);
 
   const onSubmit = useCallback(async () => {
     if (!isAllCodeCheckPassed || emailValidationError) {
@@ -150,14 +146,31 @@ const AppSumoModal: React.FC = () => {
       });
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
     } else {
-      const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
-      updateDoc(teamsRef, {
-        "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
-        "appsumo.date": Date.now(),
-      });
+      setIsUpdatingSubscription(true);
+      const updateTeamSubscriptionForAppSumo = httpsCallable(
+        getFunctions(),
+        "subscription-updateTeamSubscriptionForAppSumo"
+      );
+
+      try {
+        const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
+        await updateDoc(teamsRef, {
+          "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
+          "appsumo.date": Date.now(),
+        });
+
+        await updateTeamSubscriptionForAppSumo({
+          teamId: workspaceToUpgrade.id,
+          startDate: Date.now(),
+        });
+      } catch (error) {
+        console.error("from appsumo", error);
+      }
     }
+
     await redeemSubmittedCodes();
-  }, [appsumoCodes, emailValidationError, isAllCodeCheckPassed, redeemSubmittedCodes, workspaceToUpgrade.id]);
+    setIsUpdatingSubscription(false);
+  }, [db, appsumoCodes, emailValidationError, isAllCodeCheckPassed, redeemSubmittedCodes, workspaceToUpgrade.id]);
 
   const handleEmailValidation = (email: string) => {
     if (!email) {
@@ -177,31 +190,33 @@ const AppSumoModal: React.FC = () => {
     if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) setAppsumoCodes([{ ...DEFAULT_APPSUMO_INPUT }]);
   }, [workspaceToUpgrade]);
 
+  // TODO: Refactor this and only create team if user clicks on Unlock deal
   useEffect(() => {
-    if (!isCreatingTeam.current && !isNull(availableTeams) && !availableTeams.length) {
-      setIsLoading(true);
-      isCreatingTeam.current = true;
-      const newTeamName = "Team Workspace";
-      createTeam({ teamName: newTeamName }).then((response: any) => {
-        trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
-        switchWorkspace(
-          {
-            teamId: response?.data?.teamId,
-            teamMembersCount: 1,
-          },
-          dispatch,
-          {
-            isWorkspaceMode: false,
-            isSyncEnabled: true,
-          },
-          appMode,
-          null,
-          "appsumo"
-        );
-        setIsLoading(false);
-      });
-    }
-  }, [availableTeams, appMode, dispatch]);
+    if (isNewTeamCreated.current) return;
+
+    setIsLoading(true);
+    isNewTeamCreated.current = true;
+    const newTeamName = "Team Workspace";
+    const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
+    createTeam({ teamName: newTeamName }).then((response: any) => {
+      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
+      switchWorkspace(
+        {
+          teamId: response?.data?.teamId,
+          teamMembersCount: 1,
+        },
+        dispatch,
+        {
+          isWorkspaceMode: false,
+          isSyncEnabled: true,
+        },
+        appMode,
+        null,
+        "appsumo"
+      );
+      setIsLoading(false);
+    });
+  }, [appMode, dispatch]);
 
   return (
     <RQModal
@@ -226,7 +241,11 @@ const AppSumoModal: React.FC = () => {
             </div>
             <div className="header mt-16">Please enter your AppSumo code</div>
             <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>
-            <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
+            <WorkspaceDropdown
+              isAppSumo
+              workspaceToUpgrade={workspaceToUpgrade}
+              setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+            />
             <div className="title mt-16">AppSumo email address</div>
             <div className="items-center mt-8">
               <div className="w-full">
@@ -289,6 +308,7 @@ const AppSumoModal: React.FC = () => {
             <RQButton
               type="primary"
               disabled={!isAllCodeCheckPassed || emailValidationError}
+              loading={isUpdatingSubscription}
               onClick={() => {
                 onSubmit()
                   .then(() => {
