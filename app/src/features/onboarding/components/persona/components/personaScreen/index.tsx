@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
@@ -18,12 +18,17 @@ import {
   trackAppOnboardingNameUpdated,
   trackAppOnboardingPersonaUpdated,
   trackAppOnboardingStepCompleted,
+  trackAppOnboardingViewed,
 } from "features/onboarding/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import "./index.scss";
 
-export const PersonaScreen = () => {
+interface Props {
+  isOpen: boolean;
+}
+
+export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
@@ -155,6 +160,12 @@ export const PersonaScreen = () => {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
     }
   }, [dispatch, isLoading, shouldProceedToGettingStarted]);
+
+  useEffect(() => {
+    if (isOpen && !shouldProceedToGettingStarted()) {
+      trackAppOnboardingViewed(ONBOARDING_STEPS.PERSONA);
+    }
+  }, [isOpen, shouldProceedToGettingStarted]);
 
   return (
     <>
