@@ -147,7 +147,10 @@ const AppSumoModal: React.FC = () => {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
     } else {
       setIsUpdatingSubscription(true);
-      const createTeamSubscriptionForAppSumo = httpsCallable(getFunctions(), "createTeamSubscriptionForAppSumo");
+      const updateTeamSubscriptionForAppSumo = httpsCallable(
+        getFunctions(),
+        "subscription-updateTeamSubscriptionForAppSumo"
+      );
 
       try {
         const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
@@ -156,7 +159,7 @@ const AppSumoModal: React.FC = () => {
           "appsumo.date": Date.now(),
         });
 
-        await createTeamSubscriptionForAppSumo({
+        await updateTeamSubscriptionForAppSumo({
           teamId: workspaceToUpgrade.id,
           startDate: Date.now(),
         });
