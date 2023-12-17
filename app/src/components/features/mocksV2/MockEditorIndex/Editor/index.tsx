@@ -181,14 +181,18 @@ const MockEditor: React.FC<Props> = ({
       updatedErrors.statusCode = statusCodeValidationError;
       if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
     }
+    const headersToValidate = mappedHeader.map((header) => ({
+      name: header.index.toString(),
+      value: { name: header.name, value: header.value },
+    }));
+    const headerErrors = validateHeaders(headersToValidate);
 
-    const { HeaderErrors } = validateHeaders(data.headers);
-    if (HeaderErrors.length > 0) {
-      updatedErrors.headers = [];
-
-      HeaderErrors.forEach((error: { typeOfError: string; errorIndex: number }) => {
-        updatedErrors.headers.push({ indexError: error.errorIndex, valueError: error.typeOfError });
-      });
+    if (headerErrors.length > 0) {
+      updatedErrors.headers = headerErrors.map((error) => ({
+        description: error.description,
+        errorIndex: error.errorIndex,
+        typeOfError: error.typeOfError,
+      }));
     }
 
     // TODO: Add more validations here for special characters, //, etc.
@@ -355,70 +359,13 @@ const MockEditor: React.FC<Props> = ({
     if (type === MockType.FILE) {
       return null;
     }
-
-    const createHeadersString = (headersArray: Header[]): string => {
-      const headersString: { [key: string]: Header } = {};
-
-      headersArray.forEach((header, index) => {
-        headersString[index.toString()] = {
-          name: header.name,
-          value: header.value,
-          index: index + 1,
-        };
-      });
-
-      return JSON.stringify(headersString);
-    };
-
-    const addHeader = () => {
-      const newHeader: Header = {
-        name: "",
-        value: "",
-        index: mappedHeader.length,
-      };
-      const updatedHeaders: Header[] = [...mappedHeader, newHeader];
-      setMappedHeader(updatedHeaders);
-      setHeadersString(createHeadersString(updatedHeaders));
-    };
-
-    const removeHeader = (indexNum: number) => {
-      const updatedHeaders = [...mappedHeader];
-      updatedHeaders.splice(indexNum, 1);
-
-      const updatedHeadersString = createHeadersString(updatedHeaders);
-      setHeadersString(updatedHeadersString);
-      if (errors && errors.headers && errors.headers.length > 0) {
-        const newError = errors.headers.filter((item) => {
-          if (item.indexError === indexNum) {
-            return false;
-          } else if (item.indexError > indexNum) {
-            item.indexError--;
-          }
-          return true;
-        });
-        setErrors({ ...errors, headers: newError });
-      }
-    };
-
-    const updateHeaders = (value: string, index: number, fieldToUpdate: string) => {
-      const updatedHeaders = [...mappedHeader];
-      if (fieldToUpdate === "name") {
-        updatedHeaders[index].name = value;
-      } else if (fieldToUpdate === "value") {
-        updatedHeaders[index].value = value;
-      }
-      setMappedHeader(updatedHeaders);
-      setHeadersString(JSON.stringify(updatedHeaders));
-    };
-
     return (
       <HeaderSection
         mappedHeader={mappedHeader}
         //@ts-ignore
         errors={errors}
-        updateHeaders={updateHeaders}
-        removeHeader={removeHeader}
-        addHeader={addHeader}
+        setMappedHeader={setMappedHeader}
+        setHeadersString={setHeadersString}
       />
     );
   }, [type, mappedHeader, errors]);
