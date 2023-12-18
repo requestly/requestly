@@ -292,12 +292,28 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     });
   }
 
-  if (headersTarget === RQ.HEADERS_TARGET.RESPONSE) {
-    RQ.IGNORED_HEADERS_ON_REDIRECT.forEach((headerName) => {
-      const customHeaderName = RQ.CUSTOM_HEADER_PREFIX + headerName;
-      BG.Methods.addHeader(originalHeaders, { name: "access-control-allow-headers", value: customHeaderName });
-      hasModifiedHeaders = true;
-    });
+  if (
+    RQ.IGNORED_HEADERS_ON_REDIRECT?.length > 0 &&
+    headersTarget === RQ.HEADERS_TARGET.RESPONSE &&
+    details.method === "OPTIONS"
+  ) {
+    const customHeaderValues = RQ.IGNORED_HEADERS_ON_REDIRECT.map(
+      (headerName) => RQ.CUSTOM_HEADER_PREFIX + headerName
+    ).join(",");
+
+    const originalValue = BG.Methods.getHeaderValue(originalHeaders, "access-control-allow-headers");
+    if (originalValue) {
+      BG.Methods.replaceHeader(originalHeaders, {
+        name: "access-control-allow-headers",
+        value: `${originalValue}, ${customHeaderValues}`,
+      });
+    } else {
+      BG.Methods.addHeader(originalHeaders, {
+        name: "access-control-allow-headers",
+        value: customHeaderValues,
+      });
+    }
+    hasModifiedHeaders = true;
   }
 
   for (var i = 0; i < enabledRules.length; i++) {
