@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react";
-
+import React, { useEffect, useState } from "react";
 import {
   fetchSharedListData,
   getSharedListIdFromString,
 } from "components/features/sharedLists/SharedListViewerIndexPage/actions";
 import { RuleObj } from "features/rules/types/rules";
 import { useParams } from "react-router-dom";
-import ContentHeader from "componentsV2/ContentHeader/ContentHeader";
 import RulesTable from "features/rules/components/RulesList/components/RulesTable/RulesTable";
+import ContentHeader from "componentsV2/ContentHeader";
 
 interface Props {}
 
-const SharedListViewer = ({}: Props) => {
+const SharedListViewer: React.FC<Props> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [ruleObjs, setRuleObjs] = useState<RuleObj[]>([]);
   const { sharedListParam } = useParams();

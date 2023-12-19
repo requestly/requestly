@@ -43,7 +43,7 @@
 
 .rq-content-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
   margin-left: 4px;
-  margin-right: 8px;
+  margin-right: auto;
 }
 
 .rq-content-table-row .ant-table-row .ant-table-row-level-1 td {

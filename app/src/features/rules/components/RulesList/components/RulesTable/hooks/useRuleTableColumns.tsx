@@ -118,7 +118,9 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: 120,
       render: (rule: RuleTableDataType) => {
         const checked = rule?.status === RuleObjStatus.ACTIVE ? true : false;
-        return <Switch checked={checked} onChange={(checked: boolean) => handleStatusToggle([rule], checked)} />;
+        return (
+          <Switch size="small" checked={checked} onChange={(checked: boolean) => handleStatusToggle([rule], checked)} />
+        );
       },
     },
     {
