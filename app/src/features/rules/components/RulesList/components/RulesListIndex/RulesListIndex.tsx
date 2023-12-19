@@ -92,8 +92,6 @@ const RulesList: React.FC<Props> = () => {
     [searchValue, activeFilter, getFilteredRecords]
   );
 
-  console.log("from index component", { searchedRecords, activeFilter });
-
   const promptUserToSignup = useCallback(
     (callback = () => navigate(PATHS.RULES.CREATE), message = "Sign up to continue", source = "") => {
       dispatch(
