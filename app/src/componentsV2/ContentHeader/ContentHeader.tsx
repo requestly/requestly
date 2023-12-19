@@ -51,6 +51,7 @@ export const ContentHeader: React.FC<ContentHeaderProps> = ({
           />
         ) : null}
 
+        {/* TODO: refactor with antd's Segmented component */}
         <div className="filters">
           {filters.length > 0
             ? filters.map(({ key, label, onClick }) => (
