@@ -3,7 +3,7 @@ const storagePrefix = "rq_";
 const getStorageKey = (key: string) => `${storagePrefix}${key}`;
 
 // TODO: move in top level utils
-export const storage = {
+export const localStorage = {
   setItem(key: string, value: unknown) {
     return window.localStorage.setItem(getStorageKey(key), JSON.stringify(value));
   },
