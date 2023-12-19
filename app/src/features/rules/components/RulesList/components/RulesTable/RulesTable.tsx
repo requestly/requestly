@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
-import { isRule, rulesToContentTableDataAdapter, storage } from "./utils";
+import { isRule, rulesToContentTableDataAdapter, localStorage } from "./utils";
 import { RuleObj, RuleObjType } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
@@ -17,7 +17,7 @@ import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiToggleFill } from "@react-icons/all-files/ri/RiToggleFill";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
-import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
+// import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
 import "./rulesTable.css";
 
 interface Props {
@@ -62,7 +62,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
   // const inactiveRulesCount = selectedRows.length - activeRulesCount;
 
   const getExpandedGroupRowKeys = useCallback(() => {
-    return (storage.getItem("expandedGroups") ?? []) as string[];
+    return (localStorage.getItem("expandedGroups") ?? []) as string[];
   }, []);
 
   useEffect(() => {
@@ -82,11 +82,11 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     if (expanded && !expandedGroups.includes(record.id)) {
       const updatedExpandedGroups = [...expandedGroups, record.id];
       setExpandedGroups(updatedExpandedGroups);
-      storage.setItem("expandedGroups", updatedExpandedGroups);
+      localStorage.setItem("expandedGroups", updatedExpandedGroups);
     } else if (!expanded && expandedGroups.includes(record.id)) {
       const updatedExpandedGroups = [...expandedGroups].filter((id) => id !== record.id);
       setExpandedGroups(updatedExpandedGroups);
-      storage.setItem("expandedGroups", updatedExpandedGroups);
+      localStorage.setItem("expandedGroups", updatedExpandedGroups);
     }
   };
 
@@ -117,26 +117,27 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
           onExpand: (expanded, record) => {
             handleGroupState(expanded, record);
           },
-          expandIcon: ({ expanded, onExpand, record }) => {
-            console.clear();
-            console.log({ record, expanded, expandedGroups, expandedGroupRowKeys: getExpandedGroupRowKeys() });
+          // FIXME: fix custom expand icon
+          // expandIcon: ({ expanded, onExpand, record }) => {
+          //   console.clear();
+          //   console.log({ record, expanded, expandedGroups, expandedGroupRowKeys: getExpandedGroupRowKeys() });
 
-            if (!record.children) {
-              return null;
-            }
+          //   if (!record.children) {
+          //     return null;
+          //   }
 
-            return (
-              <span
-                // @ts-ignore
-                onClick={(e) => onExpand(record, e)}
-              >
-                <RiArrowDownSLine
-                  className="group-expand-icon"
-                  style={{ transform: `rotate(${expanded ? "-180deg" : "0deg"})` }}
-                />
-              </span>
-            );
-          },
+          //   return (
+          //     <span
+          //       // @ts-ignore
+          //       onClick={(e) => onExpand(record, e)}
+          //     >
+          //       <RiArrowDownSLine
+          //         className="group-expand-icon"
+          //         style={{ transform: `rotate(${expanded ? "-180deg" : "0deg"})` }}
+          //       />
+          //     </span>
+          //   );
+          // },
         }}
         bulkActionBarConfig={{
           type: "default",
