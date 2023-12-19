@@ -302,7 +302,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     ).join(",");
 
     const originalValue = BG.Methods.getHeaderValue(originalHeaders, "access-control-allow-headers");
-    if (originalValue) {
+    if (originalValue && originalValue !== "*") {
       BG.Methods.replaceHeader(originalHeaders, {
         name: "access-control-allow-headers",
         value: `${originalValue}, ${customHeaderValues}`,
@@ -611,6 +611,8 @@ BG.Methods.modifyHeadersForSessionReplayPlayer = ({
   requestDetails,
   originalHeaders,
 }) => {
+  if (!BG.statusSettings.isExtensionEnabled) return null;
+
   try {
     const requestInitiator = new URL(requestDetails.initiator ?? requestDetails.originUrl); // firefox does not contain "initiator"
     const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
