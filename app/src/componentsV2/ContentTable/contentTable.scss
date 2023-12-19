@@ -37,6 +37,17 @@
 tr.rq-content-table-row.ant-table-row {
   background: var(--background);
 
+  .ant-table-cell-with-append {
+    .group-expand-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      display: none; // FIXME: show expand icon only for groups
+    }
+  }
+
   &.ant-table-row-level-1 {
     &:hover > .ant-table-cell {
       background: var(--surface-0_5);

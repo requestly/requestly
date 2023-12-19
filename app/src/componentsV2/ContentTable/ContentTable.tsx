@@ -3,6 +3,7 @@ import type { ColumnsType } from "antd/es/table";
 import { Table } from "antd";
 import { BulkActionBarConfig } from "./types";
 import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
+import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
 import "./contentTable.scss";
 
 export interface ContentTableProps<DataType> {
@@ -51,6 +52,16 @@ const ContentTable = <DataType extends object>({
         columns={columns}
         dataSource={data}
         pagination={false}
+        expandable={{
+          expandIcon: ({ expanded, onExpand, record }) => (
+            <RiArrowDownSLine
+              // @ts-ignore
+              onClick={(e) => onExpand(record, e)}
+              className="group-expand-icon"
+              style={{ transform: `rotate(${expanded ? "-180deg" : "0deg"})` }}
+            />
+          ),
+        }}
         rowSelection={{
           selectedRowKeys,
           onChange: (selectedRowKeys, selectedRows) => {
