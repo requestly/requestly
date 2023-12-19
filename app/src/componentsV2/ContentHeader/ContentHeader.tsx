@@ -4,7 +4,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Filter, FilterType } from "./type";
 import "./contentHeader.scss";
 
-export interface Props {
+export interface ContentHeaderProps {
   title: ReactNode;
   subtitle: ReactNode;
   actions?: ReactNode[];
@@ -15,7 +15,7 @@ export interface Props {
 }
 
 // Contains common design and colors for app
-export const ContentHeader: React.FC<Props> = ({
+export const ContentHeader: React.FC<ContentHeaderProps> = ({
   title,
   subtitle,
   actions,

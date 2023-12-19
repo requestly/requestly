@@ -22,7 +22,6 @@ import APP_CONSTANTS from "config/constants";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
-import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import AuthPopoverButton from "components/features/rules/RulesListContainer/RulesTable/AuthPopoverButtons";
 import { DropdownButtonType } from "antd/lib/dropdown";
 import {
@@ -35,6 +34,10 @@ import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { RiCheckLine } from "@react-icons/all-files/ri/RiCheckLine";
 import { RiFolderAddLine } from "@react-icons/all-files/ri/RiFolderAddLine";
 import { isRule } from "../RulesTable/utils";
+import { CreateTeamRuleCTA, GettingStarted, ImportRulesModal } from "./components";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { ContentHeaderProps } from "componentsV2/ContentHeader";
+import SpinnerColumn from "components/misc/SpinnerColumn";
 import "./rulesListIndex.scss";
 
 interface Props {}
@@ -44,6 +47,7 @@ const RulesList: React.FC<Props> = () => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
@@ -230,7 +234,57 @@ const RulesList: React.FC<Props> = () => {
     )
   );
 
-  return (
+  const contentHeaderFilters: ContentHeaderProps["filters"] = useMemo(
+    () => [
+      {
+        key: "all",
+        label: (
+          <div className="label">
+            All {allRecords.length ? <Badge count={allRecords.length} overflowCount={20} /> : null}
+          </div>
+        ),
+        onClick: () => {
+          setActiveFilter("all");
+        },
+      },
+      {
+        key: "pinned",
+        label: (
+          <div className="label">
+            <MdOutlinePushPin className="icon" />
+            Pinned
+            {pinnedRecords.length ? <Badge count={pinnedRecords.length} overflowCount={20} /> : null}
+          </div>
+        ),
+        onClick: () => {
+          setActiveFilter("pinned");
+        },
+      },
+      {
+        key: "active",
+        label: (
+          <div className="label">
+            <RiCheckLine className="icon" />
+            Active {activeRecords.length ? <Badge count={activeRecords.length} overflowCount={20} /> : null}
+          </div>
+        ),
+        onClick: () => {
+          setActiveFilter("active");
+        },
+      },
+    ],
+    [allRecords?.length, pinnedRecords.length, activeRecords.length]
+  );
+
+  const CreateFirstRule = () => {
+    return isWorkspaceMode ? <CreateTeamRuleCTA /> : <GettingStarted />;
+  };
+
+  return isLoading ? (
+    <>
+      <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
+    </>
+  ) : allRecords?.length > 0 ? (
     <>
       <div className="rq-rules-list-container">
         {/* TODO: Add Feature Limiter Banner Here */}
@@ -255,53 +309,15 @@ const RulesList: React.FC<Props> = () => {
           searchValue={searchValue}
           setSearchValue={setSearchValue}
           activeFilter={activeFilter}
-          filters={[
-            {
-              key: "all",
-              label: (
-                <div className="label">
-                  All {allRecords.length ? <Badge count={allRecords.length} overflowCount={20} /> : null}
-                </div>
-              ),
-              onClick: () => {
-                setActiveFilter("all");
-                console.log("all clicked");
-              },
-            },
-            {
-              key: "pinned",
-              label: (
-                <div className="label">
-                  <MdOutlinePushPin className="icon" />
-                  Pinned
-                  {pinnedRecords.length ? <Badge count={pinnedRecords.length} overflowCount={20} /> : null}
-                </div>
-              ),
-              onClick: () => {
-                setActiveFilter("pinned");
-                console.log("pinned");
-              },
-            },
-            {
-              key: "active",
-              label: (
-                <div className="label">
-                  <RiCheckLine className="icon" />
-                  Active {activeRecords.length ? <Badge count={activeRecords.length} overflowCount={20} /> : null}
-                </div>
-              ),
-              onClick: () => {
-                setActiveFilter("active");
-                console.log("active");
-              },
-            },
-          ]}
+          filters={contentHeaderFilters}
         />
         <div className="rq-rules-table">
           <RulesTable rules={searchedRecords as RuleObj[]} loading={isLoading} />
         </div>
       </div>
     </>
+  ) : (
+    <CreateFirstRule />
   );
 };
 
