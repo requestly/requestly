@@ -1,74 +1,64 @@
 import React from "react";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getIsOrgBannerDismissed, getUserAuthDetails } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
-import "./appNotificationBanner.scss";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { Avatar, Divider, Row, Space, Typography } from "antd";
+import { ContactUsModal } from "components/modals/ContactUsModal";
 import { parseGravatarImage } from "utils/Misc";
 import { toast } from "utils/Toast";
 import { trackTeamPlanBannerClicked, trackTeamPlanBannerViewed } from "modules/analytics/events/common/teams";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { actions } from "store";
-import { useDispatch } from "react-redux";
+import "./appNotificationBanner.scss";
+import Logger from "lib/logger";
 
 const UsersModal: React.FC<{
   users: any[];
   isModalOpen: boolean;
   onCancel: () => void;
-  showSuccess: boolean;
   sendRequestEmail: () => void;
-}> = ({ users, isModalOpen, onCancel, showSuccess, sendRequestEmail }) => {
+  showCalendlyModal: () => void;
+}> = ({ users, isModalOpen, onCancel, sendRequestEmail, showCalendlyModal }) => {
   if (users.length === 0) return null;
 
   return (
     <RQModal open={isModalOpen} onCancel={onCancel} width={100}>
       <div className="rq-modal-content">
-        {showSuccess ? (
-          <div className="title">
-            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
-            <div className="mt-8">
-              Thank you for showing interest in the Requestly team plan.
-              <br />
-              We will reach out to you shortly via email.
+        <Row justify={"space-between"}>
+          <Typography.Title level={4}>
+            {users.length} <span className="text-capitalize">{users[0]?.domain?.split(".")[0]}</span> users{" "}
+          </Typography.Title>
+          <RQButton
+            type="primary"
+            onClick={() => {
+              trackTeamPlanBannerClicked("get_subscription", "view_users_modal");
+              showCalendlyModal();
+              onCancel();
+              sendRequestEmail();
+            }}
+          >
+            Get a team subscription
+          </RQButton>
+        </Row>
+        <Divider />
+        <div className="user-list">
+          {users.map((user) => (
+            <div className="user-list-card display-flex">
+              <Avatar
+                size={28}
+                shape="square"
+                className="mr-8"
+                src={parseGravatarImage(
+                  user.photoURL || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+                )}
+              />
+              <span className="text-bold">{user?.email}</span>
             </div>
-          </div>
-        ) : (
-          <>
-            <Row justify={"space-between"}>
-              <Typography.Title level={4}>
-                {users.length} <span className="text-capitalize">{users[0]?.domain?.split(".")[0]}</span> users{" "}
-              </Typography.Title>
-              <RQButton
-                type="primary"
-                onClick={() => {
-                  trackTeamPlanBannerClicked("get_subscription", "view_users_modal");
-                  sendRequestEmail();
-                }}
-              >
-                Get a team subscription
-              </RQButton>
-            </Row>
-            <Divider />
-            <div className="user-list">
-              {users.map((user) => (
-                <div className="user-list-card display-flex">
-                  <Avatar
-                    size={28}
-                    shape="square"
-                    className="mr-8"
-                    src={parseGravatarImage(
-                      user.photoURL || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
-                    )}
-                  />
-                  <span className="text-bold">{user?.email}</span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+          ))}
+        </div>
       </div>
     </RQModal>
   );
@@ -79,12 +69,10 @@ export const OrgNotificationBanner = () => {
 
   const isOrgBannerDismissed = useSelector(getIsOrgBannerDismissed) ?? false;
   const user = useSelector(getUserAuthDetails);
-  const userEmail = user?.details?.profile?.email;
-  const isUserSubscribed = user?.details?.isPremium && user?.details?.planDetails?.status !== "trialing";
 
   const [userDetails, setUserDetails] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [openCalendlyModal, setOpenCalendlyModal] = useState(false);
 
   const orgBannerConfig = useFeatureValue("team_plan_banner", null);
 
@@ -101,12 +89,15 @@ export const OrgNotificationBanner = () => {
     );
     sendTeamSubscriptionRequestEmail({ userCount: userDetails.length })
       .then(() => {
-        setShowSuccess(true);
+        Logger.log("request team subscription email sent successfully");
       })
       .catch(() => toast.error("Error while sending email. Please try again later."));
   }, [userDetails.length]);
 
   useEffect(() => {
+    const userEmail = user?.details?.profile?.email;
+    const isUserSubscribed = user?.details?.isPremium && user?.details?.planDetails?.status !== "trialing";
+
     if (isOrgBannerDismissed || isUserSubscribed || !orgBannerConfig) {
       return;
     }
@@ -120,7 +111,13 @@ export const OrgNotificationBanner = () => {
         }
       });
     }
-  }, [isOrgBannerDismissed, isUserSubscribed, orgBannerConfig, userEmail]);
+  }, [
+    isOrgBannerDismissed,
+    orgBannerConfig,
+    user?.details?.isPremium,
+    user?.details?.profile?.email,
+    user?.details?.planDetails?.status,
+  ]);
 
   if (isOrgBannerDismissed || !orgBannerConfig || userDetails.length === 0) return null;
 
@@ -145,8 +142,7 @@ export const OrgNotificationBanner = () => {
           <RQButton
             type="primary"
             onClick={() => {
-              setShowSuccess(true);
-              setOpenModal(true);
+              setOpenCalendlyModal(true);
               trackTeamPlanBannerClicked("get_subscription", "banner");
               sendRequestEmail();
             }}
@@ -177,7 +173,13 @@ export const OrgNotificationBanner = () => {
         isModalOpen={openModal}
         onCancel={() => setOpenModal(false)}
         sendRequestEmail={sendRequestEmail}
-        showSuccess={showSuccess}
+        showCalendlyModal={() => setOpenCalendlyModal(true)}
+      />
+      <ContactUsModal
+        isOpen={openCalendlyModal}
+        onCancel={() => setOpenCalendlyModal(false)}
+        heading="Get In Touch"
+        subHeading={`Learn about the Benefits & Pricing of Team Plan for ${userDetails[0]?.domain?.split(".")[0]}`}
       />
     </>
   );
