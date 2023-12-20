@@ -15,6 +15,7 @@ import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleActivatedStatusEvent, trackRuleDeactivatedStatus } from "modules/analytics/events/common/rules";
+import { trackGroupStatusToggled } from "features/rules/analytics/groups";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
@@ -50,7 +51,7 @@ const useRuleTableActions = () => {
 
   const changeRuleStatus = (newStatus: RuleObjStatus, rule: RuleObj) => {
     // TODO: Handle Group status toggle
-    console.log({ rule, user });
+    console.log("group", { rule, user });
 
     // TODO: Why is this added??
     // if (rule.currentOwner) {
@@ -58,6 +59,7 @@ const useRuleTableActions = () => {
     // } else {
     //   currentOwner = rule.currentOwner;
     // }
+
     const updatedRule: RuleObj = {
       ...rule,
       status: newStatus,
@@ -65,12 +67,18 @@ const useRuleTableActions = () => {
 
     Logger.log("Writing storage in RulesTable changeRuleStatus");
     updateRuleInStorage(updatedRule, rule).then(() => {
+      const isRecordRule = isRule(rule);
+
       //Push Notify
       newStatus === RuleObjStatus.ACTIVE
-        ? toast.success(`Rule is now ${newStatus.toLowerCase()}`)
-        : toast.success(`Rule is now ${newStatus.toLowerCase()}`);
+        ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
+        : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
 
-      //Analytics
+      if (!isRecordRule) {
+        trackGroupStatusToggled(newStatus === "Active");
+        return;
+      }
+
       if (newStatus.toLowerCase() === "active") {
         trackRQLastActivity("rule_activated");
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
