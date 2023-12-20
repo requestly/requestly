@@ -12,8 +12,9 @@ import { toast } from "utils/Toast";
 import { trackTeamPlanBannerClicked, trackTeamPlanBannerViewed } from "modules/analytics/events/common/teams";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { actions } from "store";
-import "./appNotificationBanner.scss";
 import Logger from "lib/logger";
+import { capitalize } from "lodash";
+import "./appNotificationBanner.scss";
 
 const UsersModal: React.FC<{
   users: any[];
@@ -179,7 +180,9 @@ export const OrgNotificationBanner = () => {
         isOpen={openCalendlyModal}
         onCancel={() => setOpenCalendlyModal(false)}
         heading="Get In Touch"
-        subHeading={`Learn about the Benefits & Pricing of Team Plan for ${userDetails[0]?.domain?.split(".")[0]}`}
+        subHeading={`Learn about the Benefits & Pricing of Team Plan for ${capitalize(
+          userDetails[0]?.domain?.split(".")[0]
+        )}`}
       />
     </>
   );
