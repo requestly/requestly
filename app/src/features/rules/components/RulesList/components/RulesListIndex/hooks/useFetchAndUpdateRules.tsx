@@ -26,7 +26,6 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log("runnning....");
     if (hasIsRulesListHardRefreshPendingChanged) {
       setIsLoading(true);
     }
