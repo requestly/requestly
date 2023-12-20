@@ -22,5 +22,12 @@
     border-radius: var(--border-radius-sm);
     border: 1px solid var(--surface-2);
     background: var(--surface-0_5);
+    padding: 20px 1rem;
+
+    & .primary-card-header {
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.25px;
+    }
   }
 }
