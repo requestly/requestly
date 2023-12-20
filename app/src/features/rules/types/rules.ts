@@ -10,7 +10,7 @@ export enum RuleObjStatus {
   INACTIVE = "Inactive",
 }
 
-enum RuleType {
+export enum RuleType {
   REDIRECT = "Redirect",
   HEADERS = "Headers",
   CANCEL = "Cancel",
