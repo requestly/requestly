@@ -1,0 +1,26 @@
+.homepage-wrapper {
+  background: var(--surface-0);
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  padding: 1rem;
+
+  & .homepage-content {
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  & .homepage-primary-cards-wrapper {
+    gap: 1rem;
+
+    & .ant-col {
+      max-width: 49%;
+    }
+  }
+
+  & .homepage-primary-card {
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--surface-2);
+    background: var(--surface-0_5);
+  }
+}
