@@ -302,18 +302,15 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     ).join(",");
 
     const originalValue = BG.Methods.getHeaderValue(originalHeaders, "access-control-allow-headers");
-    if (originalValue && originalValue !== "*") {
-      BG.Methods.replaceHeader(originalHeaders, {
-        name: "access-control-allow-headers",
-        value: `${originalValue}, ${customHeaderValues}`,
-      });
+    if (originalValue === "*") {
+      hasModifiedHeaders = false;
     } else {
       BG.Methods.addHeader(originalHeaders, {
         name: "access-control-allow-headers",
         value: customHeaderValues,
       });
+      hasModifiedHeaders = true;
     }
-    hasModifiedHeaders = true;
   }
 
   for (var i = 0; i < enabledRules.length; i++) {
