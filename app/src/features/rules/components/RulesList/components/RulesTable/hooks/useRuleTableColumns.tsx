@@ -14,6 +14,8 @@ import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -115,17 +117,27 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       key: "status",
       title: "Status",
       width: 120,
-      render: (rule: RuleTableDataType) => {
-        const checked = rule?.status === RuleObjStatus.ACTIVE ? true : false;
+      render: (_, rule: RuleTableDataType, index) => {
+        const isRuleActive = rule.status === RuleObjStatus.ACTIVE;
+
         return (
-          <Switch
-            size="small"
-            checked={checked}
-            onChange={(checked: boolean, e) => {
-              e.stopPropagation();
-              handleStatusToggle([rule], checked);
-            }}
-          />
+          <PremiumFeature
+            disabled={isRuleActive}
+            features={[FeatureLimitType.num_active_rules]}
+            popoverPlacement="left"
+            onContinue={() => handleStatusToggle([rule])}
+            source="rule_list_status_switch"
+          >
+            <Switch
+              size="small"
+              checked={isRuleActive}
+              data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+              onChange={(checked: boolean, e) => {
+                e.stopPropagation();
+                handleStatusToggle([rule]);
+              }}
+            />
+          </PremiumFeature>
         );
       },
     },

@@ -1,13 +1,11 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
+import { Rule, RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { rulesActions } from "store/features/rules/slice";
 import Logger from "lib/logger";
 import { StorageService } from "init";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { toast } from "utils/Toast";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -15,11 +13,14 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
+import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
+import { trackRuleActivatedStatusEvent, trackRuleDeactivatedStatus } from "modules/analytics/events/common/rules";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const { UNGROUPED_GROUP_ID } = RULES_LIST_TABLE_CONSTANTS;
   const {
     setRuleToDuplicate,
@@ -37,12 +38,12 @@ const useRuleTableActions = () => {
     setSelectedRows([]);
   }, [setSelectedRows]);
 
-  const handleStatusToggle = (rules: RuleTableDataType[], checked: boolean) => {
-    console.log("handleStatusToggle", { rules, checked });
+  const handleStatusToggle = (rules: RuleTableDataType[]) => {
+    console.log("handleStatusToggle", { rules });
     // TODO: Add logic to propogate the changes to storageservice;
 
     rules.forEach((rule) => {
-      const status = checked ? RuleObjStatus.ACTIVE : RuleObjStatus.INACTIVE;
+      const status = rule.status === RuleObjStatus.ACTIVE ? RuleObjStatus.INACTIVE : RuleObjStatus.ACTIVE;
       changeRuleStatus(status, rule);
     });
   };
@@ -65,19 +66,20 @@ const useRuleTableActions = () => {
     Logger.log("Writing storage in RulesTable changeRuleStatus");
     updateRuleInStorage(updatedRule, rule).then(() => {
       //Push Notify
-      newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+      newStatus === RuleObjStatus.ACTIVE
         ? toast.success(`Rule is now ${newStatus.toLowerCase()}`)
         : toast.success(`Rule is now ${newStatus.toLowerCase()}`);
 
-      // TODO: Add Analytics
       //Analytics
-      // if (newStatus.toLowerCase() === "active") {
-      //   trackRQLastActivity("rule_activated");
-      //   trackRuleActivatedStatusEvent(rule.ruleType);
-      // } else {
-      //   trackRQLastActivity("rule_deactivated");
-      //   trackRuleDeactivatedStatus(rule.ruleType);
-      // }
+      if (newStatus.toLowerCase() === "active") {
+        trackRQLastActivity("rule_activated");
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
+        trackRuleActivatedStatusEvent((rule as Rule).ruleType);
+      } else {
+        trackRQLastActivity("rule_deactivated");
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
+        trackRuleDeactivatedStatus((rule as Rule).ruleType);
+      }
     });
   };
 
