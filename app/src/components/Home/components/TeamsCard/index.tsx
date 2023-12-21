@@ -3,10 +3,10 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { Skeleton } from "antd";
-import { getPendingInvites } from "backend/workspace";
-import Logger from "lib/logger";
-import { isCompanyEmail } from "utils/FormattingHelper";
 import { CreateWorkspaceView } from "./components/CreateWorkspaceView";
+import { getPendingInvites } from "backend/workspace";
+import { isCompanyEmail } from "utils/FormattingHelper";
+import Logger from "lib/logger";
 
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -15,6 +15,10 @@ export const TeamsCard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!user.loggedIn) {
+      setIsLoading(false);
+      return;
+    }
     getPendingInvites({ email: true, domain: true })
       .then((res: any) => {
         setPendingInvites(res?.pendingInvites ?? []);
@@ -26,7 +30,7 @@ export const TeamsCard: React.FC = () => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [user.loggedIn]);
 
   if (!user.loggedIn) return <CreateWorkspaceView />;
   if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
