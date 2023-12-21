@@ -5,6 +5,7 @@ import Logger from "lib/logger";
 import "./premiumPlanBadge.scss";
 import { actions } from "store";
 import { Tooltip } from "antd";
+import { getPrettyPlanName } from "utils/FormattingHelper";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ const PremiumPlanBadge = () => {
             );
           }}
         >
-          <div className="premium-plan-name">{getPlanNameFromId(planId).toUpperCase()}</div>
+          <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
           <div className="premium-plan-days-left">
             {planStatus === "trialing" ? `${daysLeft} days left in trial` : "Plan Expired"}
           </div>
