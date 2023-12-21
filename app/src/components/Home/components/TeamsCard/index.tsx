@@ -6,6 +6,7 @@ import { Skeleton } from "antd";
 import { getPendingInvites } from "backend/workspace";
 import Logger from "lib/logger";
 import { isCompanyEmail } from "utils/FormattingHelper";
+import { CreateWorkspaceView } from "./components/CreateWorkspaceView";
 
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -27,10 +28,10 @@ export const TeamsCard: React.FC = () => {
       });
   }, []);
 
-  if (!user.loggedIn) return <>CREATE WORKSPACE VIEW HERE WITH AUTH POPOVER</>;
+  if (!user.loggedIn) return <CreateWorkspaceView />;
   if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
   if (pendingInvites?.length > 0) return <>PENDING INVITES VIEW HERE</>;
   if (availableTeams?.length > 0) return <>AVAILABLE TEAMS VIEW HERE</>;
   if (isCompanyEmail(user?.details?.profile?.email)) return <>SHOW DEFAULT WORKSPACE VIEW</>;
-  else return <>SHOW CREATE WORKSPACE VIEW</>;
+  else return <CreateWorkspaceView />;
 };
