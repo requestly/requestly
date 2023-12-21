@@ -1,0 +1,48 @@
+.teams-list-item {
+  padding: 8px 0;
+}
+
+.teams-list-item-title {
+  color: var(--white);
+}
+
+.teams-list-actions-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+}
+
+.teams-list-item-members-count {
+  font-size: 11px;
+  margin-left: 4px;
+  align-self: center;
+}
+
+.teams-list-joined-tag {
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  & svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  & span {
+    font-size: 13px;
+    font-weight: 500;
+  }
+}
+
+.teams-list-join-btn-loader {
+  font-size: 1rem;
+  color: var(--white);
+}
+
+.ant-btn.teams-list-join-btn-dark-bg {
+  background: var(--surface-0);
+  cursor: not-allowed;
+  pointer-events: none;
+}
