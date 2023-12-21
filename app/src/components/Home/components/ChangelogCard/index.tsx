@@ -25,7 +25,6 @@ export const ChangeLogCard: React.FC = () => {
       });
   }, []);
 
-  console.log(logs);
   return (
     <>
       {isLoading ? (
