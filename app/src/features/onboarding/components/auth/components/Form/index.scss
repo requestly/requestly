@@ -1,0 +1,92 @@
+.onboarding-auth-form-header {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--white);
+}
+
+.onboarding-auth-mode-switch-wrapper {
+  font-size: 13px;
+  color: var(--text-light);
+
+  .onboarding-auth-mode-switcher {
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+}
+
+.onboarding-google-auth-button.ant-btn-default.ant-btn {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 24px;
+  background-color: #383838;
+  border: none;
+  padding: 8px initial;
+  height: auto;
+
+  &:hover,
+  &:active,
+  &:focus {
+    border: none !important;
+  }
+
+  &:hover {
+    background-color: var(--surface-3) !important;
+  }
+}
+.onboarding-auth-form-divider .ant-divider-inner-text {
+  font-size: 1rem;
+  color: var(--white);
+}
+
+.why-work-email {
+  color: var(--text-light);
+  font-size: 11px;
+}
+
+.onboarding-form-input {
+  & label {
+    font-weight: 500;
+    font-size: 13px;
+  }
+  & input::placeholder {
+    font-weight: 500;
+    color: var(--neutrals-gray-400);
+  }
+
+  & input {
+    font-weight: 500;
+    margin-top: 4px;
+    border: 1px solid var(--neutrals-gray-600);
+  }
+}
+
+.persona-input-byline {
+  font-size: 11px;
+  color: var(--neutrals-gray-300);
+  margin-top: 4px;
+}
+
+.onboarding-terms-text {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 1rem;
+  & a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  & a:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+}
+
+.onboarding-continue-button.ant-btn {
+  font-weight: 500;
+}

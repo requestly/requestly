@@ -24,11 +24,7 @@ RQ.RequestResponseRuleHandler.setup = () => {
       return [RQ.RULE_TYPES.REQUEST, RQ.RULE_TYPES.RESPONSE].includes(rule.ruleType);
     });
 
-    const doRedirectRulesExist = rules.some((rule) => {
-      return [RQ.RULE_TYPES.REDIRECT, RQ.RULE_TYPES.REPLACE].includes(rule.ruleType);
-    });
-
-    if (doRequestResponseRulesExist || doRedirectRulesExist) {
+    if (doRequestResponseRulesExist) {
       RQ.RequestResponseRuleHandler.init();
     }
   });
@@ -70,13 +66,7 @@ RQ.RequestResponseRuleHandler.init = function () {
     }
   });
 
-  const clientArgs = {
-    namespace: RQ.PUBLIC_NAMESPACE,
-    customHeaderPrefix: RQ.CUSTOM_HEADER_PREFIX,
-    ignoredHeadersOnRedirect: RQ.IGNORED_HEADERS_ON_REDIRECT,
-  };
-
-  RQ.ClientUtils.executeJS(`(${this.interceptAJAXRequests.toString()})(${JSON.stringify(clientArgs)})`);
+  RQ.ClientUtils.executeJS(`(${this.interceptAJAXRequests.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
 
   RQ.RequestResponseRuleHandler.isInitialized = true;
 };
@@ -109,15 +99,12 @@ RQ.RequestResponseRuleHandler.updateRulesCache = async () => {
 };
 
 /**
+ * @param {*} namespace __REQUESTLY__
  * Do not refer other function/variables from this function.
  * This function will be injected in website and will run in different JS context.
  */
 
-RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
-  namespace,
-  customHeaderPrefix = "",
-  ignoredHeadersOnRedirect = [],
-}) {
+RQ.RequestResponseRuleHandler.interceptAJAXRequests = function (namespace) {
   window[namespace] = window[namespace] || {};
   window[namespace].requestRules = [];
   window[namespace].responseRules = [];
@@ -529,16 +516,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       request = new Request(resource.toString(), initOptions);
     }
 
-    let hasModifiedHeaders = false;
-
-    ignoredHeadersOnRedirect.forEach((header) => {
-      const originalHeaderValue = request.headers.get(header);
-      if (originalHeaderValue) {
-        hasModifiedHeaders = true;
-        request.headers.set(customHeaderPrefix + header, originalHeaderValue);
-      }
-    });
-
     const url = getAbsoluteUrl(request.url);
     const method = request.method;
     // Request body can be sent only for request methods other than GET and HEAD.
@@ -593,7 +570,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
-        if (requestRule || hasModifiedHeaders) {
+        if (requestRule) {
           // use modified request to fetch response
           fetchedResponse = await _fetch(request);
         } else {

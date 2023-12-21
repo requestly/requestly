@@ -15,10 +15,11 @@ const getWorkspaceIcon = (workspaceName: string) => {
 };
 
 const WorkspaceDropdown: React.FC<{
+  isAppSumo?: boolean;
   workspaceToUpgrade: { name: string; id: string; accessCount: number };
   setWorkspaceToUpgrade: (workspaceDetails: any) => void;
   className?: string;
-}> = ({ workspaceToUpgrade, setWorkspaceToUpgrade, className }) => {
+}> = ({ isAppSumo = false, workspaceToUpgrade, setWorkspaceToUpgrade, className }) => {
   const user = useSelector(getUserAuthDetails);
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -74,7 +75,7 @@ const WorkspaceDropdown: React.FC<{
           />
         ),
       })),
-    ],
+    ].filter((items) => (isAppSumo ? items.key !== "private_workspace" : true)),
     onClick: ({ key: teamId }: { key: string }) => {
       if (teamId === "private_workspace") {
         return setWorkspaceToUpgrade({

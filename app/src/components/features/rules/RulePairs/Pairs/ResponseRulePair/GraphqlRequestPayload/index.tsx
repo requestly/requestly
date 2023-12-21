@@ -143,8 +143,8 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
             <InfoCircleOutlined />
           </Tooltip>
         </label>
-        <Row wrap={false} gutter={6}>
-          <Col span={8}>
+        <Row wrap={true} gutter={[4, 8]}>
+          <Col span={24} lg={8}>
             <Input
               name="key"
               type="text"
@@ -156,7 +156,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
             />
           </Col>
           {isFeatureCompatible(FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR) && (
-            <Col span={4}>
+            <Col span={24} sm={14} md={8} lg={5}>
               <Select
                 className="graphql-operation-filter-operator"
                 options={[
@@ -168,7 +168,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
               />
             </Col>
           )}
-          <Col span={8}>
+          <Col span={24} lg={9}>
             <Input
               name="value"
               type="text"
@@ -179,9 +179,11 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
               onChange={handleRequestPayloadValueChange}
             />
           </Col>
-          <Button type="link" className="graphql-operation-filter-reset-button" onClick={clearRequestPayload}>
-            Reset
-          </Button>
+          <Col span={1}>
+            <Button type="link" className="graphql-operation-filter-reset-button" onClick={clearRequestPayload}>
+              Reset
+            </Button>
+          </Col>
         </Row>
       </Col>
     </Row>

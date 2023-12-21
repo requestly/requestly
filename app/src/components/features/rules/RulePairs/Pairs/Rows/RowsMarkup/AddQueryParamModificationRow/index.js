@@ -5,7 +5,15 @@ import { PlusOutlined } from "@ant-design/icons";
 const AddQueryParamModificationRow = ({ rowIndex, addEmptyModification, isInputDisabled }) => {
   return (
     <Row className="margin-top-one" key={rowIndex}>
-      <Col offset={4} span={20}>
+      <Col
+        lg={{
+          offset: 4,
+        }}
+        xs={{
+          offset: 0,
+        }}
+        span={20}
+      >
         <Button type="dashed" onClick={addEmptyModification} icon={<PlusOutlined />} disabled={isInputDisabled}>
           <span className="btn-inner--text">Add Modification</span>
         </Button>
