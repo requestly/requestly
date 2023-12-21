@@ -2,6 +2,7 @@ import React from "react";
 import { Col, Row } from "antd";
 import { RulesCard } from "./components/RulesCard";
 import "./home.scss";
+import { SessionsCard } from "./components/SessionsCard";
 
 export const Home: React.FC = () => {
   return (
@@ -12,7 +13,7 @@ export const Home: React.FC = () => {
             <RulesCard />
           </Col>
           <Col className="homepage-primary-card" span={12}>
-            Session here
+            <SessionsCard />
           </Col>
         </Row>
       </Col>

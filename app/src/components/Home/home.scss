@@ -13,7 +13,7 @@
   & .homepage-primary-cards-wrapper {
     gap: 1rem;
 
-    & .ant-col {
+    & > .ant-col {
       max-width: 49%;
     }
   }
