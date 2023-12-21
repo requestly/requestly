@@ -3,7 +3,11 @@ import { useRulesContext } from "../../../../RulesListIndex/context";
 import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
 import useRuleTableActions from "../../../hooks/useRuleTableActions";
 
-export const DeleteRulesModalWrapper: React.FC = () => {
+interface Props {
+  clearSelection: () => void;
+}
+
+export const DeleteRulesModalWrapper: React.FC<Props> = ({ clearSelection }) => {
   const { selectedRows, isDeleteConfirmationModalActive, clearSelectedRows } = useRulesContext();
   const { closeDeleteRuleModal } = useRuleTableActions();
 
@@ -20,6 +24,7 @@ export const DeleteRulesModalWrapper: React.FC = () => {
       groupIdsToDelete={selectedGroupIds}
       clearSearch={clearSelectedRows} // FIXME
       isOpen={isDeleteConfirmationModalActive}
+      ruleDeletedCallback={clearSelection}
     />
   ) : null;
 };
