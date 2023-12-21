@@ -81,6 +81,7 @@ const ChangeRuleGroupModal = (props) => {
           trackGroupChangedEvent("rules_table");
 
           // unselectAllRecords(dispatch);
+          props.onGroupChanged?.();
           props.clearSearch?.();
           //Refresh List
           dispatch(
