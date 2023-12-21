@@ -43,7 +43,7 @@ const PremiumPlanBadge = () => {
         >
           <div className="premium-plan-name">{getPlanNameFromId(planId).toUpperCase()}</div>
           <div className="premium-plan-days-left">
-            {planStatus === "trialing" && daysLeft >= 0 ? `${daysLeft} days left in trial` : "Plan Expired"}
+            {planStatus === "trialing" ? `${daysLeft} days left in trial` : "Plan Expired"}
           </div>
         </div>
       </Tooltip>
