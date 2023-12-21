@@ -183,6 +183,7 @@ export const OrgNotificationBanner = () => {
         subHeading={`Learn about the Benefits & Pricing of Team Plan for ${capitalize(
           userDetails[0]?.domain?.split(".")[0]
         )}`}
+        source="org_view_banner"
       />
     </>
   );

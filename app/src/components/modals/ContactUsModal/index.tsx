@@ -8,17 +8,18 @@ interface Props {
   isOpen: boolean;
   heading?: ReactNode;
   subHeading?: ReactNode;
+  source: string;
   onCancel: () => void;
 }
 
-export const ContactUsModal: React.FC<Props> = ({ isOpen, heading, subHeading, onCancel }) => {
+export const ContactUsModal: React.FC<Props> = ({ isOpen, heading, subHeading, onCancel, source }) => {
   useCalendlyEventListener({
-    onEventScheduled: () => trackContactUsModalMeetScheduled("org_view_banner"),
+    onEventScheduled: () => trackContactUsModalMeetScheduled(source),
   });
 
   useEffect(() => {
-    if (isOpen) trackContactUsModalViewed("org_view_banner");
-  }, [isOpen]);
+    if (isOpen) trackContactUsModalViewed(source);
+  }, [isOpen, source]);
 
   return (
     <RQModal open={isOpen} onCancel={onCancel}>
