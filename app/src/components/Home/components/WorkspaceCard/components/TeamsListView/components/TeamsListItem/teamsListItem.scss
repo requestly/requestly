@@ -1,5 +1,5 @@
 .teams-list-item {
-  padding: 8px 0;
+  padding: 8px 4px;
 }
 
 .teams-list-item-title {
@@ -10,12 +10,12 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 1rem;
 }
 
 .teams-list-item-members-count {
   font-size: 11px;
   margin-left: 4px;
+  margin-right: 1rem;
   align-self: center;
 }
 
@@ -45,4 +45,11 @@
   background: var(--surface-0);
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.teams-list-item-setting-btn.btn-icon-only.ant-btn {
+  color: var(--white);
+  margin-right: 6px;
+  padding: auto 8px;
+  width: 1rem;
 }
