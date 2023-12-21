@@ -1,6 +1,7 @@
 import React from "react";
 import { Col, Row } from "antd";
 import { ChangeLogCard } from "./components/ChangelogCard";
+import { HelpCard } from "./components/HelpCard";
 import "./home.scss";
 
 export const Home: React.FC = () => {
@@ -22,7 +23,7 @@ export const Home: React.FC = () => {
             <>TEAMS HERE</>
           </Col>
           <Col span={6} className="homepage-help-card homepage-primary-card">
-            HELP HERE
+            <HelpCard />
           </Col>
           <Col span={6} className="homepage-changelog-card homepage-primary-card">
             <ChangeLogCard />
