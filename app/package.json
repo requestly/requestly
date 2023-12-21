@@ -87,7 +87,7 @@
     "posthog-js": "^1.71.0",
     "prettier": "^2.8.1",
     "react": "^18.2.0",
-    "react-calendly": "^3.0.0",
+    "react-calendly": "^4.3.0",
     "react-copy-to-clipboard": "5.0.4",
     "react-dom": "^18.2.0",
     "react-dropzone": "^12.0.4",
