@@ -68,6 +68,7 @@ export const RulesCard: React.FC = () => {
           </Row>
         </Col>
         <Col span={5}>
+          {/* TODO: create a separate component for this dropdown button and use it in rules table as well */}
           <Dropdown.Button
             overlay={dropdownMenu}
             type="default"
