@@ -1,8 +1,7 @@
 import React from "react";
 import { Col, Row } from "antd";
-import { TeamsCard } from "./components/TeamsCard";
-import "./home.scss";
 import { ChangeLogCard } from "./components/ChangelogCard";
+import "./home.scss";
 
 export const Home: React.FC = () => {
   return (
@@ -19,7 +18,8 @@ export const Home: React.FC = () => {
         <Row>TEMPLATES HERE</Row>
         <Row className="homepage-bottom-section">
           <Col span={12} className="homepage-teams-card homepage-primary-card">
-            <TeamsCard />
+            {/* <TeamsCard /> */}
+            <>TEAMS HERE</>
           </Col>
           <Col span={6} className="homepage-help-card homepage-primary-card">
             HELP HERE
