@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { getPrettyPlanName } from "utils/FormattingHelper";
+import { getPlanNameFromId } from "utils/PremiumUtils";
 import Logger from "lib/logger";
 import "./premiumPlanBadge.scss";
 import { actions } from "store";
@@ -13,7 +13,6 @@ const PremiumPlanBadge = () => {
   const userPlanDetails = user?.details?.planDetails;
   const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status;
-  const planName = getPrettyPlanName(userPlanDetails?.planName);
   const planEndDateString = userPlanDetails?.subscription?.endDate;
   let daysLeft = 0;
 
@@ -27,7 +26,7 @@ const PremiumPlanBadge = () => {
     Logger.log(err);
   }
 
-  if (planId && planStatus === "trialing") {
+  if (planId && planStatus !== "active") {
     return (
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
@@ -42,9 +41,9 @@ const PremiumPlanBadge = () => {
             );
           }}
         >
-          <div className="premium-plan-name">{planName.toUpperCase()}</div>
+          <div className="premium-plan-name">{getPlanNameFromId(planId).toUpperCase()}</div>
           <div className="premium-plan-days-left">
-            {daysLeft >= 0 ? `${daysLeft} days left in trial` : "Trial Expired"}
+            {planStatus === "trialing" && daysLeft >= 0 ? `${daysLeft} days left in trial` : "Plan Expired"}
           </div>
         </div>
       </Tooltip>
