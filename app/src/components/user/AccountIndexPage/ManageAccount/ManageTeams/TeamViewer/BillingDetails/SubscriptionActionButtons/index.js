@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Button } from "antd";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
-import ContactUsModal from "components/landing/contactUsModal";
+import { ContactUsModal } from "components/modals/ContactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
 import { actions } from "store";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
