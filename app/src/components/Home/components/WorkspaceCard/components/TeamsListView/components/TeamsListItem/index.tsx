@@ -1,14 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Avatar, Col, Row, Skeleton, Spin, Typography } from "antd";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import { toast } from "utils/Toast";
-import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
-import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
+import { redirectToManageWorkspace } from "utils/RedirectionUtils";
 import { LoadingOutlined } from "@ant-design/icons";
 import { acceptTeamInvite } from "backend/workspace";
+import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
+import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import Logger from "lib/logger";
+import { actions } from "store";
+import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import "./teamsListItem.scss";
 
 interface Props {
@@ -18,6 +23,8 @@ interface Props {
 }
 
 export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [members, setMembers] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasJoined, setHasJoined] = useState(false);
@@ -109,14 +116,51 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
             {members?.length > 3 && <div>+{members?.length - 3} members</div>}
           </Col>
         </Row>
-        {hasJoined ? (
-          <div className="teams-list-joined-tag">
-            <BiCheckCircle />
-            <span>Joined</span>
-          </div>
+        {!inviteId && (
+          <RQButton
+            type="default"
+            iconOnly
+            icon={<MdOutlineSettings />}
+            className="teams-list-item-setting-btn"
+            onClick={() => {
+              redirectToManageWorkspace(navigate, teamId);
+            }}
+          />
+        )}
+        {inviteId ? (
+          <>
+            {hasJoined ? (
+              <Col className="teams-list-joined-tag">
+                <BiCheckCircle />
+                <span>Joined</span>
+              </Col>
+            ) : (
+              <RQButton onClick={handleJoining} className={`${isJoining ? "teams-list-join-btn-dark-bg" : ""}`}>
+                {isJoining ? (
+                  <Spin indicator={<LoadingOutlined className="teams-list-join-btn-loader" spin />} />
+                ) : (
+                  "Join"
+                )}
+              </RQButton>
+            )}
+          </>
         ) : (
-          <RQButton onClick={handleJoining} className={`${isJoining ? "teams-list-join-btn-dark-bg" : ""}`}>
-            {isJoining ? <Spin indicator={<LoadingOutlined className="teams-list-join-btn-loader" spin />} /> : "Join"}
+          <RQButton
+            type="default"
+            onClick={() => {
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "inviteMembersModal",
+                  newValue: true,
+                  newProps: {
+                    teamId: teamId,
+                    source: "homepage",
+                  },
+                })
+              );
+            }}
+          >
+            Invite
           </RQButton>
         )}
       </Col>

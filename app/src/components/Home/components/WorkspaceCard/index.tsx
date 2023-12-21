@@ -43,7 +43,7 @@ export const TeamsCard: React.FC = () => {
         pendingInvites={pendingInvites}
       />
     );
-  if (availableTeams?.length > 0) return <>AVAILABLE TEAMS VIEW HERE</>;
+  if (availableTeams?.length > 0) return <TeamsListView heading="Your workspaces" />;
   if (isCompanyEmail(user?.details?.profile?.email)) return <>SHOW DEFAULT WORKSPACE VIEW</>;
   else return <CreateWorkspaceView />;
 };
