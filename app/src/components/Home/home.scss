@@ -30,4 +30,17 @@
       letter-spacing: 0.25px;
     }
   }
+
+  & .homepage-bottom-section {
+    gap: 1rem;
+
+    & .homepage-teams-card {
+      max-width: 49%;
+    }
+
+    & .homepage-help-card,
+    & .homepage-changelog-card {
+      max-width: 24%;
+    }
+  }
 }
