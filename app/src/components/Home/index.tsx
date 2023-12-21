@@ -2,7 +2,7 @@ import React from "react";
 import { Col, Row } from "antd";
 import { ChangeLogCard } from "./components/ChangelogCard";
 import { HelpCard } from "./components/HelpCard";
-import { TeamsCard } from "./components/TeamsCard";
+import { TeamsCard } from "./components/WorkspaceCard";
 import "./home.scss";
 
 export const Home: React.FC = () => {

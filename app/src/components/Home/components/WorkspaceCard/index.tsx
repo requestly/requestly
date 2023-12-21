@@ -7,6 +7,7 @@ import { CreateWorkspaceView } from "./components/CreateWorkspaceView";
 import { getPendingInvites } from "backend/workspace";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import Logger from "lib/logger";
+import { InvitesView } from "./components/InvitesView";
 
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -34,7 +35,7 @@ export const TeamsCard: React.FC = () => {
 
   if (!user.loggedIn) return <CreateWorkspaceView />;
   if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
-  if (pendingInvites?.length > 0) return <>PENDING INVITES VIEW HERE</>;
+  if (pendingInvites?.length > 0) return <InvitesView pendingInvites={pendingInvites} />;
   if (availableTeams?.length > 0) return <>AVAILABLE TEAMS VIEW HERE</>;
   if (isCompanyEmail(user?.details?.profile?.email)) return <>SHOW DEFAULT WORKSPACE VIEW</>;
   else return <CreateWorkspaceView />;
