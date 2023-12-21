@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ContactUsModal from "components/landing/contactUsModal";
+import { ContactUsModal } from "components/modals/ContactUsModal";
 import { RQButton } from "lib/design-system/components";
 import "./index.css";
 
@@ -86,7 +86,10 @@ const PricingFAQs = () => {
       </div>
       <ContactUsModal
         isOpen={isContactUsModalOpen}
-        handleToggleModal={() => setIsContactUsModalOpen(!isContactUsModalOpen)}
+        onCancel={() => setIsContactUsModalOpen(false)}
+        heading="Get In Touch"
+        subHeading="Learn about Requestly"
+        source="pricing_page"
       />
     </>
   );
