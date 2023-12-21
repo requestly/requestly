@@ -1,0 +1,9 @@
+.teams-list-item {
+  padding: 8px 0;
+}
+
+.teams-list-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+}
