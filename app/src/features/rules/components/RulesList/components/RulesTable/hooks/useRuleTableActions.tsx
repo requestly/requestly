@@ -16,6 +16,7 @@ import { convertToArray, isRule } from "../utils";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleActivatedStatusEvent, trackRuleDeactivatedStatus } from "modules/analytics/events/common/rules";
 import { trackGroupStatusToggled } from "features/rules/analytics/groups";
+import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
@@ -91,7 +92,7 @@ const useRuleTableActions = () => {
     });
   };
 
-  const toggleSharingModal = (rules: RuleObj | RuleObj[]) => {
+  const toggleSharingModal = (rules: RuleObj | RuleObj[], clearSelection = () => {}) => {
     const updatedRules = convertToArray<RuleObj>(rules);
     const rulesToShare = updatedRules.filter(isRule);
     const ruleIds = rulesToShare.map((rule) => rule.id);
@@ -101,6 +102,7 @@ const useRuleTableActions = () => {
         modalName: "sharingModal",
         newValue: true,
         newProps: {
+          callback: clearSelection,
           selectedRules: ruleIds,
         },
       })
@@ -123,10 +125,10 @@ const useRuleTableActions = () => {
     );
   };
 
-  const handleRuleShare = (rules: RuleObj | RuleObj[]) => {
+  const handleRuleShare = (rules: RuleObj | RuleObj[], clearSelection?: () => void) => {
     // TODO
-    // trackShareButtonClicked("rules_list");
-    user.loggedIn ? toggleSharingModal(rules) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    trackShareButtonClicked(clearSelection ? "bulk_action_bar" : "rules_list");
+    user.loggedIn ? toggleSharingModal(rules, clearSelection) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
   // Generic
@@ -145,7 +147,7 @@ const useRuleTableActions = () => {
 
   const updateMultipleRecordsInStorage = useCallback(
     (updatedRecords: RuleObj[], originalRecords: RuleObj[]) => {
-      if (updatedRecords.length === 0) return;
+      if (updatedRecords.length === 0) return Promise.resolve();
 
       dispatch(rulesActions.ruleObjUpsertMany(updatedRecords));
 
