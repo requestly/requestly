@@ -13,6 +13,8 @@ class PosthogIntegration implements IAnalyticsIntegration {
   enabled = true;
   startTime = Date.now();
 
+  groupId = null;
+
   init = (user: any) => {
     Logger.log("Posthog Integration Start");
     this.initAttrBatchSyncing();
@@ -106,6 +108,11 @@ class PosthogIntegration implements IAnalyticsIntegration {
         }
       }
     }, 20000);
+  };
+
+  onGroupChange = (groupId: string, groupName: string) => {
+    this.groupId = groupId;
+    /* TODO */
   };
 }
 
