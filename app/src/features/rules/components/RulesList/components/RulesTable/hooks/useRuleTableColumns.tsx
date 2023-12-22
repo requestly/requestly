@@ -134,7 +134,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
               onChange={(checked: boolean, e) => {
                 e.stopPropagation();
-                handleStatusToggle([rule]);
               }}
             />
           </PremiumFeature>
