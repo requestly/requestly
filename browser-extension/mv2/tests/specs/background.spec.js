@@ -327,6 +327,16 @@ describe("Requestly Background Service - ", function () {
       });
       expect(originalHeaders.length).toBe(4);
     });
+
+    it("getHeaderValue should return the header's value if present otherwise undefined", function () {
+      let headerValue = BG.Methods.getHeaderValue(originalHeaders, "Host");
+      expect(headerValue).toBe("example.com");
+
+      // Should return undefined when header does not exist
+      headerValue = BG.Methods.getHeaderValue(originalHeaders, "Accept");
+      expect(originalHeaders.length).toBe(3);
+      expect(headerValue).toBeUndefined();
+    });
   });
 
   describe("#BG.Methods.modifyUrl", function () {
