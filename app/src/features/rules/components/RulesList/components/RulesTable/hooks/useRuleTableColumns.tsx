@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
@@ -16,6 +17,8 @@ import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
+import PATHS from "config/constants/sub/paths";
+import { isRule } from "../utils";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -73,7 +76,15 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       key: "name",
       width: 376,
       ellipsis: true,
-      render: (rule: RuleTableDataType) => rule.name,
+      render: (rule: RuleTableDataType) => {
+        return isRule(rule) ? (
+          <Link to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${rule.id}`} state={{ source: "my_rules" }}>
+            {rule.name}
+          </Link>
+        ) : (
+          rule.name
+        );
+      },
       onCell: (rule: RuleTableDataType) => {
         if (rule.objectType === "group") {
           return {
