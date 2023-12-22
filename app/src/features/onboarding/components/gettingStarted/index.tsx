@@ -16,10 +16,15 @@ import { OnboardingLoader } from "../loader";
 import { m, AnimatePresence } from "framer-motion";
 import { isNull } from "lodash";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { trackAppOnboardingGettingStartedViewed } from "features/onboarding/analytics";
+import { trackAppOnboardingGettingStartedViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
 
-export const GettingStartedView: React.FC = () => {
+interface Props {
+  isOpen: boolean;
+}
+
+export const GettingStartedView: React.FC<Props> = ({ isOpen }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
@@ -121,6 +126,12 @@ export const GettingStartedView: React.FC = () => {
       }
     }
   }, [pendingInvites, user?.details?.profile?.email, appOnboardingDetails.createdWorkspace]);
+
+  useEffect(() => {
+    if (isOpen) {
+      trackAppOnboardingViewed(ONBOARDING_STEPS.GETTING_STARTED);
+    }
+  }, [isOpen]);
 
   return (
     <AnimatePresence>

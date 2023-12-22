@@ -3,7 +3,7 @@ import { Col, Row, Space, Tooltip, Typography } from "antd";
 import { PricingFeatures } from "../../constants/pricingFeatures";
 import { PricingPlans } from "../../constants/pricingPlans";
 import { PRICING } from "../../constants/pricing";
-import ContactUsModal from "components/landing/contactUsModal";
+import { ContactUsModal } from "components/modals/ContactUsModal";
 import { capitalize } from "lodash";
 import underlineIcon from "../../assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
@@ -143,7 +143,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       </Row>
       <ContactUsModal
         isOpen={isContactUsModalOpen}
-        handleToggleModal={() => setIsContactUsModalOpen(!isContactUsModalOpen)}
+        onCancel={() => setIsContactUsModalOpen(false)}
+        heading="Get In Touch"
+        subHeading="Learn about the benefits & pricing of team plan"
+        source="pricing_table"
       />
     </>
   );
