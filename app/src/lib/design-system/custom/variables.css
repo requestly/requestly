@@ -76,7 +76,7 @@
   /* old tokens */
   --text-gray: var(--text-light);
   --text-dark-gray: var(--text-light);
-  --gray-dark: var(--surface-3);
+  --gray-dark: #3b3b3b;
   --gray-light: var(--text-light);
   --border: #4f5053;
   --border-dark: #303030;
@@ -84,11 +84,11 @@
   --primary: var(--brand-color);
   --link-color: #3ba0ff;
   --background-dark: var(--background);
-  --body-background: var(--background);
+  --body-background: #212121;
   --component-background: var(--surface-1);
-  --component-dark-background: var(--background);
+  --component-dark-background: #212121;
   --input-background: var(--surface-1);
-  --component-header-background: var(--surface-2);
+  --component-header-background: #2d2d2d;
   --hover-color: var(--surface-2);
   --dropdown-active-border-color: #0361ff;
   --input-hover-border-color: #2051b4;

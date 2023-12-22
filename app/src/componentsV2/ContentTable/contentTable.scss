@@ -53,7 +53,8 @@ tr.rq-content-table-row.ant-table-row {
     }
 
     .ant-table-cell {
-      background: var(--black);
+      // background: var(--black);
+      background: #0000004f;
       border-bottom: 1px solid var(--surface-1);
 
       .ant-table-row-expand-icon {
