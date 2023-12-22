@@ -257,6 +257,49 @@ BG.Methods.getHeaderValue = (headers, headerName) => {
   return header?.value;
 };
 
+BG.Methods.copyIgnoredHeadersOnRedirect = (originalHeaders) => {
+  let isHeadersModified = false;
+  RQ.IGNORED_HEADERS_ON_REDIRECT.forEach((headerName) => {
+    const customHeaderName = RQ.CUSTOM_HEADER_PREFIX + headerName;
+    const customHeaderValue = BG.Methods.getHeaderValue(originalHeaders, customHeaderName);
+    const originalHeaderValue = BG.Methods.getHeaderValue(originalHeaders, headerName);
+
+    // Check if value is present in custom header and original header is not present
+    if (customHeaderValue) {
+      if (!originalHeaderValue) {
+        // If original header is not present, copy the value from custom header to original header
+        BG.Methods.addHeader(originalHeaders, { name: headerName, value: customHeaderValue });
+      }
+      // remove the custom header
+      BG.Methods.removeHeader(originalHeaders, customHeaderName);
+      isHeadersModified = true;
+    }
+  });
+  return isHeadersModified;
+};
+
+BG.Methods.addCORSHeaderForCustomHeaders = (originalHeaders, requestMethod) => {
+  let isHeadersModified = false;
+  if (!RQ.IGNORED_HEADERS_ON_REDIRECT?.length || requestMethod !== "OPTIONS") return isHeadersModified;
+
+  const customRQHeaderNames = RQ.IGNORED_HEADERS_ON_REDIRECT.map(
+    (headerName) => RQ.CUSTOM_HEADER_PREFIX + headerName
+  ).join(",");
+
+  const originalValue = BG.Methods.getHeaderValue(originalHeaders, "access-control-allow-headers");
+  if (originalValue === "*") {
+    isHeadersModified = false;
+  } else {
+    BG.Methods.addHeader(originalHeaders, {
+      name: "access-control-allow-headers",
+      value: customRQHeaderNames,
+    });
+    isHeadersModified = true;
+  }
+
+  return isHeadersModified;
+};
+
 /**
  *
  * @param originalHeaders Original Headers present in the HTTP(s) request
@@ -269,7 +312,8 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     ruleType,
     rulePairs,
     rulePair,
-    hasModifiedHeaders = false,
+    isRuleApplied = false,
+    isHeadersModified = false,
     modifications,
     modification,
     url = details.url,
@@ -278,40 +322,9 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
 
   // Forwards Auth Header to the redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
   if (headersTarget === RQ.HEADERS_TARGET.REQUEST) {
-    RQ.IGNORED_HEADERS_ON_REDIRECT.forEach((headerName) => {
-      const customHeaderName = RQ.CUSTOM_HEADER_PREFIX + headerName;
-      const customHeaderValue = BG.Methods.getHeaderValue(originalHeaders, customHeaderName);
-      const originalHeaderValue = BG.Methods.getHeaderValue(originalHeaders, headerName);
-
-      if (customHeaderValue) {
-        if (!originalHeaderValue) {
-          BG.Methods.addHeader(originalHeaders, { name: headerName, value: customHeaderValue });
-        }
-        BG.Methods.removeHeader(originalHeaders, customHeaderName);
-        hasModifiedHeaders = true;
-      }
-    });
-  }
-
-  if (
-    RQ.IGNORED_HEADERS_ON_REDIRECT?.length > 0 &&
-    headersTarget === RQ.HEADERS_TARGET.RESPONSE &&
-    details.method === "OPTIONS"
-  ) {
-    const customHeaderValues = RQ.IGNORED_HEADERS_ON_REDIRECT.map(
-      (headerName) => RQ.CUSTOM_HEADER_PREFIX + headerName
-    ).join(",");
-
-    const originalValue = BG.Methods.getHeaderValue(originalHeaders, "access-control-allow-headers");
-    if (originalValue === "*") {
-      hasModifiedHeaders = false;
-    } else {
-      BG.Methods.addHeader(originalHeaders, {
-        name: "access-control-allow-headers",
-        value: customHeaderValues,
-      });
-      hasModifiedHeaders = true;
-    }
+    isHeadersModified = BG.Methods.copyIgnoredHeadersOnRedirect(originalHeaders);
+  } else {
+    isHeadersModified = BG.Methods.addCORSHeaderForCustomHeaders(originalHeaders, details.method);
   }
 
   for (var i = 0; i < enabledRules.length; i++) {
@@ -367,7 +380,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
           continue;
         }
 
-        hasModifiedHeaders = true;
+        isRuleApplied = true;
 
         // Check if user has used predefinedFunction in (add/modify) header value
         var valueWithPreDefFunctionsApplied = RuleMatcher.matchValueForPredefinedFunctions(modification.value, details);
@@ -412,7 +425,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
 
   // If rule is not applied and we return headers object without any change, then chrome treats them as modification
   // And some websites break due to this.
-  return hasModifiedHeaders ? originalHeaders : null;
+  return isRuleApplied || isHeadersModified ? originalHeaders : null;
 };
 
 BG.Methods.getMainFrameUrl = function (details) {
