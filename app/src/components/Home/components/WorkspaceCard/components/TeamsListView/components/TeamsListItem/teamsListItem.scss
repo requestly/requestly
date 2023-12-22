@@ -15,8 +15,9 @@
 .teams-list-item-members-count {
   font-size: 11px;
   margin-left: 4px;
-  margin-right: 1rem;
+  margin-right: 10px;
   align-self: center;
+  color: var(--neutrals-gray-300);
 }
 
 .teams-list-joined-tag {
@@ -49,7 +50,12 @@
 
 .teams-list-item-setting-btn.btn-icon-only.ant-btn {
   color: var(--white);
-  margin-right: 6px;
+  margin-right: 4px;
   padding: auto 8px;
-  width: 1rem;
+  width: 30px;
+
+  & svg {
+    width: 14px;
+    height: 14px;
+  }
 }
