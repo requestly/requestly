@@ -34,6 +34,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
 
   useEffect(() => {
     if (teamId) {
+      // TODO: Add support for getting team members from a team with domain invite.
       getTeamUsers({ teamId: teamId })
         .then((res: any) => {
           console.log({ res });
@@ -105,7 +106,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
       </Col>
       <Col span={12} className="teams-list-actions-wrapper">
         <Row align="middle">
-          <Avatar.Group maxCount={2} size="small">
+          <Avatar.Group maxCount={3} size="small" maxStyle={{ display: "none" }}>
             {members?.map((member: any) => (
               <Avatar size={24} shape="circle" key={member?.id} src={member?.photoURL}>
                 {member?.displayName?.[0]?.toUpperCase()}
@@ -148,6 +149,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
           <RQButton
             type="default"
             onClick={() => {
+              // TODO: Allow members to invite other members to a team
               dispatch(
                 actions.toggleActiveModal({
                   modalName: "inviteMembersModal",
