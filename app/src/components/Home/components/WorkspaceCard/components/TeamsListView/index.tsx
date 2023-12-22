@@ -28,7 +28,6 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
           <Col className="homepage-teams-list">
             {pendingInvites ? (
               <>
-                {" "}
                 {pendingInvites.map((invite: Invite, index: number) => (
                   <TeamsListItem
                     key={index}

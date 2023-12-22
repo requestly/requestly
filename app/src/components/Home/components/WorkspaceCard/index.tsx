@@ -4,10 +4,10 @@ import { getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { Skeleton } from "antd";
 import { CreateWorkspaceView } from "./components/CreateWorkspaceView";
+import { TeamsListView } from "./components/TeamsListView";
 import { getPendingInvites } from "backend/workspace";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import Logger from "lib/logger";
-import { TeamsListView } from "./components/TeamsListView";
 
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -44,6 +44,7 @@ export const TeamsCard: React.FC = () => {
       />
     );
   if (availableTeams?.length > 0) return <TeamsListView heading="Your workspaces" />;
+  // TODO: Add default workspace view after onboarding is 100% rolled out
   if (isCompanyEmail(user?.details?.profile?.email)) return <>SHOW DEFAULT WORKSPACE VIEW</>;
   else return <CreateWorkspaceView />;
 };
