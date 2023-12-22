@@ -276,6 +276,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     mainFrameUrl = BG.Methods.getMainFrameUrl(details),
     enabledRules = BG.Methods.getEnabledRules();
 
+  // Forwards Auth Header to the redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
   if (headersTarget === RQ.HEADERS_TARGET.REQUEST) {
     RQ.IGNORED_HEADERS_ON_REDIRECT.forEach((headerName) => {
       const customHeaderName = RQ.CUSTOM_HEADER_PREFIX + headerName;

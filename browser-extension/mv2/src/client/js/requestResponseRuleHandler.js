@@ -531,6 +531,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
     let hasModifiedHeaders = false;
 
+    // Stores Auth header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
     ignoredHeadersOnRedirect.forEach((header) => {
       const originalHeaderValue = request.headers.get(header);
       if (isExtensionEnabled() && originalHeaderValue) {
