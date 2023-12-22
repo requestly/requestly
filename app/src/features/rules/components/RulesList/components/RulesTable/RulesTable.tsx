@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
-import { isRule, rulesToContentTableDataAdapter, localStorage } from "./utils";
+import { isRule, rulesToContentTableDataAdapter } from "./utils";
 import { RuleObj, RuleObjType } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
@@ -18,6 +18,7 @@ import { RiToggleFill } from "@react-icons/all-files/ri/RiToggleFill";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 // import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
+import { localStorage } from "utils/localStorage";
 import "./rulesTable.css";
 
 interface Props {

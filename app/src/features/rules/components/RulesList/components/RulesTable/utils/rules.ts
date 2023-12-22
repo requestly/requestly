@@ -40,6 +40,6 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
   });
 
   const finalAdaptedData = Object.values(ruleTableDataTypeMap);
-  console.log({ finalAdaptedData });
+
   return finalAdaptedData;
 };
