@@ -40,9 +40,6 @@ const useRuleTableActions = () => {
   }, [setSelectedRows]);
 
   const handleStatusToggle = (rules: RuleTableDataType[]) => {
-    console.log("handleStatusToggle", { rules });
-    // TODO: Add logic to propogate the changes to storageservice;
-
     rules.forEach((rule) => {
       const status = rule.status === RuleObjStatus.ACTIVE ? RuleObjStatus.INACTIVE : RuleObjStatus.ACTIVE;
       changeRuleStatus(status, rule);
@@ -51,7 +48,6 @@ const useRuleTableActions = () => {
 
   const changeRuleStatus = (newStatus: RuleObjStatus, rule: RuleObj) => {
     // TODO: Handle Group status toggle
-    console.log("group", { rule, user });
 
     // TODO: Why is this added??
     // if (rule.currentOwner) {
