@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, rulesToContentTableDataAdapter, localStorage } from "./utils";
@@ -18,6 +20,7 @@ import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 // import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
+import { getUserAuthDetails } from "store/selectors";
 import "./rulesTable.css";
 
 interface Props {
@@ -26,6 +29,8 @@ interface Props {
 }
 
 const RulesTable: React.FC<Props> = ({ rules, loading }) => {
+  const user = useSelector(getUserAuthDetails);
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [expandedGroups, setExpandedGroups] = useState([]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [contentTableData, setContentTableAdaptedRules] = useState<RuleTableDataType[]>([]);
@@ -92,6 +97,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
   };
 
   const clearSelectionCallback = clearSelectedRowsDataCallbackRef.current;
+  const isFeatureLimitbannerShown = isFeatureLimiterOn && user?.isLimitReached;
 
   return (
     <>
@@ -104,7 +110,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
 
       <ContentTable
         size="middle"
-        scroll={{ y: "calc(100vh - 277px)" }}
+        scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(277px + 68px)" : "277px"})` }} // 68px is Feature limit banner height
         columns={columns}
         data={contentTableData}
         rowKey="id"
