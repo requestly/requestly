@@ -337,6 +337,42 @@ describe("Requestly Background Service - ", function () {
       expect(originalHeaders.length).toBe(3);
       expect(headerValue).toBeUndefined();
     });
+
+    it("copyIgnoredHeadersOnRedirect returns true when the value of custom header copied to original header if original header not present", function () {
+      originalHeaders.push({ name: "x-rq-authorization", value: "123" });
+      expect(originalHeaders.length).toBe(4);
+      expect(BG.Methods.copyIgnoredHeadersOnRedirect(originalHeaders)).toBe(true);
+    });
+
+    it("copyIgnoredHeadersOnRedirect returns true even if original header is present", function () {
+      originalHeaders.push({ name: "x-rq-authorization", value: "123" }, { name: "authorization", value: "789" });
+      expect(originalHeaders.length).toBe(5);
+      expect(BG.Methods.copyIgnoredHeadersOnRedirect(originalHeaders)).toBe(true);
+    });
+
+    it("copyIgnoredHeadersOnRedirect returns false if custom header is not present", function () {
+      originalHeaders.push({ name: "authorization", value: "789" });
+      expect(originalHeaders.length).toBe(4);
+      expect(BG.Methods.copyIgnoredHeadersOnRedirect(originalHeaders)).toBe(false);
+    });
+
+    it("addCORSHeaderForCustomHeaders returns true when CORS header is added and request method == OPTIONS", function () {
+      originalHeaders.push({ name: "authorization", value: "789" });
+      expect(originalHeaders.length).toBe(4);
+      expect(BG.Methods.addCORSHeaderForCustomHeaders(originalHeaders, "OPTIONS")).toBe(true);
+    });
+
+    it("addCORSHeaderForCustomHeaders returns false when CORS header is * and request method == OPTIONS", function () {
+      originalHeaders.push({ name: "access-control-allow-headers", value: "*" });
+      expect(originalHeaders.length).toBe(4);
+      expect(BG.Methods.addCORSHeaderForCustomHeaders(originalHeaders, "OPTIONS")).toBe(false);
+    });
+
+    it("addCORSHeaderForCustomHeaders returns false when request method != OPTIONS", function () {
+      originalHeaders.push({ name: "access-control-allow-headers", value: "x-test" });
+      expect(originalHeaders.length).toBe(4);
+      expect(BG.Methods.addCORSHeaderForCustomHeaders(originalHeaders, "POST")).toBe(false);
+    });
   });
 
   describe("#BG.Methods.modifyUrl", function () {
