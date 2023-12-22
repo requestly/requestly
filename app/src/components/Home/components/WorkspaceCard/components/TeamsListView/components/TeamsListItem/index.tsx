@@ -34,7 +34,6 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
 
   useEffect(() => {
     if (teamId) {
-      // TODO: Add support for getting team members from a team with domain invite.
       getTeamUsers({ teamId: teamId })
         .then((res: any) => {
           console.log({ res });
@@ -83,7 +82,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
       });
   }, [inviteId, teamId, teamName]);
 
-  if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
+  if (isLoading) return <Skeleton active paragraph={{ rows: 1 }} />;
 
   return (
     <Row className="teams-list-item" justify="space-between">

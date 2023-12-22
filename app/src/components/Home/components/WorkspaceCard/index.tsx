@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams } from "store/features/teams/selectors";
-import { Skeleton } from "antd";
+import { Col, Skeleton } from "antd";
 import { CreateWorkspaceView } from "./components/CreateWorkspaceView";
 import { TeamsListView } from "./components/TeamsListView";
 import { getPendingInvites } from "backend/workspace";
@@ -34,7 +34,12 @@ export const TeamsCard: React.FC = () => {
   }, [user.loggedIn]);
 
   if (!user.loggedIn) return <CreateWorkspaceView />;
-  if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
+  if (isLoading)
+    return (
+      <Col style={{ padding: "20px 1rem" }}>
+        <Skeleton active paragraph={{ rows: 6 }} />
+      </Col>
+    );
   if (pendingInvites?.length > 0)
     return (
       <TeamsListView
