@@ -74,7 +74,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "Rules",
       key: "name",
-      width: 376,
+      width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (rule: RuleTableDataType) => {
         return isRule(rule) ? (
@@ -167,7 +167,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
             <span>
-              {beautifiedDate} by <UserIcon uid={rule.lastModifiedBy} />
+              {beautifiedDate} <UserIcon uid={rule.lastModifiedBy} />
             </span>
           );
         } else return beautifiedDate;
@@ -266,7 +266,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   if (isWorkspaceMode && !options.hideCreatedBy) {
     columns.splice(6, 0, {
       title: "Author",
-      width: 96,
+      width: 92,
       responsive: ["lg"],
       key: "createdBy",
       render: (rule: RuleTableDataType) => {
