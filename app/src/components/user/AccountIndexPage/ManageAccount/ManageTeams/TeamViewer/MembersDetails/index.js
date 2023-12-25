@@ -97,7 +97,7 @@ const MembersDetails = ({ teamId, isTeamAdmin }) => {
           </div>
         </Col>
         <Col>
-          <Button disabled={!isTeamAdmin} type="primary" onClick={handleAddMemberClick}>
+          <Button type="primary" onClick={handleAddMemberClick}>
             <PlusOutlined /> <span className="text-bold caption">Invite People</span>
           </Button>
         </Col>
