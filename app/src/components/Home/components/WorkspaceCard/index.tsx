@@ -8,6 +8,7 @@ import { TeamsListView } from "./components/TeamsListView";
 import { getPendingInvites } from "backend/workspace";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import Logger from "lib/logger";
+import { Invite } from "types";
 
 export const TeamsCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
@@ -22,7 +23,24 @@ export const TeamsCard: React.FC = () => {
     }
     getPendingInvites({ email: true, domain: true })
       .then((res: any) => {
-        setPendingInvites(res?.pendingInvites ?? []);
+        if (res?.pendingInvites) {
+          // Remove duplicate invites for the same team (A team can have multiple email invite and a domain invite)
+          const uniqueInvitesArray = res?.pendingInvites.reduce((acc: Invite[], invite: Invite) => {
+            const teamId = invite.metadata.teamId;
+            // Checking if an invite with the same teamId already exists in the accumulator
+            const existingInvite = acc.find((existing) => existing.metadata.teamId === teamId);
+            if (!existingInvite || invite.createdTs > existingInvite.createdTs) {
+              // If not found or the new invite is newer, replace or add the invite to the accumulator
+              const updatedAcc = existingInvite
+                ? acc.map((existing) => (existing.metadata.teamId === teamId ? invite : existing))
+                : [...acc, invite];
+
+              return updatedAcc;
+            }
+            return acc;
+          }, []);
+          setPendingInvites(uniqueInvitesArray);
+        } else setPendingInvites([]);
       })
       .catch((e) => {
         Logger.error(e);
