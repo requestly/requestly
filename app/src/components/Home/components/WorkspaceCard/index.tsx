@@ -50,6 +50,6 @@ export const TeamsCard: React.FC = () => {
     );
   if (availableTeams?.length > 0) return <TeamsListView heading="Your workspaces" />;
   // TODO: Add default workspace view after onboarding is 100% rolled out
-  if (isCompanyEmail(user?.details?.profile?.email)) return <>SHOW DEFAULT WORKSPACE VIEW</>;
+  if (isCompanyEmail(user?.details?.profile?.email)) return <CreateWorkspaceView />;
   else return <CreateWorkspaceView />;
 };
