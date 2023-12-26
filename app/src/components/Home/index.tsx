@@ -1,6 +1,5 @@
 import React from "react";
 import { Col, Row } from "antd";
-import { RulesCard } from "./components/RulesCard";
 import "./home.scss";
 import { SessionsCard } from "./components/SessionsCard";
 
@@ -10,7 +9,7 @@ export const Home: React.FC = () => {
       <Col className="homepage-content">
         <Row className="homepage-primary-cards-wrapper">
           <Col className="homepage-primary-card" span={12}>
-            <RulesCard />
+            <>RULES HERE</>
           </Col>
           <Col className="homepage-primary-card" span={12}>
             <SessionsCard />
