@@ -14,6 +14,7 @@ import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/an
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 import PageLoader from "components/misc/PageLoader";
+import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import APP_CONSTANTS from "config/constants";
@@ -39,6 +40,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
+  const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
   const teamDetails = availableTeams?.find((team) => team.id === teamId);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
@@ -169,7 +171,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     }
   }, [isOpen, fetchPublicInvites]);
 
-  if (isPublicInviteLoading) return <PageLoader />;
+  if (isPublicInviteLoading || isLoading) return <PageLoader />;
 
   return (
     <>
@@ -207,41 +209,48 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
               Invite People
             </RQButton>
           </div>
-          <div className="title mt-16">Invite link</div>
-          {isInvitePublic ? (
-            <div className="display-flex items-center mt-8">
-              <RQInput
-                disabled
-                value={`${window.location.origin}/invite/${publicInviteId}`}
-                suffix={<CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />}
-              />
-            </div>
-          ) : (
-            <div className="display-flex items-center">
-              <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
-              <RQButton
-                loading={isInviteGenerating}
-                size="small"
-                className="create-invite-link-btn"
-                type="primary"
-                onClick={handleCreateInviteLink}
-              >
-                Create link
-              </RQButton>
-            </div>
+
+          {isTeamAdmin && (
+            <>
+              {isInvitePublic ? (
+                <>
+                  <div className="title mt-16">Invite link</div>{" "}
+                  <div className="display-flex items-center mt-8">
+                    <RQInput
+                      disabled
+                      value={`${window.location.origin}/invite/${publicInviteId}`}
+                      suffix={
+                        <CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />
+                      }
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="display-flex items-center">
+                  <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
+                  <RQButton
+                    loading={isInviteGenerating}
+                    size="small"
+                    className="create-invite-link-btn"
+                    type="primary"
+                    onClick={handleCreateInviteLink}
+                  >
+                    Create link
+                  </RQButton>
+                </div>
+              )}
+            </>
           )}
         </div>
         <Row align="middle" className="rq-modal-footer">
-          {isVerifiedBusinessUser ? (
+          {isVerifiedBusinessUser && isTeamAdmin ? (
             <>
-              {!isPublicInviteLoading && (
-                <>
-                  <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
-                  <span className="ml-2 text-gray">
-                    Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
-                  </span>
-                </>
-              )}
+              <>
+                <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
+                <span className="ml-2 text-gray">
+                  Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
+                </span>
+              </>
             </>
           ) : (
             <LearnMoreLink
