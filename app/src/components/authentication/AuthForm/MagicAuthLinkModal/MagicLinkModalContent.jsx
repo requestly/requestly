@@ -84,7 +84,7 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
         <Typography.Text className="text-white">It contains a link that will sign you super quick!</Typography.Text>
       </Space>
       <br />
-      <Typography.Text className="text-white">Didn't recieve the email? </Typography.Text>
+      <Typography.Text className="text-white">Didn't receive the email? </Typography.Text>
       {timeToResendEmailLogin > 0 ? (
         <Row className="resend-timeout-text">
           <Typography.Text>{`Send again in ${timeToResendEmailLogin} seconds`}</Typography.Text>
