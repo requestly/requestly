@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { Col, Row, Typography } from "antd";
+import { RQButton } from "lib/design-system/components";
 import RulePreviewModal from "components/landing/ruleTemplates/RulePreviewModal";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import APP_CONSTANTS from "config/constants";
 import templatesMap from "../../../landing/ruleTemplates/templates.json";
 import { RuleType } from "types";
-import { Link } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { RQButton } from "lib/design-system/components";
 import "./index.scss";
 
 export const Templates: React.FC = () => {
