@@ -3,6 +3,7 @@ import { Col, Row } from "antd";
 import { ChangeLogCard } from "./components/ChangelogCard";
 import { HelpCard } from "./components/HelpCard";
 import { TeamsCard } from "./components/WorkspaceCard";
+import { Templates } from "./components/Templates";
 import "./home.scss";
 
 export const Home: React.FC = () => {
@@ -17,7 +18,7 @@ export const Home: React.FC = () => {
             <>SESSIONS HERE</>
           </Col>
         </Row>
-        <Row>TEMPLATES HERE</Row>
+        <Templates />
         <Row className="homepage-bottom-section">
           <Col span={12} className="homepage-teams-card homepage-primary-card" style={{ padding: 0 }}>
             <TeamsCard />
