@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
@@ -14,11 +14,13 @@ import { RuleType } from "types";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumFeature } from "features/pricing";
 import { PremiumIcon } from "components/common/PremiumIcon";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "store/selectors";
 import { isSignUpRequired } from "utils/AuthUtils";
 import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
 import APP_CONSTANTS from "config/constants";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
@@ -40,6 +42,11 @@ import { ContentHeaderProps } from "componentsV2/ContentHeader";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
+import SpinnerCard from "components/misc/SpinnerCard";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
+import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import "./rulesListIndex.scss";
 
 interface Props {}
@@ -326,10 +333,63 @@ const RulesList: React.FC<Props> = () => {
 };
 
 const RulesListIndex = () => {
-  return (
+  const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
+  const isExtensionEnabled = useSelector(getIsExtensionEnabled);
+  const [showLoader, setShowLoader] = useState(false);
+  const [showInstallExtensionCTA, setShowInstallExtensionCTA] = useState(true);
+
+  const checkForAndroidDebugger = async () => {
+    if (user.loggedIn && user.details?.profile?.uid) {
+      setShowLoader(true);
+
+      if (await isUserUsingAndroidDebugger(user.details?.profile?.uid)) {
+        setShowInstallExtensionCTA(false);
+      } else {
+        setShowInstallExtensionCTA(true);
+      }
+      setShowLoader(false);
+    } else {
+      setShowInstallExtensionCTA(true);
+    }
+  };
+
+  const safeCheckForAndroidDebugger = useCallback(checkForAndroidDebugger, [user.details?.profile?.uid, user.loggedIn]);
+
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) return;
+
+    safeCheckForAndroidDebugger();
+  }, [appMode, user, showInstallExtensionCTA, safeCheckForAndroidDebugger]);
+
+  const rulesList = (
     <RulesListProvider>
       <RulesList />
     </RulesListProvider>
+  );
+
+  /* User journey flowchart
+    /* https://requestlyio.atlassian.net/wiki/spaces/RH/pages/1867777/RQLY-70+Removing+Extension+install+modal?focusedCommentId=5439489#comment-5439489
+    */
+
+  return showLoader ? (
+    <SpinnerCard customLoadingMessage="Getting your rules ready" skeletonType="list" />
+  ) : appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+    rulesList
+  ) : isExtensionInstalled() ? (
+    !isExtensionEnabled ? (
+      <ExtensionDeactivationMessage />
+    ) : (
+      rulesList
+    )
+  ) : showInstallExtensionCTA ? (
+    <InstallExtensionCTA
+      heading="Install Browser extension to start modifying network requests"
+      subHeading="Requestly lets developers Modify Headers, Redirect URLs, Switch Hosts, Delay Network requests easily. Private and secure, works locally on your browser."
+      eventPage="rules_page"
+    />
+  ) : (
+    rulesList
   );
 };
 
