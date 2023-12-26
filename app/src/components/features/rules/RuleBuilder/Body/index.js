@@ -65,7 +65,10 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
           descriptionChangeCallback={handleDescriptionChange}
         />
       )}
-      <Row className="rule-builder-body" id="rule-builder-body">
+      <Row
+        className={`rule-builder-body ${isSharedListView ? "preview-rule-builder-body" : ""}`}
+        id="rule-builder-body"
+      >
         <Col
           span={22}
           offset={1}
