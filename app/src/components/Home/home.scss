@@ -1,0 +1,51 @@
+.homepage-wrapper {
+  background: var(--surface-0);
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  padding: 1rem;
+
+  & .homepage-content {
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  & .homepage-primary-cards-wrapper {
+    gap: 1rem;
+
+    & > .ant-col {
+      max-width: 49%;
+    }
+  }
+
+  & .homepage-primary-card {
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--surface-2);
+    background: var(--surface-0_5);
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
+    padding: 20px 1rem;
+
+    & .primary-card-header {
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.25px;
+    }
+  }
+
+  & .homepage-bottom-section {
+    gap: 1rem;
+
+    & .homepage-teams-card {
+      max-width: 49%;
+    }
+
+    & .homepage-help-card,
+    & .homepage-changelog-card {
+      max-width: 24%;
+    }
+  }
+
+  .ant-skeleton-paragraph li {
+    height: 15px;
+  }
+}
