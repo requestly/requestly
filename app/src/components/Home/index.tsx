@@ -1,7 +1,10 @@
 import React from "react";
 import { Col, Row } from "antd";
+import { ChangeLogCard } from "./components/ChangelogCard";
+import { HelpCard } from "./components/HelpCard";
+import { TeamsCard } from "./components/WorkspaceCard";
+import { Templates } from "./components/Templates";
 import "./home.scss";
-import { SessionsCard } from "./components/SessionsCard";
 
 export const Home: React.FC = () => {
   return (
@@ -12,7 +15,19 @@ export const Home: React.FC = () => {
             <>RULES HERE</>
           </Col>
           <Col className="homepage-primary-card" span={12}>
-            <SessionsCard />
+            <>SESSIONS HERE</>
+          </Col>
+        </Row>
+        <Templates />
+        <Row className="homepage-bottom-section">
+          <Col span={12} className="homepage-teams-card homepage-primary-card" style={{ padding: 0 }}>
+            <TeamsCard />
+          </Col>
+          <Col span={6} className="homepage-help-card homepage-primary-card">
+            <HelpCard />
+          </Col>
+          <Col span={6} className="homepage-changelog-card homepage-primary-card">
+            <ChangeLogCard />
           </Col>
         </Row>
       </Col>
