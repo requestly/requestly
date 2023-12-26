@@ -154,14 +154,15 @@ const AppSumoModal: React.FC = () => {
 
       try {
         const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
-        await updateDoc(teamsRef, {
-          "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
-          "appsumo.date": Date.now(),
-        });
 
         await updateTeamSubscriptionForAppSumo({
           teamId: workspaceToUpgrade.id,
           startDate: Date.now(),
+        });
+
+        await updateDoc(teamsRef, {
+          "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
+          "appsumo.date": Date.now(),
         });
       } catch (error) {
         console.error("from appsumo", error);

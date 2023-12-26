@@ -18,6 +18,7 @@ import "./SubscriptionInfo.css";
 const SubscriptionInfo = ({
   isLifeTimeActive = false,
   hideShadow,
+  appSumoCodeCount = 0,
   hideManagePersonalSubscriptionButton,
   subscriptionDetails,
 }) => {
@@ -75,7 +76,11 @@ const SubscriptionInfo = ({
   }, [cancelPlanClicked, isUserPremium, status]);
 
   if (!subscriptionDetails) {
-    return <React.Fragment></React.Fragment>;
+    return <></>;
+  }
+
+  if (type === "appsumo" && status === "trialing") {
+    return <></>;
   }
 
   return (
@@ -100,7 +105,11 @@ const SubscriptionInfo = ({
                     ) : null}
                   </Space>
                 </Descriptions.Item>
-                <Descriptions.Item label="Type">{beautifySubscriptionType(type)}</Descriptions.Item>
+                <Descriptions.Item label="Type">
+                  {type === "appsumo"
+                    ? `${beautifySubscriptionType(type)} (${appSumoCodeCount} codes redeemed)`
+                    : beautifySubscriptionType(type)}
+                </Descriptions.Item>
                 {isUserPremium && (
                   <Descriptions.Item label="Valid From">{new Date(validFrom).toDateString()}</Descriptions.Item>
                 )}
