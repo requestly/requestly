@@ -260,6 +260,10 @@ export const redirectToTeam = (navigate, teamId, options = {}) => {
   }
 };
 
+export const redirectToManageWorkspace = (navigate, teamId) => {
+  navigate(PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`);
+};
+
 export const redirectToMyTeams = (navigate, hardRedirect) => {
   if (hardRedirect) {
     window.location.href = PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE;

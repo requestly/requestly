@@ -1,0 +1,40 @@
+.homepage-teams-list-title {
+  font-weight: 700;
+  color: var(--white);
+}
+
+.homepage-teams-list-subtitle {
+  font-size: 12px;
+}
+
+.homepage-teams-card-content {
+  padding: 0 1rem;
+  padding-top: 20px;
+}
+
+.homepage-teams-list {
+  height: 144px;
+  overflow-y: auto;
+  margin-top: 8px;
+}
+
+.homepage-teams-list-create-workspace-btn.ant-btn.ant-btn-default {
+  color: var(--white);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: none;
+  border-radius: 0;
+  border-top: 1px solid var(--surface-2);
+  background: none;
+  font-size: 14px;
+
+  &:hover,
+  &:focus {
+    color: var(--white);
+    border: none;
+    border-radius: 0;
+    border-top: 1px solid var(--surface-2);
+  }
+}

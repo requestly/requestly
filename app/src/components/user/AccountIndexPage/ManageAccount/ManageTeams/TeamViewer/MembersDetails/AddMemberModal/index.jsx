@@ -14,7 +14,6 @@ import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/an
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 import PageLoader from "components/misc/PageLoader";
-import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import APP_CONSTANTS from "config/constants";
@@ -41,7 +40,6 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
   const teamDetails = availableTeams?.find((team) => team.id === teamId);
-  const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
@@ -171,84 +169,72 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     }
   }, [isOpen, fetchPublicInvites]);
 
+  if (isPublicInviteLoading) return <PageLoader />;
+
   return (
     <>
       <RQModal width={620} centered open={isOpen} onCancel={toggleModal}>
         <div className="rq-modal-content">
-          {isTeamAdmin ? (
-            <>
-              <div>
-                <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
-              </div>
-              <div className="header add-member-modal-header">
-                Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
-              </div>
-              <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
+          <div>
+            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+          </div>
+          <div className="header add-member-modal-header">
+            Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
+          </div>
+          <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
 
-              <div className="title mt-16">Email address</div>
-              <div className="email-invites-wrapper">
-                <div className="emails-input-wrapper">
-                  <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
-                  <div className="access-dropdown-container">
-                    <MemberRoleDropdown
-                      placement="bottomRight"
-                      isAdmin={makeUserAdmin}
-                      handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
-                    />
-                  </div>
-                </div>
-                {isTeamAdmin && (
-                  <RQButton
-                    size="small"
-                    style={{ height: "37px", marginLeft: "4px" }}
-                    type={userEmail.length ? "primary" : "default"}
-                    htmlType="submit"
-                    onClick={handleAddMember}
-                    loading={isProcessing}
-                  >
-                    Invite People
-                  </RQButton>
-                )}
+          <div className="title mt-16">Email address</div>
+          <div className="email-invites-wrapper">
+            <div className="emails-input-wrapper">
+              <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
+              <div className="access-dropdown-container">
+                <MemberRoleDropdown
+                  placement="bottomRight"
+                  isAdmin={makeUserAdmin}
+                  handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+                />
               </div>
-              <div className="title mt-16">Invite link</div>
-              {isInvitePublic ? (
-                <div className="display-flex items-center mt-8">
-                  <RQInput
-                    disabled
-                    value={`${window.location.origin}/invite/${publicInviteId}`}
-                    suffix={
-                      <CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />
-                    }
-                  />
-                </div>
-              ) : (
-                <div className="display-flex items-center">
-                  <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
-                  <RQButton
-                    loading={isInviteGenerating}
-                    size="small"
-                    className="create-invite-link-btn"
-                    type="primary"
-                    onClick={handleCreateInviteLink}
-                  >
-                    Create link
-                  </RQButton>
-                </div>
-              )}
-            </>
-          ) : isLoading || isPublicInviteLoading ? (
-            <PageLoader />
+            </div>
+
+            <RQButton
+              size="small"
+              style={{ height: "37px", marginLeft: "4px" }}
+              type={userEmail.length ? "primary" : "default"}
+              htmlType="submit"
+              onClick={handleAddMember}
+              loading={isProcessing}
+            >
+              Invite People
+            </RQButton>
+          </div>
+          <div className="title mt-16">Invite link</div>
+          {isInvitePublic ? (
+            <div className="display-flex items-center mt-8">
+              <RQInput
+                disabled
+                value={`${window.location.origin}/invite/${publicInviteId}`}
+                suffix={<CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />}
+              />
+            </div>
           ) : (
-            <div className="title empty-message">
-              <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
-              <div>Make sure you are an admin to invite teammates</div>
+            <div className="display-flex items-center">
+              <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
+              <RQButton
+                loading={isInviteGenerating}
+                size="small"
+                className="create-invite-link-btn"
+                type="primary"
+                onClick={handleCreateInviteLink}
+              >
+                Create link
+              </RQButton>
             </div>
           )}
         </div>
         <Row align="middle" className="rq-modal-footer">
-          {isVerifiedBusinessUser && isTeamAdmin ? (
+          {isVerifiedBusinessUser ? (
             <>
-              {!isLoading && !isPublicInviteLoading && (
+              {!isPublicInviteLoading && (
                 <>
                   <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
                   <span className="ml-2 text-gray">
