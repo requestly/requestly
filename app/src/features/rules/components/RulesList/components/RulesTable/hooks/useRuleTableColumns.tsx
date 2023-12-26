@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
@@ -14,6 +15,10 @@ import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import PATHS from "config/constants/sub/paths";
+import { isRule } from "../utils";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -69,9 +74,17 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "Rules",
       key: "name",
-      width: 376,
+      width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
-      render: (rule: RuleTableDataType) => rule.name,
+      render: (rule: RuleTableDataType) => {
+        return isRule(rule) ? (
+          <Link to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${rule.id}`} state={{ source: "my_rules" }}>
+            {rule.name}
+          </Link>
+        ) : (
+          rule.name
+        );
+      },
       onCell: (rule: RuleTableDataType) => {
         if (rule.objectType === "group") {
           return {
@@ -115,17 +128,26 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       key: "status",
       title: "Status",
       width: 120,
-      render: (rule: RuleTableDataType) => {
-        const checked = rule?.status === RuleObjStatus.ACTIVE ? true : false;
+      render: (_, rule: RuleTableDataType, index) => {
+        const isRuleActive = rule.status === RuleObjStatus.ACTIVE;
+
         return (
-          <Switch
-            size="small"
-            checked={checked}
-            onChange={(checked: boolean, e) => {
-              e.stopPropagation();
-              handleStatusToggle([rule], checked);
-            }}
-          />
+          <PremiumFeature
+            disabled={isRuleActive}
+            features={[FeatureLimitType.num_active_rules]}
+            popoverPlacement="left"
+            onContinue={() => handleStatusToggle([rule])}
+            source="rule_list_status_switch"
+          >
+            <Switch
+              size="small"
+              checked={isRuleActive}
+              data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+              onChange={(checked: boolean, e) => {
+                e.stopPropagation();
+              }}
+            />
+          </PremiumFeature>
         );
       },
     },
@@ -144,7 +166,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
             <span>
-              {beautifiedDate} by <UserIcon uid={rule.lastModifiedBy} />
+              {beautifiedDate} <UserIcon uid={rule.lastModifiedBy} />
             </span>
           );
         } else return beautifiedDate;
@@ -243,7 +265,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   if (isWorkspaceMode && !options.hideCreatedBy) {
     columns.splice(6, 0, {
       title: "Author",
-      width: 96,
+      width: 92,
       responsive: ["lg"],
       key: "createdBy",
       render: (rule: RuleTableDataType) => {

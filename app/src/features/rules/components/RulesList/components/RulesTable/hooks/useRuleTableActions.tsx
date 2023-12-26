@@ -1,13 +1,11 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
+import { Rule, RuleObj, RuleObjStatus } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { rulesActions } from "store/features/rules/slice";
 import Logger from "lib/logger";
 import { StorageService } from "init";
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { toast } from "utils/Toast";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -15,11 +13,16 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
+import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
+import { trackRuleActivatedStatusEvent, trackRuleDeactivatedStatus } from "modules/analytics/events/common/rules";
+import { trackGroupStatusToggled } from "features/rules/analytics/groups";
+import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const { UNGROUPED_GROUP_ID } = RULES_LIST_TABLE_CONSTANTS;
   const {
     setRuleToDuplicate,
@@ -37,19 +40,15 @@ const useRuleTableActions = () => {
     setSelectedRows([]);
   }, [setSelectedRows]);
 
-  const handleStatusToggle = (rules: RuleTableDataType[], checked: boolean) => {
-    console.log("handleStatusToggle", { rules, checked });
-    // TODO: Add logic to propogate the changes to storageservice;
-
+  const handleStatusToggle = (rules: RuleTableDataType[]) => {
     rules.forEach((rule) => {
-      const status = checked ? RuleObjStatus.ACTIVE : RuleObjStatus.INACTIVE;
+      const status = rule.status === RuleObjStatus.ACTIVE ? RuleObjStatus.INACTIVE : RuleObjStatus.ACTIVE;
       changeRuleStatus(status, rule);
     });
   };
 
   const changeRuleStatus = (newStatus: RuleObjStatus, rule: RuleObj) => {
     // TODO: Handle Group status toggle
-    console.log({ rule, user });
 
     // TODO: Why is this added??
     // if (rule.currentOwner) {
@@ -57,6 +56,7 @@ const useRuleTableActions = () => {
     // } else {
     //   currentOwner = rule.currentOwner;
     // }
+
     const updatedRule: RuleObj = {
       ...rule,
       status: newStatus,
@@ -64,24 +64,31 @@ const useRuleTableActions = () => {
 
     Logger.log("Writing storage in RulesTable changeRuleStatus");
     updateRuleInStorage(updatedRule, rule).then(() => {
-      //Push Notify
-      newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
-        ? toast.success(`Rule is now ${newStatus.toLowerCase()}`)
-        : toast.success(`Rule is now ${newStatus.toLowerCase()}`);
+      const isRecordRule = isRule(rule);
 
-      // TODO: Add Analytics
-      //Analytics
-      // if (newStatus.toLowerCase() === "active") {
-      //   trackRQLastActivity("rule_activated");
-      //   trackRuleActivatedStatusEvent(rule.ruleType);
-      // } else {
-      //   trackRQLastActivity("rule_deactivated");
-      //   trackRuleDeactivatedStatus(rule.ruleType);
-      // }
+      //Push Notify
+      newStatus === RuleObjStatus.ACTIVE
+        ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
+        : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
+
+      if (!isRecordRule) {
+        trackGroupStatusToggled(newStatus === "Active");
+        return;
+      }
+
+      if (newStatus.toLowerCase() === "active") {
+        trackRQLastActivity("rule_activated");
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
+        trackRuleActivatedStatusEvent((rule as Rule).ruleType);
+      } else {
+        trackRQLastActivity("rule_deactivated");
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
+        trackRuleDeactivatedStatus((rule as Rule).ruleType);
+      }
     });
   };
 
-  const toggleSharingModal = (rules: RuleObj | RuleObj[]) => {
+  const toggleSharingModal = (rules: RuleObj | RuleObj[], clearSelection = () => {}) => {
     const updatedRules = convertToArray<RuleObj>(rules);
     const rulesToShare = updatedRules.filter(isRule);
     const ruleIds = rulesToShare.map((rule) => rule.id);
@@ -91,6 +98,7 @@ const useRuleTableActions = () => {
         modalName: "sharingModal",
         newValue: true,
         newProps: {
+          callback: clearSelection,
           selectedRules: ruleIds,
         },
       })
@@ -113,10 +121,10 @@ const useRuleTableActions = () => {
     );
   };
 
-  const handleRuleShare = (rules: RuleObj | RuleObj[]) => {
+  const handleRuleShare = (rules: RuleObj | RuleObj[], clearSelection?: () => void) => {
     // TODO
-    // trackShareButtonClicked("rules_list");
-    user.loggedIn ? toggleSharingModal(rules) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    trackShareButtonClicked(clearSelection ? "bulk_action_bar" : "rules_list");
+    user.loggedIn ? toggleSharingModal(rules, clearSelection) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
   // Generic
@@ -135,7 +143,7 @@ const useRuleTableActions = () => {
 
   const updateMultipleRecordsInStorage = useCallback(
     (updatedRecords: RuleObj[], originalRecords: RuleObj[]) => {
-      if (updatedRecords.length === 0) return;
+      if (updatedRecords.length === 0) return Promise.resolve();
 
       dispatch(rulesActions.ruleObjUpsertMany(updatedRecords));
 

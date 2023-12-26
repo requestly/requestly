@@ -20,7 +20,7 @@ import {
 //ACTIONS
 import { updateGroupOfSelectedRules, createNewGroup } from "./actions";
 // import { unselectAllRecords } from "../actions";
-import { trackGroupChangedEvent } from "modules/analytics/events/common/groups";
+import { trackGroupChangedEvent } from "features/rules/analytics/groups";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import Logger from "lib/logger";
 
@@ -81,6 +81,7 @@ const ChangeRuleGroupModal = (props) => {
           trackGroupChangedEvent("rules_table");
 
           // unselectAllRecords(dispatch);
+          props.onGroupChanged?.();
           props.clearSearch?.();
           //Refresh List
           dispatch(
