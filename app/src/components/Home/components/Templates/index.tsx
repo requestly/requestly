@@ -5,6 +5,9 @@ import APP_CONSTANTS from "config/constants";
 import templatesMap from "../../../landing/ruleTemplates/templates.json";
 import { RuleType } from "types";
 import "./index.scss";
+import { Link } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
+import { RQButton } from "lib/design-system/components";
 
 export const Templates: React.FC = () => {
   const filteredTemplates = useMemo(() => templatesMap.templates.filter((template: any) => template.isFeatured), []);
@@ -27,10 +30,22 @@ export const Templates: React.FC = () => {
                   {APP_CONSTANTS.RULE_TYPES_CONFIG[ruleType]?.NAME}
                 </Col>
               </Row>
+              <Col className="home-templates-card-action-bar">
+                <RQButton type="default" size="small" className="home-templates-card-action-btn">
+                  Preview
+                </RQButton>
+                <RQButton type="primary" size="small" className="home-templates-card-action-btn">
+                  Use this template
+                </RQButton>
+              </Col>
             </div>
           );
         })}
       </Col>
+
+      <Link to={PATHS.RULES.TEMPLATES.ABSOLUTE} className="home-templates-view-all-link">
+        View all templates
+      </Link>
     </Col>
   );
 };
