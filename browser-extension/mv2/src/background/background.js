@@ -252,9 +252,9 @@ BG.Methods.replaceHeader = function (headers, newHeader) {
   BG.Methods.addHeader(headers, newHeader);
 };
 
-BG.Methods.getHeaderValue = (headers, headerName) => {
-  const header = headers.find(({ name }) => name.toLowerCase() === headerName.toLowerCase());
-  return header?.value;
+BG.Methods.getHeaderValue = (headers = [], headerName) => {
+  const headerObject = headers.find(({ name }) => name.toLowerCase() === headerName.toLowerCase());
+  return headerObject?.value;
 };
 
 BG.Methods.copyIgnoredHeadersOnRedirect = (originalHeaders) => {
