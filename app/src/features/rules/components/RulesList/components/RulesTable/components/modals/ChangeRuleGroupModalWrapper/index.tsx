@@ -3,7 +3,11 @@ import { useRulesContext } from "../../../../RulesListIndex/context";
 import useRuleTableActions from "../../../hooks/useRuleTableActions";
 import ChangeRuleGroupModal from "components/features/rules/ChangeRuleGroupModal";
 
-export const ChangeRuleGroupModalWrapper: React.FC = () => {
+interface Props {
+  clearSelection: () => void;
+}
+
+export const ChangeRuleGroupModalWrapper: React.FC<Props> = ({ clearSelection }) => {
   const { selectedRows, isChangeGroupModalActive } = useRulesContext();
   const { closeChangeRuleGroupModal, clearSelectedRows } = useRuleTableActions();
 
@@ -14,6 +18,7 @@ export const ChangeRuleGroupModalWrapper: React.FC = () => {
       toggle={closeChangeRuleGroupModal}
       mode="SELECTED_RULES"
       selectedRules={selectedRows}
+      onGroupChanged={clearSelection}
     />
   ) : null;
 };

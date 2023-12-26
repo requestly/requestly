@@ -56,7 +56,7 @@ import FEATURES from "config/constants/sub/features";
 import DeleteRulesModal from "../../DeleteRulesModal";
 import UngroupOrDeleteRulesModal from "../../UngroupOrDeleteRulesModal";
 import DuplicateRuleModal from "../../DuplicateRuleModal";
-import { trackGroupDeleted, trackGroupStatusToggled } from "modules/analytics/events/common/groups";
+import { trackGroupDeleted, trackGroupStatusToggled } from "features/rules/analytics/groups";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import {
   trackRuleActivatedStatusEvent,
