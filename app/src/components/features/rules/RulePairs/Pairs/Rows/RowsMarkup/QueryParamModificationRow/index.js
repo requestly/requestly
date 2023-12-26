@@ -61,7 +61,7 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
         className="min-dropdown-tile-width-lg modification-type-dropdown"
         data-tour-id="rule-editor-queryparam-modification-type"
       >
-        <Dropdown overlay={modificationTypeMenu}>
+        <Dropdown overlay={modificationTypeMenu} disabled={isInputDisabled}>
           <Text strong className="uppercase ant-dropdown-link cursor-pointer" onClick={(e) => e.preventDefault()}>
             {modification.type} <DownOutlined />
           </Text>
@@ -113,24 +113,26 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
               data-selectionid="query-param-value"
             />
           </Col>
-          <Col span={1} align="right">
-            <Tooltip title="Remove">
-              <ImCross
-                id="delete-pair"
-                onClick={(event) => {
-                  event?.preventDefault?.();
-                  dispatch(
-                    actions.removeValueInRulePairByIndex({
-                      pairIndex,
-                      arrayPath: "modifications",
-                      index: modificationIndex,
-                    })
-                  );
-                }}
-                className="text-gray cursor-pointer"
-              />
-            </Tooltip>
-          </Col>
+          {!isInputDisabled && (
+            <Col span={1} align="right">
+              <Tooltip title="Remove">
+                <ImCross
+                  id="delete-pair"
+                  onClick={(event) => {
+                    event?.preventDefault?.();
+                    dispatch(
+                      actions.removeValueInRulePairByIndex({
+                        pairIndex,
+                        arrayPath: "modifications",
+                        index: modificationIndex,
+                      })
+                    );
+                  }}
+                  className="text-gray cursor-pointer"
+                />
+              </Tooltip>
+            </Col>
+          )}
         </Row>
       </Col>
     </Row>
