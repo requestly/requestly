@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ContactUsModal from "components/landing/contactUsModal";
+import { ContactUsModal } from "components/modals/ContactUsModal";
 import { RQButton } from "lib/design-system/components";
 import "./index.css";
 
@@ -46,6 +46,18 @@ const PricingFAQs = () => {
       ),
     },
     {
+      ques: <>I want to modify only HTTP Headers, Is there a discounted plan for me?</>,
+      answer: (
+        <>
+          We provide a custom plan for users seeking unlimited header modifications at $5/month.{" "}
+          <span onClick={() => setIsContactUsModalOpen(true)} className="link-button">
+            Contact us
+          </span>{" "}
+          to get this plan activated for you.
+        </>
+      ),
+    },
+    {
       ques: <React.Fragment>Which payment methods do you accept?</React.Fragment>,
       answer: (
         <React.Fragment>
@@ -74,7 +86,10 @@ const PricingFAQs = () => {
       </div>
       <ContactUsModal
         isOpen={isContactUsModalOpen}
-        handleToggleModal={() => setIsContactUsModalOpen(!isContactUsModalOpen)}
+        onCancel={() => setIsContactUsModalOpen(false)}
+        heading="Get In Touch"
+        subHeading="Learn about Requestly"
+        source="pricing_page"
       />
     </>
   );
