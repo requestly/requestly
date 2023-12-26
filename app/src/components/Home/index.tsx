@@ -20,7 +20,7 @@ export const Home: React.FC = () => {
         </Row>
         <Templates />
         <Row className="homepage-bottom-section">
-          <Col span={12} className="homepage-teams-card homepage-primary-card" style={{ padding: 0 }}>
+          <Col span={12} className="homepage-teams-card homepage-primary-card">
             <TeamsCard />
           </Col>
           <Col span={6} className="homepage-help-card homepage-primary-card">
