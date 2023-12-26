@@ -1,7 +1,7 @@
 import React from "react";
 import type { BaseButtonProps } from "antd/lib/button/button";
 interface BulkActionBarAction extends BaseButtonProps {
-  onClick: (selectedRows: any) => void;
+  onClick: (selectedRows: any, clearSelection: () => void) => void;
   label: React.ReactNode | ((selectedRows: any) => string);
 }
 

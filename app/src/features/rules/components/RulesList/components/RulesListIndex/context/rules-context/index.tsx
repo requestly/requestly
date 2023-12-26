@@ -16,6 +16,7 @@ export const RulesListProvider: React.FC<RulesProviderProps> = ({ children }) =>
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);
   const [isDeleteConfirmationModalActive, setIsDeleteConfirmationModalActive] = useState(false);
   const [isSharedListRuleViewerModalActive, setIsSharedListRuleViewModalActive] = useState(false);
+  const [groupToEmpty, setGroupToEmpty] = useState(null);
   const [isUngroupOrDeleteRulesModalActive, setIsUngroupOrDeleteRulesModalActive] = useState(false);
   const [isRenameGroupModalActive, setIsRenameGroupModalActive] = useState(false);
   const [idOfGroupToRename, setIdOfGroupToRename] = useState<number>(null);
@@ -36,6 +37,8 @@ export const RulesListProvider: React.FC<RulesProviderProps> = ({ children }) =>
     isDeleteConfirmationModalActive,
     isSharedListRuleViewerModalActive,
     isUngroupOrDeleteRulesModalActive,
+    groupToEmpty,
+    setGroupToEmpty,
     setRuleToDuplicate,
     setIsDuplicateRuleModalActive,
     isDuplicateRuleModalActive,

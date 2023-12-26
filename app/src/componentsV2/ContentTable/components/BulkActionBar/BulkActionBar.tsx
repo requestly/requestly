@@ -34,7 +34,7 @@ const BulkActionBar = <DataType,>({ config, selectedRows, clearSelectedRowsData 
               type={actionConfig.type ?? "default"}
               disabled={actionConfig.disabled ?? false}
               onClick={() => {
-                actionConfig?.onClick(selectedRows);
+                actionConfig?.onClick(selectedRows, clearSelectedRowsData);
               }}
             >
               {typeof actionConfig.label === "function" ? actionConfig.label(selectedRows) : actionConfig.label}

@@ -21,9 +21,14 @@ import { generateDefaultTeamName } from "utils/teams";
 interface Props {
   selectedRules: string[];
   setPostShareViewData: ({ type, targetTeamData }: PostShareViewData) => void;
+  onRulesShared?: () => void;
 }
 
-export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareViewData }) => {
+export const ShareFromPrivate: React.FC<Props> = ({
+  selectedRules,
+  setPostShareViewData,
+  onRulesShared = () => {},
+}) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const availableTeams = useSelector(getAvailableTeams);
@@ -80,6 +85,8 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
             type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
             targetTeamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
           });
+
+          onRulesShared();
         });
       });
     } catch (e) {
@@ -87,6 +94,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
     }
   }, [
     appMode,
+    onRulesShared,
     memberEmails,
     selectedRules,
     setPostShareViewData,
@@ -106,9 +114,11 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
           sourceTeamData: currentlyActiveWorkspace,
         });
+
+        onRulesShared();
       });
     },
-    [appMode, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
+    [appMode, onRulesShared, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
   );
 
   return (

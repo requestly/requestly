@@ -24,11 +24,12 @@ import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSu
 interface ShareLinkProps {
   selectedRules: string[];
   source: string;
+  onSharedLinkCreated?: () => void;
 }
 
 // TODO: handle copy changes for session replay in V1
 
-export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source }) => {
+export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source, onSharedLinkCreated = () => {} }) => {
   const appMode = useSelector(getAppMode);
   const rules = useSelector(getAllRuleObjs);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
@@ -135,6 +136,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
       createSharedList(appMode, selectedRules, sharedListName, sharedLinkVisibility, sharedListRecipients).then(
         ({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
           trackRQLastActivity("sharedList_created");
+          onSharedLinkCreated();
           if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
             sendSharedListShareEmail({
               sharedListData: sharedListData,
@@ -175,6 +177,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source 
   }, [
     appMode,
     source,
+    onSharedLinkCreated,
     selectedRules,
     sharedListName,
     sharedLinkVisibility,

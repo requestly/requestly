@@ -25,9 +25,3 @@
   flex-shrink: 0;
   color: inherit;
 }
-
-@media only screen and (max-width: 1200px) {
-  .rule-type-tag-name {
-    display: none;
-  }
-}

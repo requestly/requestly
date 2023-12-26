@@ -10,7 +10,7 @@ export enum RuleObjStatus {
   INACTIVE = "Inactive",
 }
 
-enum RuleType {
+export enum RuleType {
   REDIRECT = "Redirect",
   HEADERS = "Headers",
   CANCEL = "Cancel",
@@ -134,6 +134,7 @@ export type Rule = RedirectRule | CancelRule | ReplaceRule | DelayRule;
 
 export interface Group extends BaseRuleObj {
   objectType: RuleObjType.GROUP;
+  children: Rule[];
 }
 
 export type RuleObj = Rule | Group;

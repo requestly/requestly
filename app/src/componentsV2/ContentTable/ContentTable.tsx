@@ -1,18 +1,18 @@
-import React, { ReactElement, useCallback, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import type { ColumnsType } from "antd/es/table";
-import { Table } from "antd";
+import { Table, TableProps } from "antd";
 import { BulkActionBarConfig } from "./types";
 import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
-import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
 import "./contentTable.scss";
 
-export interface ContentTableProps<DataType> {
+export interface ContentTableProps<DataType> extends TableProps<DataType> {
   columns: ColumnsType<DataType>;
   data: DataType[];
   rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
   loading?: boolean;
   customRowClassName?: (record: DataType) => string;
   bulkActionBarConfig?: BulkActionBarConfig;
+  filterSelection?: (records: DataType[]) => DataType[];
 }
 
 const ContentTable = <DataType extends object>({
@@ -22,12 +22,14 @@ const ContentTable = <DataType extends object>({
   loading = false,
   customRowClassName = (record: DataType) => "",
   bulkActionBarConfig,
+  size = "middle",
+  scroll = { y: "calc(100vh - 277px)" },
+  filterSelection = (records) => records,
+  expandable,
 }: ContentTableProps<DataType>): ReactElement => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRowsData, setSelectedRowsData] = useState<DataType[]>([]);
 
   const clearSelectedRowsData = useCallback(() => {
-    setSelectedRowKeys([]);
     setSelectedRowsData([]);
     bulkActionBarConfig?.options?.clearSelectedRows?.();
   }, [bulkActionBarConfig?.options]);
@@ -47,26 +49,20 @@ const ContentTable = <DataType extends object>({
           className: "rq-content-table-header",
         })}
         rowClassName={(record) => `rq-content-table-row ${customRowClassName?.(record)}`}
+        size={size}
         loading={loading}
         rowKey={rowKey}
         columns={columns}
         dataSource={data}
         pagination={false}
-        expandable={{
-          expandIcon: ({ expanded, onExpand, record }) => (
-            <RiArrowDownSLine
-              // @ts-ignore
-              onClick={(e) => onExpand(record, e)}
-              className="group-expand-icon"
-              style={{ transform: `rotate(${expanded ? "-180deg" : "0deg"})` }}
-            />
-          ),
-        }}
+        scroll={scroll}
+        expandable={expandable}
         rowSelection={{
-          selectedRowKeys,
+          checkStrictly: false,
+          selectedRowKeys: selectedRowsData.map((record) => (record as any).id),
           onChange: (selectedRowKeys, selectedRows) => {
-            setSelectedRowKeys(selectedRowKeys);
-            setSelectedRowsData(selectedRows);
+            const selectedRowsData = filterSelection(selectedRows);
+            setSelectedRowsData(selectedRowsData);
           },
         }}
       />

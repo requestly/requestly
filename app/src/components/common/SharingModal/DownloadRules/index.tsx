@@ -16,9 +16,14 @@ import "./DownloadRules.css";
 interface DownloadRulesProps {
   selectedRules: string[];
   toggleModal: () => void;
+  onRulesDownloaded?: () => void;
 }
 
-export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = [], toggleModal }) => {
+export const DownloadRules: React.FC<DownloadRulesProps> = ({
+  selectedRules = [],
+  toggleModal,
+  onRulesDownloaded = () => {},
+}) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const rules = useSelector(getAllRuleObjs);
@@ -47,9 +52,10 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = []
       unselectAllRecords(dispatch);
       fileDownload(fileContent, fileName, "application/json");
       setTimeout(() => toast.success(`${rulesCount === 1 ? "Rule" : "Rules"} downloaded successfully`), 0);
+      onRulesDownloaded();
       toggleModal();
     },
-    [rulesToDownload, dispatch, fileName, toggleModal]
+    [rulesToDownload, onRulesDownloaded, dispatch, fileName, toggleModal]
   );
 
   useEffect(() => {

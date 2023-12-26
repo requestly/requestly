@@ -5,7 +5,8 @@
     border-bottom: 1px solid var(--surface-1);
   }
 
-  th {
+  th,
+  th.ant-table-cell {
     padding: 12px;
 
     .ant-table-column-title {
@@ -44,7 +45,6 @@ tr.rq-content-table-row.ant-table-row {
       height: 20px;
       cursor: pointer;
       transition: transform 0.2s;
-      display: none; // FIXME: show expand icon only for groups
     }
   }
 
@@ -54,7 +54,8 @@ tr.rq-content-table-row.ant-table-row {
     }
 
     .ant-table-cell {
-      background: var(--black);
+      // background: var(--black);
+      background: #0000004f;
       border-bottom: 1px solid var(--surface-1);
 
       .ant-table-row-expand-icon {
@@ -108,4 +109,8 @@ tr.rq-content-table-row.ant-table-row {
   .rules-actions-container .more-rule-actions-btn.ant-btn-icon-only svg {
     color: var(--text-default);
   }
+}
+
+th.ant-table-cell .ant-table-column-sorters .ant-table-column-title {
+  overflow: unset;
 }

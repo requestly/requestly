@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
@@ -14,6 +15,10 @@ import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import PATHS from "config/constants/sub/paths";
+import { isRule } from "../utils";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -26,6 +31,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     handleRenameGroupClick,
     handleChangeRuleGroupClick,
     handlePinRecordClick,
+    handleUngroupOrDeleteRulesClick,
   } = useRuleTableActions();
 
   // const isStatusEnabled = !(options && options.disableStatus);
@@ -35,9 +41,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   // const isAlertOptionsAllowed = !(options && options.disableAlertActions);
 
   /**
-   * - have a action which does the pinning of the record pick form old rules table
-   * - render pins + style them
-   *
    * - make rule name clickable and navigate to editor.
    */
 
@@ -56,7 +59,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               type="text"
               className="pin-record-btn"
               icon={<RiPushpin2Line className={`${record.isFavourite ? "record-pinned" : "record-unpinned"}`} />}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (isEditingEnabled) {
                   handlePinRecordClick(record);
                 }
@@ -70,9 +74,17 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "Rules",
       key: "name",
-      width: 376,
+      width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
-      render: (rule: RuleTableDataType) => rule.name,
+      render: (rule: RuleTableDataType) => {
+        return isRule(rule) ? (
+          <Link to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${rule.id}`} state={{ source: "my_rules" }}>
+            {rule.name}
+          </Link>
+        ) : (
+          rule.name
+        );
+      },
       onCell: (rule: RuleTableDataType) => {
         if (rule.objectType === "group") {
           return {
@@ -116,10 +128,26 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       key: "status",
       title: "Status",
       width: 120,
-      render: (rule: RuleTableDataType) => {
-        const checked = rule?.status === RuleObjStatus.ACTIVE ? true : false;
+      render: (_, rule: RuleTableDataType, index) => {
+        const isRuleActive = rule.status === RuleObjStatus.ACTIVE;
+
         return (
-          <Switch size="small" checked={checked} onChange={(checked: boolean) => handleStatusToggle([rule], checked)} />
+          <PremiumFeature
+            disabled={isRuleActive}
+            features={[FeatureLimitType.num_active_rules]}
+            popoverPlacement="left"
+            onContinue={() => handleStatusToggle([rule])}
+            source="rule_list_status_switch"
+          >
+            <Switch
+              size="small"
+              checked={isRuleActive}
+              data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+              onChange={(checked: boolean, e) => {
+                e.stopPropagation();
+              }}
+            />
+          </PremiumFeature>
         );
       },
     },
@@ -138,7 +166,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
             <span>
-              {beautifiedDate} by <UserIcon uid={rule.lastModifiedBy} />
+              {beautifiedDate} <UserIcon uid={rule.lastModifiedBy} />
             </span>
           );
         } else return beautifiedDate;
@@ -152,10 +180,11 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       render: (record: RuleTableDataType) => {
         const isRule = record.objectType === RuleObjType.RULE;
 
-        const recordActions: MenuProps["items"] = [
+        const recordActions = ([
           {
             key: 0,
-            onClick: () => {
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
               isRule ? handleChangeRuleGroupClick(record) : handleRenameGroupClick(record);
             },
             label: (
@@ -175,7 +204,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           {
             key: 1,
             disabled: !isRule,
-            onClick: () => {
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
               handleDuplicateRuleClick(record);
             },
             label: (
@@ -188,7 +218,10 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           {
             key: 2,
             danger: true,
-            onClick: () => handleDeleteRecordClick(record),
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              isRule ? handleDeleteRecordClick(record) : handleUngroupOrDeleteRulesClick(record);
+            },
             label: (
               <Row>
                 <RiDeleteBinLine />
@@ -196,20 +229,31 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               </Row>
             ),
           },
-        ].filter((option) => !option.disabled);
+        ] as MenuProps["items"]).filter((option) => {
+          // @ts-ignore
+          return !option.disabled;
+        });
 
         return (
           <Row align="middle" wrap={false} className="rules-actions-container">
-            <Button
-              type="text"
-              icon={<MdOutlineShare />}
-              onClick={() => {
-                handleRuleShare(record);
-              }}
-            />
+            {isRule ? (
+              <Button
+                type="text"
+                icon={<MdOutlineShare />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRuleShare(record);
+                }}
+              />
+            ) : null}
 
             <Dropdown menu={{ items: recordActions }} trigger={["click"]} overlayClassName="rule-more-actions-dropdown">
-              <Button type="text" className="more-rule-actions-btn" icon={<MdOutlineMoreHoriz />} />
+              <Button
+                type="text"
+                className="more-rule-actions-btn"
+                icon={<MdOutlineMoreHoriz />}
+                onClick={(e) => e.stopPropagation()}
+              />
             </Dropdown>
           </Row>
         );
@@ -219,9 +263,9 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
 
   // FIXME: Extend the column type to also support custom fields eg hidden property to hide the column
   if (isWorkspaceMode && !options.hideCreatedBy) {
-    columns.splice(3, 0, {
+    columns.splice(6, 0, {
       title: "Author",
-      width: 96,
+      width: 92,
       responsive: ["lg"],
       key: "createdBy",
       render: (rule: RuleTableDataType) => {
