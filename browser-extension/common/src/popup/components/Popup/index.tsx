@@ -23,10 +23,12 @@ const Popup: React.FC = () => {
   }, []);
 
   const handleToggleExtensionStatus = useCallback(() => {
-    sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
-      isEnabled: !isExtensionEnabled,
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS }, (updatedStatus) => {
+      setIsExtensionEnabled(updatedStatus);
+      sendEvent(EVENT.EXTENSION_STATUS_TOGGLED, {
+        isEnabled: updatedStatus,
+      });
     });
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS }, setIsExtensionEnabled);
   }, []);
 
   return (
