@@ -4,7 +4,11 @@ import { useRulesContext } from "../../../../RulesListIndex/context";
 import useRuleTableActions from "../../../hooks/useRuleTableActions";
 import { Group } from "features/rules/types/rules";
 
-export const UngroupOrDeleteRulesModalWrapper: React.FC = () => {
+interface Props {
+  clearSelection: () => void;
+}
+
+export const UngroupOrDeleteRulesModalWrapper: React.FC<Props> = ({ clearSelection }) => {
   const { isUngroupOrDeleteRulesModalActive, groupToEmpty } = useRulesContext();
   const { closeUngroupOrDeleteRulesModal } = useRuleTableActions();
   const group = groupToEmpty as Group;
@@ -15,6 +19,7 @@ export const UngroupOrDeleteRulesModalWrapper: React.FC = () => {
       groupRules={group?.children ?? []}
       isOpen={isUngroupOrDeleteRulesModalActive}
       toggle={closeUngroupOrDeleteRulesModal}
+      callback={clearSelection}
     />
   ) : null;
 };

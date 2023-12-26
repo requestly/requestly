@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, rulesToContentTableDataAdapter } from "./utils";
@@ -14,11 +16,12 @@ import {
 import useRuleTableActions from "./hooks/useRuleTableActions";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
-import { RiToggleFill } from "@react-icons/all-files/ri/RiToggleFill";
+// import { RiToggleFill } from "@react-icons/all-files/ri/RiToggleFill";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 // import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
 import { localStorage } from "utils/localStorage";
+import { getUserAuthDetails } from "store/selectors";
 import "./rulesTable.css";
 
 interface Props {
@@ -27,13 +30,16 @@ interface Props {
 }
 
 const RulesTable: React.FC<Props> = ({ rules, loading }) => {
+  const user = useSelector(getUserAuthDetails);
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [expandedGroups, setExpandedGroups] = useState([]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [contentTableData, setContentTableAdaptedRules] = useState<RuleTableDataType[]>([]);
+  const clearSelectedRowsDataCallbackRef = useRef(() => {});
   const {
     clearSelectedRows,
     handleRuleShare,
-    handleActivateOrDeactivateRecords,
+    // handleActivateOrDeactivateRecords,
     handleDeleteRecordClick,
     handleChangeRuleGroupClick,
     handleUngroupSelectedRulesClick,
@@ -91,18 +97,21 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     }
   };
 
+  const clearSelectionCallback = clearSelectedRowsDataCallbackRef.current;
+  const isFeatureLimitbannerShown = isFeatureLimiterOn && user?.isLimitReached;
+
   return (
     <>
       {/* Add Modals Required in Rules List here */}
       <DuplicateRuleModalWrapper />
       <RenameGroupModalWrapper />
-      <DeleteRulesModalWrapper />
-      <ChangeRuleGroupModalWrapper />
-      <UngroupOrDeleteRulesModalWrapper />
+      <UngroupOrDeleteRulesModalWrapper clearSelection={clearSelectionCallback} />
+      <ChangeRuleGroupModalWrapper clearSelection={clearSelectionCallback} />
+      <DeleteRulesModalWrapper clearSelection={clearSelectionCallback} />
 
       <ContentTable
         size="middle"
-        scroll={{ y: "calc(100vh - 277px)" }}
+        scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(277px + 68px)" : "277px"})` }} // 68px is Feature limit banner height
         columns={columns}
         data={contentTableData}
         rowKey="id"
@@ -149,28 +158,38 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
               {
                 label: "Ungroup",
                 icon: <ImUngroup />,
-                onClick: (selectedRows) => handleUngroupSelectedRulesClick(selectedRows),
+                onClick: (selectedRows, clearSelection) => {
+                  handleUngroupSelectedRulesClick(selectedRows)?.then(() => clearSelection());
+                },
               },
               {
                 label: "Change group",
                 icon: <RiFolderSharedLine />,
-                onClick: (selectedRows) => handleChangeRuleGroupClick(selectedRows),
+                onClick: (selectedRows, clearSelection) => {
+                  clearSelectedRowsDataCallbackRef.current = clearSelection;
+                  handleChangeRuleGroupClick(selectedRows);
+                },
               },
-              {
-                label: "Activate",
-                icon: <RiToggleFill />,
-                onClick: (selectedRows) => handleActivateOrDeactivateRecords(selectedRows),
-              },
+              // {
+              //   label: "Activate",
+              //   icon: <RiToggleFill />,
+              //   onClick: (selectedRows) => handleActivateOrDeactivateRecords(selectedRows),
+              // },
               {
                 label: "Share",
                 icon: <RiUserSharedLine />,
-                onClick: (selectedRows) => handleRuleShare(selectedRows),
+                onClick: (selectedRows, clearSelection) => {
+                  handleRuleShare(selectedRows, clearSelection);
+                },
               },
               {
                 danger: true,
                 label: "Delete",
                 icon: <RiDeleteBin2Line />,
-                onClick: (selectedRows) => handleDeleteRecordClick(selectedRows),
+                onClick: (selectedRows, clearSelection) => {
+                  clearSelectedRowsDataCallbackRef.current = clearSelection;
+                  handleDeleteRecordClick(selectedRows);
+                },
               },
             ],
           },

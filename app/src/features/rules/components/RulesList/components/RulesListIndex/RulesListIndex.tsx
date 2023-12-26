@@ -38,6 +38,8 @@ import { CreateTeamRuleCTA, GettingStarted, ImportRulesModal } from "./component
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { ContentHeaderProps } from "componentsV2/ContentHeader";
 import SpinnerColumn from "components/misc/SpinnerColumn";
+import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./rulesListIndex.scss";
 
 interface Props {}
@@ -52,6 +54,7 @@ const RulesList: React.FC<Props> = () => {
   const [searchValue, setSearchValue] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const { getFeatureLimitValue } = useFeatureLimiter();
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isCreateNewRuleGroupModalActive, setIsCreateNewRuleGroupModalActive] = useState(false);
 
@@ -61,10 +64,9 @@ const RulesList: React.FC<Props> = () => {
   // Fetch Rules here from Redux
   const allRecords = useSelector(getAllRuleObjs);
   const pinnedRecords = useMemo(() => allRecords?.filter((record) => record.isFavourite), [allRecords]);
-  const activeRecords = useMemo(
-    () => allRecords?.filter((record) => record.status === RuleObjStatus.ACTIVE),
-    [allRecords]
-  );
+  const activeRecords = useMemo(() => allRecords?.filter((record) => record.status === RuleObjStatus.ACTIVE), [
+    allRecords,
+  ]);
 
   // FIX: rules loading state
 
@@ -288,7 +290,8 @@ const RulesList: React.FC<Props> = () => {
   ) : allRecords?.length > 0 ? (
     <>
       <div className="rq-rules-list-container">
-        {/* TODO: Add Feature Limiter Banner Here */}
+        {isFeatureLimiterOn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
+
         {isImportRulesModalActive ? (
           <ImportRulesModal
             isOpen={isImportRulesModalActive}
