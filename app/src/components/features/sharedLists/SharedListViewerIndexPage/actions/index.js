@@ -7,13 +7,6 @@ import { getPublicSharedListPath } from "../../../../../utils/db/UserModel";
 //CONSTANTS
 const { PATHS } = APP_CONSTANTS;
 
-export const getSharedListIdFromString = (sharedListIdString) => {
-  /** URL Example: /dashboard/shared-lists/viewer/1600332541841-Demo */
-
-  // Split by "-" to distinguish id and name
-  return sharedListIdString.split("-")[0];
-};
-
 export const getSharedListIdFromURL = (url) => {
   /** URL Example: /dashboard/shared-lists/viewer/1600332541841-Demo */
 
