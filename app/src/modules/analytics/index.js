@@ -54,6 +54,6 @@ export const initIntegrations = (user, dispatch) => {
   }
 };
 
-export const trackGroupChange = (groupId, groupName) => {
+export const triggerGroupChange = (groupId, groupName) => {
   posthogIntegration.onGroupChange(groupId, groupName);
 };

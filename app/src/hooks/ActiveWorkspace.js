@@ -1,6 +1,6 @@
 import { getValueAsPromise, removeValueAsPromise } from "actions/FirebaseActions";
 import { isEmpty } from "lodash";
-import { trackGroupChange } from "modules/analytics";
+import { triggerGroupChange } from "modules/analytics";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -72,7 +72,7 @@ const ActiveWorkspace = () => {
     window.workspaceCleanupDone = false;
     window.currentlyActiveWorkspaceName = currentlyActiveWorkspace?.name ?? null;
 
-    trackGroupChange(currentlyActiveWorkspace.id, currentlyActiveWorkspace?.name);
+    triggerGroupChange(currentlyActiveWorkspace.id, currentlyActiveWorkspace?.name);
   }, [currentlyActiveWorkspace.id, currentlyActiveWorkspace?.membersCount, currentlyActiveWorkspace?.name]);
 };
 
