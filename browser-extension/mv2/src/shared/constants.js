@@ -46,3 +46,10 @@ RQ.CLIENT_MESSAGES = {
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   START_RULE_TESTING: "startRuleTesting",
 };
+
+RQ.CUSTOM_HEADER_PREFIX = "x-rq-";
+
+/*
+  List of headers ignored by the browser on URL redirection
+*/
+RQ.IGNORED_HEADERS_ON_REDIRECT = ["Authorization"];
