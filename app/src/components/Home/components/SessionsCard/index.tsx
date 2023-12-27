@@ -97,13 +97,13 @@ export const SessionsCard: React.FC = () => {
 
   return (
     <>
-      <Col className="sessions-card-body w-full mt-8">
+      <Col className="sessions-card-body w-full">
         {isLoading ? (
           <Skeleton active paragraph={{ rows: 6 }} />
         ) : sessionRecordings.length > 0 ? (
           <>
             <Row align="middle" justify="space-between" className="w-full">
-              <Col span={5}>
+              <Col span={8}>
                 <Row gutter={8} align="middle">
                   <Col>
                     <img width={16} height={16} src={sessionBookIcon} alt="rules" />
@@ -111,7 +111,7 @@ export const SessionsCard: React.FC = () => {
                   <Col className="text-white primary-card-header">SessionBook</Col>
                 </Row>
               </Col>
-              <Col span={19}>
+              <Col span={16}>
                 <div className="sessions-card-action-btns">
                   <Button
                     type="text"
@@ -119,7 +119,7 @@ export const SessionsCard: React.FC = () => {
                     icon={<MdOutlineSettings className="mr-8" />}
                     onClick={() => redirectToSessionSettings(navigate)}
                   >
-                    Configure auto-recording
+                    Settings
                   </Button>
                   <RQButton
                     icon={<IoMdAdd className="mr-8" />}
@@ -133,6 +133,7 @@ export const SessionsCard: React.FC = () => {
             </Row>
             <div className="sessions-card-list">
               {sessionRecordings.map((session: SessionRecording, index: number) => {
+                if (index >= pageSize - 1) return null;
                 return <SessionsListItem key={index} session={session} />;
               })}
             </div>

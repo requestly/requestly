@@ -20,16 +20,22 @@ export const SessionsListItem: React.FC<Props> = ({ session }) => {
 
   return (
     <>
-      <Row className="session-card-list-item" justify="space-between" align="middle">
-        <Col className="session-card-list-item-name" onClick={() => redirectToSavedSession(navigate, session.id)}>
-          {session.name}
-        </Col>
+      <Row
+        className="session-card-list-item"
+        justify="space-between"
+        align="middle"
+        onClick={() => redirectToSavedSession(navigate, session.id)}
+      >
+        <Col className="session-card-list-item-name">{session.name}</Col>
         <Col className="session-card-list-item-btns-wrapper">
           <RQButton
             type="text"
             iconOnly
             icon={<MdOutlineShare className="text-white" />}
-            onClick={() => setIsShareModalVisible(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsShareModalVisible(true);
+            }}
           />
           {/* <RQButton
           type="text"
