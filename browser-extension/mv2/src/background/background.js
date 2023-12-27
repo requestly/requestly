@@ -252,6 +252,54 @@ BG.Methods.replaceHeader = function (headers, newHeader) {
   BG.Methods.addHeader(headers, newHeader);
 };
 
+BG.Methods.getHeaderValue = (headers = [], headerName) => {
+  const headerObject = headers.find(({ name }) => name.toLowerCase() === headerName.toLowerCase());
+  return headerObject?.value;
+};
+
+BG.Methods.copyIgnoredHeadersOnRedirect = (originalHeaders) => {
+  let isHeadersModified = false;
+  RQ.IGNORED_HEADERS_ON_REDIRECT.forEach((headerName) => {
+    const customHeaderName = RQ.CUSTOM_HEADER_PREFIX + headerName;
+    const customHeaderValue = BG.Methods.getHeaderValue(originalHeaders, customHeaderName);
+    const originalHeaderValue = BG.Methods.getHeaderValue(originalHeaders, headerName);
+
+    // Check if value is present in custom header and original header is not present
+    if (customHeaderValue) {
+      if (!originalHeaderValue) {
+        // If original header is not present, copy the value from custom header to original header
+        BG.Methods.addHeader(originalHeaders, { name: headerName, value: customHeaderValue });
+      }
+      // remove the custom header
+      BG.Methods.removeHeader(originalHeaders, customHeaderName);
+      isHeadersModified = true;
+    }
+  });
+  return isHeadersModified;
+};
+
+BG.Methods.addCORSHeaderForCustomHeaders = (originalHeaders, requestMethod) => {
+  let isHeadersModified = false;
+  if (!RQ.IGNORED_HEADERS_ON_REDIRECT?.length || requestMethod !== "OPTIONS") return isHeadersModified;
+
+  const customRQHeaderNames = RQ.IGNORED_HEADERS_ON_REDIRECT.map(
+    (headerName) => RQ.CUSTOM_HEADER_PREFIX + headerName
+  ).join(",");
+
+  const originalValue = BG.Methods.getHeaderValue(originalHeaders, "access-control-allow-headers");
+  if (originalValue === "*") {
+    isHeadersModified = false;
+  } else {
+    BG.Methods.addHeader(originalHeaders, {
+      name: "access-control-allow-headers",
+      value: customRQHeaderNames,
+    });
+    isHeadersModified = true;
+  }
+
+  return isHeadersModified;
+};
+
 /**
  *
  * @param originalHeaders Original Headers present in the HTTP(s) request
@@ -265,11 +313,19 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     rulePairs,
     rulePair,
     isRuleApplied = false,
+    isHeadersModified = false,
     modifications,
     modification,
     url = details.url,
     mainFrameUrl = BG.Methods.getMainFrameUrl(details),
     enabledRules = BG.Methods.getEnabledRules();
+
+  // Forwards Auth Header to the redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
+  if (headersTarget === RQ.HEADERS_TARGET.REQUEST) {
+    isHeadersModified = BG.Methods.copyIgnoredHeadersOnRedirect(originalHeaders);
+  } else {
+    isHeadersModified = BG.Methods.addCORSHeaderForCustomHeaders(originalHeaders, details.method);
+  }
 
   for (var i = 0; i < enabledRules.length; i++) {
     rule = enabledRules[i];
@@ -369,7 +425,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
 
   // If rule is not applied and we return headers object without any change, then chrome treats them as modification
   // And some websites break due to this.
-  return isRuleApplied ? originalHeaders : null;
+  return isRuleApplied || isHeadersModified ? originalHeaders : null;
 };
 
 BG.Methods.getMainFrameUrl = function (details) {
@@ -566,6 +622,8 @@ BG.Methods.modifyHeadersForSessionReplayPlayer = ({
   requestDetails,
   originalHeaders,
 }) => {
+  if (!BG.statusSettings.isExtensionEnabled) return null;
+
   try {
     const requestInitiator = new URL(requestDetails.initiator ?? requestDetails.originUrl); // firefox does not contain "initiator"
     const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
