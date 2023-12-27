@@ -65,7 +65,7 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
           );
         }}
       >
-        Create workspace
+        New workspace
       </RQButton>
     </Col>
   );
