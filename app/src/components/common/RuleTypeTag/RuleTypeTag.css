@@ -1,20 +1,27 @@
-.rule-type-tag.ant-tag {
+.rule-type-tag {
   display: inline-flex;
   align-items: center;
+  column-gap: 6px;
+  flex-wrap: nowrap;
+  color: var(--text-light);
 }
 
 .rule-type-tag-name {
-  margin-left: 6px;
-  display: inline-block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  color: inherit;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
-.rule-type-tag.ant-tag svg {
-  width: 11px;
-  height: 11px;
-}
-
-@media only screen and (max-width: 1200px) {
-  .rule-type-tag-name {
-    display: none;
-  }
+.rule-type-tag svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: inherit;
 }
