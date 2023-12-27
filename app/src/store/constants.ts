@@ -5,5 +5,4 @@ export enum ReducerKeys {
   SESSION_RECORDING = "sessionRecording",
   TEAMS = "teams",
   DESKTOP_TRAFFIC_TABLE = "desktopTrafficTable",
-  RULES = "rules",
 }

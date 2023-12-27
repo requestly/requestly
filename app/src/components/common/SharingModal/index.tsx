@@ -19,16 +19,9 @@ interface ModalProps {
   toggleModal: () => void;
   selectedRules: string[];
   source: string;
-  callback: () => void;
 }
 
-export const SharingModal: React.FC<ModalProps> = ({
-  isOpen,
-  toggleModal,
-  source,
-  selectedRules = null,
-  callback = () => {},
-}) => {
+export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source, selectedRules = null }) => {
   const availableTeams = useSelector(getAvailableTeams);
   const [activeTab, setActiveTab] = useState(SharingOptions.WORKSPACE);
 
@@ -40,7 +33,7 @@ export const SharingModal: React.FC<ModalProps> = ({
         children: (
           <>
             {selectedRules?.length ? (
-              <ShareInWorkspaces selectedRules={selectedRules} toggleModal={toggleModal} onRulesShared={callback} />
+              <ShareInWorkspaces selectedRules={selectedRules} toggleModal={toggleModal} />
             ) : (
               <EmptySelectionView />
             )}
@@ -53,7 +46,7 @@ export const SharingModal: React.FC<ModalProps> = ({
         children: (
           <>
             {selectedRules?.length ? (
-              <ShareLinkView selectedRules={selectedRules} source={source} onSharedLinkCreated={callback} />
+              <ShareLinkView selectedRules={selectedRules} source={source} />
             ) : (
               <EmptySelectionView />
             )}
@@ -66,7 +59,7 @@ export const SharingModal: React.FC<ModalProps> = ({
         children: (
           <>
             {selectedRules?.length ? (
-              <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} onRulesDownloaded={callback} />
+              <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} />
             ) : (
               <EmptySelectionView />
             )}
@@ -74,7 +67,7 @@ export const SharingModal: React.FC<ModalProps> = ({
         ),
       },
     ],
-    [callback, selectedRules, toggleModal, source]
+    [selectedRules, toggleModal, source]
   );
 
   const handleSharingOptionsChange = (key: SharingOptions) => {

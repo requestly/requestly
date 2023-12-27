@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import { Tooltip } from "antd";
@@ -23,15 +23,11 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 interface Props {
   selectedRules: string[];
   setPostShareViewData: ({ type, targetTeamData }: PostShareViewData) => void;
-  onRulesShared?: () => void;
 }
 
-export const ShareFromWorkspace: React.FC<Props> = ({
-  selectedRules,
-  setPostShareViewData,
-  onRulesShared = () => {},
-}) => {
+export const ShareFromWorkspace: React.FC<Props> = ({ selectedRules, setPostShareViewData }) => {
   const appMode = useSelector(getAppMode);
+  const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,8 +56,6 @@ export const ShareFromWorkspace: React.FC<Props> = ({
         setPostShareViewData({
           type: WorkspaceSharingTypes.USERS_INVITED,
         });
-
-        onRulesShared();
       } else {
         const errorMessage = "The user is either in the workspace or has a pending invite.";
         toast.error(errorMessage);
@@ -69,12 +63,12 @@ export const ShareFromWorkspace: React.FC<Props> = ({
       }
       setIsLoading(false);
     });
-  }, [memberEmails, onRulesShared, currentlyActiveWorkspace, setPostShareViewData]);
+  }, [memberEmails, currentlyActiveWorkspace, setPostShareViewData]);
 
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Team) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
         setIsLoading(false);
         trackSharingModalRulesDuplicated("team", selectedRules.length);
         setPostShareViewData({
@@ -82,11 +76,9 @@ export const ShareFromWorkspace: React.FC<Props> = ({
           targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
           sourceTeamData: currentlyActiveWorkspace,
         });
-
-        onRulesShared();
       });
     },
-    [appMode, onRulesShared, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
+    [appMode, selectedRules, groupwiseRules, currentlyActiveWorkspace, setPostShareViewData]
   );
 
   return (
