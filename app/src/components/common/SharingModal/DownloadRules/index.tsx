@@ -2,31 +2,26 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "antd";
 import fileDownload from "js-file-download";
-import { getAppMode } from "store/selectors";
+import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { prepareContentToExport } from "../actions";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
+import { Rule } from "types";
 import { trackRulesExportedEvent } from "modules/analytics/events/common/rules";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
-import { unselectAllRecords } from "components/features/rules/actions";
-import { getAllRuleObjs } from "store/features/rules/selectors";
-import { RuleObj } from "features/rules/types/rules";
 import "./DownloadRules.css";
+import { unselectAllRecords } from "components/features/rules/actions";
 
 interface DownloadRulesProps {
   selectedRules: string[];
   toggleModal: () => void;
-  onRulesDownloaded?: () => void;
 }
 
-export const DownloadRules: React.FC<DownloadRulesProps> = ({
-  selectedRules = [],
-  toggleModal,
-  onRulesDownloaded = () => {},
-}) => {
+export const DownloadRules: React.FC<DownloadRulesProps> = ({ selectedRules = [], toggleModal }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const rules = useSelector(getAllRuleObjs);
+  const rules = useSelector(getAllRules);
+  const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [rulesToDownload, setRulesToDownload] = useState<{
     fileContent: string;
     rulesCount: number;
@@ -34,7 +29,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({
   } | null>(null);
 
   const singleRuleData = useMemo(
-    () => (selectedRules.length === 1 ? rules.find((rule: RuleObj) => rule.id === selectedRules[0]) : null),
+    () => (selectedRules.length === 1 ? rules.find((rule: Rule) => rule.id === selectedRules[0]) : null),
     [rules, selectedRules]
   );
 
@@ -52,19 +47,18 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({
       unselectAllRecords(dispatch);
       fileDownload(fileContent, fileName, "application/json");
       setTimeout(() => toast.success(`${rulesCount === 1 ? "Rule" : "Rules"} downloaded successfully`), 0);
-      onRulesDownloaded();
       toggleModal();
     },
-    [rulesToDownload, onRulesDownloaded, dispatch, fileName, toggleModal]
+    [rulesToDownload, dispatch, fileName, toggleModal]
   );
 
   useEffect(() => {
     if (!rulesToDownload) {
-      prepareContentToExport(appMode, selectedRules).then((result: any) => {
+      prepareContentToExport(appMode, selectedRules, groupwiseRulesToPopulate).then((result: any) => {
         setRulesToDownload(result);
       });
     }
-  }, [selectedRules, rulesToDownload, appMode, dispatch]);
+  }, [selectedRules, groupwiseRulesToPopulate, rulesToDownload, appMode, dispatch]);
 
   return (
     <div className="sharing-modal-body">

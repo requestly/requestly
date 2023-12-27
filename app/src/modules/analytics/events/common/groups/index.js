@@ -1,5 +1,5 @@
 import { trackEvent } from "modules/analytics";
-import { GROUPS } from "../../../../modules/analytics/events/common/constants";
+import { GROUPS } from "../constants";
 
 export const trackGroupStatusToggled = (enabled) => {
   const params = { enabled };

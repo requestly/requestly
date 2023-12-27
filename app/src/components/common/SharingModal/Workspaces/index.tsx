@@ -8,14 +8,9 @@ import { PostSharing } from "./PostSharing";
 interface ShareInWorkspaceProps {
   selectedRules: string[];
   toggleModal: () => void;
-  onRulesShared?: () => void;
 }
 
-export const ShareInWorkspaces: React.FC<ShareInWorkspaceProps> = ({
-  selectedRules,
-  toggleModal,
-  onRulesShared = () => {},
-}) => {
+export const ShareInWorkspaces: React.FC<ShareInWorkspaceProps> = ({ selectedRules, toggleModal }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [postShareViewData, setPostShareViewData] = useState(null);
 
@@ -30,17 +25,9 @@ export const ShareInWorkspaces: React.FC<ShareInWorkspaceProps> = ({
       ) : (
         <>
           {isWorkspaceMode ? (
-            <ShareFromWorkspace
-              selectedRules={selectedRules}
-              setPostShareViewData={setPostShareViewData}
-              onRulesShared={onRulesShared}
-            />
+            <ShareFromWorkspace selectedRules={selectedRules} setPostShareViewData={setPostShareViewData} />
           ) : (
-            <ShareFromPrivate
-              selectedRules={selectedRules}
-              setPostShareViewData={setPostShareViewData}
-              onRulesShared={onRulesShared}
-            />
+            <ShareFromPrivate selectedRules={selectedRules} setPostShareViewData={setPostShareViewData} />
           )}
         </>
       )}
