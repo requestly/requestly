@@ -10,11 +10,10 @@ export const createSharedList = async (
   appMode: string,
   rulesIdsToShare: string[],
   sharedListName: string,
-  groupwiseRules: Record<string, Group>,
   sharedListVisibility: SharedLinkVisibility,
   sharedListRecipients: unknown
 ) => {
-  const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare, groupwiseRules);
+  const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare);
 
   const updatedGroups = groups.map((group: Group) => ({
     ...group,
@@ -46,13 +45,9 @@ const generateSharedList = async (sharedListData: SharedListData) => {
   return newSharedList.data;
 };
 
-export const prepareContentToExport = (
-  appMode: string,
-  selectedRuleIds: string[],
-  groupwiseRules: Record<string, Group>
-) => {
+export const prepareContentToExport = (appMode: string, selectedRuleIds: string[]) => {
   return new Promise((resolve, reject) => {
-    getRulesAndGroupsFromRuleIds(appMode, selectedRuleIds, groupwiseRules).then(({ rules, groups }) => {
+    getRulesAndGroupsFromRuleIds(appMode, selectedRuleIds).then(({ rules, groups }) => {
       const updatedGroups = groups.map((group: Group) => ({
         ...group,
         children: [] as Rule[],
@@ -69,10 +64,9 @@ export const prepareContentToExport = (
 export const duplicateRulesToTargetWorkspace = async (
   appMode: string,
   workspaceId: string,
-  ruleIdsToShare: string[],
-  groupwiseRules: Record<string, Group>
+  ruleIdsToShare: string[]
 ) => {
-  const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, ruleIdsToShare, groupwiseRules);
+  const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, ruleIdsToShare);
 
   // mapping of old group IDs to new group IDs
   const groupIdMapping: Record<string, string> = {};

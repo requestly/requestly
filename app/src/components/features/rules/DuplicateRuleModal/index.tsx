@@ -11,7 +11,6 @@ import { trackRuleDuplicatedEvent } from "modules/analytics/events/common/rules"
 import { toast } from "utils/Toast";
 import type { InputRef } from "antd";
 import { Rule, Status } from "types/rules";
-import "./duplicateRuleModal.scss";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { TeamWorkspace } from "types/teamWorkspace";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -19,6 +18,7 @@ import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
+import "./duplicateRuleModal.scss";
 
 interface Props {
   isOpen: boolean;

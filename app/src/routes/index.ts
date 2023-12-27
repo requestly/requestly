@@ -1,5 +1,4 @@
 import { RouteObject } from "react-router-dom";
-import { ruleRoutes } from "./ruleRoutes";
 import { sessionRoutes } from "./sessionRoutes";
 import { apiClientRoutes } from "./apiClientRoutes";
 import { accountRoutes } from "./accountRoutes";
@@ -10,6 +9,7 @@ import { mockServerRoutes } from "./mockServerRoutes";
 import { onboardingRoutes } from "./onboardingRoutes";
 import { miscRoutes } from "./miscRoutes";
 import { settingRoutes } from "./settingRoutes";
+import { ruleRoutes } from "features/rules/routes";
 
 export const routes: RouteObject[] = [
   ...ruleRoutes,

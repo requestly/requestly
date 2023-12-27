@@ -19,7 +19,7 @@ const DeleteRulesModal = ({
   rulesToDelete,
   groupIdsToDelete = [],
   clearSearch,
-  ruleDeletedCallback,
+  ruleDeletedCallback = () => {},
 }) => {
   //Global State
   const dispatch = useDispatch();
