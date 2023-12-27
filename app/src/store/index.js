@@ -15,7 +15,6 @@ import { teamsReducer } from "./features/teams/slice";
 import INITIAL_STATE from "./initial-state";
 import { ReducerKeys } from "./constants";
 import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/slice";
-import { rulesReducer } from "./features/rules/slice";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,
@@ -57,7 +56,6 @@ export const reduxStore = configureStore({
     [ReducerKeys.SESSION_RECORDING]: sessionRecordingReducer,
     [ReducerKeys.TEAMS]: teamsReducer,
     [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducer,
-    [ReducerKeys.RULES]: rulesReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

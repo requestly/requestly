@@ -13,7 +13,7 @@ import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/
 //FUNCTIONS
 import { generateObjectId } from "../../../../utils/FormattingHelper";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
-import { trackGroupCreatedEvent } from "features/rules/analytics/groups";
+import { trackGroupCreatedEvent } from "modules/analytics/events/common/groups";
 import Logger from "lib/logger";
 
 const CreateNewRuleGroupModal = (props) => {
