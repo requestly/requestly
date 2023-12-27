@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
+import { getAllRules, getAppMode, getGroupwiseRulesToPopulate } from "store/selectors";
 import { Radio, Space, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
@@ -14,9 +14,8 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { AiFillCheckCircle } from "@react-icons/all-files/ai/AiFillCheckCircle";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
 import { SharedLinkVisibility } from "./types";
+import { Rule } from "types";
 import Logger from "lib/logger";
-import { getAllRuleObjs } from "store/features/rules/selectors";
-import { RuleObj } from "features/rules/types/rules";
 import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import "./index.css";
 import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
@@ -24,14 +23,14 @@ import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSu
 interface ShareLinkProps {
   selectedRules: string[];
   source: string;
-  onSharedLinkCreated?: () => void;
 }
 
 // TODO: handle copy changes for session replay in V1
 
-export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source, onSharedLinkCreated = () => {} }) => {
+export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source }) => {
   const appMode = useSelector(getAppMode);
-  const rules = useSelector(getAllRuleObjs);
+  const rules = useSelector(getAllRules);
+  const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
@@ -43,7 +42,7 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
   const sendSharedListShareEmail = useMemo(() => httpsCallable(getFunctions(), "sharedLists-sendShareEmail"), []);
   const singleRuleData = useMemo(
     () =>
-      selectedRules && selectedRules?.length === 1 ? rules.find((rule: RuleObj) => rule.id === selectedRules[0]) : null,
+      selectedRules && selectedRules?.length === 1 ? rules.find((rule: Rule) => rule.id === selectedRules[0]) : null,
     [rules, selectedRules]
   );
 
@@ -133,53 +132,57 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
 
     try {
       setIsLinkGenerating(true);
-      createSharedList(appMode, selectedRules, sharedListName, sharedLinkVisibility, sharedListRecipients).then(
-        ({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
-          trackRQLastActivity("sharedList_created");
-          onSharedLinkCreated();
-          if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
-            sendSharedListShareEmail({
-              sharedListData: sharedListData,
-              recipientEmails: sharedListRecipients,
+      createSharedList(
+        appMode,
+        selectedRules,
+        sharedListName,
+        groupwiseRulesToPopulate,
+        sharedLinkVisibility,
+        sharedListRecipients
+      ).then(({ sharedListId, sharedListName, sharedListData, nonRQEmails }: any) => {
+        trackRQLastActivity("sharedList_created");
+        if (sharedLinkVisibility === SharedLinkVisibility.PRIVATE && sharedListRecipients.length) {
+          sendSharedListShareEmail({
+            sharedListData: sharedListData,
+            recipientEmails: sharedListRecipients,
+          })
+            .then((res: any) => {
+              if (res.data.success) setIsMailSent(true);
             })
-              .then((res: any) => {
-                if (res.data.success) setIsMailSent(true);
-              })
-              .catch((err) => {
-                Logger.log("send shared list email failed : ", err);
-                toast.error("Opps! Couldn't send the notification");
-              });
-          }
-          setShareableLinkData({
-            link: getSharedListURL(sharedListId, sharedListName),
-            visibility: sharedLinkVisibility,
-          });
-
-          const nonRQEmailsCount = sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? nonRQEmails?.length : null;
-          const recipientsCount =
-            sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? sharedListRecipients.length : null;
-
-          trackSharedListCreatedEvent(
-            sharedListId,
-            sharedListName,
-            selectedRules.length,
-            source,
-            sharedLinkVisibility,
-            nonRQEmailsCount,
-            recipientsCount
-          );
-          setIsLinkGenerating(false);
+            .catch((err) => {
+              Logger.log("send shared list email failed : ", err);
+              toast.error("Opps! Couldn't send the notification");
+            });
         }
-      );
+        setShareableLinkData({
+          link: getSharedListURL(sharedListId, sharedListName),
+          visibility: sharedLinkVisibility,
+        });
+
+        const nonRQEmailsCount = sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? nonRQEmails?.length : null;
+        const recipientsCount =
+          sharedLinkVisibility === SharedLinkVisibility.PRIVATE ? sharedListRecipients.length : null;
+
+        trackSharedListCreatedEvent(
+          sharedListId,
+          sharedListName,
+          selectedRules.length,
+          source,
+          sharedLinkVisibility,
+          nonRQEmailsCount,
+          recipientsCount
+        );
+        setIsLinkGenerating(false);
+      });
     } catch (e) {
       setIsLinkGenerating(false);
     }
   }, [
     appMode,
     source,
-    onSharedLinkCreated,
     selectedRules,
     sharedListName,
+    groupwiseRulesToPopulate,
     sharedLinkVisibility,
     sharedListRecipients,
     sendSharedListShareEmail,

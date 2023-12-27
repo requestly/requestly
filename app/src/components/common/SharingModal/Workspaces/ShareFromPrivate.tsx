@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "store/selectors";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
@@ -21,16 +21,12 @@ import { generateDefaultTeamName } from "utils/teams";
 interface Props {
   selectedRules: string[];
   setPostShareViewData: ({ type, targetTeamData }: PostShareViewData) => void;
-  onRulesShared?: () => void;
 }
 
-export const ShareFromPrivate: React.FC<Props> = ({
-  selectedRules,
-  setPostShareViewData,
-  onRulesShared = () => {},
-}) => {
+export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareViewData }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const groupwiseRules = useSelector(getGroupwiseRulesToPopulate);
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const _availableTeams = useRef(availableTeams);
@@ -78,15 +74,13 @@ export const ShareFromPrivate: React.FC<Props> = ({
             });
         });
 
-        duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules).then(() => {
+        duplicateRulesToTargetWorkspace(appMode, teamId, selectedRules, groupwiseRules).then(() => {
           setIsLoading(false);
           trackSharingModalRulesDuplicated("personal", selectedRules.length);
           setPostShareViewData({
             type: WorkspaceSharingTypes.NEW_WORKSPACE_CREATED,
             targetTeamData: { teamId, teamName: teamData.name, accessCount: teamData.accessCount },
           });
-
-          onRulesShared();
         });
       });
     } catch (e) {
@@ -94,7 +88,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
     }
   }, [
     appMode,
-    onRulesShared,
+    groupwiseRules,
     memberEmails,
     selectedRules,
     setPostShareViewData,
@@ -106,7 +100,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
   const handleRulesTransfer = useCallback(
     (teamData: Team) => {
       setIsLoading(true);
-      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules).then(() => {
+      duplicateRulesToTargetWorkspace(appMode, teamData.id, selectedRules, groupwiseRules).then(() => {
         setIsLoading(false);
         trackSharingModalRulesDuplicated("personal", selectedRules.length);
         setPostShareViewData({
@@ -114,11 +108,9 @@ export const ShareFromPrivate: React.FC<Props> = ({
           targetTeamData: { teamId: teamData.id, teamName: teamData.name, accessCount: teamData.accessCount },
           sourceTeamData: currentlyActiveWorkspace,
         });
-
-        onRulesShared();
       });
     },
-    [appMode, onRulesShared, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
+    [appMode, groupwiseRules, selectedRules, currentlyActiveWorkspace, setPostShareViewData]
   );
 
   return (

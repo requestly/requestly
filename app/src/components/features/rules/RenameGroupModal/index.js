@@ -15,7 +15,7 @@ import "./index.scss";
 
 const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
   //Load props
-  const groupIdFromProps = groupId;
+  const groupIdFromProps = groupId.groupId;
 
   //Global State
   const dispatch = useDispatch();
