@@ -55,3 +55,34 @@
     font-size: 13px;
   }
 }
+
+.homepage-emptycard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  &-title {
+    font-weight: 500;
+    margin-top: 8px;
+    color: var(--white);
+  }
+
+  &-actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--white);
+  }
+
+  &-secondary-btn.ant-btn {
+    color: var(--white);
+    padding: 3px 8px;
+  }
+}
