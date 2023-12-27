@@ -228,7 +228,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                   </div>
                 </>
               ) : (
-                <div className="display-flex items-center">
+                <div className="display-flex items-center mt-16">
                   <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
                   <RQButton
                     loading={isInviteGenerating}
