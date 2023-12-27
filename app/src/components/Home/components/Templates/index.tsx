@@ -64,7 +64,7 @@ export const Templates: React.FC = () => {
           })}
         </Col>
 
-        <Link to={PATHS.RULES.TEMPLATES.ABSOLUTE} className="home-templates-view-all-link">
+        <Link to={PATHS.RULES.TEMPLATES.ABSOLUTE} className="homepage-view-all-link">
           View all templates
         </Link>
       </Col>
