@@ -11,7 +11,7 @@ interface Props {
 export const HomepageEmptyCard: React.FC<Props> = ({ icon, title, description, primaryButton, secondaryButton }) => {
   return (
     <div className="homepage-emptycard">
-      <img src={icon} className="homepage-emptycard-icon" />
+      <img src={icon} className="homepage-emptycard-icon" alt={title} />
       <div className="homepage-emptycard-title">{title}</div>
       <div className="mt-8">{description}</div>
       <div className="homepage-emptycard-actions">
