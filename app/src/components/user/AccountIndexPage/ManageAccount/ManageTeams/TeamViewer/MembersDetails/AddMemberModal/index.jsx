@@ -189,13 +189,15 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
           <div className="email-invites-wrapper">
             <div className="emails-input-wrapper">
               <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
-              <div className="access-dropdown-container">
-                <MemberRoleDropdown
-                  placement="bottomRight"
-                  isAdmin={makeUserAdmin}
-                  handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
-                />
-              </div>
+              {isTeamAdmin && (
+                <div className="access-dropdown-container">
+                  <MemberRoleDropdown
+                    placement="bottomRight"
+                    isAdmin={makeUserAdmin}
+                    handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+                  />
+                </div>
+              )}
             </div>
 
             <RQButton
