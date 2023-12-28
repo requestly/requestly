@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Col, Dropdown, Menu, Row, Skeleton } from "antd";
 import { useSelector, useDispatch } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
@@ -33,10 +33,13 @@ export const RulesCard: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
+  const isRulesLoading = useSelector(getIsRulesListLoading);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
   const { getFeatureLimitValue } = useFeatureLimiter();
   const [rules, setRules] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  console.log({ isRulesLoading });
 
   const dropdownMenu = useMemo(() => {
     const checkIsPremiumRule = (ruleType: RuleType) => {
@@ -74,7 +77,7 @@ export const RulesCard: React.FC = () => {
   }, [navigate, getFeatureLimitValue]);
 
   useEffect(() => {
-    if (isExtensionInstalled()) {
+    if (isExtensionInstalled() && !isRulesLoading) {
       StorageService(appMode)
         .getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE)
         .then((res) => {
@@ -93,7 +96,7 @@ export const RulesCard: React.FC = () => {
     } else {
       setIsLoading(false);
     }
-  }, [appMode, workspace, hasUserChanged]);
+  }, [appMode, workspace, hasUserChanged, isRulesLoading]);
 
   if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
 
