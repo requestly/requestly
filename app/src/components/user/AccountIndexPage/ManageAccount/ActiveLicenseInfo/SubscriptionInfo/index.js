@@ -83,6 +83,10 @@ const SubscriptionInfo = ({
     return <></>;
   }
 
+  const getAppSumoCodesRedeemedLabel = (codeCount) => {
+    return codeCount === 1 ? `${codeCount} code redeemed` : `${codeCount} codes redeemed`;
+  };
+
   return (
     <Row className="my-4">
       <Col>
@@ -107,7 +111,7 @@ const SubscriptionInfo = ({
                 </Descriptions.Item>
                 <Descriptions.Item label="Type">
                   {type === "appsumo"
-                    ? `${beautifySubscriptionType(type)} (${appSumoCodeCount} codes redeemed)`
+                    ? `${beautifySubscriptionType(type)} (${getAppSumoCodesRedeemedLabel(appSumoCodeCount)})`
                     : beautifySubscriptionType(type)}
                 </Descriptions.Item>
                 {isUserPremium && (
