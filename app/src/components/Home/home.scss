@@ -94,3 +94,26 @@
     padding: 3px 8px;
   }
 }
+
+@media (max-width: 1000px) {
+  .homepage-wrapper {
+    & .homepage-primary-cards-wrapper .homepage-primary-card.ant-col {
+      max-width: 100%;
+    }
+
+    & .homepage-bottom-section {
+      &.ant-row-no-wrap {
+        flex-wrap: wrap;
+      }
+
+      & .homepage-help-card,
+      & .homepage-changelog-card {
+        max-width: 100%;
+      }
+
+      & .homepage-teams-card {
+        max-width: 100%;
+      }
+    }
+  }
+}
