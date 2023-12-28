@@ -24,22 +24,13 @@ export const TeamsCard: React.FC = () => {
     getPendingInvites({ email: true, domain: true })
       .then((res: any) => {
         if (res?.pendingInvites) {
-          // Remove duplicate invites for the same team (A team can have multiple email invite and a domain invite)
-          const uniqueInvitesArray = res?.pendingInvites.reduce((acc: Invite[], invite: Invite) => {
-            const teamId = invite.metadata.teamId;
-            // Checking if an invite with the same teamId already exists in the accumulator
-            const existingInvite = acc.find((existing) => existing.metadata.teamId === teamId);
-            if (!existingInvite || invite.createdTs > existingInvite.createdTs) {
-              // If not found or the new invite is newer, replace or add the invite to the accumulator
-              const updatedAcc = existingInvite
-                ? acc.map((existing) => (existing.metadata.teamId === teamId ? invite : existing))
-                : [...acc, invite];
+          // Removing duplicate invites and showing most recent invites for each team
+          const uniqueInvites: Record<string, Invite> = {};
+          res?.pendingInvites
+            .sort((a: Invite, b: Invite) => a.createdTs - b.createdTs)
+            .forEach((invite: Invite) => (uniqueInvites[invite.metadata.teamId as string] = invite));
 
-              return updatedAcc;
-            }
-            return acc;
-          }, []);
-          setPendingInvites(uniqueInvitesArray);
+          setPendingInvites(Object.values(uniqueInvites));
         } else setPendingInvites([]);
       })
       .catch((e) => {
@@ -52,6 +43,7 @@ export const TeamsCard: React.FC = () => {
   }, [user.loggedIn]);
 
   if (!user.loggedIn) return <CreateWorkspaceView />;
+
   if (isLoading)
     return (
       <Col style={{ padding: "20px 1rem" }}>
