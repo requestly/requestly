@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Col, Dropdown, Menu, Row, Skeleton } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
@@ -23,11 +23,13 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PATHS from "config/constants/sub/paths";
 import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
+import { actions } from "store";
 import "./rulesCard.scss";
 
 export const RulesCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 3;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
@@ -97,7 +99,7 @@ export const RulesCard: React.FC = () => {
 
   return (
     <>
-      {rules.length ? (
+      {rules?.length ? (
         <>
           <Row justify="space-between" align="middle">
             <Col span={16}>
@@ -142,12 +144,30 @@ export const RulesCard: React.FC = () => {
           title="HTTP Rules"
           description="Create rules to modify HTTP requests and responses, including URL redirects, API modifications, and header adjustments."
           primaryButton={
-            <RQButton type="primary" onClick={() => redirectToCreateNewRule(navigate, null, "homepage")}>
+            <RQButton
+              type="primary"
+              onClick={() => {
+                if (isExtensionInstalled()) {
+                  redirectToCreateNewRule(navigate, null, "homepage");
+                } else {
+                  dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+                }
+              }}
+            >
               Create new Rule
             </RQButton>
           }
           secondaryButton={
-            <RQButton type="text" onClick={() => redirectToTemplates(navigate)}>
+            <RQButton
+              type="text"
+              onClick={() => {
+                if (isExtensionInstalled()) {
+                  redirectToTemplates(navigate);
+                } else {
+                  dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+                }
+              }}
+            >
               Start with a template
             </RQButton>
           }
