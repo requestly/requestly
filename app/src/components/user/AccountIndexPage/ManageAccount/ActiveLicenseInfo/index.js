@@ -76,6 +76,8 @@ const ActiveLicenseInfo = ({
   }, [teamId, getSubscriptionEndDateForAppsumo]);
 
   const renderSubscriptionInfo = () => {
+    if (isSessionReplayLifetimeActive && status === "trialing") return <></>;
+
     return (
       <SubscriptionInfo
         hideShadow={hideShadow}
