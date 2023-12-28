@@ -15,6 +15,7 @@ const PremiumPlanBadge = () => {
   const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status;
   const planEndDateString = userPlanDetails?.subscription?.endDate;
+  const isAppSumoDeal = planId?.includes("appsumo");
   let daysLeft = 0;
 
   try {
@@ -27,7 +28,7 @@ const PremiumPlanBadge = () => {
     Logger.log(err);
   }
 
-  if (planId && planStatus !== "active") {
+  if (!isAppSumoDeal && planId && planStatus !== "active") {
     return (
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
