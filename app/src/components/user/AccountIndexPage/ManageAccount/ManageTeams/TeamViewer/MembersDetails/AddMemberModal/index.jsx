@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { toast } from "utils/Toast.js";
 import { Row, Checkbox } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -17,8 +18,8 @@ import PageLoader from "components/misc/PageLoader";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import APP_CONSTANTS from "config/constants";
-import "./AddMemberModal.css";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
+import "./AddMemberModal.css";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -39,6 +40,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
+  const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
   const teamDetails = availableTeams?.find((team) => team.id === teamId);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
@@ -169,7 +171,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     }
   }, [isOpen, fetchPublicInvites]);
 
-  if (isPublicInviteLoading) return <PageLoader />;
+  if (isPublicInviteLoading || isLoading) return <PageLoader />;
 
   return (
     <>
@@ -187,13 +189,15 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
           <div className="email-invites-wrapper">
             <div className="emails-input-wrapper">
               <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
-              <div className="access-dropdown-container">
-                <MemberRoleDropdown
-                  placement="bottomRight"
-                  isAdmin={makeUserAdmin}
-                  handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
-                />
-              </div>
+              {isTeamAdmin && (
+                <div className="access-dropdown-container">
+                  <MemberRoleDropdown
+                    placement="bottomRight"
+                    isAdmin={makeUserAdmin}
+                    handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
+                  />
+                </div>
+              )}
             </div>
 
             <RQButton
@@ -207,32 +211,41 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
               Invite People
             </RQButton>
           </div>
-          <div className="title mt-16">Invite link</div>
-          {isInvitePublic ? (
-            <div className="display-flex items-center mt-8">
-              <RQInput
-                disabled
-                value={`${window.location.origin}/invite/${publicInviteId}`}
-                suffix={<CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />}
-              />
-            </div>
-          ) : (
-            <div className="display-flex items-center">
-              <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
-              <RQButton
-                loading={isInviteGenerating}
-                size="small"
-                className="create-invite-link-btn"
-                type="primary"
-                onClick={handleCreateInviteLink}
-              >
-                Create link
-              </RQButton>
-            </div>
+
+          {isTeamAdmin && (
+            <>
+              {isInvitePublic ? (
+                <>
+                  <div className="title mt-16">Invite link</div>{" "}
+                  <div className="display-flex items-center mt-8">
+                    <RQInput
+                      disabled
+                      value={`${window.location.origin}/invite/${publicInviteId}`}
+                      suffix={
+                        <CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />
+                      }
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="display-flex items-center mt-16">
+                  <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
+                  <RQButton
+                    loading={isInviteGenerating}
+                    size="small"
+                    className="create-invite-link-btn"
+                    type="primary"
+                    onClick={handleCreateInviteLink}
+                  >
+                    Create link
+                  </RQButton>
+                </div>
+              )}
+            </>
           )}
         </div>
         <Row align="middle" className="rq-modal-footer">
-          {isVerifiedBusinessUser ? (
+          {isVerifiedBusinessUser && isTeamAdmin ? (
             <>
               {!isPublicInviteLoading && (
                 <>
