@@ -52,6 +52,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [isCheckoutScreenVisible, setIsCheckoutScreenVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
+  const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
+
   const tableRef = useRef(null);
 
   const handleSubscribe = useCallback(
@@ -87,12 +89,12 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   );
 
   useEffect(() => {
-    if (selectedPlan && !stripeClientSecret) {
+    if (selectedPlan && !isCheckoutCompleted) {
       setIsCheckoutScreenVisible(true);
       setIsLoading(true);
       handleSubscribe(selectedPlan);
     }
-  }, [selectedPlan, handleSubscribe, stripeClientSecret]);
+  }, [selectedPlan, handleSubscribe, isCheckoutCompleted]);
 
   useEffect(() => {
     if (!isCheckoutScreenVisible) trackPricingModalPlansViewed(source);
@@ -119,6 +121,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
             isLoading={isLoading}
             toggleModal={toggleModal}
             source={source}
+            onCheckoutCompleted={() => setIsCheckoutCompleted(true)}
           />
         ) : (
           <>
