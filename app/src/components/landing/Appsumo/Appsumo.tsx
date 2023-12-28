@@ -175,7 +175,6 @@ const AppSumoModal: React.FC = () => {
     await redeemSubmittedCodes();
     setIsUpdatingSubscription(false);
   }, [
-    db,
     createNewWorkspaceForAppSumo,
     appsumoCodes,
     emailValidationError,
