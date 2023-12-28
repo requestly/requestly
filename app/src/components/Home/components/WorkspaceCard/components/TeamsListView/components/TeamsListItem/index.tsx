@@ -32,9 +32,9 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
   const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
-    const getTeamUsers = httpsCallable(getFunctions(), "teams-getTeamUsers");
-
     if (teamId) {
+      const getTeamUsers = httpsCallable(getFunctions(), "teams-getTeamUsers");
+
       getTeamUsers({ teamId: teamId })
         .then((res: any) => {
           console.log({ res });
