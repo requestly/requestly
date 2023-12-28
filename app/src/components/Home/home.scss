@@ -74,6 +74,13 @@
     color: var(--white);
   }
 
+  &-description {
+    text-align: center;
+    font-size: 12px;
+    color: var(--neutrals-gray-300);
+    max-width: 372px;
+  }
+
   &-actions {
     margin-top: 24px;
     display: flex;
