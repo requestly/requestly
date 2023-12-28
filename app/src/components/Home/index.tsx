@@ -2,7 +2,7 @@ import React from "react";
 import { Col, Row } from "antd";
 import { ChangeLogCard } from "./components/ChangelogCard";
 import { HelpCard } from "./components/HelpCard";
-import { TeamsCard } from "./components/TeamsCard";
+import { TeamsCard } from "./components/WorkspaceCard";
 import "./home.scss";
 
 export const Home: React.FC = () => {
@@ -19,7 +19,7 @@ export const Home: React.FC = () => {
         </Row>
         <Row>TEMPLATES HERE</Row>
         <Row className="homepage-bottom-section">
-          <Col span={12} className="homepage-teams-card homepage-primary-card">
+          <Col span={12} className="homepage-teams-card homepage-primary-card" style={{ padding: 0 }}>
             <TeamsCard />
           </Col>
           <Col span={6} className="homepage-help-card homepage-primary-card">

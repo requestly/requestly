@@ -40,8 +40,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
-  const teamDetails = availableTeams?.find((team) => team.id === teamId);
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
+  const teamDetails = availableTeams?.find((team) => team.id === teamId);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
@@ -171,58 +171,64 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     }
   }, [isOpen, fetchPublicInvites]);
 
+  if (isPublicInviteLoading || isLoading) return <PageLoader />;
+
   return (
     <>
       <RQModal width={620} centered open={isOpen} onCancel={toggleModal}>
         <div className="rq-modal-content">
-          {isTeamAdmin ? (
-            <>
-              <div>
-                <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
-              </div>
-              <div className="header add-member-modal-header">
-                Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
-              </div>
-              <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
+          <div>
+            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
+          </div>
+          <div className="header add-member-modal-header">
+            Invite people to {currentTeamId ? `${teamDetails?.name}` : ""} workspace
+          </div>
+          <p className="text-gray">Get the most out of Requestly by inviting your teammates.</p>
 
-              <div className="title mt-16">Email address</div>
-              <div className="email-invites-wrapper">
-                <div className="emails-input-wrapper">
-                  <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
-                  <div className="access-dropdown-container">
-                    <MemberRoleDropdown
-                      placement="bottomRight"
-                      isAdmin={makeUserAdmin}
-                      handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
-                    />
-                  </div>
-                </div>
-                {isTeamAdmin && (
-                  <RQButton
-                    size="small"
-                    style={{ height: "37px", marginLeft: "4px" }}
-                    type={userEmail.length ? "primary" : "default"}
-                    htmlType="submit"
-                    onClick={handleAddMember}
-                    loading={isProcessing}
-                  >
-                    Invite People
-                  </RQButton>
-                )}
-              </div>
-              <div className="title mt-16">Invite link</div>
-              {isInvitePublic ? (
-                <div className="display-flex items-center mt-8">
-                  <RQInput
-                    disabled
-                    value={`${window.location.origin}/invite/${publicInviteId}`}
-                    suffix={
-                      <CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />
-                    }
+          <div className="title mt-16">Email address</div>
+          <div className="email-invites-wrapper">
+            <div className="emails-input-wrapper">
+              <EmailInputWithDomainBasedSuggestions onChange={setUserEmail} transparentBackground={true} />
+              {isTeamAdmin && (
+                <div className="access-dropdown-container">
+                  <MemberRoleDropdown
+                    placement="bottomRight"
+                    isAdmin={makeUserAdmin}
+                    handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
                   />
                 </div>
+              )}
+            </div>
+
+            <RQButton
+              size="small"
+              style={{ height: "37px", marginLeft: "4px" }}
+              type={userEmail.length ? "primary" : "default"}
+              htmlType="submit"
+              onClick={handleAddMember}
+              loading={isProcessing}
+            >
+              Invite People
+            </RQButton>
+          </div>
+
+          {isTeamAdmin && (
+            <>
+              {isInvitePublic ? (
+                <>
+                  <div className="title mt-16">Invite link</div>{" "}
+                  <div className="display-flex items-center mt-8">
+                    <RQInput
+                      disabled
+                      value={`${window.location.origin}/invite/${publicInviteId}`}
+                      suffix={
+                        <CopyButton type="default" copyText={`${window.location.origin}/invite/${publicInviteId}`} />
+                      }
+                    />
+                  </div>
+                </>
               ) : (
-                <div className="display-flex items-center">
+                <div className="display-flex items-center mt-16">
                   <div className="text-gray mr-2">Invite someone to this workspace with a link</div>
                   <RQButton
                     loading={isInviteGenerating}
@@ -236,26 +242,17 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                 </div>
               )}
             </>
-          ) : isLoading || isPublicInviteLoading ? (
-            <PageLoader />
-          ) : (
-            <div className="title empty-message">
-              <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
-              <div>Make sure you are an admin to invite teammates</div>
-            </div>
           )}
         </div>
         <Row align="middle" className="rq-modal-footer">
           {isVerifiedBusinessUser && isTeamAdmin ? (
             <>
-              {!isLoading && !isPublicInviteLoading && (
-                <>
-                  <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
-                  <span className="ml-2 text-gray">
-                    Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
-                  </span>
-                </>
-              )}
+              <>
+                <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
+                <span className="ml-2 text-gray">
+                  Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
+                </span>
+              </>
             </>
           ) : (
             <LearnMoreLink
