@@ -11,7 +11,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { RQButton } from "lib/design-system/components";
-import { redirectToCreateNewRule, redirectToTemplates } from "utils/RedirectionUtils";
+import { redirectToCreateNewRule, redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { Rule, RuleType } from "types";
 import rulesIcon from "../../assets/rules.svg";
@@ -38,8 +38,6 @@ export const RulesCard: React.FC = () => {
   const { getFeatureLimitValue } = useFeatureLimiter();
   const [rules, setRules] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  console.log({ isRulesLoading });
 
   const dropdownMenu = useMemo(() => {
     const checkIsPremiumRule = (ruleType: RuleType) => {
@@ -96,7 +94,7 @@ export const RulesCard: React.FC = () => {
     } else {
       setIsLoading(false);
     }
-  }, [appMode, workspace, hasUserChanged, isRulesLoading]);
+  }, [appMode, workspace.id, hasUserChanged, isRulesLoading]);
 
   if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
 
@@ -132,7 +130,14 @@ export const RulesCard: React.FC = () => {
           <div className="homepage-rules-list">
             {rules.map((rule: Rule, index: number) => {
               if (index >= MAX_RULES_TO_SHOW) return null;
-              return <div className="homepage-rules-list-item">{rule.name}</div>;
+              return (
+                <div
+                  className="homepage-rules-list-item"
+                  onClick={() => redirectToRuleEditor(navigate, rule.id, "home")}
+                >
+                  {rule.name}
+                </div>
+              );
             })}
           </div>
           {rules.length > MAX_RULES_TO_SHOW && (
@@ -161,16 +166,7 @@ export const RulesCard: React.FC = () => {
             </RQButton>
           }
           secondaryButton={
-            <RQButton
-              type="text"
-              onClick={() => {
-                if (isExtensionInstalled()) {
-                  redirectToTemplates(navigate);
-                } else {
-                  dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
-                }
-              }}
-            >
+            <RQButton type="text" onClick={() => redirectToTemplates(navigate)}>
               Start with a template
             </RQButton>
           }
