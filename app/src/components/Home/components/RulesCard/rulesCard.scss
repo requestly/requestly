@@ -4,6 +4,14 @@
   gap: 6px;
 }
 
+.rules-card-dropdown-btn {
+  & .ant-btn-icon-only.ant-btn-compact-item:hover {
+    background: var(--hover-color);
+    color: var(--white);
+    border-color: var(--hover-color);
+  }
+}
+
 .homepage-rules-card-header-action .ant-space-compact-block {
   display: flex;
   justify-content: flex-end;
