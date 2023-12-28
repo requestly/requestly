@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { toast } from "utils/Toast.js";
 import { Row, Checkbox } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -14,12 +15,11 @@ import { trackAddTeamMemberFailure, trackAddTeamMemberSuccess } from "modules/an
 import { trackAddMembersInWorkspaceModalViewed } from "modules/analytics/events/common/teams";
 import InviteErrorModal from "./InviteErrorModal";
 import PageLoader from "components/misc/PageLoader";
-import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import APP_CONSTANTS from "config/constants";
-import "./AddMemberModal.css";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
+import "./AddMemberModal.css";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -247,12 +247,14 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
         <Row align="middle" className="rq-modal-footer">
           {isVerifiedBusinessUser && isTeamAdmin ? (
             <>
-              <>
-                <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
-                <span className="ml-2 text-gray">
-                  Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
-                </span>
-              </>
+              {!isPublicInviteLoading && (
+                <>
+                  <Checkbox checked={isDomainJoiningEnabled} onChange={handleAllowDomainUsers} />{" "}
+                  <span className="ml-2 text-gray">
+                    Any verified user from <span className="text-white">{userEmailDomain}</span> can join this workspace
+                  </span>
+                </>
+              )}
             </>
           ) : (
             <LearnMoreLink

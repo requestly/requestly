@@ -6,6 +6,7 @@
       "description": "Turn this on and see content-security-policy header being removed",
       "imageURL": "",
       "isSharedList": false,
+      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -49,6 +50,7 @@
       "name": "Redirect Google Queries to DuckDuckGo",
       "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
       "isSharedList": false,
+      "isFeatured": true,
       "imageURL": "https://www.vectorlogo.zone/logos/duckduckgo/duckduckgo-icon.svg",
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
@@ -84,6 +86,7 @@
       "description": "You can Bypass CORS by turning this on",
       "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8oBmecALAzN-kd73MyovxZKNzg0fHSvM6-xStnS8AXnoccY2oIkSVNz179uZgbIEajVE&usqp=CAU",
       "isSharedList": false,
+      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -153,6 +156,7 @@
     {
       "key": "5",
       "name": "Highlight Google Ads",
+      "isFeatured": true,
       "description": "Highlights Ads in Google Search Result to avoid clicking on them",
       "imageURL": "https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg",
       "isSharedList": false,
@@ -200,6 +204,7 @@
       "description": "Can load Quora in Incognito Mode without signing in",
       "imageURL": "https://www.vectorlogo.zone/logos/quora/quora-icon.svg",
       "isSharedList": false,
+      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -373,6 +378,7 @@
     {
       "key": "10",
       "name": "Block Instagram",
+      "isFeatured": true,
       "description": "Block Instagram to avoid unnecessary scrolling and stay focused",
       "imageURL": "https://www.vectorlogo.zone/logos/instagram/instagram-icon.svg",
       "isSharedList": false,
@@ -570,7 +576,7 @@
     },
     {
       "key": "13",
-      "name": "Block Facebook ",
+      "name": "Block Facebook",
       "description": "Block Facebook to stay focused",
       "imageURL": "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg",
       "isSharedList": false,
