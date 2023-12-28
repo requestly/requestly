@@ -13,12 +13,6 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "You can create upto 5 rules where 3 rules can be active at a time.",
         },
         {
-          title: "Unlimited header modifications",
-          enabled: true,
-          tooltip:
-            "There is no limit on header modification rules; they only count as one towards your total rule limit.",
-        },
-        {
           title: "Mock Server",
           enabled: true,
         },
