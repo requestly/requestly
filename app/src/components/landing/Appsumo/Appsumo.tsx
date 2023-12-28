@@ -10,7 +10,7 @@ import { FiXCircle } from "@react-icons/all-files/fi/FiXCircle";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
-import { arrayUnion, doc, getDoc, getFirestore, updateDoc, writeBatch } from "firebase/firestore";
+import { doc, getDoc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
 import { isEmailValid } from "utils/FormattingHelper";
@@ -123,7 +123,6 @@ const AppSumoModal: React.FC = () => {
     try {
       const response: any = await createTeam({ teamName: newTeamName });
       trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
-      console.log("1. workspace to be upgraded :: ", response?.data?.teamId);
       switchWorkspace(
         {
           teamId: response?.data?.teamId,
@@ -164,16 +163,10 @@ const AppSumoModal: React.FC = () => {
     );
 
     try {
-      const teamsRef = doc(db, "teams", teamId);
-
-      await updateDoc(teamsRef, {
-        "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
-        "appsumo.date": Date.now(),
-      });
-
       await updateTeamSubscriptionForAppSumo({
         teamId: teamId,
         startDate: Date.now(),
+        appsumoCodes: appsumoCodes.map((code) => code.code),
       });
     } catch (error) {
       console.error("from appsumo", error);
