@@ -12,6 +12,7 @@ import { actions } from "store";
 import { trackTemplateImportCompleted } from "modules/analytics/events/features/templates";
 import { snakeCase } from "lodash";
 import { generateObjectId } from "utils/FormattingHelper";
+import "./index.css";
 
 const RulePreviewModal = ({ rule, isOpen, toggle }) => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
 
   return (
     <Modal
-      className="modal-dialog-centered max-width-80-percent "
+      className="modal-dialog-centered max-width-80-percent rule-preview-modal"
       open={isOpen}
       onCancel={toggle}
       footer={null}
