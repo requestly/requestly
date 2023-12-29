@@ -72,7 +72,7 @@ const DeleteRulesModal = ({
       trackRQLastActivity("rules_deleted");
       trackRulesDeletedEvent(ruleIdsToDelete.length, analyticEventSource, "permanent");
     });
-  }, [appMode, ruleIdsToDelete]);
+  }, [appMode, ruleIdsToDelete, analyticEventSource]);
 
   const handleRulesDeletion = useCallback(
     async (uid) => {
@@ -100,7 +100,7 @@ const DeleteRulesModal = ({
         handleDeleteRulesPermanently();
       }
     },
-    [appMode, enableTrash, handleDeleteRulesPermanently, ruleIdsToDelete, rulesToDelete]
+    [appMode, enableTrash, handleDeleteRulesPermanently, ruleIdsToDelete, rulesToDelete, analyticEventSource]
   );
 
   const handleRecordsDeletion = useCallback(

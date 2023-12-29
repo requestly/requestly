@@ -113,6 +113,7 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
     close,
     navigate,
     userAttributes.num_rules,
+    analyticEventSource,
   ]);
 
   useEffect(() => {
