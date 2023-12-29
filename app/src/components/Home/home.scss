@@ -94,3 +94,18 @@
     padding: 3px 8px;
   }
 }
+
+.homepage-card-loader {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & .ant-spin-text {
+    color: var(--white);
+    margin-top: 8px;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+}

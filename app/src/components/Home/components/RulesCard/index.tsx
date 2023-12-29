@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Col, Dropdown, Menu, Row, Skeleton } from "antd";
+import { Col, Dropdown, Menu, Row, Spin } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -96,7 +96,12 @@ export const RulesCard: React.FC = () => {
     }
   }, [appMode, workspace.id, hasUserChanged, isRulesLoading]);
 
-  if (isLoading || isRulesLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
+  if (isLoading || isRulesLoading)
+    return (
+      <Col className="homepage-card-loader">
+        <Spin tip="Getting your rules ready..." size="large" />
+      </Col>
+    );
 
   return (
     <>
