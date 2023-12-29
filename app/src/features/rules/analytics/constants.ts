@@ -8,4 +8,5 @@ export const GROUPS = {
 export const RULES = {
   RULES_LIST_FILTER_APPLIED: "rules_list_filter_applied",
   RULES_LIST_SEARCHED: "rules_list_searched",
+  RULES_LIST_ACTIONS_CLICKED: "rules_list_actions_clicked",
 };

@@ -36,3 +36,8 @@ export const trackRulesListSearched = (search_keyword: string) => {
   const params = { search_keyword };
   trackEvent(RULES.RULES_LIST_SEARCHED, params);
 };
+
+export const trackRulesListActionsClicked = (category: "rule" | "group") => {
+  const params = { category };
+  trackEvent(RULES.RULES_LIST_ACTIONS_CLICKED, params);
+};
