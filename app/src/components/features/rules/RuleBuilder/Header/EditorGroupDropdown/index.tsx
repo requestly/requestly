@@ -16,7 +16,7 @@ import GroupMenuItem from "./GroupMenuItem";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics/groups";
+import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics";
 import { Group } from "types/rules";
 import Logger from "lib/logger";
 import "./EditorGroupDropdown.css";

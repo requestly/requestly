@@ -15,7 +15,7 @@ import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleActivatedStatusEvent, trackRuleDeactivatedStatus } from "modules/analytics/events/common/rules";
-import { trackGroupStatusToggled } from "features/rules/analytics/groups";
+import { trackGroupStatusToggled } from "features/rules/analytics";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 
 const useRuleTableActions = () => {
