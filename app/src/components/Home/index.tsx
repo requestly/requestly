@@ -4,8 +4,9 @@ import { ChangeLogCard } from "./components/ChangelogCard";
 import { HelpCard } from "./components/HelpCard";
 import { TeamsCard } from "./components/WorkspaceCard";
 import { Templates } from "./components/Templates";
-import "./home.scss";
 import { RulesCard } from "./components/RulesCard";
+import { MocksCard } from "./components/MocksCard";
+import "./home.scss";
 
 export const Home: React.FC = () => {
   return (
@@ -16,7 +17,7 @@ export const Home: React.FC = () => {
             <RulesCard />
           </Col>
           <Col className="homepage-primary-card" span={12}>
-            SESSIONS HERE
+            <MocksCard />
           </Col>
         </Row>
         <Templates />
