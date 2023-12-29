@@ -1,0 +1,33 @@
+.session-card-list-item {
+  padding: 8px;
+  border-radius: 4px;
+  transition: 0.25s background ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-1);
+  }
+
+  &:hover .session-card-list-item-name {
+    text-decoration: underline;
+    text-decoration-color: var(--white);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+}
+
+.session-card-list-item-btns-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.session-card-list-item-name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--white);
+  text-decoration-color: #ffffff00;
+  transition: 0.2s all ease-in-out;
+  cursor: pointer;
+}

@@ -5,6 +5,7 @@ import { HelpCard } from "./components/HelpCard";
 import { TeamsCard } from "./components/WorkspaceCard";
 import { Templates } from "./components/Templates";
 import "./home.scss";
+import { RulesCard } from "./components/RulesCard";
 
 export const Home: React.FC = () => {
   return (
@@ -12,10 +13,10 @@ export const Home: React.FC = () => {
       <Col className="homepage-content">
         <Row className="homepage-primary-cards-wrapper">
           <Col className="homepage-primary-card" span={12}>
-            <>RULES HERE</>
+            <RulesCard />
           </Col>
           <Col className="homepage-primary-card" span={12}>
-            <>SESSIONS HERE</>
+            SESSIONS HERE
           </Col>
         </Row>
         <Templates />

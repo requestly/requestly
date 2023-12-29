@@ -245,7 +245,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
           )}
         </div>
         <Row align="middle" className="rq-modal-footer">
-          {isVerifiedBusinessUser && isTeamAdmin ? (
+          {isVerifiedBusinessUser ? (
             <>
               {!isPublicInviteLoading && (
                 <>

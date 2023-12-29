@@ -43,7 +43,6 @@ export const TeamsCard: React.FC = () => {
   }, [user.loggedIn]);
 
   if (!user.loggedIn) return <CreateWorkspaceView />;
-
   if (isLoading)
     return (
       <Col style={{ padding: "20px 1rem" }}>
