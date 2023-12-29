@@ -56,3 +56,8 @@ export const trackRulesListActionsClicked = (category: "rule" | "group") => {
   const params = { category };
   trackEvent(RULES.RULES_LIST_ACTIONS_CLICKED, params);
 };
+
+export const trackRulesListBulkActionPerformed = (action: string) => {
+  const params = { action };
+  trackEvent(RULES.RULES_LIST_BULK_ACTION_PERFORMED, params);
+};
