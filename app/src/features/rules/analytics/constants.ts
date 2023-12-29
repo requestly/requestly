@@ -4,6 +4,7 @@ export const GROUPS = {
   GROUP_STATUS_TOGGLED: "group_status_toggled",
   GROUP_DELETED: "group_deleted",
   GROUP_RENAMED: "group_renamed",
+  GROUP_PIN_TOGGLED: "group_pin_toggled",
 };
 
 export const RULES = {

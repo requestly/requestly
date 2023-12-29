@@ -27,6 +27,11 @@ export const trackGroupRenamed = () => {
   trackEvent(GROUPS.GROUP_RENAMED, params);
 };
 
+export const trackGroupPinToggled = (updated_value: boolean) => {
+  const params = { updated_value };
+  trackEvent(GROUPS.GROUP_PIN_TOGGLED, params);
+};
+
 // rules
 export const trackRulesListFilterApplied = (
   name: string,

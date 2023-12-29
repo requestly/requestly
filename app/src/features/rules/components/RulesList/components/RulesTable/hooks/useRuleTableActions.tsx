@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Rule, RuleObj, RuleObjStatus } from "features/rules/types/rules";
+import { Rule, RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { rulesActions } from "store/features/rules/slice";
@@ -14,8 +14,12 @@ import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-co
 import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
-import { trackRuleActivatedStatusEvent, trackRuleDeactivatedStatus } from "modules/analytics/events/common/rules";
-import { trackGroupStatusToggled } from "features/rules/analytics";
+import {
+  trackRuleActivatedStatusEvent,
+  trackRuleDeactivatedStatus,
+  trackRulePinToggled,
+} from "modules/analytics/events/common/rules";
+import { trackGroupPinToggled, trackGroupStatusToggled } from "features/rules/analytics";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 
 const useRuleTableActions = () => {
@@ -261,7 +265,11 @@ const useRuleTableActions = () => {
     };
 
     updateRuleInStorage(updatedRecord, record).then(() => {
-      // trackRulePinToggled(newValue);
+      if (record.objectType === RuleObjType.GROUP) {
+        trackGroupPinToggled(!record.isFavourite);
+      } else {
+        trackRulePinToggled(!record.isFavourite);
+      }
     });
   };
 
