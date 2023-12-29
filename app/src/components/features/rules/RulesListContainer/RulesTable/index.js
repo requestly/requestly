@@ -1364,6 +1364,7 @@ const RulesTable = ({
           rulesToDelete={[ruleToDelete]}
           groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
+          analyticEventSource="rules_list"
         />
       ) : null}
       {isUngroupOrDeleteRulesModalActive ? (

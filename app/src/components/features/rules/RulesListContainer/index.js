@@ -269,6 +269,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
           rulesToDelete={rulesToDelete}
           groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
+          analyticEventSource="rules_list"
         />
       ) : null}
       {isImportRulesModalActive ? (

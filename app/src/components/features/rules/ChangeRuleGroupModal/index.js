@@ -78,7 +78,7 @@ const ChangeRuleGroupModal = (props) => {
     } else {
       updateGroupOfSelectedRules(appMode, selectedRuleIds, newGroupId, user)
         .then(() => {
-          trackGroupChangedEvent("rules_table");
+          trackGroupChangedEvent("rules_list");
 
           // unselectAllRecords(dispatch);
           props.onGroupChanged?.();

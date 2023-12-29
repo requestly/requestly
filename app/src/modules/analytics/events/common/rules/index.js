@@ -55,9 +55,11 @@ export const trackRuleDeletedEvent = (count, rule_type) => {
   trackEvent(RULES.RULE_DELETED, params);
 };
 
-export const trackRulesDeletedEvent = (count) => {
+export const trackRulesDeletedEvent = (count, source, type) => {
   const params = {
     count,
+    source,
+    type,
   };
   trackEvent(RULES.RULES_DELETED, params);
 };
