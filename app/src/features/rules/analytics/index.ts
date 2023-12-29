@@ -32,6 +32,11 @@ export const trackGroupPinToggled = (updated_value: boolean) => {
   trackEvent(GROUPS.GROUP_PIN_TOGGLED, params);
 };
 
+export const trackNewGroupButtonClicked = (num_groups: number) => {
+  const params = { num_groups };
+  trackEvent(GROUPS.NEW_GROUP_BUTTON_CLICKED, params);
+};
+
 // rules
 export const trackRulesListFilterApplied = (
   name: string,

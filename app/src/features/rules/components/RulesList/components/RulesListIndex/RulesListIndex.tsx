@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import RulesTable from "../RulesTable/RulesTable";
-import { RuleObj, RuleObjStatus } from "features/rules/types/rules";
+import { RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
 import { getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { RulesListProvider } from "./context";
@@ -47,7 +47,11 @@ import SpinnerCard from "components/misc/SpinnerCard";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-import { trackRulesListFilterApplied, trackRulesListSearched } from "features/rules/analytics";
+import {
+  trackNewGroupButtonClicked,
+  trackRulesListFilterApplied,
+  trackRulesListSearched,
+} from "features/rules/analytics";
 import { debounce } from "lodash";
 import "./rulesListIndex.scss";
 
@@ -74,6 +78,7 @@ const RulesList: React.FC<Props> = () => {
   // FIXME: Fetching multiple times
   // Fetch Rules here from Redux
   const allRecords = useSelector(getAllRuleObjs);
+  const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RuleObjType.GROUP), [allRecords]);
   const pinnedRecords = useMemo(() => allRecords?.filter((record) => record.isFavourite), [allRecords]);
   const activeRecords = useMemo(() => allRecords?.filter((record) => record.status === RuleObjStatus.ACTIVE), [
     allRecords,
@@ -187,6 +192,7 @@ const RulesList: React.FC<Props> = () => {
 
   const handleNewGroupClick = () => {
     setIsCreateNewRuleGroupModalActive(true);
+    trackNewGroupButtonClicked(allGroups?.length);
   };
 
   const buttonData = [

@@ -5,6 +5,7 @@ export const GROUPS = {
   GROUP_DELETED: "group_deleted",
   GROUP_RENAMED: "group_renamed",
   GROUP_PIN_TOGGLED: "group_pin_toggled",
+  NEW_GROUP_BUTTON_CLICKED: "new_group_button_clicked",
 };
 
 export const RULES = {
