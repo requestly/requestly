@@ -22,7 +22,7 @@ import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 // import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
 import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
-import { trackRulesListBulkActionPerformed } from "features/rules/analytics";
+import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
 import "./rulesTable.css";
 
 interface Props {
@@ -119,7 +119,13 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         loading={loading}
         customRowClassName={(record) => (record.isFavourite ? "record-pinned" : "")}
         filterSelection={(selectedRows) => {
-          return selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
+          const filteredRows = selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
+
+          if (filteredRows.length) {
+            trackRulesSelected(filteredRows.length);
+          }
+
+          return filteredRows;
         }}
         expandable={{
           expandRowByClick: true,

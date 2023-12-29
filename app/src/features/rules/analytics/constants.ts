@@ -13,4 +13,5 @@ export const RULES = {
   RULES_LIST_SEARCHED: "rules_list_searched",
   RULES_LIST_ACTIONS_CLICKED: "rules_list_actions_clicked",
   RULES_LIST_BULK_ACTION_PERFORMED: "rules_list_bulk_action_performed",
+  RULES_SELECTED: "rules_selected",
 };

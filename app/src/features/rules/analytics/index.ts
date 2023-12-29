@@ -61,3 +61,8 @@ export const trackRulesListBulkActionPerformed = (action: string) => {
   const params = { action };
   trackEvent(RULES.RULES_LIST_BULK_ACTION_PERFORMED, params);
 };
+
+export const trackRulesSelected = (num_rules: number) => {
+  const params = { num_rules };
+  trackEvent(RULES.RULES_SELECTED, params);
+};
