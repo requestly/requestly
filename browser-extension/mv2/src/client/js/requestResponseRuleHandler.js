@@ -267,7 +267,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     });
   };
 
-  const getRedirectRule = (url) => {
+  const getMatchingRedirectRule = (url) => {
     if (!isExtensionEnabled()) {
       return null;
     }
@@ -277,7 +277,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     );
   };
 
-  const getReplaceRule = (url) => {
+  const getMatchingReplaceRule = (url) => {
     if (!isExtensionEnabled()) {
       return null;
     }
@@ -578,8 +578,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     const url = getAbsoluteUrl(request.url);
     const method = request.method;
 
-    const redirectRuleThatMatchesURL = getRedirectRule(url);
-    const replaceRuleThatMatchesURL = getReplaceRule(url);
+    const redirectRuleThatMatchesURL = getMatchingRedirectRule(url);
+    const replaceRuleThatMatchesURL = getMatchingReplaceRule(url);
 
     // redirect/replace rule specific code that is applied only when redirect/replace rule matches the URL
     if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
