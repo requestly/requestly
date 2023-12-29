@@ -14,11 +14,7 @@ import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-co
 import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
-import {
-  trackRuleActivatedStatusEvent,
-  trackRuleDeactivatedStatus,
-  trackRulePinToggled,
-} from "modules/analytics/events/common/rules";
+import { trackRulePinToggled, trackRuleToggled } from "modules/analytics/events/common/rules";
 import { trackGroupPinToggled, trackGroupStatusToggled } from "features/rules/analytics";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 
@@ -83,11 +79,11 @@ const useRuleTableActions = () => {
       if (newStatus.toLowerCase() === "active") {
         trackRQLastActivity("rule_activated");
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
-        trackRuleActivatedStatusEvent((rule as Rule).ruleType);
+        trackRuleToggled((rule as Rule).ruleType, "rules_list", newStatus);
       } else {
         trackRQLastActivity("rule_deactivated");
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
-        trackRuleDeactivatedStatus((rule as Rule).ruleType);
+        trackRuleToggled((rule as Rule).ruleType, "rules_list", newStatus);
       }
     });
   };

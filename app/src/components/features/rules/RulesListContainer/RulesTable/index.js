@@ -58,12 +58,7 @@ import UngroupOrDeleteRulesModal from "../../UngroupOrDeleteRulesModal";
 import DuplicateRuleModal from "../../DuplicateRuleModal";
 import { trackGroupDeleted, trackGroupStatusToggled } from "features/rules/analytics";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
-import {
-  trackRuleActivatedStatusEvent,
-  trackRuleDeactivatedStatus,
-  trackRulePinToggled,
-  trackRulesUngrouped,
-} from "modules/analytics/events/common/rules";
+import { trackRulePinToggled, trackRuleToggled, trackRulesUngrouped } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -463,11 +458,11 @@ const RulesTable = ({
         if (newStatus.toLowerCase() === "active") {
           trackRQLastActivity("rule_activated");
           submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
-          trackRuleActivatedStatusEvent(rule.ruleType);
+          trackRuleToggled(rule.ruleType, "rules_list", newStatus);
         } else {
           trackRQLastActivity("rule_deactivated");
           submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
-          trackRuleDeactivatedStatus(rule.ruleType);
+          trackRuleToggled(rule.ruleType, "rules_list", newStatus);
         }
       })
       .catch(() => {

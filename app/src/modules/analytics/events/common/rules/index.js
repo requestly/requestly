@@ -62,18 +62,14 @@ export const trackRulesDeletedEvent = (count) => {
   trackEvent(RULES.RULES_DELETED, params);
 };
 
-export const trackRuleActivatedStatusEvent = (rule_type) => {
+export const trackRuleToggled = (rule_type, source, updated_status) => {
   const params = {
+    source,
     rule_type,
+    updated_status,
   };
-  trackEvent(RULES.RULE_ACTIVATED, params);
-};
 
-export const trackRuleDeactivatedStatus = (rule_type) => {
-  const params = {
-    rule_type,
-  };
-  trackEvent(RULES.RULE_DEACTIVATED, params);
+  trackEvent(RULES.RULE_TOGGLED, params);
 };
 
 export const trackRuleDuplicatedEvent = (rule_type, workspace) => {
