@@ -273,7 +273,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     }
 
     return window[namespace].redirectRules.findLast((rule) =>
-      window[namespace].matchSourceUrl(rule.pairs[0].source, url)
+      rule.pairs.some((pair) => window[namespace].matchSourceUrl(pair.source, url))
     );
   };
 
@@ -283,7 +283,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     }
 
     return window[namespace].replaceRules.findLast((rule) =>
-      window[namespace].matchSourceUrl(rule.pairs[0].source, url)
+      rule.pairs.some((pair) => window[namespace].matchSourceUrl(pair.source, url))
     );
   };
 
@@ -575,17 +575,24 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
     let hasModifiedHeaders = false;
 
-    // Stores Auth header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
-    ignoredHeadersOnRedirect.forEach((header) => {
-      const originalHeaderValue = request.headers.get(header);
-      if (isExtensionEnabled() && originalHeaderValue) {
-        hasModifiedHeaders = true;
-        request.headers.set(customHeaderPrefix + header, originalHeaderValue);
-      }
-    });
-
     const url = getAbsoluteUrl(request.url);
     const method = request.method;
+
+    const redirectRuleThatMatchesURL = getRedirectRule(url);
+    const replaceRuleThatMatchesURL = getReplaceRule(url);
+
+    // redirect/replace rule specific code that is applied only when redirect/replace rule matches the URL
+    if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+      // Stores Auth header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
+      ignoredHeadersOnRedirect.forEach((header) => {
+        const originalHeaderValue = request.headers.get(header);
+        if (isExtensionEnabled() && originalHeaderValue) {
+          hasModifiedHeaders = true;
+          request.headers.set(customHeaderPrefix + header, originalHeaderValue);
+        }
+      });
+    }
+
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
 
