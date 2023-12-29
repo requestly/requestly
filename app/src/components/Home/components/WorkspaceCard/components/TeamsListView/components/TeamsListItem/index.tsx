@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Col, Row, Skeleton, Spin, Typography } from "antd";
@@ -23,6 +23,7 @@ interface Props {
 }
 
 export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) => {
+  const MAX_MEMBERS_TO_SHOW = 3;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [members, setMembers] = useState(null);
@@ -30,10 +31,10 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
   const [hasJoined, setHasJoined] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
 
-  const getTeamUsers = useMemo(() => httpsCallable(getFunctions(), "teams-getTeamUsers"), []);
-
   useEffect(() => {
     if (teamId) {
+      const getTeamUsers = httpsCallable(getFunctions(), "teams-getTeamUsers");
+
       getTeamUsers({ teamId: teamId })
         .then((res: any) => {
           console.log({ res });
@@ -51,7 +52,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
           setIsLoading(false);
         });
     }
-  }, [teamId, getTeamUsers]);
+  }, [teamId]);
 
   const handleJoining = useCallback(() => {
     trackWorkspaceJoinClicked(teamId, "homepage");
@@ -105,7 +106,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
       </Col>
       <Col span={12} className="teams-list-actions-wrapper">
         <Row align="middle">
-          <Avatar.Group maxCount={3} size="small" maxStyle={{ display: "none" }}>
+          <Avatar.Group maxCount={MAX_MEMBERS_TO_SHOW} size="small" maxStyle={{ display: "none" }}>
             {members?.map((member: any) => (
               <Avatar size={24} shape="circle" key={member?.id} src={member?.photoURL}>
                 {member?.displayName?.[0]?.toUpperCase()}
@@ -113,7 +114,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
             ))}
           </Avatar.Group>
           <Col className="teams-list-item-members-count">
-            {members?.length > 3 && <div>+{members?.length - 3} members</div>}
+            {members?.length > MAX_MEMBERS_TO_SHOW && <div>+{members?.length - MAX_MEMBERS_TO_SHOW} members</div>}
           </Col>
         </Row>
         {!inviteId && (
@@ -148,7 +149,6 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
           <RQButton
             type="default"
             onClick={() => {
-              // TODO: Allow members to invite other members to a team
               dispatch(
                 actions.toggleActiveModal({
                   modalName: "inviteMembersModal",
