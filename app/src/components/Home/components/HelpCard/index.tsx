@@ -6,6 +6,7 @@ import infoIcon from "../../assets/info.svg";
 import communityIcon from "../../assets/community.svg";
 import documentIcon from "../../assets/document.svg";
 import bookIcon from "../../assets/book.svg";
+import PATHS from "config/constants/sub/paths";
 import "./helpCard.scss";
 
 export const HelpCard: React.FC = () => {
@@ -15,12 +16,13 @@ export const HelpCard: React.FC = () => {
       {
         icon: <img src={infoIcon} alt="info" />,
         title: "What is requestly?",
-        href: "#",
+        href: "https://requestly.io/blog/what-is-requestly/",
       },
       {
         icon: <img src={documentIcon} alt="document" />,
         title: "Getting started with Requestly",
-        href: "#",
+        href: PATHS.GETTING_STARTED,
+        openInNewTab: false,
       },
       {
         icon: <img src={bookIcon} alt="community" />,
@@ -30,12 +32,12 @@ export const HelpCard: React.FC = () => {
       {
         icon: <img src={communityIcon} alt="community" />,
         title: "Community",
-        href: "#",
+        href: "https://requestlycommunity.slack.com/ssb/redirect",
       },
       {
         icon: <img src={callIcon} alt="call" />,
         title: "Schedule a demo",
-        href: "#",
+        href: "https://calendly.com/requestly/sagar",
       },
     ],
     []
@@ -47,7 +49,12 @@ export const HelpCard: React.FC = () => {
       <Col>
         {helperLinks.map((link) => {
           return (
-            <Link rel="noopener noreferrer" target="_blank" to={link.href} className="help-card-link">
+            <Link
+              rel="noopener noreferrer"
+              target={link.openInNewTab ? "_blank" : "_self"}
+              to={link.href}
+              className="help-card-link"
+            >
               <Col>{link.icon}</Col>
               <Col className="help-card-link-title">{link.title}</Col>
             </Link>
