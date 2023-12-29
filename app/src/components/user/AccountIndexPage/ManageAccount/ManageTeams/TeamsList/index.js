@@ -79,7 +79,7 @@ const TeamsList = ({ teams = [] }) => {
       dataIndex: "adminCount",
     },
     {
-      title: "Subscription",
+      title: "Rules Subscription",
       render: (_, record) => {
         return renderSubscriptionStatus(record.subscriptionStatus, record.id);
       },
