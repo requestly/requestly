@@ -103,9 +103,33 @@ RQ.RequestResponseRuleHandler.cacheResponseRules = async () => {
   );
 };
 
+RQ.RequestResponseRuleHandler.cacheRedirectRules = async () => {
+  const redirectRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REDIRECT);
+  RQ.ClientUtils.executeJS(
+    `
+    window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+    window.${RQ.PUBLIC_NAMESPACE}.redirectRules = ${JSON.stringify(redirectRules)};
+  `,
+    true
+  );
+};
+
+RQ.RequestResponseRuleHandler.cacheReplaceRules = async () => {
+  const replaceRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REPLACE);
+  RQ.ClientUtils.executeJS(
+    `
+    window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+    window.${RQ.PUBLIC_NAMESPACE}.replaceRules = ${JSON.stringify(replaceRules)};
+  `,
+    true
+  );
+};
+
 RQ.RequestResponseRuleHandler.updateRulesCache = async () => {
   RQ.RequestResponseRuleHandler.cacheRequestRules();
   RQ.RequestResponseRuleHandler.cacheResponseRules();
+  RQ.RequestResponseRuleHandler.cacheRedirectRules();
+  RQ.RequestResponseRuleHandler.cacheReplaceRules();
 };
 
 /**
@@ -241,6 +265,26 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     return window[namespace].responseRules.findLast((rule) => {
       return matchRuleSource({ url, requestData, method }, rule);
     });
+  };
+
+  const getRedirectRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
+
+    return window[namespace].redirectRules.findLast((rule) =>
+      window[namespace].matchSourceUrl(rule.pairs[0].source, url)
+    );
+  };
+
+  const getReplaceRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
+
+    return window[namespace].replaceRules.findLast((rule) =>
+      window[namespace].matchSourceUrl(rule.pairs[0].source, url)
+    );
   };
 
   const shouldServeResponseWithoutRequest = (responseRule) => {
