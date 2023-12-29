@@ -47,6 +47,7 @@ import SpinnerCard from "components/misc/SpinnerCard";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
+import { trackRulesListFilterApplied } from "features/rules/analytics";
 import "./rulesListIndex.scss";
 
 interface Props {}
@@ -255,6 +256,7 @@ const RulesList: React.FC<Props> = () => {
         ),
         onClick: () => {
           setActiveFilter("all");
+          trackRulesListFilterApplied("all", allRecords.length, allRecords.length);
         },
       },
       {
@@ -268,6 +270,7 @@ const RulesList: React.FC<Props> = () => {
         ),
         onClick: () => {
           setActiveFilter("pinned");
+          trackRulesListFilterApplied("pinned", allRecords.length, pinnedRecords.length);
         },
       },
       {
@@ -280,6 +283,7 @@ const RulesList: React.FC<Props> = () => {
         ),
         onClick: () => {
           setActiveFilter("active");
+          trackRulesListFilterApplied("active", allRecords.length, activeRecords.length);
         },
       },
     ],

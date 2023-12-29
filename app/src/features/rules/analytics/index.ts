@@ -1,5 +1,5 @@
 import { trackEvent } from "modules/analytics";
-import { GROUPS } from "../../../modules/analytics/events/common/constants";
+import { GROUPS, RULES } from "./constants";
 
 // groups
 export const trackGroupStatusToggled = (enabled: boolean) => {
@@ -20,4 +20,14 @@ export const trackGroupCreatedEvent = (src: string) => {
 export const trackGroupChangedEvent = (src: string) => {
   const params = { src };
   trackEvent(GROUPS.GROUP_CHANGED, params);
+};
+
+// rules
+export const trackRulesListFilterApplied = (
+  name: string,
+  num_rules: number,
+  num_rules_in_filtered_category: number
+) => {
+  const params = { name, num_rules, num_rules_in_filtered_category };
+  trackEvent(RULES.RULES_LIST_FILTER_APPLIED, params);
 };
