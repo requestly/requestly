@@ -4,6 +4,7 @@
   justify-content: center;
   height: 100%;
   padding: 1rem;
+  overflow-y: auto;
 
   & .homepage-content {
     width: 100%;
@@ -48,4 +49,70 @@
   .ant-skeleton-paragraph li {
     height: 15px;
   }
+
+  .homepage-view-all-link {
+    margin-top: 8px;
+    padding-left: 4px;
+    font-size: 13px;
+  }
+}
+
+.homepage-emptycard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  &-title {
+    font-weight: 500;
+    margin-top: 8px;
+    color: var(--white);
+  }
+
+  &-description {
+    text-align: center;
+    font-size: 12px;
+    color: var(--neutrals-gray-300);
+    max-width: 372px;
+  }
+
+  &-actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--white);
+  }
+
+  &-secondary-btn.ant-btn {
+    color: var(--white);
+    padding: 3px 8px;
+  }
+}
+
+.homepage-card-loader {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+
+  & .ant-spin-text {
+    color: var(--white);
+    margin-top: 8px;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+}
+
+.homepage-view-all-link {
+  margin-top: 8px;
+  padding-left: 4px;
+  font-size: 13px;
 }
