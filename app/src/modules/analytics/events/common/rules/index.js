@@ -74,10 +74,11 @@ export const trackRuleToggled = (rule_type, source, updated_status) => {
   trackEvent(RULES.RULE_TOGGLED, params);
 };
 
-export const trackRuleDuplicatedEvent = (rule_type, workspace) => {
+export const trackRuleDuplicatedEvent = (rule_type, workspace, source) => {
   const params = {
     rule_type,
     workspace,
+    source,
   };
   trackEvent(RULES.RULE_DUPLICATED, params);
 };

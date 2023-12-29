@@ -25,11 +25,12 @@ interface Props {
   close: () => void;
   rule: Rule;
   onDuplicate: (newRule: Rule) => void;
+  analyticEventSource?: string;
 }
 
 const generateCopiedRuleName = (ruleName: string): string => ruleName + " Copy";
 
-const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate }) => {
+const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate, analyticEventSource = "" }) => {
   const navigate = useNavigate();
   const availableWorkspaces: TeamWorkspace[] = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -98,7 +99,7 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
     }
 
     trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(rule.ruleType, isOperationInSameWorkspace ? "same" : "different");
+    trackRuleDuplicatedEvent(rule.ruleType, isOperationInSameWorkspace ? "same" : "different", analyticEventSource);
     submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
     onDuplicate(newRule);
     close();

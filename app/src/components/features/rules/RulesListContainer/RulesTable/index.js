@@ -1384,6 +1384,7 @@ const RulesTable = ({
           close={closeDuplicateRuleModal}
           rule={ruleToDuplicate}
           onDuplicate={closeDuplicateRuleModal}
+          analyticEventSource="rules_list"
         />
       ) : null}
     </>
