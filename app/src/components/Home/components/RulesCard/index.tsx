@@ -96,7 +96,7 @@ export const RulesCard: React.FC = () => {
     }
   }, [appMode, workspace.id, hasUserChanged, isRulesLoading]);
 
-  if (isLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
+  if (isLoading || isRulesLoading) return <Skeleton active paragraph={{ rows: 6 }} />;
 
   return (
     <>
