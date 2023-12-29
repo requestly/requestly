@@ -22,6 +22,11 @@ export const trackGroupChangedEvent = (src: string) => {
   trackEvent(GROUPS.GROUP_CHANGED, params);
 };
 
+export const trackGroupRenamed = () => {
+  const params = {};
+  trackEvent(GROUPS.GROUP_RENAMED, params);
+};
+
 // rules
 export const trackRulesListFilterApplied = (
   name: string,

@@ -3,6 +3,7 @@ export const GROUPS = {
   GROUP_CREATED: "group_created",
   GROUP_STATUS_TOGGLED: "group_status_toggled",
   GROUP_DELETED: "group_deleted",
+  GROUP_RENAMED: "group_renamed",
 };
 
 export const RULES = {
