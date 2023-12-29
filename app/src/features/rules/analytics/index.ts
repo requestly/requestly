@@ -31,3 +31,8 @@ export const trackRulesListFilterApplied = (
   const params = { name, num_rules, num_rules_in_filtered_category };
   trackEvent(RULES.RULES_LIST_FILTER_APPLIED, params);
 };
+
+export const trackRulesListSearched = (search_keyword: string) => {
+  const params = { search_keyword };
+  trackEvent(RULES.RULES_LIST_SEARCHED, params);
+};

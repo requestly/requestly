@@ -47,8 +47,11 @@ import SpinnerCard from "components/misc/SpinnerCard";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-import { trackRulesListFilterApplied } from "features/rules/analytics";
+import { trackRulesListFilterApplied, trackRulesListSearched } from "features/rules/analytics";
+import { debounce } from "lodash";
 import "./rulesListIndex.scss";
+
+const debouncedTrackRulesListSearched = debounce(trackRulesListSearched, 500);
 
 interface Props {}
 
@@ -294,6 +297,11 @@ const RulesList: React.FC<Props> = () => {
     return isWorkspaceMode ? <CreateTeamRuleCTA /> : <GettingStarted />;
   };
 
+  const handleSearchValueUpdate = (value: string) => {
+    setSearchValue(value);
+    debouncedTrackRulesListSearched(value);
+  };
+
   return isLoading ? (
     <>
       <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
@@ -322,7 +330,7 @@ const RulesList: React.FC<Props> = () => {
           subtitle="Create and manage your rules from here"
           actions={contentHeaderActions}
           searchValue={searchValue}
-          setSearchValue={setSearchValue}
+          setSearchValue={handleSearchValueUpdate}
           activeFilter={activeFilter}
           filters={contentHeaderFilters}
         />
