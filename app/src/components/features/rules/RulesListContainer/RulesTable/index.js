@@ -397,7 +397,7 @@ const RulesTable = ({
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, { silentUpdate: true })
       .then(() => {
-        trackRulePinToggled(newValue);
+        trackRulePinToggled(updatedRule.id, updatedRule.ruleType, newValue);
       })
       .catch(() => {
         dispatch(actions.updateRecord(rule));

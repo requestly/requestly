@@ -268,7 +268,7 @@ const useRuleTableActions = () => {
       if (record.objectType === RuleObjType.GROUP) {
         trackGroupPinToggled(!record.isFavourite);
       } else {
-        trackRulePinToggled(!record.isFavourite);
+        trackRulePinToggled(record.id, record.ruleType, !record.isFavourite);
       }
     });
   };
