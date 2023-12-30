@@ -18,6 +18,7 @@ interface CheckoutProps {
   onCancel: () => void;
   toggleModal: () => void;
   source: string;
+  onCheckoutCompleted?: () => void;
 }
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
@@ -28,12 +29,14 @@ export const Checkout: React.FC<CheckoutProps> = ({
   onCancel,
   toggleModal,
   source,
+  onCheckoutCompleted,
 }) => {
   const navigate = useNavigate();
   const options = {
     clientSecret,
     onComplete: () => {
       trackCheckoutCompletedEvent(source);
+      onCheckoutCompleted?.();
     },
   };
 

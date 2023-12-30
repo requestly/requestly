@@ -99,13 +99,12 @@ const SubscriptionInfo = ({
                     <Badge
                       status={isUserPremium ? "success" : "error"}
                       text={<span className="text-capitalize">{status}</span>}
+                      className="mt-8"
                     />
                     {!isUserPremium ? (
-                      <React.Fragment>
-                        <Button size="small" type="link" onClick={handleRenewOnClick}>
-                          Renew
-                        </Button>
-                      </React.Fragment>
+                      <Button size="small" type="link" onClick={handleRenewOnClick}>
+                        Renew
+                      </Button>
                     ) : null}
                   </Space>
                 </Descriptions.Item>
