@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Col, Row, Typography, Skeleton } from "antd";
+import { Col, Row, Typography, Spin } from "antd";
 import { ChangeLogType, Changelog } from "components/Home/types";
 import Logger from "lib/logger";
 import "./changelogCard.scss";
@@ -28,7 +28,9 @@ export const ChangeLogCard: React.FC = () => {
   return (
     <>
       {isLoading ? (
-        <Skeleton active paragraph={{ rows: 6 }} />
+        <Col className="homepage-card-loader">
+          <Spin tip="Getting new updates..." size="large" />
+        </Col>
       ) : (
         <>
           <Typography.Title level={5} className="changelog-card-title">
