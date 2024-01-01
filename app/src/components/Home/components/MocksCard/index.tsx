@@ -1,27 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { Link, useNavigate } from "react-router-dom";
 import { Col, Row, Spin } from "antd";
-import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQButton } from "lib/design-system/components";
-import { MdOutlineCloud } from "@react-icons/all-files/md/MdOutlineCloud";
 import { getMocks } from "backend/mocks/getMocks";
 import { getUserAuthDetails } from "store/selectors";
 import { MockType } from "components/features/mocksV2/types";
-import Logger from "lib/logger";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { MocksListItem } from "./components/MocksListItem";
+import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
+import { MdOutlineCloud } from "@react-icons/all-files/md/MdOutlineCloud";
 import { MockMetadata } from "@requestly/mock-server/build/types/mock";
-import "./mocksCard.scss";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
+import Logger from "lib/logger";
+import PATHS from "config/constants/sub/paths";
+import "./mocksCard.scss";
 
 export const MocksCard: React.FC = () => {
+  const MAX_MOCKS_TO_SHOW = 3;
   const navigate = useNavigate();
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(true);
   const [mocks, setMocks] = useState(null);
+
+  console.log(mocks);
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -31,7 +35,8 @@ export const MocksCard: React.FC = () => {
     setIsLoading(true);
     getMocks(user?.details?.profile?.uid, MockType.API, workspace?.id)
       .then((data) => {
-        setMocks(data);
+        const sortedMocks = data.sort((a: MockMetadata, b: MockMetadata) => Number(b.createdTs) - Number(a.createdTs));
+        setMocks(sortedMocks.slice(0, MAX_MOCKS_TO_SHOW));
       })
       .catch((err) => {
         setMocks([]);
@@ -63,16 +68,25 @@ export const MocksCard: React.FC = () => {
               </Row>
             </Col>
             <Col span={6} className="mocks-card-action-btn">
-              <RQButton icon={<IoMdAdd className="mr-8" />} type="default">
+              <RQButton
+                icon={<IoMdAdd className="mr-8" />}
+                type="default"
+                onClick={() => redirectToMockEditorCreateMock(navigate)}
+              >
                 New Mock
               </RQButton>
             </Col>
           </Row>
-          <div className="mt-8">
+          <div className="mocks-card-list">
             {mocks.map((mock: MockMetadata, index: number) => (
               <MocksListItem key={index} mock={mock} />
             ))}
           </div>
+          {mocks.length > MAX_MOCKS_TO_SHOW && (
+            <Link className="homepage-view-all-link" to={PATHS.RULES.MY_RULES.ABSOLUTE}>
+              View all mock APIs
+            </Link>
+          )}
         </>
       ) : (
         <HomepageEmptyCard
