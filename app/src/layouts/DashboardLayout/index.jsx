@@ -8,14 +8,13 @@ import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import "./DashboardLayout.css";
 import { AppNotificationBanner } from "./AppNotificationBanner";
+import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const location = useLocation();
   const { pathname } = location;
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
-
   promptOneTapOnLoad();
 
   const isSidebarVisible = useMemo(

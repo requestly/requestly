@@ -19,6 +19,7 @@ import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import "./MenuHeader.css";
 import ProductsDropDown from "./ProductsDropDown";
+import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 
 const { Header } = Layout;
 
@@ -114,6 +115,9 @@ const MenuHeader = () => {
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
 
+              <Col>
+                <PremiumPlanBadge />
+              </Col>
               {/* settings */}
               <Col>
                 <Tooltip title={<span className="text-gray text-sm">Settings</span>}>

@@ -17,7 +17,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
   return (
     <div className="popup-header">
       <div className="popup-header-workspace-section">
-        <img className="product-logo" src="/resources/images/extended_logo.png" />
+        <img className="product-logo" src="/resources/images/rq_logo_transition.gif" />
       </div>
 
       <Row align="middle" gutter={16}>

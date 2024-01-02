@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Col, Input, Modal, Row, Select } from "antd";
+import { Col, Input, Modal, Row, Select, Space } from "antd";
 import { StorageService } from "../../../../init";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getUserAttributes } from "store/selectors";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
-import { trackRQLastActivity } from "utils/AnalyticsUtils";
+import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleDuplicatedEvent } from "modules/analytics/events/common/rules";
 import { toast } from "utils/Toast";
 import type { InputRef } from "antd";
@@ -16,6 +16,9 @@ import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/t
 import { TeamWorkspace } from "types/teamWorkspace";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
+import { RQButton } from "lib/design-system/components";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 
 interface Props {
   isOpen: boolean;
@@ -31,6 +34,7 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
   const availableWorkspaces: TeamWorkspace[] = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
   const [newRuleName, setNewRuleName] = useState<string>();
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(null);
   const ruleNameInputRef = useRef<InputRef>(null);
@@ -95,10 +99,20 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
 
     trackRQLastActivity("rule_duplicated");
     trackRuleDuplicatedEvent(rule.ruleType, isOperationInSameWorkspace ? "same" : "different");
-
+    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
     onDuplicate(newRule);
     close();
-  }, [rule, newRuleName, appMode, selectedWorkspaceId, currentlyActiveWorkspace.id, onDuplicate, close, navigate]);
+  }, [
+    rule,
+    newRuleName,
+    appMode,
+    selectedWorkspaceId,
+    currentlyActiveWorkspace.id,
+    onDuplicate,
+    close,
+    navigate,
+    userAttributes.num_rules,
+  ]);
 
   useEffect(() => {
     if (isOpen) {
@@ -122,9 +136,25 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
       open={isOpen}
       title="Duplicate rule"
       onCancel={close}
-      onOk={duplicateRule}
-      okText="Duplicate"
-      okButtonProps={{ disabled: !newRuleName }}
+      footer={
+        <Row justify="end" align="middle">
+          <Space size={8}>
+            <RQButton type="default" onClick={close}>
+              Cancel
+            </RQButton>
+            <PremiumFeature
+              popoverPlacement="top"
+              onContinue={duplicateRule}
+              features={[FeatureLimitType.num_rules]}
+              source="duplicate_rule"
+            >
+              <RQButton disabled={!newRuleName} type="primary">
+                Duplicate
+              </RQButton>
+            </PremiumFeature>
+          </Space>
+        </Row>
+      }
     >
       <div className="modal-body">
         <div className="duplicate-rule-modal-body">

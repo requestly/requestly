@@ -7,11 +7,7 @@ import ActiveLicenseInfo from "./ActiveLicenseInfo";
 import UserInfo from "./UserInfo";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
-import {
-  redirectToDeleteAccount,
-  redirectToSignDPA,
-  redirectToUpdateSubscriptionContactUs,
-} from "../../../../utils/RedirectionUtils";
+import { redirectToDeleteAccount, redirectToSignDPA } from "../../../../utils/RedirectionUtils";
 // ACTIONS
 import { handleForgotPasswordButtonOnClick } from "../../../authentication/AuthForm/actions";
 import ProCard from "@ant-design/pro-card";
@@ -33,7 +29,6 @@ const ManageAccount = () => {
   // const [cancelSubscriptionModal, setCancelSubscriptionModal] = useState(false);
   // Fallback image
   const defaultImageSrc = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
-  const isUserPremium = user.details?.isPremium;
   let userImageSrc = user.details.profile.photoURL ? user.details.profile.photoURL : defaultImageSrc;
 
   const userDisplayName = user.details.profile.displayName ? user.details.profile.displayName : "User";
@@ -50,10 +45,6 @@ const ManageAccount = () => {
     // Attach to original URL
     userImageSrc = userImageSrcURL.toString();
   }
-
-  const handleCancelSubscription = () => {
-    redirectToUpdateSubscriptionContactUs();
-  };
 
   return (
     <React.Fragment>
@@ -129,7 +120,7 @@ const ManageAccount = () => {
                         </AntButton>
                       </Col>
                     </Row>
-                    <Row className="my-2">
+                    {/* <Row className="my-2">
                       <Col>
                         <AntButton
                           type="secondary"
@@ -157,7 +148,7 @@ const ManageAccount = () => {
                           </AntButton>
                         </Col>
                       </Row>
-                    ) : null}
+                    ) : null} */}
                   </div>
                 </div>
               </CardBody>

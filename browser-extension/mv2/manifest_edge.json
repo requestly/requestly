@@ -38,6 +38,7 @@
 
   "icons": {
     "16": "resources/images/16x16.png",
+    "48": "resources/images/48x48.png",
     "128": "resources/images/128x128.png"
   },
 

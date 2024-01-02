@@ -253,6 +253,10 @@ export const getWorkspaceOnboardingStep = (state) => {
   return getGlobalState(state)?.workspaceOnboarding?.step;
 };
 
+export const getAppOnboardingDetails = (state) => {
+  return getGlobalState(state)?.appOnboarding;
+};
+
 export const getIsSecondarySidebarCollapsed = (state) => {
   return getGlobalState(state).userPreferences.isSecondarySidebarCollapsed;
 };
@@ -283,4 +287,8 @@ export const getTimeToResendEmailLogin = (state) => {
 
 export const getAppNotificationBannerDismissTs = (state) => {
   return getGlobalState(state).misc.persist?.appNotificationBannerDismissTs;
+};
+
+export const getIsOrgBannerDismissed = (state) => {
+  return getGlobalState(state).misc.persist?.isOrgBannerDismissed;
 };

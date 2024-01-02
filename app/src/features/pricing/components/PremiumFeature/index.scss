@@ -1,0 +1,23 @@
+.premium-feature-popover {
+  width: 400px;
+  border-radius: var(--border-radius-md);
+  padding: 0;
+
+  & .ant-popover-message-icon {
+    display: none;
+  }
+
+  & .ant-popover-inner {
+    background: var(--black);
+  }
+
+  & .ant-popover-buttons {
+    margin-top: 8px;
+    text-align: left;
+
+    & .ant-btn {
+      padding: 12px;
+      height: 32px;
+    }
+  }
+}

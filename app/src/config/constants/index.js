@@ -13,7 +13,6 @@ import SHARED_LISTS_TABLE_CONSTANTS from "./sub/shared-lists-table-constants";
 import FILES_TABLE_CONSTANTS from "./sub/files-table-constants";
 import THEME_COLORS from "./sub/theme-colors";
 import AUTH from "./sub/auth";
-import PRICING from "./sub/pricing";
 import LIMIT_REACHED_MODAL from "./sub/limit-reached-modal";
 import EMAIL_DOMAINS from "./sub/email-domains";
 import STYLES from "./sub/styles";
@@ -27,9 +26,6 @@ const APP_CONSTANTS = {};
 
 /** FEATURES */
 APP_CONSTANTS.FEATURES = FEATURES;
-
-/** PRICING */
-APP_CONSTANTS.PRICING = PRICING;
 
 /** STORAGE KEYS */
 APP_CONSTANTS.LAST_BACKUP_TIMESTAMP = "last-backup-timestamp";
@@ -151,7 +147,7 @@ APP_CONSTANTS.url = {
 };
 
 APP_CONSTANTS.mock_base_url = {
-  prod: "https://requestly.dev/api/mockv2",
+  prod: "https://requestly.tech/api/mockv2",
   beta: "https://beta.requestly.io/api/mockv2",
   local: "http://localhost:5001/requestly-dev/us-central1/handleMockRequest/api/mockv2", // Change port depending upon you firebase functions emulator port
 };

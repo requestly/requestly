@@ -12,6 +12,7 @@ import { ResponseRuleResourceType } from "types/rules";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
+import { PremiumFeature } from "features/pricing";
 import "./ResponseRuleResourceTypes.css";
 
 const DownloadDesktopAppLink: React.FC = () => (
@@ -77,13 +78,27 @@ const ResponseRuleResourceTypes: React.FC = () => {
     <div className="resource-types-container" data-tour-id="rule-editor-response-resource-type">
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
-        <Radio.Group value={responseRuleResourceType} onChange={(e) => handleResourceTypeChange(e.target.value)}>
+        <Radio.Group
+          value={responseRuleResourceType}
+          onChange={(e) => {
+            if (e.target.value !== ResponseRuleResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);
+          }}
+        >
           <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
-          <Radio value={ResponseRuleResourceType.GRAPHQL_API} className="graphql-radio-item">
-            <Row align="middle">
-              GraphQL API {isPremiumFeature ? <PremiumIcon featureType="graphql_resource_type" /> : null}
-            </Row>
-          </Radio>
+          <PremiumFeature
+            features={[FeatureLimitType.graphql_resource_type]}
+            popoverPlacement="top"
+            onContinue={() => {
+              handleResourceTypeChange(ResponseRuleResourceType.GRAPHQL_API);
+            }}
+            source="graphql_resource_type"
+          >
+            <Radio value={ResponseRuleResourceType.GRAPHQL_API} className="graphql-radio-item">
+              <Row align="middle">
+                GraphQL API {isPremiumFeature ? <PremiumIcon featureType="graphql_resource_type" /> : null}
+              </Row>
+            </Radio>
+          </PremiumFeature>
           {isDesktop ? (
             <Radio value={ResponseRuleResourceType.STATIC}>HTML / JS / CSS</Radio>
           ) : (

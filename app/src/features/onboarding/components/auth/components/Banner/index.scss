@@ -1,0 +1,41 @@
+.auth-banner {
+  & h5.ant-typography {
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  & h3.ant-typography {
+    font-weight: 500;
+    line-height: 36px;
+    margin-top: 1rem !important;
+  }
+
+  .banner-title-highlight {
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  .banner-text-small {
+    font-size: 12px;
+    color: var(--neutrals-gray-300);
+    font-weight: 500;
+  }
+
+  .banner-premium-feature-list-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: var(--neutrals-gray-300);
+    font-size: 13px;
+
+    & svg {
+      color: var(--white);
+    }
+  }
+}
+.banner-company-logo {
+  width: 70px;
+  align-self: center;
+  height: min-content;
+}

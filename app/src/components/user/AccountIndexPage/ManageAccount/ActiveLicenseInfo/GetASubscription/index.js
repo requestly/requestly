@@ -1,15 +1,15 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { Row, Col, Card, CardBody } from "reactstrap";
 import { Button, Space } from "antd";
 // UTILS
-import { redirectToPricingPlans } from "../../../../../../utils/RedirectionUtils";
 // CONSTANTS
 import APP_CONSTANTS from "../../../../../../config/constants";
+import { actions } from "store";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
 const GetASubscription = ({ hideShadow }) => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   return (
     <Row className="my-4">
       <Col>
@@ -21,8 +21,14 @@ const GetASubscription = ({ hideShadow }) => {
                 <Button
                   type="primary"
                   onClick={() => {
+                    dispatch(
+                      actions.toggleActiveModal({
+                        modalName: "pricingModal",
+                        newValue: true,
+                        newProps: { selectedPlan: null, source: "my_profile" },
+                      })
+                    );
                     trackViewPricingPlansClicked("my_profile");
-                    redirectToPricingPlans(navigate);
                   }}
                 >
                   View Plans

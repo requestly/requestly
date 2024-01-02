@@ -1,6 +1,6 @@
 {
   "name": "@requestly/browser-extension-mv2",
-  "version": "23.10.22",
+  "version": "23.12.31",
   "description": "Browser extension to Modify HTTP requests | Request and Response Headers",
   "homepage": "https://requestly.io",
   "private": true,
@@ -26,7 +26,7 @@
     "createReleaseBuild": "BUILD_MODE='production' npm run build && node scripts/createReleaseBuild"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.14.1",
+    "@requestly/web-sdk": "0.14.2",
     "archiver": "^5.3.1",
     "babel-polyfill": "^6.26.0",
     "chokidar-cli": "^3.0.0",

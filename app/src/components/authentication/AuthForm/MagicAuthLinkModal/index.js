@@ -1,23 +1,25 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { Modal } from "antd";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
-//SUB COMPONENTS
-
-//STYLES
-// import "./AuthModal.css";
-// import closeIcon from "assets/images/modal/close.svg";
 import { getUserAuthDetails } from "store/selectors";
 import MagicLinkModalContent from "./MagicLinkModalContent";
 import { isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import "./index.css";
-import { RQModal } from "lib/design-system/components";
+
+/*
+TODO FIX:
+THIS MODAL SHOULD NOT BE TOGGLED USING DISPATCH
+IT SHOULD BE TOGGLED USING A LOCAL STATE
+*/
+
 const MailLoginLinkPopup = ({ isOpen, toggleModal, authMode, email, eventSource }) => {
   //GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
   return email && isEmailValid(email) ? (
     <>
-      <RQModal
+      <Modal
         size="small"
         open={!user.loggedIn && isOpen}
         onCancel={isOpen ? () => toggleModal() : null}
@@ -29,14 +31,17 @@ const MailLoginLinkPopup = ({ isOpen, toggleModal, authMode, email, eventSource 
         wrapClassName="mail-link-modal-wrapper"
         closable={false}
       >
-        <BiArrowBack className="modal-back-btn" onClick={() => toggleModal()} alt="close-icon" />
+        <button className="modal-back-btn-wrapper" onClick={() => toggleModal()}>
+          <BiArrowBack alt="close-icon" />
+          <span> Back</span>
+        </button>
         <MagicLinkModalContent
           eventSource={eventSource}
           email={email}
           authMode={authMode}
           className="mail-link-modal-content"
         />
-      </RQModal>
+      </Modal>
     </>
   ) : (
     toast.error("Please enter a valid email address")

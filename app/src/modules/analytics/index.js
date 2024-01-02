@@ -53,3 +53,7 @@ export const initIntegrations = (user, dispatch) => {
     localIntegration.init(null, dispatch);
   }
 };
+
+export const triggerGroupChange = (groupId, groupName) => {
+  posthogIntegration.onGroupChange(groupId, groupName);
+};

@@ -55,6 +55,10 @@
   text-transform: uppercase;
 }
 
+.text-capitalize {
+  text-transform: capitalize;
+}
+
 .text-white {
   color: var(--white);
 }
@@ -158,6 +162,10 @@
   flex-shrink: 0;
 }
 
+.flex-1 {
+  flex: 1;
+}
+
 .ml-auto {
   margin-left: auto;
 }
@@ -250,4 +258,14 @@
 .external-link:hover {
   color: var(--white);
   text-decoration: underline;
+}
+
+.link-button {
+  color: var(--link-color);
+}
+
+.link-button:hover {
+  color: var(--link-color);
+  cursor: pointer;
+  opacity: 0.8;
 }

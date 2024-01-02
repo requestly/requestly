@@ -1,23 +1,23 @@
 //CONSTANTS
-import APP_CONSTANTS from "../config/constants";
+import { PRICING } from "features/pricing";
 
 export const getPlanNameFromId = (planId) => {
   if (!planId) return null;
   const planName = planId.split("_")[0];
 
   switch (planName) {
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC;
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL;
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.GOLD:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL;
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.LITE:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC;
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2;
+    case PRICING.PLAN_NAMES.BASIC:
+      return PRICING.PLAN_NAMES.BASIC;
+    case PRICING.PLAN_NAMES.PROFESSIONAL:
+      return PRICING.PLAN_NAMES.PROFESSIONAL;
+    case PRICING.PLAN_NAMES.GOLD:
+      return PRICING.PLAN_NAMES.PROFESSIONAL;
+    case PRICING.PLAN_NAMES.LITE:
+      return PRICING.PLAN_NAMES.BASIC;
+    case PRICING.PLAN_NAMES.BASIC_V2:
+      return PRICING.PLAN_NAMES.BASIC_V2;
     default:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL;
+      return PRICING.PLAN_NAMES.PROFESSIONAL;
   }
 };
 
@@ -25,7 +25,7 @@ export const isPremiumPlan = (planId) => {
   if (!planId) return false;
   const planName = planId.split("_")[0];
 
-  if (APP_CONSTANTS.PRICING.PREMIUM_PLANS.includes(planName)) return true;
+  if (PRICING.PREMIUM_PLANS.includes(planName)) return true;
 
   return false;
 };
@@ -57,7 +57,7 @@ export const isPremiumUser = (userPlanDetails) => {
 
   // For all other types eg Unlock, Team, Individual, Paypal
   return (
-    (userPlanDetails.status === "active" || userPlanDetails.status === "trialing") &&
+    ["active", "trialing", "past_due"].includes(userPlanDetails.status) &&
     isPremiumPlan(userPlanDetails.planId) &&
     !isPlanExpired(userPlanDetails)
   );
@@ -65,44 +65,44 @@ export const isPremiumUser = (userPlanDetails) => {
 
 export const getPlanName = (planDetails) => {
   if (!planDetails || !planDetails.planId || !planDetails.subscription) {
-    return APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+    return PRICING.PLAN_NAMES.FREE;
   }
 
   if (!isPremiumUser(planDetails)) {
-    return APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+    return PRICING.PLAN_NAMES.FREE;
   }
 
-  if (planDetails.planId === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_V2) {
-    return APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC;
+  if (planDetails.planId === PRICING.PLAN_NAMES.BASIC_V2) {
+    return PRICING.PLAN_NAMES.BASIC;
   }
 
   if (planDetails.planId) {
     return getPlanNameFromId(planDetails.planId);
   }
 
-  return APP_CONSTANTS.PRICING.PLAN_NAMES.FREE;
+  return PRICING.PLAN_NAMES.FREE;
 };
 
 export const isBasicPlan = (planId) => {
   if (!planId) return false;
 
-  return getPlanNameFromId(planId) === APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC;
+  return getPlanNameFromId(planId) === PRICING.PLAN_NAMES.BASIC;
 };
 
 export const isProfessionalPlan = (planId) => {
   if (!planId) return false;
 
-  return getPlanNameFromId(planId) === APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL;
+  return getPlanNameFromId(planId) === PRICING.PLAN_NAMES.PROFESSIONAL;
 };
 
 export const isEnterprisePlan = (planId) => {
   if (!planId) return false;
 
-  return getPlanNameFromId(planId) === APP_CONSTANTS.PRICING.PLAN_NAMES.ENTERPRISE;
+  return getPlanNameFromId(planId) === PRICING.PLAN_NAMES.ENTERPRISE;
 };
 
 export const isTrialPlan = (planType) => {
-  return planType?.toLowerCase() === APP_CONSTANTS.PRICING.CHECKOUT.MODES.TRIAL;
+  return planType?.toLowerCase() === PRICING.CHECKOUT.MODES.TRIAL;
 };
 
 export const getEndDate = (planDetails) => {
@@ -123,12 +123,12 @@ export const getEndDate = (planDetails) => {
 export const getTeamPlanNameFromId = (planId) => {
   const planName = getPlanNameFromId(planId);
   switch (planName) {
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.BASIC_ENTERPRISE;
-    case APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE;
+    case PRICING.PLAN_NAMES.BASIC:
+      return PRICING.PLAN_NAMES.BASIC_ENTERPRISE;
+    case PRICING.PLAN_NAMES.PROFESSIONAL:
+      return PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE;
     default:
-      return APP_CONSTANTS.PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE;
+      return PRICING.PLAN_NAMES.PROFESSIONAL_ENTERPRISE;
   }
 };
 

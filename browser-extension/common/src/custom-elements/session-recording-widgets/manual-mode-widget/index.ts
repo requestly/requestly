@@ -59,7 +59,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
 
   _getDefaultMarkup() {
     const tooltipContent =
-      "Session recording is limited to the most recent 5 minutes. The recording is still active, but you can only view the last 5 minutes of the session replay.";
+      "Session recording is limited to the most recent 5 minutes. The recording is still active, but you can only view the last 5 minutes of the session.";
 
     return `
       <style>${styles}</style>

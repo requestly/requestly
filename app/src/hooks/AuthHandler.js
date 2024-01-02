@@ -1,7 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
-import APP_CONSTANTS from "config/constants";
 import firebaseApp from "firebase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { actions } from "store";
@@ -16,6 +15,8 @@ import { getAndUpdateInstallationDate, getSignupDate } from "utils/Misc";
 import Logger from "lib/logger";
 import { getUserSubscription } from "backend/user/userSubscription";
 import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDocListener";
+import APP_CONSTANTS from "config/constants";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -23,6 +24,8 @@ let hasAuthHandlerBeenSet = false;
 const AuthHandler = (onComplete) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+
+  const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
 
   useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
@@ -50,11 +53,11 @@ const AuthHandler = (onComplete) => {
           }
         });
         try {
-          // Fetch plan details
-          const [firestorePlanDetails, isSyncEnabled, isBackupEnabled] = await Promise.all([
+          const [firestorePlanDetails, isSyncEnabled, isBackupEnabled, enterpriseDetails] = await Promise.all([
             getUserSubscription(user.uid),
             getOrUpdateUserSyncState(user.uid, appMode),
             checkUserBackupState(user.uid),
+            getEnterpriseAdminDetails(),
           ]);
 
           // phase-1 migration: Adaptor to convert firestore schema into old schema
@@ -66,6 +69,7 @@ const AuthHandler = (onComplete) => {
           window.isSyncEnabled = isSyncEnabled;
           window.keySetDoneisSyncEnabled = true;
           // Fetch UserCountry
+
           dispatch(
             actions.updateUserInfo({
               loggedIn: true,
@@ -79,6 +83,7 @@ const AuthHandler = (onComplete) => {
                 isBackupEnabled,
                 isSyncEnabled,
                 isPremium: isUserPremium,
+                organization: enterpriseDetails?.data?.enterpriseData || null,
               },
             })
           );
@@ -100,6 +105,7 @@ const AuthHandler = (onComplete) => {
           if (planDetails) {
             submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type || "Missing Value");
             submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId || "Missing Value");
+            submitAttrUtil(TRACKING.ATTR.IS_TRIAL, planDetails.status === "trialing");
 
             if (planDetails.subscription) {
               submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate || "Missing Value");
@@ -150,7 +156,7 @@ const AuthHandler = (onComplete) => {
         );
       }
     });
-  }, [dispatch, appMode, onComplete]);
+  }, [dispatch, appMode, onComplete, getEnterpriseAdminDetails]);
 
   return null;
 };

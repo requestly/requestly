@@ -111,6 +111,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    appOnboardingModal: {
+      isActive: false,
+      props: {},
+    },
     createWorkspaceModal: {
       isActive: false,
       props: {},
@@ -132,6 +136,10 @@ const INITIAL_STATE = {
       props: {},
     },
     emailLoginLinkPopup: {
+      isActive: false,
+      props: {},
+    },
+    pricingModal: {
       isActive: false,
       props: {},
     },
@@ -180,6 +188,15 @@ const INITIAL_STATE = {
     workspace: {},
   },
 
+  appOnboarding: {
+    step: "auth",
+    persona: null,
+    fullName: null,
+    disableSkip: false,
+    createdWorkspace: null,
+    isOnboardingCompleted: false,
+  },
+
   misc: {
     persist: {
       appNotificationBannerDismissTs: 0,
@@ -191,10 +208,8 @@ const INITIAL_STATE = {
       isRuleEditorTourCompleted: false,
       extensionInstallSource: null,
       isMiscTourCompleted: {
-        firstRule: false,
-        fifthRule: false,
         firstDraftSession: false,
-        rulesListSharingOnboarding: false,
+        upgradeWorkspaceMenu: false,
       },
 
       hasConnectedApp: false,
