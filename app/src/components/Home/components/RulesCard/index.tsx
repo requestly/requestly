@@ -25,6 +25,7 @@ import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import "./rulesCard.scss";
+import { m, AnimatePresence } from "framer-motion";
 
 export const RulesCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 3;
@@ -98,15 +99,17 @@ export const RulesCard: React.FC = () => {
 
   if (isLoading || isRulesLoading)
     return (
-      <Col className="homepage-card-loader">
-        <Spin tip="Getting your rules ready..." size="large" />
-      </Col>
+      <AnimatePresence>
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="homepage-card-loader">
+          <Spin tip="Getting your rules ready..." size="large" />
+        </m.div>
+      </AnimatePresence>
     );
 
   return (
-    <>
+    <AnimatePresence>
       {rules?.length ? (
-        <>
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <Row justify="space-between" align="middle">
             <Col span={16}>
               <Row gutter={8} align="middle">
@@ -150,33 +153,35 @@ export const RulesCard: React.FC = () => {
               View all rules
             </Link>
           )}
-        </>
+        </m.div>
       ) : (
-        <HomepageEmptyCard
-          icon={rulesIcon}
-          title="HTTP Rules"
-          description="Create rules to modify HTTP requests and responses, including URL redirects, API modifications, and header adjustments."
-          primaryButton={
-            <RQButton
-              type="primary"
-              onClick={() => {
-                if (isExtensionInstalled()) {
-                  redirectToCreateNewRule(navigate, null, "homepage");
-                } else {
-                  dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
-                }
-              }}
-            >
-              Create new Rule
-            </RQButton>
-          }
-          secondaryButton={
-            <RQButton type="text" onClick={() => redirectToTemplates(navigate)}>
-              Start with a template
-            </RQButton>
-          }
-        />
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <HomepageEmptyCard
+            icon={rulesIcon}
+            title="HTTP Rules"
+            description="Create rules to modify HTTP requests and responses, including URL redirects, API modifications, and header adjustments."
+            primaryButton={
+              <RQButton
+                type="primary"
+                onClick={() => {
+                  if (isExtensionInstalled()) {
+                    redirectToCreateNewRule(navigate, null, "homepage");
+                  } else {
+                    dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+                  }
+                }}
+              >
+                Create new Rule
+              </RQButton>
+            }
+            secondaryButton={
+              <RQButton type="text" onClick={() => redirectToTemplates(navigate)}>
+                Start with a template
+              </RQButton>
+            }
+          />
+        </m.div>
       )}
-    </>
+    </AnimatePresence>
   );
 };

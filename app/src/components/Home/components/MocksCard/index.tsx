@@ -8,6 +8,7 @@ import { getMocks } from "backend/mocks/getMocks";
 import { getUserAuthDetails } from "store/selectors";
 import { MockType } from "components/features/mocksV2/types";
 import { HomepageEmptyCard } from "../EmptyCard";
+import { m, AnimatePresence } from "framer-motion";
 import { MocksListItem } from "./components/MocksListItem";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { MdOutlineCloud } from "@react-icons/all-files/md/MdOutlineCloud";
@@ -47,15 +48,17 @@ export const MocksCard: React.FC = () => {
 
   if (isLoading)
     return (
-      <Col className="homepage-card-loader">
-        <Spin tip="Getting your mocks ready..." size="large" />
-      </Col>
+      <AnimatePresence>
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="homepage-card-loader">
+          <Spin tip="Getting your mocks ready..." size="large" />
+        </m.div>
+      </AnimatePresence>
     );
 
   return (
-    <>
+    <AnimatePresence>
       {mocks?.length ? (
-        <>
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <Row align="middle" justify="space-between" className="w-full">
             <Col span={18}>
               <Row gutter={8} align="middle">
@@ -85,7 +88,7 @@ export const MocksCard: React.FC = () => {
               View all mock APIs
             </Link>
           )}
-        </>
+        </m.div>
       ) : (
         <HomepageEmptyCard
           icon={<MdOutlineCloud className="mocks-card-icon" />}
@@ -98,6 +101,6 @@ export const MocksCard: React.FC = () => {
           }
         />
       )}
-    </>
+    </AnimatePresence>
   );
 };
