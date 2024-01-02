@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Col, Row, Skeleton, Spin, Tooltip, Typography } from "antd";
-import { getUniqueColorForWorkspace } from "utils/teams";
+import { getUniqueColorForUser, getUniqueColorForWorkspace } from "utils/teams";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import { toast } from "utils/Toast";
@@ -54,6 +54,8 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
         });
     }
   }, [teamId]);
+
+  console.log({ members });
 
   const handleJoining = useCallback(() => {
     trackWorkspaceJoinClicked(teamId, AUTH.SOURCE.HOME_SCREEN);
@@ -108,16 +110,30 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
       </Col>
       <Col span={12} className="teams-list-actions-wrapper">
         <Row align="middle">
-          <Avatar.Group maxCount={MAX_MEMBERS_TO_SHOW} size="small" maxStyle={{ display: "none" }}>
+          <Avatar.Group
+            maxCount={MAX_MEMBERS_TO_SHOW}
+            size="small"
+            maxPopoverTrigger="click"
+            maxStyle={{ cursor: "pointer", background: "#918f8f" }}
+            style={{ marginRight: "10px" }}
+          >
             {members?.map((member: any) => (
-              <Avatar size={24} shape="circle" key={member?.id} src={member?.photoURL}>
-                {member?.displayName?.[0]?.toUpperCase()}
-              </Avatar>
+              <>
+                {member?.photoUrl && !member?.photoUrl?.includes("gravatar") ? (
+                  <Avatar size={24} shape="circle" key={member?.id} src={member.photoUrl} />
+                ) : (
+                  <Avatar
+                    size={24}
+                    shape="circle"
+                    key={member?.id}
+                    style={{ background: getUniqueColorForUser(member.email ?? "User") }}
+                  >
+                    {member?.displayName?.[0]?.toUpperCase() ?? "U"}
+                  </Avatar>
+                )}
+              </>
             ))}
           </Avatar.Group>
-          <Col className="teams-list-item-members-count">
-            {members?.length > MAX_MEMBERS_TO_SHOW && <div>+{members?.length - MAX_MEMBERS_TO_SHOW} members</div>}
-          </Col>
         </Row>
         {!inviteId && (
           <Tooltip color="#000" title="Manage workspace">
