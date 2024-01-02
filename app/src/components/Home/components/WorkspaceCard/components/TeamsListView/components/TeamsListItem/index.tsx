@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Avatar, Col, Row, Skeleton, Spin, Typography } from "antd";
+import { Avatar, Col, Row, Skeleton, Spin, Tooltip, Typography } from "antd";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
@@ -37,7 +37,6 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
 
       getTeamUsers({ teamId: teamId })
         .then((res: any) => {
-          console.log({ res });
           if (res.data.success) {
             setMembers(res.data.users);
           } else {
@@ -118,15 +117,17 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
           </Col>
         </Row>
         {!inviteId && (
-          <RQButton
-            type="default"
-            iconOnly
-            icon={<MdOutlineSettings />}
-            className="teams-list-item-setting-btn"
-            onClick={() => {
-              redirectToManageWorkspace(navigate, teamId);
-            }}
-          />
+          <Tooltip color="#000" title="Manage workspace">
+            <RQButton
+              type="default"
+              iconOnly
+              icon={<MdOutlineSettings />}
+              className="teams-list-item-setting-btn"
+              onClick={() => {
+                redirectToManageWorkspace(navigate, teamId);
+              }}
+            />
+          </Tooltip>
         )}
         {inviteId ? (
           <>

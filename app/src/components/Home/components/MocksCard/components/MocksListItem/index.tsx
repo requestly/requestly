@@ -40,7 +40,14 @@ export const MocksListItem: React.FC<Props> = ({ mock }) => {
     >
       <Col className="mocks-card-list-item-name">{mock.name}</Col>
       <Col className="mocks-card-list-item-btns-wrapper">
-        <CopyButton showIcon={true} title={null} type="text" copyText={url} trackCopiedEvent={() => {}} />
+        <CopyButton
+          tooltipText="copy mock URL"
+          showIcon={true}
+          title={null}
+          type="text"
+          copyText={url}
+          trackCopiedEvent={() => {}}
+        />
       </Col>
     </Row>
   );
