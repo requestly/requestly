@@ -12,10 +12,15 @@ const CopyButton = ({
   size = "small",
   disabled = false,
   trackCopiedEvent = null,
+  tooltipText = "Copy",
 }) => {
   const [copyClicked, setCopyClicked] = useState(false);
   return (
-    <Tooltip title={copyClicked ? "copied!" : "copy"} overlayStyle={{ display: disableTooltip && "none" }} color="#000">
+    <Tooltip
+      title={copyClicked ? "Copied!" : tooltipText}
+      overlayStyle={{ display: disableTooltip && "none" }}
+      color="#000"
+    >
       <RQButton
         type={type}
         size={"small" | size}
