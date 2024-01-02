@@ -23,7 +23,7 @@ export const HelpCard: React.FC = () => {
         icon: <img src={documentIcon} alt="document" />,
         title: "Getting started with Requestly",
         href: PATHS.GETTING_STARTED,
-        openInNewTab: false,
+        openInSameTab: true,
       },
       {
         icon: <img src={bookIcon} alt="community" />,
@@ -52,7 +52,7 @@ export const HelpCard: React.FC = () => {
           return (
             <Link
               rel="noopener noreferrer"
-              target={link.openInNewTab ? "_blank" : "_self"}
+              target={link.openInSameTab ? "_self" : "_blank"}
               to={link.href}
               className="help-card-link"
               onClick={() => trackHomeHelpClicked(link.title)}
