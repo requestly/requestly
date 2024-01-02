@@ -47,6 +47,8 @@ const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
       currentOwner,
       modificationDate,
     };
+
+    //triggering started event here for home screen because started event is triggered from templates list page.g
     if (source === AUTH.SOURCE.HOME_SCREEN) trackTemplateImportStarted(snakeCase(ruleToSave.name), source);
     saveRule(appMode, ruleToSave).then(() => {
       trackTemplateImportCompleted(snakeCase(ruleToSave.name), source);
