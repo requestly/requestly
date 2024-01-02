@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { actions } from "store";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
@@ -37,6 +38,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   title = "Upgrade your plan to get the most out of Requestly",
   source,
 }) => {
+  const dispatch = useDispatch();
+
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(
     workspace?.id
@@ -117,7 +120,22 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           <Checkout
             clientSecret={stripeClientSecret}
             stripeError={stripeError}
-            onCancel={() => setIsCheckoutScreenVisible(false)}
+            onCancel={() => {
+              setIsCheckoutScreenVisible(false);
+              // remount the modal so to reset the selectedPlan
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "pricingModal",
+                  newValue: true,
+                  newProps: {
+                    selectedPlan: null,
+                    workspace: workspaceToUpgrade,
+                    planDuration: duration,
+                    source,
+                  },
+                })
+              );
+            }}
             isLoading={isLoading}
             toggleModal={toggleModal}
             source={source}
