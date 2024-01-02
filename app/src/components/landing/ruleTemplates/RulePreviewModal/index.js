@@ -12,6 +12,7 @@ import { actions } from "store";
 import { trackTemplateImportCompleted, trackTemplateImportStarted } from "modules/analytics/events/features/templates";
 import { snakeCase } from "lodash";
 import { generateObjectId } from "utils/FormattingHelper";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.css";
 
 const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
@@ -46,7 +47,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
       currentOwner,
       modificationDate,
     };
-    if (source === "home_screen") trackTemplateImportStarted(snakeCase(ruleToSave.name), source);
+    if (source === AUTH.SOURCE.HOME_SCREEN) trackTemplateImportStarted(snakeCase(ruleToSave.name), source);
     saveRule(appMode, ruleToSave).then(() => {
       trackTemplateImportCompleted(snakeCase(ruleToSave.name), source);
       redirectToRuleEditor(navigate, ruleToSave.id, "templates");

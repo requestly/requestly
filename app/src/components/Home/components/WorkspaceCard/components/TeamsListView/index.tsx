@@ -9,6 +9,7 @@ import { Invite, Team } from "types";
 import { actions } from "store";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./teamsListView.scss";
 
 interface Props {
@@ -30,7 +31,7 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
         style={{ position: "relative" }}
         className="h-full"
       >
-        <Col className="homepage-teams-card-content">
+        <Col className="homepage-teams-card-content h-full">
           <Typography.Text className="homepage-teams-list-title">{heading}</Typography.Text>
           <Col>
             {subheading && (
@@ -71,7 +72,7 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
                 modalName: "createWorkspaceModal",
                 newValue: true,
                 newProps: {
-                  source: "home_screen",
+                  source: AUTH.SOURCE.HOME_SCREEN,
                 },
               })
             );

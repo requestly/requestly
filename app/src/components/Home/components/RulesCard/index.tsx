@@ -27,6 +27,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./rulesCard.scss";
 
 export const RulesCard: React.FC = () => {
@@ -56,7 +57,7 @@ export const RulesCard: React.FC = () => {
             <PremiumFeature
               popoverPlacement="topLeft"
               onContinue={() => {
-                redirectToCreateNewRule(navigate, TYPE, "home");
+                redirectToCreateNewRule(navigate, TYPE, AUTH.SOURCE.HOME_SCREEN);
               }}
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
               source="rule_selection_dropdown"
@@ -131,7 +132,7 @@ export const RulesCard: React.FC = () => {
                 trigger={["click"]}
                 onClick={() => {
                   trackHomeRulesActionClicked("new_rule_dropdown");
-                  redirectToCreateNewRule(navigate, null, "home_screen");
+                  redirectToCreateNewRule(navigate, null, AUTH.SOURCE.HOME_SCREEN);
                 }}
               >
                 <>
@@ -148,8 +149,8 @@ export const RulesCard: React.FC = () => {
                   className="homepage-rules-list-item"
                   onClick={() => {
                     trackHomeRulesActionClicked("rule_name");
-                    trackRuleCreationWorkflowStartedEvent(rule.ruleType, "home_screen");
-                    redirectToRuleEditor(navigate, rule.id, "home_screen");
+                    trackRuleCreationWorkflowStartedEvent(rule.ruleType, AUTH.SOURCE.HOME_SCREEN);
+                    redirectToRuleEditor(navigate, rule.id, AUTH.SOURCE.HOME_SCREEN);
                   }}
                 >
                   {rule.name}
@@ -178,7 +179,7 @@ export const RulesCard: React.FC = () => {
                 type="primary"
                 onClick={() => {
                   if (isExtensionInstalled()) {
-                    redirectToCreateNewRule(navigate, null, "home_screen");
+                    redirectToCreateNewRule(navigate, null, AUTH.SOURCE.HOME_SCREEN);
                   } else {
                     dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
                   }

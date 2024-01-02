@@ -15,6 +15,7 @@ import Logger from "lib/logger";
 import { actions } from "store";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./teamsListItem.scss";
 
 interface Props {
@@ -55,7 +56,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
   }, [teamId]);
 
   const handleJoining = useCallback(() => {
-    trackWorkspaceJoinClicked(teamId, "home_screen");
+    trackWorkspaceJoinClicked(teamId, AUTH.SOURCE.HOME_SCREEN);
     trackHomeWorkspaceActionClicked("join_workspace_clicked");
     setIsJoining(true);
     acceptTeamInvite(inviteId)
@@ -67,7 +68,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
             teamId,
             teamName,
             inviteId,
-            "home_screen",
+            AUTH.SOURCE.HOME_SCREEN,
             res?.data?.data?.invite?.usage,
             res?.data?.data?.invite?.metadata?.teamAccessCount
           );
@@ -160,7 +161,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
                   newValue: true,
                   newProps: {
                     teamId: teamId,
-                    source: "home_screen",
+                    source: AUTH.SOURCE.HOME_SCREEN,
                   },
                 })
               );

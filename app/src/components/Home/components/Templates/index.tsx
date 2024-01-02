@@ -9,6 +9,7 @@ import { trackHomeTemplatePreviewClicked } from "components/Home/analytics";
 import templatesMap from "../../../landing/ruleTemplates/templates.json";
 import { RuleType } from "types";
 import PATHS from "config/constants/sub/paths";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
 export const Templates: React.FC = () => {
@@ -29,7 +30,7 @@ export const Templates: React.FC = () => {
           isOpen={isPreviewModalOpen}
           toggle={() => setIsPreviewModalOpen((prev) => !prev)}
           rule={ruleToPreview}
-          source="home_screen"
+          source={AUTH.SOURCE.HOME_SCREEN}
         />
       )}
       <Col className="home-templates-wrapper">
