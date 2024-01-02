@@ -76,7 +76,6 @@ const UsersModal: React.FC<{
 
 export const OrgNotificationBanner = () => {
   const dispatch = useDispatch();
-
   const isOrgBannerDismissed = useSelector(getIsOrgBannerDismissed) ?? false;
   const user = useSelector(getUserAuthDetails);
   const userEmail = user?.details?.profile?.email;

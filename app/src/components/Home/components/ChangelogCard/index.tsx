@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Col, Row, Typography, Spin } from "antd";
+import { m, AnimatePresence } from "framer-motion";
 import { ChangeLogType, Changelog } from "components/Home/types";
 import Logger from "lib/logger";
 import "./changelogCard.scss";
@@ -26,13 +27,13 @@ export const ChangeLogCard: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <AnimatePresence>
       {isLoading ? (
-        <Col className="homepage-card-loader">
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="homepage-card-loader">
           <Spin tip="Getting new updates..." size="large" />
-        </Col>
+        </m.div>
       ) : (
-        <>
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <Typography.Title level={5} className="changelog-card-title">
             🚀 What's new
           </Typography.Title>
@@ -63,8 +64,8 @@ export const ChangeLogCard: React.FC = () => {
           <Link rel="noopener noreferrer" target="_blank" to="https://requestly.productlift.dev/">
             View all updates
           </Link>
-        </>
+        </m.div>
       )}
-    </>
+    </AnimatePresence>
   );
 };
