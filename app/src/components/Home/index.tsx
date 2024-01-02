@@ -3,9 +3,9 @@ import { Col, Row } from "antd";
 import { ChangeLogCard } from "./components/ChangelogCard";
 import { HelpCard } from "./components/HelpCard";
 import { TeamsCard } from "./components/WorkspaceCard";
-import { SessionsCard } from "./components/SessionsCard";
 import { Templates } from "./components/Templates";
 import { RulesCard } from "./components/RulesCard";
+import { MocksCard } from "./components/MocksCard";
 import "./home.scss";
 
 export const Home: React.FC = () => {
@@ -16,8 +16,8 @@ export const Home: React.FC = () => {
           <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
             <RulesCard />
           </Col>
-          <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
-            <SessionsCard />
+          <Col className="homepage-primary-card" span={12}>
+            <MocksCard />
           </Col>
         </Row>
         <Templates />
