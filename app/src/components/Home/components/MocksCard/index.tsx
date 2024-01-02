@@ -25,8 +25,6 @@ export const MocksCard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [mocks, setMocks] = useState(null);
 
-  console.log(mocks);
-
   useEffect(() => {
     if (!user.loggedIn) {
       setIsLoading(false);
