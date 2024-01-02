@@ -5,6 +5,7 @@ import { m, AnimatePresence } from "framer-motion";
 import { ChangeLogType, Changelog } from "components/Home/types";
 import Logger from "lib/logger";
 import "./changelogCard.scss";
+import { trackHomeWhatsNewClicked } from "components/Home/analytics";
 
 export const ChangeLogCard: React.FC = () => {
   const [logs, setLogs] = useState(null);
@@ -61,7 +62,12 @@ export const ChangeLogCard: React.FC = () => {
               );
             })}
           </Col>
-          <Link rel="noopener noreferrer" target="_blank" to="https://requestly.productlift.dev/">
+          <Link
+            rel="noopener noreferrer"
+            target="_blank"
+            to="https://requestly.productlift.dev/"
+            onClick={() => trackHomeWhatsNewClicked("view_all_updates")}
+          >
             View all updates
           </Link>
         </m.div>

@@ -16,6 +16,7 @@ import { MockMetadata } from "@requestly/mock-server/build/types/mock";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
 import PATHS from "config/constants/sub/paths";
+import { trackHomeMockActionClicked } from "components/Home/analytics";
 import "./mocksCard.scss";
 
 export const MocksCard: React.FC = () => {
@@ -72,7 +73,10 @@ export const MocksCard: React.FC = () => {
               <RQButton
                 icon={<IoMdAdd className="mr-8" />}
                 type="default"
-                onClick={() => redirectToMockEditorCreateMock(navigate)}
+                onClick={() => {
+                  trackHomeMockActionClicked("create_new_mock");
+                  redirectToMockEditorCreateMock(navigate);
+                }}
               >
                 New Mock
               </RQButton>
@@ -84,7 +88,11 @@ export const MocksCard: React.FC = () => {
             ))}
           </div>
           {mocks.length > MAX_MOCKS_TO_SHOW && (
-            <Link className="homepage-view-all-link" to={PATHS.RULES.MY_RULES.ABSOLUTE}>
+            <Link
+              className="homepage-view-all-link"
+              to={PATHS.RULES.MY_RULES.ABSOLUTE}
+              onClick={() => trackHomeMockActionClicked("view_all_mocks")}
+            >
               View all mock APIs
             </Link>
           )}
@@ -95,7 +103,13 @@ export const MocksCard: React.FC = () => {
           title="Mock Server"
           description="Create mocks for your APIs with different status codes, delay, response headers or body."
           primaryButton={
-            <RQButton type="primary" onClick={() => redirectToMockEditorCreateMock(navigate)}>
+            <RQButton
+              type="primary"
+              onClick={() => {
+                trackHomeMockActionClicked("create_new_mock");
+                redirectToMockEditorCreateMock(navigate);
+              }}
+            >
               Create new Mock API
             </RQButton>
           }
