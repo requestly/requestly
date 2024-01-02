@@ -6,6 +6,10 @@ export const getUniqueColorForWorkspace = (teamId: string, teamName: string) => 
   return getColorFromString(teamId + teamName);
 };
 
+export const getUniqueColorForUser = (userEmail: string) => {
+  return getColorFromString(userEmail);
+};
+
 // email invites are given priority over domain invites
 export const getUniqueTeamsFromInvites = (pendingInvites: Invite[]): TeamInviteMetadata[] => {
   if (!pendingInvites) {
