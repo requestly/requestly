@@ -10,6 +10,7 @@ import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { HomepageEmptyCard } from "../EmptyCard";
+import { m, AnimatePresence } from "framer-motion";
 import { RQButton } from "lib/design-system/components";
 import { redirectToCreateNewRule, redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
@@ -24,8 +25,9 @@ import PATHS from "config/constants/sub/paths";
 import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
+import { trackHomeRulesActionClicked } from "components/Home/analytics";
+import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import "./rulesCard.scss";
-import { m, AnimatePresence } from "framer-motion";
 
 export const RulesCard: React.FC = () => {
   const MAX_RULES_TO_SHOW = 3;
@@ -127,7 +129,10 @@ export const RulesCard: React.FC = () => {
                 icon={<MdExpandMore />}
                 className="rules-card-dropdown-btn"
                 trigger={["click"]}
-                onClick={() => redirectToCreateNewRule(navigate, null, "home")}
+                onClick={() => {
+                  trackHomeRulesActionClicked("new_rule_dropdown");
+                  redirectToCreateNewRule(navigate, null, "home_screen");
+                }}
               >
                 <>
                   <IoMdAdd /> New rule
@@ -141,7 +146,11 @@ export const RulesCard: React.FC = () => {
               return (
                 <div
                   className="homepage-rules-list-item"
-                  onClick={() => redirectToRuleEditor(navigate, rule.id, "home")}
+                  onClick={() => {
+                    trackHomeRulesActionClicked("rule_name");
+                    trackRuleCreationWorkflowStartedEvent(rule.ruleType, "home_screen");
+                    redirectToRuleEditor(navigate, rule.id, "home_screen");
+                  }}
                 >
                   {rule.name}
                 </div>
@@ -149,7 +158,11 @@ export const RulesCard: React.FC = () => {
             })}
           </div>
           {rules.length > MAX_RULES_TO_SHOW && (
-            <Link className="homepage-view-all-link" to={PATHS.RULES.MY_RULES.ABSOLUTE}>
+            <Link
+              className="homepage-view-all-link"
+              to={PATHS.RULES.MY_RULES.ABSOLUTE}
+              onClick={() => trackHomeRulesActionClicked("view_all_rules")}
+            >
               View all rules
             </Link>
           )}
@@ -165,7 +178,7 @@ export const RulesCard: React.FC = () => {
                 type="primary"
                 onClick={() => {
                   if (isExtensionInstalled()) {
-                    redirectToCreateNewRule(navigate, null, "homepage");
+                    redirectToCreateNewRule(navigate, null, "home_screen");
                   } else {
                     dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
                   }

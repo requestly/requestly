@@ -5,6 +5,7 @@ import { RQButton } from "lib/design-system/components";
 import RulePreviewModal from "components/landing/ruleTemplates/RulePreviewModal";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import APP_CONSTANTS from "config/constants";
+import { trackHomeTemplatePreviewClicked } from "components/Home/analytics";
 import templatesMap from "../../../landing/ruleTemplates/templates.json";
 import { RuleType } from "types";
 import PATHS from "config/constants/sub/paths";
@@ -28,6 +29,7 @@ export const Templates: React.FC = () => {
           isOpen={isPreviewModalOpen}
           toggle={() => setIsPreviewModalOpen((prev) => !prev)}
           rule={ruleToPreview}
+          source="home_screen"
         />
       )}
       <Col className="home-templates-wrapper">
@@ -51,7 +53,10 @@ export const Templates: React.FC = () => {
                     type="primary"
                     size="small"
                     className="home-templates-card-action-btn"
-                    onClick={() => handleShowRulePreview(template.data)}
+                    onClick={() => {
+                      trackHomeTemplatePreviewClicked(template.name);
+                      handleShowRulePreview(template.data);
+                    }}
                   >
                     Preview
                   </RQButton>

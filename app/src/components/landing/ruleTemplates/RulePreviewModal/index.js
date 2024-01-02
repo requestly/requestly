@@ -9,12 +9,12 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
-import { trackTemplateImportCompleted } from "modules/analytics/events/features/templates";
+import { trackTemplateImportCompleted, trackTemplateImportStarted } from "modules/analytics/events/features/templates";
 import { snakeCase } from "lodash";
 import { generateObjectId } from "utils/FormattingHelper";
 import "./index.css";
 
-const RulePreviewModal = ({ rule, isOpen, toggle }) => {
+const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
   const navigate = useNavigate();
   //Global State
   const dispatch = useDispatch();
@@ -36,6 +36,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
         return;
       }
     }
+
     const modificationDate = Date.now();
 
     const ruleToSave = {
@@ -45,9 +46,9 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
       currentOwner,
       modificationDate,
     };
-
+    if (source === "home_screen") trackTemplateImportStarted(snakeCase(ruleToSave.name), source);
     saveRule(appMode, ruleToSave).then(() => {
-      trackTemplateImportCompleted(snakeCase(ruleToSave.name));
+      trackTemplateImportCompleted(snakeCase(ruleToSave.name), source);
       redirectToRuleEditor(navigate, ruleToSave.id, "templates");
     });
   };
