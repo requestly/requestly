@@ -28,7 +28,7 @@ const ActiveLicenseInfo = ({
 
   const { type, status, planName, subscription } = user.details?.planDetails ?? {};
   const { startDate: validFrom, endDate: validTill } = subscription ?? {};
-  const doesSubscriptionExist = !!type && !!status && !!planName;
+  const doesSubscriptionExist = (type === "appsumo" ? isSessionReplayLifetimeActive : !!type) && !!status && !!planName;
 
   const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
     const currentDate = date;
