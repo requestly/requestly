@@ -11,7 +11,6 @@ import {
   getUserAuthDetails,
   getAppMode,
   getIsWorkspaceOnboardingCompleted,
-  getIsJoinWorkspaceCardVisible,
   getAppOnboardingDetails,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
@@ -28,7 +27,6 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
-import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
 import { PricingModal } from "features/pricing";
@@ -49,7 +47,6 @@ const DashboardContent = () => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
-  const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingFeatureValue = useFeatureValue("new_onboarding", null);
@@ -219,7 +216,7 @@ const DashboardContent = () => {
               <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
             )}
 
-          {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
+          {/* {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null} */}
         </>
       )}
     </>

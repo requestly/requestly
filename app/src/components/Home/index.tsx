@@ -13,7 +13,7 @@ export const Home: React.FC = () => {
     <Col className="homepage-wrapper">
       <Col className="homepage-content">
         <Row className="homepage-primary-cards-wrapper">
-          <Col className="homepage-primary-card" span={12}>
+          <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
             <RulesCard />
           </Col>
           <Col className="homepage-primary-card" span={12}>
@@ -21,14 +21,14 @@ export const Home: React.FC = () => {
           </Col>
         </Row>
         <Templates />
-        <Row className="homepage-bottom-section">
-          <Col span={12} className="homepage-teams-card homepage-primary-card" style={{ padding: 0 }}>
+        <Row className="homepage-bottom-section" wrap={false}>
+          <Col xs={24} md={24} lg={12} className="homepage-teams-card homepage-primary-card" style={{ padding: 0 }}>
             <TeamsCard />
           </Col>
-          <Col span={6} className="homepage-help-card homepage-primary-card">
+          <Col xs={24} md={24} lg={6} className="homepage-help-card homepage-primary-card">
             <HelpCard />
           </Col>
-          <Col span={6} className="homepage-changelog-card homepage-primary-card">
+          <Col xs={24} md={24} lg={6} className="homepage-changelog-card homepage-primary-card">
             <ChangeLogCard />
           </Col>
         </Row>
