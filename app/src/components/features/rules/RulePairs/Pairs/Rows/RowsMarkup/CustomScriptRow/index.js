@@ -307,37 +307,41 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   return (
     <div key={rowIndex} className={!isLastIndex ? "custom-script-row" : ""}>
       <Row span={24} align="middle" className="code-editor-header-row mt-20">
-        <Col span={5} align="left" data-tour-id="rule-editor-script-language">
-          <Text className="text-gray">Language: </Text>
-          <CodeTypeOptions />
+        <Col span={22}>
+          <Row align="middle" className="items-center" gutter={[20, 20]}>
+            <Col align="left" data-tour-id="rule-editor-script-language">
+              <Text className="text-gray">Language: </Text>
+              <CodeTypeOptions />
+            </Col>
+            <Col align="left">
+              <Text className="text-gray">Code Source: </Text>
+              <Dropdown overlay={scriptTypeMenu} disabled={isInputDisabled}>
+                <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+                  {script.type} <DownOutlined />
+                </Text>
+              </Dropdown>
+            </Col>
+            {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
+              <Col align="left">
+                <Text className="text-gray">Insert: </Text>
+                <Dropdown overlay={loadTimeMenu} disabled={isInputDisabled}>
+                  <Text
+                    strong
+                    className="cursor-pointer ant-dropdown-link"
+                    onClick={(e) => e.preventDefault()}
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {script.loadTime === GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
+                      ? "After Page Load"
+                      : "Before Page Load"}{" "}
+                    <DownOutlined />
+                  </Text>
+                </Dropdown>
+              </Col>
+            ) : null}
+          </Row>
         </Col>
-        <Col span={6} align="left">
-          <Text className="text-gray">Code Source: </Text>
-          <Dropdown overlay={scriptTypeMenu} disabled={isInputDisabled}>
-            <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
-              {script.type} <DownOutlined />
-            </Text>
-          </Dropdown>
-        </Col>
-        {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
-          <Col span={7} align="left">
-            <Text className="text-gray">Insert: </Text>
-            <Dropdown overlay={loadTimeMenu} disabled={isInputDisabled}>
-              <Text
-                strong
-                className="cursor-pointer ant-dropdown-link"
-                onClick={(e) => e.preventDefault()}
-                style={{ textTransform: "capitalize" }}
-              >
-                {script.loadTime === GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
-                  ? "After Page Load"
-                  : "Before Page Load"}{" "}
-                <DownOutlined />
-              </Text>
-            </Dropdown>
-          </Col>
-        ) : null}
-        <Col span={6} align="right">
+        <Col align="right" className="flex-1">
           <Popconfirm
             title="This will clear the existing script"
             onConfirm={(e) => {

@@ -4,19 +4,19 @@ import { getAppMode, getGroupwiseRulesToPopulate, getUserAuthDetails } from "sto
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { Avatar, Row, Divider } from "antd";
 import { LockOutlined } from "@ant-design/icons";
-import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { RQButton } from "lib/design-system/components";
 import { WorkspaceShareMenu } from "./WorkspaceShareMenu";
 import puzzleImg from "assets/images/illustrations/puzzle.svg";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { isVerifiedBusinessDomainUser } from "utils/Misc";
-import { getDomainFromEmail } from "utils/FormattingHelper";
 import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
 import { Team, TeamRole } from "types";
 import "./index.scss";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
+import { generateDefaultTeamName } from "utils/teams";
 
 interface Props {
   selectedRules: string[];
@@ -45,8 +45,11 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
       user?.details?.profile?.uid
     );
     try {
+      const teamName = isBusinessUser
+        ? generateDefaultTeamName(user.details?.profile?.displayName, user?.details?.profile?.email)
+        : "My Team";
       createTeam({
-        teamName: isBusinessUser ? getDomainFromEmail(user?.details?.profile?.email) : "My Team",
+        teamName: teamName,
       }).then((res: any) => {
         const teamId = res.data.teamId;
         const teamData = res.data;
@@ -56,6 +59,9 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
           teamId,
           emails: memberEmails,
           role: TeamRole.write,
+          teamName,
+          source: "sharing_modal_new_team",
+          numberOfMembers: 1,
         }).then((res: any) => {
           setIsLoading(false);
           if (res?.data?.success)
@@ -86,6 +92,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
     memberEmails,
     selectedRules,
     setPostShareViewData,
+    user.details?.profile?.displayName,
     user?.details?.profile?.email,
     user?.details?.profile?.uid,
   ]);
@@ -134,20 +141,7 @@ export const ShareFromPrivate: React.FC<Props> = ({ selectedRules, setPostShareV
         <label htmlFor="user_emails" className="text-gray caption">
           Email addresses
         </label>
-        <ReactMultiEmail
-          className="sharing-modal-email-input"
-          emails={memberEmails}
-          onChange={setMemberEmails}
-          validateEmail={validateEmail}
-          getLabel={(email, index, removeEmail) => (
-            <div data-tag key={index} className="multi-email-tag">
-              {email}
-              <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-              </span>
-            </div>
-          )}
-        />
+        <EmailInputWithDomainBasedSuggestions onChange={setMemberEmails} />
       </div>
       <RQButton
         className="mt-1 text-bold sharing-primary-btn"

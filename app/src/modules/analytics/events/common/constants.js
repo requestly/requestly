@@ -155,6 +155,7 @@ export const ONBOARDING = {
   PIN_EXTENSION_POPUP_VIEWED: "pin_extension_popup_viewed",
   PIN_EXTENSION_POPUP_EXPANDED: "pin_extension_popup_expanded",
   PIN_EXTENSION_POPUP_CLOSED: "pin_extension_popup_closed",
+  APP_NOTIFICATION_BANNER_VIEWED: "app_notification_banner_viewed",
 };
 
 export const TEAMS = {
@@ -177,6 +178,8 @@ export const TEAMS = {
   TEAM_WORKSPACE_ORGANIZATION_CARD_CANCELLED: "team_workspace_organization_card_cancelled",
   TEAM_WORKSPACE_ORGANIZATION_CARD_CLICKED: "team_workspace_organization_card_clicked",
   WORKSPACE_INVITE_ANIMATION_VIEWED: "workspace_invite_animation_viewed",
+  GET_TEAM_PLAN_BANNER_VIEWED: "get_team_plan_banner_viewed",
+  GET_TEAM_PLAN_BANNER_CLICKED: "get_team_plan_banner_clicked",
 };
 
 export const TRAFFIC_TABLE = {

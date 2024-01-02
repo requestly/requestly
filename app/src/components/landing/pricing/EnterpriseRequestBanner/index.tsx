@@ -31,14 +31,14 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
   );
   const requestEnterprisePlanFromAdmin = httpsCallable<{ workspaceDetails: OrgContactDetails["workspaces"] }, null>(
     functions,
-    "requestEnterprisePlanFromAdmin"
+    "premiumNotifications-requestEnterprisePlanFromAdmin"
   );
 
   const requestPremiumToAdmin = useCallback(() => {
     setEnterpriseRequestedState(1);
     const enterpriseAdmin = orgContactDetails?.workspaces?.[0];
     const domain = enterpriseAdmin.adminEmail.split("@")[1];
-    trackTeamPlanCardClicked(domain);
+    trackTeamPlanCardClicked(domain, "pricing_page");
     requestEnterprisePlanFromAdmin({
       workspaceDetails: orgContactDetails?.workspaces,
     })

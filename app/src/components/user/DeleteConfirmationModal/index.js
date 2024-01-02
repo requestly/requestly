@@ -4,6 +4,7 @@ import { Button, Modal } from "antd";
 import { getUserAuthDetails } from "store/selectors";
 import { DeleteOutlined } from "@ant-design/icons";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const DeleteConfirmationModal = ({
   isOpen,
@@ -17,16 +18,11 @@ const DeleteConfirmationModal = ({
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
+  const enableTrash = useFeatureIsOn("enable-trash");
+
   const tryMoveToTrash = useCallback(() => {
-    if (!user.loggedIn) {
-      handleDeleteRulesPermanently();
-    }
-    if (isWorkspaceMode) {
-      handleDeleteRulesPermanently();
-    } else {
-      handleRecordsDeletion(user?.details?.profile?.uid);
-    }
-  }, [user, isWorkspaceMode, handleDeleteRulesPermanently, handleRecordsDeletion]);
+    handleRecordsDeletion(user?.details?.profile?.uid);
+  }, [user, handleRecordsDeletion]);
 
   const handleDeleteClick = useCallback(() => {
     tryMoveToTrash();
@@ -46,7 +42,7 @@ const DeleteConfirmationModal = ({
         <div className="modal-body">
           <div className="py-3 text-center">
             <h3 className="heading">
-              {user.loggedIn && !isWorkspaceMode ? (
+              {enableTrash && user.loggedIn && !isWorkspaceMode ? (
                 <>
                   Are you sure you want to move selected {ruleIdsToDelete.length}{" "}
                   {ruleIdsToDelete.length === 1 ? "rule" : "rules"} into trash?

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaExclamationCircle } from "@react-icons/all-files/fa/FaExclamationCircle";
-import { FiRefreshCcw } from "@react-icons/all-files/fi/FiRefreshCcw";
-import { Row, Col, Container, Card, CardBody, Button } from "reactstrap";
+import { Row, Col, Container, Card, CardBody } from "reactstrap";
 import { toast } from "utils/Toast.js";
 // CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -10,6 +9,8 @@ import { redirectToAccountDetails } from "../../../utils/RedirectionUtils";
 // FIREBASE
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
+import { RQButton } from "lib/design-system/components";
+
 const RefreshSubscription = () => {
   const mountedRef = useRef(true);
   // Component State
@@ -18,7 +19,7 @@ const RefreshSubscription = () => {
   const doRefreshSubscription = () => {
     setIsProcessing(true);
     const functions = getFunctions();
-    const refreshSubscription = httpsCallable(functions, "refreshSubscription");
+    const refreshSubscription = httpsCallable(functions, "subscription-refreshUserSubscription");
 
     refreshSubscription()
       .then((res) => {
@@ -68,20 +69,14 @@ const RefreshSubscription = () => {
                     ) : null}
 
                     <br />
-                    <Button
+                    <RQButton
                       className="btn-icon btn-3"
-                      color="primary"
-                      type="button"
-                      disabled={isProcessing}
+                      type="primary"
                       onClick={doRefreshSubscription}
+                      loading={isProcessing}
                     >
-                      <span className="btn-inner--icon">
-                        <b>
-                          <FiRefreshCcw className={isProcessing ? "icon-spin" : ""} />
-                        </b>
-                      </span>
-                      <span className="btn-inner--text">Refresh Subscription</span>
-                    </Button>
+                      Refresh Subscription
+                    </RQButton>
                     <br />
                     <hr />
                     <p>

@@ -9,7 +9,6 @@ import { Typography, Switch, Divider, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/common/MemberRoleDropdown";
-import { ReactMultiEmail, isEmail as validateEmail } from "react-multi-email";
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { renameWorkspace } from "backend/workspace";
@@ -25,6 +24,7 @@ import {
 } from "modules/analytics/events/features/teams";
 import { actions } from "store";
 import { NewTeamData, OnboardingSteps } from "../../types";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -77,6 +77,9 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         teamId: defaultTeamData?.teamId ?? newTeamId,
         emails: inviteEmails,
         role: makeUserAdmin ? "admin" : "write",
+        teamName: defaultTeamData?.name ?? newWorkspaceName,
+        numberOfMembers: 1,
+        source: "onboarding",
       })
         .then((res: any) => {
           if (res?.data?.success) {
@@ -111,7 +114,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
         });
     },
-    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData?.teamId, makeUserAdmin]
+    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData, makeUserAdmin]
   );
 
   const handleCreateNewTeam = useCallback(() => {
@@ -193,25 +196,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
         <label htmlFor="email-address" className="text-bold text-white">
           Email address
         </label>
-        <ReactMultiEmail
-          className="mt-8"
-          placeholder="Add multiple email address separated by commas"
-          //@ts-ignore
-          type="email"
-          value={inviteEmails}
-          onChange={(email) => {
-            setInviteEmails(email);
-          }}
-          validateEmail={validateEmail}
-          getLabel={(email, index, removeEmail) => (
-            <div data-tag key={index} className="multi-email-tag">
-              {email}
-              <span title="Remove" data-tag-handle onClick={() => removeEmail(index)}>
-                <img alt="remove" src="/assets/img/workspaces/cross.svg" />
-              </span>
-            </div>
-          )}
-        />
+        <EmailInputWithDomainBasedSuggestions onChange={setInviteEmails} />
         <Row justify="end" className="mt-8">
           <MemberRoleDropdown
             placement="bottomRight"

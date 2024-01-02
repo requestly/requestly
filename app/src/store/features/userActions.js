@@ -110,6 +110,34 @@ export const updateWorkspaceOnboardingStep = (prevState, action) => {
   prevState.workspaceOnboarding.step = action.payload;
 };
 
+export const updateAppOnboardingCompleted = (prevState) => {
+  prevState.appOnboarding.isOnboardingCompleted = true;
+};
+
+export const updateAppOnboardingStep = (prevState, action) => {
+  prevState.appOnboarding.step = action.payload;
+  prevState.appOnboarding.disableSkip = false;
+};
+
+export const updateIsAppOnboardingStepDisabled = (prevState, action) => {
+  prevState.appOnboarding.disableSkip = action.payload;
+};
+
+export const updateAppOnboardingPersona = (prevState, action) => {
+  prevState.appOnboarding.persona = action.payload;
+};
+
+export const updateAppOnboardingFullName = (prevState, action) => {
+  prevState.appOnboarding.fullName = action.payload;
+};
+
+export const updateAppOnboardingTeamDetails = (prevState, action) => {
+  prevState.appOnboarding.createdWorkspace = {
+    ...prevState.appOnboarding.createdWorkspace,
+    ...action.payload,
+  };
+};
+
 export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {
   prevState.workspaceOnboarding.workspace = { ...prevState.workspaceOnboarding.workspace, ...action.payload };
 };
@@ -140,4 +168,8 @@ export const updateTimeToResendEmailLogin = (prevState, action) => {
 
 export const updateAppNotificationBannerDismissTs = (prevState, action) => {
   prevState.misc.persist.appNotificationBannerDismissTs = action.payload;
+};
+
+export const updateIsOrgBannerDismissed = (prevState, action) => {
+  prevState.misc.persist.isOrgBannerDismissed = action.payload;
 };

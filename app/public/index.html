@@ -190,6 +190,20 @@
     <title>
       Requestly - Lightweight Proxy to Intercept & Modify HTTP(s) requests
     </title>
+    <script>
+      var scriptElem = document.createElement("script"),
+      s = document.getElementsByTagName("script")[0];
+      var BASE_URL = "https://app.saturnhq.io";
+      scriptElem.src = BASE_URL + "/assets/sdk.js";
+      scriptElem.defer = true;
+      scriptElem.async = true;
+      s.parentNode.insertBefore(scriptElem, s);
+      scriptElem.onload = function () {
+        window.saturnSDK.run({
+          integrationId: "requestly",
+        });
+      };
+    </script>
   </head>
   <body class="dark">
     <noscript> You need to enable JavaScript to run this app. </noscript>

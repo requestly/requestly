@@ -76,16 +76,16 @@ const HOME_FEATURES: HomeFeature[] = [
   {
     featureHeader: {
       title: "Debugging",
-      description: "Validate your solutions using tools like session replay",
+      description: "Validate your solutions using tools like SessionBook",
       icon: debuggingIcon,
     },
     featureCards: [
       {
-        title: "Debug faster with Session Replay",
+        title: "Debug faster with SessionBook",
         description: "Replay screen, mouse movement, network, console and more of any browser session.",
         tag: FEATURES.SESSION_RECORDING,
         navigateTo: PATHS.SESSIONS.RELATIVE,
-        highlightFeature: true,
+        highlightFeature: false,
         analyticsContext: "session_recording",
       },
     ],

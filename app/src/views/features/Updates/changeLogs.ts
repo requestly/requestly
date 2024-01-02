@@ -8,6 +8,30 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "23.12.31",
+    logs: [
+      "[RQ-1208] added URL matching for redirect/replace rules when overriding fetch (#1310)",
+      "[RQ-1207] added logo transition gif in extension popup (#1309)",
+      "[RQ-1145] feat: relay auth header when redirected [RQ-1178] fix: no script injection when extension is disabled(#1277)",
+    ],
+  },
+  {
+    version: "23.12.12",
+    logs: ["Revert #1208 Relay auth header to redirected request"],
+  },
+  {
+    version: "23.12.10",
+    logs: ["#1208 Relay auth header to redirected request"],
+  },
+  {
+    version: "23.11.8",
+    logs: [
+      "chore: bump web-sdk version v0.14.2. Fixed custom elements not visible in Session Replay (#1209)",
+      "[RQ-1031] changed Requestly icon (#1207)",
+      "[RQ-1025] chore: update rule_created event source property for devtools #1188",
+    ],
+  },
+  {
     version: "23.10.22",
     logs: [
       "[RQ-944]: new extension popup experience #1117",
