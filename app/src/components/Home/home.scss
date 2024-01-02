@@ -126,6 +126,10 @@
   font-size: 13px;
 }
 
+.homepage-teams-card > div {
+  height: 100%;
+}
+
 @media (max-width: 1000px) {
   .homepage-wrapper {
     & .homepage-primary-cards-wrapper .homepage-primary-card.ant-col {

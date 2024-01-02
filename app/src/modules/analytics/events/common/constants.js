@@ -83,6 +83,7 @@ export const AUTH = {
     PERSONA_SURVEY: "persona-survey",
     PERSONA_RECOMMENDATION_SCREEN: "persona_recommendation_screen",
     PRICING_PAGE: "pricing_page",
+    HOME_SCREEN: "home_screen",
   },
   POPOVER: {
     SHOWN: "popover_at_signup_shown",

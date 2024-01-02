@@ -8,6 +8,8 @@ import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { Invite, Team } from "types";
 import { actions } from "store";
 import { getAvailableTeams } from "store/features/teams/selectors";
+import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./teamsListView.scss";
 
 interface Props {
@@ -29,7 +31,7 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
         style={{ position: "relative" }}
         className="h-full"
       >
-        <Col className="homepage-teams-card-content">
+        <Col className="homepage-teams-card-content h-full">
           <Typography.Text className="homepage-teams-list-title">{heading}</Typography.Text>
           <Col>
             {subheading && (
@@ -64,12 +66,13 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
           type="default"
           className="homepage-teams-list-create-workspace-btn"
           onClick={() => {
+            trackHomeWorkspaceActionClicked("create_new_workspace");
             dispatch(
               actions.toggleActiveModal({
                 modalName: "createWorkspaceModal",
                 newValue: true,
                 newProps: {
-                  source: "homepage",
+                  source: AUTH.SOURCE.HOME_SCREEN,
                 },
               })
             );

@@ -6,6 +6,8 @@ import { RQButton } from "lib/design-system/components";
 import { groupSvg } from "features/onboarding";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { actions } from "store";
+import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
 export const CreateWorkspaceView: React.FC = () => {
@@ -13,13 +15,13 @@ export const CreateWorkspaceView: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleCreateWorkspace = () => {
-    //TODO: ADD ANALYTICS
+    trackHomeWorkspaceActionClicked("create_new_workspace");
     dispatch(
       actions.toggleActiveModal({
         modalName: "createWorkspaceModal",
         newValue: true,
         newProps: {
-          source: "homepage",
+          source: AUTH.SOURCE.HOME_SCREEN,
         },
       })
     );

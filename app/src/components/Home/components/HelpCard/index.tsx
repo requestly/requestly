@@ -7,6 +7,7 @@ import communityIcon from "../../assets/community.svg";
 import documentIcon from "../../assets/document.svg";
 import bookIcon from "../../assets/book.svg";
 import PATHS from "config/constants/sub/paths";
+import { trackHomeHelpClicked } from "components/Home/analytics";
 import "./helpCard.scss";
 
 export const HelpCard: React.FC = () => {
@@ -54,6 +55,7 @@ export const HelpCard: React.FC = () => {
               target={link.openInNewTab ? "_blank" : "_self"}
               to={link.href}
               className="help-card-link"
+              onClick={() => trackHomeHelpClicked(link.title)}
             >
               <Col>{link.icon}</Col>
               <Col className="help-card-link-title">{link.title}</Col>

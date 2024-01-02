@@ -14,6 +14,8 @@ import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import Logger from "lib/logger";
 import { actions } from "store";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
+import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
+import { AUTH } from "modules/analytics/events/common/constants";
 import "./teamsListItem.scss";
 
 interface Props {
@@ -54,7 +56,8 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
   }, [teamId]);
 
   const handleJoining = useCallback(() => {
-    trackWorkspaceJoinClicked(teamId, "homepage");
+    trackWorkspaceJoinClicked(teamId, AUTH.SOURCE.HOME_SCREEN);
+    trackHomeWorkspaceActionClicked("join_workspace_clicked");
     setIsJoining(true);
     acceptTeamInvite(inviteId)
       .then((res) => {
@@ -65,7 +68,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
             teamId,
             teamName,
             inviteId,
-            "homepage",
+            AUTH.SOURCE.HOME_SCREEN,
             res?.data?.data?.invite?.usage,
             res?.data?.data?.invite?.metadata?.teamAccessCount
           );
@@ -124,6 +127,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
               icon={<MdOutlineSettings />}
               className="teams-list-item-setting-btn"
               onClick={() => {
+                trackHomeWorkspaceActionClicked("manage_workspace_clicked");
                 redirectToManageWorkspace(navigate, teamId);
               }}
             />
@@ -150,13 +154,14 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
           <RQButton
             type="default"
             onClick={() => {
+              trackHomeWorkspaceActionClicked("invite_members_clicked");
               dispatch(
                 actions.toggleActiveModal({
                   modalName: "inviteMembersModal",
                   newValue: true,
                   newProps: {
                     teamId: teamId,
-                    source: "homepage",
+                    source: AUTH.SOURCE.HOME_SCREEN,
                   },
                 })
               );

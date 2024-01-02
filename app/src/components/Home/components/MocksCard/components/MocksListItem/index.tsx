@@ -7,9 +7,9 @@ import CopyButton from "components/misc/CopyButton";
 import { MockMetadata } from "@requestly/mock-server/build/types/mock";
 import { redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { generateFinalUrlParts } from "components/features/mocksV2/utils";
-
-import "./mocksListItem.scss";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { trackHomeMockActionClicked } from "components/Home/analytics";
+import "./mocksListItem.scss";
 
 interface Props {
   mock: MockMetadata;
@@ -36,7 +36,10 @@ export const MocksListItem: React.FC<Props> = ({ mock }) => {
       className="mocks-card-list-item"
       justify="space-between"
       align="middle"
-      onClick={() => redirectToMockEditorEditMock(navigate, mock.id)}
+      onClick={() => {
+        trackHomeMockActionClicked("mock_name");
+        redirectToMockEditorEditMock(navigate, mock.id);
+      }}
     >
       <Col className="mocks-card-list-item-name">{mock.name}</Col>
       <Col className="mocks-card-list-item-btns-wrapper">
@@ -46,7 +49,7 @@ export const MocksListItem: React.FC<Props> = ({ mock }) => {
           title={null}
           type="text"
           copyText={url}
-          trackCopiedEvent={() => {}}
+          trackCopiedEvent={() => trackHomeMockActionClicked("copy_mock_url")}
         />
       </Col>
     </Row>
