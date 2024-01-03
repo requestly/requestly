@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { Empty } from "antd";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, rulesToContentTableDataAdapter } from "./utils";
@@ -124,6 +125,9 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         // filterSelection={(selectedRows) => {
         //   return selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
         // }}
+        locale={{
+          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found with given name" />,
+        }}
         expandable={{
           expandRowByClick: true,
           rowExpandable: () => true,
