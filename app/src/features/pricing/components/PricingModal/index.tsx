@@ -143,9 +143,9 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           />
         ) : (
           <>
-            <Col span={24} className="display-row-center" style={{ paddingTop: "1rem" }}>
+            <Row className="display-row-center" style={{ paddingTop: "1rem" }}>
               <Typography.Title level={4}>{title}</Typography.Title>
-            </Col>
+            </Row>
             <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
               <Col>
                 <UpgradeWorkspaceMenu
