@@ -47,8 +47,6 @@ const ChangeRuleGroupModal = (props) => {
     [props.isOldRulesTable, props.selectedRules]
   );
 
-  console.log("selectedRuleIds", selectedRuleIds);
-
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);
   const [currentValueForReactSelect, setCurrentValueForReactSelect] = useState([]);
