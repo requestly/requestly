@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Col } from "antd";
 import { Modal } from "antd";
@@ -41,10 +41,6 @@ const ChangeRuleGroupModal = (props) => {
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
   const selectedRuleIds = props.selectedRules;
-
-  console.log({ selectedRuleIds, currentlySelectedRuleData, allGroups });
-  // const selectedRuleIds = useMemo(() => selectedRules.map((rule) => rule.id), [selectedRules]);
-  // const selectedRuleIds = useMemo(() => [], []);
 
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);

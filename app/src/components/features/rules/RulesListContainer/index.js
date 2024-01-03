@@ -36,8 +36,8 @@ import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import "./RulesListContainer.css";
 import { unselectAllRecords } from "../actions";
+import "./RulesListContainer.css";
 
 const { PATHS } = APP_CONSTANTS;
 
