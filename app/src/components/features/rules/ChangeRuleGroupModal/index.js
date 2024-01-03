@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Col } from "antd";
 import { Modal } from "antd";
@@ -40,7 +40,15 @@ const ChangeRuleGroupModal = (props) => {
   const allGroups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
-  const selectedRuleIds = props.selectedRules;
+  const selectedRules = props.selectedRules;
+
+  // TODO: Remove old rules table check after new table is rolled out to all users
+  const selectedRuleIds = useMemo(
+    () => (props.isOldRulesTable ? props.selectedRules : props.selectedRules.map((rule) => rule.id)),
+    [props.isOldRulesTable, props.selectedRules]
+  );
+
+  console.log("selectedRuleIds", selectedRuleIds);
 
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);

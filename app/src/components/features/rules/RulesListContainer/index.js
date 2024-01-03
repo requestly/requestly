@@ -257,6 +257,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
       {isChangeGroupModalActive ? (
         <ChangeRuleGroupModal
+          isOldRulesTable
           clearSearch={clearSearch}
           isOpen={isChangeGroupModalActive}
           toggle={toggleChangeGroupModal}
