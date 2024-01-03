@@ -12,4 +12,5 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  margin-top: 2px;
 }
