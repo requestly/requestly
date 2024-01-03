@@ -40,7 +40,6 @@ const ChangeRuleGroupModal = (props) => {
   const allGroups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
-  const selectedRules = props.selectedRules;
 
   // TODO: Remove old rules table check after new table is rolled out to all users
   const selectedRuleIds = useMemo(
