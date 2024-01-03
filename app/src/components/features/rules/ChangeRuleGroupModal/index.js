@@ -40,9 +40,11 @@ const ChangeRuleGroupModal = (props) => {
   const allGroups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
-  const selectedRules = props.selectedRules;
+  const selectedRuleIds = props.selectedRules;
 
-  const selectedRuleIds = useMemo(() => selectedRules.map((rule) => rule.id), [selectedRules]);
+  console.log({ selectedRuleIds, currentlySelectedRuleData, allGroups });
+  // const selectedRuleIds = useMemo(() => selectedRules.map((rule) => rule.id), [selectedRules]);
+  // const selectedRuleIds = useMemo(() => [], []);
 
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);
