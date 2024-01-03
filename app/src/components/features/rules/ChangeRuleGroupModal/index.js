@@ -79,7 +79,7 @@ const ChangeRuleGroupModal = (props) => {
       updateGroupOfSelectedRules(appMode, selectedRuleIds, newGroupId, user)
         .then(() => {
           trackGroupChangedEvent("rules_table");
-
+          toast.success(`${selectedRuleIds?.length > 1 ? "Rules" : "Rule"} moved to group successfully!`);
           // unselectAllRecords(dispatch);
           props.onGroupChanged?.();
           props.clearSearch?.();

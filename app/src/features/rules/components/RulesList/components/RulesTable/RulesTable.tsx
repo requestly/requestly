@@ -4,7 +4,10 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, rulesToContentTableDataAdapter } from "./utils";
-import { RuleObj, RuleObjType } from "features/rules/types/rules";
+import {
+  RuleObj,
+  //  RuleObjType
+} from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
   DeleteRulesModalWrapper,
@@ -22,6 +25,7 @@ import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 // import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
 import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
+import { toast } from "utils/Toast";
 import "./rulesTable.css";
 
 interface Props {
@@ -117,9 +121,9 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         rowKey="id"
         loading={loading}
         customRowClassName={(record) => (record.isFavourite ? "record-pinned" : "")}
-        filterSelection={(selectedRows) => {
-          return selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
-        }}
+        // filterSelection={(selectedRows) => {
+        //   return selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
+        // }}
         expandable={{
           expandRowByClick: true,
           rowExpandable: () => true,
@@ -158,8 +162,13 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
               {
                 label: "Ungroup",
                 icon: <ImUngroup />,
+                isActionHidden: (selectedRows) => !selectedRows.some((row: any) => row?.groupId?.length > 0),
                 onClick: (selectedRows, clearSelection) => {
-                  handleUngroupSelectedRulesClick(selectedRows)?.then(() => clearSelection());
+                  console.log({ selectedRows });
+                  handleUngroupSelectedRulesClick(selectedRows)?.then(() => {
+                    toast.success(`${selectedRows.length > 1 ? "Rules" : "Rule"} ungrouped successfully!`);
+                    clearSelection();
+                  });
                 },
               },
               {

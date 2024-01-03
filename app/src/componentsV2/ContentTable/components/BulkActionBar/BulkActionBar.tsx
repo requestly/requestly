@@ -25,6 +25,7 @@ const BulkActionBar = <DataType,>({ config, selectedRows, clearSelectedRowsData 
 
       <div className="action-btns">
         {config.options.actions.map((actionConfig, index) => {
+          if (actionConfig.isActionHidden?.(selectedRows)) return null;
           return (
             <Button
               key={index}
