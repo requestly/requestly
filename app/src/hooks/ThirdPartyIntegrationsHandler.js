@@ -11,11 +11,6 @@ const ThirdPartyIntegrationsHandler = () => {
   useEffect(() => {
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
-      user = user ?? {};
-      user.currentlyActiveWorkspaceTeamId = window.currentlyActiveWorkspaceTeamId ?? null;
-      user.workspace = window.currentlyActiveWorkspaceTeamId ? "team" : "personal";
-
-      user.activeWorkspaceName = window.currentlyActiveWorkspaceName;
       initIntegrations(user, stableDispatch);
     });
   }, [stableDispatch]);
