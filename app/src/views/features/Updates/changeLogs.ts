@@ -8,6 +8,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.1.3",
+    logs: ["[RQ-1215] fix: caching redirect/replace rules (#1316)"],
+  },
+  {
     version: "23.12.31",
     logs: [
       "[RQ-1208] added URL matching for redirect/replace rules when overriding fetch (#1310)",
