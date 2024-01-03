@@ -10,7 +10,6 @@ import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../
 import { actions } from "../../../../store";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
-
 import "./index.scss";
 
 const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
