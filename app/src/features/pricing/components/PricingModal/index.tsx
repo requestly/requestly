@@ -92,12 +92,12 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   );
 
   useEffect(() => {
-    if (selectedPlan && !isCheckoutCompleted) {
+    if (selectedPlan && !isCheckoutCompleted && !isCheckoutScreenVisible) {
       setIsCheckoutScreenVisible(true);
       setIsLoading(true);
       handleSubscribe(selectedPlan);
     }
-  }, [selectedPlan, handleSubscribe, isCheckoutCompleted]);
+  }, [selectedPlan, handleSubscribe, isCheckoutCompleted, isCheckoutScreenVisible]);
 
   useEffect(() => {
     if (!isCheckoutScreenVisible) trackPricingModalPlansViewed(source);
