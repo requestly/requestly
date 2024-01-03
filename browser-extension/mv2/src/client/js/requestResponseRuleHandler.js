@@ -145,6 +145,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   window[namespace] = window[namespace] || {};
   window[namespace].requestRules = [];
   window[namespace].responseRules = [];
+  window[namespace].redirectRules = [];
+  window[namespace].replaceRules = [];
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage
@@ -252,7 +254,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       return null;
     }
 
-    return window[namespace].requestRules.findLast((rule) =>
+    return window[namespace].requestRules?.findLast((rule) =>
       window[namespace].matchSourceUrl(rule.pairs[0].source, url)
     );
   };
@@ -262,7 +264,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       return null;
     }
 
-    return window[namespace].responseRules.findLast((rule) => {
+    return window[namespace].responseRules?.findLast((rule) => {
       return matchRuleSource({ url, requestData, method }, rule);
     });
   };
@@ -272,7 +274,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       return null;
     }
 
-    return window[namespace].redirectRules.findLast((rule) =>
+    return window[namespace].redirectRules?.findLast((rule) =>
       rule.pairs.some((pair) => window[namespace].matchSourceUrl(pair.source, url))
     );
   };
@@ -282,7 +284,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       return null;
     }
 
-    return window[namespace].replaceRules.findLast((rule) =>
+    return window[namespace].replaceRules?.findLast((rule) =>
       rule.pairs.some((pair) => window[namespace].matchSourceUrl(pair.source, url))
     );
   };
