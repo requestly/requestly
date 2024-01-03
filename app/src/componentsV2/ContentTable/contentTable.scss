@@ -67,6 +67,10 @@ tr.rq-content-table-row.ant-table-row {
   &.ant-table-row-selected {
     background: var(--highlight-dark-bg);
     border-bottom: 1px solid var(--surface-1);
+
+    &:hover {
+      background: var(--highlight-dark-bg);
+    }
   }
 
   &:hover {
