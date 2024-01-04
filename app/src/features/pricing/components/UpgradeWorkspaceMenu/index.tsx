@@ -57,10 +57,15 @@ export const UpgradeWorkspaceMenu: React.FC<MenuProps> = ({
   );
 
   useEffect(() => {
-    if (currentlyActiveWorkspace?.id) {
+    if (
+      currentlyActiveWorkspace?.id &&
+      filteredAvailableTeams.some((availableTeam: any) => availableTeam.id === currentlyActiveWorkspace?.id)
+    ) {
       setWorkspaceToUpgrade(populateWorkspaceDetails(currentlyActiveWorkspace?.id));
+    } else {
+      setWorkspaceToUpgrade(APP_CONSTANTS.TEAM_WORKSPACES.PRIVATE_WORKSPACE);
     }
-  }, [currentlyActiveWorkspace?.id, populateWorkspaceDetails, setWorkspaceToUpgrade]);
+  }, [currentlyActiveWorkspace?.id, populateWorkspaceDetails, setWorkspaceToUpgrade, filteredAvailableTeams]);
 
   const workspaceMenuItems = {
     items: [

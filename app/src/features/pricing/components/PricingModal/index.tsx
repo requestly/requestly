@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { actions } from "store";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
@@ -37,6 +38,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   title = "Upgrade your plan to get the most out of Requestly",
   source,
 }) => {
+  const dispatch = useDispatch();
+
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(
     workspace?.id
@@ -89,12 +92,12 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   );
 
   useEffect(() => {
-    if (selectedPlan && !isCheckoutCompleted) {
+    if (selectedPlan && !isCheckoutCompleted && !isCheckoutScreenVisible) {
       setIsCheckoutScreenVisible(true);
       setIsLoading(true);
       handleSubscribe(selectedPlan);
     }
-  }, [selectedPlan, handleSubscribe, isCheckoutCompleted]);
+  }, [selectedPlan, handleSubscribe, isCheckoutCompleted, isCheckoutScreenVisible]);
 
   useEffect(() => {
     if (!isCheckoutScreenVisible) trackPricingModalPlansViewed(source);
@@ -117,7 +120,22 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           <Checkout
             clientSecret={stripeClientSecret}
             stripeError={stripeError}
-            onCancel={() => setIsCheckoutScreenVisible(false)}
+            onCancel={() => {
+              setIsCheckoutScreenVisible(false);
+              // remount the modal so to reset the selectedPlan
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "pricingModal",
+                  newValue: true,
+                  newProps: {
+                    selectedPlan: null,
+                    workspace: workspaceToUpgrade,
+                    planDuration: duration,
+                    source,
+                  },
+                })
+              );
+            }}
             isLoading={isLoading}
             toggleModal={toggleModal}
             source={source}
@@ -125,9 +143,9 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           />
         ) : (
           <>
-            <Col span={24} className="display-row-center" style={{ paddingTop: "1rem" }}>
+            <Row className="display-row-center" style={{ paddingTop: "1rem" }}>
               <Typography.Title level={4}>{title}</Typography.Title>
-            </Col>
+            </Row>
             <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
               <Col>
                 <UpgradeWorkspaceMenu
