@@ -1,18 +1,10 @@
-.rules-card-dropdown-btn .ant-btn span {
+.rules-card-create-btn.ant-btn {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.rules-card-dropdown-btn {
-  & .ant-btn-icon-only.ant-btn-compact-item:hover {
-    background: var(--hover-color);
-    color: var(--white);
-    border-color: var(--hover-color);
-  }
-}
-
-.homepage-rules-card-header-action .ant-space-compact-block {
+.homepage-rules-card-header-action {
   display: flex;
   justify-content: flex-end;
 }
