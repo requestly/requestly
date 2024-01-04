@@ -87,10 +87,6 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
-    freeTrialExpiredModal: {
-      isActive: false,
-      props: {},
-    },
     syncConsentModal: {
       isActive: false,
       props: {},
