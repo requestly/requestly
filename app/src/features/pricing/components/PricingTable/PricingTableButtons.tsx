@@ -14,6 +14,7 @@ import { toast } from "utils/Toast";
 import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { trackPricingPlanCTAClicked } from "modules/analytics/events/misc/business";
+import APP_CONSTANTS from "config/constants";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -21,9 +22,16 @@ const CTA_ONCLICK_FUNCTIONS = {
   CHECKOUT: "checkout",
   USE_NOW: "use-now",
   CONTACT_US: "contact-us",
+  SIGNUP: "signup",
 };
 
 const CTA_BUTTONS_CONFIG = {
+  signup: {
+    text: "Sign Up",
+    tag: "",
+    onClick: CTA_ONCLICK_FUNCTIONS.SIGNUP,
+    visible: true,
+  },
   "use-now": {
     text: "Use Now",
     tag: "Current Plan",
@@ -216,13 +224,32 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     );
     setIsButtonLoading(true);
     if (!user?.details?.isLoggedIn) {
-      dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+          eventSource: "pricing_table",
+        })
+      );
       setIsButtonLoading(false);
       return;
     }
     switch (functionName) {
       case CTA_ONCLICK_FUNCTIONS.USE_NOW: {
         window.location.href = "/";
+        setIsButtonLoading(false);
+        break;
+      }
+      case CTA_ONCLICK_FUNCTIONS.SIGNUP: {
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "authModal",
+            newValue: true,
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: "pricing_table",
+          })
+        );
         setIsButtonLoading(false);
         break;
       }
@@ -309,6 +336,10 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
 
   let buttonConfig =
     pricingButtonsMap[userPlanType][userPlanName][isPrivateWorkspaceSelected ? "individual" : "team"][columnPlanName];
+
+  if (buttonConfig?.onClick === CTA_ONCLICK_FUNCTIONS.USE_NOW && !user?.details?.isLoggedIn) {
+    buttonConfig = CTA_BUTTONS_CONFIG["signup"];
+  }
 
   if (isUserTrialing) {
     buttonConfig = pricingButtonsMap.trial[isPrivateWorkspaceSelected ? "individual" : "team"][columnPlanName];
