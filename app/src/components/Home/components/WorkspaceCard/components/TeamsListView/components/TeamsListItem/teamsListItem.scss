@@ -51,3 +51,25 @@
     height: 14px;
   }
 }
+
+.teams-list-avatar-loading-wrapper {
+  display: flex;
+  margin-right: 10px;
+}
+
+.teams-list-avatar-loading {
+  width: 24px;
+  height: 24px;
+  display: block;
+
+  & .ant-skeleton-header .ant-skeleton-avatar-lg {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--white);
+    background: var(--surface-3);
+  }
+}
+
+.teams-list-avatar-loading:not(:first-child) {
+  margin-left: -8px;
+}
