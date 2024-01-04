@@ -10,4 +10,5 @@ export type Changelog = {
   title: string;
   description: string;
   type: ChangeLogType;
+  link: string;
 };
