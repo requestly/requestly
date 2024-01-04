@@ -175,7 +175,6 @@ const AppSumoModal: React.FC = () => {
         appsumoCodes: appsumoCodes.map((code) => code.code),
       })
         .then((response) => {
-          console.log("!!!debug", "resp::", response.data);
           if (!response?.data?.success && response?.data?.error === "max_limit_reached") {
             setShowMaxCodesExeceededError(true);
           } else {
