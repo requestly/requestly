@@ -248,7 +248,10 @@ const RulesList: React.FC<Props> = () => {
         key: "all",
         label: (
           <div className="label">
-            All {allRecords.length ? <Badge count={allRecords.length} overflowCount={20} /> : null}
+            All{" "}
+            {allRecords.length ? (
+              <Badge count={allRecords.filter((record: RuleObj) => isRule(record)).length} overflowCount={20} />
+            ) : null}
           </div>
         ),
         onClick: () => {
@@ -284,7 +287,7 @@ const RulesList: React.FC<Props> = () => {
         },
       },
     ],
-    [allRecords?.length, pinnedRecords.length, activeRecords]
+    [allRecords, pinnedRecords.length, activeRecords]
   );
 
   const CreateFirstRule = () => {

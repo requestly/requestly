@@ -141,7 +141,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         //   return selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
         // }}
         locale={{
-          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found with given name" />,
+          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found" />,
         }}
         expandable={{
           expandRowByClick: true,
