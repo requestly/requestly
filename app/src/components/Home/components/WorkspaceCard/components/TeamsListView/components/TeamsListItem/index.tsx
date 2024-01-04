@@ -87,8 +87,6 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
       });
   }, [inviteId, teamId, teamName]);
 
-  if (isLoading) return <Skeleton active paragraph={{ rows: 1 }} />;
-
   return (
     <Row className="teams-list-item" justify="space-between">
       <Col span={11}>
@@ -110,30 +108,42 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
       </Col>
       <Col span={12} className="teams-list-actions-wrapper">
         <Row align="middle">
-          <Avatar.Group
-            maxCount={MAX_MEMBERS_TO_SHOW}
-            size="small"
-            maxPopoverTrigger="click"
-            maxStyle={{ cursor: "pointer", background: "#918f8f" }}
-            style={{ marginRight: "10px" }}
-          >
-            {members?.map((member: any) => (
-              <>
-                {member?.photoUrl && !member?.photoUrl?.includes("gravatar") ? (
-                  <Avatar size={24} shape="circle" key={member?.id} src={member.photoUrl} />
-                ) : (
-                  <Avatar
-                    size={24}
-                    shape="circle"
-                    key={member?.id}
-                    style={{ background: getUniqueColorForUser(member.email ?? "User") }}
-                  >
-                    {member?.displayName?.[0]?.toUpperCase() ?? "U"}
-                  </Avatar>
-                )}
-              </>
-            ))}
-          </Avatar.Group>
+          {isLoading ? (
+            <div className="teams-list-avatar-loading-wrapper">
+              {Array.from({ length: MAX_MEMBERS_TO_SHOW + 1 }).map((_, index) => (
+                <Skeleton key={index} active avatar className="teams-list-avatar-loading" />
+              ))}
+            </div>
+          ) : (
+            <Avatar.Group
+              maxCount={MAX_MEMBERS_TO_SHOW}
+              size="small"
+              maxPopoverTrigger="click"
+              maxStyle={{ cursor: "pointer", background: "#918f8f" }}
+              style={{ marginRight: "10px" }}
+            >
+              {members?.map((member: any) => (
+                <>
+                  {member?.photoUrl && !member?.photoUrl?.includes("gravatar") ? (
+                    <Tooltip title={member?.email} color="#000">
+                      <Avatar size={24} shape="circle" key={member?.id} src={member.photoUrl} />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={member?.email} color="#000">
+                      <Avatar
+                        size={24}
+                        shape="circle"
+                        key={member?.id}
+                        style={{ background: getUniqueColorForUser(member.email ?? "User") }}
+                      >
+                        {member?.displayName?.[0]?.toUpperCase() ?? "U"}
+                      </Avatar>
+                    </Tooltip>
+                  )}
+                </>
+              ))}
+            </Avatar.Group>
+          )}
         </Row>
         {!inviteId && (
           <Tooltip color="#000" title="Manage workspace">
