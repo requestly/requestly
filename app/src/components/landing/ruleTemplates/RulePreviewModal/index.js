@@ -68,7 +68,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
           <Col flex="none" style={{ marginRight: "2rem" }}>
             {" "}
             <Button type="primary" onClick={() => saveRuleTemplate(rule)}>
-              Create Rule
+              Use this template
             </Button>
           </Col>
         </Row>
