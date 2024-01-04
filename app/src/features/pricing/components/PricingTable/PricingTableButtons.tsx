@@ -15,7 +15,6 @@ import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirma
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { trackPricingPlanCTAClicked } from "modules/analytics/events/misc/business";
 import APP_CONSTANTS from "config/constants";
-import { getPlanNameFromId } from "utils/PremiumUtils";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -42,12 +41,6 @@ const CTA_BUTTONS_CONFIG = {
   checkout: {
     text: "Upgrade",
     tag: "",
-    onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
-    visible: true,
-  },
-  expired: {
-    text: "Renew",
-    tag: "Expired",
     onClick: CTA_ONCLICK_FUNCTIONS.CHECKOUT,
     visible: true,
   },
@@ -219,9 +212,6 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     : "individual";
   const isPrivateWorkspaceSelected = selectedWorkspace?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
   const isUserTrialing = isUserPremium && user?.details?.planDetails?.status === "trialing";
-  const userExpiredPlan = ["canceled", "past_due"].includes(user?.details?.planDetails?.status)
-    ? getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))?.toLowerCase()
-    : null;
 
   const onButtonClick = (functionName: string) => {
     trackPricingPlanCTAClicked(
@@ -346,10 +336,6 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
 
   let buttonConfig =
     pricingButtonsMap[userPlanType][userPlanName][isPrivateWorkspaceSelected ? "individual" : "team"][columnPlanName];
-
-  if (userExpiredPlan === columnPlanName) {
-    buttonConfig = CTA_BUTTONS_CONFIG["expired"];
-  }
 
   if (buttonConfig?.onClick === CTA_ONCLICK_FUNCTIONS.USE_NOW && !user?.details?.isLoggedIn) {
     buttonConfig = CTA_BUTTONS_CONFIG["signup"];
