@@ -113,6 +113,17 @@ export const MocksCard: React.FC = () => {
               Create new Mock API
             </RQButton>
           }
+          secondaryButton={
+            <RQButton
+              type="text"
+              onClick={() => {
+                trackHomeMockActionClicked("learn_more");
+                window.open("https://developers.requestly.io/mock-server/overview/", "_blank");
+              }}
+            >
+              Learn more
+            </RQButton>
+          }
         />
       )}
     </AnimatePresence>

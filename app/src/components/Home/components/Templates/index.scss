@@ -73,6 +73,8 @@
   display: flex;
   gap: 8px;
   transition: 0.25s all ease-in-out;
+  display: flex;
+  justify-content: center;
 
   & .home-templates-card-action-btn.ant-btn {
     font-weight: 500;
