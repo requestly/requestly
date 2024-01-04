@@ -21,7 +21,7 @@ export const Home: React.FC = () => {
             <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
               <RulesCard />
             </Col>
-            <Col className="homepage-primary-card" span={12}>
+            <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
               <MocksCard />
             </Col>
           </Row>

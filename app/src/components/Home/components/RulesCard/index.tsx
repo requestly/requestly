@@ -1,23 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Col, Dropdown, Menu, Row, Spin } from "antd";
+import { Button, Col, Row, Spin } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { useHasChanged } from "hooks";
-import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { PremiumFeature } from "features/pricing";
-import { FeatureLimitType } from "hooks/featureLimiter/types";
-import { PremiumIcon } from "components/common/PremiumIcon";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { RQButton } from "lib/design-system/components";
 import { redirectToCreateNewRule, redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
-import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
-import { Rule, RuleType } from "types";
+import { Rule } from "types";
 import rulesIcon from "../../assets/rules.svg";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
-import { MdExpandMore } from "@react-icons/all-files/md/MdExpandMore";
 import { StorageService } from "init";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -39,44 +33,43 @@ export const RulesCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const isRulesLoading = useSelector(getIsRulesListLoading);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
-  const { getFeatureLimitValue } = useFeatureLimiter();
   const [rules, setRules] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const dropdownMenu = useMemo(() => {
-    const checkIsPremiumRule = (ruleType: RuleType) => {
-      const featureName = `${ruleType.toLowerCase()}_rule` as FeatureLimitType;
-      return !getFeatureLimitValue(featureName);
-    };
+  // const dropdownMenu = useMemo(() => {
+  //   const checkIsPremiumRule = (ruleType: RuleType) => {
+  //     const featureName = `${ruleType.toLowerCase()}_rule` as FeatureLimitType;
+  //     return !getFeatureLimitValue(featureName);
+  //   };
 
-    return (
-      <Menu>
-        {Object.values(RULE_TYPES_CONFIG)
-          .filter((ruleConfig) => ruleConfig.ID !== 11)
-          .map(({ ID, TYPE, ICON, NAME }) => (
-            <PremiumFeature
-              popoverPlacement="topLeft"
-              onContinue={() => {
-                redirectToCreateNewRule(navigate, TYPE, AUTH.SOURCE.HOME_SCREEN);
-              }}
-              features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
-              source="rule_selection_dropdown"
-            >
-              <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
-                {NAME}
-                {checkIsPremiumRule(TYPE) ? (
-                  <PremiumIcon
-                    placement="topLeft"
-                    featureType={`${TYPE.toLowerCase()}_rule` as FeatureLimitType}
-                    source="rule_dropdown"
-                  />
-                ) : null}
-              </Menu.Item>
-            </PremiumFeature>
-          ))}
-      </Menu>
-    );
-  }, [navigate, getFeatureLimitValue]);
+  //   return (
+  //     <Menu>
+  //       {Object.values(RULE_TYPES_CONFIG)
+  //         .filter((ruleConfig) => ruleConfig.ID !== 11)
+  //         .map(({ ID, TYPE, ICON, NAME }) => (
+  //           <PremiumFeature
+  //             popoverPlacement="topLeft"
+  //             onContinue={() => {
+  //               redirectToCreateNewRule(navigate, TYPE, AUTH.SOURCE.HOME_SCREEN);
+  //             }}
+  //             features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
+  //             source="rule_selection_dropdown"
+  //           >
+  //             <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
+  //               {NAME}
+  //               {checkIsPremiumRule(TYPE) ? (
+  //                 <PremiumIcon
+  //                   placement="topLeft"
+  //                   featureType={`${TYPE.toLowerCase()}_rule` as FeatureLimitType}
+  //                   source="rule_dropdown"
+  //                 />
+  //               ) : null}
+  //             </Menu.Item>
+  //           </PremiumFeature>
+  //         ))}
+  //     </Menu>
+  //   );
+  // }, [navigate, getFeatureLimitValue]);
 
   useEffect(() => {
     if (isExtensionInstalled() && !isRulesLoading) {
@@ -123,22 +116,16 @@ export const RulesCard: React.FC = () => {
               </Row>
             </Col>
             <Col span={8} className="homepage-rules-card-header-action">
-              {/* TODO: create a separate component for this dropdown button and use it in rules table as well */}
-              <Dropdown.Button
-                overlay={dropdownMenu}
+              <Button
                 type="default"
-                icon={<MdExpandMore />}
-                className="rules-card-dropdown-btn"
-                trigger={["click"]}
+                className="rules-card-create-btn"
                 onClick={() => {
                   trackHomeRulesActionClicked("new_rule_dropdown");
                   redirectToCreateNewRule(navigate, null, AUTH.SOURCE.HOME_SCREEN);
                 }}
               >
-                <>
-                  <IoMdAdd /> New rule
-                </>
-              </Dropdown.Button>
+                <IoMdAdd /> New rule
+              </Button>
             </Col>
           </Row>
           <div className="homepage-rules-list">
@@ -178,6 +165,7 @@ export const RulesCard: React.FC = () => {
               <RQButton
                 type="primary"
                 onClick={() => {
+                  trackHomeRulesActionClicked("create_new_rule");
                   if (isExtensionInstalled()) {
                     redirectToCreateNewRule(navigate, null, AUTH.SOURCE.HOME_SCREEN);
                   } else {
@@ -189,7 +177,13 @@ export const RulesCard: React.FC = () => {
               </RQButton>
             }
             secondaryButton={
-              <RQButton type="text" onClick={() => redirectToTemplates(navigate)}>
+              <RQButton
+                type="text"
+                onClick={() => {
+                  trackHomeRulesActionClicked("start_with_template");
+                  redirectToTemplates(navigate);
+                }}
+              >
                 Start with a template
               </RQButton>
             }
