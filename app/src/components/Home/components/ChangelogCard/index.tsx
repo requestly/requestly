@@ -4,8 +4,8 @@ import { Col, Row, Typography, Spin } from "antd";
 import { m, AnimatePresence } from "framer-motion";
 import { ChangeLogType, Changelog } from "components/Home/types";
 import Logger from "lib/logger";
-import "./changelogCard.scss";
 import { trackHomeWhatsNewClicked } from "components/Home/analytics";
+import "./changelogCard.scss";
 
 export const ChangeLogCard: React.FC = () => {
   const [logs, setLogs] = useState(null);
@@ -14,6 +14,7 @@ export const ChangeLogCard: React.FC = () => {
   useEffect(() => {
     fetch("https://requestly.tech/api/mockv2/v1/rq-changelog?teamId=LmyapmzY39XTFXvua6eX")
       .then((res) => {
+        console.log({ res });
         return res.json();
       })
       .then((data) => {
@@ -56,7 +57,15 @@ export const ChangeLogCard: React.FC = () => {
                     </Col>
                     <Col className="changelog-card-log-date">on {log.date}</Col>
                   </Row>
-                  <Typography.Text className="changelog-card-log-title">{log.title}</Typography.Text>
+                  <a
+                    className="changelog-card-log-title"
+                    href={log.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => trackHomeWhatsNewClicked(log.title)}
+                  >
+                    {log.title}
+                  </a>
                   <div className="changelog-card-log-description">{log.description}</div>
                 </Col>
               );

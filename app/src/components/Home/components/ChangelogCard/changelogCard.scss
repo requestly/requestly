@@ -15,6 +15,7 @@
 .changelog-card-log-tag {
   font-weight: 500;
   font-size: 10px;
+  margin-top: 1px;
 }
 
 .changelog-card-log-date {
@@ -23,6 +24,11 @@
 
 .changelog-card-log-title {
   color: var(--white);
+
+  &:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
 }
 
 .changelog-card-log-description {
