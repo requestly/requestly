@@ -10,7 +10,26 @@ export const convertToArray = <T>(record: T | T[]): T[] => {
 };
 
 export const getActiveRules = (records: RuleObj[]) => {
-  return records.filter((record) => record.status === RuleObjStatus.ACTIVE);
+  let activeRecords: RuleObj[] = [];
+  const seenGroupIds = new Set<string>();
+  const rules: RuleObj[] = [];
+  const groups: Record<string, RuleObj> = {};
+
+  records.forEach((record) => {
+    if (isRule(record) && record.status === RuleObjStatus.ACTIVE) {
+      rules.push(record);
+    } else {
+      groups[record.id] = record;
+    }
+  });
+
+  rules.forEach((rule) => {
+    if (rule.groupId && groups[rule.groupId] && !seenGroupIds.has(rule.groupId)) {
+      activeRecords.push(groups[rule.groupId]);
+      seenGroupIds.add(rule.groupId);
+    }
+  });
+  return [...activeRecords, ...rules];
 };
 
 // FIXME: Performance Improvements
