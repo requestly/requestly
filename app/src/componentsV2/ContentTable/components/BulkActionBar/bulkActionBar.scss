@@ -12,6 +12,7 @@
   border-radius: 4px;
   background: var(--black, #0e0e0e);
   box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.5);
+  width: max-content;
 
   .info-text {
     flex-shrink: 0;

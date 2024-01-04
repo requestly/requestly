@@ -5,10 +5,7 @@ import { Empty } from "antd";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, rulesToContentTableDataAdapter } from "./utils";
-import {
-  RuleObj,
-  //  RuleObjType
-} from "features/rules/types/rules";
+import { RuleObj, RuleObjType } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
   DeleteRulesModalWrapper,
@@ -102,6 +99,24 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     }
   };
 
+  const getSelectionCount = useCallback((selectedRows: any) => {
+    let groups = 0;
+    let rules = 0;
+
+    selectedRows.forEach((row: any) => {
+      row.objectType === RuleObjType.GROUP ? groups++ : rules++;
+    });
+
+    const formatCount = (count: number, singular: string, plural: string) => {
+      return count > 0 ? `${count} ${count > 1 ? plural : singular}` : "";
+    };
+
+    const groupString = formatCount(groups, "Group", "Groups");
+    const ruleString = formatCount(rules, "Rule", "Rules");
+
+    return `${groupString}${groupString && ruleString ? " and " : ""}${ruleString} selected`;
+  }, []);
+
   const clearSelectionCallback = clearSelectedRowsDataCallbackRef.current;
   const isFeatureLimitbannerShown = isFeatureLimiterOn && user?.isLimitReached;
 
@@ -161,14 +176,13 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
           type: "default",
           options: {
             clearSelectedRows,
-            infoText: (selectedRules) => `${selectedRules.length} Rules Selected`,
+            infoText: (selectedRules) => getSelectionCount(selectedRules),
             actions: [
               {
                 label: "Ungroup",
                 icon: <ImUngroup />,
                 isActionHidden: (selectedRows) => !selectedRows.some((row: any) => row?.groupId?.length > 0),
                 onClick: (selectedRows, clearSelection) => {
-                  console.log({ selectedRows });
                   handleUngroupSelectedRulesClick(selectedRows)?.then(() => {
                     toast.success(`${selectedRows.length > 1 ? "Rules" : "Rule"} ungrouped successfully!`);
                     clearSelection();
@@ -178,6 +192,13 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
               {
                 label: "Change group",
                 icon: <RiFolderSharedLine />,
+                //hide change group option if only empty groups are selected
+                isActionHidden: (selectedRows) =>
+                  !selectedRows.some(
+                    (row: any) =>
+                      (row.objectType === RuleObjType.GROUP && row.children?.length > 0) ||
+                      row.objectType === RuleObjType.RULE
+                  ),
                 onClick: (selectedRows, clearSelection) => {
                   clearSelectedRowsDataCallbackRef.current = clearSelection;
                   handleChangeRuleGroupClick(selectedRows);
