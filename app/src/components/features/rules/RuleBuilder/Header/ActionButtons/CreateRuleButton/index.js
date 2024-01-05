@@ -191,6 +191,9 @@ const CreateRuleButton = ({
           if (!isRuleEditorModal) {
             redirectToRuleEditor(navigate, currentlySelectedRuleData.id, MODE);
           }
+        })
+        .catch(() => {
+          toast.error("Error in saving rule. Please contact support.");
         });
     } else {
       toast.warn(ruleValidation.message);
