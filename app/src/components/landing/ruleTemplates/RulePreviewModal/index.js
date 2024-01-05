@@ -14,6 +14,8 @@ import { snakeCase } from "lodash";
 import { generateObjectId } from "utils/FormattingHelper";
 import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.css";
+import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
 const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
   const navigate = useNavigate();
@@ -53,6 +55,9 @@ const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
     saveRule(appMode, ruleToSave).then(() => {
       trackTemplateImportCompleted(snakeCase(ruleToSave.name), source);
       redirectToRuleEditor(navigate, ruleToSave.id, "templates");
+    }).catch(() => {
+      Logger.log("Error in saving rule: saveRuleTemplate");
+      toast.error("Error in saving rule. Please contact support.");
     });
   };
 

@@ -8,6 +8,7 @@ import { generateObjectId } from "../../../../../utils/FormattingHelper";
 import APP_CONSTANTS from "config/constants";
 import { saveRule } from "../Header/ActionButtons/actions";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import Logger from "lib/logger";
 
 const { RULE_TYPES_CONFIG } = APP_CONSTANTS;
 
@@ -37,7 +38,9 @@ export const createResponseRule = (appMode, source_url, response_body) => {
 
   let rule = generate_blank_rule_format(rule_type);
   rule.pairs.push(createResponseRulePair(source_url, response_body));
-  saveRule(appMode, rule);
+  saveRule(appMode, rule).catch(() => {
+    Logger.log("Error in create rule: createResponseRule");
+  });
   return rule;
 };
 
@@ -60,7 +63,9 @@ export const updateResponseRule = (appMode, rule_id, source_url, response_body) 
 
   let rule = generate_blank_rule_format(rule_type, rule_id);
   rule.pairs.push(createResponseRulePair(source_url, response_body));
-  saveRule(appMode, rule);
+  saveRule(appMode, rule).catch(() => {
+    Logger.log("Error in saving rule: updateResponseRule");
+  });
 };
 
 export const getRuleLevelInitialConfigs = (ruleType) => {
