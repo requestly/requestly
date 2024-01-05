@@ -100,6 +100,14 @@ export const redirectToSessionRecordingHome = (navigate) => {
   navigate(PATHS.SESSIONS.ABSOLUTE);
 };
 
+export const redirectToSavedSession = (navigate, id) => {
+  navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
+};
+
+export const redirectToSessionSettings = (navigate) => {
+  navigate(PATHS.SESSIONS.SETTINGS.ABSOLUTE);
+};
+
 export const redirectToNetworkSession = (navigate, id) => {
   navigate(PATHS.SESSIONS.NETWORK.ABSOLUTE + `/${id}`);
 };
@@ -258,6 +266,10 @@ export const redirectToTeam = (navigate, teamId, options = {}) => {
   } else {
     navigate(url.pathname + url.search);
   }
+};
+
+export const redirectToManageWorkspace = (navigate, teamId) => {
+  navigate(PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`);
 };
 
 export const redirectToMyTeams = (navigate, hardRedirect) => {
