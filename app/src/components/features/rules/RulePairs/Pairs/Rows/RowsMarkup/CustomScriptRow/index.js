@@ -295,7 +295,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
         cancelText="Cancel"
         visible={isCodeTypePopupVisible}
       >
-        <Dropdown overlay={scriptCodeTypeMenu}>
+        <Dropdown overlay={scriptCodeTypeMenu} disabled={isInputDisabled}>
           <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
             {script.codeType} <DownOutlined />
           </Text>
@@ -341,29 +341,31 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
             ) : null}
           </Row>
         </Col>
-        <Col align="right" className="flex-1">
-          <Popconfirm
-            title="This will clear the existing script"
-            onConfirm={(e) => {
-              handleScriptDelete(e);
-              setIsScriptDeletePopupVisible(false);
-            }}
-            onCancel={() => {
-              setIsScriptDeletePopupVisible(false);
-            }}
-            okText="Confirm"
-            cancelText="Cancel"
-            visible={isScriptDeletePopupVisible}
-          >
-            <Tooltip title="Remove">
-              <DeleteOutlined
-                id="delete-pair"
-                color="text-gray cursor-pointer"
-                onClick={showScriptDeleteConfirmation}
-              />
-            </Tooltip>
-          </Popconfirm>
-        </Col>
+        {!isInputDisabled && (
+          <Col align="right" className="flex-1">
+            <Popconfirm
+              title="This will clear the existing script"
+              onConfirm={(e) => {
+                handleScriptDelete(e);
+                setIsScriptDeletePopupVisible(false);
+              }}
+              onCancel={() => {
+                setIsScriptDeletePopupVisible(false);
+              }}
+              okText="Confirm"
+              cancelText="Cancel"
+              visible={isScriptDeletePopupVisible}
+            >
+              <Tooltip title="Remove">
+                <DeleteOutlined
+                  id="delete-pair"
+                  color="text-gray cursor-pointer"
+                  onClick={showScriptDeleteConfirmation}
+                />
+              </Tooltip>
+            </Popconfirm>
+          </Col>
+        )}
       </Row>
       {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? renderURLInput() : renderCodeEditor()}
     </div>
