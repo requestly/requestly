@@ -15,13 +15,12 @@ import {
   getAppMode,
   getCurrentlySelectedRuleData,
   getIsRefreshRulesPending,
-  getRulesSelection,
   getUserAuthDetails,
 } from "store/selectors";
 //ACTIONS
 import { updateGroupOfSelectedRules, createNewGroup } from "./actions";
-import { unselectAllRecords } from "../actions";
-import { trackGroupChangedEvent } from "modules/analytics/events/common/groups";
+// import { unselectAllRecords } from "../actions";
+import { trackGroupChangedEvent } from "features/rules/analytics";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import Logger from "lib/logger";
 
@@ -38,12 +37,15 @@ const ChangeRuleGroupModal = (props) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const selectedRules = useSelector(getRulesSelection);
   const allGroups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
 
-  const selectedRuleIds = useMemo(() => Object.keys(selectedRules), [selectedRules]);
+  // TODO: Remove old rules table check after new table is rolled out to all users
+  const selectedRuleIds = useMemo(
+    () => (props.isOldRulesTable ? props.selectedRules : props.selectedRules.map((rule) => rule.id)),
+    [props.isOldRulesTable, props.selectedRules]
+  );
 
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);
@@ -62,9 +64,10 @@ const ChangeRuleGroupModal = (props) => {
     if (MODE === MODES.SELECTED_RULES) {
       return [];
     } else {
-      return allOptions.filter((option) => option.value === currentlySelectedRuleData.groupId);
+      return allOptions.filter((option) => option.value === currentlySelectedRuleData?.groupId);
     }
   };
+
   const stableGetCurrentValueForReactSelect = useCallback(getCurrentValueForReactSelect, [
     MODE,
     MODES.SELECTED_RULES,
@@ -78,9 +81,10 @@ const ChangeRuleGroupModal = (props) => {
     } else {
       updateGroupOfSelectedRules(appMode, selectedRuleIds, newGroupId, user)
         .then(() => {
-          trackGroupChangedEvent("rules_table");
-
-          unselectAllRecords(dispatch);
+          trackGroupChangedEvent("rules_list");
+          toast.success(`${selectedRuleIds?.length > 1 ? "Rules" : "Rule"} moved to group successfully!`);
+          // unselectAllRecords(dispatch);
+          props.onGroupChanged?.();
           props.clearSearch?.();
           //Refresh List
           dispatch(
@@ -117,12 +121,13 @@ const ChangeRuleGroupModal = (props) => {
   useEffect(() => {
     setAllOptionsForReactSelect(generateOptionsForReactSelect(allGroups));
   }, [allGroups]);
+
   useEffect(() => {
     setCurrentValueForReactSelect(stableGetCurrentValueForReactSelect(allOptionsForReactSelect));
   }, [setCurrentValueForReactSelect, stableGetCurrentValueForReactSelect, allOptionsForReactSelect]);
 
   return (
-    <Modal visible={props.isOpen} onCancel={props.toggle} footer={null} title="Change Group">
+    <Modal open={props.isOpen} onCancel={props.toggle} footer={null} title="Change Group">
       <div className="">
         {/* <Row className="one-padding-bottom  my-auto"> */}
         <Col className="my-auto">

@@ -129,6 +129,7 @@ export const GA_EVENTS = {
 
     NUM_RULES: "NUM_RULES",
     NUM_RULE_TYPES: "NUM_RULE_TYPES",
+    NUM_RULES_PINNED: "num_rules_pinned",
     NUM_RULE_TYPES_TRIED: "num_rule_types_tried",
     NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES",
     NUM_GROUPS: "NUM_GROUPS",
