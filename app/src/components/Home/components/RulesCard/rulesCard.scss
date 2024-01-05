@@ -29,6 +29,12 @@
   height: 46px;
   display: flex;
   align-items: center;
+  gap: 8px;
+
+  &-icon {
+    margin-top: 5px;
+    transform: scale(0.85);
+  }
 
   &:hover {
     background: var(--surface-1);
