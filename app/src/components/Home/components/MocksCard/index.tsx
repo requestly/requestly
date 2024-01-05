@@ -116,6 +116,7 @@ export const MocksCard: React.FC = () => {
           secondaryButton={
             <RQButton
               type="text"
+              className="homepage-empty-card-secondary-btn"
               onClick={() => {
                 trackHomeMockActionClicked("learn_more");
                 window.open("https://developers.requestly.io/mock-server/overview/", "_blank");
