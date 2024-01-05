@@ -1,0 +1,32 @@
+.help-card-title {
+  font-weight: 500;
+  color: var(--white);
+}
+
+.help-card-link {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 1rem;
+  cursor: pointer;
+  width: fit-content;
+  transition: 0.2s ease-in-out;
+  color: var(--white);
+  text-decoration-color: #ffffff00;
+
+  & .help-card-link-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  & .help-card-link-title {
+    color: var(--white);
+  }
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--white);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+  }
+}
