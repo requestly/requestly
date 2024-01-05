@@ -5,11 +5,17 @@ import PageLoader from "../PageLoader";
 
 function FallbackToTrackInfiniteLoading() {
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      Sentry.captureMessage("CodeEditor lazy loaded for too long", "fatal");
-    }, 3500);
+    const timeout_10 = setTimeout(() => {
+      Sentry.captureMessage("CodeEditor lazy loaded for 10s", "fatal");
+    }, 10000);
+
+    const timeout_5 = setTimeout(() => {
+      Sentry.captureMessage("CodeEditor lazy loaded for 5s", "fatal");
+      console.log("!!!debug", "5s timout");
+    }, 5000);
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(timeout_10);
+      clearTimeout(timeout_5);
     };
   }, []);
   return <PageLoader />;
