@@ -1,0 +1,4 @@
+.rule-preview-modal .ant-modal-content .ant-modal-body {
+  max-height: 65vh;
+  overflow-y: auto;
+}
