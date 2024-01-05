@@ -11,7 +11,6 @@ import { trackRuleDuplicatedEvent } from "modules/analytics/events/common/rules"
 import { toast } from "utils/Toast";
 import type { InputRef } from "antd";
 import { Rule, Status } from "types/rules";
-import "./duplicateRuleModal.scss";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { TeamWorkspace } from "types/teamWorkspace";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -19,17 +18,19 @@ import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
+import "./duplicateRuleModal.scss";
 
 interface Props {
   isOpen: boolean;
   close: () => void;
   rule: Rule;
   onDuplicate: (newRule: Rule) => void;
+  analyticEventSource?: string;
 }
 
 const generateCopiedRuleName = (ruleName: string): string => ruleName + " Copy";
 
-const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate }) => {
+const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate, analyticEventSource = "" }) => {
   const navigate = useNavigate();
   const availableWorkspaces: TeamWorkspace[] = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -98,7 +99,7 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
     }
 
     trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(rule.ruleType, isOperationInSameWorkspace ? "same" : "different");
+    trackRuleDuplicatedEvent(rule.ruleType, isOperationInSameWorkspace ? "same" : "different", analyticEventSource);
     submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
     onDuplicate(newRule);
     close();
@@ -112,6 +113,7 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate 
     close,
     navigate,
     userAttributes.num_rules,
+    analyticEventSource,
   ]);
 
   useEffect(() => {
