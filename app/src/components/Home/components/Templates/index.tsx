@@ -59,7 +59,7 @@ export const Templates: React.FC = () => {
                       handleShowRulePreview(template.data);
                     }}
                   >
-                    Preview
+                    Preview & use
                   </RQButton>
                   {/* <RQButton type="primary" size="small" className="home-templates-card-action-btn">
                   Use this template
