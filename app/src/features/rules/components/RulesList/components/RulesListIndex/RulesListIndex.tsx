@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import RulesTable from "../RulesTable/RulesTable";
-import { RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { RuleObj, RuleObjType } from "features/rules/types/rules";
 import { getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { RulesListProvider } from "./context";
@@ -35,7 +35,7 @@ import ContentHeader, { FilterType } from "componentsV2/ContentHeader";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { RiCheckLine } from "@react-icons/all-files/ri/RiCheckLine";
 import { RiFolderAddLine } from "@react-icons/all-files/ri/RiFolderAddLine";
-import { isRule } from "../RulesTable/utils";
+import { getActiveRules, isRule } from "../RulesTable/utils";
 import { CreateTeamRuleCTA, GettingStarted, ImportRulesModal } from "./components";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { ContentHeaderProps } from "componentsV2/ContentHeader";
@@ -80,9 +80,7 @@ const RulesList: React.FC<Props> = () => {
   const allRecords = useSelector(getAllRuleObjs);
   const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RuleObjType.GROUP), [allRecords]);
   const pinnedRecords = useMemo(() => allRecords?.filter((record) => record.isFavourite), [allRecords]);
-  const activeRecords = useMemo(() => allRecords?.filter((record) => record.status === RuleObjStatus.ACTIVE), [
-    allRecords,
-  ]);
+  const activeRecords = useMemo(() => getActiveRules(allRecords), [allRecords]);
 
   // FIX: rules loading state
 
@@ -260,7 +258,10 @@ const RulesList: React.FC<Props> = () => {
         key: "all",
         label: (
           <div className="label">
-            All {allRecords.length ? <Badge count={allRecords.length} overflowCount={20} /> : null}
+            All{" "}
+            {allRecords.length ? (
+              <Badge count={allRecords.filter((record: RuleObj) => isRule(record)).length} overflowCount={20} />
+            ) : null}
           </div>
         ),
         onClick: () => {
@@ -287,7 +288,10 @@ const RulesList: React.FC<Props> = () => {
         label: (
           <div className="label">
             <RiCheckLine className="icon" />
-            Active {activeRecords.length ? <Badge count={activeRecords.length} overflowCount={20} /> : null}
+            Active{" "}
+            {activeRecords.length ? (
+              <Badge count={activeRecords.filter((record: RuleObj) => isRule(record)).length} overflowCount={20} />
+            ) : null}
           </div>
         ),
         onClick: () => {
@@ -296,7 +300,7 @@ const RulesList: React.FC<Props> = () => {
         },
       },
     ],
-    [allRecords?.length, pinnedRecords.length, activeRecords.length]
+    [allRecords, pinnedRecords.length, activeRecords]
   );
 
   const CreateFirstRule = () => {

@@ -94,6 +94,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         }
       },
       defaultSortOrder: "ascend",
+      sortDirections: ["ascend", "descend", "ascend"],
+      showSorterTooltip: false,
       sorter: {
         // Fix. Descend logic sending groups to bottom
         // Fix: Default/No sort logic. Group should stay at top
@@ -103,7 +105,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           } else if (a.objectType !== "group" && b.objectType === "group") {
             return 1;
           } else {
-            return a.name?.toLowerCase() > b.name?.toLowerCase() ? 1 : -1;
+            return a.modificationDate > b.modificationDate ? -1 : 1;
           }
         },
       },
