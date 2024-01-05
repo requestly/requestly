@@ -38,3 +38,9 @@
     border-top: 1px solid var(--surface-2);
   }
 }
+
+@media (max-width: 992px) {
+  .homepage-teams-list {
+    margin-bottom: 45px;
+  }
+}
