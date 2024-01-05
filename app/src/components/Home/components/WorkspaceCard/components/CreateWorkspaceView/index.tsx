@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { Col, Typography } from "antd";
+import { Col } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { groupSvg } from "features/onboarding";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -30,10 +30,10 @@ export const CreateWorkspaceView: React.FC = () => {
   return (
     <Col className="create-workspace-view">
       <img src={groupSvg} alt="workspace" />
-      <Typography.Title level={5} className="create-workspace-view-title">
-        Collaborate better with the team using Requestly workspaces
-      </Typography.Title>
-      <Typography.Text>Share rules, mocks, and sessions. Collaborate to solve problems faster.</Typography.Text>
+      <div className="create-workspace-view-title">Collaborate better with the team using Requestly workspaces</div>
+      <div className="create-workspace-view-description">
+        Share rules, mocks, and sessions. Collaborate to solve problems faster.
+      </div>
       <AuthConfirmationPopover
         title="You need to sign up to create a workspace"
         callback={handleCreateWorkspace}
