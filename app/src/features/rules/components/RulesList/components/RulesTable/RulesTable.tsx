@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { Empty } from "antd";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, rulesToContentTableDataAdapter } from "./utils";
@@ -22,6 +23,7 @@ import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 // import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
 import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
+import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
 import "./rulesTable.css";
 
@@ -98,6 +100,24 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
     }
   };
 
+  const getSelectionCount = useCallback((selectedRows: any) => {
+    let groups = 0;
+    let rules = 0;
+
+    selectedRows.forEach((row: any) => {
+      row.objectType === RuleObjType.GROUP ? groups++ : rules++;
+    });
+
+    const formatCount = (count: number, singular: string, plural: string) => {
+      return count > 0 ? `${count} ${count > 1 ? plural : singular}` : "";
+    };
+
+    const groupString = formatCount(groups, "Group", "Groups");
+    const ruleString = formatCount(rules, "Rule", "Rules");
+
+    return `${groupString}${groupString && ruleString ? " and " : ""}${ruleString} selected`;
+  }, []);
+
   const clearSelectionCallback = clearSelectedRowsDataCallbackRef.current;
   const isFeatureLimitbannerShown = isFeatureLimiterOn && user?.isLimitReached;
 
@@ -118,14 +138,17 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         rowKey="id"
         loading={loading}
         customRowClassName={(record) => (record.isFavourite ? "record-pinned" : "")}
+        // filterSelection={(selectedRows) => {
+        //   return selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
+        // }}
+        locale={{
+          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found" />,
+        }}
         filterSelection={(selectedRows) => {
-          const filteredRows = selectedRows.filter((record: RuleObj) => record.objectType !== RuleObjType.GROUP);
-
-          if (filteredRows.length) {
-            trackRulesSelected(filteredRows.length);
+          if (selectedRows.length) {
+            trackRulesSelected(selectedRows.length);
           }
-
-          return filteredRows;
+          return selectedRows;
         }}
         expandable={{
           expandRowByClick: true,
@@ -160,23 +183,31 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
           type: "default",
           options: {
             clearSelectedRows,
-            infoText: (selectedRules) => `${selectedRules.length} Rules Selected`,
+            infoText: (selectedRules) => getSelectionCount(selectedRules),
             actions: [
               {
                 label: "Ungroup",
                 icon: <ImUngroup />,
+                isActionHidden: (selectedRows) => !selectedRows.some((row: any) => row?.groupId?.length > 0),
                 onClick: (selectedRows, clearSelection) => {
                   const onSuccess = () => {
+                    toast.success(`${selectedRows.length > 1 ? "Rules" : "Rule"} ungrouped successfully!`);
                     clearSelection();
                     trackRulesListBulkActionPerformed("ungroup");
                   };
-
                   handleUngroupSelectedRulesClick(selectedRows)?.then(onSuccess);
                 },
               },
               {
                 label: "Change group",
                 icon: <RiFolderSharedLine />,
+                //hide change group option if only empty groups are selected
+                isActionHidden: (selectedRows) =>
+                  !selectedRows.some(
+                    (row: any) =>
+                      (row.objectType === RuleObjType.GROUP && row.children?.length > 0) ||
+                      row.objectType === RuleObjType.RULE
+                  ),
                 onClick: (selectedRows, clearSelection) => {
                   const onSuccess = () => {
                     clearSelection();

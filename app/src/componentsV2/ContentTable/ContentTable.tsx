@@ -13,6 +13,7 @@ export interface ContentTableProps<DataType> extends TableProps<DataType> {
   customRowClassName?: (record: DataType) => string;
   bulkActionBarConfig?: BulkActionBarConfig;
   filterSelection?: (records: DataType[]) => DataType[];
+  locale: TableProps<DataType>["locale"];
 }
 
 const ContentTable = <DataType extends object>({
@@ -26,6 +27,7 @@ const ContentTable = <DataType extends object>({
   scroll = { y: "calc(100vh - 277px)" },
   filterSelection = (records) => records,
   expandable,
+  locale,
 }: ContentTableProps<DataType>): ReactElement => {
   const [selectedRowsData, setSelectedRowsData] = useState<DataType[]>([]);
 
@@ -57,6 +59,7 @@ const ContentTable = <DataType extends object>({
         pagination={false}
         scroll={scroll}
         expandable={expandable}
+        locale={locale}
         rowSelection={{
           checkStrictly: false,
           selectedRowKeys: selectedRowsData.map((record) => (record as any).id),

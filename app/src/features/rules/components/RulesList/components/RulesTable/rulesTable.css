@@ -31,6 +31,10 @@
   padding: 12px 0;
 }
 
+::-webkit-scrollbar-corner {
+  background: #ffff0000;
+}
+
 .rq-content-table-row.ant-table-row td.ant-table-cell:nth-child(2) > button.ant-table-row-expand-icon,
 .rq-content-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
   flex-shrink: 0;

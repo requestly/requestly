@@ -4,8 +4,6 @@
 
     .ant-table-tbody {
       tr.rq-content-table-row.ant-table-row {
-        background: var(--background);
-
         &[data-row-key^="Group"] {
           .group-expand-icon {
             display: block;
