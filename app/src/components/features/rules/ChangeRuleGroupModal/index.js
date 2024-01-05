@@ -40,9 +40,12 @@ const ChangeRuleGroupModal = (props) => {
   const allGroups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
-  const selectedRules = props.selectedRules;
 
-  const selectedRuleIds = useMemo(() => selectedRules.map((rule) => rule.id), [selectedRules]);
+  // TODO: Remove old rules table check after new table is rolled out to all users
+  const selectedRuleIds = useMemo(
+    () => (props.isOldRulesTable ? props.selectedRules : props.selectedRules.map((rule) => rule.id)),
+    [props.isOldRulesTable, props.selectedRules]
+  );
 
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);
