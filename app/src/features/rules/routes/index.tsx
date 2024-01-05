@@ -2,7 +2,7 @@ import { Navigate, RouteObject } from "react-router-dom";
 import TemplatesIndexPage from "components/landing/ruleTemplates";
 import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer";
-import RulesIndexView from "views/features/rules/RulesIndexView";
+// import RulesIndexView from "views/features/rules/RulesIndexView";
 import SharedListsIndexPage from "components/features/sharedLists/SharedListsIndexPage";
 import TrashIndexPage from "components/features/trash/TrashIndexPage";
 import RuleEditor from "views/features/rules/RuleEditor";
@@ -13,6 +13,7 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RootComponent from "components/redirects/RootComponent";
 import RulesListIndex from "../components/RulesList/components/RulesListIndex/RulesListIndex";
 import SharedListViewer from "../components/SharedList/components/SharedListViewer/SharedListViewer";
+import RulesIndexViewWrapper from "../components/RulesList/components/RulesListIndex/RulesIndexViewWrapper";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -26,7 +27,7 @@ export const ruleRoutes: RouteObject[] = [
       {
         index: true,
         path: PATHS.RULES.MY_RULES.RELATIVE,
-        element: <RulesIndexView />,
+        element: <RulesIndexViewWrapper />,
       },
       {
         path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
