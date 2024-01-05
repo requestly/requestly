@@ -366,7 +366,7 @@ const RulesTable = ({
         modalName: "renameGroupModal",
         newValue: true,
         newProps: {
-          groupId: { groupId },
+          groupId: groupId,
         },
       })
     );
