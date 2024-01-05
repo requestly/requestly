@@ -14,7 +14,6 @@ import {
   getAppOnboardingDetails,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
-import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurvey } from "components/misc/PersonaSurvey";
@@ -117,12 +116,6 @@ const DashboardContent = () => {
               onCancel={() => toggleExtensionModal()}
               eventPage="dashboard_content"
               {...activeModals.extensionModal.props}
-            />
-          ) : null}
-          {activeModals.freeTrialExpiredModal.isActive ? (
-            <FreeTrialExpiredModal
-              isOpen={activeModals.freeTrialExpiredModal.isActive}
-              {...activeModals.freeTrialExpiredModal.props}
             />
           ) : null}
           {activeModals.syncConsentModal.isActive ? (
