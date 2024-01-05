@@ -18,7 +18,7 @@ export const getActiveRules = (records: RuleObj[]) => {
   records.forEach((record) => {
     if (isRule(record) && record.status === RuleObjStatus.ACTIVE) {
       rules.push(record);
-    } else {
+    } else if (!isRule(record)) {
       groups[record.id] = record;
     }
   });
