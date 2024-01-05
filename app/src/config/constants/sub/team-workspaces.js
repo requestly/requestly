@@ -11,4 +11,11 @@ TEAM_WORKSPACES.PRIVATE_WORKSPACE = {
   color: "#1E69FF",
 };
 
+TEAM_WORKSPACES.NEW_WORKSPACE = {
+  name: "Team Workspace",
+  id: "new_workspace",
+  accessCount: 1,
+  color: "#585b58",
+};
+
 export default TEAM_WORKSPACES;

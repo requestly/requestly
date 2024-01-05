@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Button } from "antd";
 import APP_CONSTANTS from "../../../../../../../../config/constants";
-import ContactUsModal from "components/landing/contactUsModal";
+import { ContactUsModal } from "components/modals/ContactUsModal";
 import CancelPlanModal from "./CancelPlanModal";
 import { actions } from "store";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
@@ -11,10 +11,6 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
   const dispatch = useDispatch();
   const [isContactUsModalActive, setIsContactUsModalActive] = useState(false);
   const [isCancelPlanModalActive, setIsCancelPlanModalActive] = useState(false);
-
-  const toggleContactUsModal = () => {
-    setIsContactUsModalActive(!isContactUsModalActive);
-  };
 
   const handleCancelPlanModalClose = () => {
     setIsCancelPlanModalActive(false);
@@ -54,7 +50,13 @@ const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
       </Button>
 
       {isContactUsModalActive ? (
-        <ContactUsModal isOpen={isContactUsModalActive} handleToggleModal={toggleContactUsModal} />
+        <ContactUsModal
+          isOpen={isContactUsModalActive}
+          onCancel={() => setIsContactUsModalActive(false)}
+          heading="Get In Touch"
+          subHeading="Learn about the benefits & pricing of team plan"
+          source="manage_workspace"
+        />
       ) : null}
 
       {isCancelPlanModalActive ? (
