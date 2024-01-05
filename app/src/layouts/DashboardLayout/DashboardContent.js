@@ -11,11 +11,9 @@ import {
   getUserAuthDetails,
   getAppMode,
   getIsWorkspaceOnboardingCompleted,
-  getIsJoinWorkspaceCardVisible,
   getAppOnboardingDetails,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
-import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurvey } from "components/misc/PersonaSurvey";
@@ -28,7 +26,6 @@ import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/Manag
 import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
-import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
 import { PricingModal } from "features/pricing";
@@ -49,7 +46,6 @@ const DashboardContent = () => {
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
-  const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingFeatureValue = useFeatureValue("new_onboarding", null);
@@ -120,12 +116,6 @@ const DashboardContent = () => {
               onCancel={() => toggleExtensionModal()}
               eventPage="dashboard_content"
               {...activeModals.extensionModal.props}
-            />
-          ) : null}
-          {activeModals.freeTrialExpiredModal.isActive ? (
-            <FreeTrialExpiredModal
-              isOpen={activeModals.freeTrialExpiredModal.isActive}
-              {...activeModals.freeTrialExpiredModal.props}
             />
           ) : null}
           {activeModals.syncConsentModal.isActive ? (
@@ -219,7 +209,7 @@ const DashboardContent = () => {
               <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
             )}
 
-          {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
+          {/* {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null} */}
         </>
       )}
     </>

@@ -1,0 +1,56 @@
+.changelog-card-title.ant-typography {
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: var(--white);
+}
+
+.changelog-log:not(:first-child) {
+  margin-top: 18px;
+}
+
+.changelog-card-logs-wrapper {
+  margin-bottom: 12px;
+}
+
+.changelog-card-log-tag {
+  font-weight: 500;
+  font-size: 10px;
+  margin-top: 1px;
+}
+
+.changelog-card-log-date {
+  font-size: 11px;
+}
+
+.changelog-card-log-title {
+  color: var(--white);
+
+  &:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+}
+
+.changelog-card-log-description {
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0.4px;
+  color: var(--neutrals-gray-300);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.changelog-chore {
+  color: #e09400; //warning color is different than the one in the design
+}
+
+.changelog-feature {
+  color: var(--success);
+}
+
+.changelog-fix {
+  color: var(--danger);
+}

@@ -8,6 +8,18 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.1.3",
+    logs: ["[RQ-1215] fix: caching redirect/replace rules (#1316)"],
+  },
+  {
+    version: "23.12.31",
+    logs: [
+      "[RQ-1208] added URL matching for redirect/replace rules when overriding fetch (#1310)",
+      "[RQ-1207] added logo transition gif in extension popup (#1309)",
+      "[RQ-1145] feat: relay auth header when redirected [RQ-1178] fix: no script injection when extension is disabled(#1277)",
+    ],
+  },
+  {
     version: "23.12.12",
     logs: ["Revert #1208 Relay auth header to redirected request"],
   },

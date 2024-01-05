@@ -77,8 +77,6 @@ const InvoiceTable = ({ mode, teamId }) => {
             status: doc.data().status,
             hosted_invoice_url: doc.data().hosted_invoice_url,
             number: doc.data().number,
-            productStart: new Date(doc.data().productStart * 1000).toDateString(),
-            productEnd: new Date(doc.data().productEnd * 1000).toDateString(),
           });
         });
         if (records.length > 0) {
@@ -177,7 +175,7 @@ const InvoiceTable = ({ mode, teamId }) => {
             {
               title: "Subscription Period",
               render: (_, invoice) => {
-                return `${invoice.productStart} - ${invoice.productEnd}`;
+                return `${invoice.periodStart} - ${invoice.periodEnd}`;
               },
             },
           ]}

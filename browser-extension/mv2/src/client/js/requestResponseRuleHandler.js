@@ -103,9 +103,33 @@ RQ.RequestResponseRuleHandler.cacheResponseRules = async () => {
   );
 };
 
+RQ.RequestResponseRuleHandler.cacheRedirectRules = async () => {
+  const redirectRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REDIRECT);
+  RQ.ClientUtils.executeJS(
+    `
+    window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+    window.${RQ.PUBLIC_NAMESPACE}.redirectRules = ${JSON.stringify(redirectRules)};
+  `,
+    true
+  );
+};
+
+RQ.RequestResponseRuleHandler.cacheReplaceRules = async () => {
+  const replaceRules = await RQ.RulesStore.getEnabledRules(RQ.RULE_TYPES.REPLACE);
+  RQ.ClientUtils.executeJS(
+    `
+    window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
+    window.${RQ.PUBLIC_NAMESPACE}.replaceRules = ${JSON.stringify(replaceRules)};
+  `,
+    true
+  );
+};
+
 RQ.RequestResponseRuleHandler.updateRulesCache = async () => {
   RQ.RequestResponseRuleHandler.cacheRequestRules();
   RQ.RequestResponseRuleHandler.cacheResponseRules();
+  RQ.RequestResponseRuleHandler.cacheRedirectRules();
+  RQ.RequestResponseRuleHandler.cacheReplaceRules();
 };
 
 /**
@@ -121,6 +145,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   window[namespace] = window[namespace] || {};
   window[namespace].requestRules = [];
   window[namespace].responseRules = [];
+  window[namespace].redirectRules = [];
+  window[namespace].replaceRules = [];
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage
@@ -228,7 +254,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       return null;
     }
 
-    return window[namespace].requestRules.findLast((rule) =>
+    return window[namespace].requestRules?.findLast((rule) =>
       window[namespace].matchSourceUrl(rule.pairs[0].source, url)
     );
   };
@@ -238,9 +264,29 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       return null;
     }
 
-    return window[namespace].responseRules.findLast((rule) => {
+    return window[namespace].responseRules?.findLast((rule) => {
       return matchRuleSource({ url, requestData, method }, rule);
     });
+  };
+
+  const getMatchingRedirectRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
+
+    return window[namespace].redirectRules?.findLast((rule) =>
+      rule.pairs.some((pair) => window[namespace].matchSourceUrl(pair.source, url))
+    );
+  };
+
+  const getMatchingReplaceRule = (url) => {
+    if (!isExtensionEnabled()) {
+      return null;
+    }
+
+    return window[namespace].replaceRules?.findLast((rule) =>
+      rule.pairs.some((pair) => window[namespace].matchSourceUrl(pair.source, url))
+    );
   };
 
   const shouldServeResponseWithoutRequest = (responseRule) => {
@@ -531,17 +577,24 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
     let hasModifiedHeaders = false;
 
-    // Stores Auth header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
-    ignoredHeadersOnRedirect.forEach((header) => {
-      const originalHeaderValue = request.headers.get(header);
-      if (isExtensionEnabled() && originalHeaderValue) {
-        hasModifiedHeaders = true;
-        request.headers.set(customHeaderPrefix + header, originalHeaderValue);
-      }
-    });
-
     const url = getAbsoluteUrl(request.url);
     const method = request.method;
+
+    const redirectRuleThatMatchesURL = getMatchingRedirectRule(url);
+    const replaceRuleThatMatchesURL = getMatchingReplaceRule(url);
+
+    // redirect/replace rule specific code that is applied only when redirect/replace rule matches the URL
+    if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+      // Stores Auth header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
+      ignoredHeadersOnRedirect.forEach((header) => {
+        const originalHeaderValue = request.headers.get(header);
+        if (isExtensionEnabled() && originalHeaderValue) {
+          hasModifiedHeaders = true;
+          request.headers.set(customHeaderPrefix + header, originalHeaderValue);
+        }
+      });
+    }
+
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
 

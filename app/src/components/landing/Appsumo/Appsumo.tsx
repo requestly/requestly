@@ -43,9 +43,15 @@ const AppSumoModal: React.FC = () => {
   const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
+  const [showMaxCodesExeceededError, setShowMaxCodesExeceededError] = useState(false);
+
   const db = getFirestore(firebaseApp);
 
   const addAppSumoCodeInput = () => {
+    if (appsumoCodes.length >= 10) {
+      setShowMaxCodesExeceededError(true);
+      return;
+    }
     setAppsumoCodes((prev) => [...prev, { ...DEFAULT_APPSUMO_INPUT }]);
   };
 
@@ -157,7 +163,7 @@ const AppSumoModal: React.FC = () => {
       teamId = await createNewWorkspaceForAppSumo();
     }
 
-    const updateTeamSubscriptionForAppSumo = httpsCallable(
+    const updateTeamSubscriptionForAppSumo = httpsCallable<{}, { success: boolean; message: string; error?: string }>(
       getFunctions(),
       "subscription-updateTeamSubscriptionForAppSumo"
     );
@@ -167,13 +173,28 @@ const AppSumoModal: React.FC = () => {
         teamId: teamId,
         startDate: Date.now(),
         appsumoCodes: appsumoCodes.map((code) => code.code),
-      });
+      })
+        .then((response) => {
+          if (!response?.data?.success && response?.data?.error === "max_limit_reached") {
+            setShowMaxCodesExeceededError(true);
+          } else {
+            redeemSubmittedCodes();
+            trackAppsumoCodeRedeemed(appsumoCodes.length);
+            toast.success(
+              `Lifetime access to SessionBook Plus unlocked for ${
+                appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
+              }`,
+              10
+            );
+            redirectToRoot(navigate);
+          }
+        })
+        .finally(() => {
+          setIsUpdatingSubscription(false);
+        });
     } catch (error) {
       console.error("from appsumo", error);
     }
-
-    await redeemSubmittedCodes();
-    setIsUpdatingSubscription(false);
   }, [
     createNewWorkspaceForAppSumo,
     appsumoCodes,
@@ -181,6 +202,7 @@ const AppSumoModal: React.FC = () => {
     isAllCodeCheckPassed,
     redeemSubmittedCodes,
     workspaceToUpgrade?.id,
+    navigate,
   ]);
 
   const handleEmailValidation = (email: string) => {
@@ -198,17 +220,9 @@ const AppSumoModal: React.FC = () => {
   const debouncedEmailValidation = useDebounce((email: string) => handleEmailValidation(email));
 
   const handleUnlockDealClick = async () => {
+    setShowMaxCodesExeceededError(false);
     try {
       await onSubmit();
-
-      trackAppsumoCodeRedeemed(appsumoCodes.length);
-      toast.success(
-        `Lifetime access to SessionBook Plus unlocked for ${
-          appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
-        }`,
-        10
-      );
-      redirectToRoot(navigate);
     } catch (error) {
       // do nothing
     }
@@ -293,6 +307,13 @@ const AppSumoModal: React.FC = () => {
           <RQButton className="appsumo-add-btn" type="link" onClick={addAppSumoCodeInput}>
             + Add more codes
           </RQButton>
+          {showMaxCodesExeceededError && (
+            <div className="danger caption">
+              {
+                "Maximum 10 AppSumo codes can be applied. Please connect with support for further help at contact@requestly.io"
+              }
+            </div>
+          )}
         </div>
         <Row className="rq-modal-footer" justify={"end"}>
           <RQButton
