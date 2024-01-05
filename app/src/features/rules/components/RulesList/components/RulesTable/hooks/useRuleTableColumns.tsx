@@ -19,6 +19,7 @@ import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import PATHS from "config/constants/sub/paths";
 import { isRule } from "../utils";
+import { trackRulesListActionsClicked } from "features/rules/analytics";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -254,7 +255,10 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 type="text"
                 className="more-rule-actions-btn"
                 icon={<MdOutlineMoreHoriz />}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  trackRulesListActionsClicked(record.objectType);
+                }}
               />
             </Dropdown>
           </Row>

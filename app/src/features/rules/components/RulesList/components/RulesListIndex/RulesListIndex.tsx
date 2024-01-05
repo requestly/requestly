@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import RulesTable from "../RulesTable/RulesTable";
-import { RuleObj } from "features/rules/types/rules";
+import { RuleObj, RuleObjType } from "features/rules/types/rules";
 import { getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { RulesListProvider } from "./context";
@@ -47,7 +47,15 @@ import SpinnerCard from "components/misc/SpinnerCard";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
+import {
+  trackNewGroupButtonClicked,
+  trackRulesListFilterApplied,
+  trackRulesListSearched,
+} from "features/rules/analytics";
+import { debounce } from "lodash";
 import "./rulesListIndex.scss";
+
+const debouncedTrackRulesListSearched = debounce(trackRulesListSearched, 500);
 
 interface Props {}
 
@@ -70,6 +78,7 @@ const RulesList: React.FC<Props> = () => {
   // FIXME: Fetching multiple times
   // Fetch Rules here from Redux
   const allRecords = useSelector(getAllRuleObjs);
+  const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RuleObjType.GROUP), [allRecords]);
   const pinnedRecords = useMemo(() => allRecords?.filter((record) => record.isFavourite), [allRecords]);
   const activeRecords = useMemo(() => getActiveRules(allRecords), [allRecords]);
 
@@ -181,6 +190,7 @@ const RulesList: React.FC<Props> = () => {
 
   const handleNewGroupClick = () => {
     setIsCreateNewRuleGroupModalActive(true);
+    trackNewGroupButtonClicked(allGroups?.length);
   };
 
   const buttonData = [
@@ -256,6 +266,7 @@ const RulesList: React.FC<Props> = () => {
         ),
         onClick: () => {
           setActiveFilter("all");
+          trackRulesListFilterApplied("all", allRecords.length, allRecords.length);
         },
       },
       {
@@ -269,6 +280,7 @@ const RulesList: React.FC<Props> = () => {
         ),
         onClick: () => {
           setActiveFilter("pinned");
+          trackRulesListFilterApplied("pinned", allRecords.length, pinnedRecords.length);
         },
       },
       {
@@ -284,6 +296,7 @@ const RulesList: React.FC<Props> = () => {
         ),
         onClick: () => {
           setActiveFilter("active");
+          trackRulesListFilterApplied("active", allRecords.length, activeRecords.length);
         },
       },
     ],
@@ -292,6 +305,11 @@ const RulesList: React.FC<Props> = () => {
 
   const CreateFirstRule = () => {
     return isWorkspaceMode ? <CreateTeamRuleCTA /> : <GettingStarted />;
+  };
+
+  const handleSearchValueUpdate = (value: string) => {
+    setSearchValue(value);
+    debouncedTrackRulesListSearched(value);
   };
 
   return isLoading ? (
@@ -322,7 +340,7 @@ const RulesList: React.FC<Props> = () => {
           subtitle="Create and manage your rules from here"
           actions={contentHeaderActions}
           searchValue={searchValue}
-          setSearchValue={setSearchValue}
+          setSearchValue={handleSearchValueUpdate}
           activeFilter={activeFilter}
           filters={contentHeaderFilters}
         />

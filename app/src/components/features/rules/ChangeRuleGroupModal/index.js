@@ -20,7 +20,7 @@ import {
 //ACTIONS
 import { updateGroupOfSelectedRules, createNewGroup } from "./actions";
 // import { unselectAllRecords } from "../actions";
-import { trackGroupChangedEvent } from "features/rules/analytics/groups";
+import { trackGroupChangedEvent } from "features/rules/analytics";
 import { setCurrentlySelectedRule } from "../RuleBuilder/actions";
 import Logger from "lib/logger";
 
@@ -40,9 +40,12 @@ const ChangeRuleGroupModal = (props) => {
   const allGroups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const appMode = useSelector(getAppMode);
-  const selectedRules = props.selectedRules;
 
-  const selectedRuleIds = useMemo(() => selectedRules.map((rule) => rule.id), [selectedRules]);
+  // TODO: Remove old rules table check after new table is rolled out to all users
+  const selectedRuleIds = useMemo(
+    () => (props.isOldRulesTable ? props.selectedRules : props.selectedRules.map((rule) => rule.id)),
+    [props.isOldRulesTable, props.selectedRules]
+  );
 
   //Component State
   const [allOptionsForReactSelect, setAllOptionsForReactSelect] = useState([]);
@@ -78,7 +81,7 @@ const ChangeRuleGroupModal = (props) => {
     } else {
       updateGroupOfSelectedRules(appMode, selectedRuleIds, newGroupId, user)
         .then(() => {
-          trackGroupChangedEvent("rules_table");
+          trackGroupChangedEvent("rules_list");
           toast.success(`${selectedRuleIds?.length > 1 ? "Rules" : "Rule"} moved to group successfully!`);
           // unselectAllRecords(dispatch);
           props.onGroupChanged?.();

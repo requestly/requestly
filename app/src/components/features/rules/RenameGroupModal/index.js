@@ -10,6 +10,7 @@ import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../
 import { actions } from "../../../../store";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
+import { trackGroupRenamed } from "features/rules/analytics";
 
 import "./index.scss";
 
@@ -88,6 +89,7 @@ const RenameGroupModal = ({ groupId, isOpen, toggle }) => {
       .then(async () => {
         //Push Notify
         toast.info(`Renamed Group`);
+        trackGroupRenamed();
         //Refresh List
         dispatch(
           actions.updateRefreshPendingStatus({

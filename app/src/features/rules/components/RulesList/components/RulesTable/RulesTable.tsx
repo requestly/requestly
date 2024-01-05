@@ -24,6 +24,7 @@ import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
+import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
 import "./rulesTable.css";
 
 interface Props {
@@ -143,6 +144,12 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
         locale={{
           emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found" />,
         }}
+        filterSelection={(selectedRows) => {
+          if (selectedRows.length) {
+            trackRulesSelected(selectedRows.length);
+          }
+          return selectedRows;
+        }}
         expandable={{
           expandRowByClick: true,
           rowExpandable: () => true,
@@ -183,10 +190,12 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
                 icon: <ImUngroup />,
                 isActionHidden: (selectedRows) => !selectedRows.some((row: any) => row?.groupId?.length > 0),
                 onClick: (selectedRows, clearSelection) => {
-                  handleUngroupSelectedRulesClick(selectedRows)?.then(() => {
+                  const onSuccess = () => {
                     toast.success(`${selectedRows.length > 1 ? "Rules" : "Rule"} ungrouped successfully!`);
                     clearSelection();
-                  });
+                    trackRulesListBulkActionPerformed("ungroup");
+                  };
+                  handleUngroupSelectedRulesClick(selectedRows)?.then(onSuccess);
                 },
               },
               {
@@ -200,7 +209,12 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
                       row.objectType === RuleObjType.RULE
                   ),
                 onClick: (selectedRows, clearSelection) => {
-                  clearSelectedRowsDataCallbackRef.current = clearSelection;
+                  const onSuccess = () => {
+                    clearSelection();
+                    trackRulesListBulkActionPerformed("change_group");
+                  };
+
+                  clearSelectedRowsDataCallbackRef.current = onSuccess;
                   handleChangeRuleGroupClick(selectedRows);
                 },
               },
@@ -213,7 +227,12 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
                 label: "Share",
                 icon: <RiUserSharedLine />,
                 onClick: (selectedRows, clearSelection) => {
-                  handleRuleShare(selectedRows, clearSelection);
+                  const onSuccess = () => {
+                    clearSelection();
+                    trackRulesListBulkActionPerformed("share");
+                  };
+
+                  handleRuleShare(selectedRows, onSuccess);
                 },
               },
               {
@@ -221,7 +240,12 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
                 label: "Delete",
                 icon: <RiDeleteBin2Line />,
                 onClick: (selectedRows, clearSelection) => {
-                  clearSelectedRowsDataCallbackRef.current = clearSelection;
+                  const onSuccess = () => {
+                    clearSelection();
+                    trackRulesListBulkActionPerformed("delete");
+                  };
+
+                  clearSelectedRowsDataCallbackRef.current = onSuccess;
                   handleDeleteRecordClick(selectedRows);
                 },
               },
