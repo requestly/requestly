@@ -13,3 +13,15 @@ export type SessionRecordingConfig = {
     mode: AutoRecordingMode;
   };
 };
+
+export type SessionRecording = {
+  id: string;
+  name: string;
+  duration: number;
+  startTime: number;
+  url: string;
+  visibility: string;
+  eventsFilePath: string;
+  createdBy: string;
+  updatedTs?: number;
+};

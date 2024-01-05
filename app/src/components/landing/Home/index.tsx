@@ -92,7 +92,7 @@ const HOME_FEATURES: HomeFeature[] = [
   },
 ];
 
-export const Home: React.FC = () => {
+export const HomePage: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const { isPinExtensionPopupActive, closePinExtensionPopup } = usePinExtensionPopup();
 

@@ -9,11 +9,15 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
-import { trackTemplateImportCompleted } from "modules/analytics/events/features/templates";
+import { trackTemplateImportCompleted, trackTemplateImportStarted } from "modules/analytics/events/features/templates";
 import { snakeCase } from "lodash";
 import { generateObjectId } from "utils/FormattingHelper";
+import { AUTH } from "modules/analytics/events/common/constants";
+import "./index.css";
+import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
-const RulePreviewModal = ({ rule, isOpen, toggle }) => {
+const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
   const navigate = useNavigate();
   //Global State
   const dispatch = useDispatch();
@@ -35,6 +39,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
         return;
       }
     }
+
     const modificationDate = Date.now();
 
     const ruleToSave = {
@@ -45,15 +50,22 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
       modificationDate,
     };
 
-    saveRule(appMode, ruleToSave).then(() => {
-      trackTemplateImportCompleted(snakeCase(ruleToSave.name));
-      redirectToRuleEditor(navigate, ruleToSave.id, "templates");
-    });
+    //triggering started event here for home screen because started event is triggered from templates list page.g
+    if (source === AUTH.SOURCE.HOME_SCREEN) trackTemplateImportStarted(snakeCase(ruleToSave.name), source);
+    saveRule(appMode, ruleToSave)
+      .then(() => {
+        trackTemplateImportCompleted(snakeCase(ruleToSave.name), source);
+        redirectToRuleEditor(navigate, ruleToSave.id, "templates");
+      })
+      .catch((e) => {
+        Logger.log("saveRuleTemplate Error in saving rule:", e);
+        toast.error("Error in saving rule. Please contact support.");
+      });
   };
 
   return (
     <Modal
-      className="modal-dialog-centered max-width-80-percent "
+      className="modal-dialog-centered max-width-80-percent rule-preview-modal"
       open={isOpen}
       onCancel={toggle}
       footer={null}
@@ -63,7 +75,7 @@ const RulePreviewModal = ({ rule, isOpen, toggle }) => {
           <Col flex="none" style={{ marginRight: "2rem" }}>
             {" "}
             <Button type="primary" onClick={() => saveRuleTemplate(rule)}>
-              Create Rule
+              Use this template
             </Button>
           </Col>
         </Row>
