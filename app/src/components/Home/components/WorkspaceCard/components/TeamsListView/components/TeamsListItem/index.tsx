@@ -109,7 +109,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
       <Col span={12} className="teams-list-actions-wrapper">
         <Row align="middle">
           {isLoading ? (
-            <div className="teams-list-avatar-loading-wrapper">
+            <div className="teams-list-avatar-loading-wrapper" style={{ marginRight: inviteId ? "14px" : "10px" }}>
               {Array.from({ length: MAX_MEMBERS_TO_SHOW + 1 }).map((_, index) => (
                 <Skeleton key={index} active avatar className="teams-list-avatar-loading" />
               ))}
@@ -120,7 +120,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
               size="small"
               maxPopoverTrigger="click"
               maxStyle={{ cursor: "pointer", background: "#918f8f" }}
-              style={{ marginRight: "10px" }}
+              style={{ marginRight: inviteId ? "14px" : "10px" }}
             >
               {members?.map((member: any) => (
                 <>

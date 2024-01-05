@@ -9,7 +9,7 @@ import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { RQButton } from "lib/design-system/components";
 import { redirectToCreateNewRule, redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
-import { Rule } from "types";
+import { Rule, RuleType } from "types";
 import rulesIcon from "../../assets/rules.svg";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { StorageService } from "init";
@@ -22,6 +22,7 @@ import { actions } from "store";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import { AUTH } from "modules/analytics/events/common/constants";
+import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import "./rulesCard.scss";
 
 export const RulesCard: React.FC = () => {
@@ -36,41 +37,6 @@ export const RulesCard: React.FC = () => {
   const [rules, setRules] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // const dropdownMenu = useMemo(() => {
-  //   const checkIsPremiumRule = (ruleType: RuleType) => {
-  //     const featureName = `${ruleType.toLowerCase()}_rule` as FeatureLimitType;
-  //     return !getFeatureLimitValue(featureName);
-  //   };
-
-  //   return (
-  //     <Menu>
-  //       {Object.values(RULE_TYPES_CONFIG)
-  //         .filter((ruleConfig) => ruleConfig.ID !== 11)
-  //         .map(({ ID, TYPE, ICON, NAME }) => (
-  //           <PremiumFeature
-  //             popoverPlacement="topLeft"
-  //             onContinue={() => {
-  //               redirectToCreateNewRule(navigate, TYPE, AUTH.SOURCE.HOME_SCREEN);
-  //             }}
-  //             features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
-  //             source="rule_selection_dropdown"
-  //           >
-  //             <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
-  //               {NAME}
-  //               {checkIsPremiumRule(TYPE) ? (
-  //                 <PremiumIcon
-  //                   placement="topLeft"
-  //                   featureType={`${TYPE.toLowerCase()}_rule` as FeatureLimitType}
-  //                   source="rule_dropdown"
-  //                 />
-  //               ) : null}
-  //             </Menu.Item>
-  //           </PremiumFeature>
-  //         ))}
-  //     </Menu>
-  //   );
-  // }, [navigate, getFeatureLimitValue]);
-
   useEffect(() => {
     if (isExtensionInstalled() && !isRulesLoading) {
       StorageService(appMode)
@@ -78,7 +44,7 @@ export const RulesCard: React.FC = () => {
         .then((res) => {
           setRules(
             res
-              .sort((a: Rule, b: Rule) => (b.creationDate as number) - (a.creationDate as number))
+              .sort((a: Rule, b: Rule) => (b.modificationDate as number) - (a.modificationDate as number))
               .slice(0, MAX_RULES_TO_SHOW + 1)
           );
         })
@@ -140,7 +106,8 @@ export const RulesCard: React.FC = () => {
                     redirectToRuleEditor(navigate, rule.id, AUTH.SOURCE.HOME_SCREEN);
                   }}
                 >
-                  {rule.name}
+                  <span className="homepage-rules-list-item-icon">{ruleIcons[rule.ruleType as RuleType]}</span>
+                  <div> {rule.name}</div>
                 </div>
               );
             })}
@@ -160,7 +127,7 @@ export const RulesCard: React.FC = () => {
           <HomepageEmptyCard
             icon={rulesIcon}
             title="HTTP Rules"
-            description="Create rules to modify HTTP requests and responses, including URL redirects, API modifications, and header adjustments."
+            description="Create rules to modify HTTP requests and responses."
             primaryButton={
               <RQButton
                 type="primary"
