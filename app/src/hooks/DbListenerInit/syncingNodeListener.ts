@@ -169,7 +169,18 @@ export const doSync = async (
   let consistencyCheckPassed: boolean =
     (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
 
-  let allSyncedRecords: Record<string, any>[] = await parseRemoteRecords(appMode, updatedFirebaseRecords);
+  console.log(
+    "[DEBUG] doSync consistencyCheck and sync targets: ",
+    JSON.stringify({
+      consistencyCheckPassed,
+      syncTarget,
+      lastSyncTarget: lastSyncTarget ?? "NOT PRESENT!",
+      team_id,
+      uid,
+    })
+  );
+
+  let allSyncedRecords: Record<string, any>[] = await parseRemoteRecords(appMode, updatedFirebaseRecords); // toread
 
   if (!consistencyCheckPassed) {
     // Merge records
@@ -270,10 +281,12 @@ export const invokeSyncingIfRequired = async ({
     dispatch(actions.updateIsRulesListLoading(false));
     return;
   }
+  // this does not make sense!!! Why not just call doSyncDebounced here????
   if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-    console.log("DEBUG", "doSyncDebounced");
+    console.log("[DEBUG] invokeSyncingIfRequired - debouncedDosync");
     doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
+    console.log("[DEBUG] invokeSyncingIfRequired - within wait period - invoke doSync directly");
     resetSyncDebounce();
     doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   }
