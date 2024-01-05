@@ -11,7 +11,7 @@ import CustomerStory from "../CustomerStory/index";
 import ChromeStoreStats from "../ChromeStoreStats/index";
 import { customerStoryData } from "utils/PricingPageTestimonials";
 import { CompanyMarquee } from "components/misc/Marquee";
-import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
+import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import "./index.css";
 
 const PricingIndexPage = () => {
