@@ -145,6 +145,7 @@ export const RulesCard: React.FC = () => {
             }
             secondaryButton={
               <RQButton
+                className="homepage-empty-card-secondary-btn"
                 type="text"
                 onClick={() => {
                   trackHomeRulesActionClicked("start_with_template");

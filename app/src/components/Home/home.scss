@@ -130,6 +130,10 @@
   height: 100%;
 }
 
+.homepage-empty-card-secondary-btn.ant-btn:focus {
+  background: none;
+}
+
 @media (max-width: 1000px) {
   .homepage-wrapper {
     & .homepage-primary-cards-wrapper .homepage-primary-card.ant-col {
