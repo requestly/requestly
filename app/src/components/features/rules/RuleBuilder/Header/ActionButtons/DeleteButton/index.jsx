@@ -42,6 +42,7 @@ const DeleteButton = ({ rule, isDisabled, ruleDeletedCallback, isRuleEditorModal
           toggle={toggleDeleteConfirmationModal}
           rulesToDelete={[rule]}
           ruleDeletedCallback={ruleDeletedCallback}
+          analyticEventSource="rule_editor"
         />
       ) : null}
     </>
