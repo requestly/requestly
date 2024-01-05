@@ -14,7 +14,7 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 1rem;
-  width: 100%;
+  width: calc(100% - 2px);
   padding: 4px;
   padding-bottom: 8px;
 
