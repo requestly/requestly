@@ -14,6 +14,7 @@ export const DuplicateRuleModalWrapper: React.FC = () => {
       onDuplicate={closeDuplicateRuleModal}
       isOpen={isDuplicateRuleModalActive as boolean}
       rule={ruleToDuplicate as Rule}
+      analyticEventSource="rules_list"
     />
   ) : null;
 };

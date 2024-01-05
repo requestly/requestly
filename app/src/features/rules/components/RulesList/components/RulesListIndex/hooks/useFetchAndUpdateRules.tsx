@@ -59,6 +59,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         rules.filter((rule) => rule.status === RuleObjStatus.ACTIVE).length
       );
       submitAttrUtil(TRACKING.ATTR.NUM_GROUPS, groups.length);
+      submitAttrUtil(TRACKING.ATTR.NUM_RULES_PINNED, rules.filter((rule) => rule.isFavourite).length);
       submitAttrUtil(
         TRACKING.ATTR.NUM_ACTIVE_GROUPS,
         groups.filter((group) => group.status === RuleObjStatus.ACTIVE).length

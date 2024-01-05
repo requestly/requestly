@@ -25,6 +25,7 @@ export const DeleteRulesModalWrapper: React.FC<Props> = ({ clearSelection }) => 
       clearSearch={clearSelectedRows} // FIXME
       isOpen={isDeleteConfirmationModalActive}
       ruleDeletedCallback={clearSelection}
+      analyticEventSource="rules_list"
     />
   ) : null;
 };

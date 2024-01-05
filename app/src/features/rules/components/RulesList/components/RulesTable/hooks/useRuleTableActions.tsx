@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Rule, RuleObj, RuleObjStatus } from "features/rules/types/rules";
+import { Rule, RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { rulesActions } from "store/features/rules/slice";
@@ -14,8 +14,8 @@ import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-co
 import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
-import { trackRuleActivatedStatusEvent, trackRuleDeactivatedStatus } from "modules/analytics/events/common/rules";
-import { trackGroupStatusToggled } from "features/rules/analytics/groups";
+import { trackRulePinToggled, trackRuleToggled } from "modules/analytics/events/common/rules";
+import { trackGroupPinToggled, trackGroupStatusToggled } from "features/rules/analytics";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 
 const useRuleTableActions = () => {
@@ -79,11 +79,11 @@ const useRuleTableActions = () => {
       if (newStatus.toLowerCase() === "active") {
         trackRQLastActivity("rule_activated");
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
-        trackRuleActivatedStatusEvent((rule as Rule).ruleType);
+        trackRuleToggled((rule as Rule).ruleType, "rules_list", newStatus);
       } else {
         trackRQLastActivity("rule_deactivated");
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
-        trackRuleDeactivatedStatus((rule as Rule).ruleType);
+        trackRuleToggled((rule as Rule).ruleType, "rules_list", newStatus);
       }
     });
   };
@@ -261,7 +261,11 @@ const useRuleTableActions = () => {
     };
 
     updateRuleInStorage(updatedRecord, record).then(() => {
-      // trackRulePinToggled(newValue);
+      if (record.objectType === RuleObjType.GROUP) {
+        trackGroupPinToggled(!record.isFavourite);
+      } else {
+        trackRulePinToggled(record.id, record.ruleType, !record.isFavourite);
+      }
     });
   };
 
