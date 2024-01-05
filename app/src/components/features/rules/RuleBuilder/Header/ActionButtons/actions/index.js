@@ -53,8 +53,8 @@ export const saveRule = async (appMode, ruleObject, callback) => {
       //Continue exit
       exit();
     })
-    .catch(() => {
-      Logger.log("Error in saving rule");
+    .catch((e) => {
+      Logger.log("Error in saving rule:", e);
       trackErrorInRuleCreation("save_rule_error", ruleToSave.ruleType);
       Sentry.captureException(new Error("Extension: Error in saving rule", "fatal"));
       throw new Error("Error in saving rule");

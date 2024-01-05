@@ -52,13 +52,15 @@ const RulePreviewModal = ({ rule, isOpen, toggle, source }) => {
 
     //triggering started event here for home screen because started event is triggered from templates list page.g
     if (source === AUTH.SOURCE.HOME_SCREEN) trackTemplateImportStarted(snakeCase(ruleToSave.name), source);
-    saveRule(appMode, ruleToSave).then(() => {
-      trackTemplateImportCompleted(snakeCase(ruleToSave.name), source);
-      redirectToRuleEditor(navigate, ruleToSave.id, "templates");
-    }).catch(() => {
-      Logger.log("Error in saving rule: saveRuleTemplate");
-      toast.error("Error in saving rule. Please contact support.");
-    });
+    saveRule(appMode, ruleToSave)
+      .then(() => {
+        trackTemplateImportCompleted(snakeCase(ruleToSave.name), source);
+        redirectToRuleEditor(navigate, ruleToSave.id, "templates");
+      })
+      .catch((e) => {
+        Logger.log("saveRuleTemplate Error in saving rule:", e);
+        toast.error("Error in saving rule. Please contact support.");
+      });
   };
 
   return (
