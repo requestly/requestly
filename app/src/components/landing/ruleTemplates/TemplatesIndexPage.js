@@ -117,6 +117,7 @@ const TemplatesIndexPage = () => {
             isOpen={isSharedListRuleViewerModalActive}
             toggle={toggleSharedListRuleViewerModal}
             rule={ruleToViewInModal}
+            source="templates_screen"
           />
         ) : null}
         <Table columns={columns} dataSource={filteredRuleTemplates} pagination={false} className="records-table" />

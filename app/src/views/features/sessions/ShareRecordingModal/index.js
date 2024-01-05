@@ -57,7 +57,7 @@ export const getPrettyVisibilityName = (visibility, isWorkspaceMode) => {
   }
 };
 
-const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordingId, onVisibilityChange }) => {
+const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordingId, onVisibilityChange = null }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 

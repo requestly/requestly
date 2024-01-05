@@ -1,0 +1,158 @@
+.homepage-wrapper {
+  background: var(--surface-0);
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  padding: 1rem;
+  overflow-y: auto;
+
+  & .homepage-content {
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  & .homepage-primary-cards-wrapper {
+    gap: 1rem;
+
+    & > .ant-col {
+      max-width: 49%;
+    }
+  }
+
+  & .homepage-primary-card {
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--surface-2);
+    background: var(--surface-0_5);
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
+    padding: 1rem;
+
+    & .primary-card-header {
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.25px;
+    }
+  }
+
+  & .homepage-bottom-section {
+    gap: 1rem;
+
+    & .homepage-teams-card {
+      max-width: 49%;
+    }
+
+    & .homepage-help-card,
+    & .homepage-changelog-card {
+      max-width: 24%;
+    }
+  }
+
+  .ant-skeleton-paragraph li {
+    height: 15px;
+  }
+
+  .homepage-view-all-link {
+    margin-top: 8px;
+    padding-left: 4px;
+    font-size: 13px;
+  }
+}
+
+.homepage-emptycard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &-icon-img {
+    width: 24px;
+    height: 24px;
+  }
+
+  &-icon {
+    height: 24px;
+
+    & .mocks-card-icon {
+      font-size: 24px;
+      margin-top: 0;
+    }
+  }
+
+  &-title {
+    font-weight: 500;
+    margin-top: 8px;
+    color: var(--white);
+  }
+
+  &-description {
+    text-align: center;
+    font-size: 12px;
+    color: var(--neutrals-gray-300);
+    max-width: 372px;
+  }
+
+  &-actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--white);
+  }
+
+  &-secondary-btn.ant-btn {
+    color: var(--white);
+    padding: 3px 8px;
+  }
+}
+
+.homepage-card-loader {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+
+  & .ant-spin-text {
+    color: var(--white);
+    margin-top: 8px;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+}
+
+.homepage-view-all-link {
+  margin-top: 8px;
+  padding-left: 4px;
+  font-size: 13px;
+}
+
+.homepage-teams-card > div {
+  height: 100%;
+}
+
+.homepage-empty-card-secondary-btn.ant-btn:focus {
+  background: none;
+}
+
+@media (max-width: 1000px) {
+  .homepage-wrapper {
+    & .homepage-primary-cards-wrapper .homepage-primary-card.ant-col {
+      max-width: 100%;
+    }
+
+    & .homepage-bottom-section {
+      &.ant-row-no-wrap {
+        flex-wrap: wrap;
+      }
+
+      & .homepage-help-card,
+      & .homepage-changelog-card {
+        max-width: 100%;
+      }
+
+      & .homepage-teams-card {
+        max-width: 100%;
+      }
+    }
+  }
+}

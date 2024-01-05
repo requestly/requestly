@@ -6,7 +6,7 @@ import { RQButton } from "lib/design-system/components";
 import { actions } from "store";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
-import groupIcon from "../../assets/group.svg";
+import groupIcon from "../../../../../../assets/group.svg";
 import { trackAppOnboardingManageWorkspaceClicked } from "features/onboarding/analytics";
 import "./index.scss";
 
