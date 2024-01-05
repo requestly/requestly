@@ -194,17 +194,17 @@ const Filters = (props) => {
 
   const urlOperatorOptions = (
     <Menu>
-      <Menu.Item key={1}>
-        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS)}>Equals</span>
+      <Menu.Item key={1} onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS)}>
+        <span>Equals</span>
       </Menu.Item>
-      <Menu.Item key={2}>
-        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS)}>Contains</span>
+      <Menu.Item key={2} onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS)}>
+        <span>Contains</span>
       </Menu.Item>
-      <Menu.Item key={3}>
-        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)}>Matches (RegEx)</span>
+      <Menu.Item key={3} onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)}>
+        <span>Matches (RegEx)</span>
       </Menu.Item>
-      <Menu.Item key={4}>
-        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES)}>
+      <Menu.Item key={4} onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES)}>
+        <span>
           Matches (Wildcard)
         </span>
       </Menu.Item>
