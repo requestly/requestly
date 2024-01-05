@@ -295,7 +295,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               iconOnly
               icon={<ExperimentOutlined />}
               type="default"
-              disabled={!pair.source.value}
+              disabled={!pair.source.value || isInputDisabled}
               onClick={() => {
                 setIsTestURLClicked(true);
                 setIsTestURLModalVisible(true);
@@ -311,34 +311,36 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               marginLeft: ruleDetails.TYPE === "Delay" ? 0 : "4px",
             }}
           >
-            <MoreInfo
-              text={
-                <>
-                  Advanced filters like resource type, request method to target requests when rule should be applied.{" "}
-                  <a
-                    className="tooltip-link"
-                    href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_SOURCE_FILTERS}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => trackMoreInfoClicked("redirect_source_filter", currentlySelectedRuleConfig.TYPE)}
-                  >
-                    Learn More
-                  </a>
-                </>
-              }
-              analyticsContext="redirect_source_filter"
-              source={currentlySelectedRuleConfig.TYPE}
-            >
-              <span
-                onClick={() => openFilterModal(pairIndex)}
-                className="cursor-pointer text-gray source-filter-icon-container"
+            {!isInputDisabled && (
+              <MoreInfo
+                text={
+                  <>
+                    Advanced filters like resource type, request method to target requests when rule should be applied.{" "}
+                    <a
+                      className="tooltip-link"
+                      href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_SOURCE_FILTERS}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => trackMoreInfoClicked("redirect_source_filter", currentlySelectedRuleConfig.TYPE)}
+                    >
+                      Learn More
+                    </a>
+                  </>
+                }
+                analyticsContext="redirect_source_filter"
+                source={currentlySelectedRuleConfig.TYPE}
               >
-                <FaFilter />{" "}
-                {getFilterCount(pairIndex) !== 0 ? (
-                  <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
-                ) : null}
-              </span>
-            </MoreInfo>
+                <span
+                  onClick={() => openFilterModal(pairIndex)}
+                  className="cursor-pointer text-gray source-filter-icon-container"
+                >
+                  <FaFilter />{" "}
+                  {getFilterCount(pairIndex) !== 0 ? (
+                    <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
+                  ) : null}
+                </span>
+              </MoreInfo>
+            )}
           </Col>
         ) : null}
       </div>
