@@ -36,6 +36,7 @@ import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { unselectAllRecords } from "../actions";
 import "./RulesListContainer.css";
 
 const { PATHS } = APP_CONSTANTS;
@@ -256,10 +257,13 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
       {isChangeGroupModalActive ? (
         <ChangeRuleGroupModal
+          isOldRulesTable
           clearSearch={clearSearch}
           isOpen={isChangeGroupModalActive}
           toggle={toggleChangeGroupModal}
           mode="SELECTED_RULES"
+          selectedRules={selectedRuleIds}
+          onGroupChanged={() => unselectAllRecords(dispatch)}
         />
       ) : null}
       {isDeleteRulesModalActive ? (
@@ -269,6 +273,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
           rulesToDelete={rulesToDelete}
           groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
+          analyticEventSource="rules_list"
         />
       ) : null}
       {isImportRulesModalActive ? (

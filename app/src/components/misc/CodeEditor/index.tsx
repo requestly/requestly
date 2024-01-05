@@ -11,7 +11,6 @@ function FallbackToTrackInfiniteLoading() {
 
     const timeout_5 = setTimeout(() => {
       Sentry.captureMessage("CodeEditor lazy loaded for 5s", "fatal");
-      console.log("!!!debug", "5s timout");
     }, 5000);
     return () => {
       clearTimeout(timeout_10);

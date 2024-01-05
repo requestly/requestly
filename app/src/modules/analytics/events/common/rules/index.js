@@ -55,37 +55,36 @@ export const trackRuleDeletedEvent = (count, rule_type) => {
   trackEvent(RULES.RULE_DELETED, params);
 };
 
-export const trackRulesDeletedEvent = (count) => {
+export const trackRulesDeletedEvent = (count, source, type) => {
   const params = {
     count,
+    source,
+    type,
   };
   trackEvent(RULES.RULES_DELETED, params);
 };
 
-export const trackRuleActivatedStatusEvent = (rule_type) => {
+export const trackRuleToggled = (rule_type, source, updated_status) => {
   const params = {
+    source,
     rule_type,
+    updated_status,
   };
-  trackEvent(RULES.RULE_ACTIVATED, params);
+
+  trackEvent(RULES.RULE_TOGGLED, params);
 };
 
-export const trackRuleDeactivatedStatus = (rule_type) => {
-  const params = {
-    rule_type,
-  };
-  trackEvent(RULES.RULE_DEACTIVATED, params);
-};
-
-export const trackRuleDuplicatedEvent = (rule_type, workspace) => {
+export const trackRuleDuplicatedEvent = (rule_type, workspace, source) => {
   const params = {
     rule_type,
     workspace,
+    source,
   };
   trackEvent(RULES.RULE_DUPLICATED, params);
 };
 
-export const trackRulePinToggled = (enabled) => {
-  const params = { enabled };
+export const trackRulePinToggled = (rule_id, rule_type, updated_value) => {
+  const params = { rule_id, rule_type, updated_value };
   trackEvent(RULES.RULE_PIN_TOGGLED, params);
 };
 

@@ -51,6 +51,7 @@ const DuplicateButton = ({ rule, isDisabled, handleRuleOptionsDropdownClose }) =
           close={closeDuplicateRuleModal}
           rule={rule}
           onDuplicate={onRuleDuplicated}
+          analyticEventSource="rule_editor"
         />
       ) : null}
     </>

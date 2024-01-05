@@ -19,9 +19,16 @@ interface ModalProps {
   toggleModal: () => void;
   selectedRules: string[];
   source: string;
+  callback: () => void;
 }
 
-export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source, selectedRules = null }) => {
+export const SharingModal: React.FC<ModalProps> = ({
+  isOpen,
+  toggleModal,
+  source,
+  selectedRules = null,
+  callback = () => {},
+}) => {
   const availableTeams = useSelector(getAvailableTeams);
   const [activeTab, setActiveTab] = useState(SharingOptions.WORKSPACE);
 
@@ -33,7 +40,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
         children: (
           <>
             {selectedRules?.length ? (
-              <ShareInWorkspaces selectedRules={selectedRules} toggleModal={toggleModal} />
+              <ShareInWorkspaces selectedRules={selectedRules} toggleModal={toggleModal} onRulesShared={callback} />
             ) : (
               <EmptySelectionView />
             )}
@@ -46,7 +53,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
         children: (
           <>
             {selectedRules?.length ? (
-              <ShareLinkView selectedRules={selectedRules} source={source} />
+              <ShareLinkView selectedRules={selectedRules} source={source} onSharedLinkCreated={callback} />
             ) : (
               <EmptySelectionView />
             )}
@@ -59,7 +66,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
         children: (
           <>
             {selectedRules?.length ? (
-              <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} />
+              <DownloadRules selectedRules={selectedRules} toggleModal={toggleModal} onRulesDownloaded={callback} />
             ) : (
               <EmptySelectionView />
             )}
@@ -67,7 +74,7 @@ export const SharingModal: React.FC<ModalProps> = ({ isOpen, toggleModal, source
         ),
       },
     ],
-    [selectedRules, toggleModal, source]
+    [callback, selectedRules, toggleModal, source]
   );
 
   const handleSharingOptionsChange = (key: SharingOptions) => {
