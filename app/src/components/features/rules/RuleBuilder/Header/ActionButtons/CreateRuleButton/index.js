@@ -114,7 +114,7 @@ const CreateRuleButton = ({
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
   const handleBtnOnClick = async () => {
-    if (!isExtensionInstalled()) {
+    if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
       dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
       return;
     }
