@@ -9,7 +9,7 @@ import { GettingStartedView } from "../gettingStarted";
 import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
 import { actions } from "store";
-import RQLogo from "../../../../assets/images/logo/newRQlogo.svg";
+import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { trackAppOnboardingSkipped } from "features/onboarding/analytics";
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import Logger from "lib/logger";

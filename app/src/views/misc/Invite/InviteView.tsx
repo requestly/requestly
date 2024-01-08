@@ -3,8 +3,7 @@ import Invite from "components/misc/Invite";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
 import { useNavigate, useParams } from "react-router-dom";
 import { redirectToRules } from "utils/RedirectionUtils";
-// @ts-ignore
-import RQLogo from "../../../assets/images/logo/newRQlogo.svg";
+import RQLogo from "assets/img/brand/rq_logo_full.svg";
 
 const InviteView = () => {
   const { inviteId } = useParams();
