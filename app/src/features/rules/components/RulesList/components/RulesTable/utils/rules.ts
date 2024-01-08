@@ -75,3 +75,10 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
 
   return finalAdaptedData;
 };
+
+export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, RuleObj>, rule: RuleTableDataType) => {
+  if (rule.objectType === RuleObjType.GROUP) return false;
+  if (rule.groupId.length && allRecordsMap[rule.groupId].status === RuleObjStatus.INACTIVE) {
+    return true;
+  } else return false;
+};
