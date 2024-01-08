@@ -5,6 +5,7 @@ import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
 import useRuleTableActions from "./useRuleTableActions";
+import { getAllRuleObjMap } from "store/features/rules/selectors";
 import { RuleObjStatus, RuleObjType } from "features/rules/types/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserIcon } from "components/common/UserIcon";
@@ -20,10 +21,12 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import PATHS from "config/constants/sub/paths";
 import { isRule } from "../utils";
 import { trackRulesListActionsClicked } from "features/rules/analytics";
+import { checkIsRuleGroupDisabled } from "../utils/rules";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const allRecordsMap = useSelector(getAllRuleObjMap);
   const {
     handleStatusToggle,
     handleRuleShare,
@@ -145,6 +148,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             <Switch
               size="small"
               checked={isRuleActive}
+              disabled={checkIsRuleGroupDisabled(allRecordsMap, rule)}
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
               onChange={(checked: boolean, e) => {
                 e.stopPropagation();

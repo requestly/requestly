@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import RulesTable from "../RulesTable/RulesTable";
 import { RuleObj, RuleObjType } from "features/rules/types/rules";
-import { getAllRuleObjs } from "store/features/rules/selectors";
+import { getAllRuleObjMap, getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { RulesListProvider } from "./context";
 import { DownOutlined, DownloadOutlined } from "@ant-design/icons";
@@ -47,6 +47,7 @@ import SpinnerCard from "components/misc/SpinnerCard";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
+import { getPinnedRules } from "../RulesTable/utils/rules";
 import {
   trackNewGroupButtonClicked,
   trackRulesListFilterApplied,
@@ -78,8 +79,9 @@ const RulesList: React.FC<Props> = () => {
   // FIXME: Fetching multiple times
   // Fetch Rules here from Redux
   const allRecords = useSelector(getAllRuleObjs);
+  const allRecordsMap = useSelector(getAllRuleObjMap);
   const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RuleObjType.GROUP), [allRecords]);
-  const pinnedRecords = useMemo(() => allRecords?.filter((record) => record.isFavourite), [allRecords]);
+  const pinnedRecords = useMemo(() => getPinnedRules(allRecordsMap), [allRecordsMap]);
   const activeRecords = useMemo(() => getActiveRules(allRecords), [allRecords]);
 
   // FIX: rules loading state
@@ -275,7 +277,9 @@ const RulesList: React.FC<Props> = () => {
           <div className="label">
             <MdOutlinePushPin className="icon" />
             Pinned
-            {pinnedRecords.length ? <Badge count={pinnedRecords.length} overflowCount={20} /> : null}
+            {pinnedRecords.length ? (
+              <Badge count={pinnedRecords.filter((record: RuleObj) => record.isFavourite).length} overflowCount={20} />
+            ) : null}
           </div>
         ),
         onClick: () => {
@@ -300,7 +304,7 @@ const RulesList: React.FC<Props> = () => {
         },
       },
     ],
-    [allRecords, pinnedRecords.length, activeRecords]
+    [allRecords, pinnedRecords, activeRecords]
   );
 
   const CreateFirstRule = () => {
