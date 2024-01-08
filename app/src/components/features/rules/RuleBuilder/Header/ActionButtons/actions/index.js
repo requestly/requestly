@@ -39,7 +39,7 @@ export const saveRule = async (appMode, ruleObject, callback) => {
         };
         //Save the group
         Logger.log("Writing to storage in saveRule");
-        StorageService(appMode)
+        return StorageService(appMode)
           .saveRuleOrGroup(groupToSave)
           .catch(() => {
             throw new Error("Error in saving rule");
@@ -47,16 +47,17 @@ export const saveRule = async (appMode, ruleObject, callback) => {
       }
     })
     .then(() => {
-      const exit = () => {};
       // Execute callback
       callback && callback();
-      //Continue exit
-      exit();
     })
-    .catch((e) => {
-      Logger.log("Error in saving rule:", e);
+    .catch((error) => {
+      Logger.log("Error in saving rule:", error);
       trackErrorInRuleCreation("save_rule_error", ruleToSave.ruleType);
-      Sentry.captureException(new Error("Extension: Error in saving rule", "fatal"));
+      Sentry.captureException(error, {
+        tags: {
+          error_source: "save_rule",
+        },
+      });
       throw new Error("Error in saving rule");
     });
 };
