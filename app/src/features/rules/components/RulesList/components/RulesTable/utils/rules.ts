@@ -39,6 +39,7 @@ export const getPinnedRules = (recordsMap: Record<string, RuleObj>) => {
     if (record.isFavourite) {
       pinnedRecords.push(record);
     } else {
+      //If a group is pinned then show all the rules in that group (irrespective of whether they are pinned or not)
       if (isRule(record) && record.groupId && recordsMap[record.groupId].isFavourite) {
         pinnedRecords.push(record);
       }
