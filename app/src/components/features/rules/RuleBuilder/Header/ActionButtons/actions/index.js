@@ -39,7 +39,7 @@ export const saveRule = async (appMode, ruleObject, callback) => {
         };
         //Save the group
         Logger.log("Writing to storage in saveRule");
-        StorageService(appMode)
+        return StorageService(appMode)
           .saveRuleOrGroup(groupToSave)
           .catch(() => {
             throw new Error("Error in saving rule");
@@ -47,11 +47,8 @@ export const saveRule = async (appMode, ruleObject, callback) => {
       }
     })
     .then(() => {
-      const exit = () => {};
       // Execute callback
       callback && callback();
-      //Continue exit
-      exit();
     })
     .catch((error) => {
       Logger.log("Error in saving rule:", error);
