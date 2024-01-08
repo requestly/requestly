@@ -5,6 +5,7 @@ import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
 import useRuleTableActions from "./useRuleTableActions";
+import { getAllRuleObjMap } from "store/features/rules/selectors";
 import { RuleObjStatus, RuleObjType } from "features/rules/types/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserIcon } from "components/common/UserIcon";
@@ -24,6 +25,7 @@ import { trackRulesListActionsClicked } from "features/rules/analytics";
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const allRecordsMap = useSelector(getAllRuleObjMap);
   const {
     handleStatusToggle,
     handleRuleShare,
@@ -44,6 +46,13 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   /**
    * - make rule name clickable and navigate to editor.
    */
+
+  const checkIsRuleGroupDisabled = (rule: RuleTableDataType) => {
+    if (rule.objectType === RuleObjType.GROUP) return false;
+    if (rule.groupId.length && allRecordsMap[rule.groupId].status === RuleObjStatus.INACTIVE) {
+      return true;
+    } else return false;
+  };
 
   const columns: ContentTableProps<RuleTableDataType>["columns"] = [
     Table.SELECTION_COLUMN,
@@ -145,6 +154,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             <Switch
               size="small"
               checked={isRuleActive}
+              disabled={checkIsRuleGroupDisabled(rule)}
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
               onChange={(checked: boolean, e) => {
                 e.stopPropagation();
