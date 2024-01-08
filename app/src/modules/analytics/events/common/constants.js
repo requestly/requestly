@@ -83,6 +83,7 @@ export const AUTH = {
     PERSONA_SURVEY: "persona-survey",
     PERSONA_RECOMMENDATION_SCREEN: "persona_recommendation_screen",
     PRICING_PAGE: "pricing_page",
+    HOME_SCREEN: "home_screen",
   },
   POPOVER: {
     SHOWN: "popover_at_signup_shown",
@@ -95,8 +96,7 @@ export const RULES = {
   RULE_CREATED: "rule_created",
   RULE_EDITED: "rule_edited",
   RULE_DELETED: "rule_deleted",
-  RULE_ACTIVATED: "rule_activated",
-  RULE_DEACTIVATED: "rule_deactivated",
+  RULE_TOGGLED: "rule_toggled",
   RULE_DUPLICATED: "rule_duplicated",
   RULE_PIN_TOGGLED: "rule_pin_toggled",
   RULE_EXPORTED: "rule_exported",

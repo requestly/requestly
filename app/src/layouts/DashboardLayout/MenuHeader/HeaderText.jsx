@@ -2,14 +2,12 @@ import { useSelector } from "react-redux";
 import { Col, Row } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { isPricingPage, isMobileInterceptorPage, isGoodbyePage } from "utils/PathUtils";
-import RQ_LOGO from "assets/img/brand/rq.png";
-import RQ_LOGO_LIGHT_BLUE from "assets/img/brand/rq-full-logo-light-blue.svg";
-import { getAppMode, getAppTheme, getUserAuthDetails } from "store/selectors";
+import RQ_LOGO from "assets/img/brand/rq_logo_full.svg";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { FaStackOverflow } from "@react-icons/all-files/fa/FaStackOverflow";
 import MobileDebuggerAppSelector from "components/features/mobileDebugger/components/AppSelector";
-import THEMES from "config/constants/sub/themes";
 import { YoutubeFilled } from "@ant-design/icons";
 import { trackPromoHeaderClicked } from "modules/analytics/events/misc/promoHeader";
 import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
@@ -26,7 +24,6 @@ export default function HeaderText() {
   // GLOBAL STATE
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const appTheme = useSelector(getAppTheme);
 
   const renderSessionRecordingPromo = () => {
     return (
@@ -109,7 +106,7 @@ export default function HeaderText() {
         <Col>
           <Link to="/">
             <img
-              src={appTheme === THEMES.LIGHT ? RQ_LOGO : RQ_LOGO_LIGHT_BLUE}
+              src={RQ_LOGO}
               style={{
                 boxSizing: "border-box",
                 display: "inline-block",

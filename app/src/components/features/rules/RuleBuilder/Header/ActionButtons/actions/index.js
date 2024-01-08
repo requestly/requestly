@@ -5,10 +5,11 @@ import { StorageService } from "../../../../../../../init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { parseExtensionRules } from "modules/extension/ruleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
-import { trackRuleEditorClosed } from "modules/analytics/events/common/rules";
+import { trackErrorInRuleCreation, trackRuleEditorClosed } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import Logger from "lib/logger";
-import { toast } from "utils/Toast";
+import * as Sentry from "@sentry/react";
+import { detectUnsettledPromise } from "utils/FunctionUtils";
 
 export const saveRule = async (appMode, ruleObject, callback) => {
   //Set the modification date of rule
@@ -23,12 +24,13 @@ export const saveRule = async (appMode, ruleObject, callback) => {
 
   //Save the rule
   Logger.log("Writing to storage in saveRule");
-  await StorageService(appMode).saveRuleOrGroup(ruleToSave);
-  //Fetch the group related to that rule
-  Logger.log("Reading storage in saveRule");
-  return StorageService(appMode)
-    .getRecord(ruleToSave.groupId)
-    .then((result_1) => {
+  const ruleSavePromises = [
+    detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 3000),
+    detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 3000),
+  ];
+
+  return Promise.all(ruleSavePromises)
+    .then(([_, result_1]) => {
       //Set the modification date of group
       if (result_1 && result_1.objectType === "group") {
         const groupToSave = {
@@ -51,8 +53,11 @@ export const saveRule = async (appMode, ruleObject, callback) => {
       //Continue exit
       exit();
     })
-    .catch(() => {
-      toast.error("Error in saving rule. Please contact support.");
+    .catch((e) => {
+      Logger.log("Error in saving rule:", e);
+      trackErrorInRuleCreation("save_rule_error", ruleToSave.ruleType);
+      Sentry.captureException(new Error("Extension: Error in saving rule", "fatal"));
+      throw new Error("Error in saving rule");
     });
 };
 

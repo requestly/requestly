@@ -123,24 +123,26 @@ const HeadersPairModificationRowV2 = ({
               />
             </Col>
           ) : null}
-          <Col align="left" className="margin-bottom-one">
-            <Tooltip title="Remove" placement="right">
-              <ImCross
-                id="delete-pair"
-                className="text-gray cursor-pointer"
-                onClick={(event) => {
-                  event?.preventDefault?.();
-                  dispatch(
-                    actions.removeValueInRulePairByIndex({
-                      pairIndex,
-                      arrayPath: ["modifications", modificationType],
-                      index: modificationIndex,
-                    })
-                  );
-                }}
-              />
-            </Tooltip>
-          </Col>
+          {!isInputDisabled && (
+            <Col align="left" className="margin-bottom-one">
+              <Tooltip title="Remove" placement="right">
+                <ImCross
+                  id="delete-pair"
+                  className="text-gray cursor-pointer"
+                  onClick={(event) => {
+                    event?.preventDefault?.();
+                    dispatch(
+                      actions.removeValueInRulePairByIndex({
+                        pairIndex,
+                        arrayPath: ["modifications", modificationType],
+                        index: modificationIndex,
+                      })
+                    );
+                  }}
+                />
+              </Tooltip>
+            </Col>
+          )}
         </Row>
       </Col>
     </Row>

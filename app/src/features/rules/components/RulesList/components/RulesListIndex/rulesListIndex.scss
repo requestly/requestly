@@ -1,0 +1,15 @@
+.rq-rules-list-container {
+  .rq-rules-table {
+    padding: 12px 16px;
+
+    .ant-table-tbody {
+      tr.rq-content-table-row.ant-table-row {
+        &[data-row-key^="Group"] {
+          .group-expand-icon {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+}
