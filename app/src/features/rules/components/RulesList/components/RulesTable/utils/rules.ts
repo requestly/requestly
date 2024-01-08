@@ -32,6 +32,19 @@ export const getActiveRules = (records: RuleObj[]) => {
   return [...activeRecords, ...rules];
 };
 
+export const getPinnedRules = (recordsMap: Record<string, RuleObj>) => {
+  let pinnedRecords: RuleObj[] = [];
+
+  Object.values(recordsMap).forEach((record) => {
+    //If a group is pinned then show all the rules in that group (irrespective of whether they are pinned or not)
+    if (record.isFavourite || (isRule(record) && record.groupId && recordsMap[record.groupId].isFavourite)) {
+      pinnedRecords.push(record);
+    }
+  });
+
+  return pinnedRecords;
+};
+
 // FIXME: Performance Improvements
 export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataType[] => {
   const ruleTableDataTypeMap: { [id: string]: RuleTableDataType } = {};
@@ -61,4 +74,11 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
   const finalAdaptedData = Object.values(ruleTableDataTypeMap);
 
   return finalAdaptedData;
+};
+
+export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, RuleObj>, rule: RuleTableDataType) => {
+  if (rule.objectType === RuleObjType.GROUP) return false;
+  if (rule.groupId.length && allRecordsMap[rule.groupId].status === RuleObjStatus.INACTIVE) {
+    return true;
+  } else return false;
 };
