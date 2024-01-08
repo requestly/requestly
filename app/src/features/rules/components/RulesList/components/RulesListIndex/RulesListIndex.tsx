@@ -349,7 +349,7 @@ const RulesList: React.FC<Props> = () => {
           filters={contentHeaderFilters}
         />
         <div className="rq-rules-table">
-          <RulesTable rules={searchedRecords as RuleObj[]} loading={isLoading} />
+          <RulesTable rules={searchedRecords as RuleObj[]} loading={isLoading} searchValue={searchValue} />
         </div>
       </div>
     </>
