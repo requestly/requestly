@@ -32,6 +32,22 @@ export const getActiveRules = (records: RuleObj[]) => {
   return [...activeRecords, ...rules];
 };
 
+export const getPinnedRules = (recordsMap: Record<string, RuleObj>) => {
+  let pinnedRecords: RuleObj[] = [];
+
+  Object.values(recordsMap).forEach((record) => {
+    if (record.isFavourite) {
+      pinnedRecords.push(record);
+    } else {
+      if (isRule(record) && record.groupId && recordsMap[record.groupId].isFavourite) {
+        pinnedRecords.push(record);
+      }
+    }
+  });
+
+  return pinnedRecords;
+};
+
 // FIXME: Performance Improvements
 export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataType[] => {
   const ruleTableDataTypeMap: { [id: string]: RuleTableDataType } = {};
