@@ -57,6 +57,7 @@ import { debounce } from "lodash";
 import "./rulesListIndex.scss";
 
 const debouncedTrackRulesListSearched = debounce(trackRulesListSearched, 500);
+const { UNGROUPED_GROUP_NAME } = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS;
 
 interface Props {}
 
@@ -83,7 +84,6 @@ const RulesList: React.FC<Props> = () => {
   const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RuleObjType.GROUP), [allRecords]);
   const pinnedRecords = useMemo(() => getPinnedRules(allRecordsMap), [allRecordsMap]);
   const activeRecords = useMemo(() => getActiveRules(allRecords), [allRecords]);
-
   // FIX: rules loading state
 
   const getFilteredRecords = useCallback(
@@ -108,12 +108,12 @@ const RulesList: React.FC<Props> = () => {
     allGroups.forEach((group) => {
       groupWiseRules[group.id] = [];
     });
-    groupWiseRules["ungrouped"] = [];
+    groupWiseRules[UNGROUPED_GROUP_NAME] = [];
 
     getFilteredRecords(activeFilter).forEach((record) => {
       if (record.objectType === RuleObjType.RULE) {
         if (!record.groupId) {
-          groupWiseRules["ungrouped"].push(record);
+          groupWiseRules[UNGROUPED_GROUP_NAME].push(record);
         } else groupWiseRules[record.groupId].push(record);
       }
     });
@@ -127,12 +127,15 @@ const RulesList: React.FC<Props> = () => {
     const processGroup = (groupId: string) => {
       const groupData = groupWiseRulesData[groupId];
       const groupRecord = allRecordsMap[groupId];
-      if (groupId === "ungrouped") {
+      if (groupId === UNGROUPED_GROUP_NAME) {
+        // filter ungrouped rules based on search value
         records.push(...groupData.filter((record) => record.name.toLowerCase().includes(searchValue.toLowerCase())));
       } else {
         if (groupRecord.name.toLowerCase().includes(searchValue.toLowerCase())) {
+          //if group name matches search value, add all rules in that group with the group record
           records.push(...groupData, groupRecord);
         } else {
+          // else add only those rules which match the search value along with the group record
           const groupedRules = groupData.filter((record) =>
             record.name.toLowerCase().includes(searchValue.toLowerCase())
           );
