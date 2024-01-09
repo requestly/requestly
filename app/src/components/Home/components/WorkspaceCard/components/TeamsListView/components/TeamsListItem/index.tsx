@@ -55,8 +55,6 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
     }
   }, [teamId]);
 
-  console.log({ members });
-
   const handleJoining = useCallback(() => {
     trackWorkspaceJoinClicked(teamId, AUTH.SOURCE.HOME_SCREEN);
     trackHomeWorkspaceActionClicked("join_workspace_clicked");
