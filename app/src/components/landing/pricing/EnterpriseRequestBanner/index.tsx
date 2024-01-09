@@ -66,7 +66,6 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
     }
   }, [orgContactDetails, getEnterpriseAdminDetails, user?.details?.isLoggedIn]);
 
-  // write a use Effect to trigger card shown event
   useEffect(() => {
     if (orgContactDetails && user?.details?.isLoggedIn && !user?.details?.isPremium)
       trackTeamPlanCardShown(orgContactDetails?.workspaces?.[0]?.adminEmail?.split("@")?.[1]);
