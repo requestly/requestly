@@ -15,9 +15,7 @@ class ExtensionIconManager {
 
   constructor() {
     chrome.tabs.onUpdated.addListener((tabId) => {
-      if (window.tabService.getPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG)) {
-        this.#updateIconState(tabId);
-      }
+      this.#updateIconState(tabId);
     });
   }
 
