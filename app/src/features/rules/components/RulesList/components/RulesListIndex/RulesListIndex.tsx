@@ -102,16 +102,49 @@ const RulesList: React.FC<Props> = () => {
     [allRecords, pinnedRecords, activeRecords]
   );
 
-  // FIXME: expand resultant groups and maintain state of expanded groups in localstorage
-  const searchedRecords = useMemo(
-    () =>
-      getFilteredRecords(activeFilter)
-        .filter((record) => {
-          return record.name.toLowerCase().includes(searchValue.toLowerCase());
-        })
-        .map((record) => (isRule(record) ? record : { ...record, expanded: true })),
-    [searchValue, activeFilter, getFilteredRecords]
-  );
+  const groupWiseRulesData = useMemo(() => {
+    const groupWiseRules: Record<string, RuleObj[]> = {};
+
+    allGroups.forEach((group) => {
+      groupWiseRules[group.id] = [];
+    });
+    groupWiseRules["ungrouped"] = [];
+
+    getFilteredRecords(activeFilter).forEach((record) => {
+      if (record.objectType === RuleObjType.RULE) {
+        if (!record.groupId) {
+          groupWiseRules["ungrouped"].push(record);
+        } else groupWiseRules[record.groupId].push(record);
+      }
+    });
+
+    return groupWiseRules;
+  }, [activeFilter, allGroups, getFilteredRecords]);
+
+  const searchedRecords = useMemo(() => {
+    const records: RuleObj[] = [];
+
+    const processGroup = (groupId: string) => {
+      const groupData = groupWiseRulesData[groupId];
+      const groupRecord = allRecordsMap[groupId];
+      if (groupId === "ungrouped") {
+        records.push(...groupData.filter((record) => record.name.toLowerCase().includes(searchValue.toLowerCase())));
+      } else {
+        if (groupRecord.name.toLowerCase().includes(searchValue.toLowerCase())) {
+          records.push(...groupData, groupRecord);
+        } else {
+          const groupedRules = groupData.filter((record) =>
+            record.name.toLowerCase().includes(searchValue.toLowerCase())
+          );
+          if (groupedRules.length > 0) records.push(groupRecord, ...groupedRules);
+        }
+      }
+    };
+
+    Object.keys(groupWiseRulesData).forEach(processGroup);
+
+    return records.map((record) => (isRule(record) ? record : { ...record, expanded: true }));
+  }, [searchValue, allRecordsMap, groupWiseRulesData]);
 
   const promptUserToSignup = useCallback(
     (callback = () => navigate(PATHS.RULES.CREATE), message = "Sign up to continue", source = "") => {
