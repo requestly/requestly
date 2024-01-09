@@ -60,12 +60,17 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
           if (response.data.success) {
             const contactDetails = response.data.enterpriseData;
             setOrgContactDetails(contactDetails);
-            trackTeamPlanCardShown(contactDetails?.workspaces?.[0]?.adminEmail?.split("@")?.[1]);
           }
         });
       }
     }
   }, [orgContactDetails, getEnterpriseAdminDetails, user?.details?.isLoggedIn]);
+
+  // write a use Effect to trigger card shown event
+  useEffect(() => {
+    if (orgContactDetails && user?.details?.isLoggedIn && !user?.details?.isPremium)
+      trackTeamPlanCardShown(orgContactDetails?.workspaces?.[0]?.adminEmail?.split("@")?.[1]);
+  }, [orgContactDetails, user?.details?.isLoggedIn, user?.details?.isPremium]);
 
   if (user?.details?.isPremium) return null;
 
