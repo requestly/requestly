@@ -71,7 +71,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
       trackTeamPlanCardShown(orgContactDetails?.workspaces?.[0]?.adminEmail?.split("@")?.[1]);
   }, [orgContactDetails, user?.details?.isLoggedIn, user?.details?.isPremium]);
 
-  if (user?.details?.isPremium) return null;
+  if (user?.details?.isPremium || !user?.details?.isLoggedIn) return null;
 
   return (
     <React.Fragment>
