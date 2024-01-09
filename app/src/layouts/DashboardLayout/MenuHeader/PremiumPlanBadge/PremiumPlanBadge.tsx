@@ -52,7 +52,7 @@ const PremiumPlanBadge = () => {
     Logger.log(err);
   }
 
-  if (!isAppSumoDeal && planId && planStatus !== "active") {
+  if (!isAppSumoDeal && planId && ["trialing", "canceled"].includes(planStatus)) {
     return (
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
