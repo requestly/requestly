@@ -4,7 +4,7 @@ import { Col, Row, Typography, Spin } from "antd";
 import { m, AnimatePresence } from "framer-motion";
 import { ChangeLogType, Changelog } from "components/Home/types";
 import Logger from "lib/logger";
-import { trackHomeWhatsNewClicked } from "components/Home/analytics";
+import { trackHomeChangeLogNotLoaded, trackHomeWhatsNewClicked } from "components/Home/analytics";
 import "./changelogCard.scss";
 
 export const ChangeLogCard: React.FC = () => {
@@ -22,6 +22,7 @@ export const ChangeLogCard: React.FC = () => {
       })
       .catch((err) => {
         Logger.log(err);
+        trackHomeChangeLogNotLoaded();
       })
       .finally(() => {
         setIsLoading(false);
