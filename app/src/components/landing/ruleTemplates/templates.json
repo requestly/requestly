@@ -81,7 +81,47 @@
       }
     },
     {
-      "key": "8",
+      "key": "3",
+      "name": "Modify API response",
+      "description": "Modify API response of an API call made at /exampleAPI endpoint in testheader.com",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704880778479,
+          "description": "Modify API response of an API call made at /exampleAPI endpoint in testheader.com",
+          "groupId": "",
+          "id": "Response_i4w57",
+          "isSample": false,
+          "lastModifiedBy": "pVuHQhkmZpPR5QHa1xsjRgLIk3t1",
+          "modificationDate": 1704880979492,
+          "name": "Modify API response",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "qvgs0",
+              "response": {
+                "resourceType": "restApi",
+                "statusCode": "",
+                "type": "static",
+                "value": "{\"userId\":2,\"status\":\"responsive modified!\"}"
+              },
+              "source": {
+                "filters": [],
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://testheaders.com/exampleAPI"
+              }
+            }
+          ],
+          "ruleType": "Response",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
+      "key": "4",
       "name": "Bypass CORS",
       "description": "You can Bypass CORS by turning this on",
       "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8oBmecALAzN-kd73MyovxZKNzg0fHSvM6-xStnS8AXnoccY2oIkSVNz179uZgbIEajVE&usqp=CAU",
@@ -141,7 +181,7 @@
       }
     },
     {
-      "key": "6",
+      "key": "5",
       "name": "Remove Content-Security-Policy Header",
       "description": "Turn this on and see content-security-policy header being removed",
       "imageURL": "",
@@ -186,46 +226,7 @@
       }
     },
     {
-      "key": "3",
-      "name": "Toggle Feature Flags",
-      "description": "Override JSON API responses for toggling feature flags",
-      "isSharedList": false,
-      "isFeatured": true,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1704366820790,
-          "description": "Override JSON API responses for toggling feature flags",
-          "groupId": "",
-          "id": "Response_3xxx2",
-          "isSample": false,
-          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
-          "modificationDate": 1704366993356,
-          "name": "Toggle Feature Flags",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "id": "hwm11",
-              "response": {
-                "resourceType": "restApi",
-                "statusCode": "",
-                "type": "static",
-                "value": "{\"featureFlag1\":true,\"featureFlag2\":false,\"featureFlag3\":true}"
-              },
-              "source": {
-                "key": "Url",
-                "operator": "Contains",
-                "value": "https://api.example.com/features"
-              }
-            }
-          ],
-          "ruleType": "Response",
-          "status": "Inactive"
-        }
-      }
-    },
-    {
-      "key": "4",
+      "key": "6",
       "name": "Inject JS into Customer Site",
       "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
       "isSharedList": false,
@@ -268,7 +269,86 @@
       }
     },
     {
-      "key": "5",
+      "key": "7",
+      "name": "Simulate 404 status code",
+      "description": "Returning 404 status code in response of an API call made at /exampleAPI endpoint in testheader.com",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704883199214,
+          "description": "Returning 404 status code in response of an API call made at /exampleAPI endpoint in testheader.com",
+          "groupId": "",
+          "id": "Response_dp6lk",
+          "isSample": false,
+          "lastModifiedBy": "pVuHQhkmZpPR5QHa1xsjRgLIk3t1",
+          "modificationDate": 1704883461547,
+          "name": "Simulate 404 status code",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "qoa22",
+              "response": {
+                "resourceType": "restApi",
+                "statusCode": "404",
+                "statusText": "Not Found",
+                "type": "static",
+                "value": "{}"
+              },
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://testheaders.com/exampleAPI"
+              }
+            }
+          ],
+          "ruleType": "Response",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
+      "key": "8",
+      "name": "Toggle Feature Flags",
+      "description": "Override JSON API responses for toggling feature flags",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704366820790,
+          "description": "Override JSON API responses for toggling feature flags",
+          "groupId": "",
+          "id": "Response_3xxx2",
+          "isSample": false,
+          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
+          "modificationDate": 1704366993356,
+          "name": "Toggle Feature Flags",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "hwm11",
+              "response": {
+                "resourceType": "restApi",
+                "statusCode": "",
+                "type": "static",
+                "value": "{\"featureFlag1\":true,\"featureFlag2\":false,\"featureFlag3\":true}"
+              },
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://api.example.com/features"
+              }
+            }
+          ],
+          "ruleType": "Response",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
+      "key": "9",
       "name": "Mock Geolocation Header",
       "description": "Simulate geolocation on specific websites.",
       "isSharedList": false,
@@ -318,7 +398,7 @@
       }
     },
     {
-      "key": "7",
+      "key": "10",
       "name": "Redirect Google Queries to DuckDuckGo",
       "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
       "isSharedList": false,
@@ -353,7 +433,7 @@
       }
     },
     {
-      "key": "9",
+      "key": "11",
       "name": "Load Google Analytics in Debug Mode",
       "description": "Prints useful information to the JavaScript console by enabling the debug version of the Google Analytics Javascript.",
       "isSharedList": true,
@@ -366,7 +446,7 @@
       }
     },
     {
-      "key": "10",
+      "key": "12",
       "name": "Highlight Google Ads",
       "isFeatured": true,
       "description": "Highlights Ads in Google Search Result to avoid clicking on them",
@@ -411,7 +491,7 @@
       }
     },
     {
-      "key": "11",
+      "key": "13",
       "name": "Browse Quora Anonymously",
       "description": "Can load Quora in Incognito Mode without signing in",
       "imageURL": "https://www.vectorlogo.zone/logos/quora/quora-icon.svg",
@@ -455,7 +535,7 @@
       }
     },
     {
-      "key": "12",
+      "key": "14",
       "name": "Remove UTM Params",
       "description": "Turn it on and try opening example.com?utm_source=gmail",
       "imageURL": "",
@@ -520,7 +600,7 @@
       }
     },
     {
-      "key": "13",
+      "key": "15",
       "name": "Redirect Google Queries to Bing",
       "description": "Turn it on and your chrome address bar will show results from Bing",
       "imageURL": "https://www.vectorlogo.zone/logos/bing/bing-icon.svg",
@@ -554,7 +634,7 @@
       }
     },
     {
-      "key": "19",
+      "key": "16",
       "name": "Redirect Dictionary.com to Merriam-Webster in Adobe Acrobat Reader Lookup",
       "description": "Change the Default Dictionary in Adobe Acrobat Reader to Merriam-Webster",
       "imageURL": "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
@@ -588,7 +668,7 @@
       }
     },
     {
-      "key": "20",
+      "key": "17",
       "name": "Redirect Dictionary.com to dict.cc in Adobe Acrobat Reader Lookup",
       "description": "Change the Default Dictionary in Adobe Acrobat Reader to Multilingual dictionary",
       "imageURL": "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
