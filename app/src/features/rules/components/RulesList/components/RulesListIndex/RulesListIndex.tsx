@@ -14,7 +14,7 @@ import { RuleType } from "types";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumFeature } from "features/pricing";
 import { PremiumIcon } from "components/common/PremiumIcon";
-import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
 import { isSignUpRequired } from "utils/AuthUtils";
 import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
@@ -67,6 +67,7 @@ const RulesList: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
@@ -352,7 +353,7 @@ const RulesList: React.FC<Props> = () => {
     debouncedTrackRulesListSearched(value);
   };
 
-  return isLoading ? (
+  return isLoading || isRuleListLoading ? (
     <>
       <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
     </>
@@ -385,7 +386,11 @@ const RulesList: React.FC<Props> = () => {
           filters={contentHeaderFilters}
         />
         <div className="rq-rules-table">
-          <RulesTable rules={searchedRecords as RuleObj[]} loading={isLoading} searchValue={searchValue} />
+          <RulesTable
+            rules={searchedRecords as RuleObj[]}
+            loading={isLoading || isRuleListLoading}
+            searchValue={searchValue}
+          />
         </div>
       </div>
     </>
