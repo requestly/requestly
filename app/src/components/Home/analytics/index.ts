@@ -32,3 +32,7 @@ export const trackHomeWhatsNewClicked = (action: string) => {
 export const trackHomeChangeLogNotLoaded = () => {
   trackEvent(HOMEPAGE.HOME_SCREEN_CHANGE_LOG_NOT_LOADED);
 };
+
+export const trackTemplatesScrolled = () => {
+  trackEvent(HOMEPAGE.HOME_SCREEN_TEMPLATES_SCROLLED);
+};

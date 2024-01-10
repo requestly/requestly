@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Col, Row, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
 import RulePreviewModal from "components/landing/ruleTemplates/RulePreviewModal";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import APP_CONSTANTS from "config/constants";
-import { trackHomeTemplatePreviewClicked } from "components/Home/analytics";
+import { trackHomeTemplatePreviewClicked, trackTemplatesScrolled } from "components/Home/analytics";
 import templatesMap from "../../../landing/ruleTemplates/templates.json";
 import { RuleType } from "types";
 import PATHS from "config/constants/sub/paths";
@@ -13,8 +13,10 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
 export const Templates: React.FC = () => {
+  const scrollContainerRef = useRef(null);
   const [ruleToPreview, setRuleToPreview] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [hasScrolledHorizontally, setHasScrolledHorizontally] = useState(false);
 
   const filteredTemplates = useMemo(() => templatesMap.templates.filter((template: any) => template.isFeatured), []);
 
@@ -22,6 +24,33 @@ export const Templates: React.FC = () => {
     setRuleToPreview(ruleData);
     setIsPreviewModalOpen(true);
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const container = scrollContainerRef.current;
+
+      if (container) {
+        const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
+        const isScrolledHorizontally = container.scrollLeft > 0;
+        setHasScrolledHorizontally(isScrolledHorizontally && hasHorizontalScroll);
+      }
+    };
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (hasScrolledHorizontally) {
+      trackTemplatesScrolled();
+    }
+  }, [hasScrolledHorizontally]);
 
   return (
     <>
@@ -37,7 +66,7 @@ export const Templates: React.FC = () => {
         <Typography.Title level={5} className="home-templates-title">
           Start with a template
         </Typography.Title>
-        <Col span={24} className="home-templates-row">
+        <Col span={24} className="home-templates-row" ref={scrollContainerRef}>
           {filteredTemplates.map((template: any) => {
             const ruleType = template.data.ruleDefinition.ruleType;
             return (
