@@ -6,7 +6,6 @@ import ContactUsModal from "components/landing/contactUsModal";
 import GitHubButton from "react-github-btn";
 import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
-import StripeClimateBadge from "../../../../../assets/images/pages/pricing-page/Stripe-Climate-Badge.svg";
 import { Col, Row, Switch } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
 import { PricingTable, UpgradeWorkspaceMenu } from "features/pricing";
@@ -84,15 +83,6 @@ const FreeAndEnterprisePlanTable = () => {
           </Col>
         </Row>
         <EnterpriseBanner openContactUsModal={() => setIsContactUsModalOpen(true)} />
-        <div className="note-container text-gray text-center">
-          <span>
-            <img alt="StripeClimateBadge" src={StripeClimateBadge} style={{ height: "1em" }} /> At Requestly, we
-            contribute 1% of our revenue to carbon removal.&nbsp;
-            <a href="https://climate.stripe.com/Ve5kOs" target={"_blank"} rel="noreferrer">
-              See how
-            </a>
-          </span>
-        </div>
         <div onClick={trackViewGithubClicked}>
           <GitHubButton
             href="https://github.com/requestly/requestly"
