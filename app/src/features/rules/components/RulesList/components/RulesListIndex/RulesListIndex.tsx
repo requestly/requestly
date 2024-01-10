@@ -14,7 +14,7 @@ import { RuleType } from "types";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumFeature } from "features/pricing";
 import { PremiumIcon } from "components/common/PremiumIcon";
-import { getAppMode, getIsExtensionEnabled, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
 import { isSignUpRequired } from "utils/AuthUtils";
 import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
@@ -57,6 +57,7 @@ import { debounce } from "lodash";
 import "./rulesListIndex.scss";
 
 const debouncedTrackRulesListSearched = debounce(trackRulesListSearched, 500);
+const { UNGROUPED_GROUP_NAME } = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS;
 
 interface Props {}
 
@@ -66,6 +67,7 @@ const RulesList: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
@@ -83,7 +85,6 @@ const RulesList: React.FC<Props> = () => {
   const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RuleObjType.GROUP), [allRecords]);
   const pinnedRecords = useMemo(() => getPinnedRules(allRecordsMap), [allRecordsMap]);
   const activeRecords = useMemo(() => getActiveRules(allRecords), [allRecords]);
-
   // FIX: rules loading state
 
   const getFilteredRecords = useCallback(
@@ -102,16 +103,52 @@ const RulesList: React.FC<Props> = () => {
     [allRecords, pinnedRecords, activeRecords]
   );
 
-  // FIXME: expand resultant groups and maintain state of expanded groups in localstorage
-  const searchedRecords = useMemo(
-    () =>
-      getFilteredRecords(activeFilter)
-        .filter((record) => {
-          return record.name.toLowerCase().includes(searchValue.toLowerCase());
-        })
-        .map((record) => (isRule(record) ? record : { ...record, expanded: true })),
-    [searchValue, activeFilter, getFilteredRecords]
-  );
+  const groupWiseRulesData = useMemo(() => {
+    const groupWiseRules: Record<string, RuleObj[]> = {};
+
+    allGroups.forEach((group) => {
+      groupWiseRules[group.id] = [];
+    });
+    groupWiseRules[UNGROUPED_GROUP_NAME] = [];
+
+    getFilteredRecords(activeFilter).forEach((record) => {
+      if (record.objectType === RuleObjType.RULE) {
+        if (!record.groupId) {
+          groupWiseRules[UNGROUPED_GROUP_NAME].push(record);
+        } else groupWiseRules[record.groupId].push(record);
+      }
+    });
+
+    return groupWiseRules;
+  }, [activeFilter, allGroups, getFilteredRecords]);
+
+  const searchedRecords = useMemo(() => {
+    const records: RuleObj[] = [];
+
+    const processGroup = (groupId: string) => {
+      const groupData = groupWiseRulesData[groupId];
+      const groupRecord = allRecordsMap[groupId];
+      if (groupId === UNGROUPED_GROUP_NAME) {
+        // filter ungrouped rules based on search value
+        records.push(...groupData.filter((record) => record.name.toLowerCase().includes(searchValue.toLowerCase())));
+      } else {
+        if (groupRecord.name.toLowerCase().includes(searchValue.toLowerCase())) {
+          //if group name matches search value, add all rules in that group with the group record
+          records.push(...groupData, groupRecord);
+        } else {
+          // else add only those rules which match the search value along with the group record
+          const groupedRules = groupData.filter((record) =>
+            record.name.toLowerCase().includes(searchValue.toLowerCase())
+          );
+          if (groupedRules.length > 0) records.push(groupRecord, ...groupedRules);
+        }
+      }
+    };
+
+    Object.keys(groupWiseRulesData).forEach(processGroup);
+
+    return records.map((record) => (isRule(record) ? record : { ...record, expanded: true }));
+  }, [searchValue, allRecordsMap, groupWiseRulesData]);
 
   const promptUserToSignup = useCallback(
     (callback = () => navigate(PATHS.RULES.CREATE), message = "Sign up to continue", source = "") => {
@@ -316,7 +353,7 @@ const RulesList: React.FC<Props> = () => {
     debouncedTrackRulesListSearched(value);
   };
 
-  return isLoading ? (
+  return isLoading || isRuleListLoading ? (
     <>
       <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
     </>
@@ -349,7 +386,11 @@ const RulesList: React.FC<Props> = () => {
           filters={contentHeaderFilters}
         />
         <div className="rq-rules-table">
-          <RulesTable rules={searchedRecords as RuleObj[]} loading={isLoading} searchValue={searchValue} />
+          <RulesTable
+            rules={searchedRecords as RuleObj[]}
+            loading={isLoading || isRuleListLoading}
+            searchValue={searchValue}
+          />
         </div>
       </div>
     </>
