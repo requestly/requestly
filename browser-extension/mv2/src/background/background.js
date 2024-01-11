@@ -1156,6 +1156,15 @@ BG.Methods.handleClientPortConnections = () => {
             documentLifecycle: navigatedTabData.documentLifecycle,
           },
         });
+
+      const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
+      window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
+      clientLoadSubscribers.forEach((subscriber) => subscriber());
+
+      BG.Methods.onClientPageLoad({
+        id: tabId,
+        url: navigatedTabData.url,
+      });
     }
   });
 
@@ -1172,11 +1181,13 @@ BG.Methods.handleClientPortConnections = () => {
     window.tabService.resetPageData(senderTab.id);
     window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
 
-    const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
-    window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
-    clientLoadSubscribers.forEach((subscriber) => subscriber());
+    if (!port.sender.documentLifecycle || port.sender.documentLifecycle === "active") {
+      const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
+      window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
+      clientLoadSubscribers.forEach((subscriber) => subscriber());
 
-    BG.Methods.onClientPageLoad(senderTab);
+      BG.Methods.onClientPageLoad(senderTab);
+    }
 
     // It is recommended to remove the onConnect listener after connection has been established.
     // Port is only used to notify the background of client loaded, so we can disconnect it to remove the listener
@@ -1202,6 +1213,7 @@ BG.Methods.handleClientPortConnections = () => {
 
 BG.Methods.isConnectedToClient = (tabId) => {
   const clientPortData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+  console.log("!!!debug", "clientPortData", clientPortData);
   // sender.documentLifeCycle is only used by chrome and not firefox
   if (clientPortData) {
     if (clientPortData.sender?.documentLifecycle) {
