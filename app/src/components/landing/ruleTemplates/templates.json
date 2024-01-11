@@ -82,7 +82,7 @@
     },
     {
       "key": "3",
-      "name": "Modify API response",
+      "name": "Override response of an API",
       "description": "Modify API response of an API call made at /exampleAPI endpoint in testheader.com",
       "isSharedList": false,
       "isFeatured": true,
@@ -96,7 +96,7 @@
           "isSample": false,
           "lastModifiedBy": "pVuHQhkmZpPR5QHa1xsjRgLIk3t1",
           "modificationDate": 1704880979492,
-          "name": "Modify API response",
+          "name": "Override response of an API",
           "objectType": "rule",
           "pairs": [
             {
@@ -105,7 +105,7 @@
                 "resourceType": "restApi",
                 "statusCode": "",
                 "type": "static",
-                "value": "{\"userId\":2,\"status\":\"responsive modified!\"}"
+                "value": "{\"userId\":2,\"status\":\"response modified!\"}"
               },
               "source": {
                 "filters": [],

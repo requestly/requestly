@@ -46,9 +46,10 @@ export const HelpCard: React.FC = () => {
     <>
       <Col className="help-card-title">Quick help</Col>
       <Col>
-        {helperLinks.map((link) => {
+        {helperLinks.map((link, index) => {
           return (
             <Link
+              key={index}
               rel="noopener noreferrer"
               target="_blank"
               to={link.href}

@@ -5,7 +5,11 @@ import { RQButton } from "lib/design-system/components";
 import RulePreviewModal from "components/landing/ruleTemplates/RulePreviewModal";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import APP_CONSTANTS from "config/constants";
-import { trackHomeTemplatePreviewClicked, trackTemplatesScrolled } from "components/Home/analytics";
+import {
+  trackHomeTemplatePreviewClicked,
+  trackHomeViewAllTemplatesClicked,
+  trackTemplatesScrolled,
+} from "components/Home/analytics";
 import templatesMap from "../../../landing/ruleTemplates/templates.json";
 import { RuleType } from "types";
 import PATHS from "config/constants/sub/paths";
@@ -32,13 +36,19 @@ export const Templates: React.FC = () => {
       if (container) {
         const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
         const isScrolledHorizontally = container.scrollLeft > 0;
-        setHasScrolledHorizontally(isScrolledHorizontally && hasHorizontalScroll);
+        if (isScrolledHorizontally && hasHorizontalScroll) {
+          setHasScrolledHorizontally(true);
+          container.removeEventListener("scroll", handleScroll);
+        }
       }
     };
+
     const container = scrollContainerRef.current;
+
     if (container) {
       container.addEventListener("scroll", handleScroll);
     }
+
     return () => {
       if (container) {
         container.removeEventListener("scroll", handleScroll);
@@ -67,10 +77,10 @@ export const Templates: React.FC = () => {
           Start with a template
         </Typography.Title>
         <Col span={24} className="home-templates-row" ref={scrollContainerRef}>
-          {filteredTemplates.map((template: any) => {
+          {filteredTemplates.map((template: any, index: number) => {
             const ruleType = template.data.ruleDefinition.ruleType;
             return (
-              <div className="homepage-primary-card home-templates-row-card">
+              <div className="homepage-primary-card home-templates-row-card" key={index}>
                 <Typography.Text className="home-templates-row-card-title">{template.name}</Typography.Text>
                 <Row gutter={8} align="middle" className="home-templates-row-card-tag">
                   <Col className="home-templates-row-card-icon">{ruleIcons[ruleType as RuleType]}</Col>
@@ -99,7 +109,11 @@ export const Templates: React.FC = () => {
           })}
         </Col>
 
-        <Link to={PATHS.RULES.TEMPLATES.ABSOLUTE} className="homepage-view-all-link">
+        <Link
+          to={PATHS.RULES.TEMPLATES.ABSOLUTE}
+          className="homepage-view-all-link"
+          onClick={() => trackHomeViewAllTemplatesClicked()}
+        >
           View all templates
         </Link>
       </Col>

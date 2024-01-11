@@ -41,9 +41,9 @@ export const ChangeLogCard: React.FC = () => {
             🚀 What's new
           </Typography.Title>
           <Col className="changelog-card-logs-wrapper">
-            {logs?.map((log: Changelog) => {
+            {logs?.map((log: Changelog, index: number) => {
               return (
-                <Col className="changelog-log">
+                <Col className="changelog-log" key={index}>
                   <Row align="middle" gutter={8}>
                     <Col
                       className={`${

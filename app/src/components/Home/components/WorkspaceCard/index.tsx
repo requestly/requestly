@@ -25,7 +25,8 @@ export const TeamsCard: React.FC = () => {
     getPendingInvites({ email: true, domain: true })
       .then((res: any) => {
         if (res?.pendingInvites) {
-          const sortedInvites = res?.pendingInvites.sort(
+          const invites = res?.pendingInvites;
+          const sortedInvites = invites.sort(
             (a: Invite, b: Invite) => (b.metadata.teamAccessCount as number) - (a.metadata.teamAccessCount as number)
           );
           // Removing duplicate invites and showing most recent invites for each team
