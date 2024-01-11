@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Col, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { RQButton } from "lib/design-system/components";
@@ -21,6 +21,10 @@ interface Props {
 export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subheading }) => {
   const dispatch = useDispatch();
   const availableTeams = useSelector(getAvailableTeams);
+  const sortedAvailableTeams = useMemo(
+    () => [...availableTeams]?.sort((a: Team, b: Team) => b?.accessCount - a?.accessCount),
+    [availableTeams]
+  );
 
   return (
     <AnimatePresence>
@@ -51,7 +55,7 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
                 </>
               ) : (
                 <>
-                  {availableTeams.map((team: Team, index: number) => (
+                  {sortedAvailableTeams.map((team: Team, index: number) => (
                     <TeamsListItem key={index} teamId={team.id} teamName={team.name} />
                   ))}
                 </>
