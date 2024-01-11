@@ -58,10 +58,10 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         const isPinned = record.isFavourite;
 
         return (
-          <Tooltip title={isPinned ? "Unpin Record" : "Pin Record"}>
+          <Tooltip title={isPinned ? "Unpin Record" : "Pin Record"} color="var(--black)">
             <Button
               type="text"
-              className="pin-record-btn"
+              className={`pin-record-btn ${isPinned ? "pin-record-btn-pinned" : ""}`}
               icon={<RiPushpin2Line className={`${record.isFavourite ? "record-pinned" : "record-unpinned"}`} />}
               onClick={(e) => {
                 e.stopPropagation();
