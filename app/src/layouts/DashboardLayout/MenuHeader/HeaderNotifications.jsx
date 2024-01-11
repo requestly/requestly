@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button, Badge, Row, Col, Dropdown, Divider, Avatar, Tag } from "antd";
-import { Notification, Danger } from "react-iconly";
+import { CgDanger } from "@react-icons/all-files/cg/CgDanger";
+import { IoMdNotificationsOutline } from "@react-icons/all-files/io/IoMdNotificationsOutline";
 import moment from "moment";
 import { groupBy } from "lodash";
 import { getUserAuthDetails } from "store/selectors";
@@ -101,7 +102,7 @@ export default function HeaderNotifications() {
       status: "urgent",
       // extra: "Something extra",
       title: "Verify Email",
-      avatar: <Danger size={16} className="hp-text-color-warning-1" />,
+      avatar: <CgDanger size={16} className="hp-text-color-warning-1" />,
       clickHandler: () => resendMailHandler(),
       description: <>{isResendEmailLoading ? <span>Sending...</span> : <span>Click here to resend</span>}</>,
     });
@@ -207,7 +208,7 @@ export default function HeaderNotifications() {
                 ) : null}
               </div>
 
-              <Notification set="curved" />
+              <IoMdNotificationsOutline />
             </div>
           </Dropdown>
         }

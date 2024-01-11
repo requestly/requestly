@@ -23,6 +23,7 @@
     "watch": "rm -rf dist && rollup -cw"
   },
   "devDependencies": {
+    "@requestly-ui/resource-table": "^0.1.2",
     "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
@@ -35,6 +36,7 @@
     "@types/uuid": "^9.0.1",
     "archiver": "^5.3.1",
     "node-sass": "^8.0.0",
+    "postcss": "^8.4.30",
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-postcss": "^4.0.2",
@@ -49,6 +51,7 @@
     "@devtools-ds/object-inspector": "^1.2.1",
     "@devtools-ds/table": "^1.2.1",
     "@devtools-ds/themes": "^1.2.1",
+    "@monaco-editor/react": "^4.5.2",
     "antd": "^5.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

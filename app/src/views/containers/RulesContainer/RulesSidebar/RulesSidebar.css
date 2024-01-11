@@ -1,6 +1,6 @@
 .rules-sidebar-container {
   height: 100%;
-  background-color: var(--app-secondary-sidebar-background);
+  background-color: var(--component-background);
 }
 
 .rules-sidebar-container ul {

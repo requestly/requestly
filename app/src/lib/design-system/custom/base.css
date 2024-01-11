@@ -6,6 +6,13 @@
   color: var(--white);
 }
 
+.subheader {
+  font-size: 1.125rem; /* 18px */
+  line-height: 1.565rem;
+  font-weight: 500;
+  color: var(--white);
+}
+
 .title {
   font-size: 1rem; /* 16px */
   line-height: 1.625rem;
@@ -46,6 +53,10 @@
 
 .uppercase {
   text-transform: uppercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
 }
 
 .text-white {
@@ -143,9 +154,16 @@
 .w-full {
   width: 100%;
 }
+.h-full {
+  height: 100%;
+}
 
 .shrink-0 {
   flex-shrink: 0;
+}
+
+.flex-1 {
+  flex: 1;
 }
 
 .ml-auto {
@@ -200,6 +218,9 @@
 .success {
   color: var(--success);
 }
+.danger {
+  color: var(--danger);
+}
 
 .relative {
   position: relative;
@@ -237,4 +258,14 @@
 .external-link:hover {
   color: var(--white);
   text-decoration: underline;
+}
+
+.link-button {
+  color: var(--link-color);
+}
+
+.link-button:hover {
+  color: var(--link-color);
+  cursor: pointer;
+  opacity: 0.8;
 }

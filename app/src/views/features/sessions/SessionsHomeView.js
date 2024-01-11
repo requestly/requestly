@@ -1,11 +1,8 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { getAppMode } from "../../../store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import SessionsIndexPageContainer from "./SessionsIndexPageContainer";
-import { isExtensionInstalled } from "actions/ExtensionActions";
-import OnboardingView from "./SessionsIndexPageContainer/SessionsIndexPage/OnboardingView";
-import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import NetworkSessionsIndexPage from "./SessionsIndexPageContainer/NetworkSessions";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
@@ -13,11 +10,9 @@ import DesktopAppError from "./errors/DesktopAppError";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const SessionsHomeView = () => {
+  const appMode = useSelector(getAppMode);
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
 
-  //Global State
-  const appMode = useSelector(getAppMode);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   if (isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions) {
     return <NetworkSessionsIndexPage />;
   }
@@ -26,7 +21,7 @@ const SessionsHomeView = () => {
     return <DesktopAppError />;
   }
 
-  return isExtensionInstalled() || isWorkspaceMode ? <SessionsIndexPageContainer /> : <OnboardingView />;
+  return <SessionsIndexPageContainer />;
 };
 
 export default SessionsHomeView;

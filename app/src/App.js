@@ -17,12 +17,13 @@ import LocalUserAttributesHelperComponent from "hooks/LocalUserAttributesHelperC
 import PreLoadRemover from "hooks/PreLoadRemover";
 import AppModeInitializer from "hooks/AppModeInitializer";
 import DBListeners from "hooks/DbListenerInit/DBListeners";
-import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
+// import RuleExecutionsSyncer from "hooks/RuleExecutionsSyncer";
 import FeatureUsageEvent from "hooks/FeatureUsageEvent";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/ExtensionContextInvalidationNotice";
 import { useIsExtensionEnabled } from "hooks";
+import { LazyMotion, domMax } from "framer-motion";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -36,6 +37,7 @@ const App = () => {
 
   useGeoLocation();
   useIsExtensionEnabled();
+  // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();
 
@@ -65,25 +67,27 @@ const App = () => {
       <PreLoadRemover />
       <AppModeInitializer />
       <DBListeners />
-      <RuleExecutionsSyncer />
-      <FeatureUsageEvent />
+      {/* <RuleExecutionsSyncer /> */}
       <ActiveWorkspace />
       <ThirdPartyIntegrationsHandler />
 
       <ConfigProvider locale={enUS}>
         <GrowthBookProvider growthbook={growthbook}>
           <LocalUserAttributesHelperComponent />
-          <div id="requestly-dashboard-layout">
-            <CommandBar />
-            {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
-              <FullScreenLayout />
-            ) : (
-              <>
-                <UpdateDialog />
-                <DashboardLayout />
-              </>
-            )}
-          </div>
+          <FeatureUsageEvent />
+          <LazyMotion features={domMax} strict>
+            <div id="requestly-dashboard-layout">
+              <CommandBar />
+              {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
+                <FullScreenLayout />
+              ) : (
+                <>
+                  <UpdateDialog />
+                  <DashboardLayout />
+                </>
+              )}
+            </div>
+          </LazyMotion>
         </GrowthBookProvider>
       </ConfigProvider>
     </>

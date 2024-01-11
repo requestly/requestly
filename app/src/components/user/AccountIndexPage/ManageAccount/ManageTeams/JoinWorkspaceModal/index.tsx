@@ -15,20 +15,22 @@ import { Invite, TeamInviteMetadata } from "types";
 import { trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import APP_CONSTANTS from "config/constants";
 import "./JoinWorkspaceModal.css";
+import { trackCreateNewTeamClicked } from "modules/analytics/events/common/teams";
 
 interface JoinWorkspaceModalProps {
   isOpen: boolean;
   toggleModal: () => void;
   callback?: () => void;
+  source: string;
 }
 
 interface InviteRowProps {
-  isPrimary: boolean;
   team: TeamInviteMetadata;
   callback: () => void;
+  modalSrc: string;
 }
 
-const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
+const InviteRow: React.FC<InviteRowProps> = ({ team, callback, modalSrc }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -36,7 +38,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
   const [isJoining, setIsJoining] = useState<boolean>(false);
 
   const handleJoinClick = (team: TeamInviteMetadata) => {
-    trackWorkspaceJoinClicked(team?.teamId, "workspace_joining_modal");
+    trackWorkspaceJoinClicked(team?.teamId, modalSrc);
     setIsJoining(true);
 
     acceptTeamInvite(team?.inviteId)
@@ -55,7 +57,9 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
                 isWorkspaceMode,
                 isSyncEnabled: true,
               },
-              appMode
+              appMode,
+              null,
+              "join_workspace_modal"
             );
           }
         }
@@ -87,7 +91,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
           <div>{team.teamName}</div>
         </Col>
         <div className="text-gray">{team.teamAccessCount} members</div>
-        <Button loading={isJoining} type={isPrimary ? "primary" : "default"} onClick={() => handleJoinClick(team)}>
+        <Button loading={isJoining} type="primary" onClick={() => handleJoinClick(team)}>
           {isJoining ? "Joining" : "Join"}
         </Button>
       </div>
@@ -95,7 +99,7 @@ const InviteRow: React.FC<InviteRowProps> = ({ isPrimary, team, callback }) => {
   );
 };
 
-const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleModal, callback }) => {
+const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleModal, callback, source }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [teamInvites, setTeamInvites] = useState<Invite[]>([]);
@@ -119,6 +123,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
   }, [user.loggedIn, dispatch]);
 
   const handleCreateNewWorkspace = () => {
+    trackCreateNewTeamClicked("join_workspace_modal");
     toggleModal();
     if (user.loggedIn) {
       dispatch(
@@ -162,7 +167,7 @@ const JoinWorkspaceModal: React.FC<JoinWorkspaceModalProps> = ({ isOpen, toggleM
         {teamInvites?.length > 0 ? (
           <ul className="teams-invite-list">
             {getUniqueTeamsFromInvites(teamInvites).map((team: TeamInviteMetadata, index) => {
-              return <InviteRow team={team} isPrimary={index === 0} callback={callback} />;
+              return <InviteRow team={team} callback={callback} modalSrc={source} />;
             })}
           </ul>
         ) : (

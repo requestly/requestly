@@ -1,0 +1,43 @@
+.getting-started-default-team-view {
+  padding: 1rem 24px;
+
+  & .ant-divider {
+    margin-top: 32px;
+    margin-bottom: 0;
+    width: 312px;
+    border-top-color: #383838;
+  }
+}
+
+.getting-started-default-team-title {
+  font-weight: 500;
+  margin-top: 16px;
+}
+.getting-started-default-team-description {
+  color: var(--neutrals-gray-300);
+  font-size: 13px;
+  margin-top: 1rem;
+
+  & span {
+    color: var(--white);
+    font-weight: 500;
+  }
+}
+
+.getting-started-manage-workspace-btn {
+  color: var(--white);
+  display: inline-flex;
+  gap: 8px;
+  font-size: 13px;
+
+  & svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover,
+  &:focus {
+    background: none;
+    color: var(--white);
+  }
+}

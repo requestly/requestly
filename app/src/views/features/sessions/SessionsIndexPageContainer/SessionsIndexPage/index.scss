@@ -85,3 +85,39 @@
     }
   }
 }
+
+.create-new-session-modal {
+  .onboarding-content-container {
+    .onboarding-banner {
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .banner-text {
+        color: var(--text-gray);
+        font-size: 14px;
+      }
+
+      .banner-title {
+        text-align: center;
+        font-size: 1.5rem;
+        width: 100%;
+      }
+
+      .banner-description {
+        margin-bottom: 2.5rem;
+        .banner-text {
+          text-align: center;
+        }
+      }
+
+      .input-container {
+        .ant-input {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}

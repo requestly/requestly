@@ -13,7 +13,6 @@ import SHARED_LISTS_TABLE_CONSTANTS from "./sub/shared-lists-table-constants";
 import FILES_TABLE_CONSTANTS from "./sub/files-table-constants";
 import THEME_COLORS from "./sub/theme-colors";
 import AUTH from "./sub/auth";
-import PRICING from "./sub/pricing";
 import LIMIT_REACHED_MODAL from "./sub/limit-reached-modal";
 import EMAIL_DOMAINS from "./sub/email-domains";
 import STYLES from "./sub/styles";
@@ -28,12 +27,7 @@ const APP_CONSTANTS = {};
 /** FEATURES */
 APP_CONSTANTS.FEATURES = FEATURES;
 
-/** PRICING */
-APP_CONSTANTS.PRICING = PRICING;
-
 /** STORAGE KEYS */
-APP_CONSTANTS.MIGRATED_TO_NEW_SOURCE_FILTER_FORMAT = "migrated-to-new-source-filter-format";
-APP_CONSTANTS.STORAGE_MIGRATED_TO_LOCAL = "storage-migrated-to-local";
 APP_CONSTANTS.LAST_BACKUP_TIMESTAMP = "last-backup-timestamp";
 APP_CONSTANTS.LAST_SYNC_TARGET = "last-sync-target";
 APP_CONSTANTS.LAST_SYNCED_TS = "last-synced-ts";
@@ -140,6 +134,7 @@ APP_CONSTANTS.PATH_FROM_PAIR = {
   SOURCE_REQUEST_METHOD: "source.filters.requestMethod",
   SOURCE_REQUEST_PAYLOAD: "source.filters.requestPayload",
   SOURCE_REQUEST_PAYLOAD_KEY: "source.filters.requestPayload.key",
+  SOURCE_REQUEST_PAYLOAD_OPERATOR: "source.filters.requestPayload.operator",
   SOURCE_REQUEST_PAYLOAD_VALUE: "source.filters.requestPayload.value",
 };
 
@@ -152,7 +147,7 @@ APP_CONSTANTS.url = {
 };
 
 APP_CONSTANTS.mock_base_url = {
-  prod: "https://requestly.dev/api/mockv2",
+  prod: "https://requestly.tech/api/mockv2",
   beta: "https://beta.requestly.io/api/mockv2",
   local: "http://localhost:5001/requestly-dev/us-central1/handleMockRequest/api/mockv2", // Change port depending upon you firebase functions emulator port
 };

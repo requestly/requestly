@@ -54,7 +54,7 @@ toast.info = (messageText, duration, notifyOtherTabs) => {
   }
 };
 toast.error = (messageText, duration, notifyOtherTabs) => {
-  message.error(messageText);
+  message.error(messageText, duration);
   if (notifyOtherTabs) {
     window.toastBroadcastChannel.postMessage({
       type: "error",
@@ -64,7 +64,7 @@ toast.error = (messageText, duration, notifyOtherTabs) => {
   }
 };
 toast.warn = (messageText, duration, notifyOtherTabs) => {
-  message.warn(messageText);
+  message.warn(messageText, duration);
   if (notifyOtherTabs) {
     window.toastBroadcastChannel.postMessage({
       type: "warn",

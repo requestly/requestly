@@ -8,6 +8,7 @@ import { trackDesktopAppInstalled } from "modules/analytics/events/misc/installa
 import { getValueAsPromise } from "actions/FirebaseActions";
 import { isEmailVerified } from "./AuthUtils";
 import { isCompanyEmail } from "./FormattingHelper";
+import moment from "moment";
 
 const { APP_MODES } = GLOBAL_CONSTANTS;
 
@@ -65,6 +66,9 @@ export const getAndUpdateInstallationDate = async (appMode, doUpdate, isUserLogg
       // User is not logged in - return/set date in local storage
       const localInstallationDate = getLocalInstallationDate(attrName, doUpdate, appMode);
       submitAttrUtil(attrName, localInstallationDate);
+      const installDate = moment(localInstallationDate);
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.DAYS_SINCE_INSTALL, moment().diff(installDate, "days"));
+
       resolve(localInstallationDate);
     }
   });

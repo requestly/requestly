@@ -1,7 +1,5 @@
 .pricing-table-product-wrapper {
-  display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   width: 100%;
 }
 .pricing-table-product-view-icon {
@@ -16,7 +14,7 @@
 .pricing-table-product-view {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  align-self: flex-start;
 }
 
 .pricing-table-product-view-item {
@@ -38,65 +36,77 @@
 
 .pricing-table-product-view-para p {
   color: var(--text-gray);
-  text-align: justify;
 }
-.pricing-table-row {
-  justify-content: flex-start;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  max-width: 1200px;
+
+.pricing-table-row .ant-space-item {
+  align-self: stretch;
+  flex: 1;
 }
+
 .pricing-table-product-view h1 {
   margin-bottom: 2rem;
 }
 .pricing-table-wrapper {
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
   align-items: center;
 }
 .pricing-table-wrapper .pricing-table-col {
-  min-width: 340px;
   padding: 30px !important;
   border: 1px solid var(--border-dark);
   background: var(--component-background);
   border-radius: var(--border-radius-sm);
+  min-width: 300px;
+  height: 100%;
 }
 
 .pricing-table-col .pricing-col-header .plan-for {
   text-align: left;
-  margin: 0;
   margin-bottom: 8px;
 }
 .pricing-table-col .price-container {
-  margin: 8px 0;
+  font-size: 12px;
+  margin-bottom: 6px;
 }
 .pricing-table-col .price {
   color: var(--white);
   font-size: 18px;
 }
 .pricing-table-col .plan-feature {
-  margin-top: 8px;
-  gap: 8px;
+  margin-top: 10px;
 }
+
+.plan-feature > span {
+  display: flex;
+  gap: 4px;
+}
+
+.plan-feature > span svg {
+  margin-top: 4px;
+}
+
+.plan-feature .plan-feature-tooltip-active {
+  cursor: default;
+  text-decoration: underline dashed;
+}
+
 .pricing-table-col .basic-use-with-text {
   font-size: 1rem;
   font-weight: 500;
   margin-top: 1.25rem;
   color: var(--white);
 }
-.pricing-table-col .pro-basic-feature-title {
+.pricing-table-col .feature-title {
   font-size: 1rem;
   color: var(--white);
   font-weight: 500;
-  margin-top: 40px;
+  margin-top: 30px;
 }
-.pricing-table-col .pro-basic-feature-title span {
+.pricing-table-col .feature-title span {
   display: inline-flex;
   flex-direction: column;
 }
-.pricing-table-col .pro-basic-feature-title span img {
+.pricing-table-col .feature-title span img {
   width: 75px;
   height: 8px;
 }
@@ -111,51 +121,60 @@
   transform: rotate(180deg);
 }
 .current-plan {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: text-gray;
-  padding: 4px 16px;
-  border-radius: var(--border-radius-sm);
+  margin: 0 4px;
+  padding: 0 4px;
+  color: var(--text-gray);
+  font-size: 10px;
+  vertical-align: bottom;
+  border: none;
 }
 .pricing-table-wrapper .note-container {
-  max-width: 615px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 28px;
   margin-bottom: 12px;
   font-size: 13px;
 }
 
-@media (max-width: 768px) {
-  .pricing-table-product-wrapper {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  .pricing-table-product-view-item {
-    border-left: 0px;
-    border-bottom: 5px solid #262626;
-  }
-  .pricing-table-product-view-item.active {
-    border-left: 0px;
-    border-bottom: 5px solid var(--primary);
-  }
-  .pricing-table-product-view {
-    flex-direction: row;
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  .pricing-table-product-view-para p {
-    display: none;
-  }
-  .pricing-table-product-view h1 {
-    display: none;
-  }
+.enterprise-banner {
+  border: 1px solid var(--white);
+  border-radius: var(--border-radius-md);
+  display: flex;
+  padding: 48px;
+  margin: 20px 24px;
+  justify-content: center;
+}
+
+.enterprise-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.enterprise-features-grid span {
+  vertical-align: middle;
+  padding-left: 4px;
+}
+
+.pricing-table-wrapper .pricing-table {
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pricing-table-wrapper .pricing-table .plan-card {
+  width: 300px;
+  background: var(--surface-2);
+}
+
+.upgrade-workspace-menu-btn .upgrade-workspace-selector-dropdown-btn.ant-dropdown-trigger.rq-btn.ant-btn {
+  background-color: var(--surface-2);
+}
+
+@media (min-width: 2000px) {
   .pricing-table-row {
-    justify-content: center;
-  }
-  .pricing-table-col {
-    width: 100%;
+    max-width: 50%;
+    flex: 0 0 50%;
   }
 }

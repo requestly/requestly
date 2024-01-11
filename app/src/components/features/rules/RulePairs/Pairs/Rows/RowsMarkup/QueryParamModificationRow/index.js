@@ -50,85 +50,90 @@ const QueryParamModificationRow = ({ rowIndex, pairIndex, modification, modifica
 
   return (
     <Row
-      gutter={16}
+      gutter={[16, 8]}
       key={rowIndex}
       align="middle"
       className="margin-top-one"
       data-tour-id="rule-editor-queryparam-modification-row"
     >
       <Col
-        span={3}
-        align="right"
-        className="min-dropdown-tile-width-lg"
+        span={2}
+        className="min-dropdown-tile-width-lg modification-type-dropdown"
         data-tour-id="rule-editor-queryparam-modification-type"
       >
-        <Dropdown overlay={modificationTypeMenu}>
+        <Dropdown overlay={modificationTypeMenu} disabled={isInputDisabled}>
           <Text strong className="uppercase ant-dropdown-link cursor-pointer" onClick={(e) => e.preventDefault()}>
             {modification.type} <DownOutlined />
           </Text>
         </Dropdown>
       </Col>
-      <Col span={9} align="right">
-        <Input
-          addonBefore="Param"
-          className="display-inline-block has-dark-text"
-          placeholder="Param Name"
-          type="text"
-          onChange={(event) => {
-            event?.preventDefault?.();
-            dispatch(
-              actions.updateRulePairAtGivenPath({
-                pairIndex,
-                updates: {
-                  [`modifications[${modificationIndex}].param`]: event?.target?.value,
-                },
-              })
-            );
-          }}
-          value={modification.param}
-          disabled={isInputDisabled ? true : modification.type === "Remove All" ? true : false}
-          data-selectionid="query-param-name"
-        />
-      </Col>
-      <Col span={9} align="right">
-        <Input
-          addonBefore="Value"
-          className="display-inline-block has-dark-text"
-          placeholder="Param Value"
-          type="text"
-          onChange={(event) => {
-            event?.preventDefault?.();
-            dispatch(
-              actions.updateRulePairAtGivenPath({
-                pairIndex,
-                updates: {
-                  [`modifications[${modificationIndex}].value`]: event?.target?.value,
-                },
-              })
-            );
-          }}
-          value={modification.value}
-          disabled={isInputDisabled ? true : modification.type === "Add" ? false : true}
-          data-selectionid="query-param-value"
-        />
-      </Col>
-      <Col span={1} align="right">
-        <Tooltip title="Remove">
-          <ImCross
-            id="delete-pair"
-            onClick={(event) => {
-              event?.preventDefault?.();
-              dispatch(
-                actions.removeValueInRulePairByIndex({
-                  pairIndex,
-                  arrayPath: "modifications",
-                  index: modificationIndex,
-                })
-              );
-            }}
-            className="text-gray cursor-pointer"
-          />
-        </Tooltip>
+      <Col lg={24} xl={19}>
+        <Row align="middle" className="items-center" gutter={16}>
+          <Col span={11} align="right">
+            <Input
+              addonBefore="Param"
+              className="display-inline-block has-dark-text"
+              placeholder="Param Name"
+              type="text"
+              onChange={(event) => {
+                event?.preventDefault?.();
+                dispatch(
+                  actions.updateRulePairAtGivenPath({
+                    pairIndex,
+                    updates: {
+                      [`modifications[${modificationIndex}].param`]: event?.target?.value,
+                    },
+                  })
+                );
+              }}
+              value={modification.param}
+              disabled={isInputDisabled ? true : modification.type === "Remove All" ? true : false}
+              data-selectionid="query-param-name"
+            />
+          </Col>
+          <Col span={11} align="right">
+            <Input
+              addonBefore="Value"
+              className="display-inline-block has-dark-text"
+              placeholder="Param Value"
+              type="text"
+              onChange={(event) => {
+                event?.preventDefault?.();
+                dispatch(
+                  actions.updateRulePairAtGivenPath({
+                    pairIndex,
+                    updates: {
+                      [`modifications[${modificationIndex}].value`]: event?.target?.value,
+                    },
+                  })
+                );
+              }}
+              value={modification.value}
+              disabled={isInputDisabled ? true : modification.type === "Add" ? false : true}
+              data-selectionid="query-param-value"
+            />
+          </Col>
+          {!isInputDisabled && (
+            <Col span={1} align="right">
+              <Tooltip title="Remove">
+                <ImCross
+                  id="delete-pair"
+                  onClick={(event) => {
+                    event?.preventDefault?.();
+                    dispatch(
+                      actions.removeValueInRulePairByIndex({
+                        pairIndex,
+                        arrayPath: "modifications",
+                        index: modificationIndex,
+                      })
+                    );
+                  }}
+                  className="text-gray cursor-pointer"
+                />
+              </Tooltip>
+            </Col>
+          )}
+        </Row>
       </Col>
     </Row>
   );

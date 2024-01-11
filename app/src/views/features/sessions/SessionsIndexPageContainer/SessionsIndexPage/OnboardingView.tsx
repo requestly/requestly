@@ -1,15 +1,17 @@
-import { CheckOutlined, SettingOutlined, YoutubeFilled } from "@ant-design/icons";
+import React, { useCallback, useRef, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
-import React, { useState, useCallback, useRef, useEffect } from "react";
 import { actions } from "store";
 import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
-import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
-import "./index.scss";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
+import { isValidUrl } from "utils/FormattingHelper";
+import { toast } from "utils/Toast";
+import { prefixUrlWithHttps } from "utils/URLUtils";
+import StartSessionRecordingGif from "./assets/sessions-banner.gif";
 import {
   trackInstallExtensionDialogShown,
   trackOnboardingToSettingsNavigate,
@@ -19,15 +21,7 @@ import {
   trackStartRecordingWithURLClicked,
   trackTriedRecordingForInvalidURL,
 } from "modules/analytics/events/features/sessionRecording";
-import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
-import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
-import TutorialButton from "./TutorialButton";
-import { AUTH } from "modules/analytics/events/common/constants";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
-import { isValidUrl } from "utils/FormattingHelper";
-import { toast } from "utils/Toast";
-import StartSessionRecordingGif from "assets/img/screenshots/sessions-banner.gif";
+import "./index.scss";
 
 const { Text, Title } = Typography;
 
@@ -59,6 +53,7 @@ const GreenVerifiedCheck: React.FC<{}> = () => {
 interface SessionOnboardProps {
   redirectToSettingsPage?: () => void;
   openDownloadedSessionModalBtn?: React.ReactNode;
+  isModalView?: boolean;
 }
 
 export enum OnboardingTypes {
@@ -112,93 +107,10 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
   );
 };
 
-const OldSessionOnboardingView: React.FC<SessionOnboardProps> = ({
+export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
   redirectToSettingsPage,
   openDownloadedSessionModalBtn,
-}) => {
-  const [isInstallExtensionModalVisible, setIsInstallExtensionModalVisible] = useState(false);
-  const openInstallExtensionModal = useCallback(() => {
-    setIsInstallExtensionModalVisible(true);
-    trackInstallExtensionDialogShown();
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setIsInstallExtensionModalVisible(false);
-  }, []);
-
-  const user = useSelector(getUserAuthDetails);
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        textAlign: "center",
-        height: "100%",
-        margin: "30px",
-      }}
-    >
-      <Typography.Title level={1}>Record &amp; Replay your browsing sessions</Typography.Title>
-      <Typography.Text type="secondary">
-        <div>Record your browsing sessions on specified domains (or webpages)</div>
-        <div>and Share with others for offline review or debugging.</div>
-      </Typography.Text>
-      <div>
-        <Space>
-          <AuthConfirmationPopover
-            title="You need to sign up to configure webpages"
-            callback={isExtensionInstalled() ? redirectToSettingsPage : openInstallExtensionModal}
-            source={AUTH.SOURCE.SESSION_RECORDING}
-          >
-            <Button
-              type="primary"
-              onClick={
-                user?.details?.isLoggedIn
-                  ? isExtensionInstalled()
-                    ? redirectToSettingsPage
-                    : openInstallExtensionModal
-                  : null
-              }
-              style={{ margin: "24px 0" }}
-            >
-              Configure webpages
-            </Button>
-          </AuthConfirmationPopover>
-          {openDownloadedSessionModalBtn}
-          <TutorialButton className="session-tutorial-btn">
-            See how it works <YoutubeFilled style={{ color: "red", fontSize: 18, marginTop: 4 }} />
-          </TutorialButton>
-        </Space>
-      </div>
-      <Divider />
-      <Typography.Text type="secondary">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-evenly",
-            fontWeight: "bold",
-          }}
-        >
-          <CheckItem label="Faster Debugging" />
-          <CheckItem label="No need to reproduce" />
-          <CheckItem label="Strict Privacy" />
-        </div>
-      </Typography.Text>
-
-      <InstallExtensionModal
-        open={isInstallExtensionModalVisible}
-        onCancel={closeModal}
-        heading="Install Browser extension to record sessions for faster debugging and bug reporting"
-        subHeading="Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser."
-        eventPage="session_recording_page"
-      />
-    </div>
-  );
-};
-
-const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
-  redirectToSettingsPage,
-  openDownloadedSessionModalBtn,
+  isModalView = false,
 }) => {
   const inputRef = useRef<InputRef>();
   const dispatch = useDispatch();
@@ -219,9 +131,10 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
   }, [dispatch]);
 
   const handleStartRecordingBtnClicked = useCallback(() => {
-    trackStartRecordingWithURLClicked();
+    trackStartRecordingWithURLClicked(isModalView ? "modal" : "onboarding");
     if (isExtensionInstalled()) {
-      const urlToRecord = sanitize(inputRef?.current.input.value);
+      const urlToRecord = prefixUrlWithHttps(inputRef?.current.input.value);
+      inputRef.current.input.value = urlToRecord;
       if (isValidUrl(urlToRecord)) {
         trackStartRecordingOnExternalTarget(urlToRecord);
         return startRecordingOnUrl(urlToRecord);
@@ -232,17 +145,7 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
     } else {
       openInstallExtensionModal();
     }
-
-    function sanitize(url: string) {
-      let sanitizedURL = url.trim();
-      if (sanitizedURL && !sanitizedURL.startsWith("http://") && !sanitizedURL.startsWith("https://")) {
-        sanitizedURL = "https://" + sanitizedURL;
-        inputRef.current.input.value = sanitizedURL;
-        return sanitizedURL;
-      }
-      return sanitizedURL;
-    }
-  }, [openInstallExtensionModal]);
+  }, [openInstallExtensionModal, isModalView]);
 
   const handleSettingsNavigation = useCallback(() => {
     trackOnboardingToSettingsNavigate();
@@ -251,21 +154,24 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
 
   return (
     <div className="onboarding-content-container">
-      <Row justify="end" align="middle" className="settings-row">
-        <Space size={20}>
-          {openDownloadedSessionModalBtn}
-          <span onClick={handleSettingsNavigation} className="settings-btn">
-            <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
-          </span>
-        </Space>
-      </Row>
+      {!isModalView && (
+        <Row justify="end" align="middle" className="settings-row">
+          <Space size={20}>
+            {openDownloadedSessionModalBtn}
+            <span onClick={handleSettingsNavigation} className="settings-btn">
+              <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+            </span>
+          </Space>
+        </Row>
+      )}
+
       <Row justify="space-between" className="onboarding-banner">
-        <Col span={12} className="banner-text-container">
+        <Col span={isModalView ? 24 : 12} className="banner-text-container">
           <Row className="banner-header">
-            <Title className="banner-title">Debug issues faster with Session Replay</Title>
+            <Title className="banner-title">Debug issues faster with SessionBook</Title>
           </Row>
           <Row className="banner-description">
-            <Text type="secondary" className="banner-text">
+            <Text type="secondary" className="banner-text w-full">
               <div>
                 Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
                 <Text strong>network</Text> &
@@ -276,66 +182,65 @@ const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
               </div>
               <div> debugging </div>
             </Text>
-
-            <Text type="secondary" className="banner-message banner-text">
-              <GreenVerifiedCheck /> Session Replays are not automatically saved to the cloud; they require manual
-              saving
-            </Text>
+            {!isModalView && (
+              <Text type="secondary" className="banner-message banner-text">
+                <GreenVerifiedCheck /> session recordings are not automatically saved to the cloud; they require manual
+                saving
+              </Text>
+            )}
           </Row>
-          <Row className="record-label">
-            <Text type="secondary" className="banner-text">
-              Record your first session
-            </Text>
-          </Row>
-          <Row>
-            <Col span={15} className="input-container">
-              <Input
-                ref={inputRef}
-                placeholder="Enter Page URL eg. https://ebay.com"
-                onPressEnter={handleStartRecordingBtnClicked}
-              />
-            </Col>
-            <Col span={3} className="start-btn-container">
-              <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
-                {" "}
-                Start Recording
-              </Button>
-            </Col>
-          </Row>
+          <Col span={24}>
+            <Row className="record-label">
+              <Text type="secondary" className="banner-text">
+                Record your {!isModalView && "first"} session
+              </Text>
+            </Row>
+            <Row>
+              <Col span={15} className="input-container">
+                <Input
+                  ref={inputRef}
+                  placeholder="Enter Page URL eg. https://ebay.com"
+                  onPressEnter={handleStartRecordingBtnClicked}
+                />
+              </Col>
+              <Col span={3} className="start-btn-container">
+                <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
+                  {" "}
+                  Start Recording
+                </Button>
+              </Col>
+            </Row>
+          </Col>
         </Col>
-        <Col span={12} className="banner-demo-video">
-          <Row justify="end">
-            <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
-          </Row>
-          <Row onClick={trackOnboardingSampleSessionViewed}>
-            <a
-              href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
-              target="__blank"
-              className="sample-link-container"
-            >
-              <Row justify="end" align="middle" className="sample-link">
-                <Text underline>View sample replay</Text>
-              </Row>
-            </a>
-          </Row>
-        </Col>
+        {!isModalView && (
+          <Col span={12} className="banner-demo-video">
+            <Row justify="end">
+              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+            </Row>
+            <Row onClick={trackOnboardingSampleSessionViewed}>
+              <a
+                href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
+                target="__blank"
+                className="sample-link-container"
+              >
+                <Row justify="end" align="middle" className="sample-link">
+                  <Text underline>View sample replay</Text>
+                </Row>
+              </a>
+            </Row>
+          </Col>
+        )}
       </Row>
     </div>
   );
 };
-const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage, openDownloadedSessionModalBtn }) => {
-  const shownNewOnboarding = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
+const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage, openDownloadedSessionModalBtn }) => {
   if (type === OnboardingTypes.NETWORK) {
     return <NewtorkSessionsOnboarding />;
   } else {
-    return shownNewOnboarding ? (
+    return (
       <SessionOnboardingView
-        redirectToSettingsPage={redirectToSettingsPage}
-        openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
-      />
-    ) : (
-      <OldSessionOnboardingView
         redirectToSettingsPage={redirectToSettingsPage}
         openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
       />

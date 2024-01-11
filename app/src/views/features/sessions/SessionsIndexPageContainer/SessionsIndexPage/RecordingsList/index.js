@@ -45,6 +45,7 @@ const RecordingsList = ({
   setSelectedRowVisibility,
   setIsShareModalVisible,
   configureBtn,
+  newSessionButton,
   openDownloadedSessionModalBtn,
   callbackOnDeleteSuccess,
   TableFooter,
@@ -199,11 +200,11 @@ const RecordingsList = ({
         search={false}
         pagination={false}
         options={false}
-        toolBarRender={() => [openDownloadedSessionModalBtn, configureBtn]}
+        toolBarRender={() => [configureBtn, openDownloadedSessionModalBtn, newSessionButton]}
         headerTitle={
           <>
             <Typography.Title level={4} style={{ marginBottom: 0 }}>
-              Session Replays
+              SessionBook
             </Typography.Title>
           </>
         }

@@ -66,9 +66,10 @@ const ActiveWorkspace = () => {
 
   useEffect(() => {
     window.currentlyActiveWorkspaceTeamId = currentlyActiveWorkspace.id;
+    window.workspaceMembersCount = currentlyActiveWorkspace?.membersCount ?? null;
     window.keySetDonecurrentlyActiveWorkspaceTeamId = true;
     window.workspaceCleanupDone = false;
-  }, [currentlyActiveWorkspace.id]);
+  }, [currentlyActiveWorkspace.id, currentlyActiveWorkspace?.membersCount]);
 };
 
 export default ActiveWorkspace;

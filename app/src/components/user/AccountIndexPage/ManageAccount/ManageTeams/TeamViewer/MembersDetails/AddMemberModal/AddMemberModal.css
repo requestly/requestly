@@ -65,6 +65,7 @@ div.members-email-input > input {
 .access-dropdown-container {
   margin: 0 5px;
   margin-top: 7px;
+  flex: 0 0 fit-content;
 }
 
 .empty-message {

@@ -2,88 +2,131 @@
   "templates": [
     {
       "key": "1",
-      "name": "Remove Content-Security-Policy Header",
-      "description": "Turn this on and see content-security-policy header being removed",
-      "imageURL": "",
+      "name": "Redirect JS from production to local environment",
+      "description": "Load local JS files instead of production for testing purposes.",
       "isSharedList": false,
+      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
-          "version": 2,
-          "creationDate": 1643724819721,
-          "description": "Turn this on and see content-security-policy header being removed",
+          "creationDate": 1704366536394,
+          "description": "Load local JS files instead of production for testing purposes.",
           "groupId": "",
-          "id": "Headers_ddon1",
+          "id": "Redirect_yr8on",
           "isSample": false,
-          "modificationDate": 1644102502913,
-          "name": "Remove Content-Security-Policy Header",
+          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
+          "modificationDate": 1704367057269,
+          "name": "Redirect JS from production to local environment",
           "objectType": "rule",
           "pairs": [
             {
-              "id": "7tg21",
-              "modifications": {
-                "Request": [],
-                "Response": [
-                  {
-                    "header": "content-security-policy",
-                    "type": "Remove",
-                    "value": ""
-                  }
-                ]
-              },
+              "destination": "http://localhost:8000/scripts/main.js",
+              "destinationType": "url",
+              "id": "9h8ir",
               "source": {
-                "filters": null,
                 "key": "Url",
                 "operator": "Contains",
-                "value": ""
+                "value": "https://www.example.com/scripts/main.js"
               }
             }
           ],
-          "ruleType": "Headers",
-          "status": "Active"
+          "preserveCookie": false,
+          "ruleType": "Redirect",
+          "status": "Inactive"
         }
       }
     },
     {
       "key": "2",
-      "name": "Redirect Google Queries to DuckDuckGo",
-      "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
+      "name": "Add Authorization Header to all localhost requests",
+      "description": "Add a custom value for the Authorization header for all requests to localhost",
       "isSharedList": false,
-      "imageURL": "https://www.vectorlogo.zone/logos/duckduckgo/duckduckgo-icon.svg",
+      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
-          "creationDate": 1643717688716,
-          "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
+          "creationDate": 1704367224978,
+          "description": "Add a custom value for the Authorization header for all requests to localhost",
           "groupId": "",
-          "id": "Redirect_mbdyf",
+          "id": "Headers_xcq3c",
           "isSample": false,
-          "name": "Redirect Google Queries to DuckDuckGo",
+          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
+          "modificationDate": 1704367312343,
+          "name": "Add Authorization Header to all localhost requests",
           "objectType": "rule",
           "pairs": [
             {
-              "destination": "$1://duckduckgo.com/?q=$3&$4",
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Wildcard_Matches",
-                "value": "*://www.google.*/search?q=*&*"
+              "id": "4kuze",
+              "modifications": {
+                "Request": [
+                  {
+                    "header": "Authorization",
+                    "id": "5jipq",
+                    "type": "Add",
+                    "value": "Bearer your_custom_token"
+                  }
+                ]
               },
-              "id": "soktt"
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "localhost"
+              }
             }
           ],
-          "ruleType": "Redirect",
-          "status": "Active",
-          "modificationDate": 1643718041831
+          "ruleType": "Headers",
+          "status": "Inactive",
+          "version": 2
         }
       }
     },
     {
       "key": "3",
+      "name": "Override response of an API",
+      "description": "Modify API response of an API call made at /exampleAPI endpoint in testheader.com",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704880778479,
+          "description": "Modify API response of an API call made at /exampleAPI endpoint in testheader.com",
+          "groupId": "",
+          "id": "Response_i4w57",
+          "isSample": false,
+          "lastModifiedBy": "pVuHQhkmZpPR5QHa1xsjRgLIk3t1",
+          "modificationDate": 1704880979492,
+          "name": "Override response of an API",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "qvgs0",
+              "response": {
+                "resourceType": "restApi",
+                "statusCode": "",
+                "type": "static",
+                "value": "{\"userId\":2,\"status\":\"response modified!\"}"
+              },
+              "source": {
+                "filters": [],
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://testheaders.com/exampleAPI"
+              }
+            }
+          ],
+          "ruleType": "Response",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
+      "key": "4",
       "name": "Bypass CORS",
       "description": "You can Bypass CORS by turning this on",
       "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8oBmecALAzN-kd73MyovxZKNzg0fHSvM6-xStnS8AXnoccY2oIkSVNz179uZgbIEajVE&usqp=CAU",
       "isSharedList": false,
+      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -138,7 +181,259 @@
       }
     },
     {
-      "key": "4",
+      "key": "5",
+      "name": "Remove Content-Security-Policy Header",
+      "description": "Turn this on and see content-security-policy header being removed",
+      "imageURL": "",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "version": 2,
+          "creationDate": 1643724819721,
+          "description": "Turn this on and see content-security-policy header being removed",
+          "groupId": "",
+          "id": "Headers_ddon1",
+          "isSample": false,
+          "modificationDate": 1644102502913,
+          "name": "Remove Content-Security-Policy Header",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "7tg21",
+              "modifications": {
+                "Request": [],
+                "Response": [
+                  {
+                    "header": "content-security-policy",
+                    "type": "Remove",
+                    "value": ""
+                  }
+                ]
+              },
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": ""
+              }
+            }
+          ],
+          "ruleType": "Headers",
+          "status": "Active"
+        }
+      }
+    },
+    {
+      "key": "6",
+      "name": "Inject JS into Customer Site",
+      "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704367507742,
+          "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
+          "groupId": "",
+          "id": "Script_rr1wa",
+          "isSample": false,
+          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
+          "modificationDate": 1704367578197,
+          "name": "Inject JS into Customer Site",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "gjjnt",
+              "scripts": [
+                {
+                  "codeType": "js",
+                  "fileName": "",
+                  "id": "fnujk",
+                  "loadTime": "afterPageLoad",
+                  "type": "url",
+                  "value": "https://www.yourserver.com/yourscript.js"
+                }
+              ],
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://www.customersite.com"
+              }
+            }
+          ],
+          "ruleType": "Script",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
+      "key": "7",
+      "name": "Simulate 404 status code",
+      "description": "Returning 404 status code in response of an API call made at /exampleAPI endpoint in testheader.com",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704883199214,
+          "description": "Returning 404 status code in response of an API call made at /exampleAPI endpoint in testheader.com",
+          "groupId": "",
+          "id": "Response_dp6lk",
+          "isSample": false,
+          "lastModifiedBy": "pVuHQhkmZpPR5QHa1xsjRgLIk3t1",
+          "modificationDate": 1704883461547,
+          "name": "Simulate 404 status code",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "qoa22",
+              "response": {
+                "resourceType": "restApi",
+                "statusCode": "404",
+                "statusText": "Not Found",
+                "type": "static",
+                "value": "{}"
+              },
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://testheaders.com/exampleAPI"
+              }
+            }
+          ],
+          "ruleType": "Response",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
+      "key": "8",
+      "name": "Toggle Feature Flags",
+      "description": "Override JSON API responses for toggling feature flags",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704366820790,
+          "description": "Override JSON API responses for toggling feature flags",
+          "groupId": "",
+          "id": "Response_3xxx2",
+          "isSample": false,
+          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
+          "modificationDate": 1704366993356,
+          "name": "Toggle Feature Flags",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "hwm11",
+              "response": {
+                "resourceType": "restApi",
+                "statusCode": "",
+                "type": "static",
+                "value": "{\"featureFlag1\":true,\"featureFlag2\":false,\"featureFlag3\":true}"
+              },
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://api.example.com/features"
+              }
+            }
+          ],
+          "ruleType": "Response",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
+      "key": "9",
+      "name": "Mock Geolocation Header",
+      "description": "Simulate geolocation on specific websites.",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704367701627,
+          "description": "Simulate geolocation on specific websites.",
+          "groupId": "",
+          "id": "Headers_a95vo",
+          "isSample": false,
+          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
+          "modificationDate": 1704367833216,
+          "name": "Mock Geolocation Header",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "s1lr1",
+              "modifications": {
+                "Request": [
+                  {
+                    "header": "X-Forwarded-For",
+                    "id": "abijp",
+                    "type": "Add",
+                    "value": "203.0.113.195"
+                  },
+                  {
+                    "header": "CF-IPCountry",
+                    "id": "3qfpw",
+                    "type": "Add",
+                    "value": "US"
+                  }
+                ]
+              },
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://www.specificsite.com"
+              }
+            }
+          ],
+          "ruleType": "Headers",
+          "status": "Inactive",
+          "version": 2
+        }
+      }
+    },
+    {
+      "key": "10",
+      "name": "Redirect Google Queries to DuckDuckGo",
+      "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
+      "isSharedList": false,
+      "isFeatured": true,
+      "imageURL": "https://www.vectorlogo.zone/logos/duckduckgo/duckduckgo-icon.svg",
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1643717688716,
+          "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
+          "groupId": "",
+          "id": "Redirect_mbdyf",
+          "isSample": false,
+          "name": "Redirect Google Queries to DuckDuckGo",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "destination": "$1://duckduckgo.com/?q=$3&$4",
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Wildcard_Matches",
+                "value": "*://www.google.*/search?q=*&*"
+              },
+              "id": "soktt"
+            }
+          ],
+          "ruleType": "Redirect",
+          "status": "Active",
+          "modificationDate": 1643718041831
+        }
+      }
+    },
+    {
+      "key": "11",
       "name": "Load Google Analytics in Debug Mode",
       "description": "Prints useful information to the JavaScript console by enabling the debug version of the Google Analytics Javascript.",
       "isSharedList": true,
@@ -151,8 +446,9 @@
       }
     },
     {
-      "key": "5",
+      "key": "12",
       "name": "Highlight Google Ads",
+      "isFeatured": true,
       "description": "Highlights Ads in Google Search Result to avoid clicking on them",
       "imageURL": "https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg",
       "isSharedList": false,
@@ -195,7 +491,7 @@
       }
     },
     {
-      "key": "6",
+      "key": "13",
       "name": "Browse Quora Anonymously",
       "description": "Can load Quora in Incognito Mode without signing in",
       "imageURL": "https://www.vectorlogo.zone/logos/quora/quora-icon.svg",
@@ -239,7 +535,7 @@
       }
     },
     {
-      "key": "7",
+      "key": "14",
       "name": "Remove UTM Params",
       "description": "Turn it on and try opening example.com?utm_source=gmail",
       "imageURL": "",
@@ -304,7 +600,7 @@
       }
     },
     {
-      "key": "8",
+      "key": "15",
       "name": "Redirect Google Queries to Bing",
       "description": "Turn it on and your chrome address bar will show results from Bing",
       "imageURL": "https://www.vectorlogo.zone/logos/bing/bing-icon.svg",
@@ -338,271 +634,7 @@
       }
     },
     {
-      "key": "9",
-      "name": "Block Twitter",
-      "description": "Block Twitter and do something and do something productive",
-      "imageURL": "https://www.vectorlogo.zone/logos/twitter/twitter-official.svg",
-      "isSharedList": false,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1643749070407,
-          "description": "Block Twitter and do something and do something productive",
-          "groupId": "",
-          "id": "Cancel_vcmis",
-          "isSample": false,
-          "name": "Block Twitter",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "twitter.com"
-              },
-              "id": "gm1p2"
-            }
-          ],
-          "ruleType": "Cancel",
-          "status": "Active",
-          "modificationDate": 1643749150140
-        }
-      }
-    },
-    {
-      "key": "10",
-      "name": "Block Instagram",
-      "description": "Block Instagram to avoid unnecessary scrolling and stay focused",
-      "imageURL": "https://www.vectorlogo.zone/logos/instagram/instagram-icon.svg",
-      "isSharedList": false,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1643752540500,
-          "description": "Block Instagram to avoid unnecessary scrolling and stay focused",
-          "groupId": "",
-          "id": "Cancel_wzltx",
-          "isSample": false,
-          "name": "Block Instagram",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "instagram.com"
-              },
-              "id": "q7k5t"
-            }
-          ],
-          "ruleType": "Cancel",
-          "status": "Active",
-          "modificationDate": 1643752716055
-        }
-      }
-    },
-    {
-      "key": "11",
-      "name": "Block Adult Sites",
-      "description": "",
-      "imageURL": "",
-      "isSharedList": false,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1643753300929,
-          "description": "",
-          "groupId": "",
-          "id": "Cancel_003oi",
-          "isSample": false,
-          "name": "Block Adult Sites",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "pornhub"
-              },
-              "id": "1cgz4"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "dipsea"
-              },
-              "id": "dxel7"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "xhamster"
-              },
-              "id": "g60m9"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "frolicme"
-              },
-              "id": "sdtb2"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "bellesa"
-              },
-              "id": "rpt1p"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "xtube"
-              },
-              "id": "6pmxr"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "mvtube"
-              },
-              "id": "7w0g9"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "quinn"
-              },
-              "id": "2e2zd"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "literocia"
-              },
-              "id": "hdawb"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "xvideos"
-              },
-              "id": "vptvn"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "xnxx"
-              },
-              "id": "41k0z"
-            },
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "porn"
-              },
-              "id": "3ya9j"
-            }
-          ],
-          "ruleType": "Cancel",
-          "status": "Active",
-          "modificationDate": 1643753569959
-        }
-      }
-    },
-    {
-      "key": "12",
-      "name": "Block Youtube",
-      "description": "Avoid distractions",
-      "imageURL": "https://www.vectorlogo.zone/logos/youtube/youtube-icon.svg",
-      "isSharedList": false,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1643753954887,
-          "description": "Avoid distractions",
-          "groupId": "",
-          "id": "Cancel_bwxnf",
-          "isSample": false,
-          "name": "Block Youtube",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "youtube.com"
-              },
-              "id": "5boow"
-            }
-          ],
-          "ruleType": "Cancel",
-          "status": "Active",
-          "modificationDate": 1643754021243
-        }
-      }
-    },
-    {
-      "key": "13",
-      "name": "Block Facebook ",
-      "description": "Block Facebook to stay focused",
-      "imageURL": "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg",
-      "isSharedList": false,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1643754300535,
-          "description": "Block Facebook to stay focused",
-          "groupId": "",
-          "id": "Cancel_9naiu",
-          "isSample": false,
-          "name": "Block Facebook",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "facebook.com"
-              },
-              "id": "jxq48"
-            }
-          ],
-          "ruleType": "Cancel",
-          "status": "Active",
-          "modificationDate": 1643754391040
-        }
-      }
-    },
-    {
-      "key": "14",
+      "key": "16",
       "name": "Redirect Dictionary.com to Merriam-Webster in Adobe Acrobat Reader Lookup",
       "description": "Change the Default Dictionary in Adobe Acrobat Reader to Merriam-Webster",
       "imageURL": "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
@@ -636,7 +668,7 @@
       }
     },
     {
-      "key": "15",
+      "key": "17",
       "name": "Redirect Dictionary.com to dict.cc in Adobe Acrobat Reader Lookup",
       "description": "Change the Default Dictionary in Adobe Acrobat Reader to Multilingual dictionary",
       "imageURL": "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",

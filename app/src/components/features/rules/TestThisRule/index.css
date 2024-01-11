@@ -1,0 +1,118 @@
+.test-this-rule-row-wrapper {
+  margin-top: 30px;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+
+.test-this-rule-row {
+  position: relative;
+  border-radius: var(--border-radius-md);
+}
+
+.test-this-rule-message {
+  margin: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.test-this-rule-row-header {
+  padding: 1rem 1.25rem;
+  background: var(--component-header-background);
+}
+
+.test-this-rule-row-body {
+  padding: 1.25rem;
+  background: var(--component-background);
+}
+
+.test-this-rule-row-body .start-test-rule-btn {
+  display: flex;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+.start-test-rule-btn-icon {
+  font-size: 1rem;
+}
+
+.test-this-rule-row-body .ant-input {
+  background: var(--component-dark-background);
+}
+
+.test-this-rule-success {
+  border: 1px solid var(--success);
+  background: #0b7f4315;
+}
+
+.test-this-rule-warning {
+  border: 1px solid var(--warning);
+  background: #95860231;
+}
+
+.test-this-rule-disabled {
+  border: 1px solid var(--border-dark);
+  background: var(--gray-dark);
+}
+
+.test-this-rule-results-header {
+  border-top: 1px solid #5c5b5b80;
+  border-bottom: 1px solid #5c5b5b80;
+}
+
+.test-this-rule-report-row {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 0.7fr 1fr;
+  gap: 10px;
+  padding: 1rem 1.25rem;
+  background: var(--component-background);
+}
+
+.test-this-rule-report-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.test-this-rule-report-session-link {
+  text-align: right;
+}
+
+.test-this-rule-report-session-link svg {
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
+}
+
+.test-this-rule-report-row-wrapper > .test-this-rule-report-row:nth-child(even) {
+  border-top: 1px solid var(--border-dark);
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.highlight-new-report {
+  animation: highlight-report 4s ease-in-out;
+}
+
+.rq-modal.draft-session-modal {
+  top: 25px;
+}
+
+.rq-modal.draft-session-modal .ant-modal-body {
+  height: 93vh;
+  overflow: auto;
+}
+
+@keyframes highlight-report {
+  0% {
+    background: #5c5b5b80;
+  }
+  100% {
+    background: var(--component-background);
+  }
+}

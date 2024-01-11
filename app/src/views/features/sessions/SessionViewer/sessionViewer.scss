@@ -26,8 +26,53 @@
       iframe {
         background: white;
       }
-      .rr-player .rr-player_frame {
+      .rr-player .rr-player__frame {
         width: auto;
+        .overlay-frame {
+          display: flex;
+          height: 100%;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          position: absolute;
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 4rem;
+          .blur {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            backdrop-filter: blur(4px);
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.4);
+          }
+          .overlay-content {
+            z-index: 10;
+          }
+        }
+      }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
+      }
+      #rq-controller-btns {
+        display: flex;
+        .rq-controller-button {
+          cursor: pointer;
+          padding-right: 4px;
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
       }
     }
 
@@ -75,6 +120,7 @@
         border-radius: var(--border-radius-sm);
         background: var(--component-background);
         padding: 1rem;
+        white-space: pre-wrap;
       }
     }
   }
@@ -199,7 +245,9 @@
       bottom: 20px;
       transform: translate(-50%, 0);
     }
-
+    & .ant-tabs-top > .ant-tabs-nav {
+      margin-bottom: 6px;
+    }
     /* Hiding inkbar due to Ant bug where its position is not recalculated on badge updates */
     .ant-tabs-ink-bar {
       display: none;
@@ -234,36 +282,11 @@
         font-size: 14px;
       }
 
-      .session-details-panel-row {
-        display: flex;
-        flex-direction: column;
-        padding: 6px 10px 4px 10px;
-
-        span,
-        a,
-        .right-info,
-        .secondary-message {
-          line-height: 12px;
-        }
-
-        .primary-message {
-          // object-inspector button
-          li > div {
-            line-height: 12px;
-            width: auto !important; // overriding inline style
-          }
-        }
-
-        .right-info {
-          margin-left: 8px;
-          width: 200px;
-          text-align: right;
-          flex: 0 0 auto;
-        }
-
-        .secondary-message {
-          padding-left: 40px;
-        }
+      .empty-table-view {
+        background: var(--component-dark-background);
+        height: 100%;
+        border: 1px solid var(--border-dark);
+        border-radius: var(--border-radius-sm);
       }
     }
   }
@@ -287,65 +310,6 @@
     }
     .warn span {
       color: #d3a403;
-    }
-  }
-
-  .network-logs-panel {
-    .network-logs-table {
-      overflow: auto;
-      height: 100%;
-
-      .network-log-row {
-        cursor: pointer;
-
-        &.selected {
-          background-color: #0948b2;
-          color: #fff;
-        }
-
-        .network-log-url {
-          &.failed {
-            color: #ff4d4f;
-          }
-        }
-
-        .request-method-tag {
-          font-size: 11px;
-          padding: 2px 8px;
-          margin-right: 10px;
-          margin-top: -2px;
-          min-width: 48px;
-          text-align: center;
-          flex-shrink: 0;
-        }
-      }
-    }
-
-    .gutter {
-      background-color: #0000000f;
-      margin: 0 8px;
-      cursor: col-resize;
-    }
-
-    .network-log-details {
-      .ant-tabs-tab {
-        padding: 6px 0;
-
-        + .ant-tabs-tab {
-          margin: 0 0 0 20px;
-        }
-      }
-
-      .network-log-details-tab-content {
-        overflow: auto;
-        height: 244px;
-      }
-
-      .network-payload-object {
-        span {
-          font-size: 11px;
-        }
-      }
     }
   }
 
@@ -539,10 +503,6 @@ body.dark {
       }
     }
 
-    .network-logs-panel .gutter {
-      background-color: #313a46;
-    }
-
     .ant-pro-card,
     .rr-player {
       background: var(--component-background) !important;
@@ -609,11 +569,97 @@ body.dark {
         min-height: auto;
       }
     }
+    .right-info {
+      display: none;
+    }
   }
 }
 
 @media screen and (max-width: 520px) {
   .session-viewer-page .session-properties-wrapper .session-page-url-property .ant-input-wrapper .ant-input {
     width: 100px;
+  }
+}
+
+@media screen and (min-width: 520px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 28rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 20rem;
+          word-break: break-all;
+        }
+
+        .right-info {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 850px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 26rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 34rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 48rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .session-viewer-page {
+    .session-details-panel-row {
+      &.console-log-row {
+        .primary-message,
+        .secondary-message {
+          width: 64rem;
+        }
+      }
+    }
   }
 }

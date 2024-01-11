@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import PATHS from "config/constants/sub/paths";
-import { Document, PaperUpload } from "react-iconly";
+import { IoDocumentTextOutline } from "@react-icons/all-files/io5/IoDocumentTextOutline";
+import { MdOutlineUploadFile } from "@react-icons/all-files/md/MdOutlineUploadFile";
 import { SecondarySidebarLink } from "../../common/SecondarySidebarLink";
 import "./MockServerSidebar.css";
 
@@ -8,12 +9,12 @@ const mockServerSubRoutes = [
   {
     title: "My Mock APIs",
     path: PATHS.MOCK_SERVER_V2.ABSOLUTE,
-    icon: <Document set="curved" />,
+    icon: <IoDocumentTextOutline />,
   },
   {
     title: "My Files",
     path: PATHS.FILE_SERVER_V2.ABSOLUTE,
-    icon: <PaperUpload set="curved" />,
+    icon: <MdOutlineUploadFile />,
   },
 ];
 

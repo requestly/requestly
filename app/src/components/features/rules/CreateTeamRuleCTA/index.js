@@ -6,21 +6,19 @@ import NewRuleSelector from "../NewRuleSelector";
 import ImportRulesModal from "../ImportRulesModal";
 // Constants
 import ProCard from "@ant-design/pro-card";
-import { getAppMode } from "store/selectors";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 import APP_CONSTANTS from "config/constants";
 import TeamSolvingPuzzleAnimation from "components/misc/LottieAnimation/TeamSolvingPuzzleAnimation";
+import { actions } from "store";
 
 const CreateTeamRuleCTA = () => {
   const navigate = useNavigate();
   //Global State
   const dispatch = useDispatch();
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const appMode = useSelector(getAppMode);
   //Component State
   const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
@@ -74,15 +72,17 @@ const CreateTeamRuleCTA = () => {
               </Space>
 
               <p className="lead mt-5" style={{ marginTop: "1em" }}>
-                If you have existing Rules you can{" "}
+                If you have rules in another workspace, you can{" "}
                 <Button
                   type="link"
-                  onClick={() => clearCurrentlyActiveWorkspace(dispatch, appMode)}
+                  onClick={() =>
+                    dispatch(actions.toggleActiveModal({ modalName: "switchWorkspaceModal", newValue: true }))
+                  }
                   style={{ paddingLeft: "0", paddingRight: "0" }}
                 >
-                  <strong>switch to personal workspace</strong>
+                  <strong>switch to that workspace</strong>
                 </Button>
-                , export them and import here.
+                &nbsp; and use the <strong>Share rule</strong> option to transfer the rule to this workspace.
               </p>
             </Jumbotron>
           </Col>

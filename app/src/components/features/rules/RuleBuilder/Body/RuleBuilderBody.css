@@ -5,7 +5,12 @@
 .ant-row.rule-builder-body {
   height: 80vh;
   padding-bottom: 4rem;
-  overflow: auto;
+  overflow: auto !important;
+}
+
+.ant-row.preview-rule-builder-body {
+  height: auto;
+  padding-bottom: 0;
 }
 
 .rule-builder-body > .ant-col {

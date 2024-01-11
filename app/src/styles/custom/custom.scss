@@ -569,3 +569,25 @@ div.react-multi-email .multi-email-tag {
   border: 1px solid #343434;
   background-color: var(--hover-color);
 }
+
+.upgrade-workspace-selector-dropdown {
+  & .ant-dropdown-menu {
+    overflow: auto;
+    max-height: 400px;
+
+    &::-webkit-scrollbar-track {
+      background-color: var(--surface-1);
+    }
+  }
+
+  & .ant-dropdown-menu-item .ant-dropdown-menu-title-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+  }
+}
+
+#credential_picker_container {
+  top: 45px !important;
+}

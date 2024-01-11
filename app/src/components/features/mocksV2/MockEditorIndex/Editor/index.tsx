@@ -71,6 +71,7 @@ const MockEditor: React.FC<Props> = ({
   const [endpoint, setEndpoint] = useState<string>(mockData.endpoint);
   const [headersString, setHeadersString] = useState<string>(JSON.stringify(mockData.headers));
   const [body, setBody] = useState<string>(mockData.body);
+  const [password, setPassword] = useState<string>(mockData.password ?? "");
 
   const [fileType] = useState<FileType>(mockData?.fileType || null);
   const [errors, setErrors] = useState<ValidationErrors>({
@@ -82,11 +83,12 @@ const MockEditor: React.FC<Props> = ({
   const [isAiResponseModalOpen, setIsAiResponseModalOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
-  const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId), [
+  const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId, password), [
     endpoint,
     teamId,
     user?.details?.profile?.uid,
     username,
+    password,
   ]);
 
   const apiRequest = useMemo<APIClientRequest>(() => {
@@ -138,6 +140,7 @@ const MockEditor: React.FC<Props> = ({
       headers: headersDict,
       body: body || "{}",
       responseId: mockData.responseId,
+      password: password,
     };
 
     return tempMockData;
@@ -295,6 +298,7 @@ const MockEditor: React.FC<Props> = ({
         setEndpoint={setEndpoint}
         mockType={mockType}
         ref={endpointRef}
+        password={password}
       />
     );
   };
@@ -411,10 +415,13 @@ const MockEditor: React.FC<Props> = ({
         handleClose={onClose}
         handleSave={handleOnSave}
         handleTest={handleTest}
+        setPassword={setPassword}
+        password={password}
       />
       <div className="mock-editor-title-container">
         <RQEditorTitle
           name={name}
+          mode={isNew ? "create" : "edit"}
           description={desc}
           namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
           descriptionPlaceholder="Add your description here."

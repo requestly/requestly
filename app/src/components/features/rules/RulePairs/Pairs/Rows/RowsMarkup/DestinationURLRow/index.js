@@ -108,7 +108,8 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     } else if (
       /* check for both new and old mocks */
       destination.includes("requestly.dev/api/mockv2/") ||
-      destination.includes("requestly.me")
+      destination.includes("requestly.me") ||
+      destination.includes("requestly.tech/api/mockv2/")
     ) {
       return RedirectDestinationType.MOCK_OR_FILE_PICKER;
     } else {
@@ -266,14 +267,14 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           alignItems: "center",
         }}
       >
-        <Col span={3} className="redirect-rule-destination-label">
+        <Col className="redirect-rule-destination-label">
           <MoreInfo
             showIcon
             text="Define the destination URL where you want to redirect the original request."
             analyticsContext="redirect_to_icon"
             source={currentlySelectedRuleConfig.TYPE}
           >
-            <span className="white text-bold">Redirect to</span>
+            <span className="white text-bold">Redirects to</span>
           </MoreInfo>
         </Col>
         <Col span={24}>

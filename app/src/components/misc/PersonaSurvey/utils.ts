@@ -16,12 +16,16 @@ export const shouldShowOnboarding = async (appMode: string) => {
   if (
     window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||
     window.location.href.includes("/invite") ||
-    window.location.href.includes(PATHS.SESSIONS.SAVED.RELATIVE)
+    window.location.href.includes(PATHS.AUTH.EMAIL_ACTION.RELATIVE) ||
+    window.location.href.includes(PATHS.AUTH.EMAIL_LINK_SIGNIN.RELATIVE) ||
+    window.location.href.includes(PATHS.SESSIONS.SAVED.RELATIVE) ||
+    window.location.href.includes(PATHS.APPSUMO.RELATIVE) ||
+    window.location.href.includes(PATHS.PRICING.RELATIVE)
   )
     return false;
 
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
-  if (new Date(installDate) >= new Date("2023-03-06")) return true;
+  if (new Date(installDate) >= new Date("2023-10-20")) return true;
   else return false;
 };
 

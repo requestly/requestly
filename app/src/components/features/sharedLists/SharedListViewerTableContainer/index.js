@@ -17,7 +17,6 @@ import { getAllRules } from "../../../../store/selectors";
 import ProCard from "@ant-design/pro-card";
 import RulesTable from "components/features/rules/RulesListContainer/RulesTable";
 import { ImportOutlined } from "@ant-design/icons";
-import { migrateHeaderRulesToV2 } from "../../../../utils/rules/migrateHeaderRulesToV2";
 import {
   trackSharedListImportCompleted,
   trackSharedListImportFailed,
@@ -112,9 +111,9 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
 
     //process Data
     processDataToImport([...rulesToImport, ...groupsToImport], user, allRules).then((result) => {
-      const migratedRules = migrateHeaderRulesToV2(result.data);
+      const processedRulesToImport = result.data;
 
-      addRulesAndGroupsToStorage(appMode, migratedRules).then(() => {
+      addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
         toast.info(`Successfully imported rules`);
         trackSharedListImportCompleted(id);
         if (isTemplate) {

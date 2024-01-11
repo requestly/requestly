@@ -4,7 +4,9 @@ import { SESSION_RECORDING } from "../constants";
 
 export const trackDemoVideoOpened = () => trackEvent(SESSION_RECORDING.session_recording_demo_video_opened);
 
-export const trackConfigurationOpened = () => trackEvent(SESSION_RECORDING.session_recordings_config_opened);
+export const trackConfigurationOpened = (source = "in_app") => {
+  trackEvent(SESSION_RECORDING.session_recordings_config_opened, { source });
+};
 
 export const trackConfigurationSaved = (params) => {
   trackEvent(SESSION_RECORDING.session_recordings_config_saved, params);
@@ -17,8 +19,8 @@ export const trackInstallExtensionDialogShown = (params) =>
 export const trackSessionRecordingFailed = (reason) =>
   trackEvent(SESSION_RECORDING.session_recording_failed, { reason });
 
-export const trackDraftSessionViewed = () => {
-  trackEvent(SESSION_RECORDING.draft_session_recording_viewed);
+export const trackDraftSessionViewed = (source, recording_mode) => {
+  trackEvent(SESSION_RECORDING.draft_session_recording_viewed, { source, recording_mode });
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_viewed);
 };
 
@@ -26,11 +28,13 @@ export const trackDraftSessionDiscarded = () => trackEvent(SESSION_RECORDING.dra
 
 export const trackDraftSessionNamed = () => trackEvent(SESSION_RECORDING.draft_session_recording_named);
 
-export const trackDraftSessionSaved = (sessionLength, options, type) => {
+export const trackDraftSessionSaved = ({ session_length, options, type, source, recording_mode }) => {
   trackEvent(SESSION_RECORDING.draft_session_recording_saved, {
     type,
-    sessionLength,
+    session_length,
     options,
+    source,
+    recording_mode,
   });
 
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_saved);
@@ -41,6 +45,8 @@ export const trackDraftSessionSaveFailed = (reason) =>
 
 export const trackSavedSessionViewed = (source) =>
   trackEvent(SESSION_RECORDING.saved_session_recording_viewed, { source });
+
+export const trackBadSessionRecordingViewed = () => trackEvent(SESSION_RECORDING.bad_session_recording_viewed);
 
 export const trackSessionRecordingShareClicked = () => {
   trackEvent(SESSION_RECORDING.session_recording_share_clicked);
@@ -93,7 +99,9 @@ export const trackSampleSessionClicked = (log_type) => {
 /* ONBOARDING */
 export const trackOnboardingPageViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.onboarding_page_viewed);
 export const trackOnboardingSampleSessionViewed = () => trackEvent(SESSION_RECORDING.ONBAORDING.sample_session_viewed);
-export const trackStartRecordingWithURLClicked = () => trackEvent(SESSION_RECORDING.ONBAORDING.start_recording_clicked);
+export const trackStartRecordingWithURLClicked = (source) => {
+  trackEvent(SESSION_RECORDING.ONBAORDING.start_recording_clicked, { source });
+};
 export const trackOnboardingToSettingsNavigate = () => trackEvent(SESSION_RECORDING.ONBAORDING.navigated_to_settings);
 export const trackStartRecordingOnExternalTarget = (url) => {
   trackEvent(SESSION_RECORDING.ONBAORDING.navigate_to_target_website, { url });
@@ -105,4 +113,17 @@ export const trackTriedRecordingForInvalidURL = (url) => {
 // UPLOAD SESSION
 export const trackSessionRecordingUpload = (status) => {
   trackEvent(SESSION_RECORDING.session_recording_upload, { status });
+};
+
+export const trackNewSessionClicked = () => {
+  trackEvent(SESSION_RECORDING.NEW_SESSION_CLICKED);
+};
+
+// CONTEXT MENU
+export const trackSessionRecordingNetworkLogContextMenuOpen = () => {
+  trackEvent(SESSION_RECORDING.network_log_context_menu_open);
+};
+
+export const trackSessionRecordingNetworkLogContextMenuOptionClicked = (option) => {
+  trackEvent(SESSION_RECORDING.network_log_context_menu_option_clicked, { option });
 };

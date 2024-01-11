@@ -31,6 +31,7 @@ import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import { trackSavedSessionViewed } from "modules/analytics/events/features/sessionRecording";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionViewer.scss";
+import BadSessionError from "../errors/BadSessionError";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -81,6 +82,7 @@ const SavedSessionViewer: React.FC = () => {
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
   const [showNotFoundError, setShowNotFoundError] = useState(false);
+  const [showBadSessionError, setShowBadSessionError] = useState(false);
   const [showOnboardingPrompt, setShowOnboardingPrompt] = useState(false);
   const [isDownloadPopupVisible, setIsDownloadPopupVisible] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
@@ -113,7 +115,7 @@ const SavedSessionViewer: React.FC = () => {
   const hasUserCreatedSessions = useMemo(
     () =>
       userAttributes?.num_sessions > 0 ||
-      userAttributes?.num_sessions_saved_online > 0 ||
+      userAttributes?.num_sessions_saved_online - 1 > 0 ||
       userAttributes?.num_sessions_saved_offline > 0,
     [
       userAttributes?.num_sessions,
@@ -123,7 +125,7 @@ const SavedSessionViewer: React.FC = () => {
   );
 
   useEffect(() => {
-    if ((location.state as NavigationState)?.viewAfterSave && hasUserCreatedSessions) {
+    if ((location.state as NavigationState)?.viewAfterSave && !hasUserCreatedSessions) {
       setShowOnboardingPrompt(true);
     }
   }, [location.state, hasUserCreatedSessions]);
@@ -157,15 +159,24 @@ const SavedSessionViewer: React.FC = () => {
       .then((res) => {
         setShowPermissionError(false);
         dispatch(sessionRecordingActions.setSessionRecordingMetadata({ id, ...res.payload }));
-
-        const recordedSessionEvents: RQSessionEvents = decompressEvents(res.events);
-        dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
-        setIsFetching(false);
+        try {
+          const recordedSessionEvents: RQSessionEvents = decompressEvents(res.events);
+          dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
+        } catch (e) {
+          const err = new Error("Failed to decompress session events");
+          err.name = "BadSessionEvents";
+          throw err;
+        } finally {
+          setIsFetching(false);
+        }
       })
       .catch((err) => {
         switch (err.name) {
           case "NotFound":
             setShowNotFoundError(true);
+            break;
+          case "BadSessionEvents":
+            setShowBadSessionError(true);
             break;
           case "PermissionDenied":
           default:
@@ -179,6 +190,7 @@ const SavedSessionViewer: React.FC = () => {
   };
 
   if (showPermissionError) return <PermissionError isInsideIframe={isInsideIframe} />;
+  if (showBadSessionError) return <BadSessionError />;
   if (showNotFoundError) return <NotFoundError />;
 
   return isFetching ? (

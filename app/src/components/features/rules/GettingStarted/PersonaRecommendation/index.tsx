@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button, Row } from "antd";
 import { CloudUploadOutlined } from "@ant-design/icons";
 import { actions } from "store";
@@ -13,8 +13,8 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import {
   trackPersonaRecommendationSkipped,
-  trackPersonaSurveyViewAllOptionsClicked,
-} from "modules/analytics/events/misc/personaSurvey";
+  trackWorkspaceOnboardingPageViewed,
+} from "modules/analytics/events/misc/onboarding";
 import "./PersonaRecommendation.css";
 
 interface Props {
@@ -24,33 +24,18 @@ interface Props {
 
 const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRulesClick }) => {
   const navigate = useNavigate();
-  const { state } = useLocation();
   const dispatch = useDispatch();
-  const [isViewAllOptions, setIsViewAllOptions] = useState<boolean>(false);
-
-  const data = useMemo(() => (isViewAllOptions ? personaRecommendationData : personaRecommendationData.slice(0, 3)), [
-    isViewAllOptions,
-  ]);
 
   const handleSkipClick = (e: React.MouseEvent<HTMLElement>) => {
     trackPersonaRecommendationSkipped();
-
-    navigate(
-      //@ts-ignore
-      state?.redirectTo?.includes(PATHS.GETTING_STARTED)
-        ? PATHS.RULES.MY_RULES.ABSOLUTE
-        : //@ts-ignore
-          state?.redirectTo ?? PATHS.RULES.MY_RULES.ABSOLUTE,
-      { replace: true }
-    );
     dispatch(actions.updateIsWorkspaceOnboardingCompleted());
     dispatch(actions.updateIsPersonaSurveyCompleted(true));
+    navigate(PATHS.ROOT, { replace: true });
   };
 
-  const handleViewAllOptionsClick = (e: React.MouseEvent<HTMLElement>) => {
-    setIsViewAllOptions(true);
-    trackPersonaSurveyViewAllOptionsClicked();
-  };
+  useEffect(() => {
+    trackWorkspaceOnboardingPageViewed("persona_recommendation");
+  }, []);
 
   return (
     <>
@@ -60,9 +45,9 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
         </Button>
       </Row>
       <div className="persona-recommendation-container">
-        <h2 className="header">✨ Quick and easy ways to get started</h2>
+        <h2 className="header">✨ Select an option to get started</h2>
         <div>
-          {data.map(({ section, features }) => (
+          {personaRecommendationData.map(({ section, features }) => (
             <div key={section}>
               <div className="section-header">{section}</div>
               <div className="section-row">
@@ -71,14 +56,6 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
             </div>
           ))}
         </div>
-
-        {!isViewAllOptions && (
-          <Row align="middle" justify="center">
-            <Button type="text" className="view-all-options-btn" onClick={handleViewAllOptionsClick}>
-              View all options
-            </Button>
-          </Row>
-        )}
 
         <div className="persona-recommendation-footer">
           <div className="upload-rule-message">or if you have existing rules, click below to upload them. </div>
