@@ -1143,6 +1143,22 @@ BG.Methods.addListenerForExtensionMessages = function () {
 };
 
 BG.Methods.handleClientPortConnections = () => {
+  chrome.webNavigation.onCommitted.addListener((navigatedTabData) => {
+    const tabId = navigatedTabData.tabId;
+    if (tabId && navigatedTabData.frameId === 0 && navigatedTabData.documentLifecycle === "active") {
+      const clientPortData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+
+      clientPortData?.sender &&
+        window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, {
+          ...clientPortData,
+          sender: {
+            ...clientPortData.sender,
+            documentLifecycle: navigatedTabData.documentLifecycle,
+          },
+        });
+    }
+  });
+
   chrome.runtime.onConnect.addListener((port) => {
     const senderTab = port.sender.tab;
 
@@ -1153,21 +1169,18 @@ BG.Methods.handleClientPortConnections = () => {
 
     const tabId = senderTab.id;
 
-    // documentLifeCycle is only used by chrome and not firefox
-    if (!port.sender.documentLifecycle || port.sender.documentLifecycle === "active") {
-      window.tabService.resetPageData(senderTab.id);
-      window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
+    window.tabService.resetPageData(senderTab.id);
+    window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
 
-      const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
-      window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
-      clientLoadSubscribers.forEach((subscriber) => subscriber());
+    const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
+    window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
+    clientLoadSubscribers.forEach((subscriber) => subscriber());
 
-      BG.Methods.onClientPageLoad(senderTab);
+    BG.Methods.onClientPageLoad(senderTab);
 
-      // It is recommended to remove the onConnect listener after connection has been established.
-      // Port is only used to notify the background of client loaded, so we can disconnect it to remove the listener
-      port.disconnect();
-    }
+    // It is recommended to remove the onConnect listener after connection has been established.
+    // Port is only used to notify the background of client loaded, so we can disconnect it to remove the listener
+    port.disconnect();
 
     port.onDisconnect.addListener(() => {
       window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
@@ -1188,7 +1201,15 @@ BG.Methods.handleClientPortConnections = () => {
 };
 
 BG.Methods.isConnectedToClient = (tabId) => {
-  return !!window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+  const clientPortData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+  // sender.documentLifeCycle is only used by chrome and not firefox
+  if (clientPortData) {
+    if (clientPortData.sender?.documentLifecycle) {
+      return clientPortData.sender?.documentLifecycle === "active";
+    }
+    return true;
+  }
+  return false;
 };
 
 BG.Methods.sendMessageToClient = (tabId, ...restArgs) => {
