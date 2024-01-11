@@ -99,6 +99,7 @@ export const RulesCard: React.FC = () => {
               if (index >= MAX_RULES_TO_SHOW) return null;
               return (
                 <div
+                  key={index}
                   className="homepage-rules-list-item"
                   onClick={() => {
                     trackHomeRulesActionClicked("rule_name");

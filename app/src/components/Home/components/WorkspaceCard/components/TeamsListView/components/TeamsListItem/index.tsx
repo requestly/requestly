@@ -117,7 +117,7 @@ export const TeamsListItem: React.FC<Props> = ({ inviteId, teamId, teamName }) =
               maxCount={MAX_MEMBERS_TO_SHOW}
               size="small"
               maxPopoverTrigger="click"
-              maxStyle={{ cursor: "pointer", background: "#918f8f" }}
+              maxStyle={{ cursor: "pointer", background: "var(--white)", color: "#000" }}
               style={{ marginRight: inviteId ? "14px" : "10px" }}
             >
               {members?.map((member: any) => (
