@@ -23,6 +23,7 @@ BG.TAB_SERVICE_DATA = {
   CLIENT_LOAD_SUBSCRIBERS: "clientLoadSubscribers",
   SESSION_RECORDING: "sessionRecording",
   APPLIED_RULE_DETAILS: "appliedRuleDetails",
+  TEST_RULE_DATA: "testRuleData",
 };
 
 /**
@@ -251,6 +252,54 @@ BG.Methods.replaceHeader = function (headers, newHeader) {
   BG.Methods.addHeader(headers, newHeader);
 };
 
+BG.Methods.getHeaderValue = (headers = [], headerName) => {
+  const headerObject = headers.find(({ name }) => name.toLowerCase() === headerName.toLowerCase());
+  return headerObject?.value;
+};
+
+BG.Methods.copyIgnoredHeadersOnRedirect = (originalHeaders) => {
+  let isHeadersModified = false;
+  RQ.IGNORED_HEADERS_ON_REDIRECT.forEach((headerName) => {
+    const customHeaderName = RQ.CUSTOM_HEADER_PREFIX + headerName;
+    const customHeaderValue = BG.Methods.getHeaderValue(originalHeaders, customHeaderName);
+    const originalHeaderValue = BG.Methods.getHeaderValue(originalHeaders, headerName);
+
+    // Check if value is present in custom header and original header is not present
+    if (customHeaderValue) {
+      if (!originalHeaderValue) {
+        // If original header is not present, copy the value from custom header to original header
+        BG.Methods.addHeader(originalHeaders, { name: headerName, value: customHeaderValue });
+      }
+      // remove the custom header
+      BG.Methods.removeHeader(originalHeaders, customHeaderName);
+      isHeadersModified = true;
+    }
+  });
+  return isHeadersModified;
+};
+
+BG.Methods.addCORSHeaderForCustomHeaders = (originalHeaders, requestMethod) => {
+  let isHeadersModified = false;
+  if (!RQ.IGNORED_HEADERS_ON_REDIRECT?.length || requestMethod !== "OPTIONS") return isHeadersModified;
+
+  const customRQHeaderNames = RQ.IGNORED_HEADERS_ON_REDIRECT.map(
+    (headerName) => RQ.CUSTOM_HEADER_PREFIX + headerName
+  ).join(",");
+
+  const originalValue = BG.Methods.getHeaderValue(originalHeaders, "access-control-allow-headers");
+  if (originalValue === "*") {
+    isHeadersModified = false;
+  } else {
+    BG.Methods.addHeader(originalHeaders, {
+      name: "access-control-allow-headers",
+      value: customRQHeaderNames,
+    });
+    isHeadersModified = true;
+  }
+
+  return isHeadersModified;
+};
+
 /**
  *
  * @param originalHeaders Original Headers present in the HTTP(s) request
@@ -264,11 +313,19 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
     rulePairs,
     rulePair,
     isRuleApplied = false,
+    isHeadersModified = false,
     modifications,
     modification,
     url = details.url,
     mainFrameUrl = BG.Methods.getMainFrameUrl(details),
     enabledRules = BG.Methods.getEnabledRules();
+
+  // Forwards Auth Header to the redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
+  if (headersTarget === RQ.HEADERS_TARGET.REQUEST) {
+    isHeadersModified = BG.Methods.copyIgnoredHeadersOnRedirect(originalHeaders);
+  } else {
+    isHeadersModified = BG.Methods.addCORSHeaderForCustomHeaders(originalHeaders, details.method);
+  }
 
   for (var i = 0; i < enabledRules.length; i++) {
     rule = enabledRules[i];
@@ -368,7 +425,7 @@ BG.Methods.modifyHeaders = function (originalHeaders, headersTarget, details) {
 
   // If rule is not applied and we return headers object without any change, then chrome treats them as modification
   // And some websites break due to this.
-  return isRuleApplied ? originalHeaders : null;
+  return isRuleApplied || isHeadersModified ? originalHeaders : null;
 };
 
 BG.Methods.getMainFrameUrl = function (details) {
@@ -559,8 +616,61 @@ BG.Methods.onBeforeRequest = (details) => {
   return BG.Methods.modifyUrl(details);
 };
 
+BG.Methods.modifyHeadersForSessionReplayPlayer = ({
+  headersToUpdate,
+  ruleModifiedHeaders,
+  requestDetails,
+  originalHeaders,
+}) => {
+  if (!BG.statusSettings.isExtensionEnabled) return null;
+
+  try {
+    const requestInitiator = new URL(requestDetails.initiator ?? requestDetails.originUrl); // firefox does not contain "initiator"
+    const isAppInitiator = requestInitiator.origin?.includes(RQ.configs.WEB_URL);
+    const fontTypes = ["woff", "woff2", "otf", "ttf", "eot"];
+    const requestURL = new URL(requestDetails.url);
+    const isFontResourceLink = fontTypes.some((type) => requestURL.pathname?.endsWith(type));
+
+    if (isAppInitiator && (requestDetails.type === "font" || isFontResourceLink)) {
+      const formattedHeaders = Object.keys(headersToUpdate).map((key) => ({
+        name: key,
+        value: headersToUpdate[key],
+      }));
+
+      const modifyHeaders = (headers) => {
+        return headers
+          .filter((header) => !(header?.name?.toLowerCase() in headersToUpdate))
+          .concat(...formattedHeaders);
+      };
+
+      return !ruleModifiedHeaders ? modifyHeaders(originalHeaders) : modifyHeaders(ruleModifiedHeaders);
+    }
+  } catch (e) {
+    // do nothing
+  }
+
+  return ruleModifiedHeaders;
+};
+
 BG.Methods.modifyRequestHeadersListener = function (details) {
   var modifiedHeaders = BG.Methods.modifyHeaders(details.requestHeaders, RQ.HEADERS_TARGET.REQUEST, details);
+
+  try {
+    const requestURL = new URL(details.url);
+
+    // Overriding referer header since for session replay player
+    // it's value is app.requestly.io, which break some websites eg apple.com
+    const requestHeaders = { referer: requestURL.origin + "/" };
+
+    modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
+      requestDetails: details,
+      headersToUpdate: requestHeaders,
+      ruleModifiedHeaders: modifiedHeaders,
+      originalHeaders: details.requestHeaders,
+    });
+  } catch (e) {
+    // do nothing
+  }
 
   if (modifiedHeaders !== null) {
     return { requestHeaders: modifiedHeaders };
@@ -568,7 +678,28 @@ BG.Methods.modifyRequestHeadersListener = function (details) {
 };
 
 BG.Methods.onHeadersReceived = function (details) {
-  var modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
+  let modifiedHeaders = BG.Methods.modifyHeaders(details.responseHeaders, RQ.HEADERS_TARGET.RESPONSE, details);
+
+  try {
+    const requestInitiator = new URL(details.initiator ?? details.originUrl); // firefox does not contain "initiator"
+
+    // This bypasses the CORS error in session replay player
+    const corsHeaders = {
+      "access-control-allow-methods": "*",
+      "access-control-allow-headers": "*",
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": requestInitiator.origin,
+    };
+
+    modifiedHeaders = BG.Methods.modifyHeadersForSessionReplayPlayer({
+      requestDetails: details,
+      headersToUpdate: corsHeaders,
+      ruleModifiedHeaders: modifiedHeaders,
+      originalHeaders: details.responseHeaders,
+    });
+  } catch (e) {
+    // do nothing
+  }
 
   if (modifiedHeaders !== null) {
     return { responseHeaders: modifiedHeaders };
@@ -941,7 +1072,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
-        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id);
+        BG.Methods.onSessionRecordingStartedNotification(sender.tab.id, message.markRecordingIcon);
         break;
 
       case RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
@@ -953,7 +1084,7 @@ BG.Methods.addListenerForExtensionMessages = function () {
         return true;
 
       case RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        BG.Methods.startRecordingExplicitly(message.tabId);
+        BG.Methods.startRecordingExplicitly(message.tab ?? sender.tab, message.showWidget);
         break;
 
       case RQ.EXTENSION_MESSAGES.STOP_RECORDING:
@@ -999,6 +1130,14 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         BG.Methods.cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
+
+      case RQ.EXTENSION_MESSAGES.TEST_RULE_ON_URL:
+        BG.Methods.launchUrlAndStartRuleTesting(message, sender.tab.id);
+        break;
+
+      case RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
+        BG.Methods.saveTestRuleResult(message, sender.tab);
+        break;
     }
   });
 };
@@ -1014,7 +1153,8 @@ BG.Methods.handleClientPortConnections = () => {
 
     const tabId = senderTab.id;
 
-    if (port.sender.documentLifecycle === "active") {
+    // documentLifeCycle is only used by chrome and not firefox
+    if (!port.sender.documentLifecycle || port.sender.documentLifecycle === "active") {
       window.tabService.resetPageData(senderTab.id);
       window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
 
@@ -1023,6 +1163,10 @@ BG.Methods.handleClientPortConnections = () => {
       clientLoadSubscribers.forEach((subscriber) => subscriber());
 
       BG.Methods.onClientPageLoad(senderTab);
+
+      // It is recommended to remove the onConnect listener after connection has been established.
+      // Port is only used to notify the background of client loaded, so we can disconnect it to remove the listener
+      port.disconnect();
     }
 
     port.onDisconnect.addListener(() => {
@@ -1087,8 +1231,10 @@ BG.Methods.getSessionRecordingConfig = async (url) => {
   return shouldRecord ? sessionRecordingConfig : null;
 };
 
-BG.Methods.onSessionRecordingStartedNotification = (tabId) => {
-  RQ.extensionIconManager.markRecording(tabId);
+BG.Methods.onSessionRecordingStartedNotification = (tabId, markRecordingIcon = true) => {
+  if (markRecordingIcon) {
+    RQ.extensionIconManager.markRecording(tabId);
+  }
 };
 
 BG.Methods.onSessionRecordingStoppedNotification = (tabId) => {
@@ -1103,6 +1249,7 @@ BG.Methods.cacheRecordedSessionOnClientPageUnload = (tabId, payload) => {
       ...sessionRecordingData,
       previousSession: payload.session,
       widgetPosition: payload.widgetPosition,
+      recordingStartTime: payload.recordingStartTime,
     });
   }
 };
@@ -1129,6 +1276,7 @@ BG.Methods.onAppLoadedNotification = () => {
 
 BG.Methods.onClientPageLoad = (tab) => {
   BG.Methods.handleRuleExecutionsOnClientPageLoad(tab);
+  BG.Methods.handleTestRuleOnClientPageLoad(tab);
   BG.Methods.handleSessionRecordingOnClientPageLoad(tab);
 };
 
@@ -1172,6 +1320,14 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
 
     if (sessionRecordingConfig) {
       sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
+      const recordingMode = sessionRecordingConfig?.autoRecording?.mode;
+
+      sessionRecordingData.showWidget = recordingMode === "custom";
+
+      if (recordingMode === "allPages") {
+        sessionRecordingData.markRecordingIcon = false;
+      }
+
       window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
     }
   } else if (!sessionRecordingData.explicit) {
@@ -1202,20 +1358,123 @@ BG.Methods.handleSessionRecordingOnClientPageLoad = async (tab) => {
   }
 };
 
-BG.Methods.startRecordingExplicitly = (tabId) => {
-  const sessionRecordingData = { explicit: true };
+BG.Methods.handleTestRuleOnClientPageLoad = (tab) => {
+  const testRuleData = window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA);
 
-  window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
+  if (testRuleData) {
+    BG.Methods.sendMessageToClient(tab.id, {
+      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
+      ruleId: testRuleData.ruleId,
+      record: testRuleData.record,
+    });
+  }
+};
 
-  BG.Methods.sendMessageToClient(tabId, {
+BG.Methods.saveTestReport = async (ruleId, url, appliedStatus) => {
+  const testReports = (await RQ.StorageService.getRecord(RQ.STORAGE_KEYS.TEST_REPORTS)) ?? {};
+
+  const ruleTestReports = Object.values(testReports)
+    .filter((testReport) => testReport.ruleId === ruleId)
+    .sort((a, b) => (a.timestamp < b.timestamp ? 1 : a.timestamp > b.timestamp ? -1 : 0));
+
+  if (ruleTestReports.length > 2) {
+    delete testReports[ruleTestReports[2].id];
+  }
+
+  const newTestReportId = RQ.commonUtils.generateUUID();
+  testReports[newTestReportId] = {
+    timestamp: Date.now(),
+    ruleId,
+    appliedStatus,
+    url,
+    id: newTestReportId,
+  };
+
+  await RQ.StorageService.saveRecord({
+    [RQ.STORAGE_KEYS.TEST_REPORTS]: testReports,
+  });
+
+  return newTestReportId;
+};
+
+BG.Methods.launchUrlAndStartRuleTesting = (payload, openerTabId) => {
+  BG.Methods.launchUrl(payload.url, openerTabId).then((tab) => {
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA, {
+      url: payload.url,
+      ruleId: payload.ruleId,
+      record: payload.record,
+    });
+  });
+};
+
+BG.Methods.saveTestRuleResult = (payload, senderTab) => {
+  const testRuleData = window.tabService.getData(senderTab.id, BG.TAB_SERVICE_DATA.TEST_RULE_DATA);
+  const testRuleUrl = testRuleData.url ?? senderTab.url;
+
+  BG.Methods.saveTestReport(payload.ruleId, testRuleUrl, payload.appliedStatus).then((test_id) => {
+    const isParentTabFocussed = window.tabService.focusTab(senderTab.openerTabId);
+    if (!isParentTabFocussed) {
+      // create new tab with URL if opener tab does not exist
+      chrome.tabs.create(
+        {
+          url: `${RQ.configs.WEB_URL}/rules/editor/edit/${payload.ruleId}`,
+        },
+        (tab) => {
+          window.tabService.ensureTabLoadingComplete(tab.id).then(() => {
+            BG.Methods.sendMessageToClient(tab.id, {
+              action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+              testReportId: test_id,
+              testPageTabId: senderTab.id,
+              record: testRuleData.record,
+              appliedStatus: payload.appliedStatus,
+            });
+          });
+        }
+      );
+    } else {
+      BG.Methods.sendMessageToClient(senderTab.openerTabId, {
+        action: RQ.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+        testReportId: test_id,
+        testPageTabId: senderTab.id,
+        record: testRuleData.record,
+        appliedStatus: payload.appliedStatus,
+      });
+    }
+  });
+};
+
+BG.Methods.startRecordingExplicitly = async (tab, showWidget = true) => {
+  const sessionRecordingConfig = await BG.Methods.getSessionRecordingConfig(tab.url);
+
+  const sessionRecordingDataExist = !!window.tabService.getData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING);
+  // Auto recording is on for current tab if sessionRecordingConfig exist,
+  // so forcefully start explicit recording.
+  if (!sessionRecordingConfig && sessionRecordingDataExist) {
+    return;
+  }
+
+  const sessionRecordingData = { explicit: true, showWidget };
+  window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
+
+  BG.Methods.sendMessageToClient(tab.id, {
     action: RQ.CLIENT_MESSAGES.START_RECORDING,
     payload: sessionRecordingData,
   });
 };
 
 BG.Methods.launchUrlAndStartRecording = (url) => {
-  chrome.tabs.create({ url }, (tab) => {
-    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, { notify: true, explicit: true });
+  BG.Methods.launchUrl(url).then((tab) => {
+    window.tabService.setData(tab.id, BG.TAB_SERVICE_DATA.SESSION_RECORDING, {
+      notify: true,
+      explicit: true,
+      showWidget: true,
+    });
+  });
+};
+
+BG.Methods.launchUrl = (url, openerTabId) => {
+  return new Promise((resolve) => {
+    window.tabService.createNewTab(url, openerTabId, resolve);
   });
 };
 

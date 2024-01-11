@@ -26,6 +26,12 @@
       }
     }
 
+    createNewTab(url, openerTabId, callback) {
+      chrome.tabs.create({ url, openerTabId }, (tab) => {
+        callback(tab);
+      });
+    }
+
     removeTab(tabId) {
       delete this.map[tabId];
     }
@@ -85,10 +91,14 @@
       var tab = this.getTab(tabId);
 
       if (tab && tab.windowId) {
-        chrome.windows.update(tab.windowId, { focused: true }, () => {
-          chrome.tabs.highlight({ windowId: tab.windowId, tabs: tab.index });
-        });
-        return true;
+        try {
+          chrome.windows.update(tab.windowId, { focused: true }, () => {
+            chrome.tabs.highlight({ windowId: tab.windowId, tabs: tab.index });
+          });
+          return true;
+        } catch (e) {
+          return false;
+        }
       }
 
       return false;

@@ -6,6 +6,8 @@ import Logger from "lib/logger";
 import { teamsActions } from "store/features/teams/slice";
 import { toast } from "utils/Toast";
 import firebaseApp from "../../firebase";
+import APP_CONSTANTS from "config/constants";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 const db = getFirestore(firebaseApp);
 
@@ -22,19 +24,28 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
     return onSnapshot(
       q,
       (querySnapshot) => {
-        const records = querySnapshot.docs.map((team) => {
-          const teamData = team.data();
+        const records = querySnapshot.docs
+          .map((team) => {
+            const teamData = team.data();
 
-          return {
-            id: team.id,
-            name: teamData.name,
-            owner: teamData.owner,
-            archived: teamData.archived,
-            subscriptionStatus: teamData.subscriptionStatus,
-            accessCount: teamData.accessCount,
-            adminCount: teamData.adminCount,
-          };
-        });
+            if (teamData.deleted) return null;
+
+            if (!teamData.archived && teamData.appsumo) {
+              submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
+            }
+
+            return {
+              id: team.id,
+              name: teamData.name,
+              owner: teamData.owner,
+              archived: teamData.archived,
+              subscriptionStatus: teamData.subscriptionStatus,
+              accessCount: teamData.accessCount,
+              adminCount: teamData.adminCount,
+              members: teamData.members,
+            };
+          })
+          .filter(Boolean);
 
         dispatch(teamsActions.setAvailableTeams(records));
 

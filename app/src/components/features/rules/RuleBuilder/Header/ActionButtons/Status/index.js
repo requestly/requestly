@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentlySelectedRule } from "../../../actions";
-import APP_CONSTANTS from "../../../../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import {
   getAllRules,
@@ -14,8 +13,10 @@ import { toast } from "utils/Toast.js";
 import { StorageService } from "init";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import "./RuleEditorStatus.css";
+import { PremiumFeature } from "features/pricing";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
 
-const Status = ({ location, isRuleEditorModal }) => {
+const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   //Global State
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -23,13 +24,8 @@ const Status = ({ location, isRuleEditorModal }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
 
-  const isDisabled = currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST;
-
   //Component State
   const [hasUserTriedToChangeRuleStatus, setHasUserTriedToChangeRuleStatus] = useState(false);
-
-  // fetch planName from global state
-  const planNameFromState = user.details?.planDetails?.planName || APP_CONSTANTS.PRICING.PLAN_NAMES.BRONZE;
 
   const isRuleCurrentlyActive = () => {
     return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
@@ -86,20 +82,18 @@ const Status = ({ location, isRuleEditorModal }) => {
         stableChangeRuleStatus(GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE);
       }
     }
-  }, [allRules, stableChangeRuleStatus, user, location.pathname, hasUserTriedToChangeRuleStatus, planNameFromState]);
+  }, [allRules, stableChangeRuleStatus, user, location.pathname, hasUserTriedToChangeRuleStatus]);
 
   const isChecked = isRuleCurrentlyActive();
 
   return (
     <div className="display-row-center ml-2 rule-editor-header-switch" data-tour-id="rule-editor-status-toggle">
       <span className="rule-editor-header-switch-text text-gray">{isChecked ? "Enabled" : "Disabled"}</span>
-      <Switch
-        size="small"
-        className="ml-3"
-        checked={isChecked}
-        onChange={toggleRuleStatus}
-        disabled={isDisabled}
-        onClick={() => {
+      <PremiumFeature
+        disabled={isDisabled || isChecked}
+        popoverPlacement="bottom"
+        onContinue={() => {
+          toggleRuleStatus();
           trackRuleEditorHeaderClicked(
             "toggle_status",
             currentlySelectedRuleData.ruleType,
@@ -107,7 +101,11 @@ const Status = ({ location, isRuleEditorModal }) => {
             isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
           );
         }}
-      />
+        features={[FeatureLimitType.num_active_rules]}
+        source={currentlySelectedRuleData.ruleType}
+      >
+        <Switch size="small" className="ml-3" checked={isChecked} disabled={isDisabled} />
+      </PremiumFeature>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { DetailsTab } from "../../../components/ResourceTable";
+import { DetailsTab } from "@requestly-ui/resource-table";
 import { ExecutionEvent } from "../../../types";
 import ExecutionDetails from "./ExecutionDetails";
 

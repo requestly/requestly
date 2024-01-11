@@ -1,21 +1,31 @@
 import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Col, Row } from "antd";
-import PATHS from "config/constants/sub/paths";
-import { NavLink } from "react-router-dom";
 import { RuleType } from "types/rules";
 import { getRuleDetails } from "../utils";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumIcon } from "components/common/PremiumIcon";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import "./ruleHeader.css";
+import { PremiumFeature } from "features/pricing";
+import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 
 interface RuleHeaderProps {
   selectedRuleType: RuleType;
 }
 
 const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
+  const navigate = useNavigate();
   const { icon, name, subtitle, header } = useMemo(() => getRuleDetails(selectedRuleType), [selectedRuleType]);
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
-  const handleCreateRuleClick = (ruleType: RuleType) => {
-    trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
+  const featureName = `${selectedRuleType.toLowerCase()}_rule` as FeatureLimitType;
+  const isPremiumRule = !getFeatureLimitValue(featureName);
+
+  const handleCreateRuleClick = () => {
+    trackRuleCreationWorkflowStartedEvent(selectedRuleType, "screen");
+    redirectToCreateNewRule(navigate, selectedRuleType, "rule_selection");
   };
 
   return (
@@ -25,21 +35,33 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
       </Col>
       <Col className="rule-header-name-container" span={18}>
         <Row>
-          <div className="header">{name}</div>
+          <div className="header">
+            {name}
+            {isPremiumRule ? <PremiumIcon featureType={featureName} source="rule_selection_screen" /> : null}
+          </div>
         </Row>
         <Row className="text-gray line-clamp-2">{header?.description ?? subtitle}</Row>
       </Col>
       <Col span={3} className="ml-auto">
-        <Row align="middle" justify="end">
-          <NavLink
-            replace
-            to={`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${selectedRuleType}`}
-            state={{ source: "rule_selection" }}
+        <Row
+          align="middle"
+          justify="end"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <PremiumFeature
+            onContinue={() => {
+              handleCreateRuleClick();
+            }}
+            features={[featureName, FeatureLimitType.num_rules]}
+            popoverPlacement="bottomLeft"
+            source={selectedRuleType}
           >
-            <Button size="large" type="primary" onClick={() => handleCreateRuleClick(selectedRuleType)}>
+            <Button size="large" type="primary">
               Create Rule
             </Button>
-          </NavLink>
+          </PremiumFeature>
         </Row>
       </Col>
     </Row>

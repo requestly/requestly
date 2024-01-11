@@ -38,7 +38,7 @@ const allPagesSourceData = {
   operator: SourceOperator.WILDCARD_MATCHES,
 };
 
-const defaultSessionRecordingConfig: SessionRecordingConfig = {
+export const defaultSessionRecordingConfig: SessionRecordingConfig = {
   maxDuration: 5,
   pageSources: [],
   autoRecording: {
@@ -251,7 +251,7 @@ const SessionsSettingsPage: React.FC = () => {
             icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
             onClick={() => redirectToSessionRecordingHome(navigate)}
           />
-          <span>Session Replay Settings</span>
+          <span>SessionBook Settings</span>
         </div>
 
         <div className="automatic-recording-container">

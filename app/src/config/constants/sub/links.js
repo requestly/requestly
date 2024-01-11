@@ -27,8 +27,13 @@ const LINKS = {
 
   // Docs - Extension Troubleshooting
   REQUESTLY_EXTENSION_TROUBLESHOOTING: "https://docs.requestly.io/troubleshooting",
+
+  REQUESTLY_EXTENSION_RULES_NOT_WORKING:
+    "https://docs.requestly.io/browser-extension/chrome/troubleshooting/rules-not-working",
+
   // Docs - Mock GraphQL API response
-  REQUESTLY_DOCS_MOCK_GRAPHQL: "https://docs.requestly.io/using-rules/mock-graphql-api-response",
+  REQUESTLY_DOCS_MOCK_GRAPHQL: "https://developers.requestly.io/http-rules/graphql-support",
+
   // Docs - Android Debugger Overview
   REQUESTLY_DOCS_ANDROID_DEBUGGER: "https://docs.requestly.io/android-debugger/overview",
 
@@ -45,7 +50,9 @@ const LINKS = {
   // Docs - Test URL condition
   REQUESTLY_DOCS_TEST_URL_CONDITION: "https://developers.requestly.io/test-url-condition",
 
-  REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://developers.requestly.io/session-recording-architecture",
+  REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://developers.requestly.io/sessions/architecture/",
+
+  REQUESTLY_API_DOCS: "https://developers.requestly.io/api/overview/",
 
   /** LANDING PAGES **/
 
@@ -90,11 +97,6 @@ const LINKS = {
     SIGN_DPA: "https://privacy.requestly.io/dpa",
   },
 
-  /** MARKETTING */
-  PRODUCT_HUNT: {
-    MOBILE_INTERCEPTOR: "https://www.producthunt.com/posts/requestly-for-android",
-  },
-
   /** TUTORIALS */
   YOUTUBE_TUTORIALS: "https://www.youtube.com/playlist?list=PLmHjVvTu_7ddFIIT9AkZ7p0lrC5gBuyb6",
 
@@ -111,6 +113,8 @@ const LINKS = {
     WINDOWS: "https://bit.ly/rq-windows",
     LINUX: "https://bit.ly/rq-linux",
   },
+
+  PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
 };
 
 export default LINKS;

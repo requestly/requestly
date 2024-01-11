@@ -3,10 +3,10 @@ import { NetworkEvent, ResourceFilters, NetworkSettings } from "../../types";
 import { PrimaryToolbar, FiltersToolbar } from "./toolbars";
 import EmptyContainerPlaceholder from "../../components/EmptyContainerPlaceholder/EmptyContainerPlaceholder";
 import { ResourceTypeFilterValue } from "../../components/ResourceTypeFilter";
-import { ResourceTable } from "../../components/ResourceTable";
+import { ResourceTable } from "@requestly-ui/resource-table";
 import networkEventTableColumns, { NETWORK_TABLE_COLUMN_IDS } from "./columns";
 import networkEventDetailsTabs from "./details-tabs";
-import { matchResourceTypeFilter } from "../../utils";
+import { getCurrentColorScheme, matchResourceTypeFilter } from "../../utils";
 import "./networkContainer.scss";
 
 const NetworkContainer: React.FC = () => {
@@ -67,6 +67,7 @@ const NetworkContainer: React.FC = () => {
         <>
           <FiltersToolbar filters={filters} onFiltersChange={setFilters} />
           <ResourceTable
+            colorScheme={getCurrentColorScheme()}
             resources={networkEvents}
             columns={networkEventTableColumns}
             primaryColumnKeys={[NETWORK_TABLE_COLUMN_IDS.URL]}

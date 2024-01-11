@@ -7,9 +7,9 @@ import CancelRuleIcon from "../../../../../../resources/icons/rule-icons/cancel.
 import DelayRuleIcon from "../../../../../../resources/icons/rule-icons/delay.svg";
 import { NetworkEvent, RuleEditorUrlFragment } from "../../../../types";
 import { SourceKey, SourceOperator } from "../../../../../types";
-import PropertyRow from "../../../../components/PropertyRow/PropertyRow";
-import "./generalTabContent.scss";
+import { PropertyRow } from "@requestly-ui/resource-table";
 import { createRule, generateRuleName, getBaseUrl, getHostFromUrl } from "../../../../utils";
+import "./generalTabContent.scss";
 
 interface Props {
   networkEvent: NetworkEvent;

@@ -13,10 +13,6 @@ const INITIAL_STATE = {
   userPersona: {
     page: "getting_started",
     persona: "",
-    industry: "",
-    // useCases: [],
-    // referralChannel: "",
-    // numberOfEmployees: "",
     isSurveyCompleted: false,
   },
 
@@ -43,6 +39,7 @@ const INITIAL_STATE = {
     rulesToPopulate: [],
     groupwiseRulesToPopulate: {},
     selectedRules: {},
+    selectedGroups: {},
     lastBackupTimeStamp: "",
     isRulesListLoading: false,
   },
@@ -90,10 +87,6 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
-    freeTrialExpiredModal: {
-      isActive: false,
-      props: {},
-    },
     syncConsentModal: {
       isActive: false,
       props: {},
@@ -114,6 +107,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    appOnboardingModal: {
+      isActive: false,
+      props: {},
+    },
     createWorkspaceModal: {
       isActive: false,
       props: {},
@@ -130,11 +127,18 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
-  },
-
-  /* Marketplace */
-  marketplace: {
-    ruleStatus: {},
+    sharingModal: {
+      isActive: false,
+      props: {},
+    },
+    emailLoginLinkPopup: {
+      isActive: false,
+      props: {},
+    },
+    pricingModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {
@@ -149,9 +153,6 @@ const INITIAL_STATE = {
 
   // country of current user
   country: "",
-
-  // if trial part
-  trialModeEnabled: false,
 
   mobileDebugger: {
     app: {
@@ -183,18 +184,28 @@ const INITIAL_STATE = {
     workspace: {},
   },
 
+  appOnboarding: {
+    step: "auth",
+    persona: null,
+    fullName: null,
+    disableSkip: false,
+    createdWorkspace: null,
+    isOnboardingCompleted: false,
+  },
+
   misc: {
     persist: {
-      isProductHuntBannerClosed: false,
+      appNotificationBannerDismissTs: 0,
+      isProductHuntLaunchedBannerClosed: false,
       isRedirectRuleTourCompleted: false,
       isTrafficTableTourCompleted: false,
       isConnectedAppsTourCompleted: false,
       isNetworkSessionTooltipShown: false,
       isRuleEditorTourCompleted: false,
+      extensionInstallSource: null,
       isMiscTourCompleted: {
-        firstRule: false,
-        fifthRule: false,
         firstDraftSession: false,
+        upgradeWorkspaceMenu: false,
       },
 
       hasConnectedApp: false,
@@ -203,6 +214,7 @@ const INITIAL_STATE = {
     },
     nonPersist: {
       networkSessionSaveInProgress: false,
+      timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
     },
   },

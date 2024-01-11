@@ -15,3 +15,10 @@ export const setInnerHTML = (element: InnerHTML, content: string) => {
     element.innerHTML = trustedTypesPolicy.createHTML(content);
   }
 };
+
+export const getEpochToMMSSFormat = (epochTime: number) => {
+  const date = new Date(epochTime);
+  const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+  const seconds = date.getUTCSeconds().toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
+};

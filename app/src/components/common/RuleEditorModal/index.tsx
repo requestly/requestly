@@ -14,7 +14,6 @@ import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
 import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
 import DeleteButton from "components/features/rules/RuleBuilder/Header/ActionButtons/DeleteButton";
-import ExportButton from "components/features/rules/RuleBuilder/Header/ActionButtons/ExportButton";
 import PinButton from "components/features/rules/RuleBuilder/Header/ActionButtons/PinButton";
 import RuleStatusButton from "components/features/rules/RuleBuilder/Header/ActionButtons/Status";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
@@ -65,9 +64,6 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
       <Menu className="editor-rule-options-menu">
         <Menu.Item key="1" className="editor-rule-options-menu-item">
           <PinButton rule={currentlySelectedRuleData} isRuleEditorModal={true} />
-        </Menu.Item>
-        <Menu.Item key="2" className="editor-rule-options-menu-item">
-          <ExportButton rule={currentlySelectedRuleData} isDisabled={false} isRuleEditorModal={true} />
         </Menu.Item>
         <Menu.Item key="3" className="editor-rule-options-menu-item">
           <ShareRuleButton isRuleEditorModal={true} />

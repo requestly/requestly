@@ -63,8 +63,7 @@ RQ.ClientUtils.getScriptClassAttribute = function () {
 };
 
 RQ.ClientUtils.isHTMLDocument = function () {
-  const docType = document.doctype;
-  return docType && docType.name === "html";
+  return document.doctype?.name === "html" || document instanceof HTMLDocument; // HTMLDocument can't be replaced with Document, as it fails for XML
 };
 
 RQ.ClientUtils.sendExecutionEventToBackground = (eventName, eventParams) => {

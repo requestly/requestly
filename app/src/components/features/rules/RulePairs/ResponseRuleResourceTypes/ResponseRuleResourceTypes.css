@@ -55,18 +55,16 @@
   padding-right: 4px;
 }
 
+.resource-types-radio-group .ant-radio-group .ant-radio-wrapper.graphql-radio-item {
+  margin-right: 20px;
+}
+
 .resource-disable-option-info-icon.anticon {
   margin-left: 5px;
 }
 
 .response-rule-resource-type-tooltip.ant-tooltip .ant-tooltip-content .ant-tooltip-inner {
   color: var(--text-gray);
-  background-color: var(--border-dark);
-  border-radius: var(--border-radius-sm);
-}
-
-.response-rule-resource-type-tooltip.ant-tooltip .ant-tooltip-content .ant-tooltip-arrow {
-  display: none;
 }
 
 .response-rule-resource-type-tooltip .ant-tooltip-content .ant-tooltip-inner {

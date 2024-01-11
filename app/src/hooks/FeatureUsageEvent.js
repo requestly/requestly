@@ -6,10 +6,22 @@ import { getFeatureUsage } from "utils/rules/getFeatureUsage";
 import { trackRuleFeatureUsageEvent } from "modules/analytics/events/common/rules";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
+import { useFeatureLimiter } from "./featureLimiter/useFeatureLimiter";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const FeatureUsageEvent = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
+
+  const { checkFeatureLimits } = useFeatureLimiter();
+
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
+
+  useEffect(() => {
+    if (isFeatureLimiterOn) {
+      checkFeatureLimits();
+    }
+  }, [checkFeatureLimits, isFeatureLimiterOn]);
 
   useEffect(() => {
     const timerId = setTimeout(() => {

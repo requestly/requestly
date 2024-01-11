@@ -22,19 +22,6 @@ export const getAllRules = (state) => {
   return allRulesData["rules"];
 };
 
-export const getMarketplaceRules = (state) => {
-  const allRules = getAllRules(state);
-  return allRules.filter((data) => "MKTRuleID" in data);
-};
-
-export const getUniqueMarketplaceRuleID = (state) => {
-  const onlyMarketplaceRules = getMarketplaceRules(state);
-  const uniqueMarketplaceRuleIDs = onlyMarketplaceRules.filter(
-    (rule, index, self) => self.findIndex((x) => x.MKTRuleID === rule.MKTRuleID) === index
-  );
-  return uniqueMarketplaceRuleIDs;
-};
-
 export const getAllGroups = (state) => {
   const allRulesData = getAllRulesData(state);
   return allRulesData["groups"];
@@ -58,6 +45,11 @@ export const getIsRulesListLoading = (state) => {
 export const getRulesSelection = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["selectedRules"];
+};
+
+export const getGroupsSelection = (state) => {
+  const rulesNode = getRulesNode(state);
+  return rulesNode["selectedGroups"];
 };
 
 export const getCurrentlySelectedRule = (state) => {
@@ -119,11 +111,6 @@ export const getSharedListsSearchKeyword = (state) => {
   return allSearch["sharedLists"];
 };
 
-export const getMarketplaceSearchKeyword = (state) => {
-  const allSearch = getSearch(state);
-  return allSearch["marketplace"];
-};
-
 export const getPendingHardRefreshItems = (state) => {
   return getGlobalState(state)["pendingHardRefresh"];
 };
@@ -170,10 +157,6 @@ export const getHasConnectedApp = (state) => {
   return getGlobalState(state).misc?.persist?.hasConnectedApp;
 };
 
-export const getMarketplaceRuleStatus = (state) => {
-  return getGlobalState(state)["marketplace"]["ruleStatus"];
-};
-
 export const getAppMode = (state) => {
   return getGlobalState(state)["appMode"];
 };
@@ -188,10 +171,6 @@ export const getDesktopSpecificDetails = (state) => {
 
 export const getUserCountry = (state) => {
   return getGlobalState(state)["country"];
-};
-
-export const getIfTrialModeEnabled = (state) => {
-  return getGlobalState(state)["trialModeEnabled"];
 };
 
 export const getMobileDebuggerAppDetails = (state) => {
@@ -221,8 +200,19 @@ export const getUserAttributes = (state) => {
   return getGlobalState(state)["userAttributes"];
 };
 
-export const getIsProductHuntBannerClosed = (state) => {
-  return getGlobalState(state).misc?.persist?.isProductHuntBannerClosed;
+// Had to make a separate selector, since consuming
+// "userAttributes" directly in <RulesListContainer/> component goes into infinite re-renders
+// TODO: fix above
+export const getUserRulesCount = (state) => {
+  return getUserAttributes(state)?.num_rules ?? 0;
+};
+
+export const getExtensionInstallDate = (state) => {
+  return getUserAttributes(state).install_date;
+};
+
+export const getIsProductHuntLaunchedBannerClosed = (state) => {
+  return getGlobalState(state).misc?.persist?.isProductHuntLaunchedBannerClosed;
 };
 
 export const getIsRedirectRuleTourCompleted = (state) => {
@@ -263,6 +253,10 @@ export const getWorkspaceOnboardingStep = (state) => {
   return getGlobalState(state)?.workspaceOnboarding?.step;
 };
 
+export const getAppOnboardingDetails = (state) => {
+  return getGlobalState(state)?.appOnboarding;
+};
+
 export const getIsSecondarySidebarCollapsed = (state) => {
   return getGlobalState(state).userPreferences.isSecondarySidebarCollapsed;
 };
@@ -281,4 +275,20 @@ export const getLastSeenInviteTs = (state) => {
 
 export const getIsJoinWorkspaceCardVisible = (state) => {
   return getGlobalState(state).misc.persist?.isJoinWorkspaceCardVisible;
+};
+
+export const getExtensionInsallSource = (state) => {
+  return getGlobalState(state).misc.persist?.extensionInstallSource;
+};
+
+export const getTimeToResendEmailLogin = (state) => {
+  return getGlobalState(state).misc.nonPersist?.timeToResendEmailLogin;
+};
+
+export const getAppNotificationBannerDismissTs = (state) => {
+  return getGlobalState(state).misc.persist?.appNotificationBannerDismissTs;
+};
+
+export const getIsOrgBannerDismissed = (state) => {
+  return getGlobalState(state).misc.persist?.isOrgBannerDismissed;
 };

@@ -1,17 +1,15 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSelector } from "react-redux";
 import { Button, Modal } from "antd";
 import { getUserAuthDetails } from "store/selectors";
 import { DeleteOutlined } from "@ant-design/icons";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const DeleteConfirmationModal = ({
   isOpen,
   toggle,
-  ruleToDelete,
-  rulesToDelete,
-  promptToLogin,
-  deleteRecordFromStorage,
+  ruleIdsToDelete,
   handleRecordsDeletion,
   handleDeleteRulesPermanently,
   isMoveToTrashInProgress,
@@ -20,22 +18,16 @@ const DeleteConfirmationModal = ({
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
-  const tryMoveToTrash = () => {
-    if (!user.loggedIn) {
-      handleDeleteRulesPermanently();
-      return;
-    }
-    if (isWorkspaceMode) {
-      handleDeleteRulesPermanently();
-    } else {
-      handleRecordsDeletion(user?.details?.profile?.uid);
-    }
-  };
+  const enableTrash = useFeatureIsOn("enable-trash");
 
-  // eslint-disable-next-line no-unused-vars
-  const handleDeleteRecordFromStorage = () => {
-    deleteRecordFromStorage(false, ruleToDelete);
-  };
+  const tryMoveToTrash = useCallback(() => {
+    handleRecordsDeletion(user?.details?.profile?.uid);
+  }, [user, handleRecordsDeletion]);
+
+  const handleDeleteClick = useCallback(() => {
+    tryMoveToTrash();
+    if (isOpen) toggle();
+  }, [tryMoveToTrash, toggle, isOpen]);
 
   const renderMultipleRuleDeleteModal = () => {
     return (
@@ -50,25 +42,10 @@ const DeleteConfirmationModal = ({
         <div className="modal-body">
           <div className="py-3 text-center">
             <h3 className="heading">
-              {user.loggedIn && !isWorkspaceMode ? (
-                <>
-                  Are you sure you want to move selected {rulesToDelete.length}{" "}
-                  {rulesToDelete.length === 1 ? "rule" : "rules"} into trash?
-                </>
+              {enableTrash && user.loggedIn && !isWorkspaceMode ? (
+                <>Are you share you want to delete the selected rules/groups?</>
               ) : (
-                <>
-                  Are you sure you want to delete selected {rulesToDelete.length}{" "}
-                  {rulesToDelete.length === 1 ? "rule" : "rules"} permanently?
-                  <br />
-                  {!isWorkspaceMode ? (
-                    <>
-                      <Button type="link" size="large" className="signin-link" onClick={promptToLogin}>
-                        Sign in
-                      </Button>
-                      to move rules to trash. You can recover rules from trash later on.
-                    </>
-                  ) : null}
-                </>
+                <>Are you share you want to delete the selected rules/groups permanently?</>
               )}
             </h3>
           </div>
@@ -90,7 +67,7 @@ const DeleteConfirmationModal = ({
             type="primary"
             data-dismiss="modal"
             icon={<DeleteOutlined />}
-            onClick={tryMoveToTrash}
+            onClick={handleDeleteClick}
             loading={isMoveToTrashInProgress}
             disabled={isDeletionInProgress || isMoveToTrashInProgress}
           >

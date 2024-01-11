@@ -39,11 +39,13 @@ const InvoiceTable = ({ mode, teamId }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchInvoices = (lastDoc) => {
+    if (!user.loggedIn) return;
+
     if (!mode) return;
     setIsLoading(true);
     let records = [];
     const collectionName = mode === "individual" ? "individualSubscriptions" : "teams";
-    const documentName = mode === "individual" ? user.details.profile.uid : teamId;
+    const documentName = mode === "individual" ? user?.details?.profile?.uid : teamId;
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(doc(collection(db, collectionName), documentName), "invoices");
 
@@ -75,8 +77,6 @@ const InvoiceTable = ({ mode, teamId }) => {
             status: doc.data().status,
             hosted_invoice_url: doc.data().hosted_invoice_url,
             number: doc.data().number,
-            productStart: new Date(doc.data().productStart * 1000).toDateString(),
-            productEnd: new Date(doc.data().productEnd * 1000).toDateString(),
           });
         });
         if (records.length > 0) {
@@ -88,7 +88,7 @@ const InvoiceTable = ({ mode, teamId }) => {
     });
   };
 
-  const stableFetchInvoices = useCallback(fetchInvoices, [mode, teamId, user.details.profile.uid]);
+  const stableFetchInvoices = useCallback(fetchInvoices, [mode, teamId, user?.details?.profile?.uid, user.loggedIn]);
 
   const renderLoader = () => <SpinnerColumn message="Loading your invoices" />;
 
@@ -175,7 +175,7 @@ const InvoiceTable = ({ mode, teamId }) => {
             {
               title: "Subscription Period",
               render: (_, invoice) => {
-                return `${invoice.productStart} - ${invoice.productEnd}`;
+                return `${invoice.periodStart} - ${invoice.periodEnd}`;
               },
             },
           ]}

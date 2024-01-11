@@ -83,7 +83,15 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                 ))}
                 <Row span={24} align="middle">
                   {pair.modifications[modificationType]?.length ? (
-                    <Col offset={3} span={21}>
+                    <Col
+                      lg={{
+                        offset: 4,
+                      }}
+                      xs={{
+                        offset: 0,
+                      }}
+                      span={21}
+                    >
                       <Button
                         type="dashed"
                         onClick={() => addEmptyModification(activeTab)}

@@ -1,0 +1,19 @@
+.onboarding-loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin-top: 6rem;
+  gap: 2rem;
+}
+
+.onboarding-loader-spinner {
+  transform: scale(1.5);
+}
+
+.onboarding-loader-text {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--white);
+}

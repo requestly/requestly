@@ -13,19 +13,21 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
-import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import APP_CONSTANTS from "config/constants";
 import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { InfoTag } from "components/misc/InfoTag";
 import { RQButton } from "lib/design-system/components";
 import LINKS from "config/constants/sub/links";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PremiumIcon } from "components/common/PremiumIcon";
+import { PremiumFeature } from "features/pricing";
 import "./ResponseBodyRow.css";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
-  const { MODE } = getModeData(window.location);
+
   const isServeWithoutRequestSupported = useMemo(
     () => isFeatureCompatible(FEATURES.SERVE_RESPONSE_WITHOUT_REQUEST),
     []
@@ -42,6 +44,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
   const codeFormattedFlag = useRef(null);
+  const { getFeatureLimitValue } = useFeatureLimiter();
 
   const onChangeResponseType = (responseBodyType) => {
     if (Object.values(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES).includes(responseBodyType)) {
@@ -200,19 +203,18 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }, 2000);
 
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
-        return "{}";
-      }
-      return pair.response.value ?? "{}";
+      return pair.response.value ? pair.response.value : "{}";
     }
     return null;
-  }, [MODE, pair.response.type, pair.response.value]);
+  }, [pair.response.type, pair.response.value]);
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
       setIsCodeMinified(false);
     }
   }, [pair.response.type]);
+
+  const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.dynamic_response_body);
 
   return (
     <Col span={24} data-tour-id="code-editor" key={rowIndex}>
@@ -228,7 +230,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             onCancel={() => setResponseTypePopupVisible(false)}
             okText="Confirm"
             cancelText="Cancel"
-            open={responseTypePopupVisible}
+            open={responseTypePopupVisible && responseTypePopupSelection !== GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}
           >
             <Radio.Group
               onChange={showPopup}
@@ -238,7 +240,18 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
               data-tour-id="rule-editor-responsebody-types"
             >
               <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>Static Data</Radio>
-              <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>Dynamic (JavaScript)</Radio>
+              <PremiumFeature
+                features={[FeatureLimitType.dynamic_response_body]}
+                popoverPlacement="top"
+                onContinue={() => onChangeResponseType(GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE)}
+                source="dynamic_response_body"
+              >
+                <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
+                  <Row align="middle">
+                    Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}
+                  </Row>
+                </Radio>
+              </PremiumFeature>
               {getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
                 isFeatureCompatible(FEATURES.RESPONSE_MAP_LOCAL) ? (
                   <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE}>Local File</Radio>

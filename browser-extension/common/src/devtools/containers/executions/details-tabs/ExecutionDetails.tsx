@@ -1,8 +1,8 @@
 import React from "react";
 import { ExecutionEvent } from "../../../types";
-import PropertyRow from "../../../components/PropertyRow/PropertyRow";
-import "./executionDetails.scss";
+import { PropertyRow } from "@requestly-ui/resource-table";
 import config from "../../../../config";
+import "./executionDetails.scss";
 
 interface Props {
   execution: ExecutionEvent;

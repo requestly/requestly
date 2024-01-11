@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row, Radio, Tag, Typography } from "antd";
+import { Button, Col, Row, Radio, Tag, Typography, Modal } from "antd";
 import { BsBuilding } from "@react-icons/all-files/bs/BsBuilding";
 import { AiOutlineLink } from "@react-icons/all-files/ai/AiOutlineLink";
 import React, { useEffect, useState, useRef } from "react";
@@ -9,7 +9,6 @@ import firebaseApp from "../../../../firebase";
 import { FiLock } from "@react-icons/all-files/fi/FiLock";
 import { FiUsers } from "@react-icons/all-files/fi/FiUsers";
 import SpinnerColumn from "components/misc/SpinnerColumn";
-import { ReactMultiEmail, isEmail } from "react-multi-email";
 import {
   trackIframeEmbedCopied,
   trackSessionRecordingShareLinkCopied,
@@ -21,6 +20,7 @@ import "./shareRecordingModal.scss";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 
 const _ = require("lodash");
 
@@ -28,16 +28,16 @@ export const renderHeroIcon = (currentVisibility, size = 16) => {
   switch (currentVisibility) {
     default:
     case Visibility.PUBLIC:
-      return <IoEarthOutline size={size} className="remix-icon radio-hero-icon" />;
+      return <IoEarthOutline size={size} className="radio-hero-icon" />;
 
     case Visibility.CUSTOM:
-      return <FiUsers size={size} className="remix-icon radio-hero-icon" />;
+      return <FiUsers size={size} className="radio-hero-icon" />;
 
     case Visibility.ONLY_ME:
-      return <FiLock size={size} className="remix-icon radio-hero-icon" />;
+      return <FiLock size={size} className="radio-hero-icon" />;
 
     case Visibility.ORGANIZATION:
-      return <BsBuilding size={size} className="remix-icon radio-hero-icon" />;
+      return <BsBuilding size={size} className="radio-hero-icon" />;
   }
 };
 
@@ -57,7 +57,7 @@ export const getPrettyVisibilityName = (visibility, isWorkspaceMode) => {
   }
 };
 
-const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordingId, onVisibilityChange }) => {
+const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordingId, onVisibilityChange = null }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
@@ -185,32 +185,15 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
     if (dataLoading) return <SpinnerColumn />;
     return (
       <>
-        <Row>
-          <Col span={24}>
-            <ReactMultiEmail
-              className="github-like-border restricted-users-input"
-              placeholder="sam@amazon.com, tom@google.com"
-              emails={currentEmails}
-              onChange={(emails) => {
-                setIsAnyListChangePending(true);
-                setCurrentEmails(emails);
-              }}
-              validateEmail={(email) => {
-                return isEmail(email); // return boolean
-              }}
-              getLabel={(email, index, removeEmail) => {
-                return (
-                  <div data-tag key={index}>
-                    {email}
-                    <span data-tag-handle onClick={() => removeEmail(index)}>
-                      ×
-                    </span>
-                  </div>
-                );
-              }}
-            />
-          </Col>
-        </Row>
+        <label htmlFor="user_emails" className="text-gray caption">
+          Email addresses
+        </label>
+        <EmailInputWithDomainBasedSuggestions
+          onChange={(emails) => {
+            setIsAnyListChangePending(true);
+            setCurrentEmails(emails);
+          }}
+        />
         {isAnyListChangePending ? (
           <Row>
             <Col span={24} style={{ marginTop: "8px" }}>
@@ -328,11 +311,10 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
                         </Col>
                       );
                     })}
-
-                    {sessionVisibility === Visibility.CUSTOM && (
-                      <div className="share-option-description">{renderRestrictedUsersList()}</div>
-                    )}
                   </Radio.Group>
+                  {sessionVisibility === Visibility.CUSTOM && (
+                    <div className="share-option-description">{renderRestrictedUsersList()}</div>
+                  )}
                 </Col>
               </Row>
             </Col>

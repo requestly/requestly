@@ -46,8 +46,10 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
     }
   }, [request.method, selectedTab]);
 
-  const tabItems: TabsProps["items"] = useMemo(
-    () => [
+  const tabItems: TabsProps["items"] = useMemo(() => {
+    const isRequestBodySupported = supportsRequestBody(request.method);
+
+    return [
       {
         key: Tab.QUERY_PARAMS,
         label: <LabelWithCount label="Query Params" count={removeEmptyKeys(request.queryParams).length} />,
@@ -55,7 +57,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       },
       {
         key: Tab.BODY,
-        label: <LabelWithCount label="Body" count={request.body ? 1 : 0} showDot />,
+        label: <LabelWithCount label="Body" count={request.body ? 1 : 0} showDot={isRequestBodySupported} />,
         children: (
           <RequestBody
             body={request.body}
@@ -64,7 +66,7 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
             setContentType={setContentType}
           />
         ),
-        disabled: !supportsRequestBody(request.method),
+        disabled: !isRequestBodySupported,
       },
       {
         key: Tab.HEADERS,
@@ -82,9 +84,8 @@ const RequestTabs: React.FC<Props> = ({ request, setQueryParams, setBody, setReq
       //   label: "Authorization",
       //   children: <div></div>,
       // },
-    ],
-    [request, setQueryParams, setBody, setRequestHeaders, setContentType]
-  );
+    ];
+  }, [request, setQueryParams, setBody, setRequestHeaders, setContentType]);
 
   return (
     <Tabs

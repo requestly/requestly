@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { redirectToTeam } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { trackNewTeamCreateFailure, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
-import { trackNewWorkspaceCreated } from "modules/analytics/events/common/teams";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import { useDispatch } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
@@ -38,7 +37,7 @@ const CreateWorkspace = () => {
       teamName: newTeamName,
     })
       .then((response) => {
-        trackNewWorkspaceCreated();
+        trackNewTeamCreateSuccess(response.data.teamId, newTeamName);
         toast.info("Workspace Created");
         const teamId = response.data.teamId;
         setIsSubmitProcess(false);

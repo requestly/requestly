@@ -1,7 +1,16 @@
 import { trackEvent } from "modules/analytics";
 import { RULES } from "../constants";
 
-export const trackRuleCreatedEvent = ({ rule_type, description, destination_types, source, body_types }) => {
+export const trackRuleCreatedEvent = ({
+  rule_type,
+  description,
+  destination_types,
+  source,
+  body_types,
+  num_characters,
+  header_types,
+  header_actions,
+}) => {
   const params = {
     rule_type,
   };
@@ -9,17 +18,32 @@ export const trackRuleCreatedEvent = ({ rule_type, description, destination_type
   if (destination_types) params.destination_types = destination_types;
   if (source) params.source = source;
   if (body_types) params.body_types = body_types;
+  if (num_characters !== undefined) params.num_characters = num_characters;
+  if (header_types) params.header_types = header_types;
+  if (header_actions) params.header_actions = header_actions;
 
   trackEvent(RULES.RULE_CREATED, params);
 };
 
-export const trackRuleEditedEvent = (rule_type, description, destination_types, source) => {
+export const trackRuleEditedEvent = ({
+  rule_type,
+  description,
+  destination_types,
+  source,
+  num_characters,
+  header_types,
+  header_actions,
+}) => {
   const params = {
     rule_type,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
   if (source) params.source = source;
+  if (num_characters != null) params.num_characters = num_characters;
+  if (header_types) params.header_types = header_types;
+  if (header_actions) params.header_actions = header_actions;
+
   trackEvent(RULES.RULE_EDITED, params);
 };
 
@@ -31,37 +55,36 @@ export const trackRuleDeletedEvent = (count, rule_type) => {
   trackEvent(RULES.RULE_DELETED, params);
 };
 
-export const trackRulesDeletedEvent = (count) => {
+export const trackRulesDeletedEvent = (count, source, type) => {
   const params = {
     count,
+    source,
+    type,
   };
   trackEvent(RULES.RULES_DELETED, params);
 };
 
-export const trackRuleActivatedStatusEvent = (rule_type) => {
+export const trackRuleToggled = (rule_type, source, updated_status) => {
   const params = {
+    source,
     rule_type,
+    updated_status,
   };
-  trackEvent(RULES.RULE_ACTIVATED, params);
+
+  trackEvent(RULES.RULE_TOGGLED, params);
 };
 
-export const trackRuleDeactivatedStatus = (rule_type) => {
-  const params = {
-    rule_type,
-  };
-  trackEvent(RULES.RULE_DEACTIVATED, params);
-};
-
-export const trackRuleDuplicatedEvent = (rule_type, workspace) => {
+export const trackRuleDuplicatedEvent = (rule_type, workspace, source) => {
   const params = {
     rule_type,
     workspace,
+    source,
   };
   trackEvent(RULES.RULE_DUPLICATED, params);
 };
 
-export const trackRulePinToggled = (enabled) => {
-  const params = { enabled };
+export const trackRulePinToggled = (rule_id, rule_type, updated_value) => {
+  const params = { rule_id, rule_type, updated_value };
   trackEvent(RULES.RULE_PIN_TOGGLED, params);
 };
 

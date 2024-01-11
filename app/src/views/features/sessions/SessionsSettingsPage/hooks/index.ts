@@ -1,0 +1,1 @@
+export { useInitializeNewUserSessionRecordingConfig } from "./useInitializeNewUserSessionRecordingConfig";

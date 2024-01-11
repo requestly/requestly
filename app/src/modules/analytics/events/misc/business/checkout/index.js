@@ -1,17 +1,17 @@
 import { trackEvent } from "modules/analytics";
 import { BUSINESS } from "../../constants";
 
-export const trackCheckoutInitiatedEvent = (duration, plan, quantity) => {
-  const params = { duration, plan, quantity };
+export const trackCheckoutInitiatedEvent = (duration, plan, quantity, isTrialUser, source) => {
+  const params = { duration, plan, quantity, source, is_user_on_trial: isTrialUser };
   trackEvent(BUSINESS.CHECKOUT.INITIATED, params);
 };
 
-export const trackCheckoutFailedEvent = () => {
-  trackEvent(BUSINESS.CHECKOUT.FAILED);
+export const trackCheckoutFailedEvent = (type, source) => {
+  trackEvent(BUSINESS.CHECKOUT.FAILED, { type, source });
 };
 
-export const trackCheckoutCompletedEvent = () => {
-  trackEvent(BUSINESS.CHECKOUT.COMPLETED);
+export const trackCheckoutCompletedEvent = (source) => {
+  trackEvent(BUSINESS.CHECKOUT.COMPLETED, { source });
 };
 
 export const trackEnterpriseRequestEvent = (company) => {

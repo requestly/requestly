@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
-import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import ImportRulesModal from "../ImportRulesModal";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -36,13 +36,12 @@ const GettingStarted = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
-  const appOnboardingExp = useFeatureValue("app_onboarding", null);
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
 
   const isRecommendationScreenVisible = useMemo(
-    () => shouldShowRecommendationScreen(userPersona, appMode, state?.src) && appOnboardingExp === "control",
-    [appMode, state?.src, appOnboardingExp, userPersona]
+    () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
+    [appMode, state?.src, userPersona]
   );
 
   const toggleImportRulesModal = () => {

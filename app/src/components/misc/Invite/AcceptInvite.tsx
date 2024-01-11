@@ -58,7 +58,9 @@ const AcceptInvite = ({ inviteId, ownerName, workspaceId, workspaceName }: Props
                 isSyncEnabled: user?.details?.isSyncEnabled,
                 isWorkspaceMode,
               },
-              appMode
+              appMode,
+              null,
+              "invite_screen"
             );
             redirectToTeam(navigate, res?.data?.data?.invite?.metadata?.teamId, {
               state: {

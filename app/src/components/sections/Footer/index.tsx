@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { actions } from "store";
 import { Typography, Row, Col, Button, Tooltip } from "antd";
 import { getIsSecondarySidebarCollapsed } from "store/selectors";
 import { MessageOutlined, NotificationOutlined, PicRightOutlined, ReadOutlined } from "@ant-design/icons";
 import { FaYCombinator } from "@react-icons/all-files/fa/FaYCombinator";
-import { redirectToProductUpdates, redirectToUrl } from "utils/RedirectionUtils";
+import { redirectToUrl } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
 import { Footer } from "antd/lib/layout/layout";
 import { trackFooterClicked } from "modules/analytics/events/common/onboarding/footer";
@@ -15,7 +15,6 @@ import "./Footer.css";
 const { Text } = Typography;
 
 const AppFooter: React.FC = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
   const SHOW_YC_BRANDING = false;
@@ -38,13 +37,13 @@ const AppFooter: React.FC = () => {
           className="cursor-pointer"
           onClick={() => {
             trackFooterClicked("product_updates");
-            redirectToProductUpdates(navigate);
+            redirectToUrl(APP_CONSTANTS.LINKS.PRODUCTLIFT_CHANGELOG, true);
           }}
         >
           <span className="icon__wrapper">
             <NotificationOutlined />
           </span>
-          Product updates
+          Product changelog
         </Text>
         <Text
           className="cursor-pointer"

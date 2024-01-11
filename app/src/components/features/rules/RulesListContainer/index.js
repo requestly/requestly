@@ -1,40 +1,43 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ProCard from "@ant-design/pro-card";
 import { actions } from "../../../../store";
 //Sub Components
 import CreateNewRuleGroupModal from "../CreateNewRuleGroupModal";
-import ExportRulesModal from "../ExportRulesModal";
 import DeleteRulesModal from "../DeleteRulesModal";
 import ImportRulesModal from "../ImportRulesModal";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import RenameGroupModal from "../RenameGroupModal";
-import CreateSharedListModal from "../../sharedLists/CreateSharedListModal";
 import {
   getRulesSelection,
   getUserAuthDetails,
   getAllRules,
   getActiveModals,
   getAppMode,
+  getGroupsSelection,
 } from "../../../../store/selectors";
 import { submitAttrUtil, trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { isSignUpRequired } from "utils/AuthUtils";
 //ACTIONS
-import { getSelectedRules } from "../actions";
 import { fetchSharedLists } from "../../sharedLists/SharedListsIndexPage/actions";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import RulesTable from "./RulesTable";
-import "./RulesListContainer.css";
+import { PinExtensionPopup, usePinExtensionPopup } from "components/common/PinExtensionPopup";
 import {
   trackNewRuleButtonClicked,
   trackRuleCreationWorkflowStartedEvent,
 } from "modules/analytics/events/common/rules";
 import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
+import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
+import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { unselectAllRecords } from "../actions";
+import "./RulesListContainer.css";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -44,14 +47,18 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   //Global State
   const dispatch = useDispatch();
   const rulesSelection = useSelector(getRulesSelection);
+  const groupsSelection = useSelector(getGroupsSelection);
   const user = useSelector(getUserAuthDetails);
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const availableRuleTypeArray = Object.values(GLOBAL_CONSTANTS.RULE_TYPES);
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
 
   //Component State
-  const [selectedRules, setSelectedRules] = useState(getSelectedRules(rulesSelection));
+  const selectedRuleIds = useMemo(() => Object.keys(rulesSelection), [rulesSelection]);
+  const rulesToDelete = useMemo(() => allRules.filter((rule) => !!rulesSelection[rule.id]), [allRules, rulesSelection]);
+  const selectedGroupIds = useMemo(() => Object.keys(groupsSelection), [groupsSelection]);
   const [search, setSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -64,10 +71,9 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   //Modals
   const [isCreateNewRuleGroupModalActive, setIsCreateNewRuleGroupModalActive] = useState(false);
   const [isChangeGroupModalActive, setIsChangeGroupModalActive] = useState(false);
-  const [isExportRulesModalActive, setIsExportRulesModalActive] = useState(false);
   const [isDeleteRulesModalActive, setIsDeleteRulesModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
-  const [isShareRulesModalActive, setIsShareRulesModalActive] = useState(false);
+  const { isPinExtensionPopupActive, closePinExtensionPopup } = usePinExtensionPopup();
 
   const toggleCreateNewRuleGroupModal = () => {
     setIsCreateNewRuleGroupModalActive(isCreateNewRuleGroupModalActive ? false : true);
@@ -75,9 +81,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const toggleChangeGroupModal = () => {
     setIsChangeGroupModalActive(isChangeGroupModalActive ? false : true);
   };
-  const toggleExportRulesModal = () => {
-    setIsExportRulesModalActive(isExportRulesModalActive ? false : true);
-  };
+
   const toggleDeleteRulesModal = () => {
     // isDeleteRulesModalActive
     setIsDeleteRulesModalActive(isDeleteRulesModalActive ? false : true);
@@ -85,8 +89,16 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
   };
-  const toggleShareRulesModal = () => {
-    setIsShareRulesModalActive(isShareRulesModalActive ? false : true);
+
+  const toggleSharingModal = (selectedRules) => {
+    trackShareButtonClicked("rules_list", selectedRules.length);
+    dispatch(
+      actions.toggleActiveModal({
+        modalName: "sharingModal",
+        newValue: true,
+        newProps: { selectedRules: selectedRules, source: "rules_list" },
+      })
+    );
   };
 
   const toggleRenameGroupModal = () => {
@@ -114,25 +126,9 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     );
   };
 
-  const promptUserToLogInWithoutCallback = (source) => {
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: true,
-        newProps: {
-          redirectURL: window.location.href,
-          src: APP_CONSTANTS.FEATURES.RULES,
-          userActionMessage: "Sign up to generate a public shareable link",
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: source,
-        },
-      })
-    );
-  };
-
   const handleNewRuleOnClick = async (_e, ruleType) => {
     if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
-    else trackNewRuleButtonClicked();
+    else trackNewRuleButtonClicked("in_app");
     if (!user.loggedIn) {
       if (await isSignUpRequired(allRules, appMode, user)) {
         promptUserToSignup(() => redirectToCreateNewRule(navigate, ruleType, "my_rules"));
@@ -144,7 +140,8 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const handleShareRulesOnClick = () => {
-    user.loggedIn ? verifySharedListsLimit() : promptUserToLogInWithoutCallback(AUTH.SOURCE.SHARE_RULES);
+    toggleSharingModal(selectedRuleIds);
+    trackRQLastActivity("sharedList_created");
   };
 
   const getCurrentSharedListsCount = (result) => {
@@ -155,13 +152,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     }
   };
 
-  const verifySharedListsLimit = () => {
-    //Continue creating new shared list
-    setSelectedRules(getSelectedRules(rulesSelection));
-    setIsShareRulesModalActive(true);
-    trackRQLastActivity("sharedList_created");
-  };
-
   const handleImportRulesOnClick = (e) => {
     trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
     trackRulesImportStarted();
@@ -170,15 +160,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
 
   const verifyImportRulesLimitAndContinue = () => {
     setIsImportRulesModalActive(true);
-  };
-
-  const handleExportRulesOnClick = () => {
-    verifyExportRulesLimitAndContinue();
-  };
-
-  const verifyExportRulesLimitAndContinue = () => {
-    setSelectedRules(getSelectedRules(rulesSelection));
-    setIsExportRulesModalActive(true);
   };
 
   //TO SET MOBILE VIEW WIDTH BY CHECKING THROUGH WINDOW OBJECT
@@ -221,8 +202,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     setTotalRulesCount(allRules.length);
   }, [allRules]);
 
-  const recordsToDelete = allRules.filter((rule) => selectedRules.some((ruleId) => ruleId === rule.id));
-
   const clearSearch = useCallback(() => {
     setSearch(false);
     setSearchValue("");
@@ -231,7 +210,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   return (
     <>
       {/* Page content */}
-
+      {isFeatureLimiterOn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
       {/* Table */}
       <ProCard title={null} className="rules-table-container rules-list-container">
         <RulesTable
@@ -242,19 +221,15 @@ const RulesListContainer = ({ isTableLoading = false }) => {
           clearSearch={clearSearch}
           isTableLoading={isTableLoading}
           handleChangeGroupOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsChangeGroupModalActive(true);
           }}
           handleShareRulesOnClick={handleShareRulesOnClick}
-          handleExportRulesOnClick={handleExportRulesOnClick}
           handleDeleteRulesOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsDeleteRulesModalActive(true);
           }}
           handleImportRulesOnClick={handleImportRulesOnClick}
           totalRulesCount={totalRulesCount}
           handleNewGroupOnClick={() => {
-            setSelectedRules(getSelectedRules(rulesSelection));
             setIsCreateNewRuleGroupModalActive(true);
           }}
           handleNewRuleOnClick={handleNewRuleOnClick}
@@ -276,40 +251,33 @@ const RulesListContainer = ({ isTableLoading = false }) => {
         <CreateNewRuleGroupModal isOpen={isCreateNewRuleGroupModalActive} toggle={toggleCreateNewRuleGroupModal} />
       ) : null}
 
+      {isPinExtensionPopupActive && (
+        <PinExtensionPopup isOpen={isPinExtensionPopupActive} onCancel={closePinExtensionPopup} />
+      )}
+
       {isChangeGroupModalActive ? (
         <ChangeRuleGroupModal
+          isOldRulesTable
           clearSearch={clearSearch}
           isOpen={isChangeGroupModalActive}
           toggle={toggleChangeGroupModal}
           mode="SELECTED_RULES"
-        />
-      ) : null}
-
-      {isExportRulesModalActive ? (
-        <ExportRulesModal
-          isOpen={isExportRulesModalActive}
-          toggle={toggleExportRulesModal}
-          rulesToExport={selectedRules}
+          selectedRules={selectedRuleIds}
+          onGroupChanged={() => unselectAllRecords(dispatch)}
         />
       ) : null}
       {isDeleteRulesModalActive ? (
         <DeleteRulesModal
           isOpen={isDeleteRulesModalActive}
           toggle={toggleDeleteRulesModal}
-          ruleIdsToDelete={selectedRules}
-          recordsToDelete={recordsToDelete}
+          rulesToDelete={rulesToDelete}
+          groupIdsToDelete={selectedGroupIds}
           clearSearch={clearSearch}
+          analyticEventSource="rules_list"
         />
       ) : null}
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
-      ) : null}
-      {isShareRulesModalActive ? (
-        <CreateSharedListModal
-          isOpen={isShareRulesModalActive}
-          toggle={toggleShareRulesModal}
-          rulesToShare={selectedRules}
-        />
       ) : null}
 
       {activeModals.renameGroupModal.isActive ? (

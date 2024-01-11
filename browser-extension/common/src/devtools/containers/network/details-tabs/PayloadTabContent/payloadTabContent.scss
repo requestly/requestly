@@ -1,10 +1,11 @@
 .payload-tab-content {
-  &.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  & > .ant-collapse > .ant-collapse-item .ant-collapse-header {
     padding: 6px;
     align-items: center;
 
     .ant-collapse-expand-icon,
     .ant-collapse-header-text,
+    .ant-collapse-header-text .collapse-header-text,
     .payload-action-button {
       font-size: var(--font-size-normal);
       font-weight: bold;
@@ -17,11 +18,13 @@
     }
   }
 
-  &.ant-collapse .ant-collapse-content > .ant-collapse-content-box {
+  & > .ant-collapse .ant-collapse-content > .ant-collapse-content-box {
     padding-top: 0;
   }
 
   .payload-action-button {
     margin-left: 8px;
   }
+
+  overflow-wrap: anywhere;
 }

@@ -1,0 +1,66 @@
+.mail-icon {
+  font-size: 6rem;
+  color: var(--text-light);
+}
+
+.mail-sent-title {
+  color: var(--white);
+  margin-top: 8px;
+  margin-bottom: 4px !important;
+}
+
+.mail-link-modal-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  color: var(--white);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-dark);
+}
+
+.mail-link-modal-content {
+  display: flex;
+  justify-content: center;
+  flex-flow: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 3.5rem;
+  padding-top: 0;
+}
+
+.mail-link-modal-message {
+  gap: 1px !important;
+}
+
+.modal-back-btn-wrapper {
+  color: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: none;
+  position: relative;
+  top: 10px;
+  left: 10px;
+}
+
+.modal-loader {
+  min-height: 3rem;
+  width: 100%;
+}
+.resend-timeout-text {
+  border: 1px solid var(--surface-3);
+  font-weight: 500;
+  padding: 4px 6px;
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.ant-typography.text-white {
+  color: var(--white);
+}

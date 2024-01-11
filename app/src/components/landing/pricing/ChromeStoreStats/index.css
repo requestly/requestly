@@ -5,7 +5,8 @@
   flex-wrap: wrap;
   border-top: 1px solid var(--border-dark);
   padding-top: 14px;
-  margin: 60px 0;
+  margin-top: 8px;
+  margin-bottom: 60px;
 }
 .chrome-store-stats-container .stat-wrapper {
   display: flex;

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Button } from "antd";
+import { Button, Row } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { PremiumIcon } from "components/common/PremiumIcon";
 
 interface Props {
   icon: React.ReactNode;
@@ -8,13 +9,14 @@ interface Props {
   type?: any;
   buttonText: string;
   isTooltipShown: boolean;
-  onClickHandler: () => void;
-  hasPopconfirm: boolean;
+  onClickHandler: (e?: unknown) => void;
+  hasPopconfirm?: boolean;
   tourId?: any;
-  trackClickEvent: () => void;
-  isScreenSmall: boolean;
-  isLoggedIn: boolean;
+  trackClickEvent?: () => void;
+  isScreenSmall?: boolean;
+  isLoggedIn?: boolean;
   authSource?: string;
+  isPremium?: boolean;
 }
 
 const AuthPopoverButton: React.FC<Props> = ({
@@ -28,8 +30,9 @@ const AuthPopoverButton: React.FC<Props> = ({
   tourId = null,
   trackClickEvent = () => {},
   isLoggedIn,
-  isScreenSmall,
+  isScreenSmall = false,
   authSource,
+  isPremium = false,
 }) => {
   const [isChinaUser, setIsChinaUser] = useState<boolean>(false);
 
@@ -61,7 +64,16 @@ const AuthPopoverButton: React.FC<Props> = ({
         icon={icon}
         data-tour-id={tourId}
       >
-        {!isTooltipShown ? buttonText : isScreenSmall ? null : buttonText}
+        {!isTooltipShown ? (
+          buttonText
+        ) : isScreenSmall ? null : (
+          <span>
+            <Row align="middle" wrap={false}>
+              {buttonText}
+              {isPremium ? <PremiumIcon featureType="share_rules" source="share_button" /> : null}
+            </Row>
+          </span>
+        )}
       </Button>
     </AuthConfirmationPopover>
   );

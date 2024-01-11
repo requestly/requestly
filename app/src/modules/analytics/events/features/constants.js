@@ -22,6 +22,10 @@ export const SESSION_RECORDING = {
   session_recording_panel_sample_session_clicked: "session_recording_panel_sample_session_clicked",
   session_recording_upload: "session_recording_upload",
   session_recording_iframe_embed_copied: "session_recording_iframe_embed_copied",
+  NEW_SESSION_CLICKED: "new_session clicked",
+  network_log_context_menu_open: "network_log_context_menu_open",
+  network_log_context_menu_option_clicked: "network_log_context_menu_option_clicked",
+  bad_session_recording_viewed: "bad_session_recording_viewed",
 
   ONBAORDING: {
     onboarding_page_viewed: "session_onboarding_page_viewed",
@@ -74,6 +78,7 @@ export const RULES = {
   },
 
   CHARLES_SETTINGS: {
+    VIEWED: "charles_settings_import_viewed",
     IMPORT_STARTED: "charles_settings_import_started",
     PARSED: "charles_settings_parsed",
     IMPORT_FAILED: "charles_settings_import_failed",
@@ -113,6 +118,11 @@ export const MOCKSV2 = {
   AI_MOCK_RESPONSE_USE_CLICKED: "ai_mock_response_use_clicked",
   AI_MOCK_RESPONSE_GENERATED: "ai_mock_response_generated",
   AI_MOCK_RESPONSE_GENERATE_FAILED: "ai_mock_response_generate_failed",
+
+  MOCK_PASSWORD_GENERATE_CLICKED: "mock_password_generate_clicked",
+  MOCK_PASSWORD_SAVED: "mock_password_saved",
+  MOCK_PASSWORD_SAVE_ERROR: "mock_password_save_error",
+  MOCK_PASSWORD_DELETED: "mock_password_deleted",
 };
 
 export const API_CLIENT = {
@@ -129,6 +139,7 @@ export const API_CLIENT = {
   RESPONSE_LOADED: "api_client_response_loaded",
   RAW_RESPONSE_VIEWED: "api_client_raw_response_viewed",
   RESPONSE_HEADERS_VIEWED: "api_client_response_headers_viewed",
+  INSTALL_EXTENSION_DIALOG_SHOWN: "api_client_install_extension_dialog_shown",
 };
 
 export const REDIRECT_DESTINATION_OPTION = {
@@ -206,6 +217,14 @@ export const RULE_EDITOR = {
   MODIFY_API_RESPONSE: {
     SERVE_WITHOUT_REQUEST_ENABLED: "serveWithoutRequestEnabled",
   },
+  TEST_THIS_RULE: {
+    TEST_RULE_CLICKED: "test_rule_clicked",
+    TEST_RULE_REPORT_GENERATED: "test_rule_report_generated",
+    TEST_RULE_RESULT_CLICKED: "test_rule_result_clicked",
+    TEST_RULE_SESSION_DRAFT_VIEWED: "test_rule_session_draft_viewed",
+    TEST_RULE_SESSION_DRAFT_SAVED: "test_rule_session_draft_saved",
+  },
+  TROUBLESHOOT_CLICKED: "troubleshoot_clicked",
 };
 
 export const TEMPLATES = {

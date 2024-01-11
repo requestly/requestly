@@ -123,11 +123,13 @@ export const GA_EVENTS = {
     COUPON_VALUE: "coupon_value",
     LICENSE: "licensekey",
     COMPANY: "company",
+    REF: "ref",
 
     PROFILE: "profile",
 
     NUM_RULES: "NUM_RULES",
     NUM_RULE_TYPES: "NUM_RULE_TYPES",
+    NUM_RULES_PINNED: "num_rules_pinned",
     NUM_RULE_TYPES_TRIED: "num_rule_types_tried",
     NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES",
     NUM_GROUPS: "NUM_GROUPS",
@@ -141,13 +143,7 @@ export const GA_EVENTS = {
 
     SESSION_REPLAY_ENABLED: "session_replay_enabled",
 
-    ONBOARDING_V1_DONE: "ONBOARDING_V1_DONE",
-
     PERSONA: "persona",
-    INDUSTRY: "industry",
-    // USE_CASES: "use_cases",
-    // REFERRAL_CHANNEL: "referral_channel",
-    // NUMBER_OF_EMPLOYEES: "number_of_employees",
 
     SIGNUP_DATE: "SIGNUP_DATE",
     DAYS_SINCE_SIGNUP: "days_since_signup",
@@ -161,12 +157,10 @@ export const GA_EVENTS = {
     EMAIL_DOMAIN: "EMAIL_DOMAIN",
     EMAIL_VERIFIED: "email_verified",
     IS_PREMIUM: "IS_PREMIUM",
+    IS_TRIAL: "is_trial",
 
-    HAS_AVAILED_TWITTER_TRIAL: "HAS_AVAILED_TWITTER_TRIAL",
-    HAS_AVAILED_CHROME_STORE_TRIAL: "HAS_AVAILED_CHROME_STORE_TRIAL",
-    HAS_AVAILED_GITHUB_TRIAL: "HAS_AVAILED_GITHUB_TRIAL",
-    TRIAL_MODE_ENABLED: "trial_mode_enabled",
     NUM_WORKSPACES: "num_workspaces",
+    SESSION_REPLAY_LIFETIME_REDEEMED: "session_replay_lifetime_redeemed",
   },
   VALUES: {
     PAYPAL: "paypal",

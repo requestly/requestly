@@ -4,8 +4,12 @@ RQ.SessionRecorder.setup = () => {
   RQ.SessionRecorder.isInitialized = false;
   RQ.SessionRecorder.isRecording = false;
   RQ.SessionRecorder.isExplicitRecording = false;
+  RQ.SessionRecorder.markRecordingIcon = false;
   RQ.SessionRecorder.widgetPosition = null;
+  RQ.SessionRecorder.showWidget = false;
+  RQ.SessionRecorder.recordingStartTime = null;
   RQ.SessionRecorder.sendResponseCallbacks = {};
+  RQ.SessionRecorder.recordingMode;
 
   const isTopDocument = !RQ.SessionRecorder.isIframe();
 
@@ -22,13 +26,8 @@ RQ.SessionRecorder.setup = () => {
         return true;
 
       case RQ.CLIENT_MESSAGES.STOP_RECORDING:
-        RQ.SessionRecorder.sendMessageToClient("stopRecording", null, () => {
-          // only the top document should send confirmation
-          if (isTopDocument) {
-            sendResponse();
-          }
-        });
-        return true;
+        RQ.SessionRecorder.sendMessageToClient("stopRecording", null);
+        break;
     }
 
     // messages for only the top document
@@ -43,7 +42,12 @@ RQ.SessionRecorder.setup = () => {
           break;
 
         case RQ.CLIENT_MESSAGES.GET_TAB_SESSION:
-          RQ.SessionRecorder.sendMessageToClient("getSessionData", null, sendResponse);
+          RQ.SessionRecorder.sendMessageToClient("getSessionData", null, (session) =>
+            sendResponse({
+              ...session,
+              recordingMode: RQ.SessionRecorder.recordingMode,
+            })
+          );
           return true;
       }
     }
@@ -51,8 +55,22 @@ RQ.SessionRecorder.setup = () => {
 };
 
 RQ.SessionRecorder.startRecording = async (options = {}) => {
-  const { config, previousSession, notify, explicit = false, widgetPosition } = options;
+  const {
+    config,
+    previousSession,
+    notify,
+    explicit = false,
+    widgetPosition,
+    showWidget,
+    recordingStartTime,
+    markRecordingIcon = true,
+  } = options;
+
   await RQ.SessionRecorder.initialize();
+
+  if (!explicit && RQ.SessionRecorder.isExplicitRecording) {
+    return;
+  }
 
   RQ.SessionRecorder.sendMessageToClient("startRecording", {
     relayEventsToTop: RQ.SessionRecorder.isIframe(),
@@ -68,6 +86,14 @@ RQ.SessionRecorder.startRecording = async (options = {}) => {
 
   RQ.SessionRecorder.isExplicitRecording = explicit;
   RQ.SessionRecorder.widgetPosition = widgetPosition;
+  RQ.SessionRecorder.showWidget = showWidget;
+  RQ.SessionRecorder.recordingMode = explicit ? "manual" : "auto";
+  RQ.SessionRecorder.markRecordingIcon = markRecordingIcon;
+
+  if (explicit) {
+    RQ.SessionRecorder.recordingStartTime = recordingStartTime ?? Date.now();
+    RQ.SessionRecorder.hideAutoModeWidget();
+  }
 };
 
 RQ.SessionRecorder.initialize = () => {
@@ -103,32 +129,44 @@ RQ.SessionRecorder.addMessageListeners = () => {
       RQ.SessionRecorder.sendResponseToRuntime(event.data.action, event.data.payload);
     } else if (event.data.action === "sessionRecordingStarted") {
       RQ.SessionRecorder.isRecording = true;
+
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
+        markRecordingIcon: RQ.SessionRecorder.markRecordingIcon,
       });
 
-      if (RQ.SessionRecorder.isExplicitRecording) {
-        RQ.SessionRecorder.showWidget();
+      if (RQ.SessionRecorder.showWidget) {
+        if (RQ.SessionRecorder.isExplicitRecording) {
+          RQ.SessionRecorder.showManualModeRecordingWidget();
+        } else {
+          RQ.SessionRecorder.showAutoModeRecordingWidget();
+        }
       }
     } else if (event.data.action === "sessionRecordingStopped") {
       RQ.SessionRecorder.isRecording = false;
       RQ.SessionRecorder.isExplicitRecording = false;
-      RQ.SessionRecorder.hideWidget();
+      RQ.SessionRecorder.showWidget = false;
+      RQ.SessionRecorder.recordingStartTime = null;
+      RQ.SessionRecorder.markRecordingIcon = false;
+
+      RQ.SessionRecorder.hideManualModeWidget();
+      RQ.SessionRecorder.hideAutoModeWidget();
+
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
     }
   });
 
-  window.addEventListener("beforeunload", (event) => {
-    event.preventDefault();
-
+  window.addEventListener("beforeunload", () => {
     RQ.SessionRecorder.sendMessageToClient("getSessionData", null, (session) => {
       chrome.runtime.sendMessage({
         action: RQ.CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD,
         payload: {
           session,
           widgetPosition: RQ.SessionRecorder.widgetPosition,
+          recordingMode: RQ.SessionRecorder.recordingMode,
+          recordingStartTime: RQ.SessionRecorder.recordingStartTime,
         },
       });
     });
@@ -169,6 +207,7 @@ RQ.SessionRecorder.bootstrapClient = (namespace) => {
     }
 
     if (event.data.action === "startRecording") {
+      window[namespace]?.sessionRecorder?.stop?.();
       window[namespace].sessionRecorder = new Requestly.SessionRecorder(event.data.payload);
       window[namespace].sessionRecorder.start();
       sendMessageToExtension("sessionRecordingStarted");
@@ -201,8 +240,8 @@ RQ.SessionRecorder.showToast = () => {
   document.documentElement.appendChild(rqToast);
 };
 
-RQ.SessionRecorder.showWidget = () => {
-  let widget = RQ.SessionRecorder.getWidget();
+RQ.SessionRecorder.showManualModeRecordingWidget = () => {
+  let widget = RQ.SessionRecorder.getManualModeWidget();
 
   if (!widget) {
     widget = document.createElement("rq-session-recording-widget");
@@ -227,6 +266,49 @@ RQ.SessionRecorder.showWidget = () => {
     });
   }
 
+  const recordingLimitInMilliseconds = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
+  const recordingTime = Date.now() - RQ.SessionRecorder.recordingStartTime;
+  const currentRecordingTime = recordingTime <= recordingLimitInMilliseconds ? recordingTime : null;
+
+  widget.dispatchEvent(
+    new CustomEvent("show", {
+      detail: {
+        currentRecordingTime,
+        position: RQ.SessionRecorder.widgetPosition,
+      },
+    })
+  );
+};
+
+RQ.SessionRecorder.hideManualModeWidget = () => {
+  const widget = RQ.SessionRecorder.getManualModeWidget();
+  widget?.dispatchEvent(new CustomEvent("hide"));
+};
+
+RQ.SessionRecorder.getManualModeWidget = () => {
+  return document.querySelector("rq-session-recording-widget");
+};
+
+RQ.SessionRecorder.showAutoModeRecordingWidget = () => {
+  const tagName = "rq-session-recording-auto-mode-widget";
+  let widget = document.querySelector(tagName);
+
+  if (!widget) {
+    widget = document.createElement(tagName);
+    widget.classList.add("rq-element");
+    document.documentElement.appendChild(widget);
+
+    widget.addEventListener("watch", () => {
+      chrome.runtime.sendMessage({
+        action: RQ.EXTENSION_MESSAGES.WATCH_RECORDING,
+      });
+    });
+
+    widget.addEventListener("moved", (evt) => {
+      RQ.SessionRecorder.widgetPosition = evt.detail;
+    });
+  }
+
   widget.dispatchEvent(
     new CustomEvent("show", {
       detail: {
@@ -236,11 +318,7 @@ RQ.SessionRecorder.showWidget = () => {
   );
 };
 
-RQ.SessionRecorder.hideWidget = () => {
-  const widget = RQ.SessionRecorder.getWidget();
+RQ.SessionRecorder.hideAutoModeWidget = () => {
+  let widget = document.querySelector("rq-session-recording-auto-mode-widget");
   widget?.dispatchEvent(new CustomEvent("hide"));
-};
-
-RQ.SessionRecorder.getWidget = () => {
-  return document.querySelector("rq-session-recording-widget");
 };

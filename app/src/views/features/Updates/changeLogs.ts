@@ -8,6 +8,76 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.1.3",
+    logs: ["[RQ-1215] fix: caching redirect/replace rules (#1316)"],
+  },
+  {
+    version: "23.12.31",
+    logs: [
+      "[RQ-1208] added URL matching for redirect/replace rules when overriding fetch (#1310)",
+      "[RQ-1207] added logo transition gif in extension popup (#1309)",
+      "[RQ-1145] feat: relay auth header when redirected [RQ-1178] fix: no script injection when extension is disabled(#1277)",
+    ],
+  },
+  {
+    version: "23.12.12",
+    logs: ["Revert #1208 Relay auth header to redirected request"],
+  },
+  {
+    version: "23.12.10",
+    logs: ["#1208 Relay auth header to redirected request"],
+  },
+  {
+    version: "23.11.8",
+    logs: [
+      "chore: bump web-sdk version v0.14.2. Fixed custom elements not visible in Session Replay (#1209)",
+      "[RQ-1031] changed Requestly icon (#1207)",
+      "[RQ-1025] chore: update rule_created event source property for devtools #1188",
+    ],
+  },
+  {
+    version: "23.10.22",
+    logs: [
+      "[RQ-944]: new extension popup experience #1117",
+      "#643: Modify Response rule: Support for equals/contains operators in GraphQL payload filter",
+      "chore: add event param executor_is_creator (#1148)",
+      "[RQ-905] added recording_mode to session events (#1143)",
+      "[RQ-973] fix: cache position of draggable widgets (#1144)",
+      "[RQ-934] fix: icon issue in session replay player (#1113)",
+      "[RQ-896] chore: fix analytics event in popup (#1070)",
+      "fix: stop recording widget not visible when recording from launch URL #1073",
+    ],
+  },
+  {
+    version: "23.9.20",
+    logs: [
+      "chore: removed ph-asset (#1018)",
+      "[RQ-824] feat: Requestly devtools request support (#1030)",
+      "[RQ-824] feat: Requestly Devtools response body support (#1032)",
+      "[RQ-811] fix: session replay icon display issue (#1028)",
+      "[RQ-857] added communication for response modification in test rule widget (#1035)",
+      "added emoji in requestly devtools tab name (#1047)",
+      "[RQ-871] added communication for response header modification in test rule widget (#1045)",
+      "[RQ-802] feat: integration of session replay with test this rule (#1051)",
+    ],
+  },
+  {
+    version: "23.9.2",
+    logs: [
+      "fix: need to double click on session recording on-page widget (#1008)",
+      "[RQ-816] fix: sessions not being stitched (#1006)",
+      "[RQ-810] fix: port connection not working in firefox (#997)",
+      "[RQ-778] feat: test this rule revamp (#994)",
+    ],
+  },
+  {
+    version: "23.8.24",
+    logs: [
+      "Revamped Requestly devtools panel in browser inspect with support of rule creation from network traffic",
+      "Bug fix: Script rule does not execute in HTML documents which don't have doctype defined",
+    ],
+  },
+  {
     version: "23.8.12",
     logs: [
       "Ignore large request/response payloads in Session replay",

@@ -1,39 +1,36 @@
 import React, { useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
-import { getAppMode, getIsProductHuntBannerClosed, getUserPersonaSurveyDetails } from "store/selectors";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
-import { shouldShowRecommendationScreen } from "components/misc/PersonaSurvey/utils";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import { AppBanner } from "./AppBanner";
+import { AppNotificationBanner } from "./AppNotificationBanner";
+import { httpsCallable, getFunctions } from "firebase/functions";
+import { actions } from "store";
 import "./DashboardLayout.css";
+import Logger from "lib/logger";
 
 const DashboardLayout = () => {
+  const dispatch = useDispatch();
   const location = useLocation();
-  const { pathname, state } = location;
-  const appMode = useSelector(getAppMode);
-  const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isProductHuntBannerClosed = useSelector(getIsProductHuntBannerClosed);
+  const { pathname } = location;
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
+  const user = useSelector(getUserAuthDetails);
 
   promptOneTapOnLoad();
 
-  const isPersonaRecommendationScreen = useMemo(
-    () => shouldShowRecommendationScreen(userPersona, appMode, state?.src),
-    [userPersona, appMode, state?.src]
+  const isSidebarVisible = useMemo(
+    () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname)),
+    [pathname]
   );
 
-  const isSidebarVisible = useMemo(
-    () =>
-      !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isPersonaRecommendationScreen),
-    [pathname, isPersonaRecommendationScreen]
-  );
+  const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
 
   useEffect(() => {
     if (!isAppOpenedInIframe()) return;
@@ -43,11 +40,28 @@ const DashboardLayout = () => {
     removeElement(".app-footer");
   }, []);
 
+  useEffect(() => {
+    if (user.loggedIn && !user?.details?.organization) {
+      try {
+        getEnterpriseAdminDetails().then((response) => {
+          if (response.data.success) {
+            dispatch(actions.updateOrganizationDetails(response.data.enterpriseData));
+          }
+        });
+      } catch (e) {
+        Logger.log(e);
+      }
+    }
+  }, [getEnterpriseAdminDetails, user.loggedIn, user?.details?.organization, dispatch]);
+
   return (
     <>
-      {!isAppOpenedInIframe() && !isProductHuntBannerClosed && <AppBanner />}
+      <AppNotificationBanner />
       <div className="app-layout app-dashboard-layout">
-        <div className="app-header">{!isPersonaRecommendationScreen && <MenuHeader />}</div>
+        <div className="app-header">
+          {" "}
+          <MenuHeader />
+        </div>
 
         <div className="app-sidebar">{isSidebarVisible && <Sidebar />}</div>
 
@@ -55,7 +69,9 @@ const DashboardLayout = () => {
           <DashboardContent />
         </div>
 
-        <div className="app-footer">{!isPersonaRecommendationScreen && <Footer />}</div>
+        <div className="app-footer">
+          <Footer />
+        </div>
       </div>
     </>
   );

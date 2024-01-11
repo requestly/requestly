@@ -14,7 +14,7 @@ import { TestURLModal } from "components/common/TestURLModal";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import PATHS from "config/constants/sub/paths";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
-import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+import { getModeData, setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
 import Filters from "components/features/rules/RulePairs/Filters";
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import {
@@ -35,6 +35,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
   const isTestURLFeatureFlagOn = useFeatureIsOn("test_url_modal");
   const hasSeenTestURLAnimation = useRef(false);
+  const { MODE } = getModeData(window.location);
 
   const isSourceFilterFormatUpgraded = useCallback((pairIndex, rule) => {
     return Array.isArray(rule.pairs[pairIndex].source.filters);
@@ -264,6 +265,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
           </Col>
           <Col className="w-full">
             <Input
+              autoFocus={MODE === "create"}
               placeholder={
                 ruleDetails.ALLOW_APPLY_RULE_TO_ALL_URLS
                   ? "Enter url here or leave this field empty to apply rule to all url’s..."
@@ -293,7 +295,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               iconOnly
               icon={<ExperimentOutlined />}
               type="default"
-              disabled={!pair.source.value}
+              disabled={!pair.source.value || isInputDisabled}
               onClick={() => {
                 setIsTestURLClicked(true);
                 setIsTestURLModalVisible(true);
@@ -309,34 +311,36 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               marginLeft: ruleDetails.TYPE === "Delay" ? 0 : "4px",
             }}
           >
-            <MoreInfo
-              text={
-                <>
-                  Advanced filters like resource type, request method to target requests when rule should be applied.{" "}
-                  <a
-                    className="tooltip-link"
-                    href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_SOURCE_FILTERS}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() => trackMoreInfoClicked("redirect_source_filter", currentlySelectedRuleConfig.TYPE)}
-                  >
-                    Learn More
-                  </a>
-                </>
-              }
-              analyticsContext="redirect_source_filter"
-              source={currentlySelectedRuleConfig.TYPE}
-            >
-              <span
-                onClick={() => openFilterModal(pairIndex)}
-                className="cursor-pointer text-gray source-filter-icon-container"
+            {!isInputDisabled && (
+              <MoreInfo
+                text={
+                  <>
+                    Advanced filters like resource type, request method to target requests when rule should be applied.{" "}
+                    <a
+                      className="tooltip-link"
+                      href={APP_CONSTANTS.LINKS.REQUESTLY_DOCS_SOURCE_FILTERS}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => trackMoreInfoClicked("redirect_source_filter", currentlySelectedRuleConfig.TYPE)}
+                    >
+                      Learn More
+                    </a>
+                  </>
+                }
+                analyticsContext="redirect_source_filter"
+                source={currentlySelectedRuleConfig.TYPE}
               >
-                <FaFilter />{" "}
-                {getFilterCount(pairIndex) !== 0 ? (
-                  <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
-                ) : null}
-              </span>
-            </MoreInfo>
+                <span
+                  onClick={() => openFilterModal(pairIndex)}
+                  className="cursor-pointer text-gray source-filter-icon-container"
+                >
+                  <FaFilter />{" "}
+                  {getFilterCount(pairIndex) !== 0 ? (
+                    <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
+                  ) : null}
+                </span>
+              </MoreInfo>
+            )}
           </Col>
         ) : null}
       </div>

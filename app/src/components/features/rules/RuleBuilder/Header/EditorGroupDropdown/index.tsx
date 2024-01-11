@@ -16,10 +16,10 @@ import GroupMenuItem from "./GroupMenuItem";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { trackGroupChangedEvent, trackGroupCreatedEvent } from "modules/analytics/events/common/groups";
+import { trackGroupChangedEvent, trackGroupCreatedEvent } from "features/rules/analytics";
 import { Group } from "types/rules";
-import "./EditorGroupDropdown.css";
 import Logger from "lib/logger";
+import "./EditorGroupDropdown.css";
 
 const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
@@ -94,7 +94,7 @@ const EditorGroupDropdown: React.FC<EditorGroupDropdownProps> = ({ mode }) => {
   const handleGroupChange = (groupId: string) => {
     dispatch(actions.updateCurrentlySelectedRuleData({ ...rule, groupId }));
 
-    updateGroupOfSelectedRules(appMode, { [rule.id]: true }, groupId, user).then(() => {
+    updateGroupOfSelectedRules(appMode, [rule.id], groupId, user).then(() => {
       dispatch(
         actions.updateRefreshPendingStatus({
           type: "rules",

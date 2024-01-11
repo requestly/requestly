@@ -1,0 +1,17 @@
+.response-tab-content {
+  & > .ant-collapse > .ant-collapse-item .ant-collapse-header {
+    padding: 6px;
+    align-items: center;
+
+    .ant-collapse-expand-icon,
+    .ant-collapse-header-text,
+    .payload-action-button {
+      font-size: var(--font-size-normal);
+      font-weight: bold;
+      line-height: 20px;
+      height: 20px;
+    }
+  }
+
+  height: 100%;
+}

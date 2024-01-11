@@ -27,7 +27,9 @@
     }
   ],
 
-  "devtools_page": "generated/devtools/devtools.html",
+  "devtools_page": "devtools/devtools.html",
+
+  "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com https://ssl.google-analytics.com https://cdn.jsdelivr.net/npm/; object-src 'self'",
 
   "background": {
     "scripts": ["generated/background/background-bundled.js"]
@@ -43,6 +45,7 @@
 
   "icons": {
     "16": "resources/images/16x16.png",
+    "48": "resources/images/48x48.png",
     "128": "resources/images/128x128.png"
   },
 

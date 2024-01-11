@@ -100,6 +100,14 @@ export const redirectToSessionRecordingHome = (navigate) => {
   navigate(PATHS.SESSIONS.ABSOLUTE);
 };
 
+export const redirectToSavedSession = (navigate, id) => {
+  navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
+};
+
+export const redirectToSessionSettings = (navigate) => {
+  navigate(PATHS.SESSIONS.SETTINGS.ABSOLUTE);
+};
+
 export const redirectToNetworkSession = (navigate, id) => {
   navigate(PATHS.SESSIONS.NETWORK.ABSOLUTE + `/${id}`);
 };
@@ -229,13 +237,6 @@ export const redirectToGDPRPage = (navigate, { newTab }) => {
   }
 };
 
-/* USER */
-
-/* USER - Unlock Premium */
-export const redirectToUnlockPremium = (navigate) => {
-  navigate(PATHS.UNLOCK_PREMIUM.ABSOLUTE);
-};
-
 /* ACCOUNT */
 
 /* ACCOUNT - View Account Details */
@@ -244,32 +245,6 @@ export const redirectToAccountDetails = (navigate, hardRedirect) => {
     window.location.href = PATHS.ACCOUNT.ABSOLUTE;
   } else {
     navigate(PATHS.ACCOUNT.ABSOLUTE);
-  }
-};
-
-/* ACCOUNT - My Organization*/
-export const redirectToMyOrganization = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.MY_ORGANIZATION.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.MY_ORGANIZATION.ABSOLUTE);
-  }
-};
-/* ACCOUNT - Create new Org */
-export const redirectToCreateOrg = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.CREATE_ORGANIZATION.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.CREATE_ORGANIZATION.ABSOLUTE);
-  }
-};
-
-/* ACCOUNT - View Backups */
-export const redirectToBackups = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.MY_BACKUPS.ABSOLUTE);
   }
 };
 
@@ -291,6 +266,10 @@ export const redirectToTeam = (navigate, teamId, options = {}) => {
   } else {
     navigate(url.pathname + url.search);
   }
+};
+
+export const redirectToManageWorkspace = (navigate, teamId) => {
+  navigate(PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`);
 };
 
 export const redirectToMyTeams = (navigate, hardRedirect) => {
@@ -323,7 +302,7 @@ export const redirectToPersonalSubscription = (navigate, hardRedirect, autoRefre
 };
 
 /* ACCOUNT - CHECKOUT */
-export const redirectToCheckout = ({ mode, teamId, planType: planName, days, quantity }) => {
+export const redirectToCheckout = ({ mode, teamId, planName, duration, quantity }) => {
   const url = new URL(window.location.href);
   url.pathname = PATHS.CHECKOUT.ABSOLUTE;
   url.searchParams.set("m", mode);
@@ -331,7 +310,7 @@ export const redirectToCheckout = ({ mode, teamId, planType: planName, days, qua
     url.searchParams.set("t", teamId);
   }
   url.searchParams.set("p", planName);
-  url.searchParams.set("d", days);
+  url.searchParams.set("d", duration);
   if (quantity) {
     url.searchParams.set("q", quantity);
   }
@@ -339,15 +318,6 @@ export const redirectToCheckout = ({ mode, teamId, planType: planName, days, qua
     window.open(url.href, "_blank");
   } else {
     window.location = url.href;
-  }
-};
-
-/* MARKETPLACE REDIRECT */
-export const redirectToMarketplace = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.MARKETPLACE.ABSOLUTE;
-  } else {
-    navigate(PATHS.MARKETPLACE.ABSOLUTE);
   }
 };
 
@@ -392,15 +362,6 @@ export const redirectToRefreshSubscription = (navigate, hardRedirect) => {
   }
 };
 
-/* ONBOARDING PAGE */
-export const redirectToOnboardingPage = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ONBOARDING.ABSOLUTE;
-  } else {
-    navigate(PATHS.ONBOARDING.ABSOLUTE);
-  }
-};
-
 /* MISC */
 export const redirectTo404 = (navigate, hardRedirect) => {
   if (hardRedirect) {
@@ -434,11 +395,6 @@ export const redirectToSupportEmail = (navigate, { newTab }) => {
   } else {
     navigate(LINKS.CONTACT_US);
   }
-};
-
-/* Change App Mode */
-export const redirectToAppMode = (navigate) => {
-  navigate(PATHS.APP_MODE.ABSOLUTE);
 };
 
 /* App Mode Specific Pages - Desktop - Home Page */

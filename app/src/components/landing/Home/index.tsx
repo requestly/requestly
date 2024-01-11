@@ -11,6 +11,7 @@ import debuggingIcon from "../../../assets/icons/flask.svg";
 import { BsArrowRight } from "@react-icons/all-files/bs/BsArrowRight";
 import FEATURES from "config/constants/sub/features";
 import PATHS from "config/constants/sub/paths";
+import { PinExtensionPopup, usePinExtensionPopup } from "components/common/PinExtensionPopup";
 import { trackEcosystemFeatureClicked } from "modules/analytics/events/features/ecosystem";
 import "./index.scss";
 
@@ -75,61 +76,69 @@ const HOME_FEATURES: HomeFeature[] = [
   {
     featureHeader: {
       title: "Debugging",
-      description: "Validate your solutions using tools like session replay",
+      description: "Validate your solutions using tools like SessionBook",
       icon: debuggingIcon,
     },
     featureCards: [
       {
-        title: "Debug faster with Session Replay",
+        title: "Debug faster with SessionBook",
         description: "Replay screen, mouse movement, network, console and more of any browser session.",
         tag: FEATURES.SESSION_RECORDING,
         navigateTo: PATHS.SESSIONS.RELATIVE,
-        highlightFeature: true,
+        highlightFeature: false,
         analyticsContext: "session_recording",
       },
     ],
   },
 ];
 
-export const Home: React.FC = () => {
+export const HomePage: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
+  const { isPinExtensionPopupActive, closePinExtensionPopup } = usePinExtensionPopup();
+
   return (
-    <div className="home-v2-container">
-      <div className="home-v2-welcome-message">
-        <Typography.Title className="welcome-title">
-          Hello, {user?.loggedIn ? user.details.profile.displayName : "User"}
-        </Typography.Title>
-        <Typography.Text className="welcome-subtitle">Where do you want to start today?</Typography.Text>
+    <>
+      {isPinExtensionPopupActive && (
+        <PinExtensionPopup isOpen={isPinExtensionPopupActive} onCancel={closePinExtensionPopup} />
+      )}
+
+      <div className="home-v2-container">
+        <div className="home-v2-welcome-message">
+          <Typography.Title className="welcome-title">
+            Hello, {user.details?.profile?.displayName ?? "User"}
+          </Typography.Title>
+          <Typography.Text className="welcome-subtitle">Where do you want to start today?</Typography.Text>
+        </div>
+        <div className="home-v2-feature-grid-wrapper">
+          {HOME_FEATURES.map(({ featureHeader, featureCards }, index) => {
+            return (
+              <div className="home-v2-feature-grid-item" key={index}>
+                <FeatureHeader
+                  title={featureHeader.title}
+                  description={featureHeader.description}
+                  icon={featureHeader.icon}
+                />
+                {featureCards.map(
+                  ({ title, description, tag, navigateTo, highlightFeature, analyticsContext }, index) => {
+                    return (
+                      <FeatureCard
+                        key={index}
+                        title={title}
+                        description={description}
+                        tag={tag}
+                        navigateTo={navigateTo}
+                        highlightFeature={highlightFeature}
+                        analyticsContext={analyticsContext}
+                      />
+                    );
+                  }
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <div className="home-v2-feature-grid-wrapper">
-        {HOME_FEATURES.map(({ featureHeader, featureCards }, index) => {
-          return (
-            <div className="home-v2-feature-grid-item" key={index}>
-              <FeatureHeader
-                title={featureHeader.title}
-                description={featureHeader.description}
-                icon={featureHeader.icon}
-              />
-              {featureCards.map(
-                ({ title, description, tag, navigateTo, highlightFeature, analyticsContext }, index) => {
-                  return (
-                    <FeatureCard
-                      key={index}
-                      title={title}
-                      description={description}
-                      tag={tag}
-                      navigateTo={navigateTo}
-                      highlightFeature={highlightFeature}
-                      analyticsContext={analyticsContext}
-                    />
-                  );
-                }
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    </>
   );
 };
 
