@@ -104,21 +104,17 @@ const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
   };
 
   const getSelectionCount = useCallback((selectedRows: any) => {
-    let groups = 0;
-    let rules = 0;
+    const groups = selectedRows.filter((row: any) => row.objectType === RuleObjType.GROUP).map((row: any) => row.id);
+    const rules = selectedRows.filter(
+      (row: any) =>
+        row.objectType !== RuleObjType.GROUP &&
+        ((row.groupId.length && !groups.includes(row.groupId)) || !row.groupId.length)
+    );
 
-    selectedRows.forEach((row: any) => {
-      row.objectType === RuleObjType.GROUP ? groups++ : rules++;
-    });
-
-    const formatCount = (count: number, singular: string, plural: string) => {
-      return count > 0 ? `${count} ${count > 1 ? plural : singular}` : "";
-    };
-
-    const groupString = formatCount(groups, "Group", "Groups");
-    const ruleString = formatCount(rules, "Rule", "Rules");
-
-    return `${groupString}${groupString && ruleString ? " and " : ""}${ruleString} selected`;
+    const formatCount = (count: number, label: string) => (count ? `${count} ${label}${count !== 1 ? "s" : ""}` : "");
+    const formattedGroups = formatCount(groups.length, "Group");
+    const formattedRules = formatCount(rules.length, "Rule");
+    return `${formattedGroups}${formattedGroups && formattedRules ? " and " : ""}${formattedRules} selected`;
   }, []);
 
   const clearSelectionCallback = clearSelectedRowsDataCallbackRef.current;
