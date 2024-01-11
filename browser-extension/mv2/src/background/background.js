@@ -1213,7 +1213,6 @@ BG.Methods.handleClientPortConnections = () => {
 
 BG.Methods.isConnectedToClient = (tabId) => {
   const clientPortData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
-  console.log("!!!debug", "clientPortData", clientPortData);
   // sender.documentLifeCycle is only used by chrome and not firefox
   if (clientPortData) {
     if (clientPortData.sender?.documentLifecycle) {
