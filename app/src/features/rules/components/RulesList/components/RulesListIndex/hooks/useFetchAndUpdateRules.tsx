@@ -6,7 +6,7 @@ import { StorageService } from "init";
 import { useDispatch } from "react-redux";
 import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndexPage/actions";
 import { rulesActions } from "store/features/rules/slice";
-import { Group, Rule, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { Group, Rule, RuleObjStatus, RecordType } from "features/rules/types/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 
@@ -31,8 +31,8 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     }
 
     // FIXME: This can be fetched in one call. getRecords([RULE, GROUP]);
-    const groupsPromise = StorageService(appMode).getRecords(RuleObjType.GROUP);
-    const rulesPromise = StorageService(appMode).getRecords(RuleObjType.RULE);
+    const groupsPromise = StorageService(appMode).getRecords(RecordType.GROUP);
+    const rulesPromise = StorageService(appMode).getRecords(RecordType.RULE);
     Promise.all([groupsPromise, rulesPromise]).then(async (data) => {
       const groups = data[0] as Group[];
       const rules = data[1] as Rule[];

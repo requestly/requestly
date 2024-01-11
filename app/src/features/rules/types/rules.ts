@@ -1,6 +1,6 @@
 import { HttpRequestMethod, ResourceType } from "types/network";
 
-export enum RuleObjType {
+export enum RecordType {
   RULE = "rule",
   GROUP = "group",
 }
@@ -55,8 +55,16 @@ interface BaseRuleObj extends BaseObj {
   id: string;
   name: string;
   description: string;
-  groupId?: string;
-  objectType: RuleObjType;
+  groupId: string;
+  objectType: RecordType.RULE;
+  status: RuleObjStatus;
+  isFavourite?: boolean;
+}
+
+interface BaseGroupObj extends BaseObj {
+  id: string;
+  name: string;
+  objectType: RecordType.GROUP;
   status: RuleObjStatus;
   isFavourite?: boolean;
 }
@@ -90,7 +98,7 @@ interface RedirectRulePair extends BaseRulePair {
 }
 
 export interface RedirectRule extends BaseRuleObj {
-  objectType: RuleObjType.RULE;
+  objectType: RecordType.RULE;
   ruleType: RuleType.REDIRECT;
   pairs: RedirectRulePair[];
 }
@@ -102,7 +110,7 @@ interface ReplaceRulePair extends BaseRulePair {
 }
 
 export interface ReplaceRule extends BaseRuleObj {
-  objectType: RuleObjType.RULE;
+  objectType: RecordType.RULE;
   ruleType: RuleType.REPLACE;
   pairs: ReplaceRulePair[];
 }
@@ -112,7 +120,7 @@ interface CancelRulePair extends BaseRulePair {
 }
 
 export interface CancelRule extends BaseRuleObj {
-  objectType: RuleObjType.RULE;
+  objectType: RecordType.RULE;
   ruleType: RuleType.CANCEL;
   pairs: CancelRulePair[];
 }
@@ -123,7 +131,7 @@ interface DelayRulePair extends BaseRulePair {
 }
 
 export interface DelayRule extends BaseRuleObj {
-  objectType: RuleObjType.RULE;
+  objectType: RecordType.RULE;
   ruleType: RuleType.DELAY;
   pairs: DelayRulePair[];
 }
@@ -132,8 +140,8 @@ export interface DelayRule extends BaseRuleObj {
 
 export type Rule = RedirectRule | CancelRule | ReplaceRule | DelayRule;
 
-export interface Group extends BaseRuleObj {
-  objectType: RuleObjType.GROUP;
+export interface Group extends BaseGroupObj {
+  objectType: RecordType.GROUP;
   children: Rule[];
 }
 

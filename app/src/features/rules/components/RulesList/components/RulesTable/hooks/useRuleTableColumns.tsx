@@ -6,7 +6,7 @@ import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
 import useRuleTableActions from "./useRuleTableActions";
 import { getAllRuleObjMap } from "store/features/rules/selectors";
-import { RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { RuleObjStatus, RecordType } from "features/rules/types/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserIcon } from "components/common/UserIcon";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -125,7 +125,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         }
       },
       render: (rule: RuleTableDataType) => {
-        if (rule.objectType && rule.objectType !== RuleObjType.GROUP) {
+        if (rule.objectType && rule.objectType !== RecordType.GROUP) {
           return <RuleTypeTag ruleType={rule.ruleType} />;
         }
       },
@@ -165,7 +165,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: 152,
       responsive: ["lg"],
       render: (rule: RuleTableDataType) => {
-        if (rule.objectType && rule.objectType === RuleObjType.GROUP) {
+        if (rule.objectType && rule.objectType === RecordType.GROUP) {
           return null;
         }
         const dateToDisplay = rule.modificationDate ? rule.modificationDate : rule.creationDate;
@@ -185,7 +185,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: 104,
       align: "right",
       render: (record: RuleTableDataType) => {
-        const isRule = record.objectType === RuleObjType.RULE;
+        const isRule = record.objectType === RecordType.RULE;
 
         const recordActions = ([
           {
@@ -279,7 +279,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       responsive: ["lg"],
       key: "createdBy",
       render: (rule: RuleTableDataType) => {
-        if (rule.objectType && rule.objectType === RuleObjType.GROUP) {
+        if (rule.objectType && rule.objectType === RecordType.GROUP) {
           return null;
         }
         const uid = rule.createdBy ?? null;

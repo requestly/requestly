@@ -1,8 +1,8 @@
 import { RuleTableDataType } from "../types";
-import { Rule, RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { Rule, RuleObj, RuleObjStatus, RecordType } from "features/rules/types/rules";
 
 export const isRule = (record: RuleObj) => {
-  return record.objectType === RuleObjType.RULE;
+  return record.objectType === RecordType.RULE;
 };
 
 export const convertToArray = <T>(record: T | T[]): T[] => {
@@ -52,7 +52,7 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
   const groupRules = rules.filter((rule) => !!rule.groupId) as Rule[];
   const nonGroupRules: RuleObj[] = rules
     .filter((rule) => !rule.groupId)
-    .map((rule) => (rule.objectType === RuleObjType.GROUP ? { ...rule, children: [] } : rule));
+    .map((rule) => (rule.objectType === RecordType.GROUP ? { ...rule, children: [] } : rule));
 
   nonGroupRules.forEach((rule) => {
     ruleTableDataTypeMap[rule.id] = rule;
@@ -77,7 +77,7 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
 };
 
 export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, RuleObj>, rule: RuleTableDataType) => {
-  if (rule.objectType === RuleObjType.GROUP) return false;
+  if (rule.objectType === RecordType.GROUP) return false;
   if (rule.groupId.length && allRecordsMap[rule.groupId].status === RuleObjStatus.INACTIVE) {
     return true;
   } else return false;

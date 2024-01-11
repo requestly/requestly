@@ -5,7 +5,7 @@ import { Empty } from "antd";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, rulesToContentTableDataAdapter } from "./utils";
-import { RuleObj, RuleObjType } from "features/rules/types/rules";
+import { RuleObj, RecordType } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
   DeleteRulesModalWrapper,
@@ -108,7 +108,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
     let rules = 0;
 
     selectedRows.forEach((row: any) => {
-      row.objectType === RuleObjType.GROUP ? groups++ : rules++;
+      row.objectType === RecordType.GROUP ? groups++ : rules++;
     });
 
     const formatCount = (count: number, singular: string, plural: string) => {
@@ -211,8 +211,8 @@ const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
                 isActionHidden: (selectedRows) =>
                   !selectedRows.some(
                     (row: any) =>
-                      (row.objectType === RuleObjType.GROUP && row.children?.length > 0) ||
-                      row.objectType === RuleObjType.RULE
+                      (row.objectType === RecordType.GROUP && row.children?.length > 0) ||
+                      row.objectType === RecordType.RULE
                   ),
                 onClick: (selectedRows, clearSelection) => {
                   const onSuccess = () => {

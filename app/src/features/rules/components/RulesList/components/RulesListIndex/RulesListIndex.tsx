@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import RulesTable from "../RulesTable/RulesTable";
-import { RuleObj, RuleObjType } from "features/rules/types/rules";
+import { RuleObj, RecordType } from "features/rules/types/rules";
 import { getAllRuleObjMap, getAllRuleObjs } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { RulesListProvider } from "./context";
@@ -82,7 +82,7 @@ const RulesList: React.FC<Props> = () => {
   // Fetch Rules here from Redux
   const allRecords = useSelector(getAllRuleObjs);
   const allRecordsMap = useSelector(getAllRuleObjMap);
-  const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RuleObjType.GROUP), [allRecords]);
+  const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RecordType.GROUP), [allRecords]);
   const pinnedRecords = useMemo(() => getPinnedRules(allRecordsMap), [allRecordsMap]);
   const activeRecords = useMemo(() => getActiveRules(allRecords), [allRecords]);
   // FIX: rules loading state
@@ -112,7 +112,7 @@ const RulesList: React.FC<Props> = () => {
     groupWiseRules[UNGROUPED_GROUP_NAME] = [];
 
     getFilteredRecords(activeFilter).forEach((record) => {
-      if (record.objectType === RuleObjType.RULE) {
+      if (record.objectType === RecordType.RULE) {
         if (!record.groupId) {
           groupWiseRules[UNGROUPED_GROUP_NAME].push(record);
         } else groupWiseRules[record.groupId].push(record);

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Rule, RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { Rule, RuleObj, RuleObjStatus, RecordType } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { rulesActions } from "store/features/rules/slice";
@@ -261,7 +261,7 @@ const useRuleTableActions = () => {
     };
 
     updateRuleInStorage(updatedRecord, record).then(() => {
-      if (record.objectType === RuleObjType.GROUP) {
+      if (record.objectType === RecordType.GROUP) {
         trackGroupPinToggled(!record.isFavourite);
       } else {
         trackRulePinToggled(record.id, record.ruleType, !record.isFavourite);
