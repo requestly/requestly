@@ -14,7 +14,8 @@
   color: var(--white);
   text-decoration-color: #ffffff00;
 
-  & .help-card-link-icon {
+  & .help-card-link-icon,
+  .help-card-react-icon {
     width: 20px;
     height: 20px;
   }
@@ -24,9 +25,25 @@
   }
 
   &:hover {
+    color: var(--white);
     text-decoration: underline;
     text-decoration-color: var(--white);
     text-decoration-thickness: 1px;
     text-underline-offset: 5px;
+  }
+
+  &:hover .help-card-react-icon {
+    color: var(--white);
+  }
+}
+
+.help-card-react-icon {
+  align-self: center;
+  position: relative;
+  top: 3px;
+
+  &:hover,
+  &:focus {
+    color: var(--white);
   }
 }
