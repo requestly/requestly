@@ -90,7 +90,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
     }
 
     if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
-      container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+      setInnerHTML(container.querySelector(".recording-time"), getEpochToMMSSFormat(this.#currentRecordingTime));
     }
 
     this.#recordingTimerIntervalId = setInterval(
@@ -98,9 +98,9 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
         this.#currentRecordingTime = this.#currentRecordingTime + 1000;
 
         if (this.#currentRecordingTime < EXPLICIT_RECORDING_LIMIT) {
-          container.querySelector(".recording-time").innerHTML = getEpochToMMSSFormat(this.#currentRecordingTime);
+          setInnerHTML(container.querySelector(".recording-time"), getEpochToMMSSFormat(this.#currentRecordingTime));
         } else {
-          container.querySelector(".recording-time").innerHTML = "05:00";
+          setInnerHTML(container.querySelector(".recording-time"), "05:00");
           container.querySelector(".recording-info-icon").classList.add("visible");
           clearInterval(this.#recordingTimerIntervalId);
         }
@@ -116,7 +116,7 @@ class RQSessionRecordingWidget extends RQDraggableWidget {
 
     this.#currentRecordingTime = 0;
     this.#recordingTimerIntervalId = null;
-    this.getContainer().querySelector(".recording-time").innerHTML = "00:00";
+    setInnerHTML(this.getContainer().querySelector(".recording-time"), "00:00");
     this.getContainer().querySelector(".recording-info-icon").classList.remove("visible");
   }
 
