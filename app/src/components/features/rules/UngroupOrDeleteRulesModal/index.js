@@ -25,6 +25,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
   const appMode = useSelector(getAppMode);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
+  const rulesCount = useMemo(() => groupRules.length, [groupRules]);
 
   const enableTrash = useFeatureIsOn("enable-trash");
 
@@ -151,25 +152,34 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
   return (
     <Modal open={isOpen} title="Delete Group" confirmLoading={loadingSomething} onCancel={toggle} footer={null}>
       <Row>
-        <Col>
-          <Typography.Title level={5}>This group contains one or more rules</Typography.Title>
-        </Col>
+        <Typography.Title level={5}>
+          {rulesCount ? (
+            <>
+              This group contains {rulesCount} {rulesCount > 1 ? "rules" : "rule"}.
+            </>
+          ) : (
+            "Are you sure you want to delete this empty group?"
+          )}
+        </Typography.Title>
       </Row>
       <br />
       <Row>
         <Col span={24} align="end">
           <Space>
-            <Button
-              color="secondary"
-              data-dismiss="modal"
-              type="button"
-              onClick={moveToUngrouped}
-              loading={loadingSomething}
-            >
-              Keep the rules
-            </Button>
+            {rulesCount ? (
+              <Button
+                color="secondary"
+                data-dismiss="modal"
+                type="button"
+                onClick={moveToUngrouped}
+                loading={loadingSomething}
+              >
+                Keep the rules
+              </Button>
+            ) : null}
+
             <Button type="danger" loading={loadingSomething} data-dismiss="modal" onClick={deleteRulesAndThenGroup}>
-              <DeleteOutlined /> Delete rules
+              <DeleteOutlined /> {rulesCount ? `Delete ${rulesCount > 1 ? "rules" : "rule"}` : "Delete group"}
             </Button>
           </Space>
         </Col>
