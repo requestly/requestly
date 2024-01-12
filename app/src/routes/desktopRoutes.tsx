@@ -3,6 +3,7 @@ import PATHS from "config/constants/sub/paths";
 import ManualProxySetup from "components/mode-specific/desktop/ManualProxySetup";
 import MySources from "components/mode-specific/desktop/MySources";
 import InterceptTraffic from "components/mode-specific/desktop/InterceptTraffic";
+import { LiveLocalIndex } from "components/mode-specific/desktop/LiveLocal";
 
 export const desktopRoutes: RouteObject[] = [
   {
@@ -21,5 +22,9 @@ export const desktopRoutes: RouteObject[] = [
   {
     path: PATHS.DESKTOP.RELATIVE,
     element: <Navigate to={PATHS.DESKTOP.MY_APPS.ABSOLUTE} />,
+  },
+  {
+    path: PATHS.LIVE_LOCAL.RELATIVE,
+    element: <LiveLocalIndex />,
   },
 ];
