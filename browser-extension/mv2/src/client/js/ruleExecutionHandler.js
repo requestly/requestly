@@ -74,6 +74,7 @@ RQ.RuleExecutionHandler.hasExecutedRules = () => {
 };
 
 RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
+  console.log("!!!debug", "show Test widget", document.querySelector("rq-test-rule-widget"));
   if (document.querySelector("rq-test-rule-widget")) {
     return;
   }

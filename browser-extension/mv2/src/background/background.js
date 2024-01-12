@@ -1145,17 +1145,23 @@ BG.Methods.addListenerForExtensionMessages = function () {
 BG.Methods.handleClientPortConnections = () => {
   chrome.webNavigation.onCommitted.addListener((navigatedTabData) => {
     const tabId = navigatedTabData.tabId;
-    if (tabId && navigatedTabData.frameId === 0 && navigatedTabData.documentLifecycle === "active") {
-      const clientPortData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+    if (!tabId) {
+      return;
+    }
 
-      clientPortData?.sender &&
-        window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, {
-          ...clientPortData,
-          sender: {
-            ...clientPortData.sender,
-            documentLifecycle: navigatedTabData.documentLifecycle,
-          },
-        });
+    const clientPortData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
+    if (
+      clientPortData?.sender?.documentLifecycle !== "active" &&
+      navigatedTabData.frameId === 0 &&
+      navigatedTabData.documentLifecycle === "active"
+    ) {
+      window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, {
+        ...clientPortData,
+        sender: {
+          ...clientPortData.sender,
+          documentLifecycle: navigatedTabData.documentLifecycle,
+        },
+      });
 
       const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
       window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
