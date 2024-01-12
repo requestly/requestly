@@ -99,8 +99,7 @@ export const PrimarySidebar: React.FC = () => {
         title: "Live Local",
         path: PATHS.LIVE_LOCAL.INDEX,
         icon: <NetworkTrafficIcon />,
-        // display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
-        display: true,
+        display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
     ];
     return items;
