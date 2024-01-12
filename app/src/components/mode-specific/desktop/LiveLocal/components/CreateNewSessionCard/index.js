@@ -9,7 +9,21 @@ const MAX_SESSIONS = 2;
 export const CreateNewSessionCard = ({ sessions, createNewSesionCallback }) => {
   const dispatch = useDispatch();
   const [isNewSessionCreationStarted, setIsNewSessionCreationStarted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [port, setPort] = useState("");
+
+  const handlePortValidation = (port) => {
+    if (isNaN(port)) {
+      setHasError(true);
+      return false;
+    }
+    if (port < 1024 || port > 65535) {
+      setHasError(true);
+      return false;
+    }
+    setHasError(false);
+  };
 
   return (
     <div className="create-new-session-card">
@@ -24,9 +38,13 @@ export const CreateNewSessionCard = ({ sessions, createNewSesionCallback }) => {
               autoFocus
               id="port-number"
               size="large"
+              status={hasError ? "error" : ""}
               placeholder="Enter a new port"
               className="add-new-port-card-input"
-              onChange={(e) => setPort(e.target.value)}
+              onChange={(e) => {
+                setPort(e.target.value);
+                handlePortValidation(e.target.value);
+              }}
             />
           </div>
           <div className="add-new-port-action-btns">
@@ -34,10 +52,16 @@ export const CreateNewSessionCard = ({ sessions, createNewSesionCallback }) => {
               Cancel
             </Button>
             <Button
+              loading={isLoading}
               type="primary"
+              disabled={hasError || !port}
               onClick={() => {
-                createNewSesionCallback(port);
-                setIsNewSessionCreationStarted(false);
+                setIsLoading(true);
+                setTimeout(() => {
+                  createNewSesionCallback(parseInt(port));
+                  setIsNewSessionCreationStarted(false);
+                  setIsLoading(false);
+                }, 3000);
               }}
             >
               Create

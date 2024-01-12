@@ -14,11 +14,18 @@ export const LiveLocalIndex = () => {
     ]);
   };
 
+  const handleSessionDeletion = (port) => {
+    console.log("port", port);
+    setSessions((prevSessions) => prevSessions.filter((session) => session.port !== port));
+  };
+
   return (
     <div className="live-local-index-wrapper">
       <div className="live-local-index-card live-local-sessions-card-wrapper">
         {sessions.length
-          ? sessions.map((session) => <LiveLocalSessionCard key={session.port} session={session} />)
+          ? sessions.map((session) => (
+              <LiveLocalSessionCard key={session.port} session={session} clearSessionCallback={handleSessionDeletion} />
+            ))
           : null}
         <CreateNewSessionCard sessions={sessions} createNewSesionCallback={handleNewSessionCreation} />
       </div>
