@@ -94,6 +94,14 @@ export const PrimarySidebar: React.FC = () => {
         icon: <MobileOutlined />,
         display: isAndroidDebuggerEnabled,
       },
+      {
+        id: 8,
+        title: "Live Local",
+        path: PATHS.LIVE_LOCAL.INDEX,
+        icon: <NetworkTrafficIcon />,
+        // display: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
+        display: true,
+      },
     ];
     return items;
   }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);

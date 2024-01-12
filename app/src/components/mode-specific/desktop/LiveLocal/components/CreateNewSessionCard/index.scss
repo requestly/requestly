@@ -1,0 +1,53 @@
+.create-new-session-card {
+  border-radius: 8px;
+  border: 1px solid var(--surface-2, #383838);
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.4);
+  margin-top: 20px;
+}
+
+.create-new-session-action-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem;
+  background: var(--surface-1);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: 0.2s all ease-in-out;
+
+  &:hover {
+    background: var(--surface-2);
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
+  }
+}
+
+.add-new-port-card {
+  padding: 1rem;
+  background: var(--surface-1);
+
+  &-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white);
+    width: 85px;
+  }
+
+  &-input {
+    background: #202020;
+    font-size: 14px;
+    flex: 1;
+  }
+
+  .add-new-port-action-btns {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    &.ant-btn {
+      font-weight: 500 !important;
+    }
+  }
+}
