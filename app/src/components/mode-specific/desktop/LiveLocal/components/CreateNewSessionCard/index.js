@@ -80,7 +80,10 @@ export const CreateNewSessionCard = ({ sessions, createNewSesionCallback }) => {
                   newProps: { selectedPlan: null, source: "live-local" },
                 })
               );
-            } else setIsNewSessionCreationStarted(true);
+            } else {
+              setIsNewSessionCreationStarted(true);
+              setPort("");
+            }
           }}
         >
           <IoMdAdd fontSize={35} />
