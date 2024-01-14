@@ -6,6 +6,7 @@ import { SecondarySidebarLink } from "views/containers/common/SecondarySidebarLi
 import { VscFileSymlinkDirectory } from "@react-icons/all-files/vsc/VscFileSymlinkDirectory";
 import { CiViewTimeline } from "@react-icons/all-files/ci/CiViewTimeline";
 import { FaRegFileVideo } from "@react-icons/all-files/fa6/FaRegFileVideo";
+import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
 
 import "./DesktopSessionsSidebar.css";
 
@@ -24,7 +25,12 @@ const desktopSessionsRoutes: any[] = [
         path: PATHS.SESSIONS.DESKTOP.WEB_SESSION_VIEWER.RELATIVE,
         title: "Web Session Viewer",
         icon: <FaRegFileVideo />
-    }
+    },
+    {
+        path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.RELATIVE,
+        title: "Web Sessions",
+        icon: <SessionIcon />
+    },
 ];
 
 export const DesktopSessionsSidebar: React.FC = () => {

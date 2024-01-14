@@ -7,6 +7,10 @@ import { ReactComponent as NetworkTrafficIcon } from "assets/icons/network-traff
 import { ReactComponent as HttpRulesIcon } from "assets/icons/http-rules.svg";
 import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
 import { ReactComponent as MockServerIcon } from "assets/icons/mock-server.svg";
+
+import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
+
+
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { RQBadge } from "lib/design-system/components/RQBadge";
@@ -95,6 +99,25 @@ export const PrimarySidebar: React.FC = () => {
         display: isAndroidDebuggerEnabled,
       },
     ];
+
+    if(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+      items[3] = { // overriding normal sessions
+        id: 3,
+        title: "Desktop Sessions",
+        path: PATHS.SESSIONS.DESKTOP.INDEX,
+        icon: (
+          <Tooltip
+          placement="right"
+          open={isSavingNetworkSession}
+          title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
+        >
+          <TbDeviceDesktopSearch />
+        </Tooltip>
+        ),
+        display: true,
+        activeColor: "var(--desktop-sessions)",
+      };
+    }
     return items;
   }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);
 
