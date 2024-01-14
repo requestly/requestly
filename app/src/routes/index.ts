@@ -10,6 +10,7 @@ import { onboardingRoutes } from "./onboardingRoutes";
 import { miscRoutes } from "./miscRoutes";
 import { settingRoutes } from "./settingRoutes";
 import { ruleRoutes } from "features/rules/routes";
+import { desktopSessionsRoutes } from "./desktopSessionRoutes";
 
 export const routes: RouteObject[] = [
   ...ruleRoutes,
@@ -23,4 +24,5 @@ export const routes: RouteObject[] = [
   ...onboardingRoutes,
   ...settingRoutes,
   ...miscRoutes,
+  ...desktopSessionsRoutes,
 ];
