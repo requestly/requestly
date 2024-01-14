@@ -4,6 +4,7 @@ import { DesktopSessionsContainer } from "views/containers/DesktopSessionsContai
 import { DesktopSessionsIndexView } from "views/features/sessions/desktopSessions"; // todo: remove
 import { HarViewerIndex } from "views/features/sessions/desktopSessions/HarViewer";
 import { WebSessionViewer } from "views/features/sessions/desktopSessions/WebSessionLocalViewer";
+import { WebSessionsWrapper } from "views/features/sessions/desktopSessions/WebSessionsWrapper";
 
 export const desktopSessionsRoutes: RouteObject[] = [
     {
@@ -28,7 +29,8 @@ export const desktopSessionsRoutes: RouteObject[] = [
                 element: <WebSessionViewer />,
             },
             {
-                
+                path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.RELATIVE, 
+                element: <WebSessionsWrapper />,
             }
 
         ],
