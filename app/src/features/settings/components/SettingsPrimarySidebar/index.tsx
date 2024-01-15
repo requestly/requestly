@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { Col, Row } from "antd";
@@ -19,6 +19,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
+  const redirectUrl = useRef(state?.redirectUrl ?? null);
 
   const sidebarItems = useMemo(
     () => [
@@ -74,8 +75,8 @@ export const SettingsPrimarySidebar: React.FC = () => {
           <IoMdArrowBack
             className="settings-primary-sidebar-title-icon"
             onClick={() => {
-              if (state?.redirectUrl) {
-                navigate(state.redirectUrl);
+              if (redirectUrl.current) {
+                navigate(redirectUrl.current);
                 return;
               }
               if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) redirectToTraffic(navigate);

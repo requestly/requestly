@@ -89,7 +89,7 @@ const AppFooter: React.FC = () => {
     );
   };
 
-  if (PAGES_WITHOUT_FOOTER.includes(pathname)) return null;
+  if (PAGES_WITHOUT_FOOTER.some((path) => pathname.includes(path))) return null;
 
   return (
     <>
