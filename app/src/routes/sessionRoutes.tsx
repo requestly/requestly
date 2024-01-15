@@ -9,7 +9,10 @@ export const sessionRoutes: RouteObject[] = [
     path: PATHS.SESSIONS.INDEX,
     element: <SessionsHomeView />,
   },
-
+  {
+    path: PATHS.SESSIONS.SETTINGS.RELATIVE,
+    element: <Navigate to={PATHS.SETTINGS.SESSION_BOOK.RELATIVE} replace />,
+  },
   {
     path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
     element: <DraftSessionViewer />,
