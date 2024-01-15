@@ -7,7 +7,7 @@ import { get } from "firebase/database";
 import { getNodeRef } from "actions/FirebaseActions";
 import { getRecordsSyncPath } from "utils/syncing/syncDataUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import SettingsItem from "views/user/Settings/SettingsItem";
+import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 
 const WorkspaceStatusSyncing = () => {
