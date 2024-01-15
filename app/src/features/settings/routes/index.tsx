@@ -4,6 +4,7 @@ import SettingsIndexPage from "../components/SettingsIndex";
 import { GlobalSettings } from "../components/GlobalSettings";
 import { DesktopSettings } from "../components/DesktopSettings";
 import { SessionsSettings } from "../components/SessionsBookSettings";
+import MyTeams from "../components/WorkspaceSettings/components/MyTeams";
 import ConfigurationPage from "views/features/sessions/ConfigurationPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -29,6 +30,10 @@ export const settingRoutes: RouteObject[] = [
         element: (
           <ProtectedRoute component={isSessionsNewSettingsPageCompatible ? SessionsSettings : ConfigurationPage} />
         ),
+      },
+      {
+        path: PATHS.SETTINGS.WORKSPACES.RELATIVE,
+        element: <ProtectedRoute component={MyTeams} />,
       },
     ],
   },
