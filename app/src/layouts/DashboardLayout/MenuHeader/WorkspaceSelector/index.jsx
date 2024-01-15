@@ -258,10 +258,13 @@ const WorkspaceSelector = () => {
       if (isWorkspaceMode) {
         redirectToTeam(navigate, currentlyActiveWorkspace.id);
       } else {
-        redirectToWorkspaceSettings(navigate);
+        redirectToWorkspaceSettings(navigate, window.location.pathname);
       }
     } else {
-      promptUserSignupModal(() => redirectToWorkspaceSettings(navigate), AUTH.SOURCE.WORKSPACE_SIDEBAR);
+      promptUserSignupModal(
+        () => redirectToWorkspaceSettings(navigate, window.location.pathname),
+        AUTH.SOURCE.WORKSPACE_SIDEBAR
+      );
     }
   };
 
@@ -542,7 +545,7 @@ const WorkspaceSelector = () => {
               if (isWorkspaceMode) {
                 redirectToTeam(navigate, currentlyActiveWorkspace.id);
               } else {
-                redirectToWorkspaceSettings(navigate);
+                redirectToWorkspaceSettings(navigate, window.location.pathname);
               }
               trackWorkspaceDropdownClicked("manage_workspace");
             }}

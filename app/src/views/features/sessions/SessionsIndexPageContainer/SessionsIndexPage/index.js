@@ -39,6 +39,7 @@ import {
   trackSessionRecordingUpload,
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
+import { redirectToSessionSettings } from "utils/RedirectionUtils";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -128,7 +129,7 @@ const SessionsIndexPage = () => {
           newValue: true,
           newProps: {
             redirectURL: window.location.href,
-            callback: () => navigate(APP_CONSTANTS.PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE),
+            callback: () => redirectToSessionSettings(navigate, window.location.pathname),
             eventSource: AUTH.SOURCE.SESSION_RECORDING,
           },
         })
@@ -136,7 +137,7 @@ const SessionsIndexPage = () => {
       return;
     }
 
-    navigate(APP_CONSTANTS.PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE);
+    redirectToSessionSettings(navigate, window.location.pathname);
   }, [dispatch, navigate, user?.loggedIn]);
 
   const configureBtn = useMemo(

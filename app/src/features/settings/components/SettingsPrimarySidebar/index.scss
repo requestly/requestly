@@ -6,12 +6,11 @@
 }
 
 .settings-primary-sidebar-title-icon {
-  margin-top: -2px;
-
-  svg {
-    color: var(--white);
-    font-size: 1.25rem !important;
-  }
+  margin-top: 5px;
+  color: var(--white);
+  font-size: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
 }
 
 .settings-primary-sidebar-title {

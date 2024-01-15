@@ -219,7 +219,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
       .catch((err) => {
         if (!mountedRef.current) return null;
         toast.error(err.message);
-        redirectToWorkspaceSettings(navigate);
+        redirectToWorkspaceSettings(navigate, window.location.pathname);
       });
 
     getPendingUsers({

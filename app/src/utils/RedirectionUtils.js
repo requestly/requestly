@@ -104,8 +104,8 @@ export const redirectToSavedSession = (navigate, id) => {
   navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
 };
 
-export const redirectToSessionSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE);
+export const redirectToSessionSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE, { state: { redirectUrl } });
 };
 
 export const redirectToNetworkSession = (navigate, id) => {
@@ -113,24 +113,20 @@ export const redirectToNetworkSession = (navigate, id) => {
 };
 
 /* Settings */
-export const redirectToSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE);
+export const redirectToSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
 };
 
-export const redirectToGlobalSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE);
+export const redirectToGlobalSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
 };
 
-export const redirectToDesktopSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.DESKTOP_SETTINGS.ABSOLUTE);
+export const redirectToDesktopSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.DESKTOP_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
 };
 
-export const redirectToWorkspaceSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.WORKSPACES.ABSOLUTE);
-};
-
-export const redirectToDesktopPreferences = (navigate) => {
-  navigate(PATHS.SETTINGS.DESKTOP_PREFERENCES.ABSOLUTE);
+export const redirectToWorkspaceSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.WORKSPACES.ABSOLUTE, { state: { redirectUrl } });
 };
 
 /* Product updates */
