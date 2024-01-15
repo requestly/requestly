@@ -6,7 +6,6 @@ import { NavLink } from "react-router-dom";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineDisplaySettings } from "@react-icons/all-files/md/MdOutlineDisplaySettings";
 import { RiBuildingLine } from "@react-icons/all-files/ri/RiBuildingLine";
-import { MdOutlineAccountBox } from "@react-icons/all-files/md/MdOutlineAccountBox";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
@@ -57,18 +56,6 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "billing",
             name: "Billing",
             path: PATHS.SETTINGS.BILLING.RELATIVE,
-          },
-        ],
-      },
-      {
-        id: "my_account",
-        name: "My account",
-        icon: <MdOutlineAccountBox />,
-        children: [
-          {
-            id: "profile",
-            name: "Profile",
-            path: PATHS.SETTINGS.PROFILE.RELATIVE,
           },
         ],
       },

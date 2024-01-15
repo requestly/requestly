@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "reactstrap";
 //SUB COMPONENTS
-import ManageTeams from "../../ManageTeams";
+import ManageTeams from "../../../../../../components/user/AccountIndexPage/ManageAccount/ManageTeams";
 import TeamWideAnimation from "components/misc/LottieAnimation/TeamWideAnimation";
 
 const MyTeams = () => {

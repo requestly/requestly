@@ -3,7 +3,7 @@ import { Col, Row, Space, Tooltip, Typography } from "antd";
 import { PricingFeatures } from "../../constants/pricingFeatures";
 import { PricingPlans } from "../../constants/pricingPlans";
 import { PRICING } from "../../constants/pricing";
-import { ContactUsModal } from "components/modals/ContactUsModal";
+import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { capitalize } from "lodash";
 import underlineIcon from "../../assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";

@@ -1,6 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import MyTeams from "components/user/AccountIndexPage/ManageAccount/ManageTeams/MyTeams";
+import MyTeams from "features/settings/components/WorkspaceSettings/components/MyTeams";
 import CreateWorkspace from "components/user/Teams/CreateWorkspace";
 import PersonalSubscription from "components/user/AccountIndexPage/ManageAccount/PersonalSubscription";
 import UpdateSubscriptionContactUs from "components/payments/UpdateSubscriptionContactUs";
