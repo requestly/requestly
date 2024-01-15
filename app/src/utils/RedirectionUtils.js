@@ -105,7 +105,7 @@ export const redirectToSavedSession = (navigate, id) => {
 };
 
 export const redirectToSessionSettings = (navigate) => {
-  navigate(PATHS.SESSIONS.SETTINGS.ABSOLUTE);
+  navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE);
 };
 
 export const redirectToNetworkSession = (navigate, id) => {
@@ -114,7 +114,19 @@ export const redirectToNetworkSession = (navigate, id) => {
 
 /* Settings */
 export const redirectToSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.ABSOLUTE);
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE);
+};
+
+export const redirectToGlobalSettings = (navigate) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE);
+};
+
+export const redirectToDesktopSettings = (navigate) => {
+  navigate(PATHS.SETTINGS.DESKTOP_SETTINGS.ABSOLUTE);
+};
+
+export const redirectToWorkspaceSettings = (navigate) => {
+  navigate(PATHS.SETTINGS.WORKSPACES.ABSOLUTE);
 };
 
 export const redirectToDesktopPreferences = (navigate) => {
@@ -279,6 +291,7 @@ export const redirectToMyTeams = (navigate, hardRedirect) => {
     navigate(PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE);
   }
 };
+
 export const redirectToCreateNewTeamWorkspace = (navigate, hardRedirect) => {
   if (hardRedirect) {
     window.location.href = PATHS.ACCOUNT.CREATE_NEW_TEAM_WORKSPACE.ABSOLUTE;

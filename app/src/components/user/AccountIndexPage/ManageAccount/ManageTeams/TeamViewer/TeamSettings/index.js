@@ -5,7 +5,7 @@ import { Row, Button, Input, message, Col, Tooltip } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import SpinnerColumn from "../../../../../../misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { redirectToRules, redirectToMyTeams } from "../../../../../../../utils/RedirectionUtils";
+import { redirectToRules, redirectToWorkspaceSettings } from "../../../../../../../utils/RedirectionUtils";
 import { clearCurrentlyActiveWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
 import WorkspaceStatusSyncing from "./WorkspaceStatusSyncing";
 import DeleteWorkspaceModal from "./DeleteWorkspaceModal";
@@ -24,7 +24,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const userId = user?.details?.profile?.uid;
   const isLoggedInUserOwner = userId === teamOwnerId;
 
-  if (!teamId) redirectToMyTeams(navigate);
+  if (!teamId) redirectToWorkspaceSettings(navigate);
 
   // Component State
   const [name, setName] = useState("");
@@ -91,7 +91,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
         setName(teamInfo.name);
         setOriginalTeamName(teamInfo.name);
       })
-      .catch(() => redirectToMyTeams(navigate))
+      .catch(() => redirectToWorkspaceSettings(navigate))
       .finally(() => setIsTeamInfoLoading(false));
   };
 
