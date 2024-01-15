@@ -2,11 +2,11 @@ import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { Col, Row } from "antd";
-import { NavLink } from "react-router-dom";
-import { RQButton } from "lib/design-system/components";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineDisplaySettings } from "@react-icons/all-files/md/MdOutlineDisplaySettings";
 import { RiBuildingLine } from "@react-icons/all-files/ri/RiBuildingLine";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import { redirectToTraffic } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -16,6 +16,10 @@ const { PATHS } = APP_CONSTANTS;
 
 export const SettingsPrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location;
+
   const sidebarItems = useMemo(
     () => [
       {
@@ -67,7 +71,17 @@ export const SettingsPrimarySidebar: React.FC = () => {
     <Col className="settings-primary-sidebar">
       <Row align="middle" gutter={6}>
         <Col>
-          <RQButton icon={<IoMdArrowBack />} iconOnly className="settings-primary-sidebar-title-icon" />
+          <IoMdArrowBack
+            className="settings-primary-sidebar-title-icon"
+            onClick={() => {
+              if (state?.redirectUrl) {
+                navigate(state.redirectUrl);
+                return;
+              }
+              if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) redirectToTraffic(navigate);
+              else navigate(APP_CONSTANTS.PATHS.HOME.ABSOLUTE);
+            }}
+          />
         </Col>
         <Col className="settings-primary-sidebar-title">Settings</Col>
       </Row>

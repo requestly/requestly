@@ -53,7 +53,7 @@ export default function HeaderUser() {
     },
     {
       label: "Manage Workspaces",
-      onClick: () => redirectToWorkspaceSettings(navigate),
+      onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname),
     },
     { type: "divider" },
     {
