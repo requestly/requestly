@@ -8,7 +8,7 @@ import { isEmpty } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import SpinnerColumn from "../../../../../../../misc/SpinnerColumn";
 import { toast } from "utils/Toast.js";
-import { redirectToMyTeams } from "../../../../../../../../utils/RedirectionUtils";
+import { redirectToWorkspaceSettings } from "../../../../../../../../utils/RedirectionUtils";
 import { getUserAuthDetails } from "../../../../../../../../store/selectors";
 import RemoveUserModal from "./RemoveUserModal";
 import ContactUsModal from "./ContactUsModal";
@@ -219,7 +219,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
       .catch((err) => {
         if (!mountedRef.current) return null;
         toast.error(err.message);
-        redirectToMyTeams(navigate);
+        redirectToWorkspaceSettings(navigate);
       });
 
     getPendingUsers({

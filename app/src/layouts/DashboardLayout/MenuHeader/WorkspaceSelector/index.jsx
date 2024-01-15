@@ -30,7 +30,7 @@ import {
   getUserAuthDetails,
   getLastSeenInviteTs,
 } from "store/selectors";
-import { redirectToMyTeams, redirectToTeam } from "utils/RedirectionUtils";
+import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUtils";
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -258,10 +258,10 @@ const WorkspaceSelector = () => {
       if (isWorkspaceMode) {
         redirectToTeam(navigate, currentlyActiveWorkspace.id);
       } else {
-        redirectToMyTeams(navigate, false);
+        redirectToWorkspaceSettings(navigate);
       }
     } else {
-      promptUserSignupModal(() => redirectToMyTeams(navigate, false), AUTH.SOURCE.WORKSPACE_SIDEBAR);
+      promptUserSignupModal(() => redirectToWorkspaceSettings(navigate), AUTH.SOURCE.WORKSPACE_SIDEBAR);
     }
   };
 
@@ -542,7 +542,7 @@ const WorkspaceSelector = () => {
               if (isWorkspaceMode) {
                 redirectToTeam(navigate, currentlyActiveWorkspace.id);
               } else {
-                redirectToMyTeams(navigate, false);
+                redirectToWorkspaceSettings(navigate);
               }
               trackWorkspaceDropdownClicked("manage_workspace");
             }}
