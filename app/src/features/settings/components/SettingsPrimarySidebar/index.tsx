@@ -1,4 +1,6 @@
 import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
 import { Col, Row } from "antd";
 import { NavLink } from "react-router-dom";
 import { RQButton } from "lib/design-system/components";
@@ -7,11 +9,14 @@ import { RiBuildingLine } from "@react-icons/all-files/ri/RiBuildingLine";
 import { MdOutlineAccountBox } from "@react-icons/all-files/md/MdOutlineAccountBox";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import APP_CONSTANTS from "config/constants";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.scss";
 
 const { PATHS } = APP_CONSTANTS;
 
 export const SettingsPrimarySidebar: React.FC = () => {
+  const appMode = useSelector(getAppMode);
   const sidebarItems = useMemo(
     () => [
       {
@@ -23,6 +28,12 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "global",
             name: "Global settings",
             path: PATHS.SETTINGS.GLOBAL_SETTINGS.RELATIVE,
+          },
+          {
+            id: "desktop",
+            name: "Desktop settings",
+            path: PATHS.SETTINGS.DESKTOP_SETTINGS.RELATIVE,
+            ishidden: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
           },
           {
             id: "sessionBook",
@@ -61,7 +72,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
         ],
       },
     ],
-    []
+    [appMode]
   );
 
   return (
@@ -83,12 +94,10 @@ export const SettingsPrimarySidebar: React.FC = () => {
               </Row>
               <Col style={{ padding: "0 1rem" }}>
                 {item.children.map((child) => {
+                  if (child.ishidden) {
+                    return null;
+                  }
                   return (
-                    // <Col key={child.id} className="settings-primary-sidebar-section-link">
-                    //   <Row>
-                    //     <Col>{child.name}</Col>
-                    //   </Row>
-                    // </Col>
                     <NavLink
                       to={child.path}
                       // onClick={() => trackSidebarClicked(snakeCase(title))}

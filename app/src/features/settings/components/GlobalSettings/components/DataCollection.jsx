@@ -1,6 +1,6 @@
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import { useState } from "react";
-import SettingsItem from "../../SettingsItem";
+import SettingsItem from "./SettingsItem";
 
 const DataCollection = () => {
   const [dataCollectionStatus, setDataCollectionStatus] = useState(

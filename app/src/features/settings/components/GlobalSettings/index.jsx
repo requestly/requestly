@@ -1,17 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import InstallExtensionCTA from "../../../../components/misc/InstallExtensionCTA";
 import * as ExtensionActions from "../../../../actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
-import ConsoleLogger from "./ConsoleLogger";
-import DataCollection from "./DataCollection";
-import RulesSyncing from "./RulesSyncing";
+import ConsoleLogger from "./components/ConsoleLogger";
+import DataCollection from "./components/DataCollection";
+import RulesSyncing from "./components/RulesSyncing";
+import "./index.scss";
 
-const GlobalSettings = ({ appMode }) => {
+export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
   const [storageType, setStorageType] = useState("");
 
   useEffect(() => {
@@ -42,5 +44,3 @@ const GlobalSettings = ({ appMode }) => {
     </>
   );
 };
-
-export default GlobalSettings;

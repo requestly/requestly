@@ -6,7 +6,7 @@ import { setSyncState } from "utils/syncing/SyncUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
 import { AUTH } from "modules/analytics/events/common/constants";
-import SettingsItem from "../../SettingsItem";
+import SettingsItem from "./SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 
 const RulesSyncing = () => {

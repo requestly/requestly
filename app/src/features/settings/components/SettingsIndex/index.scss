@@ -2,7 +2,7 @@
   width: 100vw;
   height: 100%;
   display: flex;
-  gap: 1rem;
+  gap: 24px;
   background: var(--surface-0);
 }
 
@@ -11,6 +11,7 @@
   justify-content: center;
   height: 100%;
   flex: 1;
+  padding: 1rem 0;
 
   & .settings-content {
     width: 100%;
