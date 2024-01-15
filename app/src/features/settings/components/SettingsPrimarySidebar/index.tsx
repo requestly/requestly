@@ -39,6 +39,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "sessionBook",
             name: "SessionBook",
             path: PATHS.SETTINGS.SESSION_BOOK.RELATIVE,
+            ishidden: appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
           },
         ],
       },

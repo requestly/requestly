@@ -64,5 +64,11 @@
     background: var(--surface-2);
     border-radius: 4px;
     color: var(--white);
+
+    &:hover {
+      background: var(--surface-2);
+      border-radius: 4px;
+      color: var(--white);
+    }
   }
 }
