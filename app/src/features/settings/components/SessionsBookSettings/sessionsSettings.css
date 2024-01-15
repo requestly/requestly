@@ -1,5 +1,6 @@
 .session-settings-container {
   margin-top: 2.5rem;
+  max-width: 820px;
 }
 
 .session-settings-container .header {

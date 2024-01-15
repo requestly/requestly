@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { AutoRecordingMode, SessionRecordingConfig } from "../../types";
-import { defaultSessionRecordingConfig } from "../";
+import { AutoRecordingMode, SessionRecordingConfig } from "../../../../../views/features/sessions/types";
+import { defaultSessionRecordingConfig } from "..";
 import { StorageService } from "init";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
