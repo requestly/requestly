@@ -26,3 +26,16 @@
     }
   }
 }
+
+.settings-index-sidebar-wrapper {
+  display: flex;
+}
+
+.settings-secondary-sidebar {
+  width: 184px;
+  padding: 12px;
+  height: 100%;
+  border-right: 1px solid var(--surface-2);
+  background: var(--surface-1);
+  box-shadow: -2px 0px 12px 0px rgba(0, 0, 0, 0.28);
+}

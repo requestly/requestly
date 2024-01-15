@@ -57,11 +57,11 @@ export const SettingsPrimarySidebar: React.FC = () => {
             name: "Workspaces",
             path: PATHS.SETTINGS.WORKSPACES.RELATIVE,
           },
-          // {
-          //   id: "billing",
-          //   name: "Billing",
-          //   path: PATHS.SETTINGS.BILLING.RELATIVE,
-          // },
+          {
+            id: "billing",
+            name: "Billing",
+            path: PATHS.SETTINGS.BILLING.RELATIVE,
+          },
         ],
       },
     ],
