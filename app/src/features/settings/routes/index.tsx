@@ -3,6 +3,13 @@ import PATHS from "config/constants/sub/paths";
 import SettingsIndexPage from "../components/SettingsIndex";
 import { GlobalSettings } from "../components/GlobalSettings";
 import { DesktopSettings } from "../components/DesktopSettings";
+import { SessionsSettings } from "../components/SessionsBookSettings";
+import ConfigurationPage from "views/features/sessions/ConfigurationPage";
+import ProtectedRoute from "components/authentication/ProtectedRoute";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+
+const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
 export const settingRoutes: RouteObject[] = [
   {
@@ -16,6 +23,12 @@ export const settingRoutes: RouteObject[] = [
       {
         path: PATHS.SETTINGS.DESKTOP_SETTINGS.RELATIVE,
         element: <DesktopSettings />,
+      },
+      {
+        path: PATHS.SETTINGS.SESSION_BOOK.RELATIVE,
+        element: (
+          <ProtectedRoute component={isSessionsNewSettingsPageCompatible ? SessionsSettings : ConfigurationPage} />
+        ),
       },
     ],
   },
