@@ -1,7 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import SettingsIndexPage from "views/user/Settings/SettingsIndexPage";
-
+import SettingsIndexPage from "../components/SettingsIndex";
 export const settingRoutes: RouteObject[] = [
   {
     path: PATHS.SETTINGS.RELATIVE,
