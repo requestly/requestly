@@ -19,6 +19,7 @@ const SettingsIndex: React.FC = () => {
       <Col className="settings-content-wrapper">
         <Col className="settings-content">
           <Outlet />
+          <br />
         </Col>
       </Col>
     </div>
