@@ -26,4 +26,58 @@
       gap: 8px;
     }
   }
+
+  & .team-plan-details-sections-wrapper {
+    display: grid;
+    grid-template-columns: 1.1fr 1.5fr 0.5fr;
+
+    & .team-plan-details-section {
+      padding: 1rem;
+
+      &-plan-name {
+        font-size: 20px;
+        line-height: 30px;
+        letter-spacing: 0.15px;
+        color: var(--white);
+      }
+
+      & .team-plan-details-btn.ant-btn {
+        align-self: center;
+        font-weight: 500 !important;
+        color: var(--neutrals-gray-300);
+        gap: 4px;
+        margin-top: 2px;
+
+        &:hover,
+        &:focus,
+        &:active {
+          background: var(--surface-2);
+          color: var(--white);
+        }
+      }
+
+      &__team-name {
+        font-size: 20px;
+        color: var(--white);
+      }
+
+      &__team-details {
+        display: flex;
+        gap: 20px;
+        margin-top: 8px;
+        font-size: 13px;
+        flex-wrap: wrap;
+
+        & .team-plan-details-section-label {
+          color: var(--neutrals-gray-300);
+          margin-bottom: 4px;
+        }
+      }
+    }
+
+    & .team-plan-details-section:nth-child(2) {
+      border-left: 1px solid var(--surface-2);
+      border-right: 1px solid var(--surface-2);
+    }
+  }
 }
