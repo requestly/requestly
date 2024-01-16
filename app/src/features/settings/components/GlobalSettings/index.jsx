@@ -15,16 +15,20 @@ export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const [storageType, setStorageType] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       ExtensionActions.getStorageInfo().then((response) => {
         setStorageType(response.storageType);
+        setIsLoading(false);
       });
     }
   }, [appMode, setStorageType]);
 
   const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.EXTENSION_CONSOLE_LOGGER), []);
+
+  if (isLoading) return null;
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !storageType) {
     return <InstallExtensionCTA heading="Requestly Extension Settings" eventPage="settings_page" />;
