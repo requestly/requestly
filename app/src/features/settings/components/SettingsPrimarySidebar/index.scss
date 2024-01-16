@@ -29,7 +29,8 @@
     margin-bottom: 8px;
 
     &-icon {
-      height: 1rem;
+      position: relative;
+      top: 3px;
       font-size: 1.125rem;
 
       & svg {
