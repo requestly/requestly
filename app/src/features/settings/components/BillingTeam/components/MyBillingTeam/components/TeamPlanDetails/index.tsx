@@ -3,15 +3,15 @@ import { Col, Popover, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
-import UpgradeIcon from "../../assets/upgrade.svg";
-import { TeamPlanStatus } from "../TeamPlanStatus";
-import { TeamPlanDetailsPopover } from "./components/TeamPlanDetailsPopover";
+import UpgradeIcon from "../../../../assets/upgrade.svg";
+import { TeamPlanStatus } from "../../../TeamPlanStatus";
+import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
 import "./index.scss";
 
 export const TeamPlanDetails: React.FC = () => {
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
   return (
-    <Col className="team-plan-details-card">
+    <Col className="billing-teams-primary-card team-plan-details-card">
       <Row className="team-plan-details-card-header" justify="space-between" align="middle">
         <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
           Your Plan <TeamPlanStatus />

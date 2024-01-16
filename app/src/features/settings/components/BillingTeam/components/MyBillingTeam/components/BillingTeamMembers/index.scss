@@ -1,0 +1,38 @@
+.billing-team-members-section-header {
+  padding: 8px 1rem;
+  border-bottom: 1px solid var(--surface-2, #383838);
+
+  &-title {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  &-btn.ant-btn {
+    font-weight: 500 !important;
+    gap: 8px;
+  }
+}
+
+.remove-member-btn.ant-btn {
+  gap: 6px;
+  color: var(--neutrals-gray-300);
+
+  &:hover,
+  &:focus,
+  &:active {
+    background: var(--surface-2);
+    color: var(--white);
+  }
+}
+
+.billing-table tbody tr:hover .remove-member-btn.ant-btn,
+.billing-table tbody tr:hover .members-table-dropdown-btn.ant-btn {
+  color: var(--white);
+}
+
+// .my-billing-team-members-table {
+//   tbody {
+//     max-height: 30px !important;
+//     overflow-y: auto;
+//   }
+// }

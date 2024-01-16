@@ -1,6 +1,7 @@
 import React from "react";
 import { Col } from "antd";
-import { TeamPlanDetails } from "../TeamPlanDetails";
+import { TeamPlanDetails } from "./components/TeamPlanDetails";
+import { BillingTeamMembers } from "./components/BillingTeamMembers";
 
 export const MyBillingTeam: React.FC = () => {
   return (
@@ -9,6 +10,11 @@ export const MyBillingTeam: React.FC = () => {
       <Col className="mt-8">
         <TeamPlanDetails />
       </Col>
+      <Col style={{ marginTop: "24px" }}>
+        <BillingTeamMembers />
+      </Col>
+      {/* ADD INVOICES TABLE */}
+      {/* ADD BILLING ADDRESS AND PAYMENT METHOD SECTION */}
     </>
   );
 };

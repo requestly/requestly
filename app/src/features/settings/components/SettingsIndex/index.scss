@@ -41,9 +41,36 @@
 }
 
 // Billing team
+.billing-teams-primary-card {
+  border-radius: 4px;
+  border: 1px solid var(--surface-2);
+  background: var(--surface-0_5);
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
+}
+
 .my-billing-team-title {
   color: var(--white);
   font-size: 20px;
   font-weight: 500;
   letter-spacing: 0.15px;
+}
+
+.billing-table {
+  & .ant-table-thead .ant-table-cell {
+    background: var(--surface-0_5);
+    padding: 12px 1rem;
+    color: var(--neutrals-gray-300);
+    font-weight: 400;
+    border-bottom: 1px solid var(--surface-1);
+  }
+
+  & th::before {
+    display: none;
+  }
+
+  & tbody tr .ant-table-cell {
+    background: var(--surface-0_5);
+    padding: 12px 1rem;
+    border-bottom: 1px solid var(--surface-1);
+  }
 }
