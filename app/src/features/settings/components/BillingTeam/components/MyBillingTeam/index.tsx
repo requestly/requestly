@@ -2,6 +2,7 @@ import React from "react";
 import { Col } from "antd";
 import { TeamPlanDetails } from "./components/TeamPlanDetails";
 import { BillingTeamMembers } from "./components/BillingTeamMembers";
+import { BillingInvoiceTable } from "./components/BillingInvoiceTable";
 
 export const MyBillingTeam: React.FC = () => {
   return (
@@ -13,8 +14,10 @@ export const MyBillingTeam: React.FC = () => {
       <Col style={{ marginTop: "24px" }}>
         <BillingTeamMembers />
       </Col>
-      {/* ADD INVOICES TABLE */}
-      {/* ADD BILLING ADDRESS AND PAYMENT METHOD SECTION */}
+      <Col style={{ marginTop: "24px" }}>
+        <BillingInvoiceTable />
+      </Col>
+      {/* TODO: ADD BILLING ADDRESS AND PAYMENT METHOD SECTION */}
     </>
   );
 };
