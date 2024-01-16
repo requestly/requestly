@@ -1,0 +1,29 @@
+.team-plan-details-card {
+  border-radius: 4px;
+  border: 1px solid var(--surface-2);
+  background: var(--surface-0_5);
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
+
+  &-header {
+    padding: 8px 1rem;
+    border-bottom: 1px solid var(--surface-2, #383838);
+  }
+
+  &-actions {
+    display: flex;
+    gap: 8px;
+
+    &-cancel.ant-btn:hover,
+    &-cancel.ant-btn:focus,
+    &-cancel.ant-btn:active {
+      background: var(--surface-2);
+      color: var(--white);
+    }
+
+    & .ant-btn {
+      font-weight: 500 !important;
+      color: var(--white);
+      gap: 8px;
+    }
+  }
+}

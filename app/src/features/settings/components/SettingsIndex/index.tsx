@@ -14,7 +14,7 @@ const SettingsIndex: React.FC = () => {
     <div className="settings-index">
       <div className="settings-index-sidebar-wrapper">
         <SettingsPrimarySidebar />
-        {isSecondarySidebarVisible && <SettingsSecondarySidebar>Secondary sidebar</SettingsSecondarySidebar>}
+        {isSecondarySidebarVisible && <SettingsSecondarySidebar>Billing</SettingsSecondarySidebar>}
       </div>
       <Col className="settings-content-wrapper">
         <Col className="settings-content">
