@@ -175,7 +175,7 @@ const AppModeInitializer = () => {
             fileData = JSON.parse(fileObj?.contents);
           } catch (error) {
             console.error("could not parse the user's file to json");
-            toast.error("Error loading file")
+            toast.error("Error loading file");
             return;
           }
 
@@ -189,25 +189,18 @@ const AppModeInitializer = () => {
             dispatch(sessionRecordingActions.setName(fileObj.name));
             navigate(`${PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.ABSOLUTE}/imported`);
           } else if (fileObj?.extension === ".har") {
-            dispatch(harPreviewActions.resetState())
-            dispatch(harPreviewActions.setImportedHar(fileData))
-            dispatch(harPreviewActions.setPreviewType(PreviewType.IMPORTED))
-            dispatch(harPreviewActions.setSessionName(fileObj.name))
+            dispatch(harPreviewActions.resetState());
+            dispatch(harPreviewActions.setImportedHar(fileData));
+            dispatch(harPreviewActions.setPreviewType(PreviewType.IMPORTED));
+            dispatch(harPreviewActions.setSessionName(fileObj.name));
             redirectToNetworkSession(navigate);
           }
         } else {
           console.log("unknown file type detected");
         }
       });
-
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("recently-accessed-files-updated", (fileRecord) => {
-        
-      })
-
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("recently-accessed-files-lost", (filePath) => {
-        // update selector
-      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

@@ -47,13 +47,11 @@ export interface DraftSessionViewerProps {
 
 const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   testRuleDraftSession,
-  source = DRAFT_SESSION_VIEWED_SOURCE.DEFAULT, 
-  desktopMode = false
+  source = DRAFT_SESSION_VIEWED_SOURCE.DEFAULT,
+  desktopMode = false,
 }) => {
-
-  console.log("desktopMode", desktopMode)
   const tempTabId = useParams().tabId ?? testRuleDraftSession?.draftSessionTabId;
-  const tabId = useMemo( () => desktopMode ? 'imported' : tempTabId, [desktopMode, tempTabId])
+  const tabId = useMemo(() => (desktopMode ? "imported" : tempTabId), [desktopMode, tempTabId]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -94,8 +92,8 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
     };
 
-    if(!desktopMode) {
-      console.log("added when should not added", desktopMode)
+    if (!desktopMode) {
+      console.log("added when should not added", desktopMode);
       // It is fired only if there was ANY interaction of the user with the site.
       // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
       // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
@@ -105,8 +103,8 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
     }
   }, [desktopMode]);
 
-  if(!desktopMode) {
-    console.log("added when should not added", desktopMode)
+  if (!desktopMode) {
+    console.log("added when should not added", desktopMode);
 
     unstable_usePrompt({
       when: !isSaveSessionClicked && !isDiscardSessionClicked && !testRuleDraftSession,
@@ -215,12 +213,12 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       <div className="session-viewer-header margin-bottom-one">
         <SessionViewerTitle />
         <div className="session-viewer-actions">
-         {!desktopMode &&(
+          {!desktopMode && (
             <RQButton type="default" onClick={confirmDiscard}>
               Discard
             </RQButton>
           )}
-          
+
           <RQButton
             data-tour-id="save-draft-session-btn"
             type="primary"

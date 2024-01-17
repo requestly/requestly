@@ -17,7 +17,7 @@ import {
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
-import { ImportHarModalButton } from "../../desktopSessions/HarViewer/ImportHarModalButton";
+import { ImportHarModalButton } from "./ImportHarModalButton";
 import { useMemo } from "react";
 
 const { Text } = Typography;
