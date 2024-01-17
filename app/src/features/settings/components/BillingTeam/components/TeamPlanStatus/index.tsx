@@ -4,26 +4,32 @@ import { Col, Row } from "antd";
 import { capitalize } from "lodash";
 import "./index.scss";
 
-export const TeamPlanStatus: React.FC = () => {
-  const planStatus = PlanStatus.ACTIVE;
+export const TeamPlanStatus: React.FC<{ subscriptionStatus: string }> = ({ subscriptionStatus }) => {
+  let planStatus = PlanStatus.ACTIVE;
+  if (!["active", "past_due"].includes(subscriptionStatus)) {
+    planStatus = PlanStatus.EXPIRED;
+  }
+
   return (
     <Row
       align="middle"
       className={`team-plan-status-badge ${
         planStatus === PlanStatus.ACTIVE
           ? "plan-status-active-badge "
-          : planStatus === PlanStatus.EXPIRING_SOON
+          : //@ts-ignore
+          planStatus === PlanStatus.EXPIRING_SOON
           ? "plan-status-warning-badge"
           : "plan-status-expired-badge"
       }
-        
+
     }`}
     >
       <Col
         className={`team-plan-status-badge-dot ${
           planStatus === PlanStatus.ACTIVE
             ? "plan-status-active-dot"
-            : planStatus === PlanStatus.EXPIRING_SOON
+            : //@ts-ignore
+            planStatus === PlanStatus.EXPIRING_SOON
             ? "plan-status-warning-dot"
             : "plan-status-expired-dot"
         }`}
