@@ -10,3 +10,13 @@ export const getBillingTeamById = (id: string) => (state: RootState): BillingTea
   const allAvailableBillingTeams = getAvailableBillingTeams(state);
   return allAvailableBillingTeams.find((billingTeam) => billingTeam.id === id);
 };
+
+export const getBillingTeamMembers = (billingId: string) => (state: RootState): Record<string, any> => {
+  return state[ReducerKeys.BILLING].billingTeamMembers[billingId];
+};
+
+export const getBillingTeamMemberById = (billingId: string, memberId: string) => (
+  state: RootState
+): Record<string, any> => {
+  return state[ReducerKeys.BILLING].billingTeamMembers[billingId]?.[memberId];
+};
