@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Avatar, Col, Drawer, Dropdown, Row, Table } from "antd";
+import { Avatar, Col, Drawer, Dropdown, Popconfirm, Row, Table } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
 import { MemberTableActions } from "./components/MemberTableActions";
@@ -16,6 +16,8 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { removeMemberFromBillingTeam, updateBillingTeamMemberRole } from "backend/billing";
+import { toast } from "utils/Toast";
 
 export const BillingTeamMembers: React.FC = () => {
   const { billingId } = useParams();
@@ -39,7 +41,7 @@ export const BillingTeamMembers: React.FC = () => {
             <Avatar size={28} shape="circle" src={record.photoUrl} alt={record.displayName} />
           </div>
           <div>
-            <div className="text-bold">{record.displayName}</div>
+            <div className="text-bold">{`${record.displayName} ${record.role}`}</div>
             <div>
               <span className="member-email">{record.email}</span>
             </div>
@@ -58,21 +60,53 @@ export const BillingTeamMembers: React.FC = () => {
       title: "",
       key: "action",
       render: (_: any, record: any) => {
-        if (!isUserAdmin) return null;
+        if (!isUserAdmin || record.id === user?.details?.profile?.uid) return null;
         return (
           <Row justify="end" align="middle" gutter={8} className="w-full">
             <Col>
-              <RQButton
-                type="text"
-                icon={<IoMdCloseCircleOutline fontSize={14} />}
-                className="remove-member-btn"
-                disabled={!isUserAdmin}
+              <Popconfirm
+                title="Do you really want to remove this user from the billing team?"
+                onConfirm={() => {
+                  removeMemberFromBillingTeam(billingId, record.id)
+                    .then((res) => {
+                      console.log("!!!debug", "success", res.data);
+                      toast.success("User removed from the billing team");
+                    })
+                    .catch((err) => {
+                      console.log("!!!debug", "removing error", err);
+                      toast.error("Error while removing user");
+                    });
+                }}
+                okText="Confirm"
+                cancelText="Cancel"
               >
-                Remove
-              </RQButton>
+                <RQButton
+                  type="text"
+                  icon={<IoMdCloseCircleOutline fontSize={14} />}
+                  className="remove-member-btn"
+                  disabled={!isUserAdmin}
+                >
+                  Remove
+                </RQButton>
+              </Popconfirm>
             </Col>
             <Col>
-              <Dropdown menu={{ items }} trigger={["click"]} disabled={!isUserAdmin}>
+              <Dropdown
+                menu={{
+                  items: items.map((item) => ({ ...item, disabled: item.key === record.role })),
+                  onClick: ({ key }) => {
+                    updateBillingTeamMemberRole(billingId, record.id, key as BillingTeamRoles)
+                      .then(() => {
+                        toast.success(`User role changed to ${key}`);
+                      })
+                      .catch((err) => {
+                        toast.error("Error while changing user role");
+                      });
+                  },
+                }}
+                trigger={["click"]}
+                disabled={!isUserAdmin}
+              >
                 <RQButton
                   className="members-table-dropdown-btn"
                   icon={<HiOutlineDotsHorizontal />}
@@ -89,7 +123,7 @@ export const BillingTeamMembers: React.FC = () => {
 
   const items: MenuProps["items"] = [
     {
-      key: "0",
+      key: BillingTeamRoles.Admin,
       label: (
         <Row align="middle" gutter={8}>
           <MdOutlineAdminPanelSettings fontSize={16} className="mr-8" />
@@ -98,7 +132,7 @@ export const BillingTeamMembers: React.FC = () => {
       ),
     },
     {
-      key: "1",
+      key: BillingTeamRoles.Member,
       label: (
         <Row align="middle" gutter={8}>
           <MdPersonOutline fontSize={16} className="mr-8" />
