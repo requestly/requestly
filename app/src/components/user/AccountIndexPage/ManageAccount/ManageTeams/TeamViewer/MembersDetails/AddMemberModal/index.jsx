@@ -20,6 +20,7 @@ import { isVerifiedBusinessDomainUser } from "utils/Misc";
 import APP_CONSTANTS from "config/constants";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import "./AddMemberModal.css";
+import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -35,6 +36,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const [isPublicInviteLoading, setPublicInviteLoading] = useState(false);
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
   const [isAddToBillingViewVisible, setIsAddToBillingViewVisible] = useState(false);
+  const [billingId, setBillingId] = useState(null);
+  const [isBillingTeamMapped, setIsBillingTeamMapped] = useState(false);
 
   // Global state
   const user = useSelector(getUserAuthDetails);
@@ -73,7 +76,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
 
   const handleAddToBilling = async () => {
     setIsProcessing(true);
-    // await call function here to add teamId in billedWorkspaces
+    await toggleWorkspaceMappingInBillingTeam(billingId, teamDetails.id, true);
     handleAddMember();
   };
 
@@ -92,7 +95,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
 
     if (
       !isAddToBillingViewVisible &&
-      !teamDetails.billingId &&
+      !isBillingTeamMapped &&
       isTeamAdmin &&
       ["active", "trialing", "past_due"].includes(teamDetails.subscriptionStatus)
     ) {
@@ -138,7 +141,17 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
         toast.error("Error while creating invitations. Make sure you are an admin");
         trackAddTeamMemberFailure(teamId, userEmail, null, "add_member_modal");
       });
-  }, [userEmail, teamId, makeUserAdmin, teamDetails, callback, toggleModal, isAddToBillingViewVisible, isTeamAdmin]);
+  }, [
+    userEmail,
+    teamId,
+    makeUserAdmin,
+    teamDetails,
+    callback,
+    toggleModal,
+    isAddToBillingViewVisible,
+    isTeamAdmin,
+    isBillingTeamMapped,
+  ]);
 
   const handleAllowDomainUsers = useCallback(
     (event) => {
@@ -189,6 +202,13 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     }
   }, [isOpen, fetchPublicInvites]);
 
+  useEffect(() => {
+    fetchBillingIdByOwner(teamDetails.owner, user?.details?.profile?.uid).then(({ billingId, mappedWorkspaces }) => {
+      setBillingId(billingId);
+      setIsBillingTeamMapped(mappedWorkspaces?.includes(teamDetails.id));
+    });
+  }, [teamDetails.id, teamDetails.owner, user?.details?.profile?.uid]);
+
   if (isPublicInviteLoading || isLoading) return <PageLoader />;
 
   return (
@@ -202,13 +222,13 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
               </Typography.Title>
               <Row className="mt-16" gutter={8} align="middle">
                 <Col>
-                  <RQButton type="default" onClick={handleAddMember} disabled={isProcessing}>
-                    No
+                  <RQButton type="primary" onClick={handleAddToBilling} disabled={isProcessing}>
+                    Yes
                   </RQButton>
                 </Col>
                 <Col>
-                  <RQButton type="primary" onClick={handleAddToBilling} disabled={isProcessing}>
-                    Yes
+                  <RQButton type="default" onClick={handleAddMember} disabled={isProcessing}>
+                    No
                   </RQButton>
                 </Col>
               </Row>
