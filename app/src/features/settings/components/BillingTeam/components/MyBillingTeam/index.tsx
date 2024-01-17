@@ -6,10 +6,13 @@ import { BillingInvoiceTable } from "./components/BillingInvoiceTable";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getBillingTeamById } from "store/features/billing/selectors";
+import { getUserAuthDetails } from "store/selectors";
+import { BillingTeamRoles } from "../../types";
 
 export const MyBillingTeam: React.FC = () => {
   const { billingId } = useParams();
 
+  const user = useSelector(getUserAuthDetails);
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
 
   if (!billingTeamDetails) return null;
@@ -23,9 +26,11 @@ export const MyBillingTeam: React.FC = () => {
       <Col style={{ marginTop: "24px" }}>
         <BillingTeamMembers />
       </Col>
-      <Col style={{ marginTop: "24px" }}>
-        <BillingInvoiceTable />
-      </Col>
+      {billingTeamDetails.members?.[user?.details?.profile?.uid].role !== BillingTeamRoles.Member ? (
+        <Col style={{ marginTop: "24px" }}>
+          <BillingInvoiceTable />
+        </Col>
+      ) : null}
       {/* TODO: ADD BILLING ADDRESS AND PAYMENT METHOD SECTION */}
     </>
   );
