@@ -9,5 +9,6 @@ interface Props {
 */
 
 export const SettingsSecondarySidebar: React.FC<Props> = ({ children }) => {
+  if (!children) return null;
   return <Col className="settings-secondary-sidebar">{children}</Col>;
 };
