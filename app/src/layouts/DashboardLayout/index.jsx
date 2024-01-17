@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { useLocation } from "react-router-dom";
-import { isPricingPage, isGoodbyePage, isInvitePage } from "utils/PathUtils.js";
+import { isPricingPage, isGoodbyePage, isInvitePage, isSettingsPage } from "utils/PathUtils.js";
 import Footer from "../../components/sections/Footer";
 import DashboardContent from "./DashboardContent";
 import { Sidebar } from "./Sidebar";
@@ -26,7 +26,7 @@ const DashboardLayout = () => {
   promptOneTapOnLoad();
 
   const isSidebarVisible = useMemo(
-    () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname)),
+    () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname)),
     [pathname]
   );
 
