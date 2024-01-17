@@ -46,12 +46,12 @@ export const BillingTeamMembers: React.FC = () => {
               <span className="text-bold">{`${record.displayName}`}</span>
               {record.role === BillingTeamRoles.Manager ? (
                 <Row className="icon__wrapper success" align={"middle"}>
-                  <MdOutlinePaid />
+                  <MdOutlinePaid className="mr-4" />
                   <span className="caption">Billing manager</span>
                 </Row>
               ) : record.role === BillingTeamRoles.Admin ? (
                 <Row className="icon__wrapper warning" align={"middle"}>
-                  <MdOutlineAdminPanelSettings />
+                  <MdOutlineAdminPanelSettings className="mr-4" />
                   <span className="caption">Billing admin</span>
                 </Row>
               ) : null}

@@ -22,7 +22,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
     <Col className="billing-teams-primary-card team-plan-details-card">
       <Row className="team-plan-details-card-header" justify="space-between" align="middle">
         <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
-          Your Plan <TeamPlanStatus />
+          Your Plan <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
         </Col>
         <Col className="team-plan-details-card-actions">
           <RQButton type="text" className="team-plan-details-card-actions-cancel" icon={<MdOutlineCancel />}>
