@@ -9,8 +9,9 @@ import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
 import "./index.scss";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
+import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 
-export const TeamPlanDetails: React.FC = ({ billingTeamDetails }) => {
+export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
 
   return (
