@@ -1,0 +1,24 @@
+.org-member-table {
+  border-radius: 4px;
+  border: 1px solid var(--surface-2);
+
+  &-header {
+    padding: 8px 1rem;
+    border-bottom: 1px solid var(--surface-2);
+
+    &-input {
+      width: 224px;
+      border-radius: 4px;
+      border: 1px solid var(--surface-2);
+      background: var(--background);
+
+      .ant-input {
+        background: var(--background);
+
+        &::placeholder {
+          color: var(--surface-3);
+        }
+      }
+    }
+  }
+}
