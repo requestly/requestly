@@ -221,6 +221,9 @@
 .danger {
   color: var(--danger);
 }
+.warning {
+  color: var(--warning);
+}
 
 .relative {
   position: relative;
