@@ -1,6 +1,16 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import firebaseApp from "../../firebase";
-import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
+import {
+  arrayRemove,
+  arrayUnion,
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import Logger from "lib/logger";
 import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 
@@ -77,5 +87,23 @@ export const fetchBillingIdByOwner = async (ownerId: string, uid: string) => {
   }
 
   const billingId = snapshot.docs[0].id;
-  return billingId;
+  return { billingId, mappedWorkspaces: snapshot.docs[0].data().billedWorkspaces };
+};
+
+export const toggleWorkspaceMappingInBillingTeam = async (
+  billingId: string,
+  workspaceId: string,
+  toBeMapped: boolean
+) => {
+  if (!billingId || !workspaceId) {
+    return;
+  }
+
+  const billingRef = doc(getFirestore(firebaseApp), "billing", billingId);
+
+  await updateDoc(billingRef, {
+    billedWorkspaces: toBeMapped ? arrayUnion(workspaceId) : arrayRemove(workspaceId),
+  }).catch((err) => {
+    throw new Error(err.message);
+  });
 };

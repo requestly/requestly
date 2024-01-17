@@ -5,7 +5,7 @@ import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate } from "react-router-dom";
 import "./BillingDetails.css";
-import { fetchBillingIdByOwner } from "backend/billing";
+import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
@@ -16,10 +16,14 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
   const user = useSelector(getUserAuthDetails);
 
   const [billingId, setBillingId] = useState(null);
+  const [isBillingTeamMapped, setIsBillingTeamMapped] = useState(false);
 
   useEffect(() => {
-    fetchBillingIdByOwner(teamDetails.owner, user?.details?.profile?.uid).then(setBillingId);
-  }, [teamDetails.owner, user?.details?.profile?.uid]);
+    fetchBillingIdByOwner(teamDetails.owner, user?.details?.profile?.uid).then(({ billingId, mappedWorkspaces }) => {
+      setBillingId(billingId);
+      setIsBillingTeamMapped(mappedWorkspaces?.includes(teamDetails.id));
+    });
+  });
 
   return isTeamAdmin ? (
     <div className="billing-details-container">
@@ -58,7 +62,24 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
       <Row gutter={8}>
         <Col>Automatically include members who join this workspace in the billing team</Col>
         <Col>
-          <Switch checked={teamDetails.billingId ?? false} />
+          <Switch
+            checked={isBillingTeamMapped}
+            onChange={(checked) => {
+              toggleWorkspaceMappingInBillingTeam(billingId, teamDetails.id, checked)
+                .then(() => {
+                  if (checked) {
+                    toast.success("Members will be automatically added to the billing team.");
+                  } else {
+                    toast.warn("Members will not be automatically added to the billing team.");
+                  }
+                  setIsBillingTeamMapped(checked);
+                })
+                .catch(() => {
+                  setIsBillingTeamMapped(!checked);
+                  toast.error("Something went wrong. Please contact support.");
+                });
+            }}
+          />
         </Col>
       </Row>
       <Divider className="manage-workspace-divider" />
