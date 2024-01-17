@@ -19,7 +19,7 @@ import {
   trackTriedRecordingForInvalidURL,
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
-import { ImportHarModalButton } from "../../desktopSessions/HarViewer/ImportHarModalButton";
+import { ImportHarModalButton } from "../NetworkSessions/ImportHarModalButton";
 
 const { Text, Title } = Typography;
 

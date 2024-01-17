@@ -41,7 +41,7 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
 import { GoRecordSessionsOnWeb } from "./GoRecordSessions";
-import { ImportWebSessionModalButton } from "../../desktopSessions/WebSessionLocalViewer/ImportWebSessionModalButton";
+import { ImportWebSessionModalButton } from "./ImportWebSessionModalButton";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -54,7 +54,7 @@ const SessionsIndexPage = () => {
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
-  const appMode  = useSelector(getAppMode)
+  const appMode = useSelector(getAppMode);
 
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sharingRecordId, setSharingRecordId] = useState("");
@@ -235,16 +235,16 @@ const SessionsIndexPage = () => {
     [navigate, toggleImportSessionModal, dispatch]
   );
 
-  const openDownloadedSessionModalBtn = useMemo(
-    () => {
-      const isDesktopMode = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
-      return isDesktopMode ? <ImportWebSessionModalButton /> : (
+  const openDownloadedSessionModalBtn = useMemo(() => {
+    const isDesktopMode = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+    return isDesktopMode ? (
+      <ImportWebSessionModalButton />
+    ) : (
       <RQButton type="default" onClick={toggleImportSessionModal}>
         Open downloaded session
       </RQButton>
-    )},
-    [toggleImportSessionModal, appMode]
-  );
+    );
+  }, [toggleImportSessionModal, appMode]);
 
   const newSessionButton = (
     <RQButton
@@ -349,7 +349,9 @@ const SessionsIndexPage = () => {
             />
           ) : null}
         </>
-      ) : appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? <GoRecordSessionsOnWeb /> : (
+      ) : appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+        <GoRecordSessionsOnWeb />
+      ) : (
         <OnboardingView
           redirectToSettingsPage={redirectToSettingsPage}
           openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
