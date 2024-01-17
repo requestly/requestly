@@ -208,7 +208,7 @@ const RecordingsList = ({
         search={false}
         pagination={false}
         options={false}
-        toolBarRender={() => [configureBtn, openDownloadedSessionModalBtn, newSessionButton]}
+        toolBarRender={() => appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? [openDownloadedSessionModalBtn] :  [configureBtn, openDownloadedSessionModalBtn, newSessionButton]}
         headerTitle={
           <>
             <Typography.Title level={4} style={{ marginBottom: 0 }}>

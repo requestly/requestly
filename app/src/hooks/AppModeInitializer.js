@@ -33,11 +33,11 @@ import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
 import { useHasChanged } from "./useHasChanged";
-import { redirectToNetworkSession } from "utils/RedirectionUtils";
-import { saveNetworkSession } from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/actions";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { decompressEvents } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
+import { PreviewType, harPreviewActions } from "store/features/har-preview/slice";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
 
 let hasAppModeBeenSet = false;
 
@@ -168,38 +168,45 @@ const AppModeInitializer = () => {
 
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("open-file", async (payload) => {
-        if (payload?.extension === ".rqly" || payload?.extension === ".har") {
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("open-file", async (fileObj) => {
+        if (fileObj?.extension === ".rqly" || fileObj?.extension === ".har") {
           let fileData;
-          const fileName = payload?.name;
-          const filePath = payload?.path;
           try {
-            fileData = JSON.parse(payload?.contents);
+            fileData = JSON.parse(fileObj?.contents);
           } catch (error) {
             console.error("could not parse the user's file to json");
+            toast.error("Error loading file")
             return;
           }
 
           // close connect app modal that opens on launch
           closeConnectedAppsModal();
 
-          if (payload?.extension === ".rqly") {
-            // opening recording inside draft view
+          if (fileObj?.extension === ".rqly") {
             dispatch(sessionRecordingActions.setSessionRecordingMetadata({ ...fileData?.data?.metadata }));
             const recordedSessionEvents = decompressEvents(fileData?.data?.events);
             dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
-            // navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
-            navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
-
-
-          } else if (payload?.extension === ".har") {
-            // const savedSessionId = await saveNetworkSession(fileName, fileData, filePath); // don't save the session here
-            // redirectToNetworkSession(navigate, savedSessionId);
+            dispatch(sessionRecordingActions.setName(fileObj.name));
+            navigate(`${PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.ABSOLUTE}/imported`);
+          } else if (fileObj?.extension === ".har") {
+            dispatch(harPreviewActions.resetState())
+            dispatch(harPreviewActions.setImportedHar(fileData))
+            dispatch(harPreviewActions.setPreviewType(PreviewType.IMPORTED))
+            dispatch(harPreviewActions.setSessionName(fileObj.name))
+            redirectToNetworkSession(navigate);
           }
         } else {
           console.log("unknown file type detected");
         }
       });
+
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("recently-accessed-files-updated", (fileRecord) => {
+        
+      })
+
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("recently-accessed-files-lost", (filePath) => {
+        // update selector
+      })
     }
   }, []);
 

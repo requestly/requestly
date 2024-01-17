@@ -4,27 +4,8 @@ declare global {
   }
 }
 
-// ipc wrapper - redundant copy for now
-// function ipcRequestToMain(channel: string, requestData?: any, timeout = 10_000) {
-//     return new Promise((resolve, reject) => {
-//       let responseTimeout = setTimeout(() => {
-//         reject(new Error(`IPC request timed out after ${timeout} ms`));
-//       }, timeout);
-  
-//       window?.RQ?.DESKTOP.SERVICES.IPC.invokeEventInMain(channel, requestData).then((res: any) => {
-//         resolve(res);
-//       });
-  
-//       window?.RQ?.DESKTOP.SERVICES.IPC.registerEvent(`reply-${channel}`, (event: any, responseData: any) => {
-//         clearTimeout(responseTimeout);
-//         resolve(responseData);
-//       });
-//     });
-// }
-
-
 export type AccessedFileCategoryTag = 'web-session' | 'har' | 'unknown'
-export interface AccessedFile {
+export interface fileRecord {
   filePath: string
   category: AccessedFileCategoryTag
   name: string
@@ -38,14 +19,22 @@ export interface FileObj {
   category?: AccessedFileCategoryTag
 }
 
-export const getRecentlyAccesedFiles = (categoryTag: AccessedFileCategoryTag = 'unknown'): Promise<AccessedFile[]> => {
+export const getRecentlyAccesedFiles = (categoryTag: AccessedFileCategoryTag = 'unknown'): Promise<fileRecord[]> => {
     return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInMain("rq-storage:storage-action", {
       type: "ACCESSED_FILES:GET_CATEGORY",
       payload: {
         data: { category: categoryTag }
       }
-    }).then((res: AccessedFile[]) => {
-      return res;
+    }).then((res: Record<fileRecord['filePath'], fileRecord>[]) => {
+      const files: fileRecord[] = [];
+      console.log("Got recently accessed files", res)
+      for (const filePath of res) {
+        const file = Object.values(filePath)[0];
+        if (file.category === categoryTag) {
+          files.push(file);
+        }
+      }
+      return files;
     }).catch((e: unknown) => {
       console.error("Got error while getting recently accessed files", e);
     })

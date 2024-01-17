@@ -2,16 +2,12 @@ import ReactHoverObserver from "react-hover-observer";
 import ProCard from "@ant-design/pro-card";
 import ProTable from "@ant-design/pro-table";
 import PATHS from "config/constants/sub/paths";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { epochToDateAndTimeString } from "utils/DateTimeUtils";
 import { Modal, Space, Tag, Tooltip, Typography } from "antd";
 import { DeleteOutlined, DownloadOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { deleteNetworkSession, getNetworkSession } from "./actions";
 import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/utils";
-import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
-import { toast } from "utils/Toast";
-import { redirectToNetworkSession } from "utils/RedirectionUtils";
-import { useCallback, useMemo } from "react";
 import {
   ActionSource,
   trackDeleteNetworkSessionCanceled,
@@ -21,6 +17,8 @@ import {
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
+import { ImportHarModalButton } from "../../desktopSessions/HarViewer/ImportHarModalButton";
+import { useMemo } from "react";
 
 const { Text } = Typography;
 
@@ -45,15 +43,6 @@ export const confirmAndDeleteRecording = (id, callback) => {
 };
 
 const NetworkSessionsList = ({ networkSessionsMetadata }) => {
-  const navigate = useNavigate();
-  const stableOnSuccessfulHarImport = useCallback(
-    (sessionId) => {
-      toast.success("Successfully imported the HAR file");
-      redirectToNetworkSession(navigate, sessionId);
-    },
-    [navigate]
-  );
-
   const columns = [
     {
       title: "Name",
@@ -157,7 +146,8 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
             <Typography.Title level={4} className="network-session-list-heading">
               Saved Network Logs
             </Typography.Title>
-            <HarImportModal onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
+            {/* <HarImportModal onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" /> */}
+            <ImportHarModalButton />
           </Space>
         }
       />
