@@ -11,6 +11,10 @@ export const getDesktopSignInAuthPath = (authCode, source) => {
   return `${PATHS.AUTH.DEKSTOP_SIGN_IN.ABSOLUTE}?ot-auth-code=${authCode}&source=${source}`;
 };
 
+export const isSettingsPage = (pathname = window.location.pathname) => {
+  return pathname.includes(APP_CONSTANTS.PATHS.SETTINGS.RELATIVE);
+};
+
 export const isPricingPage = (pathname = window.location.pathname) => {
   return pathname.includes(APP_CONSTANTS.PATHS.PRICING.RELATIVE);
 };

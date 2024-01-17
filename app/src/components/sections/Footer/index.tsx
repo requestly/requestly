@@ -13,6 +13,8 @@ import { trackFooterClicked } from "modules/analytics/events/common/onboarding/f
 import "./Footer.css";
 
 const { Text } = Typography;
+const { PATHS } = APP_CONSTANTS;
+const PAGES_WITHOUT_FOOTER = [PATHS.SETTINGS.RELATIVE];
 
 const AppFooter: React.FC = () => {
   const dispatch = useDispatch();
@@ -86,6 +88,8 @@ const AppFooter: React.FC = () => {
       </Text>
     );
   };
+
+  if (PAGES_WITHOUT_FOOTER.some((path) => pathname.includes(path))) return null;
 
   return (
     <>
