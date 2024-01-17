@@ -1,23 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Divider, Row, Col, Switch } from "antd";
 import BillingFooter from "./BillingFooter";
 import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate } from "react-router-dom";
 import "./BillingDetails.css";
+import { fetchBillingIdByOwner } from "backend/billing";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import { toast } from "utils/Toast";
 
 // Common Component for Team & Individual Payments
-const BillingDetails = ({ teamId, isTeamAdmin, teamDetails }) => {
+const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
   const navigate = useNavigate();
+  const user = useSelector(getUserAuthDetails);
 
-  // const handleRedirectToUpdatePaymentMethod = () => {
-  //   if (!subscriptionInfo.subscriptionStatus) return;
+  const [billingId, setBillingId] = useState(null);
 
-  //   redirectToUpdatePaymentMethod({
-  //     mode: "team",
-  //     teamId: teamId,
-  //   });
-  // };
+  useEffect(() => {
+    fetchBillingIdByOwner(teamDetails.owner, user?.details?.profile?.uid).then(setBillingId);
+  }, [teamDetails.owner, user?.details?.profile?.uid]);
 
   return isTeamAdmin ? (
     <div className="billing-details-container">
@@ -27,8 +29,18 @@ const BillingDetails = ({ teamId, isTeamAdmin, teamDetails }) => {
       </p>
       <Row gutter={8} align="middle">
         <Col>
-          {/* TODO: Redirect to billing team */}
-          <RQButton type="primary">Go to billing team</RQButton>
+          <RQButton
+            type="primary"
+            onClick={() => {
+              if (billingId) {
+                navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + "/" + billingId);
+              } else {
+                toast.error("Billing team not found. Please contact support.");
+              }
+            }}
+          >
+            Go to billing team
+          </RQButton>
         </Col>
         <Col>
           <RQButton
