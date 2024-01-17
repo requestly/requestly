@@ -14,11 +14,18 @@ import "./index.scss";
 import { getBillingTeamMembers } from "store/features/billing/selectors";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 
 export const BillingTeamMembers: React.FC = () => {
   const { billingId } = useParams();
+
+  const user = useSelector(getUserAuthDetails);
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
+  const isUserAdmin =
+    billingTeamMembers?.[user?.details?.profile?.uid] &&
+    billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
 
   const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
 
@@ -50,25 +57,33 @@ export const BillingTeamMembers: React.FC = () => {
     {
       title: "",
       key: "action",
-      render: (_: any, record: any) => (
-        <Row justify="end" align="middle" gutter={8} className="w-full">
-          <Col>
-            <RQButton type="text" icon={<IoMdCloseCircleOutline fontSize={14} />} className="remove-member-btn">
-              Remove
-            </RQButton>
-          </Col>
-          <Col>
-            <Dropdown menu={{ items }} trigger={["click"]}>
+      render: (_: any, record: any) => {
+        if (!isUserAdmin) return null;
+        return (
+          <Row justify="end" align="middle" gutter={8} className="w-full">
+            <Col>
               <RQButton
-                className="members-table-dropdown-btn"
-                icon={<HiOutlineDotsHorizontal />}
-                iconOnly
                 type="text"
-              />
-            </Dropdown>
-          </Col>
-        </Row>
-      ),
+                icon={<IoMdCloseCircleOutline fontSize={14} />}
+                className="remove-member-btn"
+                disabled={!isUserAdmin}
+              >
+                Remove
+              </RQButton>
+            </Col>
+            <Col>
+              <Dropdown menu={{ items }} trigger={["click"]} disabled={!isUserAdmin}>
+                <RQButton
+                  className="members-table-dropdown-btn"
+                  icon={<HiOutlineDotsHorizontal />}
+                  iconOnly
+                  type="text"
+                />
+              </Dropdown>
+            </Col>
+          </Row>
+        );
+      },
     },
   ];
 
@@ -104,6 +119,7 @@ export const BillingTeamMembers: React.FC = () => {
               icon={<IoMdAdd />}
               className="billing-team-members-section-header-btn"
               onClick={() => setIsMembersDrawerOpen(true)}
+              disabled={!isUserAdmin}
             >
               Add members
             </RQButton>
