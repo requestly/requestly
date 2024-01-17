@@ -41,6 +41,7 @@ import {
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
 import { GoRecordSessionsOnWeb } from "./GoRecordSessions";
+import { ImportWebSessionModalButton } from "../../desktopSessions/WebSessionLocalViewer/ImportWebSessionModalButton";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -235,12 +236,14 @@ const SessionsIndexPage = () => {
   );
 
   const openDownloadedSessionModalBtn = useMemo(
-    () => (
+    () => {
+      const isDesktopMode = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+      return isDesktopMode ? <ImportWebSessionModalButton /> : (
       <RQButton type="default" onClick={toggleImportSessionModal}>
         Open downloaded session
       </RQButton>
-    ),
-    [toggleImportSessionModal]
+    )},
+    [toggleImportSessionModal, appMode]
   );
 
   const newSessionButton = (

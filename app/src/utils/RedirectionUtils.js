@@ -99,15 +99,19 @@ export const redirectToTemplates = (navigate) => {
 /* FEATURE - SESSION RECORDINGS */
 export const redirectToSessionRecordingHome = (navigate, appMode = GLOBAL_CONSTANTS.APP_MODES.EXTENSION) => {
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-    const path = joinPaths(PATHS.SESSIONS.DESKTOP.ABSOLUTE, PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.ABSOLUTE) // idk why this works, but it works sooo.. not touching for now
-    navigate(path); 
+    navigate(PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.ABSOLUTE); 
   } else {
     navigate(PATHS.SESSIONS.ABSOLUTE);
   }
 };
 
+export const redirectToNetworkSessionHome = (navigate) => {
+  navigate(PATHS.SESSIONS.DESKTOP.SAVED_LOGS.RELATIVE);
+}
+
 export const redirectToNetworkSession = (navigate, id) => {
-  navigate(PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + `/${id}`);
+  if(id) navigate(PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + `/${id}`);
+  navigate(PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE);
 };
 
 /* Settings */

@@ -4,8 +4,8 @@ import { useLocation } from "react-router-dom";
 import { SecondarySidebarLink } from "views/containers/common/SecondarySidebarLink";
 
 import { VscFileSymlinkDirectory } from "@react-icons/all-files/vsc/VscFileSymlinkDirectory";
-import { CiViewTimeline } from "@react-icons/all-files/ci/CiViewTimeline";
-import { FaRegFileVideo } from "@react-icons/all-files/fa6/FaRegFileVideo";
+// import { CiViewTimeline } from "@react-icons/all-files/ci/CiViewTimeline";
+// import { FaRegFileVideo } from "@react-icons/all-files/fa6/FaRegFileVideo";
 import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
 
 import "./DesktopSessionsSidebar.css";
@@ -16,16 +16,16 @@ const desktopSessionsRoutes: any[] = [
         title: "Saved Logs",
         icon: <VscFileSymlinkDirectory />
     },
-    {
-        path: PATHS.SESSIONS.DESKTOP.HAR_VIEWER.RELATIVE,
-        title: "HAR Viewer",
-        icon: <CiViewTimeline />
-    },
-    {
-        path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.RELATIVE,
-        title: "Web Session Viewer",
-        icon: <FaRegFileVideo />
-    },
+    // {
+    //     path: PATHS.SESSIONS.DESKTOP.HAR_VIEWER.RELATIVE,
+    //     title: "HAR Viewer",
+    //     icon: <CiViewTimeline />
+    // },
+    // {
+    //     path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.RELATIVE,
+    //     title: "Web Session Viewer",
+    //     icon: <FaRegFileVideo />
+    // },
     {
         path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.RELATIVE,
         title: "Web Sessions",

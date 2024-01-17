@@ -1,12 +1,9 @@
 import React, { useCallback, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
 import { actions } from "store";
-import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
-import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
 import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
@@ -22,6 +19,7 @@ import {
   trackTriedRecordingForInvalidURL,
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
+import { ImportHarModalButton } from "../../desktopSessions/HarViewer/ImportHarModalButton";
 
 const { Text, Title } = Typography;
 
@@ -65,13 +63,6 @@ interface OnboardingProps extends SessionOnboardProps {
 }
 
 const NewtorkSessionsOnboarding: React.FC<{}> = () => {
-  const navigate = useNavigate();
-  const stableNavigate = useCallback(
-    (sessionId: string) => {
-      redirectToNetworkSession(navigate, sessionId);
-    },
-    [navigate]
-  );
   return (
     <div
       style={{
@@ -87,7 +78,8 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
         <div>Record your network sessions and Share with others for offline review or debugging.</div>
       </Text>
       <div>
-        <HarImportModal onSaved={stableNavigate} />
+        {/* <HarImportModal onSaved={stableNavigate} /> */}
+        <ImportHarModalButton />
       </div>
       <Divider />
       <Text type="secondary">
