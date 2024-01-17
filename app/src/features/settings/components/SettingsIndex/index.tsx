@@ -6,19 +6,29 @@ import { BillingTeamsSidebar } from "../BillingTeam/components/BillingTeamsSideb
 import { Outlet, useLocation } from "react-router-dom";
 import APP_CONSTANTS from "config/constants";
 import "./index.scss";
+import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
+import { useSelector } from "react-redux";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
 
 const SettingsIndex: React.FC = () => {
   // TODO: FIX THIS
   const location = useLocation();
+  useBillingTeamsListener();
+
+  const billingTeams = useSelector(getAvailableBillingTeams);
 
   const secondarySideBarItems = useMemo(() => {
     switch (true) {
       case location.pathname.includes(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE):
-        return <BillingTeamsSidebar />;
+        return (
+          <BillingTeamsSidebar
+            billingTeams={billingTeams.map((billingTeam) => ({ id: billingTeam.id, name: billingTeam.name }))}
+          />
+        );
       default:
         return null;
     }
-  }, [location.pathname]);
+  }, [billingTeams, location.pathname]);
 
   // FETCH BILLING TEAMS HERE
 
