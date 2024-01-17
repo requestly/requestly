@@ -2,6 +2,7 @@
 import { MODES } from "components/misc/VerifyEmail/modes";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
+import { joinPaths } from "./PathUtils";
 
 //CONSTANTS
 const { PATHS, LINKS } = APP_CONSTANTS;
@@ -96,20 +97,17 @@ export const redirectToTemplates = (navigate) => {
 };
 
 /* FEATURE - SESSION RECORDINGS */
-export const redirectToSessionRecordingHome = (navigate) => {
-  navigate(PATHS.SESSIONS.ABSOLUTE);
-};
-
-export const redirectToSavedSession = (navigate, id) => {
-  navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
-};
-
-export const redirectToSessionSettings = (navigate) => {
-  navigate(PATHS.SESSIONS.SETTINGS.ABSOLUTE);
+export const redirectToSessionRecordingHome = (navigate, appMode = GLOBAL_CONSTANTS.APP_MODES.EXTENSION) => {
+  if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+    const path = joinPaths(PATHS.SESSIONS.DESKTOP.ABSOLUTE, PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.ABSOLUTE) // idk why this works, but it works sooo.. not touching for now
+    navigate(path); 
+  } else {
+    navigate(PATHS.SESSIONS.ABSOLUTE);
+  }
 };
 
 export const redirectToNetworkSession = (navigate, id) => {
-  navigate(PATHS.SESSIONS.NETWORK.ABSOLUTE + `/${id}`);
+  navigate(PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + `/${id}`);
 };
 
 /* Settings */

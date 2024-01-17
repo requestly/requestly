@@ -12,6 +12,8 @@ import { settingRoutes } from "./settingRoutes";
 import { ruleRoutes } from "features/rules/routes";
 import { desktopSessionsRoutes } from "./desktopSessionRoutes";
 
+console.log("desktop routes", desktopSessionsRoutes)
+
 export const routes: RouteObject[] = [
   ...ruleRoutes,
   ...sessionRoutes,

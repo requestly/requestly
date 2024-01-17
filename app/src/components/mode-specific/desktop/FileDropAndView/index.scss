@@ -1,0 +1,7 @@
+.file-handler-wrapper {
+    width: 100%;
+    height: 100%;
+    background: var(--background);
+    grid-template-columns: 3fr 0.5fr;
+    grid-gap: 1rem;
+}
