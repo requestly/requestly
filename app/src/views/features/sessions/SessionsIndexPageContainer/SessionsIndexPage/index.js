@@ -40,7 +40,6 @@ import {
   trackSessionRecordingUpload,
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
-import { GoRecordSessionsOnWeb } from "./GoRecordSessions";
 import { ImportWebSessionModalButton } from "./ImportWebSessionModalButton";
 
 const _ = require("lodash");
