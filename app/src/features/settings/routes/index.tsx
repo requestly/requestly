@@ -40,6 +40,10 @@ export const settingRoutes: RouteObject[] = [
         path: PATHS.SETTINGS.BILLING.RELATIVE,
         element: <BillingTeam />,
       },
+      {
+        path: PATHS.SETTINGS.BILLING.RELATIVE + "/:teamId",
+        element: <BillingTeam />,
+      },
     ],
   },
   {
