@@ -6,6 +6,7 @@ import { MemberTableActions } from "./components/MemberTableActions";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { HiOutlineDotsHorizontal } from "@react-icons/all-files/hi/HiOutlineDotsHorizontal";
+import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
@@ -41,7 +42,20 @@ export const BillingTeamMembers: React.FC = () => {
             <Avatar size={28} shape="circle" src={record.photoUrl} alt={record.displayName} />
           </div>
           <div>
-            <div className="text-bold">{`${record.displayName} ${record.role}`}</div>
+            <Row align={"middle"}>
+              <span className="text-bold">{`${record.displayName}`}</span>
+              {record.role === BillingTeamRoles.Manager ? (
+                <Row className="icon__wrapper success" align={"middle"}>
+                  <MdOutlinePaid />
+                  <span className="caption">Billing manager</span>
+                </Row>
+              ) : record.role === BillingTeamRoles.Admin ? (
+                <Row className="icon__wrapper warning" align={"middle"}>
+                  <MdOutlineAdminPanelSettings />
+                  <span className="caption">Billing admin</span>
+                </Row>
+              ) : null}
+            </Row>
             <div>
               <span className="member-email">{record.email}</span>
             </div>
