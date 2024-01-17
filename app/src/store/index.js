@@ -16,7 +16,7 @@ import INITIAL_STATE from "./initial-state";
 import { ReducerKeys } from "./constants";
 import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/slice";
 import { rulesReducer } from "./features/rules/slice";
-import { harPreviewReducer } from "./features/har-preview/slice";
+import { harPreviewReducer } from "./features/network-sessions/slice";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,

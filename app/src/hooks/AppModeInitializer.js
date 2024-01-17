@@ -36,7 +36,7 @@ import { useHasChanged } from "./useHasChanged";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { decompressEvents } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import PATHS from "config/constants/sub/paths";
-import { PreviewType, harPreviewActions } from "store/features/har-preview/slice";
+import { PreviewType, networkSessionActions } from "store/features/network-sessions/slice";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 
 let hasAppModeBeenSet = false;
@@ -188,10 +188,10 @@ const AppModeInitializer = () => {
             dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
             navigate(`${PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.ABSOLUTE}/imported`);
           } else if (fileObj?.extension === ".har") {
-            dispatch(harPreviewActions.resetState());
-            dispatch(harPreviewActions.setImportedHar(fileData));
-            dispatch(harPreviewActions.setPreviewType(PreviewType.IMPORTED));
-            dispatch(harPreviewActions.setSessionName(fileObj.name));
+            dispatch(networkSessionActions.resetState());
+            dispatch(networkSessionActions.setImportedHar(fileData));
+            dispatch(networkSessionActions.setPreviewType(PreviewType.IMPORTED));
+            dispatch(networkSessionActions.setSessionName(fileObj.name));
             redirectToNetworkSession(navigate);
           }
         } else {
