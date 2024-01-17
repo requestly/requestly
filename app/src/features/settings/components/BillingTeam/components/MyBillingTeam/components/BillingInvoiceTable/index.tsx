@@ -1,24 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Table } from "antd";
 import "./index.scss";
+import { useParams } from "react-router-dom";
+import { getBillingTeamInvoices } from "backend/billing";
 
 export const BillingInvoiceTable: React.FC = () => {
+  const { billingId } = useParams();
+
+  const [invoices, setInvoices] = useState([]);
+
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text: string) => <>{text}</>,
+      title: "Date",
+      dataIndex: "created",
+      key: "created",
+      render: (created: number) => (
+        <>{new Date(created * 1000).toLocaleString("default", { month: "short", day: "numeric", year: "numeric" })}</>
+      ),
     },
     {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
+      title: "Description",
+      dataIndex: "number",
+      key: "number",
+      render: (invoiceNumber: string) => <>{invoiceNumber}</>,
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
+      title: "Amount",
+      dataIndex: "total",
+      key: "total",
+      render: (amount: number) => <>{`$${amount / 100}`}</>,
     },
     {
       title: "",
@@ -30,56 +40,16 @@ export const BillingInvoiceTable: React.FC = () => {
     },
   ];
 
-  const dataSource = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-  ];
+  useEffect(() => {
+    getBillingTeamInvoices(billingId).then(setInvoices);
+  }, [billingId]);
+
   return (
     <Col className="billing-teams-primary-card">
       <Col className="text-bold text-white billing-invoice-table-title">Billing history and invoices</Col>
       <Table
         className="billing-table my-billing-team-members-table"
-        dataSource={dataSource}
+        dataSource={invoices}
         columns={columns}
         pagination={false}
         scroll={{ y: "30vh" }}
