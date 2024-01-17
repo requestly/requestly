@@ -21,4 +21,25 @@
       }
     }
   }
+
+  .ant-table-column-sorter {
+    display: none;
+  }
+
+  .ant-table-thead th.ant-table-column-has-sorters {
+    pointer-events: none;
+  }
+
+  .org-member-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+
+  .org-member-email {
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: 0.25px;
+    color: var(--text-default);
+  }
 }

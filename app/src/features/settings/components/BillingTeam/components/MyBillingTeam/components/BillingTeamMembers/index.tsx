@@ -1,15 +1,20 @@
-import React from "react";
-import { Col, Dropdown, Row, Table } from "antd";
+import React, { useState } from "react";
+import { Col, Drawer, Dropdown, Row, Table } from "antd";
 import { RQButton } from "lib/design-system/components";
+import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { HiOutlineDotsHorizontal } from "@react-icons/all-files/hi/HiOutlineDotsHorizontal";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
+import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
+// import { TbChecks } from "@react-icons/all-files/tb/TbChecks";
 import type { MenuProps } from "antd";
 import "./index.scss";
 
 export const BillingTeamMembers: React.FC = () => {
+  const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
+
   const columns = [
     {
       title: "Name",
@@ -73,68 +78,89 @@ export const BillingTeamMembers: React.FC = () => {
     },
   ];
 
-  const dataSource = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-  ];
-
   return (
-    <Col className="billing-teams-primary-card billing-team-members-section">
-      <Row className="billing-team-members-section-header w-full" justify="space-between" align="middle">
-        <Col className="billing-team-members-section-header-title">Members in billing team</Col>
-        <Col>
-          <RQButton type="default" icon={<IoMdAdd />} className="billing-team-members-section-header-btn">
-            Add members
-          </RQButton>
+    <>
+      <Col className="billing-teams-primary-card billing-team-members-section">
+        <Row className="billing-team-members-section-header w-full" justify="space-between" align="middle">
+          <Col className="billing-team-members-section-header-title">Members in billing team</Col>
+          <Col>
+            <RQButton
+              type="default"
+              icon={<IoMdAdd />}
+              className="billing-team-members-section-header-btn"
+              onClick={() => setIsMembersDrawerOpen(true)}
+            >
+              Add members
+            </RQButton>
+          </Col>
+        </Row>
+        <Table
+          className="billing-table my-billing-team-members-table"
+          dataSource={[]}
+          columns={columns}
+          pagination={false}
+          scroll={{ y: "35vh" }}
+        />
+      </Col>
+      <Drawer
+        placement="right"
+        onClose={() => setIsMembersDrawerOpen(false)}
+        open={isMembersDrawerOpen}
+        width={640}
+        closeIcon={null}
+        mask={false}
+        className="billing-team-members-drawer"
+      >
+        <Row className="billing-team-members-drawer-header w-full" justify="space-between" align="middle">
+          <Col className="billing-team-members-drawer-header_title">Add members in billing team</Col>
+          <Col>
+            <IoMdClose onClick={() => setIsMembersDrawerOpen(false)} />
+          </Col>
+        </Row>
+        <Col className="billing-team-members-drawer-body">
+          <OrgMembersTable actionButtons={(record: any) => <MemberTableActions record={record} />} />
         </Col>
-      </Row>
-      <Table
-        className="billing-table my-billing-team-members-table"
-        dataSource={dataSource}
-        columns={columns}
-        pagination={false}
-        scroll={{ y: "35vh" }}
-      />
-    </Col>
+        <Row className="mt-8 billing-team-members-drawer-help" justify="space-between" align="middle">
+          <Col>
+            Couldn't find member?{" "}
+            <a className="external-link" href="mailto:contact@requestly.io">
+              Contact us
+            </a>
+            , and we'll assist you in adding your team members.
+          </Col>
+          <Col>
+            <RQButton type="primary" onClick={() => setIsMembersDrawerOpen(false)}>
+              Done
+            </RQButton>
+          </Col>
+        </Row>
+      </Drawer>
+    </>
+  );
+};
+
+const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
+  const [isAddingMember, setIsAddingMember] = useState(false);
+  return (
+    <Row justify="end">
+      <RQButton
+        type="default"
+        icon={<IoMdAdd />}
+        className="billing-team-members-add-btn"
+        loading={isAddingMember}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsAddingMember(true);
+        }}
+      >
+        Add
+      </RQButton>
+      {/* <Row gutter={8} align="middle" className="billing-team-members-added-label">
+        <Col>
+          <TbChecks fontSize={14} />
+        </Col>
+        <Col>Already added</Col>
+      </Row> */}
+    </Row>
   );
 };
