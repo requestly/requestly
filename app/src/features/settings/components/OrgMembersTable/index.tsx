@@ -21,9 +21,9 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
   const searchedMembers = useMemo(() => {
     if (!organizationMembers?.users) return [];
     return organizationMembers?.users?.filter((member: any) => {
-      return member?.email?.includes(search);
+      return member?.email?.includes(search) && member?.email !== user?.details?.profile?.email;
     });
-  }, [organizationMembers?.users, search]);
+  }, [organizationMembers?.users, search, user?.details?.profile?.email]);
 
   useEffect(() => {
     isEmailVerified(user?.details?.profile?.uid).then((result) => {

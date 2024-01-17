@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Col, Drawer, Dropdown, Row, Table } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
+import { MemberTableActions } from "./components/MemberTableActions";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { HiOutlineDotsHorizontal } from "@react-icons/all-files/hi/HiOutlineDotsHorizontal";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
-// import { TbChecks } from "@react-icons/all-files/tb/TbChecks";
 import type { MenuProps } from "antd";
 import "./index.scss";
 
@@ -136,31 +136,5 @@ export const BillingTeamMembers: React.FC = () => {
         </Row>
       </Drawer>
     </>
-  );
-};
-
-const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
-  const [isAddingMember, setIsAddingMember] = useState(false);
-  return (
-    <Row justify="end">
-      <RQButton
-        type="default"
-        icon={<IoMdAdd />}
-        className="billing-team-members-add-btn"
-        loading={isAddingMember}
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsAddingMember(true);
-        }}
-      >
-        Add
-      </RQButton>
-      {/* <Row gutter={8} align="middle" className="billing-team-members-added-label">
-        <Col>
-          <TbChecks fontSize={14} />
-        </Col>
-        <Col>Already added</Col>
-      </Row> */}
-    </Row>
   );
 };
