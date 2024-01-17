@@ -10,8 +10,12 @@ import "./index.scss";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
+import { useSelector } from "react-redux";
+import { getBillingTeamMemberById } from "store/features/billing/selectors";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
+  const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
+
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
 
   return (
@@ -77,11 +81,11 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
           <div className="team-plan-details-section__team-details">
             <Col>
               <div className="team-plan-details-section-label">Billing manager</div>
-              <div className="text-white">{billingTeamDetails.owner}</div>
+              <div className="text-white">{teamOwnerDetails?.displayName}</div>
             </Col>
             <Col>
               <div className="team-plan-details-section-label">Email</div>
-              <div className="text-white">{billingTeamDetails.owner}</div>
+              <div className="text-white">{teamOwnerDetails?.email}</div>
             </Col>
             {billingTeamDetails.description ? (
               <Col>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Col, Drawer, Dropdown, Row, Table } from "antd";
+import { Avatar, Col, Drawer, Dropdown, Row, Table } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
 import { MemberTableActions } from "./components/MemberTableActions";
@@ -11,26 +11,41 @@ import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
 import type { MenuProps } from "antd";
 import "./index.scss";
+import { getBillingTeamMembers } from "store/features/billing/selectors";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export const BillingTeamMembers: React.FC = () => {
+  const { billingId } = useParams();
+  const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
+  const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
+
   const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
 
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text: string) => <>{text}</>,
+      title: "Member",
+      key: "id",
+      render: (_: any, record: Record<string, any>) => (
+        <Row>
+          <div className="mr-8">
+            <Avatar size={28} shape="circle" src={record.photoUrl} alt={record.displayName} />
+          </div>
+          <div>
+            <div className="text-bold">{record.displayName}</div>
+            <div>
+              <span className="member-email">{record.email}</span>
+            </div>
+          </div>
+        </Row>
+      ),
     },
     {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
-    },
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
+      title: "Added on",
+      dataIndex: "joiningDate",
+      render: (joiningDate: number) => (
+        <>{new Date(joiningDate).toLocaleString("default", { month: "short", day: "numeric", year: "numeric" })}</>
+      ),
     },
     {
       title: "",
@@ -96,7 +111,7 @@ export const BillingTeamMembers: React.FC = () => {
         </Row>
         <Table
           className="billing-table my-billing-team-members-table"
-          dataSource={[]}
+          dataSource={membersTableSource}
           columns={columns}
           pagination={false}
           scroll={{ y: "35vh" }}
