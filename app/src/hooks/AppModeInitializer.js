@@ -186,7 +186,6 @@ const AppModeInitializer = () => {
             dispatch(sessionRecordingActions.setSessionRecordingMetadata({ ...fileData?.data?.metadata }));
             const recordedSessionEvents = decompressEvents(fileData?.data?.events);
             dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
-            dispatch(sessionRecordingActions.setName(fileObj.name));
             navigate(`${PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.ABSOLUTE}/imported`);
           } else if (fileObj?.extension === ".har") {
             dispatch(harPreviewActions.resetState());
