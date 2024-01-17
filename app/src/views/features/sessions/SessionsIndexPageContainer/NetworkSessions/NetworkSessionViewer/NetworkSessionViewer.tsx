@@ -23,8 +23,13 @@ import {
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { useSelector } from "react-redux";
-import { PreviewType, harPreviewActions } from "store/features/har-preview/slice";
-import { getImportedHar, getPreviewType, getSessionId, getSessionName } from "store/features/har-preview/selectors";
+import { PreviewType, networkSessionActions } from "store/features/network-sessions/slice";
+import {
+  getImportedHar,
+  getPreviewType,
+  getSessionId,
+  getSessionName,
+} from "store/features/network-sessions/selectors";
 import { useDispatch } from "react-redux";
 import { RQButton } from "lib/design-system/components";
 
@@ -33,26 +38,25 @@ const NetworkSessionViewer: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const harPreviewType = useSelector(getPreviewType)
-  const networkSessionId = useSelector(getSessionId)
-  const importedHar = useSelector(getImportedHar)
-  const sessionName = useSelector(getSessionName)
-  
+  const harPreviewType = useSelector(getPreviewType);
+  const networkSessionId = useSelector(getSessionId);
+  const importedHar = useSelector(getImportedHar);
+  const sessionName = useSelector(getSessionName);
+
   const [recordedLogs, setRecordedLogs] = useState<RQNetworkLog[] | null>(null);
   // const [sessionName, setSessionName] = useState("");
 
   useEffect(() => {
-    if(id) {
-      dispatch(harPreviewActions.resetState())
-      dispatch(harPreviewActions.setPreviewType(PreviewType.SAVED))
-      dispatch(harPreviewActions.setSessionId(id))
+    if (id) {
+      dispatch(networkSessionActions.resetState());
+      dispatch(networkSessionActions.setPreviewType(PreviewType.SAVED));
+      dispatch(networkSessionActions.setSessionId(id));
     }
   }, [id, dispatch]);
 
-
   const fetchRecording = useCallback(async () => {
     const recording = await getNetworkSession(networkSessionId);
-    dispatch(harPreviewActions.setSessionName(recording.name))
+    dispatch(networkSessionActions.setSessionName(recording.name));
     setRecordedLogs(convertHarJsonToRQLogs(recording.har));
   }, [networkSessionId, dispatch]);
 
@@ -60,9 +64,9 @@ const NetworkSessionViewer: React.FC = () => {
     if (harPreviewType === PreviewType.IMPORTED && importedHar) {
       const logs = convertHarJsonToRQLogs(importedHar);
       setRecordedLogs(logs);
-    } else if(networkSessionId) fetchRecording()
+    } else if (networkSessionId) fetchRecording();
     else {
-      console.error("Error: no source for recording")
+      console.error("Error: no source for recording");
     }
   }, [fetchRecording, importedHar, harPreviewType, networkSessionId]);
 
@@ -86,37 +90,35 @@ const NetworkSessionViewer: React.FC = () => {
                 columnGap: "10px",
               }}
             >
-              <div className="header text-center">
-                {sessionName}
-              </div>
+              <div className="header text-center">{sessionName}</div>
             </div>
           </div>
           {harPreviewType === PreviewType.SAVED && (
-          <div className="session-viewer-actions">
-            <Space>
-              <Button
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  confirmAndDeleteRecording(id, () => {
-                    redirectToSessionRecordingHome(navigate);
-                  });
-                  trackDeleteNetworkSessionClicked(ActionSource.Preview);
-                }}
-              >
-                Delete session
-              </Button>
-              <Button
-                icon={<DownloadOutlined />}
-                onClick={() => {
-                  downloadHar(createLogsHar(recordedLogs), sessionName);
-                  trackDownloadNetworkSessionClicked(ActionSource.Preview);
-                  trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
-                }}
-              >
-                Download HAR
-              </Button>
-            </Space>
-          </div>
+            <div className="session-viewer-actions">
+              <Space>
+                <Button
+                  icon={<DeleteOutlined />}
+                  onClick={() => {
+                    confirmAndDeleteRecording(id, () => {
+                      redirectToSessionRecordingHome(navigate);
+                    });
+                    trackDeleteNetworkSessionClicked(ActionSource.Preview);
+                  }}
+                >
+                  Delete session
+                </Button>
+                <Button
+                  icon={<DownloadOutlined />}
+                  onClick={() => {
+                    downloadHar(createLogsHar(recordedLogs), sessionName);
+                    trackDownloadNetworkSessionClicked(ActionSource.Preview);
+                    trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
+                  }}
+                >
+                  Download HAR
+                </Button>
+              </Space>
+            </div>
           )}
         </div>
         {/* view */}

@@ -3,7 +3,7 @@ import { Har } from "components/mode-specific/desktop/InterceptTraffic/WebTraffi
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { PreviewType, harPreviewActions } from "store/features/har-preview/slice";
+import { PreviewType, networkSessionActions } from "store/features/network-sessions/slice";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 
@@ -18,9 +18,9 @@ export const ImportHarModalButton: React.FC = () => {
         console.log("filename", fileName);
         console.log("filepath", filePath);
 
-        dispatch(harPreviewActions.resetState());
-        dispatch(harPreviewActions.setImportedHar(har));
-        dispatch(harPreviewActions.setPreviewType(PreviewType.IMPORTED));
+        dispatch(networkSessionActions.resetState());
+        dispatch(networkSessionActions.setImportedHar(har));
+        dispatch(networkSessionActions.setPreviewType(PreviewType.IMPORTED));
         redirectToNetworkSession(navigate);
       } catch (e) {
         console.error(e);
