@@ -350,7 +350,7 @@ const SessionsIndexPage = () => {
           ) : null}
         </>
       ) : appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-        <GoRecordSessionsOnWeb />
+        <SessionOnboardingView />
       ) : (
         <OnboardingView
           redirectToSettingsPage={redirectToSettingsPage}
