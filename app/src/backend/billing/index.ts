@@ -1,6 +1,6 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import firebaseApp from "../../firebase";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import Logger from "lib/logger";
 import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 
@@ -60,4 +60,22 @@ export const updateBillingTeamMemberRole = async (billingId: string, userId: str
   );
 
   return updateUserRole({ billingId, userId, role });
+};
+
+export const fetchBillingIdByOwner = async (ownerId: string, uid: string) => {
+  if (!ownerId || !uid) return null;
+
+  const billingQuery = query(
+    collection(getFirestore(firebaseApp), "billing"),
+    where("owner", "==", ownerId),
+    where(`members.${uid}`, "!=", null)
+  );
+  const snapshot = await getDocs(billingQuery);
+
+  if (snapshot.empty) {
+    return null;
+  }
+
+  const billingId = snapshot.docs[0].id;
+  return billingId;
 };
