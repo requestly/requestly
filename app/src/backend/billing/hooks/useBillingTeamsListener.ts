@@ -35,7 +35,7 @@ export const useBillingTeamsListener = () => {
     const db = getFirestore(firebaseApp);
     const billingTeamsQuery = query(
       collection(db, "billing"),
-      where(`members.${user.details.profile.uid}`, "!=", null)
+      where(`members.${user?.details?.profile?.uid}`, "!=", null)
     );
 
     unsubscribeBillingTeamsListener = onSnapshot(billingTeamsQuery, (billingTeams) => {
@@ -52,7 +52,7 @@ export const useBillingTeamsListener = () => {
         })
       );
     });
-  }, [dispatch, fetchAndDispatchBillingTeamMembersProfile, user.details.profile.uid, user.loggedIn]);
+  }, [dispatch, fetchAndDispatchBillingTeamMembersProfile, user?.details?.profile?.uid, user.loggedIn]);
 
   useEffect(() => {
     getAuth(firebaseApp)
