@@ -1,4 +1,6 @@
 import React, { useCallback, useState } from "react";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Alert, Button, Col, Input, Popconfirm, Row, Tooltip } from "antd";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -11,11 +13,12 @@ import {
   trackProxyPortChangeRequested,
 } from "modules/analytics/events/desktopApp";
 import { toast } from "utils/Toast";
-import "./DesktopPreference.css";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 import { RQButton } from "lib/design-system/components";
+import "./DesktopSettings.css";
 
-const DesktopPreference = ({ appMode }) => {
+export const DesktopSettings = () => {
+  const appMode = useSelector(getAppMode);
   const [portInput, setPortInput] = useState("");
   const [portSubmitLoading, setPortSubmitLoading] = useState(false);
 
@@ -143,5 +146,3 @@ const DesktopPreference = ({ appMode }) => {
     </>
   ) : null;
 };
-
-export default DesktopPreference;

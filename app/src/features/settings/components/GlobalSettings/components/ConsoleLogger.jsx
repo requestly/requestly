@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import ErrorCard from "components/misc/ErrorCard";
-import SettingsItem from "../../SettingsItem";
+import SettingsItem from "./SettingsItem";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { toast } from "utils/Toast";
