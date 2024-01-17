@@ -49,3 +49,7 @@
   overflow: auto;
   height: 100%;
 }
+
+.manage-workspace-tabs .ant-tabs-tab.ant-tabs-tab-disabled {
+  display: none;
+}

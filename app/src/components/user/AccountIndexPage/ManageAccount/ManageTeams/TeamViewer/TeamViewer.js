@@ -17,7 +17,7 @@ const TeamViewer = () => {
   const { teamId } = useParams();
   const { isTeamAdmin } = useIsTeamAdmin(teamId);
   const availableTeams = useSelector(getAvailableTeams);
-  const teamDetails = availableTeams?.find((team) => team.id === teamId) ?? {};
+  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === teamId), [availableTeams, teamId]);
   const name = teamDetails?.name;
   const teamOwnerId = teamDetails?.owner;
   const isTeamArchived = teamDetails?.archived;
@@ -45,6 +45,7 @@ const TeamViewer = () => {
       },
       {
         key: "Plans & Billings",
+        disabled: !["active", "trialing", "past_due"].includes(teamDetails?.subscriptionStatus),
         label: (
           <span className="billing-tab-label">
             <>
@@ -52,10 +53,10 @@ const TeamViewer = () => {
             </>
           </span>
         ),
-        children: <BillingDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} />,
+        children: <BillingDetails key={teamId} teamId={teamId} isTeamAdmin={isTeamAdmin} teamDetails={teamDetails} />,
       },
     ],
-    [teamId, teamOwnerId, isTeamArchived, isTeamAdmin]
+    [teamId, teamOwnerId, isTeamArchived, isTeamAdmin, teamDetails]
   );
 
   return (
