@@ -61,7 +61,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
       width: "40%",
       render: (name, record) => {
         return (
-          <Link to={PATHS.SESSIONS.NETWORK.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
+          <Link to={PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
             {name}
           </Link>
         );
@@ -155,7 +155,7 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
         headerTitle={
           <Space align="center" className="network-session-list-header">
             <Typography.Title level={4} className="network-session-list-heading">
-              Network Session Recordings
+              Saved Network Logs
             </Typography.Title>
             <HarImportModal onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
           </Space>

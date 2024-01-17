@@ -17,7 +17,7 @@ import { RQSessionEvents } from "@requestly/web-sdk";
 import { decompressEvents } from "./sessionEventsUtils";
 import ShareButton from "../ShareButton";
 import PageLoader from "components/misc/PageLoader";
-import { getAuthInitialization, getUserAuthDetails, getUserAttributes } from "store/selectors";
+import { getAuthInitialization, getUserAuthDetails, getUserAttributes, getAppMode } from "store/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { getIsRequestedByOwner, getSessionRecordingEventsFilePath } from "store/features/session-recording/selectors";
 import PermissionError from "../errors/PermissionError";
@@ -78,6 +78,7 @@ const SavedSessionViewer: React.FC = () => {
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
   const userAttributes = useSelector(getUserAttributes);
+  const appMode = useSelector(getAppMode);
 
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
@@ -205,7 +206,7 @@ const SavedSessionViewer: React.FC = () => {
               iconOnly
               type="default"
               icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={() => redirectToSessionRecordingHome(navigate)}
+              onClick={() => redirectToSessionRecordingHome(navigate, appMode)}
               className="back-button"
             />
             <SessionViewerTitle isReadOnly={!isRequestedByOwner} isInsideIframe={isInsideIframe} />

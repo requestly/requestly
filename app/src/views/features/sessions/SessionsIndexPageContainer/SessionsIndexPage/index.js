@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { SettingOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
-import { getUserAuthDetails } from "../../../../../store/selectors";
+import { getAppMode, getUserAuthDetails } from "../../../../../store/selectors";
 import firebaseApp from "../../../../../firebase";
 import {
   getFirestore,
@@ -39,6 +40,7 @@ import {
   trackSessionRecordingUpload,
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
+import { GoRecordSessionsOnWeb } from "./GoRecordSessions";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -51,6 +53,7 @@ const SessionsIndexPage = () => {
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
+  const appMode  = useSelector(getAppMode)
 
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sharingRecordId, setSharingRecordId] = useState("");
@@ -343,7 +346,7 @@ const SessionsIndexPage = () => {
             />
           ) : null}
         </>
-      ) : (
+      ) : appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? <GoRecordSessionsOnWeb /> : (
         <OnboardingView
           redirectToSettingsPage={redirectToSettingsPage}
           openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}

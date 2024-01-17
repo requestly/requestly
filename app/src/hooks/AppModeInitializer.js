@@ -188,10 +188,13 @@ const AppModeInitializer = () => {
             dispatch(sessionRecordingActions.setSessionRecordingMetadata({ ...fileData?.data?.metadata }));
             const recordedSessionEvents = decompressEvents(fileData?.data?.events);
             dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
+            // navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
             navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
+
+
           } else if (payload?.extension === ".har") {
-            const savedSessionId = await saveNetworkSession(fileName, fileData, filePath);
-            redirectToNetworkSession(navigate, savedSessionId);
+            // const savedSessionId = await saveNetworkSession(fileName, fileData, filePath); // don't save the session here
+            // redirectToNetworkSession(navigate, savedSessionId);
           }
         } else {
           console.log("unknown file type detected");

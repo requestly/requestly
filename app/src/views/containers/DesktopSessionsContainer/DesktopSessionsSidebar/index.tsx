@@ -22,12 +22,12 @@ const desktopSessionsRoutes: any[] = [
         icon: <CiViewTimeline />
     },
     {
-        path: PATHS.SESSIONS.DESKTOP.WEB_SESSION_VIEWER.RELATIVE,
+        path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.RELATIVE,
         title: "Web Session Viewer",
         icon: <FaRegFileVideo />
     },
     {
-        path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.RELATIVE,
+        path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.RELATIVE,
         title: "Web Sessions",
         icon: <SessionIcon />
     },
