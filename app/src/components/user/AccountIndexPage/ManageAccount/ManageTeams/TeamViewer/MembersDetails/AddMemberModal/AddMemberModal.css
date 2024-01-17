@@ -1,3 +1,7 @@
+.add-member-modal .rq-modal-content {
+  background-color: var(--surface-1) !important;
+}
+
 .add-member-modal-header {
   margin-top: 1.43rem;
   max-width: 38ch;
