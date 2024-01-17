@@ -1,16 +1,18 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import firebaseApp from "../../../firebase";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
+import { getAuth } from "firebase/auth";
+import { billingActions } from "store/features/billing/slice";
 
 let unsubscribeBillingTeamsListener: () => void = null;
 
 export const useBillingTeamsListener = () => {
-  const user = useSelector(getUserAuthDetails);
+  const dispatch = useDispatch();
 
-  const [billingTeams, setBillingTeams] = useState([]);
+  const user = useSelector(getUserAuthDetails);
 
   const attachBillingTeamsListener = useCallback(() => {
     if (!user.loggedIn) {
@@ -30,14 +32,20 @@ export const useBillingTeamsListener = () => {
           id: billingTeam.id,
         };
       });
-      setBillingTeams(billingTeamDetails);
+      dispatch(billingActions.setAvailableBillingTeams(billingTeamDetails));
     });
-  }, [user?.details?.profile?.uid, user.loggedIn]);
+  }, [dispatch, user.details.profile.uid, user.loggedIn]);
+
+  useEffect(() => {
+    getAuth(firebaseApp)
+      .currentUser?.getIdTokenResult(true)
+      .then(() => {
+        console.log("!!!debug", "toke refreshed");
+      });
+  }, [user.loggedIn]);
 
   useEffect(() => {
     unsubscribeBillingTeamsListener?.();
     attachBillingTeamsListener();
   }, [attachBillingTeamsListener]);
-
-  return billingTeams;
 };

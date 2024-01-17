@@ -1,8 +1,9 @@
+import React from "react";
 import { Col, Row } from "antd";
 import { MdOutlineGroup } from "@react-icons/all-files/md/MdOutlineGroup";
 import { NavLink } from "react-router-dom";
 
-export const BillingTeamsSidebar = () => {
+export const BillingTeamsSidebar: React.FC<{ billingTeams: { id: string; name: string }[] }> = ({ billingTeams }) => {
   return (
     <>
       <Col className="title">Billing</Col>
@@ -11,28 +12,20 @@ export const BillingTeamsSidebar = () => {
         <Col style={{ marginLeft: "4px" }}>My billing teams</Col>
       </Row>
 
-      {/* MAP TEAMS HERE */}
       <Col className="settings-secondary-sidebar-section">
-        <NavLink
-          to="/settings/billing/1"
-          className={({ isActive }) =>
-            `settings-secondary-sidebar-section-link ${
-              isActive ? "settings-secondary-sidebar-section-active-link" : ""
-            }`
-          }
-        >
-          RQ official
-        </NavLink>
-        <NavLink
-          to="/settings/billing/2"
-          className={({ isActive }) =>
-            `settings-secondary-sidebar-section-link ${
-              isActive ? "settings-secondary-sidebar-section-active-link" : ""
-            }`
-          }
-        >
-          RQ official 2
-        </NavLink>
+        {billingTeams.map((billingTeam) => (
+          <NavLink
+            key={billingTeam.id}
+            to={`/settings/billing/${billingTeam.id}`}
+            className={({ isActive }) =>
+              `settings-secondary-sidebar-section-link ${
+                isActive ? "settings-secondary-sidebar-section-active-link" : ""
+              }`
+            }
+          >
+            {billingTeam.name}
+          </NavLink>
+        ))}
       </Col>
     </>
   );

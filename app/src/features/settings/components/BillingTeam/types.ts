@@ -5,6 +5,7 @@ export enum PlanStatus {
 }
 
 export interface BillingTeamDetails {
+  id: string;
   name: string;
   description: string;
   owner: string;

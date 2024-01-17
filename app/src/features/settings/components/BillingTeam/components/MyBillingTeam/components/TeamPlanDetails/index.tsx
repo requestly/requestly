@@ -7,9 +7,12 @@ import UpgradeIcon from "../../../../assets/upgrade.svg";
 import { TeamPlanStatus } from "../../../TeamPlanStatus";
 import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
 import "./index.scss";
+import { getPrettyPlanName } from "utils/FormattingHelper";
+import { getPlanNameFromId } from "utils/PremiumUtils";
 
-export const TeamPlanDetails: React.FC = () => {
+export const TeamPlanDetails: React.FC = ({ billingTeamDetails }) => {
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
+
   return (
     <Col className="billing-teams-primary-card team-plan-details-card">
       <Row className="team-plan-details-card-header" justify="space-between" align="middle">
@@ -28,7 +31,9 @@ export const TeamPlanDetails: React.FC = () => {
       <div className="team-plan-details-sections-wrapper">
         <div className="team-plan-details-section">
           <Row align="middle" gutter={8}>
-            <Col className="team-plan-details-section-plan-name">Professional team plan</Col>
+            <Col className="team-plan-details-section-plan-name">
+              {getPrettyPlanName(getPlanNameFromId(billingTeamDetails.subscriptionDetails.plan))} team plan
+            </Col>
             <Col>
               <Popover
                 content={<TeamPlanDetailsPopover />}
@@ -62,31 +67,37 @@ export const TeamPlanDetails: React.FC = () => {
             Billed monthly
           </Col>
           <Row align="middle" gutter={4} className="mt-8">
-            <Col className="header">7</Col>
+            <Col className="header">{billingTeamDetails.seats}</Col>
             <Col className="text-white caption">Licences</Col>
           </Row>
         </div>
         <div className="team-plan-details-section">
-          <Col className="team-plan-details-section__team-name">Core Engineering</Col>
+          <Col className="team-plan-details-section__team-name">{billingTeamDetails.name}</Col>
           <div className="team-plan-details-section__team-details">
             <Col>
               <div className="team-plan-details-section-label">Billing manager</div>
-              <div className="text-white">Parth Bhardwaj</div>
+              <div className="text-white">{billingTeamDetails.owner}</div>
             </Col>
             <Col>
               <div className="team-plan-details-section-label">Email</div>
-              <div className="text-white">test@gmail.com</div>
+              <div className="text-white">{billingTeamDetails.owner}</div>
             </Col>
-            <Col>
-              <div className="team-plan-details-section-label">Description</div>
-              <div className="text-white">Product team QA test</div>
-            </Col>
+            {billingTeamDetails.description ? (
+              <Col>
+                <div className="team-plan-details-section-label">Description</div>
+                <div className="text-white">{billingTeamDetails.description}</div>
+              </Col>
+            ) : null}
           </div>
         </div>
         <div className="team-plan-details-section display-row-center items-center">
           <div>
             <Col className="text-center caption">Plan renewal date</Col>
-            <Col className="mt-8 text-center text-bold header">Jan 11, 2024</Col>
+            <Col className="mt-8 text-center text-bold header">
+              {new Date(
+                billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodEnd * 1000
+              ).toLocaleString("default", { month: "short", day: "numeric", year: "numeric" })}
+            </Col>
           </div>
         </div>
       </div>
