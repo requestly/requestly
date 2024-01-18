@@ -73,7 +73,7 @@ export const BillingTeamMembers: React.FC = () => {
       title: "Added on",
       dataIndex: "joiningDate",
       render: (joiningDate: number) => (
-        <div className="text-white">{joiningDate ? getLongFormatDateString(new Date(joiningDate)) : "--"}</div>
+        <div className="text-white">{joiningDate ? getLongFormatDateString(new Date(joiningDate)) : "-"}</div>
       ),
     },
     {
