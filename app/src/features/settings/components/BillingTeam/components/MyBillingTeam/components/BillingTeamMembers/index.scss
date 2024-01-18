@@ -109,3 +109,8 @@
     top: 3px;
   }
 }
+
+.billing-team-members-table-dropdown .ant-dropdown-menu-item-disabled,
+.ant-dropdown-menu-submenu-title-disabled {
+  display: none;
+}
