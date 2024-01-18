@@ -7,18 +7,30 @@ import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { PricingFeatures } from "features/pricing";
 import { PRICING } from "features/pricing";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
+import { PricingPlans } from "features/pricing";
 
 interface Props {
   planDetails: Record<string, any>;
   closePopover: () => void;
+  isAnnualPlan: boolean;
 }
 
-export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopover }) => {
+export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopover, isAnnualPlan }) => {
+  const planPrice =
+    PricingPlans[getPlanNameFromId(planDetails.plan)]?.plans[
+      isAnnualPlan ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY
+    ]?.usd?.price;
+
   return (
     <>
       <Col className="team-plan-popover-header">
-        <Col className="text-bold text-white">{getPrettyPlanName(getPlanNameFromId(planDetails.plan))} team plan</Col>
         <IoMdClose className="team-plan-popover-close-icon" onClick={closePopover} />
+        <Col className="text-bold text-white">{getPrettyPlanName(getPlanNameFromId(planDetails.plan))} team plan</Col>
+        <Row gutter={4} className="mt-8 items-center" align="middle">
+          <Col className="header ">${isAnnualPlan ? planPrice / 12 : planPrice}</Col>
+          <Col className="text-white caption">per member/ per month</Col>
+        </Row>
+        <Col className="mt-16">Billed {isAnnualPlan ? "annually" : "monthly"}</Col>
       </Col>
       <Col className="team-plan-popover-body">
         <Col className="text-white text-bold">What's included in your plan</Col>
