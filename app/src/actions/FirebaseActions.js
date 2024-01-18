@@ -569,6 +569,7 @@ export function getAuthData(user) {
 
   // Update uid inside providerData to user's uid
   userProfile.uid = user.uid;
+  userProfile.isEmailVerified = user.emailVerified;
 
   // To add a dummy photoUrl incase user profile don't have one
   if (!userProfile.photoURL) {

@@ -47,7 +47,7 @@ export const BillingTeamMembers: React.FC = () => {
           <div>
             <Row align={"middle"} gutter={4}>
               <Col>
-                <span className="text-bold text-white">{`${record.displayName}`}</span>
+                <span className="text-bold text-white">{`${record.displayName ?? "User"}`}</span>
               </Col>
               <Col>
                 {record.role === BillingTeamRoles.Manager ? (
@@ -95,14 +95,14 @@ export const BillingTeamMembers: React.FC = () => {
           >
             <Col>
               <Popconfirm
-                title="Do you really want to remove this user from the billing team?"
+                title="Are you sure you want to remove this user from the billing team?"
                 onConfirm={() => {
                   setLoadingRows([...loadingRows, record.id]);
                   removeMemberFromBillingTeam(billingId, record.id)
-                    .then((res) => {
+                    .then(() => {
                       toast.success("User removed from the billing team");
                     })
-                    .catch((err) => {
+                    .catch(() => {
                       toast.error("Error while removing user");
                     })
                     .finally(() => {
@@ -132,7 +132,7 @@ export const BillingTeamMembers: React.FC = () => {
                       .then(() => {
                         toast.success(`User role changed to ${key}`);
                       })
-                      .catch((err) => {
+                      .catch(() => {
                         toast.error("Error while changing user role");
                       })
                       .finally(() => {
