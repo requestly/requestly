@@ -220,7 +220,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
               <Typography.Title level={5}>
                 Would you like to activate premium features for the new members being added to this workspace?
               </Typography.Title>
-              <Row className="mt-16" gutter={8} align="middle">
+              <Row className="mt-20" gutter={8} align="middle">
                 <Col>
                   <RQButton type="primary" onClick={handleAddToBilling} disabled={isProcessing}>
                     Yes
