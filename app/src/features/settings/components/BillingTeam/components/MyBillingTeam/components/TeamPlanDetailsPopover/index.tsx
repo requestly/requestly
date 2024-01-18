@@ -25,7 +25,9 @@ export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopo
     <>
       <Col className="team-plan-popover-header">
         <IoMdClose className="team-plan-popover-close-icon" onClick={closePopover} />
-        <Col className="text-bold text-white">{getPrettyPlanName(getPlanNameFromId(planDetails.plan))} team plan</Col>
+        <Col className="text-bold text-white" style={{ display: "inline-block" }}>
+          {getPrettyPlanName(getPlanNameFromId(planDetails.plan))} team plan
+        </Col>
         <Row gutter={4} className="mt-8 items-center" align="middle">
           <Col className="header ">${isAnnualPlan ? planPrice / 12 : planPrice}</Col>
           <Col className="text-white caption">per member/ per month</Col>
