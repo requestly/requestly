@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { getBillingTeamMemberById } from "store/features/billing/selectors";
+import { getUserAuthDetails } from "store/selectors";
+import { getBillingTeamMemberById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { Col, Popover, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { TeamPlanStatus } from "../../../TeamPlanStatus";
 import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
-import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
+import { BillingTeamDetails, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import { CancelPlanModal } from "../CancelPlanModal";
 import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
@@ -15,9 +16,14 @@ import UpgradeIcon from "../../../../assets/upgrade.svg";
 import "./index.scss";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
+  const user = useSelector(getUserAuthDetails);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
+  const billingTeamMembers = useSelector(getBillingTeamMembers(billingTeamDetails.id));
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
   const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
+  const isUserAdmin =
+    billingTeamMembers?.[user?.details?.profile?.uid] &&
+    billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
 
   return (
     <>
@@ -26,19 +32,21 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
           <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
             Your Plan <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
           </Col>
-          <Col className="team-plan-details-card-actions">
-            <RQButton
-              type="text"
-              className="team-plan-details-card-actions-cancel"
-              icon={<MdOutlineCancel />}
-              onClick={() => setIsCancelPlanModalOpen(true)}
-            >
-              Cancel plan
-            </RQButton>
-            <RQButton type="primary" icon={<img src={UpgradeIcon} alt="upgrade" />}>
-              Upgrade plan
-            </RQButton>
-          </Col>
+          {isUserAdmin && (
+            <Col className="team-plan-details-card-actions">
+              <RQButton
+                type="text"
+                className="team-plan-details-card-actions-cancel"
+                icon={<MdOutlineCancel />}
+                onClick={() => setIsCancelPlanModalOpen(true)}
+              >
+                Cancel plan
+              </RQButton>
+              <RQButton type="primary" icon={<img src={UpgradeIcon} alt="upgrade" />}>
+                Upgrade plan
+              </RQButton>
+            </Col>
+          )}
         </Row>
         <div className="team-plan-details-sections-wrapper">
           <div className="team-plan-details-section">
