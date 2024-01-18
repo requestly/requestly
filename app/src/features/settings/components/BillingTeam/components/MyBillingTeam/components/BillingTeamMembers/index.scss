@@ -114,3 +114,37 @@
 .ant-dropdown-menu-submenu-title-disabled {
   display: none;
 }
+
+.loading-cell {
+  cursor: not-allowed;
+  transition: 0.2s all ease-in-out;
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: var(--surface-0);
+    z-index: 1;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transition: 0.15s all ease-in-out;
+    animation: pulse 1.5s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
+}

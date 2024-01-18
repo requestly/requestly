@@ -51,7 +51,9 @@ export const useBillingTeamsListener = () => {
         billingTeamDetails.map((billingTeam) => {
           return fetchAndDispatchBillingTeamMembersProfile(billingTeam.id);
         })
-      );
+      ).then(() => {
+        dispatch(billingActions.setBillingTeamsLoading(false));
+      });
     });
   }, [dispatch, fetchAndDispatchBillingTeamMembersProfile, user?.details?.profile?.uid, user.loggedIn]);
 

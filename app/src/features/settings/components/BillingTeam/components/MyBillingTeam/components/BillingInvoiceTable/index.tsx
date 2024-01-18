@@ -8,12 +8,14 @@ import { MdOutlineVerified } from "@react-icons/all-files/md/MdOutlineVerified";
 import { BiSolidHourglassTop } from "@react-icons/all-files/bi/BiSolidHourglassTop";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { redirectToUrl } from "utils/RedirectionUtils";
+import Logger from "lib/logger";
 import "./index.scss";
 
 export const BillingInvoiceTable: React.FC = () => {
   const { billingId } = useParams();
 
   const [invoices, setInvoices] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const columns = useMemo(
     () => [
@@ -76,17 +78,24 @@ export const BillingInvoiceTable: React.FC = () => {
   );
 
   useEffect(() => {
-    getBillingTeamInvoices(billingId).then(setInvoices);
+    setIsLoading(true);
+    getBillingTeamInvoices(billingId)
+      .then(setInvoices)
+      .catch((e) => {
+        Logger.log(e);
+      })
+      .finally(() => setIsLoading(false));
   }, [billingId]);
 
   return (
     <Col className="billing-teams-primary-card">
       <Col className="text-bold text-white billing-invoice-table-title">Billing history and invoices</Col>
       <Table
-        className="billing-table my-billing-team-members-table"
+        className="billing-table my-billing-team-invoice-table"
         dataSource={invoices}
         columns={columns}
         pagination={false}
+        loading={isLoading}
         scroll={{ y: "30vh" }}
       />
     </Col>
