@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Divider, Row, Col, Switch } from "antd";
+import { Divider, Row, Col } from "antd";
 import BillingFooter from "./BillingFooter";
 import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { redirectToUrl } from "utils/RedirectionUtils";
+import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";
 
 // Common Component for Team & Individual Payments
 const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
@@ -60,30 +61,28 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
       </Row>
 
       <Divider className="manage-workspace-divider" />
-      <Row gutter={8}>
-        <Col>Automatically include members who join this workspace in the billing team</Col>
-        <Col>
-          <Switch
-            checked={isBillingTeamMapped}
-            onChange={(checked) => {
-              toggleWorkspaceMappingInBillingTeam(billingId, teamDetails.id, checked)
-                .then(() => {
-                  if (checked) {
-                    toast.success("Members will be automatically added to the billing team.");
-                  } else {
-                    toast.warn("Members will not be automatically added to the billing team.");
-                  }
-                  setIsBillingTeamMapped(checked);
-                })
-                .catch(() => {
-                  setIsBillingTeamMapped(!checked);
-                  toast.error("Something went wrong. Please contact support.");
-                });
-            }}
-          />
-        </Col>
+      <Row className="w-full">
+        <SettingsItem
+          isActive={isBillingTeamMapped}
+          onChange={(checked) => {
+            toggleWorkspaceMappingInBillingTeam(billingId, teamDetails.id, checked)
+              .then(() => {
+                if (checked) {
+                  toast.success("Members will be automatically added to the billing team.");
+                } else {
+                  toast.warn("Members will not be automatically added to the billing team.");
+                }
+                setIsBillingTeamMapped(checked);
+              })
+              .catch(() => {
+                setIsBillingTeamMapped(!checked);
+                toast.error("Something went wrong. Please contact support.");
+              });
+          }}
+          title="Automatically include members who join this workspace in the billing team"
+          caption="Enable automatic inclusion in the billing team for members joining this workspace"
+        />
       </Row>
-      <Divider className="manage-workspace-divider" />
       <BillingFooter />
     </div>
   ) : (
