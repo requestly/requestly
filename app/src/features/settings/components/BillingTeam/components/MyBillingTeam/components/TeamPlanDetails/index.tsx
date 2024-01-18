@@ -15,6 +15,7 @@ import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
 import UpgradeIcon from "../../../../assets/upgrade.svg";
 import "./index.scss";
 import { actions } from "store";
+import { getLongFormatDateString } from "utils/DateTimeUtils";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const dispatch = useDispatch();
@@ -141,9 +142,9 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
             <div>
               <Col className="text-center caption">Plan renewal date</Col>
               <Col className="mt-8 text-center text-bold header">
-                {new Date(
-                  billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodEnd * 1000
-                ).toLocaleString("default", { month: "short", day: "numeric", year: "numeric" })}
+                {getLongFormatDateString(
+                  new Date(billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodEnd * 1000)
+                )}
               </Col>
             </div>
           </div>

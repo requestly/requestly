@@ -19,6 +19,7 @@ import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutline
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
 import "./index.scss";
+import { getLongFormatDateString } from "utils/DateTimeUtils";
 
 export const BillingTeamMembers: React.FC = () => {
   const { billingId } = useParams();
@@ -72,9 +73,7 @@ export const BillingTeamMembers: React.FC = () => {
       title: "Added on",
       dataIndex: "joiningDate",
       render: (joiningDate: number) => (
-        <div className="text-white">
-          {new Date(joiningDate).toLocaleString("default", { month: "short", day: "numeric", year: "numeric" })}
-        </div>
+        <div className="text-white">{getLongFormatDateString(new Date(joiningDate))}</div>
       ),
     },
     {
