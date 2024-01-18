@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getBillingTeamMemberById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { Col, Popover, Row } from "antd";
@@ -14,16 +14,19 @@ import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
 import UpgradeIcon from "../../../../assets/upgrade.svg";
 import "./index.scss";
+import { actions } from "store";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
+  const dispatch = useDispatch();
+
   const user = useSelector(getUserAuthDetails);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingTeamDetails.id));
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
   const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
-  const isUserAdmin =
+  const isUserManager =
     billingTeamMembers?.[user?.details?.profile?.uid] &&
-    billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
+    billingTeamMembers?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager;
 
   return (
     <>
@@ -32,7 +35,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
           <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
             Your Plan <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
           </Col>
-          {isUserAdmin && (
+          {isUserManager && (
             <Col className="team-plan-details-card-actions">
               <RQButton
                 type="text"
@@ -42,9 +45,28 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               >
                 Cancel plan
               </RQButton>
-              <RQButton type="primary" icon={<img src={UpgradeIcon} alt="upgrade" />}>
-                Upgrade plan
-              </RQButton>
+              {getPlanNameFromId(billingTeamDetails?.subscriptionDetails?.plan) !== "professional" && (
+                <RQButton
+                  type="primary"
+                  icon={
+                    <img
+                      src={UpgradeIcon}
+                      alt="upgrade"
+                      onClick={() => {
+                        dispatch(
+                          actions.toggleActiveModal({
+                            modalName: "pricingModal",
+                            newValue: true,
+                            newProps: { selectedPlan: null, source: "billing_team" },
+                          })
+                        );
+                      }}
+                    />
+                  }
+                >
+                  Upgrade
+                </RQButton>
+              )}
             </Col>
           )}
         </Row>
