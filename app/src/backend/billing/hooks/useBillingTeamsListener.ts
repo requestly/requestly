@@ -17,7 +17,8 @@ export const useBillingTeamsListener = () => {
   const user = useSelector(getUserAuthDetails);
 
   const fetchAndDispatchBillingTeamMembersProfile = useCallback(
-    (billingId: string) => {
+    async (billingId: string) => {
+      await refreshUserToken();
       getBillingTeamMembersProfile(billingId).then((billingTeamMembers) => {
         if (billingTeamMembers) {
           dispatch(billingActions.setBillingTeamMembers({ billingId, billingTeamMembers }));
@@ -54,12 +55,16 @@ export const useBillingTeamsListener = () => {
     });
   }, [dispatch, fetchAndDispatchBillingTeamMembersProfile, user?.details?.profile?.uid, user.loggedIn]);
 
-  useEffect(() => {
-    getAuth(firebaseApp)
+  const refreshUserToken = async () => {
+    return getAuth(firebaseApp)
       .currentUser?.getIdTokenResult(true)
       .then(() => {
         Logger.log("token refreshed for billing team custom claim");
       });
+  };
+
+  useEffect(() => {
+    refreshUserToken();
   }, [user.loggedIn]);
 
   useEffect(() => {
