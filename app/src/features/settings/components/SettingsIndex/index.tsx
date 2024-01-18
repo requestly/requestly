@@ -5,10 +5,10 @@ import { SettingsSecondarySidebar } from "../SettingsSecondarySidebar";
 import { BillingTeamsSidebar } from "../BillingTeam/components/BillingTeamsSidebar";
 import { Outlet, useLocation } from "react-router-dom";
 import APP_CONSTANTS from "config/constants";
-import "./index.scss";
 import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
 import { useSelector } from "react-redux";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import "./index.scss";
 
 const SettingsIndex: React.FC = () => {
   // TODO: FIX THIS
