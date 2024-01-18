@@ -87,13 +87,13 @@ export const BillingTeamMembers: React.FC = () => {
           <Row justify="end" align="middle" gutter={8} className="w-full">
             <Col>
               <Popconfirm
-                title="Do you really want to remove this user from the billing team?"
+                title="Are you sure you about removing this user from the billing team?"
                 onConfirm={() => {
                   removeMemberFromBillingTeam(billingId, record.id)
-                    .then((res) => {
+                    .then(() => {
                       toast.success("User removed from the billing team");
                     })
-                    .catch((err) => {
+                    .catch(() => {
                       toast.error("Error while removing user");
                     });
                 }}
