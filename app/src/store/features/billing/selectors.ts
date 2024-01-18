@@ -20,3 +20,7 @@ export const getBillingTeamMemberById = (billingId: string, memberId: string) =>
 ): Record<string, any> => {
   return state[ReducerKeys.BILLING].billingTeamMembers[billingId]?.[memberId];
 };
+
+export const getIsBillingTeamsLoading = (state: RootState): boolean => {
+  return state[ReducerKeys.BILLING].isBillingTeamsLoading;
+};

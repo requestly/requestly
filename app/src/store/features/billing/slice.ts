@@ -5,6 +5,7 @@ import { ReducerKeys } from "store/constants";
 const initialState = {
   availableBillingTeams: [] as BillingTeamDetails[],
   billingTeamMembers: {} as Record<string, any>,
+  isBillingTeamsLoading: true,
 };
 
 const slice = createSlice({
@@ -18,6 +19,9 @@ const slice = createSlice({
     setBillingTeamMembers: (state, action) => {
       const { billingId, billingTeamMembers } = action.payload;
       state.billingTeamMembers[billingId] = billingTeamMembers;
+    },
+    setBillingTeamsLoading: (state, action) => {
+      state.isBillingTeamsLoading = action.payload;
     },
   },
 });

@@ -88,3 +88,17 @@
     border-bottom: 1px solid var(--surface-1);
   }
 }
+
+.billing-team-loader-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  gap: 20px;
+
+  .ant-spin {
+    transform: scale(1.5);
+  }
+}

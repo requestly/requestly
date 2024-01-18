@@ -18,8 +18,8 @@ import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
-import "./index.scss";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
+import "./index.scss";
 
 export const BillingTeamMembers: React.FC = () => {
   const { billingId } = useParams();
@@ -32,6 +32,7 @@ export const BillingTeamMembers: React.FC = () => {
     billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
 
   const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
+  const [loadingRows, setLoadingRows] = useState<string[]>([]);
 
   const columns = [
     {
@@ -39,7 +40,7 @@ export const BillingTeamMembers: React.FC = () => {
       key: "id",
       width: 460,
       render: (_: any, record: Record<string, any>) => (
-        <Row>
+        <Row className={`${loadingRows.includes(record.id) ? "loading-cell" : ""}`}>
           <div className="billing-team-member-avatar-wrapper">
             <Avatar size={34} shape="circle" src={record.photoUrl} alt={record.displayName} />
           </div>
@@ -72,8 +73,10 @@ export const BillingTeamMembers: React.FC = () => {
     {
       title: "Added on",
       dataIndex: "joiningDate",
-      render: (joiningDate: number) => (
-        <div className="text-white">{joiningDate ? getLongFormatDateString(new Date(joiningDate)) : "-"}</div>
+      render: (joiningDate: number, record: any) => (
+        <div className={`text-white ${loadingRows.includes(record.id) ? "loading-cell" : ""}`}>
+          {joiningDate ? getLongFormatDateString(new Date(joiningDate)) : "-"}
+        </div>
       ),
     },
     {
@@ -84,17 +87,26 @@ export const BillingTeamMembers: React.FC = () => {
           return null;
         }
         return (
-          <Row justify="end" align="middle" gutter={8} className="w-full">
+          <Row
+            justify="end"
+            align="middle"
+            gutter={8}
+            className={`w-full  ${loadingRows.includes(record.id) ? "loading-cell" : ""}`}
+          >
             <Col>
               <Popconfirm
                 title="Do you really want to remove this user from the billing team?"
                 onConfirm={() => {
+                  setLoadingRows([...loadingRows, record.id]);
                   removeMemberFromBillingTeam(billingId, record.id)
                     .then((res) => {
                       toast.success("User removed from the billing team");
                     })
                     .catch((err) => {
                       toast.error("Error while removing user");
+                    })
+                    .finally(() => {
+                      setLoadingRows(loadingRows.filter((row) => row !== record.id));
                     });
                 }}
                 okText="Confirm"
@@ -115,12 +127,16 @@ export const BillingTeamMembers: React.FC = () => {
                 menu={{
                   items: items.map((item) => ({ ...item, disabled: item.key === record.role })),
                   onClick: ({ key }) => {
+                    setLoadingRows([...loadingRows, record.id]);
                     updateBillingTeamMemberRole(billingId, record.id, key as BillingTeamRoles)
                       .then(() => {
                         toast.success(`User role changed to ${key}`);
                       })
                       .catch((err) => {
                         toast.error("Error while changing user role");
+                      })
+                      .finally(() => {
+                        setLoadingRows(loadingRows.filter((row) => row !== record.id));
                       });
                   },
                 }}
@@ -214,11 +230,6 @@ export const BillingTeamMembers: React.FC = () => {
               Contact us
             </a>
             , and we'll assist you in adding your team members.
-          </Col>
-          <Col>
-            <RQButton type="primary" onClick={() => setIsMembersDrawerOpen(false)}>
-              Done
-            </RQButton>
           </Col>
         </Row>
       </Drawer>

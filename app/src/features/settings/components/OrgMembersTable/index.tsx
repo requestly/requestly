@@ -96,7 +96,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
         dataSource={searchedMembers}
         columns={columns}
         pagination={false}
-        scroll={{ y: "70vh" }}
+        scroll={{ y: "74vh" }}
         loading={!organizationMembers?.users}
         locale={{
           emptyText: (
