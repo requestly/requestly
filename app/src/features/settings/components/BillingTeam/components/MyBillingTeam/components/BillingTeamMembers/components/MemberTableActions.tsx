@@ -10,6 +10,7 @@ import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { getBillingTeamMembers } from "store/features/billing/selectors";
 import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
 export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
   const { billingId } = useParams();
@@ -36,6 +37,7 @@ export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
       })
       .catch((e) => {
         Logger.log(e);
+        toast.error("Could not add user to billing team, Please contact support");
       })
       .finally(() => setIsAddingUser(false));
   }, [billingId, record.email]);
