@@ -4,7 +4,6 @@ import { getUserAuthDetails } from "store/selectors";
 import { Col, Empty, Input, Row, Table, TableProps } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
-import { isEmailVerified } from "utils/AuthUtils";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import "./index.scss";
 
@@ -26,16 +25,14 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
   }, [organizationMembers?.users, search, user?.details?.profile?.email]);
 
   useEffect(() => {
-    isEmailVerified(user?.details?.profile?.uid).then((result) => {
-      if (result && isCompanyEmail(user?.details?.profile?.email)) {
-        getOrganizationUsers({
-          domain: getDomainFromEmail(user?.details?.profile?.email),
-        }).then((res: any) => {
-          setOrganizationMembers(res.data);
-        });
-      }
-    });
-  }, [getOrganizationUsers, user?.details?.profile?.email, user?.details?.profile?.uid]);
+    if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
+      getOrganizationUsers({
+        domain: getDomainFromEmail(user?.details?.profile?.email),
+      }).then((res: any) => {
+        setOrganizationMembers(res.data);
+      });
+    }
+  }, [getOrganizationUsers, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
 
   const columns: TableProps<any>["columns"] = useMemo(
     () => [
