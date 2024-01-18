@@ -79,11 +79,8 @@ export const fetchBillingIdByOwner = async (ownerId: string, uid: string) => {
       mappedWorkspaces: [],
     };
 
-  const billingQuery = query(
-    collection(getFirestore(firebaseApp), "billing"),
-    where("owner", "==", ownerId),
-    where(`members.${uid}`, "!=", null)
-  );
+  const billingQuery = query(collection(getFirestore(firebaseApp), "billing"), where("owner", "==", ownerId));
+
   const snapshot = await getDocs(billingQuery);
 
   if (snapshot.empty) {
