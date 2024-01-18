@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getBillingTeamMemberById, getBillingTeamMembers } from "store/features/billing/selectors";
@@ -13,9 +13,9 @@ import { CancelPlanModal } from "../CancelPlanModal";
 import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
 import UpgradeIcon from "../../../../assets/upgrade.svg";
-import "./index.scss";
 import { actions } from "store";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
+import "./index.scss";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const dispatch = useDispatch();
@@ -28,6 +28,18 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
   const isUserManager =
     billingTeamMembers?.[user?.details?.profile?.uid] &&
     billingTeamMembers?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager;
+
+  const isAnnualPlan = useMemo(() => {
+    const startDate = new Date(billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodStart * 1000);
+    const renewalDate = new Date(billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodEnd * 1000);
+    // Calculate the difference in months
+    const monthsDiff =
+      (renewalDate.getFullYear() - startDate.getFullYear()) * 12 + (renewalDate.getMonth() - startDate.getMonth());
+    return monthsDiff > 1;
+  }, [
+    billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodEnd,
+    billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodStart,
+  ]);
 
   return (
     <>
@@ -83,6 +95,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
                     <TeamPlanDetailsPopover
                       planDetails={billingTeamDetails.subscriptionDetails}
                       closePopover={() => setIsPlanDetailsPopoverVisible(false)}
+                      isAnnualPlan={isAnnualPlan}
                     />
                   }
                   title={null}
@@ -112,7 +125,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
                 color: "var(--neutrals-gray-300)",
               }}
             >
-              Billed monthly
+              Billed {isAnnualPlan ? "annually" : "monthly"}
             </Col>
             <Row align="middle" gutter={4} className="mt-8">
               <Col className="header">{billingTeamDetails.seats}</Col>

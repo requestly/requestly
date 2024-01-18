@@ -4,3 +4,4 @@ export { PricingModal } from "./components/PricingModal";
 export { UpgradeWorkspaceMenu } from "./components/UpgradeWorkspaceMenu";
 export { PremiumFeature } from "./components/PremiumFeature";
 export { PricingFeatures } from "./constants/pricingFeatures";
+export { PricingPlans } from "./constants/pricingPlans";
