@@ -126,7 +126,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
             <div className="team-plan-details-section__team-details">
               <Col>
                 <div className="team-plan-details-section-label">Billing manager</div>
-                <div className="text-white">{teamOwnerDetails?.displayName}</div>
+                <div className="text-white">{teamOwnerDetails?.displayName ?? "User"}</div>
               </Col>
               <Col>
                 <div className="team-plan-details-section-label">Email</div>
