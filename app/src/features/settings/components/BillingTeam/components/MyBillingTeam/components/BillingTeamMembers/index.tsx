@@ -46,7 +46,7 @@ export const BillingTeamMembers: React.FC = () => {
           <div>
             <Row align={"middle"} gutter={4}>
               <Col>
-                <span className="text-bold text-white">{`${record.displayName}`}</span>
+                <span className="text-bold text-white">{`${record.displayName ?? "User"}`}</span>
               </Col>
               <Col>
                 {record.role === BillingTeamRoles.Manager ? (
@@ -119,7 +119,7 @@ export const BillingTeamMembers: React.FC = () => {
                       .then(() => {
                         toast.success(`User role changed to ${key}`);
                       })
-                      .catch((err) => {
+                      .catch(() => {
                         toast.error("Error while changing user role");
                       });
                   },
