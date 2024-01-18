@@ -99,7 +99,24 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
         scroll={{ y: "70vh" }}
         loading={!organizationMembers?.users}
         locale={{
-          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No member found" />,
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                !organizationMembers?.users.length ? (
+                  <>
+                    Couldn't find member?{" "}
+                    <a className="external-link" href="mailto:contact@requestly.io">
+                      Contact us
+                    </a>
+                    and we'll assist you in adding your team members.
+                  </>
+                ) : (
+                  "No member found"
+                )
+              }
+            />
+          ),
         }}
       />
     </Col>
