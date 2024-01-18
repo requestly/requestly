@@ -41,11 +41,14 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
 
   // Global state
   const user = useSelector(getUserAuthDetails);
+  const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
+
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { id: activeWorkspaceId } = currentlyActiveWorkspace;
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
+
   const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === teamId), [availableTeams, teamId]);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
@@ -97,7 +100,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
       !isAddToBillingViewVisible &&
       !isBillingTeamMapped &&
       isTeamAdmin &&
-      ["active", "trialing", "past_due"].includes(teamDetails.subscriptionStatus)
+      ["active", "trialing", "past_due"].includes(teamDetails.subscriptionStatus) &&
+      !isAppSumoDeal
     ) {
       setIsAddToBillingViewVisible(true);
       return;
@@ -151,6 +155,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     isAddToBillingViewVisible,
     isTeamAdmin,
     isBillingTeamMapped,
+    isAppSumoDeal,
   ]);
 
   const handleAllowDomainUsers = useCallback(
