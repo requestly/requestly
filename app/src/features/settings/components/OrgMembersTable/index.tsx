@@ -41,7 +41,6 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
         key: "member",
         width: 350,
         render: (_: any, record: any) => {
-          console.log(record?.photoURL, record?.email);
           return (
             <Row align="middle" gutter={8}>
               <Col>
