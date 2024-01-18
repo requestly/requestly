@@ -57,7 +57,7 @@ export const BillingTeamMembers: React.FC = () => {
                 ) : record.role === BillingTeamRoles.Admin ? (
                   <Row className="icon__wrapper warning" align="middle">
                     <MdOutlineAdminPanelSettings style={{ marginRight: "2px" }} />
-                    <span className="caption">Billing admin</span>
+                    <span className="caption">Admin</span>
                   </Row>
                 ) : null}
               </Col>
@@ -125,6 +125,7 @@ export const BillingTeamMembers: React.FC = () => {
                 trigger={["click"]}
                 disabled={!isUserAdmin}
                 overlayStyle={{ width: "200px" }}
+                overlayClassName="billing-team-members-table-dropdown"
               >
                 <RQButton
                   className="members-table-dropdown-btn"
