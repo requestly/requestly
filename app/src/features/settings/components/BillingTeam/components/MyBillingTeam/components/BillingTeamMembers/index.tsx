@@ -80,7 +80,9 @@ export const BillingTeamMembers: React.FC = () => {
       title: "",
       key: "action",
       render: (_: any, record: any) => {
-        if (!isUserAdmin || record.id === user?.details?.profile?.uid) return null;
+        if (!isUserAdmin || record.id === user?.details?.profile?.uid || record.role === BillingTeamRoles.Manager) {
+          return null;
+        }
         return (
           <Row justify="end" align="middle" gutter={8} className="w-full">
             <Col>
