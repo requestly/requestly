@@ -1,33 +1,22 @@
 import React, { useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
-import { getBillingTeamMemberById, getBillingTeamMembers } from "store/features/billing/selectors";
+import { useSelector } from "react-redux";
+import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { Col, Popover, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { TeamPlanStatus } from "../../../TeamPlanStatus";
 import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
-import { BillingTeamDetails, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import { CancelPlanModal } from "../CancelPlanModal";
-import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
-import UpgradeIcon from "../../../../assets/upgrade.svg";
-import { actions } from "store";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import "./index.scss";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
-  const dispatch = useDispatch();
-
-  const user = useSelector(getUserAuthDetails);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
-  const billingTeamMembers = useSelector(getBillingTeamMembers(billingTeamDetails.id));
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
   const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
-  const isUserManager =
-    billingTeamMembers?.[user?.details?.profile?.uid] &&
-    billingTeamMembers?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager;
 
   const isAnnualPlan = useMemo(() => {
     const startDate = new Date(billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodStart * 1000);
@@ -48,7 +37,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
           <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
             Your Plan <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
           </Col>
-          {isUserManager && (
+          {/* {isUserManager && (
             <Col className="team-plan-details-card-actions">
               <RQButton
                 type="text"
@@ -81,7 +70,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
                 </RQButton>
               )}
             </Col>
-          )}
+          )} */}
         </Row>
         <div className="team-plan-details-sections-wrapper">
           <div className="team-plan-details-section">
