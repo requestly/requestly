@@ -30,8 +30,6 @@ const SettingsIndex: React.FC = () => {
     }
   }, [billingTeams, location.pathname]);
 
-  // FETCH BILLING TEAMS HERE
-
   return (
     <div className="settings-index">
       <div className="settings-index-sidebar-wrapper">
