@@ -77,6 +77,60 @@
   }
 }
 
-.team-plan-details-popover.ant-popover-placement-bottom {
-  padding-top: 0;
+.team-plan-details-popover {
+  width: 320px;
+
+  &.ant-popover-placement-bottomLeft {
+    padding-top: 0;
+  }
+
+  .ant-popover-inner-content {
+    padding: 0;
+    position: relative;
+  }
+
+  .team-plan-popover-header,
+  .team-plan-popover-body {
+    padding: 1rem !important;
+    border-bottom: 1px solid var(--surface-2);
+  }
+
+  .team-plan-popover-close-icon {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    font-size: 1rem;
+    color: var(--text-default);
+    cursor: pointer;
+  }
+  .team-plan-popover-feature {
+    gap: 8px;
+    color: var(--neutrals-gray-300);
+    margin-top: 10px;
+    font-size: 12px;
+    align-items: center;
+    line-height: 14px;
+
+    & svg {
+      font-size: 14px;
+    }
+  }
+
+  .team-plan-popover-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    &-section:first-child {
+      border-right: 1px solid var(--surface-2);
+    }
+
+    &-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      padding: 1rem;
+      color: var(--neutrals-gray-300);
+    }
+  }
 }

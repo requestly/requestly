@@ -1,17 +1,17 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { Col, Popover, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
-import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
-import UpgradeIcon from "../../../../assets/upgrade.svg";
 import { TeamPlanStatus } from "../../../TeamPlanStatus";
 import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
-import "./index.scss";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
-import { useSelector } from "react-redux";
-import { getBillingTeamMemberById } from "store/features/billing/selectors";
+import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
+import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
+import UpgradeIcon from "../../../../assets/upgrade.svg";
+import "./index.scss";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
@@ -41,10 +41,15 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
             </Col>
             <Col>
               <Popover
-                content={<TeamPlanDetailsPopover />}
+                content={
+                  <TeamPlanDetailsPopover
+                    planDetails={billingTeamDetails.subscriptionDetails}
+                    closePopover={() => setIsPlanDetailsPopoverVisible(false)}
+                  />
+                }
                 title={null}
                 trigger="click"
-                placement="bottom"
+                placement="bottomLeft"
                 overlayClassName="team-plan-details-popover"
                 showArrow={false}
                 open={isPlanDetailsPopoverVisible}
