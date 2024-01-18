@@ -1,8 +1,16 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Avatar, Col, Drawer, Dropdown, Popconfirm, Row, Table } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
 import { MemberTableActions } from "./components/MemberTableActions";
+import { getBillingTeamMembers } from "store/features/billing/selectors";
+import { getUserAuthDetails } from "store/selectors";
+import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { removeMemberFromBillingTeam, updateBillingTeamMemberRole } from "backend/billing";
+import { toast } from "utils/Toast";
+import type { MenuProps } from "antd";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { HiOutlineDotsHorizontal } from "@react-icons/all-files/hi/HiOutlineDotsHorizontal";
@@ -10,15 +18,7 @@ import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
-import type { MenuProps } from "antd";
 import "./index.scss";
-import { getBillingTeamMembers } from "store/features/billing/selectors";
-import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
-import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
-import { removeMemberFromBillingTeam, updateBillingTeamMemberRole } from "backend/billing";
-import { toast } from "utils/Toast";
 
 export const BillingTeamMembers: React.FC = () => {
   const { billingId } = useParams();
@@ -36,28 +36,33 @@ export const BillingTeamMembers: React.FC = () => {
     {
       title: "Member",
       key: "id",
+      width: 460,
       render: (_: any, record: Record<string, any>) => (
         <Row>
-          <div className="mr-8">
-            <Avatar size={28} shape="circle" src={record.photoUrl} alt={record.displayName} />
+          <div className="billing-team-member-avatar-wrapper">
+            <Avatar size={34} shape="circle" src={record.photoUrl} alt={record.displayName} />
           </div>
           <div>
-            <Row align={"middle"}>
-              <span className="text-bold">{`${record.displayName}`}</span>
-              {record.role === BillingTeamRoles.Manager ? (
-                <Row className="icon__wrapper success" align={"middle"}>
-                  <MdOutlinePaid className="mr-4" />
-                  <span className="caption">Billing manager</span>
-                </Row>
-              ) : record.role === BillingTeamRoles.Admin ? (
-                <Row className="icon__wrapper warning" align={"middle"}>
-                  <MdOutlineAdminPanelSettings className="mr-4" />
-                  <span className="caption">Billing admin</span>
-                </Row>
-              ) : null}
+            <Row align={"middle"} gutter={4}>
+              <Col>
+                <span className="text-bold text-white">{`${record.displayName}`}</span>
+              </Col>
+              <Col>
+                {record.role === BillingTeamRoles.Manager ? (
+                  <Row className="icon__wrapper success" align="middle">
+                    <MdOutlinePaid style={{ marginRight: "2px" }} />
+                    <span className="caption">Billing manager</span>
+                  </Row>
+                ) : record.role === BillingTeamRoles.Admin ? (
+                  <Row className="icon__wrapper warning" align="middle">
+                    <MdOutlineAdminPanelSettings style={{ marginRight: "2px" }} />
+                    <span className="caption">Billing admin</span>
+                  </Row>
+                ) : null}
+              </Col>
             </Row>
             <div>
-              <span className="member-email">{record.email}</span>
+              <span className="billing-team-member-email">{record.email}</span>
             </div>
           </div>
         </Row>
@@ -67,7 +72,9 @@ export const BillingTeamMembers: React.FC = () => {
       title: "Added on",
       dataIndex: "joiningDate",
       render: (joiningDate: number) => (
-        <>{new Date(joiningDate).toLocaleString("default", { month: "short", day: "numeric", year: "numeric" })}</>
+        <div className="text-white">
+          {new Date(joiningDate).toLocaleString("default", { month: "short", day: "numeric", year: "numeric" })}
+        </div>
       ),
     },
     {
@@ -120,6 +127,7 @@ export const BillingTeamMembers: React.FC = () => {
                 }}
                 trigger={["click"]}
                 disabled={!isUserAdmin}
+                overlayStyle={{ width: "200px" }}
               >
                 <RQButton
                   className="members-table-dropdown-btn"
