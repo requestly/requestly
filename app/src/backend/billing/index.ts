@@ -73,7 +73,11 @@ export const updateBillingTeamMemberRole = async (billingId: string, userId: str
 };
 
 export const fetchBillingIdByOwner = async (ownerId: string, uid: string) => {
-  if (!ownerId || !uid) return null;
+  if (!ownerId || !uid)
+    return {
+      billingId: null,
+      mappedWorkspaces: [],
+    };
 
   const billingQuery = query(
     collection(getFirestore(firebaseApp), "billing"),
@@ -83,7 +87,10 @@ export const fetchBillingIdByOwner = async (ownerId: string, uid: string) => {
   const snapshot = await getDocs(billingQuery);
 
   if (snapshot.empty) {
-    return null;
+    return {
+      billingId: null,
+      mappedWorkspaces: [],
+    };
   }
 
   const billingId = snapshot.docs[0].id;

@@ -89,11 +89,9 @@ export const BillingTeamMembers: React.FC = () => {
                 onConfirm={() => {
                   removeMemberFromBillingTeam(billingId, record.id)
                     .then((res) => {
-                      console.log("!!!debug", "success", res.data);
                       toast.success("User removed from the billing team");
                     })
                     .catch((err) => {
-                      console.log("!!!debug", "removing error", err);
                       toast.error("Error while removing user");
                     });
                 }}

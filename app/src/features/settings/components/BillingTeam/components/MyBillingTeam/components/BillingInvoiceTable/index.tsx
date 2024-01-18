@@ -29,7 +29,9 @@ export const BillingInvoiceTable: React.FC = () => {
         title: "Description",
         dataIndex: "number",
         key: "number",
-        render: (invoiceNumber: string) => <div className="text-white text-bold">{invoiceNumber}</div>,
+        render: (invoiceNumber: string, record: any) => (
+          <div className="text-white text-bold">{invoiceNumber ?? record.id}</div>
+        ),
       },
       {
         title: "Amount",
