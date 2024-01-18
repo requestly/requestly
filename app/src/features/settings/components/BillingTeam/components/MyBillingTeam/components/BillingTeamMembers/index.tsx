@@ -87,7 +87,7 @@ export const BillingTeamMembers: React.FC = () => {
           <Row justify="end" align="middle" gutter={8} className="w-full">
             <Col>
               <Popconfirm
-                title="Are you sure you about removing this user from the billing team?"
+                title="Are you sure you want to remove this user from the billing team?"
                 onConfirm={() => {
                   removeMemberFromBillingTeam(billingId, record.id)
                     .then(() => {
