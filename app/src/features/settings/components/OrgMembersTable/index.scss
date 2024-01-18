@@ -46,4 +46,8 @@
     letter-spacing: 0.25px;
     color: var(--text-default);
   }
+
+  .ant-spin-nested-loading > div > .ant-spin {
+    background: var(--background);
+  }
 }
