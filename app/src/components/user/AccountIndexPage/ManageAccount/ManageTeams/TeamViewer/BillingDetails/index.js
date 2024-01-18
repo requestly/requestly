@@ -9,6 +9,7 @@ import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "back
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
+import { redirectToUrl } from "utils/RedirectionUtils";
 
 // Common Component for Team & Individual Payments
 const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
@@ -50,7 +51,7 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
           <RQButton
             type="default"
             onClick={() => {
-              navigate(APP_CONSTANTS.PATHS.PRICING.ABSOLUTE);
+              redirectToUrl("https://developers.requestly.io/faq/billing-team/", true);
             }}
           >
             Learn more
