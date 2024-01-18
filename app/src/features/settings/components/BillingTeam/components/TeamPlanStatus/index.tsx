@@ -1,7 +1,7 @@
 import React from "react";
-import { PlanStatus } from "../../types";
 import { Col, Row } from "antd";
 import { capitalize } from "lodash";
+import { PlanStatus } from "../../types";
 import "./index.scss";
 
 export const TeamPlanStatus: React.FC<{ subscriptionStatus: string }> = ({ subscriptionStatus }) => {
@@ -11,31 +11,33 @@ export const TeamPlanStatus: React.FC<{ subscriptionStatus: string }> = ({ subsc
   }
 
   return (
-    <Row
-      align="middle"
-      className={`team-plan-status-badge ${
-        planStatus === PlanStatus.ACTIVE
-          ? "plan-status-active-badge "
-          : //@ts-ignore
-          planStatus === PlanStatus.EXPIRING_SOON
-          ? "plan-status-warning-badge"
-          : "plan-status-expired-badge"
-      }
-
-    }`}
-    >
-      <Col
-        className={`team-plan-status-badge-dot ${
+    <>
+      <Row
+        align="middle"
+        className={`team-plan-status-badge ${
           planStatus === PlanStatus.ACTIVE
-            ? "plan-status-active-dot"
+            ? "plan-status-active-badge "
             : //@ts-ignore
             planStatus === PlanStatus.EXPIRING_SOON
-            ? "plan-status-warning-dot"
-            : "plan-status-expired-dot"
-        }`}
-      ></Col>{" "}
-      <Col className="team-plan-status-badge-text">{capitalize(planStatus)}</Col>
-      {/* TODO: add text for expired and expiring soon plan status */}
-    </Row>
+            ? "plan-status-warning-badge"
+            : "plan-status-expired-badge"
+        }
+      
+    }`}
+      >
+        <Col
+          className={`team-plan-status-badge-dot ${
+            planStatus === PlanStatus.ACTIVE
+              ? "plan-status-active-dot"
+              : //@ts-ignore
+              planStatus === PlanStatus.EXPIRING_SOON
+              ? "plan-status-warning-dot"
+              : "plan-status-expired-dot"
+          }`}
+        ></Col>{" "}
+        <Col className="team-plan-status-badge-text">{capitalize(planStatus)}</Col>
+        {/* TODO: add text for expired and expiring soon plan status */}
+      </Row>
+    </>
   );
 };
