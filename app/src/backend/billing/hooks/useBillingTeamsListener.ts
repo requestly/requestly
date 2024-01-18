@@ -64,8 +64,13 @@ export const useBillingTeamsListener = () => {
   };
 
   useEffect(() => {
-    refreshUserToken();
-  }, [user.loggedIn]);
+    if (!user.loggedIn) {
+      unsubscribeBillingTeamsListener?.();
+      dispatch(billingActions.resetState());
+    } else {
+      refreshUserToken();
+    }
+  }, [dispatch, user.loggedIn]);
 
   useEffect(() => {
     unsubscribeBillingTeamsListener?.();
