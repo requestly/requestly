@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Divider, Row, Col } from "antd";
-import BillingFooter from "./BillingFooter";
+import { Divider, Row, Col, Typography } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate } from "react-router-dom";
@@ -30,8 +29,8 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
   return isTeamAdmin ? (
     <div className="billing-details-container">
       <p className="text-gray billing-subscription-info">
-        Members of this workspace are now integrated into a designated billing team. <br />
-        Checkout the billing team for member information, plan details, invoices etc.
+        Members of this workspace are now integrated into a designated billing team.
+        <br /> Please refer to the billing team for plan details, invoices, and more.
       </p>
       <Row gutter={8} align="middle">
         <Col>
@@ -83,7 +82,9 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
           caption="Enable automatic inclusion in the billing team for members joining this workspace"
         />
       </Row>
-      <BillingFooter />
+      <Typography.Text className="billing-non-admin-message">
+        Premium features will be enabled for the users who are part of a billing team
+      </Typography.Text>
     </div>
   ) : (
     <p className="billing-non-admin-message">Only admin can view the billing details.</p>
