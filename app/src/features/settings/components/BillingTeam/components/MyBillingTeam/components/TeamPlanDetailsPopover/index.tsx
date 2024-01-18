@@ -6,6 +6,7 @@ import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { PricingFeatures } from "features/pricing";
 import { PRICING } from "features/pricing";
+import { getLongFormatDateString } from "utils/DateTimeUtils";
 
 interface Props {
   planDetails: Record<string, any>;
@@ -34,21 +35,13 @@ export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopo
         <div className="team-plan-popover-footer-section">
           <Col>Plan start date</Col>
           <Col className="header">
-            {new Date(planDetails.subscriptionCurrentPeriodStart * 1000).toLocaleString("default", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
+            {getLongFormatDateString(new Date(planDetails.subscriptionCurrentPeriodStart * 1000))}
           </Col>
         </div>
         <div className="team-plan-popover-footer-section">
           <Col>Plan renewal date</Col>
           <Col className="header">
-            {new Date(planDetails.subscriptionCurrentPeriodEnd * 1000).toLocaleString("default", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
+            {getLongFormatDateString(new Date(planDetails.subscriptionCurrentPeriodEnd * 1000))}
           </Col>
         </div>
       </Col>

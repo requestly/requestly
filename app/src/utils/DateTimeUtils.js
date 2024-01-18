@@ -93,6 +93,10 @@ export const getDateString = (dateObj) => {
   return dateObj.toLocaleDateString("en-CA");
 };
 
+export const getLongFormatDateString = (dateObj) => {
+  return dateObj.toLocaleString("default", { month: "short", day: "numeric", year: "numeric" });
+};
+
 export const getCurrentTimeStamp = () => {
   return new Date().getTime();
 };

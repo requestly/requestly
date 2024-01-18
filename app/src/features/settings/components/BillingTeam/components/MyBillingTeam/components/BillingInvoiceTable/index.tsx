@@ -3,6 +3,7 @@ import { Col, Table } from "antd";
 import "./index.scss";
 import { useParams } from "react-router-dom";
 import { getBillingTeamInvoices } from "backend/billing";
+import { getLongFormatDateString } from "utils/DateTimeUtils";
 
 export const BillingInvoiceTable: React.FC = () => {
   const { billingId } = useParams();
@@ -14,9 +15,7 @@ export const BillingInvoiceTable: React.FC = () => {
       title: "Date",
       dataIndex: "created",
       key: "created",
-      render: (created: number) => (
-        <>{new Date(created * 1000).toLocaleString("default", { month: "short", day: "numeric", year: "numeric" })}</>
-      ),
+      render: (created: number) => <>{getLongFormatDateString(new Date(created * 1000))}</>,
     },
     {
       title: "Description",
