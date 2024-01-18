@@ -1,5 +1,6 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getAppMode } from "store/selectors";
 import { Col, Row } from "antd";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -19,6 +20,8 @@ export const SettingsPrimarySidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
+  const billingTeams = useSelector(getAvailableBillingTeams);
+
   const redirectUrl = useRef(state?.redirectUrl ?? null);
 
   const sidebarItems = useMemo(
@@ -61,12 +64,19 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "billing",
             name: "Billing",
             path: PATHS.SETTINGS.BILLING.RELATIVE,
+            ishidden: !billingTeams.length,
           },
         ],
       },
     ],
-    [appMode]
+    [appMode, billingTeams.length]
   );
+
+  useEffect(() => {
+    if (billingTeams.length && location.pathname === PATHS.SETTINGS.BILLING.RELATIVE) {
+      navigate(`${PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0]?.id}`);
+    }
+  }, [location.pathname, billingTeams, navigate]);
 
   return (
     <Col className="settings-primary-sidebar">
@@ -103,7 +113,6 @@ export const SettingsPrimarySidebar: React.FC = () => {
                   return (
                     <NavLink
                       to={child.path}
-                      // onClick={() => trackSidebarClicked(snakeCase(title))}
                       className={({ isActive }) =>
                         `settings-primary-sidebar-section-link ${
                           isActive ? "settings-primary-sidebar-section-active-link" : ""
