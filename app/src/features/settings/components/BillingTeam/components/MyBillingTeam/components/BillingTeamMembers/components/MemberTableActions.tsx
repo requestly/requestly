@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Col, Row } from "antd";
@@ -16,10 +16,7 @@ export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
   const { billingId } = useParams();
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const user = useSelector(getUserAuthDetails);
-  const isUserAlreadyAdded = useMemo(
-    () => Object.values(billingTeamMembers).some((member) => member.email === record.email),
-    [billingTeamMembers, record.email]
-  );
+  const isUserAlreadyAdded = Object.values(billingTeamMembers).some((member) => member.email === record.email);
 
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [isUserAdded, setIsUserAdded] = useState(false);
