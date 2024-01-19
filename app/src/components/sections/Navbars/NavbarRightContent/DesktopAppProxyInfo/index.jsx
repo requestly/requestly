@@ -78,7 +78,7 @@ const DesktopAppProxyInfo = () => {
           className="connected-apps-btn"
           onClick={handleConnectAppsButtonClick}
         >
-          Connect apps locally
+          Connect apps
           {numberOfConnectedApps > 0 ? <div className="rq-count-badge">{numberOfConnectedApps}</div> : null}
         </RQButton>
       </>
