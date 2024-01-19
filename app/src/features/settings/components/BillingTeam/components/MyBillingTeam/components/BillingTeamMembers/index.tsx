@@ -20,6 +20,11 @@ import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import "./index.scss";
+import {
+  trackBillingTeamActionClicked,
+  trackBillingTeamMemberRemoved,
+  trackBillingTeamRoleChanged,
+} from "features/settings/analytics";
 
 export const BillingTeamMembers: React.FC = () => {
   const { billingId } = useParams();
@@ -98,9 +103,11 @@ export const BillingTeamMembers: React.FC = () => {
                 title="Are you sure you want to remove this user from the billing team?"
                 onConfirm={() => {
                   setLoadingRows([...loadingRows, record.id]);
+                  trackBillingTeamActionClicked("remove_member");
                   removeMemberFromBillingTeam(billingId, record.id)
                     .then(() => {
                       toast.success("User removed from the billing team");
+                      trackBillingTeamMemberRemoved(record.email, billingId);
                     })
                     .catch(() => {
                       toast.error("Error while removing user");
@@ -131,6 +138,7 @@ export const BillingTeamMembers: React.FC = () => {
                     updateBillingTeamMemberRole(billingId, record.id, key as BillingTeamRoles)
                       .then(() => {
                         toast.success(`User role changed to ${key}`);
+                        trackBillingTeamRoleChanged(record.email, key, billingId);
                       })
                       .catch(() => {
                         toast.error("Error while changing user role");
@@ -163,7 +171,7 @@ export const BillingTeamMembers: React.FC = () => {
     {
       key: BillingTeamRoles.Admin,
       label: (
-        <Row align="middle" gutter={8}>
+        <Row align="middle" gutter={8} onClick={() => trackBillingTeamActionClicked("make_admin")}>
           <MdOutlineAdminPanelSettings fontSize={16} className="mr-8" />
           Make Admin
         </Row>
@@ -172,7 +180,7 @@ export const BillingTeamMembers: React.FC = () => {
     {
       key: BillingTeamRoles.Member,
       label: (
-        <Row align="middle" gutter={8}>
+        <Row align="middle" gutter={8} onClick={() => trackBillingTeamActionClicked("remove_as_admin")}>
           <MdPersonOutline fontSize={16} className="mr-8" />
           Change role to member
         </Row>

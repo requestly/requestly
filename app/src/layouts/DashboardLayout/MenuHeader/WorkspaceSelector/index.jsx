@@ -258,11 +258,11 @@ const WorkspaceSelector = () => {
       if (isWorkspaceMode) {
         redirectToTeam(navigate, currentlyActiveWorkspace.id);
       } else {
-        redirectToWorkspaceSettings(navigate, window.location.pathname);
+        redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
       }
     } else {
       promptUserSignupModal(
-        () => redirectToWorkspaceSettings(navigate, window.location.pathname),
+        () => redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown"),
         AUTH.SOURCE.WORKSPACE_SIDEBAR
       );
     }
@@ -545,7 +545,7 @@ const WorkspaceSelector = () => {
               if (isWorkspaceMode) {
                 redirectToTeam(navigate, currentlyActiveWorkspace.id);
               } else {
-                redirectToWorkspaceSettings(navigate, window.location.pathname);
+                redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown");
               }
               trackWorkspaceDropdownClicked("manage_workspace");
             }}

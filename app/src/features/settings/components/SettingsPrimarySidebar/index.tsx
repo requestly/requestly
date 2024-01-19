@@ -12,6 +12,7 @@ import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.scss";
+import { trackAppSettingsSidebarClicked } from "features/settings/analytics";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -113,6 +114,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
                   return (
                     <NavLink
                       to={child.path}
+                      onClick={() => trackAppSettingsSidebarClicked(child.id)}
                       className={({ isActive }) =>
                         `settings-primary-sidebar-section-link ${
                           isActive ? "settings-primary-sidebar-section-active-link" : ""

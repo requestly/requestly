@@ -2,6 +2,7 @@ import React from "react";
 import { Col, Row } from "antd";
 import { MdOutlineGroup } from "@react-icons/all-files/md/MdOutlineGroup";
 import { NavLink } from "react-router-dom";
+import { trackBillingTeamNavigated } from "features/settings/analytics";
 
 export const BillingTeamsSidebar: React.FC<{ billingTeams: { id: string; name: string }[] }> = ({ billingTeams }) => {
   return (
@@ -16,6 +17,8 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: { id: string; name: s
         {billingTeams.map((billingTeam) => (
           <NavLink
             key={billingTeam.id}
+            // TODO: IN PHASE 4 handle for other team as well
+            onClick={() => trackBillingTeamNavigated("my_team")}
             to={`/settings/billing/${billingTeam.id}`}
             className={({ isActive }) =>
               `settings-secondary-sidebar-section-link ${

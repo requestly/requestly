@@ -104,8 +104,8 @@ export const redirectToSavedSession = (navigate, id) => {
   navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
 };
 
-export const redirectToSessionSettings = (navigate, redirectUrl) => {
-  navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE, { state: { redirectUrl } });
+export const redirectToSessionSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
 export const redirectToNetworkSession = (navigate, id) => {
@@ -113,20 +113,24 @@ export const redirectToNetworkSession = (navigate, id) => {
 };
 
 /* Settings */
-export const redirectToSettings = (navigate, redirectUrl) => {
-  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
+export const redirectToSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
-export const redirectToGlobalSettings = (navigate, redirectUrl) => {
-  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
+export const redirectToGlobalSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
-export const redirectToDesktopSettings = (navigate, redirectUrl) => {
-  navigate(PATHS.SETTINGS.DESKTOP_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
+export const redirectToDesktopSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.DESKTOP_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
-export const redirectToWorkspaceSettings = (navigate, redirectUrl) => {
-  navigate(PATHS.SETTINGS.WORKSPACES.ABSOLUTE, { state: { redirectUrl } });
+export const redirectToWorkspaceSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.WORKSPACES.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToBillingTeam = (navigate, id, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.BILLING.RELATIVE + `/${id}`, { state: { redirectUrl, source } });
 };
 
 /* Product updates */
