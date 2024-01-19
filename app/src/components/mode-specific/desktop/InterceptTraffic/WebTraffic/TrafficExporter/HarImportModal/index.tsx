@@ -19,6 +19,7 @@ interface Props {
   btnText?: string;
 }
 
+/* NO LONGER USED */
 const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
   const [importedHar, setImportedHar] = useState<Har>();
   const [isDropZoneVisible, setIsDropZoneVisible] = useState(false);

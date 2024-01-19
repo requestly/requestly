@@ -14,6 +14,9 @@ import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { UserIcon } from "components/common/UserIcon";
 import Favicon from "components/misc/Favicon";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -52,6 +55,8 @@ const RecordingsList = ({
   _renderTableFooter,
 }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const getColumns = () => {
     let columns = [
@@ -60,7 +65,14 @@ const RecordingsList = ({
         dataIndex: "name",
         width: "30%",
         render: (name, record) => {
-          return (
+          return isDesktopSessionsCompatible ? (
+            <Link
+              to={PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + "/" + record.id}
+              state={{ fromApp: true }}
+            >
+              {name}
+            </Link>
+          ) : (
             <Link to={PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
               {name}
             </Link>
@@ -186,6 +198,7 @@ const RecordingsList = ({
     setIsShareModalVisible,
     setSelectedRowVisibility,
     setSharingRecordId,
+    isDesktopSessionsCompatible,
   ]);
 
   return (
@@ -200,7 +213,11 @@ const RecordingsList = ({
         search={false}
         pagination={false}
         options={false}
-        toolBarRender={() => [configureBtn, openDownloadedSessionModalBtn, newSessionButton]}
+        toolBarRender={() =>
+          isDesktopSessionsCompatible
+            ? [openDownloadedSessionModalBtn]
+            : [configureBtn, openDownloadedSessionModalBtn, newSessionButton]
+        }
         headerTitle={
           <>
             <Typography.Title level={4} style={{ marginBottom: 0 }}>
