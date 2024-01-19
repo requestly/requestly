@@ -11,6 +11,7 @@ import { getBillingTeamMembers } from "store/features/billing/selectors";
 import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
+import { trackBillingTeamActionClicked, trackBillingTeamMemberAdded } from "features/settings/analytics";
 
 export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
   const { billingId } = useParams();
@@ -31,6 +32,7 @@ export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
     addUserToBillingteam({ userEmails: [record.email], billingTeamId: billingId })
       .then(() => {
         setIsUserAdded(true);
+        trackBillingTeamMemberAdded(record.email, billingId);
       })
       .catch((e) => {
         Logger.log(e);
@@ -60,6 +62,7 @@ export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
                 onClick={(e) => {
                   e.stopPropagation();
                   handleAddUserToBillingTeam();
+                  trackBillingTeamActionClicked("add_member");
                 }}
               >
                 Add

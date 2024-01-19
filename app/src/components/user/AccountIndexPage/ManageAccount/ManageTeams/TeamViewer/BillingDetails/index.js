@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Divider, Row, Col, Typography } from "antd";
-import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
 import { useNavigate } from "react-router-dom";
 import "./BillingDetails.css";
@@ -8,8 +7,13 @@ import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "back
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
-import { redirectToUrl } from "utils/RedirectionUtils";
+import { redirectToBillingTeam, redirectToUrl } from "utils/RedirectionUtils";
 import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";
+import {
+  trackWorkspaceSettingsAutomaticMappingToggleClicked,
+  trackWorkspaceSettingsGoToBillingTeamClicked,
+  trackWorkspaceSettingsLearnMoreClicked,
+} from "features/settings/analytics";
 
 // Common Component for Team & Individual Payments
 const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
@@ -37,8 +41,9 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
           <RQButton
             type="primary"
             onClick={() => {
+              trackWorkspaceSettingsGoToBillingTeamClicked(teamDetails.id);
               if (billingId) {
-                navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + "/" + billingId);
+                redirectToBillingTeam(navigate, billingId, window.location.pathname, "workspace-settings");
               } else {
                 toast.error("Billing team not found. Please contact support.");
               }
@@ -51,6 +56,7 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
           <RQButton
             type="default"
             onClick={() => {
+              trackWorkspaceSettingsLearnMoreClicked(teamDetails.id);
               redirectToUrl("https://developers.requestly.io/faq/billing-team/", true);
             }}
           >
@@ -66,6 +72,7 @@ const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
           onChange={(checked) => {
             toggleWorkspaceMappingInBillingTeam(billingId, teamDetails.id, checked)
               .then(() => {
+                trackWorkspaceSettingsAutomaticMappingToggleClicked(teamDetails.id, checked);
                 if (checked) {
                   toast.success("Members will be automatically added to the billing team.");
                 } else {

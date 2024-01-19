@@ -10,6 +10,7 @@ import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDo
 import { redirectToUrl } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
 import "./index.scss";
+import { trackBillingTeamActionClicked } from "features/settings/analytics";
 
 export const BillingInvoiceTable: React.FC = () => {
   const { billingId } = useParams();
@@ -64,7 +65,10 @@ export const BillingInvoiceTable: React.FC = () => {
                   type="default"
                   size="small"
                   icon={<MdOutlineFileDownload />}
-                  onClick={() => redirectToUrl(record.hosted_invoice_url, true)}
+                  onClick={() => {
+                    trackBillingTeamActionClicked("download_invoice");
+                    redirectToUrl(record.hosted_invoice_url, true);
+                  }}
                 >
                   Invoice
                 </RQButton>

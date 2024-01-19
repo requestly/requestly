@@ -12,6 +12,7 @@ import { CancelPlanModal } from "../CancelPlanModal";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import "./index.scss";
+import { trackBillingTeamActionClicked } from "features/settings/analytics";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
@@ -101,7 +102,10 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
                     type="text"
                     icon={<MdOutlinePreview />}
                     className="team-plan-details-btn"
-                    onClick={() => setIsPlanDetailsPopoverVisible(true)}
+                    onClick={() => {
+                      setIsPlanDetailsPopoverVisible(true);
+                      trackBillingTeamActionClicked("view_plan_details");
+                    }}
                   >
                     Plan details
                   </RQButton>

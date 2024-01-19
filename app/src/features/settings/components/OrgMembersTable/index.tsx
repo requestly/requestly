@@ -6,6 +6,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import "./index.scss";
+import { trackBillingTeamNoMemberFound } from "features/settings/analytics";
 
 interface OrgMembersTableProps {
   actionButtons: (record: any) => ReactNode;
@@ -29,9 +30,13 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
       getOrganizationUsers({
         domain: getDomainFromEmail(user?.details?.profile?.email),
       }).then((res: any) => {
+        if (res.data.total <= 1) {
+          trackBillingTeamNoMemberFound("no_org_member_available");
+        }
         setOrganizationMembers(res.data);
       });
     }
+    trackBillingTeamNoMemberFound("personal_email");
   }, [getOrganizationUsers, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
 
   const columns: TableProps<any>["columns"] = useMemo(
