@@ -13,7 +13,8 @@ const SessionsHomeView = () => {
   const appMode = useSelector(getAppMode);
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
 
-  if (isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions) { // todo move to a separate page
+  if (isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions) {
+    // todo move to a separate page
     return <NetworkSessionsIndexPage />;
   }
 

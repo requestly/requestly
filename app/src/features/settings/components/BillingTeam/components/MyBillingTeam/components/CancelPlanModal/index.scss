@@ -1,0 +1,27 @@
+.cancel-plan-modal {
+  .ant-modal-header,
+  .ant-modal-content {
+    background-color: var(--surface-0_5);
+  }
+
+  .ant-modal-title {
+    color: var(--text-default);
+  }
+
+  .cancel-plan-modal-description {
+    color: var(--neutrals-gray-300);
+    font-size: 12px;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+  }
+
+  .cancel-plan-modal-textarea {
+    background: var(--background);
+    margin-top: 4px;
+  }
+
+  .cancel-plan-modal-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--surface-2, #383838);
+  }
+}

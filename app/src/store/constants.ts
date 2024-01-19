@@ -7,4 +7,5 @@ export enum ReducerKeys {
   TEAMS = "teams",
   DESKTOP_TRAFFIC_TABLE = "desktopTrafficTable",
   RULES = "rules",
+  BILLING = "billing",
 }
