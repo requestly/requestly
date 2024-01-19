@@ -19,6 +19,7 @@ import {
   ActionSource,
   trackDeleteNetworkSessionClicked,
   trackDownloadNetworkSessionClicked,
+  trackNetworkSessionViewerBackClicked,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
@@ -87,7 +88,10 @@ const NetworkSessionViewer: React.FC = () => {
               iconOnly
               type="default"
               icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={() => redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible)}
+              onClick={() => {
+                trackNetworkSessionViewerBackClicked();
+                redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
+              }}
               className="back-button"
             />
             <div

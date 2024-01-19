@@ -41,6 +41,8 @@ import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { trackHarFileOpened } from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
 
 let hasAppModeBeenSet = false;
 
@@ -174,7 +176,6 @@ const AppModeInitializer = () => {
   useEffect(() => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS)) {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("open-file", async (fileObj) => {
-        console.log("fileObj for launch", fileObj);
         if (fileObj?.extension === ".rqly" || fileObj?.extension === ".har") {
           let fileData;
           try {
@@ -192,12 +193,14 @@ const AppModeInitializer = () => {
             dispatch(sessionRecordingActions.setSessionRecordingMetadata({ ...fileData?.data?.metadata }));
             const recordedSessionEvents = decompressEvents(fileData?.data?.events);
             dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
+            trackLocalSessionRecordingOpened();
             navigate(`${PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.ABSOLUTE}/imported`);
           } else if (fileObj?.extension === ".har") {
             dispatch(networkSessionActions.resetState());
             dispatch(networkSessionActions.setImportedHar(fileData));
             dispatch(networkSessionActions.setPreviewType(PreviewType.IMPORTED));
             dispatch(networkSessionActions.setSessionName(fileObj.name));
+            trackHarFileOpened();
             redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
           }
         } else {
