@@ -24,7 +24,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
   const userId = user?.details?.profile?.uid;
   const isLoggedInUserOwner = userId === teamOwnerId;
 
-  if (!teamId) redirectToWorkspaceSettings(navigate, window.location.pathname);
+  if (!teamId) redirectToWorkspaceSettings(navigate, window.location.pathname, "my_profile");
 
   // Component State
   const [name, setName] = useState("");
@@ -91,7 +91,7 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
         setName(teamInfo.name);
         setOriginalTeamName(teamInfo.name);
       })
-      .catch(() => redirectToWorkspaceSettings(navigate, window.location.pathname))
+      .catch(() => redirectToWorkspaceSettings(navigate, window.location.pathname, "my_profile"))
       .finally(() => setIsTeamInfoLoading(false));
   };
 

@@ -1,0 +1,21 @@
+.billing-invoice-table-title {
+  color: var(--white);
+  font-weight: 500;
+  padding: 12px 1rem;
+  border-bottom: 1px solid var(--surface-2);
+}
+
+.invoice-status-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+
+  & svg {
+    font-size: 14px;
+  }
+}
+
+.my-billing-team-invoice-table .ant-spin-nested-loading > div > .ant-spin {
+  background: var(--background);
+}

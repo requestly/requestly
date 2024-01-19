@@ -16,6 +16,7 @@ import INITIAL_STATE from "./initial-state";
 import { ReducerKeys } from "./constants";
 import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/slice";
 import { rulesReducer } from "./features/rules/slice";
+import { billingReducer } from "./features/billing/slice";
 import { harPreviewReducer } from "./features/network-sessions/slice";
 
 const globalSlice = createSlice({
@@ -60,6 +61,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.TEAMS]: teamsReducer,
     [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducer,
     [ReducerKeys.RULES]: rulesReducer,
+    [ReducerKeys.BILLING]: billingReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

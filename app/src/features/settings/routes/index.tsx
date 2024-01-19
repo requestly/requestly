@@ -9,6 +9,7 @@ import ConfigurationPage from "views/features/sessions/ConfigurationPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { BillingTeam } from "../components/BillingTeam";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
@@ -34,6 +35,14 @@ export const settingRoutes: RouteObject[] = [
       {
         path: PATHS.SETTINGS.WORKSPACES.RELATIVE,
         element: <ProtectedRoute component={MyTeams} />,
+      },
+      {
+        path: PATHS.SETTINGS.BILLING.RELATIVE,
+        element: <BillingTeam />,
+      },
+      {
+        path: PATHS.SETTINGS.BILLING.RELATIVE + "/:billingId",
+        element: <BillingTeam />,
       },
     ],
   },

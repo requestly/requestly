@@ -1,119 +1,97 @@
 import React, { useEffect, useState } from "react";
-import { Divider } from "antd";
-import InvoiceTable from "./InvoiceTable";
-import SubscriptionActionButtons from "./SubscriptionActionButtons";
-import SpinnerColumn from "../../../../../../misc/SpinnerColumn";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import BillingFooter from "./BillingFooter";
-import { toast } from "utils/Toast.js";
-import APP_CONSTANTS from "config/constants";
+import { Divider, Row, Col, Typography } from "antd";
+import { RQButton } from "lib/design-system/components";
+import { useNavigate } from "react-router-dom";
 import "./BillingDetails.css";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
-import firebaseApp from "../../../../../../../firebase";
-
-const db = getFirestore(firebaseApp);
+import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import { toast } from "utils/Toast";
+import { redirectToBillingTeam, redirectToUrl } from "utils/RedirectionUtils";
+import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";
+import {
+  trackWorkspaceSettingsAutomaticMappingToggleClicked,
+  trackWorkspaceSettingsGoToBillingTeamClicked,
+  trackWorkspaceSettingsLearnMoreClicked,
+} from "features/settings/analytics";
 
 // Common Component for Team & Individual Payments
-const BillingDetails = ({ teamId, isTeamAdmin }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [subscriptionInfo, setSubscriptionInfo] = useState({});
-  const [appSumoSubscriptionInfo, setAppSumoSubscriptionInfo] = useState(null);
+const BillingDetails = ({ isTeamAdmin, teamDetails }) => {
+  const navigate = useNavigate();
+  const user = useSelector(getUserAuthDetails);
+
+  const [billingId, setBillingId] = useState(null);
+  const [isBillingTeamMapped, setIsBillingTeamMapped] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
-
-    const functions = getFunctions();
-    const getTeamSubscriptionInfo = httpsCallable(functions, "teams-getTeamSubscriptionInfo");
-
-    getTeamSubscriptionInfo({
-      teamId: teamId,
-    })
-      .then((res) => {
-        setSubscriptionInfo(res.data);
-      })
-      .catch(() => {
-        toast.error("You might not have permission to manage the team members.");
-      })
-      .finally(() => setIsLoading(false));
-  }, [teamId]);
-
-  useEffect(() => {
-    const teamsRef = doc(db, "teams", teamId);
-
-    getDoc(teamsRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setAppSumoSubscriptionInfo(data?.appsumo);
-      }
+    fetchBillingIdByOwner(teamDetails.owner, user?.details?.profile?.uid).then(({ billingId, mappedWorkspaces }) => {
+      setBillingId(billingId);
+      setIsBillingTeamMapped(mappedWorkspaces?.includes(teamDetails.id));
     });
-  }, [teamId]);
+  });
 
-  // const handleRedirectToUpdatePaymentMethod = () => {
-  //   if (!subscriptionInfo.subscriptionStatus) return;
-
-  //   redirectToUpdatePaymentMethod({
-  //     mode: "team",
-  //     teamId: teamId,
-  //   });
-  // };
-
-  const isSubscriptionActive = ["active", "trialing", "past_due"].includes(subscriptionInfo.subscriptionStatus);
-
-  return isLoading ? (
-    <SpinnerColumn skeletonCount={2} message="Fetching subscription details" />
-  ) : isTeamAdmin ? (
+  return isTeamAdmin ? (
     <div className="billing-details-container">
-      <div className="title billing-title">Billing</div>
-      {isSubscriptionActive ? (
-        <p className="text-dark-gray billing-subscription-info">This workspace has an active subscription.</p>
-      ) : (
-        <p className="text-dark-gray billing-subscription-info">
-          This workspace does not have an active subscription yet. <br />
-          Subscribe to one of the plans to get started.
-        </p>
-      )}
-
-      <SubscriptionActionButtons isSubscriptionActive={isSubscriptionActive} />
-      {appSumoSubscriptionInfo && (
-        <>
-          <Divider className="manage-workspace-divider" />
-          <div className="title billing-title">SessionBook Lifetime Pro</div>
-          <p className="text-dark-gray billing-subscription-info">
-            {`This workspace has an active SessionBook Lifetime Pro subscription for ${
-              appSumoSubscriptionInfo?.codes?.length
-            } ${appSumoSubscriptionInfo?.codes?.length > 1 ? "members" : "member"}.`}
-          </p>
-        </>
-      )}
+      <p className="text-gray billing-subscription-info">
+        Members of this workspace are now integrated into a designated billing team.
+        <br /> Please refer to the billing team for plan details, invoices, and more.
+      </p>
+      <Row gutter={8} align="middle">
+        <Col>
+          <RQButton
+            type="primary"
+            onClick={() => {
+              trackWorkspaceSettingsGoToBillingTeamClicked(teamDetails.id);
+              if (billingId) {
+                redirectToBillingTeam(navigate, billingId, window.location.pathname, "workspace-settings");
+              } else {
+                toast.error("Billing team not found. Please contact support.");
+              }
+            }}
+          >
+            Go to billing team
+          </RQButton>
+        </Col>
+        <Col>
+          <RQButton
+            type="default"
+            onClick={() => {
+              trackWorkspaceSettingsLearnMoreClicked(teamDetails.id);
+              redirectToUrl("https://developers.requestly.io/faq/billing-team/", true);
+            }}
+          >
+            Learn more
+          </RQButton>
+        </Col>
+      </Row>
 
       <Divider className="manage-workspace-divider" />
-      <div className="title billing-invoice-container">
-        {isSubscriptionActive ? (
-          <>
-            <div className="title billing-invoices-title">Invoices</div>
-            <p className="text-sm text-dark-gray">
-              Note: you will be charged for each member added. Visit{" "}
-              <a
-                target="_blank"
-                rel="noreferrer"
-                className="workspace-billing-guide-link"
-                href={APP_CONSTANTS.PATHS.PRICING.ABSOLUTE}
-              >
-                our guide
-              </a>{" "}
-              for more information on how we bill.
-            </p>
-            <InvoiceTable mode="team" teamId={teamId} />
-          </>
-        ) : (
-          <>
-            <div className="title billing-invoices-title">Invoices</div>
-            <p className="text-sm text-dark-gray">This workspace has no invoices yet.</p>
-          </>
-        )}
-      </div>
-      <Divider className="manage-workspace-divider" />
-      <BillingFooter />
+      <Row className="w-full">
+        <SettingsItem
+          isActive={isBillingTeamMapped}
+          onChange={(checked) => {
+            toggleWorkspaceMappingInBillingTeam(billingId, teamDetails.id, checked)
+              .then(() => {
+                trackWorkspaceSettingsAutomaticMappingToggleClicked(teamDetails.id, checked);
+                if (checked) {
+                  toast.success("Members will be automatically added to the billing team.");
+                } else {
+                  toast.warn("Members will not be automatically added to the billing team.");
+                }
+                setIsBillingTeamMapped(checked);
+              })
+              .catch(() => {
+                setIsBillingTeamMapped(!checked);
+                toast.error("Something went wrong. Please contact support.");
+              });
+          }}
+          title="Automatically include members who join this workspace in the billing team"
+          caption="Enable automatic inclusion in the billing team for members joining this workspace"
+        />
+      </Row>
+      <Typography.Text className="billing-non-admin-message">
+        Premium features will be enabled for the users who are part of a billing team
+      </Typography.Text>
     </div>
   ) : (
     <p className="billing-non-admin-message">Only admin can view the billing details.</p>

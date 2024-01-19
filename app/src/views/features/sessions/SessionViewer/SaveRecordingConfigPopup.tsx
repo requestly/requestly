@@ -64,8 +64,10 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
-  const isDraftSession = pathname.includes("draft") || !!testRuleDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;;
-  const isSessionLogOptionsAlreadySaved = tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isDraftSession =
+    pathname.includes("draft") || !!testRuleDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isSessionLogOptionsAlreadySaved =
+    tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecordingMetadata?.options), [
     sessionRecordingMetadata?.options,
@@ -156,8 +158,9 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
               }
             });
           } else {
-            let path = PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId
-            if(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) path = PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + `/${response?.firestoreId}`
+            let path = PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId;
+            if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
+              path = PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + `/${response?.firestoreId}`;
             navigate(path, {
               replace: true,
               state: { fromApp: true, viewAfterSave: true },

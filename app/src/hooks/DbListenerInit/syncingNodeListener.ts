@@ -197,7 +197,7 @@ export const doSync = async (
   dispatch(actions.updateIsRulesListLoading(false));
 
   // Fetch Session Recording
-  if(appMode === "EXTENSION") {
+  if (appMode === "EXTENSION") {
     const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
     const localSessionRecordingConfig = await StorageService(appMode).getRecord(
       GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG
