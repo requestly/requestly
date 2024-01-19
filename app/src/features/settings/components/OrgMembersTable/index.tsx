@@ -26,6 +26,9 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
   }, [organizationMembers?.users, search, user?.details?.profile?.email]);
 
   useEffect(() => {
+    if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {
+      trackBillingTeamNoMemberFound("personal_email");
+    }
     if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
       getOrganizationUsers({
         domain: getDomainFromEmail(user?.details?.profile?.email),
@@ -36,8 +39,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
         setOrganizationMembers(res.data);
       });
     }
-    trackBillingTeamNoMemberFound("personal_email");
-  }, [getOrganizationUsers, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
+  }, [getOrganizationUsers, user.loggedIn, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
 
   const columns: TableProps<any>["columns"] = useMemo(
     () => [
