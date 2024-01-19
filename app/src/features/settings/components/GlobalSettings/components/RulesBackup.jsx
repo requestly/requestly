@@ -5,7 +5,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { createBackupIfRequired, setIsBackupEnabled } from "utils/BackupUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import SettingsItem from "../../SettingsItem";
+import SettingsItem from "./SettingsItem";
 import { AUTH } from "modules/analytics/events/common/constants";
 import { trackBackupToggled } from "modules/analytics/events/features/syncing/backup";
 

@@ -1,18 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { Button, Col, Radio, RadioChangeEvent, Row, Switch } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { SessionSettingsRadioItem } from "./SessionSettingsRadioItem";
+import { SessionSettingsRadioItem } from "./components/SessionSettingsRadioItem";
 import { getAppMode } from "store/selectors";
 import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
-import { PageSourceRow } from "./PageSourceRow";
+import { PageSourceRow } from "./components/PageSourceRow";
 import { SessionRecordingPageSource, SourceKey, SourceOperator } from "types";
-import { AutoRecordingMode, SessionRecordingConfig } from "../types";
+import { AutoRecordingMode, SessionRecordingConfig } from "../../../../views/features/sessions/types";
 import { generateObjectId } from "utils/FormattingHelper";
-import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
-import { RQButton } from "lib/design-system/components";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 // @ts-ignore
@@ -23,10 +20,7 @@ import { StorageService } from "init";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
-import "./sessionsSettingsPage.css";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import FEATURES from "config/constants/sub/features";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import "./sessionsSettings.css";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -50,16 +44,12 @@ export const defaultSessionRecordingConfig: SessionRecordingConfig = {
   },
 };
 
-const SessionsSettingsPage: React.FC = () => {
-  const navigate = useNavigate();
+export const SessionsSettings: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
   const { autoRecording } = config;
-
-  const isDesktopSessionsCompatible =
-    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const getPageSourceLabel = useCallback((source: SessionRecordingPageSource): string => {
     const upperCasedSourceKey = source.key.toUpperCase();
@@ -242,23 +232,8 @@ const SessionsSettingsPage: React.FC = () => {
 
   return (
     <Row className="session-settings-container">
-      <Col
-        xs={{ offset: 1, span: 22 }}
-        sm={{ offset: 1, span: 22 }}
-        md={{ offset: 2, span: 20 }}
-        lg={{ offset: 3, span: 18 }}
-        xl={{ offset: 4, span: 16 }}
-        flex="1 1 820px"
-      >
-        <div className="header">
-          <RQButton
-            iconOnly
-            type="default"
-            icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-            onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
-          />
-          <span>SessionBook Settings</span>
-        </div>
+      <Col flex="1">
+        <div className="header">SessionBook Settings</div>
 
         <div className="automatic-recording-container">
           <div className="automatic-recording-details">
@@ -338,5 +313,3 @@ const SessionsSettingsPage: React.FC = () => {
     </Row>
   );
 };
-
-export default SessionsSettingsPage;

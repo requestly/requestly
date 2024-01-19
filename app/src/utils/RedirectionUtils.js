@@ -106,6 +106,14 @@ export const redirectToSessionRecordingHome = (navigate, isDesktopSessionsEnable
   }
 };
 
+export const redirectToSavedSession = (navigate, id) => {
+  navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
+};
+
+export const redirectToSessionSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE, { state: { redirectUrl } });
+};
+
 export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatible = false) => {
   if (isDesktopSessionsCompatible) {
     if (id) {
@@ -125,12 +133,20 @@ export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatib
 };
 
 /* Settings */
-export const redirectToSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.ABSOLUTE);
+export const redirectToSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
 };
 
-export const redirectToDesktopPreferences = (navigate) => {
-  navigate(PATHS.SETTINGS.DESKTOP_PREFERENCES.ABSOLUTE);
+export const redirectToGlobalSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
+};
+
+export const redirectToDesktopSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.DESKTOP_SETTINGS.ABSOLUTE, { state: { redirectUrl } });
+};
+
+export const redirectToWorkspaceSettings = (navigate, redirectUrl) => {
+  navigate(PATHS.SETTINGS.WORKSPACES.ABSOLUTE, { state: { redirectUrl } });
 };
 
 /* Product updates */
@@ -291,6 +307,7 @@ export const redirectToMyTeams = (navigate, hardRedirect) => {
     navigate(PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE);
   }
 };
+
 export const redirectToCreateNewTeamWorkspace = (navigate, hardRedirect) => {
   if (hardRedirect) {
     window.location.href = PATHS.ACCOUNT.CREATE_NEW_TEAM_WORKSPACE.ABSOLUTE;
