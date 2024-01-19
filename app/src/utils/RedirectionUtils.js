@@ -101,8 +101,10 @@ export const redirectToTemplates = (navigate) => {
 export const redirectToSessionRecordingHome = (navigate, isDesktopSessionsEnabled = false) => {
   if (isFeatureCompatible(FEATURES.DESKTOP_SESSIONS) && isDesktopSessionsEnabled) {
     navigate(PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.ABSOLUTE);
+    return;
   } else {
     navigate(PATHS.SESSIONS.ABSOLUTE);
+    return;
   }
 };
 
@@ -119,16 +121,20 @@ export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatib
     if (id) {
       const path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + "/:id";
       navigate(path);
+      return;
     }
     const path = PATHS.SESSIONS.DESKTOP.SAVED_LOGS.ABSOLUTE;
     navigate(path);
+    return;
   } else {
     if (id) {
       const path = PATHS.NETWORK_LOGS.VIEWER.RELATIVE + `/${id}`;
       navigate(path);
+      return;
     }
     const path = PATHS.SESSIONS.ABSOLUTE;
     navigate(path);
+    return;
   }
 };
 
