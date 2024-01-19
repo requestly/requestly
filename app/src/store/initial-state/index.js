@@ -49,7 +49,6 @@ const INITIAL_STATE = {
     rules: "",
     files: "",
     sharedLists: "",
-    marketplace: "",
   },
 
   /* To force re-render a component */
