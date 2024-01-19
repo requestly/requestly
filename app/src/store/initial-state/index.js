@@ -213,7 +213,7 @@ const INITIAL_STATE = {
       isJoinWorkspaceCardVisible: true,
     },
     nonPersist: {
-      networkSessionSaveInProgress: false,
+      networkSessionSaveInProgress: false, // todo: check if requried
       timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
     },

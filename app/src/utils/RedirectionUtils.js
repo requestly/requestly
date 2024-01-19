@@ -2,6 +2,8 @@
 import { MODES } from "components/misc/VerifyEmail/modes";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
+import { isFeatureCompatible } from "./CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 //CONSTANTS
 const { PATHS, LINKS } = APP_CONSTANTS;
@@ -96,20 +98,30 @@ export const redirectToTemplates = (navigate) => {
 };
 
 /* FEATURE - SESSION RECORDINGS */
-export const redirectToSessionRecordingHome = (navigate) => {
-  navigate(PATHS.SESSIONS.ABSOLUTE);
+export const redirectToSessionRecordingHome = (navigate, isDesktopSessionsEnabled = false) => {
+  if (isFeatureCompatible(FEATURES.DESKTOP_SESSIONS) && isDesktopSessionsEnabled) {
+    navigate(PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.ABSOLUTE);
+  } else {
+    navigate(PATHS.SESSIONS.ABSOLUTE);
+  }
 };
 
-export const redirectToSavedSession = (navigate, id) => {
-  navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
-};
-
-export const redirectToSessionSettings = (navigate) => {
-  navigate(PATHS.SESSIONS.SETTINGS.ABSOLUTE);
-};
-
-export const redirectToNetworkSession = (navigate, id) => {
-  navigate(PATHS.SESSIONS.NETWORK.ABSOLUTE + `/${id}`);
+export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatible = false) => {
+  if (isDesktopSessionsCompatible) {
+    if (id) {
+      const path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + "/:id";
+      navigate(path);
+    }
+    const path = PATHS.SESSIONS.DESKTOP.SAVED_LOGS.ABSOLUTE;
+    navigate(path);
+  } else {
+    if (id) {
+      const path = PATHS.NETWORK_LOGS.VIEWER.RELATIVE + `/${id}`;
+      navigate(path);
+    }
+    const path = PATHS.SESSIONS.ABSOLUTE;
+    navigate(path);
+  }
 };
 
 /* Settings */
