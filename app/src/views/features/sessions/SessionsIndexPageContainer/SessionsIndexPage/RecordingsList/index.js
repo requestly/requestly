@@ -1,4 +1,3 @@
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import React, { useCallback } from "react";
 import { DeleteOutlined, ExclamationCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
@@ -13,9 +12,11 @@ import { getPrettyVisibilityName, renderHeroIcon } from "../../../ShareRecording
 import { deleteRecording } from "../../../api";
 import { useSelector } from "react-redux";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode } from "store/selectors";
 import { UserIcon } from "components/common/UserIcon";
 import Favicon from "components/misc/Favicon";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -54,7 +55,8 @@ const RecordingsList = ({
   _renderTableFooter,
 }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const appMode = useSelector(getAppMode);
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const getColumns = () => {
     let columns = [
@@ -62,9 +64,12 @@ const RecordingsList = ({
         title: "Name",
         dataIndex: "name",
         width: "30%",
-        render: (name, record) => { // TODO: CHANGE TO REDIRECT TO DESKTOP SESSIONS
-          return appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-            <Link to={PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + "/" + record.id} state={{ fromApp: true }}>
+        render: (name, record) => {
+          return isDesktopSessionsCompatible ? (
+            <Link
+              to={PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + "/" + record.id}
+              state={{ fromApp: true }}
+            >
               {name}
             </Link>
           ) : (
@@ -193,7 +198,7 @@ const RecordingsList = ({
     setIsShareModalVisible,
     setSelectedRowVisibility,
     setSharingRecordId,
-    appMode,
+    isDesktopSessionsCompatible,
   ]);
 
   return (
@@ -208,7 +213,11 @@ const RecordingsList = ({
         search={false}
         pagination={false}
         options={false}
-        toolBarRender={() => appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? [openDownloadedSessionModalBtn] :  [configureBtn, openDownloadedSessionModalBtn, newSessionButton]}
+        toolBarRender={() =>
+          isDesktopSessionsCompatible
+            ? [openDownloadedSessionModalBtn]
+            : [configureBtn, openDownloadedSessionModalBtn, newSessionButton]
+        }
         headerTitle={
           <>
             <Typography.Title level={4} style={{ marginBottom: 0 }}>

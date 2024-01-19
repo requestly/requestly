@@ -11,7 +11,7 @@ import "./DesktopSessionsSidebar.css";
 const desktopSessionsRoutes: any[] = [
   {
     path: PATHS.SESSIONS.DESKTOP.SAVED_LOGS.RELATIVE,
-    title: "Saved Logs",
+    title: "Network Sessions",
     icon: <VscFileSymlinkDirectory />,
   },
   {

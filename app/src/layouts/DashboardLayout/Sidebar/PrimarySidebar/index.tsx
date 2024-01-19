@@ -10,7 +10,6 @@ import { ReactComponent as MockServerIcon } from "assets/icons/mock-server.svg";
 
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 
-
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
 import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { RQBadge } from "lib/design-system/components/RQBadge";
@@ -20,12 +19,17 @@ import PATHS from "config/constants/sub/paths";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./PrimarySidebar.css";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
   const [isAndroidDebuggerEnabled, setIsAndroidDebuggerEnabled] = useState(false);
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   useEffect(() => {
     isUserUsingAndroidDebugger(user?.details?.profile?.uid).then(setIsAndroidDebuggerEnabled);
@@ -100,26 +104,26 @@ export const PrimarySidebar: React.FC = () => {
       },
     ];
 
-    if(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
-      items[3] = { // overriding normal sessions
+    if (isDesktopSessionsCompatible) {
+      items[3] = {
         id: 3,
         title: "Desktop Sessions",
         path: PATHS.SESSIONS.DESKTOP.INDEX,
         icon: (
           <Tooltip
-          placement="right"
-          open={isSavingNetworkSession}
-          title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
-        >
-          <TbDeviceDesktopSearch />
-        </Tooltip>
+            placement="right"
+            open={isSavingNetworkSession}
+            title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
+          >
+            <TbDeviceDesktopSearch />
+          </Tooltip>
         ),
         display: true,
         activeColor: "var(--desktop-sessions)",
       };
     }
     return items;
-  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession]);
+  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession, isDesktopSessionsCompatible]);
 
   return (
     <div className="primary-sidebar-container">

@@ -21,7 +21,7 @@ export const ImportHarModalButton: React.FC = () => {
         dispatch(networkSessionActions.resetState());
         dispatch(networkSessionActions.setImportedHar(har));
         dispatch(networkSessionActions.setPreviewType(PreviewType.IMPORTED));
-        redirectToNetworkSession(navigate);
+        redirectToNetworkSession(navigate, undefined, true);
       } catch (e) {
         console.error(e);
         toast.error("Error parsing file");

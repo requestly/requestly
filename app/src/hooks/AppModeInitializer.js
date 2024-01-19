@@ -38,6 +38,9 @@ import { decompressEvents } from "views/features/sessions/SessionViewer/sessionE
 import PATHS from "config/constants/sub/paths";
 import { PreviewType, networkSessionActions } from "store/features/network-sessions/slice";
 import { redirectToNetworkSession } from "utils/RedirectionUtils";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 let hasAppModeBeenSet = false;
 
@@ -50,6 +53,8 @@ const AppModeInitializer = () => {
   const { appsList, isBackgroundProcessActive, isProxyServerRunning } = useSelector(getDesktopSpecificDetails);
   const hasConnectedAppBefore = useSelector(getHasConnectedApp);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const appsListRef = useRef(null);
   const hasMessageHandlersBeenSet = useRef(false);
@@ -167,8 +172,9 @@ const AppModeInitializer = () => {
   );
 
   useEffect(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS)) {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("open-file", async (fileObj) => {
+        console.log("fileObj for launch", fileObj);
         if (fileObj?.extension === ".rqly" || fileObj?.extension === ".har") {
           let fileData;
           try {
@@ -192,7 +198,7 @@ const AppModeInitializer = () => {
             dispatch(networkSessionActions.setImportedHar(fileData));
             dispatch(networkSessionActions.setPreviewType(PreviewType.IMPORTED));
             dispatch(networkSessionActions.setSessionName(fileObj.name));
-            redirectToNetworkSession(navigate);
+            redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
           }
         } else {
           console.log("unknown file type detected");
