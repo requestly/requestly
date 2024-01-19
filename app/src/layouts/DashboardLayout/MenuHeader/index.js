@@ -17,13 +17,15 @@ import WorkspaceSelector from "./WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
-import "./MenuHeader.css";
 import ProductsDropDown from "./ProductsDropDown";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
+import APP_CONSTANTS from "config/constants";
+import "./MenuHeader.css";
 
 const { Header } = Layout;
+const { PATHS } = APP_CONSTANTS;
 
-const PATHS_WITHOUT_HEADER = ["/pricing", "/invite"];
+const PATHS_WITHOUT_HEADER = [PATHS.PRICING.RELATIVE, PATHS.INVITE.RELATIVE, PATHS.SETTINGS.RELATIVE];
 
 const MenuHeader = () => {
   const navigate = useNavigate();
@@ -127,7 +129,7 @@ const MenuHeader = () => {
                     icon={<Settings />}
                     onClick={() => {
                       trackHeaderClicked("settings");
-                      redirectToSettings(navigate);
+                      redirectToSettings(navigate, window.location.pathname);
                     }}
                   />
                 </Tooltip>
