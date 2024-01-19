@@ -2,6 +2,15 @@
 <html lang="en" class="perfect-scrollbar-off nav-open" dir="ltr">
   <head>
     <script>
+      if (
+        window.location.hostname !== 'app.requestly.io' && 
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== 'beta.requestly.io' &&
+        isNaN(parseInt(window.location.hostname.replace(/\./g, ''))) // dumb check for an IP (or any number really)
+      ) {
+        window.location.href = 'https://app.requestly.io';
+      }
+
       if ("https://app.requestly.io/goodbye/" === window.location.href) { const a = { api_key: "62ff1b46909e50358cfca0668d41f011", events: [{ user_id: localStorage.getItem("__rq_uid") || Math.random().toString(36).slice(2, 10), event_type: "extension_uninstalled" }] }, b = new Blob([JSON.stringify(a)]); navigator.sendBeacon("https://api2.amplitude.com/2/httpapi", b) }
     </script>
     <meta charset="utf-8" />
