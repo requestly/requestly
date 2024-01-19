@@ -9,6 +9,7 @@ export interface BillingTeamDetails {
   name: string;
   description: string;
   owner: string;
+  ownerEmail: string;
   subscriptionDetails: Record<string, any>;
   members: {
     [userId: string]: {
