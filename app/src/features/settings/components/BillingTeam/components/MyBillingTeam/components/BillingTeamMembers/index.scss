@@ -149,3 +149,7 @@
     opacity: 0.7;
   }
 }
+
+.my-billing-team-members-table .ant-spin-nested-loading > div > .ant-spin {
+  background: var(--background);
+}

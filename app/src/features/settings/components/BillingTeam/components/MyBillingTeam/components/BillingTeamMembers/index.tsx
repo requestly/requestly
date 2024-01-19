@@ -203,6 +203,7 @@ export const BillingTeamMembers: React.FC = () => {
           columns={columns}
           pagination={false}
           scroll={{ y: "35vh" }}
+          loading={!billingTeamMembers}
         />
       </Col>
       <Drawer
