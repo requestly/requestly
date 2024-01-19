@@ -18,6 +18,9 @@ import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./configurationPage.css";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
 const emptyPageSourceData = {
   key: GLOBAL_CONSTANTS.URL_COMPONENTS.URL,
@@ -40,6 +43,8 @@ const PAGE_SOURCES_TYPE = {
 const ConfigurationPage = () => {
   const [config, setConfig] = useState({});
   const navigate = useNavigate();
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [customPageSources, setCustomPageSources] = useState([]);
@@ -248,7 +253,7 @@ const ConfigurationPage = () => {
                   iconOnly
                   type="default"
                   icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-                  onClick={() => redirectToSessionRecordingHome(navigate)}
+                  onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
                 />
                 <span>SessionBook Settings</span>
               </div>
