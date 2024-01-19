@@ -20,7 +20,6 @@ export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
   const isUserAlreadyAdded = Object.values(billingTeamMembers).some((member) => member.email === record.email);
 
   const [isAddingUser, setIsAddingUser] = useState(false);
-  const [isUserAdded, setIsUserAdded] = useState(false);
 
   const isUserAdmin =
     billingTeamMembers?.[user?.details?.profile?.uid] &&
@@ -31,7 +30,6 @@ export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
     setIsAddingUser(true);
     addUserToBillingteam({ userEmails: [record.email], billingTeamId: billingId })
       .then(() => {
-        setIsUserAdded(true);
         trackBillingTeamMemberAdded(record.email, billingId);
       })
       .catch((e) => {
@@ -43,7 +41,7 @@ export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
 
   return (
     <>
-      {isUserAdded || isUserAlreadyAdded ? (
+      {isUserAlreadyAdded ? (
         <Row gutter={8} align="middle" justify="end" className="billing-team-members-added-label">
           <Col>
             <TbChecks fontSize={14} />
