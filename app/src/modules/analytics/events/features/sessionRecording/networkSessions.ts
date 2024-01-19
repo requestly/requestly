@@ -42,3 +42,11 @@ export function trackNetworkSessionSaved() {
 export function trackNetworkSessionSaveCanceled() {
   trackEvent(SESSION_RECORDING.network.save.canceled);
 }
+
+export function trackNetworkSessionViewerBackClicked() {
+  trackEvent(SESSION_RECORDING.network.back_from_preview);
+}
+
+export function trackHarFileOpened() {
+  trackEvent(SESSION_RECORDING.network.har_file_opened);
+}
