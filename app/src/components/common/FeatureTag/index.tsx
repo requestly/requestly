@@ -31,6 +31,12 @@ const featureMap = {
     border: "#4F401B",
     title: "Sessions",
   },
+  [FEATURES.DESKTOP_SESSIONS]: {
+    color: "var(--desktop-sessions)",
+    backgroundColor: "#292213",
+    border: "#4F401B",
+    title: "Sessions",
+  },
 };
 
 export const FeatureTag: React.FC<TagProps> = ({ feature }) => {
