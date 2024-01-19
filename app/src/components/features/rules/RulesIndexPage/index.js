@@ -25,6 +25,7 @@ import CreateTeamRuleCTA from "../CreateTeamRuleCTA";
 import GettingStarted from "../GettingStarted";
 import Logger from "lib/logger";
 import { useHasChanged } from "hooks";
+import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -123,6 +124,7 @@ const RulesIndexPage = () => {
         )
       ) : (
         <>
+          <MonitorMountedTime transactionName="rules-list-loading" />
           <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
         </>
       )}
