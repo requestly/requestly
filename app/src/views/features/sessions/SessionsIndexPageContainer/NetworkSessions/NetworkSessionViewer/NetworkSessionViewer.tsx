@@ -3,7 +3,7 @@ import {
   convertHarJsonToRQLogs,
   createLogsHar,
 } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/converter";
-import { redirectToNetworkSessionHome, redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
 import { RQNetworkLog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
@@ -32,11 +32,17 @@ import {
 } from "store/features/network-sessions/selectors";
 import { useDispatch } from "react-redux";
 import { RQButton } from "lib/design-system/components";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
 const NetworkSessionViewer: React.FC = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const harPreviewType = useSelector(getPreviewType);
   const networkSessionId = useSelector(getSessionId);
@@ -81,7 +87,7 @@ const NetworkSessionViewer: React.FC = () => {
               iconOnly
               type="default"
               icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={() => redirectToNetworkSessionHome(navigate)}
+              onClick={() => redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible)}
               className="back-button"
             />
             <div
@@ -100,7 +106,7 @@ const NetworkSessionViewer: React.FC = () => {
                   icon={<DeleteOutlined />}
                   onClick={() => {
                     confirmAndDeleteRecording(id, () => {
-                      redirectToSessionRecordingHome(navigate);
+                      redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
                     });
                     trackDeleteNetworkSessionClicked(ActionSource.Preview);
                   }}

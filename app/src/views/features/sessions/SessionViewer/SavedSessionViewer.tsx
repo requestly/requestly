@@ -17,7 +17,7 @@ import { RQSessionEvents } from "@requestly/web-sdk";
 import { decompressEvents } from "./sessionEventsUtils";
 import ShareButton from "../ShareButton";
 import PageLoader from "components/misc/PageLoader";
-import { getAuthInitialization, getUserAuthDetails, getUserAttributes, getAppMode } from "store/selectors";
+import { getAuthInitialization, getUserAuthDetails, getUserAttributes } from "store/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { getIsRequestedByOwner, getSessionRecordingEventsFilePath } from "store/features/session-recording/selectors";
 import PermissionError from "../errors/PermissionError";
@@ -32,6 +32,9 @@ import { trackSavedSessionViewed } from "modules/analytics/events/features/sessi
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionViewer.scss";
 import BadSessionError from "../errors/BadSessionError";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -78,7 +81,9 @@ const SavedSessionViewer: React.FC = () => {
   const eventsFilePath = useSelector(getSessionRecordingEventsFilePath);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
   const userAttributes = useSelector(getUserAttributes);
-  const appMode = useSelector(getAppMode);
+
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const [isFetching, setIsFetching] = useState(true);
   const [showPermissionError, setShowPermissionError] = useState(false);
@@ -206,7 +211,7 @@ const SavedSessionViewer: React.FC = () => {
               iconOnly
               type="default"
               icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={() => redirectToSessionRecordingHome(navigate, appMode)}
+              onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
               className="back-button"
             />
             <SessionViewerTitle isReadOnly={!isRequestedByOwner} isInsideIframe={isInsideIframe} />
