@@ -133,7 +133,7 @@ const SessionsIndexPage = () => {
           newValue: true,
           newProps: {
             redirectURL: window.location.href,
-            callback: () => redirectToSessionSettings(navigate, window.location.pathname),
+            callback: () => redirectToSessionSettings(navigate, window.location.pathname, "sessions"),
             eventSource: AUTH.SOURCE.SESSION_RECORDING,
           },
         })
@@ -141,7 +141,7 @@ const SessionsIndexPage = () => {
       return;
     }
 
-    redirectToSessionSettings(navigate, window.location.pathname);
+    redirectToSessionSettings(navigate, window.location.pathname, "sessions");
   }, [dispatch, navigate, user?.loggedIn]);
 
   const configureBtn = useMemo(

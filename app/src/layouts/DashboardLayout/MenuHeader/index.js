@@ -129,7 +129,7 @@ const MenuHeader = () => {
                     icon={<Settings />}
                     onClick={() => {
                       trackHeaderClicked("settings");
-                      redirectToSettings(navigate, window.location.pathname);
+                      redirectToSettings(navigate, window.location.pathname, "header");
                     }}
                   />
                 </Tooltip>
