@@ -17,6 +17,7 @@ import { ReducerKeys } from "./constants";
 import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/slice";
 import { rulesReducer } from "./features/rules/slice";
 import { billingReducer } from "./features/billing/slice";
+import { harPreviewReducer } from "./features/network-sessions/slice";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,
@@ -56,6 +57,7 @@ export const reduxStore = configureStore({
   reducer: {
     [ReducerKeys.GLOBAL]: globalReducer,
     [ReducerKeys.SESSION_RECORDING]: sessionRecordingReducer,
+    [ReducerKeys.HAR_PREVIEW]: harPreviewReducer,
     [ReducerKeys.TEAMS]: teamsReducer,
     [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducer,
     [ReducerKeys.RULES]: rulesReducer,

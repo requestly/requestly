@@ -42,13 +42,16 @@ export interface DraftSessionViewerProps {
     appliedRuleStatus: boolean;
   };
   source?: string;
+  desktopMode?: boolean;
 }
 
 const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   testRuleDraftSession,
   source = DRAFT_SESSION_VIEWED_SOURCE.DEFAULT,
+  desktopMode = false,
 }) => {
-  const tabId = useParams().tabId ?? testRuleDraftSession.draftSessionTabId;
+  const tempTabId = useParams().tabId ?? testRuleDraftSession?.draftSessionTabId;
+  const tabId = useMemo(() => (desktopMode ? "imported" : tempTabId), [desktopMode, tempTabId]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -89,19 +92,25 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
     };
 
-    // It is fired only if there was ANY interaction of the user with the site.
-    // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
-    // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
-    window.addEventListener("beforeunload", unloadListener);
+    if (!desktopMode) {
+      console.log("added when should not added", desktopMode);
+      // It is fired only if there was ANY interaction of the user with the site.
+      // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
+      // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing
+      window.addEventListener("beforeunload", unloadListener);
 
-    return () => window.removeEventListener("beforeunload", unloadListener);
-  }, []);
+      return () => window.removeEventListener("beforeunload", unloadListener);
+    }
+  }, [desktopMode]);
 
-  unstable_usePrompt({
-    when: !isSaveSessionClicked && !isDiscardSessionClicked && !testRuleDraftSession,
-    message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
-  });
+  if (!desktopMode) {
+    console.log("added when should not added", desktopMode);
 
+    unstable_usePrompt({
+      when: !isSaveSessionClicked && !isDiscardSessionClicked && !testRuleDraftSession,
+      message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
+    });
+  }
   useEffect(
     () => () => {
       dispatch(sessionRecordingActions.resetState());
@@ -110,10 +119,10 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   );
 
   useEffect(() => {
-    if (isImportedSession && sessionRecordingMetadata === null) {
+    if (isImportedSession && sessionRecordingMetadata === null && !desktopMode) {
       navigate(PATHS.SESSIONS.ABSOLUTE);
     }
-  }, [navigate, isImportedSession, sessionRecordingMetadata]);
+  }, [navigate, isImportedSession, sessionRecordingMetadata, desktopMode]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -204,9 +213,12 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       <div className="session-viewer-header margin-bottom-one">
         <SessionViewerTitle />
         <div className="session-viewer-actions">
-          <RQButton type="default" onClick={confirmDiscard}>
-            Discard
-          </RQButton>
+          {!desktopMode && (
+            <RQButton type="default" onClick={confirmDiscard}>
+              Discard
+            </RQButton>
+          )}
+
           <RQButton
             data-tour-id="save-draft-session-btn"
             type="primary"

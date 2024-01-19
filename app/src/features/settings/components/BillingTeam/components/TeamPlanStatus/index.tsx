@@ -6,7 +6,7 @@ import "./index.scss";
 
 export const TeamPlanStatus: React.FC<{ subscriptionStatus: string }> = ({ subscriptionStatus }) => {
   let planStatus = PlanStatus.ACTIVE;
-  if (!["active", "past_due"].includes(subscriptionStatus)) {
+  if (!["active", "past_due", "trialing"].includes(subscriptionStatus)) {
     planStatus = PlanStatus.EXPIRED;
   }
 
@@ -22,7 +22,7 @@ export const TeamPlanStatus: React.FC<{ subscriptionStatus: string }> = ({ subsc
             ? "plan-status-warning-badge"
             : "plan-status-expired-badge"
         }
-      
+
     }`}
       >
         <Col

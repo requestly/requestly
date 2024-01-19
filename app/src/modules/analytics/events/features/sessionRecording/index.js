@@ -127,3 +127,7 @@ export const trackSessionRecordingNetworkLogContextMenuOpen = () => {
 export const trackSessionRecordingNetworkLogContextMenuOptionClicked = (option) => {
   trackEvent(SESSION_RECORDING.network_log_context_menu_option_clicked, { option });
 };
+
+export function trackLocalSessionRecordingOpened() {
+  trackEvent(SESSION_RECORDING.session_recording_file_opened);
+}
