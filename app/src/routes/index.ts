@@ -9,6 +9,7 @@ import { mockServerRoutes } from "./mockServerRoutes";
 import { onboardingRoutes } from "./onboardingRoutes";
 import { miscRoutes } from "./miscRoutes";
 import { ruleRoutes } from "features/rules/routes";
+import { desktopSessionsRoutes } from "./desktopSessionRoutes";
 import { settingRoutes } from "features/settings/routes";
 
 export const routes: RouteObject[] = [
@@ -23,4 +24,5 @@ export const routes: RouteObject[] = [
   ...onboardingRoutes,
   ...settingRoutes,
   ...miscRoutes,
+  ...desktopSessionsRoutes,
 ];

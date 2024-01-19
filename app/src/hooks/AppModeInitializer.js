@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../store";
 // UTILS
@@ -33,6 +33,16 @@ import { toast } from "utils/Toast";
 import { trackDesktopBGEvent, trackDesktopMainEvent } from "modules/analytics/events/desktopApp/backgroundEvents";
 import { useNavigate } from "react-router-dom";
 import { useHasChanged } from "./useHasChanged";
+import { sessionRecordingActions } from "store/features/session-recording/slice";
+import { decompressEvents } from "views/features/sessions/SessionViewer/sessionEventsUtils";
+import PATHS from "config/constants/sub/paths";
+import { PreviewType, networkSessionActions } from "store/features/network-sessions/slice";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { trackHarFileOpened } from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
 
 let hasAppModeBeenSet = false;
 
@@ -45,6 +55,8 @@ const AppModeInitializer = () => {
   const { appsList, isBackgroundProcessActive, isProxyServerRunning } = useSelector(getDesktopSpecificDetails);
   const hasConnectedAppBefore = useSelector(getHasConnectedApp);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const appsListRef = useRef(null);
   const hasMessageHandlersBeenSet = useRef(false);
@@ -144,6 +156,56 @@ const AppModeInitializer = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("deeplink-handler", (payload) => {
         navigate(payload);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const closeConnectedAppsModal = useCallback(
+    (props = {}) => {
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "connectedAppsModal",
+          newValue: false,
+        })
+      );
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS)) {
+      window.RQ.DESKTOP.SERVICES.IPC.registerEvent("open-file", async (fileObj) => {
+        if (fileObj?.extension === ".rqly" || fileObj?.extension === ".har") {
+          let fileData;
+          try {
+            fileData = JSON.parse(fileObj?.contents);
+          } catch (error) {
+            console.error("could not parse the user's file to json");
+            toast.error("Error loading file");
+            return;
+          }
+
+          // close connect app modal that opens on launch
+          closeConnectedAppsModal();
+
+          if (fileObj?.extension === ".rqly") {
+            dispatch(sessionRecordingActions.setSessionRecordingMetadata({ ...fileData?.data?.metadata }));
+            const recordedSessionEvents = decompressEvents(fileData?.data?.events);
+            dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
+            trackLocalSessionRecordingOpened();
+            navigate(`${PATHS.SESSIONS.DESKTOP.WEB_SESSIONS.ABSOLUTE}/imported`);
+          } else if (fileObj?.extension === ".har") {
+            dispatch(networkSessionActions.resetState());
+            dispatch(networkSessionActions.setImportedHar(fileData));
+            dispatch(networkSessionActions.setPreviewType(PreviewType.IMPORTED));
+            dispatch(networkSessionActions.setSessionName(fileObj.name));
+            trackHarFileOpened();
+            redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
+          }
+        } else {
+          console.log("unknown file type detected");
+        }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
