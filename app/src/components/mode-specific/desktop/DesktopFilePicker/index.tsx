@@ -11,8 +11,15 @@ import { toast } from "utils/Toast";
 import SpinnerCard from "components/misc/SpinnerCard";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { Divider } from "antd";
+import {
+  trackFileSelectionFailed,
+  trackFileSuccessfullySelected,
+  trackImportFileBtnClicked,
+  trackOpenSystemFileSelector,
+  trackRecentlyAccessedFileClicked,
+  trackUnexpectedFailureAfterFileSelection,
+} from "./analytics";
 
-// not good
 interface FileDropZoneProps {
   onFileParsed: (fileContents: string, fileName: string, filePath: string) => void;
   category?: AccessedFileCategoryTag;
@@ -21,13 +28,17 @@ const FileDropZone: React.FC<FileDropZoneProps> = (props) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const handleBrowseAndSelectFilesClick = useCallback(async () => {
+    trackOpenSystemFileSelector(props.category);
     setIsProcessing(true);
     try {
       const file = await openFileSelector(props.category);
       if (file) {
+        trackFileSuccessfullySelected(props.category);
         props.onFileParsed(file.contents, file.name, file.filePath);
       }
+      trackUnexpectedFailureAfterFileSelection(props.category);
     } catch (e) {
+      trackFileSelectionFailed(props.category);
       console.error(e);
       toast.error("Error opening file selector");
     }
@@ -88,6 +99,7 @@ const RecentlyAccessedFilesList: React.FC<RecentlyAccessedFilesListProps> = (pro
                   onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
                     event.preventDefault();
                     handleFileClicked(file);
+                    trackRecentlyAccessedFileClicked(file.category);
                   }}
                 >
                   {file.name}
@@ -121,6 +133,7 @@ export const FilePickerModalBtn: React.FC<FilePickerProps> = (props) => {
         type="primary"
         onClick={() => {
           setIsModalVisible(true);
+          trackImportFileBtnClicked(props.category);
         }}
         className="mt-8"
       >
