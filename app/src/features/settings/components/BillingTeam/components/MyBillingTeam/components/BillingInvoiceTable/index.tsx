@@ -40,7 +40,9 @@ export const BillingInvoiceTable: React.FC = () => {
         title: "Amount",
         dataIndex: "total",
         key: "total",
-        render: (amount: number) => <div className="text-white">{`$${amount / 100}`}</div>,
+        render: (amount: number, record: any) => (
+          <div className="text-white">{`${record.currency === "usd" ? "$" : record.currency} ${amount / 100}`}</div>
+        ),
       },
       {
         title: "",
