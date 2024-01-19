@@ -24,6 +24,9 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackConfigurationOpened, trackConfigurationSaved } from "modules/analytics/events/features/sessionRecording";
 import "./sessionsSettingsPage.css";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
 
 const emptyPageSourceData: SessionRecordingPageSource = {
   value: "",
@@ -54,6 +57,9 @@ const SessionsSettingsPage: React.FC = () => {
   const [config, setConfig] = useState<SessionRecordingConfig>({});
   const [showNewPageSource, setShowNewPageSource] = useState<boolean>(false);
   const { autoRecording } = config;
+
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
   const getPageSourceLabel = useCallback((source: SessionRecordingPageSource): string => {
     const upperCasedSourceKey = source.key.toUpperCase();
@@ -249,7 +255,7 @@ const SessionsSettingsPage: React.FC = () => {
             iconOnly
             type="default"
             icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-            onClick={() => redirectToSessionRecordingHome(navigate)}
+            onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
           />
           <span>SessionBook Settings</span>
         </div>

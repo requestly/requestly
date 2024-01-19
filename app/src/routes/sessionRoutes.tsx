@@ -32,7 +32,13 @@ export const sessionRoutes: RouteObject[] = [
     element: <SavedSessionViewer />,
   },
   {
-    path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
+    // path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
+    path: PATHS.NETWORK_LOGS.VIEWER.RELATIVE + "/:id",
+    element: <NetworkSessionViewer />,
+  },
+  {
+    // path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id", // todo
+    path: PATHS.NETWORK_LOGS.HAR.INDEX,
     element: <NetworkSessionViewer />,
   },
   {

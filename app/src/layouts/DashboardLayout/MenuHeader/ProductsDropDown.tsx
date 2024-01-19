@@ -72,6 +72,7 @@ const Products: React.FC<ProductsProps> = (props) => {
   const navigate = useNavigate();
 
   const appMode = useSelector(getAppMode);
+  const isDesktopSessionsEnabled = useFeatureIsOn("desktop-sessions");
 
   const [isDesktopAppPromoModalOpen, setIsDesktopAppPromoModalOpen] = useState(false);
   const isRequestlyApiEnabled = useFeatureIsOn("requestly_api_in_header");
@@ -107,8 +108,8 @@ const Products: React.FC<ProductsProps> = (props) => {
       handleClick: useCallback(() => {
         trackProductClickedInDropDown("session_replay");
         props.toggleDropDown();
-        redirectToSessionRecordingHome(navigate);
-      }, [navigate, props]),
+        redirectToSessionRecordingHome(navigate, isDesktopSessionsEnabled);
+      }, [navigate, props, isDesktopSessionsEnabled]),
     },
     {
       title: "API Client",
