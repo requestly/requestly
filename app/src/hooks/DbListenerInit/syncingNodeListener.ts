@@ -24,6 +24,7 @@ import { doSyncRecords } from "utils/syncing/SyncUtils";
 import { SYNC_CONSTANTS } from "utils/syncing/syncConstants";
 import APP_CONSTANTS from "config/constants";
 import { SyncType } from "utils/syncing/SyncUtils";
+import { startTransaction } from "@sentry/react";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -219,7 +220,7 @@ export const doSync = async (
 /** Debounced version of the doSync function */
 export const doSyncDebounced = _.debounce((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
   console.log("[DEBUG] doSyncDebounced in action");
-  doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+  return doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
 }, 5000);
 
 /**
@@ -250,34 +251,63 @@ export const invokeSyncingIfRequired = async ({
   appMode?: "EXTENSION" | "DESKTOP";
   isSyncEnabled?: boolean;
 }): Promise<void> => {
-  if (!uid || (!team_id && !isSyncEnabled)) return;
+  const transaction = startTransaction({ name: "recordsSyncing" });
 
-  if (window.skipSyncListenerForNextOneTime) {
-    window.skipSyncListenerForNextOneTime = false;
-    window.isFirstSyncComplete = true; // Just in case!
-    dispatch(actions.updateIsRulesListLoading(false));
-    return;
-  }
+  try {
+    const syncingSpan = transaction?.startChild({
+      op: "syncing",
+      name: "records syncing",
+      data: {
+        isFirstSync: !window.isFirstSyncComplete,
+        recordsCount: Object.keys(latestFirebaseRecords)?.length,
+      },
+    });
 
-  const syncTarget = getSyncTarget(team_id);
-  // If latestFirebaseRecords are given, means invoked for the newer time. If not given, means sync is invoked for the first time
-  let updatedFirebaseRecords = latestFirebaseRecords
-    ? latestFirebaseRecords
-    : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
+    const finishTransaction = () => {
+      syncingSpan?.finish();
+      transaction?.finish();
+    };
 
-  if (!isLocalStoragePresent(appMode)) {
-    // Just refresh the rules table in this case
-    dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
-    window.isFirstSyncComplete = true;
-    dispatch(actions.updateIsRulesListLoading(false));
-    return;
-  }
-  if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-    console.log("DEBUG", "doSyncDebounced");
-    doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
-  } else {
-    resetSyncDebounce();
-    doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+    if (!uid || (!team_id && !isSyncEnabled)) {
+      finishTransaction();
+      return;
+    }
+
+    if (window.skipSyncListenerForNextOneTime) {
+      window.skipSyncListenerForNextOneTime = false;
+      window.isFirstSyncComplete = true; // Just in case!
+      dispatch(actions.updateIsRulesListLoading(false));
+      finishTransaction();
+      return;
+    }
+
+    const syncTarget = getSyncTarget(team_id);
+    // If latestFirebaseRecords are given, means invoked for the newer time. If not given, means sync is invoked for the first time
+    let updatedFirebaseRecords = latestFirebaseRecords
+      ? latestFirebaseRecords
+      : await fetchInitialFirebaseRecords(syncTarget, uid, team_id);
+
+    if (!isLocalStoragePresent(appMode)) {
+      // Just refresh the rules table in this case
+      dispatch(actions.updateRefreshPendingStatus({ type: "rules" }));
+      window.isFirstSyncComplete = true;
+      dispatch(actions.updateIsRulesListLoading(false));
+      finishTransaction();
+      return;
+    }
+    if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
+      console.log("DEBUG", "doSyncDebounced");
+      doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id).then(() => {
+        finishTransaction();
+      });
+    } else {
+      resetSyncDebounce();
+      doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id).then(() => {
+        finishTransaction();
+      });
+    }
+  } catch (error) {
+    Logger.log(error);
   }
 };
 
