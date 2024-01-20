@@ -26,6 +26,7 @@ export const SESSION_RECORDING = {
   network_log_context_menu_open: "network_log_context_menu_open",
   network_log_context_menu_option_clicked: "network_log_context_menu_option_clicked",
   bad_session_recording_viewed: "bad_session_recording_viewed",
+  session_recording_file_opened: "session_recording_file_opened",
 
   ONBAORDING: {
     onboarding_page_viewed: "session_onboarding_page_viewed",
@@ -52,6 +53,8 @@ export const SESSION_RECORDING = {
       canceled: "new_network_session_canceled",
     },
     download: "download_network_session_clicked",
+    back_from_preview: "back_from_preview_clicked",
+    har_file_opened: "har_file_opened",
   },
 };
 

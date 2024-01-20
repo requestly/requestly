@@ -1,0 +1,23 @@
+.settings-container.ant-col {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.settings-header {
+  line-height: 33px;
+}
+
+.settings-caption {
+  margin: 1.25rem 0;
+}
+
+.settings-action {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background-color: var(--body-background);
+  padding: 1rem 1.5rem 0 1.5rem;
+}
