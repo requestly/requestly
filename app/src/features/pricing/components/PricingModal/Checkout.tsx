@@ -11,8 +11,7 @@ import { redirectToAccountDetails } from "utils/RedirectionUtils";
 import { trackCheckoutCompletedEvent } from "modules/analytics/events/misc/business/checkout";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import APP_CONSTANTS from "config/constants";
-import { getBillingTeamsById } from "backend/billing";
+import { getBillingTeamRedirectURL } from "backend/billing";
 import "./index.scss";
 
 interface CheckoutProps {
@@ -39,20 +38,13 @@ export const Checkout: React.FC<CheckoutProps> = ({
   const user = useSelector(getUserAuthDetails);
 
   const redirectTolatestBillingTeam = async () => {
-    getBillingTeamsById(user?.details?.profile?.uid).then((billingTeams) => {
-      if (billingTeams.length === 0) return;
-
-      if (billingTeams.length === 1) {
-        navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + "/" + billingTeams[0].id);
-        toggleModal();
-      } else {
-        const sortedTeams = billingTeams.sort(
-          (a: any, b: any) =>
-            b.data.subscriptionDetails.subscriptionCreated - a.data.subscriptionDetails.subscriptionCreated
-        );
-        navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + "/" + sortedTeams[0].id);
-        toggleModal();
+    getBillingTeamRedirectURL(user?.details?.profile?.uid).then((redirectUrl) => {
+      if (!redirectUrl) {
+        return;
       }
+
+      navigate(redirectUrl + "?redirectedFromCheckout=true");
+      toggleModal();
     });
   };
 
