@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import Logger from "lib/logger";
 import { BillingTeamDetails, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import PATHS from "config/constants/sub/paths";
 
 export const getBillingTeamInvoices = async (billingId: string) => {
   if (!billingId) {
@@ -112,14 +113,26 @@ export const toggleWorkspaceMappingInBillingTeam = async (
   });
 };
 
-export const getBillingTeamsById = async (userId: string): Promise<{ id: string; data: BillingTeamDetails }[]> => {
+export const getBillingTeamRedirectURL = async (ownerId: string): Promise<string | null> => {
   const db = getFirestore(firebaseApp);
-  const billingTeamsQuery = query(collection(db, "billing"), where(`owner`, "==", userId));
+  const billingTeamsQuery = query(collection(db, "billing"), where(`owner`, "==", ownerId));
   const billingTeamsSnapshot = await getDocs(billingTeamsQuery);
-  return new Promise((resolve, reject) => {
-    const billingTeams = billingTeamsSnapshot.docs.map((doc) => {
-      return { data: doc?.data() as BillingTeamDetails, id: doc?.id };
-    });
-    resolve(billingTeams);
+
+  const billingTeams = billingTeamsSnapshot.docs.map((doc) => {
+    return { data: doc?.data() as BillingTeamDetails, id: doc?.id };
   });
+
+  if (billingTeams.length === 0) {
+    return null;
+  }
+
+  if (billingTeams.length === 1) {
+    return `${PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0].id}`;
+  } else {
+    const sortedTeams = billingTeams.sort(
+      (a: any, b: any) =>
+        b.data.subscriptionDetails.subscriptionCreated - a.data.subscriptionDetails.subscriptionCreated
+    );
+    return `${PATHS.SETTINGS.BILLING.RELATIVE}/${sortedTeams[0].id}`;
+  }
 };
