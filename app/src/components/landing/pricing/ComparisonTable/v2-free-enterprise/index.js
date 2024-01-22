@@ -1,22 +1,19 @@
 import React, { useState } from "react";
 import sessionImg from "../../../../../assets/icons/session.svg";
 import rulesImg from "../../../../../assets/icons/http-rules.svg";
-// import BuyForTeamsModal from "../../BuyForTeamsModal";
 import ContactUsModal from "components/landing/contactUsModal";
 import GitHubButton from "react-github-btn";
-import "./index.css";
 import { trackViewGithubClicked } from "modules/analytics/events/misc/business";
 import { Col, Row, Switch } from "antd";
 import EnterpriseBanner from "./EnterpriseBanner";
-import { PricingTable, UpgradeWorkspaceMenu } from "features/pricing";
+import { PricingTable } from "features/pricing";
 import { PRICING } from "features/pricing";
-import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
+import "./index.css";
 
 const FreeAndEnterprisePlanTable = () => {
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
   const [product, setProduct] = useState(PRICING.PRODUCTS.HTTP_RULES);
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(TEAM_WORKSPACES.PRIVATE_WORKSPACE);
 
   return (
     <>
@@ -30,13 +27,6 @@ const FreeAndEnterprisePlanTable = () => {
             }}
           />
           <span>{"  "}Annual pricing (save 20%)</span>
-        </div>
-        <div className="text-center">
-          <UpgradeWorkspaceMenu
-            workspaceToUpgrade={workspaceToUpgrade}
-            setWorkspaceToUpgrade={setWorkspaceToUpgrade}
-            className="upgrade-workspace-menu-btn"
-          />
         </div>
         <Row>
           <Col className="pricing-table-product-view" xs={24} lg={6}>
@@ -79,7 +69,7 @@ const FreeAndEnterprisePlanTable = () => {
             </Col>
           </Col>
           <Col style={{ flex: 1 }}>
-            <PricingTable product={product} workspaceToUpgrade={workspaceToUpgrade} duration={duration} />
+            <PricingTable product={product} duration={duration} />
           </Col>
         </Row>
         <EnterpriseBanner openContactUsModal={() => setIsContactUsModalOpen(true)} />
