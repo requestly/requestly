@@ -4,10 +4,7 @@ import { Modal, Space } from "antd";
 import { PRICING } from "features/pricing/constants/pricing";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
-import {
-  // trackCheckoutFailedEvent,
-  trackCheckoutInitiatedEvent,
-} from "modules/analytics/events/misc/business/checkout";
+import { trackCheckoutFailedEvent, trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
@@ -91,7 +88,7 @@ const CTA_BUTTONS_CONFIG = {
   },
 };
 
-// Maps userPlanType/userPlanName -> columnPlanType/columnPlanName -> buttonConfig
+// Maps userPlanName -> columnPlanName -> buttonConfig
 const pricingButtonsMap: Record<string, any> = {
   default: {
     [PRICING.PLAN_NAMES.FREE]: {
@@ -102,7 +99,7 @@ const pricingButtonsMap: Record<string, any> = {
     [PRICING.PLAN_NAMES.BASIC]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["current-plan"],
-      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["manage-subscription"],
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["switch-plan"],
     },
     [PRICING.PLAN_NAMES.PROFESSIONAL]: {
       [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
@@ -155,6 +152,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         current_plan: `${userPlanName}`,
         selected_plan: `${columnPlanName}`,
         action: functionName,
+        quantity,
       },
       source
     );
@@ -224,7 +222,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
           })
           .catch((err) => {
             toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-            // trackCheckoutFailedEvent(isPrivateWorkspaceSelected ? "individual" : "team", source);
+            trackCheckoutFailedEvent(quantity, source);
           })
           .finally(() => {
             setIsButtonLoading(false);
