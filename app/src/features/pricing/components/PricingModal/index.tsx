@@ -1,9 +1,8 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { actions } from "store";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { PricingTable, UpgradeWorkspaceMenu, PRICING } from "features/pricing";
+import { PricingTable, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
 import { CloseOutlined } from "@ant-design/icons";
 import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
@@ -11,43 +10,33 @@ import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
-import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
-import { isNull } from "lodash";
-import { TeamWorkspace } from "types";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import "./index.scss";
 import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
+import "./index.scss";
 
 interface PricingModalProps {
   isOpen: boolean;
   toggleModal: () => void;
   selectedPlan?: string;
-  workspace?: TeamWorkspace;
   title?: string;
   planDuration?: string;
   source: string;
+  quantity?: number;
 }
 
 export const PricingModal: React.FC<PricingModalProps> = ({
   isOpen,
   toggleModal,
-  workspace,
   planDuration,
   selectedPlan = null,
   title = "Upgrade your plan to get the most out of Requestly",
+  quantity = 1,
   source,
 }) => {
   const dispatch = useDispatch();
 
-  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(
-    workspace?.id
-      ? workspace
-      : isNull(currentlyActiveWorkspace.id)
-      ? TEAM_WORKSPACES.PRIVATE_WORKSPACE
-      : currentlyActiveWorkspace
-  );
+  console.log({ quantity });
 
   const [duration, setDuration] = useState(planDuration || PRICING.DURATION.ANNUALLY);
   const [stripeClientSecret, setStripeClientSecret] = useState(null);
@@ -68,8 +57,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
       setIsLoading(true);
       const subscriptionData = {
         currency: "usd",
-        teamId: workspaceToUpgrade?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id ? null : workspaceToUpgrade?.id,
-        quantity: workspaceToUpgrade?.accessCount || 1,
+        quantity,
         planName: planName,
         duration: duration,
       };
@@ -88,16 +76,16 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           trackCheckoutFailedEvent("individual", source);
         });
     },
-    [workspaceToUpgrade?.id, workspaceToUpgrade?.accessCount, duration, toggleModal, source]
+    [duration, toggleModal, source, quantity]
   );
 
   useEffect(() => {
-    if (selectedPlan && !isCheckoutCompleted && !isCheckoutScreenVisible) {
+    if (selectedPlan && quantity && !isCheckoutCompleted && !isCheckoutScreenVisible) {
       setIsCheckoutScreenVisible(true);
       setIsLoading(true);
       handleSubscribe(selectedPlan);
     }
-  }, [selectedPlan, handleSubscribe, isCheckoutCompleted, isCheckoutScreenVisible]);
+  }, [selectedPlan, handleSubscribe, isCheckoutCompleted, isCheckoutScreenVisible, quantity]);
 
   useEffect(() => {
     if (!isCheckoutScreenVisible) trackPricingModalPlansViewed(source);
@@ -129,8 +117,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                   newValue: true,
                   newProps: {
                     selectedPlan: null,
-                    workspace: workspaceToUpgrade,
                     planDuration: duration,
+                    quantity: quantity,
                     source,
                   },
                 })
@@ -147,14 +135,6 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               <Typography.Title level={4}>{title}</Typography.Title>
             </Row>
             <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
-              <Col>
-                <UpgradeWorkspaceMenu
-                  workspaceToUpgrade={workspaceToUpgrade}
-                  setWorkspaceToUpgrade={setWorkspaceToUpgrade}
-                  source={source}
-                  isOpenedFromModal
-                />
-              </Col>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch
                   size="small"
@@ -188,14 +168,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               </div>
             )}
 
-            <PricingTable
-              workspaceToUpgrade={workspaceToUpgrade}
-              duration={duration}
-              isOpenedFromModal
-              handleOnSubscribe={handleSubscribe}
-              tableRef={tableRef}
-              source={source}
-            />
+            <PricingTable duration={duration} isOpenedFromModal tableRef={tableRef} source={source} />
             <CompaniesSection />
           </>
         )}

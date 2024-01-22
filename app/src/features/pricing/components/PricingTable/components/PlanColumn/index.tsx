@@ -13,7 +13,6 @@ interface PlanColumnProps {
   planDetails: any;
   planPrice: number;
   duration: string;
-  workspaceToUpgrade?: any;
   product?: string;
   source: string;
   setIsContactUsModalOpen: (value: boolean) => void;
@@ -24,12 +23,11 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   planDetails,
   planPrice,
   duration,
-  workspaceToUpgrade,
   product,
   source,
   setIsContactUsModalOpen,
 }) => {
-  const [seats, setSeats] = useState(1);
+  const [quantity, setQuantity] = useState(1);
   const renderFeaturesListHeader = (planName: string) => {
     return (
       <Row className="pro-basic-feature-title text-left">
@@ -92,8 +90,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                   size="small"
                   min={1}
                   defaultValue={1}
-                  value={seats}
-                  onChange={(value) => setSeats(value)}
+                  value={quantity}
+                  onChange={(value) => setQuantity(value)}
                 />
               </Space>
             )}
@@ -120,12 +118,12 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       </Row>
       <Row className="mt-16">
         <PricingTableButtons
-          key={planName + duration + workspaceToUpgrade?.id}
+          key={planName + duration}
           columnPlanName={planName}
-          selectedWorkspace={workspaceToUpgrade}
           product={product}
           duration={duration}
           source={source}
+          quantity={quantity}
           setIsContactUsModalOpen={setIsContactUsModalOpen}
         />
       </Row>
