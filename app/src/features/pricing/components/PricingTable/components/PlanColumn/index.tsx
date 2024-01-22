@@ -98,9 +98,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                 </Space>
               )}
 
-            <div className="caption">
-              {planName !== PRICING.PLAN_NAMES.FREE && <Typography.Text>/ month per member</Typography.Text>}
-            </div>
+            <div>{planName !== PRICING.PLAN_NAMES.FREE && <Typography.Text>member / month</Typography.Text>}</div>
           </Space>
         </Row>
       )}
