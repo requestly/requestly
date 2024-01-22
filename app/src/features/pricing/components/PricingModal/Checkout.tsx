@@ -11,8 +11,8 @@ import { redirectToAccountDetails } from "utils/RedirectionUtils";
 import { trackCheckoutCompletedEvent } from "modules/analytics/events/misc/business/checkout";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { getBillingTeamsById } from "backend/billing/getBillingTeamsById";
 import APP_CONSTANTS from "config/constants";
+import { getBillingTeamsById } from "backend/billing";
 import "./index.scss";
 
 interface CheckoutProps {

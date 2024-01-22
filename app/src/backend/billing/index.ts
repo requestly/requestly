@@ -12,7 +12,7 @@ import {
   where,
 } from "firebase/firestore";
 import Logger from "lib/logger";
-import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamDetails, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 
 export const getBillingTeamInvoices = async (billingId: string) => {
   if (!billingId) {
@@ -109,5 +109,17 @@ export const toggleWorkspaceMappingInBillingTeam = async (
     billedWorkspaces: toBeMapped ? arrayUnion(workspaceId) : arrayRemove(workspaceId),
   }).catch((err) => {
     throw new Error(err.message);
+  });
+};
+
+export const getBillingTeamsById = async (userId: string): Promise<{ id: string; data: BillingTeamDetails }[]> => {
+  const db = getFirestore(firebaseApp);
+  const billingTeamsQuery = query(collection(db, "billing"), where(`owner`, "==", userId));
+  const billingTeamsSnapshot = await getDocs(billingTeamsQuery);
+  return new Promise((resolve, reject) => {
+    const billingTeams = billingTeamsSnapshot.docs.map((doc) => {
+      return { data: doc?.data() as BillingTeamDetails, id: doc?.id };
+    });
+    resolve(billingTeams);
   });
 };
