@@ -59,7 +59,6 @@ export const Checkout: React.FC<CheckoutProps> = ({
   const options = {
     clientSecret,
     onComplete: () => {
-      console.log("onComplete called");
       trackCheckoutCompletedEvent(source);
       redirectTolatestBillingTeam();
       onCheckoutCompleted?.();
