@@ -83,18 +83,20 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             <Typography.Text strong className="plan-price">
               ${duration === PRICING.DURATION.ANNUALLY ? planPrice / 12 : planPrice}
             </Typography.Text>
-            {planName !== PRICING.PLAN_NAMES.FREE && planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
-              <Space>
-                <InputNumber
-                  style={{ width: "55px", height: "30px", display: "flex", alignItems: "center" }}
-                  size="small"
-                  min={1}
-                  defaultValue={1}
-                  value={quantity}
-                  onChange={(value) => setQuantity(value)}
-                />
-              </Space>
-            )}
+            {product === PRICING.PRODUCTS.HTTP_RULES &&
+              planName !== PRICING.PLAN_NAMES.FREE &&
+              planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
+                <Space>
+                  <InputNumber
+                    style={{ width: "55px", height: "30px", display: "flex", alignItems: "center" }}
+                    size="small"
+                    min={1}
+                    defaultValue={1}
+                    value={quantity}
+                    onChange={(value) => setQuantity(value)}
+                  />
+                </Space>
+              )}
 
             <div className="caption">
               {planName !== PRICING.PLAN_NAMES.FREE && <Typography.Text>/ month per member</Typography.Text>}
