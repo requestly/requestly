@@ -22,7 +22,7 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
   const dispatch = useDispatch();
   const availableTeams = useSelector(getAvailableTeams);
   const sortedAvailableTeams = useMemo(
-    () => [...availableTeams]?.sort((a: Team, b: Team) => b?.accessCount - a?.accessCount),
+    () => [...(availableTeams ?? [])]?.sort((a: Team, b: Team) => b?.accessCount - a?.accessCount),
     [availableTeams]
   );
 
