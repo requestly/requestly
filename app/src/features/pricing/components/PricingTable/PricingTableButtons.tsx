@@ -145,6 +145,9 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   const isUserPremium = user?.details?.isPremium;
   const userPlanName = user?.details?.planDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
   const isUserTrialing = isUserPremium && user?.details?.planDetails?.status === "trialing";
+  const userPlanType = ["team", "individual"].includes(user?.details?.planDetails?.type)
+    ? user?.details?.planDetails?.type
+    : "individual";
 
   const onButtonClick = (functionName: string) => {
     trackPricingPlanCTAClicked(
@@ -244,6 +247,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             requestPlanSwitch({
               currentPlan: userPlanName,
               planToSwitch: columnPlanName,
+              currentPlanType: userPlanType,
             })
               .catch(() => {
                 toast.error("Error in switching plan. Please contact support");
