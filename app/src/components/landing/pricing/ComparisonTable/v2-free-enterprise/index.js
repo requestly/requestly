@@ -19,14 +19,18 @@ const FreeAndEnterprisePlanTable = () => {
     <>
       <div className="pricing-table-wrapper">
         <div className="text-center margin-bottom-one">
+          <span className={duration === PRICING.DURATION.MONTHLY ? "tet-white text-bold" : "text-gray"}>Monthly </span>
           <Switch
+            style={{ margin: "0 8px" }}
             size="small"
             checked={duration === PRICING.DURATION.ANNUALLY}
             onChange={(checked) => {
               setDuration(checked ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY);
             }}
           />
-          <span>{"  "}Annual pricing (save 20%)</span>
+          <span className={duration === PRICING.DURATION.ANNUALLY ? "tet-white text-bold" : "text-gray"}>
+            Annually (save 20%)
+          </span>
         </div>
         <Row>
           <Col className="pricing-table-product-view" xs={24} lg={6}>

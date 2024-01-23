@@ -13,8 +13,8 @@ export const BillingTeam: React.FC = () => {
   const location = useLocation();
   const hasAccessToBillingTeam = useMemo(
     () =>
-      billingTeams.some((billingTeam) => {
-        return billingTeam.id === billingId && location.pathname !== APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE;
+      billingTeams?.some((billingTeam) => {
+        return billingTeam?.id === billingId && location.pathname !== APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE;
       }),
     [billingTeams, billingId, location.pathname]
   );
