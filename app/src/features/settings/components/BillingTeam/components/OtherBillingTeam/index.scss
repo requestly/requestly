@@ -1,4 +1,5 @@
 .other-team-members-table-header {
+  width: 100%;
   padding: 8px 1rem;
   border-bottom: 1px solid var(--surface-2);
   margin: 0 !important;
@@ -22,4 +23,8 @@
   .ant-popover-inner {
     background: var(--surface-1);
   }
+}
+
+.request-billing-team-btn.ant-btn {
+  gap: 8px;
 }

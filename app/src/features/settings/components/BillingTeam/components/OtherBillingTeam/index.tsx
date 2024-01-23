@@ -11,6 +11,7 @@ import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import "./index.scss";
+import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 
 export const OtherBillingTeam: React.FC = () => {
   const { billingId } = useParams();
@@ -57,10 +58,12 @@ export const OtherBillingTeam: React.FC = () => {
         ),
       },
       {
-        title: "Added on",
+        title: <div className="text-right">Added on</div>,
         dataIndex: "joiningDate",
         render: (joiningDate: number) => (
-          <div className="text-white">{joiningDate ? getLongFormatDateString(new Date(joiningDate)) : "-"}</div>
+          <div className="text-white text-right">
+            {joiningDate ? getLongFormatDateString(new Date(joiningDate)) : "-"}
+          </div>
         ),
       },
     ],
@@ -71,34 +74,44 @@ export const OtherBillingTeam: React.FC = () => {
     <>
       <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
       <Col className="billing-teams-primary-card mt-8">
-        <Row className="items-center other-team-members-table-header" align="middle" gutter={8}>
+        <Row className="items-center other-team-members-table-header" align="middle" justify="space-between" gutter={8}>
           <Col>
-            <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
+            <Row align="middle" gutter={8}>
+              <Col>
+                <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
+              </Col>
+              <Col>
+                <Popover
+                  overlayClassName="team-details-popover"
+                  open={isPlanDetailsPopoverOpen}
+                  content={
+                    <TeamDetailsPopover
+                      teamDetails={billingTeamDetails}
+                      closePopover={() => setIsPlanDetailsPopoverOpen(false)}
+                    />
+                  }
+                  showArrow={false}
+                  trigger="click"
+                  placement="bottomLeft"
+                  title={null}
+                >
+                  <RQButton
+                    type="text"
+                    size="small"
+                    className="view-team-details-btn"
+                    onClick={() => setIsPlanDetailsPopoverOpen(true)}
+                  >
+                    View details
+                  </RQButton>
+                </Popover>
+              </Col>
+            </Row>
           </Col>
+
           <Col>
-            <Popover
-              overlayClassName="team-details-popover"
-              open={isPlanDetailsPopoverOpen}
-              content={
-                <TeamDetailsPopover
-                  teamDetails={billingTeamDetails}
-                  closePopover={() => setIsPlanDetailsPopoverOpen(false)}
-                />
-              }
-              showArrow={false}
-              trigger="click"
-              placement="bottomLeft"
-              title={null}
-            >
-              <RQButton
-                type="text"
-                size="small"
-                className="view-team-details-btn"
-                onClick={() => setIsPlanDetailsPopoverOpen(true)}
-              >
-                View details
-              </RQButton>
-            </Popover>
+            <RQButton className="request-billing-team-btn" type="default" icon={<IoMdAdd />}>
+              Request to add
+            </RQButton>
           </Col>
         </Row>
         <Table
