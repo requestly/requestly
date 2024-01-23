@@ -1,13 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Modal, Space } from "antd";
-
+import { useDispatch, useSelector } from "react-redux";
 import { PRICING } from "features/pricing/constants/pricing";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import { trackCheckoutFailedEvent, trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
 import { actions } from "store";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
@@ -15,6 +14,7 @@ import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirma
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { trackPricingPlanCTAClicked } from "modules/analytics/events/misc/business";
 import APP_CONSTANTS from "config/constants";
+import { redirectToPricingPlans } from "utils/RedirectionUtils";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -134,6 +134,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   const dispatch = useDispatch();
   const firebaseFunction = getFunctions();
   const user = useSelector(getUserAuthDetails);
+  const navigate = useNavigate();
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -162,8 +163,11 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         actions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: "pricing_table",
+          newProps: {
+            callback: () => redirectToPricingPlans(navigate),
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: "pricing_table",
+          },
         })
       );
       setIsButtonLoading(false);
@@ -180,8 +184,11 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
           actions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-            eventSource: "pricing_table",
+            newProps: {
+              authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+              callback: () => redirectToPricingPlans(navigate),
+              eventSource: "pricing_table",
+            },
           })
         );
         setIsButtonLoading(false);
