@@ -22,11 +22,7 @@ const SettingsIndex: React.FC = () => {
   const secondarySideBarItems = useMemo(() => {
     switch (true) {
       case location.pathname.includes(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE) && billingTeams.length > 1:
-        return (
-          <BillingTeamsSidebar
-            billingTeams={billingTeams.map((billingTeam) => ({ id: billingTeam.id, name: billingTeam.name }))}
-          />
-        );
+        return <BillingTeamsSidebar billingTeams={billingTeams} />;
       default:
         return null;
     }

@@ -87,6 +87,18 @@
     padding: 12px 1rem;
     border-bottom: 1px solid var(--surface-1);
   }
+
+  .billing-team-member-avatar-wrapper {
+    align-self: center;
+    margin-right: 8px;
+  }
+
+  .billing-team-member-email {
+    font-size: 11px;
+    letter-spacing: 0.25px;
+    line-height: 14px;
+    color: var(--neutrals-gray-300);
+  }
 }
 
 .billing-team-loader-screen {

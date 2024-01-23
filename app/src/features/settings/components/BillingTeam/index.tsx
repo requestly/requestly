@@ -3,13 +3,21 @@ import { useSelector } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import { Result, Spin } from "antd";
 import { MyBillingTeam } from "./components/MyBillingTeam";
-import { getAvailableBillingTeams, getIsBillingTeamsLoading } from "store/features/billing/selectors";
+import {
+  getAvailableBillingTeams,
+  getBillingTeamMemberById,
+  getIsBillingTeamsLoading,
+} from "store/features/billing/selectors";
 import APP_CONSTANTS from "config/constants";
+import { getUserAuthDetails } from "store/selectors";
+import { OtherBillingTeam } from "./components/OtherBillingTeam";
 
 export const BillingTeam: React.FC = () => {
   const { billingId } = useParams();
+  const user = useSelector(getUserAuthDetails);
   const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
   const billingTeams = useSelector(getAvailableBillingTeams);
+  const isTeamMember = useSelector(getBillingTeamMemberById(billingId, user?.details?.profile?.uid));
   const location = useLocation();
   const hasAccessToBillingTeam = useMemo(
     () =>
@@ -39,9 +47,9 @@ export const BillingTeam: React.FC = () => {
     );
   }
 
-  return <MyBillingTeam />;
+  if (isTeamMember) return <MyBillingTeam />;
+  else return <OtherBillingTeam />;
   /*
-  ADD OTHER BILLING TEAM COMPONENTS HERE
   ADD NO BILLING TEAM COMPONENT HERE
   */
 };

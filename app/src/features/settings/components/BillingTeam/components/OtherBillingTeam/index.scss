@@ -1,0 +1,25 @@
+.other-team-members-table-header {
+  padding: 8px 1rem;
+  border-bottom: 1px solid var(--surface-2);
+  margin: 0 !important;
+
+  & .view-team-details-btn.ant-btn {
+    font-weight: 500;
+    &:hover,
+    &:focus,
+    &:active {
+      color: var(--white) !important;
+      background: var(--surface-2);
+    }
+  }
+}
+
+.team-details-popover {
+  width: 280px;
+  &.ant-popover-placement-bottomLeft {
+    padding-top: 0;
+  }
+  .ant-popover-inner {
+    background: var(--surface-2);
+  }
+}
