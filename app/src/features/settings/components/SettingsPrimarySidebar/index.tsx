@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getAppMode } from "store/selectors";
@@ -72,12 +72,6 @@ export const SettingsPrimarySidebar: React.FC = () => {
     ],
     [appMode, billingTeams.length]
   );
-
-  useEffect(() => {
-    if (billingTeams.length && location.pathname === PATHS.SETTINGS.BILLING.RELATIVE) {
-      navigate(`${PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0]?.id}`);
-    }
-  }, [location.pathname, billingTeams, navigate]);
 
   return (
     <Col className="settings-primary-sidebar">

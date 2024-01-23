@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Result, Spin } from "antd";
 import { MyBillingTeam } from "./components/MyBillingTeam";
 import {
@@ -14,6 +14,7 @@ import { OtherBillingTeam } from "./components/OtherBillingTeam";
 
 export const BillingTeam: React.FC = () => {
   const { billingId } = useParams();
+  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
   const billingTeams = useSelector(getAvailableBillingTeams);
@@ -26,6 +27,20 @@ export const BillingTeam: React.FC = () => {
       }),
     [billingTeams, billingId, location.pathname]
   );
+
+  useEffect(() => {
+    if (billingTeams.length && location.pathname === APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE) {
+      if (billingTeams.length === 1)
+        navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0]?.id}`);
+      else {
+        // navigate to the billing team in which the user is a member
+        const team = billingTeams.find((team) => {
+          return user?.details?.profile?.uid in team.members;
+        });
+        navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${team.id}`);
+      }
+    }
+  }, [location.pathname, billingTeams, navigate, user?.details?.profile?.uid]);
 
   if (isBillingTeamsLoading || !billingId)
     return (
