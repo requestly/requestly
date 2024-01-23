@@ -134,6 +134,9 @@ export const PricingModal: React.FC<PricingModalProps> = ({
             </Row>
             <Row justify="center" className="display-row-center w-full mt-8" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
+                <span className={`${duration === PRICING.DURATION.MONTHLY ? "text-bold text-white" : "text-gray"}`}>
+                  Monthly
+                </span>
                 <Switch
                   size="small"
                   checked={duration === PRICING.DURATION.ANNUALLY}
@@ -141,8 +144,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                     setDuration(checked ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY);
                   }}
                 />{" "}
-                <span>
-                  Annual pricing <span className="success">(save 20%)</span>
+                <span className={`${duration === PRICING.DURATION.ANNUALLY ? "text-bold text-white" : "text-gray"}`}>
+                  Annually<span className="success">(save 20%)</span>
                 </span>
               </Col>
             </Row>
