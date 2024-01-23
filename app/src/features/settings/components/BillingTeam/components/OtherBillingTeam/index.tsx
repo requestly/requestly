@@ -77,7 +77,12 @@ export const OtherBillingTeam: React.FC = () => {
         <Row className="items-center other-team-members-table-header" align="middle" justify="space-between" gutter={8}>
           <Col>
             <Row align="middle" gutter={8}>
-              <Col>
+              <Col
+                style={{
+                  paddingRight: 0,
+                  paddingLeft: 0,
+                }}
+              >
                 <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
               </Col>
               <Col>
