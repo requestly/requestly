@@ -2,13 +2,15 @@ import React, { useMemo } from "react";
 import { Col, Row } from "antd";
 import { MdOutlineGroup } from "@react-icons/all-files/md/MdOutlineGroup";
 import { MdGroups } from "@react-icons/all-files/md/MdGroups";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { trackBillingTeamNavigated } from "features/settings/analytics";
 import { BillingTeamDetails } from "../../types";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
+import APP_CONSTANTS from "config/constants";
 
 export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] }> = ({ billingTeams }) => {
+  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
 
   const groupedTeams = useMemo(() => {
@@ -34,21 +36,36 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] 
       </Row>
 
       <Col className="settings-secondary-sidebar-section">
-        {groupedTeams.myTeams.map((billingTeam) => (
-          <NavLink
-            key={billingTeam.id}
-            // TODO: IN PHASE 4 handle for other team as well
-            onClick={() => trackBillingTeamNavigated("my_team")}
-            to={`/settings/billing/${billingTeam.id}`}
-            className={({ isActive }) =>
-              `settings-secondary-sidebar-section-link ${
-                isActive ? "settings-secondary-sidebar-section-active-link" : ""
-              }`
-            }
+        {groupedTeams.myTeams.length ? (
+          <>
+            {" "}
+            {groupedTeams.myTeams.map((billingTeam) => (
+              <NavLink
+                key={billingTeam.id}
+                onClick={() => trackBillingTeamNavigated("my_team")}
+                to={`/settings/billing/${billingTeam.id}`}
+                className={({ isActive }) =>
+                  `settings-secondary-sidebar-section-link ${
+                    isActive ? "settings-secondary-sidebar-section-active-link" : ""
+                  }`
+                }
+              >
+                {billingTeam.name}
+              </NavLink>
+            ))}
+          </>
+        ) : (
+          <div
+            className="settings-secondary-sidebar-section-link"
+            style={{
+              backgroundColor:
+                window.location.pathname === APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE ? "var(--surface-2)" : "",
+            }}
+            onClick={() => navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE)}
           >
-            {billingTeam.name}
-          </NavLink>
-        ))}
+            Plan details
+          </div>
+        )}
       </Col>
 
       {groupedTeams.otherTeams.length > 0 && (
@@ -62,7 +79,6 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] 
             {groupedTeams.otherTeams.map((billingTeam) => (
               <NavLink
                 key={billingTeam.id}
-                // TODO: IN PHASE 4 handle for other team as well
                 onClick={() => trackBillingTeamNavigated("my_team")}
                 to={`/settings/billing/${billingTeam.id}`}
                 className={({ isActive }) =>
