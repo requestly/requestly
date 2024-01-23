@@ -284,6 +284,9 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
 
   if (isUserTrialing) {
     buttonConfig = pricingButtonsMap.trial[columnPlanName];
+    if (quantity > 1) {
+      buttonConfig = CTA_BUTTONS_CONFIG["checkout"];
+    }
   }
 
   if (product === PRICING.PRODUCTS.SESSION_REPLAY) {
