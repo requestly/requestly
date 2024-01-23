@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { Avatar, Col, Drawer, Dropdown, Popconfirm, Row, Table } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
-import { MemberTableActions } from "./components/MemberTableActions";
 import { getBillingTeamMembers } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
@@ -230,7 +229,7 @@ export const BillingTeamMembers: React.FC = () => {
           </Col>
         </Row>
         <Col className="billing-team-members-drawer-body">
-          <OrgMembersTable actionButtons={(record: any) => <MemberTableActions record={record} />} />
+          <OrgMembersTable />
         </Col>
         <Row className="mt-8 billing-team-members-drawer-help" justify="space-between" align="middle">
           <Col>

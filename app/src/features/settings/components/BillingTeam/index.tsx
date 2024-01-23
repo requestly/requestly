@@ -41,7 +41,7 @@ export const BillingTeam: React.FC = () => {
         <Result
           status="error"
           title="Oops, something went wrong!"
-          subTitle="You are not a part of this billing team or this  team does not exist"
+          subTitle="You are not a part of this billing team or this team does not exist"
         />
       </div>
     );
