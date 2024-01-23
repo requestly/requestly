@@ -61,9 +61,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const getPricingPlanAnnualBillingSubtitle = (planName: string) => {
     switch (planName) {
       case PRICING.PLAN_NAMES.BASIC:
-        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price} annually`;
+        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
       case PRICING.PLAN_NAMES.PROFESSIONAL:
-        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price} annually`;
+        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
       default:
         return "";
     }
