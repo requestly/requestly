@@ -4,8 +4,9 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../TeamPlanStatus";
+import { TeamDetailsPopover } from "./components/TeamDetailsPopover";
 import { RQButton } from "lib/design-system/components";
-import { BillingTeamRoles } from "../../types";
+import { BillingTeamMember, BillingTeamRoles } from "../../types";
 import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
@@ -14,7 +15,7 @@ import "./index.scss";
 export const OtherBillingTeam: React.FC = () => {
   const { billingId } = useParams();
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
-  const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
+  const billingTeamMembers = useSelector(getBillingTeamMembers(billingId)) as Record<string, BillingTeamMember>;
   const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
   const [isPlanDetailsPopoverOpen, setIsPlanDetailsPopoverOpen] = React.useState(false);
 
@@ -75,7 +76,12 @@ export const OtherBillingTeam: React.FC = () => {
             <Popover
               overlayClassName="team-details-popover"
               open={isPlanDetailsPopoverOpen}
-              content={<>TEAM DETAILS HERE</>}
+              content={
+                <TeamDetailsPopover
+                  teamDetails={billingTeamDetails}
+                  closePopover={() => setIsPlanDetailsPopoverOpen(false)}
+                />
+              }
               showArrow={false}
               trigger="click"
               placement="bottomLeft"
@@ -98,6 +104,7 @@ export const OtherBillingTeam: React.FC = () => {
           columns={columns}
           pagination={false}
           scroll={{ y: "65vh" }}
+          loading={!billingTeamMembers}
         />
       </Col>
     </>
