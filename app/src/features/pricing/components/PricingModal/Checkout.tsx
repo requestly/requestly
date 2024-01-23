@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getBillingTeamRedirectURL } from "backend/billing";
 import "./index.scss";
+import PATHS from "config/constants/sub/paths";
 
 interface CheckoutProps {
   clientSecret: string;
@@ -40,10 +41,11 @@ export const Checkout: React.FC<CheckoutProps> = ({
   const redirectTolatestBillingTeam = async () => {
     getBillingTeamRedirectURL(user?.details?.profile?.uid).then((redirectUrl) => {
       if (!redirectUrl) {
-        return;
+        navigate(PATHS.SETTINGS.BILLING.RELATIVE);
+      } else {
+        navigate(redirectUrl + "?redirectedFromCheckout=true");
       }
 
-      navigate(redirectUrl + "?redirectedFromCheckout=true");
       toggleModal();
     });
   };
