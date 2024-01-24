@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Col } from "antd";
 import { useParams } from "react-router-dom";
-import "./index.scss";
 import { RQButton } from "lib/design-system/components";
 import { fetchBillingInformation } from "backend/billing";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
+import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
+import "./index.scss";
 
 export const BillingInformation: React.FC = () => {
   const { billingId } = useParams();
 
   const [billingInformation, setBillingInformation] = useState(null);
+  const [isUpdatingBillingInfo, setIsUpdatingBillingInfo] = useState(false);
+  const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false);
 
   useEffect(() => {
     fetchBillingInformation(billingId)
@@ -22,15 +25,41 @@ export const BillingInformation: React.FC = () => {
       });
   }, [billingId]);
 
+  const redirectToUpdateInfo = useCallback(async () => {
+    const manageSubscription = httpsCallable(getFunctions(), "subscription-manageSubscription");
+    return manageSubscription({
+      portalFlowType: "update_payment_method",
+    })
+      .then((res: any) => {
+        if (res?.data?.success) {
+          window.open(res?.data?.data?.portalUrl, "_blank");
+        }
+      })
+      .catch((err) => {
+        toast.error("Error in managing subscription. Please contact support contact@requestly.io");
+      });
+  }, []);
+
   if (!billingInformation) return null;
 
   return (
     <Col className="billing-teams-primary-card team-billing-info-card">
       <div className="team-billing-info-section">
         <div className="text-bold text-white mb-16">
-          Billing Information
-          <RQButton type="text" size="small">
-            Update
+          Billing information
+          <RQButton
+            type="text"
+            size="small"
+            onClick={() => {
+              setIsUpdatingBillingInfo(true);
+              redirectToUpdateInfo().finally(() => setIsUpdatingBillingInfo(false));
+            }}
+            loading={isUpdatingBillingInfo}
+          >
+            <div className="text-gray team-billing-info-btn-text">
+              Update
+              <HiOutlineExternalLink />
+            </div>
           </RQButton>
         </div>
         <p>{billingInformation.name}</p>
@@ -43,21 +72,15 @@ export const BillingInformation: React.FC = () => {
             type="text"
             size="small"
             onClick={() => {
-              const manageSubscription = httpsCallable(getFunctions(), "subscription-manageSubscription");
-              manageSubscription({
-                portalFlowType: "update_payment_method",
-              })
-                .then((res: any) => {
-                  if (res?.data?.success) {
-                    window.location.href = res?.data?.data?.portalUrl;
-                  }
-                })
-                .catch((err) => {
-                  toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-                });
+              setIsUpdatingPaymentMethod(true);
+              redirectToUpdateInfo().finally(() => setIsUpdatingPaymentMethod(false));
             }}
+            loading={isUpdatingPaymentMethod}
           >
-            Update
+            <div className="text-gray team-billing-info-btn-text">
+              Update
+              <HiOutlineExternalLink />
+            </div>
           </RQButton>
         </div>
         <p className="text-capitalize">{billingInformation.paymentMethod.type}</p>

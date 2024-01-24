@@ -4,6 +4,12 @@
 
   .team-billing-info-section {
     padding: 1rem;
+    .team-billing-info-btn-text {
+      display: inline-flex;
+      gap: 0.25rem;
+      align-items: center;
+      padding-bottom: 2px;
+    }
   }
 
   .team-billing-info-section:first-child {
