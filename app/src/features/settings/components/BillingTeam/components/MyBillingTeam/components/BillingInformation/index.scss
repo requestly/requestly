@@ -1,0 +1,12 @@
+.team-billing-info-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  .team-billing-info-section {
+    padding: 1rem;
+  }
+
+  .team-billing-info-section:first-child {
+    border-right: 1px solid var(--surface-2);
+  }
+}

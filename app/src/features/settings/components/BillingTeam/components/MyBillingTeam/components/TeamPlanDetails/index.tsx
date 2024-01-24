@@ -121,7 +121,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               Billed {isAnnualPlan ? "annually" : "monthly"}
             </Col>
             <Row align="middle" gutter={4} className="mt-8">
-              <Col className="header">{billingTeamDetails.seats}</Col>
+              <Col className="header">{billingTeamDetails.subscriptionDetails.quantity}</Col>
               <Col className="text-white caption">Licences</Col>
             </Row>
           </div>

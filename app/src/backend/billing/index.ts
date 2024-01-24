@@ -136,3 +136,13 @@ export const getBillingTeamRedirectURL = async (ownerId: string): Promise<string
     return `${PATHS.SETTINGS.BILLING.RELATIVE}/${sortedTeams[0].id}`;
   }
 };
+
+export const fetchBillingInformation = async (billingId: string) => {
+  const billingInfo = httpsCallable<{ billingId: string }>(getFunctions(), "billing-getBillingInfo");
+  return billingInfo({ billingId }).then((res) => {
+    if (!res.data) {
+      return null;
+    }
+    return res.data;
+  });
+};

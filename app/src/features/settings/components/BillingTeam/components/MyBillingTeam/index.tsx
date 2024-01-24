@@ -10,6 +10,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { BillingTeamRoles } from "../../types";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { trackBillingTeamViewed } from "features/settings/analytics";
+import { BillingInformation } from "./components/BillingInformation";
 
 export const MyBillingTeam: React.FC = () => {
   const { billingId } = useParams();
@@ -56,7 +57,9 @@ export const MyBillingTeam: React.FC = () => {
           <BillingInvoiceTable />
         </Col>
       ) : null}
-      {/* TODO: ADD BILLING ADDRESS AND PAYMENT METHOD SECTION */}
+      <Col style={{ marginTop: "24px" }}>
+        <BillingInformation />
+      </Col>
     </>
   );
 };
