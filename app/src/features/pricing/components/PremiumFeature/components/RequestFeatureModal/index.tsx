@@ -18,6 +18,7 @@ import { trackTeamPlanCardClicked } from "modules/analytics/events/common/teams"
 import "./index.scss";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import APP_CONSTANTS from "config/constants";
+import { getBillingTeamMemberById } from "store/features/billing/selectors";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
+  const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
 
   const requestEnterprisePlanFromAdmin = useMemo(
     () =>
@@ -79,12 +81,12 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
           message: (
             <>
               Unable to send request, contact directly at{" "}
-              <span className="enterprise-admin-details">{billingTeams[0].ownerEmail} for futher details.</span>.
+              <span className="enterprise-admin-details">{teamOwnerDetails?.email} for futher details.</span>.
             </>
           ),
         });
       });
-  }, [requestEnterprisePlanFromAdmin, source, billingTeams, user?.details?.profile?.email]);
+  }, [requestEnterprisePlanFromAdmin, source, billingTeams, user?.details?.profile?.email, teamOwnerDetails?.email]);
 
   const renderModalTitle = () => {
     if (!postRequestMessage) {

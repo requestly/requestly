@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { Row, Col, Alert } from "antd";
 import { toast } from "utils/Toast.js";
@@ -18,6 +18,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
   const user = useSelector(getUserAuthDetails);
   const navigate = useNavigate();
   const billingTeams = useSelector(getAvailableBillingTeams);
+  const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
   const [enterpriseRequestedState, setEnterpriseRequestedState] = useState(0); // 1 is clicked, 2 is sent
 
   // FIREBASE FUNCTIONS
@@ -46,9 +47,9 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
       })
       .catch((err) => {
         toast.error("Unable to send email");
-        toast.info(`Contact directly at: ${billingTeams[0].ownerEmail}`);
+        toast.info(`Contact directly at: ${teamOwnerDetails?.email}`);
       });
-  }, [requestEnterprisePlanFromAdmin, navigate, billingTeams, user?.details?.profile?.email]);
+  }, [requestEnterprisePlanFromAdmin, navigate, billingTeams, user?.details?.profile?.email, teamOwnerDetails?.email]);
 
   useEffect(() => {
     if (
@@ -58,7 +59,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
       user?.details?.isLoggedIn &&
       !user?.details?.isPremium
     )
-      trackTeamPlanCardShown(getDomainFromEmail(billingTeams[0].ownerEmail));
+      trackTeamPlanCardShown(billingTeams[0].ownerDomain);
   }, [
     user?.details?.isLoggedIn,
     user?.details?.isPremium,

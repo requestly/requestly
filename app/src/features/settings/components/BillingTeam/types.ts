@@ -9,7 +9,7 @@ export interface BillingTeamDetails {
   name: string;
   description: string;
   owner: string;
-  ownerEmail: string;
+  ownerDomain?: string;
   subscriptionDetails: Record<string, any>;
   members: Record<string, BillingTeamMember>;
   billingExclude?: string[];

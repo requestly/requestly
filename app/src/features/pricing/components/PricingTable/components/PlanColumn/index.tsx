@@ -7,6 +7,7 @@ import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
 import underlineIcon from "../../../../assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
+import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 
 interface PlanColumnProps {
   planName: string;
@@ -28,6 +29,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   setIsContactUsModalOpen,
 }) => {
   const [quantity, setQuantity] = useState(1);
+
   const renderFeaturesListHeader = (planName: string) => {
     return (
       <Row className="pro-basic-feature-title text-left">
@@ -93,7 +95,10 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                     min={1}
                     defaultValue={1}
                     value={quantity}
-                    onChange={(value) => setQuantity(value)}
+                    onChange={(value) => {
+                      setQuantity(value);
+                      trackPricingPlansQuantityChanged(value, planName, source);
+                    }}
                   />
                 </Space>
               )}
