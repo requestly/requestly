@@ -25,6 +25,7 @@ export const OrgMembersTable = () => {
   useEffect(() => {
     if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {
       trackBillingTeamNoMemberFound("personal_email");
+      setOrganizationMembers({ total: 0, users: [] });
     }
     if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
       getOrganizationUsers({
