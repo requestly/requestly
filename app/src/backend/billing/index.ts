@@ -50,6 +50,16 @@ export const getBillingTeamMembersProfile = async (billingId: string) => {
     });
 };
 
+export const addUsersToBillingTeam = async (billingId: string, userEmails: string[]) => {
+  if (!billingId || !userEmails) {
+    return null;
+  }
+
+  const addUsers = httpsCallable<{ billingId: string; userEmails: string[] }>(getFunctions(), "billing-addUsers");
+
+  return addUsers({ billingId, userEmails });
+};
+
 export const removeMemberFromBillingTeam = async (billingId: string, userId: string) => {
   if (!billingId || !userId) {
     return null;
