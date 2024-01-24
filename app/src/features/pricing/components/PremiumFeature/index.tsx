@@ -9,6 +9,8 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytics";
 import { capitalize } from "lodash";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import { isCompanyEmail } from "utils/FormattingHelper";
 import "./index.scss";
 
 interface PremiumFeatureProps {
@@ -32,10 +34,12 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const billingTeams = useSelector(getAvailableBillingTeams);
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
+
   const showPremiumPopovers = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
     [features, getFeatureLimitValue, checkIfFeatureLimitReached]
@@ -52,12 +56,16 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 
   return (
     <>
-      {user?.details?.organization && !disabled && features ? (
+      {billingTeams.length &&
+      user?.details?.profile?.isEmailVerified &&
+      isCompanyEmail(user?.details?.profile?.email) &&
+      !disabled &&
+      features ? (
         <>
           <RequestFeatureModal
             isOpen={openPopup}
             setOpenPopup={setOpenPopup}
-            organizationsData={user?.details?.organization}
+            billingTeams={billingTeams}
             onContinue={onContinue}
             hasReachedLimit={isBreachingLimit}
             isDeadlineCrossed={hasCrossedDeadline}
