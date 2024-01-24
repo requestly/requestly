@@ -16,7 +16,11 @@ const SettingsIndex: React.FC = () => {
   const { state } = location;
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
+
   const isBillingTeamSidebarVisible = useMemo(() => {
+    /* Billing sidebar will be visible if there are more than 1 billing teams 
+       or if there is only 1 billing team and the user is not a member of that team
+    */
     if (
       billingTeams.length > 1 ||
       (billingTeams.length === 1 && billingTeams.some((team) => !(user?.details?.profile?.uid in team.members)))
