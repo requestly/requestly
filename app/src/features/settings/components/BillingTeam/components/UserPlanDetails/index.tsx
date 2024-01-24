@@ -24,8 +24,6 @@ export const UserPlanDetails = () => {
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [daysLeft, setDaysLeft] = useState(0);
 
-  console.log({ user });
-
   useEffect(() => {
     try {
       const diffTime = new Date(user?.details?.planDetails?.subscription?.endDate).getTime() - new Date().getTime();
