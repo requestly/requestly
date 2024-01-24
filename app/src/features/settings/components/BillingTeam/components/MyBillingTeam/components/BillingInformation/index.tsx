@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 import "./index.scss";
 import { RQButton } from "lib/design-system/components";
 import { fetchBillingInformation } from "backend/billing";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { toast } from "utils/Toast";
 
 export const BillingInformation: React.FC = () => {
   const { billingId } = useParams();
@@ -32,12 +34,29 @@ export const BillingInformation: React.FC = () => {
           </RQButton>
         </div>
         <p>{billingInformation.name}</p>
-        <p>{billingInformation.billingAddress}</p>
+        <p>{billingInformation.billingAddress || `No Billing address has been set`}</p>
       </div>
       <div className="team-billing-info-section">
         <div className="text-bold text-white mb-16">
           Payment Method
-          <RQButton type="text" size="small">
+          <RQButton
+            type="text"
+            size="small"
+            onClick={() => {
+              const manageSubscription = httpsCallable(getFunctions(), "subscription-manageSubscription");
+              manageSubscription({
+                portalFlowType: "update_payment_method",
+              })
+                .then((res: any) => {
+                  if (res?.data?.success) {
+                    window.location.href = res?.data?.data?.portalUrl;
+                  }
+                })
+                .catch((err) => {
+                  toast.error("Error in managing subscription. Please contact support contact@requestly.io");
+                });
+            }}
+          >
             Update
           </RQButton>
         </div>
