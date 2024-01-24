@@ -109,8 +109,8 @@ const pricingButtonsMap: Record<string, any> = {
   },
   trial: {
     [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-    [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
-    [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
+    [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["manage-subscription"],
+    [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["manage-subscription"],
   },
 };
 
@@ -284,6 +284,9 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
 
   if (isUserTrialing) {
     buttonConfig = pricingButtonsMap.trial[columnPlanName];
+    if (quantity > 1) {
+      buttonConfig = CTA_BUTTONS_CONFIG["checkout"];
+    }
   }
 
   if (product === PRICING.PRODUCTS.SESSION_REPLAY) {
