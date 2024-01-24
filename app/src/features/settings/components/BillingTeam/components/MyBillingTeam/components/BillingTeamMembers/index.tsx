@@ -237,8 +237,8 @@ export const BillingTeamMembers: React.FC = () => {
             Couldn't find member?{" "}
             <a className="external-link" href="mailto:contact@requestly.io">
               Contact us
-            </a>
-            , and we'll assist you in adding your team members.
+            </a>{" "}
+            and we'll assist you in adding your team members.
           </Col>
         </Row>
       </Drawer>

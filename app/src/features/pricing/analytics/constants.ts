@@ -5,4 +5,5 @@ export const PRICING_WORKSPACE = {
 export const PRICING_MODAL = {
   PRICING_MODAL_PLANS_VIEWED: "pricing_modal_plans_viewed",
   PRICING_MODAL_STRIPE_WINDOW_OPENED: "pricing_modal_stripe_window_opened",
+  PRICING_PLANS_QUANTITY_CHANGED: "pricing_plans_quantity_changed",
 };
