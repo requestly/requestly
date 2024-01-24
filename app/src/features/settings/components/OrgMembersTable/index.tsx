@@ -28,6 +28,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
   useEffect(() => {
     if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {
       trackBillingTeamNoMemberFound("personal_email");
+      setOrganizationMembers({ total: 0, users: [] });
     }
     if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
       getOrganizationUsers({
@@ -111,7 +112,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
                     Couldn't find member?{" "}
                     <a className="external-link" href="mailto:contact@requestly.io">
                       Contact us
-                    </a>
+                    </a>{" "}
                     and we'll assist you in adding your team members.
                   </>
                 ) : (

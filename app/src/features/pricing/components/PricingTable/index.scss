@@ -19,6 +19,10 @@
     color: var(--black);
     font-size: 11px;
   }
+
+  & .ant-input-number-handler-wrap {
+    opacity: 1;
+  }
 }
 
 .plan-card {
