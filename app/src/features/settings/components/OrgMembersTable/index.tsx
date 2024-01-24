@@ -109,7 +109,7 @@ export const OrgMembersTable = () => {
                     Couldn't find member?{" "}
                     <a className="external-link" href="mailto:contact@requestly.io">
                       Contact us
-                    </a>
+                    </a>{" "}
                     and we'll assist you in adding your team members.
                   </>
                 ) : (

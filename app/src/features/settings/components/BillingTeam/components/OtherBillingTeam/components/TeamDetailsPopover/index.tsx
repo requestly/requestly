@@ -23,7 +23,7 @@ export const TeamDetailsPopover: React.FC<Props> = ({ teamDetails, closePopover 
         </Col>
         <Col>
           <div className="team-details-label">Email</div>
-          <div className="text-white">{teamDetails.ownerEmail}</div>
+          <div className="text-white">{teamOwnerDetails?.email}</div>
         </Col>
       </Space>
     </div>

@@ -73,7 +73,7 @@ const FreeAndEnterprisePlanTable = () => {
             </Col>
           </Col>
           <Col style={{ flex: 1 }}>
-            <PricingTable product={product} duration={duration} />
+            <PricingTable product={product} duration={duration} source={"pricing_page"} />
           </Col>
         </Row>
         <EnterpriseBanner openContactUsModal={() => setIsContactUsModalOpen(true)} />
