@@ -5,7 +5,6 @@ import { SettingsSecondarySidebar } from "../SettingsSecondarySidebar";
 import { BillingTeamsSidebar } from "../BillingTeam/components/BillingTeamsSidebar";
 import { Outlet, useLocation } from "react-router-dom";
 import APP_CONSTANTS from "config/constants";
-import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
 import { useSelector } from "react-redux";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import "./index.scss";
@@ -15,13 +14,12 @@ const SettingsIndex: React.FC = () => {
   // TODO: FIX THIS
   const location = useLocation();
   const { state } = location;
-  useBillingTeamsListener();
-
   const billingTeams = useSelector(getAvailableBillingTeams);
+  console.log("billingTeams", billingTeams);
 
   const secondarySideBarItems = useMemo(() => {
     switch (true) {
-      case location.pathname.includes(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE) && billingTeams.length > 1:
+      case location.pathname.includes(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE):
         return <BillingTeamsSidebar billingTeams={billingTeams} />;
       default:
         return null;
