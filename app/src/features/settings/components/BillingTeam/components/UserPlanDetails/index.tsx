@@ -24,6 +24,8 @@ export const UserPlanDetails = () => {
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [daysLeft, setDaysLeft] = useState(0);
 
+  console.log({ user });
+
   useEffect(() => {
     try {
       const diffTime = new Date(user?.details?.planDetails?.subscription?.endDate).getTime() - new Date().getTime();
@@ -83,7 +85,7 @@ export const UserPlanDetails = () => {
           </Col>
         </>
       ) : null}
-      {user?.details?.planDetails?.planId !== PRICING.PLAN_NAMES.PROFESSIONAL ||
+      {user?.details?.planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL ||
       user?.details?.planDetails.status === "trialing" ? (
         <Col className="user-plan-upgrade-card">
           <MdDiversity1 />

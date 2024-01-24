@@ -32,7 +32,7 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] 
       <Col className="title">Billing</Col>
       <Row align="middle" className="mt-16 settings-secondary-sidebar-section-title" gutter={8}>
         <MdOutlineGroup />
-        <Col style={{ marginLeft: "4px" }}>My billing teams</Col>
+        <Col style={{ marginLeft: "4px" }}>My billing</Col>
       </Row>
 
       <Col className="settings-secondary-sidebar-section">
@@ -72,7 +72,7 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] 
         <>
           <Row align="middle" className="mt-16 settings-secondary-sidebar-section-title" gutter={8}>
             <MdGroups />
-            <Col style={{ marginLeft: "4px" }}>Other's billing teams</Col>
+            <Col style={{ marginLeft: "4px" }}>Other billing teams</Col>
           </Row>
 
           <Col className="settings-secondary-sidebar-section">
