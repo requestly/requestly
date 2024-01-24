@@ -6,25 +6,34 @@ import { BillingTeamsSidebar } from "../BillingTeam/components/BillingTeamsSideb
 import { Outlet, useLocation } from "react-router-dom";
 import APP_CONSTANTS from "config/constants";
 import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import "./index.scss";
 import { trackAppSettingsViewed } from "features/settings/analytics";
+import "./index.scss";
 
 const SettingsIndex: React.FC = () => {
-  // TODO: FIX THIS
   const location = useLocation();
   const { state } = location;
+  const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  console.log("billingTeams", billingTeams);
+  const isBillingTeamSidebarVisible = useMemo(() => {
+    if (
+      billingTeams.length > 1 ||
+      (billingTeams.length === 1 && billingTeams.some((team) => !(user?.details?.profile?.uid in team.members)))
+    ) {
+      return true;
+    }
+    return false;
+  }, [billingTeams, user?.details?.profile?.uid]);
 
   const secondarySideBarItems = useMemo(() => {
     switch (true) {
-      case location.pathname.includes(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE):
+      case location.pathname.includes(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE) && isBillingTeamSidebarVisible:
         return <BillingTeamsSidebar billingTeams={billingTeams} />;
       default:
         return null;
     }
-  }, [billingTeams, location.pathname]);
+  }, [billingTeams, location.pathname, isBillingTeamSidebarVisible]);
 
   useEffect(() => {
     trackAppSettingsViewed(location.pathname, state?.source);
