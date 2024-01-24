@@ -8,8 +8,12 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { trackPricingModalStripeWindowOpened } from "features/pricing/analytics";
 import { redirectToAccountDetails } from "utils/RedirectionUtils";
-import "./index.scss";
 import { trackCheckoutCompletedEvent } from "modules/analytics/events/misc/business/checkout";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import { getBillingTeamRedirectURL } from "backend/billing";
+import "./index.scss";
+import PATHS from "config/constants/sub/paths";
 
 interface CheckoutProps {
   clientSecret: string;
@@ -32,10 +36,25 @@ export const Checkout: React.FC<CheckoutProps> = ({
   onCheckoutCompleted,
 }) => {
   const navigate = useNavigate();
+  const user = useSelector(getUserAuthDetails);
+
+  const redirectTolatestBillingTeam = async () => {
+    getBillingTeamRedirectURL(user?.details?.profile?.uid).then((redirectUrl) => {
+      if (!redirectUrl) {
+        navigate(PATHS.SETTINGS.BILLING.RELATIVE);
+      } else {
+        navigate(redirectUrl + "?redirectedFromCheckout=true");
+      }
+
+      toggleModal();
+    });
+  };
+
   const options = {
     clientSecret,
     onComplete: () => {
       trackCheckoutCompletedEvent(source);
+      redirectTolatestBillingTeam();
       onCheckoutCompleted?.();
     },
   };

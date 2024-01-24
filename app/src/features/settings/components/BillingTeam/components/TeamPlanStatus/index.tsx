@@ -1,12 +1,16 @@
 import React from "react";
+import { useSearchParams } from "react-router-dom";
 import { Col, Row } from "antd";
 import { capitalize } from "lodash";
 import { PlanStatus } from "../../types";
 import "./index.scss";
 
 export const TeamPlanStatus: React.FC<{ subscriptionStatus: string }> = ({ subscriptionStatus }) => {
+  const [searchParams] = useSearchParams();
+  const redirectedFromCheckout = searchParams.get("redirectedFromCheckout");
+
   let planStatus = PlanStatus.ACTIVE;
-  if (!["active", "past_due", "trialing"].includes(subscriptionStatus)) {
+  if (!["active", "past_due", "trialing"].includes(subscriptionStatus) && !redirectedFromCheckout) {
     planStatus = PlanStatus.EXPIRED;
   }
 

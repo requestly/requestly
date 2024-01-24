@@ -12,3 +12,12 @@ export const trackPricingWorkspaceSwitched = (selection: "team" | "individual", 
 export const trackPricingModalStripeWindowOpened = (source: string) => {
   trackEvent(PRICING_MODAL.PRICING_MODAL_STRIPE_WINDOW_OPENED, { source });
 };
+
+export const trackPricingPlansQuantityChanged = (quantity: number, planName: string, source: string) => {
+  const params = {
+    quantity,
+    source,
+    plan_name: planName,
+  };
+  trackEvent(PRICING_MODAL.PRICING_PLANS_QUANTITY_CHANGED, params);
+};
