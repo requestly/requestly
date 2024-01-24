@@ -13,9 +13,9 @@ import UpgradeIcon from "../../assets/upgrade.svg";
 import { actions } from "store";
 import { PRICING } from "features/pricing";
 import Logger from "lib/logger";
-import "./index.scss";
 import APP_CONSTANTS from "config/constants";
 import { useEffect, useState } from "react";
+import "./index.scss";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
@@ -35,7 +35,12 @@ export const UserPlanDetails = () => {
   }, [user?.details?.planDetails?.subscription?.endDate]);
 
   return (
-    <Col className="billing-teams-primary-card user-plan-detail-card">
+    <Col
+      className="billing-teams-primary-card user-plan-detail-card"
+      style={{
+        marginTop: !user?.details?.isPremium ? "80px" : "0px",
+      }}
+    >
       {user?.details?.isPremium ? (
         <>
           {" "}
@@ -88,8 +93,10 @@ export const UserPlanDetails = () => {
           <div className="user-plan-upgrade-card-description">
             {user?.details?.planDetails.status === "trialing" ? (
               <>
-                Your professional plan free trail will expire in {daysLeft} days. Please consider upgrading or connect
-                directly with billing team admins already enjoying premium features.
+                Your professional plan free trail will expire in {daysLeft} days.{" "}
+                {billingTeams.length
+                  ? "Please consider upgrading or connect directly with billing team admins already enjoying premium features."
+                  : "Get access to premium rule types and extended rule limits"}
               </>
             ) : (
               <>

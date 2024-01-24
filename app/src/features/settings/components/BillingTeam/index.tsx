@@ -37,9 +37,6 @@ export const BillingTeam: React.FC = () => {
     setShowUserPlanDetails(false);
     if (location.pathname === APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE) {
       if (billingTeams.length) {
-        // if (billingTeams.length === 1)
-        //   navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0]?.id}`);
-        // else {
         // navigate to the billing team in which the user is a member
         const team = billingTeams.find((team) => {
           return user?.details?.profile?.uid in team.members;
@@ -49,7 +46,6 @@ export const BillingTeam: React.FC = () => {
           setShowUserPlanDetails(true);
           navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE);
         }
-        // }
       } else {
         setShowUserPlanDetails(true);
         navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE);
