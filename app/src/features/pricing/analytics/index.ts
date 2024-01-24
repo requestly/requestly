@@ -19,6 +19,5 @@ export const trackPricingPlansQuantityChanged = (quantity: number, planName: str
     source,
     plan_name: planName,
   };
-  console.log("!!!debug", "qty changed", params);
   trackEvent(PRICING_MODAL.PRICING_PLANS_QUANTITY_CHANGED, params);
 };
