@@ -1,24 +1,36 @@
 import { Avatar, Col, Popover, Row, Table } from "antd";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
+import { getUserAuthDetails } from "store/selectors";
+import { getAvailableBillingTeams, getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../TeamPlanStatus";
 import { TeamDetailsPopover } from "./components/TeamDetailsPopover";
 import { RQButton } from "lib/design-system/components";
 import { BillingTeamMember, BillingTeamRoles } from "../../types";
 import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
+import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
-import "./index.scss";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import Logger from "lib/logger";
+import "./index.scss";
 
 export const OtherBillingTeam: React.FC = () => {
   const { billingId } = useParams();
+  const user = useSelector(getUserAuthDetails);
+  const billingTeams = useSelector(getAvailableBillingTeams);
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId)) as Record<string, BillingTeamMember>;
   const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
-  const [isPlanDetailsPopoverOpen, setIsPlanDetailsPopoverOpen] = React.useState(false);
+  const [isPlanDetailsPopoverOpen, setIsPlanDetailsPopoverOpen] = useState(false);
+  const [isRequestingToJoin, setIsRequestingToJoin] = useState(false);
+  const [isRequestSent, setIsRequestSent] = useState(false);
+  const hasJoinedAnyTeam = useMemo(() => billingTeams.some((team) => user?.details?.profile?.uid in team.members), [
+    billingTeams,
+    user?.details?.profile?.uid,
+  ]);
 
   const columns = useMemo(
     () => [
@@ -70,6 +82,22 @@ export const OtherBillingTeam: React.FC = () => {
     [membersTableSource.length]
   );
 
+  const handleSendRequest = () => {
+    setIsRequestingToJoin(true);
+    const sendRequest = httpsCallable<{ billingId: string }, null>(
+      getFunctions(),
+      "premiumNotifications-requestEnterprisePlanFromAdmin"
+    );
+    sendRequest({ billingId })
+      .then(() => {
+        setIsRequestSent(true);
+      })
+      .catch((e) => {
+        Logger.log(e);
+      })
+      .finally(() => setIsRequestingToJoin(false));
+  };
+
   return (
     <>
       <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
@@ -113,11 +141,26 @@ export const OtherBillingTeam: React.FC = () => {
             </Row>
           </Col>
 
-          <Col>
-            <RQButton className="request-billing-team-btn" type="default" icon={<IoMdAdd />}>
-              Request to add
-            </RQButton>
-          </Col>
+          {!hasJoinedAnyTeam && (
+            <Col>
+              {isRequestSent ? (
+                <div className="success display-flex items-center">
+                  <MdCheck style={{ marginRight: "4px" }} />
+                  Request sent
+                </div>
+              ) : (
+                <RQButton
+                  loading={isRequestingToJoin}
+                  className="request-billing-team-btn"
+                  type="default"
+                  icon={<IoMdAdd />}
+                  onClick={handleSendRequest}
+                >
+                  Request to add
+                </RQButton>
+              )}
+            </Col>
+          )}
         </Row>
         <Table
           className="billing-table"
