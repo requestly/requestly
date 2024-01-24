@@ -221,6 +221,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         manageSubscription({
           planName: columnPlanName,
           duration,
+          portalFlowType: "update_subscription",
         })
           .then((res: any) => {
             if (res?.data?.success) {
