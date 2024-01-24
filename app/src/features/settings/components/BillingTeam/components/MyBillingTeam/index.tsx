@@ -52,14 +52,16 @@ export const MyBillingTeam: React.FC = () => {
       <Col style={{ marginTop: "24px" }}>
         <BillingTeamMembers />
       </Col>
-      {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member ? (
+      {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member && (
         <Col style={{ marginTop: "24px" }}>
           <BillingInvoiceTable />
         </Col>
-      ) : null}
-      <Col style={{ marginTop: "24px" }}>
-        <BillingInformation />
-      </Col>
+      )}
+      {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager && (
+        <Col style={{ marginTop: "24px" }}>
+          <BillingInformation />
+        </Col>
+      )}
     </>
   );
 };
