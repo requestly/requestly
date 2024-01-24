@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Col, Row } from "antd";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
@@ -16,10 +16,12 @@ interface Props {
 }
 
 export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopover, isAnnualPlan }) => {
+  const planName = useMemo(() => {
+    return getPlanNameFromId(planDetails.plan) === "basic-v2" ? "basic" : getPlanNameFromId(planDetails.plan);
+  }, [planDetails.plan]);
+
   const planPrice =
-    PricingPlans[getPlanNameFromId(planDetails.plan)]?.plans[
-      isAnnualPlan ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY
-    ]?.usd?.price;
+    PricingPlans[planName]?.plans[isAnnualPlan ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY]?.usd?.price;
 
   return (
     <>
@@ -37,9 +39,7 @@ export const TeamPlanDetailsPopover: React.FC<Props> = ({ planDetails, closePopo
       <Col className="team-plan-popover-body">
         <Col className="text-white text-bold">What's included in your plan</Col>
         <Col>
-          {PricingFeatures[PRICING.PRODUCTS.HTTP_RULES][
-            getPlanNameFromId(planDetails.plan) === "basic-v2" ? "basic" : getPlanNameFromId(planDetails.plan)
-          ].features.map((feature) => (
+          {PricingFeatures[PRICING.PRODUCTS.HTTP_RULES][planName].features.map((feature) => (
             <Row align="middle" className="team-plan-popover-feature">
               <MdCheck />
               <Col className="team-plan-popover-feature-name">{feature.title}</Col>
