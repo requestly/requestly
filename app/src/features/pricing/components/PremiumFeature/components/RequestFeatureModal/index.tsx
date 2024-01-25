@@ -15,10 +15,11 @@ import { actions } from "store";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "../../analytics";
 import { trackTeamPlanCardClicked } from "modules/analytics/events/common/teams";
-import "./index.scss";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import APP_CONSTANTS from "config/constants";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import "./index.scss";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -54,7 +55,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
 
   const handleSendRequest = useCallback(() => {
     setIsLoading(true);
-    const domain = user?.details?.profile?.email?.split("@")[1];
+    const domain = getDomainFromEmail(user?.details?.profile?.email);
     trackTeamPlanCardClicked(domain, source);
     trackUpgradeOptionClicked("send_request_to_admin");
 
