@@ -1,5 +1,5 @@
 import { Avatar, Col, Popover, Row, Table } from "antd";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
@@ -82,7 +82,7 @@ export const OtherBillingTeam: React.FC = () => {
     [membersTableSource.length]
   );
 
-  const handleSendRequest = () => {
+  const handleSendRequest = useCallback(() => {
     setIsRequestingToJoin(true);
     const sendRequest = httpsCallable<{ billingId: string }, null>(
       getFunctions(),
@@ -96,7 +96,7 @@ export const OtherBillingTeam: React.FC = () => {
         Logger.log(e);
       })
       .finally(() => setIsRequestingToJoin(false));
-  };
+  }, [billingId]);
 
   return (
     <>

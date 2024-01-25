@@ -38,12 +38,11 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] 
       <Col className="settings-secondary-sidebar-section">
         {groupedTeams.myTeams.length ? (
           <>
-            {" "}
             {groupedTeams.myTeams.map((billingTeam) => (
               <NavLink
                 key={billingTeam.id}
                 onClick={() => trackBillingTeamNavigated("my_team")}
-                to={`/settings/billing/${billingTeam.id}`}
+                to={APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + `/${billingTeam.id}`}
                 className={({ isActive }) =>
                   `settings-secondary-sidebar-section-link ${
                     isActive ? "settings-secondary-sidebar-section-active-link" : ""
@@ -80,7 +79,7 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] 
               <NavLink
                 key={billingTeam.id}
                 onClick={() => trackBillingTeamNavigated("my_team")}
-                to={`/settings/billing/${billingTeam.id}`}
+                to={APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + `/${billingTeam.id}`}
                 className={({ isActive }) =>
                   `settings-secondary-sidebar-section-link ${
                     isActive ? "settings-secondary-sidebar-section-active-link" : ""

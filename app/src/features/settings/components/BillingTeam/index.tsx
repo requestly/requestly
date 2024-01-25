@@ -43,10 +43,12 @@ export const BillingTeam: React.FC = () => {
         });
         if (team?.id) navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${team.id}`);
         else {
+          // Show user plan details if the user is not a member of any billing team
           setShowUserPlanDetails(true);
           navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE);
         }
       } else {
+        // Show user plan details if the user is not a member of any billing team
         setShowUserPlanDetails(true);
         navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE);
       }
