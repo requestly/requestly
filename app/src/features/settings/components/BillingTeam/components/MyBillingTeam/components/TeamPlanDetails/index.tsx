@@ -11,8 +11,8 @@ import { BillingTeamDetails } from "features/settings/components/BillingTeam/typ
 import { CancelPlanModal } from "../CancelPlanModal";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
-import "./index.scss";
 import { trackBillingTeamActionClicked } from "features/settings/analytics";
+import "./index.scss";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));

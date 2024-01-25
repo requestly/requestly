@@ -1,0 +1,67 @@
+.user-plan-detail-card {
+  .user-plan-card-header {
+    padding: 8px 1rem;
+    border-bottom: 1px solid var(--surface-2);
+    margin: 0 !important;
+  }
+
+  .user-plan-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid var(--surface-2);
+
+    .user-plan-card-grid-item {
+      padding: 1rem;
+    }
+
+    & .user-plan-card-grid-item:nth-child(2) {
+      border-left: 1px solid var(--surface-2);
+      border-right: 1px solid var(--surface-2);
+    }
+
+    .user-plan-card-grid-item-label {
+      color: var(--neutrals-gray-300);
+      line-height: 18px;
+      letter-spacing: 0.25px;
+    }
+
+    .user-plan-date {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-default);
+    }
+
+    .user-plan-card-plan-name {
+      font-size: 20px;
+      color: var(--text-default);
+      letter-spacing: 0.15px;
+      line-height: 30px;
+    }
+  }
+
+  .user-plan-upgrade-card {
+    padding: 1rem 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    & svg {
+      font-size: 2rem;
+      color: var(--neutrals-gray-300);
+    }
+
+    &-description {
+      color: var(--neutrals-gray-300);
+      text-align: center;
+      max-width: 492px;
+      line-height: 18px;
+      letter-spacing: 0.25px;
+    }
+
+    &-btn.ant-btn {
+      gap: 6px;
+    }
+  }
+}
