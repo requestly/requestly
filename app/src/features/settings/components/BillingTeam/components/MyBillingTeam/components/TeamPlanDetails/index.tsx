@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { Col, Popover, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -7,17 +8,17 @@ import { TeamPlanStatus } from "../../../TeamPlanStatus";
 import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
-import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
-import { CancelPlanModal } from "../CancelPlanModal";
+import { BillingTeamDetails, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import { MdOutlinePreview } from "@react-icons/all-files/md/MdOutlinePreview";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
-import "./index.scss";
 import { trackBillingTeamActionClicked } from "features/settings/analytics";
+import "./index.scss";
+import { TeamPlanActionButtons } from "./components/TeamPlanActionButtons";
 
 export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails }> = ({ billingTeamDetails }) => {
+  const user = useSelector(getUserAuthDetails);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeamDetails.id, billingTeamDetails.owner));
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
-  const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
 
   const isAnnualPlan = useMemo(() => {
     const startDate = new Date(billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodStart * 1000);
@@ -31,6 +32,8 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
     billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodStart,
   ]);
 
+  const isUserManager = billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
+
   return (
     <>
       <Col className="billing-teams-primary-card team-plan-details-card">
@@ -38,40 +41,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
           <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
             Your Plan <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
           </Col>
-          {/* {isUserManager && (
-            <Col className="team-plan-details-card-actions">
-              <RQButton
-                type="text"
-                className="team-plan-details-card-actions-cancel"
-                icon={<MdOutlineCancel />}
-                onClick={() => setIsCancelPlanModalOpen(true)}
-              >
-                Cancel plan
-              </RQButton>
-              {getPlanNameFromId(billingTeamDetails?.subscriptionDetails?.plan) !== "professional" && (
-                <RQButton
-                  type="primary"
-                  icon={
-                    <img
-                      src={UpgradeIcon}
-                      alt="upgrade"
-                      onClick={() => {
-                        dispatch(
-                          actions.toggleActiveModal({
-                            modalName: "pricingModal",
-                            newValue: true,
-                            newProps: { selectedPlan: null, source: "billing_team" },
-                          })
-                        );
-                      }}
-                    />
-                  }
-                >
-                  Upgrade
-                </RQButton>
-              )}
-            </Col>
-          )} */}
+          {isUserManager && <TeamPlanActionButtons subscriptionDetails={billingTeamDetails.subscriptionDetails} />}
         </Row>
         <div className="team-plan-details-sections-wrapper">
           <div className="team-plan-details-section">
@@ -156,7 +126,6 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
           </div>
         </div>
       </Col>
-      <CancelPlanModal isOpen={isCancelPlanModalOpen} closeModal={() => setIsCancelPlanModalOpen(false)} />
     </>
   );
 };
