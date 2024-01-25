@@ -141,6 +141,22 @@ class StorageServiceWrapper {
   }
 
   async clearDB() {
+    const keysToIgnore = SYNC_CONSTANTS.SYNC_KEYS_IN_LOCAL_STORAGE;
+
+    const syncingMetaData = {};
+    keysToIgnore.forEach(async (key) => {
+      syncingMetaData[key] = (await this.getRecord(key)) || null;
+      console.log(key, syncingMetaData[key]);
+    });
+
+    this.emptyDB();
+
+    for (let key in syncingMetaData) {
+      await this.saveRecord({ [key]: syncingMetaData[key] });
+    }
+  }
+
+  async emptyDB() {
     await this.StorageHelper.clearStorage();
     if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) await setStorageType("local");
   }

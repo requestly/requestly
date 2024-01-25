@@ -1,3 +1,5 @@
+import APP_CONSTANTS from "config/constants";
+
 /* Syncing */
 export const SYNC_CONSTANTS = {
   SYNC_REMOVE_RECORDS: "sync_remove_records",
@@ -13,4 +15,10 @@ export const SYNC_CONSTANTS = {
     REMOVE_RECORDS: "remove_records",
     SESSION_RECORDING_PAGE_CONFIG: "session_recording_page_config",
   },
+  // TODO: @nsr - also add any constants used in the session config flow
+  SYNC_KEYS_IN_LOCAL_STORAGE: [
+    APP_CONSTANTS.LAST_SYNC_TARGET,
+    APP_CONSTANTS.LAST_SYNCED_TS,
+    APP_CONSTANTS.LAST_UPDATED_TS,
+  ],
 };
