@@ -14,7 +14,6 @@ import { OtherBillingTeam } from "./components/OtherBillingTeam";
 import { UserPlanDetails } from "./components/UserPlanDetails";
 
 export const BillingTeam: React.FC = () => {
-  // TODO: REFACTOR
   const { billingId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
