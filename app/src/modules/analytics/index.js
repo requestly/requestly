@@ -6,7 +6,6 @@ import localIntegration from "./integrations/local";
 
 // These are mostly not user-triggered
 const BLACKLISTED_EVENTS = [
-  /// WHHHYYYYYY!!??!?!?!
   SYNCING.SYNC.TRIGGERED,
   SYNCING.SYNC.COMPLETED,
   SYNCING.SYNC.FAILED,
