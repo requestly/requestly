@@ -1,19 +1,20 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Modal, Space } from "antd";
-import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
+import { useDispatch, useSelector } from "react-redux";
 import { PRICING } from "features/pricing/constants/pricing";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import { trackCheckoutFailedEvent, trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
 import { actions } from "store";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { ChangePlanRequestConfirmationModal } from "../ChangePlanRequestConfirmationModal";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { trackPricingPlanCTAClicked } from "modules/analytics/events/misc/business";
+import APP_CONSTANTS from "config/constants";
+import { redirectToPricingPlans } from "utils/RedirectionUtils";
 
 const CTA_ONCLICK_FUNCTIONS = {
   MANAGE_SUBSCRIPTION: "manage-subscription",
@@ -21,9 +22,16 @@ const CTA_ONCLICK_FUNCTIONS = {
   CHECKOUT: "checkout",
   USE_NOW: "use-now",
   CONTACT_US: "contact-us",
+  SIGNUP: "signup",
 };
 
 const CTA_BUTTONS_CONFIG = {
+  signup: {
+    text: "Sign Up",
+    tag: "",
+    onClick: CTA_ONCLICK_FUNCTIONS.SIGNUP,
+    visible: true,
+  },
   "use-now": {
     text: "Use Now",
     tag: "Current Plan",
@@ -80,118 +88,53 @@ const CTA_BUTTONS_CONFIG = {
   },
 };
 
-// Maps userPlanType/userPlanName -> columnPlanType/columnPlanName -> buttonConfig
+// Maps userPlanName -> columnPlanName -> buttonConfig
 const pricingButtonsMap: Record<string, any> = {
-  individual: {
+  default: {
     [PRICING.PLAN_NAMES.FREE]: {
-      individual: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
-      },
-      team: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
-      },
-    },
-    [PRICING.PLAN_NAMES.BASIC]: {
-      individual: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["current-plan"],
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["manage-subscription"],
-      },
-      team: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["upgrade-email"],
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["upgrade-email"],
-      },
-    },
-    [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-      individual: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["switch-plan"],
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["current-plan"],
-      },
-      team: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["upgrade-email"],
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["upgrade-email"],
-      },
-    },
-  },
-  team: {
-    [PRICING.PLAN_NAMES.FREE]: {
-      individual: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
-      },
-      team: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
-      },
-    },
-    [PRICING.PLAN_NAMES.BASIC]: {
-      individual: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["already-included"],
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["upgrade-email"],
-      },
-      team: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["current-plan"],
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["upgrade-email"],
-      },
-    },
-    [PRICING.PLAN_NAMES.PROFESSIONAL]: {
-      individual: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["already-included"],
-      },
-      team: {
-        [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-        [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["switch-plan"],
-        [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["current-plan"],
-      },
-    },
-  },
-  trial: {
-    individual: {
-      [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
-      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["manage-subscription"],
-      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["trial-active"],
-    },
-    team: {
-      [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+      [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["use-now"],
       [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG.checkout,
       [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG.checkout,
     },
+    [PRICING.PLAN_NAMES.BASIC]: {
+      [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["current-plan"],
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["switch-plan"],
+    },
+    [PRICING.PLAN_NAMES.PROFESSIONAL]: {
+      [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+      [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["switch-plan"],
+      [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["current-plan"],
+    },
+  },
+  trial: {
+    [PRICING.PLAN_NAMES.FREE]: CTA_BUTTONS_CONFIG["not-visible"],
+    [PRICING.PLAN_NAMES.BASIC]: CTA_BUTTONS_CONFIG["manage-subscription"],
+    [PRICING.PLAN_NAMES.PROFESSIONAL]: CTA_BUTTONS_CONFIG["manage-subscription"],
   },
 };
 
 interface PricingTableButtonsProps {
   columnPlanName: string;
-  selectedWorkspace: any;
   product: string;
   duration: string;
   source: string;
+  quantity: number;
   setIsContactUsModalOpen: (value: boolean) => void;
 }
 
 export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   columnPlanName,
-  selectedWorkspace,
   product,
   duration,
   source,
+  quantity,
   setIsContactUsModalOpen,
 }) => {
   const dispatch = useDispatch();
   const firebaseFunction = getFunctions();
   const user = useSelector(getUserAuthDetails);
+  const navigate = useNavigate();
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -199,24 +142,34 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
 
   const isUserPremium = user?.details?.isPremium;
   const userPlanName = user?.details?.planDetails?.planName ?? PRICING.PLAN_NAMES.FREE;
+  const isUserTrialing = isUserPremium && user?.details?.planDetails?.status === "trialing";
   const userPlanType = ["team", "individual"].includes(user?.details?.planDetails?.type)
     ? user?.details?.planDetails?.type
     : "individual";
-  const isPrivateWorkspaceSelected = selectedWorkspace?.id === TEAM_WORKSPACES.PRIVATE_WORKSPACE.id;
-  const isUserTrialing = isUserPremium && user?.details?.planDetails?.status === "trialing";
 
   const onButtonClick = (functionName: string) => {
     trackPricingPlanCTAClicked(
       {
-        current_plan: `${userPlanName} ${userPlanType}`,
-        selected_plan: `${columnPlanName} ${isPrivateWorkspaceSelected ? "individual" : "team"}`,
+        current_plan: `${userPlanName}`,
+        selected_plan: `${columnPlanName}`,
         action: functionName,
+        quantity,
       },
       source
     );
     setIsButtonLoading(true);
     if (!user?.details?.isLoggedIn) {
-      dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: {
+            callback: () => redirectToPricingPlans(navigate),
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: "pricing_table",
+          },
+        })
+      );
       setIsButtonLoading(false);
       return;
     }
@@ -226,25 +179,44 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         setIsButtonLoading(false);
         break;
       }
-      case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
-        trackCheckoutInitiatedEvent(duration, columnPlanName, selectedWorkspace?.accessCount, isUserTrialing, source);
+      case CTA_ONCLICK_FUNCTIONS.SIGNUP: {
         dispatch(
           actions.toggleActiveModal({
-            modalName: "pricingModal",
+            modalName: "authModal",
             newValue: true,
             newProps: {
-              selectedPlan: columnPlanName,
-              workspace: selectedWorkspace,
-              planDuration: duration,
-              source,
+              authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+              callback: () => redirectToPricingPlans(navigate),
+              eventSource: "pricing_table",
             },
           })
         );
         setIsButtonLoading(false);
         break;
       }
+      case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
+        if (user?.details?.profile?.isEmailVerified) {
+          trackCheckoutInitiatedEvent(duration, columnPlanName, quantity, isUserTrialing, source);
+          dispatch(
+            actions.toggleActiveModal({
+              modalName: "pricingModal",
+              newValue: true,
+              newProps: {
+                selectedPlan: columnPlanName,
+                planDuration: duration,
+                quantity,
+                source,
+              },
+            })
+          );
+        } else {
+          toast.error("Please verify your email to proceed with the payment");
+        }
+        setIsButtonLoading(false);
+        break;
+      }
       case CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION: {
-        trackCheckoutInitiatedEvent(duration, columnPlanName, selectedWorkspace?.accessCount, isUserTrialing, source);
+        trackCheckoutInitiatedEvent(duration, columnPlanName, quantity, isUserTrialing, source);
         const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
         manageSubscription({
           planName: columnPlanName,
@@ -257,7 +229,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
           })
           .catch((err) => {
             toast.error("Error in managing subscription. Please contact support contact@requestly.io");
-            trackCheckoutFailedEvent(isPrivateWorkspaceSelected ? "individual" : "team", source);
+            trackCheckoutFailedEvent(quantity, source);
           })
           .finally(() => {
             setIsButtonLoading(false);
@@ -267,11 +239,9 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       case CTA_ONCLICK_FUNCTIONS.SWITCH_PLAN: {
         Modal.confirm({
           title: "Switch Plan",
-          content: `You are about to switch from ${getPrettyPlanName(
-            userPlanName
-          )} (${userPlanType}) plan to ${getPrettyPlanName(columnPlanName)} (${
-            isPrivateWorkspaceSelected ? "individual" : "team"
-          }) plan.`,
+          content: `You are about to switch from ${getPrettyPlanName(userPlanName)} plan to ${getPrettyPlanName(
+            columnPlanName
+          )} plan.`,
           okText: "Yes",
           okType: "primary",
           cancelText: "No",
@@ -281,9 +251,8 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             const requestPlanSwitch = httpsCallable(firebaseFunction, "premiumNotifications-requestPlanSwitch");
             requestPlanSwitch({
               currentPlan: userPlanName,
-              currentPlanType: userPlanType,
               planToSwitch: columnPlanName,
-              planToSwitchType: isPrivateWorkspaceSelected ? "individual" : "team",
+              currentPlanType: userPlanType,
             })
               .catch(() => {
                 toast.error("Error in switching plan. Please contact support");
@@ -307,11 +276,17 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
     }
   };
 
-  let buttonConfig =
-    pricingButtonsMap[userPlanType][userPlanName][isPrivateWorkspaceSelected ? "individual" : "team"][columnPlanName];
+  let buttonConfig = pricingButtonsMap.default[userPlanName][columnPlanName];
+
+  if (buttonConfig?.onClick === CTA_ONCLICK_FUNCTIONS.USE_NOW && !user?.details?.isLoggedIn) {
+    buttonConfig = CTA_BUTTONS_CONFIG["signup"];
+  }
 
   if (isUserTrialing) {
-    buttonConfig = pricingButtonsMap.trial[isPrivateWorkspaceSelected ? "individual" : "team"][columnPlanName];
+    buttonConfig = pricingButtonsMap.trial[columnPlanName];
+    if (quantity > 1) {
+      buttonConfig = CTA_BUTTONS_CONFIG["checkout"];
+    }
   }
 
   if (product === PRICING.PRODUCTS.SESSION_REPLAY) {

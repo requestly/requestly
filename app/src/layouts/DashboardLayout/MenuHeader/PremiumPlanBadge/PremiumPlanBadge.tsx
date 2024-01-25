@@ -1,21 +1,46 @@
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { getPrettyPlanName } from "utils/FormattingHelper";
+import { getPlanNameFromId } from "utils/PremiumUtils";
 import Logger from "lib/logger";
-import "./premiumPlanBadge.scss";
 import { actions } from "store";
 import { Tooltip } from "antd";
+import { getPrettyPlanName } from "utils/FormattingHelper";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import firebaseApp from "../../../../firebase";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import "./premiumPlanBadge.scss";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
-
   const user = useSelector(getUserAuthDetails);
+  const teamId = useSelector(getCurrentlyActiveWorkspace)?.id;
   const userPlanDetails = user?.details?.planDetails;
   const planId = userPlanDetails?.planId;
   const planStatus = userPlanDetails?.status;
-  const planName = getPrettyPlanName(userPlanDetails?.planName);
   const planEndDateString = userPlanDetails?.subscription?.endDate;
+  const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
   let daysLeft = 0;
+
+  useEffect(() => {
+    if (!teamId) return;
+
+    const db = getFirestore(firebaseApp);
+    const teamsRef = doc(db, "teams", teamId);
+
+    getDoc(teamsRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data?.appsumo) {
+            setIsAppSumoDeal(true);
+          }
+        }
+      })
+      .catch(() => {
+        Logger.log("Error while fetching appsumo details for team");
+      });
+  }, [teamId]);
 
   try {
     const planEndDate = new Date(planEndDateString);
@@ -27,7 +52,7 @@ const PremiumPlanBadge = () => {
     Logger.log(err);
   }
 
-  if (planId && planStatus === "trialing") {
+  if (!isAppSumoDeal && planId && ["trialing", "canceled"].includes(planStatus)) {
     return (
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
@@ -42,9 +67,9 @@ const PremiumPlanBadge = () => {
             );
           }}
         >
-          <div className="premium-plan-name">{planName.toUpperCase()}</div>
+          <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
           <div className="premium-plan-days-left">
-            {daysLeft >= 0 ? `${daysLeft} days left in trial` : "Trial Expired"}
+            {planStatus === "trialing" ? `${daysLeft} days left in trial` : "Plan Expired"}
           </div>
         </div>
       </Tooltip>

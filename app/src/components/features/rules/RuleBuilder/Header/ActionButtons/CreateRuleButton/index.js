@@ -32,6 +32,8 @@ import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import { actions } from "store";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -112,6 +114,11 @@ const CreateRuleButton = ({
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
   const handleBtnOnClick = async () => {
+    if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
+      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+      return;
+    }
+
     const createdBy = currentlySelectedRuleData?.createdBy || user?.details?.profile?.uid || null;
     const currentOwner = user?.details?.profile?.uid || null;
     const lastModifiedBy = user?.details?.profile?.uid || null;
@@ -191,6 +198,9 @@ const CreateRuleButton = ({
           if (!isRuleEditorModal) {
             redirectToRuleEditor(navigate, currentlySelectedRuleData.id, MODE);
           }
+        })
+        .catch(() => {
+          toast.error("Error in saving rule. Please contact support.");
         });
     } else {
       toast.warn(ruleValidation.message);

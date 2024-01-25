@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAvailableTeams } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 import { Row } from "antd";
 import APP_CONSTANTS from "config/constants";
@@ -11,9 +10,7 @@ import { FiXCircle } from "@react-icons/all-files/fi/FiXCircle";
 import { useNavigate } from "react-router-dom";
 import { redirectToRoot } from "utils/RedirectionUtils";
 import WorkspaceDropdown from "components/landing/pricing/WorkspaceDropdown/WorkspaceDropdown";
-import PageLoader from "components/misc/PageLoader";
-import { getAttrFromFirebase, submitAttrUtil } from "utils/AnalyticsUtils";
-import { arrayUnion, doc, getDoc, getFirestore, updateDoc, writeBatch } from "firebase/firestore";
+import { doc, getDoc, getFirestore, writeBatch } from "firebase/firestore";
 import firebaseApp from "../../../firebase";
 import { toast } from "utils/Toast";
 import { isEmailValid } from "utils/FormattingHelper";
@@ -22,14 +19,7 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { trackAppsumoCodeRedeemed } from "modules/analytics/events/misc/business";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { isNull } from "lodash";
 import "./index.scss";
-
-const PRIVATE_WORKSPACE = {
-  name: APP_CONSTANTS.TEAM_WORKSPACES.NAMES.PRIVATE_WORKSPACE,
-  id: "private_workspace",
-  accessCount: 1,
-};
 
 interface AppSumoCode {
   error: string;
@@ -43,22 +33,25 @@ const DEFAULT_APPSUMO_INPUT: AppSumoCode = {
   verified: false,
 };
 
-const db = getFirestore(firebaseApp);
-const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
-
 const AppSumoModal: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const availableTeams = useSelector(getAvailableTeams);
   const [appsumoCodes, setAppsumoCodes] = useState<AppSumoCode[]>([{ ...DEFAULT_APPSUMO_INPUT }]);
   const [userEmail, setUserEmail] = useState<string>("");
   const [emailValidationError, setEmailValidationError] = useState(null);
-  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(PRIVATE_WORKSPACE);
+  const [workspaceToUpgrade, setWorkspaceToUpgrade] = useState(APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE);
   const [isLoading, setIsLoading] = useState(false);
-  const isCreatingTeam = useRef(false);
+  const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
+  const [showMaxCodesExeceededError, setShowMaxCodesExeceededError] = useState(false);
+
+  const db = getFirestore(firebaseApp);
 
   const addAppSumoCodeInput = () => {
+    if (appsumoCodes.length >= 10) {
+      setShowMaxCodesExeceededError(true);
+      return;
+    }
     setAppsumoCodes((prev) => [...prev, { ...DEFAULT_APPSUMO_INPUT }]);
   };
 
@@ -93,7 +86,7 @@ const AppSumoModal: React.FC = () => {
       }
 
       const codeOccurence = appsumoCodes.filter((appsumoCode: AppSumoCode) => appsumoCode.code === enteredCode).length;
-      if (codeOccurence > 1 && workspaceToUpgrade?.id !== PRIVATE_WORKSPACE.id) {
+      if (codeOccurence > 1) {
         updateAppSumoCode(index, "error", "Code already used");
         updateAppSumoCode(index, "verified", false);
         return;
@@ -116,7 +109,7 @@ const AppSumoModal: React.FC = () => {
       updateAppSumoCode(index, "error", "");
       updateAppSumoCode(index, "verified", true);
     },
-    [appsumoCodes, workspaceToUpgrade?.id]
+    [db, appsumoCodes]
   );
 
   const redeemSubmittedCodes = useCallback(async () => {
@@ -126,38 +119,91 @@ const AppSumoModal: React.FC = () => {
       batch.update(docRef, { redeemed: true });
     });
     await batch.commit();
-  }, [appsumoCodes]);
+  }, [db, appsumoCodes]);
+
+  const createNewWorkspaceForAppSumo = useCallback(async () => {
+    setIsLoading(true);
+
+    const newTeamName = "Team Workspace";
+    const createTeam = httpsCallable(getFunctions(), "teams-createTeam");
+    try {
+      const response: any = await createTeam({ teamName: newTeamName });
+      trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
+      switchWorkspace(
+        {
+          teamId: response?.data?.teamId,
+          teamMembersCount: 1,
+        },
+        dispatch,
+        {
+          isWorkspaceMode: false,
+          isSyncEnabled: true,
+        },
+        appMode,
+        null,
+        "appsumo"
+      );
+
+      setIsLoading(false);
+      return response?.data?.teamId;
+    } catch (error) {
+      // do nothing
+    }
+  }, [appMode, dispatch]);
 
   const onSubmit = useCallback(async () => {
     if (!isAllCodeCheckPassed || emailValidationError) {
       toast.warn("Please fill all the fields correctly", 10);
       throw new Error("Please fill all the fields correctly");
     }
+    setIsUpdatingSubscription(true);
 
-    if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) {
-      const sessionReplayLifetime = await getAttrFromFirebase("session_replay_lifetime_pro");
-      if (sessionReplayLifetime?.code) {
-        toast.warn("You have already redeemed a code. Please contact support", 10);
-        throw new Error("You have already redeemed a code. Please contact support");
-      }
+    let teamId = workspaceToUpgrade.id;
+    if (workspaceToUpgrade.id === APP_CONSTANTS.TEAM_WORKSPACES.NEW_WORKSPACE.id) {
+      teamId = await createNewWorkspaceForAppSumo();
     }
 
-    if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) {
-      submitAttrUtil("session_replay_lifetime_pro", {
-        code: appsumoCodes[0].code,
-        date: new Date(),
-        type: "appsumo",
-      });
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.SESSION_REPLAY_LIFETIME_REDEEMED, true);
-    } else {
-      const teamsRef = doc(db, "teams", workspaceToUpgrade.id);
-      updateDoc(teamsRef, {
-        "appsumo.codes": arrayUnion(...appsumoCodes.map((code) => code.code)),
-        "appsumo.date": Date.now(),
-      });
+    const updateTeamSubscriptionForAppSumo = httpsCallable<{}, { success: boolean; message: string; error?: string }>(
+      getFunctions(),
+      "subscription-updateTeamSubscriptionForAppSumo"
+    );
+
+    try {
+      await updateTeamSubscriptionForAppSumo({
+        teamId: teamId,
+        startDate: Date.now(),
+        appsumoCodes: appsumoCodes.map((code) => code.code),
+      })
+        .then((response) => {
+          if (!response?.data?.success && response?.data?.error === "max_limit_reached") {
+            setShowMaxCodesExeceededError(true);
+          } else {
+            redeemSubmittedCodes();
+            trackAppsumoCodeRedeemed(appsumoCodes.length);
+            toast.success(
+              `Lifetime access to SessionBook Plus unlocked for ${
+                appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
+              }`,
+              10
+            );
+            redirectToRoot(navigate);
+          }
+        })
+        .finally(() => {
+          setIsUpdatingSubscription(false);
+        });
+    } catch (error) {
+      console.error("from appsumo", error);
     }
-    await redeemSubmittedCodes();
-  }, [appsumoCodes, emailValidationError, isAllCodeCheckPassed, redeemSubmittedCodes, workspaceToUpgrade.id]);
+  }, [
+    createNewWorkspaceForAppSumo,
+    appsumoCodes,
+    emailValidationError,
+    isAllCodeCheckPassed,
+    redeemSubmittedCodes,
+    workspaceToUpgrade?.id,
+    navigate,
+  ]);
 
   const handleEmailValidation = (email: string) => {
     if (!email) {
@@ -173,40 +219,19 @@ const AppSumoModal: React.FC = () => {
 
   const debouncedEmailValidation = useDebounce((email: string) => handleEmailValidation(email));
 
-  useEffect(() => {
-    if (workspaceToUpgrade.id === PRIVATE_WORKSPACE.id) setAppsumoCodes([{ ...DEFAULT_APPSUMO_INPUT }]);
-  }, [workspaceToUpgrade]);
-
-  useEffect(() => {
-    if (!isCreatingTeam.current && !isNull(availableTeams) && !availableTeams.length) {
-      setIsLoading(true);
-      isCreatingTeam.current = true;
-      const newTeamName = "Team Workspace";
-      createTeam({ teamName: newTeamName }).then((response: any) => {
-        trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "appsumo");
-        switchWorkspace(
-          {
-            teamId: response?.data?.teamId,
-            teamMembersCount: 1,
-          },
-          dispatch,
-          {
-            isWorkspaceMode: false,
-            isSyncEnabled: true,
-          },
-          appMode,
-          null,
-          "appsumo"
-        );
-        setIsLoading(false);
-      });
+  const handleUnlockDealClick = async () => {
+    setShowMaxCodesExeceededError(false);
+    try {
+      await onSubmit();
+    } catch (error) {
+      // do nothing
     }
-  }, [availableTeams, appMode, dispatch]);
+  };
 
   return (
     <RQModal
       width={620}
-      bodyStyle={{ height: isLoading ? "400px" : "auto" }}
+      bodyStyle={{ height: "auto" }}
       centered
       open={true}
       closable={false}
@@ -214,103 +239,93 @@ const AppSumoModal: React.FC = () => {
       maskStyle={{ background: "#0d0d10ef" }}
       keyboard={false}
     >
-      {isLoading ? (
-        <div className="h-full">
-          <PageLoader />
-        </div>
-      ) : (
-        <>
-          <div className="rq-modal-content appsumo-modal">
-            <div>
-              <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
-            </div>
-            <div className="header mt-16">Please enter your AppSumo code</div>
-            <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>
-            <WorkspaceDropdown workspaceToUpgrade={workspaceToUpgrade} setWorkspaceToUpgrade={setWorkspaceToUpgrade} />
-            <div className="title mt-16">AppSumo email address</div>
-            <div className="items-center mt-8">
-              <div className="w-full">
-                <RQInput
-                  className="w-full"
-                  value={userEmail}
-                  onChange={(e) => {
-                    setUserEmail(e.target.value);
-                    debouncedEmailValidation(e.target.value);
-                  }}
-                  placeholder="Enter email address here"
-                />
-                <div className="danger caption">{emailValidationError}</div>
-              </div>
-            </div>
-            <div className="title mt-16">AppSumo Code(s)</div>
-            {appsumoCodes.map((appsumoCode, index) => (
-              <div className="display-flex" key={index}>
-                <div className="appsumo-code-input-container">
-                  <RQInput
-                    value={appsumoCode.code}
-                    key={index}
-                    onChange={(e) => {
-                      updateAppSumoCode(index, "code", e.target.value);
-                      debouncedVerifyCode(e.target.value, index);
-                    }}
-                    suffix={
-                      appsumoCode.verified ? (
-                        <MdOutlineVerified />
-                      ) : appsumoCode.error ? (
-                        <>
-                          <span className="danger caption">{appsumoCode.error}</span>
-                          <FiXCircle className="danger" />
-                        </>
-                      ) : null
-                    }
-                    placeholder="Enter code here"
-                  />
-                </div>
-                {workspaceToUpgrade.id !== PRIVATE_WORKSPACE.id && (
-                  <div className={`remove-icon ${appsumoCodes.length === 1 ? "cursor-disabled" : "cursor-pointer"}`}>
-                    <ImCross
-                      id="delete-pair"
-                      className="text-gray"
-                      onClick={() => {
-                        removeAppSumoCodeInput(index);
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
-            {workspaceToUpgrade.id !== PRIVATE_WORKSPACE.id && (
-              <RQButton className="appsumo-add-btn" type="link" onClick={addAppSumoCodeInput}>
-                + Add more codes
-              </RQButton>
-            )}
+      <>
+        <div className="rq-modal-content appsumo-modal">
+          <div>
+            <img alt="smile" width="48px" height="44px" src="/assets/img/workspaces/smiles.svg" />
           </div>
-          <Row className="rq-modal-footer" justify={"end"}>
-            <RQButton
-              type="primary"
-              disabled={!isAllCodeCheckPassed || emailValidationError}
-              onClick={() => {
-                onSubmit()
-                  .then(() => {
-                    trackAppsumoCodeRedeemed(appsumoCodes.length);
-                    toast.success(
-                      `Lifetime access to SessionBook Plus unlocked for ${
-                        appsumoCodes.length > 1 ? `${appsumoCodes.length} members` : "you"
-                      }`,
-                      10
-                    );
-                    redirectToRoot(navigate);
-                  })
-                  .catch(() => {
-                    // do nothing
-                  });
-              }}
-            >
-              Unlock Deal
-            </RQButton>
-          </Row>
-        </>
-      )}
+          <div className="header mt-16">Please enter your AppSumo code</div>
+          <p className="text-gray">Unlock lifetime deal for SessionBook Plus</p>
+          <WorkspaceDropdown
+            isAppSumo
+            disabled={isLoading}
+            workspaceToUpgrade={workspaceToUpgrade}
+            setWorkspaceToUpgrade={setWorkspaceToUpgrade}
+          />
+          <div className="title mt-16">AppSumo email address</div>
+          <div className="items-center mt-8">
+            <div className="w-full">
+              <RQInput
+                className="w-full"
+                value={userEmail}
+                onChange={(e) => {
+                  setUserEmail(e.target.value);
+                  debouncedEmailValidation(e.target.value);
+                }}
+                placeholder="Enter email address here"
+              />
+              <div className="danger caption">{emailValidationError}</div>
+            </div>
+          </div>
+          <div className="title mt-16">AppSumo Code(s)</div>
+          {appsumoCodes.map((appsumoCode, index) => (
+            <div className="display-flex" key={index}>
+              <div className="appsumo-code-input-container">
+                <RQInput
+                  value={appsumoCode.code}
+                  key={index}
+                  onChange={(e) => {
+                    updateAppSumoCode(index, "code", e.target.value);
+                    debouncedVerifyCode(e.target.value, index);
+                  }}
+                  suffix={
+                    appsumoCode.verified ? (
+                      <MdOutlineVerified />
+                    ) : appsumoCode.error ? (
+                      <>
+                        <span className="danger caption">{appsumoCode.error}</span>
+                        <FiXCircle className="danger" />
+                      </>
+                    ) : null
+                  }
+                  placeholder="Enter code here"
+                />
+              </div>
+
+              <div className={`remove-icon ${appsumoCodes.length === 1 ? "cursor-disabled" : "cursor-pointer"}`}>
+                <ImCross
+                  id="delete-pair"
+                  className="text-gray"
+                  onClick={() => {
+                    removeAppSumoCodeInput(index);
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+
+          <RQButton className="appsumo-add-btn" type="link" onClick={addAppSumoCodeInput}>
+            + Add more codes
+          </RQButton>
+          {showMaxCodesExeceededError && (
+            <div className="danger caption">
+              {
+                "Maximum 10 AppSumo codes can be applied. Please connect with support for further help at contact@requestly.io"
+              }
+            </div>
+          )}
+        </div>
+        <Row className="rq-modal-footer" justify={"end"}>
+          <RQButton
+            type="primary"
+            disabled={!isAllCodeCheckPassed || emailValidationError}
+            loading={isUpdatingSubscription}
+            onClick={handleUnlockDealClick}
+          >
+            Unlock Deal
+          </RQButton>
+        </Row>
+      </>
     </RQModal>
   );
 };

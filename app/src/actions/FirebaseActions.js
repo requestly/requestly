@@ -458,7 +458,8 @@ export const signInWithEmailLink = async (email, callback) => {
     // Update details in db
     const authData = getAuthData(result.user);
     const database = getDatabase();
-    update(ref(database, getUserProfilePath(authData.uid)), authData);
+
+    if (isNewUser) await update(ref(database, getUserProfilePath(authData.uid)), authData);
 
     //  Analytics - Track event
     trackLoginSuccessEvent({
@@ -568,6 +569,7 @@ export function getAuthData(user) {
 
   // Update uid inside providerData to user's uid
   userProfile.uid = user.uid;
+  userProfile.isEmailVerified = user.emailVerified;
 
   // To add a dummy photoUrl incase user profile don't have one
   if (!userProfile.photoURL) {
@@ -637,4 +639,28 @@ export async function signOut() {
   } catch {
     trackLogoutFailed();
   }
+}
+
+/**
+ * Updates user profile information in Firebase Authentication.
+ * @param {Object} data - The data object containing fields to update in the Firebase user auth object.
+ * Possible fields in the 'data' object like:
+ * - displayName: (string) User's display name.
+ * - photoURL: (string) URL of the user's profile picture.
+ * Note: Ensure the user is signed in before calling this function.
+ * @returns {Promise<Object>} A promise that resolves with { success: true } on successful update.
+ */
+
+export async function updateUserInFirebaseAuthUser(data) {
+  const auth = getAuth(firebaseApp);
+  const user = auth.currentUser;
+  return new Promise((resolve) => {
+    updateProfile(user, data)
+      .then(() => {
+        resolve({ success: true });
+      })
+      .catch((e) => {
+        Logger.log(e);
+      });
+  });
 }

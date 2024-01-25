@@ -15,6 +15,9 @@ import { teamsReducer } from "./features/teams/slice";
 import INITIAL_STATE from "./initial-state";
 import { ReducerKeys } from "./constants";
 import { desktopTrafficTableReducer } from "./features/desktop-traffic-table/slice";
+import { rulesReducer } from "./features/rules/slice";
+import { billingReducer } from "./features/billing/slice";
+import { harPreviewReducer } from "./features/network-sessions/slice";
 
 const globalSlice = createSlice({
   name: ReducerKeys.GLOBAL,
@@ -41,10 +44,10 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   // "desktopSpecificDetails.appsList",
   "hasConnectedApp",
   "workspaceOnboarding",
+  "appOnboarding",
   "userPersona",
   "country",
   "mobileDebugger",
-  "initializations",
   "userPreferences",
   "userAttributes",
   "misc.persist",
@@ -54,8 +57,11 @@ export const reduxStore = configureStore({
   reducer: {
     [ReducerKeys.GLOBAL]: globalReducer,
     [ReducerKeys.SESSION_RECORDING]: sessionRecordingReducer,
+    [ReducerKeys.HAR_PREVIEW]: harPreviewReducer,
     [ReducerKeys.TEAMS]: teamsReducer,
     [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducer,
+    [ReducerKeys.RULES]: rulesReducer,
+    [ReducerKeys.BILLING]: billingReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

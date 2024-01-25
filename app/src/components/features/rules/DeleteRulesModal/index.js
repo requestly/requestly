@@ -19,7 +19,8 @@ const DeleteRulesModal = ({
   rulesToDelete,
   groupIdsToDelete = [],
   clearSearch,
-  ruleDeletedCallback,
+  ruleDeletedCallback = () => {},
+  analyticEventSource = "",
 }) => {
   //Global State
   const dispatch = useDispatch();
@@ -69,9 +70,9 @@ const DeleteRulesModal = ({
     await deleteRulesFromStorage(appMode, ruleIdsToDelete, () => {
       toast.info(`Rules deleted permanently!`);
       trackRQLastActivity("rules_deleted");
-      trackRulesDeletedEvent(ruleIdsToDelete.length);
+      trackRulesDeletedEvent(ruleIdsToDelete.length, analyticEventSource, "permanent");
     });
-  }, [appMode, ruleIdsToDelete]);
+  }, [appMode, ruleIdsToDelete, analyticEventSource]);
 
   const handleRulesDeletion = useCallback(
     async (uid) => {
@@ -85,7 +86,7 @@ const DeleteRulesModal = ({
                 toast.info(`Moved selected rules to trash`);
                 trackRulesTrashedEvent(ruleIdsToDelete.length);
                 trackRQLastActivity("rules_deleted");
-                trackRulesDeletedEvent(ruleIdsToDelete.length);
+                trackRulesDeletedEvent(ruleIdsToDelete.length, analyticEventSource, "trash");
                 return resolve();
               });
             } else {
@@ -99,7 +100,7 @@ const DeleteRulesModal = ({
         handleDeleteRulesPermanently();
       }
     },
-    [appMode, enableTrash, handleDeleteRulesPermanently, ruleIdsToDelete, rulesToDelete]
+    [appMode, enableTrash, handleDeleteRulesPermanently, ruleIdsToDelete, rulesToDelete, analyticEventSource]
   );
 
   const handleRecordsDeletion = useCallback(

@@ -1,3 +1,5 @@
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -62,8 +64,10 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
-  const isDraftSession = pathname.includes("draft") || !!testRuleDraftSession;
-  const isSessionLogOptionsAlreadySaved = tabId === "imported" || !isDraftSession;
+  const isDraftSession =
+    pathname.includes("draft") || !!testRuleDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isSessionLogOptionsAlreadySaved =
+    tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecordingMetadata?.options), [
     sessionRecordingMetadata?.options,
@@ -154,7 +158,10 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
               }
             });
           } else {
-            navigate(PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId, {
+            let path = PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId;
+            if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
+              path = PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + `/${response?.firestoreId}`;
+            navigate(path, {
               replace: true,
               state: { fromApp: true, viewAfterSave: true },
             });

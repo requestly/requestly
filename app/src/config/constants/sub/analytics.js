@@ -129,6 +129,7 @@ export const GA_EVENTS = {
 
     NUM_RULES: "NUM_RULES",
     NUM_RULE_TYPES: "NUM_RULE_TYPES",
+    NUM_RULES_PINNED: "num_rules_pinned",
     NUM_RULE_TYPES_TRIED: "num_rule_types_tried",
     NUM_ACTIVE_RULES: "NUM_ACTIVE_RULES",
     NUM_GROUPS: "NUM_GROUPS",
@@ -139,6 +140,7 @@ export const GA_EVENTS = {
     NUM_SESSIONS: "num_sessions",
     NUM_SESSIONS_SAVED_ONLINE: "num_sessions_saved_online",
     NUM_SESSIONS_SAVED_OFFLINE: "num_sessions_saved_offline",
+    NUM_NETWORK_SESSIONS: "num_network_sessions",
 
     SESSION_REPLAY_ENABLED: "session_replay_enabled",
 

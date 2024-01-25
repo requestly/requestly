@@ -23,6 +23,8 @@ import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/ExtensionContextInvalidationNotice";
 import { useIsExtensionEnabled } from "hooks";
+import { LazyMotion, domMax } from "framer-motion";
+import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -36,6 +38,7 @@ const App = () => {
 
   useGeoLocation();
   useIsExtensionEnabled();
+  useBillingTeamsListener();
   // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();
@@ -74,17 +77,19 @@ const App = () => {
         <GrowthBookProvider growthbook={growthbook}>
           <LocalUserAttributesHelperComponent />
           <FeatureUsageEvent />
-          <div id="requestly-dashboard-layout">
-            <CommandBar />
-            {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
-              <FullScreenLayout />
-            ) : (
-              <>
-                <UpdateDialog />
-                <DashboardLayout />
-              </>
-            )}
-          </div>
+          <LazyMotion features={domMax} strict>
+            <div id="requestly-dashboard-layout">
+              <CommandBar />
+              {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
+                <FullScreenLayout />
+              ) : (
+                <>
+                  <UpdateDialog />
+                  <DashboardLayout />
+                </>
+              )}
+            </div>
+          </LazyMotion>
         </GrowthBookProvider>
       </ConfigProvider>
     </>

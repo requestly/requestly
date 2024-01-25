@@ -11,10 +11,9 @@ import {
   getUserAuthDetails,
   getAppMode,
   getIsWorkspaceOnboardingCompleted,
-  getIsJoinWorkspaceCardVisible,
+  getAppOnboardingDetails,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
-import FreeTrialExpiredModal from "../../components/landing/pricing/FreeTrialExpiredModal";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
 import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurvey } from "components/misc/PersonaSurvey";
@@ -22,18 +21,19 @@ import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
 import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
-import CreateWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/CreateWorkspaceModal";
+import CreateWorkspaceModal from "componentsV2/modals/CreateWorkspaceModal";
 import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
-import SwitchWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/SwitchWorkspaceModal/SwitchWorkspaceModal";
+import SwitchWorkspaceModal from "componentsV2/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
-import JoinWorkspaceModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/JoinWorkspaceModal";
-import { JoinWorkspaceCard } from "components/misc/JoinWorkspaceCard";
+import JoinWorkspaceModal from "componentsV2/modals/JoinWorkspaceModal";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
 import { PricingModal } from "features/pricing";
 import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
+import { Onboarding, shouldShowOnboarding } from "features/onboarding";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -45,9 +45,10 @@ const DashboardContent = () => {
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
-  const isJoinWorkspaceCardVisible = useSelector(getIsJoinWorkspaceCardVisible);
+  const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
+  const onboardingFeatureValue = useFeatureValue("new_onboarding", null);
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -117,12 +118,6 @@ const DashboardContent = () => {
               {...activeModals.extensionModal.props}
             />
           ) : null}
-          {activeModals.freeTrialExpiredModal.isActive ? (
-            <FreeTrialExpiredModal
-              isOpen={activeModals.freeTrialExpiredModal.isActive}
-              {...activeModals.freeTrialExpiredModal.props}
-            />
-          ) : null}
           {activeModals.syncConsentModal.isActive ? (
             <SyncConsentModal
               isOpen={activeModals.syncConsentModal.isActive}
@@ -140,7 +135,9 @@ const DashboardContent = () => {
           {!userPersona.isSurveyCompleted && !user?.loggedIn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
           ) : null}
-          {!isWorkspaceOnboardingCompleted && appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
+          {!isWorkspaceOnboardingCompleted &&
+          onboardingFeatureValue === "control" &&
+          appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <WorkspaceOnboarding
               isOpen={activeModals.workspaceOnboardingModal.isActive}
               handleUploadRulesModalClick={toggleImportRulesModal}
@@ -204,8 +201,15 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
+          {shouldShowOnboarding() &&
+            onboardingFeatureValue === "variant" &&
+            appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+            !isWorkspaceOnboardingCompleted &&
+            !appOnboardingDetails.isOnboardingCompleted && (
+              <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
+            )}
 
-          {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null}
+          {/* {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null} */}
         </>
       )}
     </>

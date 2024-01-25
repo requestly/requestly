@@ -1,10 +1,8 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { Row, Col, Card } from "reactstrap";
-import { Button, Col as AntCol, Row as AntRow, Descriptions, Badge, Space, Popconfirm } from "antd";
+import { Col as AntCol, Row as AntRow, Descriptions, Badge, Popconfirm } from "antd";
 // UTILS
-import { redirectToPricingPlans } from "../../../../../..//utils/RedirectionUtils";
 import { getPrettyPlanName } from "../../../../../../utils/FormattingHelper";
 import { getUserAuthDetails } from "../../../../../../store/selectors";
 import { beautifySubscriptionType } from "../../../../../../utils/PricingUtils";
@@ -13,19 +11,33 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
 import { RQButton } from "lib/design-system/components";
 import { trackPricingPlanCancellationRequested } from "modules/analytics/events/misc/business";
+import "./SubscriptionInfo.css";
+import { actions } from "store";
 
-const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, subscriptionDetails }) => {
+const SubscriptionInfo = ({
+  isLifeTimeActive = false,
+  hideShadow,
+  appSumoCodeCount = 0,
+  hideManagePersonalSubscriptionButton,
+  subscriptionDetails,
+}) => {
+  const dispatch = useDispatch();
   //Global State
   const user = useSelector(getUserAuthDetails);
-  const navigate = useNavigate();
-  const { validFrom, validTill, status, type, planName } = subscriptionDetails;
+  const { planId, validFrom, validTill, status, type, planName } = subscriptionDetails;
   const isUserPremium = user.details?.isPremium || status === "active";
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [isConfirmationModalLoading, setIsConfirmationModalLoading] = useState(false);
 
   const handleRenewOnClick = (e) => {
     e.preventDefault();
-    redirectToPricingPlans(navigate);
+    dispatch(
+      actions.toggleActiveModal({
+        modalName: "pricingModal",
+        newValue: true,
+        newProps: { selectedPlan: null, source: "renew_link" },
+      })
+    );
   };
 
   const cancelPlanClicked = useCallback(() => {
@@ -69,48 +81,61 @@ const SubscriptionInfo = ({ hideShadow, hideManagePersonalSubscriptionButton, su
   }, [cancelPlanClicked, isUserPremium, status]);
 
   if (!subscriptionDetails) {
-    return <React.Fragment></React.Fragment>;
+    return <></>;
   }
+
+  if (type === "appsumo" && status === "trialing") {
+    return <></>;
+  }
+
+  const getAppSumoCodesRedeemedLabel = (codeCount) => {
+    return codeCount === 1 ? `${codeCount} code redeemed` : `${codeCount} codes redeemed`;
+  };
 
   return (
     <Row className="my-4">
       <Col>
-        <Card className={hideShadow ? "has-no-border has-no-box-shadow" : "shadow"}>
+        <Card className={`subscription-info ${hideShadow ? "has-no-border has-no-box-shadow" : "shadow"}`}>
           <AntRow>
             <AntCol span={24}>
               <Descriptions title={false} bordered size="small" column={2}>
-                <Descriptions.Item label="Status" className="primary-card github-like-border">
-                  <Space>
+                <Descriptions.Item label="Status">
+                  <AntRow>
                     <Badge
                       status={isUserPremium ? "success" : "error"}
                       text={<span className="text-capitalize">{status}</span>}
                     />
                     {!isUserPremium ? (
-                      <React.Fragment>
-                        <Button size="small" type="link" onClick={handleRenewOnClick}>
-                          Renew
-                        </Button>
-                      </React.Fragment>
+                      <RQButton
+                        size="small"
+                        type="link"
+                        className="text-underline cursor-pointer"
+                        onClick={handleRenewOnClick}
+                      >
+                        Renew
+                      </RQButton>
                     ) : null}
-                  </Space>
+                  </AntRow>
                 </Descriptions.Item>
-                <Descriptions.Item label="Type" className="primary-card github-like-border">
-                  {beautifySubscriptionType(type)}
+                <Descriptions.Item label="Type">
+                  {type === "appsumo"
+                    ? `${beautifySubscriptionType(type)} (${getAppSumoCodesRedeemedLabel(appSumoCodeCount)})`
+                    : beautifySubscriptionType(type)}
                 </Descriptions.Item>
                 {isUserPremium && (
-                  <Descriptions.Item label="Valid From" className="primary-card github-like-border">
-                    {new Date(validFrom).toDateString()}
-                  </Descriptions.Item>
+                  <Descriptions.Item label="Valid From">{new Date(validFrom).toDateString()}</Descriptions.Item>
                 )}
-                <Descriptions.Item label="Current Plan" className="primary-card github-like-border">
+                <Descriptions.Item label="Current Plan">
                   <AntRow justify="space-between">
-                    {getPrettyPlanName(planName)}
+                    {isLifeTimeActive && planId !== "session_book_plus"
+                      ? `HTTP Rules ${getPrettyPlanName(planName)}`
+                      : getPrettyPlanName(planName)}
                     {renderCancelButton}
                   </AntRow>
                 </Descriptions.Item>
                 {isUserPremium && (
-                  <Descriptions.Item label="Valid Till" className="primary-card github-like-border">
-                    {new Date(validTill).toDateString()}
+                  <Descriptions.Item label="Valid Till">
+                    {isLifeTimeActive ? "Lifetime" : new Date(validTill).toDateString()}
                   </Descriptions.Item>
                 )}
               </Descriptions>

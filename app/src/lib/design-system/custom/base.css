@@ -82,8 +82,13 @@
 .text-center {
   text-align: center;
 }
+
 .text-left {
   text-align: left;
+}
+
+.text-right {
+  text-align: right;
 }
 
 .text-sm {
@@ -162,6 +167,10 @@
   flex-shrink: 0;
 }
 
+.flex-1 {
+  flex: 1;
+}
+
 .ml-auto {
   margin-left: auto;
 }
@@ -184,6 +193,10 @@
 
 .mt-20 {
   margin-top: 1.25rem;
+}
+
+.mr-4 {
+  margin-right: 0.25rem;
 }
 
 .mr-8 {
@@ -216,6 +229,9 @@
 }
 .danger {
   color: var(--danger);
+}
+.warning {
+  color: var(--warning);
 }
 
 .relative {
@@ -254,4 +270,14 @@
 .external-link:hover {
   color: var(--white);
   text-decoration: underline;
+}
+
+.link-button {
+  color: var(--link-color);
+}
+
+.link-button:hover {
+  color: var(--link-color);
+  cursor: pointer;
+  opacity: 0.8;
 }

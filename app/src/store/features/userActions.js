@@ -33,6 +33,10 @@ export const updateUserLimitReached = (prevState, action) => {
   prevState.user.isLimitReached = action.payload;
 };
 
+export const updateOrganizationDetails = (prevState, action) => {
+  prevState.user.details.organization = action.payload;
+};
+
 //Persona Survey actions
 export const setUserPersonaData = (prevState, action) => {
   prevState.userPersona = { ...prevState.userPersona, ...action.payload };
@@ -108,6 +112,34 @@ export const updateIsWorkspaceOnboardingCompleted = (prevState) => {
 
 export const updateWorkspaceOnboardingStep = (prevState, action) => {
   prevState.workspaceOnboarding.step = action.payload;
+};
+
+export const updateAppOnboardingCompleted = (prevState) => {
+  prevState.appOnboarding.isOnboardingCompleted = true;
+};
+
+export const updateAppOnboardingStep = (prevState, action) => {
+  prevState.appOnboarding.step = action.payload;
+  prevState.appOnboarding.disableSkip = false;
+};
+
+export const updateIsAppOnboardingStepDisabled = (prevState, action) => {
+  prevState.appOnboarding.disableSkip = action.payload;
+};
+
+export const updateAppOnboardingPersona = (prevState, action) => {
+  prevState.appOnboarding.persona = action.payload;
+};
+
+export const updateAppOnboardingFullName = (prevState, action) => {
+  prevState.appOnboarding.fullName = action.payload;
+};
+
+export const updateAppOnboardingTeamDetails = (prevState, action) => {
+  prevState.appOnboarding.createdWorkspace = {
+    ...prevState.appOnboarding.createdWorkspace,
+    ...action.payload,
+  };
 };
 
 export const updateWorkspaceOnboardingTeamDetails = (prevState, action) => {

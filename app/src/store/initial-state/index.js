@@ -49,7 +49,6 @@ const INITIAL_STATE = {
     rules: "",
     files: "",
     sharedLists: "",
-    marketplace: "",
   },
 
   /* To force re-render a component */
@@ -87,10 +86,6 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
-    freeTrialExpiredModal: {
-      isActive: false,
-      props: {},
-    },
     syncConsentModal: {
       isActive: false,
       props: {},
@@ -108,6 +103,10 @@ const INITIAL_STATE = {
       props: {},
     },
     workspaceOnboardingModal: {
+      isActive: false,
+      props: {},
+    },
+    appOnboardingModal: {
       isActive: false,
       props: {},
     },
@@ -184,6 +183,15 @@ const INITIAL_STATE = {
     workspace: {},
   },
 
+  appOnboarding: {
+    step: "auth",
+    persona: null,
+    fullName: null,
+    disableSkip: false,
+    createdWorkspace: null,
+    isOnboardingCompleted: false,
+  },
+
   misc: {
     persist: {
       appNotificationBannerDismissTs: 0,
@@ -204,7 +212,7 @@ const INITIAL_STATE = {
       isJoinWorkspaceCardVisible: true,
     },
     nonPersist: {
-      networkSessionSaveInProgress: false,
+      networkSessionSaveInProgress: false, // todo: check if requried
       timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
     },

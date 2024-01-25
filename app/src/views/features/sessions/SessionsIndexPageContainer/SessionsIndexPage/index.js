@@ -39,6 +39,11 @@ import {
   trackSessionRecordingUpload,
 } from "modules/analytics/events/features/sessionRecording";
 import "./index.scss";
+import { ImportWebSessionModalButton } from "./ImportWebSessionModalButton";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { redirectToSessionSettings } from "utils/RedirectionUtils";
 
 const _ = require("lodash");
 const pageSize = 15;
@@ -128,7 +133,7 @@ const SessionsIndexPage = () => {
           newValue: true,
           newProps: {
             redirectURL: window.location.href,
-            callback: () => navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE),
+            callback: () => redirectToSessionSettings(navigate, window.location.pathname, "sessions"),
             eventSource: AUTH.SOURCE.SESSION_RECORDING,
           },
         })
@@ -136,7 +141,7 @@ const SessionsIndexPage = () => {
       return;
     }
 
-    navigate(APP_CONSTANTS.PATHS.SESSIONS.SETTINGS.ABSOLUTE);
+    redirectToSessionSettings(navigate, window.location.pathname, "sessions");
   }, [dispatch, navigate, user?.loggedIn]);
 
   const configureBtn = useMemo(
@@ -231,14 +236,18 @@ const SessionsIndexPage = () => {
     [navigate, toggleImportSessionModal, dispatch]
   );
 
-  const openDownloadedSessionModalBtn = useMemo(
-    () => (
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
+
+  const openDownloadedSessionModalBtn = useMemo(() => {
+    return isDesktopSessionsCompatible ? (
+      <ImportWebSessionModalButton />
+    ) : (
       <RQButton type="default" onClick={toggleImportSessionModal}>
         Open downloaded session
       </RQButton>
-    ),
-    [toggleImportSessionModal]
-  );
+    );
+  }, [toggleImportSessionModal, isDesktopSessionsCompatible]);
 
   const newSessionButton = (
     <RQButton
@@ -343,6 +352,8 @@ const SessionsIndexPage = () => {
             />
           ) : null}
         </>
+      ) : isDesktopSessionsCompatible ? (
+        <SessionOnboardingView />
       ) : (
         <OnboardingView
           redirectToSettingsPage={redirectToSettingsPage}

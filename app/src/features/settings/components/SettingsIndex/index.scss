@@ -1,0 +1,120 @@
+.settings-index {
+  width: 100vw;
+  height: 100%;
+  display: flex;
+  //   gap: 20px;
+  background: var(--surface-0);
+}
+
+.settings-content-wrapper {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  overflow-y: auto;
+  flex: 1;
+  padding: 1rem;
+
+  & .settings-content {
+    width: 100%;
+    height: 100%;
+    max-width: 1000px;
+    background: var(--surface-0);
+
+    & .ant-table-content {
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+  }
+}
+
+.settings-index-sidebar-wrapper {
+  display: flex;
+}
+
+.settings-secondary-sidebar {
+  width: 184px;
+  padding: 12px;
+  height: 100%;
+  border-right: 1px solid var(--surface-2);
+  background: var(--surface-1);
+  box-shadow: -2px 0px 12px 0px rgba(0, 0, 0, 0.28);
+
+  &-section-title {
+    color: var(--neutrals-gray-300);
+    padding-left: 2px;
+    margin-bottom: 8px;
+  }
+
+  & .settings-secondary-sidebar-section {
+    padding-left: 1rem !important;
+
+    &-link:hover {
+      background: var(--surface-2);
+    }
+  }
+}
+
+// Billing team
+.billing-teams-primary-card {
+  border-radius: 4px;
+  border: 1px solid var(--surface-2);
+  background: var(--surface-0_5);
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
+}
+
+.my-billing-team-title {
+  color: var(--white);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.15px;
+}
+
+.billing-table {
+  & .ant-table-thead .ant-table-cell {
+    background: var(--surface-0_5);
+    padding: 12px 1rem;
+    color: var(--neutrals-gray-300);
+    font-weight: 400;
+    border-bottom: 1px solid var(--surface-1);
+  }
+
+  & th::before {
+    display: none;
+  }
+
+  & tbody tr .ant-table-cell {
+    background: var(--surface-0_5);
+    padding: 12px 1rem;
+    border-bottom: 1px solid var(--surface-1);
+  }
+
+  .billing-team-member-avatar-wrapper {
+    align-self: center;
+    margin-right: 8px;
+  }
+
+  .billing-team-member-email {
+    font-size: 11px;
+    letter-spacing: 0.25px;
+    line-height: 14px;
+    color: var(--neutrals-gray-300);
+  }
+
+  & .ant-spin-nested-loading > div > .ant-spin {
+    background: var(--background);
+  }
+}
+
+.billing-team-loader-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  gap: 20px;
+
+  .ant-spin {
+    transform: scale(1.5);
+  }
+}

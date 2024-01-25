@@ -1,0 +1,75 @@
+.org-member-table {
+  border-radius: 4px;
+  border: 1px solid var(--surface-2);
+
+  thead {
+    display: none;
+  }
+
+  &-header {
+    padding: 8px 1rem;
+    border-bottom: 1px solid var(--surface-2);
+
+    &-input {
+      width: 224px;
+      border-radius: 4px;
+      border: 1px solid var(--surface-2);
+      background: var(--background);
+
+      .ant-input {
+        background: var(--background);
+
+        &::placeholder {
+          color: var(--surface-3);
+        }
+      }
+    }
+  }
+
+  .ant-table-column-sorter {
+    display: none;
+  }
+
+  .ant-table-thead th.ant-table-column-has-sorters {
+    pointer-events: none;
+  }
+
+  .org-member-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+  }
+
+  .org-member-email {
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: 0.25px;
+    color: var(--text-default);
+  }
+
+  .ant-spin-nested-loading > div > .ant-spin {
+    background: var(--background);
+  }
+
+  .billing-team-members-add-btn.ant-btn {
+    gap: 8px;
+    color: var(--neutrals-gray-300) !important;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: var(--white) !important;
+      border-color: var(--surface-3) !important;
+    }
+  }
+
+  .billing-team-members-added-label {
+    color: var(--neutrals-gray-300);
+    padding-right: 5px;
+
+    & svg {
+      position: relative;
+      top: 3px;
+    }
+  }
+}

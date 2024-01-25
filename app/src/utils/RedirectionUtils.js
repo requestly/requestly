@@ -2,6 +2,8 @@
 import { MODES } from "components/misc/VerifyEmail/modes";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
+import { isFeatureCompatible } from "./CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 //CONSTANTS
 const { PATHS, LINKS } = APP_CONSTANTS;
@@ -96,21 +98,65 @@ export const redirectToTemplates = (navigate) => {
 };
 
 /* FEATURE - SESSION RECORDINGS */
-export const redirectToSessionRecordingHome = (navigate) => {
-  navigate(PATHS.SESSIONS.ABSOLUTE);
+export const redirectToSessionRecordingHome = (navigate, isDesktopSessionsEnabled = false) => {
+  if (isFeatureCompatible(FEATURES.DESKTOP_SESSIONS) && isDesktopSessionsEnabled) {
+    navigate(PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.ABSOLUTE);
+    return;
+  } else {
+    navigate(PATHS.SESSIONS.ABSOLUTE);
+    return;
+  }
 };
 
-export const redirectToNetworkSession = (navigate, id) => {
-  navigate(PATHS.SESSIONS.NETWORK.ABSOLUTE + `/${id}`);
+export const redirectToSavedSession = (navigate, id) => {
+  navigate(PATHS.SESSIONS.SAVED.ABSOLUTE + `/${id}`);
+};
+
+export const redirectToSessionSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatible = false) => {
+  if (isDesktopSessionsCompatible) {
+    if (id) {
+      const path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + "/:id";
+      navigate(path);
+      return;
+    }
+    const path = PATHS.SESSIONS.DESKTOP.SAVED_LOGS.ABSOLUTE;
+    navigate(path);
+    return;
+  } else {
+    if (id) {
+      const path = PATHS.NETWORK_LOGS.VIEWER.RELATIVE + `/${id}`;
+      navigate(path);
+      return;
+    }
+    const path = PATHS.SESSIONS.ABSOLUTE;
+    navigate(path);
+    return;
+  }
 };
 
 /* Settings */
-export const redirectToSettings = (navigate) => {
-  navigate(PATHS.SETTINGS.ABSOLUTE);
+export const redirectToSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
-export const redirectToDesktopPreferences = (navigate) => {
-  navigate(PATHS.SETTINGS.DESKTOP_PREFERENCES.ABSOLUTE);
+export const redirectToGlobalSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.GLOBAL_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToDesktopSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.DESKTOP_SETTINGS.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToWorkspaceSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.WORKSPACES.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
+export const redirectToBillingTeam = (navigate, id, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.BILLING.RELATIVE + `/${id}`, { state: { redirectUrl, source } });
 };
 
 /* Product updates */
@@ -260,6 +306,10 @@ export const redirectToTeam = (navigate, teamId, options = {}) => {
   }
 };
 
+export const redirectToManageWorkspace = (navigate, teamId) => {
+  navigate(PATHS.ACCOUNT.TEAMS.ABSOLUTE + `/${teamId}`);
+};
+
 export const redirectToMyTeams = (navigate, hardRedirect) => {
   if (hardRedirect) {
     window.location.href = PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE;
@@ -267,6 +317,7 @@ export const redirectToMyTeams = (navigate, hardRedirect) => {
     navigate(PATHS.ACCOUNT.MY_TEAMS.ABSOLUTE);
   }
 };
+
 export const redirectToCreateNewTeamWorkspace = (navigate, hardRedirect) => {
   if (hardRedirect) {
     window.location.href = PATHS.ACCOUNT.CREATE_NEW_TEAM_WORKSPACE.ABSOLUTE;

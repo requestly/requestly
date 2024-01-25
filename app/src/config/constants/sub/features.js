@@ -45,6 +45,7 @@ FEATURES.CREATE_RULE_FROM_TRAFFIC_TABLE = "create-rule-from-traffic-table";
 FEATURES.CONNECTED_APPS = "connected-apps";
 FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR = "graphql-payload-filter-operator";
 FEATURES.CUSTOM_LAUNCH_OPTIONS = "custom-launch-options";
+FEATURES.RELAY_AUTH_HEADER = "relay-auth-header";
 
 // MARKETING
 FEATURES.INTERCEPTOR = {};
@@ -60,12 +61,16 @@ FEATURES.OPEN_SOURCE_ANNOUNCEMENT = "open_source_announcement";
 // PERSONA SURVEY
 FEATURES.PERSONA_SURVEY = "persona-survey";
 
-FEATURES.NETWORK_SESSIONS = "network-sessions";
+FEATURES.NETWORK_SESSIONS = "network-sessions"; // todo: replace redundancy
 // API CLIENT
 FEATURES.API_CLIENT = "api-client";
 
 // session recording
 FEATURES.SESSION_ONBOARDING = "session_onboarding";
 FEATURES.SESSION_RECORDING = "session_recording";
+
+// saved network logs
+FEATURES.SAVED_NETWORK_LOGS = "saved_network_logs";
+FEATURES.DESKTOP_SESSIONS = "all_desktop_session_features";
 
 export default FEATURES;

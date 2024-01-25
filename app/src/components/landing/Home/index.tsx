@@ -85,14 +85,14 @@ const HOME_FEATURES: HomeFeature[] = [
         description: "Replay screen, mouse movement, network, console and more of any browser session.",
         tag: FEATURES.SESSION_RECORDING,
         navigateTo: PATHS.SESSIONS.RELATIVE,
-        highlightFeature: true,
+        highlightFeature: false,
         analyticsContext: "session_recording",
       },
     ],
   },
 ];
 
-export const Home: React.FC = () => {
+export const HomePage: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const { isPinExtensionPopupActive, closePinExtensionPopup } = usePinExtensionPopup();
 

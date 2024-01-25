@@ -9,12 +9,12 @@ interface Props {
   type?: any;
   buttonText: string;
   isTooltipShown: boolean;
-  onClickHandler: () => void;
-  hasPopconfirm: boolean;
+  onClickHandler: (e?: unknown) => void;
+  hasPopconfirm?: boolean;
   tourId?: any;
-  trackClickEvent: () => void;
-  isScreenSmall: boolean;
-  isLoggedIn: boolean;
+  trackClickEvent?: () => void;
+  isScreenSmall?: boolean;
+  isLoggedIn?: boolean;
   authSource?: string;
   isPremium?: boolean;
 }
@@ -30,7 +30,7 @@ const AuthPopoverButton: React.FC<Props> = ({
   tourId = null,
   trackClickEvent = () => {},
   isLoggedIn,
-  isScreenSmall,
+  isScreenSmall = false,
   authSource,
   isPremium = false,
 }) => {

@@ -51,6 +51,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
     onDragLeave,
     noClick: true,
     maxFiles: maxFiles,
+    useFsAccessApi: false,
   });
   return (
     <div {...getRootProps()}>

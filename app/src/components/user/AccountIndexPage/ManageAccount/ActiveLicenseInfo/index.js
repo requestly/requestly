@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ProCard from "@ant-design/pro-card";
-// UTILS
 import { getUserAuthDetails } from "../../../../../store/selectors";
-// SUB COMPONENTS
 import GetASubscription from "./GetASubscription";
 import SubscriptionInfo from "./SubscriptionInfo";
 import { useSelector } from "react-redux";
@@ -13,8 +11,6 @@ import { doc, getDoc, getFirestore } from "firebase/firestore";
 import firebaseApp from "../../../../../firebase";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import Logger from "lib/logger";
-
-const db = getFirestore(firebaseApp);
 
 const ActiveLicenseInfo = ({
   hideShadow,
@@ -28,14 +24,24 @@ const ActiveLicenseInfo = ({
   const teamId = useSelector(getCurrentlyActiveWorkspace)?.id;
 
   const [isSessionReplayLifetimeActive, setIsSessionReplayLifetimeActive] = useState(false);
-  const [sessionReplayLifeTimeDetails, setSessionReplayLifeTimeDetails] = useState({});
+  const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState({});
 
   const { type, status, planName, subscription } = user.details?.planDetails ?? {};
   const { startDate: validFrom, endDate: validTill } = subscription ?? {};
-  const doesSubscriptionExist = !!type && !!status && !!planName;
+  const doesSubscriptionExist = (type === "appsumo" ? isSessionReplayLifetimeActive : !!type) && !!status && !!planName;
+
+  const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
+    const currentDate = date;
+
+    const endDate = new Date(currentDate);
+    endDate.setFullYear(currentDate.getFullYear() + 5);
+
+    return endDate.getTime();
+  }, []);
 
   useEffect(() => {
     if (teamId) {
+      const db = getFirestore(firebaseApp);
       const teamsRef = doc(db, "teams", teamId);
       getDoc(teamsRef)
         .then((docSnap) => {
@@ -43,7 +49,12 @@ const ActiveLicenseInfo = ({
             const data = docSnap.data();
             if (data?.appsumo) {
               setIsSessionReplayLifetimeActive(true);
-              setSessionReplayLifeTimeDetails({ ...data.appsumo, type: "appsumo-team" });
+              setLifeTimeSubscriptionDetails({
+                ...data.appsumo,
+                startDate: data.appsumo.date,
+                endDate: getSubscriptionEndDateForAppsumo(new Date(data.appsumo.date)),
+                type: "appsumo",
+              });
             }
           }
         })
@@ -55,19 +66,23 @@ const ActiveLicenseInfo = ({
         .then((val) => {
           if (val) {
             setIsSessionReplayLifetimeActive(true);
-            setSessionReplayLifeTimeDetails(val);
+            setLifeTimeSubscriptionDetails(val);
           }
         })
         .catch(() => {
           Logger.log("Error while fetching appsumo details for individual");
         });
     }
-  }, [teamId]);
+  }, [teamId, getSubscriptionEndDateForAppsumo]);
 
   const renderSubscriptionInfo = () => {
+    if (isSessionReplayLifetimeActive && status === "trialing") return <></>;
+
     return (
       <SubscriptionInfo
         hideShadow={hideShadow}
+        isLifeTimeActive={type === "appsumo"}
+        appSumoCodeCount={lifeTimeSubscriptionDetails?.codes?.length ?? 0}
         hideManagePersonalSubscriptionButton={hideManagePersonalSubscriptionButton}
         subscriptionDetails={{
           validFrom,
@@ -97,15 +112,18 @@ const ActiveLicenseInfo = ({
         <>
           <SubscriptionInfo
             hideShadow={hideShadow}
+            appSumoCodeCount={lifeTimeSubscriptionDetails?.codes?.length ?? 0}
+            isLifeTimeActive={isSessionReplayLifetimeActive}
             subscriptionDetails={{
               validFrom:
-                typeof sessionReplayLifeTimeDetails === "string"
-                  ? new Date(sessionReplayLifeTimeDetails).getTime()
-                  : new Date(sessionReplayLifeTimeDetails.date).getTime(),
-              validTill: new Date("2099-08-16T00:00:00Z").getTime(),
+                typeof lifeTimeSubscriptionDetails === "string"
+                  ? new Date(lifeTimeSubscriptionDetails).getTime()
+                  : lifeTimeSubscriptionDetails.startDate,
+              validTill: lifeTimeSubscriptionDetails.endDate,
               status: "active",
-              type: sessionReplayLifeTimeDetails.type ?? "producthunt",
-              planName: "SessionBook Plus",
+              type: lifeTimeSubscriptionDetails.type ?? "producthunt",
+              planName: "Session Book Plus",
+              planId: "session_book_plus",
             }}
           />
           <br />
