@@ -60,7 +60,6 @@ const ActiveWorkspace = () => {
 
   if (!window.workspaceCleanupDone) {
     setTimeout(() => {
-      console.log("[DEBUG] ActiveWorkspace: workspace cleanup triggered");
       performCleanup();
     }, 3000);
   }
@@ -68,7 +67,7 @@ const ActiveWorkspace = () => {
   useEffect(() => {
     window.currentlyActiveWorkspaceTeamId = currentlyActiveWorkspace.id;
     window.workspaceMembersCount = currentlyActiveWorkspace?.membersCount ?? null;
-    window.keySetDonecurrentlyActiveWorkspaceTeamId = true; // NOT USED ANYWHERE
+    window.keySetDonecurrentlyActiveWorkspaceTeamId = true;
     window.workspaceCleanupDone = false;
   }, [currentlyActiveWorkspace.id, currentlyActiveWorkspace?.membersCount]);
 };

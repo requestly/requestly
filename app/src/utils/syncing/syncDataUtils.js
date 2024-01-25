@@ -64,7 +64,6 @@ export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
 
 // The intent of this function is to somehow prevent writing of user's personal rule config into teams's rule config
 // It works by modifying the original param received: latestRules
-// todo: uid can be removed
 const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remoteRecords, myLocalRecords, appMode) => {
   const localRecords = myLocalRecords || rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
   // First, if user has defined a personal rule config and it's key, write it in required db node
@@ -185,7 +184,6 @@ export const removeUserSyncRecords = (uid, recordIds) => {
   });
 };
 
-// Also, Todo - @sagar - Move this to utils
 export const processRecordsObjectIntoArray = (records) => {
   const recordsArray = [];
   Object.keys(records).forEach((key) => {
@@ -212,7 +210,7 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
       }
     });
 
-    // Todo - @sagar - Fix duplicate code - src/hooks/DbListenerInit/syncingNodeListener.js // this is probably done
+    // Todo - @sagar - Fix duplicate code - src/hooks/DbListenerInit/syncingNodeListener.js
     // Check if it's team syncing. We might not want to read some props like "isFavourite" from this not. Instead we an read from userConfig node
     if (window.currentlyActiveWorkspaceTeamId) {
       const syncRuleStatus = localStorage.getItem("syncRuleStatus") === "true" || false;
