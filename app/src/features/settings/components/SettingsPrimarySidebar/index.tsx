@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { Col, Row } from "antd";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineDisplaySettings } from "@react-icons/all-files/md/MdOutlineDisplaySettings";
 import { RiBuildingLine } from "@react-icons/all-files/ri/RiBuildingLine";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import { redirectToTraffic } from "utils/RedirectionUtils";
+import { isCompanyEmail } from "utils/FormattingHelper";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -17,6 +18,7 @@ import { trackAppSettingsSidebarClicked } from "features/settings/analytics";
 const { PATHS } = APP_CONSTANTS;
 
 export const SettingsPrimarySidebar: React.FC = () => {
+  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,6 +59,12 @@ export const SettingsPrimarySidebar: React.FC = () => {
         icon: <RiBuildingLine />,
         children: [
           {
+            id: "members",
+            name: "Members",
+            path: PATHS.SETTINGS.MEMBERS.RELATIVE,
+            ishidden: !(user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)),
+          },
+          {
             id: "workspaces",
             name: "Workspaces",
             path: PATHS.SETTINGS.WORKSPACES.RELATIVE,
@@ -70,7 +78,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
         ],
       },
     ],
-    [appMode, billingTeams.length]
+    [appMode, billingTeams.length, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]
   );
 
   useEffect(() => {

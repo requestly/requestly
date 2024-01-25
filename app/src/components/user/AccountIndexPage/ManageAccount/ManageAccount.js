@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { Row, Card, CardHeader, Col, CardBody } from "reactstrap";
 import { Button as AntButton } from "antd";
 //SUB COMPONENTS
-import ManageTeams from "./ManageTeams";
-import ActiveLicenseInfo from "./ActiveLicenseInfo";
+// import ActiveLicenseInfo from "./ActiveLicenseInfo";
 import UserInfo from "./UserInfo";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
@@ -55,7 +54,7 @@ const ManageAccount = () => {
             <UserInfo shadow={true} hideBillingAddress={true} />
             {/* Active License Info */}
             <br />
-            <ActiveLicenseInfo customHeading={"Active Subscription"} />
+            {/* <ActiveLicenseInfo customHeading={"Active Subscription"} /> */}
           </Col>
           <Col className="profile-container-right profile-container-child mb-5 mb-xl-0" xl="4">
             <Card className="profile-card profile-card-shadow">
@@ -157,13 +156,6 @@ const ManageAccount = () => {
         </Row>
 
         {/* Teams */}
-        <Row>
-          <Col>
-            <CardBody className="profile-team-body">
-              <ManageTeams />
-            </CardBody>
-          </Col>
-        </Row>
       </ProCard>
     </React.Fragment>
   );
