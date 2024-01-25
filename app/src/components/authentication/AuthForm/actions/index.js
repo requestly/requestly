@@ -169,7 +169,7 @@ export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispat
     if (isWorkspaceMode) {
       clearCurrentlyActiveWorkspace(dispatch, appMode);
     } else if (window.uid && window.isSyncEnabled) {
-      StorageService(appMode).emptyDB(); // todo: @nsr - check if this should be clearDB instead
+      StorageService(appMode).clearDB();
     }
 
     return signOut();
