@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
 import Modal from "antd/lib/modal/Modal";
 import { Col, Row, Space, Typography } from "antd";
@@ -8,18 +9,21 @@ import { HiOutlinePaperAirplane } from "@react-icons/all-files/hi/HiOutlinePaper
 import { RiCloseCircleLine } from "@react-icons/all-files/ri/RiCloseCircleLine";
 import { RiCheckboxCircleLine } from "@react-icons/all-files/ri/RiCheckboxCircleLine";
 import { CloseOutlined } from "@ant-design/icons";
-import { OrganizationsDetails } from "../../types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { capitalize } from "lodash";
 import { actions } from "store";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "../../analytics";
 import { trackTeamPlanCardClicked } from "modules/analytics/events/common/teams";
+import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
+import APP_CONSTANTS from "config/constants";
+import { getBillingTeamMemberById } from "store/features/billing/selectors";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import "./index.scss";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
-  organizationsData: OrganizationsDetails;
+  billingTeams: BillingTeamDetails[];
   hasReachedLimit?: boolean;
   source: string;
   isDeadlineCrossed: boolean;
@@ -29,37 +33,34 @@ interface RequestFeatureModalProps {
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   isOpen,
-  organizationsData,
+  billingTeams,
   hasReachedLimit,
   source,
   isDeadlineCrossed,
   setOpenPopup,
   onContinue,
 }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
+  const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
 
   const requestEnterprisePlanFromAdmin = useMemo(
     () =>
-      httpsCallable<{ workspaceDetails: OrganizationsDetails["workspaces"] }, null>(
-        getFunctions(),
-        "premiumNotifications-requestEnterprisePlanFromAdmin"
-      ),
+      httpsCallable<{ billingId: string }, null>(getFunctions(), "premiumNotifications-requestEnterprisePlanFromAdmin"),
     []
   );
 
   const handleSendRequest = useCallback(() => {
     setIsLoading(true);
-    const enterpriseAdmin = organizationsData?.workspaces?.[0];
-    const domain = enterpriseAdmin.adminEmail.split("@")[1];
-
+    const domain = getDomainFromEmail(user?.details?.profile?.email);
     trackTeamPlanCardClicked(domain, source);
     trackUpgradeOptionClicked("send_request_to_admin");
 
     requestEnterprisePlanFromAdmin({
-      workspaceDetails: organizationsData?.workspaces,
+      billingId: billingTeams[0].id,
     })
       .then(() => {
         setIsLoading(false);
@@ -68,8 +69,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
           status: "success",
           message: (
             <>
-              Workspace {organizationsData?.workspaces?.length > 1 ? "admins have" : "admin has"} been notified. Please
-              get in touch with them for further details.
+              Billing team admins been notified.
+              <br /> Please get in touch with them for further details.
             </>
           ),
         });
@@ -81,12 +82,12 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
           message: (
             <>
               Unable to send request, contact directly at{" "}
-              <span className="enterprise-admin-details">{enterpriseAdmin.adminEmail} for futher details.</span>.
+              <span className="enterprise-admin-details">{teamOwnerDetails?.email} for futher details.</span>.
             </>
           ),
         });
       });
-  }, [organizationsData?.workspaces, requestEnterprisePlanFromAdmin, source]);
+  }, [requestEnterprisePlanFromAdmin, source, billingTeams, user?.details?.profile?.email, teamOwnerDetails?.email]);
 
   const renderModalTitle = () => {
     if (!postRequestMessage) {
@@ -148,11 +149,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         ) : (
           <>
             <Typography.Text>
-              Your organization is currently subscribed to the Requestly Professional Plan, which is managed by{" "}
-              <span className="enterprise-admin-details">
-                {organizationsData?.workspaces?.map((workspace) => workspace.adminName)?.join(", ")}
-              </span>
-              . If you need a Requestly Professional subscription for yourself, send request to admin.
+              Your organization is currently subscribed to the Requestly Premium Plan. If you need a Requestly
+              Professional subscription for yourself, send request to admin.
             </Typography.Text>
             <Row className="mt-16" justify="space-between" align="middle">
               <Col>
@@ -190,14 +188,25 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                   >
                     Upgrade yourself
                   </RQButton>
-                  <RQButton
-                    loading={isLoading}
-                    type="primary"
-                    icon={<HiOutlinePaperAirplane className="send-icon" />}
-                    onClick={handleSendRequest}
-                  >
-                    Send request
-                  </RQButton>
+                  {billingTeams.length > 1 ? (
+                    <RQButton
+                      type="primary"
+                      onClick={() => {
+                        navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + "/" + billingTeams[0].id);
+                      }}
+                    >
+                      Checkout billing teams
+                    </RQButton>
+                  ) : (
+                    <RQButton
+                      loading={isLoading}
+                      type="primary"
+                      icon={<HiOutlinePaperAirplane className="send-icon" />}
+                      onClick={handleSendRequest}
+                    >
+                      Send request
+                    </RQButton>
+                  )}
                 </Space>
               </Col>
             </Row>
