@@ -24,6 +24,7 @@ import AuthHandler from "hooks/AuthHandler";
 import ExtensionContextInvalidationNotice from "components/misc/ExtensionContextInvalidationNotice";
 import { useIsExtensionEnabled } from "hooks";
 import { LazyMotion, domMax } from "framer-motion";
+import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -37,6 +38,7 @@ const App = () => {
 
   useGeoLocation();
   useIsExtensionEnabled();
+  useBillingTeamsListener();
   // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();

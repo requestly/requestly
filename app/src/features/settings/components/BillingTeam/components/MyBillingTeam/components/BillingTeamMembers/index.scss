@@ -30,87 +30,6 @@
   color: var(--white);
 }
 
-.billing-team-member-avatar-wrapper {
-  align-self: center;
-  margin-right: 8px;
-}
-
-.billing-team-member-email {
-  font-size: 11px;
-  letter-spacing: 0.25px;
-  line-height: 14px;
-  color: var(--neutrals-gray-300);
-}
-
-.billing-team-members-drawer {
-  .ant-drawer-content-wrapper {
-    box-shadow: -16px 0px 48px 0px rgba(0, 0, 0, 0.32);
-  }
-
-  .ant-drawer-header {
-    display: none;
-  }
-
-  .ant-drawer-body {
-    background: var(--surface-0_5);
-    padding: 0;
-  }
-
-  &-header {
-    padding: 1rem;
-    border-bottom: 1px solid var(--surface-2);
-
-    &_title {
-      color: var(--white);
-      font-weight: 500;
-      font-size: 1rem;
-    }
-
-    & svg {
-      color: var(--white);
-      font-size: 1.125rem;
-      cursor: pointer;
-      align-self: center;
-    }
-  }
-
-  &-body {
-    padding: 1rem;
-    position: relative;
-  }
-
-  .billing-team-members-drawer-help {
-    color: var(--neutrals-gray-300);
-    font-size: 13px;
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    padding: 0 1rem;
-  }
-}
-
-.billing-team-members-add-btn.ant-btn {
-  gap: 8px;
-  color: var(--neutrals-gray-300) !important;
-
-  &:hover,
-  &:focus,
-  &:active {
-    color: var(--white) !important;
-    border-color: var(--surface-3) !important;
-  }
-}
-
-.billing-team-members-added-label {
-  color: var(--neutrals-gray-300);
-  padding-right: 5px;
-
-  & svg {
-    position: relative;
-    top: 3px;
-  }
-}
-
 .billing-team-members-table-dropdown .ant-dropdown-menu-item-disabled,
 .ant-dropdown-menu-submenu-title-disabled {
   display: none;
@@ -148,8 +67,4 @@
   100% {
     opacity: 0.7;
   }
-}
-
-.my-billing-team-members-table .ant-spin-nested-loading > div > .ant-spin {
-  background: var(--background);
 }
