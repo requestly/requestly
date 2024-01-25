@@ -8,7 +8,7 @@ import { getAuth } from "firebase/auth";
 import { billingActions } from "store/features/billing/slice";
 import { getBillingTeamMembersProfile } from "..";
 import Logger from "lib/logger";
-import { getDomainFromEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 
 let unsubscribeBillingTeamsListener: () => void = null;
 
@@ -35,7 +35,12 @@ export const useBillingTeamsListener = () => {
     }
     const domain = getDomainFromEmail(user?.details?.profile?.email);
     const db = getFirestore(firebaseApp);
-    const billingTeamsQuery = query(collection(db, "billing"), where("ownerDomain", "==", domain));
+    let billingTeamsQuery;
+    if (isCompanyEmail(user?.details?.profile?.email)) {
+      billingTeamsQuery = query(collection(db, "billing"), where("ownerDomain", "==", domain));
+    } else {
+      billingTeamsQuery = query(collection(db, "billing"), where(`members.${user?.details?.profile?.uid}`, "!=", null));
+    }
 
     unsubscribeBillingTeamsListener = onSnapshot(billingTeamsQuery, (billingTeams) => {
       const billingTeamDetails = billingTeams.docs.map((billingTeam) => {
@@ -53,7 +58,13 @@ export const useBillingTeamsListener = () => {
         dispatch(billingActions.setBillingTeamsLoading(false));
       });
     });
-  }, [dispatch, fetchAndDispatchBillingTeamMembersProfile, user.loggedIn, user?.details?.profile?.email]);
+  }, [
+    dispatch,
+    fetchAndDispatchBillingTeamMembersProfile,
+    user.loggedIn,
+    user?.details?.profile?.email,
+    user?.details?.profile?.uid,
+  ]);
 
   const refreshUserToken = async () => {
     return getAuth(firebaseApp)
