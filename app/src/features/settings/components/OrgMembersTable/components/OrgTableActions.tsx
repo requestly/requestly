@@ -17,10 +17,10 @@ export const OrgTableActions: React.FC<{ record: any }> = ({ record }) => {
   const { billingId } = useParams();
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const user = useSelector(getUserAuthDetails);
-  const isUserAdded = useMemo(() => Object.values(billingTeamMembers).some((member) => member.email === record.email), [
-    billingTeamMembers,
-    record.email,
-  ]);
+  const isUserAdded = useMemo(
+    () => Object.values(billingTeamMembers ?? {}).some((member) => member.email === record.email),
+    [billingTeamMembers, record.email]
+  );
 
   const [isAddingUser, setIsAddingUser] = useState(false);
 

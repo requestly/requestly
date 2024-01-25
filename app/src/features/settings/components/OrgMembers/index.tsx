@@ -7,7 +7,7 @@ export const OrgMembersView = () => {
     <>
       <Col className="my-billing-team-title">Members</Col>
       <Col className="org-members-table-wrapper">
-        <OrgMembersTable actionButtons={() => null} />
+        <OrgMembersTable />
       </Col>
     </>
   );
