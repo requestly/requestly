@@ -25,15 +25,18 @@ import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
+import { getAllRuleObjIds } from "store/features/rules/selectors";
 import "./rulesTable.css";
 
 interface Props {
   rules: RuleObj[];
   loading: boolean;
+  searchValue: string;
 }
 
-const RulesTable: React.FC<Props> = ({ rules, loading }) => {
+const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
   const user = useSelector(getUserAuthDetails);
+  const allRecordIds = useSelector(getAllRuleObjIds);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [expandedGroups, setExpandedGroups] = useState([]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
@@ -157,6 +160,9 @@ const RulesTable: React.FC<Props> = ({ rules, loading }) => {
           onExpand: (expanded, record) => {
             handleGroupState(expanded, record);
           },
+          expandedRowKeys: searchValue.length
+            ? allRecordIds.filter((recordId: string) => recordId.startsWith("Group"))
+            : expandedGroups,
           // FIXME: fix custom expand icon
           // expandIcon: ({ expanded, onExpand, record }) => {
           //   console.clear();

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ContactUsModal } from "components/modals/ContactUsModal";
+import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { RQButton } from "lib/design-system/components";
 import "./index.css";
 

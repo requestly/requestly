@@ -3,13 +3,6 @@ import PATHS from "config/constants/sub/paths";
 import SessionsHomeView from "views/features/sessions";
 import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
-import ConfigurationPage from "views/features/sessions/ConfigurationPage";
-import ProtectedRoute from "components/authentication/ProtectedRoute";
-import SessionsSettingsPage from "views/features/sessions/SessionsSettingsPage";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
-
-const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
 export const sessionRoutes: RouteObject[] = [
   {
@@ -18,10 +11,7 @@ export const sessionRoutes: RouteObject[] = [
   },
   {
     path: PATHS.SESSIONS.SETTINGS.RELATIVE,
-    element: (
-      // @ts-ignore
-      <ProtectedRoute component={isSessionsNewSettingsPageCompatible ? SessionsSettingsPage : ConfigurationPage} />
-    ),
+    element: <Navigate to={PATHS.SETTINGS.SESSION_BOOK.RELATIVE} replace />,
   },
   {
     path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
@@ -32,7 +22,13 @@ export const sessionRoutes: RouteObject[] = [
     element: <SavedSessionViewer />,
   },
   {
-    path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
+    // path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
+    path: PATHS.NETWORK_LOGS.VIEWER.RELATIVE + "/:id",
+    element: <NetworkSessionViewer />,
+  },
+  {
+    // path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id", // todo
+    path: PATHS.NETWORK_LOGS.HAR.INDEX,
     element: <NetworkSessionViewer />,
   },
   {

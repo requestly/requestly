@@ -16,6 +16,10 @@
   color: var(--warning);
 }
 
+.rq-content-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn.pin-record-btn-pinned:hover svg.record-pinned {
+  color: var(--warning);
+}
+
 .rq-content-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-unpinned {
   color: var(--text-default);
 }

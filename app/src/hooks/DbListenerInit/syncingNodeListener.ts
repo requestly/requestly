@@ -208,21 +208,23 @@ export const doSync = async (
   dispatch(actions.updateIsRulesListLoading(false));
 
   // Fetch Session Recording
-  const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
-  const localSessionRecordingConfig = await StorageService(appMode).getRecord(
-    GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG
-  );
-  saveSessionRecordingPageConfigLocallyWithoutSync(
-    sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : localSessionRecordingConfig,
-    appMode
-  );
+  if (appMode === "EXTENSION") {
+    const sessionRecordingConfigOnFirebase: Record<string, any> | null = await getSyncedSessionRecordingPageConfig(uid);
+    const localSessionRecordingConfig = await StorageService(appMode).getRecord(
+      GLOBAL_CONSTANTS.STORAGE_KEYS.SESSION_RECORDING_CONFIG
+    );
+    saveSessionRecordingPageConfigLocallyWithoutSync(
+      sessionRecordingConfigOnFirebase ? sessionRecordingConfigOnFirebase : localSessionRecordingConfig,
+      appMode
+    );
 
-  // Refresh Session Recording Config
-  dispatch(
-    actions.updateRefreshPendingStatus({
-      type: "sessionRecordingConfig",
-    })
-  );
+    // Refresh Session Recording Config
+    dispatch(
+      actions.updateRefreshPendingStatus({
+        type: "sessionRecordingConfig",
+      })
+    );
+  }
 };
 
 /** Debounced version of the doSync function */

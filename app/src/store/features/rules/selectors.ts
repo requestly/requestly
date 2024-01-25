@@ -6,3 +6,4 @@ const rulesEntitySelectors = rulesAdapter.getSelectors((state: any) => state[sto
 
 export const getAllRuleObjs = rulesEntitySelectors.selectAll;
 export const getAllRuleObjMap = rulesEntitySelectors.selectEntities;
+export const getAllRuleObjIds = rulesEntitySelectors.selectIds;

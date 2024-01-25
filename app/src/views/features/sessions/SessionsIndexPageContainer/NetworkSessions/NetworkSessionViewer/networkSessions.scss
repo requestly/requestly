@@ -6,17 +6,18 @@
   padding: 16px;
 }
 
+.network-session-name-and-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .network-session-viewer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
   padding-left: 24px;
-
-  .network-session-recording-name {
-    line-height: 40px;
-    margin: 0;
-  }
 }
 
 .network-session-viewer-more-actions {

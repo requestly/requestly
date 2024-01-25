@@ -6,8 +6,8 @@ export const trackCheckoutInitiatedEvent = (duration, plan, quantity, isTrialUse
   trackEvent(BUSINESS.CHECKOUT.INITIATED, params);
 };
 
-export const trackCheckoutFailedEvent = (type, source) => {
-  trackEvent(BUSINESS.CHECKOUT.FAILED, { type, source });
+export const trackCheckoutFailedEvent = (quantity, source) => {
+  trackEvent(BUSINESS.CHECKOUT.FAILED, { quantity, source });
 };
 
 export const trackCheckoutCompletedEvent = (source) => {
