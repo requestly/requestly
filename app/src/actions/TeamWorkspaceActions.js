@@ -77,12 +77,14 @@ export const switchWorkspace = async (
   resetSyncDebounce();
 
   // Don't clear when appMode is Extension but user has not installed it!
+  /* CAN BE REPLACED WITH isLocalStoragePresent */
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) skipStorageClearing = true;
 
   if (!skipStorageClearing) {
     Logger.log("Clearing storage in switchWorkspace");
     await StorageService(appMode).clearDB();
-  }
+    console.log("[DEBUG] switchWorkspace: DELETE COMPLETE");
+  } // was syncing triggered before clearing storage? I don't see it here
 
   // Just in case
   window.skipSyncListenerForNextOneTime = false;
