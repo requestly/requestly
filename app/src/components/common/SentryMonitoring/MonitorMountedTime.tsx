@@ -8,13 +8,14 @@ interface MonitorMountedTimeProps {
 const MonitorMountedTime: React.FC<MonitorMountedTimeProps> = (props) => {
   useEffect(() => {
     const transaction = startTransaction({
-      name: props.transactionName,
+      name: props?.transactionName,
       op: "Monitoring component shown",
     });
     return () => {
-      transaction.finish();
+      transaction?.finish();
     };
-  }, [props.transactionName]);
+  }, [props?.transactionName]);
+
   return null;
 };
 
