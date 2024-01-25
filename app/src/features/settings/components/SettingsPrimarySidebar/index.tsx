@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
-import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { Col, Row } from "antd";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineDisplaySettings } from "@react-icons/all-files/md/MdOutlineDisplaySettings";
@@ -11,17 +10,17 @@ import { redirectToTraffic } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import "./index.scss";
 import { trackAppSettingsSidebarClicked } from "features/settings/analytics";
+import "./index.scss";
 
 const { PATHS } = APP_CONSTANTS;
 
 export const SettingsPrimarySidebar: React.FC = () => {
+  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
-  const billingTeams = useSelector(getAvailableBillingTeams);
 
   const redirectUrl = useRef(state?.redirectUrl ?? null);
 
@@ -65,19 +64,13 @@ export const SettingsPrimarySidebar: React.FC = () => {
             id: "billing",
             name: "Billing",
             path: PATHS.SETTINGS.BILLING.RELATIVE,
-            ishidden: !billingTeams.length,
+            ishidden: !user.loggedIn,
           },
         ],
       },
     ],
-    [appMode, billingTeams.length]
+    [appMode, user.loggedIn]
   );
-
-  useEffect(() => {
-    if (billingTeams.length && location.pathname === PATHS.SETTINGS.BILLING.RELATIVE) {
-      navigate(`${PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0]?.id}`);
-    }
-  }, [location.pathname, billingTeams, navigate]);
 
   return (
     <Col className="settings-primary-sidebar">
