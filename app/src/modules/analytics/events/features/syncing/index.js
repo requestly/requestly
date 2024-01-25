@@ -11,6 +11,7 @@ export const trackSyncTriggered = (uid, records_count, syncType) => {
 };
 
 export const trackSyncToggled = (uid, syncStatus) => {
+  // TODO: REMOVE, NOT USED
   const params = {
     uid,
     syncStatus,

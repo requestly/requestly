@@ -27,6 +27,7 @@ const SwitchWorkspaceButton = ({ teamName, selectedTeamId, teamMembersCount, isT
   }
 
   if (!isWorkspacesFeatureEnabled(user?.details?.profile?.email)) {
+    // can be removed??
     return null;
   }
 
