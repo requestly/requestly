@@ -45,7 +45,7 @@ export const BillingInformation: React.FC = () => {
   return (
     <Col className="billing-teams-primary-card team-billing-info-card">
       <div className="team-billing-info-section">
-        <div className="text-bold text-white mb-16">
+        <div className="text-bold text-white mb-16 team-billing-info-header">
           Billing information
           <RQButton
             type="text"
@@ -55,6 +55,7 @@ export const BillingInformation: React.FC = () => {
               redirectToUpdateInfo().finally(() => setIsUpdatingBillingInfo(false));
             }}
             loading={isUpdatingBillingInfo}
+            className="team-billing-info-header-btn"
           >
             <div className="text-gray team-billing-info-btn-text">
               Update
@@ -62,11 +63,11 @@ export const BillingInformation: React.FC = () => {
             </div>
           </RQButton>
         </div>
-        <p>{billingInformation.name}</p>
-        <p>{billingInformation.billingAddress || `No Billing address has been set`}</p>
+        <div className="text-white">{billingInformation.name}</div>
+        <div className="text-white mt-8">{billingInformation.billingAddress || `No Billing address has been set`}</div>
       </div>
       <div className="team-billing-info-section">
-        <div className="text-bold text-white mb-16">
+        <div className="text-bold text-white mb-16 team-billing-info-header">
           Payment Method
           <RQButton
             type="text"
@@ -76,6 +77,7 @@ export const BillingInformation: React.FC = () => {
               redirectToUpdateInfo().finally(() => setIsUpdatingPaymentMethod(false));
             }}
             loading={isUpdatingPaymentMethod}
+            className="team-billing-info-header-btn"
           >
             <div className="text-gray team-billing-info-btn-text">
               Update
@@ -83,12 +85,12 @@ export const BillingInformation: React.FC = () => {
             </div>
           </RQButton>
         </div>
-        <p className="text-capitalize">{billingInformation.paymentMethod.type}</p>
+        <div className="text-capitalize caption text-white">{billingInformation.paymentMethod.type}</div>
         {billingInformation.paymentMethod.last4 && (
-          <p>{`Number ending with ${billingInformation.paymentMethod.last4}`}</p>
+          <div className="text-white mt-8">{`Number ending with ${billingInformation.paymentMethod.last4}`}</div>
         )}
         {billingInformation.paymentMethod.expiryDate && (
-          <p>{`Expiring on ${billingInformation.paymentMethod.expiryDate}`}</p>
+          <div className="text-white mt-8">{`Expiring on ${billingInformation.paymentMethod.expiryDate}`}</div>
         )}
       </div>
     </Col>

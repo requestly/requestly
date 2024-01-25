@@ -3,12 +3,35 @@
   grid-template-columns: 1fr 1fr;
 
   .team-billing-info-section {
+    .team-billing-info-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &-btn.ant-btn {
+        font-weight: 500;
+        gap: 6px;
+
+        &:hover,
+        &:focus,
+        &:active {
+          background: var(--surface-2);
+        }
+
+        &:hover .team-billing-info-btn-text,
+        &:focus .team-billing-info-btn-text,
+        &:active .team-billing-info-btn-text {
+          color: var(--white);
+        }
+      }
+    }
     padding: 1rem;
     .team-billing-info-btn-text {
       display: inline-flex;
       gap: 0.25rem;
       align-items: center;
       padding-bottom: 2px;
+      transition: 0.2s all ease-in-out;
     }
   }
 
