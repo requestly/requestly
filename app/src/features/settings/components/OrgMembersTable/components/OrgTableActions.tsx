@@ -13,7 +13,7 @@ import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { trackBillingTeamActionClicked, trackBillingTeamMemberAdded } from "features/settings/analytics";
 
-export const MemberTableActions: React.FC<{ record: any }> = ({ record }) => {
+export const OrgTableActions: React.FC<{ record: any }> = ({ record }) => {
   const { billingId } = useParams();
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const user = useSelector(getUserAuthDetails);
