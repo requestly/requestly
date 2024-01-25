@@ -53,7 +53,6 @@ export const doSyncRecords = async (
 
   switch (syncType) {
     case SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS:
-      console.log("[DEBUG] doSyncRecords: UPDATE_RECORDS", records);
       // Update user sync records
       await updateUserSyncRecords(window.uid, records, appMode, {
         workspaceId: options.workspaceId,
@@ -61,7 +60,6 @@ export const doSyncRecords = async (
       break;
 
     case SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS:
-      console.log("[DEBUG] doSyncRecords: REMOVE_RECORDS", records);
       // Sync records removal
       syncRecordsRemoval(records, appMode);
       break;
@@ -116,7 +114,6 @@ export const setSyncState = async (uid: string, state: boolean, appMode: AppMode
  * @param {AppMode} appMode - A string representing the current mode of the application.
  */
 export const syncRecordsRemoval = async (recordIds: string[], appMode: AppMode): Promise<void> => {
-  console.log("[NSR DEBUG] syncRecordsRemoval TRIGGERED", recordIds); // not triggered so far
   // Trigger the record synchronization tracking with provided user id, record count and sync type.
   trackSyncTriggered(window.uid, recordIds.length, SYNC_CONSTANTS.SYNC_REMOVE_RECORDS);
 

@@ -53,7 +53,6 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
 
         const found = records.find((team) => team.id === currentlyActiveWorkspace.id);
 
-        // todo: move this to a separate function and useEffect
         if (!found) {
           if (!window.hasUserRemovedHimselfRecently)
             alert("You no longer have access to this workspace. Please contact your team admin.");
@@ -72,7 +71,6 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
             })
           );
 
-          // todo: move this to a separate function and useEffect
           // Update details of all team members
           const functions = getFunctions();
           const getTeamUsers = httpsCallable(functions, "teams-getTeamUsers");
