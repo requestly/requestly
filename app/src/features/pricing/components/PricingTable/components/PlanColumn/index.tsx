@@ -80,7 +80,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">RECOMMENDED</span>}
       </Space>
       {planPrice !== undefined && (
-        <Row align="middle" className="items-center">
+        <Row align="middle" className="items-center plan-price-row">
           <Space size="small">
             <Typography.Text strong className="plan-price">
               ${(duration === PRICING.DURATION.ANNUALLY ? planPrice / 12 : planPrice) * quantity}
@@ -90,9 +90,12 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
               planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
                 <Space>
                   <InputNumber
-                    style={{ width: "55px", height: "30px", display: "flex", alignItems: "center" }}
+                    style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
                     size="small"
+                    type="number"
                     min={1}
+                    max={1000}
+                    maxLength={4}
                     defaultValue={1}
                     value={quantity}
                     onChange={(value) => {
