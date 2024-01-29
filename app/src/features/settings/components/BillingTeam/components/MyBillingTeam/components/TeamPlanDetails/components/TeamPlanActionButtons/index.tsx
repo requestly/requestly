@@ -100,7 +100,10 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails }) 
           </RQButton>
         )}
 
-        {getPlanNameFromId(subscriptionDetails?.plan) !== "professional" && (
+        {!(
+          getPlanNameFromId(subscriptionDetails?.plan) === PRICING.PLAN_NAMES.PROFESSIONAL &&
+          planStatus === PlanStatus.ACTIVE
+        ) && (
           <RQButton type="primary" onClick={handleUpgradePlan} icon={<img src={upgradeIcon} alt="upgrade" />}>
             {planStatus === PlanStatus.EXPIRED ? "Renew plan" : "Upgrade plan"}
           </RQButton>
