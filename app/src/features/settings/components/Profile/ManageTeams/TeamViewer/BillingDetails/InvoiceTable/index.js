@@ -15,7 +15,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 // Sub Components
-import SpinnerColumn from "../../../../../../../misc/SpinnerColumn";
+import SpinnerColumn from "../../../../../../../../components/misc/SpinnerColumn";
 // UTILS
 import { getUserAuthDetails } from "../../../../../../../../store/selectors";
 import { filterUniqueObjects } from "../../../../../../../../utils/FormattingHelper";

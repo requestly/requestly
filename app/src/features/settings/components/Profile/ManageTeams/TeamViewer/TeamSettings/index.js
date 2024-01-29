@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Button, Input, message, Col, Tooltip } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
-import SpinnerColumn from "../../../../../../misc/SpinnerColumn";
+import SpinnerColumn from "../../../../../../../components/misc/SpinnerColumn";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { redirectToRules, redirectToWorkspaceSettings } from "../../../../../../../utils/RedirectionUtils";
 import { clearCurrentlyActiveWorkspace, showSwitchWorkspaceSuccessToast } from "actions/TeamWorkspaceActions";
