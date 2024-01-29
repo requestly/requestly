@@ -60,7 +60,6 @@ RQ.ScriptRuleHandler.handleRules = function (rules) {
 };
 
 RQ.ScriptRuleHandler.handleCSSScripts = function (cssScripts) {
-  // todo: handle attributes here too
   return new Promise(function (resolve) {
     cssScripts.forEach(RQ.ScriptRuleHandler.includeCSS);
     resolve();
@@ -132,8 +131,7 @@ RQ.ScriptRuleHandler.includeJS = function (script, callback) {
   if (!script.value) throw new Error("Script value is empty");
   if (script.type === RQ.SCRIPT_TYPES.URL) {
     if (script.wrapperElement) {
-      // todo: add this to ruleBuilder and schema
-      const scriptBlock = RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks(script.wrapperElement, "script")[0];
+      const scriptBlock = RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks(script.wrapperElement, "script")?.[0];
       if (scriptBlock) {
         scriptBlock.attributes["src"] = script.value;
         scriptBlock.innerText = "";
@@ -164,7 +162,7 @@ RQ.ScriptRuleHandler.includeJS = function (script, callback) {
 RQ.ScriptRuleHandler.includeCSS = function (script, callback) {
   if (script.type === RQ.SCRIPT_TYPES.URL) {
     if (script.wrapperElement) {
-      const styleLinkBlock = RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks(script.wrapperElement, "link")[0];
+      const styleLinkBlock = RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks(script.wrapperElement, "link")?.[0];
       if (styleLinkBlock) {
         styleLinkBlock.attributes["href"] = script.value;
         styleLinkBlock.innerText = "";
