@@ -77,7 +77,6 @@ const ActiveLicenseInfo = ({
 
   const renderSubscriptionInfo = () => {
     if (isSessionReplayLifetimeActive && status === "trialing") return <></>;
-
     return (
       <SubscriptionInfo
         hideShadow={hideShadow}
