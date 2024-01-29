@@ -11,6 +11,7 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { BillingTeam } from "../components/BillingTeam";
 import { OrgMembersView } from "../components/OrgMembers";
+import Profile from "../components/Profile/ManageAccount";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
@@ -48,6 +49,10 @@ export const settingRoutes: RouteObject[] = [
       {
         path: PATHS.SETTINGS.BILLING.RELATIVE + "/:billingId",
         element: <BillingTeam />,
+      },
+      {
+        path: PATHS.SETTINGS.PROFILE.RELATIVE,
+        element: <Profile />,
       },
     ],
   },

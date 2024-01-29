@@ -8,7 +8,7 @@ import UserInfo from "./UserInfo";
 import { getUserAuthDetails } from "../../../../store/selectors";
 import { redirectToDeleteAccount, redirectToSignDPA } from "../../../../utils/RedirectionUtils";
 // ACTIONS
-import { handleForgotPasswordButtonOnClick } from "../../../authentication/AuthForm/actions";
+import { handleForgotPasswordButtonOnClick } from "../../../../components/authentication/AuthForm/actions";
 import ProCard from "@ant-design/pro-card";
 
 import { useSelector } from "react-redux";
@@ -48,7 +48,7 @@ const ManageAccount = () => {
   return (
     <React.Fragment>
       {/* Page content */}
-      <ProCard className="primary-card github-like-border">
+      <ProCard className="github-like-border settings-profile-wrapper">
         <Row className="profile-container">
           <Col className="profile-container-left profile-container-child" xl="8">
             <UserInfo shadow={true} hideBillingAddress={true} />

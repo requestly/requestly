@@ -4,7 +4,7 @@ import ProCard from "@ant-design/pro-card";
 // Firebase
 import { getFunctions, httpsCallable } from "firebase/functions";
 // Sub Components
-import SpinnerColumn from "../../../../../misc/SpinnerColumn";
+import SpinnerColumn from "../../../../../../components/misc/SpinnerColumn";
 import GetASubscription from "../../ActiveLicenseInfo/GetASubscription";
 import SubscriptionInfo from "../../ActiveLicenseInfo/SubscriptionInfo";
 import { PRICING } from "features/pricing";
