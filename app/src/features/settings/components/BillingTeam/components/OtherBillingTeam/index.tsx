@@ -1,7 +1,8 @@
 import { Avatar, Col, Popover, Row, Table } from "antd";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { useHasChanged } from "hooks";
 import { getUserAuthDetails } from "store/selectors";
 import { getAvailableBillingTeams, getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../TeamPlanStatus";
@@ -31,6 +32,7 @@ export const OtherBillingTeam: React.FC = () => {
     billingTeams,
     user?.details?.profile?.uid,
   ]);
+  const hasBillingIdChanged = useHasChanged(billingId);
 
   const columns = useMemo(
     () => [
@@ -97,6 +99,12 @@ export const OtherBillingTeam: React.FC = () => {
       })
       .finally(() => setIsRequestingToJoin(false));
   }, [billingId]);
+
+  useEffect(() => {
+    if (hasBillingIdChanged) {
+      setIsPlanDetailsPopoverOpen(false);
+    }
+  }, [hasBillingIdChanged]);
 
   return (
     <>
