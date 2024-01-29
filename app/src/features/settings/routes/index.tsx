@@ -52,7 +52,7 @@ export const settingRoutes: RouteObject[] = [
       },
       {
         path: PATHS.SETTINGS.PROFILE.RELATIVE,
-        element: <Profile />,
+        element: <ProtectedRoute component={Profile} />,
       },
     ],
   },
