@@ -60,6 +60,7 @@ RQ.ScriptRuleHandler.handleRules = function (rules) {
 };
 
 RQ.ScriptRuleHandler.handleCSSScripts = function (cssScripts) {
+  // todo: handle attributes here too
   return new Promise(function (resolve) {
     cssScripts.forEach(RQ.ScriptRuleHandler.includeCSS);
     resolve();
@@ -128,24 +129,114 @@ RQ.ScriptRuleHandler.includeJSScriptsInOrder = function (scripts, callback, inde
 };
 
 RQ.ScriptRuleHandler.includeJS = function (script, callback) {
+  if (!script.value) throw new Error("Script value is empty");
   if (script.type === RQ.SCRIPT_TYPES.URL) {
+    // todo: add attributes here
     RQ.ClientUtils.addRemoteJS(script.value, callback);
     return;
   }
 
   if (script.type === RQ.SCRIPT_TYPES.CODE) {
-    RQ.ClientUtils.executeJS(script.value);
+    const scriptBlocks = RQ.ScriptRuleHandler.parseScriptCodeBlocks(script.value);
+    if (!scriptBlocks || !scriptBlocks.length) {
+      RQ.ClientUtils.executeJS(script.value);
+    } else {
+      RQ.ScriptRuleHandler.embedScriptBlocks(scriptBlocks);
+    }
+  }
+  typeof callback === "function" && callback();
+};
+
+RQ.ScriptRuleHandler.parseScriptCodeBlocks = function (rawCode) {
+  const parser = new DOMParser();
+  // if it is a normal code block, string will be added to body
+  const doc = parser.parseFromString(rawCode, "text/html"); // this will take a lot of time....
+  const scripts = Array.from(doc.getElementsByTagName("script"));
+  const scriptDetails = scripts.map((script, index) => {
+    return {
+      index: index,
+      code: script.innerHTML.trim(),
+      attributes: Array.from(script.attributes).reduce((attrs, attr) => {
+        // todo: remove src attribute in case of inline script
+        attrs[attr.name] = attr.value ?? "";
+        return attrs;
+      }, {}),
+    };
+  });
+  return scriptDetails;
+};
+
+RQ.ScriptRuleHandler.embedScriptBlocks = function (scriptDetails) {
+  scriptDetails.forEach((scriptObj) => {
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.className = RQ.ClientUtils.getScriptClassAttribute();
+    // \n is seen as a un recognised character in the script tag text
+    const code = scriptObj.code.replace(/\n/g, "\\n");
+    script.appendChild(document.createTextNode(code));
+    Object.keys(scriptObj.attributes).forEach((attr) => {
+      script.setAttribute(attr, scriptObj.attributes[attr]);
+    });
+
+    RQ.ScriptRuleHandler.appendToDom(script);
+  });
+};
+
+RQ.ScriptRuleHandler.includeCSS = function (script, callback) {
+  if (script.type === RQ.SCRIPT_TYPES.URL) {
+    // todo: add attributes here
+    RQ.ClientUtils.addRemoteCSS(script.value);
+  } else if (script.type === RQ.SCRIPT_TYPES.CODE) {
+    const styleBlocks = RQ.ScriptRuleHandler.parseStyleBlocks(script.value);
+    if (!styleBlocks || !styleBlocks.length) {
+      RQ.ClientUtils.embedCSS(script.value);
+    } else {
+      RQ.ScriptRuleHandler.embedScriptBlocks(styleBlocks);
+    }
   }
 
   typeof callback === "function" && callback();
 };
 
-RQ.ScriptRuleHandler.includeCSS = function (script, callback) {
-  if (script.type === RQ.SCRIPT_TYPES.URL) {
-    RQ.ClientUtils.addRemoteCSS(script.value);
-  } else if (script.type === RQ.SCRIPT_TYPES.CODE) {
-    RQ.ClientUtils.embedCSS(script.value);
-  }
+RQ.ScriptRuleHandler.parseStyleBlocks = function (rawCode) {
+  const parser = new DOMParser();
+  // if it is a normal code block, string will be added to body
+  const doc = parser.parseFromString(rawCode, "text/html"); // this will take a lot of time....
+  const styles = Array.from(doc.getElementsByTagName("style"));
+  const styleDetails = styles.map((style, index) => {
+    return {
+      index: index,
+      code: style.innerHTML.trim(),
+      attributes: Array.from(style.attributes).reduce((attrs, attr) => {
+        // todo: remove src attribute in case of inline script
+        attrs[attr.name] = attr.value ?? "";
+        return attrs;
+      }, {}),
+    };
+  });
+  return styleDetails;
+};
 
-  typeof callback === "function" && callback();
+RQ.ScriptRuleHandler.embedStyleBlocks = function (styleDetails) {
+  styleDetails.forEach((styleObj) => {
+    const style = document.createElement("style");
+    style.className = `RQ.ClientUtils.getScriptClassAttribute();`;
+
+    style.appendChild(document.createTextNode(styleObj.code));
+
+    Object.keys(styleObj.attributes).forEach((attr) => {
+      style.setAttribute(attr, styleObj.attributes[attr]);
+    });
+
+    RQ.ScriptRuleHandler.appendToDom(style);
+  });
+};
+
+RQ.ScriptRuleHandler.appendToDom = function (htmlNode) {
+  const parent = document.head || document.documentElement;
+  try {
+    parent.appendChild(htmlNode);
+  } catch (error) {
+    console.error(error);
+  }
 };
