@@ -35,9 +35,7 @@
   border-bottom: none;
 }
 
-.workspace-member-table.ant-table-wrapper
-  .ant-table-tbody
-  .ant-table-cell-row-hover {
+.workspace-member-table.ant-table-wrapper .ant-table-tbody .ant-table-cell-row-hover {
   background-color: var(--component-background);
 }
 
@@ -45,22 +43,19 @@
   border-top: 1px solid #3e4044;
 }
 
-.workspace-member-table.ant-table-wrapper
-  .ant-table-tbody
-  .ant-table-row
-  .ant-table-cell {
+.workspace-member-table.ant-table-wrapper .ant-table-tbody .ant-table-row .ant-table-cell {
   padding: 1.25rem 4px 1.25rem 2px;
 }
 
 .pending-tag-container {
-  border: 1px solid #4F5053;
+  border: 1px solid #4f5053;
   border-radius: 47px;
-  color: #FF6905;
+  color: #ff6905;
   padding: 8px;
   font-weight: 500;
   margin-left: 12px;
 }
 
 .member-email {
- color: #B0B0B5;
+  color: #b0b0b5;
 }
