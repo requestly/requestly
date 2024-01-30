@@ -10,6 +10,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { BillingTeamRoles } from "../../types";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { trackBillingTeamViewed } from "features/settings/analytics";
+import { BillingInformation } from "./components/BillingInformation";
 import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import "./index.scss";
@@ -55,11 +56,16 @@ export const MyBillingTeam: React.FC = () => {
       <Col style={{ marginTop: "24px" }}>
         <BillingTeamMembers openDrawer={() => setIsMembersDrawerOpen(true)} />
       </Col>
-      {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member ? (
+      {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member && (
         <Col style={{ marginTop: "24px" }}>
           <BillingInvoiceTable />
         </Col>
-      ) : null}
+      )}
+      {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager && (
+        <Col style={{ marginTop: "24px" }}>
+          <BillingInformation />
+        </Col>
+      )}
 
       <Drawer
         placement="right"
@@ -89,7 +95,6 @@ export const MyBillingTeam: React.FC = () => {
           </Col>
         </Row>
       </Drawer>
-      {/* TODO: ADD BILLING ADDRESS AND PAYMENT METHOD SECTION */}
     </>
   );
 };

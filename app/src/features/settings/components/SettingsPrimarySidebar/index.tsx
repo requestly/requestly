@@ -6,7 +6,9 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineDisplaySettings } from "@react-icons/all-files/md/MdOutlineDisplaySettings";
 import { RiBuildingLine } from "@react-icons/all-files/ri/RiBuildingLine";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import { MdOutlineAccountBox } from "@react-icons/all-files/md/MdOutlineAccountBox";
 import { redirectToTraffic } from "utils/RedirectionUtils";
+import { isCompanyEmail } from "utils/FormattingHelper";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -26,6 +28,18 @@ export const SettingsPrimarySidebar: React.FC = () => {
 
   const sidebarItems = useMemo(
     () => [
+      {
+        id: "my_accounts",
+        name: "Accounts",
+        icon: <MdOutlineAccountBox />,
+        children: [
+          {
+            id: "profile",
+            name: "Profile",
+            path: PATHS.SETTINGS.PROFILE.RELATIVE,
+          },
+        ],
+      },
       {
         id: "app_settings",
         name: "App",
@@ -56,6 +70,12 @@ export const SettingsPrimarySidebar: React.FC = () => {
         icon: <RiBuildingLine />,
         children: [
           {
+            id: "members",
+            name: "Members",
+            path: PATHS.SETTINGS.MEMBERS.RELATIVE,
+            ishidden: !(user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)),
+          },
+          {
             id: "workspaces",
             name: "Workspaces",
             path: PATHS.SETTINGS.WORKSPACES.RELATIVE,
@@ -69,7 +89,7 @@ export const SettingsPrimarySidebar: React.FC = () => {
         ],
       },
     ],
-    [appMode, user.loggedIn]
+    [appMode, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user.loggedIn]
   );
 
   return (

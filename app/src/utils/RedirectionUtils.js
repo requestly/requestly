@@ -159,6 +159,10 @@ export const redirectToBillingTeam = (navigate, id, redirectUrl, source) => {
   navigate(PATHS.SETTINGS.BILLING.RELATIVE + `/${id}`, { state: { redirectUrl, source } });
 };
 
+export const redirectToProfileSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.PROFILE.ABSOLUTE, { state: { redirectUrl, source } });
+};
+
 /* Product updates */
 export const redirectToProductUpdates = (navigate) => {
   navigate(PATHS.UPDATES.ABSOLUTE);

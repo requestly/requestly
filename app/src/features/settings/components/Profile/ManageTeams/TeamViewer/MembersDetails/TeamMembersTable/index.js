@@ -6,7 +6,7 @@ import { Avatar, Badge, Col, Row, Table } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { isEmpty } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import SpinnerColumn from "../../../../../../../misc/SpinnerColumn";
+import SpinnerColumn from "../../../../../../../../components/misc/SpinnerColumn";
 import { toast } from "utils/Toast.js";
 import { redirectToWorkspaceSettings } from "../../../../../../../../utils/RedirectionUtils";
 import { getUserAuthDetails } from "../../../../../../../../store/selectors";

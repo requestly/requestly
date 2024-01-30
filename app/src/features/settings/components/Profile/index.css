@@ -4,6 +4,10 @@
   margin-top: 4rem;
 }
 
+.settings-profile-wrapper {
+  background: none;
+}
+
 .profile-container-left {
   width: 70%;
 }

@@ -8,7 +8,7 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { Typography, Switch, Divider, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
-import MemberRoleDropdown from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/common/MemberRoleDropdown";
+import MemberRoleDropdown from "features/settings/components/Profile/ManageTeams/TeamViewer/common/MemberRoleDropdown";
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { renameWorkspace } from "backend/workspace";
