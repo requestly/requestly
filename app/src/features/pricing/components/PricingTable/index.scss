@@ -30,7 +30,8 @@
 }
 
 .plan-card {
-  min-width: 285px;
+  min-width: 300px;
+  height: auto;
   padding: 20px;
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--surface-2, #383838);

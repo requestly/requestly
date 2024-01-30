@@ -120,6 +120,7 @@ interface PricingTableButtonsProps {
   duration: string;
   source: string;
   quantity: number;
+  disabled: boolean;
   setIsContactUsModalOpen: (value: boolean) => void;
 }
 
@@ -129,6 +130,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
   duration,
   source,
   quantity,
+  disabled,
   setIsContactUsModalOpen,
 }) => {
   const dispatch = useDispatch();
@@ -338,6 +340,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
             type="primary"
             className={!buttonConfig.visible ? "visibility-hidden" : ""}
             loading={isButtonLoading}
+            disabled={disabled}
           >
             {buttonConfig?.text}
           </RQButton>
