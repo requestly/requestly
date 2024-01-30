@@ -40,7 +40,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
 
   const columns = [
     {
-      title: "Member",
+      title: `Member (${membersTableSource?.length})`,
       key: "id",
       width: 460,
       render: (_: any, record: Record<string, any>) => (

@@ -2,12 +2,12 @@ import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import MyTeams from "features/settings/components/WorkspaceSettings/components/MyTeams";
 import CreateWorkspace from "components/user/Teams/CreateWorkspace";
-import PersonalSubscription from "components/user/AccountIndexPage/ManageAccount/PersonalSubscription";
+import PersonalSubscription from "features/settings/components/Profile/PersonalSubscription";
 import UpdateSubscriptionContactUs from "components/payments/UpdateSubscriptionContactUs";
 import RefreshSubscription from "components/payments/RefreshSubscription";
 import UpdatePaymentMethod from "components/payments/UpdatePaymentMethod";
-import ManageAccount from "components/user/AccountIndexPage/ManageAccount";
-import TeamViewer from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer";
+import ManageAccount from "features/settings/components/Profile";
+import TeamViewer from "features/settings/components/Profile/ManageTeams/TeamViewer";
 import APP_CONSTANTS from "config/constants";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 

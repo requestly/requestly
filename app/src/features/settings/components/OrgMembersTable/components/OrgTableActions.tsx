@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { Col, Row } from "antd";
 import { getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { TbChecks } from "@react-icons/all-files/tb/TbChecks";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { getBillingTeamMembers } from "store/features/billing/selectors";
@@ -12,15 +11,16 @@ import { BillingTeamRoles } from "features/settings/components/BillingTeam/types
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { trackBillingTeamActionClicked, trackBillingTeamMemberAdded } from "features/settings/analytics";
+import { addUsersToBillingTeam } from "backend/billing";
 
 export const OrgTableActions: React.FC<{ record: any }> = ({ record }) => {
   const { billingId } = useParams();
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const user = useSelector(getUserAuthDetails);
-  const isUserAdded = useMemo(() => Object.values(billingTeamMembers).some((member) => member.email === record.email), [
-    billingTeamMembers,
-    record.email,
-  ]);
+  const isUserAdded = useMemo(
+    () => Object.values(billingTeamMembers ?? {}).some((member) => member.email === record.email),
+    [billingTeamMembers, record.email]
+  );
 
   const [isAddingUser, setIsAddingUser] = useState(false);
 
@@ -29,9 +29,8 @@ export const OrgTableActions: React.FC<{ record: any }> = ({ record }) => {
     billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
 
   const handleAddUserToBillingTeam = useCallback(() => {
-    const addUserToBillingteam = httpsCallable(getFunctions(), "billing-addUsers");
     setIsAddingUser(true);
-    addUserToBillingteam({ userEmails: [record.email], billingTeamId: billingId })
+    addUsersToBillingTeam(billingId, [record.email])
       .then(() => {
         trackBillingTeamMemberAdded(record.email, billingId);
       })

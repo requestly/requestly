@@ -29,6 +29,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   setIsContactUsModalOpen,
 }) => {
   const [quantity, setQuantity] = useState(1);
+  const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
 
   const renderFeaturesListHeader = (planName: string) => {
     return (
@@ -70,6 +71,15 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         return "";
     }
   };
+
+  const handleQuantityChange = (value: number) => {
+    if (value < 1 || value > 1000) {
+      setDisbaleUpgradeButton(true);
+    } else setDisbaleUpgradeButton(false);
+    setQuantity(value);
+    trackPricingPlansQuantityChanged(value, planName, source);
+  };
+
   return (
     <Col
       key={planName}
@@ -80,7 +90,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">RECOMMENDED</span>}
       </Space>
       {planPrice !== undefined && (
-        <Row align="middle" className="items-center">
+        <Row align="middle" className="items-center plan-price-row">
           <Space size="small">
             <Typography.Text strong className="plan-price">
               ${(duration === PRICING.DURATION.ANNUALLY ? planPrice / 12 : planPrice) * quantity}
@@ -90,14 +100,16 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
               planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
                 <Space>
                   <InputNumber
-                    style={{ width: "55px", height: "30px", display: "flex", alignItems: "center" }}
+                    style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
                     size="small"
+                    type="number"
                     min={1}
+                    max={1000}
+                    maxLength={4}
                     defaultValue={1}
                     value={quantity}
-                    onChange={(value) => {
-                      setQuantity(value);
-                      trackPricingPlansQuantityChanged(value, planName, source);
+                    onChange={(value: number) => {
+                      handleQuantityChange(value);
                     }}
                   />
                 </Space>
@@ -132,6 +144,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           source={source}
           quantity={quantity}
           setIsContactUsModalOpen={setIsContactUsModalOpen}
+          disabled={disbaleUpgradeButton}
         />
       </Row>
       <>{renderFeaturesListHeader(planName)}</>
