@@ -29,6 +29,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   setIsContactUsModalOpen,
 }) => {
   const [quantity, setQuantity] = useState(1);
+  const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
 
   const renderFeaturesListHeader = (planName: string) => {
     return (
@@ -70,6 +71,15 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         return "";
     }
   };
+
+  const handleQuantityChange = (value: number) => {
+    if (value < 1 || value > 1000) {
+      setDisbaleUpgradeButton(true);
+    } else setDisbaleUpgradeButton(false);
+    setQuantity(value);
+    trackPricingPlansQuantityChanged(value, planName, source);
+  };
+
   return (
     <Col
       key={planName}
@@ -98,9 +108,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                     maxLength={4}
                     defaultValue={1}
                     value={quantity}
-                    onChange={(value) => {
-                      setQuantity(value);
-                      trackPricingPlansQuantityChanged(value, planName, source);
+                    onChange={(value: number) => {
+                      handleQuantityChange(value);
                     }}
                   />
                 </Space>
@@ -135,6 +144,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           source={source}
           quantity={quantity}
           setIsContactUsModalOpen={setIsContactUsModalOpen}
+          disabled={disbaleUpgradeButton}
         />
       </Row>
       <>{renderFeaturesListHeader(planName)}</>
