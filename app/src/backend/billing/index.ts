@@ -50,6 +50,16 @@ export const getBillingTeamMembersProfile = async (billingId: string) => {
     });
 };
 
+export const addUsersToBillingTeam = async (billingId: string, userEmails: string[]) => {
+  if (!billingId || !userEmails) {
+    return null;
+  }
+
+  const addUsers = httpsCallable<{ billingId: string; userEmails: string[] }>(getFunctions(), "billing-addUsers");
+
+  return addUsers({ billingId, userEmails });
+};
+
 export const removeMemberFromBillingTeam = async (billingId: string, userId: string) => {
   if (!billingId || !userId) {
     return null;
@@ -135,4 +145,14 @@ export const getBillingTeamRedirectURL = async (ownerId: string): Promise<string
     );
     return `${PATHS.SETTINGS.BILLING.RELATIVE}/${sortedTeams[0].id}`;
   }
+};
+
+export const fetchBillingInformation = async (billingId: string) => {
+  const billingInfo = httpsCallable<{ billingId: string }>(getFunctions(), "billing-getBillingInfo");
+  return billingInfo({ billingId }).then((res) => {
+    if (!res.data) {
+      return null;
+    }
+    return res.data;
+  });
 };
