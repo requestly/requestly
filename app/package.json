@@ -60,7 +60,6 @@
     "@stripe/react-stripe-js": "^2.3.0",
     "@stripe/stripe-js": "^1.24.0",
     "@tanstack/react-virtual": "^3.0.0-beta.54",
-    "@typeform/embed-react": "^1.15.0",
     "@types/har-format": "^1.2.12",
     "antd": "4.24.5",
     "buffer": "^6.0.3",
