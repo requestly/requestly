@@ -3,10 +3,14 @@ import { actions } from "../../../../../../../../store";
 //UTILS
 import { isValidUrl } from "../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-// LODASH
 import { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
+
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+
+import FEATURES from "config/constants/sub/features";
+import { invalidHTMLError, parseHTMLTagInCodeString, postProcessCode } from "./insertScriptValidators";
 
 export const validateRule = (rule, dispatch, appMode) => {
   let output;
@@ -195,9 +199,10 @@ export const validateRule = (rule, dispatch, appMode) => {
       });
     });
   }
-
   //Insert Script Rule
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT) {
+    const isAppCompatibleForRawHTMLTagsInScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
+
     rule.pairs.forEach((pair) => {
       //There should be atleast one source of script. Be it given library or a custom script
       if (isEmpty(pair.libraries) && isEmpty(pair.scripts)) {
@@ -217,14 +222,81 @@ export const validateRule = (rule, dispatch, appMode) => {
                 error: "invalid script code",
               };
             }
+
+            const htmlNodeName = script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "script" : "style"; // todo: clean
+            const result = parseHTMLTagInCodeString(script.value, htmlNodeName);
+
+            // Check if code has raw html tags, but current app version does not support it
+            if (!isAppCompatibleForRawHTMLTagsInScriptRule && result.parsedCodeBlocks.length > 0) {
+              output = {
+                result: false,
+                message: `Please upgrade the extension to use raw ${htmlNodeName} tags inside code`,
+                error: "invalid script code",
+              };
+            }
+            // if code contains raw incorrect html tags
+            else if (!result.validationResult.isValid) {
+              const validationError = result.validationResult.validationError[0];
+              // todo: show these errors in code editor!
+              // contains tags that are unsupported for current type of rule
+              if (validationError === invalidHTMLError.UNSUPPORTED_TAGS) {
+                output = {
+                  result: false,
+                  message: `Only ${htmlNodeName} tags are supported`,
+                  error: "invalid script code",
+                };
+              }
+              // incorrectly structured html tags (mostly happens because of missing closing tag)
+              else if (validationError === invalidHTMLError.UNCLOSED_TAGS) {
+                output = {
+                  result: false,
+                  message: `Please ensure all ${htmlNodeName} tags are closed properly`,
+                  error: "invalid script code",
+                };
+              }
+            }
+
+            const rawCode = result.parsedCodeBlocks.length ? result.innerCode : script.value;
+            postProcessCode(rawCode, script);
           }
           //Check if URL isn't empty. Can be absolute or relative
-          else if (script.type === "url" && isEmpty(script.value)) {
-            output = {
-              result: false,
-              message: `Please enter a valid script URL`,
-              error: "invalid script url",
-            };
+          else if (script.type === "url") {
+            if (isEmpty(script.value)) {
+              output = {
+                result: false,
+                message: `Please enter a valid script URL`,
+                error: "invalid script url",
+              };
+            } else if (script.wrapperElement) {
+              const htmlNodeName = script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "script" : "link"; // todo: clean
+
+              if (!isAppCompatibleForRawHTMLTagsInScriptRule) {
+                // in this case we can still process the code but we'll show a tooltip in the editor // todo: remove comment
+                output = {
+                  result: false,
+                  message: `Please upgrade the extension to use raw ${htmlNodeName} tags inside code`,
+                  error: "invalid script code",
+                };
+              } else {
+                const result = parseHTMLTagInCodeString(script.wrapperElement, htmlNodeName);
+                if (!result.validationResult.isValid) {
+                  const validationError = result.validationResult.validationError[0];
+                  if (validationError === invalidHTMLError.UNSUPPORTED_TAGS) {
+                    output = {
+                      result: false,
+                      message: `Only ${htmlNodeName} tags are supported`,
+                      error: "invalid script code",
+                    };
+                  } else if (validationError === invalidHTMLError.UNCLOSED_TAGS) {
+                    output = {
+                      result: false,
+                      message: `Please ensure all ${htmlNodeName} tags are closed properly`,
+                      error: "invalid script code",
+                    };
+                  }
+                }
+              }
+            }
           }
         });
       }
