@@ -4,7 +4,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Spin, Button } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
-import { redirectToAccountDetails, redirectToMyTeams } from "utils/RedirectionUtils";
+import {
+  redirectToAccountDetails,
+  redirectToProfileSettings,
+  redirectToWorkspaceSettings,
+} from "utils/RedirectionUtils";
 import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
 import APP_CONSTANTS from "config/constants";
 import { AUTH } from "modules/analytics/events/common/constants";
@@ -49,11 +53,11 @@ export default function HeaderUser() {
     { type: "divider" },
     {
       label: "Profile",
-      onClick: () => redirectToAccountDetails(navigate),
+      onClick: () => redirectToProfileSettings(navigate, window.location.pathname, "header"),
     },
     {
       label: "Manage Workspaces",
-      onClick: () => redirectToMyTeams(navigate),
+      onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
     },
     { type: "divider" },
     {

@@ -42,7 +42,7 @@ const SharedListViewer: React.FC<Props> = () => {
     <>
       {/* TODO: Add Modals Required in Shared List rules here. Eg. Rule Viewer Modal */}
       <ContentHeader title="SharedList" subtitle="Share Rules" actions={[]} />
-      <RulesTable rules={ruleObjs as RuleObj[]} loading={isLoading} />
+      <RulesTable rules={ruleObjs as RuleObj[]} loading={isLoading} searchValue="" />
     </>
   );
 };

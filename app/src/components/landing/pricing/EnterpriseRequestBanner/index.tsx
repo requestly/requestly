@@ -1,46 +1,44 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";
+import { getUserAuthDetails } from "store/selectors";
 import { Row, Col, Alert } from "antd";
 import { toast } from "utils/Toast.js";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { trackEnterpriseRequestEvent } from "modules/analytics/events/misc/business/checkout";
 import { LoadingOutlined } from "@ant-design/icons";
 import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQuestionCircle";
-import "./index.css";
 import { trackTeamPlanCardClicked, trackTeamPlanCardShown } from "modules/analytics/events/common/teams";
-import { getUserAuthDetails } from "store/selectors";
-import { useSelector } from "react-redux";
-
-interface OrgContactDetails {
-  workspaces: Array<{
-    adminName: string;
-    adminEmail: string;
-    workspaceName?: string;
-  }>;
-}
+import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { redirectToBillingTeam } from "utils/RedirectionUtils";
+import "./index.css";
 
 export default function EnterpriseRequestBanner(): React.ReactNode {
   const user = useSelector(getUserAuthDetails);
-  const [orgContactDetails, setOrgContactDetails] = useState<OrgContactDetails>(null);
+  const navigate = useNavigate();
+  const billingTeams = useSelector(getAvailableBillingTeams);
+  const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
   const [enterpriseRequestedState, setEnterpriseRequestedState] = useState(0); // 1 is clicked, 2 is sent
 
   // FIREBASE FUNCTIONS
   const functions = getFunctions();
-  const getEnterpriseAdminDetails = httpsCallable<null, { enterpriseData: OrgContactDetails; success: boolean }>(
-    functions,
-    "getEnterpriseAdminDetails"
-  );
-  const requestEnterprisePlanFromAdmin = httpsCallable<{ workspaceDetails: OrgContactDetails["workspaces"] }, null>(
+  const requestEnterprisePlanFromAdmin = httpsCallable<{ billingId: string }, null>(
     functions,
     "premiumNotifications-requestEnterprisePlanFromAdmin"
   );
 
   const requestPremiumToAdmin = useCallback(() => {
+    if (billingTeams.length > 1) {
+      redirectToBillingTeam(navigate, billingTeams[0].id, window.location.pathname, "pricing_page");
+      return;
+    }
+
     setEnterpriseRequestedState(1);
-    const enterpriseAdmin = orgContactDetails?.workspaces?.[0];
-    const domain = enterpriseAdmin.adminEmail.split("@")[1];
+    const domain = getDomainFromEmail(user?.details?.profile?.email);
     trackTeamPlanCardClicked(domain, "pricing_page");
     requestEnterprisePlanFromAdmin({
-      workspaceDetails: orgContactDetails?.workspaces,
+      billingId: billingTeams[0].id,
     })
       .then(() => {
         //GA4
@@ -49,29 +47,34 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
       })
       .catch((err) => {
         toast.error("Unable to send email");
-        toast.info(`Contact directly at: ${enterpriseAdmin.adminEmail}`);
+        toast.info(`Contact directly at: ${teamOwnerDetails?.email}`);
       });
-  }, [orgContactDetails?.workspaces, requestEnterprisePlanFromAdmin]);
+  }, [requestEnterprisePlanFromAdmin, navigate, billingTeams, user?.details?.profile?.email, teamOwnerDetails?.email]);
 
   useEffect(() => {
-    if (user?.details?.isLoggedIn) {
-      if (!orgContactDetails) {
-        getEnterpriseAdminDetails().then((response) => {
-          if (response.data.success) {
-            const contactDetails = response.data.enterpriseData;
-            setOrgContactDetails(contactDetails);
-            trackTeamPlanCardShown(contactDetails?.workspaces?.[0]?.adminEmail?.split("@")?.[1]);
-          }
-        });
-      }
-    }
-  }, [orgContactDetails, getEnterpriseAdminDetails, user?.details?.isLoggedIn]);
+    if (
+      billingTeams.length &&
+      isCompanyEmail(user?.details?.profile?.email) &&
+      user?.details?.profile?.isEmailVerified &&
+      user?.details?.isLoggedIn &&
+      !user?.details?.isPremium
+    )
+      trackTeamPlanCardShown(billingTeams[0].ownerDomain);
+  }, [
+    user?.details?.isLoggedIn,
+    user?.details?.isPremium,
+    user?.details?.profile?.email,
+    user?.details?.profile?.isEmailVerified,
+    billingTeams,
+  ]);
 
-  if (user?.details?.isPremium) return null;
+  if (user?.details?.isPremium || !user?.details?.isLoggedIn) return null;
 
   return (
     <React.Fragment>
-      {orgContactDetails !== null ? (
+      {billingTeams !== null &&
+      isCompanyEmail(user?.details?.profile?.email) &&
+      user?.details?.profile?.isEmailVerified ? (
         enterpriseRequestedState === 1 ? (
           <>
             <br />
@@ -84,8 +87,8 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
           </>
         ) : (
           <>
-            <Row className="pricing-alert-row">
-              <Col span={24} className="display-row-center">
+            <Row className="pricing-alert-row display-row-center">
+              <Col className="display-row-center">
                 {enterpriseRequestedState === 2 ? (
                   <Alert
                     type="info"
@@ -102,13 +105,12 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
                     icon={<AiOutlineQuestionCircle />}
                     message={
                       <>
-                        Your organization is already on Requestly Professional Plan managed by{" "}
-                        {orgContactDetails?.workspaces?.map((workspace) => workspace.adminName)?.join(", ")}
-                        . <br />
+                        Your organization is already on Requestly Premium Plan.
+                        <br />
                         <span onClick={requestPremiumToAdmin} className="text-white text-underline cursor-pointer">
                           Click here
                         </span>{" "}
-                        to request a Requestly Professional subscription for you.
+                        to request a Requestly Premium subscription for you.
                       </>
                     }
                   ></Alert>

@@ -1,0 +1,86 @@
+.add-member-modal .rq-modal-content {
+  background-color: var(--surface-1) !important;
+}
+
+.add-member-modal-header {
+  margin-top: 1.43rem;
+  max-width: 38ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.email-invites-wrapper {
+  display: flex;
+  margin-top: 6px;
+}
+
+.emails-input-wrapper {
+  background: var(--component-dark-background);
+  box-shadow: var(--input-box-shadow);
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  width: 100%;
+  padding: 0 4px;
+}
+.emails-input-wrapper div.react-multi-email.focused,
+.emails-input-wrapper div.react-multi-email {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+.emails-input-wrapper div.react-multi-email span {
+  padding-left: 0;
+}
+
+.members-email-input {
+  max-width: 254px;
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+div.members-email-input > input {
+  width: 100% !important;
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.add-member-modal-email-label {
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
+.add-members-modal-info-text {
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.guide-link,
+.guide-link:hover {
+  color: var(--text-gray);
+  text-decoration: underline;
+}
+
+.access-dropdown-container {
+  margin: 0 5px;
+  margin-top: 7px;
+  flex: 0 0 fit-content;
+}
+
+.empty-message {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 1rem;
+}
+
+.create-invite-link-btn {
+  height: 30px;
+}

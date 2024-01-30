@@ -6,7 +6,7 @@ import { getIsOrgBannerDismissed, getUserAuthDetails } from "store/selectors";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { Avatar, Divider, Row, Space, Typography } from "antd";
-import { ContactUsModal } from "components/modals/ContactUsModal";
+import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
 import { parseGravatarImage } from "utils/Misc";
 import { toast } from "utils/Toast";
 import { trackTeamPlanBannerClicked, trackTeamPlanBannerViewed } from "modules/analytics/events/common/teams";
