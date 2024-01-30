@@ -137,10 +137,7 @@ export const UserPlanDetails = () => {
           appSumoCodeCount={lifeTimeSubscriptionDetails?.codes?.length ?? 0}
           hideManagePersonalSubscriptionButton={true}
           subscriptionDetails={{
-            validFrom:
-              typeof lifeTimeSubscriptionDetails === "string"
-                ? new Date(lifeTimeSubscriptionDetails).getTime()
-                : lifeTimeSubscriptionDetails.startDate,
+            validFrom: lifeTimeSubscriptionDetails.startDate,
             validTill: lifeTimeSubscriptionDetails.endDate,
             status: "active",
             type: lifeTimeSubscriptionDetails.type ?? type,

@@ -9,8 +9,8 @@ import { BiSolidHourglassTop } from "@react-icons/all-files/bi/BiSolidHourglassT
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
-import "./index.scss";
 import { trackBillingTeamActionClicked } from "features/settings/analytics";
+import "./index.scss";
 
 export const BillingInvoiceTable: React.FC = () => {
   const { billingId } = useParams();
@@ -41,7 +41,9 @@ export const BillingInvoiceTable: React.FC = () => {
         dataIndex: "total",
         key: "total",
         render: (amount: number, record: any) => (
-          <div className="text-white">{`${record.currency === "usd" ? "$" : record.currency} ${amount / 100}`}</div>
+          <div className="text-white">{`${record.currency === "usd" ? "$" : record.currency} ${
+            amount < 0 ? 0 : amount / 100
+          }`}</div>
         ),
       },
       {
@@ -86,7 +88,10 @@ export const BillingInvoiceTable: React.FC = () => {
   useEffect(() => {
     setIsLoading(true);
     getBillingTeamInvoices(billingId)
-      .then(setInvoices)
+      .then((data) => {
+        const sortedInvoices = data?.sort((a: any, b: any) => b?.created - a?.created);
+        setInvoices(sortedInvoices);
+      })
       .catch((e) => {
         Logger.log(e);
       })
