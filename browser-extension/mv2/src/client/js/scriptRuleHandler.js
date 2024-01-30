@@ -151,9 +151,9 @@ RQ.ScriptRuleHandler.includeJS = function (script, callback) {
     } else {
       scriptBlocks.forEach((scriptBlock) => {
         // \n is seen as a un recognised character in the script tag text
-        scriptBlock.innerText = scriptBlock.innerText.replace(/\\n/g, "\n");
+        scriptBlock.innerText = scriptBlock.innerText.replace(/\n/g, "\\n");
       });
-      RQ.ScriptRuleHandler.embedScriptBlocks(scriptBlocks);
+      RQ.ScriptRuleHandler.embedBlocks("script", scriptBlocks);
     }
   }
   typeof callback === "function" && callback();
@@ -187,7 +187,7 @@ RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks = function (rawCode, htmlElem
   if (!htmlElementName || htmlElementName === "body") throw new Error("htmlElementName is empty");
   const parser = new DOMParser();
   // if it is a normal code block, string will be added to body, hence not parsing body
-  const doc = parser.parseFromString(rawCode, "text/html"); // this will take a lot of time....
+  const doc = parser.parseFromString(rawCode, "text/html");
   const blocks = Array.from(doc.getElementsByTagName(htmlElementName));
   const blockDetails = blocks.map((htmlBlock, index) => {
     return {
@@ -211,6 +211,10 @@ RQ.ScriptRuleHandler.embedBlocks = function (htmlElementName, blockDetails) {
     htmlBlock.appendChild(document.createTextNode(block.innerText));
 
     Object.keys(block.attributes).forEach((attr) => {
+      if (attr === "class") {
+        // to also add the RQ specific class name
+        htmlBlock.className += RQ.ClientUtils.getScriptClassAttribute() + block.attributes[attr];
+      }
       htmlBlock.setAttribute(attr, block.attributes[attr]);
     });
 
