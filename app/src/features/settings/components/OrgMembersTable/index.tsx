@@ -1,18 +1,15 @@
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { Col, Empty, Input, Row, Table, TableProps } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import "./index.scss";
 import { trackBillingTeamNoMemberFound } from "features/settings/analytics";
+import { OrgTableActions } from "./components/OrgTableActions";
+import "./index.scss";
 
-interface OrgMembersTableProps {
-  actionButtons: (record: any) => ReactNode;
-}
-
-export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons }) => {
+export const OrgMembersTable = () => {
   const user = useSelector(getUserAuthDetails);
   const [organizationMembers, setOrganizationMembers] = useState<{ total: number; users: unknown[] }>(null);
   const [search, setSearch] = useState("");
@@ -28,6 +25,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
   useEffect(() => {
     if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {
       trackBillingTeamNoMemberFound("personal_email");
+      setOrganizationMembers({ total: 0, users: [] });
     }
     if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
       getOrganizationUsers({
@@ -75,12 +73,12 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
         title: "",
         key: "action",
         render: (_: any, record: any) => {
-          return actionButtons(record);
+          return <OrgTableActions record={record} />;
         },
       },
     ],
 
-    [actionButtons]
+    []
   );
 
   return (
@@ -111,7 +109,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ actionButtons 
                     Couldn't find member?{" "}
                     <a className="external-link" href="mailto:contact@requestly.io">
                       Contact us
-                    </a>
+                    </a>{" "}
                     and we'll assist you in adding your team members.
                   </>
                 ) : (

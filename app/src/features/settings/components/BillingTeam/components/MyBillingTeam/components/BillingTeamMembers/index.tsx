@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Avatar, Col, Drawer, Dropdown, Popconfirm, Row, Table } from "antd";
+import { Avatar, Col, Dropdown, Popconfirm, Row, Table } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
-import { MemberTableActions } from "./components/MemberTableActions";
 import { getBillingTeamMembers } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
@@ -16,7 +14,6 @@ import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircl
 import { HiOutlineDotsHorizontal } from "@react-icons/all-files/hi/HiOutlineDotsHorizontal";
 import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
-import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import "./index.scss";
@@ -26,9 +23,12 @@ import {
   trackBillingTeamRoleChanged,
 } from "features/settings/analytics";
 
-export const BillingTeamMembers: React.FC = () => {
-  const { billingId } = useParams();
+interface Props {
+  openDrawer: () => void;
+}
 
+export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
+  const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
@@ -36,12 +36,11 @@ export const BillingTeamMembers: React.FC = () => {
     billingTeamMembers?.[user?.details?.profile?.uid] &&
     billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
 
-  const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
   const [loadingRows, setLoadingRows] = useState<string[]>([]);
 
   const columns = [
     {
-      title: "Member",
+      title: `Member (${membersTableSource?.length})`,
       key: "id",
       width: 460,
       render: (_: any, record: Record<string, any>) => (
@@ -198,7 +197,7 @@ export const BillingTeamMembers: React.FC = () => {
               type="default"
               icon={<IoMdAdd />}
               className="billing-team-members-section-header-btn"
-              onClick={() => setIsMembersDrawerOpen(true)}
+              onClick={openDrawer}
               disabled={!isUserAdmin}
             >
               Add members
@@ -214,34 +213,6 @@ export const BillingTeamMembers: React.FC = () => {
           loading={!billingTeamMembers}
         />
       </Col>
-      <Drawer
-        placement="right"
-        onClose={() => setIsMembersDrawerOpen(false)}
-        open={isMembersDrawerOpen}
-        width={640}
-        closeIcon={null}
-        mask={false}
-        className="billing-team-members-drawer"
-      >
-        <Row className="billing-team-members-drawer-header w-full" justify="space-between" align="middle">
-          <Col className="billing-team-members-drawer-header_title">Add members in billing team</Col>
-          <Col>
-            <IoMdClose onClick={() => setIsMembersDrawerOpen(false)} />
-          </Col>
-        </Row>
-        <Col className="billing-team-members-drawer-body">
-          <OrgMembersTable actionButtons={(record: any) => <MemberTableActions record={record} />} />
-        </Col>
-        <Row className="mt-8 billing-team-members-drawer-help" justify="space-between" align="middle">
-          <Col>
-            Couldn't find member?{" "}
-            <a className="external-link" href="mailto:contact@requestly.io">
-              Contact us
-            </a>
-            , and we'll assist you in adding your team members.
-          </Col>
-        </Row>
-      </Drawer>
     </>
   );
 };

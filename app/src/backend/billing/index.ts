@@ -12,7 +12,8 @@ import {
   where,
 } from "firebase/firestore";
 import Logger from "lib/logger";
-import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamDetails, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import PATHS from "config/constants/sub/paths";
 
 export const getBillingTeamInvoices = async (billingId: string) => {
   if (!billingId) {
@@ -47,6 +48,16 @@ export const getBillingTeamMembersProfile = async (billingId: string) => {
     .catch((err) => {
       Logger.log("Error while fetching billing team members profile", err);
     });
+};
+
+export const addUsersToBillingTeam = async (billingId: string, userEmails: string[]) => {
+  if (!billingId || !userEmails) {
+    return null;
+  }
+
+  const addUsers = httpsCallable<{ billingId: string; userEmails: string[] }>(getFunctions(), "billing-addUsers");
+
+  return addUsers({ billingId, userEmails });
 };
 
 export const removeMemberFromBillingTeam = async (billingId: string, userId: string) => {
@@ -109,5 +120,39 @@ export const toggleWorkspaceMappingInBillingTeam = async (
     billedWorkspaces: toBeMapped ? arrayUnion(workspaceId) : arrayRemove(workspaceId),
   }).catch((err) => {
     throw new Error(err.message);
+  });
+};
+
+export const getBillingTeamRedirectURL = async (ownerId: string): Promise<string | null> => {
+  const db = getFirestore(firebaseApp);
+  const billingTeamsQuery = query(collection(db, "billing"), where(`owner`, "==", ownerId));
+  const billingTeamsSnapshot = await getDocs(billingTeamsQuery);
+
+  const billingTeams = billingTeamsSnapshot.docs.map((doc) => {
+    return { data: doc?.data() as BillingTeamDetails, id: doc?.id };
+  });
+
+  if (billingTeams.length === 0) {
+    return null;
+  }
+
+  if (billingTeams.length === 1) {
+    return `${PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0].id}`;
+  } else {
+    const sortedTeams = billingTeams.sort(
+      (a: any, b: any) =>
+        b.data.subscriptionDetails.subscriptionCreated - a.data.subscriptionDetails.subscriptionCreated
+    );
+    return `${PATHS.SETTINGS.BILLING.RELATIVE}/${sortedTeams[0].id}`;
+  }
+};
+
+export const fetchBillingInformation = async (billingId: string) => {
+  const billingInfo = httpsCallable<{ billingId: string }>(getFunctions(), "billing-getBillingInfo");
+  return billingInfo({ billingId }).then((res) => {
+    if (!res.data) {
+      return null;
+    }
+    return res.data;
   });
 };

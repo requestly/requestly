@@ -19,11 +19,20 @@
     color: var(--black);
     font-size: 11px;
   }
+
+  & .ant-input-number-handler-wrap {
+    opacity: 1;
+  }
+}
+
+.plan-price-row .ant-space-item:first-child {
+  min-width: 50px;
 }
 
 .plan-card {
-  min-width: 285px;
-  padding: 24px;
+  min-width: 300px;
+  height: auto;
+  padding: 20px;
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--surface-2, #383838);
   background: var(--background, #212121);
@@ -36,8 +45,8 @@
   color: var(--white);
 }
 
-.plan-price {
-  font-size: 32px;
+.plan-price.ant-typography {
+  font-size: 1.4rem;
 }
 
 .plan-description {

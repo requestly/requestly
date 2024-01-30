@@ -22,7 +22,7 @@ import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sourc
 import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import CreateWorkspaceModal from "componentsV2/modals/CreateWorkspaceModal";
-import AddMemberModal from "components/user/AccountIndexPage/ManageAccount/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
+import AddMemberModal from "features/settings/components/Profile/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
 import SwitchWorkspaceModal from "componentsV2/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "componentsV2/modals/JoinWorkspaceModal";

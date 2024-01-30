@@ -9,14 +9,9 @@ export interface BillingTeamDetails {
   name: string;
   description: string;
   owner: string;
-  ownerEmail: string;
+  ownerDomain?: string;
   subscriptionDetails: Record<string, any>;
-  members: {
-    [userId: string]: {
-      role: BillingTeamRoles;
-      joiningDate: number;
-    };
-  };
+  members: Record<string, BillingTeamMember>;
   billingExclude?: string[];
   billedWorkspaces?: string[];
   seats: number;
@@ -29,4 +24,9 @@ export enum BillingTeamRoles {
   Manager = "manager",
   Admin = "admin",
   Member = "member",
+}
+
+export interface BillingTeamMember {
+  role: BillingTeamRoles;
+  joiningDate: number;
 }

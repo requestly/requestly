@@ -55,6 +55,7 @@ import {
 } from "features/rules/analytics";
 import { debounce } from "lodash";
 import "./rulesListIndex.scss";
+import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
 
 const debouncedTrackRulesListSearched = debounce(trackRulesListSearched, 500);
 const { UNGROUPED_GROUP_NAME } = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS;
@@ -355,6 +356,7 @@ const RulesList: React.FC<Props> = () => {
 
   return isLoading || isRuleListLoading ? (
     <>
+      <MonitorMountedTime transactionName="new-rules-list-loading" />
       <br /> <SpinnerColumn message="Getting your rules ready" skeletonType="list" />
     </>
   ) : allRecords?.length > 0 ? (
