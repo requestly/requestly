@@ -15,6 +15,7 @@ import { httpsCallable, getFunctions } from "firebase/functions";
 import { actions } from "store";
 import "./DashboardLayout.css";
 import Logger from "lib/logger";
+import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -57,7 +58,13 @@ const DashboardLayout = () => {
   return (
     <>
       <AppNotificationBanner />
-      <div className="app-layout app-dashboard-layout">
+      <PlanExpiredBanner />
+      <div
+        className="app-layout app-dashboard-layout"
+        style={{
+          height: "calc(100vh - 46px)",
+        }}
+      >
         <div className="app-header">
           {" "}
           <MenuHeader />
