@@ -228,6 +228,7 @@ export const validateRule = (rule, dispatch, appMode) => {
 
             // Check if code has raw html tags, but current app version does not support it
             if (!isAppCompatibleForRawHTMLTagsInScriptRule && result.parsedCodeBlocks.length > 0) {
+              // todo: show error in editor about this
               output = {
                 result: false,
                 message: `Please upgrade the extension to use raw ${htmlNodeName} tags inside code`,
@@ -237,7 +238,7 @@ export const validateRule = (rule, dispatch, appMode) => {
             // if code contains raw incorrect html tags
             else if (!result.validationResult.isValid) {
               const validationError = result.validationResult.validationError[0];
-              // todo: show these errors in code editor!
+              // todo: show error in editor about these
               // contains tags that are unsupported for current type of rule
               if (validationError === invalidHTMLError.UNSUPPORTED_TAGS) {
                 output = {
@@ -257,7 +258,7 @@ export const validateRule = (rule, dispatch, appMode) => {
             }
 
             const rawCode = result.parsedCodeBlocks.length ? result.innerCode : script.value;
-            postProcessCode(rawCode, script);
+            postProcessCode(rawCode, script, pair.id);
           }
           //Check if URL isn't empty. Can be absolute or relative
           else if (script.type === "url") {

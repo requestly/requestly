@@ -10,11 +10,20 @@ import parserBabel from "prettier/parser-babel";
 import { ResizableBox } from "react-resizable";
 
 import "./CodeEditor.css";
+import { getEditorOverlayWidget, removeEdtiroOverlayWidget } from "./EditorToast/actions";
 
 // https://github.com/suren-atoyan/monaco-react#use-monaco-editor-as-an-npm-package
 loader.config({
   monaco,
 });
+
+/**
+ * Editor id is used to match the exact editor instance for showing the editor toast
+ *
+ * in case of rules. id is `pair.id`
+ * while creating the rules. id is `temp-${rule.type}-rule` // HACKY
+ * in case of mocks. id is `${mock.id}`
+ */
 
 const CodeEditor = ({
   height = 275,
@@ -28,6 +37,7 @@ const CodeEditor = ({
   isCodeFormatted,
   validation = "editable",
   isResizable = true,
+  id = "",
 }) => {
   const appTheme = useSelector(getAppTheme);
   const editorRef = useRef(null);
@@ -53,6 +63,10 @@ const CodeEditor = ({
     if (!value?.length) {
       handleChange(defaultValue ? defaultValue : ""); //trigger handleChange for defaultValue in code editor
     }
+
+    console.log("editorRef.current", editor);
+    const editorToastOverlay = getEditorOverlayWidget(id, true);
+    editor.addOverlayWidget(editorToastOverlay);
   };
 
   const handleResize = (event, { element, size, handle }) => {
@@ -61,7 +75,11 @@ const CodeEditor = ({
 
   useEffect(() => {
     loader.init().then((module) => module && setIsEditorMount(true));
-  }, []);
+    return () => {
+      removeEdtiroOverlayWidget(id);
+      setIsEditorMount(false);
+    };
+  }, [id]);
 
   useEffect(() => {
     if (editorRef && isCodeFormatted) {
