@@ -85,11 +85,13 @@ export const BillingInformation: React.FC = () => {
             </div>
           </RQButton>
         </div>
-        <div className="text-capitalize caption text-white">{billingInformation.paymentMethod.type}</div>
-        {billingInformation.paymentMethod.last4 && (
+        <div className="text-capitalize caption text-white">
+          {billingInformation.paymentMethod ? billingInformation.paymentMethod.type : "No payment method has been set"}
+        </div>
+        {billingInformation.paymentMethod?.last4 && (
           <div className="text-white mt-8">{`Number ending with ${billingInformation.paymentMethod.last4}`}</div>
         )}
-        {billingInformation.paymentMethod.expiryDate && (
+        {billingInformation.paymentMethod?.expiryDate && (
           <div className="text-white mt-8">{`Expiring on ${billingInformation.paymentMethod.expiryDate}`}</div>
         )}
       </div>
