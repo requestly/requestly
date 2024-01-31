@@ -17,6 +17,7 @@ export function buildBasicUserProperties(user) {
       uid: user.uid,
       isBusinessAccount,
       company,
+      workspaceId: window.currentlyActiveWorkspaceTeamId ? window.currentlyActiveWorkspaceTeamId : null,
     };
   }
 }
