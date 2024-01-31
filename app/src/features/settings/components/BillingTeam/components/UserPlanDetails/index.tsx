@@ -131,22 +131,29 @@ export const UserPlanDetails = () => {
       ) : null}
 
       {hasAppSumoSubscription ? (
-        <SubscriptionInfo
-          hideShadow
-          isLifeTimeActive={true}
-          appSumoCodeCount={lifeTimeSubscriptionDetails?.codes?.length ?? 0}
-          hideManagePersonalSubscriptionButton={true}
-          subscriptionDetails={{
-            validFrom: lifeTimeSubscriptionDetails.startDate,
-            validTill: lifeTimeSubscriptionDetails.endDate,
-            status: "active",
-            type: lifeTimeSubscriptionDetails.type ?? type,
-            planName:
-              lifeTimeSubscriptionDetails?.codes.length > 2 ? PRICING.PLAN_NAMES.PROFESSIONAL : "Session Book Plus",
-            planId:
-              lifeTimeSubscriptionDetails?.codes.length > 2 ? PRICING.PLAN_NAMES.PROFESSIONAL : "session_book_plus",
+        <div
+          style={{
+            padding: "1rem 8px",
           }}
-        />
+        >
+          <div className="subheader mb-16">Appsumo Subscription</div>
+          <SubscriptionInfo
+            hideShadow
+            isLifeTimeActive={true}
+            appSumoCodeCount={lifeTimeSubscriptionDetails?.codes?.length ?? 0}
+            hideManagePersonalSubscriptionButton={true}
+            subscriptionDetails={{
+              validFrom: lifeTimeSubscriptionDetails.startDate,
+              validTill: lifeTimeSubscriptionDetails.endDate,
+              status: "active",
+              type: lifeTimeSubscriptionDetails.type ?? type,
+              planName:
+                lifeTimeSubscriptionDetails?.codes.length > 2 ? PRICING.PLAN_NAMES.PROFESSIONAL : "Session Book Plus",
+              planId:
+                lifeTimeSubscriptionDetails?.codes.length > 2 ? PRICING.PLAN_NAMES.PROFESSIONAL : "session_book_plus",
+            }}
+          />
+        </div>
       ) : (
         <>
           {user?.details?.planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL ||
