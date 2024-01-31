@@ -4,12 +4,12 @@ import { redirectToUrl } from "utils/RedirectionUtils";
 import "./index.scss";
 
 export const PricingModalFooterBanner = () => {
-  const monetizationExp = useFeatureValue("monetization_exp_1", null);
+  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
-  console.log("monetizationExp", monetizationExp);
+  console.log("monetizationExp", paywallIntensityExp);
   return (
     <div className="pricing-modal-footer-banner">
-      {monetizationExp === "variant1" ? (
+      {paywallIntensityExp === "variantA" ? (
         <div className="pricing-modal-footer-banner-content">
           <span className="pricing-modal-footer-banner-text">Request access for a 30 day free trial</span>
           <RQButton

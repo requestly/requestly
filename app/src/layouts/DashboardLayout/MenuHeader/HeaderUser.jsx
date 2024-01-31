@@ -15,6 +15,9 @@ import { AUTH } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import { RQButton } from "lib/design-system/components";
+import { PRICING } from "features/pricing";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -24,10 +27,14 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appMode = useSelector(getAppMode);
+  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
+
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
   const userPhoto =
     user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null;
   const userEmail = user?.details?.profile?.email;
+  const planDetails = user?.details?.planDetails;
+  console.log({ planDetails });
 
   // Component State
   const [loading, setLoading] = useState(false);
@@ -108,11 +115,39 @@ export default function HeaderUser() {
               <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
             </Dropdown>
           </Col>
+          {
+            <>
+              {paywallIntensityExp === "variantA" && (
+                <>
+                  {planDetails?.status === "trialing" ||
+                  (["active", "past_due"].includes(planDetails?.status) &&
+                    planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL) ? (
+                    <RQButton
+                      type="primary"
+                      className="header-upgrade-btn"
+                      onClick={() =>
+                        dispatch(
+                          actions.toggleActiveModal({
+                            modalName: "pricingModal",
+                            newValue: true,
+                            newProps: { selectedPlan: null, source: "header_upgrade_button" },
+                          })
+                        )
+                      }
+                    >
+                      Upgrade
+                    </RQButton>
+                  ) : null}
+                </>
+              )}
+            </>
+          }
         </>
       ) : (
         <>
           <Col>
             <Button
+              style={{ fontWeight: 500 }}
               type="primary"
               className="layout-header-signup-btn"
               onClick={(e) => {
@@ -132,7 +167,7 @@ export default function HeaderUser() {
                 return false;
               }}
             >
-              Sign up
+              {paywallIntensityExp === "variantA" ? "Get a 30-day free trial" : "Sign up"}
             </Button>
           </Col>
         </>

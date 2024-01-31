@@ -45,7 +45,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
-  const monetizationExp = useFeatureValue("monetization_exp_1", null);
+  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
   const tableRef = useRef(null);
 
@@ -174,7 +174,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
             <PricingTable duration={duration} isOpenedFromModal tableRef={tableRef} source={source} />
             <CompaniesSection />
-            {monetizationExp && monetizationExp !== "control" && <PricingModalFooterBanner />}
+            {paywallIntensityExp && paywallIntensityExp !== "control" && <PricingModalFooterBanner />}
           </>
         )}
       </div>

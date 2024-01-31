@@ -7,7 +7,7 @@ import underlineIcon from "../../../assets/img/icons/common/underline.svg";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 
 export const AuthFormHero = ({ currentTestimonialIndex }) => {
-  const monetizationExp = useFeatureValue("monetization_exp_1", null);
+  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
   const workEmailsBenefits = [
     "Use Requestly with your colleagues",
@@ -59,7 +59,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
     );
   };
 
-  if (monetizationExp === "variant1")
+  if (paywallIntensityExp === "variantA")
     return (
       <div className="new-auth-banner-wrapper">
         <OnboardingAuthBanner />
