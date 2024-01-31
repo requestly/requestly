@@ -12,7 +12,17 @@ import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 
 const { Text } = Typography;
 
-const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, script, scriptIndex, isInputDisabled }) => {
+const CustomScriptRow = ({
+  rowIndex,
+  pairIndex,
+  isLastIndex,
+  deleteScript,
+  script,
+  scriptIndex,
+  isInputDisabled,
+  pair,
+}) => {
+  console.log("pair", pair);
   const dispatch = useDispatch();
 
   const [isCodeTypePopupVisible, setIsCodeTypePopupVisible] = useState(false);
@@ -154,6 +164,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
         >
           <Col xl="12" span={24}>
             <CodeEditor
+              id={pair.id}
               language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
               defaultValue={
                 script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS

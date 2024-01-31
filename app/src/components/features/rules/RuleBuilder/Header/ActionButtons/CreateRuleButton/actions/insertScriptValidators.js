@@ -1,6 +1,7 @@
 import { parse } from "acorn";
 import { simple } from "acorn-walk";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { editorToast } from "components/misc/CodeEditor/EditorToast/actions";
 
 export const invalidHTMLError = {
   // todo: move to constants
@@ -8,7 +9,8 @@ export const invalidHTMLError = {
   UNSUPPORTED_TAGS: "unsupported_tags",
 };
 
-export function postProcessCode(code, script) {
+export function postProcessCode(code, script, scriptId) {
+  // todo: rename
   // update the rule if it has load event listener but the script is loaded after page load
   if (
     script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS &&
@@ -16,9 +18,12 @@ export function postProcessCode(code, script) {
     script.loadTime === GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
   ) {
     // todo:
-    // 1.change to before page load
+    // 1. change to before page load
     // 2. show tooltip in editor
     // 3. make sure editor state is updated
+
+    editorToast.success(scriptId, `Script is loaded after page load`);
+
     console.log("TODO: has node listener");
   }
 
