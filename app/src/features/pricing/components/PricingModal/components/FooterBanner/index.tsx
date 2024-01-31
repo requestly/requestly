@@ -10,7 +10,16 @@ export const PricingModalFooterBanner = () => {
   return (
     <div className="pricing-modal-footer-banner">
       {monetizationExp === "variant1" ? (
-        <>VARIANT 1 content here</>
+        <div className="pricing-modal-footer-banner-content">
+          <span className="pricing-modal-footer-banner-text">Request access for a 30 day free trial</span>
+          <RQButton
+            type="default"
+            className="pricing-modal-footer-banner-btn"
+            // onClick={() => redirectToUrl("https://calendly.com/requestly/sagar", true)}
+          >
+            Request now
+          </RQButton>
+        </div>
       ) : (
         <div className="pricing-modal-footer-banner-content">
           <span className="pricing-modal-footer-banner-text">Need help finding the right plan for your team?</span>

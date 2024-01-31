@@ -37,7 +37,7 @@
     &:active {
       border: 1px solid var(--text-default) !important;
       color: var(--text-default) !important;
-      background-color: transparent !important;
+      background-color: var(--primary-light) !important;
     }
   }
 }
