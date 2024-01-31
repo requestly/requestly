@@ -87,7 +87,7 @@ export const UserPlanDetails = () => {
         marginTop: !user?.details?.isPremium ? "80px" : "0px",
       }}
     >
-      {user?.details?.isPremium ? (
+      {user?.details?.isPremium && !(user?.details?.planDetails.status === "trialing" && hasAppSumoSubscription) ? (
         <>
           {" "}
           <Row gutter={8} align="middle" className="user-plan-card-header">
