@@ -42,6 +42,8 @@ export const UserPlanDetails = () => {
     return endDate.getTime();
   }, []);
 
+  console.log({ user });
+
   useEffect(() => {
     if (teamId) {
       const db = getFirestore(firebaseApp);
@@ -50,6 +52,7 @@ export const UserPlanDetails = () => {
         .then((docSnap) => {
           if (docSnap.exists()) {
             const data = docSnap.data();
+            console.log({ data });
             if (data?.appsumo) {
               setHasAppSumoSubscription(true);
               setLifeTimeSubscriptionDetails({
@@ -57,6 +60,7 @@ export const UserPlanDetails = () => {
                 startDate: data.appsumo.date,
                 endDate: getSubscriptionEndDateForAppsumo(new Date(data.appsumo.date)),
                 type: "appsumo",
+                plan: data.plan,
               });
             }
           }
@@ -148,9 +152,13 @@ export const UserPlanDetails = () => {
               status: "active",
               type: lifeTimeSubscriptionDetails.type ?? type,
               planName:
-                lifeTimeSubscriptionDetails?.codes.length > 2 ? PRICING.PLAN_NAMES.PROFESSIONAL : "Session Book Plus",
+                lifeTimeSubscriptionDetails?.codes.length > 2
+                  ? getPlanNameFromId(lifeTimeSubscriptionDetails.plan)
+                  : "Session Book Plus",
               planId:
-                lifeTimeSubscriptionDetails?.codes.length > 2 ? PRICING.PLAN_NAMES.PROFESSIONAL : "session_book_plus",
+                lifeTimeSubscriptionDetails?.codes.length > 2
+                  ? getPlanNameFromId(lifeTimeSubscriptionDetails.plan)
+                  : "session_book_plus",
             }}
           />
         </div>
