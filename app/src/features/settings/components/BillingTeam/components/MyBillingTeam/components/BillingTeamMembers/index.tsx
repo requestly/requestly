@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Avatar, Col, Dropdown, Popconfirm, Row, Table } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { getBillingTeamMembers } from "store/features/billing/selectors";
+import { getBillingTeamMembers, getBillingTeamById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import { removeMemberFromBillingTeam, updateBillingTeamMemberRole } from "backend/billing";
@@ -15,6 +15,7 @@ import { HiOutlineDotsHorizontal } from "@react-icons/all-files/hi/HiOutlineDots
 import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
 import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
+import { MdOutlineMoneyOffCsred } from "@react-icons/all-files/md/MdOutlineMoneyOffCsred";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import "./index.scss";
 import {
@@ -31,6 +32,8 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
+  const billingTeamDetails = useSelector(getBillingTeamById(billingId));
+
   const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
   const isUserAdmin =
     billingTeamMembers?.[user?.details?.profile?.uid] &&
@@ -66,6 +69,14 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                   </Row>
                 ) : null}
               </Col>
+              {billingTeamDetails?.billingExclude?.includes(record.id) && (
+                <Col>
+                  <Row className="icon__wrapper" align="middle">
+                    <MdOutlineMoneyOffCsred style={{ marginRight: "2px" }} />
+                    <span className="caption">Free</span>
+                  </Row>
+                </Col>
+              )}
             </Row>
             <div>
               <span className="billing-team-member-email">{record.email}</span>
