@@ -34,7 +34,6 @@ export default function HeaderUser() {
     user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null;
   const userEmail = user?.details?.profile?.email;
   const planDetails = user?.details?.planDetails;
-  console.log({ planDetails });
 
   // Component State
   const [loading, setLoading] = useState(false);
@@ -119,7 +118,8 @@ export default function HeaderUser() {
             <>
               {paywallIntensityExp === "variantA" && (
                 <>
-                  {planDetails?.status === "trialing" ||
+                  {!planDetails?.planId ||
+                  planDetails?.status === "trialing" ||
                   (["active", "past_due"].includes(planDetails?.status) &&
                     planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL) ? (
                     <RQButton

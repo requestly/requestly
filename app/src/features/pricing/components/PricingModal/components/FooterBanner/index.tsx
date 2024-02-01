@@ -1,12 +1,8 @@
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { RQButton } from "lib/design-system/components";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import "./index.scss";
 
 export const PricingModalFooterBanner = () => {
-  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
-
-  console.log("monetizationExp", paywallIntensityExp);
   return (
     <div className="pricing-modal-footer-banner">
       <div className="pricing-modal-footer-banner-content">
