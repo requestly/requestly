@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage, isSettingsPage } from "utils/PathUtils.js";
 import Footer from "../../components/sections/Footer";
@@ -16,6 +16,7 @@ import { actions } from "store";
 import "./DashboardLayout.css";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -23,6 +24,8 @@ const DashboardLayout = () => {
   const { pathname } = location;
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
+  const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
+  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
   promptOneTapOnLoad();
 
@@ -62,7 +65,12 @@ const DashboardLayout = () => {
       <div
         className="app-layout app-dashboard-layout"
         style={{
-          height: "calc(100vh - 46px)",
+          height:
+            paywallIntensityExp !== "control" &&
+            user?.details?.planDetails?.status === "canceled" &&
+            !isPlanExpiredBannerClosed
+              ? "calc(100vh - 46px)"
+              : "100vh",
         }}
       >
         <div className="app-header">

@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
@@ -13,6 +13,7 @@ import { useMediaQuery } from "react-responsive";
 import { ReactComponent as Settings } from "assets/icons/settings.svg";
 import LINKS from "config/constants/sub/links";
 import { RQButton } from "lib/design-system/components";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import WorkspaceSelector from "./WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
@@ -21,6 +22,7 @@ import ProductsDropDown from "./ProductsDropDown";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 import APP_CONSTANTS from "config/constants";
 import "./MenuHeader.css";
+import { PlanExpiredBadge } from "./PlanExpiredBadge";
 
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;
@@ -32,9 +34,12 @@ const MenuHeader = () => {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
   const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
 
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
+  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
+  const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
 
   //don't show general app header component for editor screens
   const showMenuHeader = () => !PATHS_WITHOUT_HEADER.some((path) => pathname.includes(path));
@@ -85,6 +90,11 @@ const MenuHeader = () => {
                 </div>
                 <div>⌘+K</div>
               </RQButton>
+              {paywallIntensityExp !== "control" &&
+              user?.details?.planDetails.status === "canceled" &&
+              isPlanExpiredBannerClosed ? (
+                <PlanExpiredBadge />
+              ) : null}
               <Col className="hidden-on-small-screen">
                 <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
                   <GitHubButton
@@ -101,9 +111,13 @@ const MenuHeader = () => {
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
 
-              <Col>
-                <PremiumPlanBadge />
-              </Col>
+              {(paywallIntensityExp === "control" ||
+                (paywallIntensityExp !== "control" && user?.details?.planDetails.status !== "canceled")) && (
+                <Col>
+                  <PremiumPlanBadge />
+                </Col>
+              )}
+
               {/* settings */}
               <Col>
                 <Tooltip title={<span className="text-gray text-sm">Settings</span>}>
