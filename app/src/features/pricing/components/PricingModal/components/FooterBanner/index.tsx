@@ -1,5 +1,6 @@
 import { RQButton } from "lib/design-system/components";
 import { redirectToUrl } from "utils/RedirectionUtils";
+import { trackContactUsClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import "./index.scss";
 
 export const PricingModalFooterBanner = () => {
@@ -10,7 +11,10 @@ export const PricingModalFooterBanner = () => {
         <RQButton
           type="default"
           className="pricing-modal-footer-banner-btn"
-          onClick={() => redirectToUrl("https://calendly.com/requestly/sagar", true)}
+          onClick={() => {
+            trackContactUsClicked("pricing_modal");
+            redirectToUrl("https://calendly.com/requestly/sagar", true);
+          }}
         >
           Contact Us
         </RQButton>

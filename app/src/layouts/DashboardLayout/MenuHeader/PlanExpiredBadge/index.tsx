@@ -5,6 +5,7 @@ import { actions } from "store";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { capitalize } from "lodash";
 import { Badge } from "antd";
+import { trackRenewNowClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import "./index.scss";
 
 export const PlanExpiredBadge = () => {
@@ -21,17 +22,18 @@ export const PlanExpiredBadge = () => {
       </div>
       <RQButton
         type="primary"
-        onClick={() =>
+        onClick={() => {
+          trackRenewNowClicked("header");
           dispatch(
             actions.toggleActiveModal({
               modalName: "pricingModal",
               newValue: true,
               newProps: { selectedPlan: null, source: "header_renew_button" },
             })
-          )
-        }
+          );
+        }}
       >
-        Renew
+        Renew now
       </RQButton>
     </div>
   );

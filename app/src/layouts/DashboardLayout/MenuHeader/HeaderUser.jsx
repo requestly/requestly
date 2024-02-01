@@ -18,6 +18,7 @@ import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/h
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { RQButton } from "lib/design-system/components";
 import { PRICING } from "features/pricing";
+import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -125,15 +126,16 @@ export default function HeaderUser() {
                     <RQButton
                       type="primary"
                       className="header-upgrade-btn"
-                      onClick={() =>
+                      onClick={() => {
+                        trackUpgradeClicked("header");
                         dispatch(
                           actions.toggleActiveModal({
                             modalName: "pricingModal",
                             newValue: true,
                             newProps: { selectedPlan: null, source: "header_upgrade_button" },
                           })
-                        )
-                      }
+                        );
+                      }}
                     >
                       Upgrade
                     </RQButton>
