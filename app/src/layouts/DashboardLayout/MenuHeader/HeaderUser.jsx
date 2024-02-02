@@ -6,6 +6,7 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import {
   redirectToAccountDetails,
+  redirectToGlobalSettings,
   redirectToProfileSettings,
   redirectToWorkspaceSettings,
 } from "utils/RedirectionUtils";
@@ -65,6 +66,10 @@ export default function HeaderUser() {
     {
       label: "Manage Workspaces",
       onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
+    },
+    {
+      label: "Settings",
+      onClick: () => redirectToGlobalSettings(navigate, window.location.pathname, "header"),
     },
     { type: "divider" },
     {
