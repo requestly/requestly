@@ -192,6 +192,8 @@ const INITIAL_STATE = {
     isOnboardingCompleted: false,
   },
 
+  editorToast: {},
+
   misc: {
     persist: {
       appNotificationBannerDismissTs: 0,

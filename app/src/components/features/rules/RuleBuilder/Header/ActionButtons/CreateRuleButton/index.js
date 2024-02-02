@@ -127,6 +127,7 @@ const CreateRuleButton = ({
     const fixedRuleData = runMinorFixesOnRule(dispatch, currentlySelectedRuleData);
     //Validation
     const ruleValidation = validateRule(fixedRuleData, dispatch, appMode);
+    console.log("ruleValidation", ruleValidation);
     if (ruleValidation.result) {
       saveRule(
         appMode,
@@ -203,7 +204,21 @@ const CreateRuleButton = ({
           toast.error("Error in saving rule. Please contact support.");
         });
     } else {
-      toast.warn(ruleValidation.message);
+      if (ruleValidation.editorToast) {
+        dispatch(
+          actions.triggerToastForEditor({
+            id: ruleValidation.editorToast.id,
+            message: ruleValidation.editorToast.message ?? ruleValidation.message,
+            type: ruleValidation.editorToast.type,
+          })
+        );
+      }
+      if (!ruleValidation?.editorToast?.onlyInEditor) toast.warn(ruleValidation.message);
+
+      if (ruleValidation.ruleUpdated) {
+        const newRule = ruleValidation.newRule;
+        dispatch(actions.updateCurrentlySelectedRuleData(newRule));
+      }
       trackErrorInRuleCreation(snakeCase(ruleValidation.error), currentlySelectedRuleData.ruleType);
     }
   };

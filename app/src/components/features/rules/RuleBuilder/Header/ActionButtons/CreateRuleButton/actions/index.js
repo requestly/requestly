@@ -203,7 +203,7 @@ export const validateRule = (rule, dispatch, appMode) => {
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT) {
     const isAppCompatibleForRawHTMLTagsInScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
 
-    rule.pairs.forEach((pair) => {
+    rule.pairs.forEach((pair, pairIndex) => {
       //There should be atleast one source of script. Be it given library or a custom script
       if (isEmpty(pair.libraries) && isEmpty(pair.scripts)) {
         output = {
@@ -212,7 +212,7 @@ export const validateRule = (rule, dispatch, appMode) => {
           error: "missing script source",
         };
       } else {
-        pair.scripts.forEach((script) => {
+        pair.scripts.forEach((script, scriptIndex) => {
           if (script.type === "code") {
             //Check if code isn't empty
             if (isEmpty(script.value)) {
@@ -226,25 +226,35 @@ export const validateRule = (rule, dispatch, appMode) => {
             const htmlNodeName = script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "script" : "style"; // todo: clean
             const result = parseHTMLTagInCodeString(script.value, htmlNodeName);
 
+            console.log("result", result);
+
             // Check if code has raw html tags, but current app version does not support it
             if (!isAppCompatibleForRawHTMLTagsInScriptRule && result.parsedCodeBlocks.length > 0) {
-              // todo: show error in editor about this
               output = {
                 result: false,
                 message: `Please upgrade the extension to use raw ${htmlNodeName} tags inside code`,
                 error: "invalid script code",
+                editorToast: {
+                  id: pair.id,
+                  type: "error",
+                  onlyInEditor: true,
+                },
               };
             }
             // if code contains raw incorrect html tags
             else if (!result.validationResult.isValid) {
               const validationError = result.validationResult.validationError[0];
-              // todo: show error in editor about these
               // contains tags that are unsupported for current type of rule
               if (validationError === invalidHTMLError.UNSUPPORTED_TAGS) {
                 output = {
                   result: false,
                   message: `Only ${htmlNodeName} tags are supported`,
                   error: "invalid script code",
+                  editorToast: {
+                    id: pair.id,
+                    type: "error",
+                    onlyInEditor: true,
+                  },
                 };
               }
               // incorrectly structured html tags (mostly happens because of missing closing tag)
@@ -253,12 +263,89 @@ export const validateRule = (rule, dispatch, appMode) => {
                   result: false,
                   message: `Please ensure all ${htmlNodeName} tags are closed properly`,
                   error: "invalid script code",
+                  editorToast: {
+                    id: pair.id,
+                    type: "error",
+                    onlyInEditor: true,
+                  },
                 };
               }
             }
 
             const rawCode = result.parsedCodeBlocks.length ? result.innerCode : script.value;
-            postProcessCode(rawCode, script, pair.id);
+
+            if (isEmpty(rawCode)) {
+              output = {
+                result: false,
+                message: `Please enter a valid script code`,
+                error: "invalid script code",
+              };
+            } else {
+              const postProcessResult = postProcessCode(rawCode, script, pair.id);
+              if (postProcessResult?.hasLoadEventListener) {
+                console.log("script id adding toast", pair.id);
+                output = output || {};
+                const newRule = { ...(output.newRule ?? rule) };
+                try {
+                  // newRule.pairs[pairIndex].scripts[scriptIndex].loadTime = GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD;
+                  // output = {
+                  //   result: false,
+                  //   message: `Script is loaded after page load`,
+                  //   error: "invalid script code",
+                  //   editorToast: {
+                  //     id: pair.id,
+                  //     type: "warning",
+                  //     onlyInEditor: true
+                  //   },
+                  //   ruleUpdated: true,
+                  //   newRule,
+                  // };
+
+                  const updatedScript = {
+                    ...newRule.pairs[pairIndex].scripts[scriptIndex],
+                    loadTime: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD,
+                  };
+
+                  const updatedScripts = [
+                    ...newRule.pairs[pairIndex].scripts.slice(0, scriptIndex),
+                    updatedScript,
+                    ...newRule.pairs[pairIndex].scripts.slice(scriptIndex + 1),
+                  ];
+
+                  const updatedPair = {
+                    ...newRule.pairs[pairIndex],
+                    scripts: updatedScripts,
+                  };
+
+                  const updatedPairs = [
+                    ...newRule.pairs.slice(0, pairIndex),
+                    updatedPair,
+                    ...newRule.pairs.slice(pairIndex + 1),
+                  ];
+
+                  const updatedRule = {
+                    ...newRule,
+                    pairs: updatedPairs,
+                  };
+
+                  output = {
+                    result: false,
+                    message: `Updated script load time to before page load`,
+                    error: "invalid script code",
+                    editorToast: {
+                      message: `Contains a DomContentLoaded listener being injected after page load`,
+                      id: pair.id,
+                      type: "info",
+                      onlyInEditor: false,
+                    },
+                    ruleUpdated: true,
+                    newRule: updatedRule,
+                  };
+                } catch (error) {
+                  console.log("Could not update rule", error);
+                }
+              }
+            }
           }
           //Check if URL isn't empty. Can be absolute or relative
           else if (script.type === "url") {
