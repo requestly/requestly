@@ -1,5 +1,7 @@
 import { editor } from "monaco-editor";
 
+// todo: remove
+
 export enum toastType {
   SUCCESS = "success",
   ERROR = "error",
