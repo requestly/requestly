@@ -114,36 +114,36 @@ export default function HeaderUser() {
             >
               <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
             </Dropdown>
+            {
+              <>
+                {paywallIntensityExp === "variantA" && (
+                  <>
+                    {!planDetails?.planId ||
+                    planDetails?.status === "trialing" ||
+                    (["active", "past_due"].includes(planDetails?.status) &&
+                      planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL) ? (
+                      <RQButton
+                        type="primary"
+                        className="header-upgrade-btn"
+                        onClick={() => {
+                          trackUpgradeClicked("header");
+                          dispatch(
+                            actions.toggleActiveModal({
+                              modalName: "pricingModal",
+                              newValue: true,
+                              newProps: { selectedPlan: null, source: "header_upgrade_button" },
+                            })
+                          );
+                        }}
+                      >
+                        Upgrade
+                      </RQButton>
+                    ) : null}
+                  </>
+                )}
+              </>
+            }
           </Col>
-          {
-            <>
-              {paywallIntensityExp === "variantA" && (
-                <>
-                  {!planDetails?.planId ||
-                  planDetails?.status === "trialing" ||
-                  (["active", "past_due"].includes(planDetails?.status) &&
-                    planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL) ? (
-                    <RQButton
-                      type="primary"
-                      className="header-upgrade-btn"
-                      onClick={() => {
-                        trackUpgradeClicked("header");
-                        dispatch(
-                          actions.toggleActiveModal({
-                            modalName: "pricingModal",
-                            newValue: true,
-                            newProps: { selectedPlan: null, source: "header_upgrade_button" },
-                          })
-                        );
-                      }}
-                    >
-                      Upgrade
-                    </RQButton>
-                  ) : null}
-                </>
-              )}
-            </>
-          }
         </>
       ) : (
         <>
