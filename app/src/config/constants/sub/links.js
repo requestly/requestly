@@ -48,7 +48,7 @@ const LINKS = {
     "https://docs.requestly.io/desktop-app/mac/features/import-settings-from-charles",
 
   // Docs - Test URL condition
-  REQUESTLY_DOCS_TEST_URL_CONDITION: "https://developers.requestly.io/test-url-condition",
+  REQUESTLY_DOCS_TEST_URL_CONDITION: "https://developers.requestly.io/http-rules/test-url-condition",
 
   REQUESTLY_DOCS_SESSION_RECORDING_ARCHITECTURE: "https://developers.requestly.io/sessions/architecture/",
 
