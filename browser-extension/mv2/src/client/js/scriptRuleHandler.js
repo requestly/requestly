@@ -130,96 +130,89 @@ RQ.ScriptRuleHandler.includeJSScriptsInOrder = function (scripts, callback, inde
 RQ.ScriptRuleHandler.includeJS = function (script, callback) {
   if (!script.value) throw new Error("Script value is empty");
   if (script.type === RQ.SCRIPT_TYPES.URL) {
-    if (script.wrapperElement) {
-      const scriptBlock = RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks(script.wrapperElement, "script")?.[0];
-      if (scriptBlock) {
-        scriptBlock.attributes["src"] = script.value;
-        scriptBlock.innerText = "";
-        RQ.ScriptRuleHandler.embedBlocks("script", [scriptBlock]);
-        return;
-      }
-    }
+    if (script.attributes) {
+      RQ.ScriptRuleHandler.addRemoteJSWithAttributes(script.value, script.attributes, callback);
+    } else RQ.ClientUtils.addRemoteJS(script.value, callback);
 
-    RQ.ClientUtils.addRemoteJS(script.value, callback);
     return;
   }
 
   if (script.type === RQ.SCRIPT_TYPES.CODE) {
-    const scriptBlocks = RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks(script.value, "script");
-    if (!scriptBlocks || !scriptBlocks.length) {
-      RQ.ClientUtils.executeJS(script.value);
-    } else {
-      scriptBlocks.forEach((scriptBlock) => {
-        // \n is seen as a un recognised character in the script tag text
-        scriptBlock.innerText = scriptBlock.innerText.replace(/\n/g, "\\n");
-      });
-      RQ.ScriptRuleHandler.embedBlocks("script", scriptBlocks);
-    }
+    if (script.attributes) {
+      RQ.ScriptRuleHandler.embedJSWithAttributes(script.value, script.attributes);
+    } else RQ.ClientUtils.executeJS(script.value);
   }
   typeof callback === "function" && callback();
 };
 
 RQ.ScriptRuleHandler.includeCSS = function (script, callback) {
   if (script.type === RQ.SCRIPT_TYPES.URL) {
-    if (script.wrapperElement) {
-      const styleLinkBlock = RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks(script.wrapperElement, "link")?.[0];
-      if (styleLinkBlock) {
-        styleLinkBlock.attributes["href"] = script.value;
-        styleLinkBlock.innerText = "";
-        RQ.ScriptRuleHandler.embedBlocks("link", [styleLinkBlock]);
-        return;
-      }
-    }
-    RQ.ClientUtils.addRemoteCSS(script.value);
-  } else if (script.type === RQ.SCRIPT_TYPES.CODE) {
-    const styleBlocks = RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks(script.value, "style");
-    if (!styleBlocks || !styleBlocks.length) {
-      RQ.ClientUtils.embedCSS(script.value);
-    } else {
-      RQ.ScriptRuleHandler.embedBlocks("style", styleBlocks);
-    }
+    if (script.attributes) {
+      RQ.ScriptRuleHandler.addRemoteCSSWithAttributes(script.value, script.attributes, callback);
+    } else RQ.ClientUtils.addRemoteCSS(script.value);
+
+    return;
   }
 
+  if (script.type === RQ.SCRIPT_TYPES.CODE) {
+    if (script.attributes) {
+      RQ.ScriptRuleHandler.embedCSSWithAttributes(script.value, script.attributes);
+    } else {
+      RQ.ClientUtils.embedCSS(script.value);
+    }
+  }
   typeof callback === "function" && callback();
 };
 
-RQ.ScriptRuleHandler.parseSpecificHTMLStringBlocks = function (rawCode, htmlElementName) {
-  if (!htmlElementName || htmlElementName === "body") throw new Error("htmlElementName is empty");
-  const parser = new DOMParser();
-  // if it is a normal code block, string will be added to body, hence not parsing body
-  const doc = parser.parseFromString(rawCode, "text/html");
-  const blocks = Array.from(doc.getElementsByTagName(htmlElementName));
-  const blockDetails = blocks.map((htmlBlock, index) => {
-    return {
-      index: index,
-      innerText: htmlBlock.innerHTML.trim(),
-      attributes: Array.from(htmlBlock.attributes).reduce((attrs, attr) => {
-        attrs[attr.name] = attr.value ?? "";
-        return attrs;
-      }, {}),
-    };
+RQ.ScriptRuleHandler.addRemoteJSWithAttributes = function (url, attributes, callback) {
+  const script = document.createElement("script");
+  attributes.forEach(({ attrName, attrVal }) => {
+    script.setAttribute(attrName, attrVal ?? "");
   });
-  return blockDetails;
+  script.src = url;
+
+  script.classList.add(RQ.ClientUtils.getScriptClassAttribute());
+  script.onload = callback;
+
+  RQ.ScriptRuleHandler.appendToDom(script);
 };
 
-RQ.ScriptRuleHandler.embedBlocks = function (htmlElementName, blockDetails) {
-  if (!htmlElementName || htmlElementName === "body") throw new Error("htmlElementName is empty");
-  blockDetails.forEach((block) => {
-    const htmlBlock = document.createElement(htmlElementName);
-    htmlBlock.className = RQ.ClientUtils.getScriptClassAttribute();
-
-    htmlBlock.appendChild(document.createTextNode(block.innerText));
-
-    Object.keys(block.attributes).forEach((attr) => {
-      if (attr === "class") {
-        // to also add the RQ specific class name
-        htmlBlock.className += RQ.ClientUtils.getScriptClassAttribute() + block.attributes[attr];
-      }
-      htmlBlock.setAttribute(attr, block.attributes[attr]);
-    });
-
-    RQ.ScriptRuleHandler.appendToDom(htmlBlock);
+RQ.ScriptRuleHandler.embedJSWithAttributes = function (code, attributes) {
+  const script = document.createElement("script");
+  attributes.forEach(({ attrName, attrVal }) => {
+    script.setAttribute(attrName, attrVal ?? "");
   });
+  script.appendChild(document.createTextNode(code));
+
+  script.classList.add(RQ.ClientUtils.getScriptClassAttribute());
+
+  RQ.ScriptRuleHandler.appendToDom(script);
+};
+
+RQ.ScriptRuleHandler.addRemoteCSSWithAttributes = function (url, attributes, callback) {
+  const link = document.createElement("link");
+  attributes.forEach(({ attrName, attrVal }) => {
+    link.setAttribute(attrName, attrVal ?? "");
+  });
+  link.href = url;
+
+  link.classList.add(RQ.ClientUtils.getScriptClassAttribute());
+  link.onload = callback;
+
+  RQ.ScriptRuleHandler.appendToDom(link);
+};
+
+RQ.ScriptRuleHandler.embedCSSWithAttributes = function (code, attributes) {
+  const style = document.createElement("style");
+  style.className = RQ.ClientUtils.getScriptClassAttribute();
+  attributes.forEach(({ attrName, attrVal }) => {
+    style.setAttribute(attrName, attrVal ?? "");
+  });
+  style.appendChild(document.createTextNode(code));
+
+  style.classList.add(RQ.ClientUtils.getScriptClassAttribute());
+
+  RQ.ScriptRuleHandler.appendToDom(style);
 };
 
 RQ.ScriptRuleHandler.appendToDom = function (htmlNode) {
