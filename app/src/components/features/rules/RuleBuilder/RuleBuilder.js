@@ -55,6 +55,8 @@ const RuleBuilder = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
+  console.log("currentlySelectedRuleData", currentlySelectedRuleData);
+
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 
@@ -67,9 +69,6 @@ const RuleBuilder = (props) => {
   //References
   const isCleaningUpRef = useRef(false);
   //Component State
-  const ruleSelection = {};
-  ruleSelection[currentlySelectedRuleData.id] = true;
-
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
   const [startWalkthrough, setStartWalkthrough] = useState(false);

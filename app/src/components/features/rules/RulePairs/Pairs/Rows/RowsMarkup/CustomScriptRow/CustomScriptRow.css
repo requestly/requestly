@@ -17,3 +17,7 @@
   border-bottom-left-radius: var(--border-radius-sm);
   border-bottom-right-radius: var(--border-radius-sm);
 }
+
+.code-editor-small {
+  max-height: 72px;
+}

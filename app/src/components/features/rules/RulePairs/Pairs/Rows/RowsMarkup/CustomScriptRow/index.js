@@ -9,8 +9,86 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import CodeEditor from "components/misc/CodeEditor";
 import "./CustomScriptRow.css";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+import { extractDomNodeDetailsFromHTMLCodeString } from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton/actions/insertScriptValidators";
 
 const { Text } = Typography;
+
+function getDefaultScript(language, scriptType, isCompatibleWithHMLAttributes) {
+  if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL && isCompatibleWithHMLAttributes) {
+    if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+      // eslint-disable-next-line no-template-curly-in-string
+      return '<script src=`${{url}}` type="text/javscript"></script>';
+    }
+    if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+      // eslint-disable-next-line no-template-curly-in-string
+      return '<link rel="stylesheet" type="text/css" href="${{url}}">';
+    }
+  }
+  if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
+    if (isCompatibleWithHMLAttributes) {
+      if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+        return '<script type="text/javascript">\n\tconsole.log("Hello World");\n</script>';
+      }
+      if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+        return "<style>\n\tbody {\n\t\t background-color: #fff;\n\t}\n</style>";
+      }
+    } else {
+      if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+        return 'console.log("Hello World");';
+      }
+      if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+        return "body {\n\t background-color: #fff;\n }";
+      }
+    }
+  }
+
+  return "";
+}
+
+function parseScriptCodeValue(codeInput, scripObj) {
+  let htmlNode = "";
+  if (scripObj.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+    // else CSS
+    htmlNode = "script";
+  } else if (scripObj.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+    htmlNode = "link";
+  } else {
+    htmlNode = "style";
+  }
+
+  // todo: rename and restructure
+  const details = extractDomNodeDetailsFromHTMLCodeString(codeInput, htmlNode);
+
+  console.log("details", JSON.stringify(details, null, 2));
+
+  if (!details?.length) {
+    return {
+      code: codeInput,
+      attributes: [],
+    };
+  }
+  if (details.length === 1) {
+    return {
+      code: details[0].innerText,
+      attributes: details[0].attributes,
+    };
+  } else if (details.length > 1) {
+    return {
+      code: details[0].innerText,
+      attributes: details[0].attributes,
+      err: "Multiple HTML Nodes inside the same pair may lead to errors",
+    };
+  }
+
+  // fail safe
+  return {
+    code: undefined,
+    attributes: undefined,
+    err: "Unexpected Error while parsing code",
+  };
+}
 
 const CustomScriptRow = ({
   rowIndex,
@@ -22,7 +100,6 @@ const CustomScriptRow = ({
   isInputDisabled,
   pair,
 }) => {
-  console.log("pair", pair);
   const dispatch = useDispatch();
 
   const [isCodeTypePopupVisible, setIsCodeTypePopupVisible] = useState(false);
@@ -30,15 +107,51 @@ const CustomScriptRow = ({
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
-  const scriptEditorBoilerCode = useMemo(
-    () => ({
-      JS: 'console.log("Hello World");',
-      CSS: "body {\n\t background-color: #fff;\n }",
-    }),
-    []
-  );
+  const isAppCompatibleToAttributesForScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
+  const scriptEditorBoilerCode = useMemo(() => {
+    return getDefaultScript(script.codeType, script.type, isAppCompatibleToAttributesForScriptRule);
+  }, [script.codeType, script.type, isAppCompatibleToAttributesForScriptRule]);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
+
+  const getPresentableEditorValue = useMemo(() => {
+    console.log("script", JSON.stringify(script, null, 2));
+    if (!isAppCompatibleToAttributesForScriptRule) return script.value;
+    if (script.attributes?.length > 0) {
+      const attributes = script.attributes ?? [];
+      const attributesString = attributes
+        .map(({ name: attrName, value: attrVal }) => {
+          if (!attrVal) return `${attrName}`;
+          return `${attrName}="${attrVal}"`;
+        })
+        .join(" ");
+
+      console.log("attributes", JSON.stringify(attributes, null, 2));
+      console.log("attributesString", attributesString);
+
+      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+          // eslint-disable-next-line no-template-curly-in-string
+          return `<script ${attributesString ? ` ${attributesString}` : `src="${script.value}"`}></script>`;
+        }
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+          // eslint-disable-next-line no-template-curly-in-string
+          return `<link ${attributesString ? ` ${attributesString}` : `href="${script.value}"`}>`;
+        }
+      }
+      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+          return `<script${attributesString ? ` ${attributesString}` : ""}>${script.value}</script>`;
+        }
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+          return `<style${attributesString ? ` ${attributesString}` : ""}>${script.value}</style>`;
+        }
+      }
+    } else {
+      // APP IS COMPATIBLE WITH ATTRIBUTES BUT NO ATTRIBUTES ARE PRESENT IN CURRENT RULE
+      return script.value;
+    }
+  }, [script, isAppCompatibleToAttributesForScriptRule]);
 
   const handleMockPickerVisibilityChange = (visible) => {
     setIsMockPickerVisible(visible);
@@ -57,8 +170,77 @@ const CustomScriptRow = ({
   };
 
   const renderURLInput = () => {
+    const renderCodeEditorForURLInput = () => {
+      // todo: rename
+      const handleScriptChange = (value) => {
+        const { code, attributes } = parseScriptCodeValue(value, script);
+        if (code) {
+          dispatch(
+            actions.triggerToastForEditor({
+              id: pair.id,
+              message: "Code isn't expected when src is remote url",
+              type: "info",
+            })
+          );
+        }
+        console.log("attributes in url code editor", attributes);
+        dispatch(
+          actions.updateRulePairAtGivenPath({
+            pairIndex,
+            updates: {
+              [`scripts[${scriptIndex}].attributes`]: attributes,
+            },
+          })
+        );
+      };
+
+      const handleCodeFormattedFlag = () => {
+        setIsCodeFormatted(true);
+        setTimeout(() => {
+          setIsCodeFormatted(false);
+        }, 2000);
+      };
+      return (
+        <Col span={24} data-tour-id="code-editor">
+          <Row
+            key={rowIndex}
+            span={24}
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Col xl="12" span={24}>
+              <CodeEditor
+                id={pair.id}
+                height={75}
+                language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
+                defaultValue={scriptEditorBoilerCode}
+                value={getPresentableEditorValue}
+                handleChange={handleScriptChange}
+                readOnly={isInputDisabled}
+                isCodeFormatted={isCodeFormatted}
+              />
+            </Col>
+          </Row>
+          <Row span={24} align="middle" justify="space-between" className="code-editor-character-count-row ">
+            <Col align="left">
+              {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
+                <Button type="link" onClick={handleCodeFormattedFlag}>
+                  Pretty Print {"{ }"}
+                </Button>
+              ) : null}
+            </Col>
+            <Col span={6} align="right">
+              <span className="codemirror-character-count text-gray">{script.value?.length ?? 0} characters</span>
+            </Col>
+          </Row>
+        </Col>
+      );
+    };
+
     return (
-      <React.Fragment>
+      <Col span={24}>
         <Row className="margin-top-one" span={24} gutter={16} align="middle">
           <Col span={2}>
             <span>Source</span>
@@ -91,17 +273,24 @@ const CustomScriptRow = ({
               value={script.value}
             />
           </Col>
+          {/* MODALS */}
+          {/* TODO: Remove this once MockV2 Released */}
+          {isMockPickerVisible ? (
+            <Col span={2}>
+              <MockPickerModal
+                isVisible={isMockPickerVisible}
+                onVisibilityChange={handleMockPickerVisibilityChange}
+                mockSelectionCallback={handleMockPickerSelectionCallback}
+              />
+            </Col>
+          ) : null}
         </Row>
-        {/* MODALS */}
-        {/* TODO: Remove this once MockV2 Released */}
-        {isMockPickerVisible ? (
-          <MockPickerModal
-            isVisible={isMockPickerVisible}
-            onVisibilityChange={handleMockPickerVisibilityChange}
-            mockSelectionCallback={handleMockPickerSelectionCallback}
-          />
+        {isAppCompatibleToAttributesForScriptRule ? (
+          <Row className="margin-top-one" span={24} gutter={16} align="middle">
+            {renderCodeEditorForURLInput()}
+          </Row>
         ) : null}
-      </React.Fragment>
+      </Col>
     );
   };
 
@@ -134,15 +323,43 @@ const CustomScriptRow = ({
 
   const renderCodeEditor = () => {
     const scriptBodyChangeHandler = (value) => {
-      dispatch(
-        actions.updateRulePairAtGivenPath({
-          pairIndex,
-          triggerUnsavedChangesIndication: !isCodeFormatted,
-          updates: {
-            [`scripts[${scriptIndex}].value`]: value,
-          },
-        })
-      );
+      if (isAppCompatibleToAttributesForScriptRule) {
+        const { code, attributes, err } = parseScriptCodeValue(value, script);
+        console.log("code", code);
+        console.log("attributes", attributes);
+        if (err) {
+          console.error("Error parsing code", err);
+          dispatch(
+            actions.triggerToastForEditor({
+              id: pair.id,
+              message: err,
+              type: "error",
+            })
+          );
+          return;
+        }
+
+        dispatch(
+          actions.updateRulePairAtGivenPath({
+            pairIndex,
+            triggerUnsavedChangesIndication: !isCodeFormatted,
+            updates: {
+              [`scripts[${scriptIndex}].value`]: code,
+              [`scripts[${scriptIndex}].attributes`]: attributes,
+            },
+          })
+        );
+      } else {
+        dispatch(
+          actions.updateRulePairAtGivenPath({
+            pairIndex,
+            triggerUnsavedChangesIndication: !isCodeFormatted,
+            updates: {
+              [`scripts[${scriptIndex}].value`]: value,
+            },
+          })
+        );
+      }
     };
 
     const handleCodeFormattedFlag = () => {
@@ -166,12 +383,8 @@ const CustomScriptRow = ({
             <CodeEditor
               id={pair.id}
               language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
-              defaultValue={
-                script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS
-                  ? scriptEditorBoilerCode.CSS
-                  : scriptEditorBoilerCode.JS
-              }
-              value={script.value}
+              defaultValue={scriptEditorBoilerCode}
+              value={getPresentableEditorValue}
               handleChange={scriptBodyChangeHandler}
               readOnly={isInputDisabled}
               isCodeFormatted={isCodeFormatted}
@@ -187,7 +400,7 @@ const CustomScriptRow = ({
             ) : null}
           </Col>
           <Col span={6} align="right">
-            <span className="codemirror-character-count text-gray">{script.value.length} characters</span>
+            <span className="codemirror-character-count text-gray">{script.value?.length ?? 0} characters</span>
           </Col>
         </Row>
       </Col>

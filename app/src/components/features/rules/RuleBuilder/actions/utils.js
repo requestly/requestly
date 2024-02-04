@@ -69,6 +69,7 @@ export const updateResponseRule = (appMode, rule_id, source_url, response_body) 
 };
 
 export const getRuleLevelInitialConfigs = (ruleType) => {
+  // todo: attributes for script rule
   switch (ruleType) {
     case GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT:
       return {

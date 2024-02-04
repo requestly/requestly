@@ -9,9 +9,17 @@ export const invalidHTMLError = {
 
 export const scriptLogicalErrors = {
   DOM_LOAD_EVENT_LISTENER_AFTER_PAGE_LOAD: "dom_load_event_listener_after_page_load",
+  CONTAINS_HTML_CODE: "contains_html_code",
 };
 
 export function checkForLogicalErrorsInCode(code, script) {
+  if (isHTMLNodeString(code)) {
+    return {
+      isValid: false,
+      error: scriptLogicalErrors.CONTAINS_HTML_CODE,
+    };
+  }
+
   // update the rule if it has load event listener but the script is loaded after page load
   if (
     script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS &&
@@ -59,6 +67,20 @@ function hasLoadEventListener(code) {
   }
 }
 
+function isHTMLNodeString(code) {
+  try {
+    const doc = new DOMParser().parseFromString(code, "text/html");
+    return (
+      // nodeType 1 is for element nodes
+      Array.from(doc.body.childNodes).some((node) => node.nodeType === 1) || // most nodes end up in body
+      Array.from(doc.head.childNodes).some((node) => node.nodeType === 1) // special nodes like link and style end up in head
+    );
+  } catch (error) {
+    console.error("Error parsing code:", error);
+    return false;
+  }
+}
+
 export function parseAndValidateHTMLCodeStringForSpecificHTMLNodeType(htmlCodeString, htmlNodeName) {
   const result = {
     innerCode: "",
@@ -90,7 +112,7 @@ export function extractDomNodeDetailsFromHTMLCodeString(htmlCodeString, nodeName
   return Array.from(blocks).map((htmlBlock) => {
     return {
       innerText: htmlBlock.innerText,
-      attributes: htmlBlock.attributes,
+      attributes: Array.from(htmlBlock.attributes).map((attr) => ({ name: attr.name, value: attr.value })),
       parent: htmlBlock.parentNode,
       html: htmlBlock.outerHTML,
       originalCode: htmlCodeString,

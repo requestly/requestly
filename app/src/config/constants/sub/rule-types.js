@@ -184,6 +184,7 @@ const RULE_TYPES_CONFIG = {
     ALLOW_REQUEST_SOURCE_FILTERS: true,
   },
   [GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT]: {
+    // todo: add empty attributes?
     ID: 6,
     TYPE: GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT,
     NAME: "Insert Scripts",
@@ -201,6 +202,7 @@ const RULE_TYPES_CONFIG = {
       scripts: [],
     },
     EMPTY_SCRIPT_FORMAT: {
+      // here
       codeType: "js",
       fileName: "",
       loadTime: "afterPageLoad",

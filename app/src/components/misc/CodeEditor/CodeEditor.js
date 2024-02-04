@@ -43,16 +43,16 @@ const CodeEditor = ({
   isResizable = true,
   id = "",
 }) => {
+  console.log("value", value);
+
   const appTheme = useSelector(getAppTheme);
   const editorRef = useRef(null);
   const dispatch = useDispatch();
   const [editorHeight, setEditorHeight] = useState(height);
   const [isEditorMount, setIsEditorMount] = useState(false);
 
-  const allEdtitorToast = useSelector(getAllEditorToast);
-  const toastOverlay = useMemo(() => allEdtitorToast[id], [allEdtitorToast, id]);
-
-  console.log("toastOverlay", toastOverlay, id);
+  const allEditorToast = useSelector(getAllEditorToast);
+  const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]);
 
   const handleCodePrettify = (parser) => {
     const code = editorRef.current.getModel().getValue();
@@ -67,7 +67,7 @@ const CodeEditor = ({
     }
   };
 
-  const handleEditordidMount = (editor) => {
+  const handleEditorDidMount = (editor) => {
     editorRef.current = editor;
 
     if (!value?.length) {
@@ -134,7 +134,7 @@ const CodeEditor = ({
             defaultValue={defaultValue}
             value={value}
             onChange={handleChange}
-            onMount={handleEditordidMount}
+            onMount={handleEditorDidMount}
             options={{
               minimap: {
                 enabled: false,
