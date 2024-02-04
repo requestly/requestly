@@ -166,7 +166,7 @@ RQ.ScriptRuleHandler.includeCSS = function (script, callback) {
 
 RQ.ScriptRuleHandler.addRemoteJSWithAttributes = function (url, attributes, callback) {
   const script = document.createElement("script");
-  attributes.forEach(({ attrName, attrVal }) => {
+  attributes.forEach(({ name: attrName, value: attrVal }) => {
     script.setAttribute(attrName, attrVal ?? "");
   });
   script.src = url;
@@ -179,7 +179,7 @@ RQ.ScriptRuleHandler.addRemoteJSWithAttributes = function (url, attributes, call
 
 RQ.ScriptRuleHandler.embedJSWithAttributes = function (code, attributes) {
   const script = document.createElement("script");
-  attributes.forEach(({ attrName, attrVal }) => {
+  attributes.forEach(({ name: attrName, value: attrVal }) => {
     script.setAttribute(attrName, attrVal ?? "");
   });
   script.appendChild(document.createTextNode(code));
@@ -191,7 +191,7 @@ RQ.ScriptRuleHandler.embedJSWithAttributes = function (code, attributes) {
 
 RQ.ScriptRuleHandler.addRemoteCSSWithAttributes = function (url, attributes, callback) {
   const link = document.createElement("link");
-  attributes.forEach(({ attrName, attrVal }) => {
+  attributes.forEach(({ name: attrName, value: attrVal }) => {
     link.setAttribute(attrName, attrVal ?? "");
   });
   link.href = url;
@@ -205,7 +205,7 @@ RQ.ScriptRuleHandler.addRemoteCSSWithAttributes = function (url, attributes, cal
 RQ.ScriptRuleHandler.embedCSSWithAttributes = function (code, attributes) {
   const style = document.createElement("style");
   style.className = RQ.ClientUtils.getScriptClassAttribute();
-  attributes.forEach(({ attrName, attrVal }) => {
+  attributes.forEach(({ name: attrName, value: attrVal }) => {
     style.setAttribute(attrName, attrVal ?? "");
   });
   style.appendChild(document.createTextNode(code));
