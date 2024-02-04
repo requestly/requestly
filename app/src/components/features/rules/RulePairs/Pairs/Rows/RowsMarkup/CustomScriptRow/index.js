@@ -312,6 +312,7 @@ const CustomScriptRow = ({
         updates: {
           [`scripts[${scriptIndex}].codeType`]: codeType,
           [`scripts[${scriptIndex}].value`]: "",
+          [`scripts[${scriptIndex}].attributes`]: [],
         },
       })
     );
