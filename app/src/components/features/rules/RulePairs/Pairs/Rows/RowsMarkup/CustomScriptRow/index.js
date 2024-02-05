@@ -103,7 +103,9 @@ const CustomScriptRow = ({
   const dispatch = useDispatch();
 
   const [isCodeTypePopupVisible, setIsCodeTypePopupVisible] = useState(false);
+  const [isSourceTypePopupVisible, setIsSourceTypePopupVisible] = useState(false);
   const [codeTypeSelection, setCodeTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS);
+  const [sourceTypeSelection, setSourceTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
@@ -301,6 +303,13 @@ const CustomScriptRow = ({
     setIsCodeTypePopupVisible(true);
   };
 
+  const showSourceTypeChangeConfirmation = (scriptType) => {
+    if (scriptType === script.type) return;
+
+    setSourceTypeSelection(scriptType);
+    setIsSourceTypePopupVisible(true);
+  };
+
   const showScriptDeleteConfirmation = () => {
     setIsScriptDeletePopupVisible(true);
   };
@@ -408,18 +417,6 @@ const CustomScriptRow = ({
     );
   };
 
-  const scriptTypeChangeHandler = (newScriptType) => {
-    dispatch(
-      actions.updateRulePairAtGivenPath({
-        pairIndex,
-        updates: {
-          [`scripts[${scriptIndex}].type`]: newScriptType,
-          [`scripts[${scriptIndex}].value`]: "",
-        },
-      })
-    );
-  };
-
   const loadTimeMenuItems = useMemo(
     () => [
       {
@@ -474,7 +471,7 @@ const CustomScriptRow = ({
   const scriptTypeMenu = (
     <Menu>
       {scriptTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item key={index} onClick={(e) => scriptTypeChangeHandler(type)}>
+        <Menu.Item key={index} onClick={(e) => showSourceTypeChangeConfirmation(type)}>
           {title}
         </Menu.Item>
       ))}
@@ -529,6 +526,42 @@ const CustomScriptRow = ({
     );
   };
 
+  const onSourceTypeChange = (sourceType) => {
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`scripts[${scriptIndex}].type`]: sourceType,
+          [`scripts[${scriptIndex}].value`]: "",
+          [`scripts[${scriptIndex}].attributes`]: [],
+        },
+      })
+    );
+  };
+
+  const SourceTypeOptions = () => {
+    return (
+      <Popconfirm
+        title="This will clear the existing attributes"
+        onConfirm={() => {
+          onSourceTypeChange(sourceTypeSelection);
+          setIsSourceTypePopupVisible(false);
+        }}
+        onCancel={() => {
+          setIsSourceTypePopupVisible(false);
+        }}
+        okText="Confirm"
+        cancelText="Cancel"
+        open={isSourceTypePopupVisible}
+      >
+        <Dropdown overlay={scriptTypeMenu} disabled={isInputDisabled}>
+          <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+            {script.type} <DownOutlined />
+          </Text>
+        </Dropdown>
+      </Popconfirm>
+    );
+  };
   return (
     <div key={rowIndex} className={!isLastIndex ? "custom-script-row" : ""}>
       <Row span={24} align="middle" className="code-editor-header-row mt-20">
@@ -540,11 +573,7 @@ const CustomScriptRow = ({
             </Col>
             <Col align="left">
               <Text className="text-gray">Code Source: </Text>
-              <Dropdown overlay={scriptTypeMenu} disabled={isInputDisabled}>
-                <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
-                  {script.type} <DownOutlined />
-                </Text>
-              </Dropdown>
+              <SourceTypeOptions />
             </Col>
             {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
               <Col align="left">
