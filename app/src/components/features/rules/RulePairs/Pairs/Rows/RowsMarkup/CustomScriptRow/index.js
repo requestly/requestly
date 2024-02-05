@@ -11,7 +11,10 @@ import "./CustomScriptRow.css";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { extractDomNodeDetailsFromHTMLCodeString } from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton/actions/insertScriptValidators";
+import {
+  doesDocumentHaveOtherNodes,
+  extractDomNodeDetailsFromHTMLCodeString,
+} from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton/actions/insertScriptValidators";
 import { useDebounce } from "hooks/useDebounce";
 
 const { Text } = Typography;
@@ -48,16 +51,21 @@ function getDefaultScript(language, scriptType, isCompatibleWithHMLAttributes) {
   return "";
 }
 
-function parseScriptCodeValue(codeInput, scripObj) {
+function getHTMLNodeName(scriptType, codeType) {
   let htmlNode = "";
-  if (scripObj.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+  if (codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
     // else CSS
     htmlNode = "script";
-  } else if (scripObj.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+  } else if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
     htmlNode = "link";
   } else {
     htmlNode = "style";
   }
+  return htmlNode;
+}
+
+function parseScriptCodeValue(codeInput, scripObj) {
+  const htmlNode = getHTMLNodeName(scripObj.type, scripObj.codeType);
 
   // todo: rename and restructure
   const details = extractDomNodeDetailsFromHTMLCodeString(codeInput, htmlNode);
@@ -132,11 +140,11 @@ const CustomScriptRow = ({
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
           // eslint-disable-next-line no-template-curly-in-string
-          return `<script ${attributesString ? ` ${attributesString}` : `src="${script.value}"`}></script>`;
+          return `<script ${attributesString ? ` ${attributesString}` : ``}></script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
           // eslint-disable-next-line no-template-curly-in-string
-          return `<link ${attributesString ? ` ${attributesString}` : `href="${script.value}"`}>`;
+          return `<link ${attributesString ? ` ${attributesString}` : ``}>`;
         }
       }
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
@@ -172,6 +180,20 @@ const CustomScriptRow = ({
   const renderURLInput = () => {
     const RenderCodeEditorForURLInput = () => {
       const handleScriptChange = useDebounce((value) => {
+        const htmlNode = getHTMLNodeName(script.type, script.codeType);
+        const hasHTMLNode = doesDocumentHaveOtherNodes(value, htmlNode);
+        console.log("hasHTMLNode", hasHTMLNode);
+        if (hasHTMLNode) {
+          dispatch(
+            actions.triggerToastForEditor({
+              id: pair.id,
+              message: `Only ${htmlNode} is allowed in this field`,
+              type: "error",
+            })
+          );
+          return;
+        }
+
         const { code, attributes } = parseScriptCodeValue(value, script);
         if (code) {
           dispatch(
@@ -191,7 +213,7 @@ const CustomScriptRow = ({
             },
           })
         );
-      }, 5000);
+      }, 500);
 
       const handleCodeFormattedFlag = () => {
         setIsCodeFormatted(true);
@@ -331,6 +353,20 @@ const CustomScriptRow = ({
   const RenderCodeEditor = () => {
     const scriptBodyChangeHandler = useDebounce((value) => {
       if (isAppCompatibleToAttributesForScriptRule) {
+        const htmlNode = getHTMLNodeName(script.type, script.codeType);
+        const hasHTMLNode = doesDocumentHaveOtherNodes(value, htmlNode);
+        console.log("hasHTMLNode", hasHTMLNode);
+        if (hasHTMLNode) {
+          dispatch(
+            actions.triggerToastForEditor({
+              id: pair.id,
+              message: `Only ${htmlNode} is allowed in this field`,
+              type: "error",
+            })
+          );
+          return;
+        }
+
         const { code, attributes, err } = parseScriptCodeValue(value, script);
         console.log("code", code);
         console.log("attributes", attributes);
@@ -367,7 +403,7 @@ const CustomScriptRow = ({
           })
         );
       }
-    }, 5000);
+    }, 500);
 
     const handleCodeFormattedFlag = () => {
       setIsCodeFormatted(true);

@@ -81,6 +81,20 @@ function isHTMLNodeString(code) {
   }
 }
 
+export function doesDocumentHaveOtherNodes(code, nodeName) {
+  try {
+    const doc = new DOMParser().parseFromString(code, "text/html");
+    return (
+      // nodeType 1 is for element nodes
+      Array.from(doc.body.childNodes).some((node) => node.nodeType === 1 && node.nodeName !== nodeName) || // most nodes end up in body
+      Array.from(doc.head.childNodes).some((node) => node.nodeType === 1 && node.nodeName !== nodeName) // special nodes like link and style end up in head
+    );
+  } catch (error) {
+    console.error("Error parsing code:", error);
+    return false;
+  }
+}
+
 export function parseAndValidateHTMLCodeStringForSpecificHTMLNodeType(htmlCodeString, htmlNodeName) {
   const result = {
     innerCode: "",

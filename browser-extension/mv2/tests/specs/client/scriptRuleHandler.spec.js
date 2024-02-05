@@ -1,4 +1,5 @@
 describe("Requestly ScriptRuleHandler - ", function () {
+  // todo: add tests for rule changes
   var scriptRules = [
     {
       name: "Script Rule 1",

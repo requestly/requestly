@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
-import { toastType } from ".";
 import "./editorToast.scss";
+
+export enum toastType {
+  SUCCESS = "success",
+  ERROR = "error",
+  WARNING = "warning",
+  INFO = "info",
+}
 interface IEditorToastProps {
   message: string;
   type: toastType;
