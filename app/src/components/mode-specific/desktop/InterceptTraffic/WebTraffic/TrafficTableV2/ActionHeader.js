@@ -35,6 +35,7 @@ import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
+import { createResponseMock } from "./utils";
 
 const { Text } = Typography;
 
@@ -237,6 +238,17 @@ const ActionHeader = ({
                 <RQButton
                   onClick={() => {
                     console.log("Mock Responses", selectedMockRequests);
+                    const newRules = Object.values(selectedMockRequests).map((req) => {
+                      return createResponseMock(
+                        {
+                          response: req.response.body,
+                          requestUrl: req.url,
+                        },
+                        "restApi"
+                      );
+                    });
+
+                    console.log("!!!debug", "new Rules", newRules);
                   }}
                 >
                   Mock Responses

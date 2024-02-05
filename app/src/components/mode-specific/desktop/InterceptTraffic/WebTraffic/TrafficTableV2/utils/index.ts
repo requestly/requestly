@@ -1,3 +1,4 @@
+import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import parser from "ua-parser-js";
 
 export const getRequestDomain = (log: any) => {
@@ -47,4 +48,40 @@ export const doesStatusCodeMatchLabels = (code: number = 0, labels: STATUS_CODE_
     const upperLimit = lowerLimit + 100;
     return lowerLimit <= code && code < upperLimit;
   });
+};
+
+export const createResponseMock = (
+  ruleParams: {
+    name: string;
+    response: string;
+    urlMatcher: string;
+    requestUrl: string;
+    operationKey?: string;
+    operationValue?: string;
+  },
+  resourceType: string
+) => {
+  const newResponseRule = getNewRule("Response");
+  const responseRulePair = { ...newResponseRule.pairs[0] };
+  responseRulePair.response.value = ruleParams.response;
+  responseRulePair.response.serveWithoutRequest = true;
+  responseRulePair.response.resourceType = resourceType;
+  responseRulePair.source.key = "Url";
+  responseRulePair.source.operator = "Equals";
+  responseRulePair.source.value = ruleParams.requestUrl;
+
+  const sourceFilters = { ...responseRulePair.source.filters[0] };
+
+  if (resourceType === "graphqlApi") {
+    sourceFilters.requestPayload = {};
+    sourceFilters.requestPayload.key = ruleParams.operationKey;
+    sourceFilters.requestPayload.value = ruleParams.operationValue;
+  }
+
+  responseRulePair.source.filters = [sourceFilters];
+
+  return {
+    ...newResponseRule,
+    pairs: [responseRulePair],
+  };
 };
