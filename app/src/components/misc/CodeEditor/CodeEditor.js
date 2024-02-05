@@ -43,8 +43,6 @@ const CodeEditor = ({
   isResizable = true,
   id = "",
 }) => {
-  console.log("value", value);
-
   const appTheme = useSelector(getAppTheme);
   const editorRef = useRef(null);
   const dispatch = useDispatch();

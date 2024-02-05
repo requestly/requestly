@@ -12,6 +12,7 @@ import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { extractDomNodeDetailsFromHTMLCodeString } from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton/actions/insertScriptValidators";
+import { useDebounce } from "hooks/useDebounce";
 
 const { Text } = Typography;
 
@@ -60,8 +61,6 @@ function parseScriptCodeValue(codeInput, scripObj) {
 
   // todo: rename and restructure
   const details = extractDomNodeDetailsFromHTMLCodeString(codeInput, htmlNode);
-
-  console.log("details", JSON.stringify(details, null, 2));
 
   if (!details?.length) {
     return {
@@ -117,7 +116,6 @@ const CustomScriptRow = ({
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
   const getPresentableEditorValue = useMemo(() => {
-    console.log("script", JSON.stringify(script, null, 2));
     if (!isAppCompatibleToAttributesForScriptRule) return script.value;
     if (script.attributes?.length > 0) {
       const attributes = script.attributes ?? [];
@@ -172,9 +170,8 @@ const CustomScriptRow = ({
   };
 
   const renderURLInput = () => {
-    const renderCodeEditorForURLInput = () => {
-      // todo: rename
-      const handleScriptChange = (value) => {
+    const RenderCodeEditorForURLInput = () => {
+      const handleScriptChange = useDebounce((value) => {
         const { code, attributes } = parseScriptCodeValue(value, script);
         if (code) {
           dispatch(
@@ -194,7 +191,7 @@ const CustomScriptRow = ({
             },
           })
         );
-      };
+      }, 5000);
 
       const handleCodeFormattedFlag = () => {
         setIsCodeFormatted(true);
@@ -289,7 +286,7 @@ const CustomScriptRow = ({
         </Row>
         {isAppCompatibleToAttributesForScriptRule ? (
           <Row className="margin-top-one" span={24} gutter={16} align="middle">
-            {renderCodeEditorForURLInput()}
+            {RenderCodeEditorForURLInput()}
           </Row>
         ) : null}
       </Col>
@@ -331,8 +328,8 @@ const CustomScriptRow = ({
     deleteScript(e, pairIndex, scriptIndex);
   };
 
-  const renderCodeEditor = () => {
-    const scriptBodyChangeHandler = (value) => {
+  const RenderCodeEditor = () => {
+    const scriptBodyChangeHandler = useDebounce((value) => {
       if (isAppCompatibleToAttributesForScriptRule) {
         const { code, attributes, err } = parseScriptCodeValue(value, script);
         console.log("code", code);
@@ -370,7 +367,7 @@ const CustomScriptRow = ({
           })
         );
       }
-    };
+    }, 5000);
 
     const handleCodeFormattedFlag = () => {
       setIsCodeFormatted(true);
@@ -621,7 +618,7 @@ const CustomScriptRow = ({
           </Col>
         )}
       </Row>
-      {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? renderURLInput() : renderCodeEditor()}
+      {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? renderURLInput() : RenderCodeEditor()}
     </div>
   );
 };
