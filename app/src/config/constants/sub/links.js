@@ -105,7 +105,7 @@ const LINKS = {
   },
 
   DEMO_VIDEOS: {
-    TEAM_WORKSPACES: "https://www.youtube.com/watch?v=aooZB0eWAbU",
+    TEAM_WORKSPACES: "https://www.youtube.com/watch?v=xF5M_z4O5zg",
   },
 
   DOWNLOAD_DESKTOP_APP: {
