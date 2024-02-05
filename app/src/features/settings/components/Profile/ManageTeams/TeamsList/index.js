@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Badge, Tag } from "antd";
+import { Button, Tag } from "antd";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import ProTable from "@ant-design/pro-table";
 import { redirectToTeam } from "../../../../../../utils/RedirectionUtils";
@@ -14,34 +14,6 @@ const TeamsList = ({ teams = [] }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const renderSubscriptionStatus = (subscriptionStatus, teamId) => {
-    switch (subscriptionStatus) {
-      case "active":
-      case "trialing":
-        return (
-          <span style={{ width: "300px" }} onClick={() => redirectToTeam(navigate, teamId)}>
-            <Badge status="success" /> Active
-          </span>
-        );
-
-      case "incomplete":
-      case "canceled":
-        return (
-          <Button color="primary" size="sm" type="button" onClick={() => redirectToTeam(navigate, teamId)}>
-            <span>Pay now</span>
-          </Button>
-        );
-
-      default:
-        return (
-          <span style={{ width: "300px" }}>
-            <Badge status="error" /> Inactive
-          </span>
-        );
-    }
-  };
 
   const columns = [
     {
@@ -77,12 +49,6 @@ const TeamsList = ({ teams = [] }) => {
     {
       title: "Admins",
       dataIndex: "adminCount",
-    },
-    {
-      title: "Rules Subscription",
-      render: (_, record) => {
-        return renderSubscriptionStatus(record.subscriptionStatus, record.id);
-      },
     },
     {
       title: "Actions",
