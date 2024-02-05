@@ -60,7 +60,6 @@
     "@stripe/react-stripe-js": "^2.3.0",
     "@stripe/stripe-js": "^1.24.0",
     "@tanstack/react-virtual": "^3.0.0-beta.54",
-    "@typeform/embed-react": "^1.15.0",
     "@types/har-format": "^1.2.12",
     "acorn": "^8.11.3",
     "acorn-walk": "^8.3.2",

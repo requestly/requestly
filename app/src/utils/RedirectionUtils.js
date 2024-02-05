@@ -116,6 +116,16 @@ export const redirectToSessionSettings = (navigate, redirectUrl, source) => {
   navigate(PATHS.SETTINGS.SESSION_BOOK.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
+export const redirectToNetworkSessionHome = (navigate, isDesktopSessionsCompatible = false) => {
+  if (isDesktopSessionsCompatible) {
+    navigate(PATHS.SESSIONS.DESKTOP.SAVED_LOGS.ABSOLUTE);
+    return;
+  } else {
+    navigate(PATHS.SESSIONS.ABSOLUTE);
+    return;
+  }
+};
+
 export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatible = false) => {
   if (isDesktopSessionsCompatible) {
     if (id) {
@@ -123,7 +133,7 @@ export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatib
       navigate(path);
       return;
     }
-    const path = PATHS.SESSIONS.DESKTOP.SAVED_LOGS.ABSOLUTE;
+    const path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE;
     navigate(path);
     return;
   } else {
@@ -157,6 +167,10 @@ export const redirectToWorkspaceSettings = (navigate, redirectUrl, source) => {
 
 export const redirectToBillingTeam = (navigate, id, redirectUrl, source) => {
   navigate(PATHS.SETTINGS.BILLING.RELATIVE + `/${id}`, { state: { redirectUrl, source } });
+};
+
+export const redirectToProfileSettings = (navigate, redirectUrl, source) => {
+  navigate(PATHS.SETTINGS.PROFILE.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
 /* Product updates */
