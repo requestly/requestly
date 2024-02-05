@@ -71,6 +71,7 @@ const CurrentTrafficTable = ({
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
+  const [selectedMockRequests, setSelectedMockRequests] = useState({});
 
   const selectedRequestResponse =
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
@@ -362,6 +363,7 @@ const CurrentTrafficTable = ({
           emptyCtaAction={emptyCtaAction}
           emptyDesc={emptyDesc}
           isStaticPreview={isStaticPreview}
+          setSelectedMockRequests={setSelectedMockRequests}
         />
       );
     },
@@ -566,6 +568,7 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               setIsFiltersCollapsed={setIsFiltersCollapsed}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
+              selectedMockRequests={selectedMockRequests}
             >
               {isStaticPreview ? (
                 <Tag>{propLogs.length} requests</Tag>

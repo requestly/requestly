@@ -52,6 +52,7 @@ const ActionHeader = ({
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
   setIsSSLProxyingModalVisible,
+  selectedMockRequests,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
   const isPaused = useSelector(getIsInterceptionPaused);
@@ -230,6 +231,19 @@ const ActionHeader = ({
               {children}
             </>
           )}
+          {isStaticPreview && (
+            <Row>
+              <Col>
+                <RQButton
+                  onClick={() => {
+                    console.log("Mock Responses", selectedMockRequests);
+                  }}
+                >
+                  Mock Responses
+                </RQButton>
+              </Col>
+            </Row>
+          )}
         </Space>
       </Row>
       <Row className="ml-auto" align="middle" justify="end">
@@ -267,6 +281,7 @@ const ActionHeader = ({
           </>
         ) : null}
       </Row>
+
       <SessionSaveModal har={logsToSaveAsHar} isVisible={isSessionSaveModalOpen} closeModal={closeSaveModal} />
     </>
   );

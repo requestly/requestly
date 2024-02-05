@@ -14,6 +14,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
+import { Checkbox } from "antd";
 
 export const ITEM_SIZE = 30;
 
@@ -21,9 +22,10 @@ interface Props {
   logs: any;
   onRow: Function;
   isStaticPreview: boolean;
+  setSelectedMockRequests?: Function;
 }
 
-const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
+const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview, setSelectedMockRequests }) => {
   const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>();
   const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
   const dispatch = useDispatch();
@@ -49,6 +51,33 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
 
   const columns = useMemo(
     () => [
+      {
+        title: "",
+        dataIndex: "id",
+        width: "4%",
+        render: (id: string, log: Record<string, any>) => {
+          //TODO@nafees87n: toggle a mode for mock response and render only then
+          return (
+            <Checkbox
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              onChange={(e) => {
+                e.stopPropagation();
+                if (e.target.checked) {
+                  setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
+                } else {
+                  setSelectedMockRequests((prev: Record<string, any>) => {
+                    const newMockRequests = { ...prev };
+                    delete newMockRequests[id];
+                    return newMockRequests;
+                  });
+                }
+              }}
+            />
+          );
+        },
+      },
       {
         id: "time",
         title: "Time",
@@ -82,7 +111,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         id: "rulesApplied",
         title: "Rules Applied",
         dataIndex: ["actions"],
-        width: "12%",
+        width: "8%",
         responsive: ["xs", "sm"],
         hideColumn: isStaticPreview,
         render: (actions: any) => {
@@ -99,7 +128,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         width: "7%",
       },
     ],
-    [isStaticPreview]
+    [isStaticPreview, setSelectedMockRequests]
   );
 
   const header = useMemo(() => {
@@ -145,7 +174,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
 
             return (
               <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>
-                {column?.render ? column.render(columnData) : columnData}
+                {column?.render ? column.render(columnData, log) : columnData}
               </Table.Cell>
             );
           })}

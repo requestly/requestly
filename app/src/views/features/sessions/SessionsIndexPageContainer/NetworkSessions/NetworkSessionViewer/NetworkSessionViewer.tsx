@@ -63,8 +63,8 @@ const NetworkSessionViewer: React.FC = () => {
 
   const fetchRecording = useCallback(async () => {
     const recording = await getNetworkSession(networkSessionId);
-    dispatch(networkSessionActions.setSessionName(recording.name));
-    setRecordedLogs(convertHarJsonToRQLogs(recording.har));
+    dispatch(networkSessionActions.setSessionName(recording?.name));
+    setRecordedLogs(convertHarJsonToRQLogs(recording?.har));
   }, [networkSessionId, dispatch]);
 
   useEffect(() => {

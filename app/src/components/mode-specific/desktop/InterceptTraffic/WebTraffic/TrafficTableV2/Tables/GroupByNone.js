@@ -4,7 +4,15 @@ import NetworkInspector from "components/mode-specific/desktop/InterceptTraffic/
 import "./index.css";
 import NoTrafficCTA from "../NetworkInspector/NetworkTable/NoTrafficCTA";
 
-const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc, isStaticPreview }) => {
+const GroupByNone = ({
+  requestsLog,
+  handleRowClick,
+  emptyCtaText,
+  emptyCtaAction,
+  emptyDesc,
+  isStaticPreview,
+  setSelectedMockRequests,
+}) => {
   const renderNoTrafficCTA = () => {
     if (emptyCtaAction && emptyCtaText) {
       return (
@@ -35,6 +43,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
           style: actions.length !== 0 && !isStaticPreview ? { background: "#13c2c280" } : {},
         };
       }}
+      setSelectedMockRequests={setSelectedMockRequests}
     />
   );
 };
