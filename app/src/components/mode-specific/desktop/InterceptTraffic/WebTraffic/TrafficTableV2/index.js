@@ -24,6 +24,7 @@ import {
   getLogResponseById,
 } from "store/features/desktop-traffic-table/selectors";
 import Logger from "lib/logger";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
 import {
@@ -43,9 +44,10 @@ import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
-import { doesStatusCodeMatchLabels } from "./utils";
+import { doesStatusCodeMatchLabels, getGraphQLOperationValue } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { RQDropdown, RQInput } from "lib/design-system/components";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -71,18 +73,23 @@ const CurrentTrafficTable = ({
   const [selectedRequestData, setSelectedRequestData] = useState({});
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
-  const [selectedMockRequests, setSelectedMockRequests] = useState({});
-
-  const selectedRequestResponse =
-    useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
+  const [selectedMockRequests, setSelectedMockRequests] = useState({});
+  // const [showMockFilters, setShowMockFilters] = useState(false);
+  const [mockResourceType, setMockResourceType] = useState("restApi");
+  const [mockMatcher, setMockMatcher] = useState(GLOBAL_CONSTANTS.RULE_KEYS.URL);
+  const [mockGraphQLKey, setMockGraphQLKey] = useState("");
+
   const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
   const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
   const mounted = useRef(false);
+
+  const selectedRequestResponse =
+    useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
   const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
     desktopSpecificDetails.appsList,
@@ -278,9 +285,23 @@ const CurrentTrafficTable = ({
         return false;
       }
 
+      if (mockGraphQLKey && mockResourceType === "graphqlApi") {
+        try {
+          const requestBody = JSON.parse(log?.request?.body);
+          if (requestBody && getGraphQLOperationValue(requestBody, mockGraphQLKey)) {
+            return true;
+          }
+        } catch (e) {
+          // Do nothing
+        }
+        return false;
+      }
+
       return true;
     },
     [
+      mockGraphQLKey,
+      mockResourceType,
       trafficTableFilters.app,
       trafficTableFilters.domain,
       trafficTableFilters.method,
@@ -569,6 +590,9 @@ const CurrentTrafficTable = ({
               setIsFiltersCollapsed={setIsFiltersCollapsed}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
               selectedMockRequests={selectedMockRequests}
+              mockMatcher={mockMatcher}
+              mockResourceType={mockResourceType}
+              mockGraphQLKey={mockGraphQLKey}
             >
               {isStaticPreview ? (
                 <Tag>{propLogs.length} requests</Tag>
@@ -577,56 +601,103 @@ const CurrentTrafficTable = ({
               ) : null}
             </ActionHeader>
           </Row>
-          {!isFiltersCollapsed && (
-            <div className="traffic-table-filters-container">
+
+          <div className="traffic-table-filters-container">
+            <>
+              {!isFiltersCollapsed && (
+                <Row>
+                  <section>
+                    <LogFilter
+                      filterId="filter-method"
+                      filterLabel="Method"
+                      filterPlaceholder="Filter by method"
+                      options={METHOD_TYPE_OPTIONS}
+                      value={trafficTableFilters.method}
+                      handleFilterChange={(options) => {
+                        dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
+                        trackTrafficTableFilterApplied("method", options, options?.length);
+                      }}
+                    />
+                    <LogFilter
+                      filterId="filter-status-code"
+                      filterLabel="Status code"
+                      filterPlaceholder="Filter by status code"
+                      options={STATUS_CODE_LABEL_ONLY_OPTIONS}
+                      value={trafficTableFilters.statusCode}
+                      handleFilterChange={(options) => {
+                        dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                        trackTrafficTableFilterApplied("status_code", options, options?.length);
+                      }}
+                    />
+                    <LogFilter
+                      filterId="filter-resource-type"
+                      filterLabel="Resource type"
+                      filterPlaceholder="Filter by resource type"
+                      options={RESOURCE_FILTER_OPTIONS}
+                      value={trafficTableFilters.resourceType}
+                      handleFilterChange={(options) => {
+                        dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
+                        trackTrafficTableFilterApplied("resource_type", options, options?.length);
+                      }}
+                    />
+                  </section>
+                  <Button
+                    type="link"
+                    className="clear-logs-filter-btn"
+                    onClick={() => {
+                      dispatch(desktopTrafficTableActions.clearColumnFilters());
+                    }}
+                  >
+                    Clear all
+                  </Button>
+                </Row>
+              )}
               <Row>
-                <section>
-                  <LogFilter
-                    filterId="filter-method"
-                    filterLabel="Method"
-                    filterPlaceholder="Filter by method"
-                    options={METHOD_TYPE_OPTIONS}
-                    value={trafficTableFilters.method}
-                    handleFilterChange={(options) => {
-                      dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
-                      trackTrafficTableFilterApplied("method", options, options?.length);
-                    }}
-                  />
-                  <LogFilter
-                    filterId="filter-status-code"
-                    filterLabel="Status code"
-                    filterPlaceholder="Filter by status code"
-                    options={STATUS_CODE_LABEL_ONLY_OPTIONS}
-                    value={trafficTableFilters.statusCode}
-                    handleFilterChange={(options) => {
-                      dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
-                      trackTrafficTableFilterApplied("status_code", options, options?.length);
-                    }}
-                  />
-                  <LogFilter
-                    filterId="filter-resource-type"
-                    filterLabel="Resource type"
-                    filterPlaceholder="Filter by resource type"
-                    options={RESOURCE_FILTER_OPTIONS}
-                    value={trafficTableFilters.resourceType}
-                    handleFilterChange={(options) => {
-                      dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
-                      trackTrafficTableFilterApplied("resource_type", options, options?.length);
-                    }}
-                  />
-                </section>
-                <Button
-                  type="link"
-                  className="clear-logs-filter-btn"
-                  onClick={() => {
-                    dispatch(desktopTrafficTableActions.clearColumnFilters());
+                <RQDropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 1,
+                        label: "REST API",
+                        onClick: () => setMockResourceType("restApi"),
+                      },
+                      {
+                        key: 2,
+                        label: "GraphQL",
+                        onClick: () => setMockResourceType("graphqlApi"),
+                      },
+                    ],
+                    selectable: true,
+                    defaultSelectedKeys: [1],
                   }}
                 >
-                  Clear all
-                </Button>
+                  <span>{mockResourceType}</span>
+                </RQDropdown>
+                <RQDropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 1,
+                        label: "URL equals",
+                        onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.URL),
+                      },
+                      {
+                        key: 2,
+                        label: "Path equals",
+                        onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.PATH),
+                      },
+                    ],
+                    selectable: true,
+                    defaultSelectedKeys: [1],
+                  }}
+                >
+                  <span>{mockMatcher}</span>
+                </RQDropdown>
+                <RQInput multiple onChange={(e) => setMockGraphQLKey(e.target.value)} />
               </Row>
-            </div>
-          )}
+            </>
+          </div>
+
           <div className={!isPreviewOpen ? "hide-traffic-table-split-gutter" : ""}>
             <Split
               sizes={rulePaneSizes}

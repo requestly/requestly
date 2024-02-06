@@ -1,5 +1,9 @@
-import { getNewRule } from "components/features/rules/RuleBuilder/actions";
+import { getNewGroup, getNewRule } from "components/features/rules/RuleBuilder/actions";
 import parser from "ua-parser-js";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { StorageService } from "init";
+import { cloneDeep } from "lodash";
 
 export const getRequestDomain = (log: any) => {
   const domain = log?.request?.host;
@@ -50,38 +54,109 @@ export const doesStatusCodeMatchLabels = (code: number = 0, labels: STATUS_CODE_
   });
 };
 
-export const createResponseMock = (
-  ruleParams: {
-    name: string;
-    response: string;
-    urlMatcher: string;
-    requestUrl: string;
-    operationKey?: string;
-    operationValue?: string;
+export const getOrCreateSessionGroupId = async (
+  sessionDetails: {
+    networkSessionId: string;
+    networkSessionName: string;
   },
-  resourceType: string
+  appMode: string
 ) => {
-  const newResponseRule = getNewRule("Response");
-  const responseRulePair = { ...newResponseRule.pairs[0] };
-  responseRulePair.response.value = ruleParams.response;
-  responseRulePair.response.serveWithoutRequest = true;
-  responseRulePair.response.resourceType = resourceType;
-  responseRulePair.source.key = "Url";
-  responseRulePair.source.operator = "Equals";
-  responseRulePair.source.value = ruleParams.requestUrl;
+  const allGroups = await StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP);
 
-  const sourceFilters = { ...responseRulePair.source.filters[0] };
+  let sessionGroup = allGroups.find((group: any) => group.sessionId === sessionDetails.networkSessionId);
 
-  if (resourceType === "graphqlApi") {
-    sourceFilters.requestPayload = {};
-    sourceFilters.requestPayload.key = ruleParams.operationKey;
-    sourceFilters.requestPayload.value = ruleParams.operationValue;
+  if (!sessionGroup) {
+    const groupName = `${sessionDetails.networkSessionName}'s mock responses`;
+    sessionGroup = getNewGroup(groupName);
+    await StorageService(appMode).saveRuleOrGroup({
+      ...sessionGroup,
+      sessionId: sessionDetails.networkSessionId,
+      sessionCreated: true,
+    });
   }
 
-  responseRulePair.source.filters = [sourceFilters];
+  return sessionGroup.id;
+};
+
+export const createResponseMock = async (ruleParams: {
+  response: string;
+  urlMatcher: string;
+  requestUrl: string;
+  requestDetails: Record<string, any>;
+  groupId: string;
+  resourceType: string;
+  operationKey?: string;
+}) => {
+  const newResponseRule = getNewRule("Response");
+  const responseRulePair = cloneDeep(newResponseRule.pairs[0]);
+  responseRulePair.response.value = ruleParams.response;
+  responseRulePair.response.serveWithoutRequest = true;
+  responseRulePair.response.resourceType = ruleParams.resourceType;
+  responseRulePair.source.key = ruleParams.urlMatcher;
+  responseRulePair.source.operator = GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS;
+  if (ruleParams.urlMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL) {
+    responseRulePair.source.value = ruleParams.requestUrl;
+  } else if (ruleParams.urlMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH) {
+    responseRulePair.source.value = ruleParams.requestDetails.path;
+  }
+
+  const sourceFilters = responseRulePair.source.filters[0];
+
+  if (ruleParams.resourceType === "graphqlApi" && ruleParams.operationKey) {
+    sourceFilters.requestPayload = {};
+    sourceFilters.requestPayload.key = ruleParams.operationKey;
+    sourceFilters.requestPayload.value = getGraphQLOperationValue(
+      JSON.parse(ruleParams.requestDetails.body),
+      ruleParams.operationKey
+    );
+    responseRulePair.source.filters = [sourceFilters];
+  }
 
   return {
     ...newResponseRule,
+    name: `[MOCK] ${ruleParams.operationKey || ""}-${ruleParams.requestUrl}`,
+    groupId: ruleParams.groupId,
+    sessionCreated: true,
     pairs: [responseRulePair],
   };
+};
+
+export const getGraphQLOperationValue = (requestData: any, operationKey: any) => {
+  if (!operationKey) return true;
+
+  // We only allow request payload targeting when requestData is JSON
+  if (!requestData || typeof requestData !== "object") return false;
+  if (Object.keys(requestData).length === 0) return false;
+
+  // tagettedKey is the json path e.g. a.b.0.c
+  if (operationKey) {
+    const valueInRequestData = traverseJsonByPath(requestData, operationKey);
+    return valueInRequestData;
+  }
+
+  return false;
+};
+
+/**
+ * @param {Object} json
+ * @param {String} path -> "a", "a.b", "a.0.b (If a is an array containing list of objects"
+ * Also copied in shared/utils.js for the sake of testing
+ */
+export const traverseJsonByPath = (jsonObject: any, path: any) => {
+  if (!path) return;
+
+  const pathParts = path.split(".");
+
+  try {
+    let i = 0;
+    // Reach the last node but not the leaf node.
+    for (i = 0; i < pathParts.length - 1; i++) {
+      jsonObject = jsonObject[pathParts[i]];
+    }
+
+    return jsonObject[pathParts[pathParts.length - 1]];
+  } catch (e) {
+    /* Do nothing */
+    console.log(e);
+  }
 };

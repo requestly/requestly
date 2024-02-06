@@ -35,7 +35,10 @@ import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
-import { createResponseMock } from "./utils";
+import { createResponseMock, getOrCreateSessionGroupId } from "./utils";
+import { getSessionId, getSessionName } from "store/features/network-sessions/selectors";
+import { StorageService } from "init";
+import { getAppMode } from "store/selectors";
 
 const { Text } = Typography;
 
@@ -54,9 +57,15 @@ const ActionHeader = ({
   activeFiltersCount = 0,
   setIsSSLProxyingModalVisible,
   selectedMockRequests,
+  mockMatcher,
+  mockResourceType,
+  mockGraphQLKey,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
   const isPaused = useSelector(getIsInterceptionPaused);
+  const networkSessionId = useSelector(getSessionId);
+  const sessionName = useSelector(getSessionName);
+  const appMode = useSelector(getAppMode);
 
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
 
@@ -149,6 +158,30 @@ const ActionHeader = ({
     trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_CLICKED);
   };
 
+  const createMockResponses = useCallback(async () => {
+    const newSessionGroupId = await getOrCreateSessionGroupId(
+      {
+        networkSessionId,
+        networkSessionName: sessionName,
+      },
+      appMode
+    );
+
+    Promise.all(
+      Object.values(selectedMockRequests).map((log) => {
+        return createResponseMock({
+          response: log.response.body,
+          urlMatcher: mockMatcher,
+          requestUrl: log.url,
+          operationKey: mockGraphQLKey,
+          requestDetails: log.request,
+          resourceType: mockResourceType,
+          groupId: newSessionGroupId,
+        });
+      })
+    ).then((newRules) => StorageService(appMode).saveMultipleRulesOrGroups(newRules));
+  }, [appMode, mockGraphQLKey, mockMatcher, mockResourceType, networkSessionId, selectedMockRequests, sessionName]);
+
   return (
     <>
       <Row
@@ -236,19 +269,9 @@ const ActionHeader = ({
             <Row>
               <Col>
                 <RQButton
-                  onClick={() => {
+                  onClick={async () => {
                     console.log("Mock Responses", selectedMockRequests);
-                    const newRules = Object.values(selectedMockRequests).map((req) => {
-                      return createResponseMock(
-                        {
-                          response: req.response.body,
-                          requestUrl: req.url,
-                        },
-                        "restApi"
-                      );
-                    });
-
-                    console.log("!!!debug", "new Rules", newRules);
+                    createMockResponses();
                   }}
                 >
                   Mock Responses
