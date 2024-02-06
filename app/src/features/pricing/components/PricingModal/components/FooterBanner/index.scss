@@ -1,0 +1,43 @@
+.pricing-modal-footer-banner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 1rem 2rem;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  background: var(--blue-blue-600);
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+
+  &-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  &-text {
+    color: var(--text-default);
+    font-weight: 500;
+    letter-spacing: 0.25px;
+  }
+
+  &-btn.ant-btn.ant-btn-default {
+    border: 1px solid var(--text-default);
+    color: var(--text-default);
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover,
+    &:focus,
+    &:active {
+      border: 1px solid var(--text-default) !important;
+      color: var(--text-default) !important;
+      background-color: var(--primary-light) !important;
+    }
+  }
+}
