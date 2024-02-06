@@ -80,6 +80,11 @@ const MenuHeader = () => {
         <Col className="ml-auto">
           <div className="header-right-section">
             <Row align="middle" gutter={8} wrap={false}>
+              {paywallIntensityExp !== "control" &&
+              user?.details?.planDetails.status === "canceled" &&
+              isPlanExpiredBannerClosed ? (
+                <PlanExpiredBadge />
+              ) : null}
               <RQButton
                 type="default"
                 className="header-search-btn"
@@ -90,11 +95,6 @@ const MenuHeader = () => {
                 </div>
                 <div>⌘+K</div>
               </RQButton>
-              {paywallIntensityExp !== "control" &&
-              user?.details?.planDetails.status === "canceled" &&
-              isPlanExpiredBannerClosed ? (
-                <PlanExpiredBadge />
-              ) : null}
               <Col className="hidden-on-small-screen">
                 <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
                   <GitHubButton
