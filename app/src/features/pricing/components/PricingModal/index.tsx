@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
 import { useDispatch } from "react-redux";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { actions } from "store";
 import { PricingTable, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
@@ -13,6 +14,7 @@ import { Checkout } from "./Checkout";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
+import { PricingModalFooterBanner } from "./components/FooterBanner";
 import "./index.scss";
 
 interface PricingModalProps {
@@ -43,6 +45,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
+  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
   const tableRef = useRef(null);
 
@@ -171,6 +174,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
             <PricingTable duration={duration} isOpenedFromModal tableRef={tableRef} source={source} />
             <CompaniesSection />
+            {paywallIntensityExp && paywallIntensityExp !== "control" && <PricingModalFooterBanner />}
           </>
         )}
       </div>
