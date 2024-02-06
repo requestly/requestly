@@ -101,19 +101,17 @@ const MenuHeader = () => {
                 </div>
                 <div>⌘+K</div>
               </RQButton>
-              <Col className="hidden-on-small-screen">
-                <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
-                  <GitHubButton
-                    style={{ display: "flex" }}
-                    className="github-star-button"
-                    href="https://github.com/requestly/requestly"
-                    data-color-scheme="dark_dimmed"
-                    data-text="Star"
-                    data-show-count="true"
-                    aria-label="Star Requestly on GitHub"
-                  />
-                </span>
-              </Col>
+              <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
+                <GitHubButton
+                  style={{ display: "flex" }}
+                  className="github-star-button"
+                  href="https://github.com/requestly/requestly"
+                  data-color-scheme="dark_dimmed"
+                  data-text="Star"
+                  data-show-count="true"
+                  aria-label="Star Requestly on GitHub"
+                />
+              </span>
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
 

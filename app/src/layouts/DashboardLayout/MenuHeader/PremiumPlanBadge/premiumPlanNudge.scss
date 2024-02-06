@@ -16,3 +16,9 @@
 .premium-plan-nudge-btn.ant-btn {
   font-weight: 500;
 }
+
+@media (max-width: 780px) {
+  .premium-plan-nudge-container {
+    display: none;
+  }
+}

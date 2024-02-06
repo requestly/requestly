@@ -12,7 +12,7 @@ import { getPlanNameFromId } from "utils/PremiumUtils";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { MdOutlineCreditCard } from "@react-icons/all-files/md/MdOutlineCreditCard";
 import { MdOutlineCreditCardOff } from "@react-icons/all-files/md/MdOutlineCreditCardOff";
-import "./premiumPlanBadge.scss";
+import "./premiumPlanNudge.scss";
 
 const PremiumPlanNudge = () => {
   const dispatch = useDispatch();
@@ -74,7 +74,6 @@ const PremiumPlanNudge = () => {
         </Row>
         <RQButton
           type="primary"
-          size="small"
           className="premium-plan-nudge-btn"
           onClick={() => {
             dispatch(

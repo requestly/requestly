@@ -217,7 +217,13 @@
   }
 }
 
-@media screen and (max-width: 860px) {
+@media screen and (max-width: 1020px) {
+  .github-star-button {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 920px) {
   .header-right-section .header-search-btn.ant-btn {
     display: none;
   }
