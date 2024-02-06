@@ -57,7 +57,7 @@
   --white: var(--neutrals-white); */
 
   /* Old Color scheme but new tokens */
-  --danger: var(--red-red-500);
+  --danger: var(--red-red-400);
   --success: var(--green-green-500);
   --text-default: var(--neutrals-white);
   --warning: #e09400;

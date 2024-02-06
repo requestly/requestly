@@ -19,7 +19,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import ProductsDropDown from "./ProductsDropDown";
-import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
+import PremiumPlanNudge from "./PremiumPlanBadge/PremiumPlanNudge";
 import APP_CONSTANTS from "config/constants";
 import "./MenuHeader.css";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
@@ -85,6 +85,12 @@ const MenuHeader = () => {
               isPlanExpiredBannerClosed ? (
                 <PlanExpiredBadge />
               ) : null}
+              {(paywallIntensityExp === "control" ||
+                (paywallIntensityExp !== "control" && user?.details?.planDetails.status !== "canceled")) && (
+                <Col>
+                  <PremiumPlanNudge />
+                </Col>
+              )}
               <RQButton
                 type="default"
                 className="header-search-btn"
@@ -110,13 +116,6 @@ const MenuHeader = () => {
               </Col>
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
-
-              {(paywallIntensityExp === "control" ||
-                (paywallIntensityExp !== "control" && user?.details?.planDetails.status !== "canceled")) && (
-                <Col>
-                  <PremiumPlanBadge />
-                </Col>
-              )}
 
               {/* settings */}
               <Col>
