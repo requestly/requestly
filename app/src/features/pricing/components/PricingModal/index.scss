@@ -1,12 +1,13 @@
 .pricing-modal-wrapper {
   position: relative;
+  height: 100%;
 }
 
 .pricing-modal-right-inset-shadow,
 .pricing-modal-left-inset-shadow {
   position: absolute;
   width: 70px;
-  height: 97%;
+  height: 90%;
   right: 0;
   top: 20px;
   bottom: 0;
@@ -42,11 +43,13 @@
 
   .ant-modal-body {
     padding: 0;
+    height: 100%;
   }
 
   .ant-modal-content {
     background: none;
     border-radius: 1rem;
+    height: 100%;
   }
 
   .plan-duration-switch-container {
