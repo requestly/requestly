@@ -50,7 +50,7 @@ const CodeEditor = ({
   const [isEditorMount, setIsEditorMount] = useState(false);
 
   const allEditorToast = useSelector(getAllEditorToast);
-  const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]);
+  const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
 
   const handleCodePrettify = (parser) => {
     const code = editorRef.current.getModel().getValue();
@@ -122,6 +122,7 @@ const CodeEditor = ({
               id={toastOverlay.id}
               onClose={() => handleEditorClose(toastOverlay.id)}
               isVisible={toastOverlay}
+              autoClose={toastOverlay.autoClose}
             />
           )}
           <Editor

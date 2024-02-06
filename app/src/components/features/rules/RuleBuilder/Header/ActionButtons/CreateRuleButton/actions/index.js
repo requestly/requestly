@@ -3,19 +3,103 @@ import { actions } from "../../../../../../../../store";
 //UTILS
 import { isValidUrl } from "../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { inRange } from "lodash";
+import _, { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
-
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-
-import FEATURES from "config/constants/sub/features";
 import {
-  invalidHTMLError,
-  parseAndValidateHTMLCodeStringForSpecificHTMLNodeType,
-  checkForLogicalErrorsInCode,
-  scriptLogicalErrors,
+  extractInnerTextAndAttributesFromHTMLString,
+  getHTMLNodeName,
+  validateStringForSpecificHTMLNode,
 } from "./insertScriptValidators";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+
+/**
+ * Convert user inputs into rule schema
+ *
+ * @param {*} ruleData
+ * @returns {
+ *  success: boolean,
+ *  newRuleData?: object, // in case of successful validation and transformation
+ *
+ *  // in case of failure
+ *  error?: string,
+ *  message?: string,
+ *  pairId?: string, // id of the pair that caused the error
+ * }
+ */
+export const transformAndValidateInputsforRule = async (ruleData) => {
+  switch (ruleData.ruleType) {
+    case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT: {
+      const isCompatibleWithAttributesForScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
+
+      if (!isCompatibleWithAttributesForScriptRule) {
+        return ruleData;
+      }
+
+      const ruleDataCopy = _.cloneDeep(ruleData);
+      const newPairs = [];
+
+      for (const pair of ruleDataCopy.pairs) {
+        const parsedPair = pair;
+        const newScripts = [];
+
+        for (const script of pair.scripts) {
+          let newScript = script;
+
+          const htmlNodeName = getHTMLNodeName(script.type, script.codeType);
+
+          if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
+            const res = await validateStringForSpecificHTMLNode(script.value, htmlNodeName);
+            if (!res.isValid) {
+              return {
+                error: res.validationError,
+                success: false,
+                message: res.errorMessage,
+                pairId: pair.id,
+              };
+            }
+            const { attributes, innerText: code } = extractInnerTextAndAttributesFromHTMLString(
+              script.value,
+              htmlNodeName
+            );
+            newScript = {
+              ...script,
+              attributes,
+              value: code,
+            };
+          } else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+            const res = await validateStringForSpecificHTMLNode(script.wrapperElement, htmlNodeName);
+            if (!res.isValid) {
+              return {
+                error: res.validationError,
+                success: false,
+                message: res.errorMessage,
+                pairId: pair.id,
+              };
+            }
+            const { attributes } = extractInnerTextAndAttributesFromHTMLString(script.wrapperElement, htmlNodeName);
+            newScript = {
+              ...script,
+              attributes,
+            };
+          }
+          delete newScript["wrapperElement"]; // this was used to temporarily store the raw code
+          newScripts.push(newScript);
+        }
+        parsedPair.scripts = newScripts;
+        newPairs.push(parsedPair);
+      }
+      const newRuleData = {
+        ...ruleData,
+        pairs: newPairs,
+      };
+      return { success: true, newRuleData };
+    }
+    default:
+      return { success: true };
+  }
+};
 
 export const validateRule = (rule, dispatch, appMode) => {
   let output;
@@ -206,9 +290,7 @@ export const validateRule = (rule, dispatch, appMode) => {
   }
   //Insert Script Rule
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT) {
-    const isAppCompatibleForRawHTMLTagsInScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
-
-    rule.pairs.forEach((pair, pairIndex) => {
+    rule.pairs.forEach((pair) => {
       //There should be atleast one source of script. Be it given library or a custom script
       if (isEmpty(pair.libraries) && isEmpty(pair.scripts)) {
         output = {
@@ -217,8 +299,8 @@ export const validateRule = (rule, dispatch, appMode) => {
           error: "missing script source",
         };
       } else {
-        pair.scripts.forEach((script, scriptIndex) => {
-          if (script.type === "code") {
+        pair.scripts.forEach((script) => {
+          if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
             //Check if code isn't empty
             if (isEmpty(script.value)) {
               output = {
@@ -226,46 +308,46 @@ export const validateRule = (rule, dispatch, appMode) => {
                 message: `Please enter a valid script code`,
                 error: "invalid script code",
               };
-            } else {
-              const res = checkForLogicalErrorsInCode(script.value, script);
-              if (!res.isValid) {
-                if (res.error === scriptLogicalErrors.CONTAINS_HTML_CODE) {
-                  output = {
-                    result: false,
-                    message: `Please remove unnecessary HTML tags from the code`,
-                    error: "invalid script code",
-                    editorToast: {
-                      id: pair.id,
-                      type: "error",
-                      onlyInEditor: false,
-                    },
-                  };
-                } else if (res.error === scriptLogicalErrors.DOM_LOAD_EVENT_LISTENER_AFTER_PAGE_LOAD) {
-                  dispatch(
-                    actions.updateRulePairAtGivenPath({
-                      pairIndex,
-                      triggerUnsavedChangesIndication: true,
-                      updates: {
-                        [`scripts[${scriptIndex}].loadTime`]: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD,
-                      },
-                    })
-                  );
-
-                  output = {
-                    result: false,
-                    message: `Updated script load time to before page load`,
-                    error: "invalid script code",
-                    editorToast: {
-                      message: `Contains a DomContentLoaded listener being injected after page load`,
-                      id: pair.id,
-                      type: "info",
-                      onlyInEditor: false,
-                    },
-                    ruleUpdated: true,
-                  };
-                }
-              }
             }
+            /* NOT APPLYING LOGICAL VALIDATIONS FOR NOW */
+            // else {
+            //   const res = checkForLogicalErrorsInCode(script.value, script);
+            //   if (!res.isValid) {
+            //     if (res.error === scriptLogicalErrors.CONTAINS_HTML_CODE) {
+            //       output = {
+            //         result: false,
+            //         message: `Please remove unnecessary HTML tags from the code`,
+            //         error: "invalid script code",
+            //       };
+            //     }
+            //     else if (res.error === scriptLogicalErrors.DOM_LOAD_EVENT_LISTENER_AFTER_PAGE_LOAD) {
+            //       // dispatch(
+            //       //   actions.updateRulePairAtGivenPath({
+            //       //     pairIndex,
+            //       //     triggerUnsavedChangesIndication: true,
+            //       //     updates: {
+            //       //       [`scripts[${scriptIndex}].loadTime`]: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD,
+            //       //     },
+            //       //   })
+            //       // );
+
+            //       // just show a toast!!!
+
+            //       output = {
+            //         result: false,
+            //         message: `Updated script load time to before page load`,
+            //         error: "invalid script code",
+            //         editorToast: {
+            //           message: `Contains a DomContentLoaded listener being injected after page load`,
+            //           id: pair.id,
+            //           type: "info",
+            //           onlyInEditor: false,
+            //         },
+            //         ruleUpdated: true,
+            //       };
+            //     }
+            //   }
+            // }
           }
           //Check if URL isn't empty. Can be absolute or relative
           else if (script.type === "url") {
@@ -275,39 +357,6 @@ export const validateRule = (rule, dispatch, appMode) => {
                 message: `Please enter a valid script URL`,
                 error: "invalid script url",
               };
-            } else if (script.wrapperElement) {
-              // todo: change
-              const htmlNodeName = script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "script" : "link"; // todo: clean
-
-              if (!isAppCompatibleForRawHTMLTagsInScriptRule) {
-                // in this case we can still process the code but we'll show a tooltip in the editor // todo: remove comment
-                output = {
-                  result: false,
-                  message: `Please upgrade the extension to use raw ${htmlNodeName} tags inside code`,
-                  error: "invalid script code",
-                };
-              } else {
-                const result = parseAndValidateHTMLCodeStringForSpecificHTMLNodeType(
-                  script.wrapperElement,
-                  htmlNodeName
-                );
-                if (!result.validationResult.isValid) {
-                  const validationError = result.validationResult.validationError[0];
-                  if (validationError === invalidHTMLError.UNSUPPORTED_TAGS) {
-                    output = {
-                      result: false,
-                      message: `Only ${htmlNodeName} tags are supported`,
-                      error: "invalid script code",
-                    };
-                  } else if (validationError === invalidHTMLError.UNCLOSED_TAGS) {
-                    output = {
-                      result: false,
-                      message: `Please ensure all ${htmlNodeName} tags are closed properly`,
-                      error: "invalid script code",
-                    };
-                  }
-                }
-              }
             }
           }
         });

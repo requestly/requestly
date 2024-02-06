@@ -11,23 +11,16 @@ import "./CustomScriptRow.css";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import {
-  doesDocumentHaveOtherNodes,
-  extractDomNodeDetailsFromHTMLCodeString,
-} from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton/actions/insertScriptValidators";
-import { useDebounce } from "hooks/useDebounce";
 
 const { Text } = Typography;
 
 function getDefaultScript(language, scriptType, isCompatibleWithHMLAttributes) {
   if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL && isCompatibleWithHMLAttributes) {
     if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-      // eslint-disable-next-line no-template-curly-in-string
-      return '<script src=`${{url}}` type="text/javscript"></script>';
+      return '<!--  Custom attributes to the script can be added here.  -->\n<script type="text/javscript">\n//Everything else will be ignored \n</script>';
     }
     if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-      // eslint-disable-next-line no-template-curly-in-string
-      return '<link rel="stylesheet" type="text/css" href="${{url}}">';
+      return '<!--  Custom attributes to the script can be added here.  -->\n<link rel="stylesheet" type="text/css" >\n<!-- Everything else will be ignored  -->\n';
     }
   }
   if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
@@ -51,51 +44,17 @@ function getDefaultScript(language, scriptType, isCompatibleWithHMLAttributes) {
   return "";
 }
 
-function getHTMLNodeName(scriptType, codeType) {
-  let htmlNode = "";
-  if (codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-    // else CSS
-    htmlNode = "script";
-  } else if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-    htmlNode = "link";
-  } else {
-    htmlNode = "style";
-  }
-  return htmlNode;
-}
-
-function parseScriptCodeValue(codeInput, scripObj) {
-  const htmlNode = getHTMLNodeName(scripObj.type, scripObj.codeType);
-
-  // todo: rename and restructure
-  const details = extractDomNodeDetailsFromHTMLCodeString(codeInput, htmlNode);
-
-  if (!details?.length) {
-    return {
-      code: codeInput,
-      attributes: [],
-    };
-  }
-  if (details.length === 1) {
-    return {
-      code: details[0].innerText,
-      attributes: details[0].attributes,
-    };
-  } else if (details.length > 1) {
-    return {
-      code: details[0].innerText,
-      attributes: details[0].attributes,
-      err: "Multiple HTML Nodes inside the same pair may lead to errors",
-    };
-  }
-
-  // fail safe
-  return {
-    code: undefined,
-    attributes: undefined,
-    err: "Unexpected Error while parsing code",
-  };
-}
+const createAttributesString = (attributes) => {
+  const attributesString =
+    attributes ??
+    []
+      .map(({ name: attrName, value: attrVal }) => {
+        if (!attrVal) return `${attrName}`;
+        return `${attrName}="${attrVal}"`;
+      })
+      .join(" ");
+  return attributesString;
+};
 
 const CustomScriptRow = ({
   rowIndex,
@@ -116,34 +75,26 @@ const CustomScriptRow = ({
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
-  const isAppCompatibleToAttributesForScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
+  const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
+
   const scriptEditorBoilerCode = useMemo(() => {
-    return getDefaultScript(script.codeType, script.type, isAppCompatibleToAttributesForScriptRule);
-  }, [script.codeType, script.type, isAppCompatibleToAttributesForScriptRule]);
+    return getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
+  }, [script.codeType, script.type, isCompatibleWithAttributes]);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
-  const getPresentableEditorValue = useMemo(() => {
-    if (!isAppCompatibleToAttributesForScriptRule) return script.value;
+  const htmlWithAttributesAndCodeFromRuleData = useMemo(() => {
+    if (!isCompatibleWithAttributes) return script.value;
+
     if (script.attributes?.length > 0) {
       const attributes = script.attributes ?? [];
-      const attributesString = attributes
-        .map(({ name: attrName, value: attrVal }) => {
-          if (!attrVal) return `${attrName}`;
-          return `${attrName}="${attrVal}"`;
-        })
-        .join(" ");
-
-      console.log("attributes", JSON.stringify(attributes, null, 2));
-      console.log("attributesString", attributesString);
+      const attributesString = createAttributesString(attributes);
 
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          // eslint-disable-next-line no-template-curly-in-string
           return `<script ${attributesString ? ` ${attributesString}` : ``}></script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          // eslint-disable-next-line no-template-curly-in-string
           return `<link ${attributesString ? ` ${attributesString}` : ``}>`;
         }
       }
@@ -156,10 +107,14 @@ const CustomScriptRow = ({
         }
       }
     } else {
-      // APP IS COMPATIBLE WITH ATTRIBUTES BUT NO ATTRIBUTES ARE PRESENT IN CURRENT RULE
-      return script.value;
+      /* APP IS COMPATIBLE WITH ATTRIBUTES BUT NO ATTRIBUTES ARE PRESENT IN CURRENT RULE */
+      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+        return script.wrapperElement;
+      } else {
+        return script.value;
+      }
     }
-  }, [script, isAppCompatibleToAttributesForScriptRule]);
+  }, [script, isCompatibleWithAttributes]);
 
   const handleMockPickerVisibilityChange = (visible) => {
     setIsMockPickerVisible(visible);
@@ -178,42 +133,18 @@ const CustomScriptRow = ({
   };
 
   const renderURLInput = () => {
-    const RenderCodeEditorForURLInput = () => {
-      const handleScriptChange = useDebounce((value) => {
-        const htmlNode = getHTMLNodeName(script.type, script.codeType);
-        const hasHTMLNode = doesDocumentHaveOtherNodes(value, htmlNode);
-        console.log("hasHTMLNode", hasHTMLNode);
-        if (hasHTMLNode) {
-          dispatch(
-            actions.triggerToastForEditor({
-              id: pair.id,
-              message: `Only ${htmlNode} is allowed in this field`,
-              type: "error",
-            })
-          );
-          return;
-        }
-
-        const { code, attributes } = parseScriptCodeValue(value, script);
-        if (code) {
-          dispatch(
-            actions.triggerToastForEditor({
-              id: pair.id,
-              message: "Code isn't expected when src is remote url",
-              type: "info",
-            })
-          );
-        }
-        console.log("attributes in url code editor", attributes);
+    const renderCodeEditorForScriptAttributes = () => {
+      const handleScriptChange = (value) => {
+        /* THIS IS A TEMPORARY RULE ATTRIBUTE */
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
             updates: {
-              [`scripts[${scriptIndex}].attributes`]: attributes,
+              [`scripts[${scriptIndex}].wrapperElement`]: value,
             },
           })
         );
-      }, 500);
+      };
 
       const handleCodeFormattedFlag = () => {
         setIsCodeFormatted(true);
@@ -237,7 +168,7 @@ const CustomScriptRow = ({
                 height={75}
                 language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
                 defaultValue={scriptEditorBoilerCode}
-                value={getPresentableEditorValue}
+                value={htmlWithAttributesAndCodeFromRuleData}
                 handleChange={handleScriptChange}
                 readOnly={isInputDisabled}
                 isCodeFormatted={isCodeFormatted}
@@ -306,9 +237,9 @@ const CustomScriptRow = ({
             </Col>
           ) : null}
         </Row>
-        {isAppCompatibleToAttributesForScriptRule ? (
+        {isCompatibleWithAttributes ? (
           <Row className="margin-top-one" span={24} gutter={16} align="middle">
-            {RenderCodeEditorForURLInput()}
+            {renderCodeEditorForScriptAttributes()}
           </Row>
         ) : null}
       </Col>
@@ -341,6 +272,7 @@ const CustomScriptRow = ({
           [`scripts[${scriptIndex}].codeType`]: codeType,
           [`scripts[${scriptIndex}].value`]: "",
           [`scripts[${scriptIndex}].attributes`]: [],
+          [`scripts[${scriptIndex}].wrapperElement`]: null,
         },
       })
     );
@@ -350,60 +282,18 @@ const CustomScriptRow = ({
     deleteScript(e, pairIndex, scriptIndex);
   };
 
-  const RenderCodeEditor = () => {
-    const scriptBodyChangeHandler = useDebounce((value) => {
-      if (isAppCompatibleToAttributesForScriptRule) {
-        const htmlNode = getHTMLNodeName(script.type, script.codeType);
-        const hasHTMLNode = doesDocumentHaveOtherNodes(value, htmlNode);
-        console.log("hasHTMLNode", hasHTMLNode);
-        if (hasHTMLNode) {
-          dispatch(
-            actions.triggerToastForEditor({
-              id: pair.id,
-              message: `Only ${htmlNode} is allowed in this field`,
-              type: "error",
-            })
-          );
-          return;
-        }
-
-        const { code, attributes, err } = parseScriptCodeValue(value, script);
-        console.log("code", code);
-        console.log("attributes", attributes);
-        if (err) {
-          console.error("Error parsing code", err);
-          dispatch(
-            actions.triggerToastForEditor({
-              id: pair.id,
-              message: err,
-              type: "error",
-            })
-          );
-          return;
-        }
-
-        dispatch(
-          actions.updateRulePairAtGivenPath({
-            pairIndex,
-            triggerUnsavedChangesIndication: !isCodeFormatted,
-            updates: {
-              [`scripts[${scriptIndex}].value`]: code,
-              [`scripts[${scriptIndex}].attributes`]: attributes,
-            },
-          })
-        );
-      } else {
-        dispatch(
-          actions.updateRulePairAtGivenPath({
-            pairIndex,
-            triggerUnsavedChangesIndication: !isCodeFormatted,
-            updates: {
-              [`scripts[${scriptIndex}].value`]: value,
-            },
-          })
-        );
-      }
-    }, 500);
+  const renderCodeEditor = () => {
+    const scriptBodyChangeHandler = (value) => {
+      dispatch(
+        actions.updateRulePairAtGivenPath({
+          pairIndex,
+          triggerUnsavedChangesIndication: !isCodeFormatted,
+          updates: {
+            [`scripts[${scriptIndex}].value`]: value,
+          },
+        })
+      );
+    };
 
     const handleCodeFormattedFlag = () => {
       setIsCodeFormatted(true);
@@ -427,7 +317,7 @@ const CustomScriptRow = ({
               id={pair.id}
               language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
               defaultValue={scriptEditorBoilerCode}
-              value={getPresentableEditorValue}
+              value={htmlWithAttributesAndCodeFromRuleData}
               handleChange={scriptBodyChangeHandler}
               readOnly={isInputDisabled}
               isCodeFormatted={isCodeFormatted}
@@ -567,6 +457,7 @@ const CustomScriptRow = ({
           [`scripts[${scriptIndex}].type`]: sourceType,
           [`scripts[${scriptIndex}].value`]: "",
           [`scripts[${scriptIndex}].attributes`]: [],
+          [`scripts[${scriptIndex}].wrapperElement`]: null,
         },
       })
     );
@@ -654,7 +545,7 @@ const CustomScriptRow = ({
           </Col>
         )}
       </Row>
-      {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? renderURLInput() : RenderCodeEditor()}
+      {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? renderURLInput() : renderCodeEditor()}
     </div>
   );
 };

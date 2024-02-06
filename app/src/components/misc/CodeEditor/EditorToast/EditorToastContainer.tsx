@@ -16,9 +16,7 @@ interface IEditorToastProps {
 }
 
 export const EditorToastContainer: React.FC<IEditorToastProps> = ({ message, type, onClose, autoClose, isVisible }) => {
-  console.log("EditorToastContainer", message, type, autoClose);
-  //   const [isVisible, setIsVisible] = useState(true);
-
+  console.log("autoClose", autoClose);
   useEffect(() => {
     if (autoClose) {
       const timer = setTimeout(() => {
