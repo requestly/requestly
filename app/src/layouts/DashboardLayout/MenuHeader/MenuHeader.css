@@ -110,6 +110,11 @@
   color: var(--white);
 }
 
+.header-upgrade-btn.ant-btn {
+  font-weight: 500;
+  margin-left: 8px;
+}
+
 .ant-btn.header-icon-btn {
   padding: 4px;
   width: 1.75rem;

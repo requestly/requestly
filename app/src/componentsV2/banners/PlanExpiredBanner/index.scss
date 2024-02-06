@@ -1,0 +1,45 @@
+.plan-expired-banner {
+  position: relative;
+  background: var(--red-red-700);
+  padding: 8px 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  &-badge {
+    padding: 4px 8px;
+    color: var(--text-default);
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    font-size: 10px;
+    line-height: 12px;
+    background: var(--danger);
+    border-radius: 4px;
+  }
+
+  &-btn.ant-btn.ant-btn-default {
+    border: 1px solid var(--text-default);
+    color: var(--text-default);
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+
+    &:hover,
+    &:focus,
+    &:active {
+      border: 1px solid var(--text-default) !important;
+      color: var(--text-default) !important;
+      background-color: var(--danger) !important;
+    }
+  }
+
+  &-close-btn {
+    position: absolute;
+    right: 18px;
+    top: 12px;
+    font-size: 20px;
+    color: var(--text-default);
+    cursor: pointer;
+  }
+}

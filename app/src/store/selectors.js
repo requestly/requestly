@@ -292,3 +292,7 @@ export const getAppNotificationBannerDismissTs = (state) => {
 export const getIsOrgBannerDismissed = (state) => {
   return getGlobalState(state).misc.persist?.isOrgBannerDismissed;
 };
+
+export const getIsPlanExpiredBannerClosed = (state) => {
+  return getGlobalState(state).misc.persist?.isPlanExpiredBannerClosed;
+};

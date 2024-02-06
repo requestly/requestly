@@ -1,3 +1,10 @@
+.new-auth-banner-wrapper .auth-banner {
+  padding: 40px;
+  background: var(--surface-0_5);
+  height: 100%;
+  border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+}
+
 .signup-modal-section-wrapper {
   padding: 32px;
   width: 55%;
@@ -5,6 +12,7 @@
 .login-modal-wrapper {
   padding: 40px;
 }
+
 .signup-form-wrapper {
   background: #19191d; /* TODO: replace this with CSS variable*/
   padding: 40px 50px;
