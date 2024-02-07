@@ -38,8 +38,8 @@ export const BillingTeam: React.FC = () => {
 
   useEffect(() => {
     if (!hasAccessToBillingTeam && billingId) {
-      const getTeamAdminView = httpsCallable(getFunctions(), "billing-getOtherBillingTeam");
-      getTeamAdminView({ billingId })
+      const getTeamOtherTeam = httpsCallable(getFunctions(), "billing-getOtherBillingTeam");
+      getTeamOtherTeam({ billingId })
         .then((result: any) => {
           if (result.data.success) {
             const newTeams = [...billingTeams, result.data.billingTeamData];
