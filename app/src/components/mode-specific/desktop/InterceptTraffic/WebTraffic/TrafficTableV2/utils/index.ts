@@ -61,6 +61,10 @@ export const getOrCreateSessionGroupId = async (
   },
   appMode: string
 ) => {
+  if (!sessionDetails?.networkSessionId) {
+    throw new Error("Session ID is required to create a session group");
+  }
+
   const allGroups = await StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP);
 
   let sessionGroup = allGroups.find((group: any) => group.sessionId === sessionDetails.networkSessionId);
@@ -101,12 +105,10 @@ export const createResponseMock = (ruleParams: {
   }
 
   const sourceFilters = responseRulePair.source.filters[0] ?? {};
-  const operationParams = getGraphQLOperationValues(
-    JSON.parse(ruleParams.requestDetails.body),
-    ruleParams.operationKeys
-  );
+  let operationParams = null;
 
   if (ruleParams.resourceType === "graphqlApi" && ruleParams.operationKeys.length) {
+    operationParams = getGraphQLOperationValues(JSON.parse(ruleParams.requestDetails.body), ruleParams.operationKeys);
     sourceFilters.requestPayload = {};
 
     if (operationParams) {
@@ -118,10 +120,11 @@ export const createResponseMock = (ruleParams: {
 
   return {
     ...newResponseRule,
-    name: `[MOCK] ${operationParams.operationValue || ""}-${ruleParams.requestUrl}`,
+    name: `[MOCK] ${operationParams?.operationValue || ""}-${ruleParams.requestUrl}`,
     groupId: ruleParams.groupId,
     sessionCreated: true,
     pairs: [responseRulePair],
+    status: GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE,
   };
 };
 

@@ -35,10 +35,7 @@ import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
-import { createResponseMock, getOrCreateSessionGroupId } from "./utils";
-import { getPreviewType, getSessionId, getSessionName } from "store/features/network-sessions/selectors";
-import { StorageService } from "init";
-import { getAppMode } from "store/selectors";
+import { getPreviewType } from "store/features/network-sessions/selectors";
 import { PreviewType } from "store/features/network-sessions/slice";
 
 const { Text } = Typography;
@@ -57,19 +54,14 @@ const ActionHeader = ({
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
   setIsSSLProxyingModalVisible,
-  selectedMockRequests,
-  mockMatcher,
-  mockResourceType,
-  mockGraphQLKeys,
+  setShowMockFilters,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
   const isPaused = useSelector(getIsInterceptionPaused);
-  const networkSessionId = useSelector(getSessionId);
-  const sessionName = useSelector(getSessionName);
   const sessionPreviewType = useSelector(getPreviewType);
-  const appMode = useSelector(getAppMode);
 
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
+  const [isSearchDisabled, setIsSearchDisabled] = useState(false);
 
   const closeSaveModal = useCallback(() => {
     setIsSessionSaveModalOpen(false);
@@ -124,6 +116,7 @@ const ActionHeader = ({
           }
           style={{ width: 300 }}
           size="small"
+          disabled={isSearchDisabled}
         />
       );
     }
@@ -150,6 +143,7 @@ const ActionHeader = ({
         }
         style={{ width: 300 }}
         size="small"
+        disabled={isSearchDisabled}
       />
     );
   };
@@ -159,30 +153,6 @@ const ActionHeader = ({
     trackTrafficTableFilterClicked();
     trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_FILTER_CLICKED);
   };
-
-  const createMockResponses = useCallback(async () => {
-    const newSessionGroupId = await getOrCreateSessionGroupId(
-      {
-        networkSessionId,
-        networkSessionName: sessionName,
-      },
-      appMode
-    );
-
-    const newRules = Object.values(selectedMockRequests).map((log) => {
-      return createResponseMock({
-        response: log.response.body,
-        urlMatcher: mockMatcher,
-        requestUrl: log.url,
-        operationKeys: mockGraphQLKeys,
-        requestDetails: log.request,
-        resourceType: mockResourceType,
-        groupId: newSessionGroupId,
-      });
-    });
-
-    return StorageService(appMode).saveMultipleRulesOrGroups(newRules);
-  }, [appMode, mockGraphQLKeys, mockMatcher, mockResourceType, networkSessionId, selectedMockRequests, sessionName]);
 
   return (
     <>
@@ -267,13 +237,16 @@ const ActionHeader = ({
               {children}
             </>
           )}
-          {isStaticPreview && (
+          {isStaticPreview && sessionPreviewType === PreviewType.SAVED && (
             <Row>
               <Col>
                 <RQButton
-                  onClick={async () => {
-                    console.log("Mock Responses", selectedMockRequests);
-                    createMockResponses();
+                  onClick={() => {
+                    setShowMockFilters((prev) => {
+                      setIsSearchDisabled(!prev);
+                      return !prev;
+                    });
+                    dispatch(desktopTrafficTableActions.updateSearchTerm(""));
                   }}
                 >
                   Mock Responses
@@ -304,7 +277,7 @@ const ActionHeader = ({
 
             {!isStaticPreview && <Divider type="vertical" style={{ margin: "0 16px" }} />}
 
-            {sessionPreviewType === PreviewType.IMPORTED && (
+            {sessionPreviewType !== PreviewType.SAVED && (
               <Col>
                 <Button
                   icon={<SaveOutlined />}

@@ -8,6 +8,8 @@ interface Props {
   onRow: Function;
   isStaticPreview: boolean;
   setSelectedMockRequests?: Function;
+  showMockRequestSelector?: boolean;
+  isMockRequestSelectorDisabled?: boolean;
 }
 
 const NetworkInspector: React.FC<Props> = (props) => {
@@ -18,6 +20,8 @@ const NetworkInspector: React.FC<Props> = (props) => {
         onRow={props.onRow}
         isStaticPreview={props.isStaticPreview}
         setSelectedMockRequests={props.setSelectedMockRequests}
+        showMockRequestSelector={props.showMockRequestSelector}
+        isMockRequestSelectorDisabled={props.isMockRequestSelectorDisabled}
       />
     </AutoThemeProvider>
   );

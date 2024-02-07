@@ -23,9 +23,18 @@ interface Props {
   onRow: Function;
   isStaticPreview: boolean;
   setSelectedMockRequests?: Function;
+  showMockRequestSelector?: boolean;
+  isMockRequestSelectorDisabled?: boolean;
 }
 
-const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview, setSelectedMockRequests }) => {
+const NetworkTable: React.FC<Props> = ({
+  logs,
+  onRow,
+  isStaticPreview,
+  setSelectedMockRequests,
+  showMockRequestSelector,
+  isMockRequestSelectorDisabled,
+}) => {
   const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>();
   const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
   const dispatch = useDispatch();
@@ -55,26 +64,29 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview, setSelect
         title: "",
         dataIndex: "id",
         width: "4%",
+        hideColumn: !showMockRequestSelector,
         render: (id: string, log: Record<string, any>) => {
-          //TODO@nafees87n: toggle a mode for mock response and render only then
           return (
-            <Checkbox
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              onChange={(e) => {
-                e.stopPropagation();
-                if (e.target.checked) {
-                  setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
-                } else {
-                  setSelectedMockRequests((prev: Record<string, any>) => {
-                    const newMockRequests = { ...prev };
-                    delete newMockRequests[id];
-                    return newMockRequests;
-                  });
-                }
-              }}
-            />
+            <div className="display-row-center">
+              <Checkbox
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  if (e.target.checked) {
+                    setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
+                  } else {
+                    setSelectedMockRequests((prev: Record<string, any>) => {
+                      const newMockRequests = { ...prev };
+                      delete newMockRequests[id];
+                      return newMockRequests;
+                    });
+                  }
+                }}
+                disabled={isMockRequestSelectorDisabled}
+              />
+            </div>
           );
         },
       },
@@ -128,7 +140,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview, setSelect
         width: "7%",
       },
     ],
-    [isStaticPreview, setSelectedMockRequests]
+    [isMockRequestSelectorDisabled, isStaticPreview, setSelectedMockRequests, showMockRequestSelector]
   );
 
   const header = useMemo(() => {

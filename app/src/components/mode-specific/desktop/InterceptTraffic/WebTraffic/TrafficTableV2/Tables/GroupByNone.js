@@ -12,6 +12,8 @@ const GroupByNone = ({
   emptyDesc,
   isStaticPreview,
   setSelectedMockRequests,
+  showMockRequestSelector,
+  isMockRequestSelectorDisabled,
 }) => {
   const renderNoTrafficCTA = () => {
     if (emptyCtaAction && emptyCtaText) {
@@ -44,6 +46,8 @@ const GroupByNone = ({
         };
       }}
       setSelectedMockRequests={setSelectedMockRequests}
+      showMockRequestSelector={showMockRequestSelector}
+      isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
     />
   );
 };
