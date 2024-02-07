@@ -1,7 +1,6 @@
 import isEmpty from "is-empty";
 import isEmail from "validator/lib/isEmail";
 import { toast } from "utils/Toast.js";
-import formbricks from "@formbricks/js";
 
 //AUTH ACTIONS
 import {
@@ -164,7 +163,6 @@ export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispat
         console.log("Error while resetting posthog", error);
       }
     }
-    formbricks.logout();
     if (!window.uid || !isLocalStoragePresent(appMode)) {
       return signOut();
     }
