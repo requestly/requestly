@@ -123,7 +123,9 @@ export const UserPlanDetails = () => {
                   {user?.details?.planDetails.status === "trialing" ? "Trial" : "Plan"} expire date
                 </div>
                 <div className="user-plan-date">
-                  {getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
+                  {hasAppSumoSubscription
+                    ? "Lifetime"
+                    : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
                 </div>
               </Space>
             </div>
