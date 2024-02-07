@@ -43,6 +43,7 @@ const availableTeamsListener = (dispatch, uid, currentlyActiveWorkspace, appMode
               accessCount: teamData.accessCount,
               adminCount: teamData.adminCount,
               members: teamData.members,
+              appsumo: teamData?.appsumo || null,
             };
           })
           .filter(Boolean);
