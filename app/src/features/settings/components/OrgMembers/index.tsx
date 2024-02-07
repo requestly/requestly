@@ -14,7 +14,7 @@ export const OrgMembersView = () => {
     <>
       <Col className="my-billing-team-title">{capitalize(domain)} Members</Col>
       <Col className="org-members-table-wrapper">
-        <OrgMembersTable />
+        <OrgMembersTable source="members_tab" />
       </Col>
     </>
   );
