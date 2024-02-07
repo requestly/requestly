@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { Avatar, Button, Col, Tag, Menu, Row, Tooltip, Space, Typography } from "antd";
+import { CloseOutlined, DownOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { makeOriginalLog } from "capture-console-logs";
@@ -44,10 +44,11 @@ import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
-import { doesStatusCodeMatchLabels, getGraphQLOperationValue } from "./utils";
+import { doesStatusCodeMatchLabels, getGraphQLOperationValues } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
-import { RQDropdown, RQInput } from "lib/design-system/components";
+import { RQButton, RQDropdown } from "lib/design-system/components";
+import CreatableSelect from "react-select/creatable";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -82,7 +83,7 @@ const CurrentTrafficTable = ({
   // const [showMockFilters, setShowMockFilters] = useState(false);
   const [mockResourceType, setMockResourceType] = useState("restApi");
   const [mockMatcher, setMockMatcher] = useState(GLOBAL_CONSTANTS.RULE_KEYS.URL);
-  const [mockGraphQLKey, setMockGraphQLKey] = useState("");
+  const [mockGraphQLKeys, setMockGraphQLKeys] = useState([]);
 
   const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
   const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
@@ -285,10 +286,10 @@ const CurrentTrafficTable = ({
         return false;
       }
 
-      if (mockGraphQLKey && mockResourceType === "graphqlApi") {
+      if (mockGraphQLKeys.length && mockResourceType === "graphqlApi") {
         try {
           const requestBody = JSON.parse(log?.request?.body);
-          if (requestBody && getGraphQLOperationValue(requestBody, mockGraphQLKey)) {
+          if (requestBody && !!getGraphQLOperationValues(requestBody, mockGraphQLKeys)) {
             return true;
           }
         } catch (e) {
@@ -300,7 +301,7 @@ const CurrentTrafficTable = ({
       return true;
     },
     [
-      mockGraphQLKey,
+      mockGraphQLKeys,
       mockResourceType,
       trafficTableFilters.app,
       trafficTableFilters.domain,
@@ -312,18 +313,13 @@ const CurrentTrafficTable = ({
     ]
   );
 
-  const getRequestLogs = useCallback(
-    (desc = true) => {
-      let logs = newLogs;
-      if (propLogs?.length > 0) {
-        logs = propLogs;
-      }
-      return logs;
-    },
-    [newLogs, propLogs]
-  );
-
-  const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
+  const requestLogs = useMemo(() => {
+    let logs = newLogs;
+    if (propLogs?.length > 0) {
+      logs = propLogs;
+    }
+    return logs;
+  }, [newLogs, propLogs]);
 
   useEffect(() => {
     if (mounted.current) {
@@ -529,9 +525,9 @@ const CurrentTrafficTable = ({
   ]);
 
   const stableGetLogsToExport = useMemo(() => {
-    const logsToExport = getFilteredLogsWithResponses(newLogs);
+    const logsToExport = getFilteredLogsWithResponses(requestLogs);
     return createLogsHar(logsToExport);
-  }, [getFilteredLogsWithResponses, newLogs]);
+  }, [getFilteredLogsWithResponses, requestLogs]);
 
   const handleSidebarMenuItemClick = useCallback(
     (e) => {
@@ -579,8 +575,8 @@ const CurrentTrafficTable = ({
             <ActionHeader
               deviceId={deviceId}
               clearLogs={clearLogs}
-              logsCount={newLogs.length}
-              filteredLogsCount={newLogs.length}
+              logsCount={requestLogs.length}
+              filteredLogsCount={requestLogs.length}
               isAnyAppConnected={isAnyAppConnected}
               isStaticPreview={isStaticPreview}
               activeFiltersCount={activeFiltersCount}
@@ -592,13 +588,9 @@ const CurrentTrafficTable = ({
               selectedMockRequests={selectedMockRequests}
               mockMatcher={mockMatcher}
               mockResourceType={mockResourceType}
-              mockGraphQLKey={mockGraphQLKey}
+              mockGraphQLKeys={mockGraphQLKeys}
             >
-              {isStaticPreview ? (
-                <Tag>{propLogs.length} requests</Tag>
-              ) : newLogs.length ? (
-                <Tag>{newLogs.length} requests</Tag>
-              ) : null}
+              <Tag>{requestLogs.length} requests</Tag>
             </ActionHeader>
           </Row>
 
@@ -652,48 +644,101 @@ const CurrentTrafficTable = ({
                   </Button>
                 </Row>
               )}
-              <Row>
-                <RQDropdown
-                  menu={{
-                    items: [
-                      {
-                        key: 1,
-                        label: "REST API",
-                        onClick: () => setMockResourceType("restApi"),
-                      },
-                      {
-                        key: 2,
-                        label: "GraphQL",
-                        onClick: () => setMockResourceType("graphqlApi"),
-                      },
-                    ],
-                    selectable: true,
-                    defaultSelectedKeys: [1],
-                  }}
-                >
-                  <span>{mockResourceType}</span>
-                </RQDropdown>
-                <RQDropdown
-                  menu={{
-                    items: [
-                      {
-                        key: 1,
-                        label: "URL equals",
-                        onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.URL),
-                      },
-                      {
-                        key: 2,
-                        label: "Path equals",
-                        onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.PATH),
-                      },
-                    ],
-                    selectable: true,
-                    defaultSelectedKeys: [1],
-                  }}
-                >
-                  <span>{mockMatcher}</span>
-                </RQDropdown>
-                <RQInput multiple onChange={(e) => setMockGraphQLKey(e.target.value)} />
+              <Row justify={"space-between"} align={"middle"}>
+                <Space size={12}>
+                  <RQDropdown
+                    menu={{
+                      items: [
+                        {
+                          key: 1,
+                          label: "REST API",
+                          onClick: () => setMockResourceType("restApi"),
+                        },
+                        {
+                          key: 2,
+                          label: "GraphQL API",
+                          onClick: () => setMockResourceType("graphqlApi"),
+                        },
+                      ],
+                      selectable: true,
+                      defaultSelectedKeys: [1],
+                    }}
+                    trigger={["click"]}
+                    className="display-inline-block"
+                  >
+                    <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
+                      {mockResourceType === "restApi" ? "REST API" : "GraphQL API"} <DownOutlined />
+                    </Typography.Text>
+                  </RQDropdown>
+                  <RQDropdown
+                    menu={{
+                      items: [
+                        {
+                          key: 1,
+                          label: "URL equals",
+                          onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.URL),
+                        },
+                        {
+                          key: 2,
+                          label: "Path equals",
+                          onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.PATH),
+                        },
+                      ],
+                      selectable: true,
+                      defaultSelectedKeys: [1],
+                    }}
+                    trigger={["click"]}
+                    className="display-inline-block"
+                  >
+                    <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
+                      {mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL ? "URL Equals" : "Path Equals"} <DownOutlined />
+                    </Typography.Text>
+                  </RQDropdown>
+                  {mockResourceType === "graphqlApi" && (
+                    <CreatableSelect
+                      isMulti={true}
+                      isClearable={true}
+                      theme={(theme) => ({
+                        ...theme,
+                        borderRadius: 4,
+                        border: "none",
+                        colors: {
+                          ...theme.colors,
+                          primary: "var(--surface-1)",
+                          primary25: "var(--surface-2)",
+                          neutral0: "var(--surface-1)",
+                          neutral10: "var(--surface-3)", // tag background color
+                          neutral80: "var(--text-default)", // tag text color
+                          danger: "var(--text-default)", // tag cancel icon color
+                          dangerLight: "var(--surface-3)", // tag cancel background color
+                        },
+                      })}
+                      isValidNewOption={(email) => true}
+                      noOptionsMessage={() => null}
+                      placeholder={"Enter graphQL keys"}
+                      onChange={(selectors) => setMockGraphQLKeys(selectors.map((selector) => selector.value))}
+                      styles={{
+                        indicatorSeparator: (provided) => ({
+                          ...provided,
+                          display: "none",
+                        }),
+                        dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
+                        control: (provided) => ({
+                          ...provided,
+                          boxShadow: "none",
+                          border: "1px solid var(--border)",
+                          backgroundColor: "var(--background)",
+                        }),
+                        container: (provided) => ({
+                          ...provided,
+                          flexGrow: 1,
+                          width: "50ch",
+                        }),
+                      }}
+                    />
+                  )}
+                </Space>
+                <RQButton type="primary">Create Mock Rules</RQButton>
               </Row>
             </>
           </div>

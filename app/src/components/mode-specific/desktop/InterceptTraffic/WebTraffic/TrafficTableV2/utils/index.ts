@@ -78,14 +78,14 @@ export const getOrCreateSessionGroupId = async (
   return sessionGroup.id;
 };
 
-export const createResponseMock = async (ruleParams: {
+export const createResponseMock = (ruleParams: {
   response: string;
   urlMatcher: string;
   requestUrl: string;
   requestDetails: Record<string, any>;
   groupId: string;
   resourceType: string;
-  operationKey?: string;
+  operationKeys?: string[];
 }) => {
   const newResponseRule = getNewRule("Response");
   const responseRulePair = cloneDeep(newResponseRule.pairs[0]);
@@ -100,41 +100,63 @@ export const createResponseMock = async (ruleParams: {
     responseRulePair.source.value = ruleParams.requestDetails.path;
   }
 
-  const sourceFilters = responseRulePair.source.filters[0];
+  const sourceFilters = responseRulePair.source.filters[0] ?? {};
+  const operationParams = getGraphQLOperationValues(
+    JSON.parse(ruleParams.requestDetails.body),
+    ruleParams.operationKeys
+  );
 
-  if (ruleParams.resourceType === "graphqlApi" && ruleParams.operationKey) {
+  if (ruleParams.resourceType === "graphqlApi" && ruleParams.operationKeys.length) {
     sourceFilters.requestPayload = {};
-    sourceFilters.requestPayload.key = ruleParams.operationKey;
-    sourceFilters.requestPayload.value = getGraphQLOperationValue(
-      JSON.parse(ruleParams.requestDetails.body),
-      ruleParams.operationKey
-    );
-    responseRulePair.source.filters = [sourceFilters];
+
+    if (operationParams) {
+      sourceFilters.requestPayload.key = operationParams?.operationKey;
+      sourceFilters.requestPayload.value = operationParams?.operationValue;
+      responseRulePair.source.filters = [sourceFilters];
+    }
   }
 
   return {
     ...newResponseRule,
-    name: `[MOCK] ${ruleParams.operationKey || ""}-${ruleParams.requestUrl}`,
+    name: `[MOCK] ${operationParams.operationValue || ""}-${ruleParams.requestUrl}`,
     groupId: ruleParams.groupId,
     sessionCreated: true,
     pairs: [responseRulePair],
   };
 };
 
-export const getGraphQLOperationValue = (requestData: any, operationKey: any) => {
-  if (!operationKey) return true;
-
+export const getGraphQLOperationValues = (
+  requestData: any,
+  operationKeys: string[]
+): {
+  operationKey: string;
+  operationValue: string;
+} | null => {
   // We only allow request payload targeting when requestData is JSON
-  if (!requestData || typeof requestData !== "object") return false;
-  if (Object.keys(requestData).length === 0) return false;
+  if (!requestData || typeof requestData !== "object") return null;
+  if (Object.keys(requestData).length === 0) return null;
+
+  let operationValueInRequestData: string | null = null;
+  let operationKeyInRequestData: string | null = null;
 
   // tagettedKey is the json path e.g. a.b.0.c
-  if (operationKey) {
-    const valueInRequestData = traverseJsonByPath(requestData, operationKey);
-    return valueInRequestData;
+  if (operationKeys.length) {
+    operationKeys.some((key) => {
+      const valueInRequestData = traverseJsonByPath(requestData, key);
+      if (valueInRequestData) {
+        operationKeyInRequestData = key;
+        operationValueInRequestData = valueInRequestData;
+        return true;
+      }
+      return false;
+    });
   }
 
-  return false;
+  if (operationValueInRequestData) {
+    return { operationKey: operationKeyInRequestData, operationValue: operationValueInRequestData };
+  }
+
+  return null;
 };
 
 /**

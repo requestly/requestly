@@ -36,9 +36,10 @@ import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
 import { createResponseMock, getOrCreateSessionGroupId } from "./utils";
-import { getSessionId, getSessionName } from "store/features/network-sessions/selectors";
+import { getPreviewType, getSessionId, getSessionName } from "store/features/network-sessions/selectors";
 import { StorageService } from "init";
 import { getAppMode } from "store/selectors";
+import { PreviewType } from "store/features/network-sessions/slice";
 
 const { Text } = Typography;
 
@@ -59,12 +60,13 @@ const ActionHeader = ({
   selectedMockRequests,
   mockMatcher,
   mockResourceType,
-  mockGraphQLKey,
+  mockGraphQLKeys,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
   const isPaused = useSelector(getIsInterceptionPaused);
   const networkSessionId = useSelector(getSessionId);
   const sessionName = useSelector(getSessionName);
+  const sessionPreviewType = useSelector(getPreviewType);
   const appMode = useSelector(getAppMode);
 
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
@@ -167,20 +169,20 @@ const ActionHeader = ({
       appMode
     );
 
-    Promise.all(
-      Object.values(selectedMockRequests).map((log) => {
-        return createResponseMock({
-          response: log.response.body,
-          urlMatcher: mockMatcher,
-          requestUrl: log.url,
-          operationKey: mockGraphQLKey,
-          requestDetails: log.request,
-          resourceType: mockResourceType,
-          groupId: newSessionGroupId,
-        });
-      })
-    ).then((newRules) => StorageService(appMode).saveMultipleRulesOrGroups(newRules));
-  }, [appMode, mockGraphQLKey, mockMatcher, mockResourceType, networkSessionId, selectedMockRequests, sessionName]);
+    const newRules = Object.values(selectedMockRequests).map((log) => {
+      return createResponseMock({
+        response: log.response.body,
+        urlMatcher: mockMatcher,
+        requestUrl: log.url,
+        operationKeys: mockGraphQLKeys,
+        requestDetails: log.request,
+        resourceType: mockResourceType,
+        groupId: newSessionGroupId,
+      });
+    });
+
+    return StorageService(appMode).saveMultipleRulesOrGroups(newRules);
+  }, [appMode, mockGraphQLKeys, mockMatcher, mockResourceType, networkSessionId, selectedMockRequests, sessionName]);
 
   return (
     <>
@@ -282,37 +284,41 @@ const ActionHeader = ({
         </Space>
       </Row>
       <Row className="ml-auto" align="middle" justify="end">
-        {!isStaticPreview && isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
+        {isFeatureCompatible(FEATURES.NETWORK_SESSIONS) && isImportNetworkSessions ? (
           <>
-            <Col>
-              <Button
-                icon={<DownloadOutlined />}
-                disabled={!filteredLogsCount}
-                onClick={() => {
-                  downloadHar(logsToSaveAsHar || {}, "");
-                  trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
-                  trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
-                }}
-              >
-                Download
-              </Button>
-            </Col>
+            {!isStaticPreview && (
+              <Col>
+                <Button
+                  icon={<DownloadOutlined />}
+                  disabled={!filteredLogsCount}
+                  onClick={() => {
+                    downloadHar(logsToSaveAsHar || {}, "");
+                    trackDownloadNetworkSessionClicked(ActionSource.TrafficTable);
+                    trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
+                  }}
+                >
+                  Download
+                </Button>
+              </Col>
+            )}
 
-            <Divider type="vertical" style={{ margin: "0 16px" }} />
+            {!isStaticPreview && <Divider type="vertical" style={{ margin: "0 16px" }} />}
 
-            <Col>
-              <Button
-                icon={<SaveOutlined />}
-                disabled={!filteredLogsCount}
-                onClick={() => {
-                  trackNetworkSessionSaveClicked();
-                  trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
-                  openSaveModal();
-                }}
-              >
-                Save
-              </Button>
-            </Col>
+            {sessionPreviewType === PreviewType.IMPORTED && (
+              <Col>
+                <Button
+                  icon={<SaveOutlined />}
+                  disabled={!filteredLogsCount}
+                  onClick={() => {
+                    trackNetworkSessionSaveClicked();
+                    trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
+                    openSaveModal();
+                  }}
+                >
+                  Save
+                </Button>
+              </Col>
+            )}
           </>
         ) : null}
       </Row>

@@ -131,7 +131,7 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 1.25rem;
-  padding: 0 25px;
+  padding: 0 10px 0 25px;
 }
 
 .traffic-table-filters-container section {
