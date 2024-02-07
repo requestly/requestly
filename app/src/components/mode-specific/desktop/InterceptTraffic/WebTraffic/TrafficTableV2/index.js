@@ -57,6 +57,8 @@ import CreatableSelect from "react-select/creatable";
 import { getSessionName, getSessionId } from "store/features/network-sessions/selectors";
 import { StorageService } from "init";
 import { toast } from "utils/Toast";
+import { redirectToRules } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -71,6 +73,8 @@ const CurrentTrafficTable = ({
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { ruleEditorModal } = useSelector(getActiveModals);
   const newLogs = useSelector(getAllLogs);
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
@@ -626,9 +630,33 @@ const CurrentTrafficTable = ({
     return StorageService(appMode)
       .saveMultipleRulesOrGroups(newRules)
       .then(() => {
-        toast.success("Mock rules have been created successfully. View Now");
+        toast.success({
+          key: "mockRulesCreated",
+          content: (
+            <>
+              {"Mock rules have been created successfully. "}{" "}
+              <span
+                className="text-primary cursor-pointer"
+                onClick={() => {
+                  redirectToRules(navigate);
+                }}
+              >
+                View rules
+              </span>
+            </>
+          ),
+        });
       });
-  }, [appMode, mockGraphQLKeys, mockMatcher, mockResourceType, networkSessionId, selectedMockRequests, sessionName]);
+  }, [
+    appMode,
+    mockGraphQLKeys,
+    mockMatcher,
+    mockResourceType,
+    networkSessionId,
+    selectedMockRequests,
+    sessionName,
+    navigate,
+  ]);
 
   return (
     <>
