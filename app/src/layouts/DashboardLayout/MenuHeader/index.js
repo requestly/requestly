@@ -22,7 +22,6 @@ import ProductsDropDown from "./ProductsDropDown";
 import PremiumPlanNudge from "./PremiumPlanBadge/PremiumPlanNudge";
 import APP_CONSTANTS from "config/constants";
 import "./MenuHeader.css";
-import { PlanExpiredBadge } from "./PlanExpiredBadge";
 
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;
@@ -43,6 +42,16 @@ const MenuHeader = () => {
 
   //don't show general app header component for editor screens
   const showMenuHeader = () => !PATHS_WITHOUT_HEADER.some((path) => pathname.includes(path));
+
+  const renderPlanNudge = () => {
+    const userPlanStatus = user?.details?.planDetails?.status;
+
+    if (paywallIntensityExp === "control" || userPlanStatus !== "canceled" || isPlanExpiredBannerClosed) {
+      return <PremiumPlanNudge />;
+    }
+
+    return null;
+  };
 
   return showMenuHeader() ? (
     <Header className="layout-header">
@@ -80,17 +89,7 @@ const MenuHeader = () => {
         <Col className="ml-auto">
           <div className="header-right-section">
             <Row align="middle" gutter={8} wrap={false}>
-              {paywallIntensityExp !== "control" &&
-              user?.details?.planDetails.status === "canceled" &&
-              isPlanExpiredBannerClosed ? (
-                <PlanExpiredBadge />
-              ) : null}
-              {(paywallIntensityExp === "control" ||
-                (paywallIntensityExp !== "control" && user?.details?.planDetails.status !== "canceled")) && (
-                <Col>
-                  <PremiumPlanNudge />
-                </Col>
-              )}
+              {renderPlanNudge()}
               <RQButton
                 type="default"
                 className="header-search-btn"

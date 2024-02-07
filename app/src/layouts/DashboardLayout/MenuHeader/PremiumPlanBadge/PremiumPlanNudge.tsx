@@ -10,8 +10,8 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import firebaseApp from "../../../../firebase";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import { MdOutlineCreditCard } from "@react-icons/all-files/md/MdOutlineCreditCard";
-import { MdOutlineCreditCardOff } from "@react-icons/all-files/md/MdOutlineCreditCardOff";
+import crownWhiteIcon from "assets/icons/crown-white.svg";
+import crownDangerIcon from "assets/icons/crown-danger.svg";
 import "./premiumPlanNudge.scss";
 
 const PremiumPlanNudge = () => {
@@ -61,9 +61,9 @@ const PremiumPlanNudge = () => {
         <Row gutter={8} align="middle" className="items-center" style={{ height: "auto" }}>
           <Col className="premium-plan-nudge-icon">
             {planStatus === "trialing" ? (
-              <MdOutlineCreditCard className="text-default" />
+              <img src={crownWhiteIcon} alt="crown" />
             ) : (
-              <MdOutlineCreditCardOff className="danger" />
+              <img src={crownDangerIcon} alt="crown" />
             )}
           </Col>
           <Col className={`text-bold  ${planStatus === "trialing" ? "text-default" : "danger"}`}>
