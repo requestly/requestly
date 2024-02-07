@@ -693,10 +693,6 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               setIsFiltersCollapsed={setIsFiltersCollapsed}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
-              selectedMockRequests={selectedMockRequests}
-              mockMatcher={mockMatcher}
-              mockResourceType={mockResourceType}
-              mockGraphQLKeys={mockGraphQLKeys}
               setShowMockFilters={setShowMockFilters}
             >
               <Tag>{requestLogs.length} requests</Tag>
@@ -793,6 +789,11 @@ const CurrentTrafficTable = ({
                             label: "Path equals",
                             onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.PATH),
                           },
+                          {
+                            key: 3,
+                            label: "Path+Query string matches",
+                            onClick: () => setMockMatcher("path_query"),
+                          },
                         ],
                         selectable: true,
                         defaultSelectedKeys: [1],
@@ -801,7 +802,12 @@ const CurrentTrafficTable = ({
                       className="display-inline-block"
                     >
                       <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
-                        {mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL ? "URL Equals" : "Path Equals"} <DownOutlined />
+                        {mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL
+                          ? "URL Equals"
+                          : mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH
+                          ? "Path Equals"
+                          : "Path+Query string matches"}{" "}
+                        <DownOutlined />
                       </Typography.Text>
                     </RQDropdown>
                     {mockResourceType === "graphqlApi" && (

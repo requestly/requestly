@@ -96,18 +96,26 @@ export const createResponseMock = (ruleParams: {
   responseRulePair.response.value = ruleParams.response;
   responseRulePair.response.serveWithoutRequest = true;
   responseRulePair.response.resourceType = ruleParams.resourceType;
-  responseRulePair.source.key = ruleParams.urlMatcher;
-  responseRulePair.source.operator = GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS;
+
   if (ruleParams.urlMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL) {
     responseRulePair.source.value = ruleParams.requestUrl;
+    responseRulePair.source.key = ruleParams.urlMatcher;
+    responseRulePair.source.operator = GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS;
   } else if (ruleParams.urlMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH) {
     responseRulePair.source.value = ruleParams.requestDetails.path;
+    responseRulePair.source.key = ruleParams.urlMatcher;
+    responseRulePair.source.operator = GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS;
+  } else if (ruleParams.urlMatcher === "path_query") {
+    const urlObject = new URL(ruleParams.requestUrl);
+    responseRulePair.source.value = urlObject.pathname + urlObject.search;
+    responseRulePair.source.key = GLOBAL_CONSTANTS.RULE_KEYS.URL;
+    responseRulePair.source.operator = GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS;
   }
 
-  const sourceFilters = responseRulePair.source.filters[0] ?? {};
   let operationParams = null;
 
   if (ruleParams.resourceType === "graphqlApi" && ruleParams.operationKeys.length) {
+    const sourceFilters = responseRulePair.source.filters[0] ?? {};
     operationParams = getGraphQLOperationValues(JSON.parse(ruleParams.requestDetails.body), ruleParams.operationKeys);
     sourceFilters.requestPayload = {};
 
@@ -121,6 +129,7 @@ export const createResponseMock = (ruleParams: {
   return {
     ...newResponseRule,
     name: `[MOCK] ${operationParams?.operationValue || ""}-${ruleParams.requestUrl}`,
+    description: `Mock response for ${ruleParams.requestUrl} - ${operationParams?.operationValue || ""}`,
     groupId: ruleParams.groupId,
     sessionCreated: true,
     pairs: [responseRulePair],
