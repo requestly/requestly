@@ -14,7 +14,7 @@ import { trackRQLastActivity } from "../../../../../../../utils/AnalyticsUtils";
 //Actions
 import { saveRule } from "../actions";
 import { getModeData, setIsCurrentlySelectedRuleHasUnsavedChanges } from "../../../actions";
-import { transformAndValidateInputsforRule, validateRule } from "./actions";
+import { transformAndValidateRuleFields, validateRule } from "./actions";
 
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../config/constants";
@@ -128,7 +128,7 @@ const CreateRuleButton = ({
     //Pre-validation: regex fix + trim whitespaces
     const fixedRuleData = runMinorFixesOnRule(dispatch, currentlySelectedRuleData);
     //Syntactic Validation
-    const syntacticValidation = await transformAndValidateInputsforRule(fixedRuleData);
+    const syntacticValidation = await transformAndValidateRuleFields(fixedRuleData);
     console.log("syntacticValidation", syntacticValidation);
     if (!syntacticValidation.success) {
       switch (syntacticValidation.error) {

@@ -359,6 +359,13 @@ export const validateRule = (rule, dispatch, appMode) => {
                 error: "invalid script url",
               };
             }
+            if (!isValidUrl(script.value)) {
+              output = {
+                result: false,
+                message: `Please enter a valid script URL`,
+                error: "invalid script url",
+              };
+            }
           }
         });
       }
