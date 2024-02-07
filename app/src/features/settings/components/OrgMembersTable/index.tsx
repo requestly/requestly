@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { Col, Empty, Input, Row, Table, TableProps } from "antd";
@@ -9,7 +9,11 @@ import { trackBillingTeamNoMemberFound } from "features/settings/analytics";
 import { OrgTableActions } from "./components/OrgTableActions";
 import "./index.scss";
 
-export const OrgMembersTable = () => {
+interface OrgMembersTableProps {
+  source: string;
+}
+
+export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ source }) => {
   const user = useSelector(getUserAuthDetails);
   const [organizationMembers, setOrganizationMembers] = useState<{ total: number; users: unknown[] }>(null);
   const [search, setSearch] = useState("");
@@ -24,7 +28,7 @@ export const OrgMembersTable = () => {
 
   useEffect(() => {
     if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {
-      trackBillingTeamNoMemberFound("personal_email");
+      trackBillingTeamNoMemberFound("personal_email", source);
       setOrganizationMembers({ total: 0, users: [] });
     }
     if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
@@ -32,12 +36,18 @@ export const OrgMembersTable = () => {
         domain: getDomainFromEmail(user?.details?.profile?.email),
       }).then((res: any) => {
         if (res.data.total <= 1) {
-          trackBillingTeamNoMemberFound("no_org_member_available");
+          trackBillingTeamNoMemberFound("no_org_member_available", source);
         }
         setOrganizationMembers(res.data);
       });
     }
-  }, [getOrganizationUsers, user.loggedIn, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
+  }, [
+    getOrganizationUsers,
+    user.loggedIn,
+    user?.details?.profile?.email,
+    user?.details?.profile?.isEmailVerified,
+    source,
+  ]);
 
   const columns: TableProps<any>["columns"] = useMemo(
     () => [
