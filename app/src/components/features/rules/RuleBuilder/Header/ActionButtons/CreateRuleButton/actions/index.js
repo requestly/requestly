@@ -28,7 +28,7 @@ import FEATURES from "config/constants/sub/features";
  *  pairId?: string, // id of the pair that caused the error
  * }
  */
-export const transformAndValidateInputsforRule = async (ruleData) => {
+export const transformAndValidateRuleFields = async (ruleData) => {
   switch (ruleData.ruleType) {
     case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT: {
       const isCompatibleWithAttributesForScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
@@ -37,6 +37,7 @@ export const transformAndValidateInputsforRule = async (ruleData) => {
         return ruleData;
       }
 
+      /* RuleData is explicitly read-only (reference to value in store) */
       const ruleDataCopy = _.cloneDeep(ruleData);
       const newPairs = [];
 
