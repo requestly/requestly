@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Result, Spin } from "antd";
 import { MyBillingTeam } from "./components/MyBillingTeam";
@@ -12,9 +12,13 @@ import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { OtherBillingTeam } from "./components/OtherBillingTeam";
 import { UserPlanDetails } from "./components/UserPlanDetails";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import Logger from "lib/logger";
+import { billingActions } from "store/features/billing/slice";
 
 export const BillingTeam: React.FC = () => {
   const { billingId } = useParams();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector(getUserAuthDetails);
@@ -31,6 +35,25 @@ export const BillingTeam: React.FC = () => {
       }),
     [billingTeams, billingId, location.pathname]
   );
+
+  useEffect(() => {
+    if (!hasAccessToBillingTeam && billingId) {
+      const getTeamAdminView = httpsCallable(getFunctions(), "billing-getOtherBillingTeam");
+      getTeamAdminView({ billingId })
+        .then((result: any) => {
+          if (result.data.success) {
+            const newTeams = [...billingTeams, result.data.billingTeamData];
+            dispatch(billingActions.setAvailableBillingTeams(newTeams));
+            dispatch(
+              billingActions.setBillingTeamMembers({ billingId, billingTeamMembers: result.data.billingTeamMembers })
+            );
+          }
+        })
+        .catch((error) => {
+          Logger.log(error);
+        });
+    }
+  }, [billingId, hasAccessToBillingTeam, dispatch, billingTeams]);
 
   useEffect(() => {
     setShowUserPlanDetails(false);
