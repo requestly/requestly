@@ -38,7 +38,7 @@ export const BillingTeam: React.FC = () => {
 
   useEffect(() => {
     if (!hasAccessToBillingTeam && billingId) {
-      const getTeamOtherTeam = httpsCallable(getFunctions(), "billing-getOtherBillingTeam");
+      const getTeamOtherTeam = httpsCallable(getFunctions(), "billing-fetchBillingTeam");
       getTeamOtherTeam({ billingId })
         .then((result: any) => {
           if (result.data.success) {
