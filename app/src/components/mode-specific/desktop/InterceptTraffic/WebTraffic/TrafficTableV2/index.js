@@ -762,7 +762,7 @@ const CurrentTrafficTable = ({
                         items: [
                           {
                             key: "restApi",
-                            label: "REST API",
+                            label: "HTTP (REST, JS, CSS)",
                           },
                           {
                             key: "graphqlApi",
@@ -770,7 +770,6 @@ const CurrentTrafficTable = ({
                           },
                         ],
                         selectable: true,
-                        defaultSelectedKeys: [1],
                         onSelect: (item) => {
                           resetMockResponseState();
                           setMockResourceType(item.key);
@@ -782,7 +781,7 @@ const CurrentTrafficTable = ({
                       <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
                         {mockResourceType
                           ? mockResourceType === "restApi"
-                            ? "REST API"
+                            ? "HTTP (REST, JS, CSS)"
                             : "GraphQL API"
                           : "Select Resource Type"}{" "}
                         <DownOutlined />
@@ -792,23 +791,37 @@ const CurrentTrafficTable = ({
                       menu={{
                         items: [
                           {
-                            key: 1,
-                            label: "URL equals",
-                            onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.URL),
+                            key: GLOBAL_CONSTANTS.RULE_KEYS.URL,
+                            label: (
+                              <Tooltip title="Ideal for targeting specific and complete URLs." placement="right">
+                                Match entire URL
+                              </Tooltip>
+                            ),
                           },
                           {
-                            key: 2,
-                            label: "Path equals",
-                            onClick: () => setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.PATH),
+                            key: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
+                            label: (
+                              <Tooltip title="Ideal for matching across different domains" placement="right">
+                                Match only path
+                              </Tooltip>
+                            ),
                           },
                           {
-                            key: 3,
-                            label: "Path+Query string matches",
-                            onClick: () => setMockMatcher("path_query"),
+                            key: "path_query",
+                            label: (
+                              <Tooltip
+                                title="Ideal for cases where param values in URL are crucial for matching"
+                                placement="right"
+                              >
+                                Match path & query params
+                              </Tooltip>
+                            ),
                           },
                         ],
                         selectable: true,
-                        defaultSelectedKeys: [1],
+                        onSelect: (item) => {
+                          setMockMatcher(item.key);
+                        },
                       }}
                       trigger={["click"]}
                       className="display-inline-block"
@@ -816,10 +829,10 @@ const CurrentTrafficTable = ({
                       <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
                         {mockMatcher
                           ? mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL
-                            ? "URL Equals"
+                            ? "Match entire URL"
                             : mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH
-                            ? "Path Equals"
-                            : "Path+Query string matches"
+                            ? "Match only path"
+                            : "Match path & query params"
                           : "Select Matching Condition"}{" "}
                         <DownOutlined />
                       </Typography.Text>
@@ -886,17 +899,17 @@ const CurrentTrafficTable = ({
                       disabled={selectedRequestsLength === 0}
                       onClick={() => {
                         if (!mockResourceType) {
-                          toast.error("Please select resource type to create a mock response");
+                          toast.error("Please select resource type to create mock rules");
                           return;
                         }
 
                         if (!mockMatcher) {
-                          toast.error("Please select matching condition to create a mock response");
+                          toast.error("Please select matching condition to create mock rules");
                           return;
                         }
 
                         if (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0) {
-                          toast.error("Please enter at least one operation key to create a mock response");
+                          toast.error("Please enter at least one operation key to create mock rules");
                           return;
                         }
                       }}
