@@ -7,98 +7,102 @@ import _, { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
 import {
-  extractInnerTextAndAttributesFromHTMLString,
+  parseHTMLString,
   getHTMLNodeName,
-  validateStringForSpecificHTMLNode,
+  validateHTMLTag,
 } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
 /**
- * Convert user inputs into rule schema
+ * In case of a few rules, input from the rule editor does not directly map to rule schema.
+ * This function is used to transform and validate the input fields before saving the rule.
  *
+ * Returns the transformed rule data if modified, else returns the original rule data.
  * @param {*} ruleData
  * @returns {
  *  success: boolean,
- *  newRuleData?: object, // in case of successful validation and transformation
- *
- *  // in case of failure
- *  error?: string,
- *  message?: string,
- *  pairId?: string, // id of the pair that caused the error
+ *  ruleData?: object,
+ *  validationError?: {
+ *    error: string,
+ *    message: string, 
+ *    pairId: string // pair that cause the error
+ *  }
  * }
  */
 export const transformAndValidateRuleFields = async (ruleData) => {
   switch (ruleData.ruleType) {
     case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT: {
-      const isCompatibleWithAttributesForScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
+      const isCompatibleWithAttributesForScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
 
       if (!isCompatibleWithAttributesForScriptRule) {
-        return ruleData;
+        return {success: true, ruleData};
+      }
+      /* RuleData is explicitly read-only (reference to value in store) */
+      const newRuleData = _.cloneDeep(ruleData);
+
+      const validateScriptRule = () => {
+        const promises = [];
+        ruleData.pairs.forEach((pair, pairIndex) => {
+          pair.scripts.forEach((script, scriptIndex) => {
+            promises.push(validateScript(script, scriptIndex, pairIndex));
+          });
+        });
+        return Promise.all(promises).then(() => {
+          return {success: true, ruleData: newRuleData};
+        }).catch((validationError) => {
+          /* validation failed */
+          return {success: false, validationError};
+        });
       }
 
-      /* RuleData is explicitly read-only (reference to value in store) */
-      const ruleDataCopy = _.cloneDeep(ruleData);
-      const newPairs = [];
-
-      for (const pair of ruleDataCopy.pairs) {
-        const parsedPair = pair;
-        const newScripts = [];
-
-        for (const script of pair.scripts) {
-          let newScript = script;
-
-          const htmlNodeName = getHTMLNodeName(script.type, script.codeType);
+      const validateScript = (script, scriptIndex, pairIndex) => {
+        return new Promise(async (resolve, reject) => {
+          const codeHTMLTagName = getHTMLNodeName(script.type, script.codeType);
 
           if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
-            const res = await validateStringForSpecificHTMLNode(script.value, htmlNodeName);
+            const res = await validateHTMLTag(script.value, codeHTMLTagName);
             if (!res.isValid) {
-              return {
+              reject({
                 error: res.validationError,
-                success: false,
                 message: res.errorMessage,
-                pairId: pair.id,
-              };
+                pairId: ruleData.pairs[pairIndex].id,
+              });
             }
-            const { attributes, innerText: code } = extractInnerTextAndAttributesFromHTMLString(
+            const { attributes, innerText: code } = parseHTMLString(
               script.value,
-              htmlNodeName
+              codeHTMLTagName
             );
-            newScript = {
+
+            newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
               ...script,
               attributes,
               value: code,
             };
           } else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-            const res = await validateStringForSpecificHTMLNode(script.wrapperElement, htmlNodeName);
+            const res = await validateHTMLTag(script.wrapperElement, codeHTMLTagName);
             if (!res.isValid) {
-              return {
+              reject({
                 error: res.validationError,
-                success: false,
                 message: res.errorMessage,
-                pairId: pair.id,
-              };
+                pairId: ruleData.pairs[pairIndex].id,
+              });
             }
-            const { attributes } = extractInnerTextAndAttributesFromHTMLString(script.wrapperElement, htmlNodeName);
-            newScript = {
+            const { attributes } = parseHTMLString(script.wrapperElement, codeHTMLTagName);
+            newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
               ...script,
               attributes,
             };
           }
-          delete newScript["wrapperElement"]; // this was used to temporarily store the raw code
-          newScripts.push(newScript);
-        }
-        parsedPair.scripts = newScripts;
-        newPairs.push(parsedPair);
+          delete newRuleData.pairs[pairIndex].scripts[scriptIndex]["wrapperElement"]; // this was used to temporarily store the raw code
+          resolve();
+        });
       }
-      const newRuleData = {
-        ...ruleData,
-        pairs: newPairs,
-      };
-      return { success: true, newRuleData };
+
+      return validateScriptRule();
     }
     default:
-      return { success: true };
+      return { success: true, ruleData };
   }
 };
 
@@ -351,15 +355,8 @@ export const validateRule = (rule, dispatch, appMode) => {
             // }
           }
           //Check if URL isn't empty. Can be absolute or relative
-          else if (script.type === "url") {
-            if (isEmpty(script.value)) {
-              output = {
-                result: false,
-                message: `Please enter a valid script URL`,
-                error: "invalid script url",
-              };
-            }
-            if (!isValidUrl(script.value)) {
+          else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+            if (isEmpty(script.value) || !isValidUrl(script.value)) {
               output = {
                 result: false,
                 message: `Please enter a valid script URL`,

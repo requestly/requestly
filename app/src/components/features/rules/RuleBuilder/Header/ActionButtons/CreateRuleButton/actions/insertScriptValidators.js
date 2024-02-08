@@ -4,16 +4,16 @@ import { HtmlValidate, StaticConfigLoader } from "html-validate";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 /* LOGICAL VALIDATORS - currently not being fully applied */
-export const scriptLogicalErrors = {
+export const SCRIPT_LOGICAL_ERRORS = {
   DOM_LOAD_EVENT_LISTENER_AFTER_PAGE_LOAD: "dom_load_event_listener_after_page_load",
-  CONTAINS_HTML_CODE: "contains_html_code",
+  CONTAINS_NON_JS_CSS: "contains_non_js_css",
 };
 
 export function checkForLogicalErrorsInCode(code, script) {
-  if (doesStringContainHTMLSnippet(code)) {
+  if (!isJSOrCSS(code)) {
     return {
       isValid: false,
-      error: scriptLogicalErrors.CONTAINS_HTML_CODE,
+      error: SCRIPT_LOGICAL_ERRORS.CONTAINS_NON_JS_CSS,
     };
   }
 
@@ -25,7 +25,7 @@ export function checkForLogicalErrorsInCode(code, script) {
   ) {
     return {
       isValid: false,
-      error: scriptLogicalErrors.DOM_LOAD_EVENT_LISTENER_AFTER_PAGE_LOAD,
+      error: SCRIPT_LOGICAL_ERRORS.DOM_LOAD_EVENT_LISTENER_AFTER_PAGE_LOAD,
     };
   }
 
@@ -56,7 +56,6 @@ function hasLoadEventListener(code) {
       },
     });
 
-    console.log("hasLoadListener", hasLoadListener); // todo: remove
     return hasLoadListener;
   } catch (error) {
     console.error("Error parsing code:", error);
@@ -64,22 +63,19 @@ function hasLoadEventListener(code) {
   }
 }
 
-function doesStringContainHTMLSnippet(code) {
+/* HACK: For now we verify this by confirming that this is not HTML code */
+function isJSOrCSS(code) {
   try {
     const doc = new DOMParser().parseFromString(code, "text/html");
-    return (
-      // nodeType 1 is for element nodes
-      Array.from(doc.body.childNodes).some((node) => node.nodeType === 1) || // most nodes end up in body
-      Array.from(doc.head.childNodes).some((node) => node.nodeType === 1) // special nodes like link and style end up in head
-    );
+    return !isHTMLString(code, doc);
   } catch (error) {
     console.error("Error parsing code:", error);
-    return false;
+    return true;
   }
 }
 
 /* HTML VALIDATORS */
-export const invalidHTMLError = {
+export const HTML_ERRORS = {
   COULD_NOT_PARSE: "could_not_parse",
   UNCLOSED_TAGS: "unclosed_tags",
   UNCLOSED_ATTRIBUTES: "unclosed_attributes",
@@ -91,14 +87,14 @@ export const invalidHTMLError = {
 /**
  * Check if the given string contains HTML snippets
  * And if so, validates if the html snippet is correct
+ * 
  * @param {string} str string containing HTML snippet
  * @param {Document} doc Document created from the HTML string
  * @returns {boolean}
  */
-export async function validateStringForSpecificHTMLNode(str, htmlNodeName) {
+export async function validateHTMLTag(str, htmlNodeName) {
   const HTMLLinterResult = await htmlValidateRawCodeString(str);
   if (!HTMLLinterResult.isValid) {
-    console.log("5");
     return {
       isValid: false,
       validationError: HTMLLinterResult.validationErrors[0].errorType,
@@ -119,25 +115,23 @@ export async function validateStringForSpecificHTMLNode(str, htmlNodeName) {
     if (nodes.length === 0) {
       return {
         isValid: false,
-        validationError: invalidHTMLError.NO_TAGS,
+        validationError: HTML_ERRORS.NO_TAGS,
         errorMessage: "No tags found in the document",
       };
     }
 
     if (nodes.length > 1) {
-      console.log("3");
       return {
         isValid: false,
-        validationError: invalidHTMLError.MULTIPLE_TAGS,
+        validationError: HTML_ERRORS.MULTIPLE_TAGS,
         errorMessage: `Multiple ${htmlNodeName} tags found in the document. Only one is allowed.`,
       };
     }
 
-    if (doesDocumentHaveOtherNodes(doc, htmlNodeName)) {
-      console.log("4", doc);
+    if (checkDocumentForAnyOtherNode(doc, htmlNodeName)) {
       return {
         isValid: false,
-        validationError: invalidHTMLError.UNSUPPORTED_TAGS,
+        validationError: HTML_ERRORS.UNSUPPORTED_TAGS,
         errorMessage: `Only ${htmlNodeName} tags are allowed `,
       };
     }
@@ -177,19 +171,19 @@ async function htmlValidateRawCodeString(codeString) {
         if (errMessage.ruleId === "parser-error") {
           validationErrors.push({
             message: errMessage.message,
-            errorType: invalidHTMLError.COULD_NOT_PARSE,
+            errorType: HTML_ERRORS.COULD_NOT_PARSE,
           });
         }
         if (errMessage.ruleId === "close-order" || errMessage.ruleId === "script-element") {
           validationErrors.push({
             message: errMessage.message,
-            errorType: invalidHTMLError.UNCLOSED_TAGS,
+            errorType: HTML_ERRORS.UNCLOSED_TAGS,
           });
         }
         if (errMessage.ruleId === "close-attr") {
           validationErrors.push({
             message: errMessage.message,
-            errorType: invalidHTMLError.UNCLOSED_ATTRIBUTES,
+            errorType: HTML_ERRORS.UNCLOSED_ATTRIBUTES,
           });
         }
       });
@@ -205,25 +199,23 @@ async function htmlValidateRawCodeString(codeString) {
 /**
  * Check if the given string contains HTML nodes
  * @param {string} str string containing HTML snippet
- * @param {Document} doc Document created from the HTML string
+ * @param {Document} generatedDocument Document created from the HTML string
  * @returns {boolean}
  */
-function isHTMLString(str, doc) {
-  // todo: rename
+function isHTMLString(str, generatedDocument) {
   const defaultResponse = true;
   if (!str) return defaultResponse;
 
   // check if body and head is just empty
-  if (doc.body.childNodes.length === 0 && doc.head.childNodes.length === 0) {
+  if (generatedDocument.body.childNodes.length === 0 && generatedDocument.head.childNodes.length === 0) {
     /* since string exists, but doc is empty, this implies there was an error parsing it into the document */
-    console.log("6");
     return defaultResponse;
   }
 
   return (
     // nodeType 1 is for element nodes
-    Array.from(doc.body.childNodes).some((node) => node.nodeType === 1) || // most nodes end up in body
-    Array.from(doc.head.childNodes).some((node) => node.nodeType === 1) // special nodes like link and style end up in head
+    Array.from(generatedDocument.body.childNodes).some((node) => node.nodeType === 1) || // most nodes end up in body
+    Array.from(generatedDocument.head.childNodes).some((node) => node.nodeType === 1) // special nodes like link and style end up in head
   );
 }
 
@@ -233,8 +225,8 @@ function isHTMLString(str, doc) {
  * @param {string} nodeName name of the node that is expected to be present in the document
  * @returns {boolean}
  */
-function doesDocumentHaveOtherNodes(doc, nodeName) {
-  const defaultResponse = false; // todo: rename
+function checkDocumentForAnyOtherNode(doc, nodeName) {
+  const defaultResponse = false;
   try {
     /* nodeType 1 is for element nodes */
     return (
@@ -250,13 +242,17 @@ function doesDocumentHaveOtherNodes(doc, nodeName) {
 }
 
 /**
+ * Parsing the attributes and the innerText of the HTML string
  *
  * @param {string} rawCode string containing HTML snipper
  * @param {string} htmlNodeName name of the HTML node
- * @returns  {Object} object containing innerText and attributes
+ * @returns  {
+ *  innerText: string,
+ *  attributes: Array<{name: string, value: string}>,
+ * } 
  */
-export function extractInnerTextAndAttributesFromHTMLString(rawCode, htmlNodeName) {
-  const details = extractDomNodeDetailsFromHTMLCodeString(rawCode, htmlNodeName); // todo: replace this call
+export function parseHTMLString(rawCode, htmlNodeName) {
+  const details = extractDOMNodeDetails(rawCode, htmlNodeName); // todo: replace this call
 
   if (!details?.length) {
     return {
@@ -287,17 +283,18 @@ export function extractInnerTextAndAttributesFromHTMLString(rawCode, htmlNodeNam
 export function getHTMLNodeName(scriptType, codeType) {
   let htmlNode = "";
   if (codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-    // else CSS
     htmlNode = "script";
-  } else if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-    htmlNode = "link";
-  } else {
-    htmlNode = "style";
+  } else { // CSS
+    if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+      htmlNode = "link";
+    } else {
+      htmlNode = "style";
+    }
   }
   return htmlNode;
 }
 
-function extractDomNodeDetailsFromHTMLCodeString(htmlCodeString, nodeName) {
+function extractDOMNodeDetails(htmlCodeString, nodeName) {
   if (!nodeName || nodeName === "body") throw new Error("htmlElementName is empty");
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlCodeString, "text/html");

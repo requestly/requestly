@@ -55,8 +55,6 @@ const RuleBuilder = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
-  console.log("currentlySelectedRuleData", currentlySelectedRuleData);
-
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 

@@ -292,3 +292,11 @@ export const getAppNotificationBannerDismissTs = (state) => {
 export const getIsOrgBannerDismissed = (state) => {
   return getGlobalState(state).misc.persist?.isOrgBannerDismissed;
 };
+
+export const getAllEditorToast = (state) => {
+  return getGlobalState(state).editorToast;
+};
+
+export const getToastForEditor = (state, id) => {
+  return getGlobalState(state).editorToast[id];
+};

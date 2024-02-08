@@ -36,7 +36,8 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import "../RuleEditorActionButtons.css";
-import { invalidHTMLError } from "./actions/insertScriptValidators";
+import { HTML_ERRORS } from "./actions/insertScriptValidators";
+import { toastType } from "components/misc/CodeEditor/EditorToast/types";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -128,33 +129,31 @@ const CreateRuleButton = ({
     //Pre-validation: regex fix + trim whitespaces
     const fixedRuleData = runMinorFixesOnRule(dispatch, currentlySelectedRuleData);
     //Syntactic Validation
-    const syntacticValidation = await transformAndValidateRuleFields(fixedRuleData);
-    console.log("syntacticValidation", syntacticValidation);
-    if (!syntacticValidation.success) {
-      switch (syntacticValidation.error) {
-        case invalidHTMLError.COULD_NOT_PARSE:
-        case invalidHTMLError.UNCLOSED_TAGS:
-        case invalidHTMLError.UNCLOSED_ATTRIBUTES:
-        case invalidHTMLError.UNSUPPORTED_TAGS:
-        case invalidHTMLError.MULTIPLE_TAGS:
-        case invalidHTMLError.NO_TAGS:
+    const syntaxValidation = await transformAndValidateRuleFields(fixedRuleData);
+    if (!syntaxValidation.success) {
+      const validationError = syntaxValidation.validationError;
+      switch (validationError.error) {
+        case HTML_ERRORS.COULD_NOT_PARSE:
+        case HTML_ERRORS.UNCLOSED_TAGS:
+        case HTML_ERRORS.UNCLOSED_ATTRIBUTES:
+        case HTML_ERRORS.UNSUPPORTED_TAGS:
+        case HTML_ERRORS.MULTIPLE_TAGS:
+        case HTML_ERRORS.NO_TAGS:
           dispatch(
             actions.triggerToastForEditor({
-              id: syntacticValidation.pairId,
-              message: syntacticValidation.message,
-              type: "error",
+              id: validationError.pairId,
+              message: validationError.message,
+              type: toastType.ERROR,
               autoClose: 4500,
             })
           );
           break;
         default:
-          toast.error(syntacticValidation.message || "Could Not Parse rule");
+          toast.error(validationError.message || "Could Not Parse rule");
           break;
       }
     } else {
-      // todo: check if I need to dispatch the new rule data @nsr
-      const parsedRuleData = syntacticValidation.newRuleData || currentlySelectedRuleData;
-      console.log("parsedRuleData", parsedRuleData);
+      const parsedRuleData = syntaxValidation.newRuleData || currentlySelectedRuleData;
       //Validation
       const ruleValidation = validateRule(parsedRuleData, dispatch, appMode);
       if (ruleValidation.result) {

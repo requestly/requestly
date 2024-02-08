@@ -12,7 +12,7 @@ import { ResizableBox } from "react-resizable";
 import "./CodeEditor.css";
 import "./EditorToast/editorToast.scss";
 import { EditorToastContainer } from "./EditorToast/EditorToastContainer";
-import { getAllEditorToast } from "store/features/editorToastActions";
+import { getAllEditorToast } from "store/selectors";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 

@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm, Button } from "antd";
@@ -14,31 +15,30 @@ import FEATURES from "config/constants/sub/features";
 
 const { Text } = Typography;
 
-function getDefaultScript(language, scriptType, isCompatibleWithHMLAttributes) {
-  if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL && isCompatibleWithHMLAttributes) {
-    if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-      return '<!--  Custom attributes to the script can be added here.  -->\n<script type="text/javscript">\n//Everything else will be ignored \n</script>';
-    }
-    if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-      return '<!--  Custom attributes to the script can be added here.  -->\n<link rel="stylesheet" type="text/css" >\n<!-- Everything else will be ignored  -->\n';
-    }
-  }
-  if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
-    if (isCompatibleWithHMLAttributes) {
-      if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-        return '<script type="text/javascript">\n\tconsole.log("Hello World");\n</script>';
+function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
+  switch (scriptType) {
+    case GLOBAL_CONSTANTS.SCRIPT_TYPES.URL:
+      if (isCompatibleWithAttributes) {
+        switch (language) {
+          case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
+            return '<!--  Custom attributes to the script can be added here.  -->\n<script type="text/javscript">\n//Everything else will be ignored \n</script>';
+          case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
+            return '<!--  Custom attributes to the script can be added here.  -->\n<link rel="stylesheet" type="text/css" >\n<!-- Everything else will be ignored  -->\n';
+        }
       }
-      if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-        return "<style>\n\tbody {\n\t\t background-color: #fff;\n\t}\n</style>";
+      break;
+    case GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE:
+      switch (language) {
+        case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
+          return isCompatibleWithAttributes
+            ? '<script type="text/javascript">\n\tconsole.log("Hello World");\n</script>'
+            : 'console.log("Hello World");';
+        case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
+          return isCompatibleWithAttributes
+            ? "<style>\n\tbody {\n\t\t background-color: #fff;\n\t}\n</style>"
+            : "body {\n\t background-color: #fff;\n }";
       }
-    } else {
-      if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-        return 'console.log("Hello World");';
-      }
-      if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-        return "body {\n\t background-color: #fff;\n }";
-      }
-    }
+      break;
   }
 
   return "";
@@ -75,7 +75,7 @@ const CustomScriptRow = ({
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
-  const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE_HTML_BLOCK);
+  const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
 
   const scriptEditorBoilerCode = useMemo(() => {
     return getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
@@ -133,64 +133,6 @@ const CustomScriptRow = ({
   };
 
   const renderURLInput = () => {
-    const renderCodeEditorForScriptAttributes = () => {
-      const handleScriptChange = (value) => {
-        /* THIS IS A TEMPORARY RULE ATTRIBUTE */
-        dispatch(
-          actions.updateRulePairAtGivenPath({
-            pairIndex,
-            updates: {
-              [`scripts[${scriptIndex}].wrapperElement`]: value,
-            },
-          })
-        );
-      };
-
-      const handleCodeFormattedFlag = () => {
-        setIsCodeFormatted(true);
-        setTimeout(() => {
-          setIsCodeFormatted(false);
-        }, 2000);
-      };
-      return (
-        <Col span={24} data-tour-id="code-editor">
-          <Row
-            key={rowIndex}
-            span={24}
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Col xl="12" span={24}>
-              <CodeEditor
-                id={pair.id}
-                height={75}
-                language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
-                defaultValue={scriptEditorBoilerCode}
-                value={htmlWithAttributesAndCodeFromRuleData}
-                handleChange={handleScriptChange}
-                readOnly={isInputDisabled}
-                isCodeFormatted={isCodeFormatted}
-              />
-            </Col>
-          </Row>
-          <Row span={24} align="middle" justify="space-between" className="code-editor-character-count-row ">
-            <Col align="left">
-              {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
-                <Button type="link" onClick={handleCodeFormattedFlag}>
-                  Pretty Print {"{ }"}
-                </Button>
-              ) : null}
-            </Col>
-            <Col span={6} align="right">
-              <span className="codemirror-character-count text-gray">{script.value?.length ?? 0} characters</span>
-            </Col>
-          </Row>
-        </Col>
-      );
-    };
-
     return (
       <Col span={24}>
         <Row className="margin-top-one" span={24} gutter={16} align="middle">
@@ -239,7 +181,7 @@ const CustomScriptRow = ({
         </Row>
         {isCompatibleWithAttributes ? (
           <Row className="margin-top-one" span={24} gutter={16} align="middle">
-            {renderCodeEditorForScriptAttributes()}
+            {renderCodeEditor()}
           </Row>
         ) : null}
       </Col>
@@ -283,18 +225,30 @@ const CustomScriptRow = ({
   };
 
   const renderCodeEditor = () => {
-    const scriptBodyChangeHandler = (value) => {
-      dispatch(
-        actions.updateRulePairAtGivenPath({
-          pairIndex,
-          triggerUnsavedChangesIndication: !isCodeFormatted,
-          updates: {
-            [`scripts[${scriptIndex}].value`]: value,
-          },
-        })
-      );
+    const handleEditorUpdate = (value) => {
+      if(script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+        /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
+        dispatch(
+          actions.updateRulePairAtGivenPath({
+            pairIndex,
+            updates: {
+              [`scripts[${scriptIndex}].wrapperElement`]: value,
+            },
+          })
+        );
+      } else {
+        dispatch(
+          actions.updateRulePairAtGivenPath({
+            pairIndex,
+            triggerUnsavedChangesIndication: !isCodeFormatted,
+            updates: {
+              [`scripts[${scriptIndex}].value`]: value,
+            },
+          })
+        );
+      }
     };
-
+  
     const handleCodeFormattedFlag = () => {
       setIsCodeFormatted(true);
       setTimeout(() => {
@@ -315,10 +269,11 @@ const CustomScriptRow = ({
           <Col xl="12" span={24}>
             <CodeEditor
               id={pair.id}
+              height={ script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 75 : 300}
               language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
               defaultValue={scriptEditorBoilerCode}
               value={htmlWithAttributesAndCodeFromRuleData}
-              handleChange={scriptBodyChangeHandler}
+              handleChange={handleEditorUpdate}
               readOnly={isInputDisabled}
               isCodeFormatted={isCodeFormatted}
             />

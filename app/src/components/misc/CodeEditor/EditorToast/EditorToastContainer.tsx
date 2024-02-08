@@ -1,12 +1,7 @@
 import React, { useEffect } from "react";
 import "./editorToast.scss";
+import { toastType } from "./types";
 
-export enum toastType {
-  SUCCESS = "success",
-  ERROR = "error",
-  WARNING = "warning",
-  INFO = "info",
-}
 interface IEditorToastProps {
   message: string;
   type: toastType;
@@ -16,7 +11,6 @@ interface IEditorToastProps {
 }
 
 export const EditorToastContainer: React.FC<IEditorToastProps> = ({ message, type, onClose, autoClose, isVisible }) => {
-  console.log("autoClose", autoClose);
   useEffect(() => {
     if (autoClose) {
       const timer = setTimeout(() => {
