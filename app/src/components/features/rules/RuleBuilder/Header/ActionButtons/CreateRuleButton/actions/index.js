@@ -6,11 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import _, { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
-import {
-  parseHTMLString,
-  getHTMLNodeName,
-  validateHTMLTag,
-} from "./insertScriptValidators";
+import { parseHTMLString, getHTMLNodeName, validateHTMLTag } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
@@ -25,7 +21,7 @@ import FEATURES from "config/constants/sub/features";
  *  ruleData?: object,
  *  validationError?: {
  *    error: string,
- *    message: string, 
+ *    message: string,
  *    pairId: string // pair that cause the error
  *  }
  * }
@@ -36,7 +32,7 @@ export const transformAndValidateRuleFields = async (ruleData) => {
       const isCompatibleWithAttributesForScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
 
       if (!isCompatibleWithAttributesForScriptRule) {
-        return {success: true, ruleData};
+        return { success: true, ruleData };
       }
       /* RuleData is explicitly read-only (reference to value in store) */
       const newRuleData = _.cloneDeep(ruleData);
@@ -48,13 +44,15 @@ export const transformAndValidateRuleFields = async (ruleData) => {
             promises.push(validateScript(script, scriptIndex, pairIndex));
           });
         });
-        return Promise.all(promises).then(() => {
-          return {success: true, ruleData: newRuleData};
-        }).catch((validationError) => {
-          /* validation failed */
-          return {success: false, validationError};
-        });
-      }
+        return Promise.all(promises)
+          .then(() => {
+            return { success: true, ruleData: newRuleData };
+          })
+          .catch((validationError) => {
+            /* validation failed */
+            return { success: false, validationError };
+          });
+      };
 
       const validateScript = (script, scriptIndex, pairIndex) => {
         return new Promise(async (resolve, reject) => {
@@ -69,10 +67,7 @@ export const transformAndValidateRuleFields = async (ruleData) => {
                 pairId: ruleData.pairs[pairIndex].id,
               });
             }
-            const { attributes, innerText: code } = parseHTMLString(
-              script.value,
-              codeHTMLTagName
-            );
+            const { attributes, innerText: code } = parseHTMLString(script.value, codeHTMLTagName);
 
             newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
               ...script,
@@ -97,7 +92,7 @@ export const transformAndValidateRuleFields = async (ruleData) => {
           delete newRuleData.pairs[pairIndex].scripts[scriptIndex]["wrapperElement"]; // this was used to temporarily store the raw code
           resolve();
         });
-      }
+      };
 
       return validateScriptRule();
     }

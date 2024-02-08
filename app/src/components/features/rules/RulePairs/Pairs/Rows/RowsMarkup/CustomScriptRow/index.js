@@ -226,7 +226,7 @@ const CustomScriptRow = ({
 
   const renderCodeEditor = () => {
     const handleEditorUpdate = (value) => {
-      if(script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
         dispatch(
           actions.updateRulePairAtGivenPath({
@@ -248,7 +248,7 @@ const CustomScriptRow = ({
         );
       }
     };
-  
+
     const handleCodeFormattedFlag = () => {
       setIsCodeFormatted(true);
       setTimeout(() => {
@@ -269,7 +269,7 @@ const CustomScriptRow = ({
           <Col xl="12" span={24}>
             <CodeEditor
               id={pair.id}
-              height={ script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 75 : 300}
+              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 75 : 300}
               language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
               defaultValue={scriptEditorBoilerCode}
               value={htmlWithAttributesAndCodeFromRuleData}
