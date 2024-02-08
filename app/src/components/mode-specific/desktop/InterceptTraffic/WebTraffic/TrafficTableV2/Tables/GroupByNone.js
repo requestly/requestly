@@ -44,7 +44,12 @@ const GroupByNone = ({
         const { actions } = record;
         return {
           onClick: () => handleRowClick(record),
-          style: actions.length !== 0 && !isStaticPreview ? { background: "#13c2c280" } : {},
+          style:
+            actions.length !== 0 && !isStaticPreview
+              ? { background: "#13c2c280" }
+              : showMockRequestSelector
+              ? { background: "transparent" }
+              : {},
         };
       }}
       setSelectedMockRequests={setSelectedMockRequests}

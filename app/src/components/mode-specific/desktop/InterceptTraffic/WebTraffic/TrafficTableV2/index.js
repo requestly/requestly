@@ -48,7 +48,7 @@ import {
   createResponseMock,
   doesStatusCodeMatchLabels,
   getGraphQLOperationValues,
-  getOrCreateSessionGroupId,
+  getOrCreateSessionGroup,
 } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
@@ -601,7 +601,7 @@ const CurrentTrafficTable = ({
   }, [selectedMockRequests]);
 
   const createMockResponses = useCallback(async () => {
-    const newSessionGroupId = await getOrCreateSessionGroupId(
+    const { groupId: newSessionGroupId, groupName: newSessionGroupName } = await getOrCreateSessionGroup(
       {
         networkSessionId,
         networkSessionName: sessionName,
@@ -625,7 +625,13 @@ const CurrentTrafficTable = ({
       .saveMultipleRulesOrGroups(newRules)
       .then(() => {
         Modal.confirm({
-          title: "Mock rules have been created successfully.",
+          title: (
+            <>
+              {" "}
+              <Typography.Text>Mock rules have been created successfully in the group:</Typography.Text>
+              <Typography.Text strong>{` ${newSessionGroupName}`}</Typography.Text>
+            </>
+          ),
           cancelText: "View Rules",
           onOk: () => {
             resetMockResponseState();
@@ -692,6 +698,7 @@ const CurrentTrafficTable = ({
               setIsFiltersCollapsed={setIsFiltersCollapsed}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
               setShowMockFilters={setShowMockFilters}
+              showMockFilters={showMockFilters}
             >
               <Tag>{requestLogs.length} requests</Tag>
             </ActionHeader>
@@ -863,15 +870,15 @@ const CurrentTrafficTable = ({
                     )}
                   </Space>
                   <Popconfirm
-                    title={`Create rules for the selected ${selectedRequestsLength} ${
+                    title={`Create rules for the ${selectedRequestsLength} selected ${
                       selectedRequestsLength > 1 ? "requests" : "request"
-                    } `}
+                    }?`}
                     onConfirm={() => {
                       createMockResponses();
                     }}
                     okText="Yes"
                     cancelText="No"
-                    placement="leftTop"
+                    placement="topLeft"
                     disabled={!mockMatcher || !mockResourceType || selectedRequestsLength === 0}
                   >
                     <RQButton

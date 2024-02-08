@@ -55,6 +55,7 @@ const ActionHeader = ({
   activeFiltersCount = 0,
   setIsSSLProxyingModalVisible,
   setShowMockFilters,
+  showMockFilters,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
   const isPaused = useSelector(getIsInterceptionPaused);
@@ -248,6 +249,7 @@ const ActionHeader = ({
                     });
                     dispatch(desktopTrafficTableActions.updateSearchTerm(""));
                   }}
+                  style={showMockFilters ? { "background-color": "var(--hover-color)" } : {}}
                 >
                   Mock Responses
                 </RQButton>

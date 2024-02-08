@@ -54,7 +54,7 @@ export const doesStatusCodeMatchLabels = (code: number = 0, labels: STATUS_CODE_
   });
 };
 
-export const getOrCreateSessionGroupId = async (
+export const getOrCreateSessionGroup = async (
   sessionDetails: {
     networkSessionId: string;
     networkSessionName: string;
@@ -79,7 +79,7 @@ export const getOrCreateSessionGroupId = async (
     });
   }
 
-  return sessionGroup.id;
+  return { groupId: sessionGroup.id, groupName: sessionGroup.name };
 };
 
 export const createResponseMock = (ruleParams: {
@@ -121,7 +121,10 @@ export const createResponseMock = (ruleParams: {
 
     if (operationParams) {
       sourceFilters.requestPayload.key = operationParams?.operationKey;
-      sourceFilters.requestPayload.value = operationParams?.operationValue;
+      sourceFilters.requestPayload.value =
+        typeof operationParams?.operationValue === "string"
+          ? operationParams?.operationValue
+          : JSON.stringify(operationParams?.operationValue);
       responseRulePair.source.filters = [sourceFilters];
     }
   }
