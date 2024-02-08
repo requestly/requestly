@@ -400,6 +400,7 @@ const CurrentTrafficTable = ({
           setSelectedMockRequests={setSelectedMockRequests}
           showMockRequestSelector={showMockRequestSelector}
           isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
+          selectedMockRequests={selectedMockRequests}
         />
       );
     },
@@ -413,6 +414,7 @@ const CurrentTrafficTable = ({
       isStaticPreview,
       requestLogs,
       showMockRequestSelector,
+      selectedMockRequests,
     ]
   );
 
@@ -571,6 +573,15 @@ const CurrentTrafficTable = ({
     [dispatch]
   );
 
+  const resetMockResponseState = useCallback(() => {
+    console.log("!!!debug", "reset state");
+    setShowMockRequestSelector(false);
+    setMockGraphQLKeys([]);
+    setSelectedMockRequests({});
+    setMockResourceType("restApi");
+    setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.URL);
+  }, []);
+
   useEffect(() => {
     if (isStaticPreview && showMockFilters) {
       setShowMockRequestSelector(true);
@@ -580,21 +591,13 @@ const CurrentTrafficTable = ({
         setIsMockRequestSelectorDisabled(false);
       }
     } else {
-      setShowMockRequestSelector(false);
-      setMockGraphQLKeys([]);
-      setSelectedMockRequests({});
-      setMockResourceType("restApi");
-      setMockMatcher(GLOBAL_CONSTANTS.RULE_KEYS.URL);
+      resetMockResponseState();
     }
-  }, [isStaticPreview, mockGraphQLKeys.length, mockResourceType, showMockFilters]);
+  }, [isStaticPreview, mockGraphQLKeys.length, mockResourceType, resetMockResponseState, showMockFilters]);
 
-  // IMP: Keep this in the end to wait for other useEffects to run first
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
+  const selectedRequestsLength = useMemo(() => {
+    return Object.keys(selectedMockRequests).length;
+  }, [selectedMockRequests]);
 
   const createMockResponses = useCallback(async () => {
     if (Object.keys(selectedMockRequests).length === 0) {
@@ -657,6 +660,14 @@ const CurrentTrafficTable = ({
     sessionName,
     navigate,
   ]);
+
+  // IMP: Keep this in the end to wait for other useEffects to run first
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   return (
     <>
@@ -756,18 +767,20 @@ const CurrentTrafficTable = ({
                       menu={{
                         items: [
                           {
-                            key: 1,
+                            key: "restApi",
                             label: "REST API",
-                            onClick: () => setMockResourceType("restApi"),
                           },
                           {
-                            key: 2,
+                            key: "graphqlApi",
                             label: "GraphQL API",
-                            onClick: () => setMockResourceType("graphqlApi"),
                           },
                         ],
                         selectable: true,
                         defaultSelectedKeys: [1],
+                        onSelect: (item) => {
+                          resetMockResponseState();
+                          setMockResourceType(item.key);
+                        },
                       }}
                       trigger={["click"]}
                       className="display-inline-block"
@@ -855,7 +868,9 @@ const CurrentTrafficTable = ({
                     )}
                   </Space>
                   <Popconfirm
-                    title={"Are you sure you want to create rules for the selected responses?"}
+                    title={`Create rules for the selected ${selectedRequestsLength} ${
+                      selectedRequestsLength > 1 ? "requests" : "request"
+                    } `}
                     onConfirm={() => {
                       createMockResponses();
                     }}
@@ -863,7 +878,12 @@ const CurrentTrafficTable = ({
                     cancelText="No"
                     placement="leftTop"
                   >
-                    <RQButton type="primary">Create Mock Rules</RQButton>
+                    <RQButton type="primary" disabled={selectedRequestsLength === 0}>
+                      <Space>
+                        Create Mock Rules
+                        <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
+                      </Space>
+                    </RQButton>
                   </Popconfirm>
                 </Row>
               )}

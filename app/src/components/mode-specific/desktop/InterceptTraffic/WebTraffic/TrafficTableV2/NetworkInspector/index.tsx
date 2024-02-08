@@ -10,6 +10,7 @@ interface Props {
   setSelectedMockRequests?: Function;
   showMockRequestSelector?: boolean;
   isMockRequestSelectorDisabled?: boolean;
+  selectedMockRequests?: Record<string, any>;
 }
 
 const NetworkInspector: React.FC<Props> = (props) => {
@@ -22,6 +23,7 @@ const NetworkInspector: React.FC<Props> = (props) => {
         setSelectedMockRequests={props.setSelectedMockRequests}
         showMockRequestSelector={props.showMockRequestSelector}
         isMockRequestSelectorDisabled={props.isMockRequestSelectorDisabled}
+        selectedMockRequests={props.selectedMockRequests}
       />
     </AutoThemeProvider>
   );

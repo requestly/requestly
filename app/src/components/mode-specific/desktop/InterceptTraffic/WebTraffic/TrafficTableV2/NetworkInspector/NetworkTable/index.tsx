@@ -25,6 +25,7 @@ interface Props {
   setSelectedMockRequests?: Function;
   showMockRequestSelector?: boolean;
   isMockRequestSelectorDisabled?: boolean;
+  selectedMockRequests?: Record<string, any>;
 }
 
 const NetworkTable: React.FC<Props> = ({
@@ -34,6 +35,7 @@ const NetworkTable: React.FC<Props> = ({
   setSelectedMockRequests,
   showMockRequestSelector,
   isMockRequestSelectorDisabled,
+  selectedMockRequests,
 }) => {
   const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>();
   const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
@@ -85,6 +87,7 @@ const NetworkTable: React.FC<Props> = ({
                   }
                 }}
                 disabled={isMockRequestSelectorDisabled}
+                checked={selectedMockRequests?.[id]}
               />
             </div>
           );
@@ -140,7 +143,13 @@ const NetworkTable: React.FC<Props> = ({
         width: "7%",
       },
     ],
-    [isMockRequestSelectorDisabled, isStaticPreview, setSelectedMockRequests, showMockRequestSelector]
+    [
+      isMockRequestSelectorDisabled,
+      isStaticPreview,
+      selectedMockRequests,
+      setSelectedMockRequests,
+      showMockRequestSelector,
+    ]
   );
 
   const header = useMemo(() => {
