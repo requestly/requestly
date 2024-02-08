@@ -19,7 +19,7 @@ import { toast } from "utils/Toast";
 import { redirectToTraffic } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 
-const NoTrafficCTA = ({ isStaticPreview }) => {
+const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -115,6 +115,14 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
       return <Typography.Text>No request matches the filter you applied</Typography.Text>;
     }
 
+    if (showMockFilters) {
+      return (
+        <Typography.Title level={5}>
+          No request contains the operation key you specified, try changing the it.
+        </Typography.Title>
+      );
+    }
+
     if (isStaticPreview) {
       return (
         <>
@@ -183,6 +191,7 @@ const NoTrafficCTA = ({ isStaticPreview }) => {
     systemWideSource.isAvailable,
     systemWideSource.isActive,
     trafficTableFilters,
+    showMockFilters,
   ]);
 
   return (
