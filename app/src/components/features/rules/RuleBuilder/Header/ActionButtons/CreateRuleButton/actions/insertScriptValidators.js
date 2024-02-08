@@ -274,8 +274,6 @@ export function parseHTMLString(rawCode, htmlNodeName) {
   }
 
   return {
-    innerText: undefined,
-    attributes: undefined,
     err: "Unexpected Error while parsing code",
   };
 }

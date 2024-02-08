@@ -29,9 +29,7 @@ import FEATURES from "config/constants/sub/features";
 export const transformAndValidateRuleFields = async (ruleData) => {
   switch (ruleData.ruleType) {
     case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT: {
-      const isCompatibleWithAttributesForScriptRule = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
-
-      if (!isCompatibleWithAttributesForScriptRule) {
+      if (!isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT)) {
         return { success: true, ruleData };
       }
       /* RuleData is explicitly read-only (reference to value in store) */
