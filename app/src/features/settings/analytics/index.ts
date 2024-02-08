@@ -21,8 +21,8 @@ export const trackBillingTeamActionClicked = (action: string) => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_ACTION_CLICKED, { action });
 };
 
-export const trackBillingTeamNoMemberFound = (reason: string) => {
-  trackEvent(SETTINGS.BILLING.BILLING_TEAM_NO_MEMBER_FOUND, { reason });
+export const trackBillingTeamNoMemberFound = (reason: string, source: string) => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_NO_MEMBER_FOUND, { reason, source });
 };
 
 export const trackBillingTeamMemberAdded = (email: string, team_id: string) => {
