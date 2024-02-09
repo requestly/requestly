@@ -924,11 +924,13 @@ const CurrentTrafficTable = ({
                     cancelText="No"
                     placement="topLeft"
                     disabled={!mockMatcher || !mockResourceType || selectedRequestsLength === 0}
-                    destroyTooltipOnHide={true}
+                    destroyTooltipOnHide
+                    trigger={["click"]}
                   >
                     <Tooltip
                       title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}
                       destroyTooltipOnHide
+                      trigger={["hover"]}
                     >
                       <RQButton
                         type="primary"

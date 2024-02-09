@@ -70,12 +70,12 @@ export const getOrCreateSessionGroup = async (
   let sessionGroup = allGroups.find((group: any) => group.sessionId === sessionDetails.networkSessionId);
 
   if (!sessionGroup) {
-    const groupName = `${sessionDetails.networkSessionName}'s mock responses`;
+    const groupName = `[Mock] ${sessionDetails.networkSessionName}`;
     sessionGroup = getNewGroup(groupName);
     await StorageService(appMode).saveRuleOrGroup({
       ...sessionGroup,
       sessionId: sessionDetails.networkSessionId,
-      sessionCreated: true,
+      createdFromSession: true,
     });
   }
 
@@ -131,10 +131,10 @@ export const createResponseMock = (ruleParams: {
 
   return {
     ...newResponseRule,
-    name: `[MOCK] ${operationParams?.operationValue || ""}-${ruleParams.requestUrl}`,
+    name: `${operationParams?.operationValue || ""} ${ruleParams.requestUrl}`,
     description: `Mock response for ${ruleParams.requestUrl} - ${operationParams?.operationValue || ""}`,
     groupId: ruleParams.groupId,
-    sessionCreated: true,
+    createdFromSession: true,
     pairs: [responseRulePair],
     status: GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE,
   };
@@ -174,6 +174,7 @@ export const getGraphQLOperationValues = (
   return null;
 };
 
+//TODO: Duplicated in common/utils
 /**
  * @param {Object} json
  * @param {String} path -> "a", "a.b", "a.0.b (If a is an array containing list of objects"
