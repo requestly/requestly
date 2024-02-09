@@ -107,6 +107,20 @@ export const getNewRule = (ruleType) => {
   return newRule;
 };
 
+export const getNewGroup = (newGroupName) => {
+  const newGroupId = `Group_${generateObjectId()}`;
+  const newGroup = {
+    creationDate: generateObjectCreationDate(),
+    description: "",
+    id: newGroupId,
+    name: newGroupName,
+    objectType: GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP,
+    status: GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE,
+  };
+
+  return newGroup;
+};
+
 export const setCurrentlySelectedRuleConfig = (dispatch, config, navigate) => {
   if (config === undefined) {
     redirectToRoot(navigate);

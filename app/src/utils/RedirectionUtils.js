@@ -129,7 +129,7 @@ export const redirectToNetworkSessionHome = (navigate, isDesktopSessionsCompatib
 export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatible = false) => {
   if (isDesktopSessionsCompatible) {
     if (id) {
-      const path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + "/:id";
+      const path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + `/${id}`;
       navigate(path);
       return;
     }
