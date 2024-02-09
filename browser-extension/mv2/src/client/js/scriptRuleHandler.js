@@ -108,7 +108,7 @@ RQ.ScriptRuleHandler.addLibraries = function (libraries, callback, index) {
     };
 
   if (library) {
-    RQ.ClientUtils.addRemoteJS(library.src, addNextLibraries);
+    RQ.ClientUtils.addRemoteJS(library.src, null, addNextLibraries);
   } else {
     addNextLibraries();
   }
@@ -129,97 +129,27 @@ RQ.ScriptRuleHandler.includeJSScriptsInOrder = function (scripts, callback, inde
 
 RQ.ScriptRuleHandler.includeJS = function (script, callback) {
   if (!script.value) throw new Error("Script value is empty");
-  if (script.type === RQ.SCRIPT_TYPES.URL) {
-    if (script.attributes) {
-      RQ.ScriptRuleHandler.addRemoteJSWithAttributes(script.value, script.attributes, callback);
-    } else RQ.ClientUtils.addRemoteJS(script.value, callback);
 
+  if (script.type === RQ.SCRIPT_TYPES.URL) {
+    RQ.ClientUtils.addRemoteJS(script.value, script.attributes, callback);
     return;
   }
 
   if (script.type === RQ.SCRIPT_TYPES.CODE) {
-    if (script.attributes) {
-      RQ.ScriptRuleHandler.embedJSWithAttributes(script.value, script.attributes);
-    } else RQ.ClientUtils.executeJS(script.value);
+    RQ.ClientUtils.executeJS(script.value, script.attributes);
   }
+
   typeof callback === "function" && callback();
 };
 
 RQ.ScriptRuleHandler.includeCSS = function (script, callback) {
   if (script.type === RQ.SCRIPT_TYPES.URL) {
-    if (script.attributes) {
-      RQ.ScriptRuleHandler.addRemoteCSSWithAttributes(script.value, script.attributes, callback);
-    } else RQ.ClientUtils.addRemoteCSS(script.value);
-
+    RQ.ClientUtils.addRemoteCSS(script.value, script.attributes);
     return;
   }
 
   if (script.type === RQ.SCRIPT_TYPES.CODE) {
-    if (script.attributes) {
-      RQ.ScriptRuleHandler.embedCSSWithAttributes(script.value, script.attributes);
-    } else {
-      RQ.ClientUtils.embedCSS(script.value);
-    }
+    RQ.ClientUtils.embedCSS(script.value, script.attributes);
   }
   typeof callback === "function" && callback();
-};
-
-RQ.ScriptRuleHandler.addRemoteJSWithAttributes = function (url, attributes, callback) {
-  const script = document.createElement("script");
-  attributes.forEach(({ name: attrName, value: attrVal }) => {
-    script.setAttribute(attrName, attrVal ?? "");
-  });
-  script.src = url;
-
-  script.classList.add(RQ.ClientUtils.getScriptClassAttribute());
-  script.onload = callback;
-
-  RQ.ScriptRuleHandler.appendToDom(script);
-};
-
-RQ.ScriptRuleHandler.embedJSWithAttributes = function (code, attributes) {
-  const script = document.createElement("script");
-  attributes.forEach(({ name: attrName, value: attrVal }) => {
-    script.setAttribute(attrName, attrVal ?? "");
-  });
-  script.appendChild(document.createTextNode(code));
-
-  script.classList.add(RQ.ClientUtils.getScriptClassAttribute());
-
-  RQ.ScriptRuleHandler.appendToDom(script);
-};
-
-RQ.ScriptRuleHandler.addRemoteCSSWithAttributes = function (url, attributes, callback) {
-  const link = document.createElement("link");
-  attributes.forEach(({ name: attrName, value: attrVal }) => {
-    link.setAttribute(attrName, attrVal ?? "");
-  });
-  link.href = url;
-
-  link.classList.add(RQ.ClientUtils.getScriptClassAttribute());
-  link.onload = callback;
-
-  RQ.ScriptRuleHandler.appendToDom(link);
-};
-
-RQ.ScriptRuleHandler.embedCSSWithAttributes = function (code, attributes) {
-  const style = document.createElement("style");
-  style.className = RQ.ClientUtils.getScriptClassAttribute();
-  attributes.forEach(({ name: attrName, value: attrVal }) => {
-    style.setAttribute(attrName, attrVal ?? "");
-  });
-  style.appendChild(document.createTextNode(code));
-
-  style.classList.add(RQ.ClientUtils.getScriptClassAttribute());
-
-  RQ.ScriptRuleHandler.appendToDom(style);
-};
-
-RQ.ScriptRuleHandler.appendToDom = function (htmlNode) {
-  const parent = document.head || document.documentElement;
-  try {
-    parent.appendChild(htmlNode);
-  } catch (error) {
-    console.error(error);
-  }
 };
