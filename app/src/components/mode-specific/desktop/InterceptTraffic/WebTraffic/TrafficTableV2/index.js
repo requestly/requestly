@@ -894,31 +894,33 @@ const CurrentTrafficTable = ({
                     placement="topLeft"
                     disabled={!mockMatcher || !mockResourceType || selectedRequestsLength === 0}
                   >
-                    <RQButton
-                      type="primary"
-                      disabled={selectedRequestsLength === 0}
-                      onClick={() => {
-                        if (!mockResourceType) {
-                          toast.error("Please select resource type to create mock rules");
-                          return;
-                        }
+                    <Tooltip title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}>
+                      <RQButton
+                        type="primary"
+                        disabled={selectedRequestsLength === 0}
+                        onClick={() => {
+                          if (!mockResourceType) {
+                            toast.error("Please select resource type to create mock rules");
+                            return;
+                          }
 
-                        if (!mockMatcher) {
-                          toast.error("Please select matching condition to create mock rules");
-                          return;
-                        }
+                          if (!mockMatcher) {
+                            toast.error("Please select matching condition to create mock rules");
+                            return;
+                          }
 
-                        if (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0) {
-                          toast.error("Please enter at least one operation key to create mock rules");
-                          return;
-                        }
-                      }}
-                    >
-                      <Space>
-                        Create Mock Rules
-                        <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
-                      </Space>
-                    </RQButton>
+                          if (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0) {
+                            toast.error("Please enter at least one operation key to create mock rules");
+                            return;
+                          }
+                        }}
+                      >
+                        <Space>
+                          Create Mock Rules
+                          <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
+                        </Space>
+                      </RQButton>
+                    </Tooltip>
                   </Popconfirm>
                 </Row>
               )}

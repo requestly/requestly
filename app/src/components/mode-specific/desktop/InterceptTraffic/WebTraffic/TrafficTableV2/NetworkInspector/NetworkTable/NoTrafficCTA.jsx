@@ -118,7 +118,7 @@ const NoTrafficCTA = ({ isStaticPreview, showMockFilters }) => {
     if (showMockFilters) {
       return (
         <Typography.Title level={5}>
-          No request contains the operation key you specified, try changing the it.
+          No request contains the operation key you specified, try changing it.
         </Typography.Title>
       );
     }
