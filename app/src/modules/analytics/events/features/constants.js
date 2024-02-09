@@ -56,6 +56,18 @@ export const SESSION_RECORDING = {
     back_from_preview: "back_from_preview_clicked",
     har_file_opened: "har_file_opened",
   },
+  MOCK_RESPONSES: {
+    MOCK_RESPONSES_BUTTON_CLICKED: "mock_responses_button_clicked",
+    MOCK_RESPONSES_RESOURCE_TYPE_SELECTED: "mock_responses_resource_type_selected",
+    MOCK_RESPONSES_TARGETING_CONDITIONS_SELECTED: "mock_responses_targeting_conditions_selected",
+    MOCK_RESPONSES_GRAPHQL_KEY_ENTERED: "mock_responses_graphql_key_entered",
+    MOCK_RESPONSES_REQUESTS_SELECTED: "mock_responses_requests_selected",
+    MOCK_RESPONSES_CREATE_RULES_CLICKED: "mock_responses_create_rules_clicked",
+    MOCK_RESPONSES_RULE_CREATION_STARTED: "mock_responses_rule_creation_started",
+    MOCK_RESPONSES_RULE_CREATION_COMPLETED: "mock_responses_rule_creation_completed",
+    MOCK_RESPONSES_RULE_CREATION_FAILED: "mock_responses_rule_creation_failed",
+    MOCK_RESPONSES_VIEW_NOW_CLICKED: "mock_responses_view_now_clicked",
+  },
 };
 
 export const SHARED_LIST = {
