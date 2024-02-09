@@ -46,13 +46,12 @@ function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
 
 const createAttributesString = (attributes) => {
   const attributesString =
-    attributes ??
-    []
-      .map(({ name: attrName, value: attrVal }) => {
+    attributes
+      ?.map(({ name: attrName, value: attrVal }) => {
         if (!attrVal) return `${attrName}`;
         return `${attrName}="${attrVal}"`;
       })
-      .join(" ");
+      .join(" ") ?? "";
   return attributesString;
 };
 
