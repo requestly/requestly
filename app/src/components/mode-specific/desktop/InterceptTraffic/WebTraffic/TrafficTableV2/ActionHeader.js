@@ -59,7 +59,7 @@ const ActionHeader = ({
   showMockFilters,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
-  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session") || true;
+  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session");
 
   const isPaused = useSelector(getIsInterceptionPaused);
   const sessionPreviewType = useSelector(getPreviewType);

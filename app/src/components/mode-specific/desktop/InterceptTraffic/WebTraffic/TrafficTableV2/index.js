@@ -117,7 +117,7 @@ const CurrentTrafficTable = ({
   const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
   const mounted = useRef(false);
 
-  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session") || true;
+  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session");
 
   const selectedRequestResponse =
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
