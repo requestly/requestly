@@ -1,52 +1,63 @@
 import { trackEvent } from "modules/analytics";
 import { SESSION_RECORDING } from "../constants";
 
-export enum ActionSource {
-  Preview = "preview",
-  List = "list",
-  TrafficTable = "taffic_table",
+export function trackMockResponsesButtonClicked() {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_BUTTON_CLICKED);
 }
 
-export function trackHarImportButtonClicked() {
-  trackEvent(SESSION_RECORDING.network.import.btn_clicked);
-}
-export function trackHarImportCanceled() {
-  trackEvent(SESSION_RECORDING.network.import.canceled);
-}
-export function trackHarImportCompleted() {
-  trackEvent(SESSION_RECORDING.network.import.completed);
+export function trackMockResponsesResourceTypeSelected(resource_type: string) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_RESOURCE_TYPE_SELECTED, {
+    resource_type,
+  });
 }
 
-export function trackDeleteNetworkSessionClicked(source: ActionSource) {
-  const params = { source };
-  trackEvent(SESSION_RECORDING.network.delete.btn_clicked, params);
-}
-export function trackDeleteNetworkSessionCanceled() {
-  trackEvent(SESSION_RECORDING.network.delete.canceled);
-}
-export function trackDeleteNetworkSessionConfirmed() {
-  trackEvent(SESSION_RECORDING.network.delete.confirmed);
+export function trackMockResponsesTargetingSelecting(target_condition: string) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_TARGETING_CONDITIONS_SELECTED, {
+    target_condition,
+  });
 }
 
-export function trackDownloadNetworkSessionClicked(source: ActionSource) {
-  const params = { source };
-  trackEvent(SESSION_RECORDING.network.download, params);
+export function trackMockResponsesGraphQLKeyEntered(keys: string[]) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_GRAPHQL_KEY_ENTERED, {
+    operationKeys: keys,
+  });
 }
 
-export function trackNetworkSessionSaveClicked() {
-  trackEvent(SESSION_RECORDING.network.save.btn_clicked);
-}
-export function trackNetworkSessionSaved() {
-  trackEvent(SESSION_RECORDING.network.save.saved);
-}
-export function trackNetworkSessionSaveCanceled() {
-  trackEvent(SESSION_RECORDING.network.save.canceled);
+export function trackMockResponsesRequestsSelected(count: number) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_REQUESTS_SELECTED, {
+    count,
+  });
 }
 
-export function trackNetworkSessionViewerBackClicked() {
-  trackEvent(SESSION_RECORDING.network.back_from_preview);
+export function trackMockResponsesCreateRulesClicked(count: number) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_CREATE_RULES_CLICKED, {
+    count,
+  });
 }
 
-export function trackHarFileOpened() {
-  trackEvent(SESSION_RECORDING.network.har_file_opened);
+export function trackMockResponsesRuleCreationStarted(count: number) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_RULE_CREATION_STARTED, {
+    count,
+  });
+}
+
+export function trackMockResponsesRuleCreationCompleted(count: number, group_id: string, group_name: string) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_RULE_CREATION_COMPLETED, {
+    count,
+    group_id,
+    group_name,
+  });
+}
+
+export function trackMockResponsesRuleCreationFailed(count: number) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_RULE_CREATION_FAILED, {
+    count,
+  });
+}
+
+export function trackMockResponsesViewNowClicked(group_id: string, group_name: string) {
+  trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_VIEW_NOW_CLICKED, {
+    group_id,
+    group_name,
+  });
 }

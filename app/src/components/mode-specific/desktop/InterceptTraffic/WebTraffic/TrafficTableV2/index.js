@@ -69,7 +69,7 @@ import {
   trackMockResponsesRuleCreationStarted,
   trackMockResponsesTargetingSelecting,
   trackMockResponsesViewNowClicked,
-} from "modules/analytics/events/features/sessionRecording/networkSessions";
+} from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -599,7 +599,9 @@ const CurrentTrafficTable = ({
   useEffect(() => {
     if (isStaticPreview && showMockFilters) {
       setShowMockRequestSelector(true);
-      if (mockResourceType === "graphqlApi") {
+      if (!mockResourceType || !mockMatcher) {
+        setIsMockRequestSelectorDisabled(true);
+      } else if (mockResourceType === "graphqlApi") {
         setIsMockRequestSelectorDisabled(mockGraphQLKeys.length === 0);
       } else {
         setIsMockRequestSelectorDisabled(false);
@@ -607,7 +609,7 @@ const CurrentTrafficTable = ({
     } else {
       resetMockResponseState();
     }
-  }, [isStaticPreview, mockGraphQLKeys.length, mockResourceType, resetMockResponseState, showMockFilters]);
+  }, [isStaticPreview, mockGraphQLKeys.length, mockResourceType, resetMockResponseState, showMockFilters, mockMatcher]);
 
   const selectedRequestsLength = useMemo(() => {
     return Object.keys(selectedMockRequests).length;
@@ -791,6 +793,7 @@ const CurrentTrafficTable = ({
                             label: "GraphQL API",
                           },
                         ],
+                        selectedKeys: mockResourceType ? [mockResourceType] : [],
                         selectable: true,
                         onSelect: (item) => {
                           resetMockResponseState();
@@ -841,6 +844,7 @@ const CurrentTrafficTable = ({
                             ),
                           },
                         ],
+                        selectedKeys: mockMatcher ? [mockMatcher] : [],
                         selectable: true,
                         onSelect: (item) => {
                           setMockMatcher(item.key);
@@ -920,8 +924,12 @@ const CurrentTrafficTable = ({
                     cancelText="No"
                     placement="topLeft"
                     disabled={!mockMatcher || !mockResourceType || selectedRequestsLength === 0}
+                    destroyTooltipOnHide={true}
                   >
-                    <Tooltip title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}>
+                    <Tooltip
+                      title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}
+                      destroyTooltipOnHide
+                    >
                       <RQButton
                         type="primary"
                         disabled={selectedRequestsLength === 0}

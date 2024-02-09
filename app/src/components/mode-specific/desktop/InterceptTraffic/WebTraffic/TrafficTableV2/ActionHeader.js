@@ -18,7 +18,6 @@ import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer
 import {
   ActionSource,
   trackDownloadNetworkSessionClicked,
-  trackMockResponsesButtonClicked,
   trackNetworkSessionSaveClicked,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { downloadHar } from "../TrafficExporter/harLogs/utils";
@@ -38,6 +37,7 @@ import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
 import { getPreviewType } from "store/features/network-sessions/selectors";
 import { PreviewType } from "store/features/network-sessions/slice";
+import { trackMockResponsesButtonClicked } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 const { Text } = Typography;
 
@@ -252,6 +252,7 @@ const ActionHeader = ({
                       return !prev;
                     });
                     dispatch(desktopTrafficTableActions.updateSearchTerm(""));
+                    setIsFiltersCollapsed(true);
                     dispatch(desktopTrafficTableActions.clearColumnFilters());
                   }}
                   style={showMockFilters ? { "background-color": "var(--hover-color)" } : {}}

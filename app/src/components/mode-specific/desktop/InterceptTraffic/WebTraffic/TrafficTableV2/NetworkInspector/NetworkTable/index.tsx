@@ -14,8 +14,8 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
-import { Checkbox } from "antd";
-import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/networkSessions";
+import { Checkbox, Tooltip } from "antd";
+import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 export const ITEM_SIZE = 30;
 
@@ -70,28 +70,30 @@ const NetworkTable: React.FC<Props> = ({
         hideColumn: !showMockRequestSelector,
         render: (id: string, log: Record<string, any>) => {
           return (
-            <div className="display-row-center">
-              <Checkbox
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  if (e.target.checked) {
-                    setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
-                  } else {
-                    setSelectedMockRequests((prev: Record<string, any>) => {
-                      const newMockRequests = { ...prev };
-                      delete newMockRequests[id];
-                      return newMockRequests;
-                    });
-                  }
-                  trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
-                }}
-                disabled={isMockRequestSelectorDisabled}
-                checked={selectedMockRequests?.[id]}
-              />
-            </div>
+            <Tooltip title={isMockRequestSelectorDisabled ? "Please fill all the conditions to select requests." : ""}>
+              <div className="display-row-center">
+                <Checkbox
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (e.target.checked) {
+                      setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
+                    } else {
+                      setSelectedMockRequests((prev: Record<string, any>) => {
+                        const newMockRequests = { ...prev };
+                        delete newMockRequests[id];
+                        return newMockRequests;
+                      });
+                    }
+                    trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
+                  }}
+                  disabled={isMockRequestSelectorDisabled}
+                  checked={selectedMockRequests?.[id]}
+                />
+              </div>
+            </Tooltip>
           );
         },
       },
