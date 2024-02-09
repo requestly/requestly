@@ -14,6 +14,8 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
+import { Checkbox, Tooltip } from "antd";
+import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 export const ITEM_SIZE = 30;
 
@@ -21,9 +23,21 @@ interface Props {
   logs: any;
   onRow: Function;
   isStaticPreview: boolean;
+  setSelectedMockRequests?: Function;
+  showMockRequestSelector?: boolean;
+  isMockRequestSelectorDisabled?: boolean;
+  selectedMockRequests?: Record<string, any>;
 }
 
-const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
+const NetworkTable: React.FC<Props> = ({
+  logs,
+  onRow,
+  isStaticPreview,
+  setSelectedMockRequests,
+  showMockRequestSelector,
+  isMockRequestSelectorDisabled,
+  selectedMockRequests,
+}) => {
   const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>();
   const [isReplayRequestModalOpen, setIsReplayRequestModalOpen] = useState(false);
   const dispatch = useDispatch();
@@ -49,6 +63,40 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
 
   const columns = useMemo(
     () => [
+      {
+        title: "",
+        dataIndex: "id",
+        width: "4%",
+        hideColumn: !showMockRequestSelector,
+        render: (id: string, log: Record<string, any>) => {
+          return (
+            <Tooltip title={isMockRequestSelectorDisabled ? "Please fill all the conditions to select requests." : ""}>
+              <div className="display-row-center">
+                <Checkbox
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (e.target.checked) {
+                      setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
+                    } else {
+                      setSelectedMockRequests((prev: Record<string, any>) => {
+                        const newMockRequests = { ...prev };
+                        delete newMockRequests[id];
+                        return newMockRequests;
+                      });
+                    }
+                    trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
+                  }}
+                  disabled={isMockRequestSelectorDisabled}
+                  checked={selectedMockRequests?.[id]}
+                />
+              </div>
+            </Tooltip>
+          );
+        },
+      },
       {
         id: "time",
         title: "Time",
@@ -82,7 +130,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         id: "rulesApplied",
         title: "Rules Applied",
         dataIndex: ["actions"],
-        width: "12%",
+        width: "8%",
         responsive: ["xs", "sm"],
         hideColumn: isStaticPreview,
         render: (actions: any) => {
@@ -99,7 +147,13 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
         width: "7%",
       },
     ],
-    [isStaticPreview]
+    [
+      isMockRequestSelectorDisabled,
+      isStaticPreview,
+      selectedMockRequests,
+      setSelectedMockRequests,
+      showMockRequestSelector,
+    ]
   );
 
   const header = useMemo(() => {
@@ -145,7 +199,7 @@ const NetworkTable: React.FC<Props> = ({ logs, onRow, isStaticPreview }) => {
 
             return (
               <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>
-                {column?.render ? column.render(columnData) : columnData}
+                {column?.render ? column.render(columnData, log) : columnData}
               </Table.Cell>
             );
           })}
