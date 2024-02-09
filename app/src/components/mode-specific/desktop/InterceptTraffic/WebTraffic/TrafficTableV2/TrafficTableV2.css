@@ -159,3 +159,13 @@
 .previewData .rdt_TableRow {
   min-height: fit-content;
 }
+
+.mock-rules-count-badge {
+  padding: 3px 5px;
+  font-size: 10px;
+  line-height: 10px;
+  color: var(--white);
+  background-color: transparent;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--white);
+}

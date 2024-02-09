@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { Avatar, Button, Col, Tag, Menu, Row, Tooltip, Space, Typography, Popconfirm, Modal } from "antd";
+import { CheckCircleOutlined, CloseOutlined, DownOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { makeOriginalLog } from "capture-console-logs";
-import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
+import { getActiveModals, getAppMode, getDesktopSpecificDetails } from "store/selectors";
 import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
@@ -24,6 +24,7 @@ import {
   getLogResponseById,
 } from "store/features/desktop-traffic-table/selectors";
 import Logger from "lib/logger";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
 import {
@@ -43,9 +44,32 @@ import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
-import { doesStatusCodeMatchLabels } from "./utils";
+import {
+  createResponseMock,
+  doesStatusCodeMatchLabels,
+  getGraphQLOperationValues,
+  getOrCreateSessionGroup,
+} from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
+import { RQButton, RQDropdown } from "lib/design-system/components";
+import CreatableSelect from "react-select/creatable";
+import { getSessionName, getSessionId } from "store/features/network-sessions/selectors";
+import { StorageService } from "init";
+import { toast } from "utils/Toast";
+import { redirectToRules } from "utils/RedirectionUtils";
+import { useNavigate } from "react-router-dom";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import {
+  trackMockResponsesCreateRulesClicked,
+  trackMockResponsesGraphQLKeyEntered,
+  trackMockResponsesResourceTypeSelected,
+  trackMockResponsesRuleCreationCompleted,
+  trackMockResponsesRuleCreationFailed,
+  trackMockResponsesRuleCreationStarted,
+  trackMockResponsesTargetingSelecting,
+  trackMockResponsesViewNowClicked,
+} from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -60,11 +84,16 @@ const CurrentTrafficTable = ({
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { ruleEditorModal } = useSelector(getActiveModals);
   const newLogs = useSelector(getAllLogs);
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
   const isInterceptingTraffic = !useSelector(getIsInterceptionPaused);
+  const networkSessionId = useSelector(getSessionId);
+  const sessionName = useSelector(getSessionName);
+  const appMode = useSelector(getAppMode);
 
   // Component State
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -72,16 +101,26 @@ const CurrentTrafficTable = ({
   const [rulePaneSizes, setRulePaneSizes] = useState([100, 0]);
   const [isSSLProxyingModalVisible, setIsSSLProxyingModalVisible] = useState(false);
 
-  const selectedRequestResponse =
-    useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
-
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
 
+  const [selectedMockRequests, setSelectedMockRequests] = useState({});
+  const [showMockFilters, setShowMockFilters] = useState(false);
+  const [mockResourceType, setMockResourceType] = useState(null);
+  const [mockMatcher, setMockMatcher] = useState(null);
+  const [mockGraphQLKeys, setMockGraphQLKeys] = useState([]);
+  const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
+  const [isMockRequestSelectorDisabled, setIsMockRequestSelectorDisabled] = useState(false);
+
   const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
   const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
   const mounted = useRef(false);
+
+  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session");
+
+  const selectedRequestResponse =
+    useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
   const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
     desktopSpecificDetails.appsList,
@@ -277,9 +316,23 @@ const CurrentTrafficTable = ({
         return false;
       }
 
+      if (mockGraphQLKeys.length && mockResourceType === "graphqlApi") {
+        try {
+          const requestBody = JSON.parse(log?.request?.body);
+          if (requestBody && !!getGraphQLOperationValues(requestBody, mockGraphQLKeys)) {
+            return true;
+          }
+        } catch (e) {
+          // Do nothing
+        }
+        return false;
+      }
+
       return true;
     },
     [
+      mockGraphQLKeys,
+      mockResourceType,
       trafficTableFilters.app,
       trafficTableFilters.domain,
       trafficTableFilters.method,
@@ -290,18 +343,13 @@ const CurrentTrafficTable = ({
     ]
   );
 
-  const getRequestLogs = useCallback(
-    (desc = true) => {
-      let logs = newLogs;
-      if (propLogs?.length > 0) {
-        logs = propLogs;
-      }
-      return logs;
-    },
-    [newLogs, propLogs]
-  );
-
-  const requestLogs = useMemo(getRequestLogs, [getRequestLogs]);
+  const requestLogs = useMemo(() => {
+    let logs = newLogs;
+    if (propLogs?.length > 0) {
+      logs = propLogs;
+    }
+    return logs;
+  }, [newLogs, propLogs]);
 
   useEffect(() => {
     if (mounted.current) {
@@ -340,7 +388,7 @@ const CurrentTrafficTable = ({
     (logs) => {
       const filteredLogs = getFilteredLogs(logs);
       return filteredLogs.map((log) => {
-        const responseBody = getResponseById(log.id);
+        const responseBody = getResponseById(log.id) ?? log.response?.body;
         return {
           ...log,
           response: { ...log.response, body: responseBody },
@@ -362,10 +410,27 @@ const CurrentTrafficTable = ({
           emptyCtaAction={emptyCtaAction}
           emptyDesc={emptyDesc}
           isStaticPreview={isStaticPreview}
+          setSelectedMockRequests={setSelectedMockRequests}
+          showMockRequestSelector={showMockRequestSelector}
+          isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
+          selectedMockRequests={selectedMockRequests}
+          showMockFilters={showMockFilters}
         />
       );
     },
-    [emptyCtaAction, emptyCtaText, emptyDesc, getFilteredLogs, handleRowClick, isStaticPreview, requestLogs]
+    [
+      emptyCtaAction,
+      emptyCtaText,
+      emptyDesc,
+      getFilteredLogs,
+      handleRowClick,
+      isMockRequestSelectorDisabled,
+      isStaticPreview,
+      requestLogs,
+      showMockRequestSelector,
+      selectedMockRequests,
+      showMockFilters,
+    ]
   );
 
   const handleClearFilter = useCallback(
@@ -506,9 +571,9 @@ const CurrentTrafficTable = ({
   ]);
 
   const stableGetLogsToExport = useMemo(() => {
-    const logsToExport = getFilteredLogsWithResponses(newLogs);
+    const logsToExport = getFilteredLogsWithResponses(requestLogs);
     return createLogsHar(logsToExport);
-  }, [getFilteredLogsWithResponses, newLogs]);
+  }, [getFilteredLogsWithResponses, requestLogs]);
 
   const handleSidebarMenuItemClick = useCallback(
     (e) => {
@@ -522,6 +587,96 @@ const CurrentTrafficTable = ({
     },
     [dispatch]
   );
+
+  const resetMockResponseState = useCallback(() => {
+    setShowMockRequestSelector(false);
+    setMockGraphQLKeys([]);
+    setSelectedMockRequests({});
+    setMockResourceType(null);
+    setMockMatcher(null);
+  }, []);
+
+  useEffect(() => {
+    if (isStaticPreview && showMockFilters) {
+      setShowMockRequestSelector(true);
+      if (!mockResourceType || !mockMatcher) {
+        setIsMockRequestSelectorDisabled(true);
+      } else if (mockResourceType === "graphqlApi") {
+        setIsMockRequestSelectorDisabled(mockGraphQLKeys.length === 0);
+      } else {
+        setIsMockRequestSelectorDisabled(false);
+      }
+    } else {
+      resetMockResponseState();
+    }
+  }, [isStaticPreview, mockGraphQLKeys.length, mockResourceType, resetMockResponseState, showMockFilters, mockMatcher]);
+
+  const selectedRequestsLength = useMemo(() => {
+    return Object.keys(selectedMockRequests).length;
+  }, [selectedMockRequests]);
+
+  const createMockResponses = useCallback(async () => {
+    trackMockResponsesRuleCreationStarted(selectedRequestsLength);
+
+    const { groupId: newSessionGroupId, groupName: newSessionGroupName } = await getOrCreateSessionGroup(
+      {
+        networkSessionId,
+        networkSessionName: sessionName,
+      },
+      appMode
+    );
+
+    const newRules = Object.values(selectedMockRequests).map((log) => {
+      return createResponseMock({
+        response: log.response.body,
+        urlMatcher: mockMatcher,
+        requestUrl: log.url,
+        operationKeys: mockGraphQLKeys,
+        requestDetails: log.request,
+        resourceType: mockResourceType,
+        groupId: newSessionGroupId,
+      });
+    });
+
+    return StorageService(appMode)
+      .saveMultipleRulesOrGroups(newRules)
+      .then(() => {
+        Modal.confirm({
+          title: (
+            <>
+              {" "}
+              <Typography.Text>Mock rules have been created successfully in the group:</Typography.Text>
+              <Typography.Text strong>{` ${newSessionGroupName}`}</Typography.Text>
+            </>
+          ),
+          cancelText: "View Rules",
+          onOk: () => {
+            resetMockResponseState();
+          },
+          onCancel: () => {
+            trackMockResponsesViewNowClicked(newSessionGroupId, newSessionGroupName);
+            redirectToRules(navigate);
+          },
+          icon: <CheckCircleOutlined style={{ color: "var(--success)" }} />,
+        });
+        trackMockResponsesRuleCreationCompleted(selectedRequestsLength, newSessionGroupName, newSessionGroupId);
+      })
+      .catch((e) => {
+        Logger.log("Error in creating mock rules", e);
+        trackMockResponsesRuleCreationFailed(selectedRequestsLength);
+      });
+  }, [
+    networkSessionId,
+    sessionName,
+    appMode,
+    selectedMockRequests,
+    mockMatcher,
+    mockGraphQLKeys,
+    mockResourceType,
+    resetMockResponseState,
+    navigate,
+    selectedRequestsLength,
+  ]);
 
   // IMP: Keep this in the end to wait for other useEffects to run first
   useEffect(() => {
@@ -556,8 +711,8 @@ const CurrentTrafficTable = ({
             <ActionHeader
               deviceId={deviceId}
               clearLogs={clearLogs}
-              logsCount={newLogs.length}
-              filteredLogsCount={newLogs.length}
+              logsCount={requestLogs.length}
+              filteredLogsCount={requestLogs.length}
               isAnyAppConnected={isAnyAppConnected}
               isStaticPreview={isStaticPreview}
               activeFiltersCount={activeFiltersCount}
@@ -566,64 +721,250 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               setIsFiltersCollapsed={setIsFiltersCollapsed}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
+              setShowMockFilters={setShowMockFilters}
+              showMockFilters={showMockFilters}
             >
-              {isStaticPreview ? (
-                <Tag>{propLogs.length} requests</Tag>
-              ) : newLogs.length ? (
-                <Tag>{newLogs.length} requests</Tag>
-              ) : null}
+              <Tag>{requestLogs.length} requests</Tag>
             </ActionHeader>
           </Row>
-          {!isFiltersCollapsed && (
-            <div className="traffic-table-filters-container">
-              <Row>
-                <section>
-                  <LogFilter
-                    filterId="filter-method"
-                    filterLabel="Method"
-                    filterPlaceholder="Filter by method"
-                    options={METHOD_TYPE_OPTIONS}
-                    value={trafficTableFilters.method}
-                    handleFilterChange={(options) => {
-                      dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
-                      trackTrafficTableFilterApplied("method", options, options?.length);
+
+          <div className="traffic-table-filters-container">
+            <>
+              {!isFiltersCollapsed && (
+                <Row>
+                  <section>
+                    <LogFilter
+                      filterId="filter-method"
+                      filterLabel="Method"
+                      filterPlaceholder="Filter by method"
+                      options={METHOD_TYPE_OPTIONS}
+                      value={trafficTableFilters.method}
+                      handleFilterChange={(options) => {
+                        dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
+                        trackTrafficTableFilterApplied("method", options, options?.length);
+                      }}
+                    />
+                    <LogFilter
+                      filterId="filter-status-code"
+                      filterLabel="Status code"
+                      filterPlaceholder="Filter by status code"
+                      options={STATUS_CODE_LABEL_ONLY_OPTIONS}
+                      value={trafficTableFilters.statusCode}
+                      handleFilterChange={(options) => {
+                        dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                        trackTrafficTableFilterApplied("status_code", options, options?.length);
+                      }}
+                    />
+                    <LogFilter
+                      filterId="filter-resource-type"
+                      filterLabel="Resource type"
+                      filterPlaceholder="Filter by resource type"
+                      options={RESOURCE_FILTER_OPTIONS}
+                      value={trafficTableFilters.resourceType}
+                      handleFilterChange={(options) => {
+                        dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
+                        trackTrafficTableFilterApplied("resource_type", options, options?.length);
+                      }}
+                    />
+                  </section>
+                  <Button
+                    type="link"
+                    className="clear-logs-filter-btn"
+                    onClick={() => {
+                      dispatch(desktopTrafficTableActions.clearColumnFilters());
                     }}
-                  />
-                  <LogFilter
-                    filterId="filter-status-code"
-                    filterLabel="Status code"
-                    filterPlaceholder="Filter by status code"
-                    options={STATUS_CODE_LABEL_ONLY_OPTIONS}
-                    value={trafficTableFilters.statusCode}
-                    handleFilterChange={(options) => {
-                      dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
-                      trackTrafficTableFilterApplied("status_code", options, options?.length);
+                  >
+                    Clear all
+                  </Button>
+                </Row>
+              )}
+              {isMockResponseFromSessionEnabled && showMockFilters && (
+                <Row justify={"space-between"} align={"middle"}>
+                  <Space size={12}>
+                    <RQDropdown
+                      menu={{
+                        items: [
+                          {
+                            key: "restApi",
+                            label: "HTTP (REST, JS, CSS)",
+                          },
+                          {
+                            key: "graphqlApi",
+                            label: "GraphQL API",
+                          },
+                        ],
+                        selectedKeys: mockResourceType ? [mockResourceType] : [],
+                        selectable: true,
+                        onSelect: (item) => {
+                          resetMockResponseState();
+                          setMockResourceType(item.key);
+                          trackMockResponsesResourceTypeSelected(item.key);
+                        },
+                      }}
+                      trigger={["click"]}
+                      className="display-inline-block"
+                    >
+                      <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
+                        {mockResourceType
+                          ? mockResourceType === "restApi"
+                            ? "HTTP (REST, JS, CSS)"
+                            : "GraphQL API"
+                          : "Select Resource Type"}{" "}
+                        <DownOutlined />
+                      </Typography.Text>
+                    </RQDropdown>
+                    <RQDropdown
+                      menu={{
+                        items: [
+                          {
+                            key: GLOBAL_CONSTANTS.RULE_KEYS.URL,
+                            label: (
+                              <Tooltip title="Ideal for targeting specific and complete URLs." placement="right">
+                                Match entire URL
+                              </Tooltip>
+                            ),
+                          },
+                          {
+                            key: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
+                            label: (
+                              <Tooltip title="Ideal for matching across different domains" placement="right">
+                                Match only path
+                              </Tooltip>
+                            ),
+                          },
+                          {
+                            key: "path_query",
+                            label: (
+                              <Tooltip
+                                title="Ideal for cases where param values in URL are crucial for matching"
+                                placement="right"
+                              >
+                                Match path & query params
+                              </Tooltip>
+                            ),
+                          },
+                        ],
+                        selectedKeys: mockMatcher ? [mockMatcher] : [],
+                        selectable: true,
+                        onSelect: (item) => {
+                          setMockMatcher(item.key);
+                          trackMockResponsesTargetingSelecting(item.key);
+                        },
+                      }}
+                      trigger={["click"]}
+                      className="display-inline-block"
+                    >
+                      <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
+                        {mockMatcher
+                          ? mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL
+                            ? "Match entire URL"
+                            : mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH
+                            ? "Match only path"
+                            : "Match path & query params"
+                          : "Select Matching Condition"}{" "}
+                        <DownOutlined />
+                      </Typography.Text>
+                    </RQDropdown>
+                    {mockResourceType === "graphqlApi" && (
+                      <CreatableSelect
+                        isMulti={true}
+                        isClearable={true}
+                        theme={(theme) => ({
+                          ...theme,
+                          borderRadius: 4,
+                          border: "none",
+                          colors: {
+                            ...theme.colors,
+                            primary: "var(--surface-1)",
+                            primary25: "var(--surface-2)",
+                            neutral0: "var(--surface-1)",
+                            neutral10: "var(--surface-3)", // tag background color
+                            neutral80: "var(--text-default)", // tag text color
+                            danger: "var(--text-default)", // tag cancel icon color
+                            dangerLight: "var(--surface-3)", // tag cancel background color
+                          },
+                        })}
+                        isValidNewOption={(string) => string}
+                        noOptionsMessage={() => null}
+                        formatCreateLabel={() => "Hit Enter to add"}
+                        placeholder={"Enter graphQL keys"}
+                        onChange={(selectors) => {
+                          trackMockResponsesGraphQLKeyEntered(selectors.map((selector) => selector.value));
+                          setMockGraphQLKeys(selectors.map((selector) => selector.value));
+                        }}
+                        styles={{
+                          indicatorSeparator: (provided) => ({
+                            ...provided,
+                            display: "none",
+                          }),
+                          dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
+                          control: (provided) => ({
+                            ...provided,
+                            boxShadow: "none",
+                            border: "1px solid var(--border)",
+                            backgroundColor: "var(--background)",
+                          }),
+                          container: (provided) => ({
+                            ...provided,
+                            flexGrow: 1,
+                            width: "50ch",
+                          }),
+                        }}
+                      />
+                    )}
+                  </Space>
+                  <Popconfirm
+                    title={`Create rules for the ${selectedRequestsLength} selected ${
+                      selectedRequestsLength > 1 ? "requests" : "request"
+                    }?`}
+                    onConfirm={() => {
+                      createMockResponses();
                     }}
-                  />
-                  <LogFilter
-                    filterId="filter-resource-type"
-                    filterLabel="Resource type"
-                    filterPlaceholder="Filter by resource type"
-                    options={RESOURCE_FILTER_OPTIONS}
-                    value={trafficTableFilters.resourceType}
-                    handleFilterChange={(options) => {
-                      dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
-                      trackTrafficTableFilterApplied("resource_type", options, options?.length);
-                    }}
-                  />
-                </section>
-                <Button
-                  type="link"
-                  className="clear-logs-filter-btn"
-                  onClick={() => {
-                    dispatch(desktopTrafficTableActions.clearColumnFilters());
-                  }}
-                >
-                  Clear all
-                </Button>
-              </Row>
-            </div>
-          )}
+                    okText="Yes"
+                    cancelText="No"
+                    placement="topLeft"
+                    disabled={!mockMatcher || !mockResourceType || selectedRequestsLength === 0}
+                    destroyTooltipOnHide
+                    trigger={["click"]}
+                  >
+                    <Tooltip
+                      title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}
+                      destroyTooltipOnHide
+                      trigger={["hover"]}
+                    >
+                      <RQButton
+                        type="primary"
+                        disabled={selectedRequestsLength === 0}
+                        onClick={() => {
+                          trackMockResponsesCreateRulesClicked(selectedRequestsLength);
+                          if (!mockResourceType) {
+                            toast.error("Please select resource type to create mock rules");
+                            return;
+                          }
+
+                          if (!mockMatcher) {
+                            toast.error("Please select matching condition to create mock rules");
+                            return;
+                          }
+
+                          if (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0) {
+                            toast.error("Please enter at least one operation key to create mock rules");
+                            return;
+                          }
+                        }}
+                      >
+                        <Space>
+                          Create Mock Rules
+                          <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
+                        </Space>
+                      </RQButton>
+                    </Tooltip>
+                  </Popconfirm>
+                </Row>
+              )}
+            </>
+          </div>
+
           <div className={!isPreviewOpen ? "hide-traffic-table-split-gutter" : ""}>
             <Split
               sizes={rulePaneSizes}
