@@ -15,6 +15,7 @@ import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 import { Checkbox } from "antd";
+import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/networkSessions";
 
 export const ITEM_SIZE = 30;
 
@@ -85,6 +86,7 @@ const NetworkTable: React.FC<Props> = ({
                       return newMockRequests;
                     });
                   }
+                  trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
                 }}
                 disabled={isMockRequestSelectorDisabled}
                 checked={selectedMockRequests?.[id]}

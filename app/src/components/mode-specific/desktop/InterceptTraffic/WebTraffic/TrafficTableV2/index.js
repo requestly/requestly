@@ -60,6 +60,16 @@ import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import {
+  trackMockResponsesCreateRulesClicked,
+  trackMockResponsesGraphQLKeyEntered,
+  trackMockResponsesResourceTypeSelected,
+  trackMockResponsesRuleCreationCompleted,
+  trackMockResponsesRuleCreationFailed,
+  trackMockResponsesRuleCreationStarted,
+  trackMockResponsesTargetingSelecting,
+  trackMockResponsesViewNowClicked,
+} from "modules/analytics/events/features/sessionRecording/networkSessions";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -604,6 +614,8 @@ const CurrentTrafficTable = ({
   }, [selectedMockRequests]);
 
   const createMockResponses = useCallback(async () => {
+    trackMockResponsesRuleCreationStarted(selectedRequestsLength);
+
     const { groupId: newSessionGroupId, groupName: newSessionGroupName } = await getOrCreateSessionGroup(
       {
         networkSessionId,
@@ -640,10 +652,16 @@ const CurrentTrafficTable = ({
             resetMockResponseState();
           },
           onCancel: () => {
+            trackMockResponsesViewNowClicked(newSessionGroupId, newSessionGroupName);
             redirectToRules(navigate);
           },
           icon: <CheckCircleOutlined style={{ color: "var(--success)" }} />,
         });
+        trackMockResponsesRuleCreationCompleted(selectedRequestsLength, newSessionGroupName, newSessionGroupId);
+      })
+      .catch((e) => {
+        Logger.log("Error in creating mock rules", e);
+        trackMockResponsesRuleCreationFailed(selectedRequestsLength);
       });
   }, [
     networkSessionId,
@@ -655,6 +673,7 @@ const CurrentTrafficTable = ({
     mockResourceType,
     resetMockResponseState,
     navigate,
+    selectedRequestsLength,
   ]);
 
   // IMP: Keep this in the end to wait for other useEffects to run first
@@ -776,6 +795,7 @@ const CurrentTrafficTable = ({
                         onSelect: (item) => {
                           resetMockResponseState();
                           setMockResourceType(item.key);
+                          trackMockResponsesResourceTypeSelected(item.key);
                         },
                       }}
                       trigger={["click"]}
@@ -824,6 +844,7 @@ const CurrentTrafficTable = ({
                         selectable: true,
                         onSelect: (item) => {
                           setMockMatcher(item.key);
+                          trackMockResponsesTargetingSelecting(item.key);
                         },
                       }}
                       trigger={["click"]}
@@ -863,7 +884,10 @@ const CurrentTrafficTable = ({
                         noOptionsMessage={() => null}
                         formatCreateLabel={() => "Hit Enter to add"}
                         placeholder={"Enter graphQL keys"}
-                        onChange={(selectors) => setMockGraphQLKeys(selectors.map((selector) => selector.value))}
+                        onChange={(selectors) => {
+                          trackMockResponsesGraphQLKeyEntered(selectors.map((selector) => selector.value));
+                          setMockGraphQLKeys(selectors.map((selector) => selector.value));
+                        }}
                         styles={{
                           indicatorSeparator: (provided) => ({
                             ...provided,
@@ -902,6 +926,7 @@ const CurrentTrafficTable = ({
                         type="primary"
                         disabled={selectedRequestsLength === 0}
                         onClick={() => {
+                          trackMockResponsesCreateRulesClicked(selectedRequestsLength);
                           if (!mockResourceType) {
                             toast.error("Please select resource type to create mock rules");
                             return;

@@ -18,6 +18,7 @@ import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer
 import {
   ActionSource,
   trackDownloadNetworkSessionClicked,
+  trackMockResponsesButtonClicked,
   trackNetworkSessionSaveClicked,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { downloadHar } from "../TrafficExporter/harLogs/utils";
@@ -245,6 +246,7 @@ const ActionHeader = ({
               <Col>
                 <RQButton
                   onClick={() => {
+                    trackMockResponsesButtonClicked();
                     setShowMockFilters((prev) => {
                       setIsTableFiltersDisabled(!prev);
                       return !prev;
