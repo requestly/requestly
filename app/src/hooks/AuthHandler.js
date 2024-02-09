@@ -145,7 +145,6 @@ const AuthHandler = (onComplete) => {
         // Unset isSyncEnabled in window
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
-        formbricks.logout();
         resetUserDetails();
 
         dispatch(actions.updateUserInfo({ loggedIn: false, details: null }));
