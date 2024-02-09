@@ -122,3 +122,9 @@ export const SHARING = {
   SHARING_MODAL_RULES_DUPLICATED: "sharing_modal_rules_duplicated",
   SHARING_MODAL_TOAST_VIEWED: "sharing_modal_toast_viewed",
 };
+
+export const MONETIZATION_EXPERIMENT = {
+  CONTACT_US_CLICKED: "contact_us_clicked",
+  UPGRADE_CLICKED: "upgrade_clicked",
+  RENEW_NOW_CLICKED: "renew_now_clicked",
+};

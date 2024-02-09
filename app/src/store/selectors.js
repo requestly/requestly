@@ -293,6 +293,10 @@ export const getIsOrgBannerDismissed = (state) => {
   return getGlobalState(state).misc.persist?.isOrgBannerDismissed;
 };
 
+export const getIsPlanExpiredBannerClosed = (state) => {
+  return getGlobalState(state).misc.persist?.isPlanExpiredBannerClosed;
+};
+
 export const getAllEditorToast = (state) => {
   return getGlobalState(state).editorToast;
 };

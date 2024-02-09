@@ -196,6 +196,7 @@ const INITIAL_STATE = {
 
   misc: {
     persist: {
+      isPlanExpiredBannerClosed: false,
       appNotificationBannerDismissTs: 0,
       isProductHuntLaunchedBannerClosed: false,
       isRedirectRuleTourCompleted: false,
