@@ -153,14 +153,14 @@ const CreateRuleButton = ({
           break;
       }
     } else {
-      const parsedRuleData = syntaxValidation.newRuleData || currentlySelectedRuleData;
+      const parsedRuleData = syntaxValidation.ruleData || currentlySelectedRuleData;
       //Validation
       const ruleValidation = validateRule(parsedRuleData, dispatch, appMode);
       if (ruleValidation.result) {
         saveRule(
           appMode,
           {
-            ...fixedRuleData,
+            ...parsedRuleData,
             createdBy,
             currentOwner,
             lastModifiedBy,
