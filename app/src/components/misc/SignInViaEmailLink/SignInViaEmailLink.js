@@ -197,7 +197,7 @@ const SignInViaEmailLink = () => {
       <div className="email-entry-form-container">
         <Row justify="center">
           <Typography.Title level={2}>
-            Hey, It appears that you are accessing Requestly from a new web browser
+            Hey, it appears that you are accessing Requestly from a new web browser
           </Typography.Title>
         </Row>
         <Row justify="center" className="mb-2">
