@@ -58,11 +58,13 @@ const ActionHeader = ({
   showMockFilters,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
+  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session") || true;
+
   const isPaused = useSelector(getIsInterceptionPaused);
   const sessionPreviewType = useSelector(getPreviewType);
 
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
-  const [isSearchDisabled, setIsSearchDisabled] = useState(false);
+  const [isTableFiltersDisabled, setIsTableFiltersDisabled] = useState(false);
 
   const closeSaveModal = useCallback(() => {
     setIsSessionSaveModalOpen(false);
@@ -117,7 +119,7 @@ const ActionHeader = ({
           }
           style={{ width: 300 }}
           size="small"
-          disabled={isSearchDisabled}
+          disabled={isTableFiltersDisabled}
         />
       );
     }
@@ -144,7 +146,7 @@ const ActionHeader = ({
         }
         style={{ width: 300 }}
         size="small"
-        disabled={isSearchDisabled}
+        disabled={isTableFiltersDisabled}
       />
     );
   };
@@ -168,7 +170,7 @@ const ActionHeader = ({
         <Space size={12}>
           <Col>{renderSearchInput()}</Col>
           <Col>
-            <Button icon={<FilterOutlined />} onClick={handleFilterClick}>
+            <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={isTableFiltersDisabled}>
               <span className="traffic-table-filter-btn-content">
                 <span>Filter</span>
                 <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
@@ -238,16 +240,17 @@ const ActionHeader = ({
               {children}
             </>
           )}
-          {isStaticPreview && sessionPreviewType === PreviewType.SAVED && (
+          {isStaticPreview && isMockResponseFromSessionEnabled && sessionPreviewType === PreviewType.SAVED && (
             <Row>
               <Col>
                 <RQButton
                   onClick={() => {
                     setShowMockFilters((prev) => {
-                      setIsSearchDisabled(!prev);
+                      setIsTableFiltersDisabled(!prev);
                       return !prev;
                     });
                     dispatch(desktopTrafficTableActions.updateSearchTerm(""));
+                    dispatch(desktopTrafficTableActions.clearColumnFilters());
                   }}
                   style={showMockFilters ? { "background-color": "var(--hover-color)" } : {}}
                 >

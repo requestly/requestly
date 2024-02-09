@@ -59,6 +59,7 @@ import { StorageService } from "init";
 import { toast } from "utils/Toast";
 import { redirectToRules } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -105,6 +106,8 @@ const CurrentTrafficTable = ({
   const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
   const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
   const mounted = useRef(false);
+
+  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session") || true;
 
   const selectedRequestResponse =
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
@@ -754,7 +757,7 @@ const CurrentTrafficTable = ({
                   </Button>
                 </Row>
               )}
-              {showMockFilters && (
+              {isMockResponseFromSessionEnabled && showMockFilters && (
                 <Row justify={"space-between"} align={"middle"}>
                   <Space size={12}>
                     <RQDropdown
