@@ -19,10 +19,9 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
 import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import ProductsDropDown from "./ProductsDropDown";
-import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
+import PremiumPlanNudge from "./PremiumPlanBadge/PremiumPlanNudge";
 import APP_CONSTANTS from "config/constants";
 import "./MenuHeader.css";
-import { PlanExpiredBadge } from "./PlanExpiredBadge";
 
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;
@@ -43,6 +42,16 @@ const MenuHeader = () => {
 
   //don't show general app header component for editor screens
   const showMenuHeader = () => !PATHS_WITHOUT_HEADER.some((path) => pathname.includes(path));
+
+  const renderPlanNudge = () => {
+    const userPlanStatus = user?.details?.planDetails?.status;
+
+    if (paywallIntensityExp === "control" || userPlanStatus !== "canceled" || isPlanExpiredBannerClosed) {
+      return <PremiumPlanNudge />;
+    }
+
+    return null;
+  };
 
   return showMenuHeader() ? (
     <Header className="layout-header">
@@ -80,11 +89,7 @@ const MenuHeader = () => {
         <Col className="ml-auto">
           <div className="header-right-section">
             <Row align="middle" gutter={8} wrap={false}>
-              {paywallIntensityExp !== "control" &&
-              user?.details?.planDetails.status === "canceled" &&
-              isPlanExpiredBannerClosed ? (
-                <PlanExpiredBadge />
-              ) : null}
+              {renderPlanNudge()}
               <RQButton
                 type="default"
                 className="header-search-btn"
@@ -95,28 +100,19 @@ const MenuHeader = () => {
                 </div>
                 <div>⌘+K</div>
               </RQButton>
-              <Col className="hidden-on-small-screen">
-                <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
-                  <GitHubButton
-                    style={{ display: "flex" }}
-                    className="github-star-button"
-                    href="https://github.com/requestly/requestly"
-                    data-color-scheme="dark_dimmed"
-                    data-text="Star"
-                    data-show-count="true"
-                    aria-label="Star Requestly on GitHub"
-                  />
-                </span>
-              </Col>
+              <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
+                <GitHubButton
+                  style={{ display: "flex" }}
+                  className="github-star-button"
+                  href="https://github.com/requestly/requestly"
+                  data-color-scheme="dark_dimmed"
+                  data-text="Star"
+                  data-show-count="true"
+                  aria-label="Star Requestly on GitHub"
+                />
+              </span>
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
-
-              {(paywallIntensityExp === "control" ||
-                (paywallIntensityExp !== "control" && user?.details?.planDetails.status !== "canceled")) && (
-                <Col>
-                  <PremiumPlanBadge />
-                </Col>
-              )}
 
               {/* settings */}
               <Col>

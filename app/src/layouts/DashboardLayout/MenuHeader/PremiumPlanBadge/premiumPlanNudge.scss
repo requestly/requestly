@@ -1,0 +1,23 @@
+.premium-plan-nudge-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-right: 10px;
+  line-height: 22px;
+}
+
+.premium-plan-nudge-icon {
+  color: var(--text-default);
+  font-size: 20px;
+  align-self: center;
+}
+
+.premium-plan-nudge-btn.ant-btn {
+  font-weight: 500;
+}
+
+@media (max-width: 780px) {
+  .premium-plan-nudge-container {
+    display: none;
+  }
+}

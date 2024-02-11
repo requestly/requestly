@@ -17,9 +17,6 @@ import { parseGravatarImage } from "utils/Misc";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import { RQButton } from "lib/design-system/components";
-import { PRICING } from "features/pricing";
-import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -35,7 +32,6 @@ export default function HeaderUser() {
   const userPhoto =
     user.loggedIn && user?.details?.profile?.photoURL ? parseGravatarImage(user.details.profile.photoURL) : null;
   const userEmail = user?.details?.profile?.email;
-  const planDetails = user?.details?.planDetails;
 
   // Component State
   const [loading, setLoading] = useState(false);
@@ -119,35 +115,6 @@ export default function HeaderUser() {
             >
               <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
             </Dropdown>
-            {
-              <>
-                {paywallIntensityExp === "variantA" && (
-                  <>
-                    {!planDetails?.planId ||
-                    planDetails?.status === "trialing" ||
-                    (["active", "past_due"].includes(planDetails?.status) &&
-                      planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL) ? (
-                      <RQButton
-                        type="primary"
-                        className="header-upgrade-btn"
-                        onClick={() => {
-                          trackUpgradeClicked("header");
-                          dispatch(
-                            actions.toggleActiveModal({
-                              modalName: "pricingModal",
-                              newValue: true,
-                              newProps: { selectedPlan: null, source: "header_upgrade_button" },
-                            })
-                          );
-                        }}
-                      >
-                        Upgrade
-                      </RQButton>
-                    ) : null}
-                  </>
-                )}
-              </>
-            }
           </Col>
         </>
       ) : (

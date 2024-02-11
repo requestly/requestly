@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { getPlanNameFromId } from "utils/PremiumUtils";
+import { RQButton } from "lib/design-system/components";
+import { Col, Row } from "antd";
 import Logger from "lib/logger";
 import { actions } from "store";
-import { Tooltip } from "antd";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import firebaseApp from "../../../../firebase";
+import { getPlanNameFromId } from "utils/PremiumUtils";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import "./premiumPlanBadge.scss";
+import crownWhiteIcon from "assets/icons/crown-white.svg";
+import crownDangerIcon from "assets/icons/crown-danger.svg";
+import "./premiumPlanNudge.scss";
 
-const PremiumPlanBadge = () => {
+const PremiumPlanNudge = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const teamId = useSelector(getCurrentlyActiveWorkspace)?.id;
@@ -54,9 +57,24 @@ const PremiumPlanBadge = () => {
 
   if (!isAppSumoDeal && planId && ["trialing", "canceled"].includes(planStatus)) {
     return (
-      <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
-        <div
-          className="premium-plan-badge-container cursor-pointer"
+      <div className="premium-plan-nudge-container">
+        <Row gutter={8} align="middle" className="items-center" style={{ height: "auto" }}>
+          <Col className="premium-plan-nudge-icon">
+            {planStatus === "trialing" ? (
+              <img src={crownWhiteIcon} alt="crown" />
+            ) : (
+              <img src={crownDangerIcon} alt="crown" />
+            )}
+          </Col>
+          <Col className={`text-bold  ${planStatus === "trialing" ? "text-default" : "danger"}`}>
+            {planStatus === "trialing"
+              ? `Premium trial - ${daysLeft} days left `
+              : `${getPrettyPlanName(getPlanNameFromId(planId))} Plan expired`}
+          </Col>
+        </Row>
+        <RQButton
+          type="primary"
+          className="premium-plan-nudge-btn"
           onClick={() => {
             dispatch(
               actions.toggleActiveModal({
@@ -67,16 +85,13 @@ const PremiumPlanBadge = () => {
             );
           }}
         >
-          <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
-          <div className="premium-plan-days-left">
-            {planStatus === "trialing" ? `${daysLeft} days left in trial` : "Plan Expired"}
-          </div>
-        </div>
-      </Tooltip>
+          {planStatus === "trialing" ? "Upgrade" : "Renew"}
+        </RQButton>
+      </div>
     );
   }
 
   return null;
 };
 
-export default PremiumPlanBadge;
+export default PremiumPlanNudge;
