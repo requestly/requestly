@@ -41,7 +41,11 @@ export const Templates: React.FC = () => {
         const isScrolledHorizontally = container.scrollLeft > 0;
         if (isScrolledHorizontally && hasHorizontalScroll) {
           setHasScrolledHorizontally(true);
-          container.removeEventListener("scroll", handleScroll);
+        }
+        if (scrollContainerRef.current.scrollLeft > 0) {
+          setIsRowScrolledRight(true);
+        } else {
+          setIsRowScrolledRight(false);
         }
       }
     };
@@ -64,18 +68,6 @@ export const Templates: React.FC = () => {
       trackTemplatesScrolled();
     }
   }, [hasScrolledHorizontally]);
-
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.addEventListener("scroll", () => {
-        if (scrollContainerRef.current.scrollLeft > 0) {
-          setIsRowScrolledRight(true);
-        } else {
-          setIsRowScrolledRight(false);
-        }
-      });
-    }
-  }, []);
 
   return (
     <>
