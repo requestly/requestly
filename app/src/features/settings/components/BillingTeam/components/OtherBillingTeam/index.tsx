@@ -119,7 +119,7 @@ export const OtherBillingTeam: React.FC = () => {
                   paddingLeft: 0,
                 }}
               >
-                <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
+                <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
               </Col>
               <Col>
                 <Popover

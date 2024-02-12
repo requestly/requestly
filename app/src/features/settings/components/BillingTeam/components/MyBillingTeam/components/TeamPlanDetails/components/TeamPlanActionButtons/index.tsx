@@ -29,7 +29,10 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails }) 
   const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
 
   let planStatus = PlanStatus.ACTIVE;
-  if (!["active", "past_due", "trialing"].includes(subscriptionDetails.subscriptionStatus) && !redirectedFromCheckout) {
+  if (
+    !["active", "past_due", "trialing"].includes(subscriptionDetails?.subscriptionStatus) &&
+    !redirectedFromCheckout
+  ) {
     planStatus = PlanStatus.EXPIRED;
   }
 
