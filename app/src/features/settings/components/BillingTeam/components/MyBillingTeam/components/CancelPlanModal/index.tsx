@@ -56,8 +56,8 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
     >
       <Col className="cancel-plan-modal-description">
         Once cancelled, your <span className="text-white">{getPrettyPlanName(subscriptionDetails?.plan)} plan</span>{" "}
-        stays active until {getLongFormatDateString(new Date(subscriptionDetails.subscriptionCurrentPeriodEnd * 1000))}.
-        After that, all premium features won't be accessible to you.
+        stays active until {getLongFormatDateString(new Date(subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000))}
+        . After that, all premium features won't be accessible to you.
       </Col>
       {/* <Col className="mt-16">
         <label className="text-bold text-white">Please let us know the reason for plan cancellation (Optional)</label>
