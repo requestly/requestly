@@ -24,7 +24,10 @@ export const BillingTeam: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const isTeamMember = useSelector(getBillingTeamMemberById(billingId, user?.details?.profile?.uid));
+  const userDetailsOfSelectedBillingTeam = useSelector(
+    getBillingTeamMemberById(billingId, user?.details?.profile?.uid)
+  );
+  const [isTeamMember, setIsTeamMember] = useState(false);
 
   const [showUserPlanDetails, setShowUserPlanDetails] = useState(false);
 
@@ -47,6 +50,7 @@ export const BillingTeam: React.FC = () => {
             dispatch(
               billingActions.setBillingTeamMembers({ billingId, billingTeamMembers: result.data.billingTeamMembers })
             );
+            setIsTeamMember(true);
           }
         })
         .catch((error) => {
@@ -99,6 +103,6 @@ export const BillingTeam: React.FC = () => {
 
   if (showUserPlanDetails) return <UserPlanDetails />;
 
-  if (isTeamMember) return <MyBillingTeam />;
+  if (isTeamMember || userDetailsOfSelectedBillingTeam) return <MyBillingTeam />;
   else return <OtherBillingTeam />;
 };
