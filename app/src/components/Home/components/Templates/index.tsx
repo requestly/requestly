@@ -41,7 +41,11 @@ export const Templates: React.FC = () => {
         const isScrolledHorizontally = container.scrollLeft > 0;
         if (isScrolledHorizontally && hasHorizontalScroll) {
           setHasScrolledHorizontally(true);
-          container.removeEventListener("scroll", handleScroll);
+        }
+        if (scrollContainerRef.current.scrollLeft > 0) {
+          setIsRowScrolledRight(true);
+        } else {
+          setIsRowScrolledRight(false);
         }
       }
     };
@@ -124,7 +128,6 @@ export const Templates: React.FC = () => {
             <IoIosArrowDropleft
               onClick={() => {
                 scrollContainerRef.current.scrollLeft = 0;
-                setIsRowScrolledRight(false);
               }}
             />
           </div>
@@ -133,7 +136,6 @@ export const Templates: React.FC = () => {
             <IoIosArrowDropright
               onClick={() => {
                 scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
-                setIsRowScrolledRight(true);
               }}
             />
           </div>
