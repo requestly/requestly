@@ -15,12 +15,15 @@ import { RuleType } from "types";
 import PATHS from "config/constants/sub/paths";
 import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.scss";
+import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
+import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft";
 
 export const Templates: React.FC = () => {
   const scrollContainerRef = useRef(null);
   const [ruleToPreview, setRuleToPreview] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [hasScrolledHorizontally, setHasScrolledHorizontally] = useState(false);
+  const [isRowScrolledRight, setIsRowScrolledRight] = useState(false);
 
   const filteredTemplates = useMemo(() => templatesMap.templates.filter((template: any) => template.isFeatured), []);
 
@@ -116,6 +119,25 @@ export const Templates: React.FC = () => {
         >
           View all templates
         </Link>
+        {isRowScrolledRight ? (
+          <div className="templates-left-inset-shadow">
+            <IoIosArrowDropleft
+              onClick={() => {
+                scrollContainerRef.current.scrollLeft = 0;
+                setIsRowScrolledRight(false);
+              }}
+            />
+          </div>
+        ) : (
+          <div className="templates-right-inset-shadow">
+            <IoIosArrowDropright
+              onClick={() => {
+                scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+                setIsRowScrolledRight(true);
+              }}
+            />
+          </div>
+        )}
       </Col>
     </>
   );
