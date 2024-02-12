@@ -21,15 +21,15 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
   const [isPlanDetailsPopoverVisible, setIsPlanDetailsPopoverVisible] = useState(false);
 
   const isAnnualPlan = useMemo(() => {
-    const startDate = new Date(billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodStart * 1000);
-    const renewalDate = new Date(billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodEnd * 1000);
+    const startDate = new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodStart * 1000);
+    const renewalDate = new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000);
     // Calculate the difference in months
     const monthsDiff =
       (renewalDate.getFullYear() - startDate.getFullYear()) * 12 + (renewalDate.getMonth() - startDate.getMonth());
     return monthsDiff > 1;
   }, [
-    billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodEnd,
-    billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodStart,
+    billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd,
+    billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodStart,
   ]);
 
   const isUserManager = billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
@@ -39,21 +39,22 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
       <Col className="billing-teams-primary-card team-plan-details-card">
         <Row className="team-plan-details-card-header" justify="space-between" align="middle">
           <Col className="text-white text-bold display-flex items-center" style={{ gap: "8px" }}>
-            Your Plan <TeamPlanStatus subscriptionStatus={billingTeamDetails.subscriptionDetails.subscriptionStatus} />
+            Your Plan{" "}
+            <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
           </Col>
-          {isUserManager && <TeamPlanActionButtons subscriptionDetails={billingTeamDetails.subscriptionDetails} />}
+          {isUserManager && <TeamPlanActionButtons subscriptionDetails={billingTeamDetails?.subscriptionDetails} />}
         </Row>
         <div className="team-plan-details-sections-wrapper">
           <div className="team-plan-details-section">
             <Row align="middle" gutter={8}>
               <Col className="team-plan-details-section-plan-name">
-                {getPrettyPlanName(getPlanNameFromId(billingTeamDetails.subscriptionDetails.plan))} team plan
+                {getPrettyPlanName(getPlanNameFromId(billingTeamDetails?.subscriptionDetails?.plan))} team plan
               </Col>
               <Col>
                 <Popover
                   content={
                     <TeamPlanDetailsPopover
-                      planDetails={billingTeamDetails.subscriptionDetails}
+                      planDetails={billingTeamDetails?.subscriptionDetails}
                       closePopover={() => setIsPlanDetailsPopoverVisible(false)}
                       isAnnualPlan={isAnnualPlan}
                     />
@@ -91,7 +92,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               Billed {isAnnualPlan ? "annually" : "monthly"}
             </Col>
             <Row align="middle" gutter={4} className="mt-8">
-              <Col className="header">{billingTeamDetails.subscriptionDetails.quantity}</Col>
+              <Col className="header">{billingTeamDetails?.subscriptionDetails?.quantity}</Col>
               <Col className="text-white caption">Licences</Col>
             </Row>
           </div>
@@ -119,7 +120,7 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
               <Col className="text-center caption">Plan renewal date</Col>
               <Col className="mt-8 text-center text-bold header">
                 {getLongFormatDateString(
-                  new Date(billingTeamDetails.subscriptionDetails.subscriptionCurrentPeriodEnd * 1000)
+                  new Date(billingTeamDetails?.subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000)
                 )}
               </Col>
             </div>
