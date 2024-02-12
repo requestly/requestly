@@ -7,6 +7,8 @@ set -e
 rm -rf node_modules
 npm install
 
+npm intall -g patch-package
+
 echo -e "\n***** Installing React app dependencies *****"
 # Install dependencies for react app
 cd app
