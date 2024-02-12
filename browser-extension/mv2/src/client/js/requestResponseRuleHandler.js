@@ -14,6 +14,7 @@ RQ.RequestResponseRuleHandler.setup = () => {
         window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
         window.${RQ.PUBLIC_NAMESPACE}.isExtensionEnabled = ${isExtensionEnabled};
       `,
+        null,
         true
       );
     }
@@ -88,6 +89,7 @@ RQ.RequestResponseRuleHandler.cacheRequestRules = async () => {
     window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
     window.${RQ.PUBLIC_NAMESPACE}.requestRules = ${JSON.stringify(requestRules)};
   `,
+    null,
     true
   );
 };
@@ -99,6 +101,7 @@ RQ.RequestResponseRuleHandler.cacheResponseRules = async () => {
     window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
     window.${RQ.PUBLIC_NAMESPACE}.responseRules = ${JSON.stringify(responseRules)};
   `,
+    null,
     true
   );
 };
@@ -110,6 +113,7 @@ RQ.RequestResponseRuleHandler.cacheRedirectRules = async () => {
     window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
     window.${RQ.PUBLIC_NAMESPACE}.redirectRules = ${JSON.stringify(redirectRules)};
   `,
+    null,
     true
   );
 };
@@ -121,6 +125,7 @@ RQ.RequestResponseRuleHandler.cacheReplaceRules = async () => {
     window.${RQ.PUBLIC_NAMESPACE} = window.${RQ.PUBLIC_NAMESPACE} || {};
     window.${RQ.PUBLIC_NAMESPACE}.replaceRules = ${JSON.stringify(replaceRules)};
   `,
+    null,
     true
   );
 };

@@ -108,7 +108,7 @@ RQ.ScriptRuleHandler.addLibraries = function (libraries, callback, index) {
     };
 
   if (library) {
-    RQ.ClientUtils.addRemoteJS(library.src, addNextLibraries);
+    RQ.ClientUtils.addRemoteJS(library.src, null, addNextLibraries);
   } else {
     addNextLibraries();
   }
@@ -128,13 +128,15 @@ RQ.ScriptRuleHandler.includeJSScriptsInOrder = function (scripts, callback, inde
 };
 
 RQ.ScriptRuleHandler.includeJS = function (script, callback) {
+  if (!script.value) throw new Error("Script value is empty");
+
   if (script.type === RQ.SCRIPT_TYPES.URL) {
-    RQ.ClientUtils.addRemoteJS(script.value, callback);
+    RQ.ClientUtils.addRemoteJS(script.value, script.attributes, callback);
     return;
   }
 
   if (script.type === RQ.SCRIPT_TYPES.CODE) {
-    RQ.ClientUtils.executeJS(script.value);
+    RQ.ClientUtils.executeJS(script.value, script.attributes);
   }
 
   typeof callback === "function" && callback();
@@ -142,10 +144,12 @@ RQ.ScriptRuleHandler.includeJS = function (script, callback) {
 
 RQ.ScriptRuleHandler.includeCSS = function (script, callback) {
   if (script.type === RQ.SCRIPT_TYPES.URL) {
-    RQ.ClientUtils.addRemoteCSS(script.value);
-  } else if (script.type === RQ.SCRIPT_TYPES.CODE) {
-    RQ.ClientUtils.embedCSS(script.value);
+    RQ.ClientUtils.addRemoteCSS(script.value, script.attributes);
+    return;
   }
 
+  if (script.type === RQ.SCRIPT_TYPES.CODE) {
+    RQ.ClientUtils.embedCSS(script.value, script.attributes);
+  }
   typeof callback === "function" && callback();
 };

@@ -67,9 +67,6 @@ const RuleBuilder = (props) => {
   //References
   const isCleaningUpRef = useRef(false);
   //Component State
-  const ruleSelection = {};
-  ruleSelection[currentlySelectedRuleData.id] = true;
-
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
   const [startWalkthrough, setStartWalkthrough] = useState(false);
