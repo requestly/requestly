@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import * as monaco from "monaco-editor";
 import Editor, { loader } from "@monaco-editor/react";
 import { useSelector } from "react-redux";
@@ -10,11 +10,24 @@ import parserBabel from "prettier/parser-babel";
 import { ResizableBox } from "react-resizable";
 
 import "./CodeEditor.css";
+import "./EditorToast/editorToast.scss";
+import { EditorToastContainer } from "./EditorToast/EditorToastContainer";
+import { getAllEditorToast } from "store/selectors";
+import { useDispatch } from "react-redux";
+import { actions } from "store";
 
 // https://github.com/suren-atoyan/monaco-react#use-monaco-editor-as-an-npm-package
 loader.config({
   monaco,
 });
+
+/**
+ * Editor id is used to match the exact editor instance for showing the editor toast
+ *
+ * in case of rules. id is `pair.id`
+ * while creating the rules. id is `temp-${rule.type}-rule` // HACKY
+ * in case of mocks. id is `${mock.id}`
+ */
 
 const CodeEditor = ({
   height = 275,
@@ -28,11 +41,16 @@ const CodeEditor = ({
   isCodeFormatted,
   validation = "editable",
   isResizable = true,
+  id = "",
 }) => {
   const appTheme = useSelector(getAppTheme);
   const editorRef = useRef(null);
+  const dispatch = useDispatch();
   const [editorHeight, setEditorHeight] = useState(height);
   const [isEditorMount, setIsEditorMount] = useState(false);
+
+  const allEditorToast = useSelector(getAllEditorToast);
+  const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
 
   const handleCodePrettify = (parser) => {
     const code = editorRef.current.getModel().getValue();
@@ -47,7 +65,7 @@ const CodeEditor = ({
     }
   };
 
-  const handleEditordidMount = (editor) => {
+  const handleEditorDidMount = (editor) => {
     editorRef.current = editor;
 
     if (!value?.length) {
@@ -61,7 +79,10 @@ const CodeEditor = ({
 
   useEffect(() => {
     loader.init().then((module) => module && setIsEditorMount(true));
-  }, []);
+    return () => {
+      setIsEditorMount(false);
+    };
+  }, [id]);
 
   useEffect(() => {
     if (editorRef && isCodeFormatted) {
@@ -72,6 +93,13 @@ const CodeEditor = ({
       }
     }
   }, [isCodeMinified, isCodeFormatted, language, unlockJsonPrettify]);
+
+  const handleEditorClose = useCallback(
+    (id) => {
+      dispatch(actions.removeToastForEditor({ id }));
+    },
+    [dispatch]
+  );
 
   return (
     <>
@@ -87,6 +115,16 @@ const CodeEditor = ({
             marginBottom: "1.5rem",
           }}
         >
+          {toastOverlay && (
+            <EditorToastContainer
+              message={toastOverlay.message}
+              type={toastOverlay.type}
+              id={toastOverlay.id}
+              onClose={() => handleEditorClose(toastOverlay.id)}
+              isVisible={toastOverlay}
+              autoClose={toastOverlay.autoClose}
+            />
+          )}
           <Editor
             width="100%"
             key={language}
@@ -95,7 +133,7 @@ const CodeEditor = ({
             defaultValue={defaultValue}
             value={value}
             onChange={handleChange}
-            onMount={handleEditordidMount}
+            onMount={handleEditorDidMount}
             options={{
               minimap: {
                 enabled: false,

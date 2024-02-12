@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm, Button } from "antd";
@@ -9,26 +10,110 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import CodeEditor from "components/misc/CodeEditor";
 import "./CustomScriptRow.css";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const { Text } = Typography;
 
-const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, script, scriptIndex, isInputDisabled }) => {
+function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
+  switch (scriptType) {
+    case GLOBAL_CONSTANTS.SCRIPT_TYPES.URL:
+      if (isCompatibleWithAttributes) {
+        switch (language) {
+          case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
+            return '<!--  Custom attributes to the script can be added here.  -->\n<script type="text/javscript">\n//Everything else will be ignored \n</script>';
+          case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
+            return '<!--  Custom attributes to the script can be added here.  -->\n<link rel="stylesheet" type="text/css" >\n<!-- Everything else will be ignored  -->\n';
+        }
+      }
+      break;
+    case GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE:
+      switch (language) {
+        case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
+          return isCompatibleWithAttributes
+            ? '<script type="text/javascript">\n\tconsole.log("Hello World");\n</script>'
+            : 'console.log("Hello World");';
+        case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
+          return isCompatibleWithAttributes
+            ? "<style>\n\tbody {\n\t\t background-color: #fff;\n\t}\n</style>"
+            : "body {\n\t background-color: #fff;\n }";
+      }
+      break;
+  }
+
+  return "";
+}
+
+const createAttributesString = (attributes) => {
+  const attributesString =
+    attributes
+      ?.map(({ name: attrName, value: attrVal }) => {
+        if (!attrVal) return `${attrName}`;
+        return `${attrName}="${attrVal}"`;
+      })
+      .join(" ") ?? "";
+  return attributesString;
+};
+
+const CustomScriptRow = ({
+  rowIndex,
+  pairIndex,
+  isLastIndex,
+  deleteScript,
+  script,
+  scriptIndex,
+  isInputDisabled,
+  pair,
+}) => {
   const dispatch = useDispatch();
 
   const [isCodeTypePopupVisible, setIsCodeTypePopupVisible] = useState(false);
+  const [isSourceTypePopupVisible, setIsSourceTypePopupVisible] = useState(false);
   const [codeTypeSelection, setCodeTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS);
+  const [sourceTypeSelection, setSourceTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
-  const scriptEditorBoilerCode = useMemo(
-    () => ({
-      JS: 'console.log("Hello World");',
-      CSS: "body {\n\t background-color: #fff;\n }",
-    }),
-    []
-  );
+  const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
+
+  const scriptEditorBoilerCode = useMemo(() => {
+    return getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
+  }, [script.codeType, script.type, isCompatibleWithAttributes]);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
+
+  const htmlWithAttributesAndCodeFromRuleData = useMemo(() => {
+    if (!isCompatibleWithAttributes) return script.value;
+
+    if (script.attributes?.length > 0) {
+      const attributes = script.attributes ?? [];
+      const attributesString = createAttributesString(attributes);
+
+      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+          return `<script ${attributesString ? ` ${attributesString}` : ``}></script>`;
+        }
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+          return `<link ${attributesString ? ` ${attributesString}` : ``}>`;
+        }
+      }
+      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+          return `<script${attributesString ? ` ${attributesString}` : ""}>${script.value}</script>`;
+        }
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+          return `<style${attributesString ? ` ${attributesString}` : ""}>${script.value}</style>`;
+        }
+      }
+    } else {
+      /* APP IS COMPATIBLE WITH ATTRIBUTES BUT NO ATTRIBUTES ARE PRESENT IN CURRENT RULE */
+      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+        return script.wrapperElement;
+      } else {
+        return script.value;
+      }
+    }
+  }, [script, isCompatibleWithAttributes]);
 
   const handleMockPickerVisibilityChange = (visible) => {
     setIsMockPickerVisible(visible);
@@ -48,7 +133,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
 
   const renderURLInput = () => {
     return (
-      <React.Fragment>
+      <Col span={24}>
         <Row className="margin-top-one" span={24} gutter={16} align="middle">
           <Col span={2}>
             <span>Source</span>
@@ -81,17 +166,24 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
               value={script.value}
             />
           </Col>
+          {/* MODALS */}
+          {/* TODO: Remove this once MockV2 Released */}
+          {isMockPickerVisible ? (
+            <Col span={2}>
+              <MockPickerModal
+                isVisible={isMockPickerVisible}
+                onVisibilityChange={handleMockPickerVisibilityChange}
+                mockSelectionCallback={handleMockPickerSelectionCallback}
+              />
+            </Col>
+          ) : null}
         </Row>
-        {/* MODALS */}
-        {/* TODO: Remove this once MockV2 Released */}
-        {isMockPickerVisible ? (
-          <MockPickerModal
-            isVisible={isMockPickerVisible}
-            onVisibilityChange={handleMockPickerVisibilityChange}
-            mockSelectionCallback={handleMockPickerSelectionCallback}
-          />
+        {isCompatibleWithAttributes ? (
+          <Row className="margin-top-one" span={24} gutter={16} align="middle">
+            {renderCodeEditor()}
+          </Row>
         ) : null}
-      </React.Fragment>
+      </Col>
     );
   };
 
@@ -100,6 +192,13 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
 
     setCodeTypeSelection(scriptCodeType);
     setIsCodeTypePopupVisible(true);
+  };
+
+  const showSourceTypeChangeConfirmation = (scriptType) => {
+    if (scriptType === script.type) return;
+
+    setSourceTypeSelection(scriptType);
+    setIsSourceTypePopupVisible(true);
   };
 
   const showScriptDeleteConfirmation = () => {
@@ -113,6 +212,8 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
         updates: {
           [`scripts[${scriptIndex}].codeType`]: codeType,
           [`scripts[${scriptIndex}].value`]: "",
+          [`scripts[${scriptIndex}].attributes`]: [],
+          [`scripts[${scriptIndex}].wrapperElement`]: null,
         },
       })
     );
@@ -123,16 +224,28 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   };
 
   const renderCodeEditor = () => {
-    const scriptBodyChangeHandler = (value) => {
-      dispatch(
-        actions.updateRulePairAtGivenPath({
-          pairIndex,
-          triggerUnsavedChangesIndication: !isCodeFormatted,
-          updates: {
-            [`scripts[${scriptIndex}].value`]: value,
-          },
-        })
-      );
+    const handleEditorUpdate = (value) => {
+      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+        /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
+        dispatch(
+          actions.updateRulePairAtGivenPath({
+            pairIndex,
+            updates: {
+              [`scripts[${scriptIndex}].wrapperElement`]: value,
+            },
+          })
+        );
+      } else {
+        dispatch(
+          actions.updateRulePairAtGivenPath({
+            pairIndex,
+            triggerUnsavedChangesIndication: !isCodeFormatted,
+            updates: {
+              [`scripts[${scriptIndex}].value`]: value,
+            },
+          })
+        );
+      }
     };
 
     const handleCodeFormattedFlag = () => {
@@ -154,14 +267,12 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
         >
           <Col xl="12" span={24}>
             <CodeEditor
+              id={pair.id}
+              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 75 : 300}
               language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
-              defaultValue={
-                script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS
-                  ? scriptEditorBoilerCode.CSS
-                  : scriptEditorBoilerCode.JS
-              }
-              value={script.value}
-              handleChange={scriptBodyChangeHandler}
+              defaultValue={scriptEditorBoilerCode}
+              value={htmlWithAttributesAndCodeFromRuleData}
+              handleChange={handleEditorUpdate}
               readOnly={isInputDisabled}
               isCodeFormatted={isCodeFormatted}
             />
@@ -176,22 +287,10 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
             ) : null}
           </Col>
           <Col span={6} align="right">
-            <span className="codemirror-character-count text-gray">{script.value.length} characters</span>
+            <span className="codemirror-character-count text-gray">{script.value?.length ?? 0} characters</span>
           </Col>
         </Row>
       </Col>
-    );
-  };
-
-  const scriptTypeChangeHandler = (newScriptType) => {
-    dispatch(
-      actions.updateRulePairAtGivenPath({
-        pairIndex,
-        updates: {
-          [`scripts[${scriptIndex}].type`]: newScriptType,
-          [`scripts[${scriptIndex}].value`]: "",
-        },
-      })
     );
   };
 
@@ -249,7 +348,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
   const scriptTypeMenu = (
     <Menu>
       {scriptTypeMenuItems.map(({ title, type }, index) => (
-        <Menu.Item key={index} onClick={(e) => scriptTypeChangeHandler(type)}>
+        <Menu.Item key={index} onClick={(e) => showSourceTypeChangeConfirmation(type)}>
           {title}
         </Menu.Item>
       ))}
@@ -304,6 +403,43 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
     );
   };
 
+  const onSourceTypeChange = (sourceType) => {
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: {
+          [`scripts[${scriptIndex}].type`]: sourceType,
+          [`scripts[${scriptIndex}].value`]: "",
+          [`scripts[${scriptIndex}].attributes`]: [],
+          [`scripts[${scriptIndex}].wrapperElement`]: null,
+        },
+      })
+    );
+  };
+
+  const SourceTypeOptions = () => {
+    return (
+      <Popconfirm
+        title="This will clear the existing attributes"
+        onConfirm={() => {
+          onSourceTypeChange(sourceTypeSelection);
+          setIsSourceTypePopupVisible(false);
+        }}
+        onCancel={() => {
+          setIsSourceTypePopupVisible(false);
+        }}
+        okText="Confirm"
+        cancelText="Cancel"
+        open={isSourceTypePopupVisible}
+      >
+        <Dropdown overlay={scriptTypeMenu} disabled={isInputDisabled}>
+          <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+            {script.type} <DownOutlined />
+          </Text>
+        </Dropdown>
+      </Popconfirm>
+    );
+  };
   return (
     <div key={rowIndex} className={!isLastIndex ? "custom-script-row" : ""}>
       <Row span={24} align="middle" className="code-editor-header-row mt-20">
@@ -315,11 +451,7 @@ const CustomScriptRow = ({ rowIndex, pairIndex, isLastIndex, deleteScript, scrip
             </Col>
             <Col align="left">
               <Text className="text-gray">Code Source: </Text>
-              <Dropdown overlay={scriptTypeMenu} disabled={isInputDisabled}>
-                <Text strong className="cursor-pointer uppercase ant-dropdown-link" onClick={(e) => e.preventDefault()}>
-                  {script.type} <DownOutlined />
-                </Text>
-              </Dropdown>
+              <SourceTypeOptions />
             </Col>
             {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
               <Col align="left">
