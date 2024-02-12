@@ -32,6 +32,7 @@ export const ORGANIZATION = {
 
 export const BUSINESS = {
   CHECKOUT: {
+    BUTTON_CLICKED: "checkout_button_clicked",
     INITIATED: "checkout_initiated",
     FAILED: "checkout_failed",
     COMPLETED: "checkout_completed",

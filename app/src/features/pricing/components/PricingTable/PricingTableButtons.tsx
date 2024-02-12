@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { PRICING } from "features/pricing/constants/pricing";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
-import { trackCheckoutFailedEvent, trackCheckoutInitiatedEvent } from "modules/analytics/events/misc/business/checkout";
+import { trackCheckoutFailedEvent, trackCheckoutButtonClicked } from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
 import { actions } from "store";
 import { getUserAuthDetails } from "store/selectors";
@@ -198,7 +198,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
       }
       case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
         if (user?.details?.profile?.isEmailVerified) {
-          trackCheckoutInitiatedEvent(duration, columnPlanName, quantity, isUserTrialing, source);
+          trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
           dispatch(
             actions.toggleActiveModal({
               modalName: "pricingModal",
@@ -218,7 +218,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.MANAGE_SUBSCRIPTION: {
-        trackCheckoutInitiatedEvent(duration, columnPlanName, quantity, isUserTrialing, source);
+        trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
         const manageSubscription = httpsCallable(firebaseFunction, "subscription-manageSubscription");
         manageSubscription({
           planName: columnPlanName,

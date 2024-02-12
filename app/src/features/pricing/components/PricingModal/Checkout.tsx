@@ -8,7 +8,6 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { trackPricingModalStripeWindowOpened } from "features/pricing/analytics";
 import { redirectToAccountDetails } from "utils/RedirectionUtils";
-import { trackCheckoutCompletedEvent } from "modules/analytics/events/misc/business/checkout";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getBillingTeamRedirectURL } from "backend/billing";
@@ -53,7 +52,6 @@ export const Checkout: React.FC<CheckoutProps> = ({
   const options = {
     clientSecret,
     onComplete: () => {
-      trackCheckoutCompletedEvent(source);
       redirectTolatestBillingTeam();
       onCheckoutCompleted?.();
     },

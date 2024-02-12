@@ -72,7 +72,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
 
   return (
     <React.Fragment>
-      {billingTeams !== null &&
+      {billingTeams?.length &&
       isCompanyEmail(user?.details?.profile?.email) &&
       user?.details?.profile?.isEmailVerified ? (
         enterpriseRequestedState === 1 ? (
