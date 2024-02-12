@@ -65,6 +65,19 @@ export const Templates: React.FC = () => {
     }
   }, [hasScrolledHorizontally]);
 
+  useEffect(() => {
+    // show the left arrow button if manually scrolled to right and show the right arrow button if manually scrolled to left
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.addEventListener("scroll", () => {
+        if (scrollContainerRef.current.scrollLeft > 0) {
+          setIsRowScrolledRight(true);
+        } else {
+          setIsRowScrolledRight(false);
+        }
+      });
+    }
+  }, []);
+
   return (
     <>
       {isPreviewModalOpen && (
@@ -124,7 +137,6 @@ export const Templates: React.FC = () => {
             <IoIosArrowDropleft
               onClick={() => {
                 scrollContainerRef.current.scrollLeft = 0;
-                setIsRowScrolledRight(false);
               }}
             />
           </div>
@@ -133,7 +145,6 @@ export const Templates: React.FC = () => {
             <IoIosArrowDropright
               onClick={() => {
                 scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
-                setIsRowScrolledRight(true);
               }}
             />
           </div>
