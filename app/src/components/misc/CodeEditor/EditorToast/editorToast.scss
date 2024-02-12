@@ -1,0 +1,54 @@
+.editor-toast-container {
+  max-height: fit-content;
+  transition: visibility 0.5s, max-height 0.5s;
+  visibility: visible;
+}
+
+.hidden-editor-toast {
+  visibility: hidden !important;
+  max-height: 0;
+}
+
+.editor-toast {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.editor-toast-message {
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.editor-toast-close {
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  height: 100%;
+
+  align-self: center;
+}
+
+.editor-toast-success {
+  background-color: var(--success);
+}
+
+.editor-toast-error {
+  background-color: var(--danger);
+}
+
+.editor-toast-info {
+  background-color: var(--blue-blue-300);
+}
+
+.editor-toast-warning {
+  background-color: var(--warning);
+}
