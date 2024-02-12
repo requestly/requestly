@@ -1,5 +1,6 @@
 .home-templates-wrapper {
   margin: 20px 0;
+  position: relative;
 }
 
 .home-templates-title.ant-typography {
@@ -17,6 +18,7 @@
   width: calc(100% - 2px);
   padding: 4px;
   padding-bottom: 8px;
+  scroll-behavior: smooth;
 
   &::-webkit-scrollbar {
     display: none;
@@ -81,4 +83,30 @@
     font-weight: 500;
     font-size: 12px;
   }
+}
+
+.templates-right-inset-shadow,
+.templates-left-inset-shadow {
+  position: absolute;
+  width: 30px;
+  height: 96px;
+  right: 0;
+  bottom: 0;
+  top: 32px;
+  background: linear-gradient(90deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & svg {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+}
+
+.templates-left-inset-shadow {
+  left: 0;
+  background: linear-gradient(270deg, rgba(14, 14, 14, 0) 0%, #090808 100%);
 }
