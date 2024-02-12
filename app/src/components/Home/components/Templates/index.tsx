@@ -66,7 +66,6 @@ export const Templates: React.FC = () => {
   }, [hasScrolledHorizontally]);
 
   useEffect(() => {
-    // show the left arrow button if manually scrolled to right and show the right arrow button if manually scrolled to left
     if (scrollContainerRef.current) {
       scrollContainerRef.current.addEventListener("scroll", () => {
         if (scrollContainerRef.current.scrollLeft > 0) {
