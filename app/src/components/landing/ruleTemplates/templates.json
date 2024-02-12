@@ -273,7 +273,6 @@
       "name": "Simulate 404 status code",
       "description": "Returning 404 status code in response of an API call made at /exampleAPI endpoint in testheader.com",
       "isSharedList": false,
-      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -313,7 +312,6 @@
       "name": "Toggle Feature Flags",
       "description": "Override JSON API responses for toggling feature flags",
       "isSharedList": false,
-      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -352,7 +350,6 @@
       "name": "Mock Geolocation Header",
       "description": "Simulate geolocation on specific websites.",
       "isSharedList": false,
-      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -402,7 +399,6 @@
       "name": "Redirect Google Queries to DuckDuckGo",
       "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
       "isSharedList": false,
-      "isFeatured": true,
       "imageURL": "https://www.vectorlogo.zone/logos/duckduckgo/duckduckgo-icon.svg",
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
@@ -448,7 +444,6 @@
     {
       "key": "12",
       "name": "Highlight Google Ads",
-      "isFeatured": true,
       "description": "Highlights Ads in Google Search Result to avoid clicking on them",
       "imageURL": "https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg",
       "isSharedList": false,
