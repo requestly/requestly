@@ -1,6 +1,49 @@
 {
   "templates": [
     {
+      "key": "6",
+      "name": "Inject JS into Customer Site",
+      "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704367507742,
+          "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
+          "groupId": "",
+          "id": "Script_rr1wa",
+          "isSample": false,
+          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
+          "modificationDate": 1704367578197,
+          "name": "Inject JS into Customer Site",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "gjjnt",
+              "scripts": [
+                {
+                  "codeType": "js",
+                  "fileName": "",
+                  "id": "fnujk",
+                  "loadTime": "afterPageLoad",
+                  "type": "url",
+                  "value": "https://www.yourserver.com/yourscript.js"
+                }
+              ],
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://www.customersite.com"
+              }
+            }
+          ],
+          "ruleType": "Script",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
       "key": "1",
       "name": "Redirect JS from production to local environment",
       "description": "Load local JS files instead of production for testing purposes.",
@@ -222,49 +265,6 @@
           ],
           "ruleType": "Headers",
           "status": "Active"
-        }
-      }
-    },
-    {
-      "key": "6",
-      "name": "Inject JS into Customer Site",
-      "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
-      "isSharedList": false,
-      "isFeatured": true,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1704367507742,
-          "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
-          "groupId": "",
-          "id": "Script_rr1wa",
-          "isSample": false,
-          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
-          "modificationDate": 1704367578197,
-          "name": "Inject JS into Customer Site",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "id": "gjjnt",
-              "scripts": [
-                {
-                  "codeType": "js",
-                  "fileName": "",
-                  "id": "fnujk",
-                  "loadTime": "afterPageLoad",
-                  "type": "url",
-                  "value": "https://www.yourserver.com/yourscript.js"
-                }
-              ],
-              "source": {
-                "key": "Url",
-                "operator": "Contains",
-                "value": "https://www.customersite.com"
-              }
-            }
-          ],
-          "ruleType": "Script",
-          "status": "Inactive"
         }
       }
     },
