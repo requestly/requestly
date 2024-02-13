@@ -68,7 +68,7 @@ const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remote
   const localRecords = myLocalRecords || rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
   // First, if user has defined a personal rule config and it's key, write it in required db node
   if (typeof localRecords?.[objectId]?.[key] !== "undefined" || key === "isFavourite") {
-    //@sagarsoni7 todo handle: localRecords doesn't contain empty groups. So they won't get updated.
+    //@sagarsoni7 todo handle: localRecords doesn't contain empty groups. So they won't get updated. // @nsr: not hanlded, but is an enhancement, no breaking logic I guess
     const teamUserRuleConfigPath = getTeamUserRuleConfigPath(objectId);
     if (!teamUserRuleConfigPath) return;
     updateValueAsPromise(teamUserRuleConfigPath, {
@@ -92,25 +92,48 @@ const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remote
   return latestRules;
 };
 
+/* TODO: REMOVE */
+function delay(duration) {
+  return new Promise((resolve) => setTimeout(resolve, duration));
+}
+
+function getTID() {
+  return Math.random().toString(36).substring(7);
+}
+
 export const updateUserSyncRecords = async (uid, records, appMode, options) => {
-  const targetWorkspaceId =
-    typeof options.workspaceId !== "undefined" ? options.workspaceId : window.currentlyActiveWorkspaceTeamId;
+  const targetWorkspaceId = options.workspaceId ?? window.currentlyActiveWorkspaceTeamId;
   const isSameWorkspaceOperation = targetWorkspaceId === window.currentlyActiveWorkspaceTeamId;
 
+  console.log(
+    `[DEBUG] updateUserSyncRecords . ISSAME - ${isSameWorkspaceOperation} . TARGET - ${targetWorkspaceId} . currentlyActiveWorkspaceTeamId - ${window.currentlyActiveWorkspaceTeamId} `
+  );
+
+  const clonTID = getTID();
+  console.time(`[DEBUG] updateUserSyncRecords CLONE DEEP ${clonTID}`);
+
+  await delay(5 * 1000);
+
   const latestRules = _.cloneDeep(records); // Does not contain all rules, only contains rules that has been updated.
+  console.timeEnd(`[DEBUG] updateUserSyncRecords CLONE DEEP ${clonTID}`);
 
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
   if (isSameWorkspaceOperation && window.currentlyActiveWorkspaceTeamId) {
     const syncRuleStatus = localStorage.getItem("syncRuleStatus") === "true" || false;
-    // Get current values from db and use them xD
+    // Get current values from db and use them xD // @sagar, what's so funny?
+    const tid = getTID();
+    console.time(`[DEBUG] updateUserSyncRecords GET REMOTE RECORDS" ${tid}`);
     const allRemoteRecords = (await getValueAsPromise(getRecordsSyncPath())) || {};
+    console.timeEnd(`[DEBUG] updateUserSyncRecords GET REMOTE RECORDS" ${tid}`);
     const remoteRecords = {};
     Object.keys(allRemoteRecords).forEach((key) => {
       if (!isEmpty(allRemoteRecords[key]?.id)) {
         remoteRecords[key] = allRemoteRecords[key];
       }
     });
+    console.time("[DEBUG] updateUserSyncRecords GET LOCAL RECORDS");
     const localRecords = rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
+    console.timeEnd("[DEBUG] updateUserSyncRecords GET LOCAL RECORDS");
     for (const objectId in latestRules) {
       try {
         // Key - "isFavourite"
@@ -147,8 +170,14 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
     }
   }
 
+  console.log(`[DEBUG] updateUserSyncRecords syncPath - [${syncPath}]`);
+
   try {
+    const debuggingId = getTID();
+    console.log("[DEBUG] updateUserSyncRecords sending updates to firebase. TID - ", debuggingId);
+    console.time(`[DEBUG] updateUserSyncRecords UPDATE VALUE AS PROMISE. TID - ${debuggingId}`);
     await updateValueAsPromise(syncPath, latestRules);
+    console.timeEnd(`[DEBUG] updateUserSyncRecords UPDATE VALUE AS PROMISE. TID - ${debuggingId}`);
   } catch (error) {
     Logger.error("err update sync records", error);
   }
@@ -281,6 +310,7 @@ export const getAllLocalRecords = async (appMode, _sanitizeRules = true) => {
 };
 
 export const saveRecords = (records, appMode) => {
+  // not being used anywhere
   Logger.log("Writing storage in saveRecords");
   return StorageService(appMode).saveMultipleRulesOrGroups(records);
 };

@@ -54,7 +54,7 @@ export const switchWorkspace = async (
   trackWorkspaceSwitched(source);
   dispatch(actions.updateIsRulesListLoading(true));
 
-  setLoader?.();
+  // setLoader?.();
   if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
     window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
       removeFirebaseListener && removeFirebaseListener();
@@ -77,11 +77,13 @@ export const switchWorkspace = async (
   resetSyncDebounce();
 
   // Don't clear when appMode is Extension but user has not installed it!
+  /* CAN BE REPLACED WITH isLocalStoragePresent */
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) skipStorageClearing = true;
 
   if (!skipStorageClearing) {
     Logger.log("Clearing storage in switchWorkspace");
     await StorageService(appMode).clearDB();
+    console.log("[DEBUG] switchWorkspace: DELETE COMPLETE");
   }
 
   // Just in case

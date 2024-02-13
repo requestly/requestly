@@ -89,12 +89,13 @@ export const mergeRecordsAndSaveToFirebase = async (
 ): Promise<Record<string, any>[]> => {
   // Fetch all local records based on the current application mode
   const localRecords: Record<string, any>[] = await getAllLocalRecords(appMode);
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { localRecords });
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { recordsOnFirebase });
+  // todo @nsr: remove, just tracking count for now
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - lenght of local", localRecords?.length ?? 0);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - lenght of recordsOnFirebase", recordsOnFirebase?.length ?? 0);
 
   // Merge the records from Firebase with the local records
   const mergedRecords: Record<string, any>[] = mergeRecords(recordsOnFirebase, localRecords);
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { mergedRecords });
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - lenght of merged", mergedRecords?.length ?? 0);
 
   // Format the merged records into an object where the keys are the record IDs
   const formattedObject: Record<string, any> = mergedRecords.reduce(
@@ -127,6 +128,9 @@ const resolveLocalConflictsAndSaveToFirebase = async (
 ): Promise<any[]> => {
   const localRecords: any[] = await getAllLocalRecords(appMode, false);
   const resolvedRecords: any[] = handleLocalConflicts(recordsOnFirebase, localRecords);
+
+  console.log("[DEBUG] resolveLocalConflictsAndSaveToFirebase - length of local", localRecords?.length ?? 0);
+  console.log("[DEBUG] resolveLocalConflictsAndSaveToFirebase - length of resolved", resolvedRecords?.length ?? 0);
 
   // Write to firebase
   const formattedObject: { [key: string]: any } = {};
@@ -169,13 +173,26 @@ export const doSync = async (
   let consistencyCheckPassed: boolean =
     (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
 
+  console.log(
+    "[DEBUG] doSync consistencyCheck and sync targets: ",
+    JSON.stringify({
+      consistencyCheckPassed,
+      syncTarget,
+      lastSyncTarget: lastSyncTarget ?? "NOT PRESENT!",
+      team_id,
+      uid,
+    })
+  );
+
   let allSyncedRecords: Record<string, any>[] = await parseRemoteRecords(appMode, updatedFirebaseRecords);
 
   if (!consistencyCheckPassed) {
+    console.log("[DEBUG] doSync not consistencyCheckPassed");
     // Merge records
     allSyncedRecords = await mergeRecordsAndSaveToFirebase(appMode, allSyncedRecords);
     await setLastSyncTarget(appMode, syncTarget, uid, team_id);
   } else {
+    console.log("[DEBUG] doSync consistencyCheckPassed");
     // At this stage we are sure that we want to sync with this target only, target is consistent
     // Now let's check if there are any local update that we should prioritize
     const tsResult: boolean = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);
@@ -272,8 +289,9 @@ export const invokeSyncingIfRequired = async ({
     dispatch(actions.updateIsRulesListLoading(false));
     return;
   }
+  // this does not make sense!!! Why not just call doSyncDebounced here????
   if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-    console.log("DEBUG", "doSyncDebounced");
+    console.log("[DEBUG] invokeSyncingIfRequired - debouncedDosync");
     doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
     resetSyncDebounce();
