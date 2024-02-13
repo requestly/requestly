@@ -34,11 +34,8 @@ export const switchWorkspace = async (
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
   let needToMergeRecords = false;
 
-  console.log("[DEBUG] switchWorkspace waiting for transactions");
-  console.time("[DEBUG] switchWorkspace transaction");
   await StorageService(appMode).waitForAllTransactions();
-  console.timeEnd("[DEBUG] switchWorkspace transaction");
-  console.log("[DEBUG] switchWorkspace transactions complete");
+
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
     const { isSyncEnabled, isWorkspaceMode } = currentSyncingState;
@@ -59,7 +56,6 @@ export const switchWorkspace = async (
   trackWorkspaceSwitched(source);
   dispatch(actions.updateIsRulesListLoading(true));
 
-  // setLoader?.();
   if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
     window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
       removeFirebaseListener && removeFirebaseListener();
@@ -88,7 +84,6 @@ export const switchWorkspace = async (
   if (!skipStorageClearing) {
     Logger.log("Clearing storage in switchWorkspace");
     await StorageService(appMode).clearDB();
-    console.log("[DEBUG] switchWorkspace: DELETE COMPLETE");
   }
 
   // Just in case

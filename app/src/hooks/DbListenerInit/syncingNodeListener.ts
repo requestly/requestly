@@ -90,12 +90,12 @@ export const mergeRecordsAndSaveToFirebase = async (
   // Fetch all local records based on the current application mode
   const localRecords: Record<string, any>[] = await getAllLocalRecords(appMode);
   // todo @nsr: remove, just tracking count for now
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - lenght of local", localRecords?.length ?? 0);
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - lenght of recordsOnFirebase", recordsOnFirebase?.length ?? 0);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of local", localRecords?.length ?? 0);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of recordsOnFirebase", recordsOnFirebase?.length ?? 0);
 
   // Merge the records from Firebase with the local records
   const mergedRecords: Record<string, any>[] = mergeRecords(recordsOnFirebase, localRecords);
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - lenght of merged", mergedRecords?.length ?? 0);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of merged", mergedRecords?.length ?? 0);
 
   // Format the merged records into an object where the keys are the record IDs
   const formattedObject: Record<string, any> = mergedRecords.reduce(
@@ -173,26 +173,13 @@ export const doSync = async (
   let consistencyCheckPassed: boolean =
     (syncTarget === "teamSync" && lastSyncTarget === team_id) || (syncTarget === "sync" && lastSyncTarget === uid);
 
-  console.log(
-    "[DEBUG] doSync consistencyCheck and sync targets: ",
-    JSON.stringify({
-      consistencyCheckPassed,
-      syncTarget,
-      lastSyncTarget: lastSyncTarget ?? "NOT PRESENT!",
-      team_id,
-      uid,
-    })
-  );
-
   let allSyncedRecords: Record<string, any>[] = await parseRemoteRecords(appMode, updatedFirebaseRecords);
 
   if (!consistencyCheckPassed) {
-    console.log("[DEBUG] doSync not consistencyCheckPassed");
     // Merge records
     allSyncedRecords = await mergeRecordsAndSaveToFirebase(appMode, allSyncedRecords);
     await setLastSyncTarget(appMode, syncTarget, uid, team_id);
   } else {
-    console.log("[DEBUG] doSync consistencyCheckPassed");
     // At this stage we are sure that we want to sync with this target only, target is consistent
     // Now let's check if there are any local update that we should prioritize
     const tsResult: boolean = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);

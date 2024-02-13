@@ -3,7 +3,7 @@ import RulesListIndex from "./RulesListIndex";
 import RulesIndexView from "views/features/rules/RulesIndexView";
 
 const RulesIndexViewWrapper = () => {
-  const shouldShowNewRulesList = useFeatureIsOn("new-rule-table") && false;
+  const shouldShowNewRulesList = useFeatureIsOn("new-rule-table");
   return shouldShowNewRulesList ? <RulesListIndex /> : <RulesIndexView />;
 };
 
