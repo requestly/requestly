@@ -41,14 +41,21 @@ export const BillingTeam: React.FC = () => {
 
   useEffect(() => {
     if (!hasAccessToBillingTeam && billingId) {
-      const getTeamOtherTeam = httpsCallable(getFunctions(), "billing-fetchBillingTeam");
-      getTeamOtherTeam({ billingId })
+      const getOtherTeam = httpsCallable(getFunctions(), "billing-fetchBillingTeam");
+      getOtherTeam({ billingId })
         .then((result: any) => {
           if (result.data.success) {
             const newTeams = [...billingTeams, result.data.billingTeamData];
             dispatch(billingActions.setAvailableBillingTeams(newTeams));
+            const formattedBillingTeamMembers = result.data.billingTeamMembers?.reduce(
+              (acc: { [id: string]: any }, curr: { [id: string]: any }) => {
+                acc[curr.id] = curr;
+                return acc;
+              },
+              {}
+            );
             dispatch(
-              billingActions.setBillingTeamMembers({ billingId, billingTeamMembers: result.data.billingTeamMembers })
+              billingActions.setBillingTeamMembers({ billingId, billingTeamMembers: formattedBillingTeamMembers })
             );
             setIsTeamMember(true);
           }
