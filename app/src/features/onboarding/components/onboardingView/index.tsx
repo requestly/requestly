@@ -5,7 +5,7 @@ import { getAppMode, getAppOnboardingDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { OnboardingAuthScreen } from "../auth";
 import { ONBOARDING_STEPS } from "../../types";
-import { GettingStartedView } from "../gettingStarted";
+import { RecommendationsView } from "../recommendations";
 import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
 import { actions } from "store";
@@ -14,6 +14,7 @@ import { trackAppOnboardingSkipped } from "features/onboarding/analytics";
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import Logger from "lib/logger";
 import "./index.scss";
+import { WorkspaceOnboardingView } from "../teams";
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -90,8 +91,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
             <OnboardingAuthScreen isOpen={isOpen} />
           ) : step === ONBOARDING_STEPS.PERSONA ? (
             <PersonaScreen isOpen={isOpen} />
+          ) : step === ONBOARDING_STEPS.TEAMS ? (
+            <WorkspaceOnboardingView />
           ) : (
-            <GettingStartedView isOpen={isOpen} />
+            <RecommendationsView isOpen={isOpen} />
           )}
         </div>
       </div>

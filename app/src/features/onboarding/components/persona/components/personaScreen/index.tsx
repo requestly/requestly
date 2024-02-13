@@ -23,6 +23,7 @@ import {
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import "./index.scss";
+import { isCompanyEmail } from "utils/FormattingHelper";
 
 interface Props {
   isOpen: boolean;
@@ -41,6 +42,12 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
 
   const getUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-getUserPersona"), []);
   const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
+
+  const handleMoveToNextStep = useCallback(() => {
+    if (isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
+    } else dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+  }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
 
   const handleSetPersona = useCallback(() => {
     if (persona) {
@@ -99,29 +106,29 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     ])
       .then(() => {
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.PERSONA);
-        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+        handleMoveToNextStep();
       })
       .catch((error) => {
         Logger.log(error);
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.PERSONA);
-        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+        handleMoveToNextStep();
         toast.error("Something went wrong.");
       })
       .finally(() => {
         setIsSaving(false);
       });
   }, [
+    handleMoveToNextStep,
     shouldShowFullNameInput,
     shouldShowPersonaInput,
     persona,
     fullName,
-    dispatch,
     handleSetPersona,
     handleSetFullName,
     user.details?.profile?.displayName,
   ]);
 
-  const shouldProceedToGettingStarted = useCallback(() => {
+  const shouldProceedToNextStep = useCallback(() => {
     if (!shouldShowFullNameInput && !shouldShowPersonaInput) {
       return true;
     } else return false;
@@ -156,16 +163,16 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   }, [user.loggedIn, user.details?.profile?.uid]);
 
   useEffect(() => {
-    if (!isLoading && shouldProceedToGettingStarted()) {
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+    if (!isLoading && shouldProceedToNextStep()) {
+      handleMoveToNextStep();
     }
-  }, [dispatch, isLoading, shouldProceedToGettingStarted]);
+  }, [isLoading, shouldProceedToNextStep, handleMoveToNextStep]);
 
   useEffect(() => {
-    if (isOpen && !shouldProceedToGettingStarted()) {
+    if (isOpen && !shouldProceedToNextStep()) {
       trackAppOnboardingViewed(ONBOARDING_STEPS.PERSONA);
     }
-  }, [isOpen, shouldProceedToGettingStarted]);
+  }, [isOpen, shouldProceedToNextStep]);
 
   return (
     <>
@@ -174,7 +181,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       ) : (
         <div className="persona-form-wrapper">
           <AnimatePresence>
-            {!shouldProceedToGettingStarted() ? (
+            {!shouldProceedToNextStep() ? (
               <m.div
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}

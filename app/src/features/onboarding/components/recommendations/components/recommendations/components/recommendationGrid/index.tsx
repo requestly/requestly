@@ -8,11 +8,14 @@ import { CloudUploadOutlined } from "@ant-design/icons";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import "./index.scss";
 
-export const RecommendationView = () => {
+export const RecommendationGrid = () => {
   const [isImportRulesModalOpen, setIsImportRulesModalOpen] = useState(false);
   const toggleImportRulesModal = () => setIsImportRulesModalOpen(!isImportRulesModalOpen);
   return (
     <>
+      <Typography.Title level={3} className="onboarding-recommendations-title">
+        Select a template to start quickly
+      </Typography.Title>
       <Col>
         {personaRecommendationData.map(({ section, features }, index) => (
           <div key={section} style={{ marginTop: index !== 0 ? "24px" : 0 }}>
