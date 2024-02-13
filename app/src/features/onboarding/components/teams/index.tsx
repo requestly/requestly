@@ -12,12 +12,16 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import Logger from "lib/logger";
 import { actions } from "store";
 import { OnboardingLoader } from "../loader";
-import "./index.scss";
 import { isNull } from "lodash";
-import { trackAppOnboardingGettingStartedViewed } from "features/onboarding/analytics";
+import { trackAppOnboardingGettingStartedViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
+import "./index.scss";
 
-export const WorkspaceOnboardingView: React.FC = () => {
+interface WorkspaceOnboardingViewProps {
+  isOpen: boolean;
+}
+
+export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = ({ isOpen }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -117,7 +121,13 @@ export const WorkspaceOnboardingView: React.FC = () => {
     }
   }, [pendingInvites, user?.details?.profile?.email, appOnboardingDetails.createdWorkspace]);
 
-  if (isLoading) return <OnboardingLoader />;
+  useEffect(() => {
+    if (isOpen) {
+      trackAppOnboardingViewed(ONBOARDING_STEPS.TEAMS);
+    }
+  }, [isOpen]);
+
+  if (isLoading || isNull(pendingInvites)) return <OnboardingLoader />;
   if (pendingInvites?.length) return <JoinTeamView pendngInvites={pendingInvites} />;
   if (appOnboardingDetails.createdWorkspace) return <DefaultTeamView />;
 };
