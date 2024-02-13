@@ -15,35 +15,41 @@ interface JoinTeamViewProps {
 export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => {
   const dispatch = useDispatch();
   return (
-    <Col className="getting-started-join-teams-view">
-      <Typography.Title level={5} className="text-white" style={{ fontWeight: 500 }}>
-        We found your team on requestly
-      </Typography.Title>
-      <Typography.Text className="getting-started-join-teams-description">
-        Join your team’s workspaces and get access to shared rules, mock APIs, session replays, and more.
-      </Typography.Text>
-      <Col className="getting-started-join-teams-list">
-        {pendngInvites.map((invite) => (
-          <TeamCard invite={invite} />
-        ))}
+    <Col className="teams-onboarding-view">
+      <Col className="getting-started-teams-wrapper">
+        <Col className="getting-started-join-teams-view">
+          <Typography.Title level={5} className="text-white" style={{ fontWeight: 500 }}>
+            We found your team on requestly
+          </Typography.Title>
+          <Typography.Text className="getting-started-join-teams-description">
+            Join your team’s workspaces and get access to shared rules, mock APIs, session replays, and more.
+          </Typography.Text>
+          <Col className="getting-started-join-teams-list">
+            {pendngInvites.map((invite) => (
+              <TeamCard invite={invite} />
+            ))}
+          </Col>
+
+          <RQButton
+            block
+            icon={<PlusOutlined />}
+            style={{ marginTop: "12px" }}
+            onClick={() => {
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "createWorkspaceModal",
+                  newValue: true,
+                  newProps: {
+                    source: "app_onboarding",
+                  },
+                })
+              );
+            }}
+          >
+            Create new workspace
+          </RQButton>
+        </Col>
       </Col>
-      <RQButton
-        icon={<PlusOutlined />}
-        style={{ marginTop: "12px" }}
-        onClick={() => {
-          dispatch(
-            actions.toggleActiveModal({
-              modalName: "createWorkspaceModal",
-              newValue: true,
-              newProps: {
-                source: "app_onboarding",
-              },
-            })
-          );
-        }}
-      >
-        Create new workspace
-      </RQButton>
     </Col>
   );
 };
