@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
-import { PersonaInput } from "../../../persona/components/PersonaInput";
+// import { PersonaInput } from "../../../persona/components/PersonaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
 import { googleSignIn } from "actions/FirebaseActions";
@@ -89,17 +89,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       }
     }
 
-    if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
-      if (!persona) {
-        toast.error("Please select or type your role");
-        return;
-      }
-
-      if (!fullName) {
-        toast.error("Please enter your full name");
-        return;
-      }
-    }
     setIsMagicLinkLoading(true);
     dispatch(actions.updateIsAppOnboardingStepDisabled(true));
     if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
@@ -164,7 +153,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           </label>
         }
       />
-      {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
+      {/* {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <>
           <div className="mt-16">
             <PersonaInput value={persona} onValueChange={(value) => setPersona(value)} />
@@ -180,7 +169,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             />
           </div>
         </>
-      )}
+      )} */}
 
       <RQButton
         type="primary"
