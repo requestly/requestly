@@ -48,7 +48,8 @@ const DashboardContent = () => {
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
-  const onboardingFeatureValue = useFeatureValue("new_onboarding", null);
+  // const onboardingFeatureValue = useFeatureValue("new_onboarding", null);
+  const onboardingFeatureValue = "variant";
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
