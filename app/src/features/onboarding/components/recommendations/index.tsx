@@ -13,7 +13,7 @@ interface Props {
 export const RecommendationsView: React.FC<Props> = ({ isOpen }) => {
   useEffect(() => {
     if (isOpen) {
-      trackAppOnboardingViewed(ONBOARDING_STEPS.GETTING_STARTED);
+      trackAppOnboardingViewed(ONBOARDING_STEPS.RECOMMENDATIONS);
     }
   }, [isOpen]);
 

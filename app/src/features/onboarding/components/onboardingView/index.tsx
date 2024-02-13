@@ -92,7 +92,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
           ) : step === ONBOARDING_STEPS.PERSONA ? (
             <PersonaScreen isOpen={isOpen} />
           ) : step === ONBOARDING_STEPS.TEAMS ? (
-            <WorkspaceOnboardingView />
+            <WorkspaceOnboardingView isOpen={isOpen} />
           ) : (
             <RecommendationsView isOpen={isOpen} />
           )}
