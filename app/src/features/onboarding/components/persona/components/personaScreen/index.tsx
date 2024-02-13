@@ -44,10 +44,12 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
 
   const handleMoveToNextStep = useCallback(() => {
-    if (isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
+    if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
-    } else dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
-  }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
+    } else {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+    }
+  }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user?.loggedIn]);
 
   const handleSetPersona = useCallback(() => {
     if (persona) {
@@ -163,10 +165,10 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   }, [user.loggedIn, user.details?.profile?.uid]);
 
   useEffect(() => {
-    if (!isLoading && shouldProceedToNextStep()) {
+    if (user.loggedIn && !isLoading && shouldProceedToNextStep()) {
       handleMoveToNextStep();
     }
-  }, [isLoading, shouldProceedToNextStep, handleMoveToNextStep]);
+  }, [isLoading, shouldProceedToNextStep, handleMoveToNextStep, user.loggedIn]);
 
   useEffect(() => {
     if (isOpen && !shouldProceedToNextStep()) {
