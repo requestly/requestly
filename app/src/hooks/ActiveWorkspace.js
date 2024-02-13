@@ -65,6 +65,7 @@ const ActiveWorkspace = () => {
   }
 
   useEffect(() => {
+    console.log("[DEBUG] ActiveWorkspace useEffect triggered");
     window.currentlyActiveWorkspaceTeamId = currentlyActiveWorkspace.id;
     window.workspaceMembersCount = currentlyActiveWorkspace?.membersCount ?? null;
     window.keySetDonecurrentlyActiveWorkspaceTeamId = true; // NOT USED ANYWHERE

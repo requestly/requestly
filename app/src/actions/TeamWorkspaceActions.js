@@ -34,6 +34,11 @@ export const switchWorkspace = async (
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
   let needToMergeRecords = false;
 
+  console.log("[DEBUG] switchWorkspace waiting for transactions");
+  console.time("[DEBUG] switchWorkspace transaction");
+  await StorageService(appMode).waitForAllTransactions();
+  console.timeEnd("[DEBUG] switchWorkspace transaction");
+  console.log("[DEBUG] switchWorkspace transactions complete");
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
     const { isSyncEnabled, isWorkspaceMode } = currentSyncingState;

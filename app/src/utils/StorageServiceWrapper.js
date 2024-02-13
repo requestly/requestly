@@ -17,6 +17,27 @@ class StorageServiceWrapper {
     this.saveRecord = this.saveRecord.bind(this);
     this.getRecord = this.getRecord.bind(this);
     this.getRecords = this.getRecords.bind(this);
+
+    this.transactionLedger = {};
+    this.transactionQueue = []; // promises of transactions that are still pending
+  }
+  // TODO: CLEANUP
+  trackPromise(promise) {
+    const id = Math.random().toString(36).substring(7);
+    console.log("promise id", id);
+    const index = this.transactionQueue.push(promise) - 1;
+    this.transactionLedger[id] = index;
+    promise.then(() => {
+      console.log("promise resolved", id);
+      const promiseIndex = this.transactionLedger[id];
+      console.log("promise resolved index", promiseIndex);
+      this.transactionQueue.splice(promiseIndex, 1);
+      delete this.transactionLedger[id];
+    });
+  }
+
+  waitForAllTransactions() {
+    return Promise.allSettled(this.transactionQueue);
   }
 
   getAllRecords() {
@@ -80,10 +101,11 @@ class StorageServiceWrapper {
         modificationDate: options.silentUpdate ? ruleOrGroup?.modificationDate : new Date().getTime(),
       },
     };
-    await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+    const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
       workspaceId: options.workspaceId,
-    });
-    return this.saveRecord(formattedObject); // writes to Extension or Desktop storage
+    }).then(this.saveRecord(formattedObject));
+    this.trackPromise(promise);
+    return promise;
   }
 
   async saveMultipleRulesOrGroups(array, options = {}) {
@@ -91,10 +113,11 @@ class StorageServiceWrapper {
     array.forEach((object) => {
       if (object && object.id) formattedObject[object.id] = object;
     });
-    await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+    const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
       workspaceId: options.workspaceId,
-    });
-    return this.saveRecord(formattedObject);
+    }).then(this.saveRecord(formattedObject));
+    this.trackPromise(promise);
+    return promise;
   }
 
   saveRulesOrGroupsWithoutSyncing(array) {
@@ -120,6 +143,8 @@ class StorageServiceWrapper {
     return this.StorageHelper.getStorageObject(key);
   }
 
+  /* why the difference in execution order for the two functions */
+  // todo: track promise
   async removeRecord(key) {
     await this.StorageHelper.removeStorageObject(key);
     await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
@@ -142,7 +167,7 @@ class StorageServiceWrapper {
 
   async clearDB() {
     await this.StorageHelper.clearStorage();
-    if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) await setStorageType("local");
+    if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) await setStorageType("local"); // no longer needed
   }
 
   saveConsoleLoggerState(state) {
