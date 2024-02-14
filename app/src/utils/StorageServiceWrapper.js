@@ -6,6 +6,7 @@ import { setStorageType } from "actions/ExtensionActions";
 import { getStorageHelper } from "../engines";
 import { processRecordsArrayIntoObject } from "./syncing/syncDataUtils";
 import { doSyncRecords } from "./syncing/SyncUtils";
+import { generateObjectId } from "./FormattingHelper";
 
 class StorageServiceWrapper {
   constructor(options) {
@@ -21,9 +22,9 @@ class StorageServiceWrapper {
     this.transactionQueue = new Set(); // promises of transactions that are still pending
     this.transactionLedger = new Map(); // optional: helpful only in putting console logs
   }
-  // TODO: CLEANUP
+
   trackPromise(promise) {
-    const id = Math.random().toString(36).substring(7);
+    const id = generateObjectId();
     console.log("promise id", id);
 
     this.transactionQueue.add(promise);
@@ -148,16 +149,21 @@ class StorageServiceWrapper {
     return this.StorageHelper.getStorageObject(key);
   }
 
-  /* why the difference in execution order for the two functions */
-  // todo: track promise
+  /* nsr: couldn't figure out why the difference in execution order for the two removal functions */
   async removeRecord(key) {
-    await this.StorageHelper.removeStorageObject(key);
-    await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
+    const promise = this.StorageHelper.removeStorageObject(key).then(
+      doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode)
+    );
+    this.trackPromise(promise);
+    await promise;
   }
 
   async removeRecords(array) {
-    await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
-    return this.StorageHelper.removeStorageObjects(array);
+    const promise = doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode).then(
+      this.StorageHelper.removeStorageObjects(array)
+    );
+    this.trackPromise(promise);
+    return promise;
   }
 
   removeRecordsWithoutSyncing(array) {
