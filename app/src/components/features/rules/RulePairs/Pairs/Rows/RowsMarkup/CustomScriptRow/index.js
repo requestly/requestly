@@ -1,5 +1,5 @@
 /* eslint-disable default-case */
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm, Button } from "antd";
 import { actions } from "store";
@@ -73,6 +73,7 @@ const CustomScriptRow = ({
   const [sourceTypeSelection, setSourceTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
   const [isCodeFormatted, setIsCodeFormatted] = useState(false);
+  const [initialCodeEditorValue, setInitialCodeEditorValue] = useState(null);
 
   const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
 
@@ -82,38 +83,52 @@ const CustomScriptRow = ({
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
-  const htmlWithAttributesAndCodeFromRuleData = useMemo(() => {
-    if (!isCompatibleWithAttributes) return script.value;
-
-    if (script.attributes?.length > 0) {
+  useEffect(() => {
+    if (initialCodeEditorValue !== null) return;
+    let newValue = script.value;
+    if (!script.value) {
+      newValue = getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
+    } else if (!isCompatibleWithAttributes) {
+      newValue = script.value;
+    } else if (script.attributes?.length > 0) {
       const attributes = script.attributes ?? [];
       const attributesString = createAttributesString(attributes);
 
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          return `<script ${attributesString ? ` ${attributesString}` : ``}></script>`;
+          newValue = `<script ${attributesString ? ` ${attributesString}` : ``}></script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          return `<link ${attributesString ? ` ${attributesString}` : ``}>`;
+          newValue = `<link ${attributesString ? ` ${attributesString}` : ``}>`;
         }
       }
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          return `<script${attributesString ? ` ${attributesString}` : ""}>${script.value}</script>`;
+          newValue = `<script${attributesString ? ` ${attributesString}` : ""}>${script.value}</script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          return `<style${attributesString ? ` ${attributesString}` : ""}>${script.value}</style>`;
+          newValue = `<style${attributesString ? ` ${attributesString}` : ""}>${script.value}</style>`;
         }
       }
     } else {
       /* APP IS COMPATIBLE WITH ATTRIBUTES BUT NO ATTRIBUTES ARE PRESENT IN CURRENT RULE */
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-        return script.wrapperElement;
+        newValue = script.wrapperElement;
       } else {
-        return script.value;
+        newValue = script.value;
       }
     }
-  }, [script, isCompatibleWithAttributes]);
+
+    setInitialCodeEditorValue(newValue);
+  }, [
+    initialCodeEditorValue,
+    script.value,
+    script.attributes,
+    script.type,
+    script.codeType,
+    script.wrapperElement,
+    isCompatibleWithAttributes,
+  ]);
 
   const handleMockPickerVisibilityChange = (visible) => {
     setIsMockPickerVisible(visible);
@@ -206,6 +221,7 @@ const CustomScriptRow = ({
   };
 
   const onCodeTypeChange = (codeType) => {
+    setInitialCodeEditorValue(null);
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
@@ -271,7 +287,7 @@ const CustomScriptRow = ({
               height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 75 : 300}
               language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
               defaultValue={scriptEditorBoilerCode}
-              value={htmlWithAttributesAndCodeFromRuleData}
+              value={initialCodeEditorValue}
               handleChange={handleEditorUpdate}
               readOnly={isInputDisabled}
               isCodeFormatted={isCodeFormatted}
@@ -420,7 +436,11 @@ const CustomScriptRow = ({
   const SourceTypeOptions = () => {
     return (
       <Popconfirm
-        title="This will clear the existing attributes"
+        title={
+          isCompatibleWithAttributes
+            ? "This will clear the existing attributes"
+            : "This will clear the updates that you made"
+        }
         onConfirm={() => {
           onSourceTypeChange(sourceTypeSelection);
           setIsSourceTypePopupVisible(false);

@@ -32,7 +32,7 @@ export const ORGANIZATION = {
 
 export const BUSINESS = {
   CHECKOUT: {
-    INITIATED: "checkout_initiated",
+    BUTTON_CLICKED: "checkout_button_clicked",
     FAILED: "checkout_failed",
     COMPLETED: "checkout_completed",
     ENTERPRISE_REQUESTED: "enterprise_requested",
