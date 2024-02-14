@@ -1143,6 +1143,12 @@ BG.Methods.addListenerForExtensionMessages = function () {
 };
 
 BG.Methods.handleClientPortConnections = () => {
+  const notifyClientSubscribers = (tabId) => {
+    const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
+    window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
+    clientLoadSubscribers.forEach((subscriber) => subscriber());
+  };
+
   chrome.webNavigation.onCommitted.addListener((navigatedTabData) => {
     const tabId = navigatedTabData.tabId;
     if (!tabId) {
@@ -1151,6 +1157,7 @@ BG.Methods.handleClientPortConnections = () => {
 
     const clientPortData = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT);
     if (
+      clientPortData &&
       clientPortData?.sender?.documentLifecycle !== "active" &&
       navigatedTabData.frameId === 0 &&
       navigatedTabData.documentLifecycle === "active"
@@ -1163,10 +1170,7 @@ BG.Methods.handleClientPortConnections = () => {
         },
       });
 
-      const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
-      window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
-      clientLoadSubscribers.forEach((subscriber) => subscriber());
-
+      notifyClientSubscribers(tabId);
       BG.Methods.onClientPageLoad({
         id: tabId,
         url: navigatedTabData.url,
@@ -1188,10 +1192,7 @@ BG.Methods.handleClientPortConnections = () => {
     window.tabService.setData(tabId, BG.TAB_SERVICE_DATA.CLIENT_PORT, port);
 
     if (!port.sender.documentLifecycle || port.sender.documentLifecycle === "active") {
-      const clientLoadSubscribers = window.tabService.getData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS) || [];
-      window.tabService.removeData(tabId, BG.TAB_SERVICE_DATA.CLIENT_LOAD_SUBSCRIBERS);
-      clientLoadSubscribers.forEach((subscriber) => subscriber());
-
+      notifyClientSubscribers(tabId);
       BG.Methods.onClientPageLoad(senderTab);
     }
 
