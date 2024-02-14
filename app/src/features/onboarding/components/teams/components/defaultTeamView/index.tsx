@@ -33,9 +33,7 @@ export const DefaultTeamView = () => {
               </Typography.Text>
               <RQButton
                 type="primary"
-                style={{
-                  marginTop: "32px",
-                }}
+                className="getting-started-invite-team-members-btn"
                 onClick={() => {
                   dispatch(
                     actions.toggleActiveModal({

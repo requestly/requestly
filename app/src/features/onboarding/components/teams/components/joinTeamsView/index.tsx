@@ -33,7 +33,7 @@ export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => 
           <RQButton
             block
             icon={<PlusOutlined />}
-            style={{ marginTop: "12px" }}
+            className="getting-started-create-new-workspace-btn"
             onClick={() => {
               dispatch(
                 actions.toggleActiveModal({
