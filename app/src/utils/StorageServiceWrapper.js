@@ -18,26 +18,31 @@ class StorageServiceWrapper {
     this.getRecord = this.getRecord.bind(this);
     this.getRecords = this.getRecords.bind(this);
 
-    this.transactionLedger = {};
-    this.transactionQueue = []; // promises of transactions that are still pending
+    this.transactionQueue = new Set(); // promises of transactions that are still pending
+    this.transactionLedger = new Map(); // optional: helpful only in putting console logs
   }
   // TODO: CLEANUP
   trackPromise(promise) {
     const id = Math.random().toString(36).substring(7);
     console.log("promise id", id);
-    const index = this.transactionQueue.push(promise) - 1;
-    this.transactionLedger[id] = index;
-    promise.then(() => {
-      console.log("promise resolved", id);
-      const promiseIndex = this.transactionLedger[id];
-      console.log("promise resolved index", promiseIndex);
-      this.transactionQueue.splice(promiseIndex, 1);
-      delete this.transactionLedger[id];
+
+    this.transactionQueue.add(promise);
+    this.transactionLedger.set(promise, { id, startTime: Date.now() });
+
+    promise.finally(() => {
+      const endTime = Date.now();
+      const ledgerEntry = this.transactionLedger.get(promise);
+      console.log(`Promise resolved: ${ledgerEntry.id}, Duration: ${endTime - ledgerEntry.startTime}ms`);
+
+      this.transactionQueue.delete(promise);
+      this.transactionLedger.delete(promise);
     });
   }
 
-  waitForAllTransactions() {
-    return Promise.allSettled(this.transactionQueue);
+  async waitForAllTransactions() {
+    await Promise.allSettled([...this.transactionQueue]);
+    this.transactionQueue.clear();
+    this.transactionLedger.clear();
   }
 
   getAllRecords() {
