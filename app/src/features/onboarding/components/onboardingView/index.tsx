@@ -25,6 +25,23 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   const appMode = useSelector(getAppMode);
   const { step, disableSkip } = useSelector(getAppOnboardingDetails);
 
+  const handleSkip = () => {
+    trackAppOnboardingSkipped(step);
+    if (step === ONBOARDING_STEPS.AUTH) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+    } else if (step === ONBOARDING_STEPS.TEAMS) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+    } else {
+      dispatch(actions.updateAppOnboardingCompleted());
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "appOnboardingModal",
+          newValue: false,
+        })
+      );
+    }
+  };
+
   useEffect(() => {
     dispatch(actions.updateIsAppOnboardingStepDisabled(false));
   }, [dispatch]);
@@ -63,24 +80,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
             </Col>
             {step === ONBOARDING_STEPS.PERSONA || disableSkip ? null : (
               <Col>
-                <RQButton
-                  type="default"
-                  className="onboarding-skip-button"
-                  onClick={() => {
-                    trackAppOnboardingSkipped(step);
-                    if (step === ONBOARDING_STEPS.AUTH) {
-                      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
-                    } else {
-                      dispatch(actions.updateAppOnboardingCompleted());
-                      dispatch(
-                        actions.toggleActiveModal({
-                          modalName: "appOnboardingModal",
-                          newValue: false,
-                        })
-                      );
-                    }
-                  }}
-                >
+                <RQButton type="default" className="onboarding-skip-button" onClick={handleSkip}>
                   Skip for now <MdOutlineArrowForward style={{ fontSize: "1rem" }} />
                 </RQButton>
               </Col>
