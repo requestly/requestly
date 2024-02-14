@@ -151,19 +151,25 @@ class StorageServiceWrapper {
 
   /* nsr: couldn't figure out why the difference in execution order for the two removal functions */
   async removeRecord(key) {
-    const promise = this.StorageHelper.removeStorageObject(key).then(
-      doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode)
-    );
-    this.trackPromise(promise);
-    await promise;
+    try {
+      await this.StorageHelper.removeStorageObject(key);
+      const syncResult = await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
+      this.trackPromise(Promise.resolve(syncResult));
+    } catch (error) {
+      console.error("Error removing record:", error);
+    }
   }
 
   async removeRecords(array) {
-    const promise = doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode).then(
-      this.StorageHelper.removeStorageObjects(array)
-    );
-    this.trackPromise(promise);
-    return promise;
+    try {
+      await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
+      const removalResult = await this.StorageHelper.removeStorageObjects(array);
+      this.trackPromise(Promise.resolve(removalResult));
+      return removalResult;
+    } catch (error) {
+      console.error("Error removing record:", error);
+      throw error;
+    }
   }
 
   removeRecordsWithoutSyncing(array) {
