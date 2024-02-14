@@ -4,7 +4,19 @@ import NetworkInspector from "components/mode-specific/desktop/InterceptTraffic/
 import "./index.css";
 import NoTrafficCTA from "../NetworkInspector/NetworkTable/NoTrafficCTA";
 
-const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction, emptyDesc, isStaticPreview }) => {
+const GroupByNone = ({
+  requestsLog,
+  handleRowClick,
+  emptyCtaText,
+  emptyCtaAction,
+  emptyDesc,
+  isStaticPreview,
+  setSelectedMockRequests,
+  showMockRequestSelector,
+  isMockRequestSelectorDisabled,
+  selectedMockRequests,
+  showMockFilters,
+}) => {
   const renderNoTrafficCTA = () => {
     if (emptyCtaAction && emptyCtaText) {
       return (
@@ -17,7 +29,7 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
       );
     }
 
-    return <NoTrafficCTA isStaticPreview={isStaticPreview} />;
+    return <NoTrafficCTA isStaticPreview={isStaticPreview} showMockFilters={showMockFilters} />;
   };
 
   if (requestsLog?.length === 0) {
@@ -32,9 +44,18 @@ const GroupByNone = ({ requestsLog, handleRowClick, emptyCtaText, emptyCtaAction
         const { actions } = record;
         return {
           onClick: () => handleRowClick(record),
-          style: actions.length !== 0 && !isStaticPreview ? { background: "#13c2c280" } : {},
+          style:
+            actions.length !== 0 && !isStaticPreview
+              ? { background: "#13c2c280" }
+              : selectedMockRequests[record.id]
+              ? { background: "var(--surface-3)" }
+              : {},
         };
       }}
+      setSelectedMockRequests={setSelectedMockRequests}
+      showMockRequestSelector={showMockRequestSelector}
+      isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
+      selectedMockRequests={selectedMockRequests}
     />
   );
 };

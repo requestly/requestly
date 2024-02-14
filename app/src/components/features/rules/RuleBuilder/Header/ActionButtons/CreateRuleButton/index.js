@@ -14,7 +14,8 @@ import { trackRQLastActivity } from "../../../../../../../utils/AnalyticsUtils";
 //Actions
 import { saveRule } from "../actions";
 import { getModeData, setIsCurrentlySelectedRuleHasUnsavedChanges } from "../../../actions";
-import { validateRule } from "./actions";
+import { transformAndValidateRuleFields, validateRule } from "./actions";
+
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -35,6 +36,8 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import "../RuleEditorActionButtons.css";
+import { HTML_ERRORS } from "./actions/insertScriptValidators";
+import { toastType } from "components/misc/CodeEditor/EditorToast/types";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -125,86 +128,113 @@ const CreateRuleButton = ({
 
     //Pre-validation: regex fix + trim whitespaces
     const fixedRuleData = runMinorFixesOnRule(dispatch, currentlySelectedRuleData);
-    //Validation
-    const ruleValidation = validateRule(fixedRuleData, dispatch, appMode);
-    if (ruleValidation.result) {
-      saveRule(
-        appMode,
-        {
-          ...fixedRuleData,
-          createdBy,
-          currentOwner,
-          lastModifiedBy,
-        },
-        // updating `isCurrentlySelectedRuleHasUnsavedChanges` in the callback of saveRule
-        // because the navigation blocker prompt is dependent on this value so we need to
-        // update it before navigating away from the page
-        () => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false)
-      )
-        .then(async () => {
-          if (isRuleEditorModal) {
-            ruleCreatedFromEditorModalCallback(currentlySelectedRuleData.id);
-          } else {
-            toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
-          }
-
-          /* @sahil865gupta: Testing GA4 events and blending BQ data. Move this to separate module*/
-
-          let rule_type = null;
-
-          if (currentlySelectedRuleData && currentlySelectedRuleData.ruleType) {
-            rule_type = currentlySelectedRuleData.ruleType;
-          }
-          if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
-            ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
-            trackRuleCreatedEvent({
-              rule_type,
-              description: currentlySelectedRuleData.description,
-              destination_types:
-                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-                  ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
-                  : null,
-              source: ruleCreatedEventSource,
-              body_types:
-                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
-                  ? getAllResponseBodyTypes(currentlySelectedRuleData)
-                  : null,
-              ...getEventParams(currentlySelectedRuleData),
-            });
-          } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
-            trackRuleEditedEvent({
-              rule_type,
-              description: currentlySelectedRuleData.description,
-              destination_types:
-                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-                  ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
-                  : null,
-              source: ruleCreatedEventSource,
-              ...getEventParams(currentlySelectedRuleData),
-            });
-          }
-          ruleModifiedAnalytics(user);
-          trackRQLastActivity("rule_saved");
-
-          if (currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
-            const resourceType = currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
-
-            if (resourceType && resourceType !== ResponseRuleResourceType.UNKNOWN) {
-              trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
-            }
-          }
-        })
-        .then(() => {
-          if (!isRuleEditorModal) {
-            redirectToRuleEditor(navigate, currentlySelectedRuleData.id, MODE);
-          }
-        })
-        .catch(() => {
-          toast.error("Error in saving rule. Please contact support.");
-        });
+    //Syntactic Validation
+    const syntaxValidation = await transformAndValidateRuleFields(fixedRuleData);
+    if (!syntaxValidation.success) {
+      const validationError = syntaxValidation.validationError;
+      switch (validationError.error) {
+        case HTML_ERRORS.COULD_NOT_PARSE:
+        case HTML_ERRORS.UNCLOSED_TAGS:
+        case HTML_ERRORS.UNCLOSED_ATTRIBUTES:
+        case HTML_ERRORS.UNSUPPORTED_TAGS:
+        case HTML_ERRORS.MULTIPLE_TAGS:
+        case HTML_ERRORS.NO_TAGS:
+          dispatch(
+            actions.triggerToastForEditor({
+              id: validationError.pairId,
+              message: validationError.message,
+              type: toastType.ERROR,
+              autoClose: 4500,
+            })
+          );
+          break;
+        default:
+          toast.error(validationError.message || "Could Not Parse rule");
+          break;
+      }
     } else {
-      toast.warn(ruleValidation.message);
-      trackErrorInRuleCreation(snakeCase(ruleValidation.error), currentlySelectedRuleData.ruleType);
+      const parsedRuleData = syntaxValidation.ruleData || currentlySelectedRuleData;
+      //Validation
+      const ruleValidation = validateRule(parsedRuleData, dispatch, appMode);
+      if (ruleValidation.result) {
+        saveRule(
+          appMode,
+          {
+            ...parsedRuleData,
+            createdBy,
+            currentOwner,
+            lastModifiedBy,
+          },
+          // updating `isCurrentlySelectedRuleHasUnsavedChanges` in the callback of saveRule
+          // because the navigation blocker prompt is dependent on this value so we need to
+          // update it before navigating away from the page
+          () => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false)
+        )
+          .then(async () => {
+            if (isRuleEditorModal) {
+              ruleCreatedFromEditorModalCallback(currentlySelectedRuleData.id);
+            } else {
+              toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
+            }
+
+            /* @sahil865gupta: Testing GA4 events and blending BQ data. Move this to separate module*/
+
+            let rule_type = null;
+
+            if (currentlySelectedRuleData && currentlySelectedRuleData.ruleType) {
+              rule_type = currentlySelectedRuleData.ruleType;
+            }
+            if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
+              ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
+              trackRuleCreatedEvent({
+                rule_type,
+                description: currentlySelectedRuleData.description,
+                destination_types:
+                  currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+                    ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+                    : null,
+                source: ruleCreatedEventSource,
+                body_types:
+                  currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
+                    ? getAllResponseBodyTypes(currentlySelectedRuleData)
+                    : null,
+                ...getEventParams(currentlySelectedRuleData),
+              });
+            } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
+              trackRuleEditedEvent({
+                rule_type,
+                description: currentlySelectedRuleData.description,
+                destination_types:
+                  currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+                    ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+                    : null,
+                source: ruleCreatedEventSource,
+                ...getEventParams(currentlySelectedRuleData),
+              });
+            }
+            ruleModifiedAnalytics(user);
+            trackRQLastActivity("rule_saved");
+
+            if (currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
+              const resourceType = currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
+
+              if (resourceType && resourceType !== ResponseRuleResourceType.UNKNOWN) {
+                trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
+              }
+            }
+          })
+          .then(() => {
+            if (!isRuleEditorModal) {
+              redirectToRuleEditor(navigate, currentlySelectedRuleData.id, MODE);
+            }
+          })
+          .catch(() => {
+            toast.error("Error in saving rule. Please contact support.");
+          });
+      } else {
+        toast.warn(ruleValidation.message);
+        trackErrorInRuleCreation(snakeCase(ruleValidation.error), currentlySelectedRuleData.ruleType);
+      }
     }
   };
 

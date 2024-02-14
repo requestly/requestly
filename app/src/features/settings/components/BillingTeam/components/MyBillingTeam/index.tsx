@@ -83,7 +83,7 @@ export const MyBillingTeam: React.FC = () => {
           </Col>
         </Row>
         <Col className="billing-team-members-drawer-body">
-          <OrgMembersTable />
+          <OrgMembersTable source="add_members_section" />
         </Col>
         <Row className="mt-8 billing-team-members-drawer-help" justify="space-between" align="middle">
           <Col>

@@ -37,6 +37,109 @@
       }
     },
     {
+      "key": "6",
+      "name": "Inject JS into Customer Site",
+      "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1704367507742,
+          "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
+          "groupId": "",
+          "id": "Script_rr1wa",
+          "isSample": false,
+          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
+          "modificationDate": 1704367578197,
+          "name": "Inject JS into Customer Site",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "gjjnt",
+              "scripts": [
+                {
+                  "codeType": "js",
+                  "fileName": "",
+                  "id": "fnujk",
+                  "loadTime": "afterPageLoad",
+                  "type": "url",
+                  "value": "https://www.yourserver.com/yourscript.js"
+                }
+              ],
+              "source": {
+                "key": "Url",
+                "operator": "Contains",
+                "value": "https://www.customersite.com"
+              }
+            }
+          ],
+          "ruleType": "Script",
+          "status": "Inactive"
+        }
+      }
+    },
+    {
+      "key": "4",
+      "name": "Bypass CORS",
+      "description": "You can Bypass CORS by turning this on",
+      "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8oBmecALAzN-kd73MyovxZKNzg0fHSvM6-xStnS8AXnoccY2oIkSVNz179uZgbIEajVE&usqp=CAU",
+      "isSharedList": false,
+      "isFeatured": true,
+      "data": {
+        "targetAppMode": ["EXTENSION", "DESKTOP"],
+        "ruleDefinition": {
+          "creationDate": 1643755328278,
+          "description": "You can Bypass CORS by turning this on",
+          "groupId": "",
+          "id": "Headers_qdrqr",
+          "isSample": false,
+          "name": "Bypass CORS",
+          "objectType": "rule",
+          "pairs": [
+            {
+              "id": "z3v66",
+              "modifications": {
+                "Request": [],
+                "Response": [
+                  {
+                    "header": "Access-Control-Allow-Origin",
+                    "type": "Add",
+                    "value": "rq_request_initiator_origin()"
+                  },
+                  {
+                    "header": "Access-Control-Allow-Methods",
+                    "type": "Add",
+                    "value": "*"
+                  },
+                  {
+                    "header": "Access-Control-Allow-Headers",
+                    "type": "Add",
+                    "value": "*"
+                  },
+                  {
+                    "header": "Access-Control-Allow-Credentials",
+                    "type": "Add",
+                    "value": "true"
+                  }
+                ]
+              },
+              "source": {
+                "filters": null,
+                "key": "Url",
+                "operator": "Contains",
+                "value": "<yourdomain.com>"
+              }
+            }
+          ],
+          "ruleType": "Headers",
+          "status": "Active",
+          "modificationDate": 1643756052651,
+          "version": 2
+        }
+      }
+    },
+    {
       "key": "2",
       "name": "Add Authorization Header to all localhost requests",
       "description": "Add a custom value for the Authorization header for all requests to localhost",
@@ -120,66 +223,7 @@
         }
       }
     },
-    {
-      "key": "4",
-      "name": "Bypass CORS",
-      "description": "You can Bypass CORS by turning this on",
-      "imageURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8oBmecALAzN-kd73MyovxZKNzg0fHSvM6-xStnS8AXnoccY2oIkSVNz179uZgbIEajVE&usqp=CAU",
-      "isSharedList": false,
-      "isFeatured": true,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1643755328278,
-          "description": "You can Bypass CORS by turning this on",
-          "groupId": "",
-          "id": "Headers_qdrqr",
-          "isSample": false,
-          "name": "Bypass CORS",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "id": "z3v66",
-              "modifications": {
-                "Request": [],
-                "Response": [
-                  {
-                    "header": "Access-Control-Allow-Origin",
-                    "type": "Add",
-                    "value": "rq_request_initiator_origin()"
-                  },
-                  {
-                    "header": "Access-Control-Allow-Methods",
-                    "type": "Add",
-                    "value": "*"
-                  },
-                  {
-                    "header": "Access-Control-Allow-Headers",
-                    "type": "Add",
-                    "value": "*"
-                  },
-                  {
-                    "header": "Access-Control-Allow-Credentials",
-                    "type": "Add",
-                    "value": "true"
-                  }
-                ]
-              },
-              "source": {
-                "filters": null,
-                "key": "Url",
-                "operator": "Contains",
-                "value": "<yourdomain.com>"
-              }
-            }
-          ],
-          "ruleType": "Headers",
-          "status": "Active",
-          "modificationDate": 1643756052651,
-          "version": 2
-        }
-      }
-    },
+
     {
       "key": "5",
       "name": "Remove Content-Security-Policy Header",
@@ -226,54 +270,10 @@
       }
     },
     {
-      "key": "6",
-      "name": "Inject JS into Customer Site",
-      "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
-      "isSharedList": false,
-      "isFeatured": true,
-      "data": {
-        "targetAppMode": ["EXTENSION", "DESKTOP"],
-        "ruleDefinition": {
-          "creationDate": 1704367507742,
-          "description": "Inject your JavaScript into a potential customer's website for testing purpose.",
-          "groupId": "",
-          "id": "Script_rr1wa",
-          "isSample": false,
-          "lastModifiedBy": "tWxDQWeiZ7grxJvV8L4iX9e0w8s1",
-          "modificationDate": 1704367578197,
-          "name": "Inject JS into Customer Site",
-          "objectType": "rule",
-          "pairs": [
-            {
-              "id": "gjjnt",
-              "scripts": [
-                {
-                  "codeType": "js",
-                  "fileName": "",
-                  "id": "fnujk",
-                  "loadTime": "afterPageLoad",
-                  "type": "url",
-                  "value": "https://www.yourserver.com/yourscript.js"
-                }
-              ],
-              "source": {
-                "key": "Url",
-                "operator": "Contains",
-                "value": "https://www.customersite.com"
-              }
-            }
-          ],
-          "ruleType": "Script",
-          "status": "Inactive"
-        }
-      }
-    },
-    {
       "key": "7",
       "name": "Simulate 404 status code",
       "description": "Returning 404 status code in response of an API call made at /exampleAPI endpoint in testheader.com",
       "isSharedList": false,
-      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -313,7 +313,6 @@
       "name": "Toggle Feature Flags",
       "description": "Override JSON API responses for toggling feature flags",
       "isSharedList": false,
-      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -352,7 +351,6 @@
       "name": "Mock Geolocation Header",
       "description": "Simulate geolocation on specific websites.",
       "isSharedList": false,
-      "isFeatured": true,
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
         "ruleDefinition": {
@@ -402,7 +400,6 @@
       "name": "Redirect Google Queries to DuckDuckGo",
       "description": "Turn it on and your chrome address bar will show results from DuckDuckGo",
       "isSharedList": false,
-      "isFeatured": true,
       "imageURL": "https://www.vectorlogo.zone/logos/duckduckgo/duckduckgo-icon.svg",
       "data": {
         "targetAppMode": ["EXTENSION", "DESKTOP"],
@@ -448,7 +445,6 @@
     {
       "key": "12",
       "name": "Highlight Google Ads",
-      "isFeatured": true,
       "description": "Highlights Ads in Google Search Result to avoid clicking on them",
       "imageURL": "https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg",
       "isSharedList": false,

@@ -3,7 +3,7 @@ import {
   convertHarJsonToRQLogs,
   createLogsHar,
 } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/converter";
-import { redirectToNetworkSession } from "utils/RedirectionUtils";
+import { redirectToNetworkSessionHome } from "utils/RedirectionUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
 import { RQNetworkLog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
@@ -63,8 +63,8 @@ const NetworkSessionViewer: React.FC = () => {
 
   const fetchRecording = useCallback(async () => {
     const recording = await getNetworkSession(networkSessionId);
-    dispatch(networkSessionActions.setSessionName(recording.name));
-    setRecordedLogs(convertHarJsonToRQLogs(recording.har));
+    dispatch(networkSessionActions.setSessionName(recording?.name));
+    setRecordedLogs(convertHarJsonToRQLogs(recording?.har));
   }, [networkSessionId, dispatch]);
 
   useEffect(() => {
@@ -90,7 +90,7 @@ const NetworkSessionViewer: React.FC = () => {
               icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
               onClick={() => {
                 trackNetworkSessionViewerBackClicked();
-                redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
+                redirectToNetworkSessionHome(navigate, isDesktopSessionsCompatible);
               }}
               className="back-button"
             />
@@ -110,7 +110,7 @@ const NetworkSessionViewer: React.FC = () => {
                   icon={<DeleteOutlined />}
                   onClick={() => {
                     confirmAndDeleteRecording(id, () => {
-                      redirectToNetworkSession(navigate, undefined, isDesktopSessionsCompatible);
+                      redirectToNetworkSessionHome(navigate, isDesktopSessionsCompatible);
                     });
                     trackDeleteNetworkSessionClicked(ActionSource.Preview);
                   }}

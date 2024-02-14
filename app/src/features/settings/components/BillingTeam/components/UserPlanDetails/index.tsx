@@ -57,6 +57,7 @@ export const UserPlanDetails = () => {
                 startDate: data.appsumo.date,
                 endDate: getSubscriptionEndDateForAppsumo(new Date(data.appsumo.date)),
                 type: "appsumo",
+                plan: data?.plan,
               });
             }
           }
@@ -87,7 +88,7 @@ export const UserPlanDetails = () => {
         marginTop: !user?.details?.isPremium ? "80px" : "0px",
       }}
     >
-      {user?.details?.isPremium ? (
+      {user?.details?.isPremium && !(user?.details?.planDetails.status === "trialing" && hasAppSumoSubscription) ? (
         <>
           {" "}
           <Row gutter={8} align="middle" className="user-plan-card-header">
@@ -122,7 +123,9 @@ export const UserPlanDetails = () => {
                   {user?.details?.planDetails.status === "trialing" ? "Trial" : "Plan"} expire date
                 </div>
                 <div className="user-plan-date">
-                  {getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
+                  {hasAppSumoSubscription
+                    ? "Lifetime"
+                    : getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.endDate))}
                 </div>
               </Space>
             </div>
@@ -131,22 +134,31 @@ export const UserPlanDetails = () => {
       ) : null}
 
       {hasAppSumoSubscription ? (
-        <SubscriptionInfo
-          hideShadow
-          isLifeTimeActive={true}
-          appSumoCodeCount={lifeTimeSubscriptionDetails?.codes?.length ?? 0}
-          hideManagePersonalSubscriptionButton={true}
-          subscriptionDetails={{
-            validFrom: lifeTimeSubscriptionDetails.startDate,
-            validTill: lifeTimeSubscriptionDetails.endDate,
-            status: "active",
-            type: lifeTimeSubscriptionDetails.type ?? type,
-            planName:
-              lifeTimeSubscriptionDetails?.codes.length > 2 ? PRICING.PLAN_NAMES.PROFESSIONAL : "Session Book Plus",
-            planId:
-              lifeTimeSubscriptionDetails?.codes.length > 2 ? PRICING.PLAN_NAMES.PROFESSIONAL : "session_book_plus",
+        <div
+          style={{
+            padding: "1rem 8px",
           }}
-        />
+        >
+          <div className="subheader mb-16">Appsumo Subscription</div>
+          <SubscriptionInfo
+            hideShadow
+            isLifeTimeActive={true}
+            appSumoCodeCount={lifeTimeSubscriptionDetails?.codes?.length ?? 0}
+            hideManagePersonalSubscriptionButton={true}
+            subscriptionDetails={{
+              validFrom: lifeTimeSubscriptionDetails.startDate,
+              validTill: lifeTimeSubscriptionDetails.endDate,
+              status: "active",
+              type: lifeTimeSubscriptionDetails.type ?? type,
+              planName: lifeTimeSubscriptionDetails?.plan
+                ? getPlanNameFromId(lifeTimeSubscriptionDetails.plan)
+                : "Session Book Plus",
+              planId: lifeTimeSubscriptionDetails?.plan
+                ? getPlanNameFromId(lifeTimeSubscriptionDetails.plan)
+                : "session_book_plus",
+            }}
+          />
+        </div>
       ) : (
         <>
           {user?.details?.planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL ||

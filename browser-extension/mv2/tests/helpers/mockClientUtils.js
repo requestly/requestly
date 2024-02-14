@@ -8,7 +8,7 @@ RQ.ClientUtils.executeJS = function (code) {
   return mockElement;
 };
 
-RQ.ClientUtils.addRemoteJS = function (src, callback) {
+RQ.ClientUtils.addRemoteJS = function (src, _attr, callback) {
   window.DOM.push(src);
   if (typeof callback === "function") {
     callback();

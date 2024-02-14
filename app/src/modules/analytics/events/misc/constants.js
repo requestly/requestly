@@ -32,7 +32,7 @@ export const ORGANIZATION = {
 
 export const BUSINESS = {
   CHECKOUT: {
-    INITIATED: "checkout_initiated",
+    BUTTON_CLICKED: "checkout_button_clicked",
     FAILED: "checkout_failed",
     COMPLETED: "checkout_completed",
     ENTERPRISE_REQUESTED: "enterprise_requested",
@@ -121,4 +121,10 @@ export const SHARING = {
   SHARING_URL_IN_WORKSPACE_COPIED: "sharing_url_in_workspace_copied",
   SHARING_MODAL_RULES_DUPLICATED: "sharing_modal_rules_duplicated",
   SHARING_MODAL_TOAST_VIEWED: "sharing_modal_toast_viewed",
+};
+
+export const MONETIZATION_EXPERIMENT = {
+  CONTACT_US_CLICKED: "contact_us_clicked",
+  UPGRADE_CLICKED: "upgrade_clicked",
+  RENEW_NOW_CLICKED: "renew_now_clicked",
 };

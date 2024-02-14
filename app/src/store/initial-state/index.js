@@ -192,8 +192,11 @@ const INITIAL_STATE = {
     isOnboardingCompleted: false,
   },
 
+  editorToast: {},
+
   misc: {
     persist: {
+      isPlanExpiredBannerClosed: false,
       appNotificationBannerDismissTs: 0,
       isProductHuntLaunchedBannerClosed: false,
       isRedirectRuleTourCompleted: false,

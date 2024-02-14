@@ -25,7 +25,7 @@ export const shouldShowOnboarding = async (appMode: string) => {
     return false;
 
   const installDate = await getAndUpdateInstallationDate(appMode, false, false);
-  if (new Date(installDate) >= new Date("2023-10-20")) return true;
+  if (new Date(installDate) >= new Date("2024-02-02")) return true;
   else return false;
 };
 
