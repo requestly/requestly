@@ -22,8 +22,8 @@ import {
 } from "features/onboarding/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
-import "./index.scss";
 import { isCompanyEmail } from "utils/FormattingHelper";
+import "./index.scss";
 
 interface Props {
   isOpen: boolean;
@@ -114,7 +114,9 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
         Logger.log(error);
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.PERSONA);
         handleMoveToNextStep();
-        toast.error("Something went wrong.");
+        if (user.loggedIn) {
+          toast.error("Something went wrong.");
+        }
       })
       .finally(() => {
         setIsSaving(false);
@@ -128,6 +130,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     handleSetPersona,
     handleSetFullName,
     user.details?.profile?.displayName,
+    user.loggedIn,
   ]);
 
   const shouldProceedToNextStep = useCallback(() => {
@@ -191,17 +194,19 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
                 transition={{ type: "linear", duration: 0.2 }}
                 className="persona-form"
               >
-                <Row gutter={16} align="middle">
-                  <Col className="login-success-icon display-row-center">
-                    <MdCheck className="text-white" />
-                  </Col>
-                  <Col>
-                    <Typography.Title level={4} style={{ fontWeight: 500, marginBottom: 0 }}>
-                      You’re logged in successfully!
-                    </Typography.Title>
-                  </Col>
-                </Row>
-                <Typography.Title level={5} style={{ marginTop: "24px", fontWeight: 500 }}>
+                {user.loggedIn && (
+                  <Row gutter={16} align="middle">
+                    <Col className="login-success-icon display-row-center">
+                      <MdCheck className="text-white" />
+                    </Col>
+                    <Col>
+                      <Typography.Title level={4} style={{ fontWeight: 500, marginBottom: 0 }}>
+                        You’re logged in successfully!
+                      </Typography.Title>
+                    </Col>
+                  </Row>
+                )}
+                <Typography.Title level={5} style={{ marginTop: user.loggedIn ? "24px" : 0, fontWeight: 500 }}>
                   Helps us in optimizing your experience
                 </Typography.Title>
                 {shouldShowPersonaInput && (

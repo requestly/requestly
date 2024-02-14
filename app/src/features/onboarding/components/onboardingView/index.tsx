@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getAppOnboardingDetails } from "store/selectors";
@@ -13,14 +14,16 @@ import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { trackAppOnboardingSkipped } from "features/onboarding/analytics";
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import Logger from "lib/logger";
-import "./index.scss";
 import { WorkspaceOnboardingView } from "../teams";
+import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import "./index.scss";
 
 interface OnboardingProps {
   isOpen: boolean;
 }
 
 export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const { step, disableSkip } = useSelector(getAppOnboardingDetails);
@@ -32,6 +35,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
     } else if (step === ONBOARDING_STEPS.TEAMS) {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
     } else {
+      redirectToWebAppHomePage(navigate);
       dispatch(actions.updateAppOnboardingCompleted());
       dispatch(
         actions.toggleActiveModal({

@@ -185,6 +185,7 @@ const INITIAL_STATE = {
 
   appOnboarding: {
     step: "auth",
+    persona: null,
     disableSkip: false,
     createdWorkspace: null,
     isOnboardingCompleted: false,
