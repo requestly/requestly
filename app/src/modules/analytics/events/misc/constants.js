@@ -128,3 +128,7 @@ export const MONETIZATION_EXPERIMENT = {
   UPGRADE_CLICKED: "upgrade_clicked",
   RENEW_NOW_CLICKED: "renew_now_clicked",
 };
+
+export const SUBSCRIPTION = {
+  PERSONAL_SUBSCRIPTION_INVOICE_CLICKED: "personal_subscription_invoice_clicked",
+};
