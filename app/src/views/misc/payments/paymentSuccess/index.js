@@ -6,12 +6,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 // Utils
 import { redirectToRules } from "../../../../utils/RedirectionUtils";
-import { trackCheckoutCompletedEvent } from "modules/analytics/events/misc/business/checkout";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
-
-  trackCheckoutCompletedEvent();
 
   return (
     <>
