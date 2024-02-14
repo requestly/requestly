@@ -1,13 +1,11 @@
 //CONFIG
 import { MODES } from "components/misc/VerifyEmail/modes";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "../config/constants";
 import { isFeatureCompatible } from "./CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
 //CONSTANTS
 const { PATHS, LINKS } = APP_CONSTANTS;
-const { APP_MODES } = GLOBAL_CONSTANTS;
 
 /* LAYOUTS */
 
@@ -354,26 +352,6 @@ export const redirectToPersonalSubscription = (navigate, hardRedirect, autoRefre
   }
 };
 
-/* ACCOUNT - CHECKOUT */
-export const redirectToCheckout = ({ mode, teamId, planName, duration, quantity }) => {
-  const url = new URL(window.location.href);
-  url.pathname = PATHS.CHECKOUT.ABSOLUTE;
-  url.searchParams.set("m", mode);
-  if (teamId) {
-    url.searchParams.set("t", teamId);
-  }
-  url.searchParams.set("p", planName);
-  url.searchParams.set("d", duration);
-  if (quantity) {
-    url.searchParams.set("q", quantity);
-  }
-  if (window?.RQ?.MODE === APP_MODES.DESKTOP) {
-    window.open(url.href, "_blank");
-  } else {
-    window.location = url.href;
-  }
-};
-
 /* ACCOUNT - UPDATE SUBSCRIPTION */
 export const redirectToUpdateSubscription = ({ mode, teamId, planType, isRenewal }) => {
   const url = new URL(window.location.href);
@@ -385,34 +363,6 @@ export const redirectToUpdateSubscription = ({ mode, teamId, planType, isRenewal
   url.searchParams.set("p", planType);
   if (isRenewal) url.searchParams.set("r", true);
   window.location = url.href;
-};
-
-/* ACCOUNT - UPDATE SUBSCRIPTION Contact Us */
-export const redirectToUpdateSubscriptionContactUs = () => {
-  const url = new URL(window.location.href);
-  url.pathname = PATHS.ACCOUNT.UPDATE_SUBSCRIPTION_CONTACT_US.ABSOLUTE;
-  window.location = url.href;
-};
-
-/* ACCOUNT - UPDATE PAYMENT METHOD */
-export const redirectToUpdatePaymentMethod = () => {
-  redirectToUpdateSubscriptionContactUs();
-};
-
-/* ACCOUNT - PAYMENT FAILED */
-export const redirectToPaymentFailed = (errorCode) => {
-  let qp = "?ref=stripe&paymentId=5357551a-e2d7";
-  if (errorCode && typeof errorCode === "string") qp = qp.concat("err=" + errorCode);
-  window.location.href = PATHS.PAYMENT_FAIL.ABSOLUTE + qp;
-};
-
-/* ACCOUNT - REFRESH SUBSCRIPTION */
-export const redirectToRefreshSubscription = (navigate, hardRedirect) => {
-  if (hardRedirect) {
-    window.location.href = PATHS.ACCOUNT.REFRESH_SUBSCRIPTION.ABSOLUTE;
-  } else {
-    navigate(PATHS.ACCOUNT.REFRESH_SUBSCRIPTION.ABSOLUTE);
-  }
 };
 
 /* MISC */
