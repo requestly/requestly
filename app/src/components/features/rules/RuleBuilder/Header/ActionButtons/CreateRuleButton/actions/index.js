@@ -3,10 +3,101 @@ import { actions } from "../../../../../../../../store";
 //UTILS
 import { isValidUrl } from "../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-// LODASH
-import { inRange } from "lodash";
+import _, { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
+import { parseHTMLString, getHTMLNodeName, validateHTMLTag } from "./insertScriptValidators";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
+
+/**
+ * In case of a few rules, input from the rule editor does not directly map to rule schema.
+ * This function is used to transform and validate the input fields before saving the rule.
+ *
+ * Returns the transformed rule data if modified, else returns the original rule data.
+ * @param {*} ruleData
+ * @returns {
+ *  success: boolean,
+ *  ruleData?: object,
+ *  validationError?: {
+ *    error: string,
+ *    message: string,
+ *    pairId: string // pair that cause the error
+ *  }
+ * }
+ */
+export const transformAndValidateRuleFields = async (ruleData) => {
+  switch (ruleData.ruleType) {
+    case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT: {
+      if (!isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT)) {
+        return { success: true, ruleData };
+      }
+      /* RuleData is explicitly read-only (reference to value in store) */
+      const newRuleData = _.cloneDeep(ruleData);
+
+      const validateScriptRule = () => {
+        const promises = [];
+        ruleData.pairs.forEach((pair, pairIndex) => {
+          pair.scripts.forEach((script, scriptIndex) => {
+            promises.push(validateScript(script, scriptIndex, pairIndex));
+          });
+        });
+        return Promise.all(promises)
+          .then(() => {
+            return { success: true, ruleData: newRuleData };
+          })
+          .catch((validationError) => {
+            /* validation failed */
+            return { success: false, validationError };
+          });
+      };
+
+      const validateScript = (script, scriptIndex, pairIndex) => {
+        return new Promise(async (resolve, reject) => {
+          const codeHTMLTagName = getHTMLNodeName(script.type, script.codeType);
+
+          if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
+            const res = await validateHTMLTag(script.value, codeHTMLTagName);
+            if (!res.isValid) {
+              reject({
+                error: res.validationError,
+                message: res.errorMessage,
+                pairId: ruleData.pairs[pairIndex].id,
+              });
+            }
+            const { attributes, innerText: code } = parseHTMLString(script.value, codeHTMLTagName);
+
+            newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
+              ...script,
+              attributes,
+              value: code,
+            };
+          } else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+            const res = await validateHTMLTag(script.wrapperElement, codeHTMLTagName);
+            if (!res.isValid) {
+              reject({
+                error: res.validationError,
+                message: res.errorMessage,
+                pairId: ruleData.pairs[pairIndex].id,
+              });
+            }
+            const { attributes } = parseHTMLString(script.wrapperElement, codeHTMLTagName);
+            newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
+              ...script,
+              attributes,
+            };
+          }
+          delete newRuleData.pairs[pairIndex].scripts[scriptIndex]["wrapperElement"]; // this was used to temporarily store the raw code
+          resolve();
+        });
+      };
+
+      return validateScriptRule();
+    }
+    default:
+      return { success: true, ruleData };
+  }
+};
 
 export const validateRule = (rule, dispatch, appMode) => {
   let output;
@@ -195,7 +286,6 @@ export const validateRule = (rule, dispatch, appMode) => {
       });
     });
   }
-
   //Insert Script Rule
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT) {
     rule.pairs.forEach((pair) => {
@@ -208,7 +298,7 @@ export const validateRule = (rule, dispatch, appMode) => {
         };
       } else {
         pair.scripts.forEach((script) => {
-          if (script.type === "code") {
+          if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
             //Check if code isn't empty
             if (isEmpty(script.value)) {
               output = {
@@ -217,14 +307,55 @@ export const validateRule = (rule, dispatch, appMode) => {
                 error: "invalid script code",
               };
             }
+            /* NOT APPLYING LOGICAL VALIDATIONS FOR NOW */
+            // else {
+            //   const res = checkForLogicalErrorsInCode(script.value, script);
+            //   if (!res.isValid) {
+            //     if (res.error === scriptLogicalErrors.CONTAINS_HTML_CODE) {
+            //       output = {
+            //         result: false,
+            //         message: `Please remove unnecessary HTML tags from the code`,
+            //         error: "invalid script code",
+            //       };
+            //     }
+            //     else if (res.error === scriptLogicalErrors.DOM_LOAD_EVENT_LISTENER_AFTER_PAGE_LOAD) {
+            //       // dispatch(
+            //       //   actions.updateRulePairAtGivenPath({
+            //       //     pairIndex,
+            //       //     triggerUnsavedChangesIndication: true,
+            //       //     updates: {
+            //       //       [`scripts[${scriptIndex}].loadTime`]: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD,
+            //       //     },
+            //       //   })
+            //       // );
+
+            //       // just show a toast!!!
+
+            //       output = {
+            //         result: false,
+            //         message: `Updated script load time to before page load`,
+            //         error: "invalid script code",
+            //         editorToast: {
+            //           message: `Contains a DomContentLoaded listener being injected after page load`,
+            //           id: pair.id,
+            //           type: "info",
+            //           onlyInEditor: false,
+            //         },
+            //         ruleUpdated: true,
+            //       };
+            //     }
+            //   }
+            // }
           }
           //Check if URL isn't empty. Can be absolute or relative
-          else if (script.type === "url" && isEmpty(script.value)) {
-            output = {
-              result: false,
-              message: `Please enter a valid script URL`,
-              error: "invalid script url",
-            };
+          else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+            if (isEmpty(script.value) || !isValidUrl(script.value)) {
+              output = {
+                result: false,
+                message: `Please enter a valid script URL`,
+                error: "invalid script url",
+              };
+            }
           }
         });
       }
