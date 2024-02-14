@@ -13,7 +13,7 @@ import Logger from "lib/logger";
 import { actions } from "store";
 import { OnboardingLoader } from "../loader";
 import { isNull } from "lodash";
-import { trackAppOnboardingGettingStartedViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
+import { trackAppOnboardingTeamsViewed, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import "./index.scss";
 
@@ -107,15 +107,15 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
   useEffect(() => {
     if (!isNull(pendingInvites)) {
       if (!isCompanyEmail(user?.details?.profile?.email)) {
-        trackAppOnboardingGettingStartedViewed("no_workspaces");
+        trackAppOnboardingTeamsViewed("no_workspaces");
         return;
       }
       if (pendingInvites.length) {
-        trackAppOnboardingGettingStartedViewed("available_to_join");
+        trackAppOnboardingTeamsViewed("available_to_join");
         return;
       }
       if (appOnboardingDetails.createdWorkspace) {
-        trackAppOnboardingGettingStartedViewed("created_workspace");
+        trackAppOnboardingTeamsViewed("created_workspace");
         return;
       }
     }
