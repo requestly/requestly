@@ -29,6 +29,6 @@ export const trackAppOnboardingManageWorkspaceClicked = () => {
   trackEvent(APP_ONBOARDING.APP_ONBOARDING_MANAGE_WORKSPACE_CLICKED);
 };
 
-export const trackAppOnboardingGettingStartedViewed = (isWorkspaceAvailable: string) => {
-  trackEvent(APP_ONBOARDING.APP_ONBOARDING_GETTING_STARTED_VIEWED, { isWorkspaceAvailable });
+export const trackAppOnboardingTeamsViewed = (isWorkspaceAvailable: string) => {
+  trackEvent(APP_ONBOARDING.APP_ONBOARDING_TEAMS_VIEWED, { isWorkspaceAvailable });
 };
