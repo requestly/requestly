@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Typography } from "antd";
@@ -6,25 +6,19 @@ import SpinnerColumn from "../SpinnerColumn";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { actions } from "store";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getAppMode, getAppOnboardingDetails, getUserAuthDetails } from "../../../store/selectors";
+import { getAppMode, getUserAuthDetails } from "../../../store/selectors";
 import { isEmailValid } from "../../../utils/FormattingHelper";
-import {
-  signInWithEmailLink,
-  updateUserInFirebaseAuthUser,
-  updateValueAsPromise,
-} from "../../../actions/FirebaseActions";
+import { signInWithEmailLink } from "../../../actions/FirebaseActions";
 import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions";
-import { redirectToRules } from "utils/RedirectionUtils";
+import { redirectToRules, redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import {
   trackSignInWithLinkCustomFormSeen,
   trackSignInWithLinkCustomFormSubmitted,
 } from "modules/analytics/events/common/auth/emailLinkSignin";
-import Logger from "lib/logger";
-import { ONBOARDING_STEPS } from "features/onboarding/types";
-import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import "./index.css";
+import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -39,11 +33,8 @@ const SignInViaEmailLink = () => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [isEmailLoginLinkDone, setIsEmailLoginLinkDone] = useState(false);
-
-  const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
 
   const logOutUser = useCallback(() => {
     handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
@@ -65,48 +56,6 @@ const SignInViaEmailLink = () => {
     return <SpinnerColumn />;
   }, [user.email, userEmailfromLocalStorage, logOutUser]);
 
-  /**
-   * Updates user displayName information during onboarding.
-   * This function is not directly linked with the authentication flow.
-   */
-  const updateUserFullName = useCallback(
-    async (data) => {
-      if (data?.displayName === "User" && appOnboardingDetails.fullName) {
-        const newName = appOnboardingDetails.fullName;
-        return new Promise((resolve, reject) => {
-          updateValueAsPromise(["users", data.uid, "profile"], { displayName: newName })
-            .then(() => {
-              resolve({ success: true });
-            })
-            .catch((e) => {
-              reject(e);
-            });
-        });
-      }
-      return Promise.resolve({ success: true });
-    },
-    [appOnboardingDetails.fullName]
-  );
-
-  /**
-   * Updates user persona information during onboarding.
-   * This function is not directly linked with the authentication flow.
-   */
-  const updateUserPersona = useCallback(async () => {
-    if (appOnboardingDetails.persona) {
-      return new Promise((resolve, reject) => {
-        setUserPersona({ persona: appOnboardingDetails.persona })
-          .then(() => {
-            resolve({ success: true });
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      });
-    }
-    return Promise.resolve({ success: true });
-  }, [appOnboardingDetails.persona, setUserPersona]);
-
   useEffect(() => {
     if (user.loggedIn && isEmailLoginLinkDone) {
       const name = user?.displayName?.split(" ")[0];
@@ -125,11 +74,6 @@ const SignInViaEmailLink = () => {
     isLogin,
     user.displayName,
     user.email,
-    setUserPersona,
-    appOnboardingDetails.persona,
-    updateUserFullName,
-    updateUserPersona,
-    appOnboardingDetails.fullName,
     user.details?.profile?.displayName,
   ]);
 
@@ -149,28 +93,9 @@ const SignInViaEmailLink = () => {
                 window.localStorage.removeItem("RQEmailForSignIn");
                 setIsLogin(!isNewUser);
                 if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
-
-                const name = authData?.displayName !== "User" ? authData.displayName : appOnboardingDetails.fullName;
-                Promise.all([
-                  updateUserPersona(),
-                  updateUserInFirebaseAuthUser({
-                    displayName: name ?? "User",
-                  }),
-                  updateUserFullName(authData),
-                ])
-                  .then(() => {
-                    //DO NOTHING
-                    Logger.log("User Persona and Full Name updated successfully");
-                  })
-                  .catch((e) => {
-                    Logger.error(e);
-                  })
-                  .finally(() => {
-                    trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
-                    dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
-                    setIsProcessing(false);
-                    setIsEmailLoginLinkDone(true);
-                  });
+                redirectToWebAppHomePage(navigate);
+                dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+                trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
               } else throw new Error("Failed");
             }
           })
@@ -182,14 +107,7 @@ const SignInViaEmailLink = () => {
         window.alert("Could not get the email to log into, please try again. If the problem persists, contact support");
       }
     },
-    [
-      user.loggedIn,
-      renderAlreadyLoggedInWarning,
-      updateUserPersona,
-      updateUserFullName,
-      appOnboardingDetails.fullName,
-      dispatch,
-    ]
+    [user.loggedIn, renderAlreadyLoggedInWarning, dispatch, navigate]
   );
 
   const renderEmailInputForm = () => {
