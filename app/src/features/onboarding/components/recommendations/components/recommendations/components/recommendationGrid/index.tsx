@@ -1,20 +1,25 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { Col, Typography } from "antd";
+import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { personaRecommendationData } from "../../personaRecommendationData";
 import { FeatureCard } from "../featureCard";
 import { RQButton } from "lib/design-system/components";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import { CloudUploadOutlined } from "@ant-design/icons";
+import { AUTH } from "modules/analytics/events/common/constants";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import "./index.scss";
 
 export const RecommendationGrid = () => {
+  const user = useSelector(getUserAuthDetails);
   const [isImportRulesModalOpen, setIsImportRulesModalOpen] = useState(false);
   const toggleImportRulesModal = () => setIsImportRulesModalOpen(!isImportRulesModalOpen);
   return (
     <>
       <Typography.Title level={3} className="onboarding-recommendations-title">
-        Select a template to start quickly
+        Select a modification type to start quickly
       </Typography.Title>
       <Col>
         {personaRecommendationData.map(({ section, features }, index) => (
@@ -28,15 +33,25 @@ export const RecommendationGrid = () => {
         <Typography.Title level={5} className="getting-started-import-rules-title">
           Have existing rules? Click below to upload and use them
         </Typography.Title>
-        <RQButton
-          className="items-center"
-          onClick={() => {
-            trackUploadRulesButtonClicked("app_onboarding_recommendation_screen");
+        <AuthConfirmationPopover
+          title="You need to sign up to upload rules"
+          callback={() => {
             toggleImportRulesModal();
           }}
+          source={AUTH.SOURCE.UPLOAD_RULES}
         >
-          <CloudUploadOutlined /> Upload rules
-        </RQButton>
+          <RQButton
+            className="items-center"
+            onClick={() => {
+              trackUploadRulesButtonClicked("app_onboarding_recommendation_screen");
+              if (user.loggedIn) {
+                toggleImportRulesModal();
+              }
+            }}
+          >
+            <CloudUploadOutlined /> Upload rules
+          </RQButton>
+        </AuthConfirmationPopover>
       </Col>
       <ImportRulesModal isOpen={isImportRulesModalOpen} toggle={toggleImportRulesModal} />
     </>

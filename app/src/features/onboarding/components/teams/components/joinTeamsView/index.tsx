@@ -19,7 +19,7 @@ export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => 
       <Col className="getting-started-teams-wrapper">
         <Col className="getting-started-join-teams-view">
           <Typography.Title level={5} className="text-white" style={{ fontWeight: 500 }}>
-            We found your team on requestly
+            We found your team on Requestly
           </Typography.Title>
           <Typography.Text className="getting-started-join-teams-description">
             Join your team’s workspaces and get access to shared rules, mock APIs, session replays, and more.

@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Avatar, Spin } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { Invite } from "types";
@@ -8,6 +9,8 @@ import Logger from "lib/logger";
 import { LoadingOutlined } from "@ant-design/icons";
 import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
+import { ONBOARDING_STEPS } from "features/onboarding/types";
+import { actions } from "store";
 import "./index.scss";
 
 interface TeamCardProps {
@@ -15,6 +18,7 @@ interface TeamCardProps {
 }
 
 export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
+  const dispatch = useDispatch();
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
 
@@ -35,6 +39,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
             res?.data?.data?.invite?.metadata?.teamAccessCount
           );
         }
+        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
       })
       .catch((e) => {
         Logger.error(e);
@@ -43,7 +48,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
       .finally(() => {
         setIsJoining(false);
       });
-  }, [invite.id, invite?.metadata?.teamId, invite?.metadata?.teamName]);
+  }, [invite.id, invite?.metadata?.teamId, invite?.metadata?.teamName, dispatch]);
 
   return (
     <div className="team-card-wrapper">
