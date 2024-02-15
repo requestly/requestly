@@ -19,7 +19,10 @@ import firebaseApp from "../../../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import SubscriptionInfo from "features/settings/components/Profile/ActiveLicenseInfo/SubscriptionInfo";
+import { redirectToPersonalSubscription } from "utils/RedirectionUtils";
+import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import "./index.scss";
+import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
@@ -101,10 +104,27 @@ export const UserPlanDetails = () => {
             <div className="user-plan-card-grid-item">
               <Space direction="vertical" size={8}>
                 {user?.details?.planDetails.status === "trialing" ? <div>One month free trial</div> : null}
-
-                <div className="user-plan-card-plan-name">
-                  {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} plan
-                </div>
+                <Row gutter={8} className="items-center">
+                  <Col className="user-plan-card-plan-name">
+                    {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} plan
+                  </Col>
+                  {user?.details?.planDetails.status !== "trialing" && (
+                    <Col>
+                      <RQButton
+                        size="small"
+                        type="text"
+                        icon={<MdOutlineFileDownload />}
+                        className="user-download-invoice-btn"
+                        onClick={() => {
+                          trackPersonalSubscriptionDownloadInvoicesClicked();
+                          redirectToPersonalSubscription(navigate, true, true);
+                        }}
+                      >
+                        Download invoices
+                      </RQButton>
+                    </Col>
+                  )}
+                </Row>
               </Space>
             </div>
             <div className="user-plan-card-grid-item">

@@ -54,21 +54,23 @@
   padding-right: 0px;
 }
 
-.invoice-url-link.ant-btn-link {
+.invoice-url-link {
   padding: 0;
   text-align: left;
   color: var(--white);
   font-weight: bold;
 }
 
-.invoice-url-link.ant-btn-link:hover,
-.invoice-url-link.ant-btn-link:focus {
+.invoice-url-link:hover,
+.invoice-url-link:focus {
   color: var(--white);
 }
 
-.invoice-url-link.ant-btn-link:hover,
-.invoice-url-link.ant-btn-link:focus span {
-  text-decoration: underline;
+.invoice-url-link:hover span,
+.invoice-url-link:focus span {
+  color: var(--white);
+  text-decoration: underline !important;
+  text-underline-offset: 4px;
 }
 
 .invoice-pay-now-btn.ant-btn {
