@@ -140,6 +140,11 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   }, [shouldShowPersonaInput, shouldShowFullNameInput]);
 
   useEffect(() => {
+    if (!user.loggedIn) {
+      setShouldShowPersonaInput(true);
+      setIsLoading(false);
+      return;
+    }
     getUserPersona()
       .then((res: any) => {
         if (!res.data.persona) {
@@ -155,7 +160,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [getUserPersona, dispatch, appOnboardingDetails.persona]);
+  }, [getUserPersona, dispatch, appOnboardingDetails.persona, user.loggedIn]);
 
   useEffect(() => {
     if (user.loggedIn) {
@@ -235,7 +240,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
                   size="large"
                   className="persona-save-btn w-full mt-16"
                 >
-                  Save
+                  Proceed
                 </RQButton>
               </m.div>
             ) : null}

@@ -65,7 +65,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .then((result) => {
         if (result.uid) {
           trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
-          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
         }
       })
       .catch((error) => {
@@ -74,7 +73,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsGoogleSignInLoading(false);
       });
-  }, [authMode, dispatch]);
+  }, [authMode]);
 
   const handleContinueClick = useCallback(() => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
