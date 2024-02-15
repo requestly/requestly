@@ -25,7 +25,6 @@ const PersonalSubscription = () => {
           <Row>
             <Col>
               <Card className="shadow">
-                <CardHeader className="border-0 "></CardHeader>
                 <CardBody>
                   <ActiveLicenseInfo
                     hideShadow={true}
