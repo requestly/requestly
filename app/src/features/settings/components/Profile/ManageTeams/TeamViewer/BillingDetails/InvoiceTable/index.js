@@ -21,6 +21,7 @@ import { getUserAuthDetails } from "../../../../../../../../store/selectors";
 import { filterUniqueObjects } from "../../../../../../../../utils/FormattingHelper";
 import InvoiceStatus from "./InvoiceStatus";
 import ProTable from "@ant-design/pro-table";
+import { trackPersonalSubscriptionInvoiceClicked } from "modules/analytics/events/misc/subscriptions";
 import "./InvoiceTable.css";
 
 const InvoiceTable = ({ mode, teamId }) => {
@@ -150,6 +151,7 @@ const InvoiceTable = ({ mode, teamId }) => {
                       rel="noreferrer"
                       className="invoice-url-link"
                       href={invoice.hosted_invoice_url}
+                      onClick={() => trackPersonalSubscriptionInvoiceClicked()}
                     >
                       {number}
                     </Button>
