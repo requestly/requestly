@@ -1,6 +1,6 @@
 <p align="center">
   <a target="_blank" href="https://requestly.io/">
-    <img src="https://github.com/requestly/requestly/assets/16779465/652552db-c867-44cb-9bb5-94a2026e04ca" alt="Requestly Logo" width="40%"/>
+    <img src="https://github.com/requestly/requestly/blob/master/app/src/assets/img/brand/rq_logo_full.svg?raw=true" alt="Requestly Logo" width="40%"/>
   </a>
 </p>
 
@@ -28,11 +28,7 @@ href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="ht
 
 **Bring the power of Charles Proxy, Fiddler & Postman together** with beautiful, modern UI & collaboration features. Available as a browser extension on all major browsers & desktop apps on all platforms. [Install Requestly](https://requestly.io/downloads)
 
-<p align="center">
-  <a href="https://requestly.io/">
-    <img src="https://github.com/requestly/requestly/assets/16779465/92af73cc-e75c-48cc-8266-acb6c05a3350" alt="Requestly Details" width="60%"/>
-  </a>
-</p>
+
 
 ## 🏡 Getting Started
 - [🚀 What is Requestly?](#-what-is-requestly)
