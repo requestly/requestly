@@ -10,6 +10,7 @@ export const SETTINGS = {
     BILLIG_TEAM_MEMBER_ADDED: "billing_team_member_added",
     BILLING_TEAM_MEMBER_REMOVED: "billing_team_member_removed",
     BILLING_TEAM_ROLE_CHANGED: "billing_team_role_changed",
+    BILLING_PERSONAL_SUBSCRIPTION_DOWNLOAD_INVOICES_CLICKED: "billing_personal_subscription_download_invoices_clicked",
   },
 
   WORKSPACE: {

@@ -65,3 +65,22 @@
     }
   }
 }
+
+.user-download-invoice-btn.ant-btn {
+  align-self: center;
+  font-weight: 500 !important;
+  color: var(--neutrals-gray-300);
+  gap: 4px;
+  margin-top: 8px;
+
+  & svg {
+    font-size: 1rem;
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    background: var(--surface-2);
+    color: var(--white);
+  }
+}
