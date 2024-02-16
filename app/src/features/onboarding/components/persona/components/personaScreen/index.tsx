@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
 import { Col, Row, Typography } from "antd";
 import { PersonaInput } from "../PersonaInput";
 import { RQButton, RQInput } from "lib/design-system/components";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { actions } from "store";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
@@ -23,6 +22,7 @@ import {
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { isCompanyEmail } from "utils/FormattingHelper";
+import { getUserPersona, setUserPersona } from "backend/onboarding";
 import "./index.scss";
 
 interface Props {
@@ -40,9 +40,6 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   const [shouldShowPersonaInput, setShouldShowPersonaInput] = useState(false);
   const [shouldShowFullNameInput, setShouldShowFullNameInput] = useState(false);
 
-  const getUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-getUserPersona"), []);
-  const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
-
   const handleMoveToNextStep = useCallback(() => {
     if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
@@ -56,9 +53,9 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, persona);
       dispatch(actions.updateAppOnboardingPersona(persona));
       return new Promise((resolve, reject) => {
-        setUserPersona({ persona })
+        setUserPersona(user.details?.profile?.uid, persona)
           .then((res: any) => {
-            if (res.data.success) {
+            if (res.success) {
               trackAppOnboardingPersonaUpdated(persona);
               resolve(res);
             }
@@ -69,7 +66,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
           });
       });
     } else return Promise.resolve();
-  }, [persona, dispatch, setUserPersona]);
+  }, [persona, dispatch, user.details?.profile?.uid]);
 
   const handleSetFullName = useCallback(() => {
     if (fullName) {
@@ -145,7 +142,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       setIsLoading(false);
       return;
     }
-    getUserPersona()
+    getUserPersona(user.details?.profile?.uid)
       .then((res: any) => {
         if (!res.data.persona) {
           setShouldShowPersonaInput(true);
@@ -160,7 +157,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [getUserPersona, dispatch, appOnboardingDetails.persona, user.loggedIn]);
+  }, [dispatch, appOnboardingDetails.persona, user.loggedIn, user.details?.profile?.uid]);
 
   useEffect(() => {
     if (user.loggedIn) {
