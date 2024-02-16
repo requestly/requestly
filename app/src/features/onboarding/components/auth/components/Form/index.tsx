@@ -1,5 +1,5 @@
-import React, { ReactNode, useCallback, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
@@ -13,6 +13,8 @@ import { toast } from "utils/Toast";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
+import { getUserAuthDetails } from "store/selectors";
+import { isNull } from "lodash";
 import "./index.scss";
 
 interface AuthFormProps {
@@ -56,15 +58,17 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   setPersona,
 }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isMagicLinkLoading, setIsMagicLinkLoading] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(null);
 
   const handleGoogleSignIn = useCallback(() => {
     setIsGoogleSignInLoading(true);
     googleSignIn(() => {}, authMode, "app_onboarding")
       .then((result) => {
         if (result.uid) {
-          trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+          setIsNewUser(result?.isNewUser || false);
         }
       })
       .catch((error) => {
@@ -97,6 +101,19 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     }
     onSendEmailLink?.(email);
   }, [authMode, email, fullName, persona, onSendEmailLink, dispatch]);
+
+  useEffect(() => {
+    if (user.loggedIn) {
+      if (!isNull(isNewUser)) {
+        trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+        if (isNewUser) {
+          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+        } else {
+          dispatch(actions.updateAppOnboardingCompleted());
+        }
+      }
+    }
+  }, [dispatch, user.loggedIn, isNewUser]);
 
   return (
     <div className="w-full">
