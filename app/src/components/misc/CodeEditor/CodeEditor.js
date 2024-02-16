@@ -115,47 +115,49 @@ const CodeEditor = ({
             marginBottom: "1.5rem",
           }}
         >
-          {toastOverlay && (
-            <EditorToastContainer
-              message={toastOverlay.message}
-              type={toastOverlay.type}
-              id={toastOverlay.id}
-              onClose={() => handleEditorClose(toastOverlay.id)}
-              isVisible={toastOverlay}
-              autoClose={toastOverlay.autoClose}
+          <>
+            {toastOverlay && (
+              <EditorToastContainer
+                message={toastOverlay.message}
+                type={toastOverlay.type}
+                id={toastOverlay.id}
+                onClose={() => handleEditorClose(toastOverlay.id)}
+                isVisible={toastOverlay}
+                autoClose={toastOverlay.autoClose}
+              />
+            )}
+            <Editor
+              width="100%"
+              key={language}
+              language={language}
+              theme={appTheme === "dark" ? "vs-dark" : "vs"}
+              defaultValue={defaultValue}
+              value={value}
+              onChange={handleChange}
+              onMount={handleEditorDidMount}
+              options={{
+                minimap: {
+                  enabled: false,
+                },
+                scrollbar: {
+                  alwaysConsumeMouseWheel: false,
+                },
+                fontSize: 13,
+                readOnly: readOnly,
+                cursorSmoothCaretAnimation: true,
+                cursorBlinking: "smooth",
+                selectionHighlight: true,
+                renderValidationDecorations: validation,
+                wordWrap: isCodeMinified && language === "json" ? "on" : "off",
+                automaticLayout: true,
+                formatOnType: false,
+                formatOnPaste: false,
+                scrollBeyondLastLine: false,
+                scrollBeyondLastColumn: 0,
+                extraEditorClassName: "code-editor",
+              }}
             />
-          )}
-          <Editor
-            width="100%"
-            key={language}
-            language={language}
-            theme={appTheme === "dark" ? "vs-dark" : "vs"}
-            defaultValue={defaultValue}
-            value={value}
-            onChange={handleChange}
-            onMount={handleEditorDidMount}
-            options={{
-              minimap: {
-                enabled: false,
-              },
-              scrollbar: {
-                alwaysConsumeMouseWheel: false,
-              },
-              fontSize: 13,
-              readOnly: readOnly,
-              cursorSmoothCaretAnimation: true,
-              cursorBlinking: "smooth",
-              selectionHighlight: true,
-              renderValidationDecorations: validation,
-              wordWrap: isCodeMinified && language === "json" ? "on" : "off",
-              automaticLayout: true,
-              formatOnType: false,
-              formatOnPaste: false,
-              scrollBeyondLastLine: false,
-              scrollBeyondLastColumn: 0,
-              extraEditorClassName: "code-editor",
-            }}
-          />
+          </>
         </ResizableBox>
       )}
     </>
