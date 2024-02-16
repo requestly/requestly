@@ -1,10 +1,6 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { Col, Typography } from "antd";
 import { TeamCard } from "../teamCard";
-import { actions } from "store";
-import { RQButton } from "lib/design-system/components";
-import { PlusOutlined } from "@ant-design/icons";
 import { Invite } from "types";
 import "./index.scss";
 
@@ -13,7 +9,6 @@ interface JoinTeamViewProps {
 }
 
 export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => {
-  const dispatch = useDispatch();
   return (
     <Col className="teams-onboarding-view">
       <Col className="getting-started-teams-wrapper">
@@ -30,7 +25,7 @@ export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => 
             ))}
           </Col>
 
-          <RQButton
+          {/* <RQButton
             block
             icon={<PlusOutlined />}
             className="getting-started-create-new-workspace-btn"
@@ -47,7 +42,7 @@ export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => 
             }}
           >
             Create new workspace
-          </RQButton>
+          </RQButton> */}
         </Col>
       </Col>
     </Col>

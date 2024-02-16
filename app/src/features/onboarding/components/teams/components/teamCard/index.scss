@@ -6,6 +6,10 @@
   margin-top: 8px;
 }
 
+.team-card-wrapper:last-child {
+  border-bottom: none;
+}
+
 .team-card-team-info-wrapper {
   display: flex;
   align-items: center;
