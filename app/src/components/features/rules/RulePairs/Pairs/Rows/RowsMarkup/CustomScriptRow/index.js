@@ -115,7 +115,12 @@ const CustomScriptRow = ({
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         newValue = script.wrapperElement;
       } else {
-        newValue = script.value;
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+          newValue = `<script type="text/javascript">${script.value}</script>`;
+        }
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+          newValue = `<style>${script.value}</style>`;
+        }
       }
     }
 
