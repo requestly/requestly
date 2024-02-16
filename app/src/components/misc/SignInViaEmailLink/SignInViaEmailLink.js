@@ -92,9 +92,14 @@ const SignInViaEmailLink = () => {
               if (authData) {
                 window.localStorage.removeItem("RQEmailForSignIn");
                 setIsLogin(!isNewUser);
-                if (isNewUser) window.localStorage.setItem("isNewUser", !!isNewUser);
+                if (isNewUser) {
+                  window.localStorage.setItem("isNewUser", !!isNewUser);
+                  dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+                } else {
+                  dispatch(actions.updateAppOnboardingCompleted());
+                }
+
                 redirectToWebAppHomePage(navigate);
-                dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
                 trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
               } else throw new Error("Failed");
             }
