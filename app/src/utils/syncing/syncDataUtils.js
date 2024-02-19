@@ -68,7 +68,7 @@ const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remote
   const localRecords = myLocalRecords || rulesFlatObjectToObjectIdArray(await getAllLocalRecords(appMode));
   // First, if user has defined a personal rule config and it's key, write it in required db node
   if (typeof localRecords?.[objectId]?.[key] !== "undefined" || key === "isFavourite") {
-    //@sagarsoni7 todo handle: localRecords doesn't contain empty groups. So they won't get updated. // @nsr: not hanlded, but is an enhancement, no breaking logic I guess
+    //@sagarsoni7 todo handle: localRecords doesn't contain empty groups. So they won't get updated.
     const teamUserRuleConfigPath = getTeamUserRuleConfigPath(objectId);
     if (!teamUserRuleConfigPath) return;
     updateValueAsPromise(teamUserRuleConfigPath, {
@@ -93,7 +93,8 @@ const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remote
 };
 
 export const updateUserSyncRecords = async (uid, records, appMode, options) => {
-  const targetWorkspaceId = options.workspaceId ?? window.currentlyActiveWorkspaceTeamId;
+  const targetWorkspaceId =
+    typeof options.workspaceId !== "undefined" ? options.workspaceId : window.currentlyActiveWorkspaceTeamId;
   const isSameWorkspaceOperation = targetWorkspaceId === window.currentlyActiveWorkspaceTeamId;
 
   const latestRules = _.cloneDeep(records); // Does not contain all rules, only contains rules that has been updated.
@@ -101,7 +102,7 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
   if (isSameWorkspaceOperation && window.currentlyActiveWorkspaceTeamId) {
     const syncRuleStatus = localStorage.getItem("syncRuleStatus") === "true" || false;
-    // Get current values from db and use them xD // @sagar, what's so funny?
+    // Get current values from db and use them xD
     const allRemoteRecords = (await getValueAsPromise(getRecordsSyncPath())) || {};
     const remoteRecords = {};
     Object.keys(allRemoteRecords).forEach((key) => {
@@ -280,7 +281,6 @@ export const getAllLocalRecords = async (appMode, _sanitizeRules = true) => {
 };
 
 export const saveRecords = (records, appMode) => {
-  // not being used anywhere
   Logger.log("Writing storage in saveRecords");
   return StorageService(appMode).saveMultipleRulesOrGroups(records);
 };

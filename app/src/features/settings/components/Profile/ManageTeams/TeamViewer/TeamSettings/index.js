@@ -46,10 +46,11 @@ const TeamSettings = ({ teamId, isTeamAdmin, isTeamArchived, teamOwnerId }) => {
 
   const handleSwitchToPrivateWorkspace = async () => {
     setIsTeamSwitchModalActive(true);
-    return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
+    await clearCurrentlyActiveWorkspace(dispatch, appMode);
+    setTimeout(() => {
       setIsTeamSwitchModalActive(false);
       showSwitchWorkspaceSuccessToast();
-    });
+    }, 2 * 1000);
   };
 
   const deleteTeam = async () => {
