@@ -80,17 +80,7 @@ export const AppNotificationBanner = () => {
   }, [newBanners?.length]);
 
   const renderAppBanner = () => {
-    const banner = {
-      id: "commercial_license",
-      short_text: "Alert!",
-      text:
-        "commercial usage (using Requestly for work) is not permitted in the free plan. Please upgrade to continue using Requestly for work.",
-      createdTs: 1708349983421,
-      backgroundColor: "#003cca",
-      badgeColor: "#004eeb",
-      isDismissable: true,
-      actions: ["upgrade", "contact_us"],
-    };
+    const banner = newBanners ? newBanners[0] : null;
 
     if (banner) {
       return (
