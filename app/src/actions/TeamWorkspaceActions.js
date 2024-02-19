@@ -34,8 +34,6 @@ export const switchWorkspace = async (
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
   let needToMergeRecords = false;
 
-  await StorageService(appMode).waitForAllTransactions();
-
   if (teamId !== null) {
     // We are switching to a given workspace, not clearing the workspace (switching to private)
     const { isSyncEnabled, isWorkspaceMode } = currentSyncingState;
@@ -56,6 +54,7 @@ export const switchWorkspace = async (
   trackWorkspaceSwitched(source);
   dispatch(actions.updateIsRulesListLoading(true));
 
+  setLoader?.();
   if (window.unsubscribeSyncingNodeRef.current && isArray(window.unsubscribeSyncingNodeRef.current)) {
     window.unsubscribeSyncingNodeRef.current.forEach((removeFirebaseListener) => {
       removeFirebaseListener && removeFirebaseListener();
@@ -78,7 +77,6 @@ export const switchWorkspace = async (
   resetSyncDebounce();
 
   // Don't clear when appMode is Extension but user has not installed it!
-  /* CAN BE REPLACED WITH isLocalStoragePresent */
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) skipStorageClearing = true;
 
   if (!skipStorageClearing) {

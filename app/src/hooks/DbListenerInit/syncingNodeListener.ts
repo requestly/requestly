@@ -89,13 +89,12 @@ export const mergeRecordsAndSaveToFirebase = async (
 ): Promise<Record<string, any>[]> => {
   // Fetch all local records based on the current application mode
   const localRecords: Record<string, any>[] = await getAllLocalRecords(appMode);
-  // todo @nsr: remove, just tracking count for now
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of local", localRecords?.length ?? 0);
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of recordsOnFirebase", recordsOnFirebase?.length ?? 0);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { localRecords });
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { recordsOnFirebase });
 
   // Merge the records from Firebase with the local records
   const mergedRecords: Record<string, any>[] = mergeRecords(recordsOnFirebase, localRecords);
-  console.log("[DEBUG] mergeRecordsAndSaveToFirebase - length of merged", mergedRecords?.length ?? 0);
+  console.log("[DEBUG] mergeRecordsAndSaveToFirebase", { mergedRecords });
 
   // Format the merged records into an object where the keys are the record IDs
   const formattedObject: Record<string, any> = mergedRecords.reduce(
@@ -128,9 +127,6 @@ const resolveLocalConflictsAndSaveToFirebase = async (
 ): Promise<any[]> => {
   const localRecords: any[] = await getAllLocalRecords(appMode, false);
   const resolvedRecords: any[] = handleLocalConflicts(recordsOnFirebase, localRecords);
-
-  console.log("[DEBUG] resolveLocalConflictsAndSaveToFirebase - length of local", localRecords?.length ?? 0);
-  console.log("[DEBUG] resolveLocalConflictsAndSaveToFirebase - length of resolved", resolvedRecords?.length ?? 0);
 
   // Write to firebase
   const formattedObject: { [key: string]: any } = {};
@@ -276,9 +272,8 @@ export const invokeSyncingIfRequired = async ({
     dispatch(actions.updateIsRulesListLoading(false));
     return;
   }
-  // this does not make sense!!! Why not just call doSyncDebounced here????
   if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-    console.log("[DEBUG] invokeSyncingIfRequired - debouncedDosync");
+    console.log("DEBUG", "doSyncDebounced");
     doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
     resetSyncDebounce();
