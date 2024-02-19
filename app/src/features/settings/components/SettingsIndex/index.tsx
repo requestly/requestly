@@ -3,15 +3,18 @@ import { Col } from "antd";
 import { SettingsPrimarySidebar } from "../SettingsPrimarySidebar";
 import { SettingsSecondarySidebar } from "../SettingsSecondarySidebar";
 import { BillingTeamsSidebar } from "../BillingTeam/components/BillingTeamsSidebar";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import APP_CONSTANTS from "config/constants";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { trackAppSettingsViewed } from "features/settings/analytics";
+import PATHS from "config/constants/sub/paths";
+import { redirectToProfileSettings } from "utils/RedirectionUtils";
 import "./index.scss";
 
 const SettingsIndex: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
   const user = useSelector(getUserAuthDetails);
@@ -42,6 +45,12 @@ const SettingsIndex: React.FC = () => {
   useEffect(() => {
     trackAppSettingsViewed(location.pathname, state?.source);
   }, [location.pathname, state?.source]);
+
+  useEffect(() => {
+    if (location.pathname === PATHS.SETTINGS.RELATIVE) {
+      redirectToProfileSettings(navigate, window.location.pathname, "settings");
+    }
+  }, [navigate, location.pathname]);
 
   return (
     <div className="settings-index">
