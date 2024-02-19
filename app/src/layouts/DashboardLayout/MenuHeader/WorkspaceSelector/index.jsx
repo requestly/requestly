@@ -317,14 +317,14 @@ const WorkspaceSelector = () => {
 
   const handleSwitchToPrivateWorkspace = async () => {
     setIsModalOpen(true);
-    return clearCurrentlyActiveWorkspace(dispatch, appMode).then(() => {
+    await clearCurrentlyActiveWorkspace(dispatch, appMode);
+    setTimeout(() => {
       setIsModalOpen(false);
       showSwitchWorkspaceSuccessToast();
-    });
+    }, 2 * 1000);
   };
 
   const handleWorkspaceSwitch = async (team) => {
-    setIsModalOpen(true);
     switchWorkspace(
       {
         teamId: team.id,
@@ -337,12 +337,15 @@ const WorkspaceSelector = () => {
         isWorkspaceMode,
       },
       appMode,
-      undefined,
+      () => {
+        setIsModalOpen(true);
+        setTimeout(() => {
+          if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
+          setIsModalOpen(false);
+        }, 2 * 1000);
+      },
       "workspaces_dropdown"
-    ).then(() => {
-      if (!isModalOpen) showSwitchWorkspaceSuccessToast(team.name);
-      setIsModalOpen(false);
-    });
+    );
   };
 
   const unauthenticatedUserMenu = (
