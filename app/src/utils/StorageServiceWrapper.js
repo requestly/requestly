@@ -6,7 +6,6 @@ import { setStorageType } from "actions/ExtensionActions";
 import { getStorageHelper } from "../engines";
 import { processRecordsArrayIntoObject } from "./syncing/syncDataUtils";
 import { doSyncRecords } from "./syncing/SyncUtils";
-import { generateObjectId } from "./FormattingHelper";
 
 class StorageServiceWrapper {
   constructor(options) {
@@ -18,32 +17,6 @@ class StorageServiceWrapper {
     this.saveRecord = this.saveRecord.bind(this);
     this.getRecord = this.getRecord.bind(this);
     this.getRecords = this.getRecords.bind(this);
-
-    this.transactionQueue = new Set(); // promises of transactions that are still pending
-    this.transactionLedger = new Map(); // optional: helpful only in putting console logs
-  }
-
-  trackPromise(promise) {
-    const id = generateObjectId();
-    console.log("promise id", id);
-
-    this.transactionQueue.add(promise);
-    this.transactionLedger.set(promise, { id, startTime: Date.now() });
-
-    promise.finally(() => {
-      const endTime = Date.now();
-      const ledgerEntry = this.transactionLedger.get(promise);
-      console.log(`Promise resolved: ${ledgerEntry.id}, Duration: ${endTime - ledgerEntry.startTime}ms`);
-
-      this.transactionQueue.delete(promise);
-      this.transactionLedger.delete(promise);
-    });
-  }
-
-  async waitForAllTransactions() {
-    await Promise.allSettled([...this.transactionQueue]);
-    this.transactionQueue.clear();
-    this.transactionLedger.clear();
   }
 
   getAllRecords() {
@@ -107,11 +80,10 @@ class StorageServiceWrapper {
         modificationDate: options.silentUpdate ? ruleOrGroup?.modificationDate : new Date().getTime(),
       },
     };
-    const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+    await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
       workspaceId: options.workspaceId,
-    }).then(this.saveRecord(formattedObject));
-    this.trackPromise(promise);
-    return promise;
+    });
+    return this.saveRecord(formattedObject); // writes to Extension or Desktop storage
   }
 
   async saveMultipleRulesOrGroups(array, options = {}) {
@@ -119,11 +91,10 @@ class StorageServiceWrapper {
     array.forEach((object) => {
       if (object && object.id) formattedObject[object.id] = object;
     });
-    const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
+    await doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
       workspaceId: options.workspaceId,
-    }).then(this.saveRecord(formattedObject));
-    this.trackPromise(promise);
-    return promise;
+    });
+    return this.saveRecord(formattedObject);
   }
 
   saveRulesOrGroupsWithoutSyncing(array) {
@@ -149,27 +120,14 @@ class StorageServiceWrapper {
     return this.StorageHelper.getStorageObject(key);
   }
 
-  /* nsr: couldn't figure out why the difference in execution order for the two removal functions */
   async removeRecord(key) {
-    try {
-      await this.StorageHelper.removeStorageObject(key);
-      const syncResult = await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
-      this.trackPromise(Promise.resolve(syncResult));
-    } catch (error) {
-      console.error("Error removing record:", error);
-    }
+    await this.StorageHelper.removeStorageObject(key);
+    await doSyncRecords([key], SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
   }
 
   async removeRecords(array) {
-    try {
-      await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
-      const removalResult = await this.StorageHelper.removeStorageObjects(array);
-      this.trackPromise(Promise.resolve(removalResult));
-      return removalResult;
-    } catch (error) {
-      console.error("Error removing record:", error);
-      throw error;
-    }
+    await doSyncRecords(array, SYNC_CONSTANTS.SYNC_TYPES.REMOVE_RECORDS, this.appMode);
+    return this.StorageHelper.removeStorageObjects(array);
   }
 
   removeRecordsWithoutSyncing(array) {
@@ -184,7 +142,7 @@ class StorageServiceWrapper {
 
   async clearDB() {
     await this.StorageHelper.clearStorage();
-    if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) await setStorageType("local"); // no longer needed
+    if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) await setStorageType("local");
   }
 
   saveConsoleLoggerState(state) {
