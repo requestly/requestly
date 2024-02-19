@@ -449,7 +449,7 @@ const RulesTable = ({
     Logger.log("Writing storage in RulesTable changeRuleStatus");
     StorageService(appMode)
       .saveRuleOrGroup(updatedRule, { silentUpdate: true })
-      .then((rule) => {
+      .then(() => {
         //Push Notify
         newStatus === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
           ? toast.success(`Rule is now ${newStatus.toLowerCase()}`)
@@ -465,7 +465,8 @@ const RulesTable = ({
           trackRuleToggled(rule.ruleType, "rules_list", newStatus);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error(err);
         dispatch(actions.updateRecord(rule));
       });
   };
