@@ -90,7 +90,7 @@ class StorageServiceWrapper {
 
   async saveRecord(object) {
     await this.StorageHelper.saveStorageObject(object); // writes to Extension or Desktop storage
-    return Object.values(object)[0];
+    return Object.values(object)[0]; // why???
   }
 
   /**
