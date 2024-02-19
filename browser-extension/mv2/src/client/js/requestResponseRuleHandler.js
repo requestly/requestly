@@ -555,6 +555,16 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule)) {
       resolveXHR(this, this.responseRule.pairs[0].response.value);
     } else {
+      const redirectRuleThatMatchesURL = getMatchingRedirectRule(this.requestURL);
+      const replaceRuleThatMatchesURL = getMatchingReplaceRule(this.requestURL);
+      if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+        ignoredHeadersOnRedirect.forEach((header) => {
+          const originalHeaderValue = this.requestHeaders?.[header] || this.requestHeaders?.[header.toLowerCase()];
+          if (isExtensionEnabled() && originalHeaderValue) {
+            this.setRequestHeader(customHeaderPrefix + header, originalHeaderValue);
+          }
+        });
+      }
       send.call(this, this.requestData);
     }
   };
