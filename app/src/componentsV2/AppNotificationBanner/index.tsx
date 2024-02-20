@@ -9,13 +9,14 @@ import { getAppNotificationBannerDismissTs, getUserAuthDetails } from "store/sel
 import { OrgNotificationBanner } from "./OrgNotificationBanner";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
-import { trackAppNotificationBannerViewed } from "modules/analytics/events/common/onboarding/appBanner";
 import { ButtonType } from "antd/lib/button";
 import { capitalize } from "lodash";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import { getCompanyNameFromEmail } from "utils/FormattingHelper";
 import LINKS from "config/constants/sub/links";
 import "./appNotificationBanner.scss";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import { trackAppBannerDismissed, trackAppNotificationBannerViewed, trackAppBannerCtaClicked } from "./analytics";
 
 enum BANNER_ACTIONS {
   UPGRADE = "upgrade",
@@ -40,6 +41,7 @@ export const AppNotificationBanner = () => {
   const lastAppBannerDismissTs = useSelector(getAppNotificationBannerDismissTs);
   const banners = useFeatureValue("app_banner", []);
   const newBanners = banners.filter((banner: Banner) => banner.createdTs > (lastAppBannerDismissTs || 0));
+  const billingTeams = useSelector(getAvailableBillingTeams);
 
   const bannerActionButtons = useMemo(() => {
     return {
@@ -74,6 +76,19 @@ export const AppNotificationBanner = () => {
     [user?.details?.profile?.email]
   );
 
+  const checkBannerVisibility = useCallback(
+    (bannerId: string) => {
+      switch (bannerId) {
+        case "commercial_license": {
+          return !billingTeams.length;
+        }
+        default:
+          return true;
+      }
+    },
+    [billingTeams.length]
+  );
+
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -82,14 +97,14 @@ export const AppNotificationBanner = () => {
 
   useEffect(() => {
     if (newBanners?.length > 0) {
-      trackAppNotificationBannerViewed();
+      trackAppNotificationBannerViewed(newBanners[0]?.id);
     }
-  }, [newBanners?.length]);
+  }, [newBanners]);
 
   const renderAppBanner = () => {
     const banner = newBanners ? newBanners[0] : null;
 
-    if (banner) {
+    if (banner && checkBannerVisibility(banner.id)) {
       return (
         <div className="app-banner" style={{ backgroundColor: banner?.backgroundColor || "#000000" }}>
           {banner?.short_text && (
@@ -110,7 +125,10 @@ export const AppNotificationBanner = () => {
               return (
                 <RQButton
                   type={bannerActionButtons[action].type as ButtonType}
-                  onClick={bannerActionButtons[action].onClick}
+                  onClick={() => {
+                    trackAppBannerCtaClicked(banner.id, action);
+                    bannerActionButtons[action].onClick();
+                  }}
                 >
                   {capitalize(bannerActionButtons[action].label)}
                 </RQButton>
@@ -122,7 +140,10 @@ export const AppNotificationBanner = () => {
               <RQButton
                 iconOnly
                 className="close-btn"
-                onClick={handleCloseBannerClick}
+                onClick={(e) => {
+                  trackAppBannerDismissed(banner.id);
+                  handleCloseBannerClick(e);
+                }}
                 icon={
                   <svg width="11.67" height="11.67" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
