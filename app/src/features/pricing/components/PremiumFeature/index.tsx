@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { getUserAuthDetails } from "store/selectors";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
+import { getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
@@ -34,13 +34,19 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
+  const popupVisibilityThreshold = useFeatureValue("paywall-visibility-threshold", 15);
 
-  const showPremiumPopovers = useMemo(
+  const shouldShowUpgradePopover = useMemo(() => {
+    return isUpgradePopoverEnabled && userAttributes?.days_since_install >= popupVisibilityThreshold;
+  }, [isUpgradePopoverEnabled, userAttributes?.days_since_install, popupVisibilityThreshold]);
+
+  const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
     [features, getFeatureLimitValue, checkIfFeatureLimitReached]
   );
@@ -74,7 +80,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (showPremiumPopovers && isUpgradePopoverEnabled) setOpenPopup(true);
+                if (isExceedingLimits && shouldShowUpgradePopover) setOpenPopup(true);
                 else onContinue();
               },
             });
@@ -82,7 +88,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         </>
       ) : (
         <Popconfirm
-          disabled={!showPremiumPopovers || !features || disabled || !isUpgradePopoverEnabled}
+          disabled={!isExceedingLimits || !features || disabled || !shouldShowUpgradePopover}
           overlayClassName="premium-feature-popover"
           autoAdjustOverflow
           showArrow={false}
@@ -128,7 +134,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (!showPremiumPopovers || !features || disabled || !isUpgradePopoverEnabled) {
+                if (!isExceedingLimits || !features || disabled || !shouldShowUpgradePopover) {
                   onContinue();
                 }
               },
