@@ -10,21 +10,28 @@ import { OrgNotificationBanner } from "./OrgNotificationBanner";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { trackAppNotificationBannerViewed } from "modules/analytics/events/common/onboarding/appBanner";
-import { BANNER_ACTIONS } from "./types";
 import { ButtonType } from "antd/lib/button";
 import { capitalize } from "lodash";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { getDomainFromEmail } from "utils/FormattingHelper";
+import { getCompanyNameFromEmail } from "utils/FormattingHelper";
+import LINKS from "config/constants/sub/links";
 import "./appNotificationBanner.scss";
+
+enum BANNER_ACTIONS {
+  UPGRADE = "upgrade",
+  CONTACT_US = "contact_us",
+}
 
 interface Banner {
   id: string;
-  short_text: string;
-  text: string;
-  cta: string;
+  short_text?: string; //Banner badge
+  text: string; // Banner text
+  cta?: string;
   createdTs: number;
   backgroundColor: string;
+  badgeColor?: string;
   isDismissable?: boolean;
+  actions?: BANNER_ACTIONS[];
 }
 
 export const AppNotificationBanner = () => {
@@ -47,7 +54,7 @@ export const AppNotificationBanner = () => {
         label: "contact us",
         type: "default",
         onClick: () => {
-          redirectToUrl("https://calendly.com/requestly/sagar", true);
+          redirectToUrl(LINKS.CALENDLY_LINK, true);
         },
       },
     };
@@ -57,8 +64,8 @@ export const AppNotificationBanner = () => {
     (bannerId: string, text: string) => {
       switch (bannerId) {
         case "commercial_license": {
-          const domain = getDomainFromEmail(user?.details?.profile?.email || "")?.split(".")[0];
-          return `Dear ${capitalize(domain)} user, ${text}`;
+          const companyName = getCompanyNameFromEmail(user?.details?.profile?.email) || "";
+          return `Dear ${companyName} user, ${text}`;
         }
         default:
           return text;
