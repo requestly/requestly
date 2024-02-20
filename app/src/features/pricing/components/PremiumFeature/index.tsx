@@ -39,9 +39,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
-  // TODO: revert this before deploying
-  // const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
-  const isUpgradePopoverEnabled = true;
+  const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
   const popupVisibilityThreshold = useFeatureValue("paywall-visibility-threshold", 15);
 
   const shouldShowUpgradePopover = useMemo(() => {
