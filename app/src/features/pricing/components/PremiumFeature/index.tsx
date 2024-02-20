@@ -45,7 +45,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const popupVisibilityThreshold = useFeatureValue("paywall-visibility-threshold", 15);
 
   const shouldShowUpgradePopover = useMemo(() => {
-    return isUpgradePopoverEnabled && userAttributes?.days_since_install > popupVisibilityThreshold;
+    return isUpgradePopoverEnabled && userAttributes?.days_since_install >= popupVisibilityThreshold;
   }, [isUpgradePopoverEnabled, userAttributes?.days_since_install, popupVisibilityThreshold]);
 
   const isExceedingLimits = useMemo(
