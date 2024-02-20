@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  column-gap: 5px;
+  column-gap: 8px;
 
   .close-button-container {
     width: 5%;
@@ -49,10 +49,36 @@
   .rq-btn.ant-btn.view-users-button {
     background-color: rgb(179 60 157);
     border: rgb(179 60 157);
+
     &:hover {
       background-color: rgb(179 60 157);
       border: rgb(179 60 157);
       opacity: 0.6;
+    }
+  }
+
+  .app-banner-badge {
+    text-transform: uppercase;
+    font-size: 10px;
+    color: var((--text-default));
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  .app-banner-action-buttons {
+    display: flex;
+    gap: 4px;
+
+    .ant-btn-default,
+    .ant-btn-default:hover {
+      border-color: var(--white) !important;
+      background: transparent !important;
+    }
+
+    .ant-btn {
+      font-weight: 500 !important;
     }
   }
 }
