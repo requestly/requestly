@@ -104,7 +104,7 @@ export const AppNotificationBanner = () => {
   const renderAppBanner = () => {
     const banner = newBanners ? newBanners[0] : null;
 
-    if (banner && checkBannerVisibility(banner.id)) {
+    if (banner && checkBannerVisibility(banner?.id)) {
       return (
         <div className="app-banner" style={{ backgroundColor: banner?.backgroundColor || "#000000" }}>
           {banner?.short_text && (
@@ -114,23 +114,23 @@ export const AppNotificationBanner = () => {
           )}
           <div className="app-banner-text">
             <ReactMarkdown
-              children={renderBannerText(banner.id, banner.text)}
+              children={renderBannerText(banner?.id, banner.text)}
               skipHtml={false}
               // @ts-ignore
               rehypePlugins={[rehypeRaw]}
             />
           </div>
           <div className="app-banner-action-buttons">
-            {banner.actions?.map((action: BANNER_ACTIONS) => {
+            {banner?.actions?.map((action: BANNER_ACTIONS) => {
               return (
                 <RQButton
                   type={bannerActionButtons[action].type as ButtonType}
                   onClick={() => {
-                    trackAppBannerCtaClicked(banner.id, action);
+                    trackAppBannerCtaClicked(banner?.id, action);
                     bannerActionButtons[action].onClick();
                   }}
                 >
-                  {capitalize(bannerActionButtons[action].label)}
+                  {capitalize(bannerActionButtons[action]?.label)}
                 </RQButton>
               );
             })}
