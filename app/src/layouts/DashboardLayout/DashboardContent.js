@@ -34,7 +34,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import { RequestBillingTeamAccessModal } from "features/settings";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -211,7 +210,6 @@ const DashboardContent = () => {
             )}
 
           {/* {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null} */}
-          <RequestBillingTeamAccessModal />
         </>
       )}
     </>
