@@ -1,7 +1,7 @@
 import { CLIENT_MESSAGES } from "common/constants";
 
 export const initRuleExecutionHandler = () => {
-  const appliedResponseRuleIds = new Set<string>();
+  const appliedRequestResponseRuleIds = new Set<string>();
   const appliedScriptRuleIds = new Set<string>();
 
   window.addEventListener("message", function (event) {
@@ -9,15 +9,18 @@ export const initRuleExecutionHandler = () => {
       return;
     }
 
-    if (event.data.action === "response_rule_applied") {
-      appliedResponseRuleIds.add(event.data.ruleId);
+    switch (event.data.action) {
+      case "response_rule_applied":
+      case "request_rule_applied":
+        appliedRequestResponseRuleIds.add(event.data.ruleId);
+        break;
     }
   });
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
-      case CLIENT_MESSAGES.GET_APPLIED_RESPONSE_RULES:
-        sendResponse(Array.from(appliedResponseRuleIds));
+      case CLIENT_MESSAGES.GET_APPLIED_REQUEST_RESPONSE_RULES:
+        sendResponse(Array.from(appliedRequestResponseRuleIds));
         break;
       case CLIENT_MESSAGES.UPDATE_APPLIED_SCRIPT_RULES:
         message.ruleIds.forEach((ruleId: string) => appliedScriptRuleIds.add(ruleId));
