@@ -8,6 +8,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { trackBillingTeamActionClicked } from "features/settings/analytics";
 import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 import "./index.scss";
 
 interface Props {
@@ -33,6 +34,7 @@ export const BillingTeamCard: React.FC<Props> = ({ team }) => {
           setIsRequestSuccess(true);
         })
         .catch((e) => {
+          toast.error("Failed to send request. Please try again later");
           Logger.log(e);
         })
         .finally(() => setIsRequesting(false));
