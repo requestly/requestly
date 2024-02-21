@@ -27,7 +27,7 @@ import { PlanExpiredBadge } from "./PlanExpiredBadge";
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;
 
-const PATHS_WITHOUT_HEADER = [PATHS.PRICING.RELATIVE, PATHS.INVITE.RELATIVE, PATHS.SETTINGS.RELATIVE];
+const PATHS_WITHOUT_HEADER = [PATHS.PRICING.RELATIVE, PATHS.INVITE.INDEX, PATHS.SETTINGS.RELATIVE];
 
 const MenuHeader = () => {
   const navigate = useNavigate();
