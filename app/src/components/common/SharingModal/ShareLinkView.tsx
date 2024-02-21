@@ -16,13 +16,13 @@ import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCirc
 import { SharedLinkVisibility } from "./types";
 import Logger from "lib/logger";
 import { getAllRuleObjs } from "store/features/rules/selectors";
-import { RuleObj } from "features/rules/types/rules";
+import { StorageRecord } from "features/rules/types/rules";
 import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import "./index.css";
 import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
 
 interface ShareLinkProps {
-  selectedRules: string[];
+  selectedRules: StorageRecord["id"][];
   source: string;
   onSharedLinkCreated?: () => void;
 }
@@ -31,7 +31,7 @@ interface ShareLinkProps {
 
 export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source, onSharedLinkCreated = () => {} }) => {
   const appMode = useSelector(getAppMode);
-  const rules = useSelector(getAllRuleObjs);
+  const records = useSelector(getAllRuleObjs);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);
@@ -43,8 +43,8 @@ export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source,
   const sendSharedListShareEmail = useMemo(() => httpsCallable(getFunctions(), "sharedLists-sendShareEmail"), []);
   const singleRuleData = useMemo(
     () =>
-      selectedRules && selectedRules?.length === 1 ? rules.find((rule: RuleObj) => rule.id === selectedRules[0]) : null,
-    [rules, selectedRules]
+      selectedRules && selectedRules?.length === 1 ? records.find((record) => record.id === selectedRules[0]) : null,
+    [records, selectedRules]
   );
 
   const visibilityOptions = useMemo(

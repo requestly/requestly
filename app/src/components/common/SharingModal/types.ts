@@ -1,5 +1,6 @@
-import { Group, Rule, Team } from "types";
-
+import { Team } from "types";
+import { Group as NewGroup, Rule as NewRule } from "features/rules/types/rules";
+// todo @nsr: test type updates
 export enum SharingOptions {
   WORKSPACE = "workspace",
   SHARE_LINK = "share_link",
@@ -12,8 +13,8 @@ export enum SharedLinkVisibility {
 }
 
 export type SharedListData = {
-  rules: Rule[];
-  updatedGroups: Group[];
+  rules: NewRule[];
+  updatedGroups: NewGroup[];
   sharedListName: string;
   sharedListVisibility: SharedLinkVisibility;
   sharedListRecipients: unknown;
