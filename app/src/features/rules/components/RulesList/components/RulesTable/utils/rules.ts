@@ -1,39 +1,48 @@
 import { RuleTableDataType } from "../types";
-import { Rule, RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { Rule, StorageRecord, RecordStatus, RecordType, Group } from "features/rules/types/rules";
 
-export const isRule = (record: RuleObj) => {
-  return record.objectType === RuleObjType.RULE;
+export const isRule = (record: StorageRecord): record is Rule => {
+  return record.objectType === RecordType.RULE;
+};
+
+export const isGroup = (record: StorageRecord): record is Group => {
+  return record.objectType === RecordType.GROUP;
+};
+
+// Assumes that if groupId is present then it's a rule
+export const isRuleWithGroupId = (record: StorageRecord): record is Rule => {
+  return "groupId" in record;
 };
 
 export const convertToArray = <T>(record: T | T[]): T[] => {
   return Array.isArray(record) ? record : [record];
 };
 
-export const getActiveRules = (records: RuleObj[]) => {
-  let activeRecords: RuleObj[] = [];
-  const seenGroupIds = new Set<string>();
-  const rules: RuleObj[] = [];
-  const groups: Record<string, RuleObj> = {};
+export const getActiveRecords = (records: StorageRecord[]): StorageRecord[] => {
+  const activeRecords: StorageRecord[] = [];
+  const seenGroupIds = new Set<Group["id"]>();
+  const allActiveRules: Rule[] = [];
+  const groups: Record<string, Group> = {};
 
   records.forEach((record) => {
-    if (isRule(record) && record.status === RuleObjStatus.ACTIVE) {
-      rules.push(record);
-    } else if (!isRule(record)) {
+    if (isRule(record) && record.status === RecordStatus.ACTIVE) {
+      allActiveRules.push(record);
+    } else if (isGroup(record)) {
       groups[record.id] = record;
     }
   });
 
-  rules.forEach((rule) => {
-    if (rule.groupId && groups[rule.groupId] && !seenGroupIds.has(rule.groupId)) {
-      activeRecords.push(groups[rule.groupId]);
-      seenGroupIds.add(rule.groupId);
+  allActiveRules.forEach((activeRule) => {
+    if (activeRule.groupId && groups[activeRule.groupId] && !seenGroupIds.has(activeRule.groupId)) {
+      activeRecords.push(groups[activeRule.groupId]);
+      seenGroupIds.add(activeRule.groupId);
     }
   });
-  return [...activeRecords, ...rules];
+  return [...activeRecords, ...allActiveRules];
 };
 
-export const getPinnedRules = (recordsMap: Record<string, RuleObj>) => {
-  let pinnedRecords: RuleObj[] = [];
+export const getPinnedRecords = (recordsMap: Record<string, StorageRecord>) => {
+  let pinnedRecords: StorageRecord[] = [];
 
   Object.values(recordsMap).forEach((record) => {
     //If a group is pinned then show all the rules in that group (irrespective of whether they are pinned or not)
@@ -46,23 +55,23 @@ export const getPinnedRules = (recordsMap: Record<string, RuleObj>) => {
 };
 
 // FIXME: Performance Improvements
-export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataType[] => {
-  const ruleTableDataTypeMap: { [id: string]: RuleTableDataType } = {};
+export const recordsToContentTableDataAdapter = (records: StorageRecord[]): RuleTableDataType[] => {
+  const ruleTableDataTypeMap: { [id: StorageRecord["id"]]: RuleTableDataType } = {};
 
-  const groupRules = rules.filter((rule) => !!rule.groupId) as Rule[];
-  const nonGroupRules: RuleObj[] = rules
-    .filter((rule) => !rule.groupId)
-    .map((rule) => (rule.objectType === RuleObjType.GROUP ? { ...rule, children: [] } : rule));
+  const groupedRules = records.filter(isRuleWithGroupId);
+  const otherRecords = records
+    .filter((rule) => !isRuleWithGroupId(rule))
+    .map((record) => (isGroup(record) ? ({ ...record, children: [] } as Group) : record)); // @nsr check if the spread is necessary??
 
-  nonGroupRules.forEach((rule) => {
-    ruleTableDataTypeMap[rule.id] = rule;
+  otherRecords.forEach((record) => {
+    ruleTableDataTypeMap[record.id] = record;
   });
 
-  groupRules.forEach((rule) => {
+  groupedRules.forEach((rule) => {
     if (ruleTableDataTypeMap[rule.groupId]) {
-      const updatedGroup = {
-        ...ruleTableDataTypeMap[rule.groupId],
-        children: [...ruleTableDataTypeMap[rule.groupId].children, rule],
+      const updatedGroup: Group = {
+        ...(ruleTableDataTypeMap[rule.groupId] as Group),
+        children: [...(ruleTableDataTypeMap[rule.groupId] as Group).children, rule],
       };
       ruleTableDataTypeMap[rule.groupId] = updatedGroup;
     } else {
@@ -76,9 +85,9 @@ export const rulesToContentTableDataAdapter = (rules: RuleObj[]): RuleTableDataT
   return finalAdaptedData;
 };
 
-export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, RuleObj>, rule: RuleTableDataType) => {
-  if (rule.objectType === RuleObjType.GROUP) return false;
-  if (rule.groupId.length && allRecordsMap[rule.groupId].status === RuleObjStatus.INACTIVE) {
+export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRecord>, record: RuleTableDataType) => {
+  if (isGroup(record)) return false;
+  if (record.groupId?.length && allRecordsMap[record.groupId].status === RecordStatus.INACTIVE) {
     return true;
   } else return false;
 };

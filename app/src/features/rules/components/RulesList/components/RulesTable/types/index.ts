@@ -1,5 +1,11 @@
-import { Rule, RuleObj } from "features/rules/types/rules";
+// import { Rule, StorageRecord } from "features/rules/types/rules";
 
-export type RuleTableDataType = RuleObj & {
-  children?: Rule[];
-};
+import { StorageRecord } from "features/rules/types/rules";
+
+// // todo : only for groups ?? -- every group is already this
+// export type RuleTableDataType = StorageRecord & {
+//   children?: Rule[];
+// };
+
+// todo: check if this is even required?
+export type RuleTableDataType = StorageRecord; // trying something
