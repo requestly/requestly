@@ -81,7 +81,7 @@ const MenuHeader = () => {
           <div className="header-right-section">
             <Row align="middle" gutter={8} wrap={false}>
               {paywallIntensityExp !== "control" &&
-              user?.details?.planDetails.status === "canceled" &&
+              user?.details?.planDetails?.status === "canceled" &&
               isPlanExpiredBannerClosed ? (
                 <PlanExpiredBadge />
               ) : null}
@@ -112,7 +112,7 @@ const MenuHeader = () => {
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
 
               {(paywallIntensityExp === "control" ||
-                (paywallIntensityExp !== "control" && user?.details?.planDetails.status !== "canceled")) && (
+                (paywallIntensityExp !== "control" && user?.details?.planDetails?.status !== "canceled")) && (
                 <Col>
                   <PremiumPlanBadge />
                 </Col>
