@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import { useDispatch } from "react-redux";
@@ -22,6 +22,7 @@ import "./appNotificationBanner.scss";
 enum BANNER_ACTIONS {
   UPGRADE = "upgrade",
   CONTACT_US = "contact_us",
+  REQUEST_ACCESS = "request_access",
 }
 
 interface Banner {
@@ -43,6 +44,7 @@ export const AppNotificationBanner = () => {
   const banners = useFeatureValue("app_banner", []);
   const newBanners = banners.filter((banner: Banner) => banner.createdTs > (lastAppBannerDismissTs || 0));
   const billingTeams = useSelector(getAvailableBillingTeams);
+  const [isRequestAccessModalOpen, setIsRequestAccessModalOpen] = useState(false);
 
   const bannerActionButtons = useMemo(() => {
     return {
@@ -58,6 +60,13 @@ export const AppNotificationBanner = () => {
         type: "default",
         onClick: () => {
           redirectToUrl(LINKS.CALENDLY_LINK, true);
+        },
+      },
+      [BANNER_ACTIONS.REQUEST_ACCESS]: {
+        label: "Request access",
+        type: "default",
+        onClick: () => {
+          setIsRequestAccessModalOpen(true);
         },
       },
     };
@@ -83,11 +92,14 @@ export const AppNotificationBanner = () => {
         case "commercial_license": {
           return !billingTeams.length;
         }
+        case "request_team_access": {
+          return billingTeams?.length && !billingTeams?.some((team) => user?.details?.profile?.uid in team.members);
+        }
         default:
           return true;
       }
     },
-    [billingTeams.length]
+    [billingTeams, user?.details?.profile?.uid]
   );
 
   const handleCloseBannerClick = (e: React.MouseEvent) => {
@@ -164,7 +176,10 @@ export const AppNotificationBanner = () => {
               </div>
             )}
           </div>
-          <RequestBillingTeamAccessModal />
+          <RequestBillingTeamAccessModal
+            isOpen={isRequestAccessModalOpen}
+            onClose={() => setIsRequestAccessModalOpen(false)}
+          />
         </>
       );
     }
