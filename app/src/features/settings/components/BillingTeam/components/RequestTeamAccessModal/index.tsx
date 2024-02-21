@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Modal, Col } from "antd";
 import { getUserAuthDetails } from "store/selectors";
@@ -6,6 +6,7 @@ import { getCompanyNameFromEmail } from "utils/FormattingHelper";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { BillingTeamDetails } from "../../types";
 import { BillingTeamCard } from "./components/TeamCard";
+import { trackRequestBillingTeamAccessModalViewed } from "features/settings/analytics";
 import "./index.scss";
 
 interface Props {
@@ -18,7 +19,11 @@ export const RequestBillingTeamAccessModal: React.FC<Props> = ({ isOpen, onClose
   const companyName = getCompanyNameFromEmail(user?.details?.profile?.email);
   const billingTeams = useSelector(getAvailableBillingTeams);
 
-  console.log({ companyName, billingTeams });
+  useEffect(() => {
+    if (isOpen) {
+      trackRequestBillingTeamAccessModalViewed();
+    }
+  }, [isOpen]);
 
   return (
     <Modal

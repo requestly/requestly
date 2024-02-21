@@ -5,8 +5,9 @@ import { BillingTeamDetails } from "features/settings/components/BillingTeam/typ
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { RQButton } from "lib/design-system/components";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import Logger from "lib/logger";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
+import { trackBillingTeamActionClicked } from "features/settings/analytics";
+import Logger from "lib/logger";
 import "./index.scss";
 
 interface Props {
@@ -20,6 +21,7 @@ export const BillingTeamCard: React.FC<Props> = ({ team }) => {
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(team?.id, team?.owner));
 
   const handleRequestAccess = useCallback(() => {
+    trackBillingTeamActionClicked("request_to_join");
     if (team?.id) {
       const sendRequest = httpsCallable<{ billingId: string }, null>(
         getFunctions(),
