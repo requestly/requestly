@@ -108,7 +108,7 @@ RQ.ScriptRuleHandler.addLibraries = function (libraries, callback, index) {
     };
 
   if (library) {
-    RQ.ClientUtils.addRemoteJS(library.src, null, addNextLibraries);
+    RQ.ClientUtils.addJSFromURL(library.src, null, addNextLibraries);
   } else {
     addNextLibraries();
   }
@@ -131,7 +131,7 @@ RQ.ScriptRuleHandler.includeJS = function (script, callback) {
   if (!script.value) throw new Error("Script value is empty");
 
   if (script.type === RQ.SCRIPT_TYPES.URL) {
-    RQ.ClientUtils.addRemoteJS(script.value, script.attributes, callback);
+    RQ.ClientUtils.addJSFromURL(script.value, script.attributes, callback);
     return;
   }
 
@@ -144,7 +144,7 @@ RQ.ScriptRuleHandler.includeJS = function (script, callback) {
 
 RQ.ScriptRuleHandler.includeCSS = function (script, callback) {
   if (script.type === RQ.SCRIPT_TYPES.URL) {
-    RQ.ClientUtils.addRemoteCSS(script.value, script.attributes);
+    RQ.ClientUtils.addCSSFromURL(script.value, script.attributes);
     return;
   }
 

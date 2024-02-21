@@ -10,7 +10,7 @@
     (isExtensionEnabled) => {
       if (isExtensionEnabled) {
         // register custom elements
-        RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/customElements.js"));
+        RQ.ClientUtils.addJSFromURL(chrome.runtime.getURL("libs/customElements.js"));
 
         if (!RQ.ClientUtils.isAppPage()) {
           RQ.ConsoleLogger.setup();
