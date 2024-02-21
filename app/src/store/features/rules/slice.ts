@@ -1,5 +1,5 @@
 import { createSlice, createEntityAdapter, EntityState, PayloadAction } from "@reduxjs/toolkit";
-import { RuleObj } from "features/rules/types/rules";
+import { StorageRecord } from "features/rules/types/rules";
 import { ReducerKeys } from "store/constants";
 
 // type ModalName =
@@ -24,7 +24,7 @@ export interface RulesState {
   ruleObjs: EntityState<any>;
 }
 
-export const rulesAdapter = createEntityAdapter<RuleObj>({
+export const rulesAdapter = createEntityAdapter<StorageRecord>({
   selectId: (ruleObj) => ruleObj.id,
   sortComparer: (a, b) => (a?.creationDate > b?.creationDate ? 1 : -1),
 });
