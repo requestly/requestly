@@ -278,7 +278,7 @@ const ActionHeader = ({
                     trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
                   }}
                 >
-                  Download
+                  Export HAR
                 </Button>
               </Col>
             )}
