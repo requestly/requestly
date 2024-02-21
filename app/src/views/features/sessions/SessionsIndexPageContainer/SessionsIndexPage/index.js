@@ -244,7 +244,7 @@ const SessionsIndexPage = () => {
       <ImportWebSessionModalButton />
     ) : (
       <RQButton type="default" onClick={toggleImportSessionModal}>
-        Open downloaded session
+        Upload & view downloaded session
       </RQButton>
     );
   }, [toggleImportSessionModal, isDesktopSessionsCompatible]);
@@ -269,7 +269,7 @@ const SessionsIndexPage = () => {
     <>
       <RQModal open={isOpen} onCancel={toggleImportSessionModal}>
         <div className="rq-modal-content">
-          <div className="header mb-16 text-center">Open downloaded session</div>
+          <div className="header mb-16 text-center">Upload & view downloaded session</div>
 
           <FilePicker
             onFilesDrop={onSessionRecordingFileDrop}
