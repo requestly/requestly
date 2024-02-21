@@ -6,7 +6,7 @@ import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
 import useRuleTableActions from "./useRuleTableActions";
 import { getAllRuleObjMap } from "store/features/rules/selectors";
-import { RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { RecordStatus, Rule } from "features/rules/types/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserIcon } from "components/common/UserIcon";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -21,7 +21,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import PATHS from "config/constants/sub/paths";
 import { isRule } from "../utils";
 import { trackRulesListActionsClicked } from "features/rules/analytics";
-import { checkIsRuleGroupDisabled } from "../utils/rules";
+import { checkIsRuleGroupDisabled, isGroup } from "../utils/rules";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -29,13 +29,13 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   const allRecordsMap = useSelector(getAllRuleObjMap);
   const {
     handleStatusToggle,
-    handleRuleShare,
+    handleRecordShare,
     handleDuplicateRuleClick,
     handleDeleteRecordClick,
     handleRenameGroupClick,
     handleChangeRuleGroupClick,
     handlePinRecordClick,
-    handleUngroupOrDeleteRulesClick,
+    handleUngroupOrDeleteGroupsClick,
   } = useRuleTableActions();
 
   // const isStatusEnabled = !(options && options.disableStatus);
@@ -89,8 +89,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           rule.name
         );
       },
-      onCell: (rule: RuleTableDataType) => {
-        if (rule.objectType === "group") {
+      onCell: (record: RuleTableDataType) => {
+        if (isGroup(record)) {
           return {
             colSpan: 2,
           };
@@ -103,9 +103,9 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         // Fix. Descend logic sending groups to bottom
         // Fix: Default/No sort logic. Group should stay at top
         compare: (a, b) => {
-          if (a.objectType === "group" && b.objectType !== "group") {
+          if (isGroup(a) && !isGroup(b)) {
             return -1;
-          } else if (a.objectType !== "group" && b.objectType === "group") {
+          } else if (isGroup(a) && isGroup(b)) {
             return 1;
           } else {
             return a.modificationDate > b.modificationDate ? -1 : 1;
@@ -117,16 +117,16 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       title: "Type",
       key: "ruleType",
       width: 200,
-      onCell: (rule: RuleTableDataType) => {
-        if (rule.objectType && rule.objectType === "group") {
+      onCell: (record: RuleTableDataType) => {
+        if (isGroup(record)) {
           return {
             colSpan: 0,
           };
         }
       },
-      render: (rule: RuleTableDataType) => {
-        if (rule.objectType && rule.objectType !== RuleObjType.GROUP) {
-          return <RuleTypeTag ruleType={rule.ruleType} />;
+      render: (record: RuleTableDataType) => {
+        if (isRule(record)) {
+          return <RuleTypeTag ruleType={record.ruleType} />;
         }
       },
     },
@@ -134,21 +134,21 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       key: "status",
       title: "Status",
       width: 120,
-      render: (_, rule: RuleTableDataType, index) => {
-        const isRuleActive = rule.status === RuleObjStatus.ACTIVE;
-
+      render: (_, record: RuleTableDataType, index) => {
+        const isRuleActive = record.status === RecordStatus.ACTIVE;
+        // todo @nsr: check if this check also applies to groups?
         return (
           <PremiumFeature
             disabled={isRuleActive}
             features={[FeatureLimitType.num_active_rules]}
             popoverPlacement="left"
-            onContinue={() => handleStatusToggle([rule])}
+            onContinue={() => handleStatusToggle([record])}
             source="rule_list_status_switch"
           >
             <Switch
               size="small"
               checked={isRuleActive}
-              disabled={checkIsRuleGroupDisabled(allRecordsMap, rule)}
+              disabled={checkIsRuleGroupDisabled(allRecordsMap, record)}
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
               onChange={(checked: boolean, e) => {
                 e.stopPropagation();
@@ -164,16 +164,16 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       align: "center",
       width: 152,
       responsive: ["lg"],
-      render: (rule: RuleTableDataType) => {
-        if (rule.objectType && rule.objectType === RuleObjType.GROUP) {
+      render: (record: RuleTableDataType) => {
+        if (isGroup(record)) {
           return null;
         }
-        const dateToDisplay = rule.modificationDate ? rule.modificationDate : rule.creationDate;
+        const dateToDisplay = record.modificationDate ? record.modificationDate : record.creationDate;
         const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
             <span>
-              {beautifiedDate} <UserIcon uid={rule.lastModifiedBy} />
+              {beautifiedDate} <UserIcon uid={record.lastModifiedBy} />
             </span>
           );
         } else return beautifiedDate;
@@ -185,18 +185,18 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: 104,
       align: "right",
       render: (record: RuleTableDataType) => {
-        const isRule = record.objectType === RuleObjType.RULE;
+        const isRuleRecord = isRule(record);
 
         const recordActions = ([
           {
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              isRule ? handleChangeRuleGroupClick(record) : handleRenameGroupClick(record);
+              isRuleRecord ? handleChangeRuleGroupClick(record) : handleRenameGroupClick(record);
             },
             label: (
               <Row>
-                {isRule ? (
+                {isRuleRecord ? (
                   <>
                     <RiEdit2Line /> Change Group
                   </>
@@ -210,10 +210,10 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           },
           {
             key: 1,
-            disabled: !isRule,
+            disabled: !isRuleRecord,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleDuplicateRuleClick(record);
+              handleDuplicateRuleClick(record as Rule);
             },
             label: (
               <Row>
@@ -227,7 +227,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              isRule ? handleDeleteRecordClick(record) : handleUngroupOrDeleteRulesClick(record);
+              isRuleRecord ? handleDeleteRecordClick(record) : handleUngroupOrDeleteGroupsClick(record);
             },
             label: (
               <Row>
@@ -243,13 +243,13 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
 
         return (
           <Row align="middle" wrap={false} className="rules-actions-container">
-            {isRule ? (
+            {isRuleRecord ? (
               <Button
                 type="text"
                 icon={<MdOutlineShare />}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleRuleShare(record);
+                  handleRecordShare(record);
                 }}
               />
             ) : null}
@@ -278,11 +278,11 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: 92,
       responsive: ["lg"],
       key: "createdBy",
-      render: (rule: RuleTableDataType) => {
-        if (rule.objectType && rule.objectType === RuleObjType.GROUP) {
+      render: (record: RuleTableDataType) => {
+        if (isGroup(record)) {
           return null;
         }
-        const uid = rule.createdBy ?? null;
+        const uid = record.createdBy ?? null;
         return currentlyActiveWorkspace?.id ? <UserIcon uid={uid} /> : null;
       },
     });

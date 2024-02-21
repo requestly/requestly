@@ -106,7 +106,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
       rules: rules,
       sharedListId: sharedListId,
     }).catch((err) => {
-      console.err(err);
+      console.error(err);
     });
 
     //process Data

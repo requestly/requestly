@@ -1,10 +1,11 @@
 import { getRulesAndGroupsFromRuleIds } from "utils/rules/misc";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { SharedLinkVisibility, SharedListData } from "./types";
-import { Group, Rule } from "types";
+import { Group as NewGroup, Rule as NewRule } from "features/rules/types/rules";
 import { StorageService } from "init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { generateObjectId } from "utils/FormattingHelper";
+import { StorageRecord } from "features/rules/types/rules";
 
 export const createSharedList = async (
   appMode: string,
@@ -15,9 +16,9 @@ export const createSharedList = async (
 ) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare);
 
-  const updatedGroups = groups.map((group: Group) => ({
+  const updatedGroups: NewGroup[] = groups.map((group) => ({
     ...group,
-    children: [] as Rule[],
+    children: [],
   }));
 
   const sharedListData: SharedListData = {
@@ -48,12 +49,12 @@ const generateSharedList = async (sharedListData: SharedListData) => {
 export const prepareContentToExport = (appMode: string, selectedRuleIds: string[]) => {
   return new Promise((resolve, reject) => {
     getRulesAndGroupsFromRuleIds(appMode, selectedRuleIds).then(({ rules, groups }) => {
-      const updatedGroups = groups.map((group: Group) => ({
+      const updatedGroups: NewGroup[] = groups.map((group) => ({
         ...group,
-        children: [] as Rule[],
+        children: [],
       }));
       resolve({
-        fileContent: JSON.stringify(rules.concat(updatedGroups), null, 2),
+        fileContent: JSON.stringify((rules as StorageRecord[]).concat(updatedGroups), null, 2),
         rulesCount: rules.length,
         groupsCount: updatedGroups.length,
       });
@@ -71,7 +72,7 @@ export const duplicateRulesToTargetWorkspace = async (
   // mapping of old group IDs to new group IDs
   const groupIdMapping: Record<string, string> = {};
 
-  const formatRule = (rule: Rule, newGroupId: string) => ({
+  const formatRule = (rule: NewRule, newGroupId: NewGroup["id"]) => ({
     ...rule,
     creationDate: generateObjectCreationDate(),
     modificationDate: generateObjectCreationDate(),
@@ -80,7 +81,7 @@ export const duplicateRulesToTargetWorkspace = async (
     groupId: newGroupId,
   });
 
-  const formattedGroups = groups.reduce((acc: Group[], group: Group) => {
+  const formattedGroups = groups.reduce((acc: NewGroup[], group: NewGroup) => {
     const newGroupId = `Group_${generateObjectId()}`;
     groupIdMapping[group.id] = newGroupId;
     acc.push({
@@ -91,7 +92,7 @@ export const duplicateRulesToTargetWorkspace = async (
     return acc;
   }, []);
 
-  const formattedRules = rules.map((rule: Rule) => {
+  const formattedRules: NewRule[] = rules.map((rule: NewRule) => {
     const newGroupId = groupIdMapping[rule.groupId] || "";
     return formatRule(rule, newGroupId);
   });

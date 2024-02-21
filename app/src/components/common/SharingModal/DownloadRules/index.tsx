@@ -10,11 +10,11 @@ import { getFormattedDate } from "utils/DateTimeUtils";
 import { toast } from "utils/Toast";
 import { unselectAllRecords } from "components/features/rules/actions";
 import { getAllRuleObjs } from "store/features/rules/selectors";
-import { RuleObj } from "features/rules/types/rules";
+import { StorageRecord } from "features/rules/types/rules";
 import "./DownloadRules.css";
 
 interface DownloadRulesProps {
-  selectedRules: string[];
+  selectedRules: StorageRecord["id"][];
   toggleModal: () => void;
   onRulesDownloaded?: () => void;
 }
@@ -26,7 +26,7 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({
 }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const rules = useSelector(getAllRuleObjs);
+  const records = useSelector(getAllRuleObjs);
   const [rulesToDownload, setRulesToDownload] = useState<{
     fileContent: string;
     rulesCount: number;
@@ -34,8 +34,8 @@ export const DownloadRules: React.FC<DownloadRulesProps> = ({
   } | null>(null);
 
   const singleRuleData = useMemo(
-    () => (selectedRules.length === 1 ? rules.find((rule: RuleObj) => rule.id === selectedRules[0]) : null),
-    [rules, selectedRules]
+    () => (selectedRules.length === 1 ? records.find((record) => record.id === selectedRules[0]) : null),
+    [records, selectedRules]
   );
 
   const fileName =
