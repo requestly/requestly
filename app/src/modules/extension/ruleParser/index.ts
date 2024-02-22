@@ -11,7 +11,6 @@ import parseUserAgentRule from "./parseUserAgentRule";
 
 type ExtensionRuleParser = (rule: Rule) => ExtensionRule[];
 
-// eslint-disable-next-line no-unused-vars
 const parsers: { [key in RuleType]?: ExtensionRuleParser } = {
   [RuleType.REDIRECT]: parseRedirectRule,
   [RuleType.CANCEL]: parseCancelRule,
