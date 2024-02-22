@@ -118,12 +118,17 @@ export interface ScriptRulePair extends RulePair {
   scripts: ScriptObject[];
 }
 
-export interface ModifyResponseObject {
+export interface ModifyRequestResponseObject {
   statusCode?: string;
   type: "static" | "code";
   value: string;
 }
 
 export interface ResponseRulePair extends RulePair {
-  response: ModifyResponseObject;
+  response: ModifyRequestResponseObject;
+  serveWithoutRequest?: boolean;
+}
+
+export interface RequestRulePair extends RulePair {
+  request: ModifyRequestResponseObject;
 }
