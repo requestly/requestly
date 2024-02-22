@@ -150,9 +150,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               checked={isRuleActive}
               disabled={checkIsRuleGroupDisabled(allRecordsMap, record)}
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
-              onChange={(checked: boolean, e) => {
-                e.stopPropagation();
-              }}
             />
           </PremiumFeature>
         );
