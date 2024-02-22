@@ -105,7 +105,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         compare: (a, b) => {
           if (isGroup(a) && !isGroup(b)) {
             return -1;
-          } else if (isGroup(a) && isGroup(b)) {
+          } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
             return a.modificationDate > b.modificationDate ? -1 : 1;
