@@ -35,13 +35,20 @@ interface InputProps {
   label: ReactNode | string;
   placeholder: string;
   onValueChange: (value: string) => void;
+  onPressEnter?: () => void;
 }
 
-const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onValueChange }) => {
+const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onValueChange, onPressEnter }) => {
   return (
     <div className="onboarding-form-input">
       {typeof label === "string" ? <label htmlFor={id}>{label}</label> : label}
-      <RQInput placeholder={placeholder} id={id} value={value} onChange={(e) => onValueChange(e.target.value)} />
+      <RQInput
+        onPressEnter={onPressEnter}
+        placeholder={placeholder}
+        id={id}
+        value={value}
+        onChange={(e) => onValueChange(e.target.value)}
+      />
     </div>
   );
 };
@@ -168,6 +175,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             </Row>
           </label>
         }
+        onPressEnter={handleContinueClick}
       />
       {/* {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <>

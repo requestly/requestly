@@ -14,13 +14,16 @@ import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { actions } from "store";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
+import { isNull } from "lodash";
 import "./index.scss";
 
 interface TeamCardProps {
   invite: Invite & { metadata?: any };
+  joiningTeamId: string;
+  setJoiningTeamId: (teamId: string) => void;
 }
 
-export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
+export const TeamCard: React.FC<TeamCardProps> = ({ invite, joiningTeamId, setJoiningTeamId }) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -29,6 +32,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
 
   const handleJoining = useCallback(() => {
     trackWorkspaceJoinClicked(invite?.metadata?.teamId, "app_onboarding");
+    setJoiningTeamId(invite?.metadata?.teamId);
     setIsJoining(true);
     acceptTeamInvite(invite.id)
       .then((res) => {
@@ -64,11 +68,21 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
       .catch((e) => {
         Logger.error(e);
         toast.error("Something went wrong, please try again");
+        setJoiningTeamId(null);
       })
       .finally(() => {
         setIsJoining(false);
+        setJoiningTeamId(null);
       });
-  }, [invite.id, invite?.metadata?.teamId, invite?.metadata?.teamName, dispatch, isWorkspaceMode, appMode]);
+  }, [
+    invite.id,
+    invite?.metadata?.teamId,
+    invite?.metadata?.teamName,
+    dispatch,
+    isWorkspaceMode,
+    appMode,
+    setJoiningTeamId,
+  ]);
 
   return (
     <div className="team-card-wrapper">
@@ -91,7 +105,11 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
             <span>Joined</span>
           </div>
         ) : (
-          <RQButton onClick={handleJoining} className={`${isJoining ? "team-card-join-btn-dark-bg" : ""}`}>
+          <RQButton
+            disabled={joiningTeamId !== invite?.metadata?.teamId && !isNull(joiningTeamId)}
+            onClick={handleJoining}
+            className={`${isJoining ? "team-card-join-btn-dark-bg" : ""}`}
+          >
             {isJoining ? <Spin indicator={<LoadingOutlined className="team-card-join-btn-loader" spin />} /> : "Join"}
           </RQButton>
         )}

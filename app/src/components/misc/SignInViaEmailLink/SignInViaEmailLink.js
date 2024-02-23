@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Typography } from "antd";
@@ -10,7 +10,7 @@ import { getAppMode, getUserAuthDetails } from "../../../store/selectors";
 import { isEmailValid } from "../../../utils/FormattingHelper";
 import { signInWithEmailLink } from "../../../actions/FirebaseActions";
 import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions";
-import { redirectToRules, redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import {
   trackSignInWithLinkCustomFormSeen,
@@ -34,7 +34,8 @@ const SignInViaEmailLink = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const [isEmailLoginLinkDone, setIsEmailLoginLinkDone] = useState(false);
+  // const [isEmailLoginLinkDone, setIsEmailLoginLinkDone] = useState(false);
+  const isUserAlreadyLoggedIn = useRef(user.loggedIn);
 
   const logOutUser = useCallback(() => {
     handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
@@ -50,32 +51,27 @@ const SignInViaEmailLink = () => {
     );
     if (shouldLogout === true) {
       logOutUser();
-    } else {
-      setIsEmailLoginLinkDone(true);
     }
     return <SpinnerColumn />;
   }, [user.email, userEmailfromLocalStorage, logOutUser]);
 
   useEffect(() => {
-    if (user.loggedIn && isEmailLoginLinkDone) {
+    if (user.loggedIn) {
       const name = user?.displayName?.split(" ")[0];
       let message = isLogin ? "Welcome back to Requestly!" : "Welcome to Requestly!";
       if (name) {
         message = isLogin ? `Welcome back ${name}!` : `Welcome to Requestly ${name}!`;
       }
       toast.success(message);
-      redirectToRules(navigate);
+      if (isLogin) {
+        dispatch(actions.updateAppOnboardingCompleted());
+      } else {
+        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+        trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+      }
+      redirectToWebAppHomePage(navigate);
     }
-  }, [
-    dispatch,
-    user.loggedIn,
-    isEmailLoginLinkDone,
-    navigate,
-    isLogin,
-    user.displayName,
-    user.email,
-    user.details?.profile?.displayName,
-  ]);
+  }, [dispatch, user.loggedIn, navigate, isLogin, user.displayName, user.email, user.details?.profile?.displayName]);
 
   const handleLogin = useCallback(
     (emailToUseForLogin) => {
@@ -89,21 +85,11 @@ const SignInViaEmailLink = () => {
           .then((response) => {
             if (response) {
               const { authData, isNewUser } = response;
-              if (authData) {
+              if (authData.uid) {
                 window.localStorage.removeItem("RQEmailForSignIn");
                 setIsLogin(!isNewUser);
                 if (isNewUser) {
                   window.localStorage.setItem("isNewUser", !!isNewUser);
-                }
-
-                if (authData.uid) {
-                  if (isNewUser) {
-                    dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
-                  } else {
-                    dispatch(actions.updateAppOnboardingCompleted());
-                  }
-                  redirectToWebAppHomePage(navigate);
-                  trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
                 }
               } else throw new Error("Failed");
             }
@@ -116,7 +102,7 @@ const SignInViaEmailLink = () => {
         window.alert("Could not get the email to log into, please try again. If the problem persists, contact support");
       }
     },
-    [user.loggedIn, renderAlreadyLoggedInWarning, dispatch, navigate]
+    [user.loggedIn, renderAlreadyLoggedInWarning]
   );
 
   const renderEmailInputForm = () => {
@@ -172,11 +158,11 @@ const SignInViaEmailLink = () => {
       const email = isEmailValid(emailFromStorage) ? emailFromStorage : null;
 
       setUserEmailfromLocalStorage(email);
-      if (!user.isLoggedIn && email) {
+      if (!user.loggedIn && email) {
         handleLogin(email);
       }
     }
-  }, [handleLogin, user.isLoggedIn]);
+  }, [handleLogin, user.loggedIn]);
 
   useEffect(() => {
     if (isCustomLoginFlow) trackSignInWithLinkCustomFormSeen();
@@ -184,7 +170,7 @@ const SignInViaEmailLink = () => {
 
   return isCustomLoginFlow ? (
     renderEmailInputForm()
-  ) : user.isLoggedIn ? (
+  ) : isUserAlreadyLoggedIn.current ? (
     renderAlreadyLoggedInWarning()
   ) : (
     <SpinnerColumn />
