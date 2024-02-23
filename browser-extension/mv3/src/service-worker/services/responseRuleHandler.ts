@@ -3,7 +3,7 @@ import { getEnabledRules } from "common/rulesStore";
 import { ResponseRulePair, RuleType } from "common/types";
 import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
-import { injectJSAtRequestSource, isNonBrowserTab } from "./utils";
+import { injectJSAtRequestSource, isExtensionEnabled, isNonBrowserTab } from "./utils";
 
 const overrideResponse = async (details: chrome.webRequest.WebRequestDetails) => {
   if (isNonBrowserTab(details.tabId)) {
@@ -11,6 +11,10 @@ const overrideResponse = async (details: chrome.webRequest.WebRequestDetails) =>
   }
 
   if (isBlacklistedURL(details.url)) {
+    return;
+  }
+
+  if (!(await isExtensionEnabled())) {
     return;
   }
 
