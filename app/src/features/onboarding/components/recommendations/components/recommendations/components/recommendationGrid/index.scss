@@ -1,3 +1,9 @@
+.onboarding-recommendations-title.ant-typography {
+  font-weight: 500;
+  color: var(--text-default);
+  margin-bottom: 24px;
+}
+
 .recommendation-title {
   font-weight: 500;
   font-size: 1rem;
@@ -8,7 +14,7 @@
   margin-top: 8px;
   display: grid;
   column-gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
 }
 
 .getting-started-import-rules-title {

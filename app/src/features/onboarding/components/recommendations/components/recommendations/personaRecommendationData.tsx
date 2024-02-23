@@ -49,6 +49,13 @@ export const personaRecommendationData: FeatureSection[] = [
         subTitle: RULE_TYPES_CONFIG[RULE_TYPES.REQUEST].DESCRIPTION,
         link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.REQUEST}`,
       },
+      {
+        id: "insert_script",
+        title: "Insert script",
+        icon: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].ICON,
+        subTitle: RULE_TYPES_CONFIG[RULE_TYPES.SCRIPT].DESCRIPTION,
+        link: `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${RULE_TYPES.SCRIPT}`,
+      },
     ],
   },
   {

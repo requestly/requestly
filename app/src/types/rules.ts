@@ -1,3 +1,4 @@
+// these are existing copies of types newly created in features/rules/types/rules.ts
 import { ExtensionRule } from "modules/extension/types";
 
 export enum ObjectType {
