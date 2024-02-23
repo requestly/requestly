@@ -53,6 +53,7 @@
     "contextMenus",
     "storage",
     "unlimitedStorage",
+    "webNavigation",
     "webRequest",
     "webRequestBlocking",
     "tabs",

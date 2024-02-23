@@ -44,14 +44,13 @@ class RQTestRuleWidget extends RQDraggableWidget {
     if (infoTextContent) {
       const infoContainer = this.shadowRoot.getElementById("info-container");
       const infoContainerText = this.shadowRoot.getElementById("info-text");
-      infoContainerText.innerHTML = infoTextContent;
+      setInnerHTML(infoContainerText, infoTextContent);
       infoContainer.classList.remove("hidden");
     }
   }
 
   addListeners() {
     this.shadowRoot.getElementById("view-result-btn").addEventListener("click", (evt) => {
-      evt.preventDefault();
       evt.stopPropagation();
       this.triggerEvent(RQTestRuleWidgetEvent.VIEW_RESULTS);
     });
@@ -71,13 +70,19 @@ class RQTestRuleWidget extends RQDraggableWidget {
   showRuleAppliedStatus(appliedStatus: boolean) {
     const ruleStatusContainer = this.shadowRoot.getElementById("rule-status");
     if (appliedStatus) {
-      ruleStatusContainer.innerHTML = `
-				✅&nbsp;&nbsp;Rule applied
-			`;
+      setInnerHTML(
+        ruleStatusContainer,
+        `
+      ✅&nbsp;&nbsp;Rule applied
+    `
+      );
     } else {
-      ruleStatusContainer.innerHTML = `
-				❌&nbsp;&nbsp;Rule not applied yet
-			`;
+      setInnerHTML(
+        ruleStatusContainer,
+        `
+      ❌&nbsp;&nbsp;Rule not applied yet
+    `
+      );
     }
   }
 

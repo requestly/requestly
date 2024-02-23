@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Rule, RuleObj, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { StorageRecord, RecordStatus, Rule, Group } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
-import { rulesActions } from "store/features/rules/slice";
+import { recordsActions } from "store/features/rules/slice";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import { toast } from "utils/Toast";
@@ -17,6 +17,7 @@ import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulePinToggled, trackRuleToggled } from "modules/analytics/events/common/rules";
 import { trackGroupPinToggled, trackGroupStatusToggled } from "features/rules/analytics";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
+import { isGroup } from "../utils";
 
 const useRuleTableActions = () => {
   const dispatch = useDispatch();
@@ -40,14 +41,14 @@ const useRuleTableActions = () => {
     setSelectedRows([]);
   }, [setSelectedRows]);
 
-  const handleStatusToggle = (rules: RuleTableDataType[]) => {
-    rules.forEach((rule) => {
-      const status = rule.status === RuleObjStatus.ACTIVE ? RuleObjStatus.INACTIVE : RuleObjStatus.ACTIVE;
-      changeRuleStatus(status, rule);
+  const handleStatusToggle = (records: RuleTableDataType[]) => {
+    records.forEach((record) => {
+      const status = record.status === RecordStatus.ACTIVE ? RecordStatus.INACTIVE : RecordStatus.ACTIVE;
+      changeRecordStatus(status, record);
     });
   };
 
-  const changeRuleStatus = (newStatus: RuleObjStatus, rule: RuleObj) => {
+  const changeRecordStatus = (newStatus: RecordStatus, record: StorageRecord) => {
     // TODO: Handle Group status toggle
 
     // TODO: Why is this added??
@@ -57,17 +58,17 @@ const useRuleTableActions = () => {
     //   currentOwner = rule.currentOwner;
     // }
 
-    const updatedRule: RuleObj = {
-      ...rule,
+    const updatedRecord: StorageRecord = {
+      ...record,
       status: newStatus,
     };
 
     Logger.log("Writing storage in RulesTable changeRuleStatus");
-    updateRuleInStorage(updatedRule, rule).then(() => {
-      const isRecordRule = isRule(rule);
+    updateRecordInStorage(updatedRecord, record).then(() => {
+      const isRecordRule = isRule(record);
 
       //Push Notify
-      newStatus === RuleObjStatus.ACTIVE
+      newStatus === RecordStatus.ACTIVE
         ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
         : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
 
@@ -79,18 +80,18 @@ const useRuleTableActions = () => {
       if (newStatus.toLowerCase() === "active") {
         trackRQLastActivity("rule_activated");
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
-        trackRuleToggled((rule as Rule).ruleType, "rules_list", newStatus);
+        trackRuleToggled(record.ruleType, "rules_list", newStatus);
       } else {
         trackRQLastActivity("rule_deactivated");
         submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
-        trackRuleToggled((rule as Rule).ruleType, "rules_list", newStatus);
+        trackRuleToggled(record.ruleType, "rules_list", newStatus);
       }
     });
   };
 
-  const toggleSharingModal = (rules: RuleObj | RuleObj[], clearSelection = () => {}) => {
-    const updatedRules = convertToArray<RuleObj>(rules);
-    const rulesToShare = updatedRules.filter(isRule);
+  const toggleSharingModal = (records: StorageRecord | StorageRecord[], clearSelection = () => {}) => {
+    const updatedRecords = convertToArray<StorageRecord>(records);
+    const rulesToShare = updatedRecords.filter(isRule);
     const ruleIds = rulesToShare.map((rule) => rule.id);
 
     dispatch(
@@ -121,41 +122,41 @@ const useRuleTableActions = () => {
     );
   };
 
-  const handleRuleShare = (rules: RuleObj | RuleObj[], clearSelection?: () => void) => {
+  const handleRecordShare = (records: StorageRecord | StorageRecord[], clearSelection?: () => void) => {
     // TODO
     trackShareButtonClicked(clearSelection ? "bulk_action_bar" : "rules_list");
-    user.loggedIn ? toggleSharingModal(rules, clearSelection) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    user.loggedIn ? toggleSharingModal(records, clearSelection) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
   };
 
   // Generic
-  const updateRuleInStorage = async (updatedRule: RuleObj, originalRule: RuleObj) => {
-    dispatch(rulesActions.ruleObjUpsert(updatedRule));
+  const updateRecordInStorage = async (updatedRecord: StorageRecord, originalRecord: StorageRecord) => {
+    dispatch(recordsActions.upsertRecord(updatedRecord));
 
     return StorageService(appMode)
-      .saveRuleOrGroup(updatedRule, { silentUpdate: true })
+      .saveRuleOrGroup(updatedRecord, { silentUpdate: true })
       .then(() => {
         console.log("Rule updated in Storage Service");
       })
       .catch(() => {
-        dispatch(rulesActions.ruleObjUpsert(originalRule));
+        dispatch(recordsActions.upsertRecord(originalRecord));
       });
   };
 
   const updateMultipleRecordsInStorage = useCallback(
-    (updatedRecords: RuleObj[], originalRecords: RuleObj[]) => {
+    async (updatedRecords: StorageRecord[], originalRecords: StorageRecord[]) => {
       if (updatedRecords.length === 0) return Promise.resolve();
 
-      dispatch(rulesActions.ruleObjUpsertMany(updatedRecords));
+      dispatch(recordsActions.upsertRecords(updatedRecords));
 
       return StorageService(appMode)
         .saveMultipleRulesOrGroups(updatedRecords)
         .then(() => console.log("Records updated in Storage Service"))
-        .catch(() => dispatch(rulesActions.ruleObjUpsertMany(originalRecords)));
+        .catch(() => dispatch(recordsActions.upsertRecords(originalRecords)));
     },
     [appMode, dispatch]
   );
 
-  const handleDuplicateRuleClick = (rule: RuleObj) => {
+  const handleDuplicateRuleClick = (rule: Rule) => {
     setRuleToDuplicate(rule);
     setIsDuplicateRuleModalActive(true);
   };
@@ -165,8 +166,8 @@ const useRuleTableActions = () => {
     setIsDuplicateRuleModalActive(false);
   };
 
-  const handleUngroupOrDeleteRulesClick = (record: RuleObj) => {
-    setGroupToEmpty(record);
+  const handleUngroupOrDeleteGroupsClick = (group: Group) => {
+    setGroupToEmpty(group);
     setIsUngroupOrDeleteRulesModalActive(true);
   };
 
@@ -175,8 +176,8 @@ const useRuleTableActions = () => {
     setIsUngroupOrDeleteRulesModalActive(false);
   };
 
-  const handleDeleteRecordClick = (records: RuleObj | RuleObj[]) => {
-    const updatedRecords = convertToArray<RuleObj>(records);
+  const handleDeleteRecordClick = (records: StorageRecord | StorageRecord[]) => {
+    const updatedRecords = convertToArray<StorageRecord>(records);
     setSelectedRows(updatedRecords);
     setIsDeleteConfirmationModalActive(true);
   };
@@ -186,7 +187,7 @@ const useRuleTableActions = () => {
     setIsDeleteConfirmationModalActive(false);
   };
 
-  const handleRenameGroupClick = (group: RuleObj) => {
+  const handleRenameGroupClick = (group: Group) => {
     setIsRenameGroupModalActive(true);
     setIdOfGroupToRename(group.id);
   };
@@ -196,8 +197,8 @@ const useRuleTableActions = () => {
     setIdOfGroupToRename(null);
   };
 
-  const handleUngroupSelectedRulesClick = useCallback(
-    (selectedRecords: RuleObj[]) => {
+  const handleUngroupSelectedRecordsClick = useCallback(
+    (selectedRecords: StorageRecord[]) => {
       const updateRules = selectedRecords.reduce(
         (rules, record) =>
           isRule(record) && record.groupId !== UNGROUPED_GROUP_ID
@@ -211,13 +212,13 @@ const useRuleTableActions = () => {
     [UNGROUPED_GROUP_ID, updateMultipleRecordsInStorage]
   );
 
-  const handleChangeRuleGroupClick = (records?: RuleObj | RuleObj[]) => {
+  const handleChangeRuleGroupClick = (records?: StorageRecord | StorageRecord[]) => {
     if (!records) {
       setIsChangeGroupModalActive(true);
       return;
     }
 
-    const updatedRecords = convertToArray<RuleObj>(records);
+    const updatedRecords = convertToArray<StorageRecord>(records);
     const selectedRules = updatedRecords.filter(isRule);
     setSelectedRows(selectedRules);
     setIsChangeGroupModalActive(true);
@@ -229,13 +230,13 @@ const useRuleTableActions = () => {
   };
 
   // FIXME: Add Deactivate all rules support
-  const handleActivateOrDeactivateRecords = (records: RuleObj[]) => {
+  const handleActivateOrDeactivateRecords = (records: StorageRecord[]) => {
     // const activeRulesCount = getActiveRules(records).length;
     // const inactiveRulesCount = records.length - activeRulesCount;
 
     const updatedRecords = records.map((record) => ({
       ...record,
-      status: RuleObjStatus.ACTIVE,
+      status: RecordStatus.ACTIVE,
     }));
 
     // setSelectedRows(records);
@@ -245,7 +246,7 @@ const useRuleTableActions = () => {
     });
   };
 
-  const handlePinRecordClick = (record: RuleObj) => {
+  const handlePinRecordClick = (record: StorageRecord) => {
     let currentOwner;
 
     if (record.currentOwner) {
@@ -254,14 +255,14 @@ const useRuleTableActions = () => {
       currentOwner = record.currentOwner;
     }
 
-    const updatedRecord = {
+    const updatedRecord: StorageRecord = {
       ...record,
       currentOwner,
       isFavourite: !record.isFavourite,
     };
 
-    updateRuleInStorage(updatedRecord, record).then(() => {
-      if (record.objectType === RuleObjType.GROUP) {
+    updateRecordInStorage(updatedRecord, record).then(() => {
+      if (isGroup(record)) {
         trackGroupPinToggled(!record.isFavourite);
       } else {
         trackRulePinToggled(record.id, record.ruleType, !record.isFavourite);
@@ -272,10 +273,10 @@ const useRuleTableActions = () => {
   return {
     clearSelectedRows,
     handleStatusToggle,
-    handleRuleShare,
+    handleRecordShare,
     handleDuplicateRuleClick,
     closeDuplicateRuleModal,
-    handleUngroupOrDeleteRulesClick,
+    handleUngroupOrDeleteGroupsClick,
     closeUngroupOrDeleteRulesModal,
     handleDeleteRecordClick,
     closeDeleteRuleModal,
@@ -283,7 +284,7 @@ const useRuleTableActions = () => {
     closeRenameGroupModal,
     handleChangeRuleGroupClick,
     closeChangeRuleGroupModal,
-    handleUngroupSelectedRulesClick,
+    handleUngroupSelectedRecordsClick,
     handleActivateOrDeactivateRecords,
     handlePinRecordClick,
   };
