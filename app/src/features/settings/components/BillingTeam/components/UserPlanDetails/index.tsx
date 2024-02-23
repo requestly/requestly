@@ -91,24 +91,24 @@ export const UserPlanDetails = () => {
         marginTop: !user?.details?.isPremium ? "80px" : "0px",
       }}
     >
-      {user?.details?.isPremium && !(user?.details?.planDetails.status === "trialing" && hasAppSumoSubscription) ? (
+      {user?.details?.isPremium && !(user?.details?.planDetails?.status === "trialing" && hasAppSumoSubscription) ? (
         <>
           {" "}
           <Row gutter={8} align="middle" className="user-plan-card-header">
             <Col className="text-white text-bold">Your plan</Col>
             <Col>
-              <TeamPlanStatus subscriptionStatus={user?.details?.planDetails.status} />
+              <TeamPlanStatus subscriptionStatus={user?.details?.planDetails?.status} />
             </Col>
           </Row>
           <Col className="user-plan-card-grid">
             <div className="user-plan-card-grid-item">
               <Space direction="vertical" size={8}>
-                {user?.details?.planDetails.status === "trialing" ? <div>One month free trial</div> : null}
+                {user?.details?.planDetails?.status === "trialing" ? <div>One month free trial</div> : null}
                 <Row gutter={8} className="items-center">
                   <Col className="user-plan-card-plan-name">
                     {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} plan
                   </Col>
-                  {user?.details?.planDetails.status !== "trialing" && (
+                  {user?.details?.planDetails?.status !== "trialing" && (
                     <Col>
                       <RQButton
                         size="small"
@@ -130,7 +130,7 @@ export const UserPlanDetails = () => {
             <div className="user-plan-card-grid-item">
               <Space direction="vertical" size={8}>
                 <div className="user-plan-card-grid-item-label">
-                  {user?.details?.planDetails.status === "trialing" ? "Trial" : "Plan"} start date
+                  {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} start date
                 </div>
                 <div className="user-plan-date">
                   {getLongFormatDateString(new Date(user?.details?.planDetails?.subscription?.startDate))}
@@ -140,7 +140,7 @@ export const UserPlanDetails = () => {
             <div className="user-plan-card-grid-item">
               <Space direction="vertical" size={8}>
                 <div className="user-plan-card-grid-item-label">
-                  {user?.details?.planDetails.status === "trialing" ? "Trial" : "Plan"} expire date
+                  {user?.details?.planDetails?.status === "trialing" ? "Trial" : "Plan"} expire date
                 </div>
                 <div className="user-plan-date">
                   {hasAppSumoSubscription
@@ -182,14 +182,14 @@ export const UserPlanDetails = () => {
       ) : (
         <>
           {user?.details?.planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL ||
-          user?.details?.planDetails.status === "trialing" ? (
+          user?.details?.planDetails?.status === "trialing" ? (
             <Col className="user-plan-upgrade-card">
               <MdDiversity1 />
               <div className="title">
                 {!user?.details?.isPremium ? "You don't have any plan. " : ""}Upgrade for more features 🚀
               </div>
               <div className="user-plan-upgrade-card-description">
-                {user?.details?.planDetails.status === "trialing" ? (
+                {user?.details?.planDetails?.status === "trialing" ? (
                   <>
                     Your professional plan free trail will expire in {daysLeft} days.{" "}
                     {billingTeams.length
