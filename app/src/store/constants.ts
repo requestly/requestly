@@ -6,6 +6,6 @@ export enum ReducerKeys {
   HAR_PREVIEW = "harPreview",
   TEAMS = "teams",
   DESKTOP_TRAFFIC_TABLE = "desktopTrafficTable",
-  RULES = "rules",
+  RULES = "rules", // ALSO CONTAINS GROUPS
   BILLING = "billing",
 }
