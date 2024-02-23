@@ -34,6 +34,7 @@ const DBListeners = () => {
     if (unsubscribeUserNodeRef.current) unsubscribeUserNodeRef.current(); // Unsubscribe existing user node listener before creating a new one
     if (user?.loggedIn) {
       unsubscribeUserNodeRef.current = userNodeListener(dispatch, user?.details?.profile.uid, appMode);
+      /* CAN BE MOVED TO SEPARATE USE EFFECT AND SHOULD HAVE AN UNSUBSCRIBER TOO, will be useful when actually implementing premium */
       userSubscriptionDocListener(dispatch, user?.details?.profile.uid);
     }
   }, [dispatch, user?.details?.profile.uid, user?.loggedIn, appMode]);
@@ -83,7 +84,7 @@ const DBListeners = () => {
   ]);
 
   // Listens to teams available to the user
-  // Also listens to changes to the currently active workspace
+  // Also listens to changes to the currently active workspace /* TODO: THIS SHOULD BE DONE IN A SEPARATE USEEFFECT */
   useEffect(() => {
     if (unsubscribeAvailableTeams.current) unsubscribeAvailableTeams.current(); // Unsubscribe any existing listener
     if (user?.loggedIn && user?.details?.profile?.uid) {

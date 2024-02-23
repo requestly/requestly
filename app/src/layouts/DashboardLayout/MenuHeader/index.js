@@ -27,7 +27,7 @@ import { PlanExpiredBadge } from "./PlanExpiredBadge";
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;
 
-const PATHS_WITHOUT_HEADER = [PATHS.PRICING.RELATIVE, PATHS.INVITE.RELATIVE, PATHS.SETTINGS.RELATIVE];
+const PATHS_WITHOUT_HEADER = [PATHS.PRICING.RELATIVE, PATHS.INVITE.INDEX, PATHS.SETTINGS.RELATIVE];
 
 const MenuHeader = () => {
   const navigate = useNavigate();
@@ -81,7 +81,7 @@ const MenuHeader = () => {
           <div className="header-right-section">
             <Row align="middle" gutter={8} wrap={false}>
               {paywallIntensityExp !== "control" &&
-              user?.details?.planDetails.status === "canceled" &&
+              user?.details?.planDetails?.status === "canceled" &&
               isPlanExpiredBannerClosed ? (
                 <PlanExpiredBadge />
               ) : null}
@@ -112,7 +112,7 @@ const MenuHeader = () => {
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
 
               {(paywallIntensityExp === "control" ||
-                (paywallIntensityExp !== "control" && user?.details?.planDetails.status !== "canceled")) && (
+                (paywallIntensityExp !== "control" && user?.details?.planDetails?.status !== "canceled")) && (
                 <Col>
                   <PremiumPlanBadge />
                 </Col>

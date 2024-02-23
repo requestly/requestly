@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Row, Card, CardHeader, Col, CardBody } from "reactstrap";
 import { Button as AntButton } from "antd";
 //SUB COMPONENTS
-// import ActiveLicenseInfo from "./ActiveLicenseInfo";
 import UserInfo from "./UserInfo";
 //UTILS
 import { getUserAuthDetails } from "../../../../store/selectors";
@@ -22,10 +21,6 @@ const ManageAccount = () => {
 
   //Component State
   const [isChangePasswordLoading, setIsChangePasswordLoading] = useState(false);
-  // const [cancelFormText, setCancelFormText] = useState("");
-  // const [alternateEmail, setAlternateEmail] = useState("");
-  // const [confirmLoading, setConfirmLoading] = useState(false);
-  // const [cancelSubscriptionModal, setCancelSubscriptionModal] = useState(false);
   // Fallback image
   const defaultImageSrc = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
   let userImageSrc = user.details.profile.photoURL ? user.details.profile.photoURL : defaultImageSrc;
@@ -119,35 +114,6 @@ const ManageAccount = () => {
                         </AntButton>
                       </Col>
                     </Row>
-                    {/* <Row className="my-2">
-                      <Col>
-                        <AntButton
-                          type="secondary"
-                          size="small"
-                          onClick={() => {
-                            redirectToUpdateSubscriptionContactUs();
-                          }}
-                        >
-                          Refresh Subscription
-                        </AntButton>
-                      </Col>
-                    </Row>
-                    {isUserPremium ? (
-                      <Row className="my-2">
-                        <Col>
-                          <AntButton
-                            type="secondary"
-                            size="small"
-                            onClick={() => {
-                              // setCancelSubscriptionModal(true);
-                              handleCancelSubscription();
-                            }}
-                          >
-                            Cancel Subscription
-                          </AntButton>
-                        </Col>
-                      </Row>
-                    ) : null} */}
                   </div>
                 </div>
               </CardBody>
