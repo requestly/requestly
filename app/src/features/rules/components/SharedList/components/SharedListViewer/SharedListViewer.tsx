@@ -26,7 +26,6 @@ const SharedListViewer: React.FC<Props> = () => {
         const rules = incomingData.rules || [];
         const groups = incomingData.groups || [];
         const sharedListRecords = [...rules, ...groups];
-        console.log({ sharedListRecords });
         setStorageRecords(sharedListRecords);
 
         setIsLoading(false);

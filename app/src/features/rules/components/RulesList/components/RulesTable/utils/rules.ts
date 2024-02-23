@@ -10,7 +10,7 @@ export const isGroup = (record: StorageRecord): record is Group => {
 };
 
 // Assumes that if groupId is present then it's a rule
-export const isRuleWithGroupId = (record: StorageRecord): record is Rule => {
+export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
   return "groupId" in record;
 };
 
@@ -58,9 +58,9 @@ export const getPinnedRecords = (recordsMap: Record<string, StorageRecord>) => {
 export const recordsToContentTableDataAdapter = (records: StorageRecord[]): RuleTableDataType[] => {
   const ruleTableDataTypeMap: { [id: StorageRecord["id"]]: RuleTableDataType } = {};
 
-  const groupedRules = records.filter(isRuleWithGroupId);
+  const groupedRules = records.filter(isRecordWithGroupId);
   const otherRecords = records
-    .filter((rule) => !isRuleWithGroupId(rule))
+    .filter((record) => !isRecordWithGroupId(record))
     .map((record) => (isGroup(record) ? ({ ...record, children: [] } as Group) : record));
 
   otherRecords.forEach((record) => {
