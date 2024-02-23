@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Col, Typography } from "antd";
 import { TeamCard } from "../teamCard";
 import { Invite } from "types";
@@ -9,6 +9,8 @@ interface JoinTeamViewProps {
 }
 
 export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => {
+  // TEMP: allow only one team to be joined
+  const [joiningTeamId, setJoiningTeamId] = useState(null);
   return (
     <Col className="teams-onboarding-view">
       <Col className="getting-started-teams-wrapper">
@@ -21,7 +23,7 @@ export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => 
           </Typography.Text>
           <Col className="getting-started-join-teams-list">
             {pendngInvites.map((invite) => (
-              <TeamCard invite={invite} />
+              <TeamCard invite={invite} joiningTeamId={joiningTeamId} setJoiningTeamId={setJoiningTeamId} />
             ))}
           </Col>
 
