@@ -3,6 +3,7 @@ import { initContextMenu } from "./services/contextMenu";
 import { initExtensionIcon } from "./services/extensionIcon";
 import { handleInstallUninstall } from "./services/installUninstall";
 import { initMessageHandler } from "./services/messageHandler";
+import { initRequestRuleHandler } from "./services/requestRuleHandler";
 import { initResponseRuleHandler } from "./services/responseRuleHandler";
 import { initRulesManager } from "./services/rulesManager";
 
@@ -15,4 +16,5 @@ import { initRulesManager } from "./services/rulesManager";
   initMessageHandler();
   initContextMenu();
   initResponseRuleHandler();
+  initRequestRuleHandler();
 })();
