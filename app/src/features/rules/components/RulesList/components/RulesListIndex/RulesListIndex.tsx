@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import RulesTable from "../RulesTable/RulesTable";
 import { StorageRecord, Group, Rule } from "features/rules/types/rules";
-import { getAllRuleObjMap, getAllRuleObjs } from "store/features/rules/selectors";
+import { getAllRecordsMap, getAllRecords } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { RulesListProvider } from "./context";
 import { DownOutlined, DownloadOutlined } from "@ant-design/icons";
@@ -80,8 +80,8 @@ const RulesList: React.FC<Props> = () => {
 
   // FIXME: Fetching multiple times
   // Fetch Rules here from Redux
-  const allRecords = useSelector(getAllRuleObjs);
-  const allRecordsMap = useSelector(getAllRuleObjMap);
+  const allRecords = useSelector(getAllRecords);
+  const allRecordsMap = useSelector(getAllRecordsMap);
   const allGroups = useMemo(() => allRecords.filter(isGroup), [allRecords]);
   const pinnedRecords = useMemo(() => getPinnedRecords(allRecordsMap), [allRecordsMap]);
   const activeRecords = useMemo(() => getActiveRecords(allRecords), [allRecords]);

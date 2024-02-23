@@ -5,7 +5,7 @@ import { useHasChanged } from "hooks";
 import { StorageService } from "init";
 import { useDispatch } from "react-redux";
 import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndexPage/actions";
-import { rulesActions } from "store/features/rules/slice";
+import { recordsActions } from "store/features/rules/slice";
 import { Group, Rule, RecordStatus, RecordType } from "features/rules/types/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
@@ -40,9 +40,9 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       // FIXME: This can be removed/improved. Move this logic to src/features
       const isGroupsSanitizationPassedResult = await isGroupsSanitizationPassed({ rules, groups, appMode });
 
-      const finalRuleObjs = [...isGroupsSanitizationPassedResult.updatedRules, ...groups];
+      const finalRecords = [...isGroupsSanitizationPassedResult.updatedRules, ...groups];
 
-      dispatch(rulesActions.ruleObjsSetAll(finalRuleObjs));
+      dispatch(recordsActions.setAllRecords(finalRecords));
 
       setIsLoading(false);
 

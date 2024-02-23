@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { StorageRecord, RecordStatus, Rule, Group } from "features/rules/types/rules";
 import { RuleTableDataType } from "../types";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
-import { rulesActions } from "store/features/rules/slice";
+import { recordsActions } from "store/features/rules/slice";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import { toast } from "utils/Toast";
@@ -130,7 +130,7 @@ const useRuleTableActions = () => {
 
   // Generic
   const updateRecordInStorage = async (updatedRecord: StorageRecord, originalRecord: StorageRecord) => {
-    dispatch(rulesActions.ruleObjUpsert(updatedRecord));
+    dispatch(recordsActions.upsertRecord(updatedRecord));
 
     return StorageService(appMode)
       .saveRuleOrGroup(updatedRecord, { silentUpdate: true })
@@ -138,20 +138,20 @@ const useRuleTableActions = () => {
         console.log("Rule updated in Storage Service");
       })
       .catch(() => {
-        dispatch(rulesActions.ruleObjUpsert(originalRecord));
+        dispatch(recordsActions.upsertRecord(originalRecord));
       });
   };
 
   const updateMultipleRecordsInStorage = useCallback(
-    (updatedRecords: StorageRecord[], originalRecords: StorageRecord[]) => {
+    async (updatedRecords: StorageRecord[], originalRecords: StorageRecord[]) => {
       if (updatedRecords.length === 0) return Promise.resolve();
 
-      dispatch(rulesActions.ruleObjUpsertMany(updatedRecords));
+      dispatch(recordsActions.upsertRecords(updatedRecords));
 
       return StorageService(appMode)
         .saveMultipleRulesOrGroups(updatedRecords)
         .then(() => console.log("Records updated in Storage Service"))
-        .catch(() => dispatch(rulesActions.ruleObjUpsertMany(originalRecords)));
+        .catch(() => dispatch(recordsActions.upsertRecords(originalRecords)));
     },
     [appMode, dispatch]
   );
