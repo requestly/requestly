@@ -105,22 +105,21 @@ const RulesList: React.FC<Props> = () => {
 
   const groupWiseRulesData = useMemo(() => {
     const groupWiseRules: Record<Group["id"], Rule[]> = {};
-
-    allGroups.forEach((group) => {
-      groupWiseRules[group.id] = [];
-    });
     groupWiseRules[UNGROUPED_GROUP_NAME] = [];
-
     getFilteredRecords(activeFilter).forEach((record) => {
       if (isRule(record)) {
         if (!record.groupId) {
           groupWiseRules[UNGROUPED_GROUP_NAME].push(record);
-        } else groupWiseRules[record.groupId].push(record);
+        } else {
+          if (!groupWiseRules[record.groupId]) {
+            groupWiseRules[record.groupId] = [];
+          }
+          groupWiseRules[record.groupId].push(record);
+        }
       }
     });
-
     return groupWiseRules;
-  }, [activeFilter, allGroups, getFilteredRecords]);
+  }, [activeFilter, getFilteredRecords]);
 
   const searchedRecords = useMemo(() => {
     const _searchedRecords: StorageRecord[] = [];
