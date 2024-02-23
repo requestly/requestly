@@ -115,6 +115,8 @@ const LINKS = {
   },
 
   PRODUCTLIFT_CHANGELOG: "https://requestly.productlift.dev/",
+
+  CALENDLY_LINK: "https://calendly.com/requestly/sagar",
 };
 
 export default LINKS;
