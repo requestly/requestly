@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { useDispatch } from "react-redux";
 import { AuthForm } from "./components/Form";
 import { OnboardingAuthBanner } from "./components/Banner";
 import AUTH from "config/constants/sub/auth";
@@ -11,7 +10,7 @@ import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm
 import { actions } from "store";
 import Logger from "lib/logger";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
-import { trackAppOnboardingStepCompleted, trackAppOnboardingViewed } from "features/onboarding/analytics";
+import { trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { m } from "framer-motion";
 import "./index.scss";
 
@@ -21,7 +20,6 @@ interface Props {
 
 export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const [authMode, setAuthMode] = useState(AUTH.ACTION_LABELS.SIGN_UP);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
@@ -40,13 +38,6 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
         });
     }
   };
-
-  useEffect(() => {
-    if (user.loggedIn) {
-      trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
-    }
-  }, [dispatch, user.loggedIn]);
 
   useEffect(() => {
     if (isOpen) {
