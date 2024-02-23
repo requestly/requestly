@@ -24,7 +24,6 @@
 
         if (window.top === window) {
           chrome.runtime.connect(); // connect to background
-
           window.addEventListener("pageshow", (event) => {
             if (event.persisted) {
               chrome.runtime.sendMessage({

@@ -15,6 +15,7 @@ import { UserPlanDetails } from "./components/UserPlanDetails";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { billingActions } from "store/features/billing/slice";
+import { PRICING } from "features/pricing";
 
 export const BillingTeam: React.FC = () => {
   const { billingId } = useParams();
@@ -74,7 +75,8 @@ export const BillingTeam: React.FC = () => {
         const team = billingTeams.find((team) => {
           return user?.details?.profile?.uid in team.members;
         });
-        if (team?.id) navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${team.id}`);
+        if (team?.id && user?.details?.planDetails?.type === PRICING.CHECKOUT.MODES.TEAM)
+          navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${team.id}`);
         else {
           // Show user plan details if the user is not a member of any billing team
           setShowUserPlanDetails(true);
@@ -86,7 +88,7 @@ export const BillingTeam: React.FC = () => {
         navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE);
       }
     }
-  }, [location.pathname, billingTeams, navigate, user?.details?.profile?.uid]);
+  }, [location.pathname, billingTeams, navigate, user?.details?.profile?.uid, user?.details?.planDetails?.type]);
 
   if ((isBillingTeamsLoading || !billingId) && !showUserPlanDetails)
     return (
