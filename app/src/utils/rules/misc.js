@@ -37,6 +37,15 @@ export const getRuleConfigInEditMode = (rule) => {
   return RULE_TYPES_CONFIG[rule.ruleType];
 };
 
+/**
+ *
+ * @param {string} appMode
+ * @param {import("features/rules/types/rules").Rule["id"][]} selectedRuleIds
+ * @returns {Promise<{
+ *  rules: import("features/rules/types/rules").Rule[],
+ *  groups: import("features/rules/types/rules").Group[]
+ * }>}
+ */
 export const getRulesAndGroupsFromRuleIds = (appMode, selectedRuleIds) => {
   return new Promise((resolve) => {
     const groupIdsArr = [];

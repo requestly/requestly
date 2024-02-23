@@ -9,22 +9,8 @@
     },
     (isExtensionEnabled) => {
       if (isExtensionEnabled) {
-        // register custom elements
-        RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/customElements.js"));
-
-        if (!RQ.ClientUtils.isAppPage()) {
-          RQ.ConsoleLogger.setup();
-          RQ.RuleExecutionHandler.setup();
-          RQ.ScriptRuleHandler.setup();
-          RQ.UserAgentRuleHandler.setup();
-          RQ.RequestResponseRuleHandler.setup();
-        }
-
-        RQ.SessionRecorder.setup();
-
         if (window.top === window) {
           chrome.runtime.connect(); // connect to background
-
           window.addEventListener("pageshow", (event) => {
             if (event.persisted) {
               chrome.runtime.sendMessage({
@@ -37,6 +23,19 @@
             }
           });
         }
+
+        if (!RQ.ClientUtils.isAppPage()) {
+          RQ.RuleExecutionHandler.setup();
+          RQ.ConsoleLogger.setup();
+          RQ.RequestResponseRuleHandler.setup();
+          RQ.ScriptRuleHandler.setup();
+          RQ.UserAgentRuleHandler.setup();
+        }
+
+        // register custom elements
+        RQ.ClientUtils.addJSFromURL(chrome.runtime.getURL("libs/customElements.js"));
+
+        RQ.SessionRecorder.setup();
       }
     }
   );
