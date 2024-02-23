@@ -45,15 +45,21 @@ export abstract class RQDraggableWidget extends HTMLElement {
         // This happens when mousedown and mouseup doesn't happen on the same element
         // Similar to this https://melkornemesis.medium.com/handling-javascript-mouseup-event-outside-element-b0a34090bb56
         setTimeout(() => {
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onMouseUp);
           this.#isDragging = false;
         }, 100);
-
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
       };
 
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
+    });
+
+    this.addEventListener("mouseleave", () => {
+      // Fallback to set isDragging false on mouseleave. Timeout used so that event.stopPropagation works when isDragging is true
+      setTimeout(() => {
+        this.#isDragging = false;
+      }, 100);
     });
 
     window.addEventListener("resize", () => {

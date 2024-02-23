@@ -231,11 +231,19 @@ RQ.SessionRecorder.showToast = () => {
   rqToast.classList.add("rq-element");
   rqToast.setAttribute("heading", "Requestly is recording session on this tab!");
   rqToast.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
-  rqToast.innerHTML = `
+  rqToastContent = `
   <div slot="content">
     You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.
   </div>
   `;
+  try {
+    rqToast.innerHTML = rqToastContent;
+  } catch (e) {
+    const trustedTypesPolicy = window.trustedTypes?.createPolicy?.("rq-html-policy", {
+      createHTML: (html) => html,
+    });
+    rqToast.innerHTML = trustedTypesPolicy.createHTML(rqToastContent);
+  }
 
   document.documentElement.appendChild(rqToast);
 };
