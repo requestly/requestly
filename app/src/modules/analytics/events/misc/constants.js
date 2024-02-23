@@ -32,7 +32,7 @@ export const ORGANIZATION = {
 
 export const BUSINESS = {
   CHECKOUT: {
-    INITIATED: "checkout_initiated",
+    BUTTON_CLICKED: "checkout_button_clicked",
     FAILED: "checkout_failed",
     COMPLETED: "checkout_completed",
     ENTERPRISE_REQUESTED: "enterprise_requested",
@@ -127,4 +127,8 @@ export const MONETIZATION_EXPERIMENT = {
   CONTACT_US_CLICKED: "contact_us_clicked",
   UPGRADE_CLICKED: "upgrade_clicked",
   RENEW_NOW_CLICKED: "renew_now_clicked",
+};
+
+export const SUBSCRIPTION = {
+  PERSONAL_SUBSCRIPTION_INVOICE_CLICKED: "personal_subscription_invoice_clicked",
 };

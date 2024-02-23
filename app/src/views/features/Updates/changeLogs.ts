@@ -8,6 +8,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.2.17",
+    logs: ["feat: Attributes support for insert script (#1386)", "[RQ-1251] feat: updated extension logo (#1371)"],
+  },
+  {
     version: "24.1.3",
     logs: ["[RQ-1215] fix: caching redirect/replace rules (#1316)"],
   },

@@ -48,3 +48,7 @@ export const trackWorkspaceSettingsLearnMoreClicked = (workspace_id: string) => 
 export const trackWorkspaceSettingsAutomaticMappingToggleClicked = (workspace_id: string, final_status: boolean) => {
   trackEvent(SETTINGS.WORKSPACE.WORKSPACE_SETTINGS_AUTOMATIC_MAPPING_TOGGLE_CLICKED, { final_status, workspace_id });
 };
+
+export const trackPersonalSubscriptionDownloadInvoicesClicked = () => {
+  trackEvent(SETTINGS.BILLING.BILLING_PERSONAL_SUBSCRIPTION_DOWNLOAD_INVOICES_CLICKED);
+};

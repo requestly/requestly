@@ -87,7 +87,7 @@ export const HTML_ERRORS = {
 /**
  * Check if the given string contains HTML snippets
  * And if so, validates if the html snippet is correct
- * 
+ *
  * @param {string} str string containing HTML snippet
  * @param {Document} doc Document created from the HTML string
  * @returns {boolean}
@@ -203,7 +203,7 @@ async function htmlValidateRawCodeString(codeString) {
  * @returns {boolean}
  */
 function isHTMLString(str, generatedDocument) {
-  const defaultResponse = true;
+  const defaultResponse = false;
   if (!str) return defaultResponse;
 
   // check if body and head is just empty
@@ -249,7 +249,7 @@ function checkDocumentForAnyOtherNode(doc, nodeName) {
  * @returns  {
  *  innerText: string,
  *  attributes: Array<{name: string, value: string}>,
- * } 
+ * }
  */
 export function parseHTMLString(rawCode, htmlNodeName) {
   const details = extractDOMNodeDetails(rawCode, htmlNodeName); // todo: replace this call
@@ -282,7 +282,8 @@ export function getHTMLNodeName(scriptType, codeType) {
   let htmlNode = "";
   if (codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
     htmlNode = "script";
-  } else { // CSS
+  } else {
+    // CSS
     if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
       htmlNode = "link";
     } else {
