@@ -24,16 +24,16 @@
           });
         }
 
-        // register custom elements
-        RQ.ClientUtils.addJSFromURL(chrome.runtime.getURL("libs/customElements.js"));
-
         if (!RQ.ClientUtils.isAppPage()) {
-          RQ.ConsoleLogger.setup();
           RQ.RuleExecutionHandler.setup();
+          RQ.ConsoleLogger.setup();
+          RQ.RequestResponseRuleHandler.setup();
           RQ.ScriptRuleHandler.setup();
           RQ.UserAgentRuleHandler.setup();
-          RQ.RequestResponseRuleHandler.setup();
         }
+
+        // register custom elements
+        RQ.ClientUtils.addJSFromURL(chrome.runtime.getURL("libs/customElements.js"));
 
         RQ.SessionRecorder.setup();
       }
