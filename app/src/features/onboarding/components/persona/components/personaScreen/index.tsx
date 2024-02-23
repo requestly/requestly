@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { getAppOnboardingDetails, getUserAuthDetails } from "store/selectors";
 import { Col, Row, Typography } from "antd";
 import { PersonaInput } from "../PersonaInput";
 import { RQButton, RQInput } from "lib/design-system/components";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { actions } from "store";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
@@ -22,6 +21,8 @@ import {
 } from "features/onboarding/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
+import { isCompanyEmail } from "utils/FormattingHelper";
+import { getUserPersona, setUserPersona } from "backend/onboarding";
 import "./index.scss";
 
 interface Props {
@@ -39,17 +40,22 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   const [shouldShowPersonaInput, setShouldShowPersonaInput] = useState(false);
   const [shouldShowFullNameInput, setShouldShowFullNameInput] = useState(false);
 
-  const getUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-getUserPersona"), []);
-  const setUserPersona = useMemo(() => httpsCallable(getFunctions(), "users-setUserPersona"), []);
+  const handleMoveToNextStep = useCallback(() => {
+    if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
+    } else {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+    }
+  }, [dispatch, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified, user?.loggedIn]);
 
   const handleSetPersona = useCallback(() => {
     if (persona) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, persona);
       dispatch(actions.updateAppOnboardingPersona(persona));
       return new Promise((resolve, reject) => {
-        setUserPersona({ persona })
+        setUserPersona(user.details?.profile?.uid, persona)
           .then((res: any) => {
-            if (res.data.success) {
+            if (res.success) {
               trackAppOnboardingPersonaUpdated(persona);
               resolve(res);
             }
@@ -60,7 +66,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
           });
       });
     } else return Promise.resolve();
-  }, [persona, dispatch, setUserPersona]);
+  }, [persona, dispatch, user.details?.profile?.uid]);
 
   const handleSetFullName = useCallback(() => {
     if (fullName) {
@@ -99,36 +105,44 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     ])
       .then(() => {
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.PERSONA);
-        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+        handleMoveToNextStep();
       })
       .catch((error) => {
         Logger.log(error);
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.PERSONA);
-        dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
-        toast.error("Something went wrong.");
+        handleMoveToNextStep();
+        if (user.loggedIn) {
+          toast.error("Something went wrong.");
+        }
       })
       .finally(() => {
         setIsSaving(false);
       });
   }, [
+    handleMoveToNextStep,
     shouldShowFullNameInput,
     shouldShowPersonaInput,
     persona,
     fullName,
-    dispatch,
     handleSetPersona,
     handleSetFullName,
     user.details?.profile?.displayName,
+    user.loggedIn,
   ]);
 
-  const shouldProceedToGettingStarted = useCallback(() => {
+  const shouldProceedToNextStep = useCallback(() => {
     if (!shouldShowFullNameInput && !shouldShowPersonaInput) {
       return true;
     } else return false;
   }, [shouldShowPersonaInput, shouldShowFullNameInput]);
 
   useEffect(() => {
-    getUserPersona()
+    if (!user.loggedIn) {
+      setShouldShowPersonaInput(true);
+      setIsLoading(false);
+      return;
+    }
+    getUserPersona(user.details?.profile?.uid)
       .then((res: any) => {
         if (!res.data.persona) {
           setShouldShowPersonaInput(true);
@@ -143,7 +157,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [getUserPersona, dispatch, appOnboardingDetails.persona]);
+  }, [dispatch, appOnboardingDetails.persona, user.loggedIn, user.details?.profile?.uid]);
 
   useEffect(() => {
     if (user.loggedIn) {
@@ -156,16 +170,16 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   }, [user.loggedIn, user.details?.profile?.uid]);
 
   useEffect(() => {
-    if (!isLoading && shouldProceedToGettingStarted()) {
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
+    if (user.loggedIn && !isLoading && shouldProceedToNextStep()) {
+      handleMoveToNextStep();
     }
-  }, [dispatch, isLoading, shouldProceedToGettingStarted]);
+  }, [isLoading, shouldProceedToNextStep, handleMoveToNextStep, user.loggedIn]);
 
   useEffect(() => {
-    if (isOpen && !shouldProceedToGettingStarted()) {
+    if (isOpen && !shouldProceedToNextStep()) {
       trackAppOnboardingViewed(ONBOARDING_STEPS.PERSONA);
     }
-  }, [isOpen, shouldProceedToGettingStarted]);
+  }, [isOpen, shouldProceedToNextStep]);
 
   return (
     <>
@@ -174,7 +188,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
       ) : (
         <div className="persona-form-wrapper">
           <AnimatePresence>
-            {!shouldProceedToGettingStarted() ? (
+            {!shouldProceedToNextStep() ? (
               <m.div
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -182,17 +196,19 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
                 transition={{ type: "linear", duration: 0.2 }}
                 className="persona-form"
               >
-                <Row gutter={16} align="middle">
-                  <Col className="login-success-icon display-row-center">
-                    <MdCheck className="text-white" />
-                  </Col>
-                  <Col>
-                    <Typography.Title level={4} style={{ fontWeight: 500, marginBottom: 0 }}>
-                      You’re logged in successfully!
-                    </Typography.Title>
-                  </Col>
-                </Row>
-                <Typography.Title level={5} style={{ marginTop: "24px", fontWeight: 500 }}>
+                {user.loggedIn && (
+                  <Row gutter={16} align="middle">
+                    <Col className="login-success-icon display-row-center">
+                      <MdCheck className="text-white" />
+                    </Col>
+                    <Col>
+                      <Typography.Title level={4} style={{ fontWeight: 500, marginBottom: 0 }}>
+                        You’re logged in successfully!
+                      </Typography.Title>
+                    </Col>
+                  </Row>
+                )}
+                <Typography.Title level={5} style={{ marginTop: user.loggedIn ? "24px" : 0, fontWeight: 500 }}>
                   Helps us in optimizing your experience
                 </Typography.Title>
                 {shouldShowPersonaInput && (
@@ -221,7 +237,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
                   size="large"
                   className="persona-save-btn w-full mt-16"
                 >
-                  Save
+                  Proceed
                 </RQButton>
               </m.div>
             ) : null}

@@ -1,9 +1,9 @@
-import React, { ReactNode, useCallback, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Divider, Row, Col, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import googleLogo from "assets/icons/google.svg";
-import { PersonaInput } from "../../../persona/components/PersonaInput";
+// import { PersonaInput } from "../../../persona/components/PersonaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
 import { googleSignIn } from "actions/FirebaseActions";
@@ -13,6 +13,8 @@ import { toast } from "utils/Toast";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
+import { getUserAuthDetails } from "store/selectors";
+import { isNull } from "lodash";
 import "./index.scss";
 
 interface AuthFormProps {
@@ -33,13 +35,20 @@ interface InputProps {
   label: ReactNode | string;
   placeholder: string;
   onValueChange: (value: string) => void;
+  onPressEnter?: () => void;
 }
 
-const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onValueChange }) => {
+const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onValueChange, onPressEnter }) => {
   return (
     <div className="onboarding-form-input">
       {typeof label === "string" ? <label htmlFor={id}>{label}</label> : label}
-      <RQInput placeholder={placeholder} id={id} value={value} onChange={(e) => onValueChange(e.target.value)} />
+      <RQInput
+        onPressEnter={onPressEnter}
+        placeholder={placeholder}
+        id={id}
+        value={value}
+        onChange={(e) => onValueChange(e.target.value)}
+      />
     </div>
   );
 };
@@ -56,16 +65,17 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   setPersona,
 }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isMagicLinkLoading, setIsMagicLinkLoading] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(null);
 
   const handleGoogleSignIn = useCallback(() => {
     setIsGoogleSignInLoading(true);
     googleSignIn(() => {}, authMode, "app_onboarding")
       .then((result) => {
         if (result.uid) {
-          trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
-          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+          setIsNewUser(result?.isNewUser || false);
         }
       })
       .catch((error) => {
@@ -74,7 +84,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsGoogleSignInLoading(false);
       });
-  }, [authMode, dispatch]);
+  }, [authMode]);
 
   const handleContinueClick = useCallback(() => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
@@ -89,17 +99,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       }
     }
 
-    if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
-      if (!persona) {
-        toast.error("Please select or type your role");
-        return;
-      }
-
-      if (!fullName) {
-        toast.error("Please enter your full name");
-        return;
-      }
-    }
     setIsMagicLinkLoading(true);
     dispatch(actions.updateIsAppOnboardingStepDisabled(true));
     if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
@@ -109,6 +108,19 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     }
     onSendEmailLink?.(email);
   }, [authMode, email, fullName, persona, onSendEmailLink, dispatch]);
+
+  useEffect(() => {
+    if (user.loggedIn) {
+      if (!isNull(isNewUser)) {
+        trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+        if (isNewUser) {
+          dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+        } else {
+          dispatch(actions.updateAppOnboardingCompleted());
+        }
+      }
+    }
+  }, [dispatch, user.loggedIn, isNewUser]);
 
   return (
     <div className="w-full">
@@ -163,8 +175,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             </Row>
           </label>
         }
+        onPressEnter={handleContinueClick}
       />
-      {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
+      {/* {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <>
           <div className="mt-16">
             <PersonaInput value={persona} onValueChange={(value) => setPersona(value)} />
@@ -180,7 +193,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             />
           </div>
         </>
-      )}
+      )} */}
 
       <RQButton
         type="primary"

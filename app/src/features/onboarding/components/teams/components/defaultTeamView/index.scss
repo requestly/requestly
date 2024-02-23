@@ -4,7 +4,7 @@
   & .ant-divider {
     margin-top: 32px;
     margin-bottom: 0;
-    width: 312px;
+    width: 400px;
     border-top-color: #383838;
   }
 }
@@ -40,4 +40,8 @@
     background: none;
     color: var(--white);
   }
+}
+
+.getting-started-invite-team-members-btn.ant-btn {
+  margin-top: 32px;
 }
