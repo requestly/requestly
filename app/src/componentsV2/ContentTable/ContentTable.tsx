@@ -11,7 +11,7 @@ export interface ContentTableProps<DataType> extends TableProps<DataType> {
   rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
   loading?: boolean;
   customRowClassName?: (record: DataType) => string;
-  bulkActionBarConfig?: BulkActionBarConfig;
+  bulkActionBarConfig?: BulkActionBarConfig<DataType>;
   filterSelection?: (records: DataType[]) => DataType[];
   locale: TableProps<DataType>["locale"];
 }

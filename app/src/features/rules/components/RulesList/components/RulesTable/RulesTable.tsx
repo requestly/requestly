@@ -4,8 +4,8 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { Empty } from "antd";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
-import { isRule, rulesToContentTableDataAdapter } from "./utils";
-import { RuleObj, RuleObjType } from "features/rules/types/rules";
+import { isRule, isGroup, recordsToContentTableDataAdapter } from "./utils";
+import { StorageRecord } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
   DeleteRulesModalWrapper,
@@ -25,36 +25,36 @@ import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
-import { getAllRuleObjIds } from "store/features/rules/selectors";
+import { getAllRecordIds } from "store/features/rules/selectors";
 import "./rulesTable.css";
 
 interface Props {
-  rules: RuleObj[];
+  records: StorageRecord[];
   loading: boolean;
   searchValue: string;
 }
 
-const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
+const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
   const user = useSelector(getUserAuthDetails);
-  const allRecordIds = useSelector(getAllRuleObjIds);
+  const allRecordIds = useSelector(getAllRecordIds);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [expandedGroups, setExpandedGroups] = useState([]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
-  const [contentTableData, setContentTableAdaptedRules] = useState<RuleTableDataType[]>([]);
+  const [contentTableData, setContentTableData] = useState<RuleTableDataType[]>([]);
   const clearSelectedRowsDataCallbackRef = useRef(() => {});
   const {
     clearSelectedRows,
-    handleRuleShare,
+    handleRecordShare,
     // handleActivateOrDeactivateRecords,
     handleDeleteRecordClick,
     handleChangeRuleGroupClick,
-    handleUngroupSelectedRulesClick,
+    handleUngroupSelectedRecordsClick,
   } = useRuleTableActions();
 
   useEffect(() => {
-    const contentTableAdaptedRules = rulesToContentTableDataAdapter(rules);
-    setContentTableAdaptedRules(contentTableAdaptedRules);
-  }, [rules]);
+    const contentTableAdaptedRecords = recordsToContentTableDataAdapter(records);
+    setContentTableData(contentTableAdaptedRecords);
+  }, [records]);
 
   // FIXME: cleanup this
   const options = useMemo(() => {
@@ -87,7 +87,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
     }
   }, [expandedGroups, isGroupsStateUpdated, getExpandedGroupRowKeys]);
 
-  const handleGroupState = (expanded: boolean, record: RuleObj) => {
+  const handleGroupState = (expanded: boolean, record: StorageRecord) => {
     if (isRule(record)) {
       return;
     }
@@ -103,12 +103,12 @@ const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
     }
   };
 
-  const getSelectionCount = useCallback((selectedRows: any) => {
+  const getSelectionCount = useCallback((selectedRows: StorageRecord[]) => {
     let groups = 0;
     let rules = 0;
 
-    selectedRows.forEach((row: any) => {
-      row.objectType === RuleObjType.GROUP ? groups++ : rules++;
+    selectedRows.forEach((record) => {
+      isGroup(record) ? groups++ : rules++;
     });
 
     const formatCount = (count: number, singular: string, plural: string) => {
@@ -201,7 +201,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
                     clearSelection();
                     trackRulesListBulkActionPerformed("ungroup");
                   };
-                  handleUngroupSelectedRulesClick(selectedRows)?.then(onSuccess);
+                  handleUngroupSelectedRecordsClick(selectedRows)?.then(onSuccess);
                 },
               },
               {
@@ -209,11 +209,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
                 icon: <RiFolderSharedLine />,
                 //hide change group option if only empty groups are selected
                 isActionHidden: (selectedRows) =>
-                  !selectedRows.some(
-                    (row: any) =>
-                      (row.objectType === RuleObjType.GROUP && row.children?.length > 0) ||
-                      row.objectType === RuleObjType.RULE
-                  ),
+                  !selectedRows.some((row) => (isGroup(row) && row.children?.length > 0) || isRule(row)),
                 onClick: (selectedRows, clearSelection) => {
                   const onSuccess = () => {
                     clearSelection();
@@ -238,7 +234,7 @@ const RulesTable: React.FC<Props> = ({ rules, loading, searchValue }) => {
                     trackRulesListBulkActionPerformed("share");
                   };
 
-                  handleRuleShare(selectedRows, onSuccess);
+                  handleRecordShare(selectedRows, onSuccess);
                 },
               },
               {
