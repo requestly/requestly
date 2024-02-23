@@ -5,7 +5,7 @@ import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentTable/ContentTable";
 import { RuleTableDataType } from "../types";
 import useRuleTableActions from "./useRuleTableActions";
-import { getAllRuleObjMap } from "store/features/rules/selectors";
+import { getAllRecordsMap } from "store/features/rules/selectors";
 import { RecordStatus, Rule } from "features/rules/types/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserIcon } from "components/common/UserIcon";
@@ -26,7 +26,7 @@ import { checkIsRuleGroupDisabled, isGroup } from "../utils/rules";
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
-  const allRecordsMap = useSelector(getAllRuleObjMap);
+  const allRecordsMap = useSelector(getAllRecordsMap);
   const {
     handleStatusToggle,
     handleRecordShare,

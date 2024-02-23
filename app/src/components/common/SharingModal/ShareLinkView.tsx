@@ -15,7 +15,7 @@ import { AiFillCheckCircle } from "@react-icons/all-files/ai/AiFillCheckCircle";
 import { AiOutlineInfoCircle } from "@react-icons/all-files/ai/AiOutlineInfoCircle";
 import { SharedLinkVisibility } from "./types";
 import Logger from "lib/logger";
-import { getAllRuleObjs } from "store/features/rules/selectors";
+import { getAllRecords } from "store/features/rules/selectors";
 import { StorageRecord } from "features/rules/types/rules";
 import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
 import "./index.css";
@@ -31,7 +31,7 @@ interface ShareLinkProps {
 
 export const ShareLinkView: React.FC<ShareLinkProps> = ({ selectedRules, source, onSharedLinkCreated = () => {} }) => {
   const appMode = useSelector(getAppMode);
-  const records = useSelector(getAllRuleObjs);
+  const records = useSelector(getAllRecords);
   const [sharedLinkVisibility, setSharedLinkVisibility] = useState(SharedLinkVisibility.PUBLIC);
   const [sharedListRecipients, setSharedListRecipients] = useState([]);
   const [sharedListName, setSharedListName] = useState(null);

@@ -20,42 +20,43 @@ import { ReducerKeys } from "store/constants";
 
 // type RuleModal = Partial<Record<ModalName, RuleModalPayload>>;
 
-export interface RulesState {
-  ruleObjs: EntityState<any>;
+export interface RulesAndGroupsState {
+  records: EntityState<StorageRecord>;
 }
 
-export const rulesAdapter = createEntityAdapter<StorageRecord>({
-  selectId: (ruleObj) => ruleObj.id,
+export const storageRecordAdapter = createEntityAdapter<StorageRecord>({
+  selectId: (record) => record.id,
   sortComparer: (a, b) => (a?.creationDate > b?.creationDate ? 1 : -1),
 });
 
-const initialState: RulesState = {
-  ruleObjs: rulesAdapter.getInitialState(),
+const initialState: RulesAndGroupsState = {
+  records: storageRecordAdapter.getInitialState(),
 };
 
 const slice = createSlice({
   name: ReducerKeys.RULES,
   initialState,
   reducers: {
-    ruleObjAdd: (state: RulesState, action: PayloadAction<any>) => {
-      rulesAdapter.addOne(state.ruleObjs, action.payload);
+    addRecord: (state: RulesAndGroupsState, action: PayloadAction<any>) => {
+      storageRecordAdapter.addOne(state.records, action.payload);
     },
-    ruleObjUpsert: (state: RulesState, action: PayloadAction<any>) => {
-      rulesAdapter.upsertOne(state.ruleObjs, action.payload);
+    upsertRecord: (state: RulesAndGroupsState, action: PayloadAction<any>) => {
+      storageRecordAdapter.upsertOne(state.records, action.payload);
     },
-    ruleObjUpsertMany: (state: RulesState, action: PayloadAction<any>) => {
-      rulesAdapter.upsertMany(state.ruleObjs, action.payload);
+    upsertRecords: (state: RulesAndGroupsState, action: PayloadAction<any>) => {
+      storageRecordAdapter.upsertMany(state.records, action.payload);
     },
-    ruleObjUpdate: (state: RulesState, action: PayloadAction<any>) => {
-      rulesAdapter.updateOne(state.ruleObjs, action.payload);
+    updateRecord: (state: RulesAndGroupsState, action: PayloadAction<any>) => {
+      storageRecordAdapter.updateOne(state.records, action.payload);
     },
-    ruleObjsSetAll: (state: RulesState, action: PayloadAction<any>) => {
-      rulesAdapter.setAll(state.ruleObjs, action.payload);
+    setAllRecords: (state: RulesAndGroupsState, action: PayloadAction<any>) => {
+      storageRecordAdapter.setAll(state.records, action.payload);
     },
-    ruleObjsClearAll: (state: RulesState, action: PayloadAction<any>) => {
-      rulesAdapter.removeAll(state.ruleObjs);
+    clearAllRecords: (state: RulesAndGroupsState, action: PayloadAction<any>) => {
+      storageRecordAdapter.removeAll(state.records);
     },
   },
 });
 
-export const { actions: rulesActions, reducer: rulesReducer } = slice;
+/* KEEPING THE NAME `rule` HERE SO THAT IT IS OBVIOUS THAT THESE ARE FOR WORKING WITH RULES (and in extension, also groups) */
+export const { actions: recordsActions, reducer: recordsReducer } = slice;

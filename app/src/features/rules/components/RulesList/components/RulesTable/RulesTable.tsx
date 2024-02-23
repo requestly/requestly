@@ -25,7 +25,7 @@ import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
-import { getAllRuleObjIds } from "store/features/rules/selectors";
+import { getAllRecordIds } from "store/features/rules/selectors";
 import "./rulesTable.css";
 
 interface Props {
@@ -36,7 +36,7 @@ interface Props {
 
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
   const user = useSelector(getUserAuthDetails);
-  const allRecordIds = useSelector(getAllRuleObjIds);
+  const allRecordIds = useSelector(getAllRecordIds);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [expandedGroups, setExpandedGroups] = useState([]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);

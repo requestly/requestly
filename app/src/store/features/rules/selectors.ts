@@ -1,10 +1,9 @@
 import { ReducerKeys } from "store/constants";
-import { rulesAdapter } from "./slice";
+import { storageRecordAdapter } from "./slice";
 
 const storeKey = ReducerKeys.RULES;
-const rulesEntitySelectors = rulesAdapter.getSelectors((state: any) => state[storeKey]["ruleObjs"]);
+const rulesEntitySelectors = storageRecordAdapter.getSelectors((state: any) => state[storeKey]["records"]);
 
-// todo @nsr: rename to ruleObjs to records
-export const getAllRuleObjs = rulesEntitySelectors.selectAll;
-export const getAllRuleObjMap = rulesEntitySelectors.selectEntities;
-export const getAllRuleObjIds = rulesEntitySelectors.selectIds;
+export const getAllRecords = rulesEntitySelectors.selectAll;
+export const getAllRecordsMap = rulesEntitySelectors.selectEntities;
+export const getAllRecordIds = rulesEntitySelectors.selectIds;
