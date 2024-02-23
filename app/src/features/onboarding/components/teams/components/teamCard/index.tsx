@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { Avatar, Spin } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { Invite } from "types";
@@ -11,6 +13,7 @@ import { BiCheckCircle } from "@react-icons/all-files/bi/BiCheckCircle";
 import { trackWorkspaceInviteAccepted, trackWorkspaceJoinClicked } from "modules/analytics/events/features/teams";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import { actions } from "store";
+import { switchWorkspace } from "actions/TeamWorkspaceActions";
 import "./index.scss";
 
 interface TeamCardProps {
@@ -19,6 +22,8 @@ interface TeamCardProps {
 
 export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
   const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
 
@@ -30,6 +35,21 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
         if (res?.data?.success) {
           toast.success("Team joined successfully");
           setHasJoined(true);
+          switchWorkspace(
+            {
+              teamId: invite?.metadata?.teamId,
+              teamName: invite?.metadata?.teamName,
+              teamMembersCount: res?.data?.data?.invite?.metadata?.teamAccessCount,
+            },
+            dispatch,
+            {
+              isWorkspaceMode,
+              isSyncEnabled: true,
+            },
+            appMode,
+            null,
+            "onboarding"
+          );
           trackWorkspaceInviteAccepted(
             invite?.metadata?.teamId,
             invite?.metadata?.teamName,
@@ -48,7 +68,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ invite }) => {
       .finally(() => {
         setIsJoining(false);
       });
-  }, [invite.id, invite?.metadata?.teamId, invite?.metadata?.teamName, dispatch]);
+  }, [invite.id, invite?.metadata?.teamId, invite?.metadata?.teamName, dispatch, isWorkspaceMode, appMode]);
 
   return (
     <div className="team-card-wrapper">
