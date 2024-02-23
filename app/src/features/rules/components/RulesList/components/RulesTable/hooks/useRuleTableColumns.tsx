@@ -58,7 +58,10 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         const isPinned = record.isFavourite;
 
         return (
-          <Tooltip title={isPinned ? "Unpin Record" : "Pin Record"} color="var(--black)">
+          <Tooltip
+            title={isPinned ? `Unpin ${isRule(record) ? "rule" : "group"}` : `Pin ${isRule(record) ? "rule" : "group"}`}
+            color="var(--black)"
+          >
             <Button
               type="text"
               className={`pin-record-btn ${isPinned ? "pin-record-btn-pinned" : ""}`}
@@ -105,7 +108,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         compare: (a, b) => {
           if (isGroup(a) && !isGroup(b)) {
             return -1;
-          } else if (isGroup(a) && isGroup(b)) {
+          } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
             return a.modificationDate > b.modificationDate ? -1 : 1;
@@ -150,9 +153,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               checked={isRuleActive}
               disabled={checkIsRuleGroupDisabled(allRecordsMap, record)}
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
-              onChange={(checked: boolean, e) => {
-                e.stopPropagation();
-              }}
             />
           </PremiumFeature>
         );
