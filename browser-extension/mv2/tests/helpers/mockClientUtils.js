@@ -8,7 +8,7 @@ RQ.ClientUtils.executeJS = function (code) {
   return mockElement;
 };
 
-RQ.ClientUtils.addRemoteJS = function (src, _attr, callback) {
+RQ.ClientUtils.addJSFromURL = function (src, _attr, callback) {
   window.DOM.push(src);
   if (typeof callback === "function") {
     callback();
@@ -21,7 +21,7 @@ RQ.ClientUtils.embedCSS = function (css) {
   return mockElement;
 };
 
-RQ.ClientUtils.addRemoteCSS = function (src) {
+RQ.ClientUtils.addCSSFromURL = function (src) {
   window.DOM.push(src);
   return mockElement;
 };

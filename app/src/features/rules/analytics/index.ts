@@ -62,6 +62,7 @@ export const trackRulesListBulkActionPerformed = (action: string) => {
   trackEvent(RULES.RULES_LIST_BULK_ACTION_PERFORMED, params);
 };
 
+// @nsr fix: this also counts groups selected
 export const trackRulesSelected = (num_rules: number) => {
   const params = { num_rules };
   trackEvent(RULES.RULES_SELECTED, params);

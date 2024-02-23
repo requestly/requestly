@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Badge, Col, Dropdown, Menu, Row, Tabs, Typography } from "antd";
 import ExecutedRules from "../ExecutedRules";
 import PinnedRecords from "../PinnedRecords";
@@ -12,6 +12,7 @@ import { RuleType } from "../../../types";
 import { EVENT, sendEvent } from "../../events";
 import config from "../../../config";
 import "./popupTabs.css";
+import { EXTENSION_MESSAGES } from "../../../constants";
 
 export enum PopupTabKey {
   PINNED_RULES = "pinned_rules",
@@ -23,6 +24,23 @@ const PopupTabs: React.FC = () => {
   const [executedRulesCount, setExecutedRulesCount] = useState(0);
   const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(false);
   const [activeTabKey, setActiveTabKey] = useState(PopupTabKey.PINNED_RULES);
+
+  useEffect(() => {
+    chrome.tabs.query({ currentWindow: true, active: true }, ([activeTab]) => {
+      chrome.runtime.sendMessage(
+        {
+          tabId: activeTab.id,
+          action: EXTENSION_MESSAGES.GET_EXECUTED_RULES,
+        },
+        (rules) => {
+          setExecutedRulesCount(rules.length);
+          if (rules.length) {
+            setActiveTabKey(PopupTabKey.EXECUTED_RULES);
+          }
+        }
+      );
+    });
+  }, []);
 
   const tabItems = useMemo(() => {
     return [
