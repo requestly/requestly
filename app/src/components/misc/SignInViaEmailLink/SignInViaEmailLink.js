@@ -34,8 +34,7 @@ const SignInViaEmailLink = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  // const [isEmailLoginLinkDone, setIsEmailLoginLinkDone] = useState(false);
-  const isUserAlreadyLoggedIn = useRef(user.loggedIn);
+  const wasUserAlreadyLoggedIn = useRef(user.loggedIn);
 
   const logOutUser = useCallback(() => {
     handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch).then(() => {
@@ -170,7 +169,7 @@ const SignInViaEmailLink = () => {
 
   return isCustomLoginFlow ? (
     renderEmailInputForm()
-  ) : isUserAlreadyLoggedIn.current ? (
+  ) : wasUserAlreadyLoggedIn.current ? (
     renderAlreadyLoggedInWarning()
   ) : (
     <SpinnerColumn />
