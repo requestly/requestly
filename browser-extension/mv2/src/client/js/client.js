@@ -33,7 +33,7 @@
         }
 
         // register custom elements
-        RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/customElements.js"));
+        RQ.ClientUtils.addJSFromURL(chrome.runtime.getURL("libs/customElements.js"));
 
         RQ.SessionRecorder.setup();
       }
