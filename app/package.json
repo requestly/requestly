@@ -135,6 +135,7 @@
   "devDependencies": {
     "@requestly-ui/resource-table": "^0.1.7",
     "@requestly/web-sdk": "0.14.2",
+    "@saturnhq/types": "^0.0.4",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
     "@types/lodash": "^4.14.185",
