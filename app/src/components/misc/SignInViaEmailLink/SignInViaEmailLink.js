@@ -94,13 +94,17 @@ const SignInViaEmailLink = () => {
                 setIsLogin(!isNewUser);
                 if (isNewUser) {
                   window.localStorage.setItem("isNewUser", !!isNewUser);
-                  dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
-                } else {
-                  dispatch(actions.updateAppOnboardingCompleted());
                 }
 
-                redirectToWebAppHomePage(navigate);
-                trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+                if (authData.uid) {
+                  if (isNewUser) {
+                    dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+                  } else {
+                    dispatch(actions.updateAppOnboardingCompleted());
+                  }
+                  redirectToWebAppHomePage(navigate);
+                  trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+                }
               } else throw new Error("Failed");
             }
           })
