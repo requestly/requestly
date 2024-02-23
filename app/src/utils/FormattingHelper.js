@@ -2,6 +2,7 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { PRICING } from "features/pricing";
+import { capitalize } from "lodash";
 
 export const generateObjectId = () => {
   return Math.random().toString(36).substr(2, 5);
@@ -61,6 +62,11 @@ export const isValidRQUrl = (url) => {
 export const getDomainFromEmail = (email) => {
   if (!email) return;
   return email.split("@")[1];
+};
+
+export const getCompanyNameFromEmail = (email) => {
+  if (!email) return;
+  return capitalize(getDomainFromEmail(email).split(".")[0]);
 };
 
 export const isCompanyEmail = (email) => {

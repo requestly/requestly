@@ -8,6 +8,7 @@ import { BillingTeamDetails } from "../../types";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
+import { PRICING } from "features/pricing";
 
 export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] }> = ({ billingTeams }) => {
   const navigate = useNavigate();
@@ -53,7 +54,10 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] 
               </NavLink>
             ))}
           </>
-        ) : (
+        ) : null}
+        {!groupedTeams.myTeams.length ||
+        (user?.details?.planDetails?.type === PRICING.CHECKOUT.MODES.INDIVIDUAL &&
+          ["active", "trialing"].includes(user?.details?.planDetails?.status)) ? (
           <div
             className="settings-secondary-sidebar-section-link"
             style={{
@@ -64,7 +68,7 @@ export const BillingTeamsSidebar: React.FC<{ billingTeams: BillingTeamDetails[] 
           >
             Plan details
           </div>
-        )}
+        ) : null}
       </Col>
 
       {groupedTeams.otherTeams.length > 0 && (
