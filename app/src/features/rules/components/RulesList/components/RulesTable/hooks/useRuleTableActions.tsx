@@ -134,7 +134,7 @@ const useRuleTableActions = () => {
 
     return StorageService(appMode)
       .saveRuleOrGroup(updatedRecord, { silentUpdate: true })
-      .then((rule) => {
+      .then(() => {
         console.log("Rule updated in Storage Service");
       })
       .catch(() => {
