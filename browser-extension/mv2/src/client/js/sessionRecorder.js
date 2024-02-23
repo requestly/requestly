@@ -102,7 +102,7 @@ RQ.SessionRecorder.initialize = () => {
       resolve();
     }
 
-    RQ.ClientUtils.addRemoteJS(chrome.runtime.getURL("libs/requestly-web-sdk.js"), null, () => {
+    RQ.ClientUtils.addJSFromURL(chrome.runtime.getURL("libs/requestly-web-sdk.js"), null, () => {
       RQ.ClientUtils.executeJS(`(${RQ.SessionRecorder.bootstrapClient.toString()})('${RQ.PUBLIC_NAMESPACE}')`);
       RQ.SessionRecorder.addMessageListeners();
       RQ.SessionRecorder.isInitialized = true;
