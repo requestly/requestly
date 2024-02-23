@@ -4,7 +4,7 @@ import { RiCloseLine } from "@react-icons/all-files/ri/RiCloseLine";
 import "./bulkActionBar.scss";
 
 export interface Props<DataType> {
-  config: BulkActionBarConfig;
+  config: BulkActionBarConfig<DataType>;
   selectedRows: DataType[]; // FIXME: Add proper data type here
   clearSelectedRowsData: () => void;
 }

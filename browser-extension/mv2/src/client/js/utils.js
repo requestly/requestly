@@ -20,7 +20,7 @@ RQ.ClientUtils.executeJS = function (code, attributes, shouldRemove) {
   }
 };
 
-RQ.ClientUtils.addRemoteJS = function (src, attributes, callback) {
+RQ.ClientUtils.addJSFromURL = function (src, attributes, callback) {
   var script = document.createElement("script");
   if (attributes) {
     attributes.forEach(({ name: attrName, value: attrVal }) => {
@@ -56,7 +56,7 @@ RQ.ClientUtils.embedCSS = function (css, attributes) {
   return style;
 };
 
-RQ.ClientUtils.addRemoteCSS = function (src, attributes) {
+RQ.ClientUtils.addCSSFromURL = function (src, attributes) {
   var link = document.createElement("link");
 
   if (attributes) {
