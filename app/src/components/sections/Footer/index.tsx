@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { actions } from "store";
 import { Typography, Row, Col, Button, Tooltip } from "antd";
 import { getIsSecondarySidebarCollapsed } from "store/selectors";
-import { MessageOutlined, NotificationOutlined, PicRightOutlined, ReadOutlined } from "@ant-design/icons";
+import { PicRightOutlined, ReadOutlined, CalendarOutlined, ApiOutlined } from "@ant-design/icons";
 import { FaYCombinator } from "@react-icons/all-files/fa/FaYCombinator";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
@@ -31,46 +31,39 @@ const AppFooter: React.FC = () => {
     dispatch(actions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
     trackFooterClicked("secondary_sidebar_toggle");
   };
-
+  const footerLinksConfig = useMemo(
+    () => ({
+      "Book a demo": {
+        link: APP_CONSTANTS.LINKS.BOOK_A_DEMO,
+        icons: <CalendarOutlined />,
+      },
+      Documentation: {
+        link: APP_CONSTANTS.LINKS.REQUESTLY_DOCS,
+        icons: <ReadOutlined />,
+      },
+      "API documentation": {
+        link: APP_CONSTANTS.LINKS.REQUESTLY_API_DOCS,
+        icons: <ApiOutlined />,
+      },
+    }),
+    []
+  );
   const renderFooterLinks = () => {
     return (
       <div className="app-footer-links">
-        <Text
-          className="cursor-pointer"
-          onClick={() => {
-            trackFooterClicked("product_updates");
-            redirectToUrl(APP_CONSTANTS.LINKS.PRODUCTLIFT_CHANGELOG, true);
-          }}
-        >
-          <span className="icon__wrapper">
-            <NotificationOutlined />
-          </span>
-          Product changelog
-        </Text>
-        <Text
-          className="cursor-pointer"
-          onClick={() => {
-            trackFooterClicked("documentation");
-            redirectToUrl(APP_CONSTANTS.LINKS.REQUESTLY_DOCS, true);
-          }}
-        >
-          <span className="icon__wrapper">
-            <ReadOutlined />
-          </span>
-          Documentation
-        </Text>
-        <Text
-          className="cursor-pointer"
-          onClick={() => {
-            trackFooterClicked("support");
-            redirectToUrl(APP_CONSTANTS.LINKS.CONTACT_US_PAGE, true);
-          }}
-        >
-          <span className="icon__wrapper">
-            <MessageOutlined />
-          </span>
-          Support
-        </Text>
+        {Object.entries(footerLinksConfig).map(([key, { link, icons }]) => (
+          <Text
+            key={key}
+            className="cursor-pointer"
+            onClick={() => {
+              trackFooterClicked(key);
+              redirectToUrl(link, true);
+            }}
+          >
+            <span className="icon__wrapper">{icons}</span>
+            {key}
+          </Text>
+        ))}
       </div>
     );
   };
