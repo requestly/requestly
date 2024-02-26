@@ -5,7 +5,7 @@ const LINKS = {
 
   // Download
   REQUESTLY_DOWNLOAD_PAGE: "https://requestly.io/downloads",
-  REQUESTLY_DOCS: "https://docs.requestly.io/",
+  REQUESTLY_DOCS: "https://developers.requestly.io/",
   //Docs - Using Rules
   REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.io/using-rules/",
   //Docs -Sharing Rules
@@ -70,6 +70,8 @@ const LINKS = {
   CONTACT_US: "mailto:" + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL,
   // Contact Us Page
   CONTACT_US_PAGE: "https://requestly.io/contact-us/",
+  // Book A Demo
+  BOOK_A_DEMO: "https://calendly.com/requestly/sagar",
 
   /** SUPPORT */
 
