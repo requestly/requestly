@@ -19,12 +19,12 @@ export const PricingPlans: PricingPlansType = {
     plans: {
       monthly: {
         usd: {
-          price: 15,
+          price: 19,
         },
       },
       annually: {
         usd: {
-          price: 144,
+          price: 180,
         },
       },
     },
@@ -33,12 +33,12 @@ export const PricingPlans: PricingPlansType = {
     plans: {
       monthly: {
         usd: {
-          price: 25,
+          price: 29,
         },
       },
       annually: {
         usd: {
-          price: 240,
+          price: 270,
         },
       },
     },

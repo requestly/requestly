@@ -79,15 +79,11 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "User management & access control",
-          enabled: true,
-        },
-        {
           title: "Daily backups(Encrypted)",
           enabled: true,
         },
         {
-          title: "Priority Support - Slack Connect, Email, Chat",
+          title: "Email + Chat Support",
           enabled: true,
         },
       ],
@@ -98,14 +94,6 @@ export const PricingFeatures: PlanFeatures = {
         "Empower your team with our Enterprise Plan, designed to seamlessly scale with your ambitions and drive collaborative success",
       features: [
         {
-          title: "API access",
-          enabled: true,
-        },
-        {
-          title: "Single Sign On",
-          enabled: true,
-        },
-        {
           title: "Unlimited Everything",
           enabled: true,
         },
@@ -114,7 +102,15 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "On Premise support",
+          title: "API access",
+          enabled: true,
+        },
+        {
+          title: "Service-level agreement (SLA)",
+          enabled: true,
+        },
+        {
+          title: "Single Sign-On",
           enabled: true,
         },
         {
