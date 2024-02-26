@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { actions } from "store";
 import { Typography, Row, Col, Button, Tooltip } from "antd";
 import { getIsSecondarySidebarCollapsed } from "store/selectors";
-import { MessageOutlined, NotificationOutlined, PicRightOutlined, ReadOutlined } from "@ant-design/icons";
+import { PicRightOutlined, ReadOutlined, CalendarOutlined, ApiOutlined } from "@ant-design/icons";
 import { FaYCombinator } from "@react-icons/all-files/fa/FaYCombinator";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
@@ -38,14 +38,14 @@ const AppFooter: React.FC = () => {
         <Text
           className="cursor-pointer"
           onClick={() => {
-            trackFooterClicked("product_updates");
-            redirectToUrl(APP_CONSTANTS.LINKS.PRODUCTLIFT_CHANGELOG, true);
+            trackFooterClicked("Book a demo");
+            redirectToUrl(APP_CONSTANTS.LINKS.BOOK_A_DEMO, true);
           }}
         >
           <span className="icon__wrapper">
-            <NotificationOutlined />
+            <CalendarOutlined />
           </span>
-          Product changelog
+          Book a demo
         </Text>
         <Text
           className="cursor-pointer"
@@ -62,14 +62,14 @@ const AppFooter: React.FC = () => {
         <Text
           className="cursor-pointer"
           onClick={() => {
-            trackFooterClicked("support");
-            redirectToUrl(APP_CONSTANTS.LINKS.CONTACT_US_PAGE, true);
+            trackFooterClicked("API documentation");
+            redirectToUrl(APP_CONSTANTS.LINKS.REQUESTLY_API_DOCS, true);
           }}
         >
           <span className="icon__wrapper">
-            <MessageOutlined />
+            <ApiOutlined />
           </span>
-          Support
+          API documentation
         </Text>
       </div>
     );
