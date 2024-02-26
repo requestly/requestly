@@ -94,3 +94,49 @@
   margin: 8px 0;
   gap: 0.5em;
 }
+
+.app-banner__warning {
+  background: var(--warning) !important;
+  color: black !important;
+
+  a {
+    color: black;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: black;
+      text-decoration: underline;
+    }
+  }
+
+  .ant-btn-primary {
+    background: #5c3111 !important;
+    border: none;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: #5c3111 !important;
+      border: none;
+    }
+  }
+
+  .ant-btn-default {
+    border: none !important;
+    color: black !important;
+    text-decoration: underline;
+    background: none;
+    font-weight: 400 !important;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: none;
+      border: none;
+      color: black;
+      text-decoration: underline !important;
+    }
+  }
+}

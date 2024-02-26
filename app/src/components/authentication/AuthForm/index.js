@@ -169,7 +169,7 @@ const AuthForm = ({
         }
       })
       .catch((err) => {
-        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, err.errorcode));
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, err.errorCode));
         setActionPending(false);
         setEmail("");
         setPassword("");
