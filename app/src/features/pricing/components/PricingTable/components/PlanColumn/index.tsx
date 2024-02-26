@@ -93,7 +93,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         <Row align="middle" className="items-center plan-price-row">
           <Space size="small">
             <Typography.Text strong className="plan-price">
-              ${(duration === PRICING.DURATION.ANNUALLY ? planPrice / 12 : planPrice) * quantity}
+              ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
             </Typography.Text>
             {product === PRICING.PRODUCTS.HTTP_RULES &&
               planName !== PRICING.PLAN_NAMES.FREE &&
