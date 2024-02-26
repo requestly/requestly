@@ -118,10 +118,8 @@ const RulesList: React.FC<Props> = () => {
           groupWiseRules[record.groupId].push(record);
         }
       } else {
-        if (activeFilter === "all") {
-          if (!groupWiseRules[record.id]) {
-            groupWiseRules[record.id] = [];
-          }
+        if (activeFilter === "all" && !groupWiseRules[record.id]) {
+          groupWiseRules[record.id] = [];
         }
       }
     });
