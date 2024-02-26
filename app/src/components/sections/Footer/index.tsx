@@ -31,20 +31,23 @@ const AppFooter: React.FC = () => {
     dispatch(actions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
     trackFooterClicked("secondary_sidebar_toggle");
   };
-  const footerLinksConfig = {
-    "Book a demo": {
-      link: APP_CONSTANTS.LINKS.BOOK_A_DEMO,
-      icons: <CalendarOutlined />,
-    },
-    Documentation: {
-      link: APP_CONSTANTS.LINKS.REQUESTLY_DOCS,
-      icons: <ReadOutlined />,
-    },
-    "API documentation": {
-      link: APP_CONSTANTS.LINKS.REQUESTLY_API_DOCS,
-      icons: <ApiOutlined />,
-    },
-  };
+  const footerLinksConfig = useMemo(
+    () => ({
+      "Book a demo": {
+        link: APP_CONSTANTS.LINKS.BOOK_A_DEMO,
+        icons: <CalendarOutlined />,
+      },
+      Documentation: {
+        link: APP_CONSTANTS.LINKS.REQUESTLY_DOCS,
+        icons: <ReadOutlined />,
+      },
+      "API documentation": {
+        link: APP_CONSTANTS.LINKS.REQUESTLY_API_DOCS,
+        icons: <ApiOutlined />,
+      },
+    }),
+    []
+  );
   const renderFooterLinks = () => {
     return (
       <div className="app-footer-links">
