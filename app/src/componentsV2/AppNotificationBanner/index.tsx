@@ -93,6 +93,15 @@ export const AppNotificationBanner = () => {
     [billingTeams.length]
   );
 
+  const getBannerClassName = (bannerType: string) => {
+    switch (bannerType) {
+      case BANNER_TYPE.WARNING:
+        return "app-banner__warning";
+      default:
+        return "";
+    }
+  };
+
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -111,7 +120,7 @@ export const AppNotificationBanner = () => {
     if (banner && checkBannerVisibility(banner?.id)) {
       return (
         <div
-          className={`app-banner ${banner?.type === BANNER_TYPE.WARNING ? "app-banner__warning" : ""}`}
+          className={`app-banner ${getBannerClassName(banner?.type)}`}
           style={{ backgroundColor: banner?.backgroundColor || "var(--blue-blue-600)" }}
         >
           {banner?.short_text && (
