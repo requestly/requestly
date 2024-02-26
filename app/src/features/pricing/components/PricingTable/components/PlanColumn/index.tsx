@@ -5,7 +5,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import { capitalize } from "lodash";
 import { PRICING } from "features/pricing/constants/pricing";
 import { PricingPlans } from "features/pricing/constants/pricingPlans";
-import underlineIcon from "../../../../assets/yellow-highlight.svg";
+import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 
