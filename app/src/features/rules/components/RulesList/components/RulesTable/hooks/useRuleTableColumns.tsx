@@ -138,27 +138,38 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       title: "Status",
       width: 120,
       render: (_, record: RuleTableDataType, index) => {
-        const isRuleActive = record.status === RecordStatus.ACTIVE;
+        const isRecordActive = record.status === RecordStatus.ACTIVE;
         // todo @nsr: check if this check also applies to groups?
-        return (
-          <PremiumFeature
-            disabled={isRuleActive}
-            features={[FeatureLimitType.num_active_rules]}
-            popoverPlacement="left"
-            onContinue={() => handleStatusToggle([record])}
-            source="rule_list_status_switch"
-          >
+        if (isRule(record)) {
+          return (
+            <PremiumFeature
+              disabled={isRecordActive}
+              features={[FeatureLimitType.num_active_rules]}
+              popoverPlacement="left"
+              onContinue={() => handleStatusToggle([record])}
+              source="rule_list_status_switch"
+            >
+              <Switch
+                size="small"
+                checked={isRecordActive}
+                disabled={checkIsRuleGroupDisabled(allRecordsMap, record)}
+                data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+              />
+            </PremiumFeature>
+          );
+        } else {
+          return (
             <Switch
               size="small"
-              checked={isRuleActive}
-              disabled={checkIsRuleGroupDisabled(allRecordsMap, record)}
+              checked={isRecordActive}
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
-              onChange={(checked: boolean, e) => {
+              onChange={(checked, e) => {
                 e.stopPropagation();
+                handleStatusToggle([record]);
               }}
             />
-          </PremiumFeature>
-        );
+          );
+        }
       },
     },
     {
