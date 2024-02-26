@@ -5,6 +5,7 @@ import indeedLogo from "assets/img/icons/common/indeed.svg";
 import atntLogo from "assets/img/icons/common/atnt.svg";
 import verizonLogo from "assets/img/icons/common/verizon.svg";
 import intuitLogo from "assets/img/icons/common/intuit.svg";
+import { MdOutlineCreditCardOff } from "@react-icons/all-files/md/MdOutlineCreditCardOff";
 import "./index.scss";
 
 const features = [
@@ -20,10 +21,10 @@ const companyLogos = [indeedLogo, atntLogo, verizonLogo, intuitLogo];
 export const OnboardingAuthBanner = () => {
   return (
     <Col className="auth-banner">
-      <Typography.Title level={5}>Why sign up?</Typography.Title>
-      <Typography.Text className="banner-text-small" style={{ fontWeight: "normal" }}>
-        No credit card is required, just sign up to get a professional plan trial.
-      </Typography.Text>
+      <div className="banner-no-cc-required text-bold">
+        <MdOutlineCreditCardOff />
+        <span>No credit card required!</span>
+      </div>
       <Typography.Title level={3}>
         Get 30 days free access to all{" "}
         <span className="banner-title-highlight">

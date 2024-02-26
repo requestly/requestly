@@ -7,7 +7,7 @@
   & h3.ant-typography {
     font-weight: 500;
     line-height: 36px;
-    margin-top: 1rem !important;
+    margin-top: 8px !important;
   }
 
   .banner-title-highlight {
@@ -38,4 +38,11 @@
   width: 70px;
   align-self: center;
   height: min-content;
+}
+
+.banner-no-cc-required {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--warning);
 }
