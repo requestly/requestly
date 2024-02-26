@@ -31,46 +31,36 @@ const AppFooter: React.FC = () => {
     dispatch(actions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
     trackFooterClicked("secondary_sidebar_toggle");
   };
-
+  const footerLinksConfig = {
+    "Book a demo": {
+      link: APP_CONSTANTS.LINKS.BOOK_A_DEMO,
+      icons: <CalendarOutlined />,
+    },
+    Documentation: {
+      link: APP_CONSTANTS.LINKS.REQUESTLY_DOCS,
+      icons: <ReadOutlined />,
+    },
+    "API documentation": {
+      link: APP_CONSTANTS.LINKS.REQUESTLY_API_DOCS,
+      icons: <ApiOutlined />,
+    },
+  };
   const renderFooterLinks = () => {
     return (
       <div className="app-footer-links">
-        <Text
-          className="cursor-pointer"
-          onClick={() => {
-            trackFooterClicked("Book a demo");
-            redirectToUrl(APP_CONSTANTS.LINKS.BOOK_A_DEMO, true);
-          }}
-        >
-          <span className="icon__wrapper">
-            <CalendarOutlined />
-          </span>
-          Book a demo
-        </Text>
-        <Text
-          className="cursor-pointer"
-          onClick={() => {
-            trackFooterClicked("documentation");
-            redirectToUrl(APP_CONSTANTS.LINKS.REQUESTLY_DOCS, true);
-          }}
-        >
-          <span className="icon__wrapper">
-            <ReadOutlined />
-          </span>
-          Documentation
-        </Text>
-        <Text
-          className="cursor-pointer"
-          onClick={() => {
-            trackFooterClicked("API documentation");
-            redirectToUrl(APP_CONSTANTS.LINKS.REQUESTLY_API_DOCS, true);
-          }}
-        >
-          <span className="icon__wrapper">
-            <ApiOutlined />
-          </span>
-          API documentation
-        </Text>
+        {Object.entries(footerLinksConfig).map(([key, { link, icons }]) => (
+          <Text
+            key={key}
+            className="cursor-pointer"
+            onClick={() => {
+              trackFooterClicked(key);
+              redirectToUrl(link, true);
+            }}
+          >
+            <span className="icon__wrapper">{icons}</span>
+            {key}
+          </Text>
+        ))}
       </div>
     );
   };
