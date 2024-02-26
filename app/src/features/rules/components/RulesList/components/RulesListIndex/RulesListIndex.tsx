@@ -106,6 +106,7 @@ const RulesList: React.FC<Props> = () => {
   const groupWiseRulesData = useMemo(() => {
     const groupWiseRules: Record<Group["id"], Rule[]> = {};
     groupWiseRules[UNGROUPED_GROUP_NAME] = [];
+
     getFilteredRecords(activeFilter).forEach((record) => {
       if (isRule(record)) {
         if (!record.groupId) {
@@ -116,8 +117,15 @@ const RulesList: React.FC<Props> = () => {
           }
           groupWiseRules[record.groupId].push(record);
         }
+      } else {
+        if (activeFilter === "all") {
+          if (!groupWiseRules[record.id]) {
+            groupWiseRules[record.id] = [];
+          }
+        }
       }
     });
+
     return groupWiseRules;
   }, [activeFilter, getFilteredRecords]);
 
