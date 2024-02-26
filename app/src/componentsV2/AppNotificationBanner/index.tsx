@@ -18,6 +18,10 @@ import "./appNotificationBanner.scss";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { trackAppBannerDismissed, trackAppNotificationBannerViewed, trackAppBannerCtaClicked } from "./analytics";
 
+enum BANNER_TYPE {
+  WARNING = "warning",
+}
+
 enum BANNER_ACTIONS {
   UPGRADE = "upgrade",
   CONTACT_US = "contact_us",
@@ -89,6 +93,15 @@ export const AppNotificationBanner = () => {
     [billingTeams.length]
   );
 
+  const getBannerClassName = (bannerType: string) => {
+    switch (bannerType) {
+      case BANNER_TYPE.WARNING:
+        return "app-banner__warning";
+      default:
+        return "";
+    }
+  };
+
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -106,9 +119,15 @@ export const AppNotificationBanner = () => {
 
     if (banner && checkBannerVisibility(banner?.id)) {
       return (
-        <div className="app-banner" style={{ backgroundColor: banner?.backgroundColor || "#000000" }}>
+        <div
+          className={`app-banner ${getBannerClassName(banner?.type)}`}
+          style={{ backgroundColor: banner?.backgroundColor || "var(--blue-blue-600)" }}
+        >
           {banner?.short_text && (
-            <span className="app-banner-badge" style={{ backgroundColor: banner?.badgeColor || "#000000" }}>
+            <span
+              className="app-banner-badge"
+              style={{ backgroundColor: banner?.badgeColor || "var(--blue-blue-600)" }}
+            >
               {banner.short_text}
             </span>
           )}
@@ -124,7 +143,7 @@ export const AppNotificationBanner = () => {
             {banner?.actions?.map((action: BANNER_ACTIONS) => {
               return (
                 <RQButton
-                  type={bannerActionButtons[action].type as ButtonType}
+                  type={bannerActionButtons[action]?.type as ButtonType}
                   onClick={() => {
                     trackAppBannerCtaClicked(banner?.id, action);
                     bannerActionButtons[action].onClick();
