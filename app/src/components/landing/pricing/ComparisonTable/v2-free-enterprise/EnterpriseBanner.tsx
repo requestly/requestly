@@ -11,7 +11,7 @@ const enterprisePlan = PricingFeatures[PRICING.PRODUCTS.HTTP_RULES].enterprise;
 const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openContactUsModal }) => {
   return (
     <Row className="enterprise-banner">
-      <Col lg={15} sm={10}>
+      <Col lg={19} sm={20}>
         <Typography.Title level={2}>Enterprise Plan</Typography.Title>
         <Typography.Title level={5}>
           <span className="enterprise-banner-underline">
@@ -41,8 +41,8 @@ const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openCo
           </Col>
         </Row>
       </Col>
-      <Col lg={{ offset: 2 }} sm={{ offset: 0 }}>
-        <img src={enterpriseImage} height={250} width={330} alt="enterprise-plan" />
+      <Col className="align-self-center">
+        <img src={enterpriseImage} height={190} width={200} alt="enterprise-plan" />
       </Col>
     </Row>
   );
