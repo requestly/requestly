@@ -1,7 +1,7 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import _ from "lodash";
+import { isEqual } from "lodash";
 
 import { getUserAttributes } from "store/selectors";
 import { initGrowthbook, updateGrowthbookAttributes } from "utils/feature-flag/growthbook";
@@ -32,7 +32,7 @@ const useGrowthBookIntegration = () => {
     if (growthbookStatus.initDone) {
       // IMP: Updating this only on after comparing if anything is changed or not. As this was causing rerenders when useFeatureValue is used which then called trackAttr() and causing infinite loops
       // We can only updateGrowthbookAttributes only if deviceId, sessionId, id, email changes in case this happens again.
-      if (!_.isEqual(prevUserAttributes, userAttributes)) {
+      if (!isEqual(prevUserAttributes, userAttributes)) {
         // console.log("gb: userAttributes value changed");
         updateGrowthbookAttributes({ ...userAttributes });
       } else {

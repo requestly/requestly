@@ -3,7 +3,7 @@ import { actions } from "../../../../../../../../store";
 //UTILS
 import { isValidUrl } from "../../../../../../../../utils/FormattingHelper";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import _, { inRange } from "lodash";
+import { cloneDeep, inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
 import { parseHTMLString, getHTMLNodeName, validateHTMLTag } from "./insertScriptValidators";
@@ -33,7 +33,7 @@ export const transformAndValidateRuleFields = async (ruleData) => {
         return { success: true, ruleData };
       }
       /* RuleData is explicitly read-only (reference to value in store) */
-      const newRuleData = _.cloneDeep(ruleData);
+      const newRuleData = cloneDeep(ruleData);
 
       const validateScriptRule = () => {
         const promises = [];
