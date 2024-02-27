@@ -1,5 +1,5 @@
 if (typeof isReactApp === "undefined") {
-  var isReactApp = typeof require !== "undefined";
+  var isReactApp = document.getElementById("root") !== null;
 }
 
 var Logger = {
@@ -26,10 +26,10 @@ if (urlParams.has("debug")) {
 
 window.rq_debug = () => (Logger.enabled = true);
 
-try {
-  Object.assign(window.RQ, window.RQ || {});
-  Object.assign(window.RQ.components, window.RQ.components || {});
-  Object.assign(window.RQ.components.logger, Logger);
-} catch (_) {
+if (isReactApp) {
   module.exports = Logger;
+} else {
+  window.RQ = window.RQ || {};
+  window.RQ.components = window.RQ.components || {};
+  window.RQ.components.logger = Logger;
 }
