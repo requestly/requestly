@@ -25,6 +25,14 @@
     position: absolute;
     bottom: 8px;
   }
+
+  & .ant-popover-buttons button:not(:first-child) {
+    margin-left: 0px;
+  }
+
+  & .ant-popover-buttons button:first-child {
+    margin-right: 8px;
+  }
 }
 
 .premium-popover-bottom-padding {
