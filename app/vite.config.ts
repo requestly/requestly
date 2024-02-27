@@ -7,6 +7,7 @@ import commonjs from "vite-plugin-commonjs";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { getThemeVariables } from "antd/dist/theme";
 import { theme } from "./src/lib/design-system/theme";
+import monacoEditorPlugin from "vite-plugin-monaco-editor";
 
 const config = ({ mode }) =>
   defineConfig({
@@ -20,9 +21,7 @@ const config = ({ mode }) =>
         name: "treat-js-files-as-jsx",
         async transform(code, id) {
           if (!id.match(/src\/.*\.js$/)) return null; // include ts or tsx for TypeScript support
-
-          // Use the exposed transform from vite, instead of directly
-          // transforming with esbuild
+          // checks for .js files containing jsx code
           return transformWithEsbuild(code, id, {
             loader: "jsx",
             jsx: "automatic",
@@ -39,6 +38,7 @@ const config = ({ mode }) =>
           },
         ],
       }),
+      monacoEditorPlugin({}),
       commonjs(),
       svgr(),
     ],
@@ -59,7 +59,6 @@ const config = ({ mode }) =>
       },
     },
     css: {
-      // devSourcemap: true,
       preprocessorOptions: {
         less: {
           javascriptEnabled: true,
