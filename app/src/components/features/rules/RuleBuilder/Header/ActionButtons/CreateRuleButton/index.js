@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -27,7 +27,7 @@ import {
   trackRuleEditedEvent,
   trackRuleResourceTypeSelected,
 } from "modules/analytics/events/common/rules";
-import { snakeCase } from "lodash";
+import { isNull, snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
@@ -107,6 +107,18 @@ const CreateRuleButton = ({
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const ruleLimitType = useMemo(() => {
+    switch (currentlySelectedRuleData.ruleType) {
+      case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
+        return FeatureLimitType.script_rule;
+      case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
+        return FeatureLimitType.response_rule;
+      case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
+        return FeatureLimitType.request_rule;
+      default:
+        return null;
+    }
+  }, [currentlySelectedRuleData.ruleType]);
 
   const tooltipText = isDisabled
     ? "Only available in desktop app."
@@ -257,14 +269,9 @@ const CreateRuleButton = ({
     <>
       <PremiumFeature
         popoverPlacement="bottomLeft"
-        features={[FeatureLimitType.num_rules]}
+        features={[FeatureLimitType.num_rules, ruleLimitType]}
         onContinue={handleBtnOnClick}
-        disabled={
-          isDisabled ||
-          location?.state?.source === "my_rules" ||
-          location?.state?.source === "rule_selection" ||
-          MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT
-        }
+        disabled={isDisabled || (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isNull(ruleLimitType))}
         source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">
