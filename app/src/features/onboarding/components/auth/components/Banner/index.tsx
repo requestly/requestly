@@ -33,7 +33,7 @@ export const OnboardingAuthBanner = () => {
         features
       </Typography.Title>
       <Typography.Text className="banner-text-small">
-        Premium features you cacn access in the free trial:
+        Premium features you can access in the free trial:
       </Typography.Text>
       {features.map((feature) => (
         <Row className="banner-premium-feature-list-item">

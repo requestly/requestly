@@ -6,7 +6,7 @@ import quoteIcon from "../../../assets/img/icons/common/quote.svg";
 import underlineIcon from "../../../assets/img/icons/common/underline.svg";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 
-export const AuthFormHero = ({ currentTestimonialIndex }) => {
+export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) => {
   const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
   const workEmailsBenefits = [
@@ -59,7 +59,7 @@ export const AuthFormHero = ({ currentTestimonialIndex }) => {
     );
   };
 
-  if (paywallIntensityExp === "variantA")
+  if (paywallIntensityExp === "variantA" && !isOnboarding)
     return (
       <div className="new-auth-banner-wrapper">
         <OnboardingAuthBanner />
