@@ -49,7 +49,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const teamId = useMemo(() => currentTeamId ?? activeWorkspaceId, [activeWorkspaceId, currentTeamId]);
   const { isLoading, isTeamAdmin } = useIsTeamAdmin(teamId);
 
-  const teamDetails = useMemo(() => availableTeams?.find((team) => team?.id === teamId), [availableTeams, teamId]);
+  const teamDetails = useMemo(() => availableTeams?.find((team) => team.id === teamId), [availableTeams, teamId]);
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
   ]);
