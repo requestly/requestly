@@ -143,6 +143,7 @@
   padding: 48px;
   margin: 20px 24px;
   justify-content: center;
+  min-width: 80%;
 }
 
 .enterprise-banner .enterprise-banner-underline {

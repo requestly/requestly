@@ -94,11 +94,11 @@ export const PricingFeatures: PlanFeatures = {
         "Empower your team with our Enterprise Plan, designed to seamlessly scale with your ambitions and drive collaborative success",
       features: [
         {
-          title: "Unlimited Everything",
+          title: "Unlimited everything",
           enabled: true,
         },
         {
-          title: "User management & access control",
+          title: "User Access Management (Map your organization)",
           enabled: true,
         },
         {
@@ -106,11 +106,19 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Service-level agreement (SLA)",
+          title: "SLAs (Support, Service Uptime, Insurance)",
           enabled: true,
         },
         {
-          title: "Single Sign-On",
+          title: "SSO identity management & SAML",
+          enabled: true,
+        },
+        {
+          title: "Pay by invoice",
+          enabled: true,
+        },
+        {
+          title: "Enterprise grade security & compliance (GDPR, SOC2)",
           enabled: true,
         },
         {
