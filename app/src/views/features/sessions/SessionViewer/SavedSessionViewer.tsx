@@ -10,7 +10,7 @@ import {
   CloseOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import DownArrow from "assets/icons/down-arrow.svg?react";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSessionEvents } from "@requestly/web-sdk";

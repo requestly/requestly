@@ -18,7 +18,7 @@ import {
   getSessionRecordingStartTimeOffset,
 } from "store/features/session-recording/selectors";
 import { useSelector } from "react-redux";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import DownArrow from "assets/icons/down-arrow.svg?react";
 import { cloneDeep } from "lodash";
 import { getConsoleLogs, getInactiveSegments, getPageNavigationLogs } from "./sessionEventsUtils";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";

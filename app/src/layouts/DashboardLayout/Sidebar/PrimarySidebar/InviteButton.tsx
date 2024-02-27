@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
-import { ReactComponent as InviteIcon } from "assets/icons/invite.svg";
+import InviteIcon from "assets/icons/invite.svg?react";
 import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";

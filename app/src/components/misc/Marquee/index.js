@@ -26,7 +26,7 @@ export const CompanyMarquee = () => {
           return (
             <img
               key={index}
-              src={require(`../../../assets/img/icons/common/${company}.svg`)}
+              src={`../../../assets/img/icons/common/${company}.svg`}
               alt={company}
               className="marquee-icons"
             />

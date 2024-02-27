@@ -3,10 +3,10 @@ import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
 import { getAppMode, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
 import { ApiOutlined, HomeOutlined, MobileOutlined } from "@ant-design/icons";
-import { ReactComponent as NetworkTrafficIcon } from "assets/icons/network-traffic.svg";
-import { ReactComponent as HttpRulesIcon } from "assets/icons/http-rules.svg";
-import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
-import { ReactComponent as MockServerIcon } from "assets/icons/mock-server.svg";
+import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
+import HttpRulesIcon from "assets/icons/http-rules.svg?react";
+import SessionIcon from "assets/icons/session.svg?react";
+import MockServerIcon from "assets/icons/mock-server.svg?react";
 
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
 
