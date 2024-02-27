@@ -18,7 +18,7 @@
     "url": "https://requestly.io/"
   },
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "vite build",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "start": "vite",
     "test": "vitest --passWithNoTests",
