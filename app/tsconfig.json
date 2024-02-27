@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "build",
     "target": "es5",
-    "lib": ["es2021", "dom"],
+    "lib": ["es2021", "dom", "dom.iterable"],
     "module": "esnext",
     "jsx": "react-jsx",
     "allowJs": true,
@@ -18,7 +18,8 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./src",
-    "paths": {}
+    "paths": {},
+    "types": ["vite/client", "vite-plugin-svgr/client"]
   },
   "exclude": ["node_modules", "build"],
   "include": ["./src/**/*"]

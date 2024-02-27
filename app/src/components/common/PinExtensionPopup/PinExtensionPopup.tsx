@@ -7,7 +7,7 @@ import { BiSliderAlt } from "@react-icons/all-files/bi/BiSliderAlt";
 import { PiCaretDownBold } from "@react-icons/all-files/pi/PiCaretDownBold";
 import { FiVideo } from "@react-icons/all-files/fi/FiVideo";
 import { FaToggleOff } from "@react-icons/all-files/fa6/FaToggleOff";
-import { ReactComponent as BlueUnderline } from "./assets/blue-underline.svg";
+import BlueUnderline from "./assets/blue-underline.svg";
 import pinExtensionGif from "./assets/pin-ext-guide.gif";
 import activateDeactivateRuleGif from "./assets/activate-deactivate-rule.gif";
 import executedRulesGif from "./assets/executed-rules.gif";
