@@ -5,7 +5,7 @@ import { Empty } from "antd";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, isGroup, recordsToContentTableDataAdapter } from "./utils";
-import { StorageRecord } from "features/rules/types/rules";
+import { RecordStatus, StorageRecord } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
   DeleteRulesModalWrapper,
@@ -25,7 +25,8 @@ import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
-import { getAllRecordIds } from "store/features/rules/selectors";
+import { getAllRecordIds, getAllRecords } from "store/features/rules/selectors";
+import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import "./rulesTable.css";
 
 interface Props {
@@ -37,6 +38,7 @@ interface Props {
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
   const user = useSelector(getUserAuthDetails);
   const allRecordIds = useSelector(getAllRecordIds);
+  const allRecords = useSelector(getAllRecords);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [expandedGroups, setExpandedGroups] = useState([]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
@@ -46,6 +48,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
     clearSelectedRows,
     handleRecordShare,
     // handleActivateOrDeactivateRecords,
+    handleStatusToggle,
     handleDeleteRecordClick,
     handleChangeRuleGroupClick,
     handleUngroupSelectedRecordsClick,
@@ -86,6 +89,25 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
       setIsGroupsStateUpdated(true);
     }
   }, [expandedGroups, isGroupsStateUpdated, getExpandedGroupRowKeys]);
+
+  useEffect(() => {
+    // TODO: run this effect only once
+    const activePremiumRules = allRecords.reduce((accumulator, record) => {
+      if (
+        isRule(record) &&
+        !user?.details?.isPremium &&
+        record.status === RecordStatus.ACTIVE &&
+        PREMIUM_RULE_TYPES.includes(record.ruleType)
+      ) {
+        accumulator.push(record);
+      }
+      return accumulator;
+    }, []);
+
+    if (activePremiumRules.length) {
+      handleStatusToggle(activePremiumRules);
+    }
+  }, [allRecords, user?.details?.isPremium]);
 
   const handleGroupState = (expanded: boolean, record: StorageRecord) => {
     if (isRule(record)) {
