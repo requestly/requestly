@@ -52,6 +52,10 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     if (persona) {
       submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, persona);
       dispatch(actions.updateAppOnboardingPersona(persona));
+      if (!user.loggedIn) {
+        trackAppOnboardingPersonaUpdated(persona);
+        return Promise.resolve();
+      }
       return new Promise((resolve, reject) => {
         setUserPersona(user.details?.profile?.uid, persona)
           .then((res: any) => {
@@ -66,7 +70,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
           });
       });
     } else return Promise.resolve();
-  }, [persona, dispatch, user.details?.profile?.uid]);
+  }, [persona, dispatch, user.details?.profile?.uid, user.loggedIn]);
 
   const handleSetFullName = useCallback(() => {
     if (fullName) {
