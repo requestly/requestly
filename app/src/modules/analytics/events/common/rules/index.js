@@ -78,7 +78,7 @@ export const trackRuleToggled = (rule_type, source, updated_status) => {
   trackEvent(RULES.RULE_TOGGLED, params);
 };
 
-export const trackRuleToggledAttempted = (current_status) => {
+export const trackRuleToggleAttempted = (current_status) => {
   trackEvent(RULES.RULE_TOGGLED_ATTEMPTED, { current_status });
 };
 

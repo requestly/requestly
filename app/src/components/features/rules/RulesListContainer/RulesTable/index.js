@@ -61,7 +61,7 @@ import { trackUploadRulesButtonClicked } from "modules/analytics/events/features
 import {
   trackRulePinToggled,
   trackRuleToggled,
-  trackRuleToggledAttempted,
+  trackRuleToggleAttempted,
   trackRulesUngrouped,
 } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
@@ -694,7 +694,7 @@ const RulesTable = ({
               popoverPlacement="left"
               onContinue={() => toggleRuleStatus(record)}
               source="rule_list_status_switch"
-              attemptEvent={() => trackRuleToggledAttempted(record.status)}
+              attemptEvent={() => trackRuleToggleAttempted(record.status)}
             >
               <Switch
                 size="small"
