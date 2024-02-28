@@ -5,7 +5,7 @@ import firebaseApp from "firebase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { actions } from "store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getEmailType } from "utils/FormattingHelper";
+import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
 import { getAppMode } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import { resetUserDetails, setAndUpdateUserDetails } from "utils/helpers/appDetails/UserProvider";
@@ -27,6 +27,7 @@ const AuthHandler = (onComplete) => {
   const appMode = useSelector(getAppMode);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
+  const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
 
   useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
@@ -37,6 +38,14 @@ const AuthHandler = (onComplete) => {
         const authData = getAuthData(user);
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
+
+        if (user.metadata.creationTime === user.metadata.lastSignInTime) {
+          if (!isCompanyEmail(user.email)) return;
+          getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
+            const users = res.data.users;
+            submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
+          });
+        }
 
         submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") || "Missing_Value");
         submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) || "Missing_Value");
@@ -159,7 +168,7 @@ const AuthHandler = (onComplete) => {
         );
       }
     });
-  }, [dispatch, appMode, onComplete, getEnterpriseAdminDetails]);
+  }, [dispatch, appMode, onComplete, getEnterpriseAdminDetails, getOrganizationUsers]);
 
   return null;
 };
