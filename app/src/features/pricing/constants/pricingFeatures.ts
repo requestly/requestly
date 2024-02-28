@@ -90,8 +90,6 @@ export const PricingFeatures: PlanFeatures = {
     },
     enterprise: {
       planTitle: "Enterprise",
-      planDescription:
-        "Empower your team with our Enterprise Plan, designed to seamlessly scale with your ambitions and drive collaborative success",
       features: [
         {
           title: "Unlimited everything",
@@ -108,6 +106,7 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "SLAs (Support, Service Uptime, Insurance)",
           enabled: true,
+          visibleInPricingPageOnly: true,
         },
         {
           title: "SSO identity management & SAML",
@@ -116,6 +115,7 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "Pay by invoice",
           enabled: true,
+          visibleInPricingPageOnly: true,
         },
         {
           title: "Enterprise grade security & compliance (GDPR, SOC2)",
