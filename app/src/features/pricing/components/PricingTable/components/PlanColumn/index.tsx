@@ -16,6 +16,7 @@ interface PlanColumnProps {
   duration: string;
   product?: string;
   source: string;
+  isOpenedFromModal: boolean;
   setIsContactUsModalOpen: (value: boolean) => void;
 }
 
@@ -26,6 +27,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   duration,
   product,
   source,
+  isOpenedFromModal,
   setIsContactUsModalOpen,
 }) => {
   const [quantity, setQuantity] = useState(1);
@@ -62,14 +64,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   };
 
   const getPricingPlanAnnualBillingSubtitle = (planName: string) => {
-    switch (planName) {
-      case PRICING.PLAN_NAMES.BASIC:
-        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
-      case PRICING.PLAN_NAMES.PROFESSIONAL:
-        return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
-      default:
-        return "";
-    }
+    if (planName === PRICING.PLAN_NAMES.BASIC || planName === PRICING.PLAN_NAMES.PROFESSIONAL)
+      return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
+    return null;
   };
 
   const handleQuantityChange = (value: number) => {
@@ -89,6 +86,18 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
         {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">RECOMMENDED</span>}
       </Space>
+      {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
+        <Row align="middle" className="items-center plan-price-row mt-8">
+          <Space size={0}>
+            <Typography.Text strong className="plan-price">
+              $59
+            </Typography.Text>
+            <div className="caption">
+              <Typography.Text>member / month</Typography.Text>
+            </div>
+          </Space>
+        </Row>
+      )}
       {planPrice !== undefined && (
         <Row align="middle" className="items-center plan-price-row mt-8">
           <Space size="small">
@@ -114,7 +123,6 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                   />
                 </Space>
               )}
-
             <div className="caption">
               {planName !== PRICING.PLAN_NAMES.FREE && <Typography.Text>member / month</Typography.Text>}
             </div>
@@ -128,7 +136,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           </Typography.Text>
         </Row>
       )}
-      <Row className={`mt-8 ${getPricingPlanAnnualBillingSubtitle(planName) ? "" : "hidden"}`}>
+      <Row className="mt-8" style={{ display: getPricingPlanAnnualBillingSubtitle(planName) ? "flex" : "none" }}>
         <Typography.Text type="secondary">
           {duration === PRICING.DURATION.MONTHLY
             ? "Billed monthly"
@@ -149,14 +157,17 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       </Row>
       <>{renderFeaturesListHeader(planName)}</>
       <Space direction="vertical" className="plan-features-list">
-        {planDetails.features.map((feature: any, index: number) => (
-          <div className="text-left plan-feature-item" key={index}>
-            {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
-            <Tooltip title={feature?.tooltip} color="var(--black)">
-              <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
-            </Tooltip>
-          </div>
-        ))}
+        {planDetails.features.map((feature: any, index: number) => {
+          if (isOpenedFromModal && feature.visibleInPricingPageOnly) return null;
+          return (
+            <div className="text-left plan-feature-item" key={index}>
+              {feature.enabled ? <img src={checkIcon} alt="check" /> : <CloseOutlined />}{" "}
+              <Tooltip title={feature?.tooltip} color="var(--black)">
+                <span className={`${feature?.tooltip ? "plan-feature-underline" : ""}`}>{feature.title}</span>
+              </Tooltip>
+            </div>
+          );
+        })}
       </Space>
     </Col>
   );
