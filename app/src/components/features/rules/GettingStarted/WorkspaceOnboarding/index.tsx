@@ -204,7 +204,7 @@ export const WorkspaceOnboarding: React.FC<OnboardingProps> = ({ isOpen, handleU
   const renderOnboardingBanner = useCallback(() => {
     switch (step) {
       case OnboardingSteps.AUTH:
-        return <AuthFormHero currentTestimonialIndex={currentTestimonialIndex} />;
+        return <AuthFormHero currentTestimonialIndex={currentTestimonialIndex} isOnboarding />;
       case OnboardingSteps.PERSONA_SURVEY:
         return <GettingStartedWithSurvey />;
       case OnboardingSteps.CREATE_JOIN_WORKSPACE:
