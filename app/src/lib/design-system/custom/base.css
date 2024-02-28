@@ -146,6 +146,10 @@
   visibility: hidden;
 }
 
+.align-self-center {
+  align-self: center;
+}
+
 .items-center {
   display: flex;
   align-items: center;

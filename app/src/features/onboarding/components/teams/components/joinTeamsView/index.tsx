@@ -22,8 +22,8 @@ export const JoinTeamView: React.FC<JoinTeamViewProps> = ({ pendngInvites }) => 
             Join your team’s workspaces and get access to shared rules, mock APIs, session replays, and more.
           </Typography.Text>
           <Col className="getting-started-join-teams-list">
-            {pendngInvites.map((invite) => (
-              <TeamCard invite={invite} joiningTeamId={joiningTeamId} setJoiningTeamId={setJoiningTeamId} />
+            {pendngInvites.map((invite, index) => (
+              <TeamCard invite={invite} joiningTeamId={joiningTeamId} setJoiningTeamId={setJoiningTeamId} key={index} />
             ))}
           </Col>
 
