@@ -324,7 +324,7 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         }}
         type="primary"
       >
-        Contact us
+        Schedule a call
       </RQButton>
     );
   }
