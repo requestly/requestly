@@ -62,7 +62,10 @@ const PremiumPlanBadge = () => {
               actions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,
-                newProps: { selectedPlan: null, source: "trial_badge" },
+                newProps: {
+                  selectedPlan: null,
+                  source: planStatus === "trialing" ? "trial_ongoing_badge" : "trial_expired_badge",
+                },
               })
             );
           }}

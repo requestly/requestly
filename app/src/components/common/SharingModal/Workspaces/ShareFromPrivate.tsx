@@ -13,10 +13,12 @@ import { duplicateRulesToTargetWorkspace } from "../actions";
 import { trackAddTeamMemberSuccess, trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { WorkspaceSharingTypes, PostShareViewData } from "../types";
 import { Team, TeamRole } from "types";
-import "./index.scss";
 import { trackSharingModalRulesDuplicated } from "modules/analytics/events/misc/sharing";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { generateDefaultTeamName } from "utils/teams";
+import { isWorkspaceMappedToBillingTeam } from "features/settings";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import "./index.scss";
 
 interface Props {
   selectedRules: string[];
@@ -33,6 +35,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
   const appMode = useSelector(getAppMode);
   const availableTeams = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const billingTeams = useSelector(getAvailableBillingTeams);
   const _availableTeams = useRef(availableTeams);
 
   const [memberEmails, setMemberEmails] = useState([]);
@@ -75,6 +78,9 @@ export const ShareFromPrivate: React.FC<Props> = ({
               is_admin: false,
               source: "sharing_modal",
               num_users_added: memberEmails.length,
+              workspace_type: isWorkspaceMappedToBillingTeam(teamId, billingTeams)
+                ? "mapped_to_billing_team"
+                : "not_mapped_to_billing_team",
             });
         });
 
@@ -101,6 +107,7 @@ export const ShareFromPrivate: React.FC<Props> = ({
     user.details?.profile?.displayName,
     user?.details?.profile?.email,
     user?.details?.profile?.uid,
+    billingTeams,
   ]);
 
   const handleRulesTransfer = useCallback(

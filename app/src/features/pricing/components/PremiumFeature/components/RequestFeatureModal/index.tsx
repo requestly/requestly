@@ -192,6 +192,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     <RQButton
                       type="primary"
                       onClick={() => {
+                        trackUpgradeOptionClicked("checkout_billing_teams");
                         navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + "/" + billingTeams[0].id);
                       }}
                     >

@@ -11,8 +11,8 @@ export const trackNewTeamCreateFailure = (name) => {
   trackEvent(TEAMS.NEW_TEAM_CREATE_FAILURE, params);
 };
 
-export const trackAddTeamMemberSuccess = ({ team_id, email, is_admin, source, num_users_added }) => {
-  const params = { team_id, email, is_admin, source, num_users_added };
+export const trackAddTeamMemberSuccess = ({ team_id, email, is_admin, source, num_users_added, workspace_type }) => {
+  const params = { team_id, email, is_admin, source, num_users_added, workspace_type };
   trackEvent(TEAMS.ADD_TEAM_MEMBER_SUCCESS, params);
 };
 

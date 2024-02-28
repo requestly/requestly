@@ -129,6 +129,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
             is_admin: makeUserAdmin,
             source: "add_member_modal",
             num_users_added: userEmail.length,
+            workspace_type: isBillingTeamMapped ? "mapped_to_billing_team" : "not_mapped_to_billing_team",
           });
           setIsProcessing(false);
           toggleModal();

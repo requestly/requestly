@@ -25,6 +25,8 @@ import {
 import { actions } from "store";
 import { NewTeamData, OnboardingSteps } from "../../types";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import { isWorkspaceMappedToBillingTeam } from "features/settings";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -51,6 +53,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState<string>(defaultTeamData?.name ?? "My new team");
   const [domainJoiningEnabled, setDomainJoiningEnabled] = useState<boolean>(true);
+  const billingTeams = useSelector(getAvailableBillingTeams);
 
   const userEmailDomain = useMemo(() => getDomainFromEmail(user?.details?.profile?.email), [
     user?.details?.profile?.email,
@@ -87,6 +90,9 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               is_admin: makeUserAdmin,
               source: "onboarding",
               num_users_added: inviteEmails.length,
+              workspace_type: isWorkspaceMappedToBillingTeam(defaultTeamData?.teamId ?? newTeamId, billingTeams)
+                ? "mapped_to_billing_team"
+                : "not_mapped_to_billing_team",
             });
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }

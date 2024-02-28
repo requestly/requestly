@@ -26,6 +26,7 @@ import {
   trackRuleCreatedEvent,
   trackRuleEditedEvent,
   trackRuleResourceTypeSelected,
+  trackRuleSavedClicked,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
@@ -117,6 +118,7 @@ const CreateRuleButton = ({
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
   const handleBtnOnClick = async (saveType) => {
+    trackRuleSavedClicked(MODE);
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
       dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
       return;
