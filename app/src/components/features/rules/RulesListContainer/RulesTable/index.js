@@ -58,7 +58,12 @@ import UngroupOrDeleteRulesModal from "../../UngroupOrDeleteRulesModal";
 import DuplicateRuleModal from "../../DuplicateRuleModal";
 import { trackGroupDeleted, trackGroupStatusToggled } from "features/rules/analytics";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
-import { trackRulePinToggled, trackRuleToggled, trackRulesUngrouped } from "modules/analytics/events/common/rules";
+import {
+  trackRulePinToggled,
+  trackRuleToggled,
+  trackRuleToggledAttempted,
+  trackRulesUngrouped,
+} from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -474,7 +479,6 @@ const RulesTable = ({
   const toggleRuleStatus = (rule) => {
     // event.preventDefault();
     // event.stopPropagation();
-
     if (checkIfRuleIsActive(rule)) {
       changeRuleStatus(GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE, rule);
     } else {
@@ -690,6 +694,7 @@ const RulesTable = ({
               popoverPlacement="left"
               onContinue={() => toggleRuleStatus(record)}
               source="rule_list_status_switch"
+              attemptEvent={() => trackRuleToggledAttempted(record.status)}
             >
               <Switch
                 size="small"

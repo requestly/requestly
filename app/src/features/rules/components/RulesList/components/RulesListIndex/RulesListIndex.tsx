@@ -176,8 +176,8 @@ const RulesList: React.FC<Props> = () => {
   );
 
   const handleNewRuleOnClick = useCallback(
-    async (ruleType?: RuleType) => {
-      if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
+    async (ruleType?: RuleType, source = "rule_table_create_new_rule_button") => {
+      if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, source);
       else trackNewRuleButtonClicked("in_app");
 
       if (!user.loggedIn) {
@@ -212,7 +212,7 @@ const RulesList: React.FC<Props> = () => {
           .map(({ ID, TYPE, ICON, NAME }) => (
             <PremiumFeature
               popoverPlacement="topLeft"
-              onContinue={() => handleNewRuleOnClick(TYPE)}
+              onContinue={() => handleNewRuleOnClick(TYPE, "dropdown")}
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
               source="rule_selection_dropdown"
             >

@@ -19,6 +19,8 @@ import {
 import PATHS from "config/constants/sub/paths";
 import { toast } from "utils/Toast";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
+import { isWorkspaceMappedToBillingTeam } from "features/settings";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
 
 interface Props {
   selectedRules: string[];
@@ -33,6 +35,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
 }) => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const billingTeams = useSelector(getAvailableBillingTeams);
   const [memberEmails, setMemberEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,6 +59,9 @@ export const ShareFromWorkspace: React.FC<Props> = ({
           is_admin: false,
           source: "sharing_modal",
           num_users_added: memberEmails.length,
+          workspace_type: isWorkspaceMappedToBillingTeam(currentlyActiveWorkspace.id, billingTeams)
+            ? "mapped_to_billing_team"
+            : "not_mapped_to_billing_team",
         });
         setPostShareViewData({
           type: WorkspaceSharingTypes.USERS_INVITED,
@@ -69,7 +75,7 @@ export const ShareFromWorkspace: React.FC<Props> = ({
       }
       setIsLoading(false);
     });
-  }, [memberEmails, onRulesShared, currentlyActiveWorkspace, setPostShareViewData]);
+  }, [memberEmails, onRulesShared, currentlyActiveWorkspace, setPostShareViewData, billingTeams]);
 
   const handleTransferToOtherWorkspace = useCallback(
     (teamData: Team) => {

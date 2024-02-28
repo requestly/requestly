@@ -22,6 +22,7 @@ import PATHS from "config/constants/sub/paths";
 import { isRule } from "../utils";
 import { trackRulesListActionsClicked } from "features/rules/analytics";
 import { checkIsRuleGroupDisabled, isGroup } from "../utils/rules";
+import { trackRuleToggledAttempted } from "modules/analytics/events/common/rules";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -148,6 +149,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               popoverPlacement="left"
               onContinue={() => handleStatusToggle([record])}
               source="rule_list_status_switch"
+              attemptEvent={() => trackRuleToggledAttempted(record.status)}
             >
               <Switch
                 size="small"

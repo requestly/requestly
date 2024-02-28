@@ -21,6 +21,7 @@ interface PremiumFeatureProps {
   popoverPlacement: PopconfirmProps["placement"];
   disabled?: boolean;
   source: string;
+  attemptEvent?: () => void;
 }
 
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
@@ -31,6 +32,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   popoverPlacement,
   disabled = false,
   source,
+  attemptEvent,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -80,6 +82,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
+                attemptEvent?.();
                 if (isExceedingLimits && shouldShowUpgradePopover) setOpenPopup(true);
                 else onContinue();
               },
@@ -134,6 +137,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
+                attemptEvent?.();
                 if (!isExceedingLimits || !features || disabled || !shouldShowUpgradePopover) {
                   onContinue();
                 }
