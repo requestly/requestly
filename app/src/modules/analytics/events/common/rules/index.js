@@ -120,7 +120,6 @@ export const trackRulePairCreated = ({ current_pairs_count, rule_type }) => {
     current_pairs_count,
     rule_type,
   };
-  console.log("PAIR", { params });
   trackEvent(RULES.RULE_PAIR_CREATED, params);
 };
 
@@ -242,6 +241,6 @@ export const trackDocsSidebarContactUsClicked = (rule_type) => {
   trackEvent(RULES.DOCS_SIDEBAR_CONTACT_US_CLICKED, params);
 };
 
-export const trackRuleSavedClicked = (mode) => {
+export const trackRuleSaveClicked = (mode) => {
   trackEvent(RULES.RULE_SAVE_CLICKED, { mode });
 };
