@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { actions } from "store";
 import { PricingTable, PRICING } from "features/pricing";
-// import { CompaniesSection } from "../CompaniesSection";
+import { CompaniesSection } from "../CompaniesSection";
 import { CloseOutlined } from "@ant-design/icons";
 import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
 import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft";
@@ -173,7 +173,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
             )}
 
             <PricingTable duration={duration} isOpenedFromModal tableRef={tableRef} source={source} />
-            {/* <CompaniesSection /> */}
+            <CompaniesSection />
             {paywallIntensityExp && paywallIntensityExp !== "control" && <PricingModalFooterBanner />}
           </>
         )}
