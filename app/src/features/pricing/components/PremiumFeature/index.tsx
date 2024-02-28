@@ -89,7 +89,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       ) : (
         <Popconfirm
           disabled={!isExceedingLimits || !features || disabled || !shouldShowUpgradePopover}
-          overlayClassName="premium-feature-popover"
+          overlayClassName={`premium-feature-popover ${!user.loggedIn ? "premium-popover-bottom-padding" : ""}`}
           autoAdjustOverflow
           showArrow={false}
           placement={popoverPlacement}
@@ -125,6 +125,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
                     } plan. Consider upgrading for uninterrupted usage.`
                   : " This feature is a part of our paid offering. Consider upgrading for uninterrupted usage."}
               </Typography.Text>
+              {!user.loggedIn && <div className="no-cc-text caption text-gray text-bold">No credit card required!</div>}
             </>
           }
           onOpenChange={(open) => {

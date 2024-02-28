@@ -90,7 +90,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">RECOMMENDED</span>}
       </Space>
       {planPrice !== undefined && (
-        <Row align="middle" className="items-center plan-price-row">
+        <Row align="middle" className="items-center plan-price-row mt-8">
           <Space size="small">
             <Typography.Text strong className="plan-price">
               ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
@@ -128,11 +128,11 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
           </Typography.Text>
         </Row>
       )}
-      <Row className={`mt-8 ${getPricingPlanAnnualBillingSubtitle(planName) ? "" : "visibility-hidden"}`}>
+      <Row className={`mt-8 ${getPricingPlanAnnualBillingSubtitle(planName) ? "" : "hidden"}`}>
         <Typography.Text type="secondary">
           {duration === PRICING.DURATION.MONTHLY
             ? "Billed monthly"
-            : getPricingPlanAnnualBillingSubtitle(planName) || "dummy"}
+            : getPricingPlanAnnualBillingSubtitle(planName) || ""}
         </Typography.Text>
       </Row>
       <Row className="mt-16">
