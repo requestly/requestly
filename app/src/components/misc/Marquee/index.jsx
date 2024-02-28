@@ -12,7 +12,6 @@ import verizon from "assets/img/icons/common/verizon.svg";
 import cbs from "assets/img/icons/common/cbs.svg";
 import salesforce from "assets/img/icons/common/salesforce.svg";
 import pearson from "assets/img/icons/common/pearson.svg";
-
 import "./marquee.css";
 
 export const CompanyMarquee = () => {
@@ -34,7 +33,7 @@ export const CompanyMarquee = () => {
 
   return (
     <div className="marquee-container">
-      <Marquee gradientWidth={200} gradientColor={["33", "33", "37"]} speed={50} className="åmarquee">
+      <Marquee gradientWidth={200} gradientColor={["33", "33", "37"]} speed={20}>
         {Object.entries(companies).map(([company, image], index) => (
           <img key={index} src={image} alt={company} className="marquee-icons" />
         ))}
