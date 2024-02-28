@@ -116,7 +116,7 @@ const CreateRuleButton = ({
 
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
-  const handleBtnOnClick = async () => {
+  const handleBtnOnClick = async (saveType) => {
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
       dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
       return;
@@ -199,6 +199,7 @@ const CreateRuleButton = ({
                     ? getAllResponseBodyTypes(currentlySelectedRuleData)
                     : null,
                 ...getEventParams(currentlySelectedRuleData),
+                save_type: saveType,
               });
             } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
               trackRuleEditedEvent({
@@ -210,6 +211,7 @@ const CreateRuleButton = ({
                     : null,
                 source: ruleCreatedEventSource,
                 ...getEventParams(currentlySelectedRuleData),
+                save_type: saveType,
               });
             }
             ruleModifiedAnalytics(user);
@@ -242,7 +244,7 @@ const CreateRuleButton = ({
   const saveFn = (event) => {
     if ((navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === "s") {
       event.preventDefault();
-      handleBtnOnClick();
+      handleBtnOnClick("cmd+s");
     }
   };
 
@@ -258,7 +260,7 @@ const CreateRuleButton = ({
       <PremiumFeature
         popoverPlacement="bottomLeft"
         features={[FeatureLimitType.num_rules]}
-        onContinue={handleBtnOnClick}
+        onContinue={() => handleBtnOnClick("button_click")}
         disabled={
           isDisabled ||
           location?.state?.source === "my_rules" ||

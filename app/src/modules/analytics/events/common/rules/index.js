@@ -10,9 +10,11 @@ export const trackRuleCreatedEvent = ({
   num_characters,
   header_types,
   header_actions,
+  save_type,
 }) => {
   const params = {
     rule_type,
+    save_type,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
@@ -33,9 +35,11 @@ export const trackRuleEditedEvent = ({
   num_characters,
   header_types,
   header_actions,
+  save_type,
 }) => {
   const params = {
     rule_type,
+    save_type,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
