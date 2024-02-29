@@ -40,7 +40,8 @@ const AuthHandler = (onComplete) => {
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
 
-        if (user.metadata.creationTime === user.metadata.lastSignInTime) {
+        // New user signing in from an org domain will be assigned a serial number attribute
+        if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
           if (isCompanyEmail(user.email) && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
             getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
               const users = res.data.users;
@@ -49,8 +50,8 @@ const AuthHandler = (onComplete) => {
           }
         }
 
-        submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") || "Missing_Value");
-        submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) || "Missing_Value");
+        submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") ?? "Missing_Value");
+        submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) ?? "Missing_Value");
 
         getSignupDate(user.uid).then((signup_date) => {
           if (signup_date) {
@@ -95,7 +96,7 @@ const AuthHandler = (onComplete) => {
                 isBackupEnabled,
                 isSyncEnabled,
                 isPremium: isUserPremium,
-                organization: enterpriseDetails?.data?.enterpriseData || null,
+                organization: enterpriseDetails?.data?.enterpriseData ?? null,
               },
             })
           );
@@ -110,18 +111,18 @@ const AuthHandler = (onComplete) => {
           setAndUpdateUserDetails({
             id: user?.uid,
             isLoggedIn: true,
-            email: user?.email || null,
+            email: user?.email ?? null,
           });
 
           // Analytics
           if (planDetails) {
-            submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type || "Missing Value");
-            submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId || "Missing Value");
+            submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type ?? "Missing Value");
+            submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId ?? "Missing Value");
             submitAttrUtil(TRACKING.ATTR.IS_TRIAL, planDetails.status === "trialing");
 
             if (planDetails.subscription) {
-              submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate || "Missing Value");
-              submitAttrUtil(TRACKING.ATTR.PLAN_END_DATE, planDetails.subscription.endDate || "Missing Value");
+              submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate ?? "Missing Value");
+              submitAttrUtil(TRACKING.ATTR.PLAN_END_DATE, planDetails.subscription.endDate ?? "Missing Value");
             }
           }
         } catch (e) {
@@ -148,7 +149,7 @@ const AuthHandler = (onComplete) => {
             dispatch(actions.updateUsername({ username: username }));
           })
           .catch((err) => {
-            Logger.log("Error updating username in store");
+            Logger.log("Error updating username in store :", err.message);
           });
       } else {
         // No user is signed in, Unset UID in window object
