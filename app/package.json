@@ -70,7 +70,7 @@
     "codemirror": "^5.65.2",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",
-    "firebase": "^10.2.0",
+    "firebase": "^10.8.1",
     "framer-motion": "^10.16.16",
     "fuzzysort": "^2.0.4",
     "html-validate": "^8.9.1",
@@ -157,11 +157,6 @@
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.3.1",
     "vitest": "^1.3.1"
-  },
-  "overrides": {
-    "firebase": {
-      "undici": "5.28.3"
-    }
   },
   "jest": {
     "transformIgnorePatterns": [
