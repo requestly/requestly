@@ -50,13 +50,13 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       // TODO: Cleanup
       //ANALYTICS
       const ruleTypes = rules.reduce((result, { ruleType }) => result.add(ruleType), new Set());
-      const activePremiumRuleTypes = rules.filter(
+      const activePremiumRules = rules.filter(
         (rule) => rule.status === RecordStatus.ACTIVE && PREMIUM_RULE_TYPES.includes(rule.ruleType)
       );
       const numRuleTypes = parseInt(window.localStorage.getItem("num_rule_types") || "0");
       submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
       submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
-      submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRuleTypes.length);
+      submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);
       submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES, ruleTypes.size);
       window.localStorage.setItem("num_rule_types", JSON.stringify(ruleTypes.size));
       submitAttrUtil(
