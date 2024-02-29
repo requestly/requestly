@@ -44,7 +44,7 @@ const AddPairButton = (props) => {
       onContinue={handleRulePairsOnClick}
       features={[FeatureLimitType.add_new_rule_pair]}
       source="add_new_rule_pair"
-      attemptEvent={() => trackRulePairCreationAttempted(currentlySelectedRuleData.ruleType)}
+      onClickCallback={() => trackRulePairCreationAttempted(currentlySelectedRuleData.ruleType)}
     >
       <Button block type="dashed" className="add-pair-btn" icon={<PlusOutlined />}>
         <span>
