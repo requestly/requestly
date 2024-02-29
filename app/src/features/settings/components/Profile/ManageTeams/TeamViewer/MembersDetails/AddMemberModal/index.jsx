@@ -37,7 +37,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const [isPublicInviteLoading, setPublicInviteLoading] = useState(false);
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
   const [isAddToBillingViewVisible, setIsAddToBillingViewVisible] = useState(false);
-  const [billingId, setBillingId] = useState(null);
+  const [billingTeamId, setBillingTeamId] = useState(null);
   const [isBillingTeamMapped, setIsBillingTeamMapped] = useState(false);
 
   // Global state
@@ -80,7 +80,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
 
   const handleAddToBilling = async () => {
     setIsProcessing(true);
-    await toggleWorkspaceMappingInBillingTeam(billingId, teamDetails?.id, true);
+    await toggleWorkspaceMappingInBillingTeam(billingTeamId, teamDetails?.id, true);
     handleAddMember();
   };
 
@@ -137,9 +137,9 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
           setIsProcessing(false);
           toggleModal();
         } else {
-          const inviteErrors = res?.data?.results.filter((result) => result?.success !== true);
+          const inviteMemberErrors = res?.data?.results.filter((result) => result?.success !== true);
           callback?.();
-          setInviteErrors([...inviteErrors]);
+          setInviteErrors([...inviteMemberErrors]);
           setInviteErrorModalActive(true);
           trackAddTeamMemberFailure(teamId, userEmail, null, "add_member_modal");
           setIsProcessing(false);
@@ -213,7 +213,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
 
   useEffect(() => {
     fetchBillingIdByOwner(teamDetails?.owner, user?.details?.profile?.uid).then(({ billingId, mappedWorkspaces }) => {
-      setBillingId(billingId);
+      setBillingTeamId(billingId);
       setIsBillingTeamMapped(mappedWorkspaces?.includes(teamDetails?.id));
     });
   }, [teamDetails?.id, teamDetails?.owner, user?.details?.profile?.uid]);

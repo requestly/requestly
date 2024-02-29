@@ -203,8 +203,8 @@ const RulesTable = ({
     setIsSharedListRuleViewModalActive(true);
   };
 
-  const setRulesToPopulate = (rules) => {
-    dispatch(actions.updateRulesToPopulate(rules));
+  const setRulesToPopulate = (rulesToPopulate) => {
+    dispatch(actions.updateRulesToPopulate(rulesToPopulate));
   };
 
   const getPrettyDesktopRuleTooltipTitle = (ruleType) => {
