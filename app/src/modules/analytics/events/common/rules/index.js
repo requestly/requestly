@@ -79,7 +79,7 @@ export const trackRuleToggled = (rule_type, source, updated_status) => {
 };
 
 export const trackRuleToggleAttempted = (current_status) => {
-  trackEvent(RULES.RULE_TOGGLED_ATTEMPTED, { current_status });
+  trackEvent(RULES.RULE_TOGGLE_ATTEMPTED, { current_status });
 };
 
 export const trackRuleDuplicatedEvent = (rule_type, workspace, source) => {

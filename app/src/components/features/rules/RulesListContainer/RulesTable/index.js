@@ -67,7 +67,7 @@ import {
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import LINKS from "config/constants/sub/links";
 import Logger from "lib/logger";
@@ -516,7 +516,7 @@ const RulesTable = ({
 
   const shareIconOnClickHandler = (rule) => {
     trackShareButtonClicked("rules_list");
-    user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    user.loggedIn ? toggleSharingModal(rule) : promptUserToSignup(SOURCE.SHARE_RULES);
   };
 
   const copyIconOnClickHandler = useCallback(async (event, rule) => {
@@ -1193,7 +1193,7 @@ const RulesTable = ({
               <AuthConfirmationPopover
                 title="You need to sign up to share rules"
                 callback={handleShareRulesOnClick}
-                source={AUTH.SOURCE.SHARE_RULES}
+                source={SOURCE.SHARE_RULES}
               >
                 <Tooltip title={isScreenSmall ? "Share Rules" : null}>
                   <Button
@@ -1276,11 +1276,11 @@ const RulesTable = ({
                     isTooltipShown: true,
                     hasPopconfirm: true,
                     buttonText: "Import",
-                    authSource: AUTH.SOURCE.UPLOAD_RULES,
+                    authSource: SOURCE.UPLOAD_RULES,
                     icon: <DownloadOutlined />,
                     onClickHandler: handleImportRulesOnClick,
                     trackClickEvent: () => {
-                      trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
+                      trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
                     },
                   },
                   {
@@ -1296,7 +1296,7 @@ const RulesTable = ({
                     isTooltipShown: true,
                     hasPopconfirm: true,
                     buttonText: "Share",
-                    authSource: AUTH.SOURCE.SHARE_RULES,
+                    authSource: SOURCE.SHARE_RULES,
                     icon: <UsergroupAddOutlined />,
                     tourId: "rule-list-share-btn",
                     onClickHandler: handleShareRulesOnClick,

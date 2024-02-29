@@ -16,7 +16,7 @@ import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "../../
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./sharedListViewerIndexPage.css";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import PageLoader from "components/misc/PageLoader";
 
@@ -101,7 +101,7 @@ const SharedListViewerIndexPage = () => {
                 <h2>This list is private. Please login to access it</h2>
                 <button
                   className="ant-btn ant-btn-primary"
-                  onClick={() => promptUserToSignup(AUTH.SOURCE.ACCESS_SHARED_LIST)}
+                  onClick={() => promptUserToSignup(SOURCE.ACCESS_SHARED_LIST)}
                 >
                   Login
                 </button>

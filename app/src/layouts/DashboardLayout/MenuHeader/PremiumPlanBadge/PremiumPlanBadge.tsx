@@ -10,6 +10,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import "./premiumPlanBadge.scss";
+import APP_CONSTANTS from "config/constants";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
@@ -52,7 +53,11 @@ const PremiumPlanBadge = () => {
     Logger.log(err);
   }
 
-  if (!isAppSumoDeal && planId && ["trialing", "canceled"].includes(planStatus)) {
+  if (
+    !isAppSumoDeal &&
+    planId &&
+    [APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING, APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED].includes(planStatus)
+  ) {
     return (
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
@@ -64,7 +69,10 @@ const PremiumPlanBadge = () => {
                 newValue: true,
                 newProps: {
                   selectedPlan: null,
-                  source: planStatus === "trialing" ? "trial_ongoing_badge" : "trial_expired_badge",
+                  source:
+                    planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
+                      ? "trial_ongoing_badge"
+                      : "trial_expired_badge",
                 },
               })
             );
@@ -72,7 +80,9 @@ const PremiumPlanBadge = () => {
         >
           <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
           <div className="premium-plan-days-left">
-            {planStatus === "trialing" ? `${daysLeft} days left in trial` : "Plan Expired"}
+            {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
+              ? `${daysLeft} days left in trial`
+              : "Plan Expired"}
           </div>
         </div>
       </Tooltip>

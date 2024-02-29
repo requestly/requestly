@@ -8,7 +8,7 @@ import { personaRecommendationData } from "./personaRecommendationData";
 import { RQButton } from "lib/design-system/components";
 import { FeatureCard } from "./FeatureCard";
 import PATHS from "config/constants/sub/paths";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import {
@@ -67,12 +67,12 @@ const PersonaRecommendation: React.FC<Props> = ({ isUserLoggedIn, handleUploadRu
               dispatch(actions.updateIsWorkspaceOnboardingCompleted());
               dispatch(actions.updateIsPersonaSurveyCompleted(true));
             }}
-            source={AUTH.SOURCE.UPLOAD_RULES}
+            source={SOURCE.UPLOAD_RULES}
           >
             <RQButton
               className="items-center upload-btn"
               onClick={() => {
-                trackUploadRulesButtonClicked(AUTH.SOURCE.PERSONA_RECOMMENDATION_SCREEN);
+                trackUploadRulesButtonClicked(SOURCE.PERSONA_RECOMMENDATION_SCREEN);
                 if (isUserLoggedIn) {
                   handleUploadRulesClick();
                 }
