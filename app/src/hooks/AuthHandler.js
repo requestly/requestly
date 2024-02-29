@@ -36,15 +36,17 @@ const AuthHandler = (onComplete) => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const authData = getAuthData(user);
+        console.log({ authData, user });
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
 
         if (user.metadata.creationTime === user.metadata.lastSignInTime) {
-          if (!isCompanyEmail(user.email)) return;
-          getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
-            const users = res.data.users;
-            submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
-          });
+          if (isCompanyEmail(user.email) && user.emailVerified) {
+            getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
+              const users = res.data.users;
+              submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
+            });
+          }
         }
 
         submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") || "Missing_Value");
