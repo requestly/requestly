@@ -36,7 +36,6 @@ const AuthHandler = (onComplete) => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const authData = getAuthData(user);
-        console.log({ authData, user });
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
 
