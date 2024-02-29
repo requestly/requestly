@@ -27,6 +27,7 @@ import { NewTeamData, OnboardingSteps } from "../../types";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -91,8 +92,8 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               source: "onboarding",
               num_users_added: inviteEmails.length,
               workspace_type: isWorkspaceMappedToBillingTeam(defaultTeamData?.teamId ?? newTeamId, billingTeams)
-                ? "mapped_to_billing_team"
-                : "not_mapped_to_billing_team",
+                ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+                : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
             });
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }

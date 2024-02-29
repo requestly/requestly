@@ -176,7 +176,7 @@ const RulesList: React.FC<Props> = () => {
   );
 
   const handleNewRuleOnClick = useCallback(
-    async (ruleType?: RuleType, source = "rule_table_create_new_rule_button") => {
+    async (ruleType?: RuleType, source = SOURCE.RULE_TABLE_CREATE_NEW_RULE_BUTTON) => {
       if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, source);
       else trackNewRuleButtonClicked("in_app");
 
@@ -212,7 +212,7 @@ const RulesList: React.FC<Props> = () => {
           .map(({ ID, TYPE, ICON, NAME }) => (
             <PremiumFeature
               popoverPlacement="topLeft"
-              onContinue={() => handleNewRuleOnClick(TYPE, "dropdown")}
+              onContinue={() => handleNewRuleOnClick(TYPE, SOURCE.DROPDOWN)}
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
               source="rule_selection_dropdown"
             >

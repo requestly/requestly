@@ -9,8 +9,9 @@ import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import "./premiumPlanBadge.scss";
 import APP_CONSTANTS from "config/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import "./premiumPlanBadge.scss";
 
 const PremiumPlanBadge = () => {
   const dispatch = useDispatch();
@@ -71,8 +72,8 @@ const PremiumPlanBadge = () => {
                   selectedPlan: null,
                   source:
                     planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
-                      ? "trial_ongoing_badge"
-                      : "trial_expired_badge",
+                      ? SOURCE.TRIAL_ONGOING_BADGE
+                      : SOURCE.TRIAL_EXPIRED_BADGE,
                 },
               })
             );

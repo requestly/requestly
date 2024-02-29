@@ -18,6 +18,7 @@ import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWi
 import { generateDefaultTeamName } from "utils/teams";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import "./index.scss";
 
 interface Props {
@@ -79,8 +80,8 @@ export const ShareFromPrivate: React.FC<Props> = ({
               source: "sharing_modal",
               num_users_added: memberEmails.length,
               workspace_type: isWorkspaceMappedToBillingTeam(teamId, billingTeams)
-                ? "mapped_to_billing_team"
-                : "not_mapped_to_billing_team",
+                ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+                : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
             });
         });
 

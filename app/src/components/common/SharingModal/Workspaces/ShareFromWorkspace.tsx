@@ -21,6 +21,7 @@ import { toast } from "utils/Toast";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 
 interface Props {
   selectedRules: string[];
@@ -60,8 +61,8 @@ export const ShareFromWorkspace: React.FC<Props> = ({
           source: "sharing_modal",
           num_users_added: memberEmails.length,
           workspace_type: isWorkspaceMappedToBillingTeam(currentlyActiveWorkspace.id, billingTeams)
-            ? "mapped_to_billing_team"
-            : "not_mapped_to_billing_team",
+            ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+            : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
         });
         setPostShareViewData({
           type: WorkspaceSharingTypes.USERS_INVITED,

@@ -23,6 +23,7 @@ import { trackAddWorkspaceNameModalViewed } from "modules/analytics/events/commo
 import APP_CONSTANTS from "config/constants";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import "./CreateWorkspaceModal.css";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -105,8 +106,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
                 source: "notify_all_teammates",
                 num_users_added: 1,
                 workspace_type: isWorkspaceMappedToBillingTeam(teamId, billingTeams)
-                  ? "mapped_to_billing_team"
-                  : "not_mapped_to_billing_team",
+                  ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+                  : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
               });
             } else {
               switch (inviteRes.data.errCode) {
