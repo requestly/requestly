@@ -24,6 +24,22 @@ const PremiumPlanBadge = () => {
   const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
   let daysLeft = 0;
 
+  const handleBadgeClick = () => {
+    dispatch(
+      actions.toggleActiveModal({
+        modalName: "pricingModal",
+        newValue: true,
+        newProps: {
+          selectedPlan: null,
+          source:
+            planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
+              ? SOURCE.TRIAL_ONGOING_BADGE
+              : SOURCE.TRIAL_EXPIRED_BADGE,
+        },
+      })
+    );
+  };
+
   useEffect(() => {
     if (!teamId) return;
 
@@ -63,21 +79,9 @@ const PremiumPlanBadge = () => {
       <Tooltip title={"Click for more details"} destroyTooltipOnHide={true}>
         <div
           className="premium-plan-badge-container cursor-pointer"
-          onClick={() => {
-            dispatch(
-              actions.toggleActiveModal({
-                modalName: "pricingModal",
-                newValue: true,
-                newProps: {
-                  selectedPlan: null,
-                  source:
-                    planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
-                      ? SOURCE.TRIAL_ONGOING_BADGE
-                      : SOURCE.TRIAL_EXPIRED_BADGE,
-                },
-              })
-            );
-          }}
+          role="button"
+          onKeyDown={handleBadgeClick}
+          onClick={handleBadgeClick}
         >
           <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
           <div className="premium-plan-days-left">
