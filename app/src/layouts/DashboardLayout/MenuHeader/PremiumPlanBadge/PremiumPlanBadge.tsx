@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getPlanNameFromId } from "utils/PremiumUtils";
@@ -24,7 +24,7 @@ const PremiumPlanBadge = () => {
   const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
   let daysLeft = 0;
 
-  const handleBadgeClick = () => {
+  const handleBadgeClick = useCallback(() => {
     dispatch(
       actions.toggleActiveModal({
         modalName: "pricingModal",
@@ -38,7 +38,7 @@ const PremiumPlanBadge = () => {
         },
       })
     );
-  };
+  }, [dispatch, planStatus]);
 
   useEffect(() => {
     if (!teamId) return;
