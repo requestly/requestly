@@ -12,6 +12,7 @@ import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import "./index.scss";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -106,7 +107,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           }}
           onCancel={() => {
             if (!hasCrossedDeadline) {
-              trackUpgradeOptionClicked("use_for_free_now");
+              trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
               onContinue();
             } else if (!user.loggedIn) {
               trackUpgradeOptionClicked("sign_up_for_trial");
