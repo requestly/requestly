@@ -108,6 +108,70 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
     return null;
   };
 
+  const ModalActionButtons = useMemo(() => {
+    return (
+      <Row className="mt-16" justify="space-between" align="middle">
+        <Col>
+          {!isDeadlineCrossed && (
+            <RQButton
+              type="link"
+              className="request-modal-link-btn"
+              disabled={isLoading}
+              onClick={() => {
+                trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
+                setOpenPopup(false);
+                onContinue();
+              }}
+            >
+              Use free till 30 November
+            </RQButton>
+          )}
+        </Col>
+        <Col>
+          <Space direction="horizontal" size={8}>
+            <RQButton
+              type="default"
+              className="request-modal-default-btn"
+              disabled={isLoading}
+              onClick={() => {
+                trackUpgradeOptionClicked("upgrade_yourself");
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "pricingModal",
+                    newValue: true,
+                    newProps: { selectedPlan: null, source: SOURCE.REQUEST_FEATURE_MODAL },
+                  })
+                );
+              }}
+            >
+              Upgrade yourself
+            </RQButton>
+            {billingTeams.length ? (
+              <RQButton
+                type="primary"
+                onClick={() => {
+                  trackUpgradeOptionClicked(SOURCE.CHECKOUT_BILLING_TEAMS);
+                  navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${billingTeams[0].id}`);
+                }}
+              >
+                Checkout billing teams
+              </RQButton>
+            ) : (
+              <RQButton
+                loading={isLoading}
+                type="primary"
+                icon={<HiOutlinePaperAirplane className="send-icon" />}
+                onClick={handleSendRequest}
+              >
+                Send request
+              </RQButton>
+            )}
+          </Space>
+        </Col>
+      </Row>
+    );
+  }, [billingTeams, dispatch, handleSendRequest, isLoading, isDeadlineCrossed, navigate, onContinue, setOpenPopup]);
+
   useEffect(() => {
     if (isOpen) {
       trackUpgradePopoverViewed("send_request", source);
@@ -152,65 +216,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
             Your organization is currently subscribed to the Requestly Premium Plan. If you need a Requestly
             Professional subscription for yourself, send request to admin.
           </Typography.Text>
-          <Row className="mt-16" justify="space-between" align="middle">
-            <Col>
-              {!isDeadlineCrossed && (
-                <RQButton
-                  type="link"
-                  className="request-modal-link-btn"
-                  disabled={isLoading}
-                  onClick={() => {
-                    trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
-                    setOpenPopup(false);
-                    onContinue();
-                  }}
-                >
-                  Use free till 30 November
-                </RQButton>
-              )}
-            </Col>
-            <Col>
-              <Space direction="horizontal" size={8}>
-                <RQButton
-                  type="default"
-                  className="request-modal-default-btn"
-                  disabled={isLoading}
-                  onClick={() => {
-                    trackUpgradeOptionClicked("upgrade_yourself");
-                    dispatch(
-                      actions.toggleActiveModal({
-                        modalName: "pricingModal",
-                        newValue: true,
-                        newProps: { selectedPlan: null, source: SOURCE.REQUEST_FEATURE_MODAL },
-                      })
-                    );
-                  }}
-                >
-                  Upgrade yourself
-                </RQButton>
-                {billingTeams.length > 1 ? (
-                  <RQButton
-                    type="primary"
-                    onClick={() => {
-                      trackUpgradeOptionClicked(SOURCE.CHECKOUT_BILLING_TEAMS);
-                      navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + "/" + billingTeams[0].id);
-                    }}
-                  >
-                    Checkout billing teams
-                  </RQButton>
-                ) : (
-                  <RQButton
-                    loading={isLoading}
-                    type="primary"
-                    icon={<HiOutlinePaperAirplane className="send-icon" />}
-                    onClick={handleSendRequest}
-                  >
-                    Send request
-                  </RQButton>
-                )}
-              </Space>
-            </Col>
-          </Row>
+          {ModalActionButtons}
         </>
       )}
     </Modal>
