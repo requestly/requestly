@@ -6,7 +6,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { actions } from "store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getUserAttributes } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import { resetUserDetails, setAndUpdateUserDetails } from "utils/helpers/appDetails/UserProvider";
 import { getUsername } from "backend/auth/username";
@@ -25,6 +25,7 @@ let hasAuthHandlerBeenSet = false;
 const AuthHandler = (onComplete) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
@@ -40,7 +41,7 @@ const AuthHandler = (onComplete) => {
         localStorage.setItem("__rq_uid", authData?.uid);
 
         if (user.metadata.creationTime === user.metadata.lastSignInTime) {
-          if (isCompanyEmail(user.email) && user.emailVerified) {
+          if (isCompanyEmail(user.email) && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
             getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
               const users = res.data.users;
               submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
@@ -169,7 +170,7 @@ const AuthHandler = (onComplete) => {
         );
       }
     });
-  }, [dispatch, appMode, onComplete, getEnterpriseAdminDetails, getOrganizationUsers]);
+  }, [dispatch, appMode, onComplete, getEnterpriseAdminDetails, getOrganizationUsers, userAttributes]);
 
   return null;
 };
