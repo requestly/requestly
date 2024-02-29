@@ -55,7 +55,6 @@ const useGrowthBookIntegration = () => {
 export const GrowthbookExperimentHelperComponent = (): any => {
   // Fire experiment_assigned as soon as ui loads
   useFeatureValue("paywall-visibility-threshold", 15);
-  useFeatureValue("redirect_rule_onboarding", null);
   useFeatureValue("persona_recommendation", null);
 
   // console.log("gb: GrowthbookExperimentHelperComponent");
