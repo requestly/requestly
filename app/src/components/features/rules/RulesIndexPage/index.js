@@ -33,8 +33,8 @@ const TRACKING = APP_CONSTANTS.GA_EVENTS;
 const RulesIndexPage = () => {
   //Global State
   const dispatch = useDispatch();
-  const rules = useSelector(getAllRules);
-  const groups = useSelector(getAllGroups);
+  const allRules = useSelector(getAllRules);
+  const allGroups = useSelector(getAllGroups);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);
   const appMode = useSelector(getAppMode);
@@ -56,54 +56,58 @@ const RulesIndexPage = () => {
     const groupsPromise = StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.GROUP);
     Logger.log("Reading storage in RulesIndexPage useEffect");
     const rulesPromise = StorageService(appMode).getRecords(GLOBAL_CONSTANTS.OBJECT_TYPES.RULE);
-    Promise.all([groupsPromise, rulesPromise]).then(async (data) => {
-      const groups = data[0];
-      const rules = data[1];
+    Promise.all([groupsPromise, rulesPromise])
+      .then(async (data) => {
+        const groups = data[0];
+        const rules = data[1];
 
-      const isGroupsSanitizationPassedResult = await isGroupsSanitizationPassed({ rules, groups, appMode });
+        const isGroupsSanitizationPassedResult = await isGroupsSanitizationPassed({ rules, groups, appMode });
 
-      if (isGroupsSanitizationPassedResult.success === false) {
-        // Sanitization has updated the storage! but we dont need to fetch again as we have the updated copy
-        stableDispatch(
-          actions.updateRulesAndGroups({
-            rules: isGroupsSanitizationPassedResult.updatedRules,
-            groups,
-          })
+        if (isGroupsSanitizationPassedResult.success === false) {
+          // Sanitization has updated the storage! but we dont need to fetch again as we have the updated copy
+          stableDispatch(
+            actions.updateRulesAndGroups({
+              rules: isGroupsSanitizationPassedResult.updatedRules,
+              groups,
+            })
+          );
+        } else {
+          // Sanitization required doing nothing, so continue as it is
+          stableDispatch(
+            actions.updateRulesAndGroups({
+              rules: isGroupsSanitizationPassedResult.updatedRules,
+              groups,
+            })
+          );
+        }
+
+        if (!fetchRulesAndGroupsComplete) setFetchRulesAndGroupsComplete(true);
+        setIsTableLoading(false);
+
+        const ruleTypes = rules.reduce((result, { ruleType }) => result.add(ruleType), new Set());
+        const activePremiumRules = rules.filter(
+          (rule) => rule.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE && PREMIUM_RULE_TYPES.includes(rule.ruleType)
         );
-      } else {
-        // Sanitization required doing nothing, so continue as it is
-        stableDispatch(
-          actions.updateRulesAndGroups({
-            rules: isGroupsSanitizationPassedResult.updatedRules,
-            groups,
-          })
+        //ANALYTICS
+        const numRuleTypes = window.localStorage.getItem("num_rule_types") || 0;
+        submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
+        submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
+        submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);
+        submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES, ruleTypes.size);
+        window.localStorage.setItem("num_rule_types", ruleTypes.size);
+        submitAttrUtil(
+          TRACKING.ATTR.NUM_ACTIVE_RULES,
+          rules.filter((rule) => rule.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE).length
         );
-      }
-
-      if (!fetchRulesAndGroupsComplete) setFetchRulesAndGroupsComplete(true);
-      setIsTableLoading(false);
-
-      const ruleTypes = rules.reduce((result, { ruleType }) => result.add(ruleType), new Set());
-      const activePremiumRules = rules.filter(
-        (rule) => rule.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE && PREMIUM_RULE_TYPES.includes(rule.ruleType)
-      );
-      //ANALYTICS
-      const numRuleTypes = window.localStorage.getItem("num_rule_types") || 0;
-      submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
-      submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
-      submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);
-      submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES, ruleTypes.size);
-      window.localStorage.setItem("num_rule_types", ruleTypes.size);
-      submitAttrUtil(
-        TRACKING.ATTR.NUM_ACTIVE_RULES,
-        rules.filter((rule) => rule.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE).length
-      );
-      submitAttrUtil(TRACKING.ATTR.NUM_GROUPS, groups.length);
-      submitAttrUtil(
-        TRACKING.ATTR.NUM_ACTIVE_GROUPS,
-        groups.filter((group) => group.status === GLOBAL_CONSTANTS.GROUP_STATUS.ACTIVE).length
-      );
-    });
+        submitAttrUtil(TRACKING.ATTR.NUM_GROUPS, groups.length);
+        submitAttrUtil(
+          TRACKING.ATTR.NUM_ACTIVE_GROUPS,
+          groups.filter((group) => group.status === GLOBAL_CONSTANTS.GROUP_STATUS.ACTIVE).length
+        );
+      })
+      .catch((err) => {
+        Logger.log(err);
+      });
   }, [
     stableDispatch,
     isRulesListRefreshPending,
@@ -121,7 +125,7 @@ const RulesIndexPage = () => {
   return (
     <React.Fragment>
       {fetchRulesAndGroupsComplete && !isRulesListLoading ? (
-        rules?.length > 0 || groups?.length > 0 ? (
+        allRules?.length > 0 || allGroups?.length > 0 ? (
           <RulesListContainer isTableLoading={isTableLoading} />
         ) : (
           <CreateFirstRule />
