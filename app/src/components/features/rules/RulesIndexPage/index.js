@@ -89,7 +89,7 @@ const RulesIndexPage = () => {
           (rule) => rule.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE && PREMIUM_RULE_TYPES.includes(rule.ruleType)
         );
         //ANALYTICS
-        const numRuleTypes = window.localStorage.getItem("num_rule_types") || 0;
+        const numRuleTypes = window.localStorage.getItem("num_rule_types") ?? 0;
         submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
         submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
         submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);
