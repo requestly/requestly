@@ -146,7 +146,7 @@ const AuthHandler = (onComplete) => {
 
         getUsername(authData?.uid)
           .then((username) => {
-            dispatch(actions.updateUsername({ username: username }));
+            dispatch(actions.updateUsername({ username }));
           })
           .catch((err) => {
             Logger.log("Error updating username in store :", err.message);
