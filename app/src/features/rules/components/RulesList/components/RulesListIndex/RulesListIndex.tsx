@@ -22,7 +22,7 @@ import APP_CONSTANTS from "config/constants";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import AuthPopoverButton from "components/features/rules/RulesListContainer/RulesTable/AuthPopoverButtons";
 import { DropdownButtonType } from "antd/lib/dropdown";
@@ -193,7 +193,7 @@ const RulesList: React.FC<Props> = () => {
   );
 
   const handleImportRulesOnClick = useCallback((e?: unknown) => {
-    trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
+    trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
     trackRulesImportStarted();
 
     setIsImportRulesModalActive(true);
@@ -250,11 +250,11 @@ const RulesList: React.FC<Props> = () => {
       isTooltipShown: true,
       hasPopconfirm: true,
       buttonText: "Import",
-      authSource: AUTH.SOURCE.UPLOAD_RULES,
+      authSource: SOURCE.UPLOAD_RULES,
       icon: <DownloadOutlined />,
       onClickHandler: handleImportRulesOnClick,
       trackClickEvent: () => {
-        trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
+        trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
       },
     },
     {

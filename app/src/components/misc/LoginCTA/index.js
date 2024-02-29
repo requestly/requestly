@@ -8,7 +8,7 @@ import APP_CONSTANTS from "../../../config/constants";
 import { actions } from "store";
 import { useNavigate } from "react-router-dom";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 const LoginCTA = ({ heading, content, cbUrl }) => {
   //Global State
@@ -27,7 +27,7 @@ const LoginCTA = ({ heading, content, cbUrl }) => {
           callback: () => {
             navigate(cbUrl);
           },
-          eventSource: AUTH.SOURCE.LOGIN_CTA,
+          eventSource: SOURCE.LOGIN_CTA,
         },
       })
     );

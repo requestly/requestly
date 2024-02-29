@@ -8,7 +8,7 @@ import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode, getAllRules }
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { actions } from "../../../../store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
@@ -251,7 +251,7 @@ const ImportRulesModal = (props) => {
     if (isImportFromCharlesModalOpen) {
       toggleModal();
     } else {
-      trackCharlesSettingsImportStarted(AUTH.SOURCE.RULES_LIST);
+      trackCharlesSettingsImportStarted(SOURCE.RULES_LIST);
     }
 
     setIsImportFromCharlesModalOpen((prev) => !prev);
@@ -270,7 +270,7 @@ const ImportRulesModal = (props) => {
         <ImportFromCharlesModal
           isOpen={isImportFromCharlesModalOpen}
           toggle={toggleImportFromCharlesModal}
-          triggeredBy={AUTH.SOURCE.RULES_LIST}
+          triggeredBy={SOURCE.RULES_LIST}
         />
       ) : null}
 
