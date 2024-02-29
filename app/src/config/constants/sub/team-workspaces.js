@@ -18,9 +18,8 @@ TEAM_WORKSPACES.NEW_WORKSPACE = {
   color: "#585b58",
 };
 
-export default TEAM_WORKSPACES;
-
 TEAM_WORKSPACES.WORKSPACE_TYPE = {
   MAPPED_TO_BILLING_TEAM: "mapped_to_billing_team",
   NOT_MAPPED_TO_BILLING_TEAM: "not_mapped_to_billing_team",
 };
+export default TEAM_WORKSPACES;
