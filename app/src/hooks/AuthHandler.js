@@ -17,7 +17,6 @@ import { getUserSubscription } from "backend/user/userSubscription";
 import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDocListener";
 import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import formbricks from "@formbricks/js";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
