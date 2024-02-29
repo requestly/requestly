@@ -28,45 +28,43 @@ const RuleEditorSplitPane = ({ mode, showExecutionLogs, expandRulePane, collapse
   };
 
   return (
-    <>
-      <Tabs
-        defaultActiveKey={activeKey}
-        type="card"
-        size="middle"
-        tabBarGutter={4}
-        className="rule-simulator-tabs"
-        style={{ marginTop: "8px" }}
-        onTabClick={(key) => {
-          expandRulePane();
-          if (key === "ruleSimulator") {
-            trackRuleSimulatorTried(ruleType, mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT);
-          }
-        }}
-        tabBarExtraContent={{
-          right: <Button icon={<DownOutlined />} onClick={collapseRulesPlane} style={{ marginBottom: "8px" }} />,
-        }}
+    <Tabs
+      defaultActiveKey={activeKey}
+      type="card"
+      size="middle"
+      tabBarGutter={4}
+      className="rule-simulator-tabs"
+      style={{ marginTop: "8px" }}
+      onTabClick={(key) => {
+        expandRulePane();
+        if (key === "ruleSimulator") {
+          trackRuleSimulatorTried(ruleType, mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT);
+        }
+      }}
+      tabBarExtraContent={{
+        right: <Button icon={<DownOutlined />} onClick={collapseRulesPlane} style={{ marginBottom: "8px" }} />,
+      }}
+    >
+      <TabPane
+        tab={
+          <span>
+            {"Execution Logs "}
+            {!showExecutionLogs ? <CrownTwoTone twoToneColor={"limegreen"} /> : null}
+          </span>
+        }
+        key="executionLogs"
       >
-        <TabPane
-          tab={
-            <span>
-              {"Execution Logs "}
-              {!showExecutionLogs ? <CrownTwoTone twoToneColor={"limegreen"} /> : null}
-            </span>
-          }
-          key="executionLogs"
-        >
-          {isExecutionLogsCompatible ? (
-            showExecutionLogs ? (
-              <ExecutionLogs />
-            ) : (
-              <PremiumRequiredCTA message={"Execution Logs is a premium feature"} />
-            )
+        {isExecutionLogsCompatible ? (
+          showExecutionLogs ? (
+            <ExecutionLogs />
           ) : (
-            <UpgradeExtensionCTA />
-          )}
-        </TabPane>
-      </Tabs>
-    </>
+            <PremiumRequiredCTA message={"Execution Logs is a premium feature"} />
+          )
+        ) : (
+          <UpgradeExtensionCTA />
+        )}
+      </TabPane>
+    </Tabs>
   );
 };
 
