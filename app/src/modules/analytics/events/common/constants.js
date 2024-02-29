@@ -90,6 +90,15 @@ export const SOURCE = {
   PERSONA_RECOMMENDATION_SCREEN: "persona_recommendation_screen",
   PRICING_PAGE: "pricing_page",
   HOME_SCREEN: "home_screen",
+  DROPDOWN: "dropdown",
+  TRIAL_BADGE: "trial_badge",
+  SCREEN: "screen",
+  RULE_TABLE_CREATE_NEW_RULE_BUTTON: "rule_table_create_new_rule_button",
+  CHECKOUT_BILLING_TEAMS: "checkout_billing_teams",
+  TRIAL_ONGOING_BADGE: "trial_ongoing_badge",
+  TRIAL_EXPIRED_BADGE: "trial_expired_badge",
+  REQUEST_FEATURE_MODAL: "request_feature_modal",
+  USE_FOR_FREE_NOW: "use_for_free_now",
 };
 
 export const RULES = {

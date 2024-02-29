@@ -20,6 +20,7 @@ import APP_CONSTANTS from "config/constants";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import "./index.scss";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -160,7 +161,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     className="request-modal-link-btn"
                     disabled={isLoading}
                     onClick={() => {
-                      trackUpgradeOptionClicked("use_for_free_now");
+                      trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
                       setOpenPopup(false);
                       onContinue();
                     }}
@@ -181,7 +182,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                         actions.toggleActiveModal({
                           modalName: "pricingModal",
                           newValue: true,
-                          newProps: { selectedPlan: null, source: "request_feature_modal" },
+                          newProps: { selectedPlan: null, source: SOURCE.REQUEST_FEATURE_MODAL },
                         })
                       );
                     }}
@@ -192,7 +193,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     <RQButton
                       type="primary"
                       onClick={() => {
-                        trackUpgradeOptionClicked("checkout_billing_teams");
+                        trackUpgradeOptionClicked(SOURCE.CHECKOUT_BILLING_TEAMS);
                         navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE + "/" + billingTeams[0].id);
                       }}
                     >

@@ -21,6 +21,7 @@ import APP_CONSTANTS from "config/constants";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import "./AddMemberModal.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -129,7 +130,9 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
             is_admin: makeUserAdmin,
             source: "add_member_modal",
             num_users_added: userEmail.length,
-            workspace_type: isBillingTeamMapped ? "mapped_to_billing_team" : "not_mapped_to_billing_team",
+            workspace_type: isBillingTeamMapped
+              ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+              : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
           });
           setIsProcessing(false);
           toggleModal();
