@@ -149,7 +149,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               popoverPlacement="left"
               onContinue={() => handleStatusToggle([record])}
               source="rule_list_status_switch"
-              attemptEvent={() => trackRuleToggleAttempted(record.status)}
+              onClickCallback={() => trackRuleToggleAttempted(record.status)}
             >
               <Switch
                 size="small"
