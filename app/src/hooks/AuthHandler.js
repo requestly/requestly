@@ -40,7 +40,7 @@ const AuthHandler = (onComplete) => {
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
 
-        // New user signing in from an org domain will be assigned a serial number attribute
+        /* To ensure that this attribute is assigned to only the users signing up for the first time */
         if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
           if (isCompanyEmail(user.email) && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
             getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
