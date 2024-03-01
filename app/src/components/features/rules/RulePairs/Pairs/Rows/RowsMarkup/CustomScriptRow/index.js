@@ -20,6 +20,8 @@ function getInfoMessageAsComment(scriptLanguage) {
     return "\n  // Custom attributes to the script can be added here.\n  // Everything else will be ignored.\n";
   if (scriptLanguage === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS)
     return "\n<!--\n  Custom attributes to the script can be added here.\n  Everything else will be ignored \n-->\n";
+
+  return null;
 }
 
 function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
