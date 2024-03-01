@@ -34,7 +34,7 @@ import { redirectToTeam, redirectToWorkspaceSettings } from "utils/RedirectionUt
 import LoadingModal from "./LoadingModal";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getUniqueColorForWorkspace } from "utils/teams";
 import { trackWorkspaceJoiningModalOpened } from "modules/analytics/events/features/teams";
@@ -219,7 +219,7 @@ const WorkspaceSelector = () => {
           })
         );
         trackWorkspaceJoiningModalOpened(teamInvites?.length, "workspaces_dropdown");
-      }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
+      }, SOURCE.WORKSPACE_SIDEBAR);
     }
   };
 
@@ -241,7 +241,7 @@ const WorkspaceSelector = () => {
             newProps: { source: "workspaces_dropdown" },
           })
         );
-      }, AUTH.SOURCE.WORKSPACE_SIDEBAR);
+      }, SOURCE.WORKSPACE_SIDEBAR);
     }
   };
 
@@ -263,7 +263,7 @@ const WorkspaceSelector = () => {
     } else {
       promptUserSignupModal(
         () => redirectToWorkspaceSettings(navigate, window.location.pathname, "workspaces_dropdown"),
-        AUTH.SOURCE.WORKSPACE_SIDEBAR
+        SOURCE.WORKSPACE_SIDEBAR
       );
     }
   };
@@ -374,7 +374,7 @@ const WorkspaceSelector = () => {
         key="2"
         className="workspace-menu-item"
         onClick={() => {
-          promptUserSignupModal(() => {}, AUTH.SOURCE.WORKSPACE_SIDEBAR);
+          promptUserSignupModal(() => {}, SOURCE.WORKSPACE_SIDEBAR);
           trackWorkspaceDropdownClicked("sign_in");
         }}
         icon={<UserOutlined className="icon-wrapper" />}

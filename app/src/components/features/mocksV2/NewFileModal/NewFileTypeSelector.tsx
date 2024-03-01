@@ -10,7 +10,7 @@ import { FileType } from "../types";
 import { IoLogoCss3 } from "@react-icons/all-files/io5/IoLogoCss3";
 import { IoLogoHtml5 } from "@react-icons/all-files/io5/IoLogoHtml5";
 import { IoLogoJavascript } from "@react-icons/all-files/io5/IoLogoJavascript";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 const FILE_TYPES_CONFIG = {
   [FileType.HTML]: {
@@ -53,7 +53,7 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
               callback={() =>
                 handleTypeSelection ? handleTypeSelection(type) : redirectToFileMockEditorCreateMock(navigate, type)
               }
-              source={AUTH.SOURCE.CREATE_FILE_MOCK}
+              source={SOURCE.CREATE_FILE_MOCK}
             >
               <Button
                 onClick={() =>

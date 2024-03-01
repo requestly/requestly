@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Button, Space } from "antd";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { actions } from "../../../../store";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -29,7 +29,7 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
           redirectURL: window.location.href,
           authMode: AUTH_ACTION_LABELS.LOG_IN,
           src: src,
-          eventSource: AUTH.SOURCE.LOGIN_CTA,
+          eventSource: SOURCE.LOGIN_CTA,
         },
       })
     );
@@ -48,7 +48,7 @@ const AuthButtons = ({ src, hardRedirect = false, autoPrompt = true }) => {
           redirectURL: window.location.href,
           authMode: AUTH_ACTION_LABELS.SIGN_UP,
           src: src,
-          eventSource: AUTH.SOURCE.SIGNUP_CTA,
+          eventSource: SOURCE.SIGNUP_CTA,
         },
       })
     );
