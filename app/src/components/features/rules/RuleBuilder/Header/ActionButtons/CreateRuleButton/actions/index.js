@@ -52,7 +52,21 @@ export const transformAndValidateRuleFields = async (ruleData) => {
           });
       };
 
+      const getIndentedCode = (code) => {
+        if (!code || typeof code !== "string") return "";
+        code.trim();
+        // indenting the code without adding unnecessary tabs and new lines
+        const newCode = code
+          .replace(/^\n+|\n+$/g, "")
+          .split("\n")
+          .map((line) => (line.startsWith("\t") ? line : "\t" + line))
+          .join("\n");
+
+        return newCode;
+      };
+
       const validateScript = (script, scriptIndex, pairIndex) => {
+        // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
           const codeHTMLTagName = getHTMLNodeName(script.type, script.codeType);
 
@@ -70,7 +84,7 @@ export const transformAndValidateRuleFields = async (ruleData) => {
             newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
               ...script,
               attributes,
-              value: code,
+              value: getIndentedCode(code),
             };
           } else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
             const res = await validateHTMLTag(script.wrapperElement, codeHTMLTagName);
