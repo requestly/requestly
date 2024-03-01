@@ -21,7 +21,7 @@ import { getUserAuthDetails, getUserAttributes, getAppMode } from "store/selecto
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
 import PATHS from "config/constants/sub/paths";
 import {
@@ -108,7 +108,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
             newProps: {
               authMode: AUTH_ACTION_LABELS.SIGN_UP,
               src: window.location.href,
-              eventSource: AUTH.SOURCE.SAVE_DRAFT_SESSION,
+              eventSource: SOURCE.SAVE_DRAFT_SESSION,
             },
           })
         );

@@ -5,7 +5,7 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { toast } from "utils/Toast";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import SettingsItem from "./SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
 
@@ -26,7 +26,7 @@ const RulesSyncing = () => {
           newValue: true,
           newProps: {
             redirectURL: window.location.href,
-            eventSource: AUTH.SOURCE.ENABLE_SYNC,
+            eventSource: SOURCE.ENABLE_SYNC,
           },
         })
       );
