@@ -139,10 +139,10 @@ const CustomScriptRow = ({
       }
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script${attributesString ? `${attributesString}` : ""}>\n${script.value}\n</script>`;
+          newValue = `<script ${attributesString ? `${attributesString}` : ""}>\n${script.value}\n</script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<style${attributesString ? `${attributesString}` : ""}>\n${script.value}\n</style>`;
+          newValue = `<style ${attributesString ? `${attributesString}` : ""}>\n${script.value}\n</style>`;
         }
       }
     } else {
