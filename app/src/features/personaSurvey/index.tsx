@@ -11,7 +11,7 @@ import { Option, QuestionnaireType, SurveyPage } from "./types";
 import { SurveyOption } from "./Option";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { trackPersonaSurveySignInClicked, trackPersonaSurveyViewed } from "modules/analytics/events/misc/onboarding";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -42,7 +42,7 @@ const SkipButton = () => {
                   dispatch(actions.updateIsPersonaSurveyCompleted(true));
                 },
                 authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                eventSource: AUTH.SOURCE.PERSONA_SURVEY,
+                eventSource: SOURCE.PERSONA_SURVEY,
               },
             })
           );
