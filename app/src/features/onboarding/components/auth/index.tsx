@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 import { AuthForm } from "./components/Form";
 import { OnboardingAuthBanner } from "./components/Banner";
 import AUTH from "config/constants/sub/auth";
@@ -20,6 +21,7 @@ interface Props {
 
 export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const [authMode, setAuthMode] = useState(AUTH.ACTION_LABELS.SIGN_UP);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
@@ -44,6 +46,12 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
       trackAppOnboardingViewed(ONBOARDING_STEPS.AUTH);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (user.loggedIn) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+    }
+  }, [user.loggedIn, dispatch]);
 
   return (
     <div className="onboarding-auth-screen-wrapper">
