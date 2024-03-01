@@ -11,7 +11,7 @@ import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm
 import { actions } from "store";
 import Logger from "lib/logger";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
-import { trackAppOnboardingViewed } from "features/onboarding/analytics";
+import { trackAppOnboardingStepCompleted, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { m } from "framer-motion";
 import "./index.scss";
 
@@ -50,6 +50,7 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
   useEffect(() => {
     if (user.loggedIn) {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+      trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
     }
   }, [user.loggedIn, dispatch]);
 
