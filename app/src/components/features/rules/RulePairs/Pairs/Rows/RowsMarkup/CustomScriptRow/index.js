@@ -21,9 +21,9 @@ function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
       if (isCompatibleWithAttributes) {
         switch (language) {
           case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
-            return '<!--  Custom attributes to the script can be added here.  -->\n<script type="text/javscript">\n//Everything else will be ignored \n</script>';
+            return '<script type="text/javscript">\n  // Custom attributes to the script can be added here.\n  // Everything else will be ignored.\n</script>';
           case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
-            return '<!--  Custom attributes to the script can be added here.  -->\n<link rel="stylesheet" type="text/css" >\n<!-- Everything else will be ignored  -->\n';
+            return '<link rel="stylesheet" type="text/css" >\n<!--\n  Custom attributes to the script can be added here.\n  Everything else will be ignored \n-->\n';
         }
       }
       break;
@@ -81,6 +81,14 @@ const CustomScriptRow = ({
     return getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
   }, [script.codeType, script.type, isCompatibleWithAttributes]);
 
+  const codeEditorLanguage = useMemo(() => {
+    return isCompatibleWithAttributes
+      ? "html"
+      : script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS
+      ? "javascript"
+      : "css";
+  }, [script.codeType, isCompatibleWithAttributes]);
+
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
   useEffect(() => {
@@ -104,10 +112,10 @@ const CustomScriptRow = ({
       }
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script${attributesString ? ` ${attributesString}` : ""}>${script.value}</script>`;
+          newValue = `<script${attributesString ? ` ${attributesString}` : ""}>\n${script.value}\n</script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<style${attributesString ? ` ${attributesString}` : ""}>${script.value}</style>`;
+          newValue = `<style${attributesString ? ` ${attributesString}` : ""}>\n${script.value}\n</style>`;
         }
       }
     } else {
@@ -116,10 +124,10 @@ const CustomScriptRow = ({
         newValue = script.wrapperElement;
       } else {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script type="text/javascript">${script.value}</script>`;
+          newValue = `<script type="text/javascript">\n${script.value}\n</script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<style>${script.value}</style>`;
+          newValue = `<style>\n${script.value}\n</style>`;
         }
       }
     }
@@ -298,8 +306,8 @@ const CustomScriptRow = ({
           <Col xl="12" span={24}>
             <CodeEditor
               id={pair.id}
-              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 75 : 300}
-              language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
+              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 115 : 300}
+              language={codeEditorLanguage}
               defaultValue={scriptEditorBoilerCode}
               value={initialCodeEditorValue}
               handleChange={handleEditorUpdate}
@@ -434,6 +442,7 @@ const CustomScriptRow = ({
   };
 
   const onSourceTypeChange = (sourceType) => {
+    setInitialCodeEditorValue(null);
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
