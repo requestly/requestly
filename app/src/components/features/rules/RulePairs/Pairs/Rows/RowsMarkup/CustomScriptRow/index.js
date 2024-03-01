@@ -15,15 +15,22 @@ import FEATURES from "config/constants/sub/features";
 
 const { Text } = Typography;
 
+function getInfoMessageAsComment(scriptLanguage) {
+  if (scriptLanguage === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS)
+    return "\n  // Custom attributes to the script can be added here.\n  // Everything else will be ignored.\n";
+  if (scriptLanguage === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS)
+    return "\n<!--\n  Custom attributes to the script can be added here.\n  Everything else will be ignored \n-->\n";
+}
+
 function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
   switch (scriptType) {
     case GLOBAL_CONSTANTS.SCRIPT_TYPES.URL:
       if (isCompatibleWithAttributes) {
         switch (language) {
           case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
-            return '<script type="text/javscript">\n  // Custom attributes to the script can be added here.\n  // Everything else will be ignored.\n</script>';
+            return `<script type="text/javscript">${getInfoMessageAsComment(language)}</script>`;
           case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
-            return '<link rel="stylesheet" type="text/css" >\n<!--\n  Custom attributes to the script can be added here.\n  Everything else will be ignored \n-->\n';
+            return `<link rel="stylesheet" type="text/css">${getInfoMessageAsComment(language)}`;
         }
       }
       break;
@@ -44,14 +51,30 @@ function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
   return "";
 }
 
-const createAttributesString = (attributes) => {
+const createAttributesString = (attributes = [], scriptType, scriptValue, scriptCodeType) => {
+  // adding the saved url attribute
+  const _attributes = Array.from(attributes);
+  if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
+    const urlAttrName = scriptCodeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "src" : "href";
+
+    const urlIndex = _attributes.findIndex((attr) => attr.name === urlAttrName);
+    if (urlIndex > -1) {
+      _attributes.splice(urlIndex, 1);
+    }
+    _attributes.unshift({
+      name: urlAttrName,
+      value: scriptValue,
+    });
+  }
   const attributesString =
-    attributes
+    _attributes
       ?.map(({ name: attrName, value: attrVal }) => {
         if (!attrVal) return `${attrName}`;
         return `${attrName}="${attrVal}"`;
       })
       .join(" ") ?? "";
+
+  attributesString.trim();
   return attributesString;
 };
 
@@ -100,22 +123,26 @@ const CustomScriptRow = ({
       newValue = script.value;
     } else if (script.attributes?.length > 0) {
       const attributes = script.attributes ?? [];
-      const attributesString = createAttributesString(attributes);
+      const attributesString = createAttributesString(attributes, script.type, script.value, script.codeType);
 
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script ${attributesString ? ` ${attributesString}` : ``}></script>`;
+          newValue = `<script ${attributesString ? ` ${attributesString}` : ``}>${getInfoMessageAsComment(
+            script.codeType
+          )}</script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<link ${attributesString ? ` ${attributesString}` : ``}>`;
+          newValue = `<link ${attributesString ? ` ${attributesString}` : ``}>${getInfoMessageAsComment(
+            script.codeType
+          )}`;
         }
       }
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script${attributesString ? ` ${attributesString}` : ""}>\n${script.value}\n</script>`;
+          newValue = `<script${attributesString ? `${attributesString}` : ""}>\n${script.value}\n</script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<style${attributesString ? ` ${attributesString}` : ""}>\n${script.value}\n</style>`;
+          newValue = `<style${attributesString ? `${attributesString}` : ""}>\n${script.value}\n</style>`;
         }
       }
     } else {
@@ -306,7 +333,7 @@ const CustomScriptRow = ({
           <Col xl="12" span={24}>
             <CodeEditor
               id={pair.id}
-              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 115 : 300}
+              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}
               language={codeEditorLanguage}
               defaultValue={scriptEditorBoilerCode}
               value={initialCodeEditorValue}
