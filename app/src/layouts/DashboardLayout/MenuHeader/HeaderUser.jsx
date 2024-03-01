@@ -12,7 +12,7 @@ import {
 } from "utils/RedirectionUtils";
 import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
@@ -174,7 +174,7 @@ export default function HeaderUser() {
                       newProps: {
                         redirectURL: window.location.href,
                         authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-                        eventSource: AUTH.SOURCE.NAVBAR,
+                        eventSource: SOURCE.NAVBAR,
                       },
                     })
                   );

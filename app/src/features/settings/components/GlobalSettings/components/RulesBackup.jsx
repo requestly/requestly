@@ -6,7 +6,7 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { createBackupIfRequired, setIsBackupEnabled } from "utils/BackupUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import SettingsItem from "./SettingsItem";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackBackupToggled } from "modules/analytics/events/features/syncing/backup";
 
 const RulesBackup = () => {
@@ -32,7 +32,7 @@ const RulesBackup = () => {
           newValue: true,
           newProps: {
             redirectURL: window.location.href,
-            eventSource: AUTH.SOURCE.ENABLE_BACKUP,
+            eventSource: SOURCE.ENABLE_BACKUP,
           },
         })
       );
