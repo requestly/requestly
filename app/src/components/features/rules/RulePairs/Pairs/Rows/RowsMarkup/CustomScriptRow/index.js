@@ -244,8 +244,8 @@ const CustomScriptRow = ({
     deleteScript(e, pairIndex, scriptIndex);
   };
 
-  const renderCodeEditor = () => {
-    const handleEditorUpdate = (value) => {
+  const handleEditorUpdate = useCallback(
+    (value) => {
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
         dispatch(
@@ -267,8 +267,17 @@ const CustomScriptRow = ({
           })
         );
       }
-    };
+    },
+    [dispatch, isCodeFormatted, pairIndex, script.type, scriptIndex]
+  );
 
+  useEffect(() => {
+    if (initialCodeEditorValue !== null) {
+      handleEditorUpdate(initialCodeEditorValue);
+    }
+  }, [initialCodeEditorValue, handleEditorUpdate]);
+
+  const renderCodeEditor = () => {
     const handleCodeFormattedFlag = () => {
       setIsCodeFormatted(true);
       setTimeout(() => {
