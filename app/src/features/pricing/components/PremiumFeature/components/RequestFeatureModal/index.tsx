@@ -146,7 +146,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
             >
               Upgrade yourself
             </RQButton>
-            {billingTeams.length ? (
+            {billingTeams.length > 1 ? (
               <RQButton
                 type="primary"
                 onClick={() => {
