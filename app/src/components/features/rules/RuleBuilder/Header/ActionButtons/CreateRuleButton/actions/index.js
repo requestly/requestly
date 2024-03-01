@@ -16,7 +16,7 @@ import FEATURES from "config/constants/sub/features";
  *
  * Returns the transformed rule data if modified, else returns the original rule data.
  * @param {*} ruleData
- * @returns {
+ * @returns {Promise<{
  *  success: boolean,
  *  ruleData?: object,
  *  validationError?: {
@@ -24,9 +24,9 @@ import FEATURES from "config/constants/sub/features";
  *    message: string,
  *    pairId: string // pair that cause the error
  *  }
- * }
+ * }>}
  */
-export const transformAndValidateRuleFields = async (ruleData) => {
+export const transformAndValidateRuleFields = (ruleData) => {
   switch (ruleData.ruleType) {
     case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT: {
       if (!isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT)) {
@@ -59,7 +59,7 @@ export const transformAndValidateRuleFields = async (ruleData) => {
         const newCode = code
           .replace(/^\n+|\n+$/g, "")
           .split("\n")
-          .map((line) => (line.startsWith("\t") ? line : "\t" + line))
+          .map((line) => (line.startsWith("\t") ? line : `\t${line}`))
           .join("\n");
 
         return newCode;
