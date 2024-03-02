@@ -1,4 +1,4 @@
-// @ts-ignore Expected to through an error since we haven't compiled this module with ts yet!
+// @ts-expect-error Expected to through an error since we haven't compiled this module with ts yet!
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 /* TYPES */
