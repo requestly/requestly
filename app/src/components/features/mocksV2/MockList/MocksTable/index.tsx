@@ -11,7 +11,7 @@ import {
 import { RQButton, RQInput } from "lib/design-system/components";
 import { Tooltip, Space, Row, Col, Table, Typography } from "antd";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
@@ -325,7 +325,7 @@ const MocksTable: React.FC<Props> = ({
                 title="You need to sign up to create API mocks"
                 disabled={mockType === MockType.FILE}
                 callback={handleCreateNew}
-                source={AUTH.SOURCE.CREATE_API_MOCK}
+                source={SOURCE.CREATE_API_MOCK}
               >
                 <RQButton
                   type="primary"
@@ -340,7 +340,7 @@ const MocksTable: React.FC<Props> = ({
                   <AuthConfirmationPopover
                     title="You need to sign up to upload mocks"
                     callback={handleUploadAction}
-                    source={mockType === MockType.API ? AUTH.SOURCE.CREATE_API_MOCK : AUTH.SOURCE.CREATE_FILE_MOCK}
+                    source={mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK}
                   >
                     <RQButton
                       type="default"

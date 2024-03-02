@@ -21,7 +21,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import "./rulesCard.scss";
 
@@ -87,7 +87,7 @@ export const RulesCard: React.FC = () => {
                 className="rules-card-create-btn"
                 onClick={() => {
                   trackHomeRulesActionClicked("new_rule_dropdown");
-                  redirectToCreateNewRule(navigate, null, AUTH.SOURCE.HOME_SCREEN);
+                  redirectToCreateNewRule(navigate, null, SOURCE.HOME_SCREEN);
                 }}
               >
                 <IoMdAdd /> New rule
@@ -103,8 +103,8 @@ export const RulesCard: React.FC = () => {
                   className="homepage-rules-list-item"
                   onClick={() => {
                     trackHomeRulesActionClicked("rule_name");
-                    trackRuleCreationWorkflowStartedEvent(rule.ruleType, AUTH.SOURCE.HOME_SCREEN);
-                    redirectToRuleEditor(navigate, rule.id, AUTH.SOURCE.HOME_SCREEN);
+                    trackRuleCreationWorkflowStartedEvent(rule.ruleType, SOURCE.HOME_SCREEN);
+                    redirectToRuleEditor(navigate, rule.id, SOURCE.HOME_SCREEN);
                   }}
                 >
                   <span className="homepage-rules-list-item-icon">{ruleIcons[rule.ruleType as RuleType]}</span>
@@ -135,7 +135,7 @@ export const RulesCard: React.FC = () => {
                 onClick={() => {
                   trackHomeRulesActionClicked("create_new_rule");
                   if (isExtensionInstalled()) {
-                    redirectToCreateNewRule(navigate, null, AUTH.SOURCE.HOME_SCREEN);
+                    redirectToCreateNewRule(navigate, null, SOURCE.HOME_SCREEN);
                   } else {
                     dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
                   }
