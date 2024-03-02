@@ -143,7 +143,7 @@ const CreateRuleButton = ({
         case HTML_ERRORS.NO_TAGS:
           dispatch(
             actions.triggerToastForEditor({
-              id: validationError.pairId,
+              id: validationError.id,
               message: validationError.message,
               type: toastType.ERROR,
               autoClose: 4500,

@@ -237,7 +237,7 @@ const CustomScriptRow = ({
         >
           <Col xl="12" span={24}>
             <CodeEditor
-              id={pair.id}
+              id={script.id}
               height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}
               language={codeEditorLanguage}
               defaultValue={scriptEditorBoilerCode}
@@ -352,7 +352,7 @@ const CustomScriptRow = ({
   const CodeTypeOptions = () => {
     return (
       <Popconfirm
-        title="This will clear the existing code"
+        title="Changing the script language will reset the script to default placeholder"
         onConfirm={() => {
           onCodeTypeChange(codeTypeSelection);
           setIsCodeTypePopupVisible(false);
@@ -393,7 +393,7 @@ const CustomScriptRow = ({
       <Popconfirm
         title={
           isCompatibleWithAttributes
-            ? "This will clear the existing attributes"
+            ? "Changing the script source will reset the script to default placeholder"
             : "This will clear the updates that you made"
         }
         onConfirm={() => {
