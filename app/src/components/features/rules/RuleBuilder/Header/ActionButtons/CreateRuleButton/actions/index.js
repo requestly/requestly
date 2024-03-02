@@ -77,6 +77,7 @@ export const transformAndValidateRuleFields = (ruleData) => {
                 error: res.validationError,
                 message: res.errorMessage,
                 pairId: ruleData.pairs[pairIndex].id,
+                id: script.id,
               });
             }
             const { attributes, innerText: code } = parseHTMLString(script.value, codeHTMLTagName);
@@ -93,6 +94,7 @@ export const transformAndValidateRuleFields = (ruleData) => {
                 error: res.validationError,
                 message: res.errorMessage,
                 pairId: ruleData.pairs[pairIndex].id,
+                id: script.id,
               });
             }
             const { attributes: _attr } = parseHTMLString(script.wrapperElement, codeHTMLTagName);
