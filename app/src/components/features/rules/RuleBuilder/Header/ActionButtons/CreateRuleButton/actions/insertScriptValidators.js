@@ -116,7 +116,7 @@ export async function validateHTMLTag(str, htmlNodeName) {
       return {
         isValid: false,
         validationError: HTML_ERRORS.NO_TAGS,
-        errorMessage: "No tags found in the document",
+        errorMessage: `No ${htmlNodeName} tags found in the script block`,
       };
     }
 
