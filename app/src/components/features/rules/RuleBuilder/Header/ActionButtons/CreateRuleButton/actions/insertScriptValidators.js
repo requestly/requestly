@@ -144,6 +144,12 @@ export async function validateHTMLTag(str, htmlNodeName) {
   };
 }
 
+export const removeUrlAttribute = (attributes, codeType) => {
+  const urlAttrName = codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "src" : "href";
+
+  return attributes?.filter((attr) => attr.name !== urlAttrName) ?? [];
+};
+
 /* Pass the code string through an HTML linter and return errors if any */
 async function htmlValidateRawCodeString(codeString) {
   const loader = new StaticConfigLoader({
@@ -246,10 +252,10 @@ function checkDocumentForAnyOtherNode(doc, nodeName) {
  *
  * @param {string} rawCode string containing HTML snipper
  * @param {string} htmlNodeName name of the HTML node
- * @returns  {
+ * @returns  {{
  *  innerText: string,
  *  attributes: Array<{name: string, value: string}>,
- * }
+ * }}
  */
 export function parseHTMLString(rawCode, htmlNodeName) {
   const details = extractDOMNodeDetails(rawCode, htmlNodeName); // todo: replace this call

@@ -6,7 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import _, { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
-import { parseHTMLString, getHTMLNodeName, validateHTMLTag } from "./insertScriptValidators";
+import { parseHTMLString, getHTMLNodeName, validateHTMLTag, removeUrlAttribute } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
@@ -16,7 +16,7 @@ import FEATURES from "config/constants/sub/features";
  *
  * Returns the transformed rule data if modified, else returns the original rule data.
  * @param {*} ruleData
- * @returns {
+ * @returns {Promise<{
  *  success: boolean,
  *  ruleData?: object,
  *  validationError?: {
@@ -24,9 +24,9 @@ import FEATURES from "config/constants/sub/features";
  *    message: string,
  *    pairId: string // pair that cause the error
  *  }
- * }
+ * }>}
  */
-export const transformAndValidateRuleFields = async (ruleData) => {
+export const transformAndValidateRuleFields = (ruleData) => {
   switch (ruleData.ruleType) {
     case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT: {
       if (!isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT)) {
@@ -52,7 +52,21 @@ export const transformAndValidateRuleFields = async (ruleData) => {
           });
       };
 
+      const getIndentedCode = (code) => {
+        if (!code || typeof code !== "string") return "";
+        code.trim();
+        // indenting the code without adding unnecessary tabs and new lines
+        const newCode = code
+          .replace(/^\n+|\n+$/g, "")
+          .split("\n")
+          .map((line) => (line.startsWith("\t") ? line : `\t${line}`))
+          .join("\n");
+
+        return newCode;
+      };
+
       const validateScript = (script, scriptIndex, pairIndex) => {
+        // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
           const codeHTMLTagName = getHTMLNodeName(script.type, script.codeType);
 
@@ -70,7 +84,7 @@ export const transformAndValidateRuleFields = async (ruleData) => {
             newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
               ...script,
               attributes,
-              value: code,
+              value: getIndentedCode(code),
             };
           } else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
             const res = await validateHTMLTag(script.wrapperElement, codeHTMLTagName);
@@ -81,7 +95,10 @@ export const transformAndValidateRuleFields = async (ruleData) => {
                 pairId: ruleData.pairs[pairIndex].id,
               });
             }
-            const { attributes } = parseHTMLString(script.wrapperElement, codeHTMLTagName);
+            const { attributes: _attr } = parseHTMLString(script.wrapperElement, codeHTMLTagName);
+
+            const attributes = removeUrlAttribute(_attr, script.codeType);
+
             newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
               ...script,
               attributes,
