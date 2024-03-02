@@ -24,12 +24,14 @@ const createAttributesString = (attributes: ScriptAttributes = []) => {
 
 /* DEFAULTS */
 function getInfoMessageAsComment(language: ScriptLanguage) {
-  if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS)
-    return "\n  // Custom attributes to the script can be added here.\n  // Everything else will be ignored.\n";
-  if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS)
-    return "\n<!--\n  Custom attributes to the script can be added here.\n  Everything else will be ignored \n-->\n";
-
-  return null;
+  switch (language) {
+    case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
+      return "\n  // Custom attributes to the script can be added here.\n  // Everything else will be ignored.\n";
+    case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
+      return "\n<!--\n  Custom attributes to the script can be added here.\n  Everything else will be ignored \n-->\n";
+    default:
+      return null;
+  }
 }
 function getPlaceHolderCode(language: ScriptLanguage, isCompatibleWithAttributes: boolean) {
   switch (language) {
@@ -41,9 +43,9 @@ function getPlaceHolderCode(language: ScriptLanguage, isCompatibleWithAttributes
       return isCompatibleWithAttributes
         ? "<style>\n\tbody {\n\t\t background-color: #fff;\n\t}\n</style>"
         : "body {\n\t background-color: #fff;\n }";
+    default:
+      return "";
   }
-
-  return "";
 }
 
 /* MAIN */
@@ -53,26 +55,32 @@ function createRenderedTextForCode(code: string, attributes: ScriptAttributes, l
   if (!code && !attributes.length) return getPlaceHolderCode(language, true);
 
   const attributesString = createAttributesString(attributes);
-  if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-    return `<script ${attributesString ? `${attributesString}` : `type="text/javascript"`}>\n${code}\n</script>`;
-  }
-  if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-    return `<style ${attributesString ? `${attributesString}` : `type="text/css"`}>\n${code}\n</style>`;
+
+  switch (language) {
+    case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
+      return `<script ${attributesString ? `${attributesString}` : `type="text/javascript"`}>\n${code}\n</script>`;
+    case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
+      return `<style ${attributesString ? `${attributesString}` : `type="text/css"`}>\n${code}\n</style>`;
+    default:
+      return null;
   }
 }
 
 // ScriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL
 function getRenderedTextForURLType(attributes: ScriptAttributes, language: ScriptLanguage) {
   const attributesString = createAttributesString(attributes);
-  if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-    return `<script src={{scriptURL}} ${
-      attributesString ? ` ${attributesString}` : `type="text/javascript"`
-    }>${getInfoMessageAsComment(language)}</script>`;
-  }
-  if (language === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-    return `<link href={{scriptURL}} ${
-      attributesString ? ` ${attributesString}` : `rel="stylesheet" type="text/css"`
-    }>${getInfoMessageAsComment(language)}`;
+  const infoComment = getInfoMessageAsComment(language);
+  switch (language) {
+    case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
+      return `<script src={{scriptURL}} ${
+        attributesString ? ` ${attributesString}` : `type="text/javascript"`
+      }>${infoComment}</script>`;
+    case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
+      return `<link href={{scriptURL}} ${
+        attributesString ? ` ${attributesString}` : `rel="stylesheet" type="text/css"`
+      }>${infoComment}`;
+    default:
+      return null;
   }
 }
 
@@ -83,11 +91,13 @@ export function createRenderedScript(
   type: ScriptType,
   language: ScriptLanguage
 ) {
-  if (type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-    return getRenderedTextForURLType(attrs, language);
-  }
-  if (type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
-    return createRenderedTextForCode(code, attrs, language);
+  switch (type) {
+    case GLOBAL_CONSTANTS.SCRIPT_TYPES.URL:
+      return getRenderedTextForURLType(attrs, language);
+    case GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE:
+      return createRenderedTextForCode(code, attrs, language);
+    default:
+      return null;
   }
 }
 
@@ -102,6 +112,6 @@ export function getDefaultScriptRender(
     case GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE:
       return getPlaceHolderCode(language, isCompatibleWithAttributes);
     default:
-      return "";
+      return null;
   }
 }
