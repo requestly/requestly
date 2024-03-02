@@ -20,7 +20,7 @@ const ScriptRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
 
   const isInEditMode = location.pathname.split("/rules/editor")[1]?.startsWith("/edit");
 
-  const toShowLibraries = isInEditMode && pair?.libraries?.length;
+  const toShowLibraries = isInEditMode && pair?.libraries?.length; // this, and the corresponding logic can be removed
 
   const [hasUserClickedDeleteIconInThisSession, setHasUserClickedDeleteIconInThisSession] = useState(false);
 
