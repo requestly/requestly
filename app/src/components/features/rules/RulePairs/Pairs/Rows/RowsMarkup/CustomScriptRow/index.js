@@ -30,9 +30,9 @@ function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
       if (isCompatibleWithAttributes) {
         switch (language) {
           case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
-            return `<script type="text/javscript">${getInfoMessageAsComment(language)}</script>`;
+            return `<script src={{scriptURL}} type="text/javscript">${getInfoMessageAsComment(language)}</script>`;
           case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
-            return `<link rel="stylesheet" type="text/css">${getInfoMessageAsComment(language)}`;
+            return `<link href={{scriptURL}} rel="stylesheet" type="text/css">${getInfoMessageAsComment(language)}`;
         }
       }
       break;
@@ -53,23 +53,9 @@ function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
   return "";
 }
 
-const createAttributesString = (attributes = [], scriptType, scriptValue, scriptCodeType) => {
-  // adding the saved url attribute
-  const _attributes = Array.from(attributes);
-  if (scriptType === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-    const urlAttrName = scriptCodeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "src" : "href";
-
-    const urlIndex = _attributes.findIndex((attr) => attr.name === urlAttrName);
-    if (urlIndex > -1) {
-      _attributes.splice(urlIndex, 1);
-    }
-    _attributes.unshift({
-      name: urlAttrName,
-      value: scriptValue,
-    });
-  }
+const createAttributesString = (attributes = []) => {
   const attributesString =
-    _attributes
+    attributes
       ?.map(({ name: attrName, value: attrVal }) => {
         if (!attrVal) return `${attrName}`;
         return `${attrName}="${attrVal}"`;
@@ -117,6 +103,7 @@ const CustomScriptRow = ({
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
   useEffect(() => {
+    /* USED TO SET THE CORRECT RENDERED VALUE OF THE RULE, ON EVERY UPDATE */
     if (initialCodeEditorValue !== null) return;
     let newValue = script.value;
     if (!script.value) {
@@ -125,18 +112,18 @@ const CustomScriptRow = ({
       newValue = script.value;
     } else if (script.attributes?.length > 0) {
       const attributes = script.attributes ?? [];
-      const attributesString = createAttributesString(attributes, script.type, script.value, script.codeType);
+      const attributesString = createAttributesString(attributes);
 
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script ${attributesString ? ` ${attributesString}` : ``}>${getInfoMessageAsComment(
-            script.codeType
-          )}</script>`;
+          newValue = `<script src={{scriptURL}} ${
+            attributesString ? ` ${attributesString}` : ``
+          }>${getInfoMessageAsComment(script.codeType)}</script>`;
         }
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<link ${attributesString ? ` ${attributesString}` : ``}>${getInfoMessageAsComment(
-            script.codeType
-          )}`;
+          newValue = `<link href={{scriptURL}} ${
+            attributesString ? ` ${attributesString}` : ``
+          }>${getInfoMessageAsComment(script.codeType)}`;
         }
       }
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
@@ -150,8 +137,16 @@ const CustomScriptRow = ({
     } else {
       /* APP IS COMPATIBLE WITH ATTRIBUTES BUT NO ATTRIBUTES ARE PRESENT IN CURRENT RULE */
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-        newValue = script.wrapperElement;
-      } else {
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
+          console.log("[D2] 4");
+          newValue = `<script src={{scriptURL}} type="text/javascript">${getInfoMessageAsComment(
+            script.codeType
+          )}</script>`;
+        }
+        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
+          newValue = `<link href={{scriptURL}}>${getInfoMessageAsComment(script.codeType)}`;
+        }
+      } else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
         if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
           newValue = `<script type="text/javascript">\n${script.value}\n</script>`;
         }
