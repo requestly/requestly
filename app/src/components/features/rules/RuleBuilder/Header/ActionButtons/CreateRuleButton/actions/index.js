@@ -6,7 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import _, { inRange } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { ResponseRuleResourceType } from "types/rules";
-import { parseHTMLString, getHTMLNodeName, validateHTMLTag } from "./insertScriptValidators";
+import { parseHTMLString, getHTMLNodeName, validateHTMLTag, removeUrlAttribute } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 
@@ -95,7 +95,10 @@ export const transformAndValidateRuleFields = (ruleData) => {
                 pairId: ruleData.pairs[pairIndex].id,
               });
             }
-            const { attributes } = parseHTMLString(script.wrapperElement, codeHTMLTagName);
+            const { attributes: _attr } = parseHTMLString(script.wrapperElement, codeHTMLTagName);
+
+            const attributes = removeUrlAttribute(_attr, script.codeType);
+
             newRuleData.pairs[pairIndex].scripts[scriptIndex] = {
               ...script,
               attributes,
