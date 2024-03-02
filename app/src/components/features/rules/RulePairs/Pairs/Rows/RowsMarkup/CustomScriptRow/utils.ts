@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-ignore Expected to through an error since we haven't compiled this module with ts yet!
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 /* TYPES */
@@ -58,9 +58,9 @@ function createRenderedTextForCode(code: string, attributes: ScriptAttributes, l
 
   switch (language) {
     case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
-      return `<script ${attributesString ? `${attributesString}` : `type="text/javascript"`}>\n${code}\n</script>`;
+      return `<script ${attributesString ? `${attributesString}` : 'type="text/javascript"'}>\n${code}\n</script>`;
     case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
-      return `<style ${attributesString ? `${attributesString}` : `type="text/css"`}>\n${code}\n</style>`;
+      return `<style ${attributesString ? `${attributesString}` : 'type="text/css"'}>\n${code}\n</style>`;
     default:
       return null;
   }
@@ -73,11 +73,11 @@ function getRenderedTextForURLType(attributes: ScriptAttributes, language: Scrip
   switch (language) {
     case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
       return `<script src={{scriptURL}} ${
-        attributesString ? ` ${attributesString}` : `type="text/javascript"`
+        attributesString ? ` ${attributesString}` : 'type="text/javascript"'
       }>${infoComment}</script>`;
     case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
       return `<link href={{scriptURL}} ${
-        attributesString ? ` ${attributesString}` : `rel="stylesheet" type="text/css"`
+        attributesString ? ` ${attributesString}` : 'rel="stylesheet" type="text/css"'
       }>${infoComment}`;
     default:
       return null;
