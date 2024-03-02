@@ -12,59 +12,9 @@ import "./CustomScriptRow.css";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { getDefaultScriptRender, createRenderedScript } from "./utils";
 
 const { Text } = Typography;
-
-function getInfoMessageAsComment(scriptLanguage) {
-  if (scriptLanguage === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS)
-    return "\n  // Custom attributes to the script can be added here.\n  // Everything else will be ignored.\n";
-  if (scriptLanguage === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS)
-    return "\n<!--\n  Custom attributes to the script can be added here.\n  Everything else will be ignored \n-->\n";
-
-  return null;
-}
-
-function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
-  switch (scriptType) {
-    case GLOBAL_CONSTANTS.SCRIPT_TYPES.URL:
-      if (isCompatibleWithAttributes) {
-        switch (language) {
-          case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
-            return `<script src={{scriptURL}} type="text/javscript">${getInfoMessageAsComment(language)}</script>`;
-          case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
-            return `<link href={{scriptURL}} rel="stylesheet" type="text/css">${getInfoMessageAsComment(language)}`;
-        }
-      }
-      break;
-    case GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE:
-      switch (language) {
-        case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
-          return isCompatibleWithAttributes
-            ? '<script type="text/javascript">\n\tconsole.log("Hello World");\n</script>'
-            : 'console.log("Hello World");';
-        case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
-          return isCompatibleWithAttributes
-            ? "<style>\n\tbody {\n\t\t background-color: #fff;\n\t}\n</style>"
-            : "body {\n\t background-color: #fff;\n }";
-      }
-      break;
-  }
-
-  return "";
-}
-
-const createAttributesString = (attributes = []) => {
-  const attributesString =
-    attributes
-      ?.map(({ name: attrName, value: attrVal }) => {
-        if (!attrVal) return `${attrName}`;
-        return `${attrName}="${attrVal}"`;
-      })
-      .join(" ") ?? "";
-
-  attributesString.trim();
-  return attributesString;
-};
 
 const CustomScriptRow = ({
   rowIndex,
@@ -89,7 +39,7 @@ const CustomScriptRow = ({
   const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
 
   const scriptEditorBoilerCode = useMemo(() => {
-    return getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
+    return getDefaultScriptRender(script.codeType, script.type, isCompatibleWithAttributes);
   }, [script.codeType, script.type, isCompatibleWithAttributes]);
 
   const codeEditorLanguage = useMemo(() => {
@@ -107,53 +57,11 @@ const CustomScriptRow = ({
     if (initialCodeEditorValue !== null) return;
     let newValue = script.value;
     if (!script.value) {
-      newValue = getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
+      newValue = getDefaultScriptRender(script.codeType, script.type, isCompatibleWithAttributes);
     } else if (!isCompatibleWithAttributes) {
       newValue = script.value;
-    } else if (script.attributes?.length > 0) {
-      const attributes = script.attributes ?? [];
-      const attributesString = createAttributesString(attributes);
-
-      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script src={{scriptURL}} ${
-            attributesString ? ` ${attributesString}` : ``
-          }>${getInfoMessageAsComment(script.codeType)}</script>`;
-        }
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<link href={{scriptURL}} ${
-            attributesString ? ` ${attributesString}` : ``
-          }>${getInfoMessageAsComment(script.codeType)}`;
-        }
-      }
-      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script ${attributesString ? `${attributesString}` : ""}>\n${script.value}\n</script>`;
-        }
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<style ${attributesString ? `${attributesString}` : ""}>\n${script.value}\n</style>`;
-        }
-      }
     } else {
-      /* APP IS COMPATIBLE WITH ATTRIBUTES BUT NO ATTRIBUTES ARE PRESENT IN CURRENT RULE */
-      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          console.log("[D2] 4");
-          newValue = `<script src={{scriptURL}} type="text/javascript">${getInfoMessageAsComment(
-            script.codeType
-          )}</script>`;
-        }
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<link href={{scriptURL}}>${getInfoMessageAsComment(script.codeType)}`;
-        }
-      } else if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script type="text/javascript">\n${script.value}\n</script>`;
-        }
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<style>\n${script.value}\n</style>`;
-        }
-      }
+      newValue = createRenderedScript(script.value, script.attributes, script.type, script.codeType);
     }
 
     setInitialCodeEditorValue(newValue);
