@@ -12,7 +12,7 @@ import {
   defaultHtmlEditorMock,
   defaultJsEditorMock,
 } from "../MockEditorIndex/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { AiOutlineCloudUpload } from "@react-icons/all-files/ai/AiOutlineCloudUpload";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { Row, Space, Typography } from "antd";
@@ -134,7 +134,7 @@ const MockPickerIndex: React.FC<Props> = ({
             <AuthConfirmationPopover
               title="You need to sign up to create file mocks"
               callback={handleCreateNewFile}
-              source={AUTH.SOURCE.CREATE_FILE_MOCK}
+              source={SOURCE.CREATE_FILE_MOCK}
             >
               <RQButton type="default" className="getting-started-btn" onClick={user?.loggedIn && handleCreateNewFile}>
                 Create new mock file
@@ -143,7 +143,7 @@ const MockPickerIndex: React.FC<Props> = ({
             <AuthConfirmationPopover
               title="You need to sign up to create API mocks"
               callback={handleCreateNewMock}
-              source={AUTH.SOURCE.CREATE_API_MOCK}
+              source={SOURCE.CREATE_API_MOCK}
             >
               <RQButton type="primary" className="getting-started-btn" onClick={user?.loggedIn && handleCreateNewMock}>
                 Create new mock API
