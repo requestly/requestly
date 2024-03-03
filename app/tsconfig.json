@@ -18,7 +18,8 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./src",
-    "paths": {}
+    "paths": {},
+    "typeRoots": ["./node_modules/@types", "./node_modules/@saturnhq"]
   },
   "exclude": ["node_modules", "build"],
   "include": ["./src/**/*"]
