@@ -8,7 +8,7 @@ import { redirectToCreateNewApp, redirectToMobileDebuggerHome } from "utils/Redi
 import { APP_PLATFORMS_MAP } from "../screens/createApp/constants";
 import { getSdkApps } from "../utils/sdkUtils";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
-import { AUTH } from "modules/analytics/events/common/constants.js";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 const { Title } = Typography;
 
@@ -87,7 +87,7 @@ const MobileDebuggerAppSelector = () => {
       <AuthConfirmationPopover
         title="You need to sign up to create a new app"
         onConfirm={createNewAppHandler}
-        source={AUTH.SOURCE.CREATE_NEW_APP}
+        source={SOURCE.CREATE_NEW_APP}
       >
         <Button type="primary" onClick={user?.details?.isLoggedIn && createNewAppHandler}>
           <PlusOutlined /> Create New App

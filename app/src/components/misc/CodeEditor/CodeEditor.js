@@ -24,7 +24,7 @@ loader.config({
 /**
  * Editor id is used to match the exact editor instance for showing the editor toast
  *
- * in case of rules. id is `pair.id`
+ * in case of rules. id is `pair.id` (script id in case of script rule)
  * while creating the rules. id is `temp-${rule.type}-rule` // HACKY
  * in case of mocks. id is `${mock.id}`
  */

@@ -10,7 +10,7 @@ import { toast } from "utils/Toast.js";
 import { deleteGroup } from "../RulesListContainer/RulesTable/actions";
 import { deleteGroupsFromStorage, deleteRulesFromStorage } from "../DeleteRulesModal/actions";
 import { addRecordsToTrash } from "utils/trash/TrashUtils";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
@@ -132,7 +132,7 @@ const UngroupOrDeleteRulesModal = ({ isOpen, toggle, groupIdToDelete, groupRules
   const deleteRulesAndThenGroup = () => {
     // Login is mandatory since we have move Rules to the Trash
     if (!user.loggedIn) {
-      promptUserToSignup(AUTH.SOURCE.DELETE_RULE);
+      promptUserToSignup(SOURCE.DELETE_RULE);
       return;
     }
 

@@ -9,7 +9,7 @@ import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
-import { trackRulePairCreated } from "modules/analytics/events/common/rules";
+import { trackRulePairCreated, trackRulePairCreationAttempted } from "modules/analytics/events/common/rules";
 import "./AddPairButton.css";
 
 const AddPairButton = (props) => {
@@ -32,7 +32,10 @@ const AddPairButton = (props) => {
   const handleRulePairsOnClick = () => {
     addEmptyPair(currentlySelectedRuleData, currentlySelectedRuleConfig, dispatch);
     trackRQLastActivity("rule_pair_created");
-    trackRulePairCreated({ current_pairs_count: currentlySelectedRuleCount });
+    trackRulePairCreated({
+      current_pairs_count: currentlySelectedRuleCount,
+      rule_type: currentlySelectedRuleData.ruleType,
+    });
   };
 
   return (
@@ -41,6 +44,7 @@ const AddPairButton = (props) => {
       onContinue={handleRulePairsOnClick}
       features={[FeatureLimitType.add_new_rule_pair]}
       source="add_new_rule_pair"
+      onClickCallback={() => trackRulePairCreationAttempted(currentlySelectedRuleData.ruleType)}
     >
       <Button block type="dashed" className="add-pair-btn" icon={<PlusOutlined />}>
         <span>

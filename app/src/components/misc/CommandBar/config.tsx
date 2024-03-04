@@ -30,7 +30,7 @@ import { ActionProps, CommandBarItem, CommandItemType, PageConfig, Page, TitlePr
 import { Tag } from "antd";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.css";
 
 export const config: PageConfig[] = [
@@ -223,7 +223,7 @@ const newRuleChildren: CommandBarItem[] = Object.values(RULE_TYPES_CONFIG)
                   newProps: {
                     callback: () => redirectToCreateNewRule(navigate, TYPE, "command_bar"),
                     authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-                    eventSource: AUTH.SOURCE.COMMAND_BAR,
+                    eventSource: SOURCE.COMMAND_BAR,
                   },
                 })
               );

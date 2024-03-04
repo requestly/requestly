@@ -9,7 +9,7 @@ import { StorageService } from "init";
 import { toast } from "utils/Toast";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 import { useRulesContext } from "../../RulesListIndex/context";
 import { convertToArray, isRule } from "../utils";
@@ -125,7 +125,7 @@ const useRuleTableActions = () => {
   const handleRecordShare = (records: StorageRecord | StorageRecord[], clearSelection?: () => void) => {
     // TODO
     trackShareButtonClicked(clearSelection ? "bulk_action_bar" : "rules_list");
-    user.loggedIn ? toggleSharingModal(records, clearSelection) : promptUserToSignup(AUTH.SOURCE.SHARE_RULES);
+    user.loggedIn ? toggleSharingModal(records, clearSelection) : promptUserToSignup(SOURCE.SHARE_RULES);
   };
 
   // Generic

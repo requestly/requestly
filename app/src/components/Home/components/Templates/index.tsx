@@ -13,10 +13,10 @@ import {
 import templatesMap from "../../../landing/ruleTemplates/templates.json";
 import { RuleType } from "types";
 import PATHS from "config/constants/sub/paths";
-import { AUTH } from "modules/analytics/events/common/constants";
-import "./index.scss";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { IoIosArrowDropright } from "@react-icons/all-files/io/IoIosArrowDropright";
 import { IoIosArrowDropleft } from "@react-icons/all-files/io/IoIosArrowDropleft";
+import "./index.scss";
 
 export const Templates: React.FC = () => {
   const scrollContainerRef = useRef(null);
@@ -76,7 +76,7 @@ export const Templates: React.FC = () => {
           isOpen={isPreviewModalOpen}
           toggle={() => setIsPreviewModalOpen((prev) => !prev)}
           rule={ruleToPreview}
-          source={AUTH.SOURCE.HOME_SCREEN}
+          source={SOURCE.HOME_SCREEN}
         />
       )}
       <Col className="home-templates-wrapper">
