@@ -24,6 +24,7 @@ import {
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
+import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
@@ -230,8 +231,10 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
     (importType) => {
       if (isImportLimitReached) {
         toast.error(
-          "You have reached the limit of rules you can import. Please upgrade your plan to import more rules."
+          "The rules cannot be imported due to exceeding free plan limits. To proceed, consider upgrading your plan.",
+          4
         );
+        trackUpgradeToastViewed(rulesToImportCount, "import_rules_modal");
         return;
       }
 
@@ -243,7 +246,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
         doImportRules(importType);
       }
     },
-    [isImportLimitReached, allRules, dataToImport, doImportRules, user]
+    [isImportLimitReached, allRules, dataToImport, doImportRules, user, rulesToImportCount]
   );
 
   const renderWarningMessage = () => {

@@ -258,7 +258,8 @@ const CreateRuleButton = ({
   const saveFn = (event) => {
     if ((navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === "s") {
       event.preventDefault();
-      handleBtnOnClick("cmd+s");
+      // simulating click on save button when user presses cmd+s or ctrl+s to invoke upgrade popover
+      document.getElementById("rule-editor-save-btn").click();
     }
   };
 
@@ -279,7 +280,13 @@ const CreateRuleButton = ({
         source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">
-          <Button data-tour-id="rule-editor-create-btn" type="primary" className="text-bold" disabled={isDisabled}>
+          <Button
+            data-tour-id="rule-editor-create-btn"
+            id="rule-editor-save-btn"
+            type="primary"
+            className="text-bold"
+            disabled={isDisabled}
+          >
             {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
             {`Save rule`}
           </Button>
