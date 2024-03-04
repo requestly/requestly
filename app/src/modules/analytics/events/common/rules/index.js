@@ -10,9 +10,11 @@ export const trackRuleCreatedEvent = ({
   num_characters,
   header_types,
   header_actions,
+  save_type,
 }) => {
   const params = {
     rule_type,
+    save_type,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
@@ -33,9 +35,11 @@ export const trackRuleEditedEvent = ({
   num_characters,
   header_types,
   header_actions,
+  save_type,
 }) => {
   const params = {
     rule_type,
+    save_type,
   };
   if (description) params.description = description;
   if (destination_types) params.destination_types = destination_types;
@@ -74,6 +78,10 @@ export const trackRuleToggled = (rule_type, source, updated_status) => {
   trackEvent(RULES.RULE_TOGGLED, params);
 };
 
+export const trackRuleToggleAttempted = (current_status) => {
+  trackEvent(RULES.RULE_TOGGLE_ATTEMPTED, { current_status });
+};
+
 export const trackRuleDuplicatedEvent = (rule_type, workspace, source) => {
   const params = {
     rule_type,
@@ -103,9 +111,14 @@ export const trackRulesExportedEvent = (count) => {
   trackEvent(RULES.RULES_EXPORTED, params);
 };
 
-export const trackRulePairCreated = ({ current_pairs_count }) => {
+export const trackRulePairCreationAttempted = (rule_type) => {
+  trackEvent(RULES.RULE_PAIR_CREATION_ATTEMPTED, { rule_type });
+};
+
+export const trackRulePairCreated = ({ current_pairs_count, rule_type }) => {
   const params = {
     current_pairs_count,
+    rule_type,
   };
   trackEvent(RULES.RULE_PAIR_CREATED, params);
 };
@@ -226,4 +239,8 @@ export const trackDocsSidebarDemovideoWatched = (rule_type) => {
 export const trackDocsSidebarContactUsClicked = (rule_type) => {
   const params = { rule_type };
   trackEvent(RULES.DOCS_SIDEBAR_CONTACT_US_CLICKED, params);
+};
+
+export const trackRuleSaveClicked = (mode) => {
+  trackEvent(RULES.RULE_SAVE_CLICKED, { mode });
 };

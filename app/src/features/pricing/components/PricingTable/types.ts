@@ -8,6 +8,7 @@ export type PlanFeatures = {
         title: string;
         enabled: boolean;
         tooltip?: string;
+        visibleInPricingPageOnly?: boolean;
       }[];
     };
   };

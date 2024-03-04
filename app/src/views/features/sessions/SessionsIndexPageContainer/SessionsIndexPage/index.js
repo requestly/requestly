@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { SettingOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "../../../../../store/selectors";
 import firebaseApp from "../../../../../firebase";
 import {
@@ -134,7 +134,7 @@ const SessionsIndexPage = () => {
           newProps: {
             redirectURL: window.location.href,
             callback: () => redirectToSessionSettings(navigate, window.location.pathname, "sessions"),
-            eventSource: AUTH.SOURCE.SESSION_RECORDING,
+            eventSource: SOURCE.SESSION_RECORDING,
           },
         })
       );
@@ -182,7 +182,7 @@ const SessionsIndexPage = () => {
           modalName: "authModal",
           newValue: true,
           newProps: {
-            eventSource: AUTH.SOURCE.SESSION_RECORDING,
+            eventSource: SOURCE.SESSION_RECORDING,
           },
         })
       );
