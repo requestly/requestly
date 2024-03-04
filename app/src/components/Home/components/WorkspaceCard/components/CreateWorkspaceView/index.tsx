@@ -7,7 +7,7 @@ import { groupSvg } from "features/onboarding";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { actions } from "store";
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
 export const CreateWorkspaceView: React.FC = () => {
@@ -21,7 +21,7 @@ export const CreateWorkspaceView: React.FC = () => {
         modalName: "createWorkspaceModal",
         newValue: true,
         newProps: {
-          source: AUTH.SOURCE.HOME_SCREEN,
+          source: SOURCE.HOME_SCREEN,
         },
       })
     );

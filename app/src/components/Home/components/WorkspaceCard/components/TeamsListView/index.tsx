@@ -9,7 +9,7 @@ import { Invite, Team } from "types";
 import { actions } from "store";
 import { getAvailableTeams } from "store/features/teams/selectors";
 import { trackHomeWorkspaceActionClicked } from "components/Home/analytics";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./teamsListView.scss";
 
 interface Props {
@@ -76,7 +76,7 @@ export const TeamsListView: React.FC<Props> = ({ pendingInvites, heading, subhea
                 modalName: "createWorkspaceModal",
                 newValue: true,
                 newProps: {
-                  source: AUTH.SOURCE.HOME_SCREEN,
+                  source: SOURCE.HOME_SCREEN,
                 },
               })
             );

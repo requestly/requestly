@@ -21,8 +21,8 @@ import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events
 import ProductsDropDown from "./ProductsDropDown";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 import APP_CONSTANTS from "config/constants";
-import "./MenuHeader.css";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
+import "./MenuHeader.css";
 
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;

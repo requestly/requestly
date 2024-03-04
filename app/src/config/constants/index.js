@@ -118,7 +118,7 @@ APP_CONSTANTS.TEAM_WORKSPACES = TEAM_WORKSPACES;
 // Moved from global constants
 APP_CONSTANTS.SUBSCRIPTION_STATUS = {
   ACTIVE: "active",
-  CANCELLED: "cancelled",
+  CANCELLED: "canceled",
   TRIALING: "trialing",
 };
 
