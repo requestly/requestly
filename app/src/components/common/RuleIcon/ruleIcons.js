@@ -1,13 +1,13 @@
-import { ReactComponent as Redirect } from "assets/icons/rule-types/redirect.svg";
-import { ReactComponent as Cancel } from "assets/icons/rule-types/cancel.svg";
-import { ReactComponent as Replace } from "assets/icons/rule-types/replace.svg";
-import { ReactComponent as Headers } from "assets/icons/rule-types/headers.svg";
-import { ReactComponent as QueryParam } from "assets/icons/rule-types/queryparam.svg";
-import { ReactComponent as Script } from "assets/icons/rule-types/script.svg";
-import { ReactComponent as Request } from "assets/icons/rule-types/request.svg";
-import { ReactComponent as Response } from "assets/icons/rule-types/response.svg";
-import { ReactComponent as Delay } from "assets/icons/rule-types/delay.svg";
-import { ReactComponent as UserAgent } from "assets/icons/rule-types/useragent.svg";
+import Redirect from "assets/icons/rule-types/redirect.svg?react";
+import Cancel from "assets/icons/rule-types/cancel.svg?react";
+import Replace from "assets/icons/rule-types/replace.svg?react";
+import Headers from "assets/icons/rule-types/headers.svg?react";
+import QueryParam from "assets/icons/rule-types/queryparam.svg?react";
+import Script from "assets/icons/rule-types/script.svg?react";
+import Request from "assets/icons/rule-types/request.svg?react";
+import Response from "assets/icons/rule-types/response.svg?react";
+import Delay from "assets/icons/rule-types/delay.svg?react";
+import UserAgent from "assets/icons/rule-types/useragent.svg?react";
 
 export const ruleIcons = {
   Redirect: <Redirect />,

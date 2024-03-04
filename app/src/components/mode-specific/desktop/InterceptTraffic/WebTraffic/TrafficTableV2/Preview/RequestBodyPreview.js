@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button, Tag } from "antd";
-import _ from "lodash";
+import { isEqual } from "lodash";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { toast } from "utils/Toast";
 import { createResponseRule, updateResponseRule } from "../../../../../../features/rules/RuleBuilder/actions/utils";
@@ -67,7 +67,7 @@ const RequestBodyPreview = ({ data, type, url, actions, log_id, upsertRequestAct
    * so as to avoid loosing ungoing modification
    */
   useEffect(() => {
-    if (!_.isEqual(currentData, data) && !isUpdating) {
+    if (!isEqual(currentData, data) && !isUpdating) {
       setCurrentData(data);
       setModifiedData(data);
     }
@@ -82,7 +82,7 @@ const RequestBodyPreview = ({ data, type, url, actions, log_id, upsertRequestAct
    * modifiedData != currentData
    */
   useEffect(() => {
-    if (_.isEqual(currentData, modifiedData)) {
+    if (isEqual(currentData, modifiedData)) {
       setIsUpdating(false);
     } else {
       setIsUpdating(true);
