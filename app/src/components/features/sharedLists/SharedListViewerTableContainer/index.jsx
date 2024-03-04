@@ -52,8 +52,8 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   //Component state
   const [areRulesImporting, setAreRulesImporting] = useState(false);
   const isImportLimitReached = useMemo(
-    () => getFeatureLimitValue(FeatureLimitType.num_rules) < rules.length && userAttributes.days_since_install > 3,
-    [rules.length, getFeatureLimitValue, userAttributes.days_since_install]
+    () => getFeatureLimitValue(FeatureLimitType.num_rules) < rules.length && userAttributes?.days_since_install > 3,
+    [rules.length, getFeatureLimitValue, userAttributes?.days_since_install]
   );
 
   const functions = getFunctions();
