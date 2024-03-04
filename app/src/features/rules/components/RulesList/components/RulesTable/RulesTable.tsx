@@ -91,7 +91,6 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
   }, [expandedGroups, isGroupsStateUpdated, getExpandedGroupRowKeys]);
 
   useEffect(() => {
-    // TODO: run this effect only once
     const activePremiumRules = allRecords.reduce((accumulator, record) => {
       if (
         isRule(record) &&
