@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
@@ -8,11 +10,13 @@ import { getAllRules, getAppMode, getIsRefreshRulesPending, getUserAuthDetails }
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { actions } from "store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
-import { AUTH } from "modules/analytics/events/common/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { RQModal } from "lib/design-system/components";
+import { FilePicker } from "components/common/FilePicker";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { RULE_IMPORT_TYPE } from "features/rules";
+import { AUTH } from "modules/analytics/events/common/constants";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
 import {
   trackRulesJsonParsed,
@@ -20,9 +24,6 @@ import {
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
-import { FilePicker } from "components/common/FilePicker";
-import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { FeatureLimitType } from "hooks/featureLimiter/types";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
@@ -187,7 +188,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
               data-dismiss="modal"
               type="button"
               onClick={() => {
-                handleRulesAndGroupsImport("overwrite");
+                handleRulesAndGroupsImport(RULE_IMPORT_TYPE.OVERWRITE);
               }}
             >
               Overwrite Conflicting Rules
@@ -197,7 +198,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
               data-dismiss="modal"
               type="button"
               onClick={() => {
-                handleRulesAndGroupsImport("duplicate");
+                handleRulesAndGroupsImport(RULE_IMPORT_TYPE.DUPLICATE);
               }}
             >
               Duplicate Conflicting Rules
@@ -217,7 +218,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
           className="ml-auto"
           data-dismiss="modal"
           loading={isImporting}
-          onClick={() => handleRulesAndGroupsImport("normal")}
+          onClick={() => handleRulesAndGroupsImport(RULE_IMPORT_TYPE.NORMAL)}
         >
           Import
         </Button>
@@ -234,12 +235,12 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
         return;
       }
 
-      if (importType === "overwrite" || importType === "normal") {
+      if (importType === RULE_IMPORT_TYPE.OVERWRITE || importType === RULE_IMPORT_TYPE.NORMAL) {
         // by default overwrite is true so we dont need to process the importData again
         doImportRules(importType);
       } else {
         processDataToImport(dataToImport, user, allRules, false);
-        doImportRules("duplicate");
+        doImportRules(importType);
       }
     },
     [isImportLimitReached, allRules, dataToImport, doImportRules, user]
