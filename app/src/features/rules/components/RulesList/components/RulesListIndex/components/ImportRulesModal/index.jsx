@@ -47,7 +47,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [isImporting, setIsImporting] = useState(false);
 
   const isImportLimitReached = useMemo(() => {
-    return getFeatureLimitValue(FeatureLimitType.num_rules) <= rulesToImportCount;
+    return getFeatureLimitValue(FeatureLimitType.num_rules) < rulesToImportCount;
   }, [rulesToImportCount, getFeatureLimitValue]);
 
   const onDrop = useCallback(
