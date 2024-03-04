@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { addRulesAndGroupsToStorage, processDataToImport } from "../../rules/ImportRulesModal/actions";
 //UTILS
 import { redirectToRules } from "../../../../utils/RedirectionUtils";
-import { getAppMode, getUserAuthDetails } from "../../../../store/selectors";
+import { getAppMode, getUserAttributes, getUserAuthDetails } from "../../../../store/selectors";
 import { isExtensionInstalled } from "../../../../actions/ExtensionActions";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -43,6 +43,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
 
   //Global State
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
   const allRules = useSelector(getAllRules);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const user = useSelector(getUserAuthDetails);
@@ -50,10 +51,10 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
 
   //Component state
   const [areRulesImporting, setAreRulesImporting] = useState(false);
-  const isImportLimitReached = useMemo(() => getFeatureLimitValue(FeatureLimitType.num_rules) < rules.length, [
-    rules.length,
-    getFeatureLimitValue,
-  ]);
+  const isImportLimitReached = useMemo(
+    () => getFeatureLimitValue(FeatureLimitType.num_rules) < rules.length && userAttributes.days_since_install > 3,
+    [rules.length, getFeatureLimitValue, userAttributes.days_since_install]
+  );
 
   const functions = getFunctions();
   const sendSharedListImportAsEmail = httpsCallable(functions, "sharedLists-sendSharedListImportAsEmail");

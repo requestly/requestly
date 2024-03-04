@@ -6,7 +6,13 @@ import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
-import { getAllRules, getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
+import {
+  getAllRules,
+  getAppMode,
+  getIsRefreshRulesPending,
+  getUserAttributes,
+  getUserAuthDetails,
+} from "store/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { actions } from "store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
@@ -33,6 +39,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
+  const userAttributes = useSelector(getUserAttributes);
   const { getFeatureLimitValue } = useFeatureLimiter();
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
@@ -47,8 +54,10 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [isImporting, setIsImporting] = useState(false);
 
   const isImportLimitReached = useMemo(() => {
-    return getFeatureLimitValue(FeatureLimitType.num_rules) < rulesToImportCount;
-  }, [rulesToImportCount, getFeatureLimitValue]);
+    return (
+      getFeatureLimitValue(FeatureLimitType.num_rules) < rulesToImportCount && userAttributes.days_since_install > 3
+    );
+  }, [rulesToImportCount, getFeatureLimitValue, userAttributes.days_since_install]);
 
   const onDrop = useCallback(
     async (acceptedFiles) => {
