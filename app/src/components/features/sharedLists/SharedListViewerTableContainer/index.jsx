@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "antd";
 import { toast } from "utils/Toast.js";
@@ -29,11 +29,15 @@ import { actions } from "store";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { snakeCase } from "lodash";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 
 const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { getFeatureLimitValue } = useFeatureLimiter();
   const queryParams = new URLSearchParams(location.search);
   const sharedListId = getSharedListIdFromURL(location.pathname);
 
@@ -46,6 +50,10 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
 
   //Component state
   const [areRulesImporting, setAreRulesImporting] = useState(false);
+  const isImportLimitReached = useMemo(() => getFeatureLimitValue(FeatureLimitType.num_rules) < rules.length, [
+    rules.length,
+    getFeatureLimitValue,
+  ]);
 
   const functions = getFunctions();
   const sendSharedListImportAsEmail = httpsCallable(functions, "sharedLists-sendSharedListImportAsEmail");
@@ -87,6 +95,16 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
       openAuthModal(SOURCE.IMPORT_SHARED_LIST);
       return;
     }
+
+    if (isImportLimitReached) {
+      toast.error(
+        "The rules cannot be imported due to exceeding free plan limits. To proceed, consider upgrading your plan.",
+        4
+      );
+      trackUpgradeToastViewed(rules.length, "shared_list_import");
+      return;
+    }
+
     if (isWorkspaceMode) {
       const message =
         "Do you really want to import this shared list to current workspace? It will be available for every team member.";
