@@ -8,7 +8,7 @@ import { BiPencil } from "@react-icons/all-files/bi/BiPencil";
 import { updateSessionName } from "../api";
 // @ts-ignore
 import CopyToClipboard from "react-copy-to-clipboard";
-import { ReactComponent as ExportOutlined } from "assets/icons/export-outlined.svg";
+import ExportOutlined from "assets/icons/export-outlined.svg?react";
 import {
   trackDraftSessionNamed,
   trackSavedSessionViewed,
