@@ -54,7 +54,6 @@ const useGrowthBookIntegration = () => {
 // This is used to prevent rerenders in `useGrowthBookIntegration` when `updateGrowthbookAttributes` is called since it triggers useFeatureValue change.
 export const GrowthbookExperimentHelperComponent = (): any => {
   // Fire experiment_assigned as soon as ui loads
-  useFeatureValue("paywall-visibility-threshold", 15);
   useFeatureValue("redirect_rule_onboarding", null);
   useFeatureValue("persona_recommendation", null);
 

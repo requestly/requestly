@@ -12,48 +12,9 @@ import "./CustomScriptRow.css";
 import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { getDefaultScriptRender, createRenderedScript } from "./utils";
 
 const { Text } = Typography;
-
-function getDefaultScript(language, scriptType, isCompatibleWithAttributes) {
-  switch (scriptType) {
-    case GLOBAL_CONSTANTS.SCRIPT_TYPES.URL:
-      if (isCompatibleWithAttributes) {
-        switch (language) {
-          case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
-            return '<!--  Custom attributes to the script can be added here.  -->\n<script type="text/javscript">\n//Everything else will be ignored \n</script>';
-          case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
-            return '<!--  Custom attributes to the script can be added here.  -->\n<link rel="stylesheet" type="text/css" >\n<!-- Everything else will be ignored  -->\n';
-        }
-      }
-      break;
-    case GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE:
-      switch (language) {
-        case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS:
-          return isCompatibleWithAttributes
-            ? '<script type="text/javascript">\n\tconsole.log("Hello World");\n</script>'
-            : 'console.log("Hello World");';
-        case GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS:
-          return isCompatibleWithAttributes
-            ? "<style>\n\tbody {\n\t\t background-color: #fff;\n\t}\n</style>"
-            : "body {\n\t background-color: #fff;\n }";
-      }
-      break;
-  }
-
-  return "";
-}
-
-const createAttributesString = (attributes) => {
-  const attributesString =
-    attributes
-      ?.map(({ name: attrName, value: attrVal }) => {
-        if (!attrVal) return `${attrName}`;
-        return `${attrName}="${attrVal}"`;
-      })
-      .join(" ") ?? "";
-  return attributesString;
-};
 
 const CustomScriptRow = ({
   rowIndex,
@@ -78,50 +39,29 @@ const CustomScriptRow = ({
   const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
 
   const scriptEditorBoilerCode = useMemo(() => {
-    return getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
+    return getDefaultScriptRender(script.codeType, script.type, isCompatibleWithAttributes);
   }, [script.codeType, script.type, isCompatibleWithAttributes]);
+
+  const codeEditorLanguage = useMemo(() => {
+    return isCompatibleWithAttributes
+      ? "html"
+      : script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS
+      ? "javascript"
+      : "css";
+  }, [script.codeType, isCompatibleWithAttributes]);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
   useEffect(() => {
+    /* USED TO SET THE CORRECT RENDERED VALUE OF THE RULE, ON EVERY UPDATE */
     if (initialCodeEditorValue !== null) return;
     let newValue = script.value;
     if (!script.value) {
-      newValue = getDefaultScript(script.codeType, script.type, isCompatibleWithAttributes);
+      newValue = getDefaultScriptRender(script.codeType, script.type, isCompatibleWithAttributes);
     } else if (!isCompatibleWithAttributes) {
       newValue = script.value;
-    } else if (script.attributes?.length > 0) {
-      const attributes = script.attributes ?? [];
-      const attributesString = createAttributesString(attributes);
-
-      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script ${attributesString ? ` ${attributesString}` : ``}></script>`;
-        }
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<link ${attributesString ? ` ${attributesString}` : ``}>`;
-        }
-      }
-      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE) {
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script${attributesString ? ` ${attributesString}` : ""}>${script.value}</script>`;
-        }
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<style${attributesString ? ` ${attributesString}` : ""}>${script.value}</style>`;
-        }
-      }
     } else {
-      /* APP IS COMPATIBLE WITH ATTRIBUTES BUT NO ATTRIBUTES ARE PRESENT IN CURRENT RULE */
-      if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
-        newValue = script.wrapperElement;
-      } else {
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS) {
-          newValue = `<script type="text/javascript">${script.value}</script>`;
-        }
-        if (script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.CSS) {
-          newValue = `<style>${script.value}</style>`;
-        }
-      }
+      newValue = createRenderedScript(script.value, script.attributes, script.type, script.codeType);
     }
 
     setInitialCodeEditorValue(newValue);
@@ -244,8 +184,8 @@ const CustomScriptRow = ({
     deleteScript(e, pairIndex, scriptIndex);
   };
 
-  const renderCodeEditor = () => {
-    const handleEditorUpdate = (value) => {
+  const handleEditorUpdate = useCallback(
+    (value) => {
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
         dispatch(
@@ -267,8 +207,17 @@ const CustomScriptRow = ({
           })
         );
       }
-    };
+    },
+    [dispatch, isCodeFormatted, pairIndex, script.type, scriptIndex]
+  );
 
+  useEffect(() => {
+    if (initialCodeEditorValue !== null) {
+      handleEditorUpdate(initialCodeEditorValue);
+    }
+  }, [initialCodeEditorValue, handleEditorUpdate]);
+
+  const renderCodeEditor = () => {
     const handleCodeFormattedFlag = () => {
       setIsCodeFormatted(true);
       setTimeout(() => {
@@ -288,9 +237,9 @@ const CustomScriptRow = ({
         >
           <Col xl="12" span={24}>
             <CodeEditor
-              id={pair.id}
-              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 75 : 300}
-              language={script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "javascript" : "css"}
+              id={script.id}
+              height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}
+              language={codeEditorLanguage}
               defaultValue={scriptEditorBoilerCode}
               value={initialCodeEditorValue}
               handleChange={handleEditorUpdate}
@@ -403,7 +352,7 @@ const CustomScriptRow = ({
   const CodeTypeOptions = () => {
     return (
       <Popconfirm
-        title="This will clear the existing code"
+        title="Changing the script language will reset the script to default placeholder"
         onConfirm={() => {
           onCodeTypeChange(codeTypeSelection);
           setIsCodeTypePopupVisible(false);
@@ -425,6 +374,7 @@ const CustomScriptRow = ({
   };
 
   const onSourceTypeChange = (sourceType) => {
+    setInitialCodeEditorValue(null);
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
@@ -443,7 +393,7 @@ const CustomScriptRow = ({
       <Popconfirm
         title={
           isCompatibleWithAttributes
-            ? "This will clear the existing attributes"
+            ? "Changing the script source will reset the script to default placeholder"
             : "This will clear the updates that you made"
         }
         onConfirm={() => {

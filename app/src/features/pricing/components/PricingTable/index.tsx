@@ -42,6 +42,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               product={product}
               source={source}
               setIsContactUsModalOpen={setIsContactUsModalOpen}
+              isOpenedFromModal={isOpenedFromModal}
             />
           );
         })}

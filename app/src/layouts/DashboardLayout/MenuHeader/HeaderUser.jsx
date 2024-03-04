@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Dropdown, Col, Avatar, Spin, Button } from "antd";
+import { Dropdown, Col, Avatar, Spin, Button, Tooltip } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import {
@@ -12,7 +12,7 @@ import {
 } from "utils/RedirectionUtils";
 import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
@@ -153,29 +153,37 @@ export default function HeaderUser() {
       ) : (
         <>
           <Col>
-            <Button
-              style={{ fontWeight: 500 }}
-              type="primary"
-              className="layout-header-signup-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                // PROMPT USER TO SIGNUP
-                dispatch(
-                  actions.toggleActiveModal({
-                    modalName: "authModal",
-                    newValue: true,
-                    newProps: {
-                      redirectURL: window.location.href,
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-                      eventSource: AUTH.SOURCE.NAVBAR,
-                    },
-                  })
-                );
-                return false;
-              }}
+            <Tooltip
+              title="No credit card required"
+              color="#000"
+              placement="bottom"
+              showArrow={false}
+              overlayClassName="signup-btn-popover"
             >
-              {paywallIntensityExp === "variantA" ? "Get a 30-day free trial" : "Sign up"}
-            </Button>
+              <Button
+                style={{ fontWeight: 500 }}
+                type="primary"
+                className="layout-header-signup-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // PROMPT USER TO SIGNUP
+                  dispatch(
+                    actions.toggleActiveModal({
+                      modalName: "authModal",
+                      newValue: true,
+                      newProps: {
+                        redirectURL: window.location.href,
+                        authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                        eventSource: SOURCE.NAVBAR,
+                      },
+                    })
+                  );
+                  return false;
+                }}
+              >
+                {paywallIntensityExp === "variantA" ? "Get a 30-day free trial" : "Sign up"}
+              </Button>
+            </Tooltip>
           </Col>
         </>
       )}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";
 import { RQModal } from "lib/design-system/components";
@@ -20,7 +21,9 @@ import {
 } from "modules/analytics/events/features/teams";
 import { trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
 import APP_CONSTANTS from "config/constants";
+import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import "./CreateWorkspaceModal.css";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -30,6 +33,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const billingTeams = useSelector(getAvailableBillingTeams);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -101,6 +105,9 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
                 is_admin: true,
                 source: "notify_all_teammates",
                 num_users_added: 1,
+                workspace_type: isWorkspaceMappedToBillingTeam(teamId, billingTeams)
+                  ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+                  : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
               });
             } else {
               switch (inviteRes.data.errCode) {
@@ -136,6 +143,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       upsertTeamCommonInvite,
       user?.details?.profile?.email,
       handlePostTeamCreation,
+      billingTeams,
     ]
   );
 

@@ -10,12 +10,12 @@ import { getAllRules, getAppMode, getIsRefreshRulesPending, getUserAuthDetails }
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { actions } from "store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { RULE_IMPORT_TYPE } from "features/rules";
-import { AUTH } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
 import {
@@ -278,7 +278,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
     if (isImportFromCharlesModalOpen) {
       toggleModal();
     } else {
-      trackCharlesSettingsImportStarted(AUTH.SOURCE.RULES_LIST);
+      trackCharlesSettingsImportStarted(SOURCE.RULES_LIST);
     }
 
     setIsImportFromCharlesModalOpen((prev) => !prev);
@@ -297,7 +297,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
         <ImportFromCharlesModal
           isOpen={isImportFromCharlesModalOpen}
           toggle={toggleImportFromCharlesModal}
-          triggeredBy={AUTH.SOURCE.RULES_LIST}
+          triggeredBy={SOURCE.RULES_LIST}
         />
       ) : null}
 

@@ -116,7 +116,7 @@ export async function validateHTMLTag(str, htmlNodeName) {
       return {
         isValid: false,
         validationError: HTML_ERRORS.NO_TAGS,
-        errorMessage: "No tags found in the document",
+        errorMessage: `No ${htmlNodeName} tags found in the script block`,
       };
     }
 
@@ -143,6 +143,12 @@ export async function validateHTMLTag(str, htmlNodeName) {
     isValid: true,
   };
 }
+
+export const removeUrlAttribute = (attributes, codeType) => {
+  const urlAttrName = codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? "src" : "href";
+
+  return attributes?.filter((attr) => attr.name !== urlAttrName) ?? [];
+};
 
 /* Pass the code string through an HTML linter and return errors if any */
 async function htmlValidateRawCodeString(codeString) {
@@ -246,10 +252,10 @@ function checkDocumentForAnyOtherNode(doc, nodeName) {
  *
  * @param {string} rawCode string containing HTML snipper
  * @param {string} htmlNodeName name of the HTML node
- * @returns  {
+ * @returns  {{
  *  innerText: string,
  *  attributes: Array<{name: string, value: string}>,
- * }
+ * }}
  */
 export function parseHTMLString(rawCode, htmlNodeName) {
   const details = extractDOMNodeDetails(rawCode, htmlNodeName); // todo: replace this call
