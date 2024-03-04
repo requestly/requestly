@@ -1,6 +1,6 @@
 import React from "react";
 import { TooltipProps } from "antd";
-import { ReactComponent as CrownIcon } from "assets/icons/crown.svg";
+import CrownIcon from "assets/icons/crown.svg?react";
 import { FeatureType, PaidFeatureNudgeViewedSource } from "modules/analytics/events/common/pricing";
 import "./premiumIcon.css";
 
