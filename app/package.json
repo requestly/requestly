@@ -151,7 +151,6 @@
     "typescript": "^4.7.3",
     "vite": "^5.1.4",
     "vite-plugin-commonjs": "^0.10.1",
-    "vite-plugin-imp": "^2.4.0",
     "vite-plugin-monaco-editor": "^1.1.0",
     "vite-plugin-node-polyfills": "^0.21.0",
     "vite-plugin-svgr": "^4.2.0",
