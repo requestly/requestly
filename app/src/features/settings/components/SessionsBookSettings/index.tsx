@@ -296,7 +296,7 @@ export const SessionsSettings: React.FC = () => {
                 ) : (
                   <Button
                     block
-                    disabled={!autoRecording?.isActive ?? false}
+                    disabled={!autoRecording?.isActive}
                     type="dashed"
                     icon={<PlusOutlined />}
                     className="add-new-source-btn"

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
-import { getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
@@ -12,6 +12,7 @@ import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import "./index.scss";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -21,6 +22,7 @@ interface PremiumFeatureProps {
   popoverPlacement: PopconfirmProps["placement"];
   disabled?: boolean;
   source: string;
+  onClickCallback?: () => void;
 }
 
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
@@ -31,21 +33,15 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   popoverPlacement,
   disabled = false,
   source,
+  onClickCallback,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
-  const popupVisibilityThreshold = useFeatureValue("paywall-visibility-threshold", 15);
-
-  const shouldShowUpgradePopover = useMemo(() => {
-    return isUpgradePopoverEnabled && userAttributes?.days_since_install >= popupVisibilityThreshold;
-  }, [isUpgradePopoverEnabled, userAttributes?.days_since_install, popupVisibilityThreshold]);
-
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
     [features, getFeatureLimitValue, checkIfFeatureLimitReached]
@@ -80,7 +76,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (isExceedingLimits && shouldShowUpgradePopover) setOpenPopup(true);
+                onClickCallback?.();
+                if (isExceedingLimits && isUpgradePopoverEnabled) setOpenPopup(true);
                 else onContinue();
               },
             });
@@ -88,7 +85,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         </>
       ) : (
         <Popconfirm
-          disabled={!isExceedingLimits || !features || disabled || !shouldShowUpgradePopover}
+          disabled={!isExceedingLimits || !features || disabled || !isUpgradePopoverEnabled}
           overlayClassName={`premium-feature-popover ${!user.loggedIn ? "premium-popover-bottom-padding" : ""}`}
           autoAdjustOverflow
           showArrow={false}
@@ -103,7 +100,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           }}
           onCancel={() => {
             if (!hasCrossedDeadline) {
-              trackUpgradeOptionClicked("use_for_free_now");
+              trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
               onContinue();
             } else if (!user.loggedIn) {
               trackUpgradeOptionClicked("sign_up_for_trial");
@@ -135,7 +132,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
-                if (!isExceedingLimits || !features || disabled || !shouldShowUpgradePopover) {
+                onClickCallback?.();
+                if (!isExceedingLimits || !features || disabled || !isUpgradePopoverEnabled) {
                   onContinue();
                 }
               },

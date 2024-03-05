@@ -4,7 +4,7 @@ import { Row, Col, Select, AutoComplete } from "antd";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { statusCodes } from "config/constants/sub/statusCode";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import DownArrow from "assets/icons/down-arrow.svg?react";
 import "./ResponseStatusCodeRow.css";
 
 const { Option, OptGroup } = Select;

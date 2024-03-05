@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { getIsTrafficTableTourCompleted, getIsConnectedAppsTourCompleted } from "store/selectors";
 import { Table } from "@devtools-ds/table";
-import _ from "lodash";
+import { get } from "lodash";
 import { getColumnKey } from "../utils";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
@@ -192,7 +192,7 @@ const NetworkTable: React.FC<Props> = ({
             if (column.hideColumn === true) {
               return null;
             }
-            const columnData = _.get(log, getColumnKey(column?.dataIndex));
+            const columnData = get(log, getColumnKey(column?.dataIndex));
 
             return (
               <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>

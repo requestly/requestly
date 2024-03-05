@@ -4,8 +4,8 @@ import LINKS from "config/constants/sub/links";
 import { UAParser } from "ua-parser-js";
 import { Button } from "antd";
 import { AppleFilled, WindowsFilled } from "@ant-design/icons";
-import { ReactComponent as BlueUnderline } from "./blue-underline.svg";
-import { ReactComponent as LinuxIcon } from "./linux.svg";
+import BlueUnderline from "./blue-underline.svg?react";
+import LinuxIcon from "./linux.svg?react";
 import { trackDesktopAppPromoClicked } from "modules/analytics/events/common/onboarding";
 import "./desktopAppPromoModal.css";
 

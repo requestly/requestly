@@ -11,7 +11,7 @@ import { getAppMode, getUserAuthDetails } from "../../../../store/selectors";
 import { isExtensionInstalled } from "../../../../actions/ExtensionActions";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 //UTILS
 import { getAllRules } from "../../../../store/selectors";
 import ProCard from "@ant-design/pro-card";
@@ -84,7 +84,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
     }
 
     if (!isTemplate && !user.loggedIn) {
-      openAuthModal(AUTH.SOURCE.IMPORT_SHARED_LIST);
+      openAuthModal(SOURCE.IMPORT_SHARED_LIST);
       return;
     }
     if (isWorkspaceMode) {

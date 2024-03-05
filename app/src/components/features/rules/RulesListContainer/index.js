@@ -23,7 +23,7 @@ import { isSignUpRequired } from "utils/AuthUtils";
 import { fetchSharedLists } from "../../sharedLists/SharedListsIndexPage/actions";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import RulesTable from "./RulesTable";
 import { PinExtensionPopup, usePinExtensionPopup } from "components/common/PinExtensionPopup";
@@ -153,7 +153,7 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   };
 
   const handleImportRulesOnClick = (e) => {
-    trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
+    trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
     trackRulesImportStarted();
     verifyImportRulesLimitAndContinue();
   };
