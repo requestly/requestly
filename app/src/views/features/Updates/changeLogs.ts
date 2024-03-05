@@ -8,6 +8,18 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.3.5",
+    logs: [
+      "fix: auto recording logo (#1481)",
+      "fix: response rule status code (#1475)",
+      "[RQ-1339] chore: update extension title and description (#1452)",
+      "[RQ-1307] chore: rename addJSFromURL and addCSSFromURL (#1443)",
+      "[RQ-1327] fix: relay authorization header in case of cross origin XHR redirects (#1432)",
+      "[RQ-1030] [RQ-1237] fix: extension popup executed rules indication and draggable widgets click (#1346)",
+      "[RQ-1328] fix: rules implemention in MV3 (#1441)",
+    ],
+  },
+  {
     version: "24.2.17",
     logs: ["feat: Attributes support for insert script (#1386)", "[RQ-1251] feat: updated extension logo (#1371)"],
   },
