@@ -6,7 +6,6 @@ import { isEqual } from "lodash";
 import { getUserAttributes } from "store/selectors";
 import { initGrowthbook, updateGrowthbookAttributes } from "utils/feature-flag/growthbook";
 import firebaseApp from "firebase.js";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const useGrowthBookIntegration = () => {
   // Keeping it object as boolean wasn't working when updating attributes
@@ -54,7 +53,6 @@ const useGrowthBookIntegration = () => {
 // This is used to prevent rerenders in `useGrowthBookIntegration` when `updateGrowthbookAttributes` is called since it triggers useFeatureValue change.
 export const GrowthbookExperimentHelperComponent = (): any => {
   // Fire experiment_assigned as soon as ui loads
-  useFeatureValue("paywall-visibility-threshold", 15);
   // console.log("gb: GrowthbookExperimentHelperComponent");
 
   return null;
