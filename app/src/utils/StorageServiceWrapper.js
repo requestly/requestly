@@ -1,7 +1,6 @@
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SYNC_CONSTANTS } from "./syncing/syncConstants";
-import { setStorageType } from "actions/ExtensionActions";
 //UTILS
 import { getStorageHelper } from "../engines";
 import { processRecordsArrayIntoObject } from "./syncing/syncDataUtils";
@@ -184,7 +183,6 @@ class StorageServiceWrapper {
 
   async clearDB() {
     await this.StorageHelper.clearStorage();
-    if (this.appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) await setStorageType("local"); // no longer needed
   }
 
   saveConsoleLoggerState(state) {

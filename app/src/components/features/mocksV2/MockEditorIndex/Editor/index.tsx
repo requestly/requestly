@@ -2,7 +2,7 @@
 // On changes, this should call onSave() which is passed as props to this component.
 // onSave should actually do all the interaction with the database.
 
-import { AutoComplete, Button, Col, InputNumber, Row, Select } from "antd";
+import { AutoComplete, Col, InputNumber, Row, Select } from "antd";
 import { RQEditorTitle } from "../../../../../lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
 import CodeEditor from "components/misc/CodeEditor";
@@ -10,7 +10,6 @@ import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { BsStars } from "@react-icons/all-files/bs/BsStars";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { FileType, MockType } from "../../types";
@@ -20,14 +19,8 @@ import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
 import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
 import "./index.css";
-import {
-  trackAiResponseButtonClicked,
-  trackMockEditorOpened,
-  trackTestMockClicked,
-} from "modules/analytics/events/features/mocksV2";
+import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import AIResponseModal from "./AIResponseModal";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
@@ -58,8 +51,6 @@ const MockEditor: React.FC<Props> = ({
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const isAiResponseActive = useFeatureValue("ai_mock_response", false);
-
   const [id] = useState<string>(mockData.id); // No need to edit this. Set by firebase
   const [type] = useState<MockType>(mockData?.type || mockType);
   const [name, setName] = useState<string>(mockData.name);
@@ -80,7 +71,6 @@ const MockEditor: React.FC<Props> = ({
     endpoint: null,
   });
 
-  const [isAiResponseModalOpen, setIsAiResponseModalOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
   const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId, password), [
@@ -380,25 +370,7 @@ const MockEditor: React.FC<Props> = ({
     if (mockType === MockType.API) {
       return (
         <>
-          <Tabs
-            defaultActiveKey="1"
-            items={editors}
-            tabBarExtraContent={
-              isAiResponseActive ? (
-                <Button
-                  className="generate-ai-response-button"
-                  type="ghost"
-                  onClick={() => {
-                    trackAiResponseButtonClicked();
-                    setIsAiResponseModalOpen(true);
-                  }}
-                >
-                  <BsStars />
-                  &nbsp;AI Response
-                </Button>
-              ) : null
-            }
-          />
+          <Tabs defaultActiveKey="1" items={editors} />
         </>
       );
     } else {
@@ -442,13 +414,6 @@ const MockEditor: React.FC<Props> = ({
           <Row className="mock-editor-body">
             {renderMetadataRow()}
             {renderMockCodeEditor()}
-            <AIResponseModal
-              isOpen={isAiResponseModalOpen}
-              toggleOpen={(open) => setIsAiResponseModalOpen(open)}
-              handleAiResponseUsed={(responseText) => {
-                setBody(responseText);
-              }}
-            />
           </Row>
         </Col>
       </Row>

@@ -1,5 +1,5 @@
 import { Collapse, CollapseProps } from "antd";
-import { ReactComponent as DownArrow } from "assets/icons/down-arrow.svg";
+import DownArrow from "assets/icons/down-arrow.svg?react";
 import "./RQCollapse.css";
 
 export const RQCollapse = (props: CollapseProps) => {

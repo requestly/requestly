@@ -137,12 +137,18 @@
 }
 
 .enterprise-banner {
-  border: 1px solid var(--white);
+  background: var(--surface-2);
   border-radius: var(--border-radius-md);
   display: flex;
   padding: 48px;
   margin: 20px 24px;
   justify-content: center;
+  min-width: 80%;
+}
+
+.enterprise-banner .enterprise-banner-underline {
+  display: inline-flex;
+  flex-direction: column;
 }
 
 .enterprise-features-grid {
@@ -151,6 +157,7 @@
   grid-template-rows: repeat(3, 1fr);
   gap: 8px;
   margin: 6px 0;
+  color: var(--neutrals-gray-300);
 }
 
 .enterprise-features-grid span {

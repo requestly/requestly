@@ -79,42 +79,46 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "User management & access control",
-          enabled: true,
-        },
-        {
           title: "Daily backups(Encrypted)",
           enabled: true,
         },
         {
-          title: "Priority Support - Slack Connect, Email, Chat",
+          title: "Email + Chat Support",
           enabled: true,
         },
       ],
     },
     enterprise: {
       planTitle: "Enterprise",
-      planDescription:
-        "Empower your team with our Enterprise Plan, designed to seamlessly scale with your ambitions and drive collaborative success",
       features: [
+        {
+          title: "Unlimited everything",
+          enabled: true,
+        },
+        {
+          title: "User Access Management (Map your organization)",
+          enabled: true,
+        },
         {
           title: "API access",
           enabled: true,
         },
         {
-          title: "Single Sign On",
+          title: "SLAs (Support, Service Uptime, Insurance)",
+          enabled: true,
+          visibleInPricingPageOnly: true,
+        },
+        {
+          title: "SSO identity management & SAML",
           enabled: true,
         },
         {
-          title: "Unlimited Everything",
+          title: "Pay by invoice",
           enabled: true,
+          visibleInPricingPageOnly: true,
         },
         {
-          title: "User management & access control",
-          enabled: true,
-        },
-        {
-          title: "On Premise support",
+          title: "Enterprise grade security & compliance (GDPR, SOC2)",
           enabled: true,
         },
         {

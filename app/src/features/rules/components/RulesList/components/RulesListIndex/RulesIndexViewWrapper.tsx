@@ -4,6 +4,7 @@ import RulesIndexView from "views/features/rules/RulesIndexView";
 
 const RulesIndexViewWrapper = () => {
   const shouldShowNewRulesList = useFeatureIsOn("new-rule-table");
+
   return shouldShowNewRulesList ? <RulesListIndex /> : <RulesIndexView />;
 };
 

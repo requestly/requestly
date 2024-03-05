@@ -3,14 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { getIsTrafficTableTourCompleted, getIsConnectedAppsTourCompleted } from "store/selectors";
 import { Table } from "@devtools-ds/table";
-import _ from "lodash";
+import { get } from "lodash";
 import { getColumnKey } from "../utils";
-import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
@@ -43,7 +41,6 @@ const NetworkTable: React.FC<Props> = ({
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
   const isConnectedAppsTourCompleted = useSelector(getIsConnectedAppsTourCompleted);
-  const isTrafficTableVirtualV2Enabled = useFeatureIsOn("traffic_table_virtualization_v2");
   const apiClientRequestForSelectedRowRef = useRef<APIClientRequest>(null);
 
   const onReplayRequest = useCallback(() => {
@@ -195,7 +192,7 @@ const NetworkTable: React.FC<Props> = ({
             if (column.hideColumn === true) {
               return null;
             }
-            const columnData = _.get(log, getColumnKey(column?.dataIndex));
+            const columnData = get(log, getColumnKey(column?.dataIndex));
 
             return (
               <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>
@@ -216,27 +213,13 @@ const NetworkTable: React.FC<Props> = ({
         startWalkthrough={!isTrafficTableTourCompleted && isConnectedAppsTourCompleted}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
       />
-      {isTrafficTableVirtualV2Enabled ? (
-        <VirtualTableV2
-          header={header}
-          renderLogRow={renderLogRow}
-          logs={logs}
-          selectedRowData={selectedRowData}
-          onReplayRequest={onReplayRequest}
-        />
-      ) : (
-        <VirtualTable
-          height="100%"
-          width="100%"
-          itemCount={logs?.length ?? 0}
-          itemSize={ITEM_SIZE}
-          header={header}
-          row={({ index }) => renderLogRow(logs[index], index)}
-          footer={null}
-          selectedRowData={selectedRowData}
-          onReplayRequest={onReplayRequest}
-        />
-      )}
+      <VirtualTableV2
+        header={header}
+        renderLogRow={renderLogRow}
+        logs={logs}
+        selectedRowData={selectedRowData}
+        onReplayRequest={onReplayRequest}
+      />
       {isReplayRequestModalOpen ? (
         <APIClient
           request={apiClientRequestForSelectedRowRef.current}

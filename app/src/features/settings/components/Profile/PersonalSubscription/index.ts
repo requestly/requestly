@@ -2,4 +2,5 @@
 
 // export default lazyload(() => import(/* webpackChunkName: "PersonalSubscription" */ "./PersonalSubscription"));
 
-export { default } from "./PersonalSubscription";
+import PersonalSubscription from "./PersonalSubscription";
+export default PersonalSubscription;

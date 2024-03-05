@@ -5,8 +5,8 @@ import firebaseApp from "firebase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { actions } from "store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getEmailType } from "utils/FormattingHelper";
-import { getAppMode } from "store/selectors";
+import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
+import { getAppMode, getUserAttributes } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import { resetUserDetails, setAndUpdateUserDetails } from "utils/helpers/appDetails/UserProvider";
 import { getUsername } from "backend/auth/username";
@@ -17,7 +17,6 @@ import { getUserSubscription } from "backend/user/userSubscription";
 import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDocListener";
 import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import formbricks from "@formbricks/js";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -25,8 +24,10 @@ let hasAuthHandlerBeenSet = false;
 const AuthHandler = (onComplete) => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
+  const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
 
   useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
@@ -38,8 +39,18 @@ const AuthHandler = (onComplete) => {
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
 
-        submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") || "Missing_Value");
-        submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) || "Missing_Value");
+        /* To ensure that this attribute is assigned to only the users signing up for the first time */
+        if (user?.metadata?.creationTime === user?.metadata?.lastSignInTime) {
+          if (isCompanyEmail(user.email) && user.emailVerified && !userAttributes[TRACKING.ATTR.COMPANY_USER_SERIAL]) {
+            getOrganizationUsers({ domain: getDomainFromEmail(user.email) }).then((res) => {
+              const users = res.data.users;
+              submitAttrUtil(TRACKING.ATTR.COMPANY_USER_SERIAL, users.length);
+            });
+          }
+        }
+
+        submitAttrUtil(TRACKING.ATTR.EMAIL_DOMAIN, user.email.split("@")[1].replace(".", "_dot_") ?? "Missing_Value");
+        submitAttrUtil(TRACKING.ATTR.EMAIL_TYPE, getEmailType(user.email) ?? "Missing_Value");
 
         getSignupDate(user.uid).then((signup_date) => {
           if (signup_date) {
@@ -84,7 +95,7 @@ const AuthHandler = (onComplete) => {
                 isBackupEnabled,
                 isSyncEnabled,
                 isPremium: isUserPremium,
-                organization: enterpriseDetails?.data?.enterpriseData || null,
+                organization: enterpriseDetails?.data?.enterpriseData ?? null,
               },
             })
           );
@@ -99,18 +110,18 @@ const AuthHandler = (onComplete) => {
           setAndUpdateUserDetails({
             id: user?.uid,
             isLoggedIn: true,
-            email: user?.email || null,
+            email: user?.email ?? null,
           });
 
           // Analytics
           if (planDetails) {
-            submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type || "Missing Value");
-            submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId || "Missing Value");
+            submitAttrUtil(TRACKING.ATTR.PAYMENT_MODE, planDetails.type ?? "Missing Value");
+            submitAttrUtil(TRACKING.ATTR.PLAN_ID, planDetails.planId ?? "Missing Value");
             submitAttrUtil(TRACKING.ATTR.IS_TRIAL, planDetails.status === "trialing");
 
             if (planDetails.subscription) {
-              submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate || "Missing Value");
-              submitAttrUtil(TRACKING.ATTR.PLAN_END_DATE, planDetails.subscription.endDate || "Missing Value");
+              submitAttrUtil(TRACKING.ATTR.PLAN_START_DATE, planDetails.subscription.startDate ?? "Missing Value");
+              submitAttrUtil(TRACKING.ATTR.PLAN_END_DATE, planDetails.subscription.endDate ?? "Missing Value");
             }
           }
         } catch (e) {
@@ -134,10 +145,10 @@ const AuthHandler = (onComplete) => {
 
         getUsername(authData?.uid)
           .then((username) => {
-            dispatch(actions.updateUsername({ username: username }));
+            dispatch(actions.updateUsername({ username }));
           })
           .catch((err) => {
-            Logger.log("Error updating username in store");
+            Logger.log("Error updating username in store :", err.message);
           });
       } else {
         // No user is signed in, Unset UID in window object
@@ -145,9 +156,6 @@ const AuthHandler = (onComplete) => {
         // Unset isSyncEnabled in window
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
-        if (window.FORMBRICKS_INTEGRATION_DONE) {
-          formbricks.logout();
-        }
         resetUserDetails();
 
         dispatch(actions.updateUserInfo({ loggedIn: false, details: null }));
@@ -159,7 +167,7 @@ const AuthHandler = (onComplete) => {
         );
       }
     });
-  }, [dispatch, appMode, onComplete, getEnterpriseAdminDetails]);
+  }, [dispatch, appMode, onComplete, getEnterpriseAdminDetails, getOrganizationUsers, userAttributes]);
 
   return null;
 };

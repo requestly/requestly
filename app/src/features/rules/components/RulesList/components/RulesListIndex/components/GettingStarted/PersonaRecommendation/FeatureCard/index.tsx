@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { actions } from "store";
 import { Feature } from "../types";
 import { RQBadge } from "lib/design-system/components/RQBadge";
-import { ReactComponent as RightChevron } from "assets/icons/chevron-right.svg";
+import RightChevron from "assets/icons/chevron-right.svg?react";
 import { trackPersonaRecommendationSelected } from "modules/analytics/events/misc/onboarding";
 import "./FeatureCard.css";
 

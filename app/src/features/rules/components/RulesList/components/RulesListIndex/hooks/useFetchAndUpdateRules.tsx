@@ -5,10 +5,11 @@ import { useHasChanged } from "hooks";
 import { StorageService } from "init";
 import { useDispatch } from "react-redux";
 import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndexPage/actions";
-import { rulesActions } from "store/features/rules/slice";
-import { Group, Rule, RuleObjStatus, RuleObjType } from "features/rules/types/rules";
+import { recordsActions } from "store/features/rules/slice";
+import { Group, Rule, RecordStatus, RecordType } from "features/rules/types/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
+import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -31,8 +32,8 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     }
 
     // FIXME: This can be fetched in one call. getRecords([RULE, GROUP]);
-    const groupsPromise = StorageService(appMode).getRecords(RuleObjType.GROUP);
-    const rulesPromise = StorageService(appMode).getRecords(RuleObjType.RULE);
+    const groupsPromise = StorageService(appMode).getRecords(RecordType.GROUP);
+    const rulesPromise = StorageService(appMode).getRecords(RecordType.RULE);
     Promise.all([groupsPromise, rulesPromise]).then(async (data) => {
       const groups = data[0] as Group[];
       const rules = data[1] as Rule[];
@@ -40,29 +41,33 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
       // FIXME: This can be removed/improved. Move this logic to src/features
       const isGroupsSanitizationPassedResult = await isGroupsSanitizationPassed({ rules, groups, appMode });
 
-      const finalRuleObjs = [...isGroupsSanitizationPassedResult.updatedRules, ...groups];
+      const finalRecords = [...isGroupsSanitizationPassedResult.updatedRules, ...groups];
 
-      dispatch(rulesActions.ruleObjsSetAll(finalRuleObjs));
+      dispatch(recordsActions.setAllRecords(finalRecords));
 
       setIsLoading(false);
 
       // TODO: Cleanup
       //ANALYTICS
       const ruleTypes = rules.reduce((result, { ruleType }) => result.add(ruleType), new Set());
+      const activePremiumRules = rules.filter(
+        (rule) => rule.status === RecordStatus.ACTIVE && PREMIUM_RULE_TYPES.includes(rule.ruleType)
+      );
       const numRuleTypes = parseInt(window.localStorage.getItem("num_rule_types") || "0");
       submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
       submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
+      submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);
       submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES, ruleTypes.size);
       window.localStorage.setItem("num_rule_types", JSON.stringify(ruleTypes.size));
       submitAttrUtil(
         TRACKING.ATTR.NUM_ACTIVE_RULES,
-        rules.filter((rule) => rule.status === RuleObjStatus.ACTIVE).length
+        rules.filter((rule) => rule.status === RecordStatus.ACTIVE).length
       );
       submitAttrUtil(TRACKING.ATTR.NUM_GROUPS, groups.length);
       submitAttrUtil(TRACKING.ATTR.NUM_RULES_PINNED, rules.filter((rule) => rule.isFavourite).length);
       submitAttrUtil(
         TRACKING.ATTR.NUM_ACTIVE_GROUPS,
-        groups.filter((group) => group.status === RuleObjStatus.ACTIVE).length
+        groups.filter((group) => group.status === RecordStatus.ACTIVE).length
       );
     });
   }, [

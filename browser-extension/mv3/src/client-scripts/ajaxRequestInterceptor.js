@@ -3,6 +3,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 ((namespace) => {
   window[namespace] = window[namespace] || {};
   window[namespace].responseRules = {};
+  window[namespace].requestRules = {};
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage
@@ -16,8 +17,23 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return dummyLink.href;
   };
 
-  const isApplicableOnUrl = (url) => {
+  const isNonJsonObject = (obj) => {
+    return [
+      Blob,
+      ArrayBuffer,
+      Object.getPrototypeOf(Uint8Array), // TypedArray instance type
+      DataView,
+      FormData,
+      URLSearchParams,
+    ].some((nonJsonType) => obj instanceof nonJsonType);
+  };
+
+  const isResponseRuleApplicableOnUrl = (url) => {
     return window[namespace].responseRules.hasOwnProperty(getAbsoluteUrl(url));
+  };
+
+  const isRequestRuleApplicableOnUrl = (url) => {
+    return window[namespace].requestRules.hasOwnProperty(getAbsoluteUrl(url));
   };
 
   /**
@@ -63,11 +79,20 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
         requestPayloadFilter = requestPayloadFilter || {};
         const targettedKey = requestPayloadFilter?.key;
+        const targetedValue = requestPayloadFilter?.value;
 
         // tagettedKey is the json path e.g. a.b.0.c
-        if (targettedKey) {
+        if (targettedKey && typeof targetedValue !== undefined) {
           const valueInRequestData = traverseJsonByPath(requestData, targettedKey);
-          return valueInRequestData == requestPayloadFilter?.value;
+          const operator = requestPayloadFilter?.operator;
+
+          if (!operator || operator === "Equals") {
+            return valueInRequestData === targetedValue;
+          }
+
+          if (operator === "Contains") {
+            return valueInRequestData.includes(targetedValue);
+          }
         }
 
         return false;
@@ -75,8 +100,31 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     );
   };
 
-  const getResponseRule = (url) => {
-    return window[namespace].responseRules[getAbsoluteUrl(url)];
+  const getMatchedResponseRule = (url) => {
+    return window[namespace].responseRules?.[getAbsoluteUrl(url)];
+  };
+
+  const getMatchedRequestRule = (url) => {
+    return window[namespace].requestRules?.[getAbsoluteUrl(url)];
+  };
+
+  const shouldServeResponseWithoutRequest = (responseModification) => {
+    return responseModification.type === "static" && responseModification.serveWithoutRequest;
+  };
+
+  const getCustomRequestBody = (requestModification, args) => {
+    let requestBody;
+    if (requestModification.type === "static") {
+      requestBody = requestModification.value;
+    } else {
+      requestBody = requestModification.evaluator(args);
+    }
+
+    if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {
+      return requestBody;
+    }
+
+    return JSON.stringify(requestBody);
   };
 
   /**
@@ -92,6 +140,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     }
 
     return mightBeJSONString;
+  };
+
+  const isJSON = (data) => {
+    const parsedJson = jsonifyValidJSONString(data);
+    return parsedJson !== data; // if data is not a JSON, jsonifyValidJSONString() returns same value
   };
 
   /**
@@ -119,11 +172,23 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return paramsObject;
   };
 
-  const notifyRuleApplied = (message) => {
+  const notifyResponseRuleApplied = (message) => {
     window.top.postMessage(
       {
         source: "requestly:client",
         action: "response_rule_applied",
+        ruleId: message.ruleDetails.id,
+        requestDetails: message["requestDetails"],
+      },
+      window.location.href
+    );
+  };
+
+  const notifyRequestRuleApplied = (message) => {
+    window.top.postMessage(
+      {
+        source: "requestly:client",
+        action: "request_rule_applied",
         ruleId: message.ruleDetails.id,
         requestDetails: message["requestDetails"],
       },
@@ -139,20 +204,21 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   /**
    * ********** Within Context Functions end here *************
    */
+
   // Intercept XMLHttpRequest
   const onReadyStateChange = async function () {
     if (this.readyState === this.HEADERS_RECEIVED || this.readyState === this.DONE) {
       let url;
 
-      if (isApplicableOnUrl(this.responseURL)) {
+      if (isResponseRuleApplicableOnUrl(this.responseURL)) {
         url = this.responseURL;
-      } else if (isApplicableOnUrl(this.requestURL)) {
+      } else if (isResponseRuleApplicableOnUrl(this.requestURL)) {
         url = this.requestURL;
       } else {
         return;
       }
 
-      const responseRuleData = getResponseRule(url);
+      const responseRuleData = getMatchedResponseRule(url);
       const { response: responseModification, source } = responseRuleData;
       const responseType = this.responseType;
       const contentType = this.getResponseHeader("content-type");
@@ -178,7 +244,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
       if (this.readyState === this.HEADERS_RECEIVED) {
         // For network failures, responseStatus=0 but we still return customResponse with status=200
-        const responseStatus = responseModification.statusCode || this.status || 200;
+        const responseStatus = parseInt(responseModification.statusCode || this.status) || 200;
         const responseStatusText = responseModification.statusText || this.statusText;
 
         Object.defineProperty(this, "status", {
@@ -255,9 +321,37 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           timeStamp: Date.now(),
         };
 
-        notifyRuleApplied({ ruleDetails: responseRuleData, requestDetails });
+        notifyResponseRuleApplied({ ruleDetails: responseRuleData, requestDetails });
       }
     }
+  };
+
+  const resolveXHR = (xhr, responseData) => {
+    Object.defineProperty(xhr, "readyState", { writable: true });
+    const updateReadyState = (readyState) => {
+      xhr.readyState = readyState;
+      xhr.dispatchEvent(new CustomEvent("readystatechange"));
+    };
+    const dispatchProgressEvent = (type) => {
+      xhr.dispatchEvent(new ProgressEvent(type));
+    };
+
+    dispatchProgressEvent("loadstart");
+
+    // update response headers
+    const contentType = isJSON(responseData) ? "application/json" : "text/plain";
+    xhr.getResponseHeader = (key) => {
+      if (key.toLowerCase() === "content-type") {
+        return contentType;
+      }
+      return null;
+    };
+    updateReadyState(xhr.HEADERS_RECEIVED);
+
+    // mark resolved
+    updateReadyState(xhr.DONE);
+    dispatchProgressEvent("load");
+    dispatchProgressEvent("loadend");
   };
 
   const XHR = XMLHttpRequest;
@@ -281,7 +375,34 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (data) {
     this.requestData = data;
-    send.apply(this, arguments);
+
+    const requestRule = getMatchedRequestRule(this.requestURL);
+    if (requestRule) {
+      this.requestData = getCustomRequestBody(requestRule.request, {
+        method: this.method,
+        url: this.requestURL,
+        body: data,
+        bodyAsJson: jsonifyValidJSONString(data),
+      });
+
+      notifyRequestRuleApplied({
+        ruleDetails: requestRule,
+        requestDetails: {
+          url: this.requestURL,
+          method: this.method,
+          type: "xmlhttprequest",
+          timeStamp: Date.now(),
+        },
+      });
+    }
+
+    this.responseRule = getMatchedResponseRule(this.requestURL);
+
+    if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule.response)) {
+      resolveXHR(this, this.responseRule.response.value);
+    } else {
+      send.apply(this, arguments);
+    }
   };
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
@@ -304,20 +425,83 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       request = new Request(resource.toString(), initOptions);
     }
 
+    let url = getAbsoluteUrl(request.url);
+    const method = request.method;
+
+    // Request body can be sent only for request methods other than GET and HEAD.
+    const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
+
+    const requestRule = canRequestBodyBeSent && getMatchedRequestRule(url);
+
+    if (requestRule) {
+      const originalRequestBody = await request.text();
+      const requestBody =
+        getCustomRequestBody(requestRule.request, {
+          method,
+          url,
+          body: originalRequestBody,
+          bodyAsJson: jsonifyValidJSONString(originalRequestBody),
+        }) || {};
+
+      request = new Request(request.url, {
+        method,
+        body: requestBody,
+        headers: request.headers,
+        referrer: request.referrer,
+        referrerPolicy: request.referrerPolicy,
+        mode: request.mode,
+        credentials: request.credentials,
+        cache: request.cache,
+        redirect: request.redirect,
+        integrity: request.integrity,
+      });
+
+      notifyRequestRuleApplied({
+        ruleDetails: requestRule,
+        requestDetails: {
+          url,
+          method,
+          type: "fetch",
+          timeStamp: Date.now(),
+        },
+      });
+    }
+
+    let requestData;
+    if (canRequestBodyBeSent) {
+      requestData = jsonifyValidJSONString(await request.clone().text()); // cloning because the request will be used to make API call
+    }
+
+    let responseHeaders;
     let fetchedResponse;
     let exceptionCaught;
 
-    try {
-      fetchedResponse = await getOriginalResponse();
-    } catch (error) {
-      exceptionCaught = error;
+    const responseRule = getMatchedResponseRule(url);
+
+    if (responseRule && shouldServeResponseWithoutRequest(responseRule.response)) {
+      const contentType = isJSON(responseRule.response.value) ? "application/json" : "text/plain";
+      responseHeaders = new Headers({ "content-type": contentType });
+    } else {
+      try {
+        if (requestRule) {
+          fetchedResponse = await _fetch(request);
+        } else {
+          fetchedResponse = await getOriginalResponse();
+        }
+
+        if (!responseRule) {
+          return fetchedResponse;
+        }
+
+        responseHeaders = fetchedResponse?.headers;
+      } catch (error) {
+        exceptionCaught = error;
+      }
     }
 
-    let url;
-
-    if (fetchedResponse && isApplicableOnUrl(fetchedResponse.url)) {
+    if (fetchedResponse && isResponseRuleApplicableOnUrl(fetchedResponse.url)) {
       url = fetchedResponse.url; // final URL obtained after any redirects
-    } else if (isApplicableOnUrl(request.url)) {
+    } else if (isResponseRuleApplicableOnUrl(request.url)) {
       url = request.url;
     } else {
       if (exceptionCaught) {
@@ -326,7 +510,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       return fetchedResponse;
     }
 
-    const responseRuleData = getResponseRule(url);
+    const responseRuleData = getMatchedResponseRule(url);
 
     if (fetchedResponse?.status === 204) {
       // Return the same response when status is 204. fetch doesn't allow to create new response with empty body
@@ -340,9 +524,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         initOptions,
         fetchedResponse,
       });
-
-    const method = request.method;
-    let requestData;
 
     if (method === "POST") {
       requestData = jsonifyValidJSONString(await request.text());
@@ -406,13 +587,17 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       timeStamp: Date.now(),
     };
 
-    notifyRuleApplied({ ruleDetails: responseRuleData, requestDetails });
+    notifyResponseRuleApplied({ ruleDetails: responseRuleData, requestDetails });
 
-    return new Response(new Blob([customResponse]), {
+    // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
+    const finalStatusCode = parseInt(responseRuleData.response.statusCode || fetchedResponse?.status) || 200;
+    const requiresNullResponseBody = [204, 205, 304].includes(finalStatusCode);
+
+    return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
-      status: responseRuleData.response.statusCode || fetchedResponse?.status || 200,
+      status: finalStatusCode,
       statusText: responseRuleData.response.statusText || fetchedResponse?.statusText,
-      headers: fetchedResponse?.headers,
+      headers: responseHeaders,
     });
   };
 })(PUBLIC_NAMESPACE);

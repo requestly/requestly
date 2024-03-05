@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
-import { RuleObj } from "features/rules/types/rules";
+import { StorageRecord } from "features/rules/types/rules";
 
-type RulesListContext = { selectedRows: RuleObj[] } & Record<string, any>;
+type RulesListContext = { selectedRows: StorageRecord[] } & Record<string, any>; // why is this extension of type necessary?
 
 const RulesContext = createContext<RulesListContext>(null);
 
@@ -10,7 +10,7 @@ interface RulesProviderProps {
 }
 
 export const RulesListProvider: React.FC<RulesProviderProps> = ({ children }) => {
-  const [selectedRows, setSelectedRows] = useState<RuleObj[]>([]);
+  const [selectedRows, setSelectedRows] = useState<StorageRecord[]>([]);
   const [ruleToDuplicate, setRuleToDuplicate] = useState(null);
   const [ruleToViewInModal, setRuleToViewInModal] = useState(false);
   const [isDuplicateRuleModalActive, setIsDuplicateRuleModalActive] = useState(false);

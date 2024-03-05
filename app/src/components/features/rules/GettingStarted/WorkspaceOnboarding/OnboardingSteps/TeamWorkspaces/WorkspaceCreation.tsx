@@ -25,6 +25,9 @@ import {
 import { actions } from "store";
 import { NewTeamData, OnboardingSteps } from "../../types";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
+import { isWorkspaceMappedToBillingTeam } from "features/settings";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 
 interface Props {
   defaultTeamData: NewTeamData | null;
@@ -45,6 +48,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appMode = useSelector(getAppMode);
+  const billingTeams = useSelector(getAvailableBillingTeams);
 
   const [inviteEmails, setInviteEmails] = useState<string[]>([]);
   const [makeUserAdmin, setMakeUserAdmin] = useState(false);
@@ -90,6 +94,9 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
               is_admin: makeUserAdmin,
               source: "onboarding",
               num_users_added: inviteEmails.length,
+              workspace_type: isWorkspaceMappedToBillingTeam(defaultTeamData?.teamId ?? newTeamId, billingTeams)
+                ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+                : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
             });
             dispatch(actions.updateWorkspaceOnboardingStep(OnboardingSteps.RECOMMENDATIONS));
           }
@@ -114,7 +121,7 @@ export const CreateWorkspace: React.FC<Props> = ({ defaultTeamData }) => {
           trackAddTeamMemberFailure(defaultTeamData?.teamId ?? newTeamId, inviteEmails, null, "onboarding");
         });
     },
-    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData, makeUserAdmin]
+    [appMode, dispatch, isWorkspaceMode, inviteEmails, defaultTeamData, makeUserAdmin, billingTeams]
   );
 
   const handleCreateNewTeam = useCallback(() => {
