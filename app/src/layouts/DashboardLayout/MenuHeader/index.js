@@ -10,10 +10,9 @@ import { SearchOutlined } from "@ant-design/icons";
 import { redirectToSettings } from "utils/RedirectionUtils";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
-import { ReactComponent as Settings } from "assets/icons/settings.svg";
+import Settings from "assets/icons/settings.svg?react";
 import LINKS from "config/constants/sub/links";
 import { RQButton } from "lib/design-system/components";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import WorkspaceSelector from "./WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isGoodbyePage, isInvitePage, isPricingPage } from "utils/PathUtils";
@@ -38,7 +37,6 @@ const MenuHeader = () => {
 
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
-  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
 
   //don't show general app header component for editor screens
@@ -80,7 +78,7 @@ const MenuHeader = () => {
         <Col className="ml-auto">
           <div className="header-right-section">
             <Row align="middle" gutter={8} wrap={false}>
-              {paywallIntensityExp !== "control" &&
+              {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
               user?.details?.planDetails?.status === "canceled" &&
               isPlanExpiredBannerClosed ? (
                 <PlanExpiredBadge />
@@ -111,8 +109,9 @@ const MenuHeader = () => {
 
               <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
 
-              {(paywallIntensityExp === "control" ||
-                (paywallIntensityExp !== "control" && user?.details?.planDetails?.status !== "canceled")) && (
+              {(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
+                (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+                  user?.details?.planDetails?.status !== "canceled")) && (
                 <Col>
                   <PremiumPlanBadge />
                 </Col>

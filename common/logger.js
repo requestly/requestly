@@ -1,5 +1,5 @@
 if (typeof isReactApp === "undefined") {
-  var isReactApp = typeof require !== "undefined";
+  var isReactApp = document.getElementById("root") !== null;
 }
 
 var Logger = {

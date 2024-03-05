@@ -7,7 +7,7 @@ import APP_CONSTANTS from "config/constants";
 import { getAppMode } from "store/selectors";
 import BlockingDialog from "./BlockingDialog";
 import NonBlockingDialog from "./NonBlockingDialog";
-import _ from "lodash";
+import { isEqual } from "lodash";
 import BreakingDialog from "./BreakingDialog";
 import { getUserOS } from "utils/Misc";
 
@@ -22,7 +22,7 @@ const UpdateDialog = () => {
   useEffect(() => {
     if (window.RQ && window.RQ && window.RQ.DESKTOP) {
       window.RQ.DESKTOP.SERVICES.IPC.registerEvent("update-downloaded", (payload) => {
-        if (payload && !_.isEqual(payload, updateDetailsRef.current)) {
+        if (payload && !isEqual(payload, updateDetailsRef.current)) {
           setIsUpdateDownloaded(true);
           updateDetailsRef.current = payload;
         }
