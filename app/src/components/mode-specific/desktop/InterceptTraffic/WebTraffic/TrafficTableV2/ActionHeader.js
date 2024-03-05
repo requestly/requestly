@@ -283,22 +283,23 @@ const ActionHeader = ({
               </Col>
             )}
 
-            {!isStaticPreview && <Divider type="vertical" style={{ margin: "0 16px" }} />}
-
-            {sessionPreviewType !== PreviewType.SAVED && (
-              <Col>
-                <Button
-                  icon={<SaveOutlined />}
-                  disabled={!filteredLogsCount}
-                  onClick={() => {
-                    trackNetworkSessionSaveClicked();
-                    trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
-                    openSaveModal();
-                  }}
-                >
-                  Save
-                </Button>
-              </Col>
+            {!isStaticPreview && (
+              <>
+                <Divider type="vertical" style={{ margin: "0 16px" }} />
+                <Col>
+                  <Button
+                    icon={<SaveOutlined />}
+                    disabled={!filteredLogsCount}
+                    onClick={() => {
+                      trackNetworkSessionSaveClicked();
+                      trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
+                      openSaveModal();
+                    }}
+                  >
+                    Save
+                  </Button>
+                </Col>
+              </>
             )}
           </>
         ) : null}
