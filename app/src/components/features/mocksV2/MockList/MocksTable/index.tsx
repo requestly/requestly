@@ -17,7 +17,7 @@ import React, { useEffect, useState } from "react";
 import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
 import { IoMdLink } from "@react-icons/all-files/io/IoMdLink";
 import { UserIcon } from "components/common/UserIcon";
-import REQUEST_METHOD_COLORS from "constants/requestMethodColors";
+import REQUEST_METHOD_COLORS from "./constants/requestMethodColors";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { MockType, RQMockMetadataSchema } from "../../types";

@@ -2,10 +2,10 @@ import React, { useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { SecondarySidebarLink } from "../../common/SecondarySidebarLink";
-import { ReactComponent as MyRulesIcon } from "assets/icons/http-rules/my-rules.svg";
-import { ReactComponent as TemplatesIcon } from "assets/icons/http-rules/templates.svg";
-import { ReactComponent as SharedListIcon } from "assets/icons/http-rules/shared-list.svg";
-import { ReactComponent as TrashIcon } from "assets/icons/http-rules/trash.svg";
+import MyRulesIcon from "assets/icons/http-rules/my-rules.svg?react";
+import TemplatesIcon from "assets/icons/http-rules/templates.svg?react";
+import SharedListIcon from "assets/icons/http-rules/shared-list.svg?react";
+import TrashIcon from "assets/icons/http-rules/trash.svg?react";
 import "./RulesSidebar.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 

@@ -13,7 +13,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { trackTestRuleReportGenerated, trackTestRuleResultClicked } from "modules/analytics/events/features/ruleEditor";
 import { getTestReportsByRuleId } from "./helpers";
-import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
+import SessionIcon from "assets/icons/session.svg?react";
 import { DRAFT_SESSION_VIEWED_SOURCE } from "views/features/sessions/SessionViewer/constants";
 import "./index.css";
 

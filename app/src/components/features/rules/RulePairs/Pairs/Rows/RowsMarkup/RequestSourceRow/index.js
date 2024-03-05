@@ -11,7 +11,6 @@ import { DownOutlined } from "@ant-design/icons";
 import { RQDropdown, RQButton } from "lib/design-system/components";
 import { MoreInfo } from "components/misc/MoreInfo";
 import { TestURLModal } from "components/common/TestURLModal";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import PATHS from "config/constants/sub/paths";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
 import { getModeData, setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
@@ -33,7 +32,6 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const [isTestURLModalVisible, setIsTestURLModalVisible] = useState(false);
   const [isTestURLClicked, setIsTestURLClicked] = useState(false);
   const [ruleFilterActiveWithPairIndex, setRuleFilterActiveWithPairIndex] = useState(false);
-  const isTestURLFeatureFlagOn = useFeatureIsOn("test_url_modal");
   const hasSeenTestURLAnimation = useRef(false);
   const { MODE } = getModeData(window.location);
 
@@ -289,19 +287,17 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               data-selectionid="source-value"
             />
           </Col>
-          {isTestURLFeatureFlagOn && (
-            <RQButton
-              className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
-              iconOnly
-              icon={<ExperimentOutlined />}
-              type="default"
-              disabled={!pair.source.value || isInputDisabled}
-              onClick={() => {
-                setIsTestURLClicked(true);
-                setIsTestURLModalVisible(true);
-              }}
-            />
-          )}
+          <RQButton
+            className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
+            iconOnly
+            icon={<ExperimentOutlined />}
+            type="default"
+            disabled={!pair.source.value || isInputDisabled}
+            onClick={() => {
+              setIsTestURLClicked(true);
+              setIsTestURLModalVisible(true);
+            }}
+          />
         </Row>
         {ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS ? (
           <Col

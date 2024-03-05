@@ -4,11 +4,8 @@ import { CompanyMarquee } from "components/misc/Marquee";
 import { OnboardingAuthBanner } from "features/onboarding";
 import quoteIcon from "../../../assets/img/icons/common/quote.svg";
 import underlineIcon from "../../../assets/img/icons/common/underline.svg";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 
 export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) => {
-  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
-
   const workEmailsBenefits = [
     "Use Requestly with your colleagues",
     "Access to Team Workspaces",
@@ -59,7 +56,7 @@ export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) 
     );
   };
 
-  if (paywallIntensityExp === "variantA" && !isOnboarding)
+  if (!isOnboarding)
     return (
       <div className="new-auth-banner-wrapper">
         <OnboardingAuthBanner />
