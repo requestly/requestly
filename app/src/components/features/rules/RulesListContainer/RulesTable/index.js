@@ -1098,6 +1098,7 @@ const RulesTable = ({
               popoverPlacement="topLeft"
               onContinue={(e) => handleNewRuleOnClick(e, TYPE)}
               features={[`${TYPE.toLowerCase()}_rule`, FeatureLimitType.num_rules]}
+              featureName={APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME}
               source="rule_selection_dropdown"
             >
               <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">

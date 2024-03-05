@@ -214,6 +214,7 @@ const RulesList: React.FC<Props> = () => {
               popoverPlacement="topLeft"
               onContinue={() => handleNewRuleOnClick(TYPE, SOURCE.DROPDOWN)}
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
+              featureName={APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME}
               source="rule_selection_dropdown"
             >
               <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
