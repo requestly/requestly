@@ -4,7 +4,7 @@ import { onValue, get } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
 import { isLocalStoragePresent } from "utils/AppUtils";
-import _ from "lodash";
+import { debounce } from "lodash";
 import Logger from "lib/logger";
 import {
   parseRemoteRecords,
@@ -221,7 +221,7 @@ export const doSync = async (
 };
 
 /** Debounced version of the doSync function */
-export const doSyncDebounced = _.debounce((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
+export const doSyncDebounced = debounce((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
   console.log("[DEBUG] doSyncDebounced in action");
   doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
 }, 5000);

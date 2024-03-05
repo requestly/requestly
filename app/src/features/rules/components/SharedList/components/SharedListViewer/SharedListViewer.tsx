@@ -3,7 +3,7 @@ import {
   fetchSharedListData,
   getSharedListIdFromString,
 } from "components/features/sharedLists/SharedListViewerIndexPage/actions";
-import { RuleObj } from "features/rules/types/rules";
+import { StorageRecord } from "features/rules/types/rules";
 import { useParams } from "react-router-dom";
 import RulesTable from "features/rules/components/RulesList/components/RulesTable/RulesTable";
 import ContentHeader from "componentsV2/ContentHeader";
@@ -12,7 +12,7 @@ interface Props {}
 
 const SharedListViewer: React.FC<Props> = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [ruleObjs, setRuleObjs] = useState<RuleObj[]>([]);
+  const [storageRecords, setStorageRecords] = useState<StorageRecord[]>([]);
   const { sharedListParam } = useParams();
   const sharedListId = sharedListParam ? getSharedListIdFromString(sharedListParam) : null;
   console.log({ sharedListParam, sharedListId });
@@ -25,9 +25,8 @@ const SharedListViewer: React.FC<Props> = () => {
       if (incomingData !== null) {
         const rules = incomingData.rules || [];
         const groups = incomingData.groups || [];
-        const sharedListRuleObjs = [...rules, ...groups];
-        console.log({ sharedListRuleObjs });
-        setRuleObjs(sharedListRuleObjs);
+        const sharedListRecords = [...rules, ...groups];
+        setStorageRecords(sharedListRecords);
 
         setIsLoading(false);
       } else {
@@ -42,7 +41,7 @@ const SharedListViewer: React.FC<Props> = () => {
     <>
       {/* TODO: Add Modals Required in Shared List rules here. Eg. Rule Viewer Modal */}
       <ContentHeader title="SharedList" subtitle="Share Rules" actions={[]} />
-      <RulesTable rules={ruleObjs as RuleObj[]} loading={isLoading} searchValue="" />
+      <RulesTable records={storageRecords} loading={isLoading} searchValue="" />
     </>
   );
 };

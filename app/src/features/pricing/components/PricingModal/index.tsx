@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Modal, Row, Switch, Typography } from "antd";
 import { useDispatch } from "react-redux";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { actions } from "store";
 import { PricingTable, PRICING } from "features/pricing";
 import { CompaniesSection } from "../CompaniesSection";
@@ -45,7 +44,6 @@ export const PricingModal: React.FC<PricingModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isTableScrolledToRight, setIsTableScrolledToRight] = useState(false);
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false);
-  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
   const tableRef = useRef(null);
 
@@ -174,7 +172,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
             <PricingTable duration={duration} isOpenedFromModal tableRef={tableRef} source={source} />
             <CompaniesSection />
-            {paywallIntensityExp && paywallIntensityExp !== "control" && <PricingModalFooterBanner />}
+            <PricingModalFooterBanner />
           </>
         )}
       </div>

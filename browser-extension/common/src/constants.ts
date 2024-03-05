@@ -31,7 +31,7 @@ export const CLIENT_MESSAGES = {
   NOTIFY_SESSION_RECORDING_STARTED: "notifySessionRecordingStarted",
   IS_RECORDING_SESSION: "isRecordingSession",
   GET_TAB_SESSION: "getTabSession",
-  GET_APPLIED_RESPONSE_RULES: "getAppliedResponseRules",
+  GET_APPLIED_REQUEST_RESPONSE_RULES: "getAppliedRequestResponseRules",
   GET_APPLIED_SCRIPT_RULES: "getAppliedScriptRules",
   UPDATE_APPLIED_SCRIPT_RULES: "updateAppliedScriptRules",
   START_RECORDING: "startRecording",

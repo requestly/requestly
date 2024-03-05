@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { AuthForm } from "./components/Form";
 import { OnboardingAuthBanner } from "./components/Banner";
@@ -42,17 +42,17 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
   };
 
   useEffect(() => {
-    if (user.loggedIn) {
-      trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
-      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
-    }
-  }, [dispatch, user.loggedIn]);
-
-  useEffect(() => {
     if (isOpen) {
       trackAppOnboardingViewed(ONBOARDING_STEPS.AUTH);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (user.loggedIn) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+      trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
+    }
+  }, [user.loggedIn, dispatch]);
 
   return (
     <div className="onboarding-auth-screen-wrapper">

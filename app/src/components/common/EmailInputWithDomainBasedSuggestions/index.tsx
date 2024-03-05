@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import _ from "lodash";
+import { without } from "lodash";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
@@ -31,7 +31,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
     getOrganizationUsers({ domain: getDomainFromEmail(userEmail) }).then((res: any) => {
       const users = res.data.users;
       const emails = users.map((user: any) => user.email);
-      const suggestionOptionsFromEmails = _.without(emails, userEmail).map((suggestion) => {
+      const suggestionOptionsFromEmails = without(emails, userEmail).map((suggestion) => {
         return {
           label: suggestion,
           value: suggestion,

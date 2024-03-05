@@ -11,7 +11,7 @@ import { getUserAuthDetails } from "../../../../store/selectors";
 
 //CONSTANTS
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 import { CloudUploadOutlined } from "@ant-design/icons";
 
@@ -31,7 +31,7 @@ const UploadFileBtn = ({ updateCollection, buttonType = "primary" }) => {
           redirectURL: window.location.href,
           userActionMessage: "Sign up to upload files to server",
           authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: AUTH.SOURCE.UPLOAD_FILES,
+          eventSource: SOURCE.UPLOAD_FILES,
         },
       })
     );
@@ -68,7 +68,7 @@ const UploadFileBtn = ({ updateCollection, buttonType = "primary" }) => {
         <AuthConfirmationPopover
           title="You need to sign up to upload files"
           onConfirm={handleUploadBtnOnClick}
-          source={AUTH.SOURCE.UPLOAD_FILES}
+          source={SOURCE.UPLOAD_FILES}
         >
           <Button type={buttonType} icon={<CloudUploadOutlined />} onClick={handleUploadBtnOnClick}>
             Upload File

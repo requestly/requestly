@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import RulesTable from "../RulesTable/RulesTable";
-import { RuleObj, RuleObjType } from "features/rules/types/rules";
-import { getAllRuleObjMap, getAllRuleObjs } from "store/features/rules/selectors";
+import { StorageRecord, Group, Rule } from "features/rules/types/rules";
+import { getAllRecordsMap, getAllRecords } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { RulesListProvider } from "./context";
 import { DownOutlined, DownloadOutlined } from "@ant-design/icons";
@@ -22,7 +22,7 @@ import APP_CONSTANTS from "config/constants";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackRulesImportStarted, trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import AuthPopoverButton from "components/features/rules/RulesListContainer/RulesTable/AuthPopoverButtons";
 import { DropdownButtonType } from "antd/lib/dropdown";
@@ -35,7 +35,7 @@ import ContentHeader, { FilterType } from "componentsV2/ContentHeader";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { RiCheckLine } from "@react-icons/all-files/ri/RiCheckLine";
 import { RiFolderAddLine } from "@react-icons/all-files/ri/RiFolderAddLine";
-import { getActiveRules, isRule } from "../RulesTable/utils";
+import { getActiveRecords, isRule, isGroup, getPinnedRecords } from "../RulesTable/utils";
 import { CreateTeamRuleCTA, GettingStarted, ImportRulesModal } from "./components";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { ContentHeaderProps } from "componentsV2/ContentHeader";
@@ -47,7 +47,6 @@ import SpinnerCard from "components/misc/SpinnerCard";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-import { getPinnedRules } from "../RulesTable/utils/rules";
 import {
   trackNewGroupButtonClicked,
   trackRulesListFilterApplied,
@@ -81,11 +80,11 @@ const RulesList: React.FC<Props> = () => {
 
   // FIXME: Fetching multiple times
   // Fetch Rules here from Redux
-  const allRecords = useSelector(getAllRuleObjs);
-  const allRecordsMap = useSelector(getAllRuleObjMap);
-  const allGroups = useMemo(() => allRecords.filter((record) => record.objectType === RuleObjType.GROUP), [allRecords]);
-  const pinnedRecords = useMemo(() => getPinnedRules(allRecordsMap), [allRecordsMap]);
-  const activeRecords = useMemo(() => getActiveRules(allRecords), [allRecords]);
+  const allRecords = useSelector(getAllRecords);
+  const allRecordsMap = useSelector(getAllRecordsMap);
+  const allGroups = useMemo(() => allRecords.filter(isGroup), [allRecords]);
+  const pinnedRecords = useMemo(() => getPinnedRecords(allRecordsMap), [allRecordsMap]);
+  const activeRecords = useMemo(() => getActiveRecords(allRecords), [allRecords]);
   // FIX: rules loading state
 
   const getFilteredRecords = useCallback(
@@ -105,51 +104,56 @@ const RulesList: React.FC<Props> = () => {
   );
 
   const groupWiseRulesData = useMemo(() => {
-    const groupWiseRules: Record<string, RuleObj[]> = {};
-
-    allGroups.forEach((group) => {
-      groupWiseRules[group.id] = [];
-    });
+    const groupWiseRules: Record<Group["id"], Rule[]> = {};
     groupWiseRules[UNGROUPED_GROUP_NAME] = [];
 
     getFilteredRecords(activeFilter).forEach((record) => {
-      if (record.objectType === RuleObjType.RULE) {
+      if (isRule(record)) {
         if (!record.groupId) {
           groupWiseRules[UNGROUPED_GROUP_NAME].push(record);
-        } else groupWiseRules[record.groupId].push(record);
+        } else {
+          if (!groupWiseRules[record.groupId]) {
+            groupWiseRules[record.groupId] = [];
+          }
+          groupWiseRules[record.groupId].push(record);
+        }
+      } else {
+        if (!groupWiseRules[record.id]) {
+          groupWiseRules[record.id] = [];
+        }
       }
     });
 
     return groupWiseRules;
-  }, [activeFilter, allGroups, getFilteredRecords]);
+  }, [activeFilter, getFilteredRecords]);
 
   const searchedRecords = useMemo(() => {
-    const records: RuleObj[] = [];
+    const _searchedRecords: StorageRecord[] = [];
 
-    const processGroup = (groupId: string) => {
-      const groupData = groupWiseRulesData[groupId];
+    const processGroup = (groupId: Group["id"]) => {
+      const rulesOfGroup = groupWiseRulesData[groupId];
       const groupRecord = allRecordsMap[groupId];
       if (groupId === UNGROUPED_GROUP_NAME) {
-        // filter ungrouped rules based on search value
-        records.push(...groupData.filter((record) => record.name.toLowerCase().includes(searchValue.toLowerCase())));
+        _searchedRecords.push(...rulesOfGroup.filter((rule) => doesStringInclude(rule.name, searchValue)));
       } else {
-        if (groupRecord.name.toLowerCase().includes(searchValue.toLowerCase())) {
-          //if group name matches search value, add all rules in that group with the group record
-          records.push(...groupData, groupRecord);
+        if (doesStringInclude(groupRecord.name, searchValue)) {
+          _searchedRecords.push(...rulesOfGroup, groupRecord);
         } else {
           // else add only those rules which match the search value along with the group record
-          const groupedRules = groupData.filter((record) =>
-            record.name.toLowerCase().includes(searchValue.toLowerCase())
-          );
-          if (groupedRules.length > 0) records.push(groupRecord, ...groupedRules);
+          const groupedRules = rulesOfGroup.filter((rule) => doesStringInclude(rule.name, searchValue));
+          if (groupedRules.length > 0) _searchedRecords.push(groupRecord, ...groupedRules);
         }
+      }
+
+      function doesStringInclude(src: string, subStr: string) {
+        return src.toLowerCase().includes(subStr.toLowerCase());
       }
     };
 
     Object.keys(groupWiseRulesData).forEach(processGroup);
 
-    return records.map((record) => (isRule(record) ? record : { ...record, expanded: true }));
-  }, [searchValue, allRecordsMap, groupWiseRulesData]);
+    return _searchedRecords.map((record) => (isRule(record) ? record : { ...record, expanded: true }));
+  }, [searchValue, allRecordsMap, groupWiseRulesData]) as StorageRecord[];
 
   const promptUserToSignup = useCallback(
     (callback = () => navigate(PATHS.RULES.CREATE), message = "Sign up to continue", source = "") => {
@@ -172,8 +176,8 @@ const RulesList: React.FC<Props> = () => {
   );
 
   const handleNewRuleOnClick = useCallback(
-    async (ruleType?: RuleType) => {
-      if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
+    async (ruleType?: RuleType, source = SOURCE.RULE_TABLE_CREATE_NEW_RULE_BUTTON) => {
+      if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, source);
       else trackNewRuleButtonClicked("in_app");
 
       if (!user.loggedIn) {
@@ -189,7 +193,7 @@ const RulesList: React.FC<Props> = () => {
   );
 
   const handleImportRulesOnClick = useCallback((e?: unknown) => {
-    trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
+    trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
     trackRulesImportStarted();
 
     setIsImportRulesModalActive(true);
@@ -208,7 +212,7 @@ const RulesList: React.FC<Props> = () => {
           .map(({ ID, TYPE, ICON, NAME }) => (
             <PremiumFeature
               popoverPlacement="topLeft"
-              onContinue={() => handleNewRuleOnClick(TYPE)}
+              onContinue={() => handleNewRuleOnClick(TYPE, SOURCE.DROPDOWN)}
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
               source="rule_selection_dropdown"
             >
@@ -246,11 +250,11 @@ const RulesList: React.FC<Props> = () => {
       isTooltipShown: true,
       hasPopconfirm: true,
       buttonText: "Import",
-      authSource: AUTH.SOURCE.UPLOAD_RULES,
+      authSource: SOURCE.UPLOAD_RULES,
       icon: <DownloadOutlined />,
       onClickHandler: handleImportRulesOnClick,
       trackClickEvent: () => {
-        trackUploadRulesButtonClicked(AUTH.SOURCE.RULES_LIST);
+        trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
       },
     },
     {
@@ -300,7 +304,7 @@ const RulesList: React.FC<Props> = () => {
           <div className="label">
             All{" "}
             {allRecords.length ? (
-              <Badge count={allRecords.filter((record: RuleObj) => isRule(record)).length} overflowCount={20} />
+              <Badge count={allRecords.filter((record) => isRule(record)).length} overflowCount={20} />
             ) : null}
           </div>
         ),
@@ -316,7 +320,7 @@ const RulesList: React.FC<Props> = () => {
             <MdOutlinePushPin className="icon" />
             Pinned
             {pinnedRecords.length ? (
-              <Badge count={pinnedRecords.filter((record: RuleObj) => record.isFavourite).length} overflowCount={20} />
+              <Badge count={pinnedRecords.filter((record) => record.isFavourite).length} overflowCount={20} />
             ) : null}
           </div>
         ),
@@ -332,7 +336,7 @@ const RulesList: React.FC<Props> = () => {
             <RiCheckLine className="icon" />
             Active{" "}
             {activeRecords.length ? (
-              <Badge count={activeRecords.filter((record: RuleObj) => isRule(record)).length} overflowCount={20} />
+              <Badge count={activeRecords.filter((record) => isRule(record)).length} overflowCount={20} />
             ) : null}
           </div>
         ),
@@ -388,11 +392,7 @@ const RulesList: React.FC<Props> = () => {
           filters={contentHeaderFilters}
         />
         <div className="rq-rules-table">
-          <RulesTable
-            rules={searchedRecords as RuleObj[]}
-            loading={isLoading || isRuleListLoading}
-            searchValue={searchValue}
-          />
+          <RulesTable records={searchedRecords} loading={isLoading || isRuleListLoading} searchValue={searchValue} />
         </div>
       </div>
     </>

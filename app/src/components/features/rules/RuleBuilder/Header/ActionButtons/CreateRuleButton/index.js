@@ -26,6 +26,7 @@ import {
   trackRuleCreatedEvent,
   trackRuleEditedEvent,
   trackRuleResourceTypeSelected,
+  trackRuleSaveClicked,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
@@ -116,7 +117,8 @@ const CreateRuleButton = ({
 
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
-  const handleBtnOnClick = async () => {
+  const handleBtnOnClick = async (saveType) => {
+    trackRuleSaveClicked(MODE);
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
       dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
       return;
@@ -141,7 +143,7 @@ const CreateRuleButton = ({
         case HTML_ERRORS.NO_TAGS:
           dispatch(
             actions.triggerToastForEditor({
-              id: validationError.pairId,
+              id: validationError.id,
               message: validationError.message,
               type: toastType.ERROR,
               autoClose: 4500,
@@ -199,6 +201,7 @@ const CreateRuleButton = ({
                     ? getAllResponseBodyTypes(currentlySelectedRuleData)
                     : null,
                 ...getEventParams(currentlySelectedRuleData),
+                save_type: saveType,
               });
             } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
               trackRuleEditedEvent({
@@ -210,6 +213,7 @@ const CreateRuleButton = ({
                     : null,
                 source: ruleCreatedEventSource,
                 ...getEventParams(currentlySelectedRuleData),
+                save_type: saveType,
               });
             }
             ruleModifiedAnalytics(user);
@@ -242,7 +246,7 @@ const CreateRuleButton = ({
   const saveFn = (event) => {
     if ((navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === "s") {
       event.preventDefault();
-      handleBtnOnClick();
+      handleBtnOnClick("cmd+s");
     }
   };
 
@@ -258,7 +262,7 @@ const CreateRuleButton = ({
       <PremiumFeature
         popoverPlacement="bottomLeft"
         features={[FeatureLimitType.num_rules]}
-        onContinue={handleBtnOnClick}
+        onContinue={() => handleBtnOnClick("button_click")}
         disabled={
           isDisabled ||
           location?.state?.source === "my_rules" ||

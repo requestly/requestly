@@ -205,6 +205,10 @@
   margin-right: 8px;
 }
 
+.signup-btn-popover.ant-tooltip-placement-bottom {
+  padding-top: 0;
+}
+
 @media screen and (max-width: 1300px) {
   .desktop .header-left-section > a {
     display: none;

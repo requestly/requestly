@@ -5,7 +5,19 @@ import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 const UNGROUPED_GROUP_ID = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
 
-// Handle Rules whose Groups are missing!
+/**
+ * Handle Rules whose Groups are missing!
+ *
+ * @param {{
+ *  rules: import("features/rules/types/rules").Rule[],
+ *  groups: import("features/rules/types/rules").Group[],
+ *  appMode: string
+ * }}
+ * @returns {Promise<{
+ *  success: boolean,
+ *  updatedRules: import("features/rules/types/rules").Rule[]
+ * }>}
+ */
 export const isGroupsSanitizationPassed = async ({ rules = [], groups = [], appMode }) => {
   return new Promise((resolve) => {
     let result = true; // This is tell the invoker to fetch rules again!

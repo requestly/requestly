@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getAppOnboardingDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { OnboardingAuthScreen } from "../auth";
 import { ONBOARDING_STEPS } from "../../types";
-import { GettingStartedView } from "../gettingStarted";
+import { RecommendationsView } from "../recommendations";
 import { PersonaScreen } from "../persona/components/personaScreen";
 import { MdOutlineArrowForward } from "@react-icons/all-files/md/MdOutlineArrowForward";
 import { actions } from "store";
@@ -13,6 +14,8 @@ import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { trackAppOnboardingSkipped } from "features/onboarding/analytics";
 import { getAndUpdateInstallationDate } from "utils/Misc";
 import Logger from "lib/logger";
+import { WorkspaceOnboardingView } from "../teams";
+import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import "./index.scss";
 
 interface OnboardingProps {
@@ -20,9 +23,28 @@ interface OnboardingProps {
 }
 
 export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const { step, disableSkip } = useSelector(getAppOnboardingDetails);
+
+  const handleSkip = () => {
+    trackAppOnboardingSkipped(step);
+    if (step === ONBOARDING_STEPS.AUTH) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
+    } else if (step === ONBOARDING_STEPS.TEAMS) {
+      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
+    } else {
+      redirectToWebAppHomePage(navigate);
+      dispatch(actions.updateAppOnboardingCompleted());
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "appOnboardingModal",
+          newValue: false,
+        })
+      );
+    }
+  };
 
   useEffect(() => {
     dispatch(actions.updateIsAppOnboardingStepDisabled(false));
@@ -31,7 +53,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
   useEffect(() => {
     getAndUpdateInstallationDate(appMode, false, false)
       .then((install_date) => {
-        if (new Date(install_date) >= new Date("2024-02-02")) {
+        if (new Date(install_date) >= new Date("2024-02-24")) {
           dispatch(
             actions.toggleActiveModal({
               modalName: "appOnboardingModal",
@@ -62,24 +84,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
             </Col>
             {step === ONBOARDING_STEPS.PERSONA || disableSkip ? null : (
               <Col>
-                <RQButton
-                  type="default"
-                  className="onboarding-skip-button"
-                  onClick={() => {
-                    trackAppOnboardingSkipped(step);
-                    if (step === ONBOARDING_STEPS.AUTH) {
-                      dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.GETTING_STARTED));
-                    } else {
-                      dispatch(actions.updateAppOnboardingCompleted());
-                      dispatch(
-                        actions.toggleActiveModal({
-                          modalName: "appOnboardingModal",
-                          newValue: false,
-                        })
-                      );
-                    }
-                  }}
-                >
+                <RQButton type="default" className="onboarding-skip-button" onClick={handleSkip}>
                   Skip for now <MdOutlineArrowForward style={{ fontSize: "1rem" }} />
                 </RQButton>
               </Col>
@@ -90,8 +95,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
             <OnboardingAuthScreen isOpen={isOpen} />
           ) : step === ONBOARDING_STEPS.PERSONA ? (
             <PersonaScreen isOpen={isOpen} />
+          ) : step === ONBOARDING_STEPS.TEAMS ? (
+            <WorkspaceOnboardingView isOpen={isOpen} />
           ) : (
-            <GettingStartedView isOpen={isOpen} />
+            <RecommendationsView isOpen={isOpen} />
           )}
         </div>
       </div>
