@@ -55,9 +55,10 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
 
   const isImportLimitReached = useMemo(() => {
     return (
-      getFeatureLimitValue(FeatureLimitType.num_rules) < rulesToImportCount && userAttributes?.days_since_install > 3
+      getFeatureLimitValue(FeatureLimitType.num_rules) < rulesToImportCount + allRules.length &&
+      userAttributes?.days_since_install > 3
     );
-  }, [rulesToImportCount, getFeatureLimitValue, userAttributes?.days_since_install]);
+  }, [rulesToImportCount, getFeatureLimitValue, userAttributes?.days_since_install, allRules.length]);
 
   const onDrop = useCallback(
     async (acceptedFiles) => {
