@@ -35,7 +35,7 @@ export const RequestBillingTeamAccessModal: React.FC<Props> = ({ isOpen, onClose
       <Col>
         <div className="mt-8 billing-teams-card-wrapper">
           {billingTeams?.map((team: BillingTeamDetails, index: number) => {
-            if (team?.subscriptionDetails?.status === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE) {
+            if (team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE) {
               return <BillingTeamCard key={index} team={team} />;
             }
             return null;
