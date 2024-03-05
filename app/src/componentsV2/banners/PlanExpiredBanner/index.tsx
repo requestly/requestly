@@ -1,6 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
 import { getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { RQButton } from "lib/design-system/components";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { actions } from "store";
@@ -12,13 +11,8 @@ export const PlanExpiredBanner = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
-  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
-  if (
-    paywallIntensityExp !== "control" &&
-    user?.details?.planDetails?.status === "canceled" &&
-    !isPlanExpiredBannerClosed
-  ) {
+  if (user?.details?.planDetails?.status === "canceled" && !isPlanExpiredBannerClosed) {
     return (
       <div className="plan-expired-banner">
         <span className="plan-expired-banner-badge">PLAN EXPIRED</span>

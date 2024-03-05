@@ -16,7 +16,6 @@ import { actions } from "store";
 import "./DashboardLayout.css";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -25,7 +24,6 @@ const DashboardLayout = () => {
   const { promptOneTapOnLoad } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
-  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
 
   promptOneTapOnLoad();
 
@@ -66,9 +64,7 @@ const DashboardLayout = () => {
         className="app-layout app-dashboard-layout"
         style={{
           height:
-            paywallIntensityExp !== "control" &&
-            user?.details?.planDetails?.status === "canceled" &&
-            !isPlanExpiredBannerClosed
+            user?.details?.planDetails?.status === "canceled" && !isPlanExpiredBannerClosed
               ? "calc(100vh - 46px)"
               : "100vh",
         }}
