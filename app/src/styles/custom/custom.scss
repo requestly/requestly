@@ -586,3 +586,21 @@ div.react-multi-email .multi-email-tag {
 #credential_picker_container {
   top: 45px !important;
 }
+
+// TODO: Update modal design system and remove this class
+.custom-rq-modal {
+  & .ant-modal {
+    & .ant-modal-content {
+      background: var(--surface-0_5);
+      & .ant-modal-header {
+        background: var(--surface-0_5);
+        & .ant-modal-title {
+          color: var(--text-default);
+        }
+      }
+      & .ant-modal-footer {
+        background: var(--surface-0_5);
+      }
+    }
+  }
+}
