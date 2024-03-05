@@ -61,7 +61,44 @@ const NetworkTable: React.FC<Props> = ({
   const columns = useMemo(
     () => [
       {
-        title: "",
+        title: () => {
+          return (
+            <Tooltip title={isMockRequestSelectorDisabled ? "Please fill all the conditions to select requests." : ""}>
+              <div className="display-row-center">
+                <Checkbox
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (e.target.checked) {
+                      const selectedRequests = logs.reduce((acc: Record<string, any>, log: Record<string, any>) => {
+                        acc[log.id] = log;
+                        return acc;
+                      }, {});
+                      setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, ...selectedRequests }));
+                    } else {
+                      setSelectedMockRequests((prev: Record<string, any>) => {
+                        const prevMockRequests = { ...prev };
+                        const requestsAfterUnselection = logs.reduce(
+                          (acc: Record<string, any>, log: Record<string, any>) => {
+                            delete acc[log.id];
+                            return acc;
+                          },
+                          prevMockRequests
+                        );
+                        return requestsAfterUnselection;
+                      });
+                    }
+                    trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
+                  }}
+                  disabled={isMockRequestSelectorDisabled && Object.keys(selectedMockRequests).length === 0}
+                  checked={logs.every((log: Record<string, any>) => log.id && log.id in selectedMockRequests)}
+                />
+              </div>
+            </Tooltip>
+          );
+        },
         dataIndex: "id",
         width: "4%",
         hideColumn: !showMockRequestSelector,
@@ -147,6 +184,7 @@ const NetworkTable: React.FC<Props> = ({
     [
       isMockRequestSelectorDisabled,
       isStaticPreview,
+      logs,
       selectedMockRequests,
       setSelectedMockRequests,
       showMockRequestSelector,
@@ -163,7 +201,7 @@ const NetworkTable: React.FC<Props> = ({
             }
             return (
               <Table.HeadCell title={column.title} key={column.id} style={{ width: column.width }}>
-                {column.title}
+                {typeof column.title === "function" ? column.title() : column.title}
               </Table.HeadCell>
             );
           })}

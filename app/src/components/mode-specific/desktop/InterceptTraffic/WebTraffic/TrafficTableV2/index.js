@@ -923,7 +923,12 @@ const CurrentTrafficTable = ({
                     okText="Yes"
                     cancelText="No"
                     placement="topLeft"
-                    disabled={!mockMatcher || !mockResourceType || selectedRequestsLength === 0}
+                    disabled={
+                      !mockMatcher ||
+                      !mockResourceType ||
+                      selectedRequestsLength === 0 ||
+                      (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0)
+                    }
                     destroyTooltipOnHide
                     trigger={["click"]}
                   >
