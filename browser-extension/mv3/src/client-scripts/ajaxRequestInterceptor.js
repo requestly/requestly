@@ -17,6 +17,17 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return dummyLink.href;
   };
 
+  const isNonJsonObject = (obj) => {
+    return [
+      Blob,
+      ArrayBuffer,
+      Object.getPrototypeOf(Uint8Array), // TypedArray instance type
+      DataView,
+      FormData,
+      URLSearchParams,
+    ].some((nonJsonType) => obj instanceof nonJsonType);
+  };
+
   const isResponseRuleApplicableOnUrl = (url) => {
     return window[namespace].responseRules.hasOwnProperty(getAbsoluteUrl(url));
   };
@@ -578,9 +589,13 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     notifyResponseRuleApplied({ ruleDetails: responseRuleData, requestDetails });
 
-    return new Response(new Blob([customResponse]), {
+    // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
+    const finalStatusCode = parseInt(responseRuleData.response.statusCode || fetchedResponse?.status) || 200;
+    const requiresNullResponseBody = [204, 205, 304].includes(finalStatusCode);
+
+    return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
-      status: responseRuleData.response.statusCode || fetchedResponse?.status || 200,
+      status: finalStatusCode,
       statusText: responseRuleData.response.statusText || fetchedResponse?.statusText,
       headers: responseHeaders,
     });

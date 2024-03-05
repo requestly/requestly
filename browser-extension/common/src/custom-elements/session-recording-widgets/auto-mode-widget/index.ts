@@ -1,7 +1,7 @@
 import { RQDraggableWidget } from "../../abstract-classes/draggable-widget";
 import { registerCustomElement, setInnerHTML } from "../../utils";
 import ReplayLastFiveMinuteIcon from "../../../../resources/icons/replayLastFiveMinute.svg";
-import RQLogo from "../../../../resources/icons/rqLogo.svg";
+import RQLogo from "../../../../resources/icons/rqLogo-white.svg";
 import styles from "./index.css";
 
 enum RQSessionAutoModeRecordingWidgetEvent {

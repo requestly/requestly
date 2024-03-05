@@ -128,6 +128,7 @@ export const GA_EVENTS = {
     PROFILE: "profile",
 
     NUM_RULES: "NUM_RULES",
+    NUM_PREMIUM_ACTIVE_RULES: "num_premium_active_rules",
     NUM_RULE_TYPES: "NUM_RULE_TYPES",
     NUM_RULES_PINNED: "num_rules_pinned",
     NUM_RULE_TYPES_TRIED: "num_rule_types_tried",
@@ -162,6 +163,7 @@ export const GA_EVENTS = {
 
     NUM_WORKSPACES: "num_workspaces",
     SESSION_REPLAY_LIFETIME_REDEEMED: "session_replay_lifetime_redeemed",
+    COMPANY_USER_SERIAL: "company_user_serial",
   },
   VALUES: {
     PAYPAL: "paypal",

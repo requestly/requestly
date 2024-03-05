@@ -5,7 +5,8 @@ import { Row, Col, Button, Space } from "antd";
 import ProCard from "@ant-design/pro-card";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
+
 // Icons
 import { EditOutlined } from "@ant-design/icons";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -47,7 +48,7 @@ const GetStartedWithFiles = ({ updateCollection }) => {
           userActionMessage: `${
             isMockServerPage ? "Sign up to Create Mock APIs" : "Sign up to start using File Hosting"
           }`,
-          eventSource: `${isMockServerPage ? AUTH.SOURCE.CREATE_API_MOCK : AUTH.SOURCE.CREATE_FILE_MOCK}`,
+          eventSource: `${isMockServerPage ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK}`,
         },
       })
     );
@@ -96,7 +97,7 @@ const GetStartedWithFiles = ({ updateCollection }) => {
                 }
                 disabled={user?.details?.isLoggedIn}
                 onConfirm={handleCreateMock}
-                source={path.includes("my-mocks") ? AUTH.SOURCE.CREATE_API_MOCK : AUTH.SOURCE.CREATE_FILE_MOCK}
+                source={path.includes("my-mocks") ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK}
               >
                 <Button
                   className="btn-icon btn-3"

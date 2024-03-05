@@ -8,7 +8,7 @@ import { FeatureCard } from "../featureCard";
 import { RQButton } from "lib/design-system/components";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import { CloudUploadOutlined } from "@ant-design/icons";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import "./index.scss";
 
@@ -38,7 +38,7 @@ export const RecommendationGrid = () => {
           callback={() => {
             toggleImportRulesModal();
           }}
-          source={AUTH.SOURCE.UPLOAD_RULES}
+          source={SOURCE.UPLOAD_RULES}
         >
           <RQButton
             className="items-center"

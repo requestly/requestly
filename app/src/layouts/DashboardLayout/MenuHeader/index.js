@@ -10,7 +10,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { redirectToSettings } from "utils/RedirectionUtils";
 import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
-import { ReactComponent as Settings } from "assets/icons/settings.svg";
+import Settings from "assets/icons/settings.svg?react";
 import LINKS from "config/constants/sub/links";
 import { RQButton } from "lib/design-system/components";
 import WorkspaceSelector from "./WorkspaceSelector";
@@ -20,8 +20,8 @@ import { trackHeaderClicked, trackTopbarClicked } from "modules/analytics/events
 import ProductsDropDown from "./ProductsDropDown";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 import APP_CONSTANTS from "config/constants";
-import "./MenuHeader.css";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
+import "./MenuHeader.css";
 
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;

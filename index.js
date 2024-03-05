@@ -8,3 +8,5 @@ module.exports = {
   LOGGER,
   RULE_PROCESSOR,
 };
+
+export { CONSTANTS, LOGGER, RULE_PROCESSOR };
