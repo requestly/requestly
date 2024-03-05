@@ -43,6 +43,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
   const [expandedGroups, setExpandedGroups] = useState([]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [contentTableData, setContentTableData] = useState<RuleTableDataType[]>([]);
+  const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
   const clearSelectedRowsDataCallbackRef = useRef(() => {});
   const {
     clearSelectedRows,
@@ -91,22 +92,25 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
   }, [expandedGroups, isGroupsStateUpdated, getExpandedGroupRowKeys]);
 
   useEffect(() => {
-    const activePremiumRules = allRecords.reduce((accumulator, record) => {
-      if (
-        isRule(record) &&
-        !user?.details?.isPremium &&
-        record.status === RecordStatus.ACTIVE &&
-        PREMIUM_RULE_TYPES.includes(record.ruleType)
-      ) {
-        accumulator.push(record);
-      }
-      return accumulator;
-    }, []);
+    if (!loading && !isPremiumRulesToggleChecked) {
+      const activePremiumRules = allRecords.reduce((accumulator, record) => {
+        if (
+          isRule(record) &&
+          !user?.details?.isPremium &&
+          record.status === RecordStatus.ACTIVE &&
+          PREMIUM_RULE_TYPES.includes(record.ruleType)
+        ) {
+          accumulator.push(record);
+        }
+        return accumulator;
+      }, []);
 
-    if (activePremiumRules.length) {
-      handleStatusToggle(activePremiumRules);
+      if (activePremiumRules.length) {
+        handleStatusToggle(activePremiumRules, false);
+      }
+      setIsPremiumRulesToggleChecked(true);
     }
-  }, [allRecords, user?.details?.isPremium]);
+  }, [allRecords, user?.details?.isPremium, loading, isPremiumRulesToggleChecked]);
 
   const handleGroupState = (expanded: boolean, record: StorageRecord) => {
     if (isRule(record)) {
