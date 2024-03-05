@@ -4,7 +4,7 @@ import { RQButton } from "lib/design-system/components";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { actions } from "store";
 import { getPlanNameFromId } from "utils/PremiumUtils";
-import { capitalize } from "lodash";
+import { getPrettyPlanName } from "utils/FormattingHelper";
 import "./index.scss";
 
 export const PlanExpiredBanner = () => {
@@ -17,8 +17,8 @@ export const PlanExpiredBanner = () => {
       <div className="plan-expired-banner">
         <span className="plan-expired-banner-badge">PLAN EXPIRED</span>
         <span className="text-white text-bold">
-          Your {capitalize(getPlanNameFromId(user?.details?.planDetails?.planId))} plan has expired. Renew now to get
-          full feature access!
+          Your {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planId))} plan has expired. Renew now to
+          get full feature access!
         </span>
         <RQButton
           type="default"
