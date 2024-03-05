@@ -24,6 +24,7 @@ import { trackRulesListActionsClicked } from "features/rules/analytics";
 import { checkIsRuleGroupDisabled, isGroup } from "../utils/rules";
 import { trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
+import APP_CONSTANTS from "config/constants";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -150,6 +151,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                   ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
                   : [FeatureLimitType.num_active_rules]
               }
+              featureName={APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME}
               popoverPlacement="left"
               onContinue={() => handleStatusToggle([record])}
               source="rule_list_status_switch"

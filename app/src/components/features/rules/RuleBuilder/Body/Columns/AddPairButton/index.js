@@ -43,6 +43,7 @@ const AddPairButton = (props) => {
       popoverPlacement="top"
       onContinue={handleRulePairsOnClick}
       features={[FeatureLimitType.add_new_rule_pair]}
+      featureName="Multiple rule pairs"
       source="add_new_rule_pair"
       onClickCallback={() => trackRulePairCreationAttempted(currentlySelectedRuleData.ruleType)}
     >
