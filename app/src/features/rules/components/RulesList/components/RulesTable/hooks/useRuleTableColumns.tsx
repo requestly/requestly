@@ -151,7 +151,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                   ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
                   : [FeatureLimitType.num_active_rules]
               }
-              featureName={APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME}
+              featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME} rule`}
               popoverPlacement="left"
               onContinue={() => handleStatusToggle([record])}
               source="rule_list_status_switch"

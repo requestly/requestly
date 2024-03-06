@@ -56,7 +56,7 @@ const RuleHeader: React.FC<RuleHeaderProps> = ({ selectedRuleType }) => {
             }}
             features={[featureName, FeatureLimitType.num_rules]}
             popoverPlacement="bottomLeft"
-            featureName={name}
+            featureName={`${name} rule`}
             source={selectedRuleType}
           >
             <Button size="large" type="primary">
