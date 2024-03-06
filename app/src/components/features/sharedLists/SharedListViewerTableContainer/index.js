@@ -8,12 +8,12 @@ import { addRulesAndGroupsToStorage, processDataToImport } from "../../rules/Imp
 //UTILS
 import { redirectToRules } from "../../../../utils/RedirectionUtils";
 import { getAppMode, getUserAuthDetails } from "../../../../store/selectors";
+import { getAllRules } from "store/features/rules/selectors";
 import { isExtensionInstalled } from "../../../../actions/ExtensionActions";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SOURCE } from "modules/analytics/events/common/constants";
 //UTILS
-import { getAllRules } from "../../../../store/selectors";
 import ProCard from "@ant-design/pro-card";
 import RulesTable from "components/features/rules/RulesListContainer/RulesTable";
 import { ImportOutlined } from "@ant-design/icons";
