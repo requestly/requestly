@@ -108,7 +108,7 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
             ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
             : [FeatureLimitType.num_active_rules]
         }
-        featureName={APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME}
+        featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME} rule`}
         source={currentlySelectedRuleData.ruleType}
       >
         <Switch size="small" className="ml-3" checked={isChecked} disabled={isDisabled} />

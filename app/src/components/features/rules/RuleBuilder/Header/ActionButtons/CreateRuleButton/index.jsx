@@ -276,7 +276,7 @@ const CreateRuleButton = ({
         popoverPlacement="bottomLeft"
         features={[FeatureLimitType.num_rules, ruleLimitType]}
         onContinue={handleBtnOnClick}
-        featureName={APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME}
+        featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME} rule`}
         disabled={isDisabled || (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isNull(ruleLimitType))}
         source={currentlySelectedRuleData.ruleType}
       >
