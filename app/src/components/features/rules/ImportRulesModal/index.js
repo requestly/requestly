@@ -4,7 +4,8 @@ import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
-import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode, getAllRules } from "../../../../store/selectors";
+import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode } from "../../../../store/selectors";
+import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { actions } from "../../../../store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
@@ -33,6 +34,7 @@ const ImportRulesModal = (props) => {
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
+  console.log("TESTY", { allRules });
   //Component State
   const [dataToImport, setDataToImport] = useState(false);
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
