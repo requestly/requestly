@@ -119,7 +119,6 @@ const ActionHeader = ({
           }
           style={{ width: 300 }}
           size="small"
-          // disabled={isTableFiltersDisabled}
         />
       );
     }
