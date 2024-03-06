@@ -218,7 +218,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
     });
   }, [teamDetails?.id, teamDetails?.owner, user?.details?.profile?.uid]);
 
-  if (!activeWorkspaceId) return null;
+  if (!teamId) return null;
 
   return (
     <>
