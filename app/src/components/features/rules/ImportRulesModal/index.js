@@ -34,7 +34,6 @@ const ImportRulesModal = (props) => {
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
-  console.log("TESTY", { allRules });
   //Component State
   const [dataToImport, setDataToImport] = useState(false);
   const [processingDataToImport, setProcessingDataToImport] = useState(false);
