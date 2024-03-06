@@ -2,12 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentlySelectedRule } from "../../../actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import {
-  getAllRules,
-  getAppMode,
-  getCurrentlySelectedRuleData,
-  getUserAuthDetails,
-} from "../../../../../../../store/selectors";
+import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "../../../../../../../store/selectors";
+import { getAllRules } from "store/features/rules/selectors";
 import { Switch } from "antd";
 import { toast } from "utils/Toast.js";
 import { StorageService } from "init";
