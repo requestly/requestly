@@ -10,7 +10,6 @@ import {
   getUserPersonaSurveyDetails,
   getUserAuthDetails,
   getAppMode,
-  getIsWorkspaceOnboardingCompleted,
   getAppOnboardingDetails,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
@@ -19,7 +18,6 @@ import { trackPageViewEvent } from "modules/analytics/events/misc/pageView";
 import { PersonaSurvey } from "components/misc/PersonaSurvey";
 import ImportRulesModal from "components/features/rules/ImportRulesModal";
 import ConnectedAppsModal from "components/mode-specific/desktop/MySources/Sources/index";
-import { WorkspaceOnboarding } from "components/features/rules/GettingStarted/WorkspaceOnboarding";
 import InstallExtensionModal from "components/misc/InstallExtensionCTA/Modal";
 import CreateWorkspaceModal from "componentsV2/modals/CreateWorkspaceModal";
 import AddMemberModal from "features/settings/components/Profile/ManageTeams/TeamViewer/MembersDetails/AddMemberModal";
@@ -33,7 +31,6 @@ import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLink
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -44,11 +41,9 @@ const DashboardContent = () => {
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
-  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
-  const onboardingFeatureValue = useFeatureValue("new_onboarding", null);
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -65,9 +60,6 @@ const DashboardContent = () => {
   const toggleConnectedAppsModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "connectedAppsModal" }));
   };
-  const toggleWorkspaceOnboardingModal = useCallback(() => {
-    dispatch(actions.toggleActiveModal({ modalName: "workspaceOnboardingModal" }));
-  }, [dispatch]);
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
@@ -135,15 +127,6 @@ const DashboardContent = () => {
           {!userPersona.isSurveyCompleted && !user?.loggedIn && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
             <PersonaSurvey isSurveyModal={true} isOpen={activeModals.personaSurveyModal.isActive} />
           ) : null}
-          {!isWorkspaceOnboardingCompleted &&
-          onboardingFeatureValue === "control" &&
-          appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-            <WorkspaceOnboarding
-              isOpen={activeModals.workspaceOnboardingModal.isActive}
-              handleUploadRulesModalClick={toggleImportRulesModal}
-              toggle={toggleWorkspaceOnboardingModal}
-            />
-          ) : null}
           {activeModals.createWorkspaceModal.isActive ? (
             <CreateWorkspaceModal
               isOpen={activeModals.createWorkspaceModal.isActive}
@@ -202,9 +185,7 @@ const DashboardContent = () => {
             />
           ) : null}
           {shouldShowOnboarding() &&
-            onboardingFeatureValue === "variant" &&
             appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-            !isWorkspaceOnboardingCompleted &&
             !appOnboardingDetails.isOnboardingCompleted && (
               <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
             )}
