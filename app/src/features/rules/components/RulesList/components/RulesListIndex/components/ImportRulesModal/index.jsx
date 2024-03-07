@@ -6,13 +6,8 @@ import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
-import {
-  getAllRules,
-  getAppMode,
-  getIsRefreshRulesPending,
-  getUserAttributes,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { actions } from "store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
@@ -248,14 +243,12 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
         return;
       }
 
-      if (importType === RULE_IMPORT_TYPE.OVERWRITE || importType === RULE_IMPORT_TYPE.NORMAL) {
-        // by default overwrite is true so we dont need to process the importData again
-        doImportRules(importType);
-      } else {
+      if (importType === RULE_IMPORT_TYPE.DUPLICATE) {
         processDataToImport(dataToImport, user, allRules, false);
-        doImportRules(importType);
       }
+      doImportRules(importType);
     },
+
     [isImportLimitReached, allRules, dataToImport, doImportRules, user, rulesToImportCount]
   );
 

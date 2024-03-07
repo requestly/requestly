@@ -5,5 +5,4 @@ export const PREMIUM_RULE_TYPES = [RuleType.RESPONSE, RuleType.REQUEST, RuleType
 export const RULE_IMPORT_TYPE = {
   OVERWRITE: "overwrite",
   DUPLICATE: "duplicate",
-  NORMAL: "normal",
 };
