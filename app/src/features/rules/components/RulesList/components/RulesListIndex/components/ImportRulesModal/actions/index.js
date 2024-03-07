@@ -81,13 +81,10 @@ export const processDataToImport = (incomingArray, user, allRules, overwrite = t
   const rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
   const groups = data.groups.filter((object) => isObjectValid(object));
 
-  console.log("B", { rules });
   if (!overwrite) {
     setNewIdofRules(rules);
     setNewIdOfRulePairs(rules);
   }
-
-  console.log("A", { rules });
 
   //For Rules which do not have a valid Group associated, move them to Ungrouped
   setUnknownGroupIdsToUngroupped(rules, data.groupsId);
