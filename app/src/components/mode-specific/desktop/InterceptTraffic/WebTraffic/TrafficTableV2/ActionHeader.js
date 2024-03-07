@@ -35,9 +35,6 @@ import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
-import { getPreviewType } from "store/features/network-sessions/selectors";
-import { PreviewType } from "store/features/network-sessions/slice";
-import { trackMockResponsesButtonClicked } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 const { Text } = Typography;
 
@@ -55,14 +52,10 @@ const ActionHeader = ({
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
   setIsSSLProxyingModalVisible,
-  setShowMockFilters,
-  showMockFilters,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
-  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session");
 
   const isPaused = useSelector(getIsInterceptionPaused);
-  const sessionPreviewType = useSelector(getPreviewType);
 
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
 
@@ -237,26 +230,6 @@ const ActionHeader = ({
 
               {children}
             </>
-          )}
-          {isStaticPreview && isMockResponseFromSessionEnabled && sessionPreviewType === PreviewType.SAVED && (
-            <Row>
-              <Col>
-                <RQButton
-                  onClick={() => {
-                    trackMockResponsesButtonClicked();
-                    setShowMockFilters((prev) => {
-                      return !prev;
-                    });
-                    dispatch(desktopTrafficTableActions.updateSearchTerm(""));
-                    setIsFiltersCollapsed(true);
-                    dispatch(desktopTrafficTableActions.clearColumnFilters());
-                  }}
-                  style={showMockFilters ? { "background-color": "var(--hover-color)" } : {}}
-                >
-                  Mock Responses
-                </RQButton>
-              </Col>
-            </Row>
           )}
         </Space>
       </Row>
