@@ -39,6 +39,7 @@ import { actions } from "store";
 import "../RuleEditorActionButtons.css";
 import { HTML_ERRORS } from "./actions/insertScriptValidators";
 import { toastType } from "components/misc/CodeEditor/EditorToast/types";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -120,6 +121,8 @@ const CreateRuleButton = ({
         return null;
     }
   }, [currentlySelectedRuleData.ruleType]);
+
+  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
 
   const tooltipText = isDisabled
     ? "Only available in desktop app."
@@ -277,7 +280,11 @@ const CreateRuleButton = ({
         features={[FeatureLimitType.num_rules, ruleLimitType]}
         onContinue={handleBtnOnClick}
         featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME} rule`}
-        disabled={isDisabled || (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isNull(ruleLimitType))}
+        disabled={
+          isDisabled ||
+          (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isNull(ruleLimitType)) ||
+          !isBackgateRestrictionEnabled
+        }
         source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">

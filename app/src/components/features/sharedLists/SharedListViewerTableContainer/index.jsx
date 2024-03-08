@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { addRulesAndGroupsToStorage, processDataToImport } from "../../rules/ImportRulesModal/actions";
 //UTILS
 import { redirectToRules } from "../../../../utils/RedirectionUtils";
-import { getAppMode, getUserAttributes, getUserAuthDetails } from "../../../../store/selectors";
+import { getAppMode, getUserAuthDetails } from "../../../../store/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { isExtensionInstalled } from "../../../../actions/ExtensionActions";
 //CONSTANTS
@@ -32,6 +32,7 @@ import { snakeCase } from "lodash";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   const dispatch = useDispatch();
@@ -43,7 +44,6 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
 
   //Global State
   const appMode = useSelector(getAppMode);
-  const userAttributes = useSelector(getUserAttributes);
   const allRules = useSelector(getAllRules);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const user = useSelector(getUserAuthDetails);
@@ -52,11 +52,11 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   //Component state
   const [areRulesImporting, setAreRulesImporting] = useState(false);
   const isImportLimitReached = useMemo(
-    () =>
-      getFeatureLimitValue(FeatureLimitType.num_rules) < rules.length + allRules.length &&
-      userAttributes?.days_since_install > 3,
-    [rules.length, getFeatureLimitValue, userAttributes?.days_since_install, allRules.length]
+    () => getFeatureLimitValue(FeatureLimitType.num_rules) < rules.length + allRules.length,
+    [rules.length, getFeatureLimitValue, allRules.length]
   );
+  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
+  const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
 
   const functions = getFunctions();
   const sendSharedListImportAsEmail = httpsCallable(functions, "sharedLists-sendSharedListImportAsEmail");
@@ -99,7 +99,7 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
       return;
     }
 
-    if (isImportLimitReached) {
+    if (isImportLimitReached && isBackgateRestrictionEnabled && isUpgradePopoverEnabled) {
       toast.error(
         "The rules cannot be imported due to exceeding free plan limits. To proceed, consider upgrading your plan.",
         4

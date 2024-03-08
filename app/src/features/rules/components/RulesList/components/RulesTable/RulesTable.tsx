@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { Empty } from "antd";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
@@ -54,6 +54,8 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
     handleChangeRuleGroupClick,
     handleUngroupSelectedRecordsClick,
   } = useRuleTableActions();
+  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
+  const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
 
   useEffect(() => {
     const contentTableAdaptedRecords = recordsToContentTableDataAdapter(records);
@@ -92,7 +94,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
   }, [expandedGroups, isGroupsStateUpdated, getExpandedGroupRowKeys]);
 
   useEffect(() => {
-    if (!loading && !isPremiumRulesToggleChecked) {
+    if (!loading && !isPremiumRulesToggleChecked && isBackgateRestrictionEnabled && isUpgradePopoverEnabled) {
       const activePremiumRules = allRecords.reduce((accumulator, record) => {
         if (
           isRule(record) &&
@@ -110,7 +112,15 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
       }
       setIsPremiumRulesToggleChecked(true);
     }
-  }, [allRecords, user?.details?.isPremium, loading, isPremiumRulesToggleChecked]);
+  }, [
+    allRecords,
+    user?.details?.isPremium,
+    loading,
+    isPremiumRulesToggleChecked,
+    handleStatusToggle,
+    isBackgateRestrictionEnabled,
+    isUpgradePopoverEnabled,
+  ]);
 
   const handleGroupState = (expanded: boolean, record: StorageRecord) => {
     if (isRule(record)) {

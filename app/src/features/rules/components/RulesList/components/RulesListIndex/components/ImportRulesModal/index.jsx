@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
-import { getAppMode, getIsRefreshRulesPending, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { actions } from "store";
@@ -34,7 +34,6 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-  const userAttributes = useSelector(getUserAttributes);
   const { getFeatureLimitValue } = useFeatureLimiter();
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
@@ -49,11 +48,11 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [isImporting, setIsImporting] = useState(false);
 
   const isImportLimitReached = useMemo(() => {
-    return (
-      getFeatureLimitValue(FeatureLimitType.num_rules) < rulesToImportCount + allRules.length &&
-      userAttributes?.days_since_install > 3
-    );
-  }, [rulesToImportCount, getFeatureLimitValue, userAttributes?.days_since_install, allRules.length]);
+    return getFeatureLimitValue(FeatureLimitType.num_rules) < rulesToImportCount + allRules.length;
+  }, [rulesToImportCount, getFeatureLimitValue, allRules.length]);
+
+  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
+  const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
 
   const onDrop = useCallback(
     async (acceptedFiles) => {
@@ -234,7 +233,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
 
   const handleRulesAndGroupsImport = useCallback(
     (importType) => {
-      if (isImportLimitReached) {
+      if (isImportLimitReached && isUpgradePopoverEnabled && isBackgateRestrictionEnabled) {
         toast.error(
           "The rules cannot be imported due to exceeding free plan limits. To proceed, consider upgrading your plan.",
           4
@@ -249,7 +248,16 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
       doImportRules(importType);
     },
 
-    [isImportLimitReached, allRules, dataToImport, doImportRules, user, rulesToImportCount]
+    [
+      isImportLimitReached,
+      allRules,
+      dataToImport,
+      doImportRules,
+      user,
+      rulesToImportCount,
+      isUpgradePopoverEnabled,
+      isBackgateRestrictionEnabled,
+    ]
   );
 
   const renderWarningMessage = () => {
