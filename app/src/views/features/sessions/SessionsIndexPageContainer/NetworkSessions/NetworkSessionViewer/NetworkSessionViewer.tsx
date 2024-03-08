@@ -546,3 +546,5 @@ export const NetworkSessionViewer: React.FC = () => {
     renderLoader()
   );
 };
+
+export default NetworkSessionViewer;
