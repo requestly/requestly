@@ -89,8 +89,6 @@ const NetworkTable: React.FC<Props> = ({
                   }
                   trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
                 }}
-                // disabled={isMockRequestSelectorDisabled && Object.keys(selectedMockRequests).length === 0}
-                disabled={Object.keys(selectedMockRequests).length === 0}
                 checked={logs.every((log: Record<string, any>) => log.id && log.id in selectedMockRequests)}
               />
             </div>
