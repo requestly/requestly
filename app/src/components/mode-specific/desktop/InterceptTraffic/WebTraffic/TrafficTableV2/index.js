@@ -85,6 +85,8 @@ const CurrentTrafficTable = ({
   mockGraphQLKeys,
   selectedMockRequests,
   setSelectedMockRequests,
+  isMockRequestSelectorDisabled,
+  showMockRequestSelector,
 }) => {
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
@@ -114,8 +116,8 @@ const CurrentTrafficTable = ({
   // const [showMockFilters, setShowMockFilters] = useState(false);
   // const [mockMatcher, setMockMatcher] = useState(null);
   // const [mockGraphQLKeys, setMockGraphQLKeys] = useState([]);
-  const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
-  const [isMockRequestSelectorDisabled, setIsMockRequestSelectorDisabled] = useState(false);
+  // const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
+  // const [isMockRequestSelectorDisabled, setIsMockRequestSelectorDisabled] = useState(false);
 
   const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
   const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
@@ -124,10 +126,9 @@ const CurrentTrafficTable = ({
   const selectedRequestResponse =
     useSelector(getLogResponseById(selectedRequestData?.id)) || selectedRequestData?.response?.body;
 
-  const isAnyAppConnected = useMemo(
-    () => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0,
-    [desktopSpecificDetails.appsList]
-  );
+  const isAnyAppConnected = useMemo(() => getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0, [
+    desktopSpecificDetails.appsList,
+  ]);
 
   const handleRuleEditorModalClose = useCallback(() => {
     dispatch(
@@ -592,29 +593,6 @@ const CurrentTrafficTable = ({
     [dispatch]
   );
 
-  const resetMockResponseState = useCallback(() => {
-    setShowMockRequestSelector(false);
-    // setMockGraphQLKeys([]);
-    // setSelectedMockRequests({});
-    // setMockResourceType(null);
-    // setMockMatcher(null);
-  }, []);
-
-  useEffect(() => {
-    if (isStaticPreview && createMocksMode) {
-      setShowMockRequestSelector(true);
-      if (!mockResourceType) {
-        setIsMockRequestSelectorDisabled(true);
-      } else if (mockResourceType === "graphqlApi") {
-        setIsMockRequestSelectorDisabled(mockGraphQLKeys.length === 0);
-      } else {
-        setIsMockRequestSelectorDisabled(false);
-      }
-    } else {
-      resetMockResponseState();
-    }
-  }, [isStaticPreview, mockGraphQLKeys?.length, mockResourceType, resetMockResponseState, createMocksMode]);
-
   // IMP: Keep this in the end to wait for other useEffects to run first
   useEffect(() => {
     mounted.current = true;
@@ -713,196 +691,6 @@ const CurrentTrafficTable = ({
                   </Button>
                 </Row>
               )}
-              {/* {isMockResponseFromSessionEnabled && createMocksMode && (
-                <Row justify={"space-between"} align={"middle"}>
-                  <Space size={12}>
-                    <RQDropdown
-                      menu={{
-                        items: [
-                          {
-                            key: "restApi",
-                            label: "HTTP (REST, JS, CSS)",
-                          },
-                          {
-                            key: "graphqlApi",
-                            label: "GraphQL API",
-                          },
-                        ],
-                        selectedKeys: mockResourceType ? [mockResourceType] : [],
-                        selectable: true,
-                        onSelect: (item) => {
-                          resetMockResponseState();
-                          setMockResourceType(item.key);
-                          trackMockResponsesResourceTypeSelected(item.key);
-                        },
-                      }}
-                      trigger={["click"]}
-                      className="display-inline-block"
-                      overlayStyle={{ fontSize: "10px" }}
-                    >
-                      <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
-                        {mockResourceType
-                          ? mockResourceType === "restApi"
-                            ? "HTTP (REST, JS, CSS)"
-                            : "GraphQL API"
-                          : "Select Resource Type"}{" "}
-                        <DownOutlined />
-                      </Typography.Text>
-                    </RQDropdown>
-                    <RQDropdown
-                      menu={{
-                        items: [
-                          {
-                            key: GLOBAL_CONSTANTS.RULE_KEYS.URL,
-                            label: (
-                              <Tooltip title="Ideal for targeting specific and complete URLs." placement="right">
-                                Match entire URL
-                              </Tooltip>
-                            ),
-                          },
-                          {
-                            key: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
-                            label: (
-                              <Tooltip title="Ideal for matching across different domains" placement="right">
-                                Match only path
-                              </Tooltip>
-                            ),
-                          },
-                          {
-                            key: "path_query",
-                            label: (
-                              <Tooltip
-                                title="Ideal for cases where param values in URL are crucial for matching"
-                                placement="right"
-                              >
-                                Match path & query params
-                              </Tooltip>
-                            ),
-                          },
-                        ],
-                        selectedKeys: mockMatcher ? [mockMatcher] : [],
-                        selectable: true,
-                        onSelect: (item) => {
-                          setMockMatcher(item.key);
-                          trackMockResponsesTargetingSelecting(item.key);
-                        },
-                      }}
-                      trigger={["click"]}
-                      className="display-inline-block"
-                    >
-                      <Typography.Text className="cursor-pointer" onClick={(e) => e.preventDefault()}>
-                        {mockMatcher
-                          ? mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL
-                            ? "Match entire URL"
-                            : mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH
-                            ? "Match only path"
-                            : "Match path & query params"
-                          : "Select Matching Condition"}{" "}
-                        <DownOutlined />
-                      </Typography.Text>
-                    </RQDropdown>
-                    {mockResourceType === "graphqlApi" && (
-                      <CreatableSelect
-                        isMulti={true}
-                        isClearable={true}
-                        theme={(theme) => ({
-                          ...theme,
-                          borderRadius: 4,
-                          border: "none",
-                          colors: {
-                            ...theme.colors,
-                            primary: "var(--surface-1)",
-                            primary25: "var(--surface-2)",
-                            neutral0: "var(--surface-1)",
-                            neutral10: "var(--surface-3)", // tag background color
-                            neutral80: "var(--text-default)", // tag text color
-                            danger: "var(--text-default)", // tag cancel icon color
-                            dangerLight: "var(--surface-3)", // tag cancel background color
-                          },
-                        })}
-                        isValidNewOption={(string) => string}
-                        noOptionsMessage={() => null}
-                        formatCreateLabel={() => "Hit Enter to add"}
-                        placeholder={"Enter graphQL keys"}
-                        onChange={(selectors) => {
-                          trackMockResponsesGraphQLKeyEntered(selectors.map((selector) => selector.value));
-                          setMockGraphQLKeys(selectors.map((selector) => selector.value));
-                        }}
-                        styles={{
-                          indicatorSeparator: (provided) => ({
-                            ...provided,
-                            display: "none",
-                          }),
-                          dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "none",
-                            border: "1px solid var(--border)",
-                            backgroundColor: "var(--background)",
-                          }),
-                          container: (provided) => ({
-                            ...provided,
-                            flexGrow: 1,
-                            width: "50ch",
-                          }),
-                        }}
-                      />
-                    )}
-                  </Space>
-                  <Popconfirm
-                    title={`Create rules for the ${selectedRequestsLength} selected ${
-                      selectedRequestsLength > 1 ? "requests" : "request"
-                    }?`}
-                    onConfirm={() => {
-                      createMockResponses();
-                    }}
-                    okText="Yes"
-                    cancelText="No"
-                    placement="topLeft"
-                    disabled={
-                      !mockMatcher ||
-                      !mockResourceType ||
-                      selectedRequestsLength === 0 ||
-                      (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0)
-                    }
-                    destroyTooltipOnHide
-                    trigger={["click"]}
-                  >
-                    <Tooltip
-                      title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}
-                      destroyTooltipOnHide
-                      trigger={["hover"]}
-                    >
-                      <RQButton
-                        type="primary"
-                        disabled={selectedRequestsLength === 0}
-                        onClick={() => {
-                          trackMockResponsesCreateRulesClicked(selectedRequestsLength);
-                          if (!mockResourceType) {
-                            toast.error("Please select resource type to create mock rules");
-                            return;
-                          }
-
-                          if (!mockMatcher) {
-                            toast.error("Please select matching condition to create mock rules");
-                            return;
-                          }
-
-                          if (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0) {
-                            toast.error("Please enter at least one operation key to create mock rules");
-                            return;
-                          }
-                        }}
-                      >
-                        <Space>
-                          Create Mock Rules
-                          <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
-                        </Space>
-                      </RQButton>
-                    </Tooltip>
-                  </Popconfirm>
-                </Row>
-              )} */}
             </>
           </div>
 

@@ -71,9 +71,15 @@
   }
 }
 
+.mock-responses-popover-overlay {
+  font-size: 12px;
+  z-index: 20000;
+}
+
 .mock-responses-popover {
   padding: 4px;
   cursor: pointer;
+
   & .mock-responses-popover-dropdown-text {
     font-size: 12px;
   }

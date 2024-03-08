@@ -3,13 +3,13 @@ import {
   convertHarJsonToRQLogs,
   createLogsHar,
 } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/converter";
-import { redirectToNetworkSessionHome } from "utils/RedirectionUtils";
+import { redirectToNetworkSessionHome, redirectToRules } from "utils/RedirectionUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
 import { RQNetworkLog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 import PageLoader from "components/misc/PageLoader";
 import { Alert, Button, Popconfirm, Popover, Space, Tooltip, Typography } from "antd";
-import { CloseOutlined, DeleteOutlined, DownOutlined, DownloadOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseOutlined, DeleteOutlined, DownOutlined, DownloadOutlined } from "@ant-design/icons";
 import DownArrow from "assets/icons/down-arrow.svg?react";
 import "./networkSessions.scss";
 import { confirmAndDeleteRecording } from "../NetworkSessionsList";
@@ -42,12 +42,20 @@ import {
   trackMockResponsesCreateRulesClicked,
   trackMockResponsesGraphQLKeyEntered,
   trackMockResponsesResourceTypeSelected,
+  trackMockResponsesRuleCreationFailed,
+  trackMockResponsesRuleCreationStarted,
+  trackMockResponsesTargetingSelecting,
 } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 import { getAppMode } from "store/selectors";
-import { createResponseMock } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/utils";
+import {
+  createResponseMock,
+  getOrCreateSessionGroup,
+} from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/utils";
 import { StorageService } from "init";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const NetworkSessionViewer: React.FC = () => {
   const { id } = useParams();
@@ -69,6 +77,11 @@ const NetworkSessionViewer: React.FC = () => {
   const [mockGraphQLKeys, setMockGraphQLKeys] = useState<string[]>([]);
   const [selectedMockRequests, setSelectedMockRequests] = useState({});
   const [mockMatcher, setMockMatcher] = useState<string | null>(null);
+  const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
+  const [isMockRequestSelectorDisabled, setIsMockRequestSelectorDisabled] = useState(false);
+  const [isRulesCreated, setIsRulesCreated] = useState(false);
+  const [createdGroupName, setCreatedGroupName] = useState("");
+  const [createMockLoader, setCreateMockLoader] = useState(false);
   // const [sessionName, setSessionName] = useState("");
 
   useEffect(() => {
@@ -95,6 +108,30 @@ const NetworkSessionViewer: React.FC = () => {
     }
   }, [fetchRecording, importedHar, harPreviewType, networkSessionId]);
 
+  const resetMockResponseState = useCallback(() => {
+    setShowMockRequestSelector(false);
+    setMockGraphQLKeys([]);
+    setSelectedMockRequests({});
+    setMockResourceType(null);
+    setMockMatcher(null);
+    setIsRulesCreated(false);
+  }, []);
+
+  useEffect(() => {
+    if (createMocksMode) {
+      setShowMockRequestSelector(true);
+      // if (!mockResourceType) {
+      //   setIsMockRequestSelectorDisabled(true);
+      // } else if (mockResourceType === "graphqlApi") {
+      //   setIsMockRequestSelectorDisabled(mockGraphQLKeys.length === 0);
+      // } else {
+      //   setIsMockRequestSelectorDisabled(false);
+      // }
+    } else {
+      // resetMockResponseState();
+    }
+  }, [mockGraphQLKeys?.length, mockResourceType, resetMockResponseState, createMocksMode]);
+
   const renderLoader = () => <PageLoader message="Fetching session details..." />;
 
   const selectedRequestsLength = useMemo(() => {
@@ -102,7 +139,8 @@ const NetworkSessionViewer: React.FC = () => {
   }, [selectedMockRequests]);
 
   const createMockResponses = useCallback(async () => {
-    // trackMockResponsesRuleCreationStarted(selectedRequestsLength);
+    console.log("!!!debug", "createMock response started");
+    trackMockResponsesRuleCreationStarted(selectedRequestsLength);
 
     const { groupId: newSessionGroupId, groupName: newSessionGroupName } = await getOrCreateSessionGroup(
       {
@@ -115,7 +153,6 @@ const NetworkSessionViewer: React.FC = () => {
     const newRules = Object.values(selectedMockRequests).map((log: any) => {
       return createResponseMock({
         response: log.response.body,
-        //TODO @nafees87n: Add support for matching conditions
         urlMatcher: mockMatcher,
         requestUrl: log.url,
         operationKeys: mockGraphQLKeys,
@@ -128,32 +165,27 @@ const NetworkSessionViewer: React.FC = () => {
     return StorageService(appMode)
       .saveMultipleRulesOrGroups(newRules)
       .then(() => {
-        //TODO:@nafee87n: Add support for toast
-        // Modal.confirm({
-        //   title: (
-        //     <>
-        //       {" "}
-        //       <Typography.Text>Mock rules have been created successfully in the group:</Typography.Text>
-        //       <Typography.Text strong>{` ${newSessionGroupName}`}</Typography.Text>
-        //     </>
-        //   ),
-        //   cancelText: "View Rules",
-        //   onOk: () => {
-        //     resetMockResponseState();
-        //   },
-        //   onCancel: () => {
-        //     trackMockResponsesViewNowClicked(newSessionGroupId, newSessionGroupName);
-        //     redirectToRules(navigate);
-        //   },
-        //   icon: <CheckCircleOutlined style={{ color: "var(--success)" }} />,
-        // });
-        // trackMockResponsesRuleCreationCompleted(selectedRequestsLength, newSessionGroupName, newSessionGroupId);
+        console.log("!!!debug", ".then create rules");
+        setIsRulesCreated(true);
+        setCreatedGroupName(newSessionGroupName);
       })
       .catch((e) => {
         Logger.log("Error in creating mock rules", e);
-        // trackMockResponsesRuleCreationFailed(selectedRequestsLength);
+        trackMockResponsesRuleCreationFailed(selectedRequestsLength);
+      })
+      .finally(() => {
+        setCreateMockLoader(false);
       });
-  }, [appMode, mockGraphQLKeys, mockMatcher, mockResourceType, networkSessionId, selectedMockRequests, sessionName]);
+  }, [
+    appMode,
+    mockGraphQLKeys,
+    mockMatcher,
+    mockResourceType,
+    networkSessionId,
+    selectedMockRequests,
+    selectedRequestsLength,
+    sessionName,
+  ]);
 
   return recordedLogs ? (
     <>
@@ -166,7 +198,12 @@ const NetworkSessionViewer: React.FC = () => {
             message={
               <div className="display-flex w-100" style={{ justifyContent: "space-between", alignItems: "center" }}>
                 <div className="w-100">
-                  {selectedRequestsLength === 0 ? (
+                  {isRulesCreated ? (
+                    <>
+                      <CheckCircleOutlined style={{ color: "var(--success)" }} className="mr-4" />
+                      <span>{`Mock rules have been created successfully in the group: ${createdGroupName}`}</span>
+                    </>
+                  ) : selectedRequestsLength === 0 ? (
                     <span>
                       {mockResourceType === "graphqlApi"
                         ? `Enter the request payload key to filter specific graphQL requests in the traffic table.`
@@ -227,58 +264,124 @@ const NetworkSessionViewer: React.FC = () => {
                     </div>
                   )}
                   <div>
-                    <Popconfirm
-                      title={`Create rules for the ${selectedRequestsLength} selected ${
-                        selectedRequestsLength > 1 ? "requests" : "request"
-                      }?`}
-                      onConfirm={() => {
-                        createMockResponses();
-                      }}
-                      okText="Yes"
-                      cancelText="No"
-                      placement="topLeft"
-                      disabled={
-                        !mockMatcher ||
-                        !mockResourceType ||
-                        selectedRequestsLength === 0 ||
-                        (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0)
-                      }
-                      destroyTooltipOnHide
-                      trigger={["click"]}
-                    >
-                      <Tooltip
-                        title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}
-                        destroyTooltipOnHide
-                        trigger={["hover"]}
-                      >
-                        <RQButton
-                          type="primary"
-                          disabled={selectedRequestsLength === 0}
-                          onClick={() => {
-                            trackMockResponsesCreateRulesClicked(selectedRequestsLength);
-                            if (!mockResourceType) {
-                              toast.error("Please select resource type to create mock rules");
-                              return;
-                            }
-
-                            if (!mockMatcher) {
-                              toast.error("Please select matching condition to create mock rules");
-                              return;
-                            }
-
-                            if (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0) {
-                              toast.error("Please enter at least one operation key to create mock rules");
-                              return;
-                            }
-                          }}
-                        >
-                          <Space>
-                            Create Mock Rules
-                            <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
+                    {isRulesCreated ? (
+                      <RQButton type="primary" onClick={() => redirectToRules(navigate)}>
+                        View Rules
+                      </RQButton>
+                    ) : (
+                      <Popconfirm
+                        title={
+                          <Space direction="vertical">
+                            <div>
+                              {`Create rules for the ${selectedRequestsLength} selected ${
+                                selectedRequestsLength > 1 ? "requests" : "request"
+                              }?`}
+                            </div>
+                            <RQDropdown
+                              menu={{
+                                items: [
+                                  {
+                                    key: GLOBAL_CONSTANTS.RULE_KEYS.URL,
+                                    label: (
+                                      <Tooltip
+                                        title="Ideal for targeting specific and complete URLs."
+                                        placement="right"
+                                        zIndex={30000}
+                                      >
+                                        Match entire URL
+                                      </Tooltip>
+                                    ),
+                                  },
+                                  {
+                                    key: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
+                                    label: (
+                                      <Tooltip
+                                        title="Ideal for matching across different domains"
+                                        placement="right"
+                                        zIndex={30000}
+                                      >
+                                        Match only path
+                                      </Tooltip>
+                                    ),
+                                  },
+                                  {
+                                    key: "path_query",
+                                    label: (
+                                      <Tooltip
+                                        title="Ideal for cases where param values in URL are crucial for matching"
+                                        placement="right"
+                                        zIndex={30000}
+                                      >
+                                        Match path & query params
+                                      </Tooltip>
+                                    ),
+                                  },
+                                ],
+                                selectedKeys: mockMatcher ? [mockMatcher] : [],
+                                selectable: true,
+                                onSelect: (item) => {
+                                  // resetMockResponseState();
+                                  setMockMatcher(item.key);
+                                  trackMockResponsesTargetingSelecting(item.key);
+                                },
+                              }}
+                              trigger={["click"]}
+                              className="display-inline-block mock-responses-popover"
+                              placement="bottomRight"
+                              overlayClassName="mock-responses-popover-overlay"
+                            >
+                              <div>
+                                <Typography.Text
+                                  className="cursor-pointer mock-responses-popover-dropdown-text"
+                                  onClick={(e) => e.preventDefault()}
+                                >
+                                  {mockMatcher
+                                    ? mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL
+                                      ? "Match entire URL"
+                                      : mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH
+                                      ? "Match only path"
+                                      : "Match path & query params"
+                                    : "Select Matching Condition"}{" "}
+                                </Typography.Text>
+                                <DownOutlined className="mock-responses-popover-dropdown-icon" />
+                              </div>
+                            </RQDropdown>
                           </Space>
-                        </RQButton>
-                      </Tooltip>
-                    </Popconfirm>
+                        }
+                        onConfirm={() => {
+                          if (!mockMatcher) {
+                            toast.error("Please select a matching condition to proceed.");
+                            return;
+                          }
+                          setCreateMockLoader(true);
+                          createMockResponses();
+                        }}
+                        okText="Create rules"
+                        cancelText="Discard"
+                        placement="bottom"
+                        disabled={
+                          // !mockMatcher ||
+                          !mockResourceType ||
+                          selectedRequestsLength === 0 ||
+                          (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0)
+                        }
+                        destroyTooltipOnHide
+                        trigger={["click"]}
+                      >
+                        <Tooltip
+                          title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}
+                          destroyTooltipOnHide
+                          trigger={["hover"]}
+                        >
+                          <RQButton loading={createMockLoader} type="primary" disabled={selectedRequestsLength === 0}>
+                            <Space>
+                              Create Mock Rules
+                              <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
+                            </Space>
+                          </RQButton>
+                        </Tooltip>
+                      </Popconfirm>
+                    )}
                   </div>
                   <div>
                     <Tooltip placement="top" title="Clear selected mode">
@@ -286,7 +389,10 @@ const NetworkSessionViewer: React.FC = () => {
                         size="small"
                         icon={<CloseOutlined />}
                         style={{ margin: "0 8px" }}
-                        onClick={() => setCreateMocksMode(false)}
+                        onClick={() => {
+                          setCreateMocksMode(false);
+                          resetMockResponseState();
+                        }}
                       />
                     </Tooltip>
                   </div>
@@ -425,6 +531,8 @@ const NetworkSessionViewer: React.FC = () => {
           mockGraphQLKeys={mockGraphQLKeys}
           selectedMockRequests={selectedMockRequests}
           setSelectedMockRequests={setSelectedMockRequests}
+          showMockRequestSelector={showMockRequestSelector}
+          isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
         />
       </div>
     </>
