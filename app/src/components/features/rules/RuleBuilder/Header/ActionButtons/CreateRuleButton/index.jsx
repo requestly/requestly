@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -28,7 +28,7 @@ import {
   trackRuleResourceTypeSelected,
   trackRuleSaveClicked,
 } from "modules/analytics/events/common/rules";
-import { snakeCase } from "lodash";
+import { isNull, snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
@@ -39,6 +39,7 @@ import { actions } from "store";
 import "../RuleEditorActionButtons.css";
 import { HTML_ERRORS } from "./actions/insertScriptValidators";
 import { toastType } from "components/misc/CodeEditor/EditorToast/types";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -108,6 +109,20 @@ const CreateRuleButton = ({
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const ruleLimitType = useMemo(() => {
+    switch (currentlySelectedRuleData.ruleType) {
+      case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
+        return FeatureLimitType.script_rule;
+      case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
+        return FeatureLimitType.response_rule;
+      case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
+        return FeatureLimitType.request_rule;
+      default:
+        return null;
+    }
+  }, [currentlySelectedRuleData.ruleType]);
+
+  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
 
   const tooltipText = isDisabled
     ? "Only available in desktop app."
@@ -117,7 +132,7 @@ const CreateRuleButton = ({
 
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
-  const handleBtnOnClick = async (saveType) => {
+  const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
       dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
@@ -246,7 +261,8 @@ const CreateRuleButton = ({
   const saveFn = (event) => {
     if ((navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === "s") {
       event.preventDefault();
-      handleBtnOnClick("cmd+s");
+      // simulating click on save button when user presses cmd+s or ctrl+s to invoke upgrade popover
+      document.getElementById("rule-editor-save-btn").click();
     }
   };
 
@@ -261,18 +277,24 @@ const CreateRuleButton = ({
     <>
       <PremiumFeature
         popoverPlacement="bottomLeft"
-        features={[FeatureLimitType.num_rules]}
-        onContinue={() => handleBtnOnClick("button_click")}
+        features={[FeatureLimitType.num_rules, ruleLimitType]}
+        onContinue={handleBtnOnClick}
+        featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME} rule`}
         disabled={
           isDisabled ||
-          location?.state?.source === "my_rules" ||
-          location?.state?.source === "rule_selection" ||
-          MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT
+          (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isNull(ruleLimitType)) ||
+          !isBackgateRestrictionEnabled
         }
         source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">
-          <Button data-tour-id="rule-editor-create-btn" type="primary" className="text-bold" disabled={isDisabled}>
+          <Button
+            data-tour-id="rule-editor-create-btn"
+            id="rule-editor-save-btn"
+            type="primary"
+            className="text-bold"
+            disabled={isDisabled}
+          >
             {isCurrentlySelectedRuleHasUnsavedChanges ? "*" : null}
             {`Save rule`}
           </Button>
