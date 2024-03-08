@@ -12,7 +12,7 @@ import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
-import { Checkbox, Tooltip } from "antd";
+import { Checkbox } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 export const ITEM_SIZE = 30;
@@ -23,7 +23,6 @@ interface Props {
   isStaticPreview: boolean;
   setSelectedMockRequests?: Function;
   showMockRequestSelector?: boolean;
-  isMockRequestSelectorDisabled?: boolean;
   selectedMockRequests?: Record<string, any>;
 }
 
@@ -33,7 +32,6 @@ const NetworkTable: React.FC<Props> = ({
   isStaticPreview,
   setSelectedMockRequests,
   showMockRequestSelector,
-  isMockRequestSelectorDisabled,
   selectedMockRequests,
 }) => {
   const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>();
@@ -63,40 +61,39 @@ const NetworkTable: React.FC<Props> = ({
       {
         title: () => {
           return (
-            <Tooltip title={isMockRequestSelectorDisabled ? "Please fill all the conditions to select requests." : ""}>
-              <div className="display-row-center">
-                <Checkbox
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    if (e.target.checked) {
-                      const selectedRequests = logs.reduce((acc: Record<string, any>, log: Record<string, any>) => {
-                        acc[log.id] = log;
-                        return acc;
-                      }, {});
-                      setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, ...selectedRequests }));
-                    } else {
-                      setSelectedMockRequests((prev: Record<string, any>) => {
-                        const prevMockRequests = { ...prev };
-                        const requestsAfterUnselection = logs.reduce(
-                          (acc: Record<string, any>, log: Record<string, any>) => {
-                            delete acc[log.id];
-                            return acc;
-                          },
-                          prevMockRequests
-                        );
-                        return requestsAfterUnselection;
-                      });
-                    }
-                    trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
-                  }}
-                  disabled={isMockRequestSelectorDisabled && Object.keys(selectedMockRequests).length === 0}
-                  checked={logs.every((log: Record<string, any>) => log.id && log.id in selectedMockRequests)}
-                />
-              </div>
-            </Tooltip>
+            <div className="display-row-center">
+              <Checkbox
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  if (e.target.checked) {
+                    const selectedRequests = logs.reduce((acc: Record<string, any>, log: Record<string, any>) => {
+                      acc[log.id] = log;
+                      return acc;
+                    }, {});
+                    setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, ...selectedRequests }));
+                  } else {
+                    setSelectedMockRequests((prev: Record<string, any>) => {
+                      const prevMockRequests = { ...prev };
+                      const requestsAfterUnselection = logs.reduce(
+                        (acc: Record<string, any>, log: Record<string, any>) => {
+                          delete acc[log.id];
+                          return acc;
+                        },
+                        prevMockRequests
+                      );
+                      return requestsAfterUnselection;
+                    });
+                  }
+                  trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
+                }}
+                // disabled={isMockRequestSelectorDisabled && Object.keys(selectedMockRequests).length === 0}
+                disabled={Object.keys(selectedMockRequests).length === 0}
+                checked={logs.every((log: Record<string, any>) => log.id && log.id in selectedMockRequests)}
+              />
+            </div>
           );
         },
         dataIndex: "id",
@@ -104,30 +101,30 @@ const NetworkTable: React.FC<Props> = ({
         hideColumn: !showMockRequestSelector,
         render: (id: string, log: Record<string, any>) => {
           return (
-            <Tooltip title={isMockRequestSelectorDisabled ? "Please fill all the conditions to select requests." : ""}>
-              <div className="display-row-center">
-                <Checkbox
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    if (e.target.checked) {
-                      setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
-                    } else {
-                      setSelectedMockRequests((prev: Record<string, any>) => {
-                        const newMockRequests = { ...prev };
-                        delete newMockRequests[id];
-                        return newMockRequests;
-                      });
-                    }
-                    trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
-                  }}
-                  disabled={isMockRequestSelectorDisabled}
-                  checked={selectedMockRequests?.[id]}
-                />
-              </div>
-            </Tooltip>
+            // <Tooltip title={isMockRequestSelectorDisabled ? "Please fill all the conditions to select requests." : ""}>
+            <div className="display-row-center">
+              <Checkbox
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  if (e.target.checked) {
+                    setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
+                  } else {
+                    setSelectedMockRequests((prev: Record<string, any>) => {
+                      const newMockRequests = { ...prev };
+                      delete newMockRequests[id];
+                      return newMockRequests;
+                    });
+                  }
+                  trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
+                }}
+                // disabled={isMockRequestSelectorDisabled}
+                checked={selectedMockRequests?.[id]}
+              />
+            </div>
+            // </Tooltip>
           );
         },
       },
@@ -181,14 +178,7 @@ const NetworkTable: React.FC<Props> = ({
         width: "7%",
       },
     ],
-    [
-      isMockRequestSelectorDisabled,
-      isStaticPreview,
-      logs,
-      selectedMockRequests,
-      setSelectedMockRequests,
-      showMockRequestSelector,
-    ]
+    [isStaticPreview, logs, selectedMockRequests, setSelectedMockRequests, showMockRequestSelector]
   );
 
   const header = useMemo(() => {

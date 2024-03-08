@@ -55,6 +55,7 @@ import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./networkSessions.scss";
 
 export const NetworkSessionViewer: React.FC = () => {
   const { id } = useParams();
@@ -77,7 +78,7 @@ export const NetworkSessionViewer: React.FC = () => {
   const [selectedMockRequests, setSelectedMockRequests] = useState({});
   const [mockMatcher, setMockMatcher] = useState<string | null>(null);
   const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
-  const [isMockRequestSelectorDisabled, setIsMockRequestSelectorDisabled] = useState(false);
+  const [isMockRequestSelectorDisabled] = useState(false);
   const [isRulesCreated, setIsRulesCreated] = useState(false);
   const [createdGroupName, setCreatedGroupName] = useState("");
   const [createMockLoader, setCreateMockLoader] = useState(false);
@@ -117,15 +118,16 @@ export const NetworkSessionViewer: React.FC = () => {
 
   useEffect(() => {
     if (createMocksMode) {
-      setShowMockRequestSelector(true);
       if (mockResourceType === "graphqlApi") {
         if (mockGraphQLKeys.length === 0) {
-          setIsMockRequestSelectorDisabled(true);
+          setShowMockRequestSelector(false);
           setDisableFilters(true);
         } else {
+          setShowMockRequestSelector(true);
           setDisableFilters(false);
-          setIsMockRequestSelectorDisabled(false);
         }
+      } else {
+        setShowMockRequestSelector(true);
       }
     }
   }, [mockGraphQLKeys?.length, mockResourceType, resetMockResponseState, createMocksMode]);
@@ -537,7 +539,6 @@ export const NetworkSessionViewer: React.FC = () => {
           selectedMockRequests={selectedMockRequests}
           setSelectedMockRequests={setSelectedMockRequests}
           showMockRequestSelector={showMockRequestSelector}
-          isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
           disableFilters={disableFilters}
         />
       </div>

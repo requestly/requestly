@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Avatar, Button, Col, Tag, Menu, Row, Tooltip, Space, Typography, Popconfirm, Modal } from "antd";
-import { CheckCircleOutlined, CloseOutlined, DownOutlined } from "@ant-design/icons";
+import { Avatar, Button, Col, Tag, Menu, Row, Tooltip } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { makeOriginalLog } from "capture-console-logs";
@@ -24,7 +24,6 @@ import {
   getLogResponseById,
 } from "store/features/desktop-traffic-table/selectors";
 import Logger from "lib/logger";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getConnectedAppsCount } from "utils/Misc";
 import { ANALYTIC_EVENT_SOURCE, logType } from "./constant";
 import {
@@ -44,32 +43,10 @@ import { createLogsHar } from "../TrafficExporter/harLogs/converter";
 import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 import { RESOURCE_FILTER_OPTIONS, doesContentTypeMatchResourceFilter } from "config/constants/sub/resoureTypeFilters";
 import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
-import {
-  createResponseMock,
-  doesStatusCodeMatchLabels,
-  getGraphQLOperationValues,
-  getOrCreateSessionGroup,
-} from "./utils";
+import { doesStatusCodeMatchLabels, getGraphQLOperationValues } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
-import { redirectToRules } from "utils/RedirectionUtils";
-import { RQButton, RQDropdown } from "lib/design-system/components";
-import CreatableSelect from "react-select/creatable";
 import { getSessionName, getSessionId } from "store/features/network-sessions/selectors";
-import { StorageService } from "init";
-import { toast } from "utils/Toast";
-import { useNavigate } from "react-router-dom";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import {
-  trackMockResponsesCreateRulesClicked,
-  trackMockResponsesGraphQLKeyEntered,
-  trackMockResponsesResourceTypeSelected,
-  trackMockResponsesRuleCreationCompleted,
-  trackMockResponsesRuleCreationFailed,
-  trackMockResponsesRuleCreationStarted,
-  trackMockResponsesTargetingSelecting,
-  trackMockResponsesViewNowClicked,
-} from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
@@ -85,7 +62,6 @@ const CurrentTrafficTable = ({
   mockGraphQLKeys,
   selectedMockRequests,
   setSelectedMockRequests,
-  isMockRequestSelectorDisabled,
   showMockRequestSelector,
   disableFilters = false,
 }) => {
@@ -99,9 +75,6 @@ const CurrentTrafficTable = ({
   const desktopSpecificDetails = useSelector(getDesktopSpecificDetails);
   const trafficTableFilters = useSelector(getAllFilters);
   const isInterceptingTraffic = !useSelector(getIsInterceptionPaused);
-  const networkSessionId = useSelector(getSessionId);
-  const sessionName = useSelector(getSessionName);
-  const appMode = useSelector(getAppMode);
 
   // Component State
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -410,7 +383,6 @@ const CurrentTrafficTable = ({
           isStaticPreview={isStaticPreview}
           setSelectedMockRequests={setSelectedMockRequests}
           showMockRequestSelector={showMockRequestSelector}
-          isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
           selectedMockRequests={selectedMockRequests}
           showMockFilters={createMocksMode}
         />
@@ -426,7 +398,6 @@ const CurrentTrafficTable = ({
       isStaticPreview,
       setSelectedMockRequests,
       showMockRequestSelector,
-      isMockRequestSelectorDisabled,
       selectedMockRequests,
       createMocksMode,
     ]

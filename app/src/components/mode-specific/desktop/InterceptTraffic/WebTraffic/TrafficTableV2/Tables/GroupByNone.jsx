@@ -13,7 +13,6 @@ const GroupByNone = ({
   isStaticPreview,
   setSelectedMockRequests,
   showMockRequestSelector,
-  isMockRequestSelectorDisabled,
   selectedMockRequests,
   showMockFilters,
 }) => {
@@ -54,7 +53,6 @@ const GroupByNone = ({
       }}
       setSelectedMockRequests={setSelectedMockRequests}
       showMockRequestSelector={showMockRequestSelector}
-      isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
       selectedMockRequests={selectedMockRequests}
     />
   );
