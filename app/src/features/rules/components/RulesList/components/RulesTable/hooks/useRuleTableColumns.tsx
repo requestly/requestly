@@ -23,6 +23,8 @@ import { isRule } from "../utils";
 import { trackRulesListActionsClicked } from "features/rules/analytics";
 import { checkIsRuleGroupDisabled, isGroup } from "../utils/rules";
 import { trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
+import { PREMIUM_RULE_TYPES } from "features/rules/constants";
+import APP_CONSTANTS from "config/constants";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -140,12 +142,16 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: 120,
       render: (_, record: RuleTableDataType, index) => {
         const isRecordActive = record.status === RecordStatus.ACTIVE;
-        // todo @nsr: check if this check also applies to groups?
         if (isRule(record)) {
           return (
             <PremiumFeature
               disabled={isRecordActive}
-              features={[FeatureLimitType.num_active_rules]}
+              features={
+                PREMIUM_RULE_TYPES.includes(record.ruleType)
+                  ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
+                  : [FeatureLimitType.num_active_rules]
+              }
+              featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME} rule`}
               popoverPlacement="left"
               onContinue={() => handleStatusToggle([record])}
               source="rule_list_status_switch"

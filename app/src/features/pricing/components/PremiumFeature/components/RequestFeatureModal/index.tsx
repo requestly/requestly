@@ -28,6 +28,7 @@ interface RequestFeatureModalProps {
   hasReachedLimit?: boolean;
   source: string;
   isDeadlineCrossed: boolean;
+  featureName?: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
 }
@@ -40,6 +41,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   isDeadlineCrossed,
   setOpenPopup,
   onContinue,
+  featureName,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -99,7 +101,9 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               {capitalize(user?.details?.planDetails?.planName) || "Free"} plan limits reached!
             </Typography.Title>
           ) : (
-            <Typography.Title level={5}>This feature is a part of our paid offering</Typography.Title>
+            <Typography.Title level={5}>
+              {featureName ?? "This feature"} is a part of our paid offering
+            </Typography.Title>
           )}
         </>
       );

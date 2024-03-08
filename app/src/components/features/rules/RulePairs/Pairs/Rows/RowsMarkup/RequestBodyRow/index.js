@@ -143,6 +143,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
               <Radio value={GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC}>Static</Radio>
               <PremiumFeature
                 features={[FeatureLimitType.dynamic_request_body]}
+                featureName="Dynamic Request Body"
                 popoverPlacement="top"
                 onContinue={() => onChangeRequestType(GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE)}
                 source="dynamic_request_body"

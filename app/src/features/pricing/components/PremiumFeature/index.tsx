@@ -22,6 +22,7 @@ interface PremiumFeatureProps {
   popoverPlacement: PopconfirmProps["placement"];
   disabled?: boolean;
   source: string;
+  featureName?: string;
   onClickCallback?: () => void;
 }
 
@@ -34,6 +35,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   disabled = false,
   source,
   onClickCallback,
+  featureName,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -72,6 +74,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             hasReachedLimit={isBreachingLimit}
             isDeadlineCrossed={hasCrossedDeadline}
             source={source}
+            featureName={featureName}
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
@@ -120,7 +123,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
                   ? `You've exceeded the usage limits of the ${
                       user?.details?.planDetails?.planName || "free"
                     } plan. Consider upgrading for uninterrupted usage.`
-                  : " This feature is a part of our paid offering. Consider upgrading for uninterrupted usage."}
+                  : ` ${
+                      featureName ?? "This feature"
+                    } is a part of our paid offering. Consider upgrading for uninterrupted usage.`}
               </Typography.Text>
               {!user.loggedIn && <div className="no-cc-text caption text-gray text-bold">No credit card required!</div>}
             </>
