@@ -87,6 +87,7 @@ const CurrentTrafficTable = ({
   setSelectedMockRequests,
   isMockRequestSelectorDisabled,
   showMockRequestSelector,
+  disableFilters = false,
 }) => {
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
@@ -111,13 +112,6 @@ const CurrentTrafficTable = ({
   const [consoleLogsShown, setConsoleLogsShown] = useState([]);
   const [expandedLogTypes, setExpandedLogTypes] = useState([]);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
-
-  // const [selectedMockRequests, setSelectedMockRequests] = useState({});
-  // const [showMockFilters, setShowMockFilters] = useState(false);
-  // const [mockMatcher, setMockMatcher] = useState(null);
-  // const [mockGraphQLKeys, setMockGraphQLKeys] = useState([]);
-  // const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
-  // const [isMockRequestSelectorDisabled, setIsMockRequestSelectorDisabled] = useState(false);
 
   const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
   const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
@@ -636,6 +630,7 @@ const CurrentTrafficTable = ({
               showDeviceSelector={showDeviceSelector}
               setIsFiltersCollapsed={setIsFiltersCollapsed}
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
+              disableFilters={disableFilters}
             >
               <Tag>{requestLogs.length} requests</Tag>
             </ActionHeader>

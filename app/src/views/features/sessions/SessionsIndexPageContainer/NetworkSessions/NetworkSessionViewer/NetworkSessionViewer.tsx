@@ -11,7 +11,6 @@ import PageLoader from "components/misc/PageLoader";
 import { Alert, Button, Popconfirm, Popover, Space, Tooltip, Typography } from "antd";
 import { CheckCircleOutlined, CloseOutlined, DeleteOutlined, DownOutlined, DownloadOutlined } from "@ant-design/icons";
 import DownArrow from "assets/icons/down-arrow.svg?react";
-import "./networkSessions.scss";
 import { confirmAndDeleteRecording } from "../NetworkSessionsList";
 import { getNetworkSession } from "../actions";
 import { downloadHar } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/utils";
@@ -57,7 +56,7 @@ import { toast } from "utils/Toast";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
-const NetworkSessionViewer: React.FC = () => {
+export const NetworkSessionViewer: React.FC = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -82,7 +81,7 @@ const NetworkSessionViewer: React.FC = () => {
   const [isRulesCreated, setIsRulesCreated] = useState(false);
   const [createdGroupName, setCreatedGroupName] = useState("");
   const [createMockLoader, setCreateMockLoader] = useState(false);
-  // const [sessionName, setSessionName] = useState("");
+  const [disableFilters, setDisableFilters] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -114,21 +113,20 @@ const NetworkSessionViewer: React.FC = () => {
     setSelectedMockRequests({});
     setMockResourceType(null);
     setMockMatcher(null);
-    setIsRulesCreated(false);
   }, []);
 
   useEffect(() => {
     if (createMocksMode) {
       setShowMockRequestSelector(true);
-      // if (!mockResourceType) {
-      //   setIsMockRequestSelectorDisabled(true);
-      // } else if (mockResourceType === "graphqlApi") {
-      //   setIsMockRequestSelectorDisabled(mockGraphQLKeys.length === 0);
-      // } else {
-      //   setIsMockRequestSelectorDisabled(false);
-      // }
-    } else {
-      // resetMockResponseState();
+      if (mockResourceType === "graphqlApi") {
+        if (mockGraphQLKeys.length === 0) {
+          setIsMockRequestSelectorDisabled(true);
+          setDisableFilters(true);
+        } else {
+          setDisableFilters(false);
+          setIsMockRequestSelectorDisabled(false);
+        }
+      }
     }
   }, [mockGraphQLKeys?.length, mockResourceType, resetMockResponseState, createMocksMode]);
 
@@ -173,6 +171,7 @@ const NetworkSessionViewer: React.FC = () => {
       })
       .finally(() => {
         setCreateMockLoader(false);
+        resetMockResponseState();
       });
   }, [
     appMode,
@@ -180,6 +179,7 @@ const NetworkSessionViewer: React.FC = () => {
     mockMatcher,
     mockResourceType,
     networkSessionId,
+    resetMockResponseState,
     selectedMockRequests,
     selectedRequestsLength,
     sessionName,
@@ -212,7 +212,7 @@ const NetworkSessionViewer: React.FC = () => {
                   )}
                 </div>
                 <Space direction="horizontal">
-                  {mockResourceType === "graphqlApi" && (
+                  {mockResourceType === "graphqlApi" && !isRulesCreated && (
                     <div className="mr-16">
                       <CreatableSelect
                         isMulti={true}
@@ -371,7 +371,14 @@ const NetworkSessionViewer: React.FC = () => {
                           destroyTooltipOnHide
                           trigger={["hover"]}
                         >
-                          <RQButton loading={createMockLoader} type="primary" disabled={selectedRequestsLength === 0}>
+                          <RQButton
+                            loading={createMockLoader}
+                            type="primary"
+                            onClick={() => {
+                              trackMockResponsesCreateRulesClicked(selectedRequestsLength);
+                            }}
+                            disabled={selectedRequestsLength === 0}
+                          >
                             <Space>
                               Create Mock Rules
                               <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
@@ -381,15 +388,15 @@ const NetworkSessionViewer: React.FC = () => {
                       </Popconfirm>
                     )}
                   </div>
-                  <div>
-                    <Tooltip placement="top" title="Clear selected mode">
+                  <div className={`${isRulesCreated ? "not-visible" : ""}`}>
+                    <Tooltip placement="left" title="Clear selected mode">
                       <Button
                         size="small"
                         icon={<CloseOutlined />}
-                        style={{ margin: "0 8px" }}
                         onClick={() => {
                           setCreateMocksMode(false);
                           resetMockResponseState();
+                          setIsRulesCreated(false);
                         }}
                       />
                     </Tooltip>
@@ -531,6 +538,7 @@ const NetworkSessionViewer: React.FC = () => {
           setSelectedMockRequests={setSelectedMockRequests}
           showMockRequestSelector={showMockRequestSelector}
           isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
+          disableFilters={disableFilters}
         />
       </div>
     </>
@@ -538,4 +546,3 @@ const NetworkSessionViewer: React.FC = () => {
     renderLoader()
   );
 };
-export default NetworkSessionViewer;

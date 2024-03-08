@@ -52,6 +52,7 @@ const ActionHeader = ({
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
   setIsSSLProxyingModalVisible,
+  disableFilters,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
 
@@ -112,6 +113,7 @@ const ActionHeader = ({
           }
           style={{ width: 300 }}
           size="small"
+          disabled={disableFilters}
         />
       );
     }
@@ -138,6 +140,7 @@ const ActionHeader = ({
         }
         style={{ width: 300 }}
         size="small"
+        disabled={disableFilters}
       />
     );
   };
@@ -161,7 +164,7 @@ const ActionHeader = ({
         <Space size={12}>
           <Col>{renderSearchInput()}</Col>
           <Col>
-            <Button icon={<FilterOutlined />} onClick={handleFilterClick}>
+            <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={disableFilters}>
               <span className="traffic-table-filter-btn-content">
                 <span>Filter</span>
                 <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
