@@ -139,7 +139,6 @@ const NetworkSessionViewer: React.FC = () => {
   }, [selectedMockRequests]);
 
   const createMockResponses = useCallback(async () => {
-    console.log("!!!debug", "createMock response started");
     trackMockResponsesRuleCreationStarted(selectedRequestsLength);
 
     const { groupId: newSessionGroupId, groupName: newSessionGroupName } = await getOrCreateSessionGroup(
@@ -165,7 +164,6 @@ const NetworkSessionViewer: React.FC = () => {
     return StorageService(appMode)
       .saveMultipleRulesOrGroups(newRules)
       .then(() => {
-        console.log("!!!debug", ".then create rules");
         setIsRulesCreated(true);
         setCreatedGroupName(newSessionGroupName);
       })
