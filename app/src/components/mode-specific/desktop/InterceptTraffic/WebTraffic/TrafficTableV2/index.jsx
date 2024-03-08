@@ -5,7 +5,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import Split from "react-split";
 import { makeOriginalLog } from "capture-console-logs";
-import { getActiveModals, getAppMode, getDesktopSpecificDetails } from "store/selectors";
+import { getActiveModals, getDesktopSpecificDetails } from "store/selectors";
 import { actions } from "store";
 import FixedRequestLogPane from "./FixedRequestLogPane";
 import ActionHeader from "./ActionHeader";
@@ -46,7 +46,6 @@ import { METHOD_TYPE_OPTIONS } from "config/constants/sub/methodType";
 import { doesStatusCodeMatchLabels, getGraphQLOperationValues } from "./utils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/common/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
-import { getSessionName, getSessionId } from "store/features/network-sessions/selectors";
 
 const CurrentTrafficTable = ({
   logs: propLogs = [],
