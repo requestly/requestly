@@ -2,7 +2,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { isEqual } from "lodash";
-
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getUserAttributes } from "store/selectors";
 import { initGrowthbook, updateGrowthbookAttributes } from "utils/feature-flag/growthbook";
 import firebaseApp from "firebase.js";
@@ -54,6 +54,7 @@ const useGrowthBookIntegration = () => {
 export const GrowthbookExperimentHelperComponent = (): any => {
   // Fire experiment_assigned as soon as ui loads
   // console.log("gb: GrowthbookExperimentHelperComponent");
+  useFeatureValue("backgates_restriction", false);
 
   return null;
 };

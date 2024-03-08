@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { Empty } from "antd";
 import ContentTable from "componentsV2/ContentTable/ContentTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { isRule, isGroup, recordsToContentTableDataAdapter } from "./utils";
-import { StorageRecord } from "features/rules/types/rules";
+import { RecordStatus, StorageRecord } from "features/rules/types/rules";
 import { RuleTableDataType } from "./types";
 import {
   DeleteRulesModalWrapper,
@@ -25,7 +25,8 @@ import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
-import { getAllRecordIds } from "store/features/rules/selectors";
+import { getAllRecordIds, getAllRecords } from "store/features/rules/selectors";
+import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import "./rulesTable.css";
 
 interface Props {
@@ -37,19 +38,24 @@ interface Props {
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
   const user = useSelector(getUserAuthDetails);
   const allRecordIds = useSelector(getAllRecordIds);
+  const allRecords = useSelector(getAllRecords);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [expandedGroups, setExpandedGroups] = useState([]);
   const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [contentTableData, setContentTableData] = useState<RuleTableDataType[]>([]);
+  const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
   const clearSelectedRowsDataCallbackRef = useRef(() => {});
   const {
     clearSelectedRows,
     handleRecordShare,
     // handleActivateOrDeactivateRecords,
+    handleStatusToggle,
     handleDeleteRecordClick,
     handleChangeRuleGroupClick,
     handleUngroupSelectedRecordsClick,
   } = useRuleTableActions();
+  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
+  const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
 
   useEffect(() => {
     const contentTableAdaptedRecords = recordsToContentTableDataAdapter(records);
@@ -86,6 +92,35 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue }) => {
       setIsGroupsStateUpdated(true);
     }
   }, [expandedGroups, isGroupsStateUpdated, getExpandedGroupRowKeys]);
+
+  useEffect(() => {
+    if (!loading && !isPremiumRulesToggleChecked && isBackgateRestrictionEnabled && isUpgradePopoverEnabled) {
+      const activePremiumRules = allRecords.reduce((accumulator, record) => {
+        if (
+          isRule(record) &&
+          !user?.details?.isPremium &&
+          record.status === RecordStatus.ACTIVE &&
+          PREMIUM_RULE_TYPES.includes(record.ruleType)
+        ) {
+          accumulator.push(record);
+        }
+        return accumulator;
+      }, []);
+
+      if (activePremiumRules.length) {
+        handleStatusToggle(activePremiumRules, false);
+      }
+      setIsPremiumRulesToggleChecked(true);
+    }
+  }, [
+    allRecords,
+    user?.details?.isPremium,
+    loading,
+    isPremiumRulesToggleChecked,
+    handleStatusToggle,
+    isBackgateRestrictionEnabled,
+    isUpgradePopoverEnabled,
+  ]);
 
   const handleGroupState = (expanded: boolean, record: StorageRecord) => {
     if (isRule(record)) {
