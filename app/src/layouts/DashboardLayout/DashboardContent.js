@@ -11,6 +11,7 @@ import {
   getUserAuthDetails,
   getAppMode,
   getAppOnboardingDetails,
+  getIsWorkspaceOnboardingCompleted,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
@@ -43,6 +44,7 @@ const DashboardContent = () => {
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
+  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
@@ -192,7 +194,11 @@ const DashboardContent = () => {
             )}
 
           {/* {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null} */}
-          <RequestBillingTeamAccessModal isReminder />
+          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
+          isWorkspaceOnboardingCompleted ||
+          appOnboardingDetails.isOnboardingCompleted ? (
+            <RequestBillingTeamAccessModal isReminder />
+          ) : null}
         </>
       )}
     </>
