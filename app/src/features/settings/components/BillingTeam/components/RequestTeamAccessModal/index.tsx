@@ -36,19 +36,20 @@ export const RequestBillingTeamAccessModal: React.FC<Props> = ({ isOpen, onClose
     if (joinTeamReminder && isReminder) {
       const lastReminderDate = localStorage.getItem("lastReminderDate");
       const currentDate = new Date();
-      const formattedCurrentDate = currentDate.toISOString().slice(0, 10);
       const reminderStartDate = new Date(joinTeamReminder.startDate);
       const persistenceDate = new Date(joinTeamReminder.persistenceDate);
 
-      if (lastReminderDate === formattedCurrentDate) {
+      if (currentDate >= persistenceDate) {
+        setIsModalClosable(false);
+        setIsModalVisible(true);
+        return;
+      }
+
+      if (lastReminderDate === currentDate.toISOString().slice(0, 10)) {
         return;
       }
       if (!lastReminderDate || currentDate >= reminderStartDate) {
         setIsModalVisible(true);
-      }
-
-      if (currentDate >= persistenceDate) {
-        setIsModalClosable(false);
       }
     }
   }, [joinTeamReminder, isReminder]);
