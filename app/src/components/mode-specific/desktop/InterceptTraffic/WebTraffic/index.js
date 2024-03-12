@@ -6,7 +6,7 @@ const WebTraffic = () => {
   return (
     <Row>
       <Col span={24}>
-        <TrafficTableV2 persistLogFilters />
+        <TrafficTableV2 persistLogsFilters />
       </Col>
     </Row>
   );
