@@ -80,7 +80,7 @@ const CurrentTrafficTable = ({
   deviceId,
   clearLogsCallback,
   isStaticPreview = false,
-  persistLogFilters = false,
+  persistLogsFilters = false,
 }) => {
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
@@ -259,7 +259,7 @@ const CurrentTrafficTable = ({
   const activeFiltersCount = useMemo(() => {
     const countFilters = (filters) => filters.reduce((acc, curr) => acc + curr.length, 0);
 
-    if (persistLogFilters) {
+    if (persistLogsFilters) {
       const { method, statusCode, resourceType } = trafficTableFilters;
       return countFilters([method, statusCode, resourceType]);
     } else {
@@ -272,16 +272,16 @@ const CurrentTrafficTable = ({
     statusCodesFilters,
     methodTypeFilters,
     resourceTypeFilters,
-    persistLogFilters,
+    persistLogsFilters,
   ]);
 
   const filterLog = useCallback(
     (log) => {
       let includeLog = true;
-      const statusCodeFilter = persistLogFilters ? trafficTableFilters.statusCode : statusCodesFilters;
-      const resourceTypeFilter = persistLogFilters ? trafficTableFilters.resourceType : resourceTypeFilters;
-      const methodFilter = persistLogFilters ? trafficTableFilters.method : methodTypeFilters;
-      const searchFilter = persistLogFilters ? trafficTableFilters.search : search;
+      const statusCodeFilter = persistLogsFilters ? trafficTableFilters.statusCode : statusCodesFilters;
+      const resourceTypeFilter = persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters;
+      const methodFilter = persistLogsFilters ? trafficTableFilters.method : methodTypeFilters;
+      const searchFilter = persistLogsFilters ? trafficTableFilters.search : search;
       if (searchFilter.term) {
         const searchTerm = searchFilter.term.toLowerCase();
         const logUrl = log.url.toLowerCase();
@@ -358,7 +358,7 @@ const CurrentTrafficTable = ({
       trafficTableFilters.search.regex,
       trafficTableFilters.search.term,
       trafficTableFilters.statusCode,
-      persistLogFilters,
+      persistLogsFilters,
       statusCodesFilters,
       methodTypeFilters,
       resourceTypeFilters,
@@ -748,7 +748,7 @@ const CurrentTrafficTable = ({
               showMockFilters={showMockFilters}
               search={search}
               setSearch={setSearch}
-              persistLogsSearch={persistLogFilters}
+              persistLogsSearch={persistLogsFilters}
             >
               <Tag>{requestLogs.length} requests</Tag>
             </ActionHeader>
@@ -764,9 +764,9 @@ const CurrentTrafficTable = ({
                       filterLabel="Method"
                       filterPlaceholder="Filter by method"
                       options={METHOD_TYPE_OPTIONS}
-                      value={persistLogFilters ? trafficTableFilters.method : methodTypeFilters}
+                      value={persistLogsFilters ? trafficTableFilters.method : methodTypeFilters}
                       handleFilterChange={(options) => {
-                        if (persistLogFilters) {
+                        if (persistLogsFilters) {
                           dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
                         } else {
                           setMethodTypeFilters(options);
@@ -779,9 +779,9 @@ const CurrentTrafficTable = ({
                       filterLabel="Status code"
                       filterPlaceholder="Filter by status code"
                       options={STATUS_CODE_LABEL_ONLY_OPTIONS}
-                      value={persistLogFilters ? trafficTableFilters.statusCode : statusCodesFilters}
+                      value={persistLogsFilters ? trafficTableFilters.statusCode : statusCodesFilters}
                       handleFilterChange={(options) => {
-                        if (persistLogFilters) {
+                        if (persistLogsFilters) {
                           dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
                         } else {
                           setStatusCodesFilters(options);
@@ -794,9 +794,9 @@ const CurrentTrafficTable = ({
                       filterLabel="Resource type"
                       filterPlaceholder="Filter by resource type"
                       options={RESOURCE_FILTER_OPTIONS}
-                      value={persistLogFilters ? trafficTableFilters.resourceType : resourceTypeFilters}
+                      value={persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters}
                       handleFilterChange={(options) => {
-                        if (persistLogFilters) {
+                        if (persistLogsFilters) {
                           dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
                         } else {
                           setResourceTypeFilters(options);
@@ -809,7 +809,7 @@ const CurrentTrafficTable = ({
                     type="link"
                     className="clear-logs-filter-btn"
                     onClick={() => {
-                      if (persistLogFilters) {
+                      if (persistLogsFilters) {
                         dispatch(desktopTrafficTableActions.clearColumnFilters());
                       } else {
                         setStatusCodesFilters([]);
