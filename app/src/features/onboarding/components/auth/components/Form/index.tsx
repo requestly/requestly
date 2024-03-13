@@ -207,11 +207,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       </RQButton>
       <div className="onboarding-terms-text">
         I agree to the Requestly{" "}
-        <a href="https://requestly.io/terms/" target="_blank" rel="noreferrer">
+        <a href="https://requestly.com/terms/" target="_blank" rel="noreferrer">
           terms
         </a>
-        . Learn about how we use and protect your data in our <a href="https://requestly.io/privacy/">privacy policy</a>
-        .
+        . Learn about how we use and protect your data in our{" "}
+        <a href="https://requestly.com/privacy/">privacy policy</a>.
       </div>
     </div>
   );

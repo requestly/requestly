@@ -469,11 +469,11 @@ const AuthForm = ({
                 <FormSubmitButton />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
-                  <a className="auth-modal-link" href="https://requestly.io/terms" target="_blank" rel="noreferrer">
+                  <a className="auth-modal-link" href="https://requestly.com/terms" target="_blank" rel="noreferrer">
                     Requestly Terms
                   </a>
                   . Learn about how we use and protect your data in our{" "}
-                  <a className="auth-modal-link" href="https://requestly.io/privacy" target="_blank" rel="noreferrer">
+                  <a className="auth-modal-link" href="https://requestly.com/privacy" target="_blank" rel="noreferrer">
                     Privacy Policy
                   </a>
                   .

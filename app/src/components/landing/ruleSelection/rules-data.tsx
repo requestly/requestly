@@ -66,7 +66,7 @@ export const rulesData: Record<RuleType, RuleDetail> = {
   </ul>`,
     image: {
       src: CANCEL_REQUEST,
-      link: "https://requestly.io/feature/block-network-requests",
+      link: "https://developers.requestly.io/http-rules/cancel-rule/",
     },
   },
   [RuleType.REPLACE]: {
