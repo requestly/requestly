@@ -40,10 +40,10 @@ export const RequestBillingTeamAccessReminder = () => {
         return;
       }
 
-      if (lastReminderDate === currentDate.toISOString().slice(0, 10)) {
+      if (lastReminderDate === currentDate.toISOString().split("T")[0]) {
         return;
       }
-      if (!lastReminderDate || currentDate >= reminderStartDate) {
+      if (currentDate >= reminderStartDate) {
         setIsModalVisible(true);
       }
     }
@@ -60,7 +60,7 @@ export const RequestBillingTeamAccessReminder = () => {
   return (
     <Modal
       maskStyle={{
-        backgroundColor: !isModalClosable ? "#000000E6" : "auto",
+        backgroundColor: !isModalClosable ? "#000000" : "auto",
       }}
       maskClosable={false}
       closable={isModalClosable}
