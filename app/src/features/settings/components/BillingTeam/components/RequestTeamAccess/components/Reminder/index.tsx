@@ -80,9 +80,9 @@ export const RequestBillingTeamAccessReminder = () => {
         </div>
 
         <div className="mt-8 billing-teams-card-wrapper">
-          {billingTeams?.map((team: BillingTeamDetails, index: number) => {
+          {billingTeams?.map((team: BillingTeamDetails) => {
             if (team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE) {
-              return <BillingTeamCard key={index} team={team} />;
+              return <BillingTeamCard key={team.id} team={team} />;
             }
             return null;
           })}
