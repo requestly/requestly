@@ -21,7 +21,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.io/feature/redirect-url/", "blank");
+                window.open("https://requestly.com/products/web-debugger/redirect-urls/", "blank");
               }}
             >
               View More
@@ -40,7 +40,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.io/feature/block-network-requests/", "blank");
+                window.open("https://developers.requestly.io/http-rules/cancel-rule/", "blank");
               }}
             >
               View More
@@ -61,7 +61,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://docs.requestly.io/using-rules/replace-rule", "blank");
+                window.open("https://developers.requestly.io/http-rules/replace-strings/", "blank");
               }}
             >
               View More
@@ -83,7 +83,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://docs.requestly.io/using-rules/modify-headers", "blank");
+                window.open("https://developers.requestly.io/http-rules/modify-headers/", "blank");
               }}
             >
               View More
@@ -105,7 +105,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.io/feature/modify-query-params/", "blank");
+                window.open("https://requestly.com/products/web-debugger/modify-query-params/", "blank");
               }}
             >
               View More
@@ -127,7 +127,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://docs.requestly.io/using-rules/custom-script-rule", "blank");
+                window.open("https://requestly.com/products/web-debugger/insert-script-rule/", "blank");
               }}
             >
               View More
@@ -151,7 +151,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://docs.requestly.io/using-rules/modify-ajax-response-rule", "blank");
+                window.open("https://requestly.com/products/web-debugger/override-api-response/", "blank");
               }}
             >
               View More
@@ -173,7 +173,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://docs.requestly.io/using-rules/user-agent-modification-rule", "blank");
+                window.open("https://developers.requestly.io/http-rules/modify-user-agents/", "blank");
               }}
             >
               View More
@@ -192,7 +192,7 @@ const ExampleContent = (props) => {
               type="link"
               size="small"
               onClick={() => {
-                window.open("https://requestly.io/feature/delay-request/", "blank");
+                window.open("https://requestly.com/products/web-debugger/delay-http-request/", "blank");
               }}
             >
               View More

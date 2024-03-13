@@ -80,6 +80,7 @@ const CurrentTrafficTable = ({
   deviceId,
   clearLogsCallback,
   isStaticPreview = false,
+  persistLogsFilters = false,
 }) => {
   const GUTTER_SIZE = 20;
   const gutterSize = GUTTER_SIZE;
@@ -115,6 +116,10 @@ const CurrentTrafficTable = ({
 
   const [appList, setAppList] = useState(new Set([...trafficTableFilters.app]));
   const [domainList, setDomainList] = useState(new Set([...trafficTableFilters.domain]));
+  const [statusCodesFilters, setStatusCodesFilters] = useState([]);
+  const [methodTypeFilters, setMethodTypeFilters] = useState([]);
+  const [resourceTypeFilters, setResourceTypeFilters] = useState([]);
+  const [search, setSearch] = useState({ term: "", regex: false });
   const mounted = useRef(false);
 
   const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session");
@@ -251,23 +256,40 @@ const CurrentTrafficTable = ({
     };
   }, [isStaticPreview]);
 
-  const activeFiltersCount = useMemo(
-    () =>
-      [...trafficTableFilters.method, ...trafficTableFilters.statusCode, ...trafficTableFilters.resourceType].length,
-    [trafficTableFilters.method, trafficTableFilters.resourceType, trafficTableFilters.statusCode]
-  );
+  const activeFiltersCount = useMemo(() => {
+    const countFilters = (filters) => filters.reduce((acc, curr) => acc + curr.length, 0);
+
+    if (persistLogsFilters) {
+      const { method, statusCode, resourceType } = trafficTableFilters;
+      return countFilters([method, statusCode, resourceType]);
+    } else {
+      return countFilters([statusCodesFilters, methodTypeFilters, resourceTypeFilters]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    trafficTableFilters.method,
+    trafficTableFilters.resourceType,
+    trafficTableFilters.statusCode,
+    statusCodesFilters,
+    methodTypeFilters,
+    resourceTypeFilters,
+    persistLogsFilters,
+  ]);
 
   const filterLog = useCallback(
     (log) => {
       let includeLog = true;
-
-      if (trafficTableFilters.search.term) {
-        const searchTerm = trafficTableFilters.search.term.toLowerCase();
+      const statusCodeFilter = persistLogsFilters ? trafficTableFilters.statusCode : statusCodesFilters;
+      const resourceTypeFilter = persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters;
+      const methodFilter = persistLogsFilters ? trafficTableFilters.method : methodTypeFilters;
+      const searchFilter = persistLogsFilters ? trafficTableFilters.search : search;
+      if (searchFilter.term) {
+        const searchTerm = searchFilter.term.toLowerCase();
         const logUrl = log.url.toLowerCase();
         try {
           // TODO: @wrongsahil fix this. Special Characters are breaking the UI
           let reg = null;
-          if (trafficTableFilters.search.regex) {
+          if (searchFilter.regex) {
             reg = new RegExp(searchTerm);
             includeLog = logUrl.match(reg);
           } else {
@@ -282,19 +304,16 @@ const CurrentTrafficTable = ({
         return false;
       }
 
-      if (
-        trafficTableFilters.statusCode.length > 0 &&
-        !doesStatusCodeMatchLabels(log?.response?.statusCode, trafficTableFilters.statusCode)
-      ) {
+      if (statusCodeFilter.length > 0 && !doesStatusCodeMatchLabels(log?.response?.statusCode, statusCodeFilter)) {
         return false;
       }
       if (
-        trafficTableFilters.resourceType.length > 0 &&
-        !doesContentTypeMatchResourceFilter(log?.response?.contentType, trafficTableFilters.resourceType)
+        resourceTypeFilter.length > 0 &&
+        !doesContentTypeMatchResourceFilter(log?.response?.contentType, resourceTypeFilter)
       ) {
         return false;
       }
-      if (trafficTableFilters.method.length > 0 && !trafficTableFilters.method.includes(log?.request?.method)) {
+      if (methodFilter.length > 0 && !methodFilter.includes(log?.request?.method)) {
         return false;
       }
 
@@ -337,9 +356,13 @@ const CurrentTrafficTable = ({
       trafficTableFilters.domain,
       trafficTableFilters.method,
       trafficTableFilters.resourceType,
-      trafficTableFilters.search.regex,
-      trafficTableFilters.search.term,
+      trafficTableFilters.search,
       trafficTableFilters.statusCode,
+      persistLogsFilters,
+      statusCodesFilters,
+      methodTypeFilters,
+      resourceTypeFilters,
+      search,
     ]
   );
 
@@ -723,6 +746,9 @@ const CurrentTrafficTable = ({
               setIsSSLProxyingModalVisible={setIsSSLProxyingModalVisible}
               setShowMockFilters={setShowMockFilters}
               showMockFilters={showMockFilters}
+              search={search}
+              setSearch={setSearch}
+              persistLogsSearch={persistLogsFilters}
             >
               <Tag>{requestLogs.length} requests</Tag>
             </ActionHeader>
@@ -738,9 +764,13 @@ const CurrentTrafficTable = ({
                       filterLabel="Method"
                       filterPlaceholder="Filter by method"
                       options={METHOD_TYPE_OPTIONS}
-                      value={trafficTableFilters.method}
+                      value={persistLogsFilters ? trafficTableFilters.method : methodTypeFilters}
                       handleFilterChange={(options) => {
-                        dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
+                        if (persistLogsFilters) {
+                          dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
+                        } else {
+                          setMethodTypeFilters(options);
+                        }
                         trackTrafficTableFilterApplied("method", options, options?.length);
                       }}
                     />
@@ -749,9 +779,13 @@ const CurrentTrafficTable = ({
                       filterLabel="Status code"
                       filterPlaceholder="Filter by status code"
                       options={STATUS_CODE_LABEL_ONLY_OPTIONS}
-                      value={trafficTableFilters.statusCode}
+                      value={persistLogsFilters ? trafficTableFilters.statusCode : statusCodesFilters}
                       handleFilterChange={(options) => {
-                        dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                        if (persistLogsFilters) {
+                          dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                        } else {
+                          setStatusCodesFilters(options);
+                        }
                         trackTrafficTableFilterApplied("status_code", options, options?.length);
                       }}
                     />
@@ -760,9 +794,13 @@ const CurrentTrafficTable = ({
                       filterLabel="Resource type"
                       filterPlaceholder="Filter by resource type"
                       options={RESOURCE_FILTER_OPTIONS}
-                      value={trafficTableFilters.resourceType}
+                      value={persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters}
                       handleFilterChange={(options) => {
-                        dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
+                        if (persistLogsFilters) {
+                          dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
+                        } else {
+                          setResourceTypeFilters(options);
+                        }
                         trackTrafficTableFilterApplied("resource_type", options, options?.length);
                       }}
                     />
@@ -771,7 +809,13 @@ const CurrentTrafficTable = ({
                     type="link"
                     className="clear-logs-filter-btn"
                     onClick={() => {
-                      dispatch(desktopTrafficTableActions.clearColumnFilters());
+                      if (persistLogsFilters) {
+                        dispatch(desktopTrafficTableActions.clearColumnFilters());
+                      } else {
+                        setStatusCodesFilters([]);
+                        setMethodTypeFilters([]);
+                        setResourceTypeFilters([]);
+                      }
                     }}
                   >
                     Clear all

@@ -6,7 +6,7 @@ const { Text, Title } = Typography;
 const BreakingDialog = () => {
   const handleUpdateClick = () => {
     window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
-      link: "https://requestly.io/desktop",
+      link: "https://requestly.com/desktop",
     });
   };
 

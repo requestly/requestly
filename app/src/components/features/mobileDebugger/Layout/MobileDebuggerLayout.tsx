@@ -11,7 +11,7 @@ export default function MobileDebuggerLayout() {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://requestly.io/blog/saying-goodbye-to-the-requestly-android-debugger/"
+              href="https://requestly.com/blog/saying-goodbye-to-the-requestly-android-debugger/"
             >
               Check here to know more.
             </a>
