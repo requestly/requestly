@@ -45,7 +45,7 @@ const CreateTeamRuleCTA = () => {
               <p className="lead">
                 Rules created here can be accessed by your teammates. To manage your teammates click{" "}
                 <a
-                  href="https://requestly.io/"
+                  href="https://requestly.com/"
                   className="cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();

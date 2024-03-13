@@ -1,5 +1,5 @@
 <p align="center">
-  <a target="_blank" href="https://requestly.io/">
+  <a target="_blank" href="https://requestly.com/">
     <img src="https://github.com/requestly/requestly/blob/master/app/src/assets/img/brand/rq_logo_full.svg?raw=true" alt="Requestly Logo" width="40%"/>
   </a>
 </p>
@@ -20,13 +20,13 @@
 <!--
 <p align="center">
   <a target="_blank" href="https://docs.requestly.io">Docs</a> - <a target="_blank" 
-href="https://requestly.io/downloads">Download</a> - <a target="_blank" href="https://app.requestly.io/getting-started">Getting Started</a> - <a target="_blank" href="https://bit.ly/requestly-slack">Support community</a> - <a target="_blank" href="https://github.com/requestly/requestly/issues/new?assignees=&labels=bug&template=bug-report.yml">Report a bug</a>
+href="https://requestly.com/downloads">Download</a> - <a target="_blank" href="https://app.requestly.io/getting-started">Getting Started</a> - <a target="_blank" href="https://bit.ly/requestly-slack">Support community</a> - <a target="_blank" href="https://github.com/requestly/requestly/issues/new?assignees=&labels=bug&template=bug-report.yml">Report a bug</a>
 </p>
 -->
 
 <h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
 
-**Bring the power of Charles Proxy, Fiddler & Postman together** with beautiful, modern UI & collaboration features. Available as a browser extension on all major browsers & desktop apps on all platforms. [Install Requestly](https://requestly.io/downloads)
+**Bring the power of Charles Proxy, Fiddler & Postman together** with beautiful, modern UI & collaboration features. Available as a browser extension on all major browsers & desktop apps on all platforms. [Install Requestly](https://requestly.com/downloads)
 
 
 
@@ -68,7 +68,7 @@ Different Modifications supported
 <br/>
 
 <p align="center">
-  <a target="_blank" href="https://requestly.io/">
+  <a target="_blank" href="https://requestly.com/products/web-debugger">
     <img width="60%" alt="intercept_ _modify_https_requests_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/c69f0935-40d5-4b91-bd50-102696c55560">
   </a>
 </p>
@@ -83,7 +83,7 @@ Requestly offers a minimal, lightweight API client that works directly in the br
 - Integration with Modify Response Rule to override the response body
 
 <p align="center">
-  <a target="_blank" href="https://requestly.io/feature/api-client">
+  <a target="_blank" href="https://requestly.com/products/api-client">
     <img width="60%" alt="store_asset_-_api_client_-_1280x800_8" src="https://github.com/requestly/requestly/assets/3108399/d04e3116-665c-4e60-8a50-4ce50326c900">
   </a>
 </p>
@@ -93,7 +93,7 @@ Requestly offers a minimal, lightweight API client that works directly in the br
 Mock Server helps you quickly create API mocks. Especially helpful when APIs don't exist and you have to build a feature, just define the response you need and get an endpoint to be used in your code.
 
 <p align="center">
-  <a target="_blank" href="https://requestly.io/feature/mock-server">
+  <a target="_blank" href="https://requestly.com/products/mock-server">
     <img width="60%" alt="mock_server_-_1280x800_4" src="https://github.com/requestly/requestly/assets/3108399/337b8251-3b62-4f87-825f-f3166417c7d5">
   </a>
 </p>
@@ -103,7 +103,7 @@ Mock Server helps you quickly create API mocks. Especially helpful when APIs don
 Collaborate with other teammates and get Requestly sessions that contain video, console logs, network logs, and env details for faster troubleshooting.
 
 <p align="center">
-  <a target="_blank" href="https://requestly.io/feature/mock-server">
+  <a target="_blank" href="https://requestly.com/products/session-book">
   <img width="60%" alt="session_-_1280x800_5" src="https://github.com/requestly/requestly/assets/3108399/41375ad4-021e-490e-b488-1967cade727c">
   </a>
 </p>
@@ -161,7 +161,7 @@ Our mission is to help developers ship web and mobile apps faster and with confi
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nsrCodes"><img src="https://avatars.githubusercontent.com/u/57226514?v=4?s=100" width="100px;" alt="Navdeep Singh Rathore"/><br /><sub><b>Navdeep Singh Rathore</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=nsrCodes" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="http://requestly.io"><img src="https://avatars.githubusercontent.com/u/3108399?v=4?s=100" width="100px;" alt="Sachin Jain"/><br /><sub><b>Sachin Jain</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=sachinjain024" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://requestly.com"><img src="https://avatars.githubusercontent.com/u/3108399?v=4?s=100" width="100px;" alt="Sachin Jain"/><br /><sub><b>Sachin Jain</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=sachinjain024" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ashishsangle707"><img src="https://avatars.githubusercontent.com/u/124448580?v=4?s=100" width="100px;" alt="ashishsangle707"/><br /><sub><b>ashishsangle707</b></sub></a><br /><a href="#projectManagement-ashishsangle707" title="Project Management">📆</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/echo-sg"><img src="https://avatars.githubusercontent.com/u/56088056?v=4?s=100" width="100px;" alt="Shrey Gupta"/><br /><sub><b>Shrey Gupta</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=echo-sg" title="Code">💻</a> <a href="#projectManagement-echo-sg" title="Project Management">📆</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ncharanaraj"><img src="https://avatars.githubusercontent.com/u/43924299?v=4?s=100" width="100px;" alt="Charanaraj N"/><br /><sub><b>Charanaraj N</b></sub></a><br /><a href="https://github.com/requestly/requestly/commits?author=ncharanaraj" title="Code">💻</a></td>
