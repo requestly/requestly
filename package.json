@@ -18,13 +18,13 @@
   "author": {
     "name": "Requestly",
     "email": "contact@requestly.io",
-    "url": "https://requestly.io/"
+    "url": "https://requestly.com/"
   },
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
     "url": "https://github.com/requestly/requestly/issues"
   },
-  "homepage": "https://requestly.io",
+  "homepage": "https://requestly.com",
   "devDependencies": {
     "eslint": "^8.23.0",
     "eslint-config-prettier": "^8.5.0",

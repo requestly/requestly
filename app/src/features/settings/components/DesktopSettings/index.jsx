@@ -114,7 +114,7 @@ export const DesktopSettings = () => {
               showIcon
               action={
                 <Button type="link" size="small" icon={<LinkOutlined />}>
-                  https://requestly.io/desktop
+                  https://requestly.com/desktop
                 </Button>
               }
             />
