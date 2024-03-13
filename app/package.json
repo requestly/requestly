@@ -15,7 +15,7 @@
   "author": {
     "name": "Requestly",
     "email": "contact@requestly.io",
-    "url": "https://requestly.io/"
+    "url": "https://requestly.com/"
   },
   "scripts": {
     "build": "vite build",

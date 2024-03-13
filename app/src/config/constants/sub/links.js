@@ -4,7 +4,7 @@ const LINKS = {
   /** DOCS */
 
   // Download
-  REQUESTLY_DOWNLOAD_PAGE: "https://requestly.io/downloads",
+  REQUESTLY_DOWNLOAD_PAGE: "https://requestly.com/downloads",
   REQUESTLY_DOCS: "https://developers.requestly.io/",
   //Docs - Using Rules
   REQUESTLY_DOCS_USING_RULES: "https://docs.requestly.io/using-rules/",
@@ -57,19 +57,19 @@ const LINKS = {
   /** LANDING PAGES **/
 
   // Home
-  REQUESTLY_LANDING_HOME: "https://requestly.io/",
+  REQUESTLY_LANDING_HOME: "https://requestly.com/",
   //Blog
-  REQUESTLY_BLOG: "https://requestly.io/blog/",
+  REQUESTLY_BLOG: "https://requestly.com/blog/",
   //Desktop App
-  REQUESTLY_DESKTOP_APP: "https://requestly.io/desktop",
+  REQUESTLY_DESKTOP_APP: "https://requestly.com/desktop",
   //Privacy Policy
-  REQUESTLY_PRIVACY_POLICY: "https://requestly.io/privacy",
+  REQUESTLY_PRIVACY_POLICY: "https://requestly.com/privacy",
   // Terms and Conditions
-  REQUESTLY_TERMS_AND_CONDITIONS: "https://requestly.io/terms/",
+  REQUESTLY_TERMS_AND_CONDITIONS: "https://requestly.com/terms/",
   //Contact Us
   CONTACT_US: "mailto:" + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL,
   // Contact Us Page
-  CONTACT_US_PAGE: "https://requestly.io/contact-us/",
+  CONTACT_US_PAGE: "https://requestly.com/contact-us/",
   // Book A Demo
   BOOK_A_DEMO: "https://calendly.com/requestly/sagar",
 
