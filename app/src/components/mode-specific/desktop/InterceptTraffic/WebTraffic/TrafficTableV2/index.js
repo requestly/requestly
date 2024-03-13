@@ -265,6 +265,7 @@ const CurrentTrafficTable = ({
     } else {
       return countFilters([statusCodesFilters, methodTypeFilters, resourceTypeFilters]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     trafficTableFilters.method,
     trafficTableFilters.resourceType,
@@ -355,8 +356,7 @@ const CurrentTrafficTable = ({
       trafficTableFilters.domain,
       trafficTableFilters.method,
       trafficTableFilters.resourceType,
-      trafficTableFilters.search.regex,
-      trafficTableFilters.search.term,
+      trafficTableFilters.search,
       trafficTableFilters.statusCode,
       persistLogsFilters,
       statusCodesFilters,
