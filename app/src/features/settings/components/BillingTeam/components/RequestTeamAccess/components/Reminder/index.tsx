@@ -29,7 +29,7 @@ export const RequestBillingTeamAccessReminder = () => {
 
   useEffect(() => {
     if (joinTeamReminder) {
-      const lastReminderDate = localStorage.getItem("lastReminderDate");
+      const lastReminderDate = localStorage.getItem(APP_CONSTANTS.STORAGE.LOCAL_STORAGE.LAST_REMINDER_DATE);
       const currentDate = new Date();
       const reminderStartDate = new Date(joinTeamReminder.startDate);
       const persistenceDate = new Date(joinTeamReminder.persistenceDate);
@@ -51,7 +51,7 @@ export const RequestBillingTeamAccessReminder = () => {
 
   const handleModalClose = useCallback(() => {
     setIsModalVisible(false);
-    localStorage.setItem("lastReminderDate", new Date().toISOString().slice(0, 10));
+    localStorage.setItem(APP_CONSTANTS.STORAGE.LOCAL_STORAGE.LAST_REMINDER_DATE, new Date().toISOString().slice(0, 10));
   }, []);
 
   return (
