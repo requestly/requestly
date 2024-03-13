@@ -9,7 +9,14 @@ import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebT
 import { RQNetworkLog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 import PageLoader from "components/misc/PageLoader";
 import { Alert, Button, Popconfirm, Popover, Space, Tooltip, Typography } from "antd";
-import { CheckCircleOutlined, CloseOutlined, DeleteOutlined, DownOutlined, DownloadOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  DownOutlined,
+  DownloadOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import DownArrow from "assets/icons/down-arrow.svg?react";
 import { confirmAndDeleteRecording } from "../NetworkSessionsList";
 import { getNetworkSession } from "../actions";
@@ -78,7 +85,6 @@ export const NetworkSessionViewer: React.FC = () => {
   const [selectedMockRequests, setSelectedMockRequests] = useState({});
   const [mockMatcher, setMockMatcher] = useState<string | null>(null);
   const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
-  const [isMockRequestSelectorDisabled] = useState(false);
   const [isRulesCreated, setIsRulesCreated] = useState(false);
   const [createdGroupName, setCreatedGroupName] = useState("");
   const [createMockLoader, setCreateMockLoader] = useState(false);
@@ -270,6 +276,7 @@ export const NetworkSessionViewer: React.FC = () => {
                       </RQButton>
                     ) : (
                       <Popconfirm
+                        icon={<InfoCircleOutlined />}
                         title={
                           <Space direction="vertical">
                             <div>
@@ -320,7 +327,6 @@ export const NetworkSessionViewer: React.FC = () => {
                                 selectedKeys: mockMatcher ? [mockMatcher] : [],
                                 selectable: true,
                                 onSelect: (item) => {
-                                  // resetMockResponseState();
                                   setMockMatcher(item.key);
                                   trackMockResponsesTargetingSelecting(item.key);
                                 },
@@ -348,6 +354,9 @@ export const NetworkSessionViewer: React.FC = () => {
                             </RQDropdown>
                           </Space>
                         }
+                        okButtonProps={{
+                          disabled: !mockMatcher,
+                        }}
                         onConfirm={() => {
                           if (!mockMatcher) {
                             toast.error("Please select a matching condition to proceed.");
@@ -360,7 +369,6 @@ export const NetworkSessionViewer: React.FC = () => {
                         cancelText="Discard"
                         placement="bottom"
                         disabled={
-                          // !mockMatcher ||
                           !mockResourceType ||
                           selectedRequestsLength === 0 ||
                           (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0)
@@ -390,7 +398,7 @@ export const NetworkSessionViewer: React.FC = () => {
                       </Popconfirm>
                     )}
                   </div>
-                  <div className={`${isRulesCreated ? "not-visible" : ""}`}>
+                  <div>
                     <Tooltip placement="left" title="Clear selected mode">
                       <Button
                         size="small"
@@ -443,11 +451,11 @@ export const NetworkSessionViewer: React.FC = () => {
                             items: [
                               {
                                 key: "restApi",
-                                label: "HTTP (REST, JS, CSS)",
+                                label: "REST/Static APIs",
                               },
                               {
                                 key: "graphqlApi",
-                                label: "GraphQL API",
+                                label: "GraphQL APIs",
                               },
                             ],
                             selectedKeys: mockResourceType ? [mockResourceType] : [],

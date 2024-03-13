@@ -70,7 +70,7 @@ export const getOrCreateSessionGroup = async (
   let sessionGroup = allGroups.find((group: any) => group.sessionId === sessionDetails.networkSessionId);
 
   if (!sessionGroup) {
-    const groupName = `[Mock rules] ${sessionDetails.networkSessionName}`;
+    const groupName = `[Mocks] ${sessionDetails.networkSessionName}`;
     sessionGroup = getNewGroup(groupName);
     await StorageService(appMode).saveRuleOrGroup({
       ...sessionGroup,
