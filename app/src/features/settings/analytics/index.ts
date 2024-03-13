@@ -56,3 +56,7 @@ export const trackPersonalSubscriptionDownloadInvoicesClicked = () => {
 export const trackRequestBillingTeamAccessModalViewed = () => {
   trackEvent(SETTINGS.BILLING.REQUEST_BILLING_TEAM_ACCESS_MODAL_VIEWED);
 };
+
+export const trackJoinBillingTeamReminderViewed = () => {
+  trackEvent(SETTINGS.BILLING.JOIN_BILLING_TEAM_REMINDER_VIEWED);
+};

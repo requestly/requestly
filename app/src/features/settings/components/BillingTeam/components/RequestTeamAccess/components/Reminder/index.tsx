@@ -6,7 +6,7 @@ import { Modal, Col } from "antd";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import { BillingTeamCard } from "../TeamCard";
-import { trackRequestBillingTeamAccessModalViewed } from "features/settings/analytics";
+import { trackJoinBillingTeamReminderViewed } from "features/settings/analytics";
 import APP_CONSTANTS from "config/constants";
 import { openEmailClientWithDefaultEmailBody } from "utils/Misc";
 import "../../index.scss";
@@ -23,7 +23,7 @@ export const RequestBillingTeamAccessReminder = () => {
 
   useEffect(() => {
     if (isModalVisible) {
-      trackRequestBillingTeamAccessModalViewed();
+      trackJoinBillingTeamReminderViewed();
     }
   }, [isModalVisible]);
 
