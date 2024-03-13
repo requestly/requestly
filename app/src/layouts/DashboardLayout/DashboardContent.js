@@ -32,7 +32,7 @@ import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLink
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
-import { RequestBillingTeamAccessModal } from "features/settings";
+import { RequestBillingTeamAccessReminder } from "features/settings";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -197,7 +197,7 @@ const DashboardContent = () => {
           {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
           isWorkspaceOnboardingCompleted ||
           appOnboardingDetails.isOnboardingCompleted ? (
-            <RequestBillingTeamAccessModal isReminder />
+            <RequestBillingTeamAccessReminder />
           ) : null}
         </>
       )}
