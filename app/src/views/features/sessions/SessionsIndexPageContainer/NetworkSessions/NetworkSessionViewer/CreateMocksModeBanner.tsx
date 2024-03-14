@@ -25,14 +25,19 @@ import { getAppMode } from "store/selectors";
 import { StorageService } from "init";
 import Logger from "lib/logger";
 
-const DEFAULT_PAIR_VALUE = {
+const DEFAULT_PAIR_VALUE: GraphQLFilterPair = {
   key: "",
   value: "",
 };
 
+interface GraphQLFilterPair {
+  key: string;
+  value: string;
+}
+
 interface Props {
-  setMockGraphQLKeys: (value: any) => void;
-  mockGraphQLKeys: { key: string; value: string }[];
+  setMockGraphQLKeys: (value: GraphQLFilterPair[]) => void;
+  mockGraphQLKeys: GraphQLFilterPair[];
   mockResourceType: string;
   selectedMockRequests: Record<string, any>;
   resetMockResponseState: () => void;
@@ -58,7 +63,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
   const [isRulesCreated, setIsRulesCreated] = useState(false);
   const [createdGroupName, setCreatedGroupName] = useState("");
   const [createMockLoader, setCreateMockLoader] = useState(false);
-  const [graphQLFilterPairs, setGraphQLFilterPairs] = useState([{ ...DEFAULT_PAIR_VALUE }]);
+  const [graphQLFilterPairs, setGraphQLFilterPairs] = useState<GraphQLFilterPair[]>([{ ...DEFAULT_PAIR_VALUE }]);
   const [mockMatcher, setMockMatcher] = useState<string | null>(null);
 
   const selectedRequestsLength = useMemo(() => {
@@ -66,12 +71,12 @@ const CreateMocksModeBanner: React.FC<Props> = ({
   }, [selectedMockRequests]);
 
   const confirmGraphQLPairs = useCallback(
-    (pairs: any) => {
+    (pairs: GraphQLFilterPair[]) => {
       if (pairs.length === 0) {
         toast.error("Please add at least one key-value pair to proceed.");
         return;
       }
-      if (pairs.some((pair: any) => !pair.key || !pair.value)) {
+      if (pairs.some((pair) => !pair.key || !pair.value)) {
         toast.error("Please fill in all the key-value pairs to proceed.");
         return;
       }
@@ -81,7 +86,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
   );
 
   const updateGraphQLPairs = useCallback((index: number, selector: "key" | "value", value: string) => {
-    setGraphQLFilterPairs((prev: { key: string; value: string }[]) => {
+    setGraphQLFilterPairs((prev) => {
       const updatedSelectors = [...prev];
       updatedSelectors[index][selector] = value;
       return updatedSelectors;
@@ -89,7 +94,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
   }, []);
 
   const removeGraphQLKeyInput = useCallback((index: number) => {
-    setGraphQLFilterPairs((prev: { key: string; value: string }[]) => {
+    setGraphQLFilterPairs((prev) => {
       const updatedSelectors = [...prev];
       updatedSelectors.splice(index, 1);
       return updatedSelectors;
@@ -109,7 +114,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
 
     const graphQLKeys = mockGraphQLKeys.map((selector) => selector.key);
 
-    const newRules = Object.values(selectedMockRequests).map((log: any) => {
+    const newRules = Object.values(selectedMockRequests).map((log) => {
       return createResponseMock({
         response: log.response.body,
         urlMatcher: mockMatcher,
@@ -230,7 +235,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                       <RQButton
                         size="small"
                         type="link"
-                        onClick={() => setGraphQLFilterPairs((prev: any) => [...prev, { ...DEFAULT_PAIR_VALUE }])}
+                        onClick={() => setGraphQLFilterPairs((prev) => [...prev, { ...DEFAULT_PAIR_VALUE }])}
                       >
                         + Add
                       </RQButton>
