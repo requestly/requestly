@@ -478,7 +478,7 @@ export const NetworkSessionViewer: React.FC = () => {
                             >
                               {mockResourceType
                                 ? mockResourceType === "restApi"
-                                  ? "HTTP (REST, JS, CSS)"
+                                  ? "REST/Static APIs"
                                   : "GraphQL API"
                                 : "Select Resource Type"}{" "}
                             </Typography.Text>
