@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "utils/Toast";
-import { doSyncDebounced } from "hooks/DbListenerInit/syncingNodeListener";
+import { doSyncThrottled } from "hooks/DbListenerInit/syncingNodeListener";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { get } from "firebase/database";
@@ -27,7 +27,7 @@ const WorkspaceStatusSyncing = () => {
 
       const syncNodeRefNode = await get(syncNodeRef);
 
-      doSyncDebounced(
+      doSyncThrottled(
         user.details.profile.uid,
         appMode,
         dispatch,
