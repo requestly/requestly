@@ -151,7 +151,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreat
                 <FiArrowUpRight /> See demo
               </a>
               <a
-                href="https://requestly.io/feature/mock-server"
+                href="https://requestly.com/products/mock-server/"
                 target="_blank"
                 rel="noreferrer"
                 className="helper-item"

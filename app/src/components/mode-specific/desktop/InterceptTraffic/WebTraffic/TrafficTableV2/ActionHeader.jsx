@@ -53,6 +53,11 @@ const ActionHeader = ({
   activeFiltersCount = 0,
   setIsSSLProxyingModalVisible,
   disableFilters,
+  setShowMockFilters,
+  showMockFilters,
+  search,
+  setSearch,
+  persistLogsSearch,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
 
@@ -71,7 +76,7 @@ const ActionHeader = ({
   const dispatch = useDispatch();
   const trafficTableFilters = useSelector(getAllFilters);
 
-  const isRegexSearchActive = trafficTableFilters.search.regex;
+  const isRegexSearchActive = persistLogsSearch ? trafficTableFilters.search.regex : search.regex;
 
   const sendOnSearchEvents = useDebounce(() => {
     trackTrafficTableSearched();
@@ -83,14 +88,21 @@ const ActionHeader = ({
     if (searchValue) {
       sendOnSearchEvents();
     }
-    dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
+    if (persistLogsSearch) {
+      dispatch(desktopTrafficTableActions.updateSearchTerm(searchValue));
+    } else {
+      setSearch((prev) => {
+        return { ...prev, term: searchValue };
+      });
+    }
   };
 
   const renderSearchInput = () => {
-    if (trafficTableFilters.search.regex) {
+    const searchFilter = persistLogsSearch ? trafficTableFilters.search : search;
+    if (searchFilter.regex) {
       return (
         <Input
-          value={trafficTableFilters.search.term || ""}
+          value={searchFilter.term || ""}
           className="action-header-input"
           placeholder="Input RegEx"
           onChange={handleOnSearchChange}
@@ -104,7 +116,15 @@ const ActionHeader = ({
                   className={`traffic-table-regex-btn ${
                     isRegexSearchActive ? "traffic-table-regex-btn-active" : "traffic-table-regex-btn-inactive"
                   }`}
-                  onClick={() => dispatch(desktopTrafficTableActions.toggleRegexSearch())}
+                  onClick={() => {
+                    if (persistLogsSearch) {
+                      dispatch(desktopTrafficTableActions.toggleRegexSearch());
+                    } else {
+                      setSearch((prev) => {
+                        return { ...prev, regex: !prev.regex };
+                      });
+                    }
+                  }}
                   iconOnly
                   icon={<VscRegex />}
                 />
@@ -120,7 +140,7 @@ const ActionHeader = ({
 
     return (
       <Input
-        value={trafficTableFilters.search.term || ""}
+        value={searchFilter.term || ""}
         className="action-header-input"
         placeholder="Input Search URL"
         onChange={handleOnSearchChange}

@@ -2,7 +2,7 @@
   "name": "@requestly/browser-extension-common",
   "version": "1.0.0",
   "description": "Common code between MV2 and MV3 browser extensions",
-  "homepage": "https://requestly.io",
+  "homepage": "https://requestly.com",
   "private": true,
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
   "author": {
     "name": "Requestly",
     "email": "contact@requestly.io",
-    "url": "https://requestly.io/"
+    "url": "https://requestly.com/"
   },
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {

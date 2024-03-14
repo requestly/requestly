@@ -8,6 +8,18 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.3.5",
+    logs: [
+      "fix: auto recording logo (#1481)",
+      "fix: response rule status code (#1475)",
+      "[RQ-1339] chore: update extension title and description (#1452)",
+      "[RQ-1307] chore: rename addJSFromURL and addCSSFromURL (#1443)",
+      "[RQ-1327] fix: relay authorization header in case of cross origin XHR redirects (#1432)",
+      "[RQ-1030] [RQ-1237] fix: extension popup executed rules indication and draggable widgets click (#1346)",
+      "[RQ-1328] fix: rules implemention in MV3 (#1441)",
+    ],
+  },
+  {
     version: "24.2.17",
     logs: ["feat: Attributes support for insert script (#1386)", "[RQ-1251] feat: updated extension logo (#1371)"],
   },
@@ -308,7 +320,7 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [
       {
         title: "Launched analytics debugger for android apps.",
-        link: "https://requestly.io/debug-android-apps/",
+        link: "https://requestly.com/products/debug-android-apps/",
       },
       {
         title: "Added support for description and start time offset for session recording.",
@@ -325,15 +337,15 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [
       {
         title: "Report bugs with video, console logs, API logs and environment details.",
-        link: "https://requestly.io/feature/session-recording/",
+        link: "https://requestly.com/products/session-book/",
       },
       {
         title: "Added support to modify response status code.",
-        link: "https://requestly.io/feature/modify-response/",
+        link: "https://requestly.com/products/web-debugger/override-api-response/",
       },
       {
         title: "Improved modify headers rule experience.",
-        link: "https://requestly.io/feature/modify-request-response-headers/",
+        link: "https://requestly.com/products/web-debugger/modify-http-headers/",
       },
     ],
   },
@@ -345,7 +357,7 @@ const changeLogs: VersionedChangeLogs[] = [
       },
       {
         title: "Modify graphql query response using the modify response rule.",
-        link: "https://requestly.io/blog/mocking-graphql-api-response/",
+        link: "https://requestly.com/blog/mocking-graphql-apis-response/",
       },
       {
         title: "Support for logging for rule executions in the console.",
@@ -358,7 +370,7 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [
       {
         title: "Delay network requests.",
-        link: "https://requestly.io/feature/delay-request/",
+        link: "https://requestly.com/products/web-debugger/delay-http-request/",
       },
       {
         title: "Added support for fetch in Modify response rule.",

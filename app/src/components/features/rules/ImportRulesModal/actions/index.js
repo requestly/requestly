@@ -7,6 +7,7 @@ import { setIdsOfSingleRulePairs } from "../../../../../utils/rules/set-ids-of-r
 import { generateObjectId } from "../../../../../utils/FormattingHelper";
 import Logger from "lib/logger";
 import { runRuleMigrations } from "utils/rules/ruleMigrations";
+import { RecordStatus } from "features/rules";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
@@ -113,7 +114,7 @@ export const processDataToImport = (incomingArray, user, allRules, overwrite = t
   const combinedRulesAndGroups = [];
   if (rules.length || groups.length) {
     importedRulesAndGroups.forEach((data) => {
-      const updatedData = { ...data, currentOwner };
+      const updatedData = { ...data, currentOwner, status: RecordStatus.INACTIVE };
       combinedRulesAndGroups.push(updatedData);
     });
   }

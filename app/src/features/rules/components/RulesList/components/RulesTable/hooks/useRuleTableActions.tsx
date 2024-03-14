@@ -41,14 +41,14 @@ const useRuleTableActions = () => {
     setSelectedRows([]);
   }, [setSelectedRows]);
 
-  const handleStatusToggle = (records: RuleTableDataType[]) => {
+  const handleStatusToggle = (records: RuleTableDataType[], showToast = true) => {
     records.forEach((record) => {
       const status = record.status === RecordStatus.ACTIVE ? RecordStatus.INACTIVE : RecordStatus.ACTIVE;
-      changeRecordStatus(status, record);
+      changeRecordStatus(status, record, showToast);
     });
   };
 
-  const changeRecordStatus = (newStatus: RecordStatus, record: StorageRecord) => {
+  const changeRecordStatus = (newStatus: RecordStatus, record: StorageRecord, showToast: boolean) => {
     // TODO: Handle Group status toggle
 
     // TODO: Why is this added??
@@ -68,9 +68,11 @@ const useRuleTableActions = () => {
       const isRecordRule = isRule(record);
 
       //Push Notify
-      newStatus === RecordStatus.ACTIVE
-        ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
-        : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
+      if (showToast) {
+        newStatus === RecordStatus.ACTIVE
+          ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
+          : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
+      }
 
       if (!isRecordRule) {
         trackGroupStatusToggled(newStatus === "Active");

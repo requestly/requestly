@@ -16,7 +16,7 @@ export const HelpCard: React.FC = () => {
       {
         icon: <img src={infoIcon} alt="info" />,
         title: "What is Requestly?",
-        href: "https://requestly.io/blog/what-is-requestly/",
+        href: "https://requestly.com/blog/what-is-requestly/",
       },
       {
         icon: <img src={bookIcon} alt="community" />,

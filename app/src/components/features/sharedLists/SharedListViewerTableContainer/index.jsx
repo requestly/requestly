@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "antd";
 import { toast } from "utils/Toast.js";
@@ -8,12 +8,12 @@ import { addRulesAndGroupsToStorage, processDataToImport } from "../../rules/Imp
 //UTILS
 import { redirectToRules } from "../../../../utils/RedirectionUtils";
 import { getAppMode, getUserAuthDetails } from "../../../../store/selectors";
+import { getAllRules } from "store/features/rules/selectors";
 import { isExtensionInstalled } from "../../../../actions/ExtensionActions";
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SOURCE } from "modules/analytics/events/common/constants";
 //UTILS
-import { getAllRules } from "../../../../store/selectors";
 import ProCard from "@ant-design/pro-card";
 import RulesTable from "components/features/rules/RulesListContainer/RulesTable";
 import { ImportOutlined } from "@ant-design/icons";
@@ -29,11 +29,16 @@ import { actions } from "store";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import { snakeCase } from "lodash";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { getFeatureLimitValue } = useFeatureLimiter();
   const queryParams = new URLSearchParams(location.search);
   const sharedListId = getSharedListIdFromURL(location.pathname);
 
@@ -46,6 +51,12 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
 
   //Component state
   const [areRulesImporting, setAreRulesImporting] = useState(false);
+  const isImportLimitReached = useMemo(
+    () => getFeatureLimitValue(FeatureLimitType.num_rules) < rules.length + allRules.length,
+    [rules.length, getFeatureLimitValue, allRules.length]
+  );
+  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
+  const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
 
   const functions = getFunctions();
   const sendSharedListImportAsEmail = httpsCallable(functions, "sharedLists-sendSharedListImportAsEmail");
@@ -87,6 +98,16 @@ const SharedListViewerTableContainer = ({ id, rules, groups }) => {
       openAuthModal(SOURCE.IMPORT_SHARED_LIST);
       return;
     }
+
+    if (isImportLimitReached && isBackgateRestrictionEnabled && isUpgradePopoverEnabled) {
+      toast.error(
+        "The rules cannot be imported due to exceeding free plan limits. To proceed, consider upgrading your plan.",
+        4
+      );
+      trackUpgradeToastViewed(rules.length, "shared_list_import");
+      return;
+    }
+
     if (isWorkspaceMode) {
       const message =
         "Do you really want to import this shared list to current workspace? It will be available for every team member.";
