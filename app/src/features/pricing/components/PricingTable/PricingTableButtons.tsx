@@ -272,6 +272,9 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         setIsContactUsModalOpen(true);
         break;
       }
+      default: {
+        setIsButtonLoading(false);
+      }
     }
   };
 
