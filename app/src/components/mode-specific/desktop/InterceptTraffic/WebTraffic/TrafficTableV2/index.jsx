@@ -208,7 +208,7 @@ const CurrentTrafficTable = ({
 
     return () => {
       if (window.RQ?.DESKTOP) {
-        return window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
+        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
   }, [printLogsToConsole, saveLogInRedux, isInterceptingTraffic, updateDomainList, updateAppList]);
@@ -221,7 +221,7 @@ const CurrentTrafficTable = ({
     return () => {
       if (window.RQ?.DESKTOP && !isStaticPreview) {
         // Disable sending logs from bg window
-        return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
+        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
       }
     };
   }, [isStaticPreview]);
