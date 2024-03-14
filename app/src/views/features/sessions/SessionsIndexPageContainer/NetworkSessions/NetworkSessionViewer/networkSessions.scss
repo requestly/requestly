@@ -90,3 +90,9 @@
     vertical-align: middle;
   }
 }
+
+.session-mock-input.rq-input {
+  &::placeholder {
+    font-size: 12px;
+  }
+}

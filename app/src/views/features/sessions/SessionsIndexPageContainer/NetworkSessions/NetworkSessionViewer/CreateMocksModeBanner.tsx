@@ -3,12 +3,11 @@ import { useNavigate } from "react-router-dom";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { CheckCircleOutlined, CloseOutlined, DownOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { Alert, Popconfirm, Space, Tooltip, Typography } from "antd";
-import { RQButton, RQDropdown } from "lib/design-system/components";
-import CreatableSelect from "react-select/creatable";
+import { Alert, Popconfirm, Popover, Space, Tooltip, Typography } from "antd";
+import { RQButton, RQDropdown, RQInput } from "lib/design-system/components";
+import { ImCross } from "@react-icons/all-files/im/ImCross";
 import {
   trackMockResponsesCreateRulesClicked,
-  trackMockResponsesGraphQLKeyEntered,
   trackMockResponsesRuleCreationFailed,
   trackMockResponsesRuleCreationStarted,
   trackMockResponsesTargetingSelecting,
@@ -132,52 +131,84 @@ const CreateMocksModeBanner: React.FC<Props> = ({
           <Space direction="horizontal">
             {mockResourceType === "graphqlApi" && !isRulesCreated && (
               <div className="mr-16">
-                <CreatableSelect
-                  isMulti={true}
-                  isClearable={true}
-                  theme={(theme) => ({
-                    ...theme,
-                    borderRadius: 4,
-                    border: "none",
-                    colors: {
-                      ...theme.colors,
-                      primary: "var(--surface-1)",
-                      primary25: "var(--surface-2)",
-                      neutral0: "var(--surface-1)",
-                      neutral10: "var(--surface-3)", // tag background color
-                      neutral80: "var(--text-default)", // tag text color
-                      danger: "var(--text-default)", // tag cancel icon color
-                      dangerLight: "var(--surface-3)", // tag cancel background color
-                    },
-                  })}
-                  isValidNewOption={(string) => !!string}
-                  noOptionsMessage={() => null}
-                  formatCreateLabel={() => "Hit Enter to add"}
-                  placeholder={"Enter graphQL keys"}
-                  onChange={(selectors) => {
-                    trackMockResponsesGraphQLKeyEntered(selectors.map((selector: any) => selector.value));
-                    setMockGraphQLKeys(selectors.map((selector: any) => selector.value));
-                  }}
-                  styles={{
-                    indicatorSeparator: (provided) => ({
-                      ...provided,
-                      display: "none",
-                    }),
-                    dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
-                    control: (provided) => ({
-                      ...provided,
-                      boxShadow: "none",
-                      border: "1px solid var(--border)",
-                      backgroundColor: "var(--background)",
-                    }),
-                    container: (provided) => ({
-                      ...provided,
-                      flexGrow: 1,
-                      width: "50ch",
-                    }),
-                  }}
-                />
+                <Popover
+                  trigger={["click"]}
+                  content={
+                    <Space direction="vertical">
+                      <Typography.Text>Specify the keys and values to filter out GraphQL requests</Typography.Text>
+                      <Space direction="horizontal">
+                        <RQInput size="small" placeholder="Key eg: OperationName" className="session-mock-input" />
+                        <RQInput size="small" placeholder="Value eg: getUserInfo" className="session-mock-input" />
+                        <div className={`cursor-pointer display-row-center`}>
+                          <ImCross
+                            className="text-gray icon__wrapper"
+                            onClick={() => {
+                              // removeAppSumoCodeInput(index);
+                            }}
+                          />
+                        </div>
+                      </Space>
+                      <RQButton size="small" type="link">
+                        + Add more
+                      </RQButton>
+                      <RQButton type="primary" size="small">
+                        Proceed
+                      </RQButton>
+                    </Space>
+                  }
+                  placement="bottom"
+                  destroyTooltipOnHide
+                >
+                  <RQButton>Select GraphQL requests</RQButton>
+                </Popover>
               </div>
+              // <div className="mr-16">
+              //   <CreatableSelect
+              //     isMulti={true}
+              //     isClearable={true}
+              //     theme={(theme) => ({
+              //       ...theme,
+              //       borderRadius: 4,
+              //       border: "none",
+              //       colors: {
+              //         ...theme.colors,
+              //         primary: "var(--surface-1)",
+              //         primary25: "var(--surface-2)",
+              //         neutral0: "var(--surface-1)",
+              //         neutral10: "var(--surface-3)", // tag background color
+              //         neutral80: "var(--text-default)", // tag text color
+              //         danger: "var(--text-default)", // tag cancel icon color
+              //         dangerLight: "var(--surface-3)", // tag cancel background color
+              //       },
+              //     })}
+              //     isValidNewOption={(string) => !!string}
+              //     noOptionsMessage={() => null}
+              //     formatCreateLabel={() => "Hit Enter to add"}
+              //     placeholder={"Enter graphQL keys"}
+              //     onChange={(selectors) => {
+              //       trackMockResponsesGraphQLKeyEntered(selectors.map((selector: any) => selector.value));
+              //       setMockGraphQLKeys(selectors.map((selector: any) => selector.value));
+              //     }}
+              //     styles={{
+              //       indicatorSeparator: (provided) => ({
+              //         ...provided,
+              //         display: "none",
+              //       }),
+              //       dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
+              //       control: (provided) => ({
+              //         ...provided,
+              //         boxShadow: "none",
+              //         border: "1px solid var(--border)",
+              //         backgroundColor: "var(--background)",
+              //       }),
+              //       container: (provided) => ({
+              //         ...provided,
+              //         flexGrow: 1,
+              //         width: "50ch",
+              //       }),
+              //     }}
+              //   />
+              // </div>
             )}
             <div>
               {isRulesCreated ? (
