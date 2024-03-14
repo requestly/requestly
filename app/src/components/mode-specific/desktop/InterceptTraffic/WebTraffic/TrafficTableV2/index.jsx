@@ -163,7 +163,7 @@ const CurrentTrafficTable = ({
   const saveLogInRedux = useCallback(
     (log) => {
       if (log) {
-        if (log.response && log.response.body) {
+        if (log.response?.body) {
           stableDispatch(desktopTrafficTableActions.logResponseBodyAdd(log));
           log.response.body = null; // Setting this to null so that it doesn't get saved in logs state
         }
@@ -207,21 +207,21 @@ const CurrentTrafficTable = ({
     });
 
     return () => {
-      if (window.RQ && window.RQ.DESKTOP) {
-        window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
+      if (window.RQ?.DESKTOP) {
+        return window.RQ.DESKTOP.SERVICES.IPC.unregisterEvent("log-network-request-v2");
       }
     };
   }, [printLogsToConsole, saveLogInRedux, isInterceptingTraffic, updateDomainList, updateAppList]);
 
   useEffect(() => {
-    if (window.RQ && window.RQ.DESKTOP && !isStaticPreview) {
+    if (window.RQ?.DESKTOP && !isStaticPreview) {
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("enable-request-logger").then(() => {});
     }
 
     return () => {
-      if (window.RQ && window.RQ.DESKTOP && !isStaticPreview) {
+      if (window.RQ?.DESKTOP && !isStaticPreview) {
         // Disable sending logs from bg window
-        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
+        return window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
       }
     };
   }, [isStaticPreview]);
@@ -359,7 +359,7 @@ const CurrentTrafficTable = ({
     const domains = new Set();
     const apps = new Set();
 
-    requestLogs.map((log) => {
+    requestLogs.forEach((log) => {
       if (log?.domain) {
         domains.add(log?.domain);
       }
@@ -369,8 +369,6 @@ const CurrentTrafficTable = ({
 
       setDomainList(domains);
       setAppList(apps);
-
-      return null;
     });
   }, [requestLogs]);
 
@@ -445,23 +443,21 @@ const CurrentTrafficTable = ({
       const isSelected = trafficTableFilters[key].includes(logName);
 
       return (
-        <>
-          <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={logName.length >= 20 ? logName : ""}>
-            <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
-            <span className="log-name">{`  ${logName}`}</span>
-            {isSelected && (
-              <Tooltip mouseEnterDelay={0.5} placement="bottom" title="Clear filter">
-                <Button
-                  size="small"
-                  shape="circle"
-                  icon={<CloseOutlined />}
-                  onClick={(e) => handleClearFilter(e, key, logName)}
-                  className="clear-log-filter-btn"
-                />
-              </Tooltip>
-            )}
-          </Tooltip>
-        </>
+        <Tooltip mouseEnterDelay={0.3} placement="topLeft" title={logName.length >= 20 ? logName : ""}>
+          <Avatar size={18} src={avatarUrl} style={{ display: "inline-block", marginRight: "4px" }} />
+          <span className="log-name">{`  ${logName}`}</span>
+          {isSelected && (
+            <Tooltip mouseEnterDelay={0.5} placement="bottom" title="Clear filter">
+              <Button
+                size="small"
+                shape="circle"
+                icon={<CloseOutlined />}
+                onClick={(e) => handleClearFilter(e, key, logName)}
+                className="clear-log-filter-btn"
+              />
+            </Tooltip>
+          )}
+        </Tooltip>
       );
     },
     [handleClearFilter, trafficTableFilters]
@@ -646,74 +642,72 @@ const CurrentTrafficTable = ({
           </Row>
 
           <div className="traffic-table-filters-container">
-            <>
-              {!isFiltersCollapsed && (
-                <Row>
-                  <section>
-                    <LogFilter
-                      filterId="filter-method"
-                      filterLabel="Method"
-                      filterPlaceholder="Filter by method"
-                      options={METHOD_TYPE_OPTIONS}
-                      value={persistLogsFilters ? trafficTableFilters.method : methodTypeFilters}
-                      handleFilterChange={(options) => {
-                        if (persistLogsFilters) {
-                          dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
-                        } else {
-                          setMethodTypeFilters(options);
-                        }
-                        trackTrafficTableFilterApplied("method", options, options?.length);
-                      }}
-                    />
-                    <LogFilter
-                      filterId="filter-status-code"
-                      filterLabel="Status code"
-                      filterPlaceholder="Filter by status code"
-                      options={STATUS_CODE_LABEL_ONLY_OPTIONS}
-                      value={persistLogsFilters ? trafficTableFilters.statusCode : statusCodesFilters}
-                      handleFilterChange={(options) => {
-                        if (persistLogsFilters) {
-                          dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
-                        } else {
-                          setStatusCodesFilters(options);
-                        }
-                        trackTrafficTableFilterApplied("status_code", options, options?.length);
-                      }}
-                    />
-                    <LogFilter
-                      filterId="filter-resource-type"
-                      filterLabel="Resource type"
-                      filterPlaceholder="Filter by resource type"
-                      options={RESOURCE_FILTER_OPTIONS}
-                      value={persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters}
-                      handleFilterChange={(options) => {
-                        if (persistLogsFilters) {
-                          dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
-                        } else {
-                          setResourceTypeFilters(options);
-                        }
-                        trackTrafficTableFilterApplied("resource_type", options, options?.length);
-                      }}
-                    />
-                  </section>
-                  <Button
-                    type="link"
-                    className="clear-logs-filter-btn"
-                    onClick={() => {
+            {!isFiltersCollapsed && (
+              <Row>
+                <section>
+                  <LogFilter
+                    filterId="filter-method"
+                    filterLabel="Method"
+                    filterPlaceholder="Filter by method"
+                    options={METHOD_TYPE_OPTIONS}
+                    value={persistLogsFilters ? trafficTableFilters.method : methodTypeFilters}
+                    handleFilterChange={(options) => {
                       if (persistLogsFilters) {
-                        dispatch(desktopTrafficTableActions.clearColumnFilters());
+                        dispatch(desktopTrafficTableActions.updateFilters({ method: options }));
                       } else {
-                        setStatusCodesFilters([]);
-                        setMethodTypeFilters([]);
-                        setResourceTypeFilters([]);
+                        setMethodTypeFilters(options);
                       }
+                      trackTrafficTableFilterApplied("method", options, options?.length);
                     }}
-                  >
-                    Clear all
-                  </Button>
-                </Row>
-              )}
-            </>
+                  />
+                  <LogFilter
+                    filterId="filter-status-code"
+                    filterLabel="Status code"
+                    filterPlaceholder="Filter by status code"
+                    options={STATUS_CODE_LABEL_ONLY_OPTIONS}
+                    value={persistLogsFilters ? trafficTableFilters.statusCode : statusCodesFilters}
+                    handleFilterChange={(options) => {
+                      if (persistLogsFilters) {
+                        dispatch(desktopTrafficTableActions.updateFilters({ statusCode: options }));
+                      } else {
+                        setStatusCodesFilters(options);
+                      }
+                      trackTrafficTableFilterApplied("status_code", options, options?.length);
+                    }}
+                  />
+                  <LogFilter
+                    filterId="filter-resource-type"
+                    filterLabel="Resource type"
+                    filterPlaceholder="Filter by resource type"
+                    options={RESOURCE_FILTER_OPTIONS}
+                    value={persistLogsFilters ? trafficTableFilters.resourceType : resourceTypeFilters}
+                    handleFilterChange={(options) => {
+                      if (persistLogsFilters) {
+                        dispatch(desktopTrafficTableActions.updateFilters({ resourceType: options }));
+                      } else {
+                        setResourceTypeFilters(options);
+                      }
+                      trackTrafficTableFilterApplied("resource_type", options, options?.length);
+                    }}
+                  />
+                </section>
+                <Button
+                  type="link"
+                  className="clear-logs-filter-btn"
+                  onClick={() => {
+                    if (persistLogsFilters) {
+                      dispatch(desktopTrafficTableActions.clearColumnFilters());
+                    } else {
+                      setStatusCodesFilters([]);
+                      setMethodTypeFilters([]);
+                      setResourceTypeFilters([]);
+                    }
+                  }}
+                >
+                  Clear all
+                </Button>
+              </Row>
+            )}
           </div>
 
           <div className={!isPreviewOpen ? "hide-traffic-table-split-gutter" : ""}>

@@ -116,153 +116,151 @@ export const NetworkSessionViewer: React.FC = () => {
   const renderLoader = () => <PageLoader message="Fetching session details..." />;
 
   return recordedLogs ? (
-    <>
-      <div className="network-session-viewer-page">
-        {createMocksMode && (
-          <CreateMocksModeBanner
-            resetMockResponseState={resetMockResponseState}
-            setMockGraphQLKeys={setMockGraphQLKeys}
-            mockGraphQLKeys={mockGraphQLKeys}
-            setCreateMocksMode={setCreateMocksMode}
-            selectedMockRequests={selectedMockRequests}
-            setSelectedMockRequests={setSelectedMockRequests}
-            mockResourceType={mockResourceType}
-          />
-        )}
-        {!createMocksMode && (
-          <div className="network-session-viewer-header">
-            <div className="network-session-name-and-navigation">
-              <RQButton
-                iconOnly
-                type="default"
-                icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-                onClick={() => {
-                  trackNetworkSessionViewerBackClicked();
-                  redirectToNetworkSessionHome(navigate, isDesktopSessionsCompatible);
-                }}
-                className="back-button"
-              />
-              <div
-                style={{
-                  display: "flex",
-                  columnGap: "10px",
-                }}
-              >
-                <div className="header text-center">{sessionName}</div>
-              </div>
-            </div>
-            {harPreviewType === PreviewType.SAVED && (
-              <div className="session-viewer-actions">
-                <Space>
-                  <Popover
-                    trigger={["click"]}
-                    content={
-                      <Space direction="vertical">
-                        <Typography.Text>Which type of requests do you want to serve?</Typography.Text>
-                        <RQDropdown
-                          menu={{
-                            items: [
-                              {
-                                key: "restApi",
-                                label: "REST/Static APIs",
-                              },
-                              {
-                                key: "graphqlApi",
-                                label: "GraphQL APIs",
-                              },
-                            ],
-                            selectedKeys: mockResourceType ? [mockResourceType] : [],
-                            selectable: true,
-                            onSelect: (item) => {
-                              setMockResourceType(item.key);
-                              trackMockResponsesResourceTypeSelected(item.key);
-                            },
-                          }}
-                          trigger={["click"]}
-                          className="display-inline-block mock-responses-popover"
-                          placement="bottomRight"
-                          overlayStyle={{ fontSize: "10px" }}
-                        >
-                          <div>
-                            <Typography.Text
-                              className="cursor-pointer mock-responses-popover-dropdown-text"
-                              onClick={(e) => e.preventDefault()}
-                            >
-                              {mockResourceType
-                                ? mockResourceType === "restApi"
-                                  ? "REST/Static APIs"
-                                  : "GraphQL API"
-                                : "Select Resource Type"}{" "}
-                            </Typography.Text>
-                            <DownOutlined className="mock-responses-popover-dropdown-icon" />
-                          </div>
-                        </RQDropdown>
-                        <RQButton
-                          disabled={!mockResourceType}
-                          className="mock-responses-popover-dropdown-btn"
-                          type="primary"
-                          size="small"
-                          onClick={() => {
-                            trackMockResponsesButtonClicked();
-                            setCreateMocksMode(true);
-                          }}
-                        >
-                          Proceed
-                        </RQButton>
-                      </Space>
-                    }
-                  >
-                    <RQButton>
-                      <span>Create mocks from this session</span>
-                      <DownArrow style={{ marginTop: "2px", marginLeft: "4px" }} />
-                    </RQButton>
-                  </Popover>
-                  <Button
-                    icon={<DeleteOutlined />}
-                    onClick={() => {
-                      confirmAndDeleteRecording(id, () => {
-                        redirectToNetworkSessionHome(navigate, isDesktopSessionsCompatible);
-                      });
-                      trackDeleteNetworkSessionClicked(ActionSource.Preview);
-                    }}
-                  >
-                    Delete session
-                  </Button>
-                  <Button
-                    icon={<DownloadOutlined />}
-                    onClick={() => {
-                      downloadHar(createLogsHar(recordedLogs), sessionName);
-                      trackDownloadNetworkSessionClicked(ActionSource.Preview);
-                      trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
-                    }}
-                  >
-                    Download HAR
-                  </Button>
-                </Space>
-              </div>
-            )}
-          </div>
-        )}
-        {/* view */}
-        <TrafficTable
-          logs={recordedLogs}
-          isStaticPreview={true}
-          emptyCtaText=""
-          emptyDesc=""
-          emptyCtaAction={null}
-          showDeviceSelector={undefined}
-          deviceId={undefined}
-          clearLogsCallback={undefined}
-          createMocksMode={createMocksMode}
-          mockResourceType={mockResourceType}
+    <div className="network-session-viewer-page">
+      {createMocksMode && (
+        <CreateMocksModeBanner
+          resetMockResponseState={resetMockResponseState}
+          setMockGraphQLKeys={setMockGraphQLKeys}
           mockGraphQLKeys={mockGraphQLKeys}
+          setCreateMocksMode={setCreateMocksMode}
           selectedMockRequests={selectedMockRequests}
           setSelectedMockRequests={setSelectedMockRequests}
-          showMockRequestSelector={showMockRequestSelector}
-          disableFilters={disableFilters}
+          mockResourceType={mockResourceType}
         />
-      </div>
-    </>
+      )}
+      {!createMocksMode && (
+        <div className="network-session-viewer-header">
+          <div className="network-session-name-and-navigation">
+            <RQButton
+              iconOnly
+              type="default"
+              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+              onClick={() => {
+                trackNetworkSessionViewerBackClicked();
+                redirectToNetworkSessionHome(navigate, isDesktopSessionsCompatible);
+              }}
+              className="back-button"
+            />
+            <div
+              style={{
+                display: "flex",
+                columnGap: "10px",
+              }}
+            >
+              <div className="header text-center">{sessionName}</div>
+            </div>
+          </div>
+          {harPreviewType === PreviewType.SAVED && (
+            <div className="session-viewer-actions">
+              <Space>
+                <Popover
+                  trigger={["click"]}
+                  content={
+                    <Space direction="vertical">
+                      <Typography.Text>Which type of requests do you want to serve?</Typography.Text>
+                      <RQDropdown
+                        menu={{
+                          items: [
+                            {
+                              key: "restApi",
+                              label: "REST/Static APIs",
+                            },
+                            {
+                              key: "graphqlApi",
+                              label: "GraphQL APIs",
+                            },
+                          ],
+                          selectedKeys: mockResourceType ? [mockResourceType] : [],
+                          selectable: true,
+                          onSelect: (item) => {
+                            setMockResourceType(item.key);
+                            trackMockResponsesResourceTypeSelected(item.key);
+                          },
+                        }}
+                        trigger={["click"]}
+                        className="display-inline-block mock-responses-popover"
+                        placement="bottomRight"
+                        overlayStyle={{ fontSize: "10px" }}
+                      >
+                        <div>
+                          <Typography.Text
+                            className="cursor-pointer mock-responses-popover-dropdown-text"
+                            onClick={(e) => e.preventDefault()}
+                          >
+                            {mockResourceType
+                              ? mockResourceType === "restApi"
+                                ? "REST/Static APIs"
+                                : "GraphQL API"
+                              : "Select Resource Type"}{" "}
+                          </Typography.Text>
+                          <DownOutlined className="mock-responses-popover-dropdown-icon" />
+                        </div>
+                      </RQDropdown>
+                      <RQButton
+                        disabled={!mockResourceType}
+                        className="mock-responses-popover-dropdown-btn"
+                        type="primary"
+                        size="small"
+                        onClick={() => {
+                          trackMockResponsesButtonClicked();
+                          setCreateMocksMode(true);
+                        }}
+                      >
+                        Proceed
+                      </RQButton>
+                    </Space>
+                  }
+                >
+                  <RQButton>
+                    <span>Create mocks from this session</span>
+                    <DownArrow style={{ marginTop: "2px", marginLeft: "4px" }} />
+                  </RQButton>
+                </Popover>
+                <Button
+                  icon={<DeleteOutlined />}
+                  onClick={() => {
+                    confirmAndDeleteRecording(id, () => {
+                      redirectToNetworkSessionHome(navigate, isDesktopSessionsCompatible);
+                    });
+                    trackDeleteNetworkSessionClicked(ActionSource.Preview);
+                  }}
+                >
+                  Delete session
+                </Button>
+                <Button
+                  icon={<DownloadOutlined />}
+                  onClick={() => {
+                    downloadHar(createLogsHar(recordedLogs), sessionName);
+                    trackDownloadNetworkSessionClicked(ActionSource.Preview);
+                    trackRQDesktopLastActivity(SESSION_RECORDING.network.download);
+                  }}
+                >
+                  Download HAR
+                </Button>
+              </Space>
+            </div>
+          )}
+        </div>
+      )}
+      {/* view */}
+      <TrafficTable
+        logs={recordedLogs}
+        isStaticPreview={true}
+        emptyCtaText=""
+        emptyDesc=""
+        emptyCtaAction={null}
+        showDeviceSelector={undefined}
+        deviceId={undefined}
+        clearLogsCallback={undefined}
+        createMocksMode={createMocksMode}
+        mockResourceType={mockResourceType}
+        mockGraphQLKeys={mockGraphQLKeys}
+        selectedMockRequests={selectedMockRequests}
+        setSelectedMockRequests={setSelectedMockRequests}
+        showMockRequestSelector={showMockRequestSelector}
+        disableFilters={disableFilters}
+      />
+    </div>
   ) : (
     renderLoader()
   );

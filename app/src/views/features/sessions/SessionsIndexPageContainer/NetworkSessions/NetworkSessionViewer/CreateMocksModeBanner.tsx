@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-//@ts-ignore
+//@ts-ignore : needed because rq-core type declaration is not present
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { CheckCircleOutlined, CloseOutlined, DownOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Alert, Popconfirm, Popover, Space, Tooltip, Typography } from "antd";
@@ -157,7 +157,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
   return (
     <Alert
       type="info"
-      banner={true}
+      banner
       showIcon={false}
       message={
         <div className="display-flex w-100" style={{ justifyContent: "space-between", alignItems: "center" }}>
@@ -186,7 +186,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                     <Space direction="vertical">
                       <Typography.Text>Specify the keys and values to filter out GraphQL requests</Typography.Text>
                       {graphQLFilterPairs.map((selector, index) => (
-                        <Space direction="horizontal">
+                        <Space direction="horizontal" key={index}>
                           <RQInput
                             size="small"
                             onChange={(e) => updateGraphQLPairs(index, "key", e.target.value)}
