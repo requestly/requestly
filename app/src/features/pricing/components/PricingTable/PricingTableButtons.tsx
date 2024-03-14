@@ -197,23 +197,19 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
         break;
       }
       case CTA_ONCLICK_FUNCTIONS.CHECKOUT: {
-        if (user?.details?.profile?.isEmailVerified) {
-          trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
-          dispatch(
-            actions.toggleActiveModal({
-              modalName: "pricingModal",
-              newValue: true,
-              newProps: {
-                selectedPlan: columnPlanName,
-                planDuration: duration,
-                quantity,
-                source,
-              },
-            })
-          );
-        } else {
-          toast.error("Please verify your email to proceed with the payment");
-        }
+        trackCheckoutButtonClicked(duration, columnPlanName, quantity, isUserTrialing, source);
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "pricingModal",
+            newValue: true,
+            newProps: {
+              selectedPlan: columnPlanName,
+              planDuration: duration,
+              quantity,
+              source,
+            },
+          })
+        );
         setIsButtonLoading(false);
         break;
       }
