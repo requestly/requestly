@@ -719,6 +719,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
           responseType,
           response: fetchedResponseData,
           responseJSON: fetchedResponseDataAsJson,
+          statusCode: fetchedResponse.status,
         };
       }
 
