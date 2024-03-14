@@ -41,15 +41,6 @@ declare global {
 export const resetSyncThrottleTimerStart = () => (window.syncThrottleTimerStart = Date.now());
 resetSyncThrottleTimerStart();
 
-export const resetSyncThrottle = () => {
-  try {
-    doSyncThrottled?.cancel();
-    console.log("[Debug] Sync Throttle Canceled");
-  } catch (err) {
-    Logger.log("Sync Trottle cancel failed");
-  }
-};
-
 const waitPeriod = 5000; // allow bulk sync calls in this time
 
 /**
@@ -225,6 +216,15 @@ export const doSyncThrottled = throttle((uid, appMode, dispatch, updatedFirebase
   console.log("[DEBUG] doSyncThrottled in action");
   doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
 }, 5000);
+
+export const resetSyncThrottle = () => {
+  try {
+    doSyncThrottled?.cancel();
+    console.log("[Debug] Sync Throttle Canceled");
+  } catch (err) {
+    Logger.log("Sync Trottle cancel failed");
+  }
+};
 
 /**
  * Initiates the syncing process if conditions are met
