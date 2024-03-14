@@ -170,8 +170,8 @@ const CreateMocksModeBanner: React.FC<Props> = ({
             ) : selectedRequestsLength === 0 ? (
               <span>
                 {mockResourceType === "graphqlApi"
-                  ? `Enter the request payload key to filter specific graphQL requests in the traffic table.`
-                  : `Select the REST/Static requests that you want to mock from the traffic table below.`}
+                  ? "Enter the request payload key to filter specific graphQL requests in the traffic table."
+                  : "Select the REST/Static requests that you want to mock from the traffic table below."}
               </span>
             ) : (
               <span>{`${selectedRequestsLength} requests selected`}</span>
@@ -225,7 +225,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                               cancelText="No"
                               placement="bottom"
                             >
-                              <div className={`cursor-pointer display-row-center`}>
+                              <div className={"cursor-pointer display-row-center"}>
                                 <ImCross className="text-gray icon__wrapper" />
                               </div>
                             </Popconfirm>
