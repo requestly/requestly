@@ -17,6 +17,7 @@ import { toast } from "utils/Toast";
 import {
   createResponseMock,
   getOrCreateSessionGroup,
+  traverseJsonByPath,
 } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/utils";
 import { useSelector } from "react-redux";
 import { getSessionId, getSessionName } from "store/features/network-sessions/selectors";
@@ -36,15 +37,17 @@ interface Props {
   selectedMockRequests: Record<string, any>;
   resetMockResponseState: () => void;
   setCreateMocksMode: (value: boolean) => void;
+  setSelectedMockRequests: (value: Record<string, any>) => void;
 }
 
 const CreateMocksModeBanner: React.FC<Props> = ({
   setMockGraphQLKeys,
   mockGraphQLKeys,
-  mockResourceType,
+  setSelectedMockRequests,
   selectedMockRequests,
-  resetMockResponseState,
   setCreateMocksMode,
+  resetMockResponseState,
+  mockResourceType,
 }) => {
   const navigate = useNavigate();
 
@@ -55,7 +58,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
   const [isRulesCreated, setIsRulesCreated] = useState(false);
   const [createdGroupName, setCreatedGroupName] = useState("");
   const [createMockLoader, setCreateMockLoader] = useState(false);
-  const [graphQLFilterPairs, setGraphQLFilterPairs] = useState([DEFAULT_PAIR_VALUE]);
+  const [graphQLFilterPairs, setGraphQLFilterPairs] = useState([{ ...DEFAULT_PAIR_VALUE }]);
   const [mockMatcher, setMockMatcher] = useState<string | null>(null);
 
   const selectedRequestsLength = useMemo(() => {
@@ -130,6 +133,8 @@ const CreateMocksModeBanner: React.FC<Props> = ({
       })
       .finally(() => {
         setCreateMockLoader(false);
+        setMockMatcher(null);
+        setGraphQLFilterPairs([{ ...DEFAULT_PAIR_VALUE }]);
         resetMockResponseState();
       });
   }, [
@@ -192,21 +197,40 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                             value={selector.value}
                           />
                           {index > 0 && (
-                            <div className={`cursor-pointer display-row-center`}>
-                              <ImCross
-                                className="text-gray icon__wrapper"
-                                onClick={() => {
-                                  removeGraphQLKeyInput(index);
-                                }}
-                              />
-                            </div>
+                            <Popconfirm
+                              title={"Removing it will also clear the selected requests. Are you sure?"}
+                              onConfirm={() => {
+                                removeGraphQLKeyInput(index);
+
+                                //remove the request selection
+                                const graphQLPair = { ...graphQLFilterPairs[index] };
+                                Object.values(selectedMockRequests).forEach((log) => {
+                                  const requestData = JSON.parse(log?.request?.body);
+                                  const valueInRequestData = traverseJsonByPath(requestData, graphQLPair.key);
+                                  if (valueInRequestData && valueInRequestData === graphQLPair.value) {
+                                    setSelectedMockRequests((prev: Record<string, any>) => {
+                                      const prevMockRequests = { ...prev };
+                                      delete prevMockRequests[log.id];
+                                      return prevMockRequests;
+                                    });
+                                  }
+                                });
+                              }}
+                              okText="Yes"
+                              cancelText="No"
+                              placement="bottom"
+                            >
+                              <div className={`cursor-pointer display-row-center`}>
+                                <ImCross className="text-gray icon__wrapper" />
+                              </div>
+                            </Popconfirm>
                           )}
                         </Space>
                       ))}
                       <RQButton
                         size="small"
                         type="link"
-                        onClick={() => setGraphQLFilterPairs((prev: any) => [...prev, DEFAULT_PAIR_VALUE])}
+                        onClick={() => setGraphQLFilterPairs((prev: any) => [...prev, { ...DEFAULT_PAIR_VALUE }])}
                       >
                         + Add
                       </RQButton>
@@ -358,17 +382,15 @@ const CreateMocksModeBanner: React.FC<Props> = ({
               )}
             </div>
             <div>
-              <Tooltip placement="left" title="Clear selected mode">
-                <RQButton
-                  size="small"
-                  icon={<CloseOutlined />}
-                  onClick={() => {
-                    setCreateMocksMode(false);
-                    resetMockResponseState();
-                    setIsRulesCreated(false);
-                  }}
-                />
-              </Tooltip>
+              <RQButton
+                size="small"
+                icon={<CloseOutlined />}
+                onClick={() => {
+                  setCreateMocksMode(false);
+                  resetMockResponseState();
+                  setIsRulesCreated(false);
+                }}
+              />
             </div>
           </Space>
         </div>

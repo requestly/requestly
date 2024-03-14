@@ -92,7 +92,6 @@ export const NetworkSessionViewer: React.FC = () => {
     setMockGraphQLKeys([]);
     setSelectedMockRequests({});
     setMockResourceType(null);
-    // setMockMatcher(null);
   }, []);
 
   useEffect(() => {
@@ -126,6 +125,7 @@ export const NetworkSessionViewer: React.FC = () => {
             mockGraphQLKeys={mockGraphQLKeys}
             setCreateMocksMode={setCreateMocksMode}
             selectedMockRequests={selectedMockRequests}
+            setSelectedMockRequests={setSelectedMockRequests}
             mockResourceType={mockResourceType}
           />
         )}
