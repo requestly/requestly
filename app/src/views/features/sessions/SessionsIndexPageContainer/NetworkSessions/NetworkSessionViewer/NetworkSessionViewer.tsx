@@ -58,7 +58,7 @@ export const NetworkSessionViewer: React.FC = () => {
   const [recordedLogs, setRecordedLogs] = useState<RQNetworkLog[] | null>(null);
   const [createMocksMode, setCreateMocksMode] = useState(false);
   const [mockResourceType, setMockResourceType] = useState<string>(null);
-  const [mockGraphQLKeys, setMockGraphQLKeys] = useState<string[]>([]);
+  const [mockGraphQLKeys, setMockGraphQLKeys] = useState<{ key: string; value: string }[]>([]);
   const [selectedMockRequests, setSelectedMockRequests] = useState({});
   const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
   const [disableFilters, setDisableFilters] = useState(false);

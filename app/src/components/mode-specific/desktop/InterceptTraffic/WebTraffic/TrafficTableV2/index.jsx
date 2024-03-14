@@ -308,7 +308,14 @@ const CurrentTrafficTable = ({
       if (mockGraphQLKeys.length && mockResourceType === "graphqlApi") {
         try {
           const requestBody = JSON.parse(log?.request?.body);
-          if (requestBody && !!getGraphQLOperationValues(requestBody, mockGraphQLKeys)) {
+          if (
+            requestBody &&
+            !!getGraphQLOperationValues(
+              requestBody,
+              mockGraphQLKeys.map((graphQLkey) => graphQLkey.key),
+              mockGraphQLKeys.map((graphQLkey) => graphQLkey.value)
+            )
+          ) {
             return true;
           }
         } catch (e) {

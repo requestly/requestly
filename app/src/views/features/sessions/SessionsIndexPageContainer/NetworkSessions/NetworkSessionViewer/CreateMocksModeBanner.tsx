@@ -24,9 +24,14 @@ import { getAppMode } from "store/selectors";
 import { StorageService } from "init";
 import Logger from "lib/logger";
 
+const DEFAULT_PAIR_VALUE = {
+  key: "",
+  value: "",
+};
+
 interface Props {
-  setMockGraphQLKeys: (key: string[]) => void;
-  mockGraphQLKeys: string[];
+  setMockGraphQLKeys: (value: any) => void;
+  mockGraphQLKeys: { key: string; value: string }[];
   mockResourceType: string;
   selectedMockRequests: Record<string, any>;
   resetMockResponseState: () => void;
@@ -50,11 +55,43 @@ const CreateMocksModeBanner: React.FC<Props> = ({
   const [isRulesCreated, setIsRulesCreated] = useState(false);
   const [createdGroupName, setCreatedGroupName] = useState("");
   const [createMockLoader, setCreateMockLoader] = useState(false);
+  const [graphQLFilterPairs, setGraphQLFilterPairs] = useState([DEFAULT_PAIR_VALUE]);
   const [mockMatcher, setMockMatcher] = useState<string | null>(null);
 
   const selectedRequestsLength = useMemo(() => {
     return Object.keys(selectedMockRequests).length;
   }, [selectedMockRequests]);
+
+  const confirmGraphQLPairs = useCallback(
+    (pairs: any) => {
+      if (pairs.length === 0) {
+        toast.error("Please add at least one key-value pair to proceed.");
+        return;
+      }
+      if (pairs.some((pair: any) => !pair.key || !pair.value)) {
+        toast.error("Please fill in all the key-value pairs to proceed.");
+        return;
+      }
+      setMockGraphQLKeys(pairs);
+    },
+    [setMockGraphQLKeys]
+  );
+
+  const updateGraphQLPairs = useCallback((index: number, selector: "key" | "value", value: string) => {
+    setGraphQLFilterPairs((prev: { key: string; value: string }[]) => {
+      const updatedSelectors = [...prev];
+      updatedSelectors[index][selector] = value;
+      return updatedSelectors;
+    });
+  }, []);
+
+  const removeGraphQLKeyInput = useCallback((index: number) => {
+    setGraphQLFilterPairs((prev: { key: string; value: string }[]) => {
+      const updatedSelectors = [...prev];
+      updatedSelectors.splice(index, 1);
+      return updatedSelectors;
+    });
+  }, []);
 
   const createMockResponses = useCallback(async () => {
     trackMockResponsesRuleCreationStarted(selectedRequestsLength);
@@ -67,12 +104,14 @@ const CreateMocksModeBanner: React.FC<Props> = ({
       appMode
     );
 
+    const graphQLKeys = mockGraphQLKeys.map((selector) => selector.key);
+
     const newRules = Object.values(selectedMockRequests).map((log: any) => {
       return createResponseMock({
         response: log.response.body,
         urlMatcher: mockMatcher,
         requestUrl: log.url,
-        operationKeys: mockGraphQLKeys,
+        operationKeys: graphQLKeys,
         requestDetails: log.request,
         resourceType: mockResourceType,
         groupId: newSessionGroupId,
@@ -136,22 +175,48 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                   content={
                     <Space direction="vertical">
                       <Typography.Text>Specify the keys and values to filter out GraphQL requests</Typography.Text>
-                      <Space direction="horizontal">
-                        <RQInput size="small" placeholder="Key eg: OperationName" className="session-mock-input" />
-                        <RQInput size="small" placeholder="Value eg: getUserInfo" className="session-mock-input" />
-                        <div className={`cursor-pointer display-row-center`}>
-                          <ImCross
-                            className="text-gray icon__wrapper"
-                            onClick={() => {
-                              // removeAppSumoCodeInput(index);
-                            }}
+                      {graphQLFilterPairs.map((selector, index) => (
+                        <Space direction="horizontal">
+                          <RQInput
+                            size="small"
+                            onChange={(e) => updateGraphQLPairs(index, "key", e.target.value)}
+                            placeholder="Key eg: OperationName"
+                            className="session-mock-input"
+                            value={selector.key}
                           />
-                        </div>
-                      </Space>
-                      <RQButton size="small" type="link">
-                        + Add more
+                          <RQInput
+                            size="small"
+                            onChange={(e) => updateGraphQLPairs(index, "value", e.target.value)}
+                            placeholder="Value eg: getUserInfo"
+                            className="session-mock-input"
+                            value={selector.value}
+                          />
+                          {index > 0 && (
+                            <div className={`cursor-pointer display-row-center`}>
+                              <ImCross
+                                className="text-gray icon__wrapper"
+                                onClick={() => {
+                                  removeGraphQLKeyInput(index);
+                                }}
+                              />
+                            </div>
+                          )}
+                        </Space>
+                      ))}
+                      <RQButton
+                        size="small"
+                        type="link"
+                        onClick={() => setGraphQLFilterPairs((prev: any) => [...prev, DEFAULT_PAIR_VALUE])}
+                      >
+                        + Add
                       </RQButton>
-                      <RQButton type="primary" size="small">
+                      <RQButton
+                        type="primary"
+                        size="small"
+                        onClick={() => {
+                          confirmGraphQLPairs(graphQLFilterPairs);
+                        }}
+                      >
                         Proceed
                       </RQButton>
                     </Space>
@@ -162,53 +227,6 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                   <RQButton>Select GraphQL requests</RQButton>
                 </Popover>
               </div>
-              // <div className="mr-16">
-              //   <CreatableSelect
-              //     isMulti={true}
-              //     isClearable={true}
-              //     theme={(theme) => ({
-              //       ...theme,
-              //       borderRadius: 4,
-              //       border: "none",
-              //       colors: {
-              //         ...theme.colors,
-              //         primary: "var(--surface-1)",
-              //         primary25: "var(--surface-2)",
-              //         neutral0: "var(--surface-1)",
-              //         neutral10: "var(--surface-3)", // tag background color
-              //         neutral80: "var(--text-default)", // tag text color
-              //         danger: "var(--text-default)", // tag cancel icon color
-              //         dangerLight: "var(--surface-3)", // tag cancel background color
-              //       },
-              //     })}
-              //     isValidNewOption={(string) => !!string}
-              //     noOptionsMessage={() => null}
-              //     formatCreateLabel={() => "Hit Enter to add"}
-              //     placeholder={"Enter graphQL keys"}
-              //     onChange={(selectors) => {
-              //       trackMockResponsesGraphQLKeyEntered(selectors.map((selector: any) => selector.value));
-              //       setMockGraphQLKeys(selectors.map((selector: any) => selector.value));
-              //     }}
-              //     styles={{
-              //       indicatorSeparator: (provided) => ({
-              //         ...provided,
-              //         display: "none",
-              //       }),
-              //       dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
-              //       control: (provided) => ({
-              //         ...provided,
-              //         boxShadow: "none",
-              //         border: "1px solid var(--border)",
-              //         backgroundColor: "var(--background)",
-              //       }),
-              //       container: (provided) => ({
-              //         ...provided,
-              //         flexGrow: 1,
-              //         width: "50ch",
-              //       }),
-              //     }}
-              //   />
-              // </div>
             )}
             <div>
               {isRulesCreated ? (

@@ -153,7 +153,8 @@ export const createResponseMock = (ruleParams: {
 
 export const getGraphQLOperationValues = (
   requestData: any,
-  operationKeys: string[]
+  operationKeys: string[],
+  operationValues?: string[]
 ): {
   operationKey: string;
   operationValue: string;
@@ -171,8 +172,10 @@ export const getGraphQLOperationValues = (
       const valueInRequestData = traverseJsonByPath(requestData, key);
       if (valueInRequestData) {
         operationKeyInRequestData = key;
-        operationValueInRequestData = valueInRequestData;
-        return true;
+        if ((operationValues?.length && operationValues.includes(valueInRequestData)) || !operationValues) {
+          operationValueInRequestData = valueInRequestData;
+          return true;
+        }
       }
       return false;
     });
