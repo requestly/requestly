@@ -32,21 +32,21 @@ type Snapshot = DataSnapshot;
 
 declare global {
   interface Window {
-    syncDebounceTimerStart: any;
+    syncThrottleTimerStart: any;
     isFirstSyncComplete: any;
     skipSyncListenerForNextOneTime: any;
   }
 }
 
-export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
-resetSyncDebounceTimerStart();
+export const resetSyncThrottleTimerStart = () => (window.syncThrottleTimerStart = Date.now());
+resetSyncThrottleTimerStart();
 
-export const resetSyncDebounce = () => {
+export const resetSyncThrottle = () => {
   try {
-    doSyncDebounced?.cancel();
-    console.log("[Debug] Sync Debounce Canceled");
+    doSyncThrottled?.cancel();
+    console.log("[Debug] Sync Throttle Canceled");
   } catch (err) {
-    Logger.log("Sync Debounce cancel failed");
+    Logger.log("Sync Trottle cancel failed");
   }
 };
 
@@ -220,9 +220,9 @@ export const doSync = async (
   }
 };
 
-/** Debounced version of the doSync function */
-export const doSyncDebounced = throttle((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
-  console.log("[DEBUG] doSyncDebounced in action");
+/** Trottled version of the doSync function */
+export const doSyncThrottled = throttle((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
+  console.log("[DEBUG] doSyncThrottled in action");
   doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
 }, 5000);
 
@@ -277,11 +277,11 @@ export const invokeSyncingIfRequired = async ({
     return;
   }
 
-  if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-    console.log("[DEBUG] invokeSyncingIfRequired - debouncedDosync");
-    doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+  if (Date.now() - window.syncThrottleTimerStart > waitPeriod) {
+    console.log("[DEBUG] invokeSyncingIfRequired - doSyncThrottled");
+    doSyncThrottled(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
-    resetSyncDebounce();
+    resetSyncThrottle();
     doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   }
 };
