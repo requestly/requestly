@@ -174,7 +174,6 @@ export const NetworkSessionViewer: React.FC = () => {
                             selectedKeys: mockResourceType ? [mockResourceType] : [],
                             selectable: true,
                             onSelect: (item) => {
-                              // resetMockResponseState();
                               setMockResourceType(item.key);
                               trackMockResponsesResourceTypeSelected(item.key);
                             },
