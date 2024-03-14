@@ -580,6 +580,12 @@ const CurrentTrafficTable = ({
     [dispatch]
   );
 
+  useEffect(() => {
+    if (disableFilters) {
+      setIsFiltersCollapsed(true);
+    }
+  }, [disableFilters]);
+
   // IMP: Keep this in the end to wait for other useEffects to run first
   useEffect(() => {
     mounted.current = true;

@@ -1,22 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   convertHarJsonToRQLogs,
   createLogsHar,
 } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/converter";
-import { redirectToNetworkSessionHome, redirectToRules } from "utils/RedirectionUtils";
+import { redirectToNetworkSessionHome } from "utils/RedirectionUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import TrafficTable from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2";
 import { RQNetworkLog } from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
 import PageLoader from "components/misc/PageLoader";
-import { Alert, Button, Popconfirm, Popover, Space, Tooltip, Typography } from "antd";
-import {
-  CheckCircleOutlined,
-  CloseOutlined,
-  DeleteOutlined,
-  DownOutlined,
-  DownloadOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+import { Button, Popover, Space, Typography } from "antd";
+import { DeleteOutlined, DownOutlined, DownloadOutlined } from "@ant-design/icons";
 import DownArrow from "assets/icons/down-arrow.svg?react";
 import { confirmAndDeleteRecording } from "../NetworkSessionsList";
 import { getNetworkSession } from "../actions";
@@ -42,26 +35,11 @@ import { RQButton, RQDropdown } from "lib/design-system/components";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import CreatableSelect from "react-select/creatable";
 import {
   trackMockResponsesButtonClicked,
-  trackMockResponsesCreateRulesClicked,
-  trackMockResponsesGraphQLKeyEntered,
   trackMockResponsesResourceTypeSelected,
-  trackMockResponsesRuleCreationFailed,
-  trackMockResponsesRuleCreationStarted,
-  trackMockResponsesTargetingSelecting,
 } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
-import { getAppMode } from "store/selectors";
-import {
-  createResponseMock,
-  getOrCreateSessionGroup,
-} from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficTableV2/utils";
-import { StorageService } from "init";
-import Logger from "lib/logger";
-import { toast } from "utils/Toast";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import CreateMocksModeBanner from "./CreateMocksModeBanner";
 import "./networkSessions.scss";
 
 export const NetworkSessionViewer: React.FC = () => {
@@ -76,18 +54,13 @@ export const NetworkSessionViewer: React.FC = () => {
   const networkSessionId = useSelector(getSessionId);
   const importedHar = useSelector(getImportedHar);
   const sessionName = useSelector(getSessionName);
-  const appMode = useSelector(getAppMode);
 
   const [recordedLogs, setRecordedLogs] = useState<RQNetworkLog[] | null>(null);
   const [createMocksMode, setCreateMocksMode] = useState(false);
   const [mockResourceType, setMockResourceType] = useState<string>(null);
   const [mockGraphQLKeys, setMockGraphQLKeys] = useState<string[]>([]);
   const [selectedMockRequests, setSelectedMockRequests] = useState({});
-  const [mockMatcher, setMockMatcher] = useState<string | null>(null);
   const [showMockRequestSelector, setShowMockRequestSelector] = useState(false);
-  const [isRulesCreated, setIsRulesCreated] = useState(false);
-  const [createdGroupName, setCreatedGroupName] = useState("");
-  const [createMockLoader, setCreateMockLoader] = useState(false);
   const [disableFilters, setDisableFilters] = useState(false);
 
   useEffect(() => {
@@ -119,7 +92,7 @@ export const NetworkSessionViewer: React.FC = () => {
     setMockGraphQLKeys([]);
     setSelectedMockRequests({});
     setMockResourceType(null);
-    setMockMatcher(null);
+    // setMockMatcher(null);
   }, []);
 
   useEffect(() => {
@@ -135,285 +108,25 @@ export const NetworkSessionViewer: React.FC = () => {
       } else {
         setShowMockRequestSelector(true);
       }
+    } else {
+      setShowMockRequestSelector(false);
+      setDisableFilters(false);
     }
-  }, [mockGraphQLKeys?.length, mockResourceType, resetMockResponseState, createMocksMode]);
+  }, [mockGraphQLKeys?.length, mockResourceType, createMocksMode]);
 
   const renderLoader = () => <PageLoader message="Fetching session details..." />;
-
-  const selectedRequestsLength = useMemo(() => {
-    return Object.keys(selectedMockRequests).length;
-  }, [selectedMockRequests]);
-
-  const createMockResponses = useCallback(async () => {
-    trackMockResponsesRuleCreationStarted(selectedRequestsLength);
-
-    const { groupId: newSessionGroupId, groupName: newSessionGroupName } = await getOrCreateSessionGroup(
-      {
-        networkSessionId,
-        networkSessionName: sessionName,
-      },
-      appMode
-    );
-
-    const newRules = Object.values(selectedMockRequests).map((log: any) => {
-      return createResponseMock({
-        response: log.response.body,
-        urlMatcher: mockMatcher,
-        requestUrl: log.url,
-        operationKeys: mockGraphQLKeys,
-        requestDetails: log.request,
-        resourceType: mockResourceType,
-        groupId: newSessionGroupId,
-      });
-    });
-
-    return StorageService(appMode)
-      .saveMultipleRulesOrGroups(newRules)
-      .then(() => {
-        setIsRulesCreated(true);
-        setCreatedGroupName(newSessionGroupName);
-      })
-      .catch((e) => {
-        Logger.log("Error in creating mock rules", e);
-        trackMockResponsesRuleCreationFailed(selectedRequestsLength);
-      })
-      .finally(() => {
-        setCreateMockLoader(false);
-        resetMockResponseState();
-      });
-  }, [
-    appMode,
-    mockGraphQLKeys,
-    mockMatcher,
-    mockResourceType,
-    networkSessionId,
-    resetMockResponseState,
-    selectedMockRequests,
-    selectedRequestsLength,
-    sessionName,
-  ]);
 
   return recordedLogs ? (
     <>
       <div className="network-session-viewer-page">
         {createMocksMode && (
-          <Alert
-            type="info"
-            banner={true}
-            showIcon={false}
-            message={
-              <div className="display-flex w-100" style={{ justifyContent: "space-between", alignItems: "center" }}>
-                <div className="w-100">
-                  {isRulesCreated ? (
-                    <>
-                      <CheckCircleOutlined style={{ color: "var(--success)" }} className="mr-4" />
-                      <span>{`Mock rules have been created successfully in the group: ${createdGroupName}`}</span>
-                    </>
-                  ) : selectedRequestsLength === 0 ? (
-                    <span>
-                      {mockResourceType === "graphqlApi"
-                        ? `Enter the request payload key to filter specific graphQL requests in the traffic table.`
-                        : `Select the REST/Static requests that you want to mock from the traffic table below.`}
-                    </span>
-                  ) : (
-                    <span>{`${selectedRequestsLength} requests selected`}</span>
-                  )}
-                </div>
-                <Space direction="horizontal">
-                  {mockResourceType === "graphqlApi" && !isRulesCreated && (
-                    <div className="mr-16">
-                      <CreatableSelect
-                        isMulti={true}
-                        isClearable={true}
-                        theme={(theme) => ({
-                          ...theme,
-                          borderRadius: 4,
-                          border: "none",
-                          colors: {
-                            ...theme.colors,
-                            primary: "var(--surface-1)",
-                            primary25: "var(--surface-2)",
-                            neutral0: "var(--surface-1)",
-                            neutral10: "var(--surface-3)", // tag background color
-                            neutral80: "var(--text-default)", // tag text color
-                            danger: "var(--text-default)", // tag cancel icon color
-                            dangerLight: "var(--surface-3)", // tag cancel background color
-                          },
-                        })}
-                        isValidNewOption={(string) => !!string}
-                        noOptionsMessage={() => null}
-                        formatCreateLabel={() => "Hit Enter to add"}
-                        placeholder={"Enter graphQL keys"}
-                        onChange={(selectors) => {
-                          trackMockResponsesGraphQLKeyEntered(selectors.map((selector: any) => selector.value));
-                          setMockGraphQLKeys(selectors.map((selector: any) => selector.value));
-                        }}
-                        styles={{
-                          indicatorSeparator: (provided) => ({
-                            ...provided,
-                            display: "none",
-                          }),
-                          dropdownIndicator: (provided) => ({ ...provided, display: "none" }),
-                          control: (provided) => ({
-                            ...provided,
-                            boxShadow: "none",
-                            border: "1px solid var(--border)",
-                            backgroundColor: "var(--background)",
-                          }),
-                          container: (provided) => ({
-                            ...provided,
-                            flexGrow: 1,
-                            width: "50ch",
-                          }),
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div>
-                    {isRulesCreated ? (
-                      <RQButton type="primary" onClick={() => redirectToRules(navigate)}>
-                        View Rules
-                      </RQButton>
-                    ) : (
-                      <Popconfirm
-                        icon={<InfoCircleOutlined />}
-                        title={
-                          <Space direction="vertical">
-                            <div>
-                              {`Create rules for the ${selectedRequestsLength} selected ${
-                                selectedRequestsLength > 1 ? "requests" : "request"
-                              }?`}
-                            </div>
-                            <RQDropdown
-                              menu={{
-                                items: [
-                                  {
-                                    key: GLOBAL_CONSTANTS.RULE_KEYS.URL,
-                                    label: (
-                                      <Tooltip
-                                        title="Ideal for targeting specific and complete URLs."
-                                        placement="right"
-                                        zIndex={30000}
-                                      >
-                                        Match entire URL
-                                      </Tooltip>
-                                    ),
-                                  },
-                                  {
-                                    key: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
-                                    label: (
-                                      <Tooltip
-                                        title="Ideal for matching across different domains"
-                                        placement="right"
-                                        zIndex={30000}
-                                      >
-                                        Match only path
-                                      </Tooltip>
-                                    ),
-                                  },
-                                  {
-                                    key: "path_query",
-                                    label: (
-                                      <Tooltip
-                                        title="Ideal for cases where param values in URL are crucial for matching"
-                                        placement="right"
-                                        zIndex={30000}
-                                      >
-                                        Match path & query params
-                                      </Tooltip>
-                                    ),
-                                  },
-                                ],
-                                selectedKeys: mockMatcher ? [mockMatcher] : [],
-                                selectable: true,
-                                onSelect: (item) => {
-                                  setMockMatcher(item.key);
-                                  trackMockResponsesTargetingSelecting(item.key);
-                                },
-                              }}
-                              trigger={["click"]}
-                              className="display-inline-block mock-responses-popover"
-                              placement="bottomRight"
-                              overlayClassName="mock-responses-popover-overlay"
-                            >
-                              <div>
-                                <Typography.Text
-                                  className="cursor-pointer mock-responses-popover-dropdown-text"
-                                  onClick={(e) => e.preventDefault()}
-                                >
-                                  {mockMatcher
-                                    ? mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL
-                                      ? "Match entire URL"
-                                      : mockMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH
-                                      ? "Match only path"
-                                      : "Match path & query params"
-                                    : "Select Matching Condition"}{" "}
-                                </Typography.Text>
-                                <DownOutlined className="mock-responses-popover-dropdown-icon" />
-                              </div>
-                            </RQDropdown>
-                          </Space>
-                        }
-                        okButtonProps={{
-                          disabled: !mockMatcher,
-                        }}
-                        onConfirm={() => {
-                          if (!mockMatcher) {
-                            toast.error("Please select a matching condition to proceed.");
-                            return;
-                          }
-                          setCreateMockLoader(true);
-                          createMockResponses();
-                        }}
-                        okText="Create rules"
-                        cancelText="Discard"
-                        placement="bottom"
-                        disabled={
-                          !mockResourceType ||
-                          selectedRequestsLength === 0 ||
-                          (mockResourceType === "graphqlApi" && mockGraphQLKeys.length === 0)
-                        }
-                        destroyTooltipOnHide
-                        trigger={["click"]}
-                      >
-                        <Tooltip
-                          title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}
-                          destroyTooltipOnHide
-                          trigger={["hover"]}
-                        >
-                          <RQButton
-                            loading={createMockLoader}
-                            type="primary"
-                            onClick={() => {
-                              trackMockResponsesCreateRulesClicked(selectedRequestsLength);
-                            }}
-                            disabled={selectedRequestsLength === 0}
-                          >
-                            <Space>
-                              Create Mock Rules
-                              <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
-                            </Space>
-                          </RQButton>
-                        </Tooltip>
-                      </Popconfirm>
-                    )}
-                  </div>
-                  <div>
-                    <Tooltip placement="left" title="Clear selected mode">
-                      <Button
-                        size="small"
-                        icon={<CloseOutlined />}
-                        onClick={() => {
-                          setCreateMocksMode(false);
-                          resetMockResponseState();
-                          setIsRulesCreated(false);
-                        }}
-                      />
-                    </Tooltip>
-                  </div>
-                </Space>
-              </div>
-            }
+          <CreateMocksModeBanner
+            resetMockResponseState={resetMockResponseState}
+            setMockGraphQLKeys={setMockGraphQLKeys}
+            mockGraphQLKeys={mockGraphQLKeys}
+            setCreateMocksMode={setCreateMocksMode}
+            selectedMockRequests={selectedMockRequests}
+            mockResourceType={mockResourceType}
           />
         )}
         {!createMocksMode && (
