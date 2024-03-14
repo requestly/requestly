@@ -11,6 +11,7 @@ import {
   getUserAuthDetails,
   getAppMode,
   getAppOnboardingDetails,
+  getIsWorkspaceOnboardingCompleted,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
@@ -31,6 +32,7 @@ import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLink
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
+import { RequestBillingTeamAccessReminder } from "features/settings";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -42,6 +44,7 @@ const DashboardContent = () => {
   const activeModals = useSelector(getActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
+  const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
@@ -191,6 +194,11 @@ const DashboardContent = () => {
             )}
 
           {/* {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null} */}
+          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
+          isWorkspaceOnboardingCompleted ||
+          appOnboardingDetails.isOnboardingCompleted ? (
+            <RequestBillingTeamAccessReminder />
+          ) : null}
         </>
       )}
     </>
