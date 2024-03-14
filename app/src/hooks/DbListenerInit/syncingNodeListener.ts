@@ -276,7 +276,7 @@ export const invokeSyncingIfRequired = async ({
     dispatch(actions.updateIsRulesListLoading(false));
     return;
   }
-  // this does not make sense!!! Why not just call doSyncDebounced here????
+
   if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
     console.log("[DEBUG] invokeSyncingIfRequired - debouncedDosync");
     doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
