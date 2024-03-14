@@ -50,7 +50,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
   if (source.key === SourceKey.HOST) {
     switch (source.operator) {
       case SourceOperator.EQUALS:
-        return { urlFilter: `||${source.value}^` }; // host.com matches both host.com a.host.com
+        return { regexFilter: `^(?:https?://)?(?:www.)?${source.value}(?![w.])` }; // host.com matches only host.com and should not match a.host.com
 
       case SourceOperator.CONTAINS:
         return { urlFilter: `||${source.value}*^` }; // host.c matches a.host.com but not ahost.com
