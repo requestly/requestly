@@ -87,7 +87,7 @@ export const recordsToContentTableDataAdapter = (records: StorageRecord[]): Rule
 
 export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRecord>, record: RuleTableDataType) => {
   if (isGroup(record)) return false;
-  if (record.groupId?.length && allRecordsMap[record.groupId].status === RecordStatus.INACTIVE) {
+  if (record.groupId?.length && allRecordsMap[record.groupId]?.status === RecordStatus.INACTIVE) {
     return true;
   } else return false;
 };
