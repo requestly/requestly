@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Modal, Col } from "antd";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
-import { BillingTeamDetails } from "../../types";
-import { BillingTeamCard } from "./components/TeamCard";
+import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
+import { BillingTeamCard } from "../TeamCard";
 import { trackRequestBillingTeamAccessModalViewed } from "features/settings/analytics";
 import APP_CONSTANTS from "config/constants";
-import "./index.scss";
+import "../../index.scss";
 
 interface Props {
   isOpen: boolean;
@@ -24,6 +24,7 @@ export const RequestBillingTeamAccessModal: React.FC<Props> = ({ isOpen, onClose
 
   return (
     <Modal
+      maskClosable={false}
       wrapClassName="custom-rq-modal"
       width={600}
       open={isOpen}
@@ -34,9 +35,9 @@ export const RequestBillingTeamAccessModal: React.FC<Props> = ({ isOpen, onClose
     >
       <Col>
         <div className="mt-8 billing-teams-card-wrapper">
-          {billingTeams?.map((team: BillingTeamDetails, index: number) => {
+          {billingTeams?.map((team: BillingTeamDetails) => {
             if (team?.subscriptionDetails?.subscriptionStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.ACTIVE) {
-              return <BillingTeamCard key={index} team={team} />;
+              return <BillingTeamCard key={team.id} team={team} />;
             }
             return null;
           })}

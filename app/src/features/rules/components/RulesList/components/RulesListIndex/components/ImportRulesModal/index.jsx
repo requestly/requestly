@@ -1,5 +1,7 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
@@ -10,10 +12,12 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { actions } from "store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { RQModal } from "lib/design-system/components";
+import { FilePicker } from "components/common/FilePicker";
+import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { RULE_IMPORT_TYPE } from "features/rules";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
 import {
   trackRulesJsonParsed,
@@ -21,7 +25,7 @@ import {
   trackRulesImportCompleted,
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
-import { FilePicker } from "components/common/FilePicker";
+import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
@@ -30,6 +34,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const allRules = useSelector(getAllRules);
   const user = useSelector(getUserAuthDetails);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
+  const { getFeatureLimitValue } = useFeatureLimiter();
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
   //Component State
@@ -41,6 +46,13 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [showImportOptions, setShowImportOptions] = useState(true);
   const [isImportFromCharlesModalOpen, setIsImportFromCharlesModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+
+  const isImportLimitReached = useMemo(() => {
+    return getFeatureLimitValue(FeatureLimitType.num_rules) < rulesToImportCount + allRules.length;
+  }, [rulesToImportCount, getFeatureLimitValue, allRules.length]);
+
+  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
+  const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
 
   const onDrop = useCallback(
     async (acceptedFiles) => {
@@ -135,32 +147,35 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
     );
   };
 
-  const doImportRules = (natureOfImport) => {
-    setIsImporting(true);
-    addRulesAndGroupsToStorage(appMode, dataToImport)
-      .then(async () => {
-        dispatch(
-          actions.updateRefreshPendingStatus({
-            type: "rules",
-            newValue: !isRulesListRefreshPending,
-          })
-        );
-        toggleModal();
-      })
-      .then(() => {
-        toast.info(`Successfully imported rules`);
-        trackRQLastActivity("rules_imported");
-        trackRulesImportCompleted({
-          count: rulesToImportCount,
-          nature_of_import: natureOfImport,
-          conflicting_rules_count: conflictingRecords?.length || 0,
-        });
-      })
-      .catch((e) => {
-        trackRulesImportFailed("unsuccessful_save");
-      })
-      .finally(() => setIsImporting(false));
-  };
+  const doImportRules = useCallback(
+    (natureOfImport) => {
+      setIsImporting(true);
+      addRulesAndGroupsToStorage(appMode, dataToImport)
+        .then(async () => {
+          dispatch(
+            actions.updateRefreshPendingStatus({
+              type: "rules",
+              newValue: !isRulesListRefreshPending,
+            })
+          );
+          toggleModal();
+        })
+        .then(() => {
+          toast.info(`Successfully imported rules`);
+          trackRQLastActivity("rules_imported");
+          trackRulesImportCompleted({
+            count: rulesToImportCount,
+            nature_of_import: natureOfImport,
+            conflicting_rules_count: conflictingRecords?.length || 0,
+          });
+        })
+        .catch((e) => {
+          trackRulesImportFailed("unsuccessful_save");
+        })
+        .finally(() => setIsImporting(false));
+    },
+    [appMode, dataToImport, dispatch, isRulesListRefreshPending, rulesToImportCount, toggleModal, conflictingRecords]
+  );
 
   const renderImportRulesBtn = () => {
     if (
@@ -178,8 +193,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
               data-dismiss="modal"
               type="button"
               onClick={() => {
-                // by default overwrite is true so we dont need to process the importData again
-                doImportRules("overwrite");
+                handleRulesAndGroupsImport(RULE_IMPORT_TYPE.OVERWRITE);
               }}
             >
               Overwrite Conflicting Rules
@@ -189,8 +203,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
               data-dismiss="modal"
               type="button"
               onClick={() => {
-                processDataToImport(dataToImport, user, allRules, false);
-                doImportRules("duplicate");
+                handleRulesAndGroupsImport(RULE_IMPORT_TYPE.DUPLICATE);
               }}
             >
               Duplicate Conflicting Rules
@@ -210,13 +223,42 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
           className="ml-auto"
           data-dismiss="modal"
           loading={isImporting}
-          onClick={() => doImportRules("normal")}
+          onClick={() => handleRulesAndGroupsImport(RULE_IMPORT_TYPE.NORMAL)}
         >
           Import
         </Button>
       </Row>
     ) : null;
   };
+
+  const handleRulesAndGroupsImport = useCallback(
+    (importType) => {
+      if (isImportLimitReached && isUpgradePopoverEnabled && isBackgateRestrictionEnabled) {
+        toast.error(
+          "The rules cannot be imported due to exceeding free plan limits. To proceed, consider upgrading your plan.",
+          4
+        );
+        trackUpgradeToastViewed(rulesToImportCount, "import_rules_modal");
+        return;
+      }
+
+      if (importType === RULE_IMPORT_TYPE.DUPLICATE) {
+        processDataToImport(dataToImport, user, allRules, false);
+      }
+      doImportRules(importType);
+    },
+
+    [
+      isImportLimitReached,
+      allRules,
+      dataToImport,
+      doImportRules,
+      user,
+      rulesToImportCount,
+      isUpgradePopoverEnabled,
+      isBackgateRestrictionEnabled,
+    ]
+  );
 
   const renderWarningMessage = () => {
     return (
