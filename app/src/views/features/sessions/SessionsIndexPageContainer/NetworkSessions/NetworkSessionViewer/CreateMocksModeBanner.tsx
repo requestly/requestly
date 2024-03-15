@@ -224,9 +224,23 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                               okText="Yes"
                               cancelText="No"
                               placement="bottom"
+                              disabled={
+                                (!mockGraphQLKeys[index]?.key && !graphQLFilterPairs[index].key) ||
+                                (!mockGraphQLKeys[index]?.value && !graphQLFilterPairs[index].value)
+                              }
                             >
                               <div className={"cursor-pointer display-row-center"}>
-                                <ImCross className="text-gray icon__wrapper" />
+                                <ImCross
+                                  className="text-gray icon__wrapper"
+                                  onClick={() => {
+                                    if (
+                                      (!mockGraphQLKeys[index]?.key && !graphQLFilterPairs[index].key) ||
+                                      (!mockGraphQLKeys[index]?.value && !graphQLFilterPairs[index].value)
+                                    ) {
+                                      removeGraphQLKeyInput(index);
+                                    }
+                                  }}
+                                />
                               </div>
                             </Popconfirm>
                           )}
