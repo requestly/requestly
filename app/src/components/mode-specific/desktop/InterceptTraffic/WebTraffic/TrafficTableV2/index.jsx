@@ -583,11 +583,31 @@ const CurrentTrafficTable = ({
     [dispatch]
   );
 
+  const clearAllFilters = useCallback(() => {
+    if (persistLogsFilters) {
+      dispatch(desktopTrafficTableActions.clearColumnFilters());
+    } else {
+      setStatusCodesFilters([]);
+      setMethodTypeFilters([]);
+      setResourceTypeFilters([]);
+    }
+  }, [dispatch, persistLogsFilters]);
+
+  const clearSearchFilter = useCallback(() => {
+    if (persistLogsFilters) {
+      dispatch(desktopTrafficTableActions.updateSearchTerm(""));
+    } else {
+      setSearch({ term: "", regex: false });
+    }
+  }, [dispatch, persistLogsFilters]);
+
   useEffect(() => {
     if (disableFilters) {
+      clearAllFilters();
+      clearSearchFilter();
       setIsFiltersCollapsed(true);
     }
-  }, [disableFilters]);
+  }, [clearAllFilters, clearSearchFilter, disableFilters]);
 
   // IMP: Keep this in the end to wait for other useEffects to run first
   useEffect(() => {
@@ -691,19 +711,7 @@ const CurrentTrafficTable = ({
                     }}
                   />
                 </section>
-                <Button
-                  type="link"
-                  className="clear-logs-filter-btn"
-                  onClick={() => {
-                    if (persistLogsFilters) {
-                      dispatch(desktopTrafficTableActions.clearColumnFilters());
-                    } else {
-                      setStatusCodesFilters([]);
-                      setMethodTypeFilters([]);
-                      setResourceTypeFilters([]);
-                    }
-                  }}
-                >
+                <Button type="link" className="clear-logs-filter-btn" onClick={clearAllFilters}>
                   Clear all
                 </Button>
               </Row>
