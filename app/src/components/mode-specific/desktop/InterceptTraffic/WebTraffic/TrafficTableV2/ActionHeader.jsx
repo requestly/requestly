@@ -178,16 +178,10 @@ const ActionHeader = ({
         }}
       >
         <Space size={12}>
-          <Tooltip
-            disabled={!disableFilters}
-            title="First, filter the GraphQL requests using payload key-value filters."
-          >
+          <Tooltip title={disableFilters ? "First, filter the GraphQL requests using payload key-value filters." : ""}>
             <Col>{renderSearchInput()}</Col>
           </Tooltip>
-          <Tooltip
-            disabled={!disableFilters}
-            title="First, filter the GraphQL requests using payload key-value filters."
-          >
+          <Tooltip title={disableFilters ? "First, filter the GraphQL requests using payload key-value filters." : ""}>
             <Col>
               <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={disableFilters}>
                 <span className="traffic-table-filter-btn-content">

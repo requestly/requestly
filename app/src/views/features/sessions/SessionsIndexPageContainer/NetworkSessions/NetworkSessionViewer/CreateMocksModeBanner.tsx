@@ -201,7 +201,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                             className="session-mock-input"
                             value={selector.value}
                           />
-                          (
+
                           <Popconfirm
                             title={"Clearing the filter will unselect the chosen requests. Do you want to continue?"}
                             onConfirm={() => {
@@ -243,7 +243,6 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                               />
                             </div>
                           </Popconfirm>
-                          )
                         </Space>
                       ))}
                       <RQButton
