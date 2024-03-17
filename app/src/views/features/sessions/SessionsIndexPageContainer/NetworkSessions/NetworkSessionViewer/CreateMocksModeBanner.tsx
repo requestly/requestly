@@ -170,7 +170,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
             ) : selectedRequestsLength === 0 ? (
               <span>
                 {mockResourceType === "graphqlApi"
-                  ? "Enter the request payload key to filter specific graphQL requests in the traffic table."
+                  ? "Filter GraphQL requests by payload keys and values, then select the requests to be mocked."
                   : "Select the REST/Static requests that you want to mock from the traffic table below."}
               </span>
             ) : (
@@ -190,7 +190,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                           <RQInput
                             size="small"
                             onChange={(e) => updateGraphQLPairs(index, "key", e.target.value)}
-                            placeholder="Key eg: OperationName"
+                            placeholder="Key eg: operationName"
                             className="session-mock-input"
                             value={selector.key}
                           />
@@ -201,49 +201,49 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                             className="session-mock-input"
                             value={selector.value}
                           />
-                          {index > 0 && (
-                            <Popconfirm
-                              title={"Removing it will also clear the selected requests. Are you sure?"}
-                              onConfirm={() => {
-                                removeGraphQLKeyInput(index);
+                          (
+                          <Popconfirm
+                            title={"Clearing the filter will unselect the chosen requests. Do you want to continue?"}
+                            onConfirm={() => {
+                              removeGraphQLKeyInput(index);
 
-                                //remove the request selection
-                                const graphQLPair = { ...graphQLFilterPairs[index] };
-                                Object.values(selectedMockRequests).forEach((log) => {
-                                  const requestData = JSON.parse(log?.request?.body);
-                                  const valueInRequestData = traverseJsonByPath(requestData, graphQLPair.key);
-                                  if (valueInRequestData && valueInRequestData === graphQLPair.value) {
-                                    setSelectedMockRequests((prev: Record<string, any>) => {
-                                      const prevMockRequests = { ...prev };
-                                      delete prevMockRequests[log.id];
-                                      return prevMockRequests;
-                                    });
+                              //remove the request selection
+                              const graphQLPair = { ...graphQLFilterPairs[index] };
+                              Object.values(selectedMockRequests).forEach((log) => {
+                                const requestData = JSON.parse(log?.request?.body);
+                                const valueInRequestData = traverseJsonByPath(requestData, graphQLPair.key);
+                                if (valueInRequestData && valueInRequestData === graphQLPair.value) {
+                                  setSelectedMockRequests((prev: Record<string, any>) => {
+                                    const prevMockRequests = { ...prev };
+                                    delete prevMockRequests[log.id];
+                                    return prevMockRequests;
+                                  });
+                                }
+                              });
+                            }}
+                            okText="Yes"
+                            cancelText="No"
+                            placement="bottom"
+                            disabled={
+                              (!mockGraphQLKeys[index]?.key && !graphQLFilterPairs[index].key) ||
+                              (!mockGraphQLKeys[index]?.value && !graphQLFilterPairs[index].value)
+                            }
+                          >
+                            <div className={"cursor-pointer display-row-center"}>
+                              <ImCross
+                                className="text-gray icon__wrapper"
+                                onClick={() => {
+                                  if (
+                                    (!mockGraphQLKeys[index]?.key && !graphQLFilterPairs[index].key) ||
+                                    (!mockGraphQLKeys[index]?.value && !graphQLFilterPairs[index].value)
+                                  ) {
+                                    removeGraphQLKeyInput(index);
                                   }
-                                });
-                              }}
-                              okText="Yes"
-                              cancelText="No"
-                              placement="bottom"
-                              disabled={
-                                (!mockGraphQLKeys[index]?.key && !graphQLFilterPairs[index].key) ||
-                                (!mockGraphQLKeys[index]?.value && !graphQLFilterPairs[index].value)
-                              }
-                            >
-                              <div className={"cursor-pointer display-row-center"}>
-                                <ImCross
-                                  className="text-gray icon__wrapper"
-                                  onClick={() => {
-                                    if (
-                                      (!mockGraphQLKeys[index]?.key && !graphQLFilterPairs[index].key) ||
-                                      (!mockGraphQLKeys[index]?.value && !graphQLFilterPairs[index].value)
-                                    ) {
-                                      removeGraphQLKeyInput(index);
-                                    }
-                                  }}
-                                />
-                              </div>
-                            </Popconfirm>
-                          )}
+                                }}
+                              />
+                            </div>
+                          </Popconfirm>
+                          )
                         </Space>
                       ))}
                       <RQButton
@@ -267,7 +267,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                   placement="bottom"
                   destroyTooltipOnHide
                 >
-                  <RQButton>Select GraphQL requests</RQButton>
+                  <RQButton>Filter GraphQL requests</RQButton>
                 </Popover>
               </div>
             )}
@@ -379,7 +379,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                   trigger={["click"]}
                 >
                   <Tooltip
-                    title={selectedRequestsLength === 0 ? "Please select requests to proceed" : ""}
+                    title={selectedRequestsLength === 0 ? "Select requests to be mocked" : ""}
                     destroyTooltipOnHide
                     trigger={["hover"]}
                   >
@@ -392,7 +392,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
                       disabled={selectedRequestsLength === 0}
                     >
                       <Space>
-                        Create Mock Rules
+                        Create mocks
                         <div className="mock-rules-count-badge">{selectedRequestsLength}</div>
                       </Space>
                     </RQButton>

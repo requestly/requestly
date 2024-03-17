@@ -157,7 +157,7 @@ export const NetworkSessionViewer: React.FC = () => {
                   trigger={["click"]}
                   content={
                     <Space direction="vertical">
-                      <Typography.Text>Which type of requests do you want to serve?</Typography.Text>
+                      <Typography.Text>Which type of requests do you want to mock?</Typography.Text>
                       <RQDropdown
                         menu={{
                           items: [

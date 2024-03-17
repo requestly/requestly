@@ -178,15 +178,25 @@ const ActionHeader = ({
         }}
       >
         <Space size={12}>
-          <Col>{renderSearchInput()}</Col>
-          <Col>
-            <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={disableFilters}>
-              <span className="traffic-table-filter-btn-content">
-                <span>Filter</span>
-                <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
-              </span>
-            </Button>
-          </Col>
+          <Tooltip
+            disabled={!disableFilters}
+            title="First, filter the GraphQL requests using payload key-value filters."
+          >
+            <Col>{renderSearchInput()}</Col>
+          </Tooltip>
+          <Tooltip
+            disabled={!disableFilters}
+            title="First, filter the GraphQL requests using payload key-value filters."
+          >
+            <Col>
+              <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={disableFilters}>
+                <span className="traffic-table-filter-btn-content">
+                  <span>Filter</span>
+                  <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
+                </span>
+              </Button>
+            </Col>
+          </Tooltip>
           {isStaticPreview ? null : (
             <>
               <Col>
