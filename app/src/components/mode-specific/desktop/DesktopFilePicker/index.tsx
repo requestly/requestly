@@ -147,6 +147,7 @@ export const FilePickerModalBtn: React.FC<FilePickerProps> = (props) => {
           setIsModalVisible(false);
         }}
         wrapClassName="file-picker-modal-content"
+        centered
       >
         <div className="import-modal-content-wrapper">
           <div className="file-handler-wrapper">
@@ -161,7 +162,7 @@ export const FilePickerModalBtn: React.FC<FilePickerProps> = (props) => {
               />
             </div>
           </div>
-          <Divider type="vertical" className="divider" />
+          <Divider type="vertical" className="file-picker-modal-divider" />
           <div className="recently-accessed">
             <RecentlyAccessedFilesList
               onFileSelected={props.onFileParsed}
