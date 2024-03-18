@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 // reactstrap components
@@ -25,8 +25,11 @@ const AuthPage = (props) => {
     authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP ? true : true
   );
 
+  const params = useMemo(() => new URLSearchParams(window.location.search), []);
+
+  const authMethod = params.has("method") ? params.get("method") : null;
+
   const postSignInSteps = () => {
-    const params = new URLSearchParams(window.location.search);
     if (params.has("redirectUrl")) {
       navigate(params.get("redirectUrl"));
     } else {
@@ -34,7 +37,7 @@ const AuthPage = (props) => {
     }
   };
 
-  const stablePostSignInSteps = useCallback(postSignInSteps, [navigate]);
+  const stablePostSignInSteps = useCallback(postSignInSteps, [navigate, params]);
 
   useEffect(() => {
     if (user.loggedIn && (authMode === AUTH_ACTION_LABELS.LOG_IN || authMode === AUTH_ACTION_LABELS.SIGN_UP)) {
@@ -65,6 +68,7 @@ const AuthPage = (props) => {
             setAuthMode={setAuthMode}
             popoverVisible={popoverVisible}
             setPopoverVisible={setPopoverVisible}
+            authMethod={authMethod}
           />
           {/* </Popover> */}
         </Col>
