@@ -39,7 +39,7 @@ const DesktopSignIn = () => {
   const dispatch = useDispatch();
 
   const handleDoneSignIn = useCallback(
-    async (firebaseUser, isNewUser = "false") => {
+    async (firebaseUser, isNewUser = false) => {
       const params = new URLSearchParams(window.location.search);
       const token = await firebaseUser?.getIdToken();
       const code = params.get("ot-auth-code");
