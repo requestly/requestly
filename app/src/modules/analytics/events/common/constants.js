@@ -99,6 +99,8 @@ export const SOURCE = {
   TRIAL_EXPIRED_BADGE: "trial_expired_badge",
   REQUEST_FEATURE_MODAL: "request_feature_modal",
   USE_FOR_FREE_NOW: "use_for_free_now",
+  MAGIC_LINK: "magic_link",
+  ONE_TAP_PROMPT: "one_tap_prompt",
 };
 
 export const RULES = {
