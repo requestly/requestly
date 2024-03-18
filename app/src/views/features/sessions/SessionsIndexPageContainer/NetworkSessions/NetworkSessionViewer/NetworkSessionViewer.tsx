@@ -50,6 +50,8 @@ export const NetworkSessionViewer: React.FC = () => {
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
+  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session");
+
   const harPreviewType = useSelector(getPreviewType);
   const networkSessionId = useSelector(getSessionId);
   const importedHar = useSelector(getImportedHar);
@@ -153,69 +155,72 @@ export const NetworkSessionViewer: React.FC = () => {
           {harPreviewType === PreviewType.SAVED && (
             <div className="session-viewer-actions">
               <Space>
-                <Popover
-                  trigger={["click"]}
-                  content={
-                    <Space direction="vertical">
-                      <Typography.Text>Which type of requests do you want to mock?</Typography.Text>
-                      <RQDropdown
-                        menu={{
-                          items: [
-                            {
-                              key: "restApi",
-                              label: "REST/Static APIs",
+                {isMockResponseFromSessionEnabled && (
+                  <Popover
+                    trigger={["click"]}
+                    content={
+                      <Space direction="vertical">
+                        <Typography.Text>Which type of requests do you want to mock?</Typography.Text>
+                        <RQDropdown
+                          menu={{
+                            items: [
+                              {
+                                key: "restApi",
+                                label: "REST/Static APIs",
+                              },
+                              {
+                                key: "graphqlApi",
+                                label: "GraphQL APIs",
+                              },
+                            ],
+                            selectedKeys: mockResourceType ? [mockResourceType] : [],
+                            selectable: true,
+                            onSelect: (item) => {
+                              setMockResourceType(item.key);
+                              trackMockResponsesResourceTypeSelected(item.key);
                             },
-                            {
-                              key: "graphqlApi",
-                              label: "GraphQL APIs",
-                            },
-                          ],
-                          selectedKeys: mockResourceType ? [mockResourceType] : [],
-                          selectable: true,
-                          onSelect: (item) => {
-                            setMockResourceType(item.key);
-                            trackMockResponsesResourceTypeSelected(item.key);
-                          },
-                        }}
-                        trigger={["click"]}
-                        className="display-inline-block mock-responses-popover"
-                        placement="bottomRight"
-                        overlayStyle={{ fontSize: "10px" }}
-                      >
-                        <div>
-                          <Typography.Text
-                            className="cursor-pointer mock-responses-popover-dropdown-text"
-                            onClick={(e) => e.preventDefault()}
-                          >
-                            {mockResourceType
-                              ? mockResourceType === "restApi"
-                                ? "REST/Static APIs"
-                                : "GraphQL API"
-                              : "Select Resource Type"}{" "}
-                          </Typography.Text>
-                          <DownOutlined className="mock-responses-popover-dropdown-icon" />
-                        </div>
-                      </RQDropdown>
-                      <RQButton
-                        disabled={!mockResourceType}
-                        className="mock-responses-popover-dropdown-btn"
-                        type="primary"
-                        size="small"
-                        onClick={() => {
-                          trackMockResponsesButtonClicked();
-                          setCreateMocksMode(true);
-                        }}
-                      >
-                        Proceed
-                      </RQButton>
-                    </Space>
-                  }
-                >
-                  <RQButton>
-                    <span>Create mocks from this session</span>
-                    <DownArrow style={{ marginTop: "2px", marginLeft: "4px" }} />
-                  </RQButton>
-                </Popover>
+                          }}
+                          trigger={["click"]}
+                          className="display-inline-block mock-responses-popover"
+                          placement="bottomRight"
+                          overlayStyle={{ fontSize: "10px" }}
+                        >
+                          <div>
+                            <Typography.Text
+                              className="cursor-pointer mock-responses-popover-dropdown-text"
+                              onClick={(e) => e.preventDefault()}
+                            >
+                              {mockResourceType
+                                ? mockResourceType === "restApi"
+                                  ? "REST/Static APIs"
+                                  : "GraphQL API"
+                                : "Select Resource Type"}{" "}
+                            </Typography.Text>
+                            <DownOutlined className="mock-responses-popover-dropdown-icon" />
+                          </div>
+                        </RQDropdown>
+                        <RQButton
+                          disabled={!mockResourceType}
+                          className="mock-responses-popover-dropdown-btn"
+                          type="primary"
+                          size="small"
+                          onClick={() => {
+                            trackMockResponsesButtonClicked();
+                            setCreateMocksMode(true);
+                          }}
+                        >
+                          Proceed
+                        </RQButton>
+                      </Space>
+                    }
+                  >
+                    <RQButton>
+                      <span>Create mocks from this session</span>
+                      <DownArrow style={{ marginTop: "2px", marginLeft: "4px" }} />
+                    </RQButton>
+                  </Popover>
+                )}
+
                 <Button
                   icon={<DeleteOutlined />}
                   onClick={() => {
