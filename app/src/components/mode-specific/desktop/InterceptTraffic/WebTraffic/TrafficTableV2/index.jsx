@@ -56,7 +56,7 @@ const CurrentTrafficTable = ({
   deviceId,
   clearLogsCallback,
   isStaticPreview = false,
-  createMocksMode,
+  createMocksMode = false,
   mockResourceType,
   mockGraphQLKeys,
   selectedMockRequests,
@@ -305,7 +305,7 @@ const CurrentTrafficTable = ({
         return false;
       }
 
-      if (mockGraphQLKeys.length && mockResourceType === "graphqlApi") {
+      if (createMocksMode && mockGraphQLKeys.length && mockResourceType === "graphqlApi") {
         try {
           const requestBody = JSON.parse(log?.request?.body);
           if (
@@ -327,6 +327,7 @@ const CurrentTrafficTable = ({
       return true;
     },
     [
+      createMocksMode,
       mockGraphQLKeys,
       mockResourceType,
       trafficTableFilters.app,

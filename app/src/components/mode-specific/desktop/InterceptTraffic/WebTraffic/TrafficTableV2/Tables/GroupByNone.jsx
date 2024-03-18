@@ -46,7 +46,7 @@ const GroupByNone = ({
           style:
             actions.length !== 0 && !isStaticPreview
               ? { background: "#13c2c280" }
-              : selectedMockRequests[record.id]
+              : selectedMockRequests?.[record.id]
               ? { background: "var(--surface-3)" }
               : {},
         };
