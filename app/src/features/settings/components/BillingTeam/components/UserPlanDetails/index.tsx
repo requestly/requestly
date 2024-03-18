@@ -23,6 +23,7 @@ import { redirectToPersonalSubscription } from "utils/RedirectionUtils";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import "./index.scss";
 import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ export const UserPlanDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
+  const trialDuration = useFeatureValue("trial_days_duration", 30);
   const { type } = user.details?.planDetails ?? {};
 
   const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
@@ -103,7 +105,7 @@ export const UserPlanDetails = () => {
           <Col className="user-plan-card-grid">
             <div className="user-plan-card-grid-item">
               <Space direction="vertical" size={8}>
-                {user?.details?.planDetails?.status === "trialing" ? <div>One month free trial</div> : null}
+                {user?.details?.planDetails?.status === "trialing" ? <div>{trialDuration} days free trial</div> : null}
                 <Row gutter={8} className="items-center">
                   <Col className="user-plan-card-plan-name">
                     {getPrettyPlanName(getPlanNameFromId(user?.details?.planDetails?.planName))} plan
