@@ -215,13 +215,13 @@ const CurrentTrafficTable = ({
 
   useEffect(() => {
     if (window.RQ?.DESKTOP && !isStaticPreview) {
-      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("enable-request-logger").then(() => {});
+      window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("enable-request-logger");
     }
 
     return () => {
       if (window.RQ?.DESKTOP && !isStaticPreview) {
         // Disable sending logs from bg window
-        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger").then(() => {});
+        window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("disable-request-logger");
       }
     };
   }, [isStaticPreview]);
