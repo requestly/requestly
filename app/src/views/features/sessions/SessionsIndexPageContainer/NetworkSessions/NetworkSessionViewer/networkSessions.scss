@@ -70,3 +70,29 @@
     }
   }
 }
+
+.mock-responses-popover-overlay {
+  font-size: 12px;
+  z-index: 20000;
+}
+
+.mock-responses-popover {
+  padding: 4px;
+  cursor: pointer;
+
+  & .mock-responses-popover-dropdown-text {
+    font-size: 12px;
+  }
+  & .mock-responses-popover-dropdown-btn {
+    margin-top: 6px;
+  }
+  & .anticon.mock-responses-popover-dropdown-icon {
+    vertical-align: middle;
+  }
+}
+
+.session-mock-input.rq-input {
+  &::placeholder {
+    font-size: 12px;
+  }
+}
