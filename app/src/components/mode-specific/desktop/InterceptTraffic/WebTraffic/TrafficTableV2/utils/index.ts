@@ -4,6 +4,7 @@ import parser from "ua-parser-js";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
 import { cloneDeep } from "lodash";
+import { STATUS_CODE_LABEL_ONLY_OPTIONS } from "config/constants/sub/statusCode";
 
 export const getRequestDomain = (log: any) => {
   const domain = log?.request?.host;
@@ -43,14 +44,24 @@ export const getAppNameFromUA = (userAgent: any) => {
 
 type STATUS_CODE_LABEL = "1xx" | "2xx" | "3xx" | "4xx" | "5xx";
 
+const isStatusCodeLabel = (value: string): value is STATUS_CODE_LABEL => {
+  return STATUS_CODE_LABEL_ONLY_OPTIONS.some((options) => {
+    return options.value === value;
+  });
+};
+
 export const doesStatusCodeMatchLabels = (code: number = 0, labels: STATUS_CODE_LABEL[]) => {
   if (!code) return false; // some logs don't have status codes
 
   return labels.some((label) => {
-    const statusCodeClass = parseInt(label.charAt(0));
-    const lowerLimit = statusCodeClass * 100;
-    const upperLimit = lowerLimit + 100;
-    return lowerLimit <= code && code < upperLimit;
+    if (!isStatusCodeLabel(label)) {
+      return parseInt(label) === code;
+    } else {
+      const statusCodeClass = parseInt(label.charAt(0));
+      const lowerLimit = statusCodeClass * 100;
+      const upperLimit = lowerLimit + 100;
+      return lowerLimit <= code && code < upperLimit;
+    }
   });
 };
 
@@ -70,7 +81,7 @@ export const getOrCreateSessionGroup = async (
   let sessionGroup = allGroups.find((group: any) => group.sessionId === sessionDetails.networkSessionId);
 
   if (!sessionGroup) {
-    const groupName = `[Mock rules] ${sessionDetails.networkSessionName}`;
+    const groupName = `[Mocks] ${sessionDetails.networkSessionName}`;
     sessionGroup = getNewGroup(groupName);
     await StorageService(appMode).saveRuleOrGroup({
       ...sessionGroup,
@@ -142,7 +153,8 @@ export const createResponseMock = (ruleParams: {
 
 export const getGraphQLOperationValues = (
   requestData: any,
-  operationKeys: string[]
+  operationKeys: string[],
+  operationValues?: string[]
 ): {
   operationKey: string;
   operationValue: string;
@@ -160,8 +172,10 @@ export const getGraphQLOperationValues = (
       const valueInRequestData = traverseJsonByPath(requestData, key);
       if (valueInRequestData) {
         operationKeyInRequestData = key;
-        operationValueInRequestData = valueInRequestData;
-        return true;
+        if ((operationValues?.length && operationValues.includes(valueInRequestData)) || !operationValues) {
+          operationValueInRequestData = valueInRequestData;
+          return true;
+        }
       }
       return false;
     });

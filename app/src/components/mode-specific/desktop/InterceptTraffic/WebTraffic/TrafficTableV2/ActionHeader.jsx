@@ -35,9 +35,6 @@ import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { TRAFFIC_TABLE } from "modules/analytics/events/desktopApp/constants";
 import { useDebounce } from "hooks/useDebounce";
-import { getPreviewType } from "store/features/network-sessions/selectors";
-import { PreviewType } from "store/features/network-sessions/slice";
-import { trackMockResponsesButtonClicked } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 const { Text } = Typography;
 
@@ -47,28 +44,22 @@ const ActionHeader = ({
   deviceId,
   logsCount,
   filteredLogsCount,
-  isAnyAppConnected,
   showDeviceSelector,
   logsToSaveAsHar,
   isStaticPreview,
-  isFiltersCollapsed,
   setIsFiltersCollapsed,
   activeFiltersCount = 0,
   setIsSSLProxyingModalVisible,
-  setShowMockFilters,
-  showMockFilters,
+  disableFilters,
   search,
   setSearch,
   persistLogsSearch,
 }) => {
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
-  const isMockResponseFromSessionEnabled = useFeatureIsOn("mock_response_from_session");
 
   const isPaused = useSelector(getIsInterceptionPaused);
-  const sessionPreviewType = useSelector(getPreviewType);
 
   const [isSessionSaveModalOpen, setIsSessionSaveModalOpen] = useState(false);
-  const [isTableFiltersDisabled, setIsTableFiltersDisabled] = useState(false);
 
   const closeSaveModal = useCallback(() => {
     setIsSessionSaveModalOpen(false);
@@ -138,7 +129,7 @@ const ActionHeader = ({
           }
           style={{ width: 300 }}
           size="small"
-          disabled={isTableFiltersDisabled}
+          disabled={disableFilters}
         />
       );
     }
@@ -165,7 +156,7 @@ const ActionHeader = ({
         }
         style={{ width: 300 }}
         size="small"
-        disabled={isTableFiltersDisabled}
+        disabled={disableFilters}
       />
     );
   };
@@ -187,14 +178,20 @@ const ActionHeader = ({
         }}
       >
         <Space size={12}>
-          <Col>{renderSearchInput()}</Col>
+          <Tooltip title={disableFilters ? "First, filter the GraphQL requests using payload key-value filters." : ""}>
+            <Col>{renderSearchInput()}</Col>
+          </Tooltip>
           <Col>
-            <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={isTableFiltersDisabled}>
-              <span className="traffic-table-filter-btn-content">
-                <span>Filter</span>
-                <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
-              </span>
-            </Button>
+            <Tooltip
+              title={disableFilters ? "First, filter the GraphQL requests using payload key-value filters." : ""}
+            >
+              <Button icon={<FilterOutlined />} onClick={handleFilterClick} disabled={disableFilters}>
+                <span className="traffic-table-filter-btn-content">
+                  <span>Filter</span>
+                  <Badge className="traffic-table-applied-filter-count" count={activeFiltersCount} size="small" />
+                </span>
+              </Button>
+            </Tooltip>
           </Col>
           {isStaticPreview ? null : (
             <>
@@ -259,27 +256,6 @@ const ActionHeader = ({
               {children}
             </>
           )}
-          {isStaticPreview && isMockResponseFromSessionEnabled && sessionPreviewType === PreviewType.SAVED && (
-            <Row>
-              <Col>
-                <RQButton
-                  onClick={() => {
-                    trackMockResponsesButtonClicked();
-                    setShowMockFilters((prev) => {
-                      setIsTableFiltersDisabled(!prev);
-                      return !prev;
-                    });
-                    dispatch(desktopTrafficTableActions.updateSearchTerm(""));
-                    setIsFiltersCollapsed(true);
-                    dispatch(desktopTrafficTableActions.clearColumnFilters());
-                  }}
-                  style={showMockFilters ? { "background-color": "var(--hover-color)" } : {}}
-                >
-                  Mock Responses
-                </RQButton>
-              </Col>
-            </Row>
-          )}
         </Space>
       </Row>
       <Row className="ml-auto" align="middle" justify="end">
@@ -301,22 +277,23 @@ const ActionHeader = ({
               </Col>
             )}
 
-            {!isStaticPreview && <Divider type="vertical" style={{ margin: "0 16px" }} />}
-
-            {sessionPreviewType !== PreviewType.SAVED && (
-              <Col>
-                <Button
-                  icon={<SaveOutlined />}
-                  disabled={!filteredLogsCount}
-                  onClick={() => {
-                    trackNetworkSessionSaveClicked();
-                    trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
-                    openSaveModal();
-                  }}
-                >
-                  Save
-                </Button>
-              </Col>
+            {!isStaticPreview && (
+              <>
+                <Divider type="vertical" style={{ margin: "0 16px" }} />
+                <Col>
+                  <Button
+                    icon={<SaveOutlined />}
+                    disabled={!filteredLogsCount}
+                    onClick={() => {
+                      trackNetworkSessionSaveClicked();
+                      trackRQDesktopLastActivity(SESSION_RECORDING.network.save.btn_clicked);
+                      openSaveModal();
+                    }}
+                  >
+                    Save
+                  </Button>
+                </Col>
+              </>
             )}
           </>
         ) : null}
