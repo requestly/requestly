@@ -44,11 +44,12 @@ import GenerateLoginLinkBtn from "./GenerateLoginLinkButton";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 
-const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
+const { ACTION_LABELS: AUTH_ACTION_LABELS, METHODS: AUTH_METHODS } = APP_CONSTANTS.AUTH;
 
 const AuthForm = ({
   setAuthMode: SET_MODE,
   authMode: MODE,
+  authMethod: AUTH_METHOD,
   setPopoverVisible: SET_POPOVER = () => {},
   eventSource,
   callbacks,
@@ -74,6 +75,9 @@ const AuthForm = ({
   // const [emailOptin, setEmailOptin] = useState(false);
   const [trackEvent, setTrackEvent] = useState(true);
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
+
+  const showPasswordSignInOptionInstead =
+    appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || AUTH_METHOD === AUTH_METHODS.PASSWORD;
 
   useEffect(() => {
     // Updating reference code from query parameters
@@ -235,7 +239,7 @@ const AuthForm = ({
     switch (MODE) {
       default:
       case AUTH_ACTION_LABELS.LOG_IN:
-        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+        if (showPasswordSignInOptionInstead) {
           return (
             <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignInButtonClick}>
               Sign In with Email
@@ -254,7 +258,7 @@ const AuthForm = ({
         );
 
       case AUTH_ACTION_LABELS.SIGN_UP:
-        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
+        if (showPasswordSignInOptionInstead) {
           return (
             <RQButton type="primary" className="form-elements-margin w-full" onClick={handleEmailSignUpButtonClick}>
               Create Account
@@ -465,7 +469,7 @@ const AuthForm = ({
                 <div className="auth-modal-message w-full">Sign Up with email</div>
 
                 {renderEmailField()}
-                {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && renderPasswordField()}
+                {showPasswordSignInOptionInstead && renderPasswordField()}
                 <FormSubmitButton />
                 <Typography.Text className="secondary-text form-elements-margin">
                   I agree to the{" "}
@@ -498,7 +502,7 @@ const AuthForm = ({
             <div className="auth-modal-divider w-full">or</div>
             <div className="auth-modal-message w-full">Sign In with email</div>
             {renderEmailField()}
-            {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && renderPasswordField()}
+            {showPasswordSignInOptionInstead && renderPasswordField()}
             <FormSubmitButton />
           </Row>
         </Col>
