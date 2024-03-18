@@ -59,6 +59,7 @@ import { sanitizeDataForFirebase } from "utils/Misc";
 import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { DB_UTILS } from "@requestly/rq-common";
 import {
   trackLogoutAttempted,
@@ -330,7 +331,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
     if (is_new_user) {
       trackSignUpAttemptedEvent({
         auth_provider: AUTH_PROVIDERS.GMAIL,
-        source: "one_tap_prompt",
+        source: SOURCE.ONE_TAP_PROMPT,
       });
       trackSignupSuccessEvent({
         auth_provider: AUTH_PROVIDERS.GMAIL,
@@ -338,12 +339,12 @@ export const handleOnetapSignIn = async ({ credential }) => {
         uid,
         email_type: getEmailType(email),
         domain: email.split("@")[1],
-        source: "one_tap_prompt",
+        source: SOURCE.ONE_TAP_PROMPT,
       });
     } else {
       trackLoginAttemptedEvent({
         auth_provider: AUTH_PROVIDERS.GMAIL,
-        source: "one_tap_prompt",
+        source: SOURCE.ONE_TAP_PROMPT,
       });
       trackLoginSuccessEvent({
         auth_provider: AUTH_PROVIDERS.GMAIL,
@@ -351,7 +352,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
         email,
         email_type: getEmailType(email),
         domain: email.split("@")[1],
-        source: "one_tap_prompt",
+        source: SOURCE.ONE_TAP_PROMPT,
       });
     }
 
@@ -360,7 +361,7 @@ export const handleOnetapSignIn = async ({ credential }) => {
     trackLoginFailedEvent({
       auth_provider: AUTH_PROVIDERS.GMAIL,
       error_message: err.message,
-      source: "one_tap_prompt",
+      source: SOURCE.ONE_TAP_PROMPT,
     });
     throw err;
   }
@@ -448,7 +449,7 @@ export const googleSignInDesktopApp = (callback, MODE, source) => {
 };
 
 export const signInWithEmailLink = async (email, callback) => {
-  trackLoginAttemptedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email });
+  trackLoginAttemptedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email, source: SOURCE.MAGIC_LINK });
   try {
     const auth = getAuth(firebaseApp);
     const result = await signInWithEmailLinkFirebaseLib(auth, email, window.location.href);
@@ -468,6 +469,7 @@ export const signInWithEmailLink = async (email, callback) => {
       email,
       email_type: getEmailType(email),
       domain: email.split("@")[1],
+      source: SOURCE.MAGIC_LINK,
     });
 
     callback && callback.call(null, true);
@@ -487,6 +489,7 @@ export const signInWithEmailLink = async (email, callback) => {
           email,
           email_type: getEmailType(email),
           domain: email.split("@")[1],
+          source: SOURCE.MAGIC_LINK,
         });
 
         return {
@@ -501,7 +504,7 @@ export const signInWithEmailLink = async (email, callback) => {
         };
       }
     }
-    trackLoginFailedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email });
+    trackLoginFailedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email, source: SOURCE.MAGIC_LINK });
     return null;
   }
 };
