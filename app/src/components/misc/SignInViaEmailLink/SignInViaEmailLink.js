@@ -72,37 +72,31 @@ const SignInViaEmailLink = () => {
     }
   }, [dispatch, user.loggedIn, navigate, isLogin, user.displayName, user.email, user.details?.profile?.displayName]);
 
-  const handleLogin = useCallback(
-    (emailToUseForLogin) => {
-      const loginEmail = emailToUseForLogin;
-      if (loginEmail) {
-        setIsProcessing(true);
-        if (user.loggedIn) {
-          renderAlreadyLoggedInWarning();
-        }
-        signInWithEmailLink(loginEmail)
-          .then((response) => {
-            if (response) {
-              const { authData, isNewUser } = response;
-              if (authData.uid) {
-                window.localStorage.removeItem("RQEmailForSignIn");
-                setIsLogin(!isNewUser);
-                if (isNewUser) {
-                  window.localStorage.setItem("isNewUser", !!isNewUser);
-                }
-              } else throw new Error("Failed");
-            }
-          })
-          .catch(() => {
-            setIsProcessing(false);
-            setUserEmailfromLocalStorage(null);
-          });
-      } else {
-        window.alert("Could not get the email to log into, please try again. If the problem persists, contact support");
-      }
-    },
-    [user.loggedIn, renderAlreadyLoggedInWarning]
-  );
+  const handleLogin = useCallback((emailToUseForLogin) => {
+    const loginEmail = emailToUseForLogin;
+    if (loginEmail) {
+      setIsProcessing(true);
+      signInWithEmailLink(loginEmail)
+        .then((response) => {
+          if (response) {
+            const { authData, isNewUser } = response;
+            if (authData.uid) {
+              window.localStorage.removeItem("RQEmailForSignIn");
+              setIsLogin(!isNewUser);
+              if (isNewUser) {
+                window.localStorage.setItem("isNewUser", !!isNewUser);
+              }
+            } else throw new Error("Failed");
+          }
+        })
+        .catch(() => {
+          setIsProcessing(false);
+          setUserEmailfromLocalStorage(null);
+        });
+    } else {
+      window.alert("Could not get the email to log into, please try again. If the problem persists, contact support");
+    }
+  }, []);
 
   const renderEmailInputForm = () => {
     return (
