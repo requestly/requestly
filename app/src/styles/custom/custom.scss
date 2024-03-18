@@ -24,7 +24,7 @@ li {
   list-style: none;
 }
 
-input.ant-input {
+input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
   padding: 8px;
 }
 

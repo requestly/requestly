@@ -13,7 +13,6 @@ const GroupByNone = ({
   isStaticPreview,
   setSelectedMockRequests,
   showMockRequestSelector,
-  isMockRequestSelectorDisabled,
   selectedMockRequests,
   showMockFilters,
 }) => {
@@ -47,14 +46,13 @@ const GroupByNone = ({
           style:
             actions.length !== 0 && !isStaticPreview
               ? { background: "#13c2c280" }
-              : selectedMockRequests[record.id]
+              : selectedMockRequests?.[record.id]
               ? { background: "var(--surface-3)" }
               : {},
         };
       }}
       setSelectedMockRequests={setSelectedMockRequests}
       showMockRequestSelector={showMockRequestSelector}
-      isMockRequestSelectorDisabled={isMockRequestSelectorDisabled}
       selectedMockRequests={selectedMockRequests}
     />
   );

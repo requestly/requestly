@@ -9,7 +9,6 @@ interface Props {
   isStaticPreview: boolean;
   setSelectedMockRequests?: Function;
   showMockRequestSelector?: boolean;
-  isMockRequestSelectorDisabled?: boolean;
   selectedMockRequests?: Record<string, any>;
 }
 
@@ -22,7 +21,6 @@ const NetworkInspector: React.FC<Props> = (props) => {
         isStaticPreview={props.isStaticPreview}
         setSelectedMockRequests={props.setSelectedMockRequests}
         showMockRequestSelector={props.showMockRequestSelector}
-        isMockRequestSelectorDisabled={props.isMockRequestSelectorDisabled}
         selectedMockRequests={props.selectedMockRequests}
       />
     </AutoThemeProvider>
