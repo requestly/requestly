@@ -43,9 +43,9 @@ const DeleteConfirmationModal = ({
           <div className="py-3 text-center">
             <h3 className="heading">
               {enableTrash && user.loggedIn && !isWorkspaceMode ? (
-                <>Are you share you want to delete the selected rules/groups?</>
+                <>Are you sure you want to delete the selected rules/groups?</>
               ) : (
-                <>Are you share you want to delete the selected rules/groups permanently?</>
+                <>Are you sure you want to delete the selected rules/groups permanently?</>
               )}
             </h3>
           </div>
