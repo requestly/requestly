@@ -15,14 +15,10 @@
   <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Downloads" src="https://img.shields.io/chrome-web-store/users/mdnleldcmiljblolnjhpnblkcekpdkpa?label=downloads" />
   </a>
+    <a target="_blank" href="https://status.requestly.io">
+    <img alt="Status badge" src="https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg" />
+  </a>
 </p>
-
-<!--
-<p align="center">
-  <a target="_blank" href="https://docs.requestly.io">Docs</a> - <a target="_blank" 
-href="https://requestly.com/downloads">Download</a> - <a target="_blank" href="https://app.requestly.io/getting-started">Getting Started</a> - <a target="_blank" href="https://bit.ly/requestly-slack">Support community</a> - <a target="_blank" href="https://github.com/requestly/requestly/issues/new?assignees=&labels=bug&template=bug-report.yml">Report a bug</a>
-</p>
--->
 
 <h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
 
