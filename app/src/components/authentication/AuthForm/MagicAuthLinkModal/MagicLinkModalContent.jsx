@@ -14,6 +14,10 @@ import firebaseApp from "firebase.js";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import * as Sentry from "@sentry/react";
+import { AUTH_PROVIDERS } from "modules/analytics/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
+import { trackSignUpAttemptedEvent } from "modules/analytics/events/common/auth/signup";
 
 // HACKY WAY FOR CHECKING IF USER EXISTS
 async function doesUserExist(email) {
@@ -37,8 +41,19 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
     doesUserExist(email).then((isExistingUser) => {
       setIsLogin(isExistingUser);
       setLoading(false);
+      if (isExistingUser) {
+        trackLoginAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
+          source: eventSource ?? SOURCE.MAGIC_LINK,
+        });
+      } else {
+        trackSignUpAttemptedEvent({
+          auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
+          source: eventSource ?? SOURCE.MAGIC_LINK,
+        });
+      }
     });
-  }, [email]);
+  }, [email, eventSource]);
 
   const handleEmailSend = () => {
     setIsSendingMail(true);
