@@ -84,7 +84,7 @@ const SignInViaEmailLink = () => {
               window.localStorage.removeItem("RQEmailForSignIn");
               setIsLogin(!isNewUser);
               if (isNewUser) {
-                window.localStorage.setItem("isNewUser", !!isNewUser);
+                window.localStorage.setItem("isNewUser", Boolean(isNewUser));
               }
             } else throw new Error("Failed");
           }
