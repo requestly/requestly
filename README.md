@@ -15,13 +15,10 @@
   <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Downloads" src="https://img.shields.io/chrome-web-store/users/mdnleldcmiljblolnjhpnblkcekpdkpa?label=downloads" />
   </a>
+    <a target="_blank" href="https://status.requestly.io">
+    <img alt="Status badge" src="https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg" />
+  </a>
 </p>
-
-<center>
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://status.requestly.io)
-</center>
-
-
 
 <h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
 
