@@ -17,7 +17,11 @@
   </a>
 </p>
 
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
+<center>
+[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://status.requestly.io)
+</center>
+
+
 
 <h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
 
