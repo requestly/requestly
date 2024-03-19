@@ -25,8 +25,8 @@ export const saveRule = async (appMode, ruleObject, callback) => {
   //Save the rule
   Logger.log("Writing to storage in saveRule");
   const ruleSavePromises = [
-    detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 3000),
-    detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 3000),
+    detectUnsettledPromise(StorageService(appMode).saveRuleOrGroup(ruleToSave), 10000),
+    detectUnsettledPromise(StorageService(appMode).getRecord(ruleToSave.groupId), 10000),
   ];
 
   return Promise.all(ruleSavePromises)
