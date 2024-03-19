@@ -15,6 +15,7 @@
   <a target="_blank" href="https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/">
     <img alt="Chrome Web Store Downloads" src="https://img.shields.io/chrome-web-store/users/mdnleldcmiljblolnjhpnblkcekpdkpa?label=downloads" />
   </a>
+  [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 </p>
 
 <!--
