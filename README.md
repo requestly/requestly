@@ -1,5 +1,3 @@
-[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
-
 <p align="center">
   <a target="_blank" href="https://requestly.com/">
     <img src="https://github.com/requestly/requestly/blob/master/app/src/assets/img/brand/rq_logo_full.svg?raw=true" alt="Requestly Logo" width="40%"/>
@@ -19,12 +17,7 @@
   </a>
 </p>
 
-<!--
-<p align="center">
-  <a target="_blank" href="https://docs.requestly.io">Docs</a> - <a target="_blank" 
-href="https://requestly.com/downloads">Download</a> - <a target="_blank" href="https://app.requestly.io/getting-started">Getting Started</a> - <a target="_blank" href="https://bit.ly/requestly-slack">Support community</a> - <a target="_blank" href="https://github.com/requestly/requestly/issues/new?assignees=&labels=bug&template=bug-report.yml">Report a bug</a>
-</p>
--->
+[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/13j20.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 
 <h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
 
