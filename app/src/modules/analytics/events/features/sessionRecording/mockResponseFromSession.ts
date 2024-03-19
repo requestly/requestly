@@ -17,9 +17,9 @@ export function trackMockResponsesTargetingSelecting(target_condition: string) {
   });
 }
 
-export function trackMockResponsesGraphQLKeyEntered(keys: string[]) {
+export function trackMockResponsesGraphQLKeyEntered(operationKeyPairs: { key: string; value: string }[]) {
   trackEvent(SESSION_RECORDING.MOCK_RESPONSES.MOCK_RESPONSES_GRAPHQL_KEY_ENTERED, {
-    operationKeys: keys,
+    operationKeys: operationKeyPairs,
   });
 }
 
