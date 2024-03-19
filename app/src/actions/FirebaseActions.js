@@ -463,10 +463,6 @@ export const signInWithEmailLink = async (email, callback) => {
 
     //  Analytics - Track event
     if (isNewUser) {
-      trackSignUpAttemptedEvent({
-        auth_provider: AUTH_PROVIDERS.GMAIL,
-        source: SOURCE.MAGIC_LINK,
-      });
       trackSignupSuccessEvent({
         auth_provider: AUTH_PROVIDERS.EMAIL,
         email,
@@ -476,7 +472,6 @@ export const signInWithEmailLink = async (email, callback) => {
         source: SOURCE.MAGIC_LINK,
       });
     } else {
-      trackLoginAttemptedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email, source: SOURCE.MAGIC_LINK });
       trackLoginSuccessEvent({
         auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
         uid: authData.uid,
@@ -497,7 +492,6 @@ export const signInWithEmailLink = async (email, callback) => {
         const auth = getAuth(firebaseApp);
         const authData = getAuthData(auth.currentUser) || {};
         authData.email = userEmail;
-        trackLoginAttemptedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email, source: SOURCE.MAGIC_LINK });
         trackLoginSuccessEvent({
           auth_provider: AUTH_PROVIDERS.EMAIL_LINK,
           uid: authData.uid,
@@ -519,7 +513,6 @@ export const signInWithEmailLink = async (email, callback) => {
         };
       }
     }
-    trackLoginAttemptedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email, source: SOURCE.MAGIC_LINK });
     trackLoginFailedEvent({ auth_provider: AUTH_PROVIDERS.EMAIL_LINK, email, source: SOURCE.MAGIC_LINK });
     return null;
   }
