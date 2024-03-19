@@ -8,6 +8,7 @@ import { RQButton, RQDropdown, RQInput } from "lib/design-system/components";
 import { ImCross } from "@react-icons/all-files/im/ImCross";
 import {
   trackMockResponsesCreateRulesClicked,
+  trackMockResponsesGraphQLKeyEntered,
   trackMockResponsesRuleCreationFailed,
   trackMockResponsesRuleCreationStarted,
   trackMockResponsesTargetingSelecting,
@@ -81,6 +82,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
         return;
       }
       setMockGraphQLKeys(pairs);
+      trackMockResponsesGraphQLKeyEntered(pairs);
     },
     [setMockGraphQLKeys]
   );
