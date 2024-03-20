@@ -7,6 +7,7 @@ import verizonLogo from "assets/img/icons/common/verizon.svg";
 import intuitLogo from "assets/img/icons/common/intuit.svg";
 import { MdOutlineCreditCardOff } from "@react-icons/all-files/md/MdOutlineCreditCardOff";
 import "./index.scss";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const features = [
   "Modify API response",
@@ -19,6 +20,8 @@ const features = [
 const companyLogos = [indeedLogo, atntLogo, verizonLogo, intuitLogo];
 
 export const OnboardingAuthBanner = () => {
+  const trialDuration = useFeatureValue("trial_days_duration", 30);
+
   return (
     <Col className="auth-banner">
       <div className="banner-no-cc-required text-bold">
@@ -26,7 +29,7 @@ export const OnboardingAuthBanner = () => {
         <span>No credit card required!</span>
       </div>
       <Typography.Title level={3}>
-        Get 30 days free access to all{" "}
+        Get {trialDuration} days free access to all{" "}
         <span className="banner-title-highlight">
           premium <img src={underlineIcon} alt="highlight" />
         </span>{" "}

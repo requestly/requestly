@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
@@ -11,8 +11,8 @@ import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytic
 import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
-import "./index.scss";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import "./index.scss";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -43,6 +43,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
+  const trialDuration = useFeatureValue("trial_days_duration", 30);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
@@ -95,7 +96,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           placement={popoverPlacement}
           okText="See upgrade plans"
           cancelText={
-            !hasCrossedDeadline ? "Use free till 30 November" : !user.loggedIn && "Sign up for 30-day free trial"
+            !hasCrossedDeadline
+              ? "Use free till 30 November"
+              : !user.loggedIn && `Sign up for ${trialDuration}-day free trial`
           }
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
