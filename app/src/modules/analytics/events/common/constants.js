@@ -101,6 +101,7 @@ export const SOURCE = {
   USE_FOR_FREE_NOW: "use_for_free_now",
   MAGIC_LINK: "magic_link",
   ONE_TAP_PROMPT: "one_tap_prompt",
+  SIDEBAR_INVITE_BUTTON: "sidebar_invite_button",
 };
 
 export const RULES = {

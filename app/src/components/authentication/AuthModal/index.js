@@ -60,7 +60,6 @@ const AuthModal = ({
       >
         <AuthForm
           authMode={authMode}
-          src={src}
           callbacks={{
             onSignInSuccess: callback,
             onRequestPasswordResetSuccess: toggle,
