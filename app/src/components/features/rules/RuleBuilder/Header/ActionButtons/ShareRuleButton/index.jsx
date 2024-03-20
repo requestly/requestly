@@ -25,8 +25,10 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
         actions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: SOURCE.SHARE_RULES,
+          newProps: {
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: SOURCE.SHARE_RULES,
+          },
         })
       );
     }
