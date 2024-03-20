@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Spin, Button, Tooltip } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
@@ -28,6 +29,7 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appMode = useSelector(getAppMode);
+  const trialDuration = useFeatureValue("trial_days_duration", 30);
 
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
   const userPhoto =
@@ -170,7 +172,7 @@ export default function HeaderUser() {
                   );
                 }}
               >
-                Get a 30-day free trial
+                Get a {trialDuration}-day free trial
               </Button>
             </Tooltip>
           </Col>
