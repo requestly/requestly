@@ -102,7 +102,13 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           }
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
-            dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true, newProps: { source } }));
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "pricingModal",
+                newValue: true,
+                newProps: { eventSource: source },
+              })
+            );
           }}
           onCancel={() => {
             if (!hasCrossedDeadline) {
@@ -110,7 +116,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
               onContinue();
             } else if (!user.loggedIn) {
               trackUpgradeOptionClicked("sign_up_for_trial");
-              dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+              dispatch(
+                actions.toggleActiveModal({ modalName: "authModal", newValue: true, newProps: { eventSource: source } })
+              );
             }
           }}
           cancelButtonProps={{ style: { display: hasCrossedDeadline && user.loggedIn ? "none" : "inline-flex" } }}
