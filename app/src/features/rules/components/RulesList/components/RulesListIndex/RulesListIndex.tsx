@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import RulesTable from "../RulesTable/RulesTable";
@@ -15,9 +15,6 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumFeature } from "features/pricing";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
-import { isSignUpRequired } from "utils/AuthUtils";
-import { actions } from "store";
-import PATHS from "config/constants/sub/paths";
 import APP_CONSTANTS from "config/constants";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -62,10 +59,8 @@ const { UNGROUPED_GROUP_NAME } = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS;
 interface Props {}
 
 const RulesList: React.FC<Props> = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
-  const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
@@ -155,41 +150,14 @@ const RulesList: React.FC<Props> = () => {
     return _searchedRecords.map((record) => (isRule(record) ? record : { ...record, expanded: true }));
   }, [searchValue, allRecordsMap, groupWiseRulesData]) as StorageRecord[];
 
-  const promptUserToSignup = useCallback(
-    (callback = () => navigate(PATHS.RULES.CREATE), message = "Sign up to continue", source = "") => {
-      dispatch(
-        actions.toggleActiveModal({
-          modalName: "authModal",
-          newValue: true,
-          newProps: {
-            redirectURL: window.location.href,
-            src: APP_CONSTANTS.FEATURES.RULES,
-            callback,
-            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-            userActionMessage: message,
-            eventSource: source,
-          },
-        })
-      );
-    },
-    [navigate, dispatch]
-  );
-
   const handleNewRuleOnClick = useCallback(
     async (ruleType?: RuleType, source = SOURCE.RULE_TABLE_CREATE_NEW_RULE_BUTTON) => {
       if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, source);
       else trackNewRuleButtonClicked("in_app");
-
-      if (!user.loggedIn) {
-        if (await isSignUpRequired(allRecords, appMode, user)) {
-          promptUserToSignup(() => redirectToCreateNewRule(navigate, ruleType, "my_rules"));
-          return;
-        }
-      }
       redirectToCreateNewRule(navigate, ruleType, "my_rules");
       return;
     },
-    [promptUserToSignup, allRecords, appMode, navigate, user]
+    [navigate]
   );
 
   const handleImportRulesOnClick = useCallback((e?: unknown) => {
