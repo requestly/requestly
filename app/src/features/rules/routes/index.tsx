@@ -14,6 +14,7 @@ import RootComponent from "components/redirects/RootComponent";
 import RulesListIndex from "../components/RulesList/components/RulesListIndex/RulesListIndex";
 import SharedListViewer from "../components/SharedList/components/SharedListViewer/SharedListViewer";
 import RulesIndexViewWrapper from "../components/RulesList/components/RulesListIndex/RulesIndexViewWrapper";
+import RulesListIndexV2 from "../components/RulesListV2/components/RulesListIndex/RulesListIndex";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -28,6 +29,10 @@ export const ruleRoutes: RouteObject[] = [
         index: true,
         path: PATHS.RULES.MY_RULES.RELATIVE,
         element: <RulesIndexViewWrapper />,
+      },
+      {
+        path: "my-rules-v2",
+        element: <RulesListIndexV2 />,
       },
       {
         path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
