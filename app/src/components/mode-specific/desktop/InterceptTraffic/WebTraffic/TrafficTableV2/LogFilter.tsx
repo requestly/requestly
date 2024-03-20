@@ -26,7 +26,7 @@ export const LogFilter: React.FC<FilterProps> = ({
       <Select
         id={filterId}
         className="traffic-table-filter-select"
-        mode="tags"
+        mode={filterId === "filter-status-code" ? "tags" : "multiple"}
         value={value}
         placeholder={filterPlaceholder}
         options={options}
