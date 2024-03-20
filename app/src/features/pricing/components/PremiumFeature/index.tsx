@@ -106,7 +106,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
               actions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,
-                newProps: { eventSource: source },
+                newProps: { source },
               })
             );
           }}
