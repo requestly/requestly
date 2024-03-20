@@ -14,11 +14,9 @@ import {
   getUserAuthDetails,
   getAllRules,
   getActiveModals,
-  getAppMode,
   getGroupsSelection,
 } from "../../../../store/selectors";
 import { submitAttrUtil, trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
-import { isSignUpRequired } from "utils/AuthUtils";
 //ACTIONS
 import { fetchSharedLists } from "../../sharedLists/SharedListsIndexPage/actions";
 //CONSTANTS
@@ -39,8 +37,6 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { unselectAllRecords } from "../actions";
 import "./RulesListContainer.css";
 
-const { PATHS } = APP_CONSTANTS;
-
 const RulesListContainer = ({ isTableLoading = false }) => {
   const navigate = useNavigate();
 
@@ -50,7 +46,6 @@ const RulesListContainer = ({ isTableLoading = false }) => {
   const groupsSelection = useSelector(getGroupsSelection);
   const user = useSelector(getUserAuthDetails);
   const allRules = useSelector(getAllRules);
-  const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
   const availableRuleTypeArray = Object.values(GLOBAL_CONSTANTS.RULE_TYPES);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
@@ -105,36 +100,9 @@ const RulesListContainer = ({ isTableLoading = false }) => {
     dispatch(actions.toggleActiveModal({ modalName: "renameGroupModal" }));
   };
 
-  const promptUserToSignup = (
-    callback = () => navigate(PATHS.RULES.CREATE),
-    message = "Sign up to continue",
-    source
-  ) => {
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "authModal",
-        newValue: true,
-        newProps: {
-          redirectURL: window.location.href,
-          src: APP_CONSTANTS.FEATURES.RULES,
-          callback,
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          userActionMessage: message,
-          eventSource: source,
-        },
-      })
-    );
-  };
-
   const handleNewRuleOnClick = async (_e, ruleType) => {
     if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, "screen");
     else trackNewRuleButtonClicked("in_app");
-    if (!user.loggedIn) {
-      if (await isSignUpRequired(allRules, appMode, user)) {
-        promptUserToSignup(() => redirectToCreateNewRule(navigate, ruleType, "my_rules"));
-        return;
-      }
-    }
     redirectToCreateNewRule(navigate, ruleType, "my_rules");
     return;
   };
