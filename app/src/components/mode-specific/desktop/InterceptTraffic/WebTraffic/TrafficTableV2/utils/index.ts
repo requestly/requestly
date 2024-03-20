@@ -172,7 +172,8 @@ export const getGraphQLOperationValues = (
       const valueInRequestData = traverseJsonByPath(requestData, key);
       if (valueInRequestData) {
         operationKeyInRequestData = key;
-        if ((operationValues?.length && operationValues.includes(valueInRequestData)) || !operationValues) {
+
+        if (!operationValues || operationValues?.includes(valueInRequestData) || operationValues?.includes("*")) {
           operationValueInRequestData = valueInRequestData;
           return true;
         }
