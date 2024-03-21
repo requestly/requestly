@@ -186,13 +186,7 @@ const CustomScriptRow = ({
   };
 
   const handleEditorUpdate = useCallback(
-    (value) => {
-      const shouldTriggerUnsavedChanges = !isFirstRender.current;
-
-      if (isFirstRender.current) {
-        isFirstRender.current = false;
-      }
-
+    (value, triggerUnsavedChanges = true) => {
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
         dispatch(
@@ -201,14 +195,14 @@ const CustomScriptRow = ({
             updates: {
               [`scripts[${scriptIndex}].wrapperElement`]: value,
             },
-            triggerUnsavedChangesIndication: shouldTriggerUnsavedChanges,
+            triggerUnsavedChangesIndication: triggerUnsavedChanges,
           })
         );
       } else {
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
-            triggerUnsavedChangesIndication: !isCodeFormatted && shouldTriggerUnsavedChanges,
+            triggerUnsavedChangesIndication: !isCodeFormatted && triggerUnsavedChanges,
             updates: {
               [`scripts[${scriptIndex}].value`]: value,
             },
@@ -221,7 +215,12 @@ const CustomScriptRow = ({
 
   useEffect(() => {
     if (initialCodeEditorValue !== null) {
-      handleEditorUpdate(initialCodeEditorValue);
+      const shouldTriggerUnsavedChanges = !isFirstRender.current;
+      if (isFirstRender.current) {
+        isFirstRender.current = false;
+      }
+
+      handleEditorUpdate(initialCodeEditorValue, shouldTriggerUnsavedChanges);
     }
   }, [initialCodeEditorValue, handleEditorUpdate]);
 
