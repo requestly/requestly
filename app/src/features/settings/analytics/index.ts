@@ -60,3 +60,7 @@ export const trackRequestBillingTeamAccessModalViewed = () => {
 export const trackJoinBillingTeamReminderViewed = () => {
   trackEvent(SETTINGS.BILLING.JOIN_BILLING_TEAM_REMINDER_VIEWED);
 };
+
+export const trackJoinBillingTeamRequestToastViewed = (action: string, status: string) => {
+  trackEvent(SETTINGS.BILLING.JOIN_BILLING_TEAM_REQUEST_TOAST_VIEWED, { action, status });
+};

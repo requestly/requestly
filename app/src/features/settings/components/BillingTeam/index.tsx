@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Result, Spin } from "antd";
@@ -21,6 +21,7 @@ import { actions } from "store";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { toast } from "utils/Toast";
 import { BillingTeamJoinRequestAction } from "./types";
+import { trackJoinBillingTeamRequestToastViewed } from "features/settings/analytics";
 
 export const BillingTeam: React.FC = () => {
   const { billingId } = useParams();
@@ -49,7 +50,7 @@ export const BillingTeam: React.FC = () => {
   const joiningRequestAction = queryParams.get("joinRequestAction");
   const userId = queryParams.get("user");
 
-  const showToast = (message: string, type: string, duration = 5) => {
+  const showReviewResultToast = useCallback((message: string, type: string, duration = 5) => {
     switch (type) {
       case "success":
         toast.success(message, duration);
@@ -63,7 +64,7 @@ export const BillingTeam: React.FC = () => {
       default:
         toast.info(message, duration);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!hasAccessToBillingTeam && billingId) {
@@ -123,6 +124,7 @@ export const BillingTeam: React.FC = () => {
         } the joining request ...`,
         5
       );
+      trackJoinBillingTeamRequestToastViewed(joiningRequestAction, "loading");
       const reviewBillingTeamJoiningRequest = httpsCallable(getFunctions(), "billing-reviewBillingTeamJoiningRequest");
       reviewBillingTeamJoiningRequest({
         billingTeamId: billingId,
@@ -130,15 +132,17 @@ export const BillingTeam: React.FC = () => {
         userId,
       })
         .then((res: any) => {
-          showToast(res.data.message, res.data.result.status);
+          showReviewResultToast(res.data.message, res.data.result.status);
+          trackJoinBillingTeamRequestToastViewed(joiningRequestAction, res.data.result.status);
           Logger.log("Billing team joining request reviewed");
         })
         .catch((err: any) => {
           toast.error(err.message, 5);
+          trackJoinBillingTeamRequestToastViewed(joiningRequestAction, "error");
           Logger.log("Error while reviewing billing team joining request");
         });
     }
-  }, [billingId, joiningRequestAction, userId]);
+  }, [billingId, joiningRequestAction, userId, showReviewResultToast]);
 
   if (!user.loggedIn) {
     return (
