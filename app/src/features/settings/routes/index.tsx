@@ -12,7 +12,6 @@ import FEATURES from "config/constants/sub/features";
 import { BillingTeam } from "../components/BillingTeam";
 import { OrgMembersView } from "../components/OrgMembers";
 import Profile from "../components/Profile/ManageAccount";
-import { BillingTeamRequestReview } from "../components/BillingTeam/components/BillingTeamRequestReview";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
@@ -50,10 +49,6 @@ export const settingRoutes: RouteObject[] = [
       {
         path: PATHS.SETTINGS.BILLING.RELATIVE + "/:billingId",
         element: <BillingTeam />,
-      },
-      {
-        path: PATHS.SETTINGS.BILLING.RELATIVE + `/:billingId${PATHS.SETTINGS.BILLING.JOINING_REQUESTS.INDEX}`,
-        element: <BillingTeamRequestReview />,
       },
       {
         path: PATHS.SETTINGS.PROFILE.RELATIVE,
