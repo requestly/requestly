@@ -131,11 +131,11 @@ export const BillingTeam: React.FC = () => {
       })
         .then((res: any) => {
           showToast(res.data.message, res.data.result.status);
-          console.log("Billing team joining request reviewed", res);
+          Logger.log("Billing team joining request reviewed");
         })
         .catch((err: any) => {
-          console.error("Error while reviewing billing team joining request", err);
           toast.error(err.message, 5);
+          Logger.log("Error while reviewing billing team joining request");
         });
     }
   }, [billingId, joiningRequestAction, userId]);
