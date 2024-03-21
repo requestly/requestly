@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Result, Spin } from "antd";
 import { MyBillingTeam } from "./components/MyBillingTeam";
 import {
@@ -16,9 +16,15 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { billingActions } from "store/features/billing/slice";
 import { PRICING } from "features/pricing";
+import { RQButton } from "lib/design-system/components";
+import { actions } from "store";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { toast } from "utils/Toast";
+import { BillingTeamJoinRequestAction } from "./types";
 
 export const BillingTeam: React.FC = () => {
   const { billingId } = useParams();
+  const [queryParams] = useSearchParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,6 +45,25 @@ export const BillingTeam: React.FC = () => {
       }),
     [billingTeams, billingId, location.pathname]
   );
+
+  const joiningRequestAction = queryParams.get("joinRequestAction");
+  const userId = queryParams.get("user");
+
+  const showToast = (message: string, type: string, duration = 5) => {
+    switch (type) {
+      case "success":
+        toast.success(message, duration);
+        break;
+      case "warning":
+        toast.warn(message, duration);
+        break;
+      case "error":
+        toast.error(message, duration);
+        break;
+      default:
+        toast.info(message, duration);
+    }
+  };
 
   useEffect(() => {
     if (!hasAccessToBillingTeam && billingId) {
@@ -89,6 +114,63 @@ export const BillingTeam: React.FC = () => {
       }
     }
   }, [location.pathname, billingTeams, navigate, user?.details?.profile?.uid, user?.details?.planDetails?.type]);
+
+  useEffect(() => {
+    if (billingId && joiningRequestAction && userId) {
+      toast.loading(
+        `${
+          joiningRequestAction === BillingTeamJoinRequestAction.ACCEPT ? "Approving" : "Declining"
+        } the joining request ...`,
+        5
+      );
+      const reviewBillingTeamJoiningRequest = httpsCallable(getFunctions(), "billing-reviewBillingTeamJoiningRequest");
+      reviewBillingTeamJoiningRequest({
+        billingTeamId: billingId,
+        action: joiningRequestAction,
+        userId,
+      })
+        .then((res: any) => {
+          showToast(res.data.message, res.data.result.status);
+          console.log("Billing team joining request reviewed", res);
+        })
+        .catch((err: any) => {
+          console.error("Error while reviewing billing team joining request", err);
+          toast.error(err.message, 5);
+        });
+    }
+  }, [billingId, joiningRequestAction, userId]);
+
+  if (!user.loggedIn) {
+    return (
+      <Result
+        status="error"
+        title={
+          joiningRequestAction
+            ? `You need to login to review this joining request`
+            : "You need to login to view this billing team"
+        }
+        extra={
+          <RQButton
+            type="primary"
+            onClick={() => {
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "authModal",
+                  newValue: true,
+                  newProps: {
+                    authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                    eventSource: SOURCE.BILLING_TEAM,
+                  },
+                })
+              );
+            }}
+          >
+            Login
+          </RQButton>
+        }
+      />
+    );
+  }
 
   if ((isBillingTeamsLoading || !billingId) && !showUserPlanDetails)
     return (
