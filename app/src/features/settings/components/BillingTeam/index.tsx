@@ -117,7 +117,7 @@ export const BillingTeam: React.FC = () => {
   }, [location.pathname, billingTeams, navigate, user?.details?.profile?.uid, user?.details?.planDetails?.type]);
 
   useEffect(() => {
-    if (billingId && joiningRequestAction && userId) {
+    if (user.loggedIn && billingId && joiningRequestAction && userId) {
       toast.loading(
         `${
           joiningRequestAction === BillingTeamJoinRequestAction.ACCEPT ? "Approving" : "Declining"
@@ -142,11 +142,32 @@ export const BillingTeam: React.FC = () => {
           Logger.log("Error while reviewing billing team joining request");
         });
     }
-  }, [billingId, joiningRequestAction, userId, showReviewResultToast]);
+  }, [billingId, joiningRequestAction, userId, showReviewResultToast, user.loggedIn]);
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      toast.warn(
+        joiningRequestAction
+          ? `You need to login to review this joining request`
+          : `You need to login to view this billing team`
+      );
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: {
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: SOURCE.BILLING_TEAM,
+          },
+        })
+      );
+    }
+  }, [user.loggedIn, joiningRequestAction, dispatch]);
 
   if (!user.loggedIn) {
     return (
       <Result
+        icon={null}
         status="error"
         title={
           joiningRequestAction
