@@ -4,11 +4,23 @@ import { updateActivationStatus } from "./contextMenu";
 import { getAllSupportedWebURLs } from "../../utils";
 
 /* Do not refer any external variable in below function other than arguments */
-const addInlineJS = (code: string, executeAfterPageLoad = false): void => {
+const addInlineJS = (
+  code: string,
+  attributes: { name: string; value: string }[] = [],
+  executeAfterPageLoad = false
+): void => {
   const addScript = () => {
     const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.className = "__RQ_SCRIPT__";
+
+    if (attributes.length) {
+      attributes.forEach(({ name: attrName, value: attrVal }) => {
+        script.setAttribute(attrName, attrVal ?? "");
+      });
+    } else {
+      script.type = "text/javascript";
+    }
+
+    script.classList.add("__RQ_SCRIPT__");
     script.appendChild(document.createTextNode(code));
     const parent = document.head || document.documentElement;
     parent.appendChild(script);
@@ -21,11 +33,23 @@ const addInlineJS = (code: string, executeAfterPageLoad = false): void => {
 };
 
 /* Do not refer any external variable in below function other than arguments */
-const addRemoteJS = (url: string, executeAfterPageLoad = false): void => {
+const addJSFromURL = (
+  url: string,
+  attributes: { name: string; value: string }[] = [],
+  executeAfterPageLoad = false
+): void => {
   const addScript = () => {
     const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.className = "__RQ_SCRIPT__";
+
+    if (attributes.length) {
+      attributes.forEach(({ name: attrName, value: attrVal }) => {
+        script.setAttribute(attrName, attrVal ?? "");
+      });
+    } else {
+      script.type = "text/javascript";
+    }
+
+    script.classList.add("__RQ_SCRIPT__");
     script.src = url;
     const parent = document.head || document.documentElement;
     parent.appendChild(script);
@@ -38,21 +62,36 @@ const addRemoteJS = (url: string, executeAfterPageLoad = false): void => {
 };
 
 /* Do not refer any external variable in below function other than arguments */
-const addInlineCSS = function (css: string): void {
+const addInlineCSS = function (css: string, attributes: { name: string; value: string }[] = []): void {
   var style = document.createElement("style");
   style.appendChild(document.createTextNode(css));
-  style.className = "__RQ_SCRIPT__";
+
+  if (attributes.length) {
+    attributes.forEach(({ name: attrName, value: attrVal }) => {
+      style.setAttribute(attrName, attrVal ?? "");
+    });
+  }
+
+  style.classList.add("__RQ_SCRIPT__");
   const parent = document.head || document.documentElement;
   parent.appendChild(style);
 };
 
 /* Do not refer any external variable in below function other than arguments */
-const addRemoteCSS = function (url: string): void {
+const addCSSFromURL = function (url: string, attributes: { name: string; value: string }[] = []): void {
   var link = document.createElement("link");
+
+  if (attributes.length) {
+    attributes.forEach(({ name: attrName, value: attrVal }) => {
+      link.setAttribute(attrName, attrVal ?? "");
+    });
+  } else {
+    link.type = "text/css";
+    link.rel = "stylesheet";
+  }
+
   link.href = url;
-  link.type = "text/css";
-  link.rel = "stylesheet";
-  link.className = "__RQ_SCRIPT__";
+  link.classList.add("__RQ_SCRIPT__");
   const parent = document.head || document.documentElement;
   parent.appendChild(link);
 };
@@ -61,16 +100,16 @@ export const injectScript = (script: ScriptObject, target: chrome.scripting.Inje
   return new Promise((resolve) => {
     let func: (val: string) => void;
     if (script.codeType === ScriptCodeType.JS) {
-      func = script.type === ScriptType.URL ? addRemoteJS : addInlineJS;
+      func = script.type === ScriptType.URL ? addJSFromURL : addInlineJS;
     } else {
-      func = script.type === ScriptType.URL ? addRemoteCSS : addInlineCSS;
+      func = script.type === ScriptType.URL ? addCSSFromURL : addInlineCSS;
     }
 
     chrome.scripting.executeScript(
       {
         target,
         func,
-        args: [script.value, script.loadTime === "afterPageLoad"],
+        args: [script.value, script.attributes, script.loadTime === "afterPageLoad"],
         world: "MAIN",
         // @ts-ignore
         injectImmediately: true,

@@ -107,11 +107,17 @@ export enum ScriptType {
   CODE = "code",
 }
 
+interface ScriptAttributes {
+  name: string;
+  value: string;
+}
+
 export interface ScriptObject {
   codeType: ScriptCodeType;
   type: ScriptType;
   value: string;
   loadTime?: "afterPageLoad" | "beforePageLoad";
+  attributes?: ScriptAttributes[];
 }
 
 export interface ScriptRulePair extends RulePair {
