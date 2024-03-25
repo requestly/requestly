@@ -6,7 +6,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { personaRecommendationData } from "../../personaRecommendationData";
 import { FeatureCard } from "../featureCard";
 import { RQButton } from "lib/design-system/components";
-import { ImportRulesModal } from "features/rules/components/RulesList/components/RulesListIndex/components";
+import { ImportRulesModal } from "features/rules/features/rulesList/components/RulesList/components";
 import { CloudUploadOutlined } from "@ant-design/icons";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";

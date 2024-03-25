@@ -275,8 +275,6 @@ export type Rule =
   | DelayRule
   | ScriptRule;
 
-export interface Group extends GroupRecord {
-  children: Rule[]; // aren't always correctly populated, but present
-}
+export interface Group extends GroupRecord {}
 
 export type StorageRecord = Rule | Group; // todo: rename

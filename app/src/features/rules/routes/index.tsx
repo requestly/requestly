@@ -11,9 +11,7 @@ import { joinPaths } from "utils/PathUtils";
 import ImportSharedListIndexPage from "components/features/sharedLists/ImportSharedListIndexPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RootComponent from "components/redirects/RootComponent";
-import RulesListIndex from "../components/RulesList/components/RulesListIndex/RulesListIndex";
-import SharedListViewer from "../components/SharedList/components/SharedListViewer/SharedListViewer";
-import RulesIndexViewWrapper from "../components/RulesList/components/RulesListIndex/RulesIndexViewWrapper";
+import RulesListIndex from "../features/rulesList/";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -27,7 +25,7 @@ export const ruleRoutes: RouteObject[] = [
       {
         index: true,
         path: PATHS.RULES.MY_RULES.RELATIVE,
-        element: <RulesIndexViewWrapper />,
+        element: <RulesListIndex />,
       },
       {
         path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
@@ -70,10 +68,6 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: "my-rules", // FIXME: Move to constants and remove old path
         element: <RulesListIndex />,
-      },
-      {
-        path: joinPaths(`${PATHS.SHARED_LISTS.VIEWER.RELATIVE}`, ":sharedListParam"),
-        element: <SharedListViewer />,
       },
     ],
   },
