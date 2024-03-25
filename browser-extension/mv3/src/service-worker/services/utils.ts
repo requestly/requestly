@@ -105,11 +105,13 @@ export const injectScript = (script: ScriptObject, target: chrome.scripting.Inje
       func = script.type === ScriptType.URL ? addCSSFromURL : addInlineCSS;
     }
 
+    const scriptRuleAttributes: ScriptAttributes[] = script.attributes ?? [];
+
     chrome.scripting.executeScript(
       {
         target,
         func,
-        args: [script.value, script.attributes, script.loadTime === "afterPageLoad"],
+        args: [script.value, scriptRuleAttributes, script.loadTime === "afterPageLoad"],
         world: "MAIN",
         // @ts-ignore
         injectImmediately: true,
