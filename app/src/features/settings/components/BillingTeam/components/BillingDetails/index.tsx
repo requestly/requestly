@@ -10,9 +10,13 @@ import { OtherBillingTeamDetails } from "./OtherBillingTeamDetails";
 import APP_CONSTANTS from "config/constants";
 import { toast } from "utils/Toast";
 import { trackJoinBillingTeamRequestToastViewed } from "features/settings/analytics";
-import { BillingTeamJoinRequestAction } from "../../types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
+
+const BILLING_TEAM_JOIN_REQUEST_ACTION = {
+  ACCEPT: "accept",
+  REJECT: "reject",
+};
 
 export const BillingDetails = () => {
   const location = useLocation();
@@ -57,7 +61,7 @@ export const BillingDetails = () => {
     if (user.loggedIn && billingId && joiningRequestAction && userId) {
       toast.loading(
         `${
-          joiningRequestAction === BillingTeamJoinRequestAction.ACCEPT ? "Approving" : "Declining"
+          joiningRequestAction === BILLING_TEAM_JOIN_REQUEST_ACTION.ACCEPT ? "Approving" : "Declining"
         } the joining request ...`,
         5
       );
