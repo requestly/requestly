@@ -5,13 +5,13 @@ import { billingActions } from "store/features/billing/slice";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import Logger from "lib/logger";
 
-function useBillingTeamFetcher(hasAccessToBillingTeam: boolean, billingId: string) {
+export const useCheckCurrentTeamAccess = (billingId: string) => {
   const [isTeamMember, setIsTeamMember] = useState(false);
   const dispatch = useDispatch();
   const billingTeams = useSelector(getAvailableBillingTeams);
 
   useEffect(() => {
-    if (!hasAccessToBillingTeam && billingId) {
+    if (billingId) {
       const getOtherTeam = httpsCallable(getFunctions(), "billing-fetchBillingTeam");
       getOtherTeam({ billingId })
         .then((result: any) => {
@@ -32,9 +32,7 @@ function useBillingTeamFetcher(hasAccessToBillingTeam: boolean, billingId: strin
           Logger.log(error);
         });
     }
-  }, [billingId, hasAccessToBillingTeam, dispatch, billingTeams]);
+  }, [billingId, dispatch, billingTeams]);
 
   return isTeamMember;
-}
-
-export default useBillingTeamFetcher;
+};

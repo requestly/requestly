@@ -1,25 +1,23 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
-import useBillingTeamFetcher from "../../hooks/useBillingTeamFetcher";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useCheckCurrentTeamAccess } from "../../hooks/useCheckCurrentTeamAccess";
 import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/features/billing/selectors";
 import { Result } from "antd";
 import { MyBillingTeamDetails } from "./MyBillingTeamDetails";
 import { OtherBillingTeamDetails } from "./OtherBillingTeamDetails";
-import APP_CONSTANTS from "config/constants";
 import { toast } from "utils/Toast";
 import { trackJoinBillingTeamRequestToastViewed } from "features/settings/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 
-const BILLING_TEAM_JOIN_REQUEST_ACTION = {
-  ACCEPT: "accept",
-  REJECT: "reject",
-};
+enum BillingTeamJoinRequestAction {
+  ACCEPT = "accept",
+  REJECT = "reject",
+}
 
 export const BillingDetails = () => {
-  const location = useLocation();
   const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
@@ -44,14 +42,15 @@ export const BillingDetails = () => {
     }
   }, []);
 
-  const hasAccessToBillingTeam = useMemo(
+  const hasAccessToCurrentTeam = useCheckCurrentTeamAccess(billingId);
+
+  const isBillingTeamDetailsViewable = useMemo(
     () =>
       billingTeams?.some((billingTeam) => {
-        return billingTeam?.id === billingId && location.pathname !== APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE;
+        return billingTeam?.id === billingId;
       }),
-    [billingTeams, billingId, location.pathname]
+    [billingTeams, billingId]
   );
-  const isTeamMember = useBillingTeamFetcher(hasAccessToBillingTeam, billingId);
 
   const userDetailsOfSelectedBillingTeam = useSelector(
     getBillingTeamMemberById(billingId, user?.details?.profile?.uid)
@@ -61,7 +60,7 @@ export const BillingDetails = () => {
     if (user.loggedIn && billingId && joiningRequestAction && userId) {
       toast.loading(
         `${
-          joiningRequestAction === BILLING_TEAM_JOIN_REQUEST_ACTION.ACCEPT ? "Approving" : "Declining"
+          joiningRequestAction === BillingTeamJoinRequestAction.ACCEPT ? "Approving" : "Declining"
         } the joining request ...`,
         5
       );
@@ -85,7 +84,7 @@ export const BillingDetails = () => {
     }
   }, [billingId, joiningRequestAction, userId, showReviewResultToast, user.loggedIn]);
 
-  if (!hasAccessToBillingTeam && billingId) {
+  if (!isBillingTeamDetailsViewable && billingId) {
     return (
       <div className="display-row-center items-center" style={{ marginTop: "80px" }}>
         <Result
@@ -97,6 +96,6 @@ export const BillingDetails = () => {
     );
   }
 
-  if (isTeamMember || userDetailsOfSelectedBillingTeam) return <MyBillingTeamDetails />;
+  if (hasAccessToCurrentTeam || userDetailsOfSelectedBillingTeam) return <MyBillingTeamDetails />;
   else return <OtherBillingTeamDetails />;
 };
