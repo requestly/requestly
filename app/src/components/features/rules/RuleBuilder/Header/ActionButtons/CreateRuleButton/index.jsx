@@ -28,7 +28,7 @@ import {
   trackRuleResourceTypeSelected,
   trackRuleSaveClicked,
 } from "modules/analytics/events/common/rules";
-import { isNull, snakeCase } from "lodash";
+import { snakeCase } from "lodash";
 import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
@@ -39,7 +39,6 @@ import { actions } from "store";
 import "../RuleEditorActionButtons.css";
 import { HTML_ERRORS } from "./actions/insertScriptValidators";
 import { toastType } from "components/misc/CodeEditor/EditorToast/types";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -122,8 +121,6 @@ const CreateRuleButton = ({
     }
   }, [currentlySelectedRuleData.ruleType]);
 
-  const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
-
   const tooltipText = isDisabled
     ? "Only available in desktop app."
     : navigator.platform.match("Mac")
@@ -131,6 +128,20 @@ const CreateRuleButton = ({
     : "Ctrl+S";
 
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
+
+  const isUpgradePopoverDisabled = useMemo(() => {
+    if (isDisabled) return true;
+    if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
+      // If rule limit type exists and user is not premium, then enable popover else disable
+      if (ruleLimitType) {
+        if (user.details?.isPremium) return true;
+        else return false;
+      } else {
+        // disable popover for non-premium rule types
+        return true;
+      }
+    }
+  }, [isDisabled, MODE, ruleLimitType, user.details?.isPremium]);
 
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
@@ -280,11 +291,7 @@ const CreateRuleButton = ({
         features={[FeatureLimitType.num_rules, ruleLimitType]}
         onContinue={handleBtnOnClick}
         featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME} rule`}
-        disabled={
-          isDisabled ||
-          (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isNull(ruleLimitType)) ||
-          !isBackgateRestrictionEnabled
-        }
+        disabled={isUpgradePopoverDisabled}
         source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">
