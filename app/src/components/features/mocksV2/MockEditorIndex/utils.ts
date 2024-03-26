@@ -1,4 +1,10 @@
+import HEADER_SUGGESTIONS from "config/constants/sub/header-suggestions";
 import { FileType } from "../types";
+interface HeaderError {
+  typeOfError: "name" | "value";
+  description: string;
+  errorIndex: number;
+}
 
 // Remove leading & trailing slash
 export const cleanupEndpoint = (endpoint: string) => {
@@ -47,4 +53,33 @@ export const getEditorLanguage = (fileType?: FileType) => {
     default:
       return "json";
   }
+};
+
+export const validateHeaders = (
+  headerItems: Array<{ name: string; value: { name: string; value: string } }>
+): HeaderError[] => {
+  const headerErrors: HeaderError[] = [];
+  const seenHeaderNames = new Set<string>();
+
+  headerItems.forEach((headerWrapper, index) => {
+    const headerName = headerWrapper.value.name;
+    const headerValue = headerWrapper.value.value;
+
+    if (!headerName) {
+      headerErrors.push({ typeOfError: "name", description: "Header name is required", errorIndex: index });
+    } else if (!HEADER_SUGGESTIONS.Response.some((option) => option.value.toLowerCase() === headerName.toLowerCase())) {
+      headerErrors.push({ typeOfError: "name", description: "Invalid Header name", errorIndex: index });
+    } else if (seenHeaderNames.has(headerName.toLowerCase())) {
+      headerErrors.push({ typeOfError: "name", description: "Duplicate Header name", errorIndex: index });
+    } else {
+      seenHeaderNames.add(headerName.toLowerCase());
+    }
+
+    if (!headerValue) {
+      headerErrors.push({ typeOfError: "value", description: "Header value is required", errorIndex: index });
+    } else if (!/^[a-zA-Z\d/]*$/.test(headerValue)) {
+      headerErrors.push({ typeOfError: "value", description: "Invalid characters in Header value", errorIndex: index });
+    }
+  });
+  return headerErrors;
 };

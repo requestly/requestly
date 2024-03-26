@@ -17,7 +17,7 @@ import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
 import { MockEditorDataSchema, RequestMethod, ValidationErrors } from "../types";
-import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode } from "../utils";
+import { cleanupEndpoint, getEditorLanguage, validateEndpoint, validateStatusCode, validateHeaders } from "../utils";
 import "./index.css";
 import { trackMockEditorOpened, trackTestMockClicked } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -25,6 +25,7 @@ import { APIClient, APIClientRequest } from "components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
+import HeaderSection from "./HeaderSection";
 
 interface Props {
   isNew?: boolean;
@@ -34,6 +35,12 @@ interface Props {
   onSave: Function;
   onClose: Function;
   mockType?: MockType;
+}
+
+interface Header {
+  name: string;
+  value: string;
+  index: number;
 }
 
 const MockEditor: React.FC<Props> = ({
@@ -61,6 +68,7 @@ const MockEditor: React.FC<Props> = ({
   const [contentType, setContentType] = useState<string>(mockData.contentType);
   const [endpoint, setEndpoint] = useState<string>(mockData.endpoint);
   const [headersString, setHeadersString] = useState<string>(JSON.stringify(mockData.headers));
+  const [mappedHeader, setMappedHeader] = useState<Header[]>([]);
   const [body, setBody] = useState<string>(mockData.body);
   const [password, setPassword] = useState<string>(mockData.password ?? "");
 
@@ -69,6 +77,7 @@ const MockEditor: React.FC<Props> = ({
     name: null,
     statusCode: null,
     endpoint: null,
+    headers: [],
   });
 
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
@@ -95,6 +104,23 @@ const MockEditor: React.FC<Props> = ({
   useEffect(() => {
     trackMockEditorOpened(mockType);
   }, [mockType]);
+
+  useEffect(() => {
+    try {
+      const headersObject = JSON.parse(headersString);
+      const headersArray: Header[] = Object.values(headersObject);
+      const mappedHeaders = headersArray.map((header, index) => {
+        return {
+          name: header.name,
+          value: header.value,
+          index: index,
+        };
+      });
+      setMappedHeader(mappedHeaders);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [headersString]);
 
   const handleMockLatencyChange = (value: number) => {
     if (Number.isInteger(value)) {
@@ -147,6 +173,19 @@ const MockEditor: React.FC<Props> = ({
     if (statusCodeValidationError) {
       updatedErrors.statusCode = statusCodeValidationError;
       if (!focusedInvalidFieldRef) focusedInvalidFieldRef = statusCodeRef;
+    }
+    const headersToValidate = mappedHeader.map((header) => ({
+      name: header.index.toString(),
+      value: { name: header.name, value: header.value },
+    }));
+    const headerErrors = validateHeaders(headersToValidate);
+
+    if (headerErrors.length > 0) {
+      updatedErrors.headers = headerErrors.map((error) => ({
+        description: error.description,
+        errorIndex: error.errorIndex,
+        typeOfError: error.typeOfError,
+      }));
     }
 
     // TODO: Add more validations here for special characters, //, etc.
@@ -315,20 +354,15 @@ const MockEditor: React.FC<Props> = ({
       return null;
     }
     return (
-      <Row className="editor-row">
-        <Col span={24}>
-          {/* @ts-ignore */}
-          <CodeEditor
-            height={220}
-            language="json"
-            value={headersString}
-            readOnly={false}
-            handleChange={setHeadersString}
-          />
-        </Col>
-      </Row>
+      <HeaderSection
+        mappedHeader={mappedHeader}
+        //@ts-ignore
+        errors={errors}
+        setMappedHeader={setMappedHeader}
+        setHeadersString={setHeadersString}
+      />
     );
-  }, [headersString, type]);
+  }, [type, mappedHeader, errors]);
 
   const renderBodyRow = useCallback((): ReactNode => {
     return (
