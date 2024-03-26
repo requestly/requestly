@@ -30,8 +30,3 @@ export interface BillingTeamMember {
   role: BillingTeamRoles;
   joiningDate: number;
 }
-
-export enum BillingTeamJoinRequestAction {
-  ACCEPT = "accept",
-  REJECT = "reject",
-}
