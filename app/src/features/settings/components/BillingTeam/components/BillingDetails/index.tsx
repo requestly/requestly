@@ -67,7 +67,7 @@ export const BillingDetails = () => {
       trackJoinBillingTeamRequestToastViewed(joiningRequestAction, "loading");
       const reviewBillingTeamJoiningRequest = httpsCallable(getFunctions(), "billing-reviewBillingTeamJoiningRequest");
       reviewBillingTeamJoiningRequest({
-        billingTeamId: billingId,
+        billingId,
         action: joiningRequestAction,
         userId,
       })
