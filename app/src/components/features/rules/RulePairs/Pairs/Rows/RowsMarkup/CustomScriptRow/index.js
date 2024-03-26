@@ -1,5 +1,5 @@
 /* eslint-disable default-case */
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm, Button } from "antd";
 import { actions } from "store";
@@ -28,6 +28,7 @@ const CustomScriptRow = ({
 }) => {
   const dispatch = useDispatch();
 
+  const isFirstRender = useRef(true); // to maintain a state for unsaved changes
   const [isCodeTypePopupVisible, setIsCodeTypePopupVisible] = useState(false);
   const [isSourceTypePopupVisible, setIsSourceTypePopupVisible] = useState(false);
   const [codeTypeSelection, setCodeTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS);
@@ -185,7 +186,7 @@ const CustomScriptRow = ({
   };
 
   const handleEditorUpdate = useCallback(
-    (value) => {
+    (value, triggerUnsavedChanges = true) => {
       if (script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL) {
         /* THIS IS TEMPORARY REPRESENTATION OF SCRIPT ATTRIBUTE */
         dispatch(
@@ -194,13 +195,14 @@ const CustomScriptRow = ({
             updates: {
               [`scripts[${scriptIndex}].wrapperElement`]: value,
             },
+            triggerUnsavedChangesIndication: triggerUnsavedChanges,
           })
         );
       } else {
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
-            triggerUnsavedChangesIndication: !isCodeFormatted,
+            triggerUnsavedChangesIndication: !isCodeFormatted && triggerUnsavedChanges,
             updates: {
               [`scripts[${scriptIndex}].value`]: value,
             },
@@ -213,7 +215,12 @@ const CustomScriptRow = ({
 
   useEffect(() => {
     if (initialCodeEditorValue !== null) {
-      handleEditorUpdate(initialCodeEditorValue);
+      const shouldTriggerUnsavedChanges = !isFirstRender.current;
+      if (isFirstRender.current) {
+        isFirstRender.current = false;
+      }
+
+      handleEditorUpdate(initialCodeEditorValue, shouldTriggerUnsavedChanges);
     }
   }, [initialCodeEditorValue, handleEditorUpdate]);
 
