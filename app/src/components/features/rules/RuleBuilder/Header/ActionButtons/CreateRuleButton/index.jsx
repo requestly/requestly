@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -108,7 +108,8 @@ const CreateRuleButton = ({
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const ruleLimitType = useMemo(() => {
+
+  const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {
       case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
         return FeatureLimitType.script_rule;
@@ -129,11 +130,11 @@ const CreateRuleButton = ({
 
   const currentActionText = MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "Save" : "Create";
 
-  const isUpgradePopoverDisabled = useMemo(() => {
+  const checkIsUpgradePopoverDisabled = useCallback(() => {
     if (isDisabled) return true;
     if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
       // If rule limit type exists and user is not premium, then enable popover else disable
-      if (ruleLimitType) {
+      if (premiumRuleLimitType) {
         if (user.details?.isPremium) return true;
         else return false;
       } else {
@@ -141,7 +142,7 @@ const CreateRuleButton = ({
         return true;
       }
     }
-  }, [isDisabled, MODE, ruleLimitType, user.details?.isPremium]);
+  }, [isDisabled, MODE, premiumRuleLimitType, user.details?.isPremium]);
 
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
@@ -288,10 +289,10 @@ const CreateRuleButton = ({
     <>
       <PremiumFeature
         popoverPlacement="bottomLeft"
-        features={[FeatureLimitType.num_rules, ruleLimitType]}
+        features={[FeatureLimitType.num_rules, premiumRuleLimitType]}
         onContinue={handleBtnOnClick}
         featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME} rule`}
-        disabled={isUpgradePopoverDisabled}
+        disabled={checkIsUpgradePopoverDisabled()}
         source={currentlySelectedRuleData.ruleType}
       >
         <Tooltip title={tooltipText} placement="top">
