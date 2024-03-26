@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import type { ColumnsType } from "antd/es/table";
 import { Table, TableProps } from "antd";
 import { BulkActionBarConfig } from "./types";
@@ -7,6 +7,7 @@ import "./contentListTable.scss";
 import { useContentListTableContext } from "./context";
 
 export interface ContentTableProps<DataType> extends TableProps<DataType> {
+  id: string;
   columns: ColumnsType<DataType>;
   data: DataType[];
   rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
@@ -17,7 +18,8 @@ export interface ContentTableProps<DataType> extends TableProps<DataType> {
   onRecordSelection?: (selectedRows: DataType[]) => void;
 }
 
-const ContentListTable = <DataType extends object>({
+const ContentListTable = <DataType extends { [key: string]: any }>({
+  id,
   columns,
   data,
   rowKey = "key",
@@ -26,11 +28,39 @@ const ContentListTable = <DataType extends object>({
   bulkActionBarConfig,
   size = "middle",
   scroll = { y: "calc(100vh - 277px)" },
-  expandable,
   locale,
   onRecordSelection = () => {},
 }: ContentTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
+  const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
+
+  const handleOnExpandClick = useCallback(
+    (expanded: boolean, record: DataType) => {
+      console.log("handleOnExpandClick", expanded, record);
+      let updatedExpandedRowKeys = new Set(expandedRowKeys);
+      if (expanded) {
+        updatedExpandedRowKeys = updatedExpandedRowKeys.add(record[rowKey]);
+      } else {
+        updatedExpandedRowKeys.delete(record[rowKey]);
+      }
+      setExpandedRowsKeys(Array.from(updatedExpandedRowKeys));
+      localStorage.setItem(
+        "content-list-table-expanded-rows",
+        JSON.stringify({
+          [id]: Array.from(updatedExpandedRowKeys),
+        })
+      );
+    },
+    [expandedRowKeys, id, rowKey]
+  );
+
+  useEffect(() => {
+    const expandedRowsData = localStorage.getItem("content-list-table-expanded-rows");
+    const currentListTableExpandedRows = expandedRowsData ? JSON.parse(expandedRowsData)[id] : [];
+    if (currentListTableExpandedRows) {
+      setExpandedRowsKeys(currentListTableExpandedRows);
+    }
+  }, [id]);
 
   return (
     <>
@@ -48,7 +78,6 @@ const ContentListTable = <DataType extends object>({
         dataSource={data}
         pagination={false}
         scroll={scroll}
-        expandable={expandable}
         locale={locale}
         rowSelection={{
           checkStrictly: false,
@@ -57,6 +86,13 @@ const ContentListTable = <DataType extends object>({
             onRecordSelection(selectedRows);
             setSelectedRows(selectedRows);
           },
+        }}
+        expandable={{
+          expandRowByClick: true,
+          rowExpandable: () => true,
+          defaultExpandedRowKeys: expandedRowKeys,
+          onExpand: handleOnExpandClick,
+          expandedRowKeys,
         }}
       />
     </>

@@ -17,15 +17,12 @@ import {
 import useRuleTableActions from "./hooks/useRuleTableActions";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
-// import { RiToggleFill } from "@react-icons/all-files/ri/RiToggleFill";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
-// import { RiArrowDownSLine } from "@react-icons/all-files/ri/RiArrowDownSLine";
-import { localStorage } from "utils/localStorage";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
-import { getAllRecordIds, getAllRecords } from "store/features/rules/selectors";
+import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import "./rulesTable.css";
 import { enhanceRecords } from "./utils/rules";
@@ -47,14 +44,10 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const { clearSelectedRows } = useContentListTableContext();
 
   const user = useSelector(getUserAuthDetails);
-  const allRecordIds = useSelector(getAllRecordIds);
   const allRecords = useSelector(getAllRecords);
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
-  const [expandedGroups, setExpandedGroups] = useState([]);
-  const [isGroupsStateUpdated, setIsGroupsStateUpdated] = useState(false);
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
   const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
-  // const clearSelectedRowsDataCallbackRef = useRef(() => {});
   const {
     handleRecordsShare,
     handleRecordsStatusToggle,
@@ -91,23 +84,6 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
   const columns = useRuleTableColumns(options);
 
-  // TODO
-  // const activeRulesCount = useMemo(() => getActiveRules(selectedRows).length, [selectedRows]);
-  // const inactiveRulesCount = selectedRows.length - activeRulesCount;
-
-  // const getExpandedGroupRowKeys = useCallback(() => {
-  //   return (localStorage.getItem("expandedGroups") ?? []) as string[];
-  // }, []);
-
-  // useEffect(() => {
-  //   const expandedGroups = getExpandedGroupRowKeys();
-
-  //   if (expandedGroups && !isGroupsStateUpdated) {
-  //     setExpandedGroups(expandedGroups);
-  //     setIsGroupsStateUpdated(true);
-  //   }
-  // }, [expandedGroups, isGroupsStateUpdated, getExpandedGroupRowKeys]);
-
   // TODO: Why?
   useEffect(() => {
     if (!loading && !isPremiumRulesToggleChecked && isBackgateRestrictionEnabled && isUpgradePopoverEnabled) {
@@ -137,22 +113,6 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     isBackgateRestrictionEnabled,
     isUpgradePopoverEnabled,
   ]);
-
-  // const handleGroupState = (expanded: boolean, record: StorageRecord) => {
-  //   if (isRule(record)) {
-  //     return;
-  //   }
-
-  //   if (expanded && !expandedGroups.includes(record.id)) {
-  //     const updatedExpandedGroups = [...expandedGroups, record.id];
-  //     setExpandedGroups(updatedExpandedGroups);
-  //     localStorage.setItem("expandedGroups", updatedExpandedGroups);
-  //   } else if (!expanded && expandedGroups.includes(record.id)) {
-  //     const updatedExpandedGroups = [...expandedGroups].filter((id) => id !== record.id);
-  //     setExpandedGroups(updatedExpandedGroups);
-  //     localStorage.setItem("expandedGroups", updatedExpandedGroups);
-  //   }
-  // };
 
   const getSelectionCount = useCallback((selectedRows: StorageRecord[]) => {
     let groups = 0;
@@ -187,6 +147,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       <CreateNewRuleGroupModalWrapper />
 
       <ContentListTable
+        id="rules-list-table"
         size="middle"
         scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(277px + 68px)" : "277px"})` }} // 68px is Feature limit banner height
         columns={columns}
@@ -202,38 +163,6 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
             trackRulesSelected(selectedRows.length);
           }
         }}
-        // expandable={{
-        //   expandRowByClick: true,
-        //   rowExpandable: () => true,
-        //   defaultExpandedRowKeys: getExpandedGroupRowKeys(),
-        //   onExpand: (expanded, record) => {
-        //     handleGroupState(expanded, record);
-        //   },
-        //   expandedRowKeys: searchValue.length
-        //     ? allRecordIds.filter((recordId: string) => recordId.startsWith("Group"))
-        //     : expandedGroups,
-        //   // FIXME: fix custom expand icon
-        //   // expandIcon: ({ expanded, onExpand, record }) => {
-        //   //   console.clear();
-        //   //   console.log({ record, expanded, expandedGroups, expandedGroupRowKeys: getExpandedGroupRowKeys() });
-
-        //   //   if (!record.children) {
-        //   //     return null;
-        //   //   }
-
-        //   //   return (
-        //   //     <span
-        //   //       // @ts-ignore
-        //   //       onClick={(e) => onExpand(record, e)}
-        //   //     >
-        //   //       <RiArrowDownSLine
-        //   //         className="group-expand-icon"
-        //   //         style={{ transform: `rotate(${expanded ? "-180deg" : "0deg"})` }}
-        //   //       />
-        //   //     </span>
-        //   //   );
-        //   // },
-        // }}
         bulkActionBarConfig={{
           options: {
             infoText: (selectedRules) => getSelectionCount(selectedRules),

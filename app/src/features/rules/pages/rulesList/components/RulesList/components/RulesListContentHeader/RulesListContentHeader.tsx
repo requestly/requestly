@@ -22,6 +22,13 @@ import { getUserAuthDetails } from "store/selectors";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 import useRuleTableActions from "../RulesTable/hooks/useRuleTableActions";
+import {
+  trackNewRuleButtonClicked,
+  trackRuleCreationWorkflowStartedEvent,
+} from "modules/analytics/events/common/rules";
+import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
+import { useDebounce } from "hooks/useDebounce";
+import { trackRulesListFilterApplied, trackRulesListSearched } from "features/rules/analytics";
 
 interface Props {
   searchValue: string;
@@ -36,11 +43,15 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
   const { getFeatureLimitValue } = useFeatureLimiter();
   const { handleRecordsImport, handleGroupCreate } = useRuleTableActions();
   const user = useSelector(getUserAuthDetails);
+  const debouncedTrackRulesListSearched = useDebounce(trackRulesListSearched, 500);
 
   const handleNewRuleOnClick = useCallback(
     async (ruleType?: any, source = SOURCE.RULE_TABLE_CREATE_NEW_RULE_BUTTON) => {
-      // if (ruleType) trackRuleCreationWorkflowStartedEvent(ruleType, source);
-      // else trackNewRuleButtonClicked("in_app");
+      if (ruleType) {
+        trackRuleCreationWorkflowStartedEvent(ruleType, source);
+      } else {
+        trackNewRuleButtonClicked("in_app");
+      }
       redirectToCreateNewRule(navigate, ruleType, "my_rules");
       return;
     },
@@ -99,7 +110,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       icon: <DownloadOutlined />,
       onClickHandler: handleRecordsImport,
       trackClickEvent: () => {
-        // trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
+        trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
       },
     },
     {
@@ -115,7 +126,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
 
   const handleSearchValueUpdate = (value: string) => {
     setSearchValue(value);
-    // debouncedTrackRulesListSearched(value);
+    debouncedTrackRulesListSearched(value);
   };
 
   const contentHeaderActions = buttonData.map(
@@ -160,7 +171,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
         ),
         onClick: () => {
           setFilter("all");
-          // trackRulesListFilterApplied("all", allRecords.length, allRecords.length);
+          trackRulesListFilterApplied("all", records.length, records.length);
         },
       },
       {
@@ -180,7 +191,8 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
         ),
         onClick: () => {
           setFilter("pinned");
-          // trackRulesListFilterApplied("pinned", allRecords.length, pinnedRecords.length);
+          // FIXME: 0 is not correct
+          trackRulesListFilterApplied("pinned", records.length, 0);
         },
       },
       {
@@ -199,7 +211,8 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
         ),
         onClick: () => {
           setFilter("active");
-          // trackRulesListFilterApplied("active", allRecords.length, activeRecords.length);
+          // FIXME: 0 is not correct
+          trackRulesListFilterApplied("active", records.length, 0);
         },
       },
     ],
