@@ -5,10 +5,10 @@ import { useParams } from "react-router-dom";
 import { useHasChanged } from "hooks";
 import { getUserAuthDetails } from "store/selectors";
 import { getAvailableBillingTeams, getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
-import { TeamPlanStatus } from "../TeamPlanStatus";
+import { TeamPlanStatus } from "../../TeamPlanStatus";
 import { TeamDetailsPopover } from "./components/TeamDetailsPopover";
 import { RQButton } from "lib/design-system/components";
-import { BillingTeamMember, BillingTeamRoles } from "../../types";
+import { BillingTeamMember, BillingTeamRoles } from "../../../types";
 import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
@@ -18,7 +18,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import "./index.scss";
 
-export const OtherBillingTeam: React.FC = () => {
+export const OtherBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
