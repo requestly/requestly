@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getAvailableBillingTeams, getBillingTeamById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/selectors";
-import { BillingTeamRoles } from "../../types";
+import { BillingTeamRoles } from "../../../types";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { trackBillingTeamViewed } from "features/settings/analytics";
 import { BillingInformation } from "./components/BillingInformation";
@@ -15,7 +15,7 @@ import { OrgMembersTable } from "features/settings/components/OrgMembersTable";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import "./index.scss";
 
-export const MyBillingTeam: React.FC = () => {
+export const MyBillingTeamDetails: React.FC = () => {
   const { billingId } = useParams();
 
   const user = useSelector(getUserAuthDetails);
