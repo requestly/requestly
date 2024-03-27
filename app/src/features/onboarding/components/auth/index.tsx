@@ -6,10 +6,7 @@ import { OnboardingAuthBanner } from "./components/Banner";
 import AUTH from "config/constants/sub/auth";
 import MagicLinkModalContent from "components/authentication/AuthForm/MagicAuthLinkModal/MagicLinkModalContent";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
-import { sendEmailLinkForSignin } from "actions/FirebaseActions";
-import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm/MagicAuthLinkModal/actions";
 import { actions } from "store";
-import Logger from "lib/logger";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
 import { trackAppOnboardingStepCompleted, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { m } from "framer-motion";
@@ -36,19 +33,6 @@ export const AuthScreen: React.FC<Props> = ({
   const [authMode, setAuthMode] = useState(defaultAuthMode);
   const [email, setEmail] = useState("");
   const [isVerifyEmailPopupVisible, setIsVerifyEmailPopupVisible] = useState(false);
-
-  const handleSendEmailLink = () => {
-    if (email) {
-      sendEmailLinkForSignin(email, source)
-        .then(() => {
-          updateTimeToResendEmailLogin(dispatch, 30);
-          setIsVerifyEmailPopupVisible(true);
-        })
-        .catch((error) => {
-          Logger.log(error);
-        });
-    }
-  };
 
   useEffect(() => {
     if (isOpen && isOnboarding) {
@@ -89,12 +73,12 @@ export const AuthScreen: React.FC<Props> = ({
             <AuthForm
               authMode={authMode}
               setAuthMode={setAuthMode}
-              onSendEmailLink={handleSendEmailLink}
               email={email}
               setEmail={setEmail}
               isOnboarding={isOnboarding}
               source={source}
               callbacks={callbacks}
+              setIsVerifyEmailPopupVisible={setIsVerifyEmailPopupVisible}
             />
           </m.div>
           {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
