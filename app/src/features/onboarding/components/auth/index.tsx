@@ -52,7 +52,7 @@ export const AuthScreen: React.FC<Props> = ({
       {email && isVerifyEmailPopupVisible ? (
         <div className="verify-email-wrapper">
           <button
-            className="verify-email-back-btn"
+            className="auth-screen-back-btn"
             onClick={() => {
               dispatch(actions.updateIsAppOnboardingStepDisabled(false));
               setIsVerifyEmailPopupVisible(false);
@@ -69,7 +69,15 @@ export const AuthScreen: React.FC<Props> = ({
           layout
           className={`onboarding-auth-screen ${authMode === AUTH.ACTION_LABELS.SIGN_UP ? "w-full" : ""}`}
         >
-          <m.div transition={{ type: "linear" }} layout className="onboarding-auth-form-wrapper">
+          <m.div
+            transition={{ type: "linear" }}
+            layout
+            className="onboarding-auth-form-wrapper"
+            style={{
+              paddingTop:
+                authMode === AUTH.ACTION_LABELS.SIGN_UP || authMode === AUTH.ACTION_LABELS.LOG_IN ? "40px" : 0,
+            }}
+          >
             <AuthForm
               authMode={authMode}
               setAuthMode={setAuthMode}

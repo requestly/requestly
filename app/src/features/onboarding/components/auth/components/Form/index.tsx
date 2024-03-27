@@ -19,9 +19,10 @@ import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm
 import Logger from "lib/logger";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import "./index.scss";
 import APP_CONSTANTS from "config/constants";
 import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils";
+import { SSOSignInForm } from "./components/SSOSignInForm";
+import "./index.scss";
 
 interface AuthFormProps {
   authMode: string;
@@ -30,7 +31,8 @@ interface AuthFormProps {
   source: string;
   setEmail?: (email: string) => void;
   setAuthMode: (mode: string) => void;
-  setIsVerifyEmailPopupVisible?: (flag: boolean) => void;
+  setIsVerifyEmailPopupVisible?: (isVisble: boolean) => void;
+  setIsAuthBannerVisible?: (isVisible: boolean) => void;
   callbacks?: any;
 }
 
@@ -173,6 +175,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     }
   }, [dispatch, user.loggedIn, isNewUser, isOnboarding]);
 
+  if (authMode === AUTH.ACTION_LABELS.SSO) {
+    return <SSOSignInForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} />;
+  }
+
   return (
     <div className="w-full">
       <h2 className="onboarding-auth-form-header">
@@ -263,6 +269,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             ? "Create new account"
             : "Sign in with email"
           : "Continue"}
+      </RQButton>
+      <RQButton
+        block
+        type="default"
+        size="large"
+        className="auth-screen-sso-btn"
+        onClick={() => setAuthMode(AUTH.ACTION_LABELS.SSO)}
+      >
+        Continue with Single Sign-on (SSO)
       </RQButton>
       <div className="onboarding-terms-text">
         I agree to the Requestly{" "}
