@@ -82,7 +82,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (rule: RuleTableRecord) => {
-        console.log({ rule });
         return isRule(rule) ? (
           <Link to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${rule.id}`} state={{ source: "my_rules" }}>
             {rule.name}

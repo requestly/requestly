@@ -13,7 +13,7 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RootComponent from "components/redirects/RootComponent";
 
 // V2 Imports
-import RulesListContainer from "./screens/rulesList";
+import RulesListIndexView from "./screens/rulesList";
 import RulesContainerV2 from "./container";
 
 export const ruleRoutes: RouteObject[] = [
@@ -28,7 +28,7 @@ export const ruleRoutes: RouteObject[] = [
       {
         index: true,
         path: PATHS.RULES.MY_RULES.RELATIVE,
-        element: <RulesListContainer />,
+        element: <RulesListIndexView />,
       },
       {
         path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
@@ -70,7 +70,7 @@ export const ruleRoutes: RouteObject[] = [
     children: [
       {
         path: "my-rules",
-        element: <RulesListContainer />,
+        element: <RulesListIndexView />,
       },
     ],
   },
