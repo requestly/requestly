@@ -11,3 +11,8 @@
 .desktop-port-update-btn {
   margin-top: 8px;
 }
+
+.desktop-settings-container {
+  padding: 2rem;
+  padding-top: 1rem;
+}

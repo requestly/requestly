@@ -3,6 +3,7 @@
   padding: 12px;
   background: var(--surface-0_5);
   border-right: 1px solid var(--surface-2);
+  height: 100vh;
 }
 
 .settings-primary-sidebar-title-icon {
@@ -22,55 +23,4 @@
 
 .settings-primary-sidebar-section:not(:first-child) {
   margin-top: 1rem;
-}
-
-.settings-primary-sidebar-section,
-.settings-secondary-sidebar-section {
-  &-header {
-    margin-bottom: 8px;
-
-    &-icon {
-      position: relative;
-      top: 3px;
-      font-size: 1.125rem;
-
-      & svg {
-        color: var(--neutrals-gray-300);
-      }
-    }
-
-    &-title {
-      color: var(--neutrals-gray-300);
-      letter-spacing: 0.25px;
-    }
-  }
-
-  &-link {
-    display: block;
-    color: var(--white);
-    padding: 6px 8px;
-    margin-top: 4px;
-    border-radius: 4px;
-    cursor: pointer;
-    line-height: 18px;
-    transition: 0.25s background ease-in-out;
-
-    &:hover {
-      background: var(--surface-1);
-      border-radius: 4px;
-      color: var(--white);
-    }
-  }
-
-  &-active-link {
-    background: var(--surface-2);
-    border-radius: 4px;
-    color: var(--white);
-
-    &:hover {
-      background: var(--surface-2);
-      border-radius: 4px;
-      color: var(--white);
-    }
-  }
 }

@@ -107,78 +107,85 @@ export const OtherBillingTeamDetails: React.FC = () => {
   }, [hasBillingIdChanged]);
 
   return (
-    <>
-      <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
-      <Col className="billing-teams-primary-card mt-8">
-        <Row className="items-center other-team-members-table-header" align="middle" justify="space-between" gutter={8}>
-          <Col>
-            <Row align="middle" gutter={8}>
-              <Col
-                style={{
-                  paddingRight: 0,
-                  paddingLeft: 0,
-                }}
-              >
-                <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
-              </Col>
-              <Col>
-                <Popover
-                  overlayClassName="team-details-popover"
-                  open={isPlanDetailsPopoverOpen}
-                  content={
-                    <TeamDetailsPopover
-                      teamDetails={billingTeamDetails}
-                      closePopover={() => setIsPlanDetailsPopoverOpen(false)}
-                    />
-                  }
-                  showArrow={false}
-                  trigger="click"
-                  placement="bottomLeft"
-                  title={null}
-                >
-                  <RQButton
-                    type="text"
-                    size="small"
-                    className="view-team-details-btn"
-                    onClick={() => setIsPlanDetailsPopoverOpen(true)}
-                  >
-                    View details
-                  </RQButton>
-                </Popover>
-              </Col>
-            </Row>
-          </Col>
-
-          {!hasJoinedAnyTeam && (
+    <div className="display-row-center w-full">
+      <div className="w-full" style={{ maxWidth: "1000px" }}>
+        <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
+        <Col className="billing-teams-primary-card mt-8">
+          <Row
+            className="items-center other-team-members-table-header"
+            align="middle"
+            justify="space-between"
+            gutter={8}
+          >
             <Col>
-              {isRequestSent ? (
-                <div className="success display-flex items-center">
-                  <MdCheck style={{ marginRight: "4px" }} />
-                  Request sent
-                </div>
-              ) : (
-                <RQButton
-                  loading={isRequestingToJoin}
-                  className="request-billing-team-btn"
-                  type="default"
-                  icon={<IoMdAdd />}
-                  onClick={handleSendRequest}
+              <Row align="middle" gutter={8}>
+                <Col
+                  style={{
+                    paddingRight: 0,
+                    paddingLeft: 0,
+                  }}
                 >
-                  Request to add
-                </RQButton>
-              )}
+                  <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
+                </Col>
+                <Col>
+                  <Popover
+                    overlayClassName="team-details-popover"
+                    open={isPlanDetailsPopoverOpen}
+                    content={
+                      <TeamDetailsPopover
+                        teamDetails={billingTeamDetails}
+                        closePopover={() => setIsPlanDetailsPopoverOpen(false)}
+                      />
+                    }
+                    showArrow={false}
+                    trigger="click"
+                    placement="bottomLeft"
+                    title={null}
+                  >
+                    <RQButton
+                      type="text"
+                      size="small"
+                      className="view-team-details-btn"
+                      onClick={() => setIsPlanDetailsPopoverOpen(true)}
+                    >
+                      View details
+                    </RQButton>
+                  </Popover>
+                </Col>
+              </Row>
             </Col>
-          )}
-        </Row>
-        <Table
-          className="billing-table"
-          dataSource={membersTableSource}
-          columns={columns}
-          pagination={false}
-          scroll={{ y: "65vh" }}
-          loading={!billingTeamMembers}
-        />
-      </Col>
-    </>
+
+            {!hasJoinedAnyTeam && (
+              <Col>
+                {isRequestSent ? (
+                  <div className="success display-flex items-center">
+                    <MdCheck style={{ marginRight: "4px" }} />
+                    Request sent
+                  </div>
+                ) : (
+                  <RQButton
+                    loading={isRequestingToJoin}
+                    className="request-billing-team-btn"
+                    type="default"
+                    icon={<IoMdAdd />}
+                    onClick={handleSendRequest}
+                  >
+                    Request to add
+                  </RQButton>
+                )}
+              </Col>
+            )}
+          </Row>
+          <Table
+            className="billing-table"
+            dataSource={membersTableSource}
+            columns={columns}
+            pagination={false}
+            scroll={{ y: "65vh" }}
+            loading={!billingTeamMembers}
+          />
+        </Col>
+      </div>
+    </div>
   );
 };

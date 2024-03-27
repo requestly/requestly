@@ -48,53 +48,55 @@ export const MyBillingTeamDetails: React.FC = () => {
   if (!billingTeamDetails) return null;
 
   return (
-    <>
-      <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
-      <Col className="mt-8">
-        <TeamPlanDetails billingTeamDetails={billingTeamDetails} />
-      </Col>
-      <Col style={{ marginTop: "24px" }}>
-        <BillingTeamMembers openDrawer={() => setIsMembersDrawerOpen(true)} />
-      </Col>
-      {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member && (
-        <Col style={{ marginTop: "24px" }}>
-          <BillingInvoiceTable />
+    <div className="display-row-center w-full">
+      <div className="w-full" style={{ maxWidth: "1000px" }}>
+        <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
+        <Col className="mt-8">
+          <TeamPlanDetails billingTeamDetails={billingTeamDetails} />
         </Col>
-      )}
-      {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager && (
         <Col style={{ marginTop: "24px" }}>
-          <BillingInformation />
+          <BillingTeamMembers openDrawer={() => setIsMembersDrawerOpen(true)} />
         </Col>
-      )}
+        {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member && (
+          <Col style={{ marginTop: "24px" }}>
+            <BillingInvoiceTable />
+          </Col>
+        )}
+        {billingTeamDetails.members?.[user?.details?.profile?.uid]?.role === BillingTeamRoles.Manager && (
+          <Col style={{ marginTop: "24px" }}>
+            <BillingInformation />
+          </Col>
+        )}
 
-      <Drawer
-        placement="right"
-        onClose={() => setIsMembersDrawerOpen(false)}
-        open={isMembersDrawerOpen}
-        width={640}
-        closeIcon={null}
-        mask={false}
-        className="billing-team-members-drawer"
-      >
-        <Row className="billing-team-members-drawer-header w-full" justify="space-between" align="middle">
-          <Col className="billing-team-members-drawer-header_title">Add members in billing team</Col>
-          <Col>
-            <IoMdClose onClick={() => setIsMembersDrawerOpen(false)} />
+        <Drawer
+          placement="right"
+          onClose={() => setIsMembersDrawerOpen(false)}
+          open={isMembersDrawerOpen}
+          width={640}
+          closeIcon={null}
+          mask={false}
+          className="billing-team-members-drawer"
+        >
+          <Row className="billing-team-members-drawer-header w-full" justify="space-between" align="middle">
+            <Col className="billing-team-members-drawer-header_title">Add members in billing team</Col>
+            <Col>
+              <IoMdClose onClick={() => setIsMembersDrawerOpen(false)} />
+            </Col>
+          </Row>
+          <Col className="billing-team-members-drawer-body">
+            <OrgMembersTable source="add_members_section" />
           </Col>
-        </Row>
-        <Col className="billing-team-members-drawer-body">
-          <OrgMembersTable source="add_members_section" />
-        </Col>
-        <Row className="mt-8 billing-team-members-drawer-help" justify="space-between" align="middle">
-          <Col>
-            Couldn't find member?{" "}
-            <a className="external-link" href="mailto:contact@requestly.io">
-              Contact us
-            </a>
-            , and we'll assist you in adding your team members.
-          </Col>
-        </Row>
-      </Drawer>
-    </>
+          <Row className="mt-8 billing-team-members-drawer-help" justify="space-between" align="middle">
+            <Col>
+              Couldn't find member?{" "}
+              <a className="external-link" href="mailto:contact@requestly.io">
+                Contact us
+              </a>
+              , and we'll assist you in adding your team members.
+            </Col>
+          </Row>
+        </Drawer>
+      </div>
+    </div>
   );
 };

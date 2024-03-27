@@ -1,5 +1,20 @@
-.session-settings-container {
+/* .session-settings-container {
   max-width: 1100px;
+  padding: 2rem;
+  padding-top: 1rem;
+} */
+
+.session-settings-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.session-settings-wrapper {
+  padding: 2rem;
+  padding-top: 1rem;
+  width: 100%;
+  max-width: 1000px;
 }
 
 .session-settings-container .header {

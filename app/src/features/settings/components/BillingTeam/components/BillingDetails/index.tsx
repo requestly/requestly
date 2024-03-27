@@ -17,7 +17,7 @@ enum BillingTeamJoinRequestAction {
   REJECT = "reject",
 }
 
-export const BillingDetails = () => {
+export const BillingTeamDetails = () => {
   const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);

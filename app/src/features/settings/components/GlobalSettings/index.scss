@@ -1,3 +1,16 @@
+.global-settings-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.global-settings-wrapper {
+  padding: 2rem;
+  padding-top: 1rem;
+  width: 100%;
+  max-width: 1000px;
+}
+
 .settings-container.ant-col {
   display: flex;
   flex-direction: column;
