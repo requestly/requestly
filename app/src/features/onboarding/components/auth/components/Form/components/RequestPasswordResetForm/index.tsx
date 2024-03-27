@@ -36,11 +36,7 @@ export const RequestPasswordResetForm: React.FC<Props> = ({ setAuthMode, email, 
   return (
     <>
       <button
-        className="auth-screen-back-btn"
-        style={{
-          left: "-20px",
-          color: "var(--text-subtle)",
-        }}
+        className="auth-screen-back-btn request-new-password-back-btn"
         onClick={() => {
           setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
         }}
@@ -48,7 +44,7 @@ export const RequestPasswordResetForm: React.FC<Props> = ({ setAuthMode, email, 
         <BiArrowBack />
         <span>Back</span>
       </button>
-      <div className="text-bold text-white header mt-24">Forgot your password?</div>
+      <div className="text-bold text-white header mt-16">Forgot your password?</div>
       <div className="request-new-password-screen-text">
         Enter your email address to reset your password. You may need to check your spam folder or unblock{" "}
         <strong>no-reply@requestly.io</strong>.
