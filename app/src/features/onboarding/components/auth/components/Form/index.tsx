@@ -6,27 +6,24 @@ import googleLogo from "assets/icons/google.svg";
 // import { PersonaInput } from "../../../persona/components/PersonaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
-import { googleSignIn } from "actions/FirebaseActions";
+import { handleGoogleSignIn } from "./actions";
 import { actions } from "store";
-import { isEmailValid } from "utils/FormattingHelper";
+import { getGreeting, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
-import { submitAttrUtil } from "utils/AnalyticsUtils";
-import APP_CONSTANTS from "config/constants";
-import { getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { isNull } from "lodash";
 import "./index.scss";
 
 interface AuthFormProps {
   authMode: string;
+  email?: string;
+  isOnboarding: boolean;
+  source: string;
+  setEmail?: (email: string) => void;
   setAuthMode: (mode: string) => void;
   onSendEmailLink?: (email: string) => void;
-  email?: string;
-  fullName?: string;
-  persona?: string;
-  setEmail?: (email: string) => void;
-  setFullName?: (fullName: string) => void;
-  setPersona?: (persona: string) => void;
+  callbacks?: any;
 }
 
 interface InputProps {
@@ -58,24 +55,30 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   setAuthMode,
   onSendEmailLink,
   email,
-  fullName,
-  persona,
   setEmail,
-  setFullName,
-  setPersona,
+  isOnboarding,
+  source,
+  callbacks = null,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const appMode = useSelector(getAppMode);
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isMagicLinkLoading, setIsMagicLinkLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(null);
 
-  const handleGoogleSignIn = useCallback(() => {
+  const handleGoogleSignInButtonClick = useCallback(() => {
     setIsGoogleSignInLoading(true);
-    googleSignIn(() => {}, authMode, "app_onboarding")
+    handleGoogleSignIn(appMode, authMode, source)
       .then((result) => {
         if (result.uid) {
           setIsNewUser(result?.isNewUser || false);
+        }
+        const greatingName = result.displayName?.split(" ")?.[0];
+        !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
+
+        if (callbacks?.onSignInSuccess) {
+          callbacks.onSignInSuccess();
         }
       })
       .catch((error) => {
@@ -84,7 +87,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsGoogleSignInLoading(false);
       });
-  }, [authMode]);
+  }, [authMode, source, appMode, isOnboarding, callbacks]);
 
   const handleContinueClick = useCallback(() => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
@@ -101,16 +104,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
     setIsMagicLinkLoading(true);
     dispatch(actions.updateIsAppOnboardingStepDisabled(true));
-    if (authMode === AUTH.ACTION_LABELS.SIGN_UP) {
-      dispatch(actions.updateAppOnboardingPersona(persona));
-      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.PERSONA, persona);
-      dispatch(actions.updateAppOnboardingFullName(fullName));
-    }
     onSendEmailLink?.(email);
-  }, [authMode, email, fullName, persona, onSendEmailLink, dispatch]);
+  }, [authMode, email, onSendEmailLink, dispatch]);
 
   useEffect(() => {
-    if (user.loggedIn) {
+    if (user.loggedIn && isOnboarding) {
       if (!isNull(isNewUser)) {
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
         if (isNewUser) {
@@ -120,7 +118,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         }
       }
     }
-  }, [dispatch, user.loggedIn, isNewUser]);
+  }, [dispatch, user.loggedIn, isNewUser, isOnboarding]);
 
   return (
     <div className="w-full">
@@ -145,7 +143,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <RQButton
         type="default"
         className="onboarding-google-auth-button"
-        onClick={handleGoogleSignIn}
+        onClick={handleGoogleSignInButtonClick}
         loading={isGoogleSignInLoading}
         disabled={isMagicLinkLoading}
       >
