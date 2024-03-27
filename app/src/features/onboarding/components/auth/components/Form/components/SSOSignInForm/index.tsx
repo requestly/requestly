@@ -87,7 +87,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
           </div>
         </div>
       )}
-      <div className="text-bold text-white header mt-24">Sign in with SSO</div>
+      <div className="text-bold text-white header mt-16">Sign in with SSO</div>
       <div className="mt-24">
         <AuthFormInput
           id="email"
