@@ -49,6 +49,7 @@ const AuthModal = ({
             onSignInSuccess: callback,
             onRequestPasswordResetSuccess: toggle,
           }}
+          toggleAuthModal={toggle}
         />
       </Modal>
     </>

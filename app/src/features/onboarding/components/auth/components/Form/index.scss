@@ -106,3 +106,16 @@
     font-size: 14px;
   }
 }
+
+.auth-screen-forgot-password-btn.ant-btn {
+  text-decoration: underline;
+  color: var(--text-default);
+  padding: 0;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: var(--white);
+    text-decoration: underline;
+  }
+}
