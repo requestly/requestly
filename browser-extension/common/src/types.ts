@@ -111,7 +111,7 @@ export interface ScriptObject {
   codeType: ScriptCodeType;
   type: ScriptType;
   value: string;
-  loadTime?: "afterPageLoad" | "asSoonAsPossible";
+  loadTime?: "afterPageLoad" | "beforePageLoad" | "asSoonAsPossible";
 }
 
 export interface ScriptRulePair extends RulePair {
