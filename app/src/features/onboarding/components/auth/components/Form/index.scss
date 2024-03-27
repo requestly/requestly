@@ -26,8 +26,12 @@
   margin-top: 24px;
   background-color: #383838;
   border: none;
-  padding: 8px initial;
+  padding: 8px;
   height: auto;
+
+  & span {
+    font-size: 14px;
+  }
 
   &:hover,
   &:active,
@@ -89,4 +93,16 @@
 
 .onboarding-continue-button.ant-btn {
   font-weight: 500;
+  & span {
+    font-size: 14px;
+  }
+}
+
+.auth-screen-sso-btn.ant-btn {
+  margin-top: 24px;
+  font-weight: 500;
+
+  & span {
+    font-size: 14px;
+  }
 }
