@@ -37,7 +37,7 @@ const processManifest = (content) => {
       reload: {
         description: "Reload extension in development mode",
         suggested_key: {
-          default: "Alt+Shift+T",
+          default: "Alt+T",
         },
       },
     };
