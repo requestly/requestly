@@ -1,19 +1,27 @@
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Divider, Row, Col, Tooltip } from "antd";
-import { RQButton, RQInput } from "lib/design-system/components";
+import { RQButton } from "lib/design-system/components";
+import { AuthFormInput } from "./components/AuthFormInput";
 import googleLogo from "assets/icons/google.svg";
 // import { PersonaInput } from "../../../persona/components/PersonaInput";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
 import AUTH from "config/constants/sub/auth";
-import { handleGoogleSignIn } from "./actions";
+import { handleEmailSignIn, handleEmailSignUp, handleGoogleSignIn } from "./actions";
 import { actions } from "store";
 import { getGreeting, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { isNull } from "lodash";
+import { sendEmailLinkForSignin } from "actions/FirebaseActions";
+import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm/MagicAuthLinkModal/actions";
+import Logger from "lib/logger";
+// @ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.scss";
+import APP_CONSTANTS from "config/constants";
+import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils";
 
 interface AuthFormProps {
   authMode: string;
@@ -22,50 +30,40 @@ interface AuthFormProps {
   source: string;
   setEmail?: (email: string) => void;
   setAuthMode: (mode: string) => void;
-  onSendEmailLink?: (email: string) => void;
+  setIsVerifyEmailPopupVisible?: (flag: boolean) => void;
   callbacks?: any;
 }
 
-interface InputProps {
-  id?: string;
-  value: string;
-  label: ReactNode | string;
-  placeholder: string;
-  onValueChange: (value: string) => void;
-  onPressEnter?: () => void;
-}
-
-const FormInput: React.FC<InputProps> = ({ id, value, label, placeholder, onValueChange, onPressEnter }) => {
-  return (
-    <div className="onboarding-form-input">
-      {typeof label === "string" ? <label htmlFor={id}>{label}</label> : label}
-      <RQInput
-        onPressEnter={onPressEnter}
-        placeholder={placeholder}
-        id={id}
-        value={value}
-        onChange={(e) => onValueChange(e.target.value)}
-      />
-    </div>
-  );
-};
-
 export const AuthForm: React.FC<AuthFormProps> = ({
   authMode,
-  setAuthMode,
-  onSendEmailLink,
   email,
-  setEmail,
+  setAuthMode,
   isOnboarding,
+  setIsVerifyEmailPopupVisible,
+  setEmail,
   source,
   callbacks = null,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const [password, setPassword] = useState("");
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
-  const [isMagicLinkLoading, setIsMagicLinkLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(null);
+
+  const handleSendEmailLink = useCallback(() => {
+    if (email) {
+      sendEmailLinkForSignin(email, source)
+        .then(() => {
+          updateTimeToResendEmailLogin(dispatch, 30);
+          setIsVerifyEmailPopupVisible(true);
+        })
+        .catch((error) => {
+          Logger.log(error);
+        });
+    }
+  }, [email, source, dispatch, setIsVerifyEmailPopupVisible]);
 
   const handleGoogleSignInButtonClick = useCallback(() => {
     setIsGoogleSignInLoading(true);
@@ -89,7 +87,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       });
   }, [authMode, source, appMode, isOnboarding, callbacks]);
 
-  const handleContinueClick = useCallback(() => {
+  const handleMagicLinkAuthClick = useCallback(() => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
       if (!email) {
         toast.error("Please enter your email address");
@@ -102,10 +100,65 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       }
     }
 
-    setIsMagicLinkLoading(true);
+    setIsLoading(true);
     dispatch(actions.updateIsAppOnboardingStepDisabled(true));
-    onSendEmailLink?.(email);
-  }, [authMode, email, onSendEmailLink, dispatch]);
+    handleSendEmailLink();
+  }, [authMode, email, handleSendEmailLink, dispatch]);
+
+  const handleEmailPasswordSignUp = useCallback(() => {
+    setIsLoading(true);
+    handleEmailSignUp(email, password, null, source)
+      .then(({ status }) => {
+        if (status) {
+          handleEmailSignIn(email, password, true, source)
+            .then(({ result }) => {
+              if (result.user.uid) {
+                const greatingName = result.user.displayName?.split(" ")?.[0];
+                !isOnboarding &&
+                  toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
+                setEmail("");
+                setPassword("");
+                callbacks && callbacks?.onSignInSuccess(result.user.uid, true);
+              }
+            })
+            .catch((err) => {
+              toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, err.errorCode));
+              setEmail("");
+              setPassword("");
+            });
+        }
+      })
+      .catch((err) => {
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_UP, err.errorCode));
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [email, password, source, isOnboarding, callbacks, setEmail, setPassword]);
+
+  const handleEmailPasswordSignIn = useCallback(() => {
+    setIsLoading(true);
+    handleEmailSignIn(email, password, false, source)
+      .then(({ result }) => {
+        if (result.user.uid) {
+          const greatingName = result.user.displayName?.split(" ")?.[0];
+          !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
+          setEmail("");
+          setPassword("");
+          callbacks && callbacks?.onSignInSuccess(result.user.uid, true);
+        } else {
+          toast.error("Sorry we couldn't log you in. Can you please retry?");
+        }
+      })
+      .catch((err) => {
+        toast.error(getAuthErrorMessage(AuthTypes.SIGN_IN, err.errorCode));
+        setEmail("");
+        setPassword("");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [email, password, source, isOnboarding, callbacks, setEmail, setPassword]);
 
   useEffect(() => {
     if (user.loggedIn && isOnboarding) {
@@ -145,7 +198,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         className="onboarding-google-auth-button"
         onClick={handleGoogleSignInButtonClick}
         loading={isGoogleSignInLoading}
-        disabled={isMagicLinkLoading}
+        disabled={isLoading}
       >
         <img src={googleLogo} alt="google" />
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
@@ -154,7 +207,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         or {authMode === AUTH.ACTION_LABELS.SIGN_UP ? " sign up with email" : "sign in with email"}
       </Divider>
 
-      <FormInput
+      <AuthFormInput
         id="work-email"
         value={email}
         onValueChange={(email) => setEmail(email)}
@@ -173,35 +226,43 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             </Row>
           </label>
         }
-        onPressEnter={handleContinueClick}
+        onPressEnter={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? handleMagicLinkAuthClick : null}
       />
-      {/* {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
-        <>
-          <div className="mt-16">
-            <PersonaInput value={persona} onValueChange={(value) => setPersona(value)} />
-            <div className="persona-input-byline">Help us optimizing your Requestly experience</div>
-          </div>
-          <div className="mt-16">
-            <FormInput
-              id="full-name"
-              value={fullName}
-              onValueChange={(name) => setFullName(name)}
-              placeholder="E.g., John Doe"
-              label="Your full name"
-            />
-          </div>
-        </>
-      )} */}
+      {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
+        <div className="mt-16">
+          <AuthFormInput
+            id="password"
+            type="password"
+            value={password}
+            onValueChange={(value) => setPassword(value)}
+            placeholder="Enter your password here"
+            label="Password"
+            onPressEnter={
+              authMode === AUTH.ACTION_LABELS.SIGN_UP ? handleEmailPasswordSignUp : handleEmailPasswordSignIn
+            }
+          />
+        </div>
+      )}
 
       <RQButton
         type="primary"
         size="large"
         className="w-full mt-16 onboarding-continue-button"
-        onClick={handleContinueClick}
-        loading={isMagicLinkLoading}
+        onClick={
+          appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+            ? authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
+              ? handleEmailPasswordSignUp
+              : handleEmailPasswordSignIn
+            : handleMagicLinkAuthClick
+        }
+        loading={isLoading}
         disabled={isGoogleSignInLoading}
       >
-        Continue
+        {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+          ? authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
+            ? "Create new account"
+            : "Sign in with email"
+          : "Continue"}
       </RQButton>
       <div className="onboarding-terms-text">
         I agree to the Requestly{" "}
