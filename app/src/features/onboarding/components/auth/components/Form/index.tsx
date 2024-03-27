@@ -179,7 +179,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   }, [dispatch, user.loggedIn, isNewUser, isOnboarding]);
 
   if (authMode === AUTH.ACTION_LABELS.SSO) {
-    return <SSOSignInForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} />;
+    return <SSOSignInForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} source={source} />;
   }
 
   if (authMode === AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD) {

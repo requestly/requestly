@@ -6,17 +6,21 @@ import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { getDomainFromEmail, isEmailValid } from "utils/FormattingHelper";
+import { getDomainFromEmail, getEmailType, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
+import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
+import { AUTH_PROVIDERS } from "modules/analytics/constants";
+import { trackLoginWithSSOClicked } from "features/onboarding/components/auth/analytics";
 import "./index.scss";
 
 interface Props {
   email: string;
   setAuthMode: (authMode: string) => void;
   setEmail: (userEmail: string) => void;
+  source: string;
 }
 
-export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail }) => {
+export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, source }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isNoConnectionFoundCardVisible, setIsNoConnectionFoundCardVisible] = useState(false);
   const domain = getDomainFromEmail(email);
@@ -31,6 +35,15 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail })
       toast.error("Please enter a valid email");
       return;
     }
+    trackLoginAttemptedEvent({
+      auth_provider: AUTH_PROVIDERS.SSO,
+      email,
+      place: window.location.href,
+      email_type: getEmailType(email),
+      domain: getDomainFromEmail(email),
+      source,
+    });
+    trackLoginWithSSOClicked();
 
     setIsLoading(true);
     const captureSSOInterest = httpsCallable(getFunctions(), "auth-captureSSOInterest");
@@ -46,7 +59,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail })
         setIsLoading(false);
         setIsNoConnectionFoundCardVisible(true);
       });
-  }, [email]);
+  }, [email, source]);
 
   return (
     <>

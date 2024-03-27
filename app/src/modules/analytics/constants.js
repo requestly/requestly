@@ -15,4 +15,5 @@ export const AUTH_PROVIDERS = {
   APPLE: "apple",
   MICROSOFT: "microsoft",
   EMAIL_LINK: "email_link",
+  SSO: "sso",
 };
