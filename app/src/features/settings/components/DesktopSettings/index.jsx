@@ -65,7 +65,7 @@ export const DesktopSettings = () => {
 
   // add loader
   return appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-    <>
+    <div className="desktop-settings-container">
       <div className="settings-header header">🖥️ Desktop Settings</div>
       <p className="text-gray text-sm settings-caption">Following are desktop preference settings</p>
 
@@ -143,6 +143,6 @@ export const DesktopSettings = () => {
           </Row>
         </>
       ) : null}
-    </>
+    </div>
   ) : null;
 };

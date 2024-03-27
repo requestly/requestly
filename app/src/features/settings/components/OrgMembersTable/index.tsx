@@ -92,44 +92,46 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ source }) => {
   );
 
   return (
-    <Col className="org-member-table">
-      <Col className="org-member-table-header">
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search members"
-          className="org-member-table-header-input"
-          suffix={<SearchOutlined />}
+    <Col>
+      <Col className="org-member-table">
+        <Col className="org-member-table-header">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search members"
+            className="org-member-table-header-input"
+            suffix={<SearchOutlined />}
+          />
+        </Col>
+        <Table
+          className="billing-table"
+          dataSource={searchedMembers}
+          columns={columns}
+          pagination={false}
+          scroll={{ y: "74vh" }}
+          loading={!organizationMembers?.users}
+          locale={{
+            emptyText: (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  !organizationMembers?.users.length ? (
+                    <>
+                      Couldn't find member?{" "}
+                      <a className="external-link" href="mailto:contact@requestly.io">
+                        Contact us
+                      </a>{" "}
+                      and we'll assist you in adding your team members.
+                    </>
+                  ) : (
+                    "No member found"
+                  )
+                }
+              />
+            ),
+          }}
         />
       </Col>
-      <Table
-        className="billing-table"
-        dataSource={searchedMembers}
-        columns={columns}
-        pagination={false}
-        scroll={{ y: "74vh" }}
-        loading={!organizationMembers?.users}
-        locale={{
-          emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={
-                !organizationMembers?.users.length ? (
-                  <>
-                    Couldn't find member?{" "}
-                    <a className="external-link" href="mailto:contact@requestly.io">
-                      Contact us
-                    </a>{" "}
-                    and we'll assist you in adding your team members.
-                  </>
-                ) : (
-                  "No member found"
-                )
-              }
-            />
-          ),
-        }}
-      />
     </Col>
   );
 };

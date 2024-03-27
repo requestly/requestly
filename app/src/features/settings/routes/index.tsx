@@ -9,10 +9,10 @@ import ConfigurationPage from "views/features/sessions/ConfigurationPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { BillingTeam } from "../components/BillingTeam";
+import { BillingTeamContainer } from "../components/BillingTeam";
 import { OrgMembersView } from "../components/OrgMembers";
 import Profile from "../components/Profile/ManageAccount";
-import { BillingDetails } from "../components/BillingTeam/components/BillingDetails";
+import { BillingTeamDetails } from "../components/BillingTeam/components/BillingDetails";
 
 const isSessionsNewSettingsPageCompatible = isFeatureCompatible(FEATURES.SESSION_ONBOARDING);
 
@@ -45,12 +45,15 @@ export const settingRoutes: RouteObject[] = [
       },
       {
         path: PATHS.SETTINGS.BILLING.RELATIVE,
-        element: <BillingTeam />,
+        element: <BillingTeamContainer />,
+        children: [
+          {
+            path: PATHS.SETTINGS.BILLING.RELATIVE + "/:billingId",
+            element: <BillingTeamDetails />,
+          },
+        ],
       },
-      {
-        path: PATHS.SETTINGS.BILLING.RELATIVE + "/:billingId",
-        element: <BillingDetails />,
-      },
+
       {
         path: PATHS.SETTINGS.PROFILE.RELATIVE,
         element: <ProtectedRoute component={Profile} />,
