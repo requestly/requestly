@@ -116,7 +116,7 @@ export interface ScriptObject {
   codeType: ScriptCodeType;
   type: ScriptType;
   value: string;
-  loadTime?: "afterPageLoad" | "beforePageLoad";
+  loadTime?: "afterPageLoad" | "beforePageLoad" | "asSoonAsPossible";
   attributes?: ScriptAttributes[];
 }
 

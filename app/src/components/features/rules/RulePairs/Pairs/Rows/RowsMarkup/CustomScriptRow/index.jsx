@@ -13,6 +13,7 @@ import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getDefaultScriptRender, createRenderedScript } from "./utils";
+import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 
 const { Text } = Typography;
 
@@ -278,8 +279,10 @@ const CustomScriptRow = ({
         type: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD,
       },
       {
-        title: "Before Page Load",
-        type: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD,
+        title: isExtensionManifestVersion3() ? "As Soon As Possible" : "Before Page Load",
+        type: isExtensionManifestVersion3()
+          ? GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AS_SOON_AS_POSSIBLE
+          : GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD,
       },
     ],
     []
@@ -447,6 +450,8 @@ const CustomScriptRow = ({
                   >
                     {script.loadTime === GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
                       ? "After Page Load"
+                      : isExtensionManifestVersion3()
+                      ? "As Soon As Possible"
                       : "Before Page Load"}{" "}
                     <DownOutlined />
                   </Text>
