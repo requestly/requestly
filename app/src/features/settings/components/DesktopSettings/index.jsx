@@ -66,83 +66,85 @@ export const DesktopSettings = () => {
   // add loader
   return appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
     <div className="desktop-settings-container">
-      <div className="settings-header header">🖥️ Desktop Settings</div>
-      <p className="text-gray text-sm settings-caption">Following are desktop preference settings</p>
+      <div className="desktop-settings-wrapper">
+        <div className="settings-header header">🖥️ Desktop Settings</div>
+        <p className="text-gray text-sm settings-caption">Following are desktop preference settings</p>
 
-      <div>
-        {isFeatureCompatible(FEATURES.DESKTOP_USER_PREFERENCES) ? (
-          <Row className="w-full" align="middle" gutter={8}>
-            <Col
-              span={13}
-              xs={{ span: 17 }}
-              sm={{ span: 16 }}
-              md={{ span: 15 }}
-              lg={{ span: 14 }}
-              xl={{ span: 13 }}
-              flex="0 1 420px"
-              align="left"
-            >
-              <label className="caption text-bold desktop-setting-port-input-label">Set default proxy port</label>
-              <Input
-                value={portInput}
-                disabled={portSubmitLoading}
-                placeholder="Enter New Port"
-                className="desktop-setting-port-input"
-                onChange={(e) => setPortInput(e.target.value)}
-              />
-
-              <Popconfirm
-                okText="Continue"
-                cancelText="No"
-                placement="topLeft"
-                title="Browsers launched from Requestly will be closed. Do you want to proceed?"
-                onConfirm={handlePortChange}
-                onCancel={trackUserDeniedClosingLaunchedApps}
+        <div>
+          {isFeatureCompatible(FEATURES.DESKTOP_USER_PREFERENCES) ? (
+            <Row className="w-full" align="middle" gutter={8}>
+              <Col
+                span={13}
+                xs={{ span: 17 }}
+                sm={{ span: 16 }}
+                md={{ span: 15 }}
+                lg={{ span: 14 }}
+                xl={{ span: 13 }}
+                flex="0 1 420px"
+                align="left"
               >
-                <Button className="desktop-port-update-btn" onClick={trackProxyPortChangeRequested}>
-                  Update
-                </Button>
-              </Popconfirm>
-            </Col>
-          </Row>
-        ) : (
-          <Row className="w-full" align="middle" gutter={8}>
-            <Alert
-              message="Upgrade to latest version"
-              description="You will be able to edit preferences like proxy port only on the latest version of the desktop app. Please get the latest release from our website here 👉🏻"
-              type="info"
-              showIcon
-              action={
-                <Button type="link" size="small" icon={<LinkOutlined />}>
-                  https://requestly.com/desktop
-                </Button>
-              }
-            />
-          </Row>
-        )}
-      </div>
+                <label className="caption text-bold desktop-setting-port-input-label">Set default proxy port</label>
+                <Input
+                  value={portInput}
+                  disabled={portSubmitLoading}
+                  placeholder="Enter New Port"
+                  className="desktop-setting-port-input"
+                  onChange={(e) => setPortInput(e.target.value)}
+                />
 
-      {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) ? (
-        <>
-          <Row align="middle" className="w-full mt-16 setting-item-container">
-            <Col span={22}>
-              <div className="title">Regenerate SSL Certificate</div>
-              <p className="setting-item-caption">
-                If you face certificate trust issues, regenerating the proxy certificates will reset the trust settings
-                in your certificate store.
-              </p>
-            </Col>
-            <Col span={2}>
-              <Tooltip title="The app needs to be relaunched after this">
-                <RQButton type="default" onClick={regenerateRootCa}>
-                  {" "}
-                  Regenerate{" "}
-                </RQButton>
-              </Tooltip>
-            </Col>
-          </Row>
-        </>
-      ) : null}
+                <Popconfirm
+                  okText="Continue"
+                  cancelText="No"
+                  placement="topLeft"
+                  title="Browsers launched from Requestly will be closed. Do you want to proceed?"
+                  onConfirm={handlePortChange}
+                  onCancel={trackUserDeniedClosingLaunchedApps}
+                >
+                  <Button className="desktop-port-update-btn" onClick={trackProxyPortChangeRequested}>
+                    Update
+                  </Button>
+                </Popconfirm>
+              </Col>
+            </Row>
+          ) : (
+            <Row className="w-full" align="middle" gutter={8}>
+              <Alert
+                message="Upgrade to latest version"
+                description="You will be able to edit preferences like proxy port only on the latest version of the desktop app. Please get the latest release from our website here 👉🏻"
+                type="info"
+                showIcon
+                action={
+                  <Button type="link" size="small" icon={<LinkOutlined />}>
+                    https://requestly.com/desktop
+                  </Button>
+                }
+              />
+            </Row>
+          )}
+        </div>
+
+        {isFeatureCompatible(FEATURES.REGENERATE_SSL_CERTS) ? (
+          <>
+            <Row align="middle" className="w-full mt-16 setting-item-container">
+              <Col span={22}>
+                <div className="title">Regenerate SSL Certificate</div>
+                <p className="setting-item-caption">
+                  If you face certificate trust issues, regenerating the proxy certificates will reset the trust
+                  settings in your certificate store.
+                </p>
+              </Col>
+              <Col span={2}>
+                <Tooltip title="The app needs to be relaunched after this">
+                  <RQButton type="default" onClick={regenerateRootCa}>
+                    {" "}
+                    Regenerate{" "}
+                  </RQButton>
+                </Tooltip>
+              </Col>
+            </Row>
+          </>
+        ) : null}
+      </div>
     </div>
   ) : null;
 };
