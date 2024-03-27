@@ -164,6 +164,7 @@ enum ScriptType {
 enum ScriptLoadTime {
   BEFORE_PAGE_LOAD = "beforePageLoad",
   AFTER_PAGE_LOAD = "afterPageLoad",
+  AS_SOON_AS_POSSIBLE = "asSoonAsPossible",
 }
 
 enum ScriptValueType {
