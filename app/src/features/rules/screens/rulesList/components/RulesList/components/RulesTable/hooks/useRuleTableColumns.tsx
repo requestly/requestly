@@ -4,9 +4,8 @@ import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentTableProps } from "componentsV2/ContentList/ContentListTable/ContentListTable";
 import { RuleTableRecord } from "../types";
-import useRuleTableActions from "./useRuleTableActions";
 import { getAllRecordsMap } from "store/features/rules/selectors";
-import { RecordStatus, Rule } from "features/rules/types/rules";
+import { Group, RecordStatus, Rule } from "features/rules/types/rules";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { UserIcon } from "components/common/UserIcon";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -19,34 +18,29 @@ import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import PATHS from "config/constants/sub/paths";
-import { isRule } from "../utils";
+import { isRule, isGroup } from "features/rules/utils";
 import { trackRulesListActionsClicked } from "features/rules/analytics";
-import { checkIsRuleGroupDisabled, isGroup } from "../utils/rules";
+import { checkIsRuleGroupDisabled } from "../utils/rules";
 import { trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import APP_CONSTANTS from "config/constants";
+import { useRulesActionContext } from "features/rules/context/actions";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
   const {
-    handleRecordsStatusToggle,
-    handleRecordsShare,
-    handleRecordDuplicate,
-    handleRecordsDelete,
-    handleRecordRename,
-    handleRecordsChangeGroup,
-    handleRecordsPin,
-    handleGroupDelete,
-  } = useRuleTableActions();
-
-  // TODO: Can be improved
-  // const isStatusEnabled = !(options && options.disableStatus);
+    recordsChangeGroupAction,
+    recordsShareAction,
+    recordsDeleteAction,
+    recordsStatusToggleAction,
+    recordDuplicateAction,
+    recordRenameAction,
+    groupDeleteAction,
+    recordsPinAction,
+  } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
-  // const areActionsEnabled = !(options && options.disableActions);
-  // const isFavouritingAllowed = !(options && options.disableFavourites);
-  // const isAlertOptionsAllowed = !(options && options.disableAlertActions);
 
   /**
    * - make rule name clickable and navigate to editor.
@@ -73,7 +67,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               onClick={(e) => {
                 e.stopPropagation();
                 if (isEditingEnabled) {
-                  handleRecordsPin([record]);
+                  recordsPinAction([record]);
                 }
               }}
             />
@@ -88,6 +82,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (rule: RuleTableRecord) => {
+        console.log({ rule });
         return isRule(rule) ? (
           <Link to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${rule.id}`} state={{ source: "my_rules" }}>
             {rule.name}
@@ -153,7 +148,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               }
               featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME} rule`}
               popoverPlacement="left"
-              onContinue={() => handleRecordsStatusToggle([record])}
+              onContinue={() => recordsStatusToggleAction([record])}
               source="rule_list_status_switch"
               onClickCallback={() => trackRuleToggleAttempted(record.status)}
             >
@@ -173,7 +168,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
               onChange={(checked, e) => {
                 e.stopPropagation();
-                handleRecordsStatusToggle([record]);
+                recordsStatusToggleAction([record]);
               }}
             />
           );
@@ -212,7 +207,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleRecordRename(record);
+              recordRenameAction(record);
             },
             label: (
               <Row>
@@ -227,7 +222,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleGroupDelete(record);
+              groupDeleteAction(record as Group);
             },
             label: (
               <Row>
@@ -243,7 +238,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleRecordsChangeGroup([record]);
+              recordsChangeGroupAction([record]);
             },
             label: (
               <Row>
@@ -255,7 +250,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             key: 1,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleRecordDuplicate(record as Rule);
+              recordDuplicateAction(record as Rule);
             },
             label: (
               <Row>
@@ -269,7 +264,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleRecordsDelete([record]);
+              recordsDeleteAction([record]);
             },
             label: (
               <Row>
@@ -287,7 +282,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 icon={<MdOutlineShare />}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleRecordsShare(record);
+                  recordsShareAction([record]);
                 }}
               />
             ) : null}

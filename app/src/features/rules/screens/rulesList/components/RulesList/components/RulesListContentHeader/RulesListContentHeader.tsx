@@ -12,23 +12,17 @@ import { RecordStatus, StorageRecord } from "features/rules/types/rules";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import { RuleType } from "types";
-import { isRule } from "../RulesTable/utils";
+import { isRule } from "features/rules/utils";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { RiCheckLine } from "@react-icons/all-files/ri/RiCheckLine";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { redirectToCreateNewRule } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
-import useRuleTableActions from "../RulesTable/hooks/useRuleTableActions";
-import {
-  trackNewRuleButtonClicked,
-  trackRuleCreationWorkflowStartedEvent,
-} from "modules/analytics/events/common/rules";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import { useDebounce } from "hooks/useDebounce";
 import { trackRulesListFilterApplied, trackRulesListSearched } from "features/rules/analytics";
+import { useRulesActionContext } from "features/rules/context/actions";
 
 interface Props {
   searchValue: string;
@@ -39,24 +33,11 @@ interface Props {
 }
 
 const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, filter, setFilter, records }) => {
-  const navigate = useNavigate();
   const { getFeatureLimitValue } = useFeatureLimiter();
-  const { handleRecordsImport, handleGroupCreate } = useRuleTableActions();
   const user = useSelector(getUserAuthDetails);
   const debouncedTrackRulesListSearched = useDebounce(trackRulesListSearched, 500);
 
-  const handleNewRuleOnClick = useCallback(
-    async (ruleType?: any, source = SOURCE.RULE_TABLE_CREATE_NEW_RULE_BUTTON) => {
-      if (ruleType) {
-        trackRuleCreationWorkflowStartedEvent(ruleType, source);
-      } else {
-        trackNewRuleButtonClicked("in_app");
-      }
-      redirectToCreateNewRule(navigate, ruleType, "my_rules");
-      return;
-    },
-    [navigate]
-  );
+  const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
 
   const dropdownOverlay = useMemo(() => {
     // FIXME: RuleType needed?
@@ -72,7 +53,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           .map(({ ID, TYPE, ICON, NAME }) => (
             <PremiumFeature
               popoverPlacement="topLeft"
-              onContinue={() => handleNewRuleOnClick(TYPE, SOURCE.DROPDOWN)}
+              onContinue={() => createRuleAction(TYPE, SOURCE.DROPDOWN)}
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
               featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
               source="rule_selection_dropdown"
@@ -91,7 +72,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           ))}
       </Menu>
     );
-  }, [handleNewRuleOnClick, getFeatureLimitValue]);
+  }, [createRuleAction, getFeatureLimitValue]);
 
   const buttonData = [
     {
@@ -100,7 +81,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       tourId: "rule-table-create-group-btn",
       buttonText: "New Group",
       icon: <RiFolderAddLine className="anticon" />,
-      onClickHandler: handleGroupCreate,
+      onClickHandler: createGroupAction,
     },
     {
       isTooltipShown: true,
@@ -108,7 +89,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       buttonText: "Import",
       authSource: SOURCE.UPLOAD_RULES,
       icon: <DownloadOutlined />,
-      onClickHandler: handleRecordsImport,
+      onClickHandler: importRecordsAction,
       trackClickEvent: () => {
         trackUploadRulesButtonClicked(SOURCE.RULES_LIST);
       },
@@ -118,7 +99,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       isTooltipShown: false,
       buttonText: "New Rule",
       icon: <DownOutlined />,
-      onClickHandler: handleNewRuleOnClick,
+      onClickHandler: createRuleAction,
       isDropdown: true,
       overlay: dropdownOverlay,
     },

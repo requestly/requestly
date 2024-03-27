@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Col, Button, Space } from "antd";
 import { NewRuleSelector } from "../../NewRuleSelector";
-import { ImportRulesModal } from "../../RulesTable/components/modals/ImportRulesModal";
+import { ImportRulesModal } from "../../../../../../../modals/ImportRulesModal";
 import ProCard from "@ant-design/pro-card";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import { useNavigate } from "react-router-dom";

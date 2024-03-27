@@ -1,15 +1,6 @@
+import { isGroup, isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../types";
-import { Rule, StorageRecord, RecordStatus, RecordType, Group } from "features/rules/types/rules";
-
-// TODO: Move this to features/rules
-export const isRule = (record: StorageRecord): record is Rule => {
-  return record.objectType === RecordType.RULE;
-};
-
-// TODO: Move this to features/rules
-export const isGroup = (record: StorageRecord): record is Group => {
-  return record.objectType === RecordType.GROUP;
-};
+import { Rule, StorageRecord, RecordStatus, Group } from "features/rules/types/rules";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
@@ -20,43 +11,6 @@ export const convertToArray = <T>(record: T | T[]): T[] => {
   return Array.isArray(record) ? record : [record];
 };
 
-// export const getActiveRecords = (records: StorageRecord[]): StorageRecord[] => {
-//   const activeRecords: StorageRecord[] = [];
-//   const seenGroupIds = new Set<Group["id"]>();
-//   const allActiveRules: Rule[] = [];
-//   const groups: Record<string, Group> = {};
-
-//   records.forEach((record) => {
-//     if (isRule(record) && record.status === RecordStatus.ACTIVE) {
-//       allActiveRules.push(record);
-//     } else if (isGroup(record)) {
-//       groups[record.id] = record;
-//     }
-//   });
-
-//   allActiveRules.forEach((activeRule) => {
-//     if (activeRule.groupId && groups[activeRule.groupId] && !seenGroupIds.has(activeRule.groupId)) {
-//       activeRecords.push(groups[activeRule.groupId]);
-//       seenGroupIds.add(activeRule.groupId);
-//     }
-//   });
-//   return [...activeRecords, ...allActiveRules];
-// };
-
-// export const getPinnedRecords = (recordsMap: Record<string, StorageRecord>) => {
-//   let pinnedRecords: StorageRecord[] = [];
-
-//   Object.values(recordsMap).forEach((record) => {
-//     //If a group is pinned then show all the rules in that group (irrespective of whether they are pinned or not)
-//     if (record.isFavourite || (isRule(record) && record.groupId && recordsMap[record.groupId].isFavourite)) {
-//       pinnedRecords.push(record);
-//     }
-//   });
-
-//   return pinnedRecords;
-// };
-
-// ✅
 // FIXME: Performance Improvements
 export const recordsToContentTableRecordsAdapter = (records: StorageRecord[]): RuleTableRecord[] => {
   const adaptedRecordMap: { [id: StorageRecord["id"]]: RuleTableRecord } = {};

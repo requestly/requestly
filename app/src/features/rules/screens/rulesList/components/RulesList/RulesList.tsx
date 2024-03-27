@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import RulesTable from "./components/RulesTable/RulesTable";
 import { getAllRecordsMap, getAllRecords } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
-import { RulesListProvider } from "./context";
 import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -65,7 +64,7 @@ const RulesList: React.FC<Props> = () => {
       }
     }
     return (
-      <RulesListProvider>
+      <>
         {isLoading || isRuleListLoading ? (
           <>
             <MonitorMountedTime transactionName="new-rules-list-loading" />
@@ -95,7 +94,7 @@ const RulesList: React.FC<Props> = () => {
         ) : (
           <CreateFirstRule />
         )}
-      </RulesListProvider>
+      </>
     );
   }
 

@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useRulesContext } from "../../../../../context";
 import RenameGroupModal from "components/features/rules/RenameGroupModal";
 import { Group } from "features/rules/types/rules";
+import { useRulesModalsContext } from "features/rules/context/modals";
 
 export const RenameGroupModalWrapper: React.FC = () => {
-  const { setRenameGroupAction } = useRulesContext();
+  const { setOpenRenameGroupModal } = useRulesModalsContext();
 
   const [isModalActive, setModalActive] = useState(false);
   const [groupToRename, setGroupToRename] = useState<Group | null>(null);
 
   useEffect(() => {
-    const renameGroup = (group: Group) => {
+    const openModal = (group: Group) => {
       setGroupToRename(group);
       setModalActive(true);
     };
 
-    setRenameGroupAction(() => renameGroup);
-  }, [setRenameGroupAction]);
+    setOpenRenameGroupModal(() => openModal);
+  }, [setOpenRenameGroupModal]);
 
   const onClose = () => {
     setGroupToRename(null);

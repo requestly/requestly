@@ -9,7 +9,6 @@ interface BulkActionBarActionButton<DataType> extends BaseButtonProps {
 
 export interface BulkActionBarConfig<DataType> {
   options: {
-    clearSelectedRows?: () => void;
     infoText?: string | ((selectedRows: DataType[]) => string);
     actionButtons?: BulkActionBarActionButton<DataType>[];
   };

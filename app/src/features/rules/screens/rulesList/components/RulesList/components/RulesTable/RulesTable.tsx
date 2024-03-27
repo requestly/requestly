@@ -4,17 +4,10 @@ import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { Empty } from "antd";
 import ContentListTable from "componentsV2/ContentList/ContentListTable/ContentListTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
-import { isRule, isGroup, recordsToContentTableDataAdapter } from "./utils";
+import { recordsToContentTableDataAdapter } from "./utils";
+import { isRule, isGroup } from "features/rules/utils";
 import { RecordStatus, StorageRecord } from "features/rules/types/rules";
 import { RuleTableRecord } from "./types";
-import {
-  DeleteRecordsModalWrapper,
-  RenameGroupModalWrapper,
-  DuplicateRuleModalWrapper,
-  ChangeRuleGroupModalWrapper,
-  UngroupOrDeleteRulesModalWrapper,
-} from "./components";
-import useRuleTableActions from "./hooks/useRuleTableActions";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
@@ -26,12 +19,11 @@ import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import "./rulesTable.css";
 import { enhanceRecords } from "./utils/rules";
-import { ImportRulesModalWrapper } from "./components/modals/ImportRulesModal/ImportRulesModalWrapper";
-import { CreateNewRuleGroupModalWrapper } from "./components/modals/CreateNewRuleGroupModalWrapper";
 import {
   useContentListTableContext,
   withContentListTableContext,
 } from "componentsV2/ContentList/ContentListTable/context";
+import { useRulesActionContext } from "features/rules/context/actions";
 
 interface Props {
   records: StorageRecord[];
@@ -48,24 +40,20 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
   const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
-  const {
-    handleRecordsShare,
-    handleRecordsStatusToggle,
-    handleRecordsDelete,
-    handleRecordsChangeGroup,
-    handleRecordsUngroup,
-  } = useRuleTableActions();
   const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
   const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
+  const {
+    recordsUngroupAction,
+    recordsChangeGroupAction,
+    recordsShareAction,
+    recordsDeleteAction,
+    recordsStatusToggleAction,
+  } = useRulesActionContext();
 
   useEffect(() => {
-    console.log({ records, allRecordsMap });
     const enhancedRecords = enhanceRecords(records, allRecordsMap);
-    console.log({ enhancedRecords });
-
     const contentTableAdaptedRecords = recordsToContentTableDataAdapter(enhancedRecords);
     setContentTableData(contentTableAdaptedRecords);
-    console.log({ records, contentTableAdaptedRecords, enhancedRecords });
   }, [records, allRecordsMap]);
 
   // FIXME: cleanup this
@@ -100,7 +88,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       }, []);
 
       if (activePremiumRules.length) {
-        handleRecordsStatusToggle(activePremiumRules, false);
+        recordsStatusToggleAction(activePremiumRules, false);
       }
       setIsPremiumRulesToggleChecked(true);
     }
@@ -109,7 +97,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     user?.details?.isPremium,
     loading,
     isPremiumRulesToggleChecked,
-    handleRecordsStatusToggle,
+    recordsStatusToggleAction,
     isBackgateRestrictionEnabled,
     isUpgradePopoverEnabled,
   ]);
@@ -132,19 +120,11 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     return `${groupString}${groupString && ruleString ? " and " : ""}${ruleString} selected`;
   }, []);
 
-  // const clearSelectionCallback = clearSelectedRowsDataCallbackRef.current;
   const isFeatureLimitbannerShown = isFeatureLimiterOn && user?.isLimitReached;
 
   return (
     <>
       {/* Add Modals Required in Rules List here */}
-      <DuplicateRuleModalWrapper />
-      <RenameGroupModalWrapper />
-      <UngroupOrDeleteRulesModalWrapper />
-      <ChangeRuleGroupModalWrapper />
-      <DeleteRecordsModalWrapper />
-      <ImportRulesModalWrapper />
-      <CreateNewRuleGroupModalWrapper />
 
       <ContentListTable
         id="rules-list-table"
@@ -177,7 +157,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     clearSelectedRows();
                     trackRulesListBulkActionPerformed("ungroup");
                   };
-                  handleRecordsUngroup(selectedRows).then(onSuccess);
+                  recordsUngroupAction(selectedRows).then(onSuccess);
                 },
               },
               {
@@ -191,7 +171,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("change_group");
                   };
 
-                  handleRecordsChangeGroup(selectedRows, onSuccess);
+                  recordsChangeGroupAction(selectedRows, onSuccess);
                 },
               },
               {
@@ -203,7 +183,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("share");
                   };
 
-                  handleRecordsShare(selectedRows, onSuccess);
+                  recordsShareAction(selectedRows, onSuccess);
                 },
               },
               {
@@ -217,7 +197,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("delete");
                   };
 
-                  handleRecordsDelete(selectedRows, onSuccess);
+                  recordsDeleteAction(selectedRows, onSuccess);
                 },
               },
             ],

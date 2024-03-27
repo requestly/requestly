@@ -11,7 +11,10 @@ import { joinPaths } from "utils/PathUtils";
 import ImportSharedListIndexPage from "components/features/sharedLists/ImportSharedListIndexPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RootComponent from "components/redirects/RootComponent";
-import RulesListContainer from "./pages/rulesList";
+
+// V2 Imports
+import RulesListContainer from "./screens/rulesList";
+import RulesContainerV2 from "./container";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -63,10 +66,10 @@ export const ruleRoutes: RouteObject[] = [
   },
   {
     path: `/v2${PATHS.RULES.INDEX}`,
-    element: <RulesContainer />,
+    element: <RulesContainerV2 />,
     children: [
       {
-        path: "my-rules", // FIXME: Move to constants and remove old path
+        path: "my-rules",
         element: <RulesListContainer />,
       },
     ],

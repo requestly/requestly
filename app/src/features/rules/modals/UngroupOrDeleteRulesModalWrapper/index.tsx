@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from "react";
 import UngroupOrDeleteRulesModal from "components/features/rules/UngroupOrDeleteRulesModal";
-import { useRulesContext } from "../../../../../context";
 import { Group } from "features/rules/types/rules";
+import { useRulesModalsContext } from "features/rules/context/modals";
 
 interface Props {}
 
 export const UngroupOrDeleteRulesModalWrapper: React.FC<Props> = () => {
-  const { setRenameGroupAction } = useRulesContext();
+  const { setOpenGroupDeleteModal } = useRulesModalsContext();
 
   const [isModalActive, setIsModalActive] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
 
   useEffect(() => {
-    const renameGroup = (group: Group) => {
+    const openModal = (group: Group) => {
       setGroupToDelete(group);
       setIsModalActive(true);
     };
 
-    setRenameGroupAction(() => renameGroup);
-  }, [setRenameGroupAction]);
+    setOpenGroupDeleteModal(() => openModal);
+  }, [setOpenGroupDeleteModal]);
 
   const onClose = () => {
     setGroupToDelete(null);
@@ -28,6 +28,7 @@ export const UngroupOrDeleteRulesModalWrapper: React.FC<Props> = () => {
   return isModalActive ? (
     <UngroupOrDeleteRulesModal
       groupIdToDelete={groupToDelete?.id}
+      // @ts-ignore
       groupRules={groupToDelete?.children ?? []}
       isOpen={isModalActive}
       toggle={onClose}

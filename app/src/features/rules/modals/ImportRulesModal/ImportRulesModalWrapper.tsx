@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useRulesContext } from "../../../../../context";
 import { ImportRulesModal } from ".";
+import { useRulesModalsContext } from "features/rules/context/modals";
 
 interface Props {}
 
 export const ImportRulesModalWrapper: React.FC<Props> = () => {
-  const { setImportRecordsAction } = useRulesContext();
+  const { setOpenImportRecordsModal } = useRulesModalsContext();
 
   const [isModalActive, setIsModalActive] = useState(false);
 
   useEffect(() => {
-    const importRecords = () => {
+    const openModal = () => {
       setIsModalActive(true);
     };
 
-    setImportRecordsAction(() => importRecords);
-  }, [setImportRecordsAction]);
+    setOpenImportRecordsModal(() => openModal);
+  }, [setOpenImportRecordsModal]);
 
   const onClose = () => {
     setIsModalActive(false);
