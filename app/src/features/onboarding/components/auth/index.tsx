@@ -15,6 +15,7 @@ import "./index.scss";
 
 interface Props {
   isOpen: boolean;
+  toggleAuthModal?: () => void;
   defaultAuthMode: string;
   isOnboarding?: boolean;
   source: string;
@@ -23,6 +24,7 @@ interface Props {
 
 export const AuthScreen: React.FC<Props> = ({
   isOpen,
+  toggleAuthModal = () => {},
   defaultAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
   isOnboarding = false,
   source,
@@ -69,15 +71,7 @@ export const AuthScreen: React.FC<Props> = ({
           layout
           className={`onboarding-auth-screen ${authMode === AUTH.ACTION_LABELS.SIGN_UP ? "w-full" : ""}`}
         >
-          <m.div
-            transition={{ type: "linear" }}
-            layout
-            className="onboarding-auth-form-wrapper"
-            style={{
-              paddingTop:
-                authMode === AUTH.ACTION_LABELS.SIGN_UP || authMode === AUTH.ACTION_LABELS.LOG_IN ? "40px" : 0,
-            }}
-          >
+          <m.div transition={{ type: "linear" }} layout className="onboarding-auth-form-wrapper">
             <AuthForm
               authMode={authMode}
               setAuthMode={setAuthMode}
@@ -87,6 +81,7 @@ export const AuthScreen: React.FC<Props> = ({
               source={source}
               callbacks={callbacks}
               setIsVerifyEmailPopupVisible={setIsVerifyEmailPopupVisible}
+              toggleModal={toggleAuthModal}
             />
           </m.div>
           {authMode === AUTH.ACTION_LABELS.SIGN_UP && (

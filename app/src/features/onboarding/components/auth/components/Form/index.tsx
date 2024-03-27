@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Divider, Row, Col, Tooltip } from "antd";
+import { Divider, Row, Col, Tooltip, Button } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { AuthFormInput } from "./components/AuthFormInput";
 import googleLogo from "assets/icons/google.svg";
@@ -22,6 +22,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils";
 import { SSOSignInForm } from "./components/SSOSignInForm";
+import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
 import "./index.scss";
 
 interface AuthFormProps {
@@ -33,6 +34,7 @@ interface AuthFormProps {
   setAuthMode: (mode: string) => void;
   setIsVerifyEmailPopupVisible?: (isVisble: boolean) => void;
   setIsAuthBannerVisible?: (isVisible: boolean) => void;
+  toggleModal: () => void;
   callbacks?: any;
 }
 
@@ -44,6 +46,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   setIsVerifyEmailPopupVisible,
   setEmail,
   source,
+  toggleModal,
   callbacks = null,
 }) => {
   const dispatch = useDispatch();
@@ -179,6 +182,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     return <SSOSignInForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} />;
   }
 
+  if (authMode === AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD) {
+    return (
+      <RequestPasswordResetForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} toggleModal={toggleModal} />
+    );
+  }
+
   return (
     <div className="w-full">
       <h2 className="onboarding-auth-form-header">
@@ -247,6 +256,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({
               authMode === AUTH.ACTION_LABELS.SIGN_UP ? handleEmailPasswordSignUp : handleEmailPasswordSignIn
             }
           />
+          <Button
+            type="link"
+            className="auth-screen-forgot-password-btn"
+            onClick={() => setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD)}
+          >
+            Forgot password?
+          </Button>
         </div>
       )}
 

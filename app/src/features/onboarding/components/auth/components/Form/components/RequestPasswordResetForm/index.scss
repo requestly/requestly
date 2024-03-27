@@ -1,0 +1,13 @@
+.request-new-password-screen-text {
+  font-size: 13px;
+  color: var(--neutrals-gray-300);
+  margin-top: 12px;
+}
+
+.request-new-password-btn {
+  font-weight: 500;
+
+  & span {
+    font-size: 14px;
+  }
+}

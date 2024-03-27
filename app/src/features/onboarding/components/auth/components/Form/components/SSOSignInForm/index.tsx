@@ -17,7 +17,7 @@ interface Props {
 }
 
 export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail }) => {
-  const [isloading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isNoConnectionFoundCardVisible, setIsNoConnectionFoundCardVisible] = useState(false);
   const domain = getDomainFromEmail(email);
 
@@ -90,7 +90,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail })
         size="large"
         type="primary"
         className="sso-screen-continue-btn mt-16"
-        loading={isloading}
+        loading={isLoading}
         onClick={handleCaptureSSOInterest}
       >
         Continue

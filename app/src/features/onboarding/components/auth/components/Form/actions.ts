@@ -24,13 +24,13 @@ import { isLocalStoragePresent } from "utils/AppUtils";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 
 const showError = (err: string) => {
-  toast.error(err, { hideProgressBar: true, autoClose: 6000 });
+  toast.error(err, 3);
 };
 const showWarning = (err: string) => {
-  toast.warn(err, { hideProgressBar: true });
+  toast.warn(err, 3);
 };
 const showInfo = (err: string) => {
-  toast.info(err, { hideProgressBar: true, autoClose: 5000 });
+  toast.info(err, 3);
 };
 
 export const handleEmailSignIn = (email: string, password: string, isSignUp: boolean, source: string) => {
