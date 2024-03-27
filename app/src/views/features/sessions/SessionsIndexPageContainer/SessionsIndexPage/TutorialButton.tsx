@@ -24,7 +24,7 @@ const TutorialButton: React.FC<Props & ButtonProps> = ({ children, ...buttonProp
   }, []);
 
   const openFeaturePage = useCallback(() => {
-    window.open("https://requestly.io/feature/session-recording/", "blank");
+    window.open("https://requestly.com/feature/session-recording/", "blank");
   }, []);
 
   return (
