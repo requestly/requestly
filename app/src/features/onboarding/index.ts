@@ -3,3 +3,4 @@ export { Onboarding } from "./components/onboardingView";
 export { shouldShowOnboarding } from "./utils";
 export { groupSvg };
 export { OnboardingAuthBanner } from "./components/auth/components/Banner/index";
+export { AuthScreen } from "./components/auth/index";

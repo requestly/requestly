@@ -13,24 +13,33 @@ import Logger from "lib/logger";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
 import { trackAppOnboardingStepCompleted, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { m } from "framer-motion";
+import APP_CONSTANTS from "config/constants";
 import "./index.scss";
 
 interface Props {
   isOpen: boolean;
+  defaultAuthMode: string;
+  isOnboarding?: boolean;
+  source: string;
+  callbacks?: any;
 }
 
-export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
+export const AuthScreen: React.FC<Props> = ({
+  isOpen,
+  defaultAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+  isOnboarding = false,
+  source,
+  callbacks = null,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const [authMode, setAuthMode] = useState(AUTH.ACTION_LABELS.SIGN_UP);
+  const [authMode, setAuthMode] = useState(defaultAuthMode);
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [persona, setPersona] = useState("");
   const [isVerifyEmailPopupVisible, setIsVerifyEmailPopupVisible] = useState(false);
 
   const handleSendEmailLink = () => {
     if (email) {
-      sendEmailLinkForSignin(email, "app_onboarding")
+      sendEmailLinkForSignin(email, source)
         .then(() => {
           updateTimeToResendEmailLogin(dispatch, 30);
           setIsVerifyEmailPopupVisible(true);
@@ -42,17 +51,17 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isOnboarding) {
       trackAppOnboardingViewed(ONBOARDING_STEPS.AUTH);
     }
-  }, [isOpen]);
+  }, [isOpen, isOnboarding]);
 
   useEffect(() => {
-    if (user.loggedIn) {
+    if (user.loggedIn && isOnboarding) {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
       trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
     }
-  }, [user.loggedIn, dispatch]);
+  }, [user.loggedIn, dispatch, isOnboarding]);
 
   return (
     <div className="onboarding-auth-screen-wrapper">
@@ -68,7 +77,7 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
             <BiArrowBack />
             <span>Back</span>
           </button>
-          <MagicLinkModalContent email={email} authMode={authMode} eventSource="app_onboarding" />
+          <MagicLinkModalContent email={email} authMode={authMode} eventSource={source} />
         </div>
       ) : (
         <m.div
@@ -83,10 +92,9 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
               onSendEmailLink={handleSendEmailLink}
               email={email}
               setEmail={setEmail}
-              fullName={fullName}
-              setFullName={setFullName}
-              persona={persona}
-              setPersona={setPersona}
+              isOnboarding={isOnboarding}
+              source={source}
+              callbacks={callbacks}
             />
           </m.div>
           {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
