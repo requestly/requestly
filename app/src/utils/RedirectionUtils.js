@@ -168,7 +168,7 @@ export const redirectToBillingTeam = (navigate, id, redirectUrl, source) => {
 };
 
 export const redirectToBillingTeamSettings = (navigate, redirectUrl, source) => {
-  navigate(PATHS.SETTINGS.BILLING.RELATIVE, { state: { redirectUrl, source } });
+  navigate(PATHS.SETTINGS.BILLING.ABSOLUTE, { state: { redirectUrl, source } });
 };
 
 export const redirectToProfileSettings = (navigate, redirectUrl, source) => {
