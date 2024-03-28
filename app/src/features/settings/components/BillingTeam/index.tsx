@@ -9,7 +9,6 @@ import { RQButton } from "lib/design-system/components";
 import { actions } from "store";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { toast } from "utils/Toast";
-import { BillingList } from "./components/BillingList";
 import { BillingTeamsSidebar } from "./components/BillingTeamsSidebar";
 import { SettingsSecondarySidebar } from "../SettingsSecondarySidebar";
 import "./index.scss";
@@ -93,8 +92,6 @@ export const BillingTeamContainer: React.FC = () => {
           <div className="header">Getting your billing team ...</div>
         </div>
       );
-
-    return <BillingList />;
   }, [user.loggedIn, joiningRequestAction, dispatch, isBillingTeamsLoading]);
 
   return (
