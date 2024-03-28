@@ -84,6 +84,10 @@ export const BillingTeamDetails = () => {
     }
   }, [billingId, joiningRequestAction, userId, showReviewResultToast, user.loggedIn]);
 
+  if (!user.loggedIn) {
+    return null;
+  }
+
   if (!isBillingTeamDetailsViewable && billingId) {
     return (
       <div className="display-row-center items-center" style={{ marginTop: "80px" }}>
