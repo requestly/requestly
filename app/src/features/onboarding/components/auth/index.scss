@@ -12,11 +12,11 @@
 
   .onboarding-auth-form-wrapper {
     width: 100%;
+    min-width: 440px;
     max-width: 440px;
     background: var(--surface-1);
     border-radius: var(--border-radius-md);
     padding: 1rem 2rem;
-    padding-top: 40px;
   }
 
   .onboarding-auth-banner-wrapper {
@@ -32,7 +32,7 @@
   width: 440px;
 }
 
-.verify-email-back-btn {
+.auth-screen-back-btn {
   color: var(--white);
   cursor: pointer;
   display: flex;
