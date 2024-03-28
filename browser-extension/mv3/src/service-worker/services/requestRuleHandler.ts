@@ -1,9 +1,9 @@
-import { PUBLIC_NAMESPACE } from "common/constants";
+import { CLIENT_MESSAGES, PUBLIC_NAMESPACE } from "common/constants";
 import { getEnabledRules } from "common/rulesStore";
 import { RequestRulePair, RuleType } from "common/types";
 import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
-import { injectJSAtRequestSource, isExtensionEnabled, isNonBrowserTab } from "./utils";
+import { isExtensionEnabled, isNonBrowserTab } from "./utils";
 
 const overrideRequest = async (details: chrome.webRequest.WebRequestDetails) => {
   if (isNonBrowserTab(details.tabId)) {
@@ -31,22 +31,28 @@ const overrideRequest = async (details: chrome.webRequest.WebRequestDetails) => 
     const requestRule = matchingRequestRules[matchingRequestRules.length - 1]; // last overridden rule is final
     const requestRulePair = requestRule.pairs[0] as RequestRulePair;
 
-    injectJSAtRequestSource(
-      `window.${PUBLIC_NAMESPACE}.requestRules['${details.url}'] = ${JSON.stringify({
-        id: requestRule.id,
-        request: requestRulePair.request,
-        source: requestRule.pairs[0].source,
-      })};
-    `,
-      details
-    );
+    let requestRuleCodeToExecute: string;
+
+    requestRuleCodeToExecute = `window.${PUBLIC_NAMESPACE}.requestRules['${details.url}'] = ${JSON.stringify({
+      id: requestRule.id,
+      request: requestRulePair.request,
+      source: requestRule.pairs[0].source,
+    })};`;
 
     if (requestRulePair.request.type === "code") {
-      injectJSAtRequestSource(
-        `window.${PUBLIC_NAMESPACE}.requestRules['${details.url}'].evaluator = ${requestRulePair.request.value};`,
-        details
-      );
+      requestRuleCodeToExecute += `window.${PUBLIC_NAMESPACE}.requestRules['${details.url}'].evaluator = ${requestRulePair.request.value};`;
     }
+
+    chrome.tabs.sendMessage(
+      details.tabId,
+      {
+        action: CLIENT_MESSAGES.EXECUTE_SCRIPT,
+        code: requestRuleCodeToExecute,
+      },
+      {
+        frameId: details.frameId,
+      }
+    );
   }
 };
 
