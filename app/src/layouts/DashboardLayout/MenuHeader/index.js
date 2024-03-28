@@ -68,7 +68,7 @@ const MenuHeader = () => {
         ) : null}
 
         {appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION && (
-          <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 10 : 10) : 10}>
+          <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 10 : 8) : 10}>
             <div className="header-middle-section">
               <HeaderText />
             </div>
