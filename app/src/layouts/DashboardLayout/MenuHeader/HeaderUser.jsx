@@ -7,6 +7,7 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import {
   redirectToAccountDetails,
+  redirectToBillingTeamSettings,
   redirectToGlobalSettings,
   redirectToProfileSettings,
   redirectToWorkspaceSettings,
@@ -67,6 +68,10 @@ export default function HeaderUser() {
       {
         label: "Manage Workspaces",
         onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
+      },
+      {
+        label: "Plans and Billing",
+        onClick: () => redirectToBillingTeamSettings(navigate, window.location.pathname, "header"),
       },
       {
         label: "Settings",
