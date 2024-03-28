@@ -11,11 +11,15 @@ export const OrgMembersView = () => {
   const domain = getDomainFromEmail(user?.details?.profile?.email)?.split(".")[0];
 
   return (
-    <>
-      <Col className="my-billing-team-title">{capitalize(domain)} Members</Col>
+    <Col className="org-members-table-container">
       <Col className="org-members-table-wrapper">
-        <OrgMembersTable source="members_tab" />
+        <Col className="my-billing-team-title" style={{ alignSelf: "start" }}>
+          {capitalize(domain)} Members
+        </Col>
+        <div className="mt-16">
+          <OrgMembersTable source="members_tab" />
+        </div>
       </Col>
-    </>
+    </Col>
   );
 };
