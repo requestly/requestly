@@ -43,10 +43,7 @@ const AuthModal = ({
           isOpen={false}
           defaultAuthMode={authMode}
           source={eventSource}
-          callbacks={{
-            onSignInSuccess: callback,
-            onRequestPasswordResetSuccess: toggle,
-          }}
+          callback={callback}
           toggleAuthModal={toggle}
         />
       </Modal>

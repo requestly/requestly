@@ -35,7 +35,7 @@ interface AuthFormProps {
   setIsVerifyEmailPopupVisible?: (isVisble: boolean) => void;
   setIsAuthBannerVisible?: (isVisible: boolean) => void;
   toggleModal: () => void;
-  callbacks?: any;
+  callback: () => void;
 }
 
 export const AuthForm: React.FC<AuthFormProps> = ({
@@ -47,7 +47,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   setEmail,
   source,
   toggleModal,
-  callbacks = null,
+  callback,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -80,9 +80,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         const greatingName = result.displayName?.split(" ")?.[0];
         !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
 
-        if (callbacks?.onSignInSuccess) {
-          callbacks.onSignInSuccess();
-        }
+        callback?.();
       })
       .catch((error) => {
         console.log(error);
@@ -90,7 +88,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsGoogleSignInLoading(false);
       });
-  }, [authMode, source, appMode, isOnboarding, callbacks]);
+  }, [authMode, source, appMode, isOnboarding, callback]);
 
   const handleMagicLinkAuthClick = useCallback(() => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
@@ -123,7 +121,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                   toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
                 setEmail("");
                 setPassword("");
-                // TODO: call on success signIn callback
+                callback?.();
               }
             })
             .catch((err) => {
@@ -139,7 +137,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [email, password, source, isOnboarding, setEmail, setPassword]);
+  }, [email, password, source, isOnboarding, setEmail, setPassword, callback]);
 
   const handleEmailPasswordSignIn = useCallback(() => {
     setIsLoading(true);
@@ -150,7 +148,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
           setEmail("");
           setPassword("");
-          // TODO: call on success signIn callback
+          callback?.();
         } else {
           toast.error("Sorry we couldn't log you in. Can you please retry?");
         }
@@ -163,7 +161,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [email, password, source, isOnboarding, setEmail, setPassword]);
+  }, [email, password, source, isOnboarding, setEmail, setPassword, callback]);
 
   useEffect(() => {
     if (user.loggedIn && isOnboarding) {
