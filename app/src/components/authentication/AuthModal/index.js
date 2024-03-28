@@ -11,7 +11,6 @@ const AuthModal = ({
   isOpen,
   toggle,
   authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-  userActionMessage,
   eventSource,
   callback,
   closable = true,
@@ -43,7 +42,6 @@ const AuthModal = ({
         <AuthScreen
           isOpen={false}
           defaultAuthMode={authMode}
-          userActionMessage={userActionMessage ? userActionMessage : null}
           source={eventSource}
           callbacks={{
             onSignInSuccess: callback,

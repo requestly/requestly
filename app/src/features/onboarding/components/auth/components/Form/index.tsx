@@ -123,7 +123,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                   toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
                 setEmail("");
                 setPassword("");
-                callbacks && callbacks?.onSignInSuccess(result.user.uid, true);
+                // TODO: call on success signIn callback
               }
             })
             .catch((err) => {
@@ -139,7 +139,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [email, password, source, isOnboarding, callbacks, setEmail, setPassword]);
+  }, [email, password, source, isOnboarding, setEmail, setPassword]);
 
   const handleEmailPasswordSignIn = useCallback(() => {
     setIsLoading(true);
@@ -150,6 +150,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
           setEmail("");
           setPassword("");
+          // TODO: call on success signIn callback
         } else {
           toast.error("Sorry we couldn't log you in. Can you please retry?");
         }
