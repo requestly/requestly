@@ -112,12 +112,12 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return responseModification.type === "static" && responseModification.serveWithoutRequest;
   };
 
-  const getCustomRequestBody = (requestModification, args) => {
+  const getCustomRequestBody = (requestRuleData, args) => {
     let requestBody;
-    if (requestModification.type === "static") {
-      requestBody = requestModification.value;
+    if (requestRuleData.request.type === "static") {
+      requestBody = requestRuleData.request.value;
     } else {
-      requestBody = requestModification.evaluator(args);
+      requestBody = requestRuleData.evaluator(args);
     }
 
     if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {
@@ -431,12 +431,12 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
 
-    const requestRule = canRequestBodyBeSent && getMatchedRequestRule(url);
+    const requestRuleData = canRequestBodyBeSent && getMatchedRequestRule(url);
 
-    if (requestRule) {
+    if (requestRuleData) {
       const originalRequestBody = await request.text();
       const requestBody =
-        getCustomRequestBody(requestRule.request, {
+        getCustomRequestBody(requestRuleData, {
           method,
           url,
           body: originalRequestBody,
@@ -457,7 +457,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       });
 
       notifyRequestRuleApplied({
-        ruleDetails: requestRule,
+        ruleDetails: requestRuleData,
         requestDetails: {
           url,
           method,
@@ -483,7 +483,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
-        if (requestRule) {
+        if (requestRuleData) {
           fetchedResponse = await _fetch(request);
         } else {
           fetchedResponse = await getOriginalResponse();
