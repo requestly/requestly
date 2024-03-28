@@ -19,7 +19,7 @@ interface Props {
   defaultAuthMode: string;
   isOnboarding?: boolean;
   source: string;
-  callbacks?: any;
+  callback?: () => void;
 }
 
 export const AuthScreen: React.FC<Props> = ({
@@ -28,7 +28,7 @@ export const AuthScreen: React.FC<Props> = ({
   defaultAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
   isOnboarding = false,
   source,
-  callbacks = null,
+  callback = () => {},
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -79,7 +79,7 @@ export const AuthScreen: React.FC<Props> = ({
               setEmail={setEmail}
               isOnboarding={isOnboarding}
               source={source}
-              callbacks={callbacks}
+              callback={callback}
               setIsVerifyEmailPopupVisible={setIsVerifyEmailPopupVisible}
               toggleModal={toggleAuthModal}
             />
