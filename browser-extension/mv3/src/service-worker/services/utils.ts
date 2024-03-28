@@ -1,4 +1,4 @@
-import { ScriptCodeType, ScriptObject, ScriptType } from "common/types";
+import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
 import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
 import { updateActivationStatus } from "./contextMenu";
 import { getAllSupportedWebURLs } from "../../utils";
