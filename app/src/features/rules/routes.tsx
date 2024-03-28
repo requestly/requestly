@@ -22,15 +22,6 @@ export const ruleRoutes: RouteObject[] = [
     element: <RulesContainer />,
     children: [
       {
-        path: "",
-        element: <Navigate to={PATHS.RULES.MY_RULES.RELATIVE} />,
-      },
-      {
-        index: true,
-        path: PATHS.RULES.MY_RULES.RELATIVE,
-        element: <RulesListIndexView />,
-      },
-      {
         path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
         element: <RuleEditor />,
       },
@@ -65,17 +56,6 @@ export const ruleRoutes: RouteObject[] = [
     ],
   },
   {
-    path: `/v2${PATHS.RULES.INDEX}`,
-    element: <RulesContainerV2 />,
-    children: [
-      {
-        path: "my-rules",
-        element: <RulesListIndexView />,
-      },
-    ],
-  },
-  // redirects
-  {
     path: PATHS.MARKETPLACE.RELATIVE,
     element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
   },
@@ -86,5 +66,16 @@ export const ruleRoutes: RouteObject[] = [
   {
     path: PATHS.INDEX_HTML,
     element: <RootComponent />,
+  },
+  // New V2 Routes
+  {
+    path: `${PATHS.RULES.INDEX}`,
+    element: <RulesContainerV2 />,
+    children: [
+      {
+        path: `${PATHS.RULES.MY_RULES.RELATIVE}`,
+        element: <RulesListIndexView />,
+      },
+    ],
   },
 ];
