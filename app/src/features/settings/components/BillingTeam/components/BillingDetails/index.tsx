@@ -8,7 +8,7 @@ import { Result } from "antd";
 import { MyBillingTeamDetails } from "./MyBillingTeamDetails";
 import { OtherBillingTeamDetails } from "./OtherBillingTeamDetails";
 import { toast } from "utils/Toast";
-import { trackJoinBillingTeamRequestToastViewed } from "features/settings/analytics";
+import { trackBillingTeamAccessRequestResponded } from "features/settings/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import Logger from "lib/logger";
 
@@ -64,7 +64,7 @@ export const BillingTeamDetails = () => {
         } the joining request ...`,
         5
       );
-      trackJoinBillingTeamRequestToastViewed(joinRequestAction, "loading");
+      trackBillingTeamAccessRequestResponded(joinRequestAction, "loading");
       const reviewBillingTeamJoiningRequest = httpsCallable(getFunctions(), "billing-reviewBillingTeamJoiningRequest");
       reviewBillingTeamJoiningRequest({
         billingId,
@@ -73,12 +73,12 @@ export const BillingTeamDetails = () => {
       })
         .then((res: any) => {
           showReviewResultToast(res.data.message, res.data.result.status);
-          trackJoinBillingTeamRequestToastViewed(joinRequestAction, res.data.result.status);
+          trackBillingTeamAccessRequestResponded(joinRequestAction, res.data.result.status);
           Logger.log("Billing team joining request reviewed");
         })
         .catch((err: any) => {
           toast.error(err.message, 5);
-          trackJoinBillingTeamRequestToastViewed(joinRequestAction, "error");
+          trackBillingTeamAccessRequestResponded(joinRequestAction, "error");
           Logger.log("Error while reviewing billing team joining request");
         });
     }
