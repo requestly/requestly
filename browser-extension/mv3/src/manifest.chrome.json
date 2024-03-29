@@ -21,7 +21,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["libs/requestly-web-sdk.js", "executeScript.js"],
+      "resources": ["libs/requestly-web-sdk.js", "libs/executeScript.js"],
       "matches": ["<all_urls>"]
     }
   ],
