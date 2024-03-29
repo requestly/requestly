@@ -3,10 +3,12 @@ import { Card } from "reactstrap";
 //SUB COMPONENTS
 import ManageTeams from "../../../Profile/ManageTeams";
 import TeamWideAnimation from "components/misc/LottieAnimation/TeamWideAnimation";
+import { Col } from "antd";
+import "./index.scss";
 
 const MyTeams = () => {
   return (
-    <React.Fragment>
+    <Col className="workspace-settings-container">
       {/* Page content */}
       <Card className="mt-4">
         <center>
@@ -15,7 +17,7 @@ const MyTeams = () => {
         <h1 style={{ textAlign: "center" }}>Requestly for QA & Development Teams</h1>
         <ManageTeams />
       </Card>
-    </React.Fragment>
+    </Col>
   );
 };
 
