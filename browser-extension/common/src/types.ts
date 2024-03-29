@@ -107,7 +107,7 @@ export enum ScriptType {
   CODE = "code",
 }
 
-interface ScriptAttributes {
+export interface ScriptAttributes {
   name: string;
   value: string;
 }
