@@ -23,6 +23,7 @@ import APP_CONSTANTS from "config/constants";
 import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils";
 import { SSOSignInForm } from "./components/SSOSignInForm";
 import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
+import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analytics";
 import "./index.scss";
 
 interface AuthFormProps {
@@ -56,6 +57,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(null);
+
+  const handleSignupSigninSwitch = useCallback(() => {
+    const finalState = authMode === AUTH.ACTION_LABELS.SIGN_UP ? AUTH.ACTION_LABELS.LOG_IN : AUTH.ACTION_LABELS.SIGN_UP;
+    setAuthMode(finalState);
+    trackSignUpSignInSwitched(finalState);
+  }, [authMode, setAuthMode]);
 
   const handleSendEmailLink = useCallback(() => {
     if (email) {
@@ -195,14 +202,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <span>
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Already using Requestly?" : "Don't have an account yet?"}{" "}
         </span>
-        <span
-          onClick={() =>
-            setAuthMode(
-              authMode === AUTH.ACTION_LABELS.SIGN_UP ? AUTH.ACTION_LABELS.LOG_IN : AUTH.ACTION_LABELS.SIGN_UP
-            )
-          }
-          className="text-white onboarding-auth-mode-switcher"
-        >
+        <span onClick={handleSignupSigninSwitch} className="text-white onboarding-auth-mode-switcher">
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign in" : "Sign up now"}
         </span>
       </Row>
@@ -289,7 +289,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         type="default"
         size="large"
         className="auth-screen-sso-btn"
-        onClick={() => setAuthMode(AUTH.ACTION_LABELS.SSO)}
+        onClick={() => {
+          setAuthMode(AUTH.ACTION_LABELS.SSO);
+          trackLoginWithSSOClicked();
+        }}
       >
         Continue with Single Sign-on (SSO)
       </RQButton>

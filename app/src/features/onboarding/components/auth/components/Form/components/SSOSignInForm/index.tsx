@@ -10,7 +10,6 @@ import { getDomainFromEmail, getEmailType, isEmailValid } from "utils/Formatting
 import { toast } from "utils/Toast";
 import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
-import { trackLoginWithSSOClicked } from "features/onboarding/components/auth/analytics";
 import "./index.scss";
 
 interface Props {
@@ -43,7 +42,6 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       domain: getDomainFromEmail(email),
       source,
     });
-    trackLoginWithSSOClicked();
 
     setIsLoading(true);
     const captureSSOInterest = httpsCallable(getFunctions(), "auth-captureSSOInterest");
