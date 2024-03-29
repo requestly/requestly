@@ -23,7 +23,7 @@ export const BillingTeamDetails = () => {
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [queryParams] = useSearchParams();
 
-  const joiningRequestAction = queryParams.get("joinRequestAction");
+  const joinRequestAction = queryParams.get("joinRequestAction");
   const userId = queryParams.get("userId");
 
   const showReviewResultToast = useCallback((message: string, type: string, duration = 5) => {
@@ -57,32 +57,32 @@ export const BillingTeamDetails = () => {
   );
 
   useEffect(() => {
-    if (user.loggedIn && billingId && joiningRequestAction && userId) {
+    if (user.loggedIn && billingId && joinRequestAction && userId) {
       toast.loading(
         `${
-          joiningRequestAction === BillingTeamJoinRequestAction.ACCEPT ? "Approving" : "Declining"
+          joinRequestAction === BillingTeamJoinRequestAction.ACCEPT ? "Approving" : "Declining"
         } the joining request ...`,
         5
       );
-      trackJoinBillingTeamRequestToastViewed(joiningRequestAction, "loading");
+      trackJoinBillingTeamRequestToastViewed(joinRequestAction, "loading");
       const reviewBillingTeamJoiningRequest = httpsCallable(getFunctions(), "billing-reviewBillingTeamJoiningRequest");
       reviewBillingTeamJoiningRequest({
         billingId,
-        action: joiningRequestAction,
+        action: joinRequestAction,
         userId,
       })
         .then((res: any) => {
           showReviewResultToast(res.data.message, res.data.result.status);
-          trackJoinBillingTeamRequestToastViewed(joiningRequestAction, res.data.result.status);
+          trackJoinBillingTeamRequestToastViewed(joinRequestAction, res.data.result.status);
           Logger.log("Billing team joining request reviewed");
         })
         .catch((err: any) => {
           toast.error(err.message, 5);
-          trackJoinBillingTeamRequestToastViewed(joiningRequestAction, "error");
+          trackJoinBillingTeamRequestToastViewed(joinRequestAction, "error");
           Logger.log("Error while reviewing billing team joining request");
         });
     }
-  }, [billingId, joiningRequestAction, userId, showReviewResultToast, user.loggedIn]);
+  }, [billingId, joinRequestAction, userId, showReviewResultToast, user.loggedIn]);
 
   if (!user.loggedIn) {
     return null;

@@ -19,7 +19,7 @@ export const BillingTeamContainer: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
-  const joiningRequestAction = queryParams.get("joinRequestAction");
+  const joinRequestAction = queryParams.get("joinRequestAction");
 
   const isBillingTeamSidebarVisible = useMemo(() => {
     if (
@@ -34,7 +34,7 @@ export const BillingTeamContainer: React.FC = () => {
   useEffect(() => {
     if (!user.loggedIn) {
       toast.warn(
-        joiningRequestAction
+        joinRequestAction
           ? `You need to login to review this joining request`
           : `You need to login to view this billing team`
       );
@@ -49,7 +49,7 @@ export const BillingTeamContainer: React.FC = () => {
         })
       );
     }
-  }, [user.loggedIn, joiningRequestAction, dispatch]);
+  }, [user.loggedIn, joinRequestAction, dispatch]);
 
   const renderBillingTeamContent = useCallback(() => {
     if (!user.loggedIn) {
@@ -58,7 +58,7 @@ export const BillingTeamContainer: React.FC = () => {
           icon={null}
           status="error"
           title={
-            joiningRequestAction
+            joinRequestAction
               ? `You need to login to review this joining request`
               : "You need to login to view this billing team"
           }
@@ -92,7 +92,7 @@ export const BillingTeamContainer: React.FC = () => {
           <div className="header">Getting your billing team ...</div>
         </div>
       );
-  }, [user.loggedIn, joiningRequestAction, dispatch, isBillingTeamsLoading]);
+  }, [user.loggedIn, joinRequestAction, dispatch, isBillingTeamsLoading]);
 
   return (
     <div className="billing-team-container">
