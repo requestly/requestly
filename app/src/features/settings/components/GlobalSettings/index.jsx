@@ -31,16 +31,18 @@ export const GlobalSettings = () => {
   }
 
   return (
-    <>
-      <div className="settings-header header">⚙️ Global Settings</div>
-      <p className="text-gray text-sm settings-caption">
-        Please enable the following settings to get the best experience
-      </p>
-      <div>
-        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && <ConsoleLogger isCompatible={isCompatible} />}
-        <RulesSyncing />
-        {user?.loggedIn ? <DataCollection /> : null}
+    <div className="global-settings-container">
+      <div className="global-settings-wrapper">
+        <div className="settings-header header">⚙️ Global Settings</div>
+        <p className="text-gray text-sm settings-caption">
+          Please enable the following settings to get the best experience
+        </p>
+        <div>
+          {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && <ConsoleLogger isCompatible={isCompatible} />}
+          <RulesSyncing />
+          {user?.loggedIn ? <DataCollection /> : null}
+        </div>
       </div>
-    </>
+    </div>
   );
 };

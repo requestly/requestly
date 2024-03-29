@@ -1,117 +1,112 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useSearchParams } from "react-router-dom";
 import { Result, Spin } from "antd";
-import { MyBillingTeam } from "./components/MyBillingTeam";
-import {
-  getAvailableBillingTeams,
-  getBillingTeamMemberById,
-  getIsBillingTeamsLoading,
-} from "store/features/billing/selectors";
+import { getAvailableBillingTeams, getIsBillingTeamsLoading } from "store/features/billing/selectors";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
-import { OtherBillingTeam } from "./components/OtherBillingTeam";
-import { UserPlanDetails } from "./components/UserPlanDetails";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import Logger from "lib/logger";
-import { billingActions } from "store/features/billing/slice";
-import { PRICING } from "features/pricing";
+import { RQButton } from "lib/design-system/components";
+import { actions } from "store";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { toast } from "utils/Toast";
+import { BillingTeamsSidebar } from "./components/BillingTeamsSidebar";
+import { SettingsSecondarySidebar } from "../SettingsSecondarySidebar";
+import "./index.scss";
 
-export const BillingTeam: React.FC = () => {
-  const { billingId } = useParams();
+export const BillingTeamContainer: React.FC = () => {
+  const [queryParams] = useSearchParams();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
   const user = useSelector(getUserAuthDetails);
-  const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const userDetailsOfSelectedBillingTeam = useSelector(
-    getBillingTeamMemberById(billingId, user?.details?.profile?.uid)
-  );
-  const [isTeamMember, setIsTeamMember] = useState(false);
+  const isBillingTeamsLoading = useSelector(getIsBillingTeamsLoading);
+  const joinRequestAction = queryParams.get("joinRequestAction");
 
-  const [showUserPlanDetails, setShowUserPlanDetails] = useState(false);
-
-  const hasAccessToBillingTeam = useMemo(
-    () =>
-      billingTeams?.some((billingTeam) => {
-        return billingTeam?.id === billingId && location.pathname !== APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE;
-      }),
-    [billingTeams, billingId, location.pathname]
-  );
+  const isBillingTeamSidebarVisible = useMemo(() => {
+    if (
+      billingTeams.length > 1 ||
+      (billingTeams.length === 1 && billingTeams.some((team) => !(user?.details?.profile?.uid in team.members)))
+    ) {
+      return true;
+    }
+    return false;
+  }, [billingTeams, user?.details?.profile?.uid]);
 
   useEffect(() => {
-    if (!hasAccessToBillingTeam && billingId) {
-      const getOtherTeam = httpsCallable(getFunctions(), "billing-fetchBillingTeam");
-      getOtherTeam({ billingId })
-        .then((result: any) => {
-          if (result.data.success) {
-            const newTeams = [...billingTeams, result.data.billingTeamData];
-            dispatch(billingActions.setAvailableBillingTeams(newTeams));
-            const formattedBillingTeamMembers = result.data.billingTeamMembers?.reduce(
-              (acc: { [id: string]: any }, curr: { [id: string]: any }) => {
-                acc[curr.id] = curr;
-                return acc;
-              },
-              {}
-            );
-            dispatch(
-              billingActions.setBillingTeamMembers({ billingId, billingTeamMembers: formattedBillingTeamMembers })
-            );
-            setIsTeamMember(true);
-          }
+    if (!user.loggedIn) {
+      toast.warn(
+        joinRequestAction
+          ? `You need to login to review this joining request`
+          : `You need to login to view this billing team`
+      );
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: {
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: SOURCE.BILLING_TEAM,
+          },
         })
-        .catch((error) => {
-          Logger.log(error);
-        });
+      );
     }
-  }, [billingId, hasAccessToBillingTeam, dispatch, billingTeams]);
+  }, [user.loggedIn, joinRequestAction, dispatch]);
 
-  useEffect(() => {
-    setShowUserPlanDetails(false);
-    if (location.pathname === APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE) {
-      if (billingTeams.length) {
-        // navigate to the billing team in which the user is a member
-        const team = billingTeams.find((team) => {
-          return user?.details?.profile?.uid in team.members;
-        });
-        if (team?.id && user?.details?.planDetails?.type === PRICING.CHECKOUT.MODES.TEAM)
-          navigate(`${APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE}/${team.id}`);
-        else {
-          // Show user plan details if the user is not a member of any billing team
-          setShowUserPlanDetails(true);
-          navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE);
-        }
-      } else {
-        // Show user plan details if the user is not a member of any billing team
-        setShowUserPlanDetails(true);
-        navigate(APP_CONSTANTS.PATHS.SETTINGS.BILLING.RELATIVE);
-      }
-    }
-  }, [location.pathname, billingTeams, navigate, user?.details?.profile?.uid, user?.details?.planDetails?.type]);
-
-  if ((isBillingTeamsLoading || !billingId) && !showUserPlanDetails)
-    return (
-      <div className="billing-team-loader-screen">
-        <Spin size="large" />
-        <div className="header">Getting your billing team ...</div>
-      </div>
-    );
-
-  if (!hasAccessToBillingTeam && billingId) {
-    return (
-      <div className="display-row-center items-center" style={{ marginTop: "80px" }}>
+  const renderBillingTeamContent = useCallback(() => {
+    if (!user.loggedIn) {
+      return (
         <Result
+          icon={null}
           status="error"
-          title="Oops, something went wrong!"
-          subTitle="You are not a part of this billing team or this team does not exist"
+          title={
+            joinRequestAction
+              ? `You need to login to review this joining request`
+              : "You need to login to view this billing team"
+          }
+          extra={
+            <RQButton
+              type="primary"
+              onClick={() => {
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newValue: true,
+                    newProps: {
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                      eventSource: SOURCE.BILLING_TEAM,
+                    },
+                  })
+                );
+              }}
+            >
+              Login
+            </RQButton>
+          }
         />
+      );
+    }
+
+    if (isBillingTeamsLoading)
+      return (
+        <div className="billing-team-loader-screen">
+          <Spin size="large" />
+          <div className="header">Getting your billing team ...</div>
+        </div>
+      );
+  }, [user.loggedIn, joinRequestAction, dispatch, isBillingTeamsLoading]);
+
+  return (
+    <div className="billing-team-container">
+      <div>
+        {isBillingTeamSidebarVisible && (
+          <SettingsSecondarySidebar>
+            <BillingTeamsSidebar billingTeams={billingTeams} />
+          </SettingsSecondarySidebar>
+        )}
       </div>
-    );
-  }
-
-  if (showUserPlanDetails) return <UserPlanDetails />;
-
-  if (isTeamMember || userDetailsOfSelectedBillingTeam) return <MyBillingTeam />;
-  else return <OtherBillingTeam />;
+      <div className="billing-team-content-wrapper">
+        {renderBillingTeamContent()}
+        <Outlet />
+      </div>
+    </div>
+  );
 };
