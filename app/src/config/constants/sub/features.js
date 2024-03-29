@@ -75,4 +75,6 @@ FEATURES.SESSION_RECORDING = "session_recording";
 FEATURES.SAVED_NETWORK_LOGS = "saved_network_logs";
 FEATURES.DESKTOP_SESSIONS = "all_desktop_session_features";
 
+FEATURES.COMPRESS_RULE_PAIRS = "compress_rule_pairs";
+
 export default FEATURES;
