@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^1.12.1",
+    "@ant-design/colors": "^7.0.2",
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-card": "^1.20.6",
     "@ant-design/pro-table": "^2.75.1",
@@ -117,6 +118,7 @@
     "rrweb": "2.0.0-alpha.11",
     "rrweb-player": "2.0.0-alpha.11",
     "semver": "^7.5.4",
+    "styled-components": "^6.1.8",
     "ts-loader": "^9.3.0",
     "typewriter-effect": "^2.19.0",
     "ua-parser-js": "^1.0.2",
