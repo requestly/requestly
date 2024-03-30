@@ -92,7 +92,7 @@ function compressRecord(record) {
         });
         break;
 
-      case "Script":
+      case RuleType.SCRIPT:
         record.pairs.forEach((pair, idx) => {
           pair.scripts.forEach((script, sidx) => {
             if (script.type === "code") {
