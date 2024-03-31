@@ -1,4 +1,4 @@
-import { FilterType } from "componentsV2/ContentList/ContentListHeader";
+import { FilterType } from "componentsV2/ContentList";
 import { RecordStatus, StorageRecord } from "features/rules/types/rules";
 
 // FIXME: Performance Improvements
@@ -14,7 +14,6 @@ export const getFilteredRecords = (records: StorageRecord[], filterType: FilterT
     });
   }
 
-  console.log({ records, filteredRecords, searchFilteredRecords });
   return searchFilteredRecords;
 };
 

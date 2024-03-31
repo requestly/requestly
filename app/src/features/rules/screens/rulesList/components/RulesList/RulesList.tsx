@@ -6,7 +6,7 @@ import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { FilterType } from "componentsV2/ContentList/ContentListHeader";
+import { FilterType } from "componentsV2/ContentList/";
 import { CreateTeamRuleCTA, GettingStarted } from "./components";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import SpinnerColumn from "components/misc/SpinnerColumn";

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { Empty } from "antd";
-import ContentListTable from "componentsV2/ContentList/ContentListTable/ContentListTable";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { recordsToContentTableDataAdapter } from "./utils";
 import { isRule, isGroup } from "features/rules/utils";
@@ -19,10 +18,7 @@ import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import "./rulesTable.css";
 import { enhanceRecords } from "./utils/rules";
-import {
-  useContentListTableContext,
-  withContentListTableContext,
-} from "componentsV2/ContentList/ContentListTable/context";
+import { ContentListTable, useContentListTableContext, withContentListTableContext } from "componentsV2/ContentList";
 import { useRulesActionContext } from "features/rules/context/actions";
 
 interface Props {

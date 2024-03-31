@@ -18,7 +18,6 @@ interface Props {
 }
 
 const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
-  console.log("useFetchAndUpdateRules");
   const appMode = useSelector(getAppMode);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);

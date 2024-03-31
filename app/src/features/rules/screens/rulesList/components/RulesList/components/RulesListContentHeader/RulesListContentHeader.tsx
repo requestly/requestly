@@ -4,7 +4,7 @@ import { Badge, Dropdown, Menu, Tooltip } from "antd";
 import { DropdownButtonType } from "antd/lib/dropdown";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import AuthPopoverButton from "components/features/rules/RulesListContainer/RulesTable/AuthPopoverButtons";
-import ContentListHeader, { ContentListHeaderProps, FilterType } from "componentsV2/ContentList/ContentListHeader";
+import { ContentListHeader, ContentListHeaderProps, FilterType } from "componentsV2/ContentList";
 import APP_CONSTANTS from "config/constants";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { PremiumFeature } from "features/pricing";

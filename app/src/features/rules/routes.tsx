@@ -13,8 +13,8 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RootComponent from "components/redirects/RootComponent";
 
 // V2 Imports
-import RulesListIndexView from "./screens/rulesList";
 import RulesContainerV2 from "./container";
+import { RulesListScreen } from "./screens/rulesList";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -73,8 +73,12 @@ export const ruleRoutes: RouteObject[] = [
     element: <RulesContainerV2 />,
     children: [
       {
+        index: true,
+        element: <Navigate to={PATHS.RULES.MY_RULES.RELATIVE} />,
+      },
+      {
         path: `${PATHS.RULES.MY_RULES.RELATIVE}`,
-        element: <RulesListIndexView />,
+        element: <RulesListScreen />,
       },
     ],
   },

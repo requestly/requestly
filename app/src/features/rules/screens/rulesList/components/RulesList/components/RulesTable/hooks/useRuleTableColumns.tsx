@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
-import { ContentTableProps } from "componentsV2/ContentList/ContentListTable/ContentListTable";
+import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "../types";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { Group, RecordStatus, Rule } from "features/rules/types/rules";
@@ -46,7 +46,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
    * - make rule name clickable and navigate to editor.
    */
 
-  const columns: ContentTableProps<RuleTableRecord>["columns"] = [
+  const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
     {
       title: "",

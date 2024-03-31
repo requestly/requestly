@@ -6,7 +6,7 @@ import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
 import "./contentListTable.scss";
 import { useContentListTableContext } from "./context";
 
-export interface ContentTableProps<DataType> extends TableProps<DataType> {
+export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   id: string;
   columns: ColumnsType<DataType>;
   data: DataType[];
@@ -30,7 +30,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   scroll = { y: "calc(100vh - 277px)" },
   locale,
   onRecordSelection = () => {},
-}: ContentTableProps<DataType>): ReactElement => {
+}: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
 

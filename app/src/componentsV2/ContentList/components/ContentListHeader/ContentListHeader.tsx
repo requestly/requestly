@@ -15,7 +15,7 @@ export interface ContentListHeaderProps {
 }
 
 // Contains common design and colors for app
-export const ContentListHeader: React.FC<ContentListHeaderProps> = ({
+const ContentListHeader: React.FC<ContentListHeaderProps> = ({
   title,
   subtitle,
   actions,
@@ -67,3 +67,5 @@ export const ContentListHeader: React.FC<ContentListHeaderProps> = ({
     </div>
   );
 };
+
+export default ContentListHeader;
