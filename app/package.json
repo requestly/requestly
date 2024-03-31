@@ -40,7 +40,6 @@
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^1.12.1",
-    "@ant-design/colors": "^7.0.2",
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-card": "^1.20.6",
     "@ant-design/pro-table": "^2.75.1",
@@ -53,6 +52,7 @@
     "@monaco-editor/react": "^4.4.6",
     "@react-icons/all-files": "https://github.com/react-icons/react-icons/releases/download/v4.10.1/react-icons-all-files-4.10.1.tgz",
     "@reduxjs/toolkit": "^1.9.0",
+    "@requestly/colors": "^1.0.1",
     "@requestly/mock-server": "0.1.6",
     "@requestly/requestly-core": "file:..",
     "@requestly/rq-common": "^1.0.2",

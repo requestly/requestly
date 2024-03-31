@@ -1,8 +1,17 @@
-import { generate } from "@ant-design/colors";
+import { generate } from "@requestly/colors";
 
 type SeedTokenKeys = "primary" | "neutral" | "success" | "error" | "warning";
 type MapTokenVariations = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 type MapTokenKeys = `${SeedTokenKeys}-${MapTokenVariations}`;
+type AliasTokenKeys =
+  | "primary-light"
+  | "primary-text"
+  | "background"
+  | "surface-1"
+  | "surface-2"
+  | "surface-3"
+  | "text-placeholder"
+  | "text-subtle";
 
 type SeedTokens = {
   [key in SeedTokenKeys]: string;
@@ -10,6 +19,10 @@ type SeedTokens = {
 
 type MapTokens = {
   [key in MapTokenKeys]: string;
+};
+
+type AliasTokens = {
+  [key in AliasTokenKeys]: string;
 };
 
 export const generateColorTokens = (
@@ -36,9 +49,7 @@ const generateMapTokens = (seedTokens: SeedTokens) => {
 
   Object.entries(seedTokens).forEach(([key, value]) => {
     generate(value).forEach((color, index) => {
-      if (index === 0) return; // Skipping 0 as it is generating 10 colors 5 light, and 4 dark
-
-      mapTokens[`${key}-${index * 100}` as MapTokenKeys] = color;
+      mapTokens[`${key}-${(index + 1) * 100}` as MapTokenKeys] = color;
     });
   });
 
@@ -46,7 +57,7 @@ const generateMapTokens = (seedTokens: SeedTokens) => {
 };
 
 const generateAliasTokens = (seedTokens: SeedTokens, mapTokens: MapTokens) => {
-  const aliasTokens = {
+  const aliasTokens: AliasTokens = {
     "primary-light": mapTokens["primary-400"],
     "primary-text": mapTokens["primary-300"],
     background: mapTokens["neutral-900"],

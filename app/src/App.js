@@ -25,7 +25,7 @@ import ExtensionContextInvalidationNotice from "components/misc/ExtensionContext
 import { useIsExtensionEnabled } from "hooks";
 import { LazyMotion, domMax } from "framer-motion";
 import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
-import DesignSystemStyles from "lib/design-system-v2/DesignSystemStyles";
+import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -72,27 +72,28 @@ const App = () => {
       {/* <RuleExecutionsSyncer /> */}
       <ActiveWorkspace />
       <ThirdPartyIntegrationsHandler />
-      <DesignSystemStyles />
 
-      <ConfigProvider locale={enUS}>
-        <GrowthBookProvider growthbook={growthbook}>
-          <LocalUserAttributesHelperComponent />
-          <FeatureUsageEvent />
-          <LazyMotion features={domMax} strict>
-            <div id="requestly-dashboard-layout">
-              <CommandBar />
-              {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
-                <FullScreenLayout />
-              ) : (
-                <>
-                  <UpdateDialog />
-                  <DashboardLayout />
-                </>
-              )}
-            </div>
-          </LazyMotion>
-        </GrowthBookProvider>
-      </ConfigProvider>
+      <ThemeProvider>
+        <ConfigProvider locale={enUS}>
+          <GrowthBookProvider growthbook={growthbook}>
+            <LocalUserAttributesHelperComponent />
+            <FeatureUsageEvent />
+            <LazyMotion features={domMax} strict>
+              <div id="requestly-dashboard-layout">
+                <CommandBar />
+                {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
+                  <FullScreenLayout />
+                ) : (
+                  <>
+                    <UpdateDialog />
+                    <DashboardLayout />
+                  </>
+                )}
+              </div>
+            </LazyMotion>
+          </GrowthBookProvider>
+        </ConfigProvider>
+      </ThemeProvider>
     </>
   );
 };
