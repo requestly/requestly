@@ -23,7 +23,8 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, primaryColor, n
 
   console.log({ theme, themeCssVariables });
 
-  // Used fot injecting css variables to the root element
+  // Used for injecting css variables to the root element
+  // TODO: Generate .css file from this for local testing and autocompletion in IDE
   const GlobalStyles = createGlobalStyle`
     :root {
       ${Object.entries(themeCssVariables)
