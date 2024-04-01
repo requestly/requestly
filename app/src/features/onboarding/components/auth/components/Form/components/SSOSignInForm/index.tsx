@@ -106,6 +106,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       >
         Continue
       </RQButton>
+      <div className="sso-form-footer">You will be redirected to your organization's Single Sign-on portal.</div>
     </>
   );
 };
