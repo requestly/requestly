@@ -5,7 +5,7 @@ import { useRulesModalsContext } from "features/rules/context/modals";
 interface Props {}
 
 export const CreateNewRuleGroupModalWrapper: React.FC<Props> = () => {
-  const { setOpenCreateGroupModal } = useRulesModalsContext();
+  const { setOpenCreateGroupModalAction } = useRulesModalsContext();
 
   const [isModalActive, setIsModalActive] = useState(false);
 
@@ -14,8 +14,8 @@ export const CreateNewRuleGroupModalWrapper: React.FC<Props> = () => {
       setIsModalActive(true);
     };
 
-    setOpenCreateGroupModal(() => openModal);
-  }, [setOpenCreateGroupModal]);
+    setOpenCreateGroupModalAction(() => openModal);
+  }, [setOpenCreateGroupModalAction]);
 
   const onClose = () => {
     setIsModalActive(false);

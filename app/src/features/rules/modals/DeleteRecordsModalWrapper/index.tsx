@@ -6,7 +6,7 @@ import { useRulesModalsContext } from "features/rules/context/modals";
 interface Props {}
 
 export const DeleteRecordsModalWrapper: React.FC<Props> = () => {
-  const { setOpenDeleteRecordsModal } = useRulesModalsContext();
+  const { setOpenDeleteRecordsModalAction } = useRulesModalsContext();
 
   const [isModalActive, setIsModalActive] = useState(false);
   const [records, setRecords] = useState<StorageRecord[]>([]);
@@ -19,8 +19,8 @@ export const DeleteRecordsModalWrapper: React.FC<Props> = () => {
       setOnSuccess(() => onSuccess);
     };
 
-    setOpenDeleteRecordsModal(() => openModal);
-  }, [setOpenDeleteRecordsModal]);
+    setOpenDeleteRecordsModalAction(() => openModal);
+  }, [setOpenDeleteRecordsModalAction]);
 
   const onClose = () => {
     setRecords(null);

@@ -4,7 +4,7 @@ import { Group } from "features/rules/types/rules";
 import { useRulesModalsContext } from "features/rules/context/modals";
 
 export const RenameGroupModalWrapper: React.FC = () => {
-  const { setOpenRenameGroupModal } = useRulesModalsContext();
+  const { setOpenRenameGroupModalAction } = useRulesModalsContext();
 
   const [isModalActive, setModalActive] = useState(false);
   const [groupToRename, setGroupToRename] = useState<Group | null>(null);
@@ -15,8 +15,8 @@ export const RenameGroupModalWrapper: React.FC = () => {
       setModalActive(true);
     };
 
-    setOpenRenameGroupModal(() => openModal);
-  }, [setOpenRenameGroupModal]);
+    setOpenRenameGroupModalAction(() => openModal);
+  }, [setOpenRenameGroupModalAction]);
 
   const onClose = () => {
     setGroupToRename(null);

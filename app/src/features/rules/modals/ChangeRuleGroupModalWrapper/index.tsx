@@ -6,7 +6,7 @@ import { useRulesModalsContext } from "features/rules/context/modals";
 interface Props {}
 
 export const ChangeRuleGroupModalWrapper: React.FC<Props> = () => {
-  const { setOpenChangeRecordsGroupModal } = useRulesModalsContext();
+  const { setOpenChangeRecordsGroupModalAction } = useRulesModalsContext();
 
   const [isModalActive, setIsModalActive] = useState(false);
   const [rulesToChange, setRulesToChange] = useState<Rule[]>([]);
@@ -19,8 +19,8 @@ export const ChangeRuleGroupModalWrapper: React.FC<Props> = () => {
       setOnSuccess(() => onSuccess);
     };
 
-    setOpenChangeRecordsGroupModal(() => openModal);
-  }, [setOpenChangeRecordsGroupModal]);
+    setOpenChangeRecordsGroupModalAction(() => openModal);
+  }, [setOpenChangeRecordsGroupModalAction]);
 
   const onClose = () => {
     setRulesToChange([]);

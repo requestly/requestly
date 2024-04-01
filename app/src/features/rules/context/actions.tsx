@@ -55,13 +55,13 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const userAttributes = useSelector(getUserAttributes);
 
   const {
-    openCreateGroupModal,
-    openImportRecordsModal,
-    openChangeRecordsGroupModal,
-    openDeleteRecordsModal,
-    openDuplicateRecordModal,
-    openRenameGroupModal,
-    openGroupDeleteModal,
+    openCreateGroupModalAction,
+    openImportRecordsModalAction,
+    openChangeRecordsGroupModalAction,
+    openDeleteRecordsModalAction,
+    openDuplicateRecordModalAction,
+    openRenameGroupModalAction,
+    openGroupDeleteModalAction,
   } = useRulesModalsContext();
 
   /** Generic */
@@ -112,13 +112,13 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const createGroupAction = useCallback(() => {
     console.log("[DEBUG]", "createGroupAction");
-    openCreateGroupModal();
-  }, [openCreateGroupModal]);
+    openCreateGroupModalAction();
+  }, [openCreateGroupModalAction]);
 
   const importRecordsAction = useCallback(() => {
     console.log("[DEBUG]", "importRecordsAction");
-    openImportRecordsModal();
-  }, [openImportRecordsModal]);
+    openImportRecordsModalAction();
+  }, [openImportRecordsModalAction]);
 
   const recordsUngroupAction = useCallback(
     async (records: StorageRecord[]) => {
@@ -147,9 +147,9 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
       }
 
       const selectedRules = records.filter(isRule);
-      openChangeRecordsGroupModal(selectedRules, onSuccess);
+      openChangeRecordsGroupModalAction(selectedRules, onSuccess);
     },
-    [openChangeRecordsGroupModal]
+    [openChangeRecordsGroupModalAction]
   );
 
   const recordsShareAction = useCallback(
@@ -192,9 +192,9 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const recordsDeleteAction = useCallback(
     (records: StorageRecord[], onSuccess?: Function) => {
       console.log("[DEBUG]", "recordsDeleteAction");
-      openDeleteRecordsModal(records, onSuccess);
+      openDeleteRecordsModalAction(records, onSuccess);
     },
-    [openDeleteRecordsModal]
+    [openDeleteRecordsModalAction]
   );
 
   const recordsStatusToggleAction = useCallback(
@@ -249,9 +249,9 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         return;
       }
 
-      openDuplicateRecordModal(record);
+      openDuplicateRecordModalAction(record);
     },
-    [openDuplicateRecordModal]
+    [openDuplicateRecordModalAction]
   );
 
   const recordRenameAction = useCallback(
@@ -261,17 +261,17 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         return;
       }
 
-      openRenameGroupModal(record);
+      openRenameGroupModalAction(record);
     },
-    [openRenameGroupModal]
+    [openRenameGroupModalAction]
   );
 
   const groupDeleteAction = useCallback(
     (group: Group) => {
       console.log("[DEBUG]", "groupDeleteAction");
-      openGroupDeleteModal(group);
+      openGroupDeleteModalAction(group);
     },
-    [openGroupDeleteModal]
+    [openGroupDeleteModalAction]
   );
 
   const recordsPinAction = useCallback(

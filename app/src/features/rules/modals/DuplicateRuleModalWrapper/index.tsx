@@ -5,7 +5,7 @@ import { Rule } from "features/rules/types/rules";
 import { useRulesModalsContext } from "features/rules/context/modals";
 
 export const DuplicateRuleModalWrapper: React.FC = () => {
-  const { setOpenDuplicateRecordModal } = useRulesModalsContext();
+  const { setOpenDuplicateRecordModalAction } = useRulesModalsContext();
 
   const [isModalActive, setIdModalActive] = useState(false);
   const [ruleToDuplicate, setRuleToDuplicate] = useState<Rule | null>(null);
@@ -16,8 +16,8 @@ export const DuplicateRuleModalWrapper: React.FC = () => {
       setIdModalActive(true);
     };
 
-    setOpenDuplicateRecordModal(() => openModal);
-  }, [setOpenDuplicateRecordModal]);
+    setOpenDuplicateRecordModalAction(() => openModal);
+  }, [setOpenDuplicateRecordModalAction]);
 
   const onClose = () => {
     setRuleToDuplicate(null);

@@ -6,7 +6,7 @@ import { useRulesModalsContext } from "features/rules/context/modals";
 interface Props {}
 
 export const UngroupOrDeleteRulesModalWrapper: React.FC<Props> = () => {
-  const { setOpenGroupDeleteModal } = useRulesModalsContext();
+  const { setOpenGroupDeleteModalAction } = useRulesModalsContext();
 
   const [isModalActive, setIsModalActive] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<Group | null>(null);
@@ -17,8 +17,8 @@ export const UngroupOrDeleteRulesModalWrapper: React.FC<Props> = () => {
       setIsModalActive(true);
     };
 
-    setOpenGroupDeleteModal(() => openModal);
-  }, [setOpenGroupDeleteModal]);
+    setOpenGroupDeleteModalAction(() => openModal);
+  }, [setOpenGroupDeleteModalAction]);
 
   const onClose = () => {
     setGroupToDelete(null);

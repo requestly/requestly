@@ -6,26 +6,26 @@ import React, { createContext, useContext, useState } from "react";
 import { Group, Rule, StorageRecord } from "../types/rules";
 
 type RulesModalsContextType = {
-  openCreateGroupModal: () => void;
-  setOpenCreateGroupModal: React.Dispatch<React.SetStateAction<() => void>>;
+  openCreateGroupModalAction: () => void;
+  setOpenCreateGroupModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openImportRecordsModal: () => void;
-  setOpenImportRecordsModal: React.Dispatch<React.SetStateAction<() => void>>;
+  openImportRecordsModalAction: () => void;
+  setOpenImportRecordsModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openChangeRecordsGroupModal: (rules: Rule[], onSuccess: Function) => void;
-  setOpenChangeRecordsGroupModal: React.Dispatch<React.SetStateAction<() => void>>;
+  openChangeRecordsGroupModalAction: (rules: Rule[], onSuccess: Function) => void;
+  setOpenChangeRecordsGroupModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openDeleteRecordsModal: (records: StorageRecord[], onSuccess?: Function) => void;
-  setOpenDeleteRecordsModal: React.Dispatch<React.SetStateAction<() => void>>;
+  openDeleteRecordsModalAction: (records: StorageRecord[], onSuccess?: Function) => void;
+  setOpenDeleteRecordsModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openDuplicateRecordModal: (record: StorageRecord) => void;
-  setOpenDuplicateRecordModal: React.Dispatch<React.SetStateAction<() => void>>;
+  openDuplicateRecordModalAction: (record: StorageRecord) => void;
+  setOpenDuplicateRecordModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openRenameGroupModal: (record: StorageRecord) => void;
-  setOpenRenameGroupModal: React.Dispatch<React.SetStateAction<() => void>>;
+  openRenameGroupModalAction: (record: StorageRecord) => void;
+  setOpenRenameGroupModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openGroupDeleteModal: (record: Group) => void;
-  setOpenGroupDeleteModal: React.Dispatch<React.SetStateAction<() => void>>;
+  openGroupDeleteModalAction: (record: Group) => void;
+  setOpenGroupDeleteModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 };
 
 const RulesModalsContext = createContext<RulesModalsContextType>(null);
@@ -35,35 +35,39 @@ interface RulesModalsContextProviderProps {
 }
 
 export const RulesModalsContextProvider: React.FC<RulesModalsContextProviderProps> = ({ children }) => {
-  const [openCreateGroupModal, setOpenCreateGroupModal] = useState<() => void>(async () => () => {});
-  const [openImportRecordsModal, setOpenImportRecordsModal] = useState<() => void>(async () => () => {});
-  const [openChangeRecordsGroupModal, setOpenChangeRecordsGroupModal] = useState<() => void>(async () => () => {});
-  const [openDeleteRecordsModal, setOpenDeleteRecordsModal] = useState<() => void>(async () => () => {});
-  const [openDuplicateRecordModal, setOpenDuplicateRecordModal] = useState<() => void>(async () => () => {});
-  const [openRenameGroupModal, setOpenRenameGroupModal] = useState<() => void>(async () => () => {});
-  const [openGroupDeleteModal, setOpenGroupDeleteModal] = useState<() => void>(async () => () => {});
+  const [openCreateGroupModalAction, setOpenCreateGroupModalAction] = useState<() => void>(async () => () => {});
+  const [openImportRecordsModalAction, setOpenImportRecordsModalAction] = useState<() => void>(async () => () => {});
+  const [openChangeRecordsGroupModalAction, setOpenChangeRecordsGroupModalAction] = useState<() => void>(
+    async () => () => {}
+  );
+  const [openDeleteRecordsModalAction, setOpenDeleteRecordsModalAction] = useState<() => void>(async () => () => {});
+  const [openDuplicateRecordModalAction, setOpenDuplicateRecordModalAction] = useState<() => void>(
+    async () => () => {}
+  );
+  const [openRenameGroupModalAction, setOpenRenameGroupModalAction] = useState<() => void>(async () => () => {});
+  const [openGroupDeleteModalAction, setOpenGroupDeleteModalAction] = useState<() => void>(async () => () => {});
 
   const value = {
-    openCreateGroupModal,
-    setOpenCreateGroupModal,
+    openCreateGroupModalAction,
+    setOpenCreateGroupModalAction,
 
-    openImportRecordsModal,
-    setOpenImportRecordsModal,
+    openImportRecordsModalAction,
+    setOpenImportRecordsModalAction,
 
-    openChangeRecordsGroupModal,
-    setOpenChangeRecordsGroupModal,
+    openChangeRecordsGroupModalAction,
+    setOpenChangeRecordsGroupModalAction,
 
-    openDeleteRecordsModal,
-    setOpenDeleteRecordsModal,
+    openDeleteRecordsModalAction,
+    setOpenDeleteRecordsModalAction,
 
-    openDuplicateRecordModal,
-    setOpenDuplicateRecordModal,
+    openDuplicateRecordModalAction,
+    setOpenDuplicateRecordModalAction,
 
-    openRenameGroupModal,
-    setOpenRenameGroupModal,
+    openRenameGroupModalAction,
+    setOpenRenameGroupModalAction,
 
-    openGroupDeleteModal,
-    setOpenGroupDeleteModal,
+    openGroupDeleteModalAction,
+    setOpenGroupDeleteModalAction,
   };
 
   return <RulesModalsContext.Provider value={value}>{children}</RulesModalsContext.Provider>;
