@@ -1,4 +1,4 @@
-.secondary-sidebar-link {
+.rq-secondary-sidebar-item {
   width: 100%;
   margin-top: 2px;
   display: inline-flex;
@@ -11,17 +11,17 @@
   border-radius: var(--border-radius-sm);
 }
 
-.secondary-sidebar-link .icon__wrapper svg {
+.rq-secondary-sidebar-item .icon__wrapper svg {
   width: 17px;
   height: 15px;
 }
 
-.secondary-sidebar-active-link {
+.rq-secondary-sidebar-active-item {
   color: white;
   background-color: var(--gray-dark);
 }
 
-.secondary-sidebar-link:hover {
+.rq-secondary-sidebar-item:hover {
   color: white;
   background-color: var(--hover-color);
 }

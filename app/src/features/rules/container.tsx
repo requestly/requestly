@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { getIsSecondarySidebarCollapsed } from "store/selectors";
-import { RulesSidebar } from "./components/RulesSidebar";
+import { RulesSidebar } from "./components/RulesSidebar/RulesSidebar";
 import { RulesContextProvider } from "./context";
 import { CreateNewRuleGroupModalWrapper } from "./modals/CreateNewRuleGroupModalWrapper";
 import { ImportRulesModalWrapper } from "./modals/ImportRulesModal/ImportRulesModalWrapper";
