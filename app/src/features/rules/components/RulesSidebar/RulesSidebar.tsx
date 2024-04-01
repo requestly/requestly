@@ -24,6 +24,5 @@ const rulesSidebarItems = [
 ];
 
 export const RulesSidebar: React.FC = () => {
-  console.log("RulesSidebar");
   return <SecondarySidebar items={rulesSidebarItems} />;
 };
