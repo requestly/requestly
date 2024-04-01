@@ -3,7 +3,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 ((namespace) => {
   window[namespace] = window[namespace] || {};
   window[namespace].responseRules = [];
-  window[namespace].requestRules = {};
+  window[namespace].requestRules = [];
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage
@@ -108,10 +108,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return !!getMatchedResponseRule(url);
   };
 
-  const isRequestRuleApplicableOnUrl = (url) => {
-    return window[namespace].requestRules.hasOwnProperty(getAbsoluteUrl(url));
-  };
-
   /**
    * @param {Object} json
    * @param {String} path -> "a", "a.b", "a.0.b (If a is an array containing list of objects"
@@ -181,7 +177,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const getMatchedRequestRule = (url) => {
-    return window[namespace].requestRules?.[getAbsoluteUrl(url)];
+    return window[namespace].requestRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
   const shouldServeResponseWithoutRequest = (responseModification) => {

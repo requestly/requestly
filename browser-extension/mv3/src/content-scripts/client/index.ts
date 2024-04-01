@@ -3,6 +3,7 @@ import { initRuleExecutionHandler } from "./ruleExecution";
 import { initSessionRecording } from "./sessionRecorder";
 import { executeScriptOnPageExternally } from "../utils";
 import { initResponseRuleHandler } from "./responseRuleHandler";
+import { initRequestRuleHandler } from "./requestRuleHandler";
 
 console.log("Hello from Requestly!");
 
@@ -11,6 +12,7 @@ if (document.doctype?.name === "html" || document.contentType?.includes("html"))
   initSessionRecording();
   initRuleExecutionHandler();
   initResponseRuleHandler();
+  initRequestRuleHandler();
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
