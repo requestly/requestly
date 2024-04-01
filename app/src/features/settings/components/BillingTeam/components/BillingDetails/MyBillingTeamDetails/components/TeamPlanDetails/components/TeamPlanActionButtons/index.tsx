@@ -3,7 +3,7 @@ import { Col, Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { MdOutlineCancel } from "@react-icons/all-files/md/MdOutlineCancel";
-import upgradeIcon from "../../../../../../assets/upgrade.svg";
+import upgradeIcon from "../../../../../../../assets/upgrade.svg";
 import { PRICING } from "features/pricing";
 import { actions } from "store";
 import { useDispatch } from "react-redux";

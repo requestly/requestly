@@ -4,7 +4,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { Col, Popover, Row } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { TeamPlanStatus } from "../../../TeamPlanStatus";
+import { TeamPlanStatus } from "../../../../TeamPlanStatus";
 import { TeamPlanDetailsPopover } from "../TeamPlanDetailsPopover";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getPlanNameFromId } from "utils/PremiumUtils";
