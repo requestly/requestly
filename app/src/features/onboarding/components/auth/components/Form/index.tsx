@@ -217,7 +217,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
       </RQButton>
       <Divider plain className="onboarding-auth-form-divider">
-        or {authMode === AUTH.ACTION_LABELS.SIGN_UP ? " sign up with email" : "sign in with email"}
+        Or
       </Divider>
 
       <AuthFormInput
@@ -229,13 +229,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           <label>
             <Row justify="space-between" align="middle">
               <Col>Your work email</Col>{" "}
-              <Tooltip
-                placement="right"
-                title="Use your work email to use team workspaces, session replay and orgazniation-level access controls."
-                color="var(--black)"
-              >
-                <Col className="why-work-email">Why work email?</Col>
-              </Tooltip>
+              {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
+                <Tooltip
+                  placement="right"
+                  title="Use your work email to use team workspaces, session replay and orgazniation-level access controls."
+                  color="var(--black)"
+                >
+                  <Col className="why-work-email">Why work email?</Col>
+                </Tooltip>
+              )}
             </Row>
           </label>
         }
@@ -284,26 +286,31 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             : "Sign in with email"
           : "Continue"}
       </RQButton>
-      <RQButton
-        block
-        type="default"
-        size="large"
-        className="auth-screen-sso-btn"
-        onClick={() => {
-          setAuthMode(AUTH.ACTION_LABELS.SSO);
-          trackLoginWithSSOClicked();
-        }}
-      >
-        Continue with Single Sign-on (SSO)
-      </RQButton>
-      <div className="onboarding-terms-text">
-        I agree to the Requestly{" "}
-        <a href="https://requestly.com/terms/" target="_blank" rel="noreferrer">
-          terms
-        </a>
-        . Learn about how we use and protect your data in our{" "}
-        <a href="https://requestly.com/privacy/">privacy policy</a>.
-      </div>
+      {authMode === AUTH.ACTION_LABELS.LOG_IN && (
+        <RQButton
+          block
+          type="default"
+          size="large"
+          className="auth-screen-sso-btn"
+          onClick={() => {
+            setAuthMode(AUTH.ACTION_LABELS.SSO);
+            trackLoginWithSSOClicked();
+          }}
+        >
+          Continue with Single Sign-on (SSO)
+        </RQButton>
+      )}
+
+      {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
+        <div className="onboarding-terms-text">
+          I agree to the Requestly{" "}
+          <a href="https://requestly.com/terms/" target="_blank" rel="noreferrer">
+            terms
+          </a>
+          . Learn about how we use and protect your data in our{" "}
+          <a href="https://requestly.com/privacy/">privacy policy</a>.
+        </div>
+      )}
     </div>
   );
 };
