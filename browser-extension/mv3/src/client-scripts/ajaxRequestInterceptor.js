@@ -2,7 +2,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
 ((namespace) => {
   window[namespace] = window[namespace] || {};
-  window[namespace].responseRules = {};
+  window[namespace].responseRules = [];
   window[namespace].requestRules = {};
   let isDebugMode = false;
 
@@ -28,8 +28,84 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     ].some((nonJsonType) => obj instanceof nonJsonType);
   };
 
+  const matchSourceUrl = (sourceObject, url) => {
+    const extractUrlComponent = (url, key) => {
+      const urlObj = new URL(url);
+
+      switch (key) {
+        case "Url":
+          return url;
+        case "host":
+          return urlObj.host;
+        case "path":
+          return urlObj.pathname;
+        default:
+          return null;
+      }
+    };
+
+    const checkRegexMatch = (regexString, inputString) => {
+      const toRegex = (regexStr) => {
+        const matchRegExp = regexStr.match(new RegExp("^/(.+)/(|i|g|ig|gi)$"));
+
+        if (!matchRegExp) {
+          return null;
+        }
+
+        try {
+          return new RegExp(matchRegExp[1], matchRegExp[2]);
+        } catch {
+          return null;
+        }
+      };
+
+      if (!regexString.startsWith("/")) {
+        regexString = `/${regexString}/`; // Keeping enclosing slashes for regex as optional
+      }
+
+      const regex = toRegex(regexString);
+      return regex?.test(inputString);
+    };
+
+    const checkWildCardMatch = (wildCardString, inputString) => {
+      const regexString = "/^" + wildCardString.replaceAll("*", ".*") + "$/";
+      return checkRegexMatch(regexString, inputString);
+    };
+
+    const urlComponent = extractUrlComponent(url, sourceObject.key);
+    const value = sourceObject.value;
+
+    if (!urlComponent) {
+      return false;
+    }
+
+    switch (sourceObject.operator) {
+      case "Equals":
+        if (value === urlComponent) {
+          return true;
+        }
+        break;
+
+      case "Contains":
+        if (urlComponent.includes(value)) {
+          return true;
+        }
+        break;
+
+      case "Matches": {
+        return checkRegexMatch(value, urlComponent);
+      }
+
+      case "Wildcard_Matches": {
+        return checkWildCardMatch(value, urlComponent);
+      }
+    }
+
+    return false;
+  };
+
   const isResponseRuleApplicableOnUrl = (url) => {
-    return window[namespace].responseRules.hasOwnProperty(getAbsoluteUrl(url));
+    return !!getMatchedResponseRule(url);
   };
 
   const isRequestRuleApplicableOnUrl = (url) => {
@@ -101,7 +177,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const getMatchedResponseRule = (url) => {
-    return window[namespace].responseRules?.[getAbsoluteUrl(url)];
+    return window[namespace].responseRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
   const getMatchedRequestRule = (url) => {
@@ -112,12 +188,16 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return responseModification.type === "static" && responseModification.serveWithoutRequest;
   };
 
+  const getFunctionFromCode = (code) => {
+    return new Function("args", `return (${code})(args);`);
+  };
+
   const getCustomRequestBody = (requestRuleData, args) => {
     let requestBody;
     if (requestRuleData.request.type === "static") {
       requestBody = requestRuleData.request.value;
     } else {
-      requestBody = requestRuleData.evaluator(args);
+      requestBody = getFunctionFromCode(requestRuleData.request.value)(args);
     }
 
     if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {
@@ -259,7 +339,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       if (this.readyState === this.DONE) {
         let customResponse =
           responseModification.type === "code"
-            ? responseRuleData.evaluator({
+            ? getFunctionFromCode(responseRuleData.response.value)({
                 method: this.method,
                 url,
                 requestHeaders: this.requestHeaders,
@@ -565,7 +645,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         };
       }
 
-      customResponse = responseRuleData.evaluator(evaluatorArgs);
+      customResponse = getFunctionFromCode(responseRuleData.response.value)(evaluatorArgs);
 
       // evaluator might return us Object but response.value is string
       // So make the response consistent by converting to JSON String and then create the Response object
