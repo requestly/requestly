@@ -30,7 +30,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   const matchSourceUrl = (sourceObject, url) => {
     const extractUrlComponent = (url, key) => {
-      const urlObj = new URL(url);
+      const urlObj = new URL(getAbsoluteUrl(url));
 
       switch (key) {
         case "Url":
@@ -288,15 +288,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   // Intercept XMLHttpRequest
   const onReadyStateChange = async function () {
     if (this.readyState === this.HEADERS_RECEIVED || this.readyState === this.DONE) {
-      let url;
-
-      if (isResponseRuleApplicableOnUrl(this.responseURL)) {
-        url = this.responseURL;
-      } else if (isResponseRuleApplicableOnUrl(this.requestURL)) {
-        url = this.requestURL;
-      } else {
+      if (!this.responseRule) {
         return;
       }
+
+      const url = this.requestURL;
 
       const responseRuleData = getMatchedResponseRule(url);
       const { response: responseModification, source } = responseRuleData;
@@ -448,7 +444,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   const open = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method, url) {
     this.method = method;
-    this.requestURL = url;
+    this.requestURL = getAbsoluteUrl(url);
     open.apply(this, arguments);
   };
 
@@ -556,10 +552,10 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     let fetchedResponse;
     let exceptionCaught;
 
-    const responseRule = getMatchedResponseRule(url);
+    const responseRuleData = getMatchedResponseRule(url);
 
-    if (responseRule && shouldServeResponseWithoutRequest(responseRule.response)) {
-      const contentType = isJSON(responseRule.response.value) ? "application/json" : "text/plain";
+    if (responseRuleData && shouldServeResponseWithoutRequest(responseRuleData.response)) {
+      const contentType = isJSON(responseRuleData.response.value) ? "application/json" : "text/plain";
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
@@ -569,7 +565,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           fetchedResponse = await getOriginalResponse();
         }
 
-        if (!responseRule) {
+        if (!responseRuleData) {
           return fetchedResponse;
         }
 
@@ -589,8 +585,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       }
       return fetchedResponse;
     }
-
-    const responseRuleData = getMatchedResponseRule(url);
 
     if (fetchedResponse?.status === 204) {
       // Return the same response when status is 204. fetch doesn't allow to create new response with empty body
