@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { Col } from "antd";
+import "./index.scss";
 
 interface Props {
   children: ReactNode;

@@ -11,3 +11,15 @@
 .desktop-port-update-btn {
   margin-top: 8px;
 }
+
+.desktop-settings-container {
+  display: flex;
+  justify-content: center;
+}
+
+.desktop-settings-wrapper {
+  padding: 2rem;
+  padding-top: 1rem;
+  width: 100%;
+  max-width: 1000px;
+}

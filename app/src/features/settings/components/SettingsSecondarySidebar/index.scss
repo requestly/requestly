@@ -1,0 +1,23 @@
+.settings-secondary-sidebar {
+  width: 184px;
+  padding: 12px;
+  height: 100vw;
+  border-right: 1px solid var(--surface-2);
+  background: var(--surface-1);
+  box-shadow: -2px 0px 12px 0px rgba(0, 0, 0, 0.28);
+  overflow-y: auto;
+
+  &-section-title {
+    color: var(--neutrals-gray-300);
+    padding-left: 2px;
+    margin-bottom: 8px;
+  }
+
+  & .settings-secondary-sidebar-section {
+    padding-left: 1rem !important;
+
+    &-link:hover {
+      background: var(--surface-2);
+    }
+  }
+}
