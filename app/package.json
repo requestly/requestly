@@ -103,7 +103,7 @@
     "react-redux": "^8.0.2",
     "react-resizable": "^3.0.4",
     "react-responsive": "^9.0.0-beta.6",
-    "react-router-dom": "6.14.1",
+    "react-router-dom": "6.22.3",
     "react-select": "^5.2.2",
     "react-split": "^2.0.14",
     "react-text-loop": "^2.3.0",
