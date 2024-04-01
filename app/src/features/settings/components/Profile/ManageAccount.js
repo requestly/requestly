@@ -7,7 +7,7 @@ import UserInfo from "./UserInfo";
 import { getUserAuthDetails } from "../../../../store/selectors";
 import { redirectToDeleteAccount, redirectToSignDPA } from "../../../../utils/RedirectionUtils";
 // ACTIONS
-import { handleForgotPasswordButtonOnClick } from "../../../../components/authentication/AuthForm/actions";
+import { handleForgotPasswordButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import ProCard from "@ant-design/pro-card";
 
 import { useSelector } from "react-redux";
