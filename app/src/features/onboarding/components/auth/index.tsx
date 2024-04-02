@@ -6,60 +6,55 @@ import { OnboardingAuthBanner } from "./components/Banner";
 import AUTH from "config/constants/sub/auth";
 import MagicLinkModalContent from "components/authentication/AuthForm/MagicAuthLinkModal/MagicLinkModalContent";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
-import { sendEmailLinkForSignin } from "actions/FirebaseActions";
-import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm/MagicAuthLinkModal/actions";
 import { actions } from "store";
-import Logger from "lib/logger";
 import { BiArrowBack } from "@react-icons/all-files/bi/BiArrowBack";
 import { trackAppOnboardingStepCompleted, trackAppOnboardingViewed } from "features/onboarding/analytics";
 import { m } from "framer-motion";
+import APP_CONSTANTS from "config/constants";
 import "./index.scss";
 
 interface Props {
   isOpen: boolean;
+  toggleAuthModal?: () => void;
+  defaultAuthMode: string;
+  isOnboarding?: boolean;
+  source: string;
+  callback?: () => void;
 }
 
-export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
+export const AuthScreen: React.FC<Props> = ({
+  isOpen,
+  toggleAuthModal = () => {},
+  defaultAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+  isOnboarding = false,
+  source,
+  callback = () => {},
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const [authMode, setAuthMode] = useState(AUTH.ACTION_LABELS.SIGN_UP);
+  const [authMode, setAuthMode] = useState(defaultAuthMode);
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [persona, setPersona] = useState("");
   const [isVerifyEmailPopupVisible, setIsVerifyEmailPopupVisible] = useState(false);
 
-  const handleSendEmailLink = () => {
-    if (email) {
-      sendEmailLinkForSignin(email, "app_onboarding")
-        .then(() => {
-          updateTimeToResendEmailLogin(dispatch, 30);
-          setIsVerifyEmailPopupVisible(true);
-        })
-        .catch((error) => {
-          Logger.log(error);
-        });
-    }
-  };
-
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && isOnboarding) {
       trackAppOnboardingViewed(ONBOARDING_STEPS.AUTH);
     }
-  }, [isOpen]);
+  }, [isOpen, isOnboarding]);
 
   useEffect(() => {
-    if (user.loggedIn) {
+    if (user.loggedIn && isOnboarding) {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
       trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
     }
-  }, [user.loggedIn, dispatch]);
+  }, [user.loggedIn, dispatch, isOnboarding]);
 
   return (
     <div className="onboarding-auth-screen-wrapper">
       {email && isVerifyEmailPopupVisible ? (
         <div className="verify-email-wrapper">
           <button
-            className="verify-email-back-btn"
+            className="auth-screen-back-btn"
             onClick={() => {
               dispatch(actions.updateIsAppOnboardingStepDisabled(false));
               setIsVerifyEmailPopupVisible(false);
@@ -68,7 +63,7 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
             <BiArrowBack />
             <span>Back</span>
           </button>
-          <MagicLinkModalContent email={email} authMode={authMode} eventSource="app_onboarding" />
+          <MagicLinkModalContent email={email} authMode={authMode} eventSource={source} />
         </div>
       ) : (
         <m.div
@@ -80,13 +75,13 @@ export const OnboardingAuthScreen: React.FC<Props> = ({ isOpen }) => {
             <AuthForm
               authMode={authMode}
               setAuthMode={setAuthMode}
-              onSendEmailLink={handleSendEmailLink}
               email={email}
               setEmail={setEmail}
-              fullName={fullName}
-              setFullName={setFullName}
-              persona={persona}
-              setPersona={setPersona}
+              isOnboarding={isOnboarding}
+              source={source}
+              callback={callback}
+              setIsVerifyEmailPopupVisible={setIsVerifyEmailPopupVisible}
+              toggleModal={toggleAuthModal}
             />
           </m.div>
           {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
