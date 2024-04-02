@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from "styled-components";
-import { generateColorTokens } from "../typography/colors";
+import { AliasTokens, MapTokens, SeedTokens, generateColorTokens } from "../typography/colors";
 import { generateCSSVariables } from "../utils";
 
 interface ThemeProviderProps {
@@ -9,12 +9,16 @@ interface ThemeProviderProps {
   neutralColor?: string;
 }
 
+export interface Theme {
+  colors: SeedTokens & MapTokens & AliasTokens;
+}
+
 export const generateTheme = (primaryColor?: string, neutralColor?: string) => {
   const colorTokens = generateColorTokens(primaryColor, neutralColor);
   // TODO: @wrongsahil - rename requestly to rq after old theme is removed
   const colorCssVariables = generateCSSVariables(colorTokens, "requestly-color-");
 
-  const theme = {
+  const theme: Theme = {
     colors: colorTokens,
   };
 

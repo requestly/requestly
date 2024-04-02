@@ -13,15 +13,15 @@ type AliasTokenKeys =
   | "text-placeholder"
   | "text-subtle";
 
-type SeedTokens = {
+export type SeedTokens = {
   [key in SeedTokenKeys]: string;
 };
 
-type MapTokens = {
+export type MapTokens = {
   [key in MapTokenKeys]: string;
 };
 
-type AliasTokens = {
+export type AliasTokens = {
   [key in AliasTokenKeys]: string;
 };
 
