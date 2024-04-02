@@ -4,7 +4,7 @@ import { Col, Modal, Row } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { getAppMode, getAppOnboardingDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
-import { OnboardingAuthScreen } from "../auth";
+import { AuthScreen } from "../auth";
 import { ONBOARDING_STEPS } from "../../types";
 import { RecommendationsView } from "../recommendations";
 import { PersonaScreen } from "../persona/components/personaScreen";
@@ -16,6 +16,8 @@ import { getAndUpdateInstallationDate } from "utils/Misc";
 import Logger from "lib/logger";
 import { WorkspaceOnboardingView } from "../teams";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import APP_CONSTANTS from "config/constants";
 import "./index.scss";
 
 interface OnboardingProps {
@@ -92,7 +94,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
           </Row>
 
           {step === ONBOARDING_STEPS.AUTH ? (
-            <OnboardingAuthScreen isOpen={isOpen} />
+            <AuthScreen
+              isOpen={isOpen}
+              defaultAuthMode={APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP}
+              source={SOURCE.APP_ONBOARDING}
+              isOnboarding
+            />
           ) : step === ONBOARDING_STEPS.PERSONA ? (
             <PersonaScreen isOpen={isOpen} />
           ) : step === ONBOARDING_STEPS.TEAMS ? (

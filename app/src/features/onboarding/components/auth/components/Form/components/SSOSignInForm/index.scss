@@ -1,0 +1,50 @@
+.auth-screen-back-btn.sso-screen-back-btn {
+  left: -20px;
+  top: 0;
+  color: var(--text-subtle);
+}
+
+.sso-screen-continue-btn.ant-btn {
+  font-weight: 500;
+
+  & span {
+    font-size: 14px;
+  }
+}
+
+.sso-not-found-card {
+  border: 1px solid var(--neutrals-yellow-600);
+  border-radius: 4px;
+  background: var(--neutrals-yellow-800);
+  padding: 12px 1rem;
+  margin-top: 24px;
+  display: flex;
+  gap: 8px;
+
+  & .sso-not-found-card-icon {
+    color: var(--neutrals-yellow-300);
+    font-size: 1.3rem;
+  }
+
+  & .sso-not-found-card-header {
+    font-weight: 500;
+    color: var(--neutrals-yellow-300);
+  }
+
+  & .sso-not-found-card-text {
+    font-size: 12px;
+    color: var(--neutrals-yellow-300);
+
+    & a {
+      color: var(--neutrals-yellow-300);
+      text-decoration: underline;
+    }
+  }
+}
+
+.sso-form-footer {
+  font-weight: 500;
+  color: var(--text-subtle);
+  font-size: 12px;
+  margin-top: 1rem;
+}
