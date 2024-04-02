@@ -9,7 +9,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode, getUserAuthDetails } from "../../../store/selectors";
 import { isEmailValid } from "../../../utils/FormattingHelper";
 import { signInWithEmailLink } from "../../../actions/FirebaseActions";
-import { handleLogoutButtonOnClick } from "../../authentication/AuthForm/actions";
+import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import {

@@ -6,7 +6,7 @@ import AuthButtons from "components/authentication/LoginRequiredCTA/AuthButtons"
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
 import img from "../../../../../assets/images/pages/error/403.svg";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
-import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
+import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
 const PermissionError = ({ isInsideIframe = false }) => {
