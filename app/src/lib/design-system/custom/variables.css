@@ -40,6 +40,10 @@
   --neutrals-gray-800: #262b37;
   --neutrals-gray-900: #161a25;
 
+  --neutrals-yellow-300: #fdba0f;
+  --neutrals-yellow-600: #d07d00;
+  --neutrals-yellow-800: #5c3111;
+
   --neutrals-white: #ffffff;
   --neutrals-black: #000000;
 
@@ -60,6 +64,7 @@
   --danger: var(--red-red-500);
   --success: var(--green-green-500);
   --text-default: var(--neutrals-white);
+  --text-subtle: #bbbbbb;
   --warning: #e09400;
   --text-light: #b0b0b5b3;
   --surface-0: #1b1b1b;

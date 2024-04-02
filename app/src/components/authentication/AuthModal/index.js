@@ -1,40 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Modal } from "antd";
-//SUB COMPONENTS
-import AuthForm from "../AuthForm";
-//UTILS
 import { getUserAuthDetails } from "../../../store/selectors";
-// CONSTANTS
-import APP_CONSTANTS from "../../../config/constants";
-//STYLES
+import { AuthScreen } from "features/onboarding";
 import "./AuthModal.css";
 import closeIcon from "../../../assets/images/modal/close.svg";
+import APP_CONSTANTS from "../../../config/constants";
 
 const AuthModal = ({
   isOpen,
   toggle,
-  authMode: authModeFromProps,
-  src,
-  userActionMessage,
+  authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
   eventSource,
   callback,
   closable = true,
 }) => {
-  //GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
-  // Component State
-  const [authMode, setAuthMode] = useState(
-    authModeFromProps ? authModeFromProps : APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
-  );
-  const [popoverVisible, setPopoverVisible] = useState(
-    authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP ? true : true
-  );
+
   useEffect(() => {
     if (user.loggedIn) {
       toggle();
     }
-  }, [user.loggedIn, toggle, authMode]);
+  }, [user.loggedIn, toggle]);
 
   return (
     <>
@@ -48,27 +35,16 @@ const AuthModal = ({
         closeIcon={null}
         maskStyle={{ background: "#0d0d10f9" }}
         bodyStyle={{ padding: "0" }}
-        wrapClassName="modal-wrapper"
+        wrapClassName="auth-modal-wrapper"
         closable={false}
-        width={
-          authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN ||
-          authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD ||
-          authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.DO_RESET_PASSWORD
-            ? "500px"
-            : "auto"
-        }
+        width={920}
       >
-        <AuthForm
-          authMode={authMode}
-          callbacks={{
-            onSignInSuccess: callback,
-            onRequestPasswordResetSuccess: toggle,
-          }}
-          setAuthMode={setAuthMode}
-          popoverVisible={popoverVisible}
-          setPopoverVisible={setPopoverVisible}
-          userActionMessage={userActionMessage ? userActionMessage : null}
-          eventSource={eventSource}
+        <AuthScreen
+          isOpen={false}
+          defaultAuthMode={authMode}
+          source={eventSource}
+          callback={callback}
+          toggleAuthModal={toggle}
         />
       </Modal>
     </>

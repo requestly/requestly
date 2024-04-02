@@ -102,6 +102,7 @@ export const SOURCE = {
   MAGIC_LINK: "magic_link",
   ONE_TAP_PROMPT: "one_tap_prompt",
   SIDEBAR_INVITE_BUTTON: "sidebar_invite_button",
+  APP_ONBOARDING: "app_onboarding",
   BILLING_TEAM: "billing_team",
 };
 

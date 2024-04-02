@@ -1,5 +1,4 @@
-import isEmpty from "is-empty";
-import isEmail from "validator/lib/isEmail";
+import { isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast.js";
 
 //AUTH ACTIONS
@@ -12,54 +11,61 @@ import {
   verifyOobCode,
   resetPassword,
   googleSignInDesktopApp,
-} from "../../../../actions/FirebaseActions";
+} from "actions/FirebaseActions";
 //CONSTANTS
+// @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 //UTILS
-import { redirectToForgotPassword } from "../../../../utils/RedirectionUtils";
+import { redirectToForgotPassword } from "utils/RedirectionUtils";
 import { getAuthErrorMessage, AuthTypes } from "components/authentication/utils";
 import posthog from "posthog-js";
 import { StorageService } from "init";
 import { isLocalStoragePresent } from "utils/AppUtils";
 import { clearCurrentlyActiveWorkspace } from "actions/TeamWorkspaceActions";
 
-const showError = (err) => {
-  toast.error(err, { hideProgressBar: true, autoClose: 6000 });
+const showError = (err: string) => {
+  toast.error(err, 3);
 };
-const showWarning = (err) => {
-  toast.warn(err, { hideProgressBar: true });
+const showWarning = (err: string) => {
+  toast.warn(err, 3);
 };
-const showInfo = (err) => {
-  toast.info(err, { hideProgressBar: true, autoClose: 5000 });
+const showInfo = (err: string) => {
+  toast.info(err, 3);
 };
 
-export const handleEmailSignIn = (email, password, isSignUp, eventSource) => {
-  if (isEmpty(email) || !isEmail(email)) {
+export const handleEmailSignIn = (email: string, password: string, isSignUp: boolean, source: string) => {
+  if (!email || !isEmailValid(email)) {
     showWarning("Please enter a valid email");
     return null;
   }
-  if (isEmpty(password)) {
+  if (!password) {
     showWarning("Oops! You forgot to enter password");
     return null;
   }
-  return emailSignIn(email, password, isSignUp, eventSource);
+  return emailSignIn(email, password, isSignUp, source);
 };
-export const handleGoogleSignIn = (appMode, MODE, eventSource) => {
+
+export const handleGoogleSignIn = (appMode: string, MODE: string, source: string) => {
   const functionToCall =
     appMode && appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? googleSignInDesktopApp : googleSignIn;
 
-  return functionToCall(null, MODE, eventSource);
+  return functionToCall(null, MODE, source);
 };
 
-export const handleEmailSignUp = (email, password, referralCode, eventSource) => {
-  return signUp(email, password, referralCode, eventSource);
+export const handleEmailSignUp = (email: string, password: string, referralCode: string, source: string) => {
+  return signUp(email, password, referralCode, source);
 };
 
-export const handleForgotPasswordButtonOnClick = (event, email, setLoader, callbackOnSuccess) => {
+export const handleForgotPasswordButtonOnClick = (
+  event: any,
+  email: string,
+  setLoader: (flag: boolean) => void,
+  callbackOnSuccess: () => void
+) => {
   event && event.preventDefault();
-  if (isEmpty(email) || !isEmail(email)) {
+  if (!email || !isEmailValid(email)) {
     showWarning("Please enter a valid email");
-    return null;
+    return;
   }
 
   setLoader(true);
@@ -91,8 +97,14 @@ const getOobCode = () => {
   }
 };
 
-const doResetPassword = (oobCode, email, newPassword, setLoader, callbackOnSuccess) => {
-  const handleResponse = (status) => {
+const doResetPassword = (
+  oobCode: string,
+  email: string,
+  newPassword: string,
+  setLoader: (flag: boolean) => void,
+  callbackOnSuccess: () => void
+) => {
+  const handleResponse = (status: unknown) => {
     if (status) {
       setLoader(false);
       if (email) {
@@ -120,17 +132,23 @@ const doResetPassword = (oobCode, email, newPassword, setLoader, callbackOnSucce
     });
 };
 
-export const handleResetPasswordOnClick = (event, password, setLoader, navigate, callbackOnSuccess) => {
+export const handleResetPasswordOnClick = (
+  event: any,
+  password: string,
+  setLoader: (flag: boolean) => void,
+  navigate: any,
+  callbackOnSuccess: () => void
+) => {
   event && event.preventDefault();
-  if (isEmpty(password)) {
+  if (!password) {
     showWarning("Please set a new password");
-    return null;
+    return;
   }
   setLoader(true);
 
   const oobCode = getOobCode();
 
-  const handleVerificationResponse = (status, email) => {
+  const handleVerificationResponse = (status: unknown, email: string) => {
     if (status) {
       doResetPassword(oobCode, email, password, setLoader, callbackOnSuccess);
     } else {
@@ -142,10 +160,10 @@ export const handleResetPasswordOnClick = (event, password, setLoader, navigate,
 
   verifyOobCode(oobCode)
     .then(
-      ({ status, msg, email }) => {
+      ({ status, email }) => {
         handleVerificationResponse(status, email);
       },
-      ({ status, msg }) => {
+      ({ status }) => {
         handleVerificationResponse(status, null);
       }
     )
@@ -154,7 +172,7 @@ export const handleResetPasswordOnClick = (event, password, setLoader, navigate,
     });
 };
 
-export const handleLogoutButtonOnClick = async (appMode, isWorkspaceMode, dispatch) => {
+export const handleLogoutButtonOnClick = async (appMode: string, isWorkspaceMode: boolean, dispatch: any) => {
   try {
     if (window.location.host.includes("app.requestly.io")) {
       try {

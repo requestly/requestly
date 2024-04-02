@@ -6,7 +6,7 @@ import { getUniqueColorForWorkspace } from "utils/teams";
 import { actions } from "store";
 import "./index.css";
 import APP_CONSTANTS from "config/constants";
-import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
+import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAppMode } from "store/selectors";
 
