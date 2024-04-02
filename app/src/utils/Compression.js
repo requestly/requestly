@@ -14,12 +14,6 @@ function compressString(uncompressedString) {
   return base64Compressed;
 }
 
-function shouldDecompressRecord(recordId) {
-  // trying to keep it as efficient as possible by working with ID instead of whole object
-  const recordType = recordId.split("_")[0];
-  return recordType && ["Response", "Request", "Script"].includes(recordType);
-}
-
 function decompressRecord(record) {
   const decompressedRecord = { ...record };
   if (isRule(record)) {
@@ -54,7 +48,7 @@ function decompressRecord(record) {
         });
         break;
       default:
-        console.log("This rule type should not need decompression");
+        break;
     }
   }
   return decompressedRecord;
@@ -63,11 +57,7 @@ function decompressRecord(record) {
 export function decompressRecords(recordsMap) {
   const decompressedRecordsMap = {};
   for (const recordId in recordsMap) {
-    if (shouldDecompressRecord(recordId)) {
-      decompressedRecordsMap[recordId] = decompressRecord(recordsMap[recordId]);
-    } else {
-      decompressedRecordsMap[recordId] = recordsMap[recordId];
-    }
+    decompressedRecordsMap[recordId] = decompressRecord(recordsMap[recordId]);
   }
   return decompressedRecordsMap;
 }
@@ -103,7 +93,7 @@ function compressRecord(record) {
         });
         break;
       default:
-        console.log("This rule type should not need compression");
+        break;
     }
   }
   return compressedRecord;
