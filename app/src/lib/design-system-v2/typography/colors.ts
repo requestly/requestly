@@ -36,7 +36,6 @@ export const generateColorTokens = (
   const mapTokens = generateMapTokens(seedTokens);
   const aliasTokens = generateAliasTokens(seedTokens, mapTokens);
 
-  console.log({ seedTokens, mapTokens, aliasTokens });
   return {
     ...seedTokens,
     ...mapTokens,

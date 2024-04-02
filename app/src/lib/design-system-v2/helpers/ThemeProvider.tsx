@@ -9,9 +9,10 @@ interface ThemeProviderProps {
   neutralColor?: string;
 }
 
-const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, primaryColor, neutralColor }) => {
+export const generateTheme = (primaryColor?: string, neutralColor?: string) => {
   const colorTokens = generateColorTokens(primaryColor, neutralColor);
-  const colorCssVariables = generateCSSVariables(colorTokens, "rq-color-");
+  // TODO: @wrongsahil - rename requestly to rq after old theme is removed
+  const colorCssVariables = generateCSSVariables(colorTokens, "requestly-color-");
 
   const theme = {
     colors: colorTokens,
@@ -21,10 +22,18 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, primaryColor, n
     ...colorCssVariables,
   };
 
-  console.log({ theme, themeCssVariables });
+  return { theme, themeCssVariables };
+};
 
-  // Used for injecting css variables to the root element
-  // TODO: Generate .css file from this for local testing and autocompletion in IDE
+const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, primaryColor, neutralColor }) => {
+  const { theme, themeCssVariables } = generateTheme(primaryColor, neutralColor);
+
+  // Paste the output in ./theme.css files for autocompletion
+  // console.log(`:root {
+  //   ${Object.entries(themeCssVariables)
+  //     .map(([key, value]) => `${key}: ${value};`)
+  //     .join("\n")}
+  // }`);
   const GlobalStyles = createGlobalStyle`
     :root {
       ${Object.entries(themeCssVariables)
