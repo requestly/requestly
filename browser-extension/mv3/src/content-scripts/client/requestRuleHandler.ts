@@ -6,6 +6,10 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 const cacheRequestRules = async () => {
   const requestRules = await getEnabledRules(RuleType.REQUEST);
 
+  if (!requestRules.length) {
+    return;
+  }
+
   executeDynamicScriptOnPage(
     `
     window.${PUBLIC_NAMESPACE}=window.${PUBLIC_NAMESPACE}||{};
