@@ -50,7 +50,7 @@ const generateMapTokens = (seedTokens: SeedTokens) => {
 
   Object.entries(seedTokens).forEach(([key, value]) => {
     generate(value).forEach((color, index) => {
-      mapTokens[`${key}-${(index + 1) * 100}` as MapTokenKeys] = color;
+      mapTokens[`${key}-${index * 100}` as MapTokenKeys] = color;
     });
   });
 
@@ -59,6 +59,7 @@ const generateMapTokens = (seedTokens: SeedTokens) => {
 
 const generateAliasTokens = (seedTokens: SeedTokens, mapTokens: MapTokens) => {
   const aliasTokens: AliasTokens = {
+    // Generated from Map Tokens
     "primary-light": mapTokens["primary-400"],
     "primary-text": mapTokens["primary-300"],
     background: mapTokens["neutral-900"],
@@ -67,6 +68,8 @@ const generateAliasTokens = (seedTokens: SeedTokens, mapTokens: MapTokens) => {
     "surface-3": mapTokens["neutral-600"],
     "text-placeholder": mapTokens["neutral-400"],
     "text-subtle": mapTokens["neutral-300"],
+
+    // Hardcoded Colors
   };
 
   return aliasTokens;
