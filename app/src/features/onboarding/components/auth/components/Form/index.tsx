@@ -256,13 +256,15 @@ export const AuthForm: React.FC<AuthFormProps> = ({
               authMode === AUTH.ACTION_LABELS.SIGN_UP ? handleEmailPasswordSignUp : handleEmailPasswordSignIn
             }
           />
-          <Button
-            type="link"
-            className="auth-screen-forgot-password-btn"
-            onClick={() => setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD)}
-          >
-            Forgot password?
-          </Button>
+          {authMode === AUTH.ACTION_LABELS.LOG_IN && (
+            <Button
+              type="link"
+              className="auth-screen-forgot-password-btn"
+              onClick={() => setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD)}
+            >
+              Forgot password?
+            </Button>
+          )}
         </div>
       )}
 
