@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from "styled-components";
-import { AliasTokens, MapTokens, SeedTokens, generateColorTokens } from "../typography/colors";
+import { ColorTokens, generateColorTokens } from "../typography/colors";
 import { generateCSSVariables } from "../utils";
 
 interface ThemeProviderProps {
@@ -10,7 +10,7 @@ interface ThemeProviderProps {
 }
 
 export interface Theme {
-  colors: SeedTokens & MapTokens & AliasTokens;
+  colors: ColorTokens;
 }
 
 export const generateTheme = (primaryColor?: string, neutralColor?: string) => {

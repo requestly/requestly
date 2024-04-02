@@ -25,6 +25,8 @@ export type AliasTokens = {
   [key in AliasTokenKeys]: string;
 };
 
+export type ColorTokens = SeedTokens & MapTokens & AliasTokens;
+
 export const generateColorTokens = (
   primary = "#004EEB",
   neutral = "#787878",
