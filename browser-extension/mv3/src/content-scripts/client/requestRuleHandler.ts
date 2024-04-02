@@ -1,12 +1,12 @@
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { RequestRulePair, RuleType } from "common/types";
-import { executeScriptOnPageExternally } from "../utils";
+import { executeDynamicScriptOnPage } from "../utils";
 import { PUBLIC_NAMESPACE } from "common/constants";
 
 const cacheRequestRules = async () => {
   const requestRules = await getEnabledRules(RuleType.REQUEST);
 
-  executeScriptOnPageExternally(
+  executeDynamicScriptOnPage(
     `
     window.${PUBLIC_NAMESPACE}=window.${PUBLIC_NAMESPACE}||{};
     window.${PUBLIC_NAMESPACE}.requestRules=${JSON.stringify(
