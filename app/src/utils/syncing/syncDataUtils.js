@@ -9,6 +9,9 @@ import { isEmpty } from "lodash";
 import Logger from "lib/logger";
 import { rulesFlatObjectToObjectIdArray } from "utils/FormattingHelper";
 import APP_CONSTANTS from "config/constants";
+import { compressRecords } from "utils/Compression";
+import { growthbook } from "utils/feature-flag/growthbook";
+import FEATURES from "config/constants/sub/features";
 const _ = require("lodash");
 
 const defaultSyncValue = "Inactive";
@@ -145,9 +148,14 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
       syncPath = getTeamSyncPath(targetWorkspaceId);
     }
   }
+  let rulesToWriteToFirebase = latestRules;
+  // @nsr: Updates might lead to conflicts if not 100% rolled to all the users using compressed rules
+  if (growthbook.isOn(FEATURES.COMPRESS_RULE_PAIRS)) {
+    rulesToWriteToFirebase = compressRecords(latestRules);
+  }
 
   try {
-    await updateValueAsPromise(syncPath, latestRules);
+    await updateValueAsPromise(syncPath, rulesToWriteToFirebase);
   } catch (error) {
     Logger.error("err update sync records", error);
   }
