@@ -3,16 +3,17 @@
   z-index: 2147483647 !important;
   top: 10px;
   right: 10px;
-  width: 32vw;
+  width: 460px;
 }
 
 #container {
-  border-radius: 8px;
+  border-radius: 1rem;
+  padding: 12px 1rem;
   display: flex;
   flex-direction: column;
   color: #fff;
   font-family: system-ui;
-  background: #1c1d21;
+  background: #1a1a1a;
   border: 1px solid #5c5b5b;
   cursor: move;
 }
@@ -22,15 +23,23 @@
   margin: 4px 0;
   font-weight: bolder;
   line-height: 1.4;
+  max-width: 290px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #heading-container {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
-  border-bottom: 1px solid #5c5b5b;
-  padding: 12px 18px;
-  background: transparent;
+  align-items: center;
+  gap: 4px;
+}
+
+#logo-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 #heading-container div {
@@ -40,16 +49,34 @@
   align-content: center;
 }
 
-#content-container {
+#actions-container {
   display: flex;
-  flex-direction: column;
-  padding: 12px 18px;
-  background: #242529;
+  flex-direction: row;
+  gap: 4px;
+}
+
+#actions-container button {
+  background: none;
+  border: none;
+  color: #fff;
+  transition: all 0.2s;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#actions-container button:hover {
+  background: #383838;
+}
+
+#content-container {
+  padding: 12px;
+  background: #282828;
   border-radius: 8px;
-  justify-content: space-between;
-  font-size: 13px;
-  line-height: 1.4;
-  gap: 8px;
+  margin-top: 8px;
 }
 
 #rule-status-container {
@@ -59,36 +86,37 @@
   align-items: center;
 }
 
+#test-rule-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
 #info-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
-  gap: 8px;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 #info-icon {
-  color: #dc6803;
   align-self: flex-start;
-  margin-top: 1px;
 }
 
 #rule-status-comment {
   align-self: center;
 }
 
-#icon-container {
-  height: 20px;
-  width: 20px;
-  padding-right: 4px;
-  align-self: center;
-}
-
-#icon-container img {
+#heading-logo {
   height: 16px;
   width: 16px;
-  background: #2a2a2a;
-  border-radius: 4px;
+}
+
+#logo-text {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 #view-result-btn {
@@ -111,6 +139,25 @@
   flex-wrap: nowrap;
   justify-content: center;
   gap: 4px;
+}
+
+#rule-applied-status,
+#rule-not-applied-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 1px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-top: -3px;
+}
+
+#rule-applied-status {
+  color: #28c07a;
+}
+
+#rule-not-applied-status {
+  color: #e09400;
 }
 
 .secondary-text {
