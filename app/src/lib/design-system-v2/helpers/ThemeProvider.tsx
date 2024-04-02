@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from "styled-components";
-import { ColorTokens, generateColorTokens } from "../typography/colors";
+import { ColorTokens, generateColorTokens } from "../tokens/colors";
 import { generateCSSVariables } from "../utils";
 
 interface ThemeProviderProps {

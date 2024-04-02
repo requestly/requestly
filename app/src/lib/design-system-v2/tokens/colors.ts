@@ -36,7 +36,7 @@ export const generateColorTokens = (
 ) => {
   const seedTokens = { primary, neutral, success, error, warning };
   const mapTokens = generateMapTokens(seedTokens);
-  const aliasTokens = generateAliasTokens(seedTokens, mapTokens);
+  const aliasTokens = generateAliasTokens(mapTokens);
 
   return {
     ...seedTokens,
@@ -57,7 +57,7 @@ const generateMapTokens = (seedTokens: SeedTokens) => {
   return mapTokens;
 };
 
-const generateAliasTokens = (seedTokens: SeedTokens, mapTokens: MapTokens) => {
+const generateAliasTokens = (mapTokens: MapTokens) => {
   const aliasTokens: AliasTokens = {
     // Generated from Map Tokens
     "primary-light": mapTokens["primary-400"],
