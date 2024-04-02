@@ -50,7 +50,7 @@ RQ.RuleExecutionHandler.setup = () => {
             showWidget: false,
           });
         }
-        RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
+        RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId, "explicit");
         break;
     }
 
@@ -73,7 +73,7 @@ RQ.RuleExecutionHandler.hasExecutedRules = () => {
   return RQ.RuleExecutionHandler.appliedRuleIds.size > 0;
 };
 
-RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
+RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId, mode) => {
   if (document.querySelector("rq-test-rule-widget")) {
     return;
   }
@@ -85,7 +85,7 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
-  testRuleWidget.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
+  testRuleWidget.setAttribute("mode", mode);
   testRuleWidget.setAttribute("applied-status", RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId));
   RQ.RuleExecutionHandler.setWidgetInfoText(testRuleWidget, ruleDetails);
 
@@ -107,7 +107,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
     case "Response":
       testRuleWidget.setAttribute(
         "info-text-content",
-        `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>`
+        `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>.`
       );
       break;
     case "Headers":
@@ -117,7 +117,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
       responseHeaderExists &&
         testRuleWidget.setAttribute(
           "info-text-content",
-          `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>`
+          `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>.`
         );
       break;
     default:
