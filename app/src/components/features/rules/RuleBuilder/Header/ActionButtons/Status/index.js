@@ -2,12 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentlySelectedRule } from "../../../actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import {
-  getAllRules,
-  getAppMode,
-  getCurrentlySelectedRuleData,
-  getUserAuthDetails,
-} from "../../../../../../../store/selectors";
+import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "../../../../../../../store/selectors";
+import { getAllRules } from "store/features/rules/selectors";
 import { Switch } from "antd";
 import { toast } from "utils/Toast.js";
 import { StorageService } from "init";
@@ -15,6 +11,8 @@ import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/ru
 import "./RuleEditorStatus.css";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { PREMIUM_RULE_TYPES } from "features/rules";
+import APP_CONSTANTS from "config/constants";
 
 const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   //Global State
@@ -101,7 +99,12 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
             isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
           );
         }}
-        features={[FeatureLimitType.num_active_rules]}
+        features={
+          PREMIUM_RULE_TYPES.includes(currentlySelectedRuleData.ruleType)
+            ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
+            : [FeatureLimitType.num_active_rules]
+        }
+        featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME} rule`}
         source={currentlySelectedRuleData.ruleType}
       >
         <Switch size="small" className="ml-3" checked={isChecked} disabled={isDisabled} />

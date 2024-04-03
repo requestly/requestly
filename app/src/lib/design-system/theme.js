@@ -1,9 +1,9 @@
-const { colors } = require("./colors");
-const { utils } = require("./utils");
+import { colors } from "./colors";
+import { utils } from "./utils";
 
 // ant-design overrides
 // NOTE: DO NOT USE THIS VALUES DIRECTLY IN ANY FILE
-module.exports.theme = {
+export const theme = {
   // font
   "@font-family": "Roboto, sans-serif",
 

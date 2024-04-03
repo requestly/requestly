@@ -6,7 +6,7 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
 import { isDesktopMode } from "utils/AppUtils";
-import { ReactComponent as DesktopIcon } from "assets/icons/desktop.svg";
+import DesktopIcon from "assets/icons/desktop.svg?react";
 import { omit, set } from "lodash";
 import { ResponseRuleResourceType } from "types/rules";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
@@ -87,6 +87,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
           <Radio value={ResponseRuleResourceType.REST_API}>REST API</Radio>
           <PremiumFeature
             features={[FeatureLimitType.graphql_resource_type]}
+            featureName="GraphQL API"
             popoverPlacement="top"
             onContinue={() => {
               handleResourceTypeChange(ResponseRuleResourceType.GRAPHQL_API);

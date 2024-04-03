@@ -6,7 +6,7 @@ import { RQButton } from "lib/design-system/components";
 import { Button, Row, Tooltip } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "../../../actions";
 
@@ -25,8 +25,10 @@ const ShareRuleButton = ({ isRuleEditorModal }) => {
         actions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
-          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-          eventSource: AUTH.SOURCE.SHARE_RULES,
+          newProps: {
+            authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+            eventSource: SOURCE.SHARE_RULES,
+          },
         })
       );
     }

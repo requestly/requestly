@@ -1,12 +1,13 @@
 import React, { useCallback } from "react";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
-import { ReactComponent as InviteIcon } from "assets/icons/invite.svg";
+import InviteIcon from "assets/icons/invite.svg?react";
 import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import { trackInviteTeammatesClicked } from "modules/analytics/events/common/teams";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 const InviteButton: React.FC = () => {
   const dispatch = useDispatch();
@@ -15,9 +16,15 @@ const InviteButton: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
 
   const handleInviteClick = useCallback(() => {
-    trackInviteTeammatesClicked("sidebar_invite_button");
+    trackInviteTeammatesClicked(SOURCE.SIDEBAR_INVITE_BUTTON);
     if (!user?.loggedIn) {
-      dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: { eventSource: SOURCE.SIDEBAR_INVITE_BUTTON },
+        })
+      );
       return;
     }
 
@@ -26,7 +33,7 @@ const InviteButton: React.FC = () => {
         actions.toggleActiveModal({
           modalName: "inviteMembersModal",
           newValue: true,
-          newProps: { source: "sidebar_invite_button" },
+          newProps: { source: SOURCE.SIDEBAR_INVITE_BUTTON },
         })
       );
     } else if (availableTeams?.length === 0) {
@@ -34,7 +41,7 @@ const InviteButton: React.FC = () => {
         actions.toggleActiveModal({
           modalName: "createWorkspaceModal",
           newValue: true,
-          newProps: { source: "sidebar_invite_button" },
+          newProps: { source: SOURCE.SIDEBAR_INVITE_BUTTON },
         })
       );
     } else {

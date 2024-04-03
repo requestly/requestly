@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { SecondarySidebarLink } from "views/containers/common/SecondarySidebarLink";
 
 import { VscFileSymlinkDirectory } from "@react-icons/all-files/vsc/VscFileSymlinkDirectory";
-import { ReactComponent as SessionIcon } from "assets/icons/session.svg";
+import SessionIcon from "assets/icons/session.svg?react";
 
 import "./DesktopSessionsSidebar.css";
 

@@ -4,11 +4,12 @@ import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
-import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode, getAllRules } from "../../../../store/selectors";
+import { getIsRefreshRulesPending, getUserAuthDetails, getAppMode } from "../../../../store/selectors";
+import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 import { actions } from "../../../../store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
@@ -251,7 +252,7 @@ const ImportRulesModal = (props) => {
     if (isImportFromCharlesModalOpen) {
       toggleModal();
     } else {
-      trackCharlesSettingsImportStarted(AUTH.SOURCE.RULES_LIST);
+      trackCharlesSettingsImportStarted(SOURCE.RULES_LIST);
     }
 
     setIsImportFromCharlesModalOpen((prev) => !prev);
@@ -270,7 +271,7 @@ const ImportRulesModal = (props) => {
         <ImportFromCharlesModal
           isOpen={isImportFromCharlesModalOpen}
           toggle={toggleImportFromCharlesModal}
-          triggeredBy={AUTH.SOURCE.RULES_LIST}
+          triggeredBy={SOURCE.RULES_LIST}
         />
       ) : null}
 

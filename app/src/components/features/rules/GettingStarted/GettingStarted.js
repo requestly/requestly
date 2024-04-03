@@ -7,7 +7,7 @@ import ImportRulesModal from "../ImportRulesModal";
 import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
@@ -60,14 +60,14 @@ const GettingStarted = () => {
           redirectURL: window.location.href,
           authMode: AUTH_ACTION_LABELS.LOG_IN,
           src: APP_CONSTANTS.FEATURES.RULES,
-          eventSource: AUTH.SOURCE.GETTING_STARTED,
+          eventSource: SOURCE.GETTING_STARTED,
         },
       })
     );
   };
 
   const handleCreateMyFirstRuleClick = () => {
-    trackNewRuleButtonClicked(AUTH.SOURCE.GETTING_STARTED);
+    trackNewRuleButtonClicked(SOURCE.GETTING_STARTED);
     navigate(PATHS.RULES.CREATE);
   };
 
@@ -142,13 +142,13 @@ const GettingStarted = () => {
                 <AuthConfirmationPopover
                   title="You need to sign up to upload rules"
                   callback={handleUploadRulesClick}
-                  source={AUTH.SOURCE.UPLOAD_RULES}
+                  source={SOURCE.UPLOAD_RULES}
                   disabled={window.isChinaUser}
                 >
                   <RQButton
                     type="default"
                     onClick={() => {
-                      trackUploadRulesButtonClicked(AUTH.SOURCE.GETTING_STARTED);
+                      trackUploadRulesButtonClicked(SOURCE.GETTING_STARTED);
                       user?.details?.isLoggedIn && handleUploadRulesClick();
                     }}
                   >
@@ -162,7 +162,7 @@ const GettingStarted = () => {
                     type="default"
                     onClick={() => {
                       toggleImportCharlesRulesModal();
-                      trackCharlesSettingsImportStarted(AUTH.SOURCE.GETTING_STARTED);
+                      trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
                     }}
                   >
                     Import settings from Charles Proxy
@@ -187,7 +187,7 @@ const GettingStarted = () => {
         <ImportFromCharlesModal
           isOpen={isImportCharlesRulesModalActive}
           toggle={toggleImportCharlesRulesModal}
-          triggeredBy={AUTH.SOURCE.GETTING_STARTED}
+          triggeredBy={SOURCE.GETTING_STARTED}
         />
       ) : null}
 

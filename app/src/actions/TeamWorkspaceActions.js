@@ -6,8 +6,8 @@ import { actions } from "store";
 import { trackWorkspaceSwitched } from "modules/analytics/events/common/teams";
 import {
   mergeRecordsAndSaveToFirebase,
-  resetSyncDebounce,
-  resetSyncDebounceTimerStart,
+  resetSyncThrottle,
+  resetSyncThrottleTimerStart,
 } from "hooks/DbListenerInit/syncingNodeListener";
 import { toast } from "utils/Toast";
 import APP_CONSTANTS from "config/constants";
@@ -74,8 +74,8 @@ export const switchWorkspace = async (
   needToMergeRecords && (await mergeLocalRecords());
 
   let skipStorageClearing = false;
-  resetSyncDebounceTimerStart();
-  resetSyncDebounce();
+  resetSyncThrottleTimerStart();
+  resetSyncThrottle();
 
   // Don't clear when appMode is Extension but user has not installed it!
   /* CAN BE REPLACED WITH isLocalStoragePresent */

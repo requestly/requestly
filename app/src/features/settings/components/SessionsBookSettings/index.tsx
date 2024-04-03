@@ -231,85 +231,87 @@ export const SessionsSettings: React.FC = () => {
     (!autoRecording?.isActive || autoRecording?.mode === AutoRecordingMode.ALL_PAGES) ?? false;
 
   return (
-    <Row className="session-settings-container">
-      <Col flex="1">
-        <div className="header">SessionBook Settings</div>
+    <div className="session-settings-container">
+      <div className="session-settings-wrapper">
+        <Col flex="1">
+          <div className="header">SessionBook Settings</div>
 
-        <div className="automatic-recording-container">
-          <div className="automatic-recording-details">
-            <div className="heading">Automatic recording</div>
-            <div className="caption">Adjust the automatic recording rules</div>
-          </div>
-
-          <div className="automatic-recording-switch">
-            <span>{autoRecording?.isActive ? "Enabled" : "Disabled"}</span>
-            <Switch checked={!!autoRecording?.isActive} onChange={handleAutoRecordingToggle} />
-          </div>
-
-          <Radio.Group
-            value={autoRecording?.mode ?? AutoRecordingMode.ALL_PAGES}
-            disabled={!autoRecording?.isActive}
-            onChange={handleConfigModeChange}
-            className="automatic-recording-radio-group"
-          >
-            <Row align="bottom" justify="space-between">
-              <Col span={24}>
-                <SessionSettingsRadioItem
-                  value={AutoRecordingMode.ALL_PAGES}
-                  title="All pages"
-                  caption="Save up to last 5 minutes of activity on any tab."
-                />
-              </Col>
-            </Row>
-            <div className="specific-page-mode-container">
-              <SessionSettingsRadioItem
-                value={AutoRecordingMode.CUSTOM}
-                title="Specific pages"
-                caption="Start recording automatically when you visit websites or URLs below."
-              />
-
-              <div className="page-source-list">
-                {config.pageSources?.length > 0
-                  ? config.pageSources?.map((source) => (
-                      <PageSourceRow
-                        key={source.id}
-                        source={source}
-                        disabled={isPageSourcesDisabled}
-                        handleSavePageSourceDetails={handleSavePageSourceDetails}
-                        handlePageSourceStatusToggle={handlePageSourceStatusToggle}
-                        handleDeletePageSource={handleDeletePageSource}
-                        getPageSourceLabel={getPageSourceLabel}
-                      />
-                    ))
-                  : null}
-
-                {showNewPageSource || config.pageSources === undefined || config.pageSources?.length === 0 ? (
-                  <PageSourceRow
-                    source={{ ...emptyPageSourceData }}
-                    openInCreateMode={true}
-                    disabled={isPageSourcesDisabled}
-                    handleSavePageSourceDetails={handleSavePageSourceDetails}
-                    handlePageSourceStatusToggle={handlePageSourceStatusToggle}
-                    handleDeletePageSource={handleDeletePageSource}
-                    getPageSourceLabel={getPageSourceLabel}
-                  />
-                ) : (
-                  <Button
-                    block
-                    disabled={!autoRecording?.isActive ?? false}
-                    type="dashed"
-                    icon={<PlusOutlined />}
-                    className="add-new-source-btn"
-                    onClick={handleAddNewPageSourceClick}
-                  >
-                    Add page source
-                  </Button>
-                )}
-              </div>
+          <div className="automatic-recording-container">
+            <div className="automatic-recording-details">
+              <div className="heading">Automatic recording</div>
+              <div className="caption">Adjust the automatic recording rules</div>
             </div>
-          </Radio.Group>
-        </div>
-      </Col>
-    </Row>
+
+            <div className="automatic-recording-switch">
+              <span>{autoRecording?.isActive ? "Enabled" : "Disabled"}</span>
+              <Switch checked={!!autoRecording?.isActive} onChange={handleAutoRecordingToggle} />
+            </div>
+
+            <Radio.Group
+              value={autoRecording?.mode ?? AutoRecordingMode.ALL_PAGES}
+              disabled={!autoRecording?.isActive}
+              onChange={handleConfigModeChange}
+              className="automatic-recording-radio-group"
+            >
+              <Row align="bottom" justify="space-between">
+                <Col span={24}>
+                  <SessionSettingsRadioItem
+                    value={AutoRecordingMode.ALL_PAGES}
+                    title="All pages"
+                    caption="Save up to last 5 minutes of activity on any tab."
+                  />
+                </Col>
+              </Row>
+              <div className="specific-page-mode-container">
+                <SessionSettingsRadioItem
+                  value={AutoRecordingMode.CUSTOM}
+                  title="Specific pages"
+                  caption="Start recording automatically when you visit websites or URLs below."
+                />
+
+                <div className="page-source-list">
+                  {config.pageSources?.length > 0
+                    ? config.pageSources?.map((source) => (
+                        <PageSourceRow
+                          key={source.id}
+                          source={source}
+                          disabled={isPageSourcesDisabled}
+                          handleSavePageSourceDetails={handleSavePageSourceDetails}
+                          handlePageSourceStatusToggle={handlePageSourceStatusToggle}
+                          handleDeletePageSource={handleDeletePageSource}
+                          getPageSourceLabel={getPageSourceLabel}
+                        />
+                      ))
+                    : null}
+
+                  {showNewPageSource || config.pageSources === undefined || config.pageSources?.length === 0 ? (
+                    <PageSourceRow
+                      source={{ ...emptyPageSourceData }}
+                      openInCreateMode={true}
+                      disabled={isPageSourcesDisabled}
+                      handleSavePageSourceDetails={handleSavePageSourceDetails}
+                      handlePageSourceStatusToggle={handlePageSourceStatusToggle}
+                      handleDeletePageSource={handleDeletePageSource}
+                      getPageSourceLabel={getPageSourceLabel}
+                    />
+                  ) : (
+                    <Button
+                      block
+                      disabled={!autoRecording?.isActive}
+                      type="dashed"
+                      icon={<PlusOutlined />}
+                      className="add-new-source-btn"
+                      onClick={handleAddNewPageSourceClick}
+                    >
+                      Add page source
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Radio.Group>
+          </div>
+        </Col>
+      </div>
+    </div>
   );
 };

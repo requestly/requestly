@@ -1,22 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Dropdown, Col, Avatar, Spin, Button, Tooltip } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import {
   redirectToAccountDetails,
+  redirectToBillingTeamSettings,
   redirectToGlobalSettings,
   redirectToProfileSettings,
   redirectToWorkspaceSettings,
 } from "utils/RedirectionUtils";
-import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
+import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import APP_CONSTANTS from "config/constants";
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { RQButton } from "lib/design-system/components";
 import { PRICING } from "features/pricing";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
@@ -29,7 +30,7 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appMode = useSelector(getAppMode);
-  const paywallIntensityExp = useFeatureValue("paywall_intensity", null);
+  const trialDuration = useFeatureValue("trial_days_duration", 30);
 
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
   const userPhoto =
@@ -47,47 +48,54 @@ export default function HeaderUser() {
     );
   }, [location]);
 
-  const menuPropItems = [
-    {
-      icon: <Avatar size={42} src={userPhoto} shape="square" className="cursor-pointer header-user-avatar" />,
-      onClick: () => redirectToAccountDetails(navigate),
-      label: (
-        <div className="profile-details">
-          <div className="profile-username">{userName}</div>
-          {userEmail ? <div className="text-gray text-sm">{userEmail}</div> : null}
-        </div>
-      ),
-    },
-    { type: "divider" },
-    {
-      label: "Profile",
-      onClick: () => redirectToProfileSettings(navigate, window.location.pathname, "header"),
-    },
-    {
-      label: "Manage Workspaces",
-      onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
-    },
-    {
-      label: "Settings",
-      onClick: () => redirectToGlobalSettings(navigate, window.location.pathname, "header"),
-    },
-    { type: "divider" },
-    {
-      label: "Sign out",
-      onClick: () => {
-        setLoading(true);
-        handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
-          .then(() =>
-            dispatch(
-              actions.updateHardRefreshPendingStatus({
-                type: "rules",
-              })
-            )
-          )
-          .finally(() => setLoading(false));
+  const menuPropItems = useMemo(
+    () => [
+      {
+        icon: <Avatar size={42} src={userPhoto} shape="square" className="cursor-pointer header-user-avatar" />,
+        onClick: () => redirectToAccountDetails(navigate),
+        label: (
+          <div className="profile-details">
+            <div className="profile-username">{userName}</div>
+            {userEmail ? <div className="text-gray text-sm">{userEmail}</div> : null}
+          </div>
+        ),
       },
-    },
-  ];
+      { type: "divider" },
+      {
+        label: "Profile",
+        onClick: () => redirectToProfileSettings(navigate, window.location.pathname, "header"),
+      },
+      {
+        label: "Manage Workspaces",
+        onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
+      },
+      {
+        label: "Plans and Billing",
+        onClick: () => redirectToBillingTeamSettings(navigate, window.location.pathname, "header"),
+      },
+      {
+        label: "Settings",
+        onClick: () => redirectToGlobalSettings(navigate, window.location.pathname, "header"),
+      },
+      { type: "divider" },
+      {
+        label: "Sign out",
+        onClick: () => {
+          setLoading(true);
+          handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
+            .then(() =>
+              dispatch(
+                actions.updateHardRefreshPendingStatus({
+                  type: "rules",
+                })
+              )
+            )
+            .finally(() => setLoading(false));
+        },
+      },
+    ],
+    [appMode, dispatch, isWorkspaceMode, navigate, userEmail, userPhoto, userName]
+  );
 
   if (loading) {
     return (
@@ -104,52 +112,42 @@ export default function HeaderUser() {
   }
 
   return hideUserDropDown ? null : (
-    <>
+    <section>
       {user.loggedIn && user?.details?.profile ? (
-        <>
-          <Col>
-            <Dropdown
-              trigger={["click"]}
-              menu={{ items: menuPropItems }}
-              placement="bottomLeft"
-              className="header-profile-dropdown-trigger"
-              onOpenChange={(open) => {
-                open && trackHeaderClicked("user_menu");
+        <Col>
+          <Dropdown
+            trigger={["click"]}
+            menu={{ items: menuPropItems }}
+            placement="bottomLeft"
+            className="header-profile-dropdown-trigger"
+            onOpenChange={(open) => {
+              open && trackHeaderClicked("user_menu");
+            }}
+          >
+            <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
+          </Dropdown>
+          {!planDetails?.planId ||
+          planDetails?.status === "trialing" ||
+          (["active", "past_due"].includes(planDetails?.status) &&
+            planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL) ? (
+            <RQButton
+              type="primary"
+              className="header-upgrade-btn"
+              onClick={() => {
+                trackUpgradeClicked("header");
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "pricingModal",
+                    newValue: true,
+                    newProps: { selectedPlan: null, source: "header_upgrade_button" },
+                  })
+                );
               }}
             >
-              <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
-            </Dropdown>
-            {
-              <>
-                {paywallIntensityExp === "variantA" && (
-                  <>
-                    {!planDetails?.planId ||
-                    planDetails?.status === "trialing" ||
-                    (["active", "past_due"].includes(planDetails?.status) &&
-                      planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL) ? (
-                      <RQButton
-                        type="primary"
-                        className="header-upgrade-btn"
-                        onClick={() => {
-                          trackUpgradeClicked("header");
-                          dispatch(
-                            actions.toggleActiveModal({
-                              modalName: "pricingModal",
-                              newValue: true,
-                              newProps: { selectedPlan: null, source: "header_upgrade_button" },
-                            })
-                          );
-                        }}
-                      >
-                        Upgrade
-                      </RQButton>
-                    ) : null}
-                  </>
-                )}
-              </>
-            }
-          </Col>
-        </>
+              Upgrade
+            </RQButton>
+          ) : null}
+        </Col>
       ) : (
         <>
           <Col>
@@ -166,7 +164,6 @@ export default function HeaderUser() {
                 className="layout-header-signup-btn"
                 onClick={(e) => {
                   e.preventDefault();
-                  // PROMPT USER TO SIGNUP
                   dispatch(
                     actions.toggleActiveModal({
                       modalName: "authModal",
@@ -174,19 +171,18 @@ export default function HeaderUser() {
                       newProps: {
                         redirectURL: window.location.href,
                         authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-                        eventSource: AUTH.SOURCE.NAVBAR,
+                        eventSource: SOURCE.NAVBAR,
                       },
                     })
                   );
-                  return false;
                 }}
               >
-                {paywallIntensityExp === "variantA" ? "Get a 30-day free trial" : "Sign up"}
+                Get a {trialDuration}-day free trial
               </Button>
             </Tooltip>
           </Col>
         </>
       )}
-    </>
+    </section>
   );
 }

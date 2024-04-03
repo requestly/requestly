@@ -11,6 +11,9 @@ export const SETTINGS = {
     BILLING_TEAM_MEMBER_REMOVED: "billing_team_member_removed",
     BILLING_TEAM_ROLE_CHANGED: "billing_team_role_changed",
     BILLING_PERSONAL_SUBSCRIPTION_DOWNLOAD_INVOICES_CLICKED: "billing_personal_subscription_download_invoices_clicked",
+    REQUEST_BILLING_TEAM_ACCESS_MODAL_VIEWED: "request_billing_team_access_modal_viewed",
+    JOIN_BILLING_TEAM_REMINDER_VIEWED: "join_billing_team_reminder_viewed",
+    BILLING_TEAM_ACCESS_REQUEST_RESPONDED: "billing_team_access_request_responded",
   },
 
   WORKSPACE: {

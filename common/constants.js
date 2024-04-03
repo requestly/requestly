@@ -3,7 +3,7 @@
  * Right now the imports are defined using require, once changed to ES6 module we can move to import module
  */
 if (typeof isReactApp === "undefined") {
-  var isReactApp = typeof require !== "undefined";
+  var isReactApp = document.getElementById("root") !== null;
 }
 const CONSTANTS = {};
 
@@ -176,6 +176,7 @@ CONSTANTS.SCRIPT_CODE_TYPES = {
 CONSTANTS.SCRIPT_LOAD_TIME = {
   BEFORE_PAGE_LOAD: "beforePageLoad",
   AFTER_PAGE_LOAD: "afterPageLoad",
+  AS_SOON_AS_POSSIBLE: "asSoonAsPossible",
 };
 
 CONSTANTS.SCRIPT_LIBRARIES = {

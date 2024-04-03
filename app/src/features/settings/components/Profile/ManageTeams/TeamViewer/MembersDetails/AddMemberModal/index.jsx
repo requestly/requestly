@@ -21,6 +21,7 @@ import APP_CONSTANTS from "config/constants";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import "./AddMemberModal.css";
 import { fetchBillingIdByOwner, toggleWorkspaceMappingInBillingTeam } from "backend/billing";
+import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 
 const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, source }) => {
   //Component State
@@ -36,7 +37,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   const [isPublicInviteLoading, setPublicInviteLoading] = useState(false);
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
   const [isAddToBillingViewVisible, setIsAddToBillingViewVisible] = useState(false);
-  const [billingId, setBillingId] = useState(null);
+  const [billingTeamId, setBillingTeamId] = useState(null);
   const [isBillingTeamMapped, setIsBillingTeamMapped] = useState(false);
 
   // Global state
@@ -79,7 +80,7 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
 
   const handleAddToBilling = async () => {
     setIsProcessing(true);
-    await toggleWorkspaceMappingInBillingTeam(billingId, teamDetails?.id, true);
+    await toggleWorkspaceMappingInBillingTeam(billingTeamId, teamDetails?.id, true);
     handleAddMember();
   };
 
@@ -129,13 +130,16 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
             is_admin: makeUserAdmin,
             source: "add_member_modal",
             num_users_added: userEmail.length,
+            workspace_type: isBillingTeamMapped
+              ? TEAM_WORKSPACES.WORKSPACE_TYPE.MAPPED_TO_BILLING_TEAM
+              : TEAM_WORKSPACES.WORKSPACE_TYPE.NOT_MAPPED_TO_BILLING_TEAM,
           });
           setIsProcessing(false);
           toggleModal();
         } else {
-          const inviteErrors = res?.data?.results.filter((result) => result?.success !== true);
+          const inviteMemberErrors = res?.data?.results.filter((result) => result?.success !== true);
           callback?.();
-          setInviteErrors([...inviteErrors]);
+          setInviteErrors([...inviteMemberErrors]);
           setInviteErrorModalActive(true);
           trackAddTeamMemberFailure(teamId, userEmail, null, "add_member_modal");
           setIsProcessing(false);
@@ -209,12 +213,12 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
 
   useEffect(() => {
     fetchBillingIdByOwner(teamDetails?.owner, user?.details?.profile?.uid).then(({ billingId, mappedWorkspaces }) => {
-      setBillingId(billingId);
+      setBillingTeamId(billingId);
       setIsBillingTeamMapped(mappedWorkspaces?.includes(teamDetails?.id));
     });
   }, [teamDetails?.id, teamDetails?.owner, user?.details?.profile?.uid]);
 
-  if (!activeWorkspaceId) return null;
+  if (!teamId) return null;
 
   return (
     <>

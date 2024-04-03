@@ -4,7 +4,6 @@ import { submitAttrUtil } from "./AnalyticsUtils";
 import DataStoreUtils from "./DataStoreUtils";
 import { toast } from "utils/Toast.js";
 import { getDateString } from "./DateTimeUtils";
-import { getAndUpdateInstallationDate } from "utils/Misc";
 import APP_CONSTANTS from "config/constants";
 import {
   trackEmailVerificationSendAttempted,
@@ -12,7 +11,6 @@ import {
   trackEmailVerificationSendSuccess,
 } from "modules/analytics/events/common/auth/emailVerification";
 import Logger from "lib/logger";
-import { isProductionUI } from "./AppUtils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -101,45 +99,4 @@ export const reloadAuth = () => {
   const auth = getAuth(firebaseApp);
   const user = auth.currentUser;
   return user.reload();
-};
-
-export const isSignUpRequired = async (allRules, appMode, user) => {
-  if (!isProductionUI) {
-    return false;
-  }
-
-  // Avoid prompting users from China
-  if (window.isChinaUser) {
-    return false;
-  }
-  // Never prompt for signup if user has less than 3 rules
-  if (allRules.length <= 2) {
-    return false;
-  }
-  // Always prompt for signup if user has more than 7 rules
-  if (allRules.length > 7) {
-    return true;
-  }
-
-  const currentDate = new Date().getTime();
-  let installationDate = null;
-
-  try {
-    installationDate = await getAndUpdateInstallationDate(appMode, false, user?.loggedIn);
-    installationDate = Date.parse(installationDate);
-  } catch (error) {
-    installationDate = null;
-  }
-  if (!installationDate) {
-    // Edge case - Let user continue creating rule
-    return false;
-  }
-
-  const daysSinceInstallation = (currentDate - installationDate) / (1000 * 60 * 60 * 24);
-
-  if (daysSinceInstallation >= 15) {
-    return true;
-  } else {
-    return false;
-  }
 };

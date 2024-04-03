@@ -3,18 +3,16 @@ import { useSelector, useDispatch } from "react-redux";
 import { actions } from "store";
 import { getIsTrafficTableTourCompleted, getIsConnectedAppsTourCompleted } from "store/selectors";
 import { Table } from "@devtools-ds/table";
-import _ from "lodash";
+import { get } from "lodash";
 import { getColumnKey } from "../utils";
-import { VirtualTable } from "./VirtualTable";
 import AppliedRules from "../../Tables/columns/AppliedRules";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import FEATURES from "config/constants/sub/features";
 import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
-import { Checkbox, Tooltip } from "antd";
+import { Checkbox } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 export const ITEM_SIZE = 30;
@@ -25,7 +23,6 @@ interface Props {
   isStaticPreview: boolean;
   setSelectedMockRequests?: Function;
   showMockRequestSelector?: boolean;
-  isMockRequestSelectorDisabled?: boolean;
   selectedMockRequests?: Record<string, any>;
 }
 
@@ -35,7 +32,6 @@ const NetworkTable: React.FC<Props> = ({
   isStaticPreview,
   setSelectedMockRequests,
   showMockRequestSelector,
-  isMockRequestSelectorDisabled,
   selectedMockRequests,
 }) => {
   const [selectedRowData, setSelectedRowData] = useState<RQNetworkLog>();
@@ -43,7 +39,6 @@ const NetworkTable: React.FC<Props> = ({
   const dispatch = useDispatch();
   const isTrafficTableTourCompleted = useSelector(getIsTrafficTableTourCompleted);
   const isConnectedAppsTourCompleted = useSelector(getIsConnectedAppsTourCompleted);
-  const isTrafficTableVirtualV2Enabled = useFeatureIsOn("traffic_table_virtualization_v2");
   const apiClientRequestForSelectedRowRef = useRef<APIClientRequest>(null);
 
   const onReplayRequest = useCallback(() => {
@@ -64,36 +59,70 @@ const NetworkTable: React.FC<Props> = ({
   const columns = useMemo(
     () => [
       {
-        title: "",
+        title: () => {
+          return (
+            <div className="display-row-center">
+              <Checkbox
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  if (e.target.checked) {
+                    const selectedRequests = logs.reduce((acc: Record<string, any>, log: Record<string, any>) => {
+                      acc[log.id] = log;
+                      return acc;
+                    }, {});
+                    setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, ...selectedRequests }));
+                  } else {
+                    setSelectedMockRequests((prev: Record<string, any>) => {
+                      const prevMockRequests = { ...prev };
+                      const requestsAfterUnselection = logs.reduce(
+                        (acc: Record<string, any>, log: Record<string, any>) => {
+                          delete acc[log.id];
+                          return acc;
+                        },
+                        prevMockRequests
+                      );
+                      return requestsAfterUnselection;
+                    });
+                  }
+                  trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
+                }}
+                checked={logs.every((log: Record<string, any>) => log.id && log.id in selectedMockRequests)}
+              />
+            </div>
+          );
+        },
         dataIndex: "id",
         width: "4%",
         hideColumn: !showMockRequestSelector,
         render: (id: string, log: Record<string, any>) => {
           return (
-            <Tooltip title={isMockRequestSelectorDisabled ? "Please fill all the conditions to select requests." : ""}>
-              <div className="display-row-center">
-                <Checkbox
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    if (e.target.checked) {
-                      setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
-                    } else {
-                      setSelectedMockRequests((prev: Record<string, any>) => {
-                        const newMockRequests = { ...prev };
-                        delete newMockRequests[id];
-                        return newMockRequests;
-                      });
-                    }
-                    trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
-                  }}
-                  disabled={isMockRequestSelectorDisabled}
-                  checked={selectedMockRequests?.[id]}
-                />
-              </div>
-            </Tooltip>
+            // <Tooltip title={isMockRequestSelectorDisabled ? "Please fill all the conditions to select requests." : ""}>
+            <div className="display-row-center">
+              <Checkbox
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  if (e.target.checked) {
+                    setSelectedMockRequests((prev: Record<string, any>) => ({ ...prev, [id]: log }));
+                  } else {
+                    setSelectedMockRequests((prev: Record<string, any>) => {
+                      const newMockRequests = { ...prev };
+                      delete newMockRequests[id];
+                      return newMockRequests;
+                    });
+                  }
+                  trackMockResponsesRequestsSelected(Object.keys(selectedMockRequests)?.length);
+                }}
+                // disabled={isMockRequestSelectorDisabled}
+                checked={selectedMockRequests?.[id]}
+              />
+            </div>
+            // </Tooltip>
           );
         },
       },
@@ -147,13 +176,7 @@ const NetworkTable: React.FC<Props> = ({
         width: "7%",
       },
     ],
-    [
-      isMockRequestSelectorDisabled,
-      isStaticPreview,
-      selectedMockRequests,
-      setSelectedMockRequests,
-      showMockRequestSelector,
-    ]
+    [isStaticPreview, logs, selectedMockRequests, setSelectedMockRequests, showMockRequestSelector]
   );
 
   const header = useMemo(() => {
@@ -166,7 +189,7 @@ const NetworkTable: React.FC<Props> = ({
             }
             return (
               <Table.HeadCell title={column.title} key={column.id} style={{ width: column.width }}>
-                {column.title}
+                {typeof column.title === "function" ? column.title() : column.title}
               </Table.HeadCell>
             );
           })}
@@ -195,7 +218,7 @@ const NetworkTable: React.FC<Props> = ({
             if (column.hideColumn === true) {
               return null;
             }
-            const columnData = _.get(log, getColumnKey(column?.dataIndex));
+            const columnData = get(log, getColumnKey(column?.dataIndex));
 
             return (
               <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>
@@ -216,27 +239,13 @@ const NetworkTable: React.FC<Props> = ({
         startWalkthrough={!isTrafficTableTourCompleted && isConnectedAppsTourCompleted}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
       />
-      {isTrafficTableVirtualV2Enabled ? (
-        <VirtualTableV2
-          header={header}
-          renderLogRow={renderLogRow}
-          logs={logs}
-          selectedRowData={selectedRowData}
-          onReplayRequest={onReplayRequest}
-        />
-      ) : (
-        <VirtualTable
-          height="100%"
-          width="100%"
-          itemCount={logs?.length ?? 0}
-          itemSize={ITEM_SIZE}
-          header={header}
-          row={({ index }) => renderLogRow(logs[index], index)}
-          footer={null}
-          selectedRowData={selectedRowData}
-          onReplayRequest={onReplayRequest}
-        />
-      )}
+      <VirtualTableV2
+        header={header}
+        renderLogRow={renderLogRow}
+        logs={logs}
+        selectedRowData={selectedRowData}
+        onReplayRequest={onReplayRequest}
+      />
       {isReplayRequestModalOpen ? (
         <APIClient
           request={apiClientRequestForSelectedRowRef.current}

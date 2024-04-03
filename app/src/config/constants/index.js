@@ -21,6 +21,7 @@ import THEMES from "./sub/themes";
 import HEADER_SUGGESTIONS from "./sub/header-suggestions";
 import TEAM_WORKSPACES from "./sub/team-workspaces";
 import { GA_EVENTS } from "./sub/analytics";
+import STORAGE from "./sub/storage";
 
 const APP_CONSTANTS = {};
 
@@ -115,10 +116,12 @@ APP_CONSTANTS.PROD_RULES_URL = "https://app.requestly.io/rules";
 
 APP_CONSTANTS.TEAM_WORKSPACES = TEAM_WORKSPACES;
 
+APP_CONSTANTS.STORAGE = STORAGE;
+
 // Moved from global constants
 APP_CONSTANTS.SUBSCRIPTION_STATUS = {
   ACTIVE: "active",
-  CANCELLED: "cancelled",
+  CANCELLED: "canceled",
   TRIALING: "trialing",
 };
 

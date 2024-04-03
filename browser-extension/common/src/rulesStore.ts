@@ -28,7 +28,7 @@ export const getEnabledRules = async (ruleType?: RuleType): Promise<Rule[]> => {
   const groups = await getGroups();
 
   return rules.filter((rule) => {
-    if (rule.status === Status.INACTIVE) {
+    if (!rule.status || rule.status === Status.INACTIVE) {
       return false;
     }
 

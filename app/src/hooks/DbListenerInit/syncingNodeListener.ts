@@ -4,7 +4,7 @@ import { onValue, get } from "firebase/database";
 import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
 import { isLocalStoragePresent } from "utils/AppUtils";
-import _ from "lodash";
+import { throttle } from "lodash";
 import Logger from "lib/logger";
 import {
   parseRemoteRecords,
@@ -26,29 +26,21 @@ import APP_CONSTANTS from "config/constants";
 import { SyncType } from "utils/syncing/SyncUtils";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { decompressRecords } from "../../utils/Compression";
 
 type NodeRef = DatabaseReference;
 type Snapshot = DataSnapshot;
 
 declare global {
   interface Window {
-    syncDebounceTimerStart: any;
+    syncThrottleTimerStart: any;
     isFirstSyncComplete: any;
     skipSyncListenerForNextOneTime: any;
   }
 }
 
-export const resetSyncDebounceTimerStart = () => (window.syncDebounceTimerStart = Date.now());
-resetSyncDebounceTimerStart();
-
-export const resetSyncDebounce = () => {
-  try {
-    doSyncDebounced?.cancel();
-    console.log("[Debug] Sync Debounce Canceled");
-  } catch (err) {
-    Logger.log("Sync Debounce cancel failed");
-  }
-};
+export const resetSyncThrottleTimerStart = () => (window.syncThrottleTimerStart = Date.now());
+resetSyncThrottleTimerStart();
 
 const waitPeriod = 5000; // allow bulk sync calls in this time
 
@@ -220,18 +212,27 @@ export const doSync = async (
   }
 };
 
-/** Debounced version of the doSync function */
-export const doSyncDebounced = _.debounce((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
-  console.log("[DEBUG] doSyncDebounced in action");
+/** Trottled version of the doSync function */
+export const doSyncThrottled = throttle((uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id) => {
+  console.log("[DEBUG] doSyncThrottled in action");
   doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
 }, 5000);
+
+export const resetSyncThrottle = () => {
+  try {
+    doSyncThrottled?.cancel();
+    console.log("[Debug] Sync Throttle Canceled");
+  } catch (err) {
+    Logger.log("Sync Trottle cancel failed");
+  }
+};
 
 /**
  * Initiates the syncing process if conditions are met
  *
  * @param {Object} params - The parameters for the function.
  * @param {Function} params.dispatch - Dispatch function to manage the state.
- * @param {Array} params.latestFirebaseRecords - Most recent records fetched from Firebase.
+ * @param {Record<string, any>} params.latestFirebaseRecords - Most recent records fetched from Firebase.
  * @param {string} params.uid - User ID.
  * @param {string} params.team_id - Team ID.
  * @param {('EXTENSION' | 'DESKTOP')}  params.appMode - Current mode of the app.
@@ -248,7 +249,7 @@ export const invokeSyncingIfRequired = async ({
   isSyncEnabled,
 }: {
   dispatch: Function;
-  latestFirebaseRecords?: any[];
+  latestFirebaseRecords?: Record<string, any>;
   uid?: string;
   team_id?: string;
   appMode?: "EXTENSION" | "DESKTOP";
@@ -276,12 +277,12 @@ export const invokeSyncingIfRequired = async ({
     dispatch(actions.updateIsRulesListLoading(false));
     return;
   }
-  // this does not make sense!!! Why not just call doSyncDebounced here????
-  if (Date.now() - window.syncDebounceTimerStart > waitPeriod) {
-    console.log("[DEBUG] invokeSyncingIfRequired - debouncedDosync");
-    doSyncDebounced(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
+
+  if (Date.now() - window.syncThrottleTimerStart > waitPeriod) {
+    console.log("[DEBUG] invokeSyncingIfRequired - doSyncThrottled");
+    doSyncThrottled(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   } else {
-    resetSyncDebounce();
+    resetSyncThrottle();
     doSync(uid, appMode, dispatch, updatedFirebaseRecords, syncTarget, team_id);
   }
 };
@@ -376,7 +377,7 @@ const syncingNodeListener = (
         onValue(syncNodeRef, async (snap: Snapshot) => {
           await invokeSyncingIfRequired({
             dispatch,
-            latestFirebaseRecords: snap.val(),
+            latestFirebaseRecords: decompressRecords(snap.val()),
             uid,
             team_id,
             appMode,
@@ -392,7 +393,7 @@ const syncingNodeListener = (
         onValue(syncNodeRef, async (snap: Snapshot) => {
           await callInvokeSyncingIfRequiredIfNotCalledRecently({
             dispatch,
-            latestFirebaseRecords: snap.val(),
+            latestFirebaseRecords: decompressRecords(snap.val()),
             uid,
             team_id,
             appMode,

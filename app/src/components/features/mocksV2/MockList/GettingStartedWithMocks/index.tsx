@@ -11,8 +11,7 @@ import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQues
 import { FiArrowUpRight } from "@react-icons/all-files/fi/FiArrowUpRight";
 //@ts-ignore
 import noMocksIcon from "../../../../../assets/img/icons/common/no-mocks.svg";
-
-import { AUTH } from "modules/analytics/events/common/constants";
+import { SOURCE } from "modules/analytics/events/common/constants.js";
 
 import "./index.css";
 
@@ -100,7 +99,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreat
             <AuthConfirmationPopover
               title="You need to sign up to upload mocks"
               callback={handleUploadAction}
-              source={mockType === MockType.API ? AUTH.SOURCE.CREATE_API_MOCK : AUTH.SOURCE.CREATE_FILE_MOCK}
+              source={mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK}
             >
               <RQButton
                 type="default"
@@ -115,7 +114,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreat
               title="You need to sign up to create API mocks"
               disabled={mockType === MockType.FILE}
               callback={handleCreateNew}
-              source={AUTH.SOURCE.CREATE_API_MOCK}
+              source={SOURCE.CREATE_API_MOCK}
             >
               <RQButton
                 type="primary"
@@ -152,7 +151,7 @@ export const GettingStartedWithMocks: React.FC<Props> = ({ mockType, handleCreat
                 <FiArrowUpRight /> See demo
               </a>
               <a
-                href="https://requestly.io/feature/mock-server"
+                href="https://requestly.com/products/mock-server/"
                 target="_blank"
                 rel="noreferrer"
                 className="helper-item"

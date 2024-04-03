@@ -2,8 +2,7 @@ import React, { useMemo } from "react";
 import { Col, notification, Row, Space } from "antd";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-//@ts-ignore
-import { ReactComponent as QuestionMarkIcon } from "assets/icons/question-mark.svg";
+import QuestionMarkIcon from "assets/icons/question-mark.svg?react";
 import { RQButton } from "lib/design-system/components";
 import "./ruleInfoDialog.css";
 

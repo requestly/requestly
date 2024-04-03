@@ -25,12 +25,10 @@ import {
   redirectToRuleEditor,
   redirectToCreateNewRule,
 } from "utils/RedirectionUtils";
-import { isSignUpRequired } from "utils/AuthUtils";
 import { ActionProps, CommandBarItem, CommandItemType, PageConfig, Page, TitleProps } from "./types";
 import { Tag } from "antd";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { AUTH } from "modules/analytics/events/common/constants";
 import "./index.css";
 
 export const config: PageConfig[] = [
@@ -213,22 +211,7 @@ const newRuleChildren: CommandBarItem[] = Object.values(RULE_TYPES_CONFIG)
         title: NAME,
         icon: <ICON />,
         action: async ({ navigate, dispatch, user, appMode, rules }) => {
-          if (user.loggedIn) redirectToCreateNewRule(navigate, TYPE, "command_bar");
-          else {
-            if (await isSignUpRequired(rules, appMode, user))
-              dispatch(
-                actions.toggleActiveModal({
-                  modalName: "authModal",
-                  newValue: true,
-                  newProps: {
-                    callback: () => redirectToCreateNewRule(navigate, TYPE, "command_bar"),
-                    authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-                    eventSource: AUTH.SOURCE.COMMAND_BAR,
-                  },
-                })
-              );
-            else redirectToCreateNewRule(navigate, TYPE, "command_bar");
-          }
+          redirectToCreateNewRule(navigate, TYPE, "command_bar");
         },
       };
     }

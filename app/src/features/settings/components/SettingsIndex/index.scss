@@ -1,9 +1,9 @@
 .settings-index {
-  width: 100vw;
+  width: 100%;
   height: 100%;
   display: flex;
-  //   gap: 20px;
   background: var(--surface-0);
+  overflow-y: hidden;
 }
 
 .settings-content-wrapper {
@@ -12,45 +12,16 @@
   height: 100%;
   overflow-y: auto;
   flex: 1;
-  padding: 1rem;
 
   & .settings-content {
     width: 100%;
     height: 100%;
-    max-width: 1000px;
+    overflow-y: hidden;
     background: var(--surface-0);
 
     & .ant-table-content {
       max-height: 55vh;
       overflow-y: auto;
-    }
-  }
-}
-
-.settings-index-sidebar-wrapper {
-  display: flex;
-}
-
-.settings-secondary-sidebar {
-  width: 184px;
-  padding: 12px;
-  height: 100%;
-  border-right: 1px solid var(--surface-2);
-  background: var(--surface-1);
-  box-shadow: -2px 0px 12px 0px rgba(0, 0, 0, 0.28);
-  overflow-y: auto;
-
-  &-section-title {
-    color: var(--neutrals-gray-300);
-    padding-left: 2px;
-    margin-bottom: 8px;
-  }
-
-  & .settings-secondary-sidebar-section {
-    padding-left: 1rem !important;
-
-    &-link:hover {
-      background: var(--surface-2);
     }
   }
 }
@@ -117,5 +88,57 @@
 
   .ant-spin {
     transform: scale(1.5);
+  }
+}
+
+// COMMON STYLES FOR PRIMARY AND SECONDARY SIDEBAR
+.settings-primary-sidebar-section,
+.settings-secondary-sidebar-section {
+  &-header {
+    margin-bottom: 8px;
+
+    &-icon {
+      position: relative;
+      top: 3px;
+      font-size: 1.125rem;
+
+      & svg {
+        color: var(--neutrals-gray-300);
+      }
+    }
+
+    &-title {
+      color: var(--neutrals-gray-300);
+      letter-spacing: 0.25px;
+    }
+  }
+
+  &-link {
+    display: block;
+    color: var(--white);
+    padding: 6px 8px;
+    margin-top: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 18px;
+    transition: 0.25s background ease-in-out;
+
+    &:hover {
+      background: var(--surface-1);
+      border-radius: 4px;
+      color: var(--white);
+    }
+  }
+
+  &-active-link {
+    background: var(--surface-2);
+    border-radius: 4px;
+    color: var(--white);
+
+    &:hover {
+      background: var(--surface-2);
+      border-radius: 4px;
+      color: var(--white);
+    }
   }
 }

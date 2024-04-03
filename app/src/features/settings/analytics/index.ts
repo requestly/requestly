@@ -52,3 +52,15 @@ export const trackWorkspaceSettingsAutomaticMappingToggleClicked = (workspace_id
 export const trackPersonalSubscriptionDownloadInvoicesClicked = () => {
   trackEvent(SETTINGS.BILLING.BILLING_PERSONAL_SUBSCRIPTION_DOWNLOAD_INVOICES_CLICKED);
 };
+
+export const trackRequestBillingTeamAccessModalViewed = () => {
+  trackEvent(SETTINGS.BILLING.REQUEST_BILLING_TEAM_ACCESS_MODAL_VIEWED);
+};
+
+export const trackJoinBillingTeamReminderViewed = () => {
+  trackEvent(SETTINGS.BILLING.JOIN_BILLING_TEAM_REMINDER_VIEWED);
+};
+
+export const trackBillingTeamAccessRequestResponded = (action: string, status: string) => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_ACCESS_REQUEST_RESPONDED, { action, status });
+};

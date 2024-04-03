@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
@@ -11,6 +11,7 @@ import { trackUpgradeOptionClicked, trackUpgradePopoverViewed } from "./analytic
 import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
 interface PremiumFeatureProps {
@@ -21,6 +22,8 @@ interface PremiumFeatureProps {
   popoverPlacement: PopconfirmProps["placement"];
   disabled?: boolean;
   source: string;
+  featureName?: string;
+  onClickCallback?: () => void;
 }
 
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
@@ -31,6 +34,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   popoverPlacement,
   disabled = false,
   source,
+  onClickCallback,
+  featureName,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -38,6 +43,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
 
+  const trialDuration = useFeatureValue("trial_days_duration", 30);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
@@ -69,10 +75,12 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             hasReachedLimit={isBreachingLimit}
             isDeadlineCrossed={hasCrossedDeadline}
             source={source}
+            featureName={featureName}
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
+                onClickCallback?.();
                 if (isExceedingLimits && isUpgradePopoverEnabled) setOpenPopup(true);
                 else onContinue();
               },
@@ -88,19 +96,29 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           placement={popoverPlacement}
           okText="See upgrade plans"
           cancelText={
-            !hasCrossedDeadline ? "Use free till 30 November" : !user.loggedIn && "Sign up for 30-day free trial"
+            !hasCrossedDeadline
+              ? "Use free till 30 November"
+              : !user.loggedIn && `Sign up for ${trialDuration}-day free trial`
           }
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
-            dispatch(actions.toggleActiveModal({ modalName: "pricingModal", newValue: true, newProps: { source } }));
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "pricingModal",
+                newValue: true,
+                newProps: { source },
+              })
+            );
           }}
           onCancel={() => {
             if (!hasCrossedDeadline) {
-              trackUpgradeOptionClicked("use_for_free_now");
+              trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
               onContinue();
             } else if (!user.loggedIn) {
               trackUpgradeOptionClicked("sign_up_for_trial");
-              dispatch(actions.toggleActiveModal({ modalName: "authModal", newValue: true }));
+              dispatch(
+                actions.toggleActiveModal({ modalName: "authModal", newValue: true, newProps: { eventSource: source } })
+              );
             }
           }}
           cancelButtonProps={{ style: { display: hasCrossedDeadline && user.loggedIn ? "none" : "inline-flex" } }}
@@ -116,7 +134,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
                   ? `You've exceeded the usage limits of the ${
                       user?.details?.planDetails?.planName || "free"
                     } plan. Consider upgrading for uninterrupted usage.`
-                  : " This feature is a part of our paid offering. Consider upgrading for uninterrupted usage."}
+                  : ` ${
+                      featureName ?? "This feature"
+                    } is a part of our paid offering. Consider upgrading for uninterrupted usage.`}
               </Typography.Text>
               {!user.loggedIn && <div className="no-cc-text caption text-gray text-bold">No credit card required!</div>}
             </>
@@ -128,6 +148,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
               onClick: () => {
+                onClickCallback?.();
                 if (!isExceedingLimits || !features || disabled || !isUpgradePopoverEnabled) {
                   onContinue();
                 }
