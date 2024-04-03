@@ -28,7 +28,7 @@ export const RequestBillingTeamAccessReminder = () => {
   }, [isModalVisible]);
 
   useEffect(() => {
-    if (joinTeamReminder) {
+    if (joinTeamReminder && !user.details?.isPremium && user.loggedIn) {
       const lastReminderDate = localStorage.getItem(APP_CONSTANTS.STORAGE.LOCAL_STORAGE.LAST_REMINDER_DATE);
       const currentDate = new Date();
       const reminderStartDate = new Date(joinTeamReminder.startDate);
@@ -46,8 +46,8 @@ export const RequestBillingTeamAccessReminder = () => {
       if (currentDate >= reminderStartDate) {
         setIsModalVisible(true);
       }
-    }
-  }, [joinTeamReminder]);
+    } else setIsModalVisible(false);
+  }, [joinTeamReminder, user.details?.isPremium, user.loggedIn]);
 
   const handleModalClose = useCallback(() => {
     setIsModalVisible(false);
