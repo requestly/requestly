@@ -46,7 +46,6 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
     }
   }
 
-  // Host patterns for operators other than EQUALS may false match other parts of URL as well. TODO: fix
   if (source.key === SourceKey.HOST) {
     switch (source.operator) {
       case SourceOperator.EQUALS:
