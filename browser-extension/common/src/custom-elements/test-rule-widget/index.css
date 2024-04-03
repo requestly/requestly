@@ -13,6 +13,7 @@
   color: #fff;
   font-family: system-ui;
   background: #1a1a1a;
+  box-shadow: 0px 0px 0px 4px rgba(255, 255, 255, 0.16), 0px 16px 32px 0px rgba(0, 0, 0, 0.24);
   border: 1px solid #5c5b5b;
   cursor: move;
   width: 420px;

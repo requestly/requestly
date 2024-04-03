@@ -131,11 +131,9 @@ class RQTestRuleWidget extends RQDraggableWidget {
     if (minimize) {
       container.classList.add("minimized");
       minimizedDetails.classList.add("visible");
-      this.moveToPostion({ right: 16, bottom: 50 });
     } else {
       container.classList.remove("minimized");
       minimizedDetails.classList.remove("visible");
-      this.moveToPostion(DEFAULT_POSITION);
     }
   }
 

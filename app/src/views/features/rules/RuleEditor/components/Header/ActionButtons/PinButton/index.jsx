@@ -6,7 +6,7 @@ import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import { trackRuleEditorHeaderClicked, trackRulePinToggled } from "modules/analytics/events/common/rules";
 import "./PinButton.css";
-import { getModeData } from "../../../actions";
+import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { StorageService } from "init";
 
 const PinButton = ({ rule, isRuleEditorModal }) => {

@@ -9,15 +9,18 @@ import {
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getUserAuthDetails,
-} from "../../../../../../../store/selectors";
-import { trackRQLastActivity } from "../../../../../../../utils/AnalyticsUtils";
+} from "../../../../../../../../store/selectors";
+import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
 //Actions
 import { saveRule } from "../actions";
-import { getModeData, setIsCurrentlySelectedRuleHasUnsavedChanges } from "../../../actions";
+import {
+  getModeData,
+  setIsCurrentlySelectedRuleHasUnsavedChanges,
+} from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { transformAndValidateRuleFields, validateRule } from "./actions";
 
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "../../../../../../../config/constants";
+import APP_CONSTANTS from "../../../../../../../../config/constants";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { getAllRedirectDestinationTypes, getAllResponseBodyTypes } from "utils/rules/misc";
 import { ruleModifiedAnalytics } from "./actions";

@@ -1,7 +1,7 @@
 //Sub-components
 import CreateRuleButton from "./CreateRuleButton";
 import ShareRuleButton from "./ShareRuleButton";
-import { getModeData } from "../../actions";
+import { getModeData } from "../../../../../../../components/features/rules/RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
 import "./RuleEditorActionButtons.css";
 
