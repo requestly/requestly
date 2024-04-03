@@ -3,7 +3,7 @@ import { registerCustomElement, setInnerHTML } from "../utils";
 import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
 import InfoIcon from "../../../resources/icons/info.svg";
 import RQLogo from "../../../resources/icons/rqLogo-blue.svg";
-import SettingsIcon from "../../../resources/icons/setting.svg";
+import RQLogoSmall from "../../../resources/icons/rqLogo-white.svg";
 import MinimizeIcon from "../../../resources/icons/minimze.svg";
 import CheckIcon from "../../../resources/icons/check.svg";
 import PendingIcon from "../../../resources/icons/pending.svg";
@@ -13,7 +13,7 @@ enum RQTestRuleWidgetEvent {
 }
 
 const TAG_NAME = "rq-test-rule-widget";
-const DEFAULT_POSITION = { right: 10, top: 10 };
+const DEFAULT_POSITION = { right: 16, top: 16 };
 
 class RQTestRuleWidget extends RQDraggableWidget {
   #testRuleId: string;
@@ -76,6 +76,14 @@ class RQTestRuleWidget extends RQDraggableWidget {
         this.showRuleAppliedStatus(true);
       }
     });
+
+    this.shadowRoot.getElementById("minimize-button").addEventListener("click", () => {
+      this.toggleMinimize(true);
+    });
+
+    this.shadowRoot.getElementById("minimized-status-btn").addEventListener("click", () => {
+      this.toggleMinimize(false);
+    });
   }
 
   triggerEvent(name: RQTestRuleWidgetEvent, detail?: unknown) {
@@ -84,6 +92,7 @@ class RQTestRuleWidget extends RQDraggableWidget {
 
   showRuleAppliedStatus(appliedStatus: boolean) {
     const ruleStatusContainer = this.shadowRoot.getElementById("rule-status");
+    const minimizedStatusBtn = this.shadowRoot.getElementById("minimized-status-btn");
     if (appliedStatus) {
       setInnerHTML(
         ruleStatusContainer,
@@ -91,6 +100,13 @@ class RQTestRuleWidget extends RQDraggableWidget {
         <span>${CheckIcon}</span>
         <span id="rule-applied-status">RULE APPLIED</span>
         `
+      );
+
+      setInnerHTML(
+        minimizedStatusBtn,
+        `
+        <span class="rq-success">${CheckIcon}</span>
+      `
       );
     } else {
       setInnerHTML(
@@ -100,6 +116,26 @@ class RQTestRuleWidget extends RQDraggableWidget {
         <span id="rule-not-applied-status">RULE NOT APPLIED YET</span>
         `
       );
+      setInnerHTML(
+        minimizedStatusBtn,
+        `
+        <span class="rq-warning">${PendingIcon}</span>
+      `
+      );
+    }
+  }
+
+  toggleMinimize(minimize: boolean) {
+    const container = this.shadowRoot.getElementById("container");
+    const minimizedDetails = this.shadowRoot.getElementById("minimized-details");
+    if (minimize) {
+      container.classList.add("minimized");
+      minimizedDetails.classList.add("visible");
+      this.moveToPostion({ right: 16, bottom: 50 });
+    } else {
+      container.classList.remove("minimized");
+      minimizedDetails.classList.remove("visible");
+      this.moveToPostion(DEFAULT_POSITION);
     }
   }
 
@@ -107,13 +143,16 @@ class RQTestRuleWidget extends RQDraggableWidget {
     return `
     <style>${styles}</style>
     <div id="container">
+      <div id="minimized-details">
+        <div id="minimized-logo">${RQLogoSmall}</div>
+        <button id="minimized-status-btn"></button>
+      </div>
       <div id="heading-container">
         <div id="logo-container"> 
           <span id="heading-logo">${RQLogo}</span>
           <span id="logo-text">requestly</span>
         </div>
         <div id="actions-container">
-         <button id="settings-button">${SettingsIcon}</buttton>
          <button id="minimize-button">${MinimizeIcon}</buttton>
         </div>
       </div>
