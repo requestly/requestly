@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation } from "react-router-dom";
 import { Row, Col } from "antd";
@@ -13,11 +13,13 @@ import {
 } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
-import "./RuleEditor.css";
 import EditorHeader from "./components/Header";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { BottomSheet, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { TestThisRuleRow } from "components/features/rules/TestThisRule";
+import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
+import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
   const location = useLocation();
@@ -31,6 +33,26 @@ const RuleEditor = (props) => {
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
+
+  const BOTTOM_SHEET_TAB_KEYS = {
+    TEST_RULE: "TEST_RULE",
+  };
+
+  const bottomSheetTabItems = useMemo(() => {
+    return [
+      {
+        key: BOTTOM_SHEET_TAB_KEYS.TEST_RULE,
+        label: (
+          <div className="bottom-sheet-tab">
+            <MdOutlineScience />
+            <span>Test</span>
+          </div>
+        ),
+        children: <TestThisRuleRow />,
+        forceRender: true,
+      },
+    ];
+  }, [BOTTOM_SHEET_TAB_KEYS.TEST_RULE]);
 
   useEffect(() => {
     const unloadListener = (e) => {
@@ -52,7 +74,7 @@ const RuleEditor = (props) => {
 
   const renderRuleEditor = () => {
     return (
-      <Col className="overflow-hidden">
+      <Col className="overflow-hidden h-full">
         {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
             mode={MODE}
@@ -61,34 +83,13 @@ const RuleEditor = (props) => {
             currentlySelectedRuleConfig={currentlySelectedRuleConfig}
           />
         ) : null}
-        <Row>
-          <Col
-            span={viewAsPanel ? 15 : 24}
-            // xxl={{
-            //   span: 15,
-            // }}
-            // xs={{
-            //   span: 24,
-            // }}
-          >
+        <Row style={{ height: "inherit", position: "relative" }}>
+          <Col span={viewAsPanel ? 15 : 24}>
             <ProCard className="rule-editor-procard">
               <RuleBuilder />
             </ProCard>
           </Col>
-          <Col
-            // style={{
-            //   background: "red",
-            // }}
-            // xxl={{
-            //   span: 9,
-            // }}
-            // xs={{
-            //   span: 24,
-            // }}
-            span={viewAsPanel ? 9 : 24}
-          >
-            <BottomSheet height={360} />
-          </Col>
+          <BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />
         </Row>
       </Col>
     );

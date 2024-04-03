@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
 import { Col, Row } from "antd";
 import { actions } from "../../../../../../app/src/store";
-import Header from "../../../../views/features/rules/RuleEditor/components/Header";
 import Body from "./Body";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
@@ -247,28 +246,6 @@ const RuleBuilder = (props) => {
         <Col span={24}>
           <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
         </Col>
-
-        {/* {enableDocs ? (
-          <>
-            {!showDocs ? (
-              <Button
-                className="rule-editor-help-btn"
-                onClick={() => {
-                  setShowDocs(true);
-                }}
-              >
-                Help
-                <span>
-                  <DownArrow />
-                </span>
-              </Button>
-            ) : (
-              <Col span={7}>
-                <Help setShowDocs={setShowDocs} ruleType={currentlySelectedRuleData.ruleType} />
-              </Col>
-            )}
-          </>
-        ) : null} */}
       </Row>
 
       {/* Modals */}
