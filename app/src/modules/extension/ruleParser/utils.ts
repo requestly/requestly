@@ -50,7 +50,10 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
   if (source.key === SourceKey.HOST) {
     switch (source.operator) {
       case SourceOperator.EQUALS:
-        return { regexFilter: `^(?:https?://)?(?:www.)?${source.value}(?![w.])` }; // host.com matches only host.com and should not match a.host.com
+        return {
+          regexFilter: `^(https?://)?(www.)?${source.value}([/:?#].*)?$`, // host.com matches only host.com and should not match a.host.com
+          isUrlFilterCaseSensitive: false,
+        };
 
       case SourceOperator.CONTAINS:
         return { urlFilter: `||${source.value}*^` }; // host.c matches a.host.com but not ahost.com
@@ -58,7 +61,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
         return {
-          regexFilter: `^https?://${pattern}(/|$)`,
+          regexFilter: `^https?://${pattern}(/|$)(.*)`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
@@ -66,7 +69,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(createRegexForWildcardString(source.value));
         return {
-          regexFilter: `^https?://${pattern}(/|$)`,
+          regexFilter: `^https?://${pattern}(/|$)(.*)`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
