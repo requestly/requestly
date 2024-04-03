@@ -46,7 +46,7 @@ export const RequestBillingTeamAccessReminder = () => {
       if (currentDate >= reminderStartDate) {
         setIsModalVisible(true);
       }
-    }
+    } else setIsModalVisible(false);
   }, [joinTeamReminder, user.details?.isPremium, user.loggedIn]);
 
   const handleModalClose = useCallback(() => {
