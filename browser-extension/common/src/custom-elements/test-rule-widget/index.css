@@ -1,9 +1,8 @@
 :host {
   position: fixed !important;
   z-index: 2147483647 !important;
-  top: 10px;
-  right: 10px;
-  width: 460px;
+  top: 16px;
+  right: 16px;
 }
 
 #container {
@@ -16,6 +15,20 @@
   background: #1a1a1a;
   border: 1px solid #5c5b5b;
   cursor: move;
+  width: 420px;
+  transition: all 0.2s;
+}
+
+#container.minimized {
+  width: fit-content;
+  height: 56px;
+  padding: 6px;
+  border-radius: 20px;
+}
+
+#container.minimized #content-container,
+#container.minimized #heading-container {
+  display: none;
 }
 
 #rule-name {
@@ -160,6 +173,44 @@
   color: #e09400;
 }
 
+#minimized-details {
+  display: none;
+  pointer-events: none;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 3px;
+}
+
+#minimized-details.visible {
+  display: flex;
+  pointer-events: auto;
+}
+
+#minimized-logo svg {
+  height: 16px;
+  width: 16px;
+}
+
+#minimized-status-btn {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+#minimized-status-btn span {
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+#minimized-status-btn span svg {
+  height: 20px;
+  width: 20px;
+}
+
 .secondary-text {
   font-size: 11px;
   color: #b0b0b5b3;
@@ -171,4 +222,12 @@
 
 a {
   color: #9370db;
+}
+
+.rq-warning {
+  background: #5c3111;
+}
+
+.rq-success {
+  background: #104b2f;
 }
