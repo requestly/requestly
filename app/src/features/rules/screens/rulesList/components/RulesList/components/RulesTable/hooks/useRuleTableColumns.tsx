@@ -43,6 +43,17 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
 
+  const getRuleDetailsInGroup = (group: Group) => {
+    let activeRulesCount = 0;
+    group.children?.forEach((rule) => {
+      if (rule.status === RecordStatus.ACTIVE) {
+        activeRulesCount += 1;
+      }
+    });
+
+    return { activeRulesCount, totalRules: group.children?.length ?? 0 };
+  };
+
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
     {
