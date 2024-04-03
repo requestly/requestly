@@ -288,20 +288,18 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             : "Sign in with email"
           : "Continue"}
       </RQButton>
-      {authMode === AUTH.ACTION_LABELS.LOG_IN && (
-        <RQButton
-          block
-          type="default"
-          size="large"
-          className="auth-screen-sso-btn"
-          onClick={() => {
-            setAuthMode(AUTH.ACTION_LABELS.SSO);
-            trackLoginWithSSOClicked();
-          }}
-        >
-          Continue with Single Sign-on (SSO)
-        </RQButton>
-      )}
+      <RQButton
+        block
+        type="default"
+        size="large"
+        className="auth-screen-sso-btn"
+        onClick={() => {
+          setAuthMode(AUTH.ACTION_LABELS.SSO);
+          trackLoginWithSSOClicked();
+        }}
+      >
+        Continue with Single Sign-on (SSO)
+      </RQButton>
 
       {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <div className="onboarding-terms-text">
