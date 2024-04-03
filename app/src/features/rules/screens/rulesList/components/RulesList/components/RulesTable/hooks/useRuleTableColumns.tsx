@@ -13,6 +13,7 @@ import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
+import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 import { PremiumFeature } from "features/pricing";
@@ -41,10 +42,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordsPinAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
-
-  /**
-   * - make rule name clickable and navigate to editor.
-   */
 
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
@@ -83,9 +80,27 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       ellipsis: true,
       render: (rule: RuleTableRecord) => {
         return isRule(rule) ? (
-          <Link to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${rule.id}`} state={{ source: "my_rules" }}>
-            {rule.name}
-          </Link>
+          rule?.description ? (
+            <div className="rule-name-container">
+              <Link
+                className="rule-name"
+                to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${rule.id}`}
+                state={{ source: "my_rules" }}
+              >
+                {rule.name}
+              </Link>
+
+              <Tooltip title={rule?.description} placement="right" showArrow={false}>
+                <span className="rule-description-icon">
+                  <RiInformationLine />
+                </span>
+              </Tooltip>
+            </div>
+          ) : (
+            <Link to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${rule.id}`} state={{ source: "my_rules" }}>
+              {rule.name}
+            </Link>
+          )
         ) : (
           rule.name
         );
