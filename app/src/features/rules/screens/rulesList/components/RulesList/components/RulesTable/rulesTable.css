@@ -93,3 +93,24 @@
 .rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
   color: var(--danger);
 }
+
+.rule-name-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.rule-name-container .rule-name {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rule-name-container .rule-description-icon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: var(--text-light);
+}
