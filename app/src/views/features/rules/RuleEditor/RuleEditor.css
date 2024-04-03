@@ -5,3 +5,7 @@
 .rule-editor-split-procard.ant-pro-card .ant-pro-card-body {
   padding-top: 2px;
 }
+
+.rule-editor-procard.ant-pro-card {
+  background: #1a1a1a;
+}

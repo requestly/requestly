@@ -3,11 +3,57 @@
   left: 0;
   right: 0;
   width: 100%;
-  background: red;
 }
 
 .bottom-sheet-panel-container {
   position: relative;
   height: 100% !important;
-  background-color: green;
+}
+
+.bottom-sheet-container,
+.bottom-sheet-panel-container {
+  border-top: 1px solid var(--surface-1);
+  background: var(--surface-0_5);
+
+  & .ant-tabs-nav {
+    padding: 8px 1rem;
+    margin-bottom: 0;
+  }
+
+  & .ant-tabs-tab {
+    border-radius: 4px !important;
+  }
+
+  & .ant-tabs-tab.ant-tabs-tab-active {
+    background: var(--surface-2);
+
+    & .ant-tabs-tab-btn {
+      color: var(--text-default);
+    }
+  }
+
+  & .ant-tabs-content-holder {
+    padding: 8px 1rem;
+  }
+}
+
+.bottom-sheet-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bottom-sheet-action-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+  cursor: pointer;
+  z-index: 2;
+
+  & svg {
+    transform: scale(1.1);
+    color: var(--text-default);
+  }
 }

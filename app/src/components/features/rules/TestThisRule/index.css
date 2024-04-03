@@ -1,5 +1,4 @@
 .test-this-rule-row-wrapper {
-  margin-top: 30px;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
   overflow: hidden;
