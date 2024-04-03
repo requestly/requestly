@@ -52,7 +52,6 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.EQUALS:
         return {
           regexFilter: `^(https?://)?(www.)?${source.value}([/:?#].*)?$`, // host.com matches only host.com and should not match a.host.com
-          isUrlFilterCaseSensitive: false,
         };
 
       case SourceOperator.CONTAINS:
