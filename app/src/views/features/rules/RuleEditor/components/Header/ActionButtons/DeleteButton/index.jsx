@@ -2,7 +2,7 @@ import { useState } from "react";
 import { RQButton } from "lib/design-system/components";
 import { DeleteOutlined } from "@ant-design/icons";
 import DeleteRulesModal from "components/features/rules/DeleteRulesModal";
-import { getModeData } from "../../../actions";
+import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 
 const DeleteButton = ({ rule, isDisabled, ruleDeletedCallback, isRuleEditorModal }) => {

@@ -2,9 +2,9 @@ import React, { useEffect, useState, useCallback, useRef, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
-import { Button, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import { actions } from "../../../../../../app/src/store";
-import Header from "./Header";
+import Header from "../../../../views/features/rules/RuleEditor/components/Header";
 import Body from "./Body";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
@@ -36,9 +36,9 @@ import {
 } from "modules/analytics/events/common/rules";
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import DownArrow from "assets/icons/down-arrow.svg?react";
+// import DownArrow from "assets/icons/down-arrow.svg?react";
 import { useHasChanged } from "hooks";
-import Help from "./Help";
+// import Help from "./Help";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -70,7 +70,7 @@ const RuleBuilder = (props) => {
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
   const [startWalkthrough, setStartWalkthrough] = useState(false);
-  const [showDocs, setShowDocs] = useState(false);
+  const [showDocs] = useState(false);
   const isDocsVisible = useMemo(() => {
     return enableDocs && showDocs;
   }, [enableDocs, showDocs]);
@@ -242,21 +242,13 @@ const RuleBuilder = (props) => {
         context={currentlySelectedRuleData}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
       />
-      {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
-        <Header
-          mode={MODE}
-          location={location}
-          currentlySelectedRuleData={currentlySelectedRuleData}
-          currentlySelectedRuleConfig={currentlySelectedRuleConfig}
-        />
-      ) : null}
 
       <Row className="w-full relative">
-        <Col span={isDocsVisible ? 17 : 24}>
+        <Col span={24}>
           <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
         </Col>
 
-        {enableDocs ? (
+        {/* {enableDocs ? (
           <>
             {!showDocs ? (
               <Button
@@ -276,7 +268,7 @@ const RuleBuilder = (props) => {
               </Col>
             )}
           </>
-        ) : null}
+        ) : null} */}
       </Row>
 
       {/* Modals */}

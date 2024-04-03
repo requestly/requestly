@@ -1,7 +1,7 @@
 //UTILS
-import { redirectToRules } from "../../../../../../../utils/RedirectionUtils";
+import { redirectToRules } from "../../../../../../../../utils/RedirectionUtils";
 //EXTERNALS
-import { StorageService } from "../../../../../../../init";
+import { StorageService } from "../../../../../../../../init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { parseExtensionRules } from "modules/extension/ruleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";

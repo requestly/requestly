@@ -8,7 +8,7 @@ import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/ru
 import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
-import { getModeData } from "../../../actions";
+import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 
 const ShareRuleButton = ({ isRuleEditorModal }) => {
   const { MODE } = getModeData(window.location);

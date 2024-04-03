@@ -4,7 +4,7 @@ import { Button } from "antd";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import { getIsCurrentlySelectedRuleHasUnsavedChanges } from "store/selectors";
 import { actions } from "store";
-import { getModeData } from "../../../actions";
+import { getModeData } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { toast } from "utils/Toast";
 import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
 
