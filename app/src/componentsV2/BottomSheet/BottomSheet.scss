@@ -1,0 +1,13 @@
+.bottom-sheet-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: red;
+}
+
+.bottom-sheet-panel-container {
+  position: relative;
+  height: 100% !important;
+  background-color: green;
+}

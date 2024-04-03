@@ -17,6 +17,7 @@ import "./RuleEditor.css";
 import EditorHeader from "./components/Header";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
+import { BottomSheet, useBottomSheetContext } from "componentsV2/BottomSheet";
 
 const RuleEditor = (props) => {
   const location = useLocation();
@@ -25,6 +26,8 @@ const RuleEditor = (props) => {
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
+
+  const { viewAsPanel } = useBottomSheetContext();
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
@@ -60,29 +63,31 @@ const RuleEditor = (props) => {
         ) : null}
         <Row>
           <Col
-            xxl={{
-              span: 15,
-            }}
-            xs={{
-              span: 24,
-            }}
+            span={viewAsPanel ? 15 : 24}
+            // xxl={{
+            //   span: 15,
+            // }}
+            // xs={{
+            //   span: 24,
+            // }}
           >
             <ProCard className="rule-editor-procard">
               <RuleBuilder />
             </ProCard>
           </Col>
           <Col
-            style={{
-              background: "red",
-            }}
-            xxl={{
-              span: 9,
-            }}
-            xs={{
-              span: 24,
-            }}
+            // style={{
+            //   background: "red",
+            // }}
+            // xxl={{
+            //   span: 9,
+            // }}
+            // xs={{
+            //   span: 24,
+            // }}
+            span={viewAsPanel ? 9 : 24}
           >
-            TEST PANEL HERE
+            <BottomSheet height={360} />
           </Col>
         </Row>
       </Col>
