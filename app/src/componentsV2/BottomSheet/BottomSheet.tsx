@@ -20,8 +20,8 @@ export const BottomSheet: React.FC<BotttomSheetProps> = ({ height, items, defaul
       span={viewAsPanel ? 9 : 24}
       className={`${viewAsPanel ? "bottom-sheet-panel-container" : "bottom-sheet-container "}`}
       style={{
-        bottom: viewAsPanel ? 0 : isOpen ? 0 : `-290px`,
-        height: viewAsPanel ? "100%" : `400px`,
+        bottom: viewAsPanel ? 0 : isOpen ? 0 : `-335px`,
+        height: viewAsPanel ? "100%" : `440px`,
       }}
     >
       <div className="bottom-sheet-action-buttons">
