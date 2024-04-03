@@ -17,7 +17,7 @@ import EditorHeader from "./components/Header";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { BottomSheet, useBottomSheetContext } from "componentsV2/BottomSheet";
-import { TestThisRuleRow } from "components/features/rules/TestThisRule";
+import { TestThisRuleV2 } from "components/features/rules/TestThisRuleV2";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import "./RuleEditor.css";
 
@@ -48,7 +48,7 @@ const RuleEditor = (props) => {
             <span>Test</span>
           </div>
         ),
-        children: <TestThisRuleRow />,
+        children: <TestThisRuleV2 />,
         forceRender: true,
       },
     ];
@@ -89,7 +89,9 @@ const RuleEditor = (props) => {
               <RuleBuilder />
             </ProCard>
           </Col>
-          <BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />
+          {MODE === RULE_EDITOR_CONFIG.MODES.EDIT && (
+            <BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />
+          )}
         </Row>
       </Col>
     );

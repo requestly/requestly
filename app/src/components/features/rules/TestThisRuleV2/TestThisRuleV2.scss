@@ -1,0 +1,30 @@
+.test-rule-input {
+  width: 388px;
+  height: 32px;
+
+  &::placeholder {
+    color: var(--neutrals-gray-400);
+  }
+}
+
+.test-rule-btn.ant-btn {
+  gap: 4px;
+}
+
+.test-rule-checkbox {
+  margin-top: 8px;
+  color: var(--text-default);
+  font-size: 13px;
+  letter-spacing: 0.25px;
+  line-height: 18px;
+}
+
+.test-results-header {
+  color: var(--text-default);
+}
+
+.test-reports-container {
+  border-radius: 4px;
+  border: 1px solid var(--surface-2);
+  flex: 1;
+}
