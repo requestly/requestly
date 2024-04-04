@@ -23,6 +23,7 @@ function decompressRecord(record) {
           if (pair.isCompressed) {
             const decompressedVal = decompressString(pair?.response?.value ?? "");
             decompressedRecord.pairs[idx].response.value = decompressedVal;
+            decompressedRecord.pairs[idx].isCompressed = false;
           }
         });
         break;
@@ -32,6 +33,7 @@ function decompressRecord(record) {
           if (pair.isCompressed) {
             const decompressedVal = decompressString(pair?.request?.value ?? "");
             decompressedRecord.pairs[idx].request.value = decompressedVal;
+            decompressedRecord.pairs[idx].isCompressed = false;
           }
         });
         break;
@@ -41,8 +43,9 @@ function decompressRecord(record) {
           pair.scripts.forEach((script, sidx) => {
             if (script.type === "code" && script.isCompressed) {
               const ScriptValue = script?.value;
-              const compressedValue = decompressString(ScriptValue ?? "");
-              decompressedRecord.pairs[idx].scripts[sidx].value = compressedValue;
+              const decompressedVal = decompressString(ScriptValue ?? "");
+              decompressedRecord.pairs[idx].scripts[sidx].value = decompressedVal;
+              decompressedRecord.pairs[idx].scripts[sidx].isCompressed = false;
             }
           });
         });
