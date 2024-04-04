@@ -3,15 +3,13 @@
 }
 
 .ant-row.rule-builder-body {
-  height: 80vh;
+  height: calc(100vh - 180px);
   overflow: auto !important;
+  padding-right: 8px;
+  padding-bottom: 6rem;
 }
 
 .ant-row.preview-rule-builder-body {
   height: auto;
   padding-bottom: 0;
-}
-
-.rule-builder-body > .ant-col {
-  margin-bottom: 4rem;
 }
