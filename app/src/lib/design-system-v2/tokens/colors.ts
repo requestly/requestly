@@ -137,7 +137,7 @@ const generateAliasTokens = (mapTokens: MapTokens) => {
     "surface-3": mapTokens["neutral-600"],
     "text-placeholder": mapTokens["neutral-400"],
     "text-subtle": mapTokens["neutral-300"],
-    "text-default": "#FFFFFF", // TODO: @vijay needs to link this with a map token,
+    "text-default": "#FFFFFF", // This needs to be generated depending upon neutral color. Light in case of dark and dark in case of light
     "error-light": mapTokens["error-400"],
     "error-text": mapTokens["error-300"],
     "warning-light": mapTokens["warning-400"],
