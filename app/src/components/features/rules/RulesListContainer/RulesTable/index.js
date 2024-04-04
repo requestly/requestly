@@ -345,7 +345,7 @@ const RulesTable = ({
       setGroupToEmpty(groupData.id);
       event.stopPropagation();
 
-      deleteGroup(appMode, groupData.id, groupwiseRulesToPopulate)
+      deleteGroup(appMode, groupData.id, groupwiseRulesToPopulate, true)
         .then(async (args) => {
           if (args && args.err) {
             if (args.err === "ungroup-rules-first") {
