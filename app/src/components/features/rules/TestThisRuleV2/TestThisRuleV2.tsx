@@ -5,6 +5,26 @@ import { TestReportsTable } from "./components/TestReportsTable";
 import "./TestThisRuleV2.scss";
 
 export const TestThisRuleV2 = () => {
+  // const handleStartTestRule = () => {
+  //   if (!pageUrl.length) {
+  //     setError("Enter a page URL");
+  //     return;
+  //   }
+  //   const urlToTest = prefixUrlWithHttps(pageUrl);
+
+  //   if (!isValidUrl(urlToTest)) {
+  //     setError("Enter a valid page URL");
+  //     return;
+  //   }
+  //   if (error) {
+  //     setError(null);
+  //   }
+
+  //   trackTestRuleClicked(currentlySelectedRuleData.ruleType, recordTestPage);
+  //   setPageUrl(urlToTest);
+  //   testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: recordTestPage });
+  // };
+
   return (
     <Col className="test-this-rule-container">
       <Row align="middle" gutter={[8, 8]}>
