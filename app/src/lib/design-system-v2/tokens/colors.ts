@@ -1,5 +1,3 @@
-import { generate } from "@requestly/colors";
-
 type SeedTokenKeys = "primary" | "neutral" | "success" | "error" | "warning";
 type MapTokenVariations = 0 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000;
 type MapTokenKeys = `${SeedTokenKeys}-${MapTokenVariations}`;
