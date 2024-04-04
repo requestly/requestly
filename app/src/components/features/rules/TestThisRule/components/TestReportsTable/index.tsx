@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { getAppMode } from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { useSelector } from "react-redux";
 import { Col, Popconfirm, Row, Spin, Table } from "antd";
 import { TestReport } from "../../types";
@@ -16,6 +16,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import "./index.scss";
+import { trackTestRuleReportDeleted, trackTestRuleResultClicked } from "../../analytics";
 
 interface TestReportsTableProps {
   testReports: TestReport[];
@@ -30,8 +31,9 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
   isSessionSaving,
   refreshTestReports,
 }) => {
-  const [reportIdBeingDeleted, setReportIdBeingDeleted] = useState(null);
   const appMode = useSelector(getAppMode);
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const [reportIdBeingDeleted, setReportIdBeingDeleted] = useState(null);
 
   const { viewAsPanel } = useBottomSheetContext();
 
@@ -41,6 +43,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
       deleteTestReport(appMode, reportId)
         .then(() => {
           toast.success("Test deleted successfully");
+          trackTestRuleReportDeleted(currentlySelectedRuleData.ruleType);
           refreshTestReports();
         })
         .catch((error) => {
@@ -50,7 +53,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
           setReportIdBeingDeleted(null);
         });
     },
-    [appMode, refreshTestReports]
+    [appMode, refreshTestReports, currentlySelectedRuleData.ruleType]
   );
 
   const columns = useMemo(
@@ -101,7 +104,10 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
                   className="watch-test-session-btn"
                   type="default"
                   icon={<MdOndemandVideo />}
-                  onClick={() => redirectToUrl(record?.sessionLink, true)}
+                  onClick={() => {
+                    trackTestRuleResultClicked(currentlySelectedRuleData.ruleType, record.sessionLink);
+                    redirectToUrl(record?.sessionLink, true);
+                  }}
                 >
                   Watch session
                 </RQButton>
@@ -133,7 +139,14 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
         ),
       },
     ],
-    [viewAsPanel, isSessionSaving, newReportId, handleTestReportDelete, reportIdBeingDeleted]
+    [
+      viewAsPanel,
+      isSessionSaving,
+      newReportId,
+      handleTestReportDelete,
+      reportIdBeingDeleted,
+      currentlySelectedRuleData.ruleType,
+    ]
   );
 
   return (

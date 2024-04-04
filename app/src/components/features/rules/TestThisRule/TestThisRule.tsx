@@ -20,7 +20,7 @@ import {
   getRecordingOptionsToSave,
   getSessionEventsToSave,
 } from "views/features/sessions/SessionViewer/sessionEventsUtils";
-import { DebugInfo } from "views/features/sessions/SessionViewer/types";
+import { DebugInfo, SessionSaveMode } from "views/features/sessions/SessionViewer/types";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { EmptyTestResultScreen } from "./components/EmptyTestResultScreen";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
@@ -31,9 +31,10 @@ import Logger from "lib/logger";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
-import "./TestThisRuleV2.scss";
+import { trackTestRuleClicked, trackTestRuleReportGenerated, trackTestRuleSessionDraftSaved } from "./analytics";
+import "./TestThisRule.scss";
 
-export const TestThisRuleV2 = () => {
+export const TestThisRule = () => {
   const location = useLocation();
   const { state } = location;
   const appMode = useSelector(getAppMode);
@@ -52,6 +53,7 @@ export const TestThisRuleV2 = () => {
   const { viewAsPanel, isOpen, toggleOpen } = useBottomSheetContext();
 
   const handleStartTestRule = useCallback(() => {
+    trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
     if (!pageUrl.length) {
       setError("Enter a page URL");
       return;
@@ -70,7 +72,6 @@ export const TestThisRuleV2 = () => {
     if (error) {
       setError(null);
     }
-    // trackTestRuleClicked(currentlySelectedRuleData.ruleType, recordTestPage);
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
   }, [pageUrl, error, doCaptureSession, currentlySelectedRuleData, user.loggedIn]);
@@ -102,7 +103,7 @@ export const TestThisRuleV2 = () => {
             SOURCE.TEST_THIS_RULE
           ).then((response) => {
             if (response.success) {
-              // trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
+              trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
               getTestReportById(appMode, reportId).then((testReport) => {
                 if (testReport) {
                   testReport.sessionLink = getSessionRecordingSharedLink(response?.firestoreId);
@@ -146,7 +147,7 @@ export const TestThisRuleV2 = () => {
 
             const newTestReport = testReports.find((report: TestReport) => report.id === newReportId);
             if (newTestReport) {
-              //  trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, newTestReport.appliedStatus);
+              trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, newTestReport.appliedStatus);
             }
           }
         })
@@ -157,7 +158,7 @@ export const TestThisRuleV2 = () => {
           setRefreshTestReports(false);
         });
     }
-  }, [appMode, currentlySelectedRuleData.id, refreshTestReports, newReportId]);
+  }, [appMode, currentlySelectedRuleData.id, refreshTestReports, newReportId, currentlySelectedRuleData.ruleType]);
 
   useEffect(() => {
     if (isNewRuleCreated.current && !isOpen) {

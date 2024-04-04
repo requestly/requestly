@@ -17,7 +17,7 @@ import EditorHeader from "./components/Header";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { BottomSheet, useBottomSheetContext } from "componentsV2/BottomSheet";
-import { TestThisRuleV2 } from "components/features/rules/TestThisRuleV2";
+import { TestThisRule } from "components/features/rules/TestThisRule";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import "./RuleEditor.css";
 
@@ -48,7 +48,7 @@ const RuleEditor = (props) => {
             <span>Test</span>
           </div>
         ),
-        children: <TestThisRuleV2 />,
+        children: <TestThisRule />,
         forceRender: true,
       },
     ];
