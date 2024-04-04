@@ -40,6 +40,13 @@
   & .ant-tabs-content-holder {
     padding: 8px 1rem;
   }
+
+  & .ant-tabs-content {
+    height: 100%;
+  }
+  & .ant-tabs-tabpane {
+    height: inherit;
+  }
 }
 
 .bottom-sheet-tab {

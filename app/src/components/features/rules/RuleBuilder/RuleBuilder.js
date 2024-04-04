@@ -241,9 +241,9 @@ const RuleBuilder = (props) => {
         context={currentlySelectedRuleData}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
       />
-
-      <Row className="w-full relative">
-        <Col span={24}>
+      {/* TODO: NEEDS REFACTORING */}
+      <Row className="w-full relative rule-builder-container">
+        <Col span={24} className="rule-builder-body-wrapper">
           <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
         </Col>
       </Row>

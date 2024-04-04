@@ -44,7 +44,7 @@ export const TestReportsTable = () => {
       {
         title: "Status",
         key: "status",
-        width: 150,
+        width: 140,
         render: (_: any, record: TestReport) => (
           <div className="test-report-status">
             {record.appliedStatus ? (
@@ -118,7 +118,7 @@ export const TestReportsTable = () => {
       dataSource={testReports}
       className="test-reports-table"
       pagination={false}
-      scroll={{ y: viewAsPanel ? `calc(100% - 200px)` : 150 }}
+      scroll={{ y: viewAsPanel ? `calc(100vh - 380px)` : 150 }}
     />
   );
 };

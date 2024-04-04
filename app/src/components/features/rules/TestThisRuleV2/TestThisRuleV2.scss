@@ -1,5 +1,8 @@
+.test-this-rule-container {
+  height: inherit;
+}
+
 .test-rule-input {
-  width: 388px;
   height: 32px;
 
   &::placeholder {
@@ -24,8 +27,6 @@
 }
 
 .test-reports-container {
-  border-radius: 4px;
-  border: 1px solid var(--surface-2);
   flex: 1;
-  max-width: 1100px;
+  height: inherit;
 }
