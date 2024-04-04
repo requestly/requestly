@@ -8,6 +8,10 @@
 .bottom-sheet-panel-container {
   position: relative;
   height: 100% !important;
+
+  & .ant-tabs.ant-tabs-card {
+    height: 100%;
+  }
 }
 
 .bottom-sheet-container,
