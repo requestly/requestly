@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
 import { Checkbox, Col, Row } from "antd";
@@ -29,9 +30,12 @@ import Logger from "lib/logger";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import APP_CONSTANTS from "config/constants";
 import "./TestThisRuleV2.scss";
 
 export const TestThisRuleV2 = () => {
+  const location = useLocation();
+  const { state } = location;
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -43,7 +47,9 @@ export const TestThisRuleV2 = () => {
   const [newReportId, setNewReportId] = useState(null);
   const [isSessionSaving, setIsSessionSaving] = useState(false);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const { viewAsPanel } = useBottomSheetContext();
+  const isNewRuleCreated = useRef(state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE);
+
+  const { viewAsPanel, isOpen, toggleOpen } = useBottomSheetContext();
 
   const handleStartTestRule = useCallback(() => {
     if (!pageUrl.length) {
@@ -153,6 +159,13 @@ export const TestThisRuleV2 = () => {
     }
   }, [appMode, currentlySelectedRuleData.id, refreshTestReports, newReportId]);
 
+  useEffect(() => {
+    if (isNewRuleCreated.current && !isOpen) {
+      toggleOpen();
+      isNewRuleCreated.current = false;
+    }
+  }, [isOpen, toggleOpen]);
+
   return (
     <Col className="test-this-rule-container">
       {error && (
@@ -190,7 +203,12 @@ export const TestThisRuleV2 = () => {
       <div className="mt-16 test-results-header">Results</div>
       <Col className="mt-8 test-reports-container">
         {testReports?.length ? (
-          <TestReportsTable testReports={testReports} newReportId={newReportId} isSessionSaving={isSessionSaving} />
+          <TestReportsTable
+            testReports={testReports}
+            newReportId={newReportId}
+            isSessionSaving={isSessionSaving}
+            refreshTestReports={() => setRefreshTestReports(true)}
+          />
         ) : (
           <EmptyTestResultScreen />
         )}
