@@ -83,3 +83,13 @@
     color: var(--text-default);
   }
 }
+
+.test-report-delete-popconfirm {
+  & .ant-popover-inner {
+    background-color: var(--neutrals-black);
+  }
+
+  & .ant-popover-arrow-content::before {
+    background-color: var(--neutrals-black);
+  }
+}

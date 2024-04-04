@@ -1,5 +1,7 @@
-import React, { useMemo } from "react";
-import { Col, Row, Spin, Table } from "antd";
+import React, { useCallback, useMemo, useState } from "react";
+import { getAppMode } from "store/selectors";
+import { useSelector } from "react-redux";
+import { Col, Popconfirm, Row, Spin, Table } from "antd";
 import { TestReport } from "../../types";
 import { getFormattedTimestamp } from "utils/DateTimeUtils";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
@@ -8,18 +10,48 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOndemandVideo } from "@react-icons/all-files/md/MdOndemandVideo";
 import { RQButton } from "lib/design-system/components";
 import { redirectToUrl } from "utils/RedirectionUtils";
+import { deleteTestReport } from "../../helpers";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import { LoadingOutlined } from "@ant-design/icons";
+import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 import "./index.scss";
 
 interface TestReportsTableProps {
   testReports: TestReport[];
   newReportId: string;
   isSessionSaving: boolean;
+  refreshTestReports: () => void;
 }
 
-export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports, newReportId, isSessionSaving }) => {
+export const TestReportsTable: React.FC<TestReportsTableProps> = ({
+  testReports,
+  newReportId,
+  isSessionSaving,
+  refreshTestReports,
+}) => {
+  const [reportIdBeingDeleted, setReportIdBeingDeleted] = useState(null);
+  const appMode = useSelector(getAppMode);
+
   const { viewAsPanel } = useBottomSheetContext();
+
+  const handleTestReportDelete = useCallback(
+    (reportId: string) => {
+      setReportIdBeingDeleted(reportId);
+      deleteTestReport(appMode, reportId)
+        .then(() => {
+          toast.success("Test deleted successfully");
+          refreshTestReports();
+        })
+        .catch((error) => {
+          Logger.log(error);
+        })
+        .finally(() => {
+          setReportIdBeingDeleted(null);
+        });
+    },
+    [appMode, refreshTestReports]
+  );
 
   const columns = useMemo(
     () => [
@@ -73,7 +105,20 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports,
                 >
                   Watch session
                 </RQButton>
-                <RQButton className="test-report-delete-btn" iconOnly icon={<RiDeleteBin6Line />} />
+                <Popconfirm
+                  title="Are you sure to delete this test?"
+                  okText="Yes"
+                  cancelText="No"
+                  overlayClassName="test-report-delete-popconfirm"
+                  onConfirm={() => handleTestReportDelete(record.id)}
+                >
+                  <RQButton
+                    loading={reportIdBeingDeleted === record.id}
+                    className="test-report-delete-btn"
+                    iconOnly
+                    icon={<RiDeleteBin6Line />}
+                  />
+                </Popconfirm>
               </div>
             )}
             {isSessionSaving && record.id === newReportId && (
@@ -88,7 +133,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports,
         ),
       },
     ],
-    [viewAsPanel, isSessionSaving, newReportId]
+    [viewAsPanel, isSessionSaving, newReportId, handleTestReportDelete, reportIdBeingDeleted]
   );
 
   return (
