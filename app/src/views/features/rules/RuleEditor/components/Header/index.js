@@ -8,6 +8,7 @@ import ActionButtons from "./ActionButtons";
 import PinButton from "./ActionButtons/PinButton";
 import EditorGroupDropdown from "./EditorGroupDropdown";
 import CloseButton from "./ActionButtons/CloseButton";
+import { TestRuleButton } from "./ActionButtons/TestRuleButton";
 import RuleOptions from "./RuleOptions";
 import { capitalize, replace } from "lodash";
 import "./RuleEditorHeader.css";
@@ -63,6 +64,9 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
             </Col>
             <Col>
               <EditorGroupDropdown mode={mode} />
+            </Col>
+            <Col>
+              <TestRuleButton />
             </Col>
             <Col>
               <ActionButtons location={location} />
