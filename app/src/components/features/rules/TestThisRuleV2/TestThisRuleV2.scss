@@ -31,3 +31,12 @@
   flex: 1;
   height: inherit;
 }
+
+.test-rule-error-message {
+  color: var(--warning);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}

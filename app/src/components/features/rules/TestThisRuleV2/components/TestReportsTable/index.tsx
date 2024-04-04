@@ -1,8 +1,6 @@
 import React, { useMemo } from "react";
 import { Col, Row, Spin, Table } from "antd";
-
 import { TestReport } from "../../types";
-import { EmptyTestResultScreen } from "../EmptyTestResultScreen";
 import { getFormattedTimestamp } from "utils/DateTimeUtils";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
@@ -92,10 +90,6 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports,
     ],
     [viewAsPanel, isSessionSaving, newReportId]
   );
-
-  if (!testReports) {
-    return <EmptyTestResultScreen />;
-  }
 
   return (
     <Table

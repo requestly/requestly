@@ -3,18 +3,14 @@ import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
 import { Checkbox, Col, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
-import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { TestReportsTable } from "./components/TestReportsTable";
 import { prefixUrlWithHttps } from "utils/URLUtils";
 import { isValidUrl } from "utils/FormattingHelper";
 import { getTabSession, testRuleOnUrl } from "actions/ExtensionActions";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
-//@ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { TestReport } from "./types";
 import { getTestReportById, getTestReportsByRuleId, saveTestReport } from "./helpers";
-import Logger from "lib/logger";
 import { generateDraftSessionTitle } from "views/features/sessions/SessionViewer/utils";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -23,10 +19,16 @@ import {
   getRecordingOptionsToSave,
   getSessionEventsToSave,
 } from "views/features/sessions/SessionViewer/sessionEventsUtils";
-import { SOURCE } from "modules/analytics/events/common/constants";
 import { DebugInfo } from "views/features/sessions/SessionViewer/types";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
+import { EmptyTestResultScreen } from "./components/EmptyTestResultScreen";
+import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
+import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { toast } from "utils/Toast";
+import Logger from "lib/logger";
+//@ts-ignore
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./TestThisRuleV2.scss";
 
 export const TestThisRuleV2 = () => {
@@ -54,13 +56,18 @@ export const TestThisRuleV2 = () => {
       setError("Enter a valid page URL");
       return;
     }
+    if (!user.loggedIn && doCaptureSession) {
+      setError("You need to login to capture your test session");
+      return;
+    }
+
     if (error) {
       setError(null);
     }
     // trackTestRuleClicked(currentlySelectedRuleData.ruleType, recordTestPage);
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
-  }, [pageUrl, error, doCaptureSession, currentlySelectedRuleData]);
+  }, [pageUrl, error, doCaptureSession, currentlySelectedRuleData, user.loggedIn]);
 
   const handleSaveTestSession = useCallback(
     (tabId: number, reportId: string) => {
@@ -146,10 +153,14 @@ export const TestThisRuleV2 = () => {
     }
   }, [appMode, currentlySelectedRuleData.id, refreshTestReports, newReportId]);
 
-  console.log({ newReportId, testReports, isSessionSaving });
-
   return (
     <Col className="test-this-rule-container">
+      {error && (
+        <div className="test-rule-error-message">
+          <MdOutlineWarningAmber />
+          <span>{error}</span>
+        </div>
+      )}
       <Row align="middle" gutter={[8, 8]}>
         <Col>
           <RQInput
@@ -178,7 +189,11 @@ export const TestThisRuleV2 = () => {
       </Checkbox>
       <div className="mt-16 test-results-header">Results</div>
       <Col className="mt-8 test-reports-container">
-        <TestReportsTable testReports={testReports} newReportId={newReportId} isSessionSaving={isSessionSaving} />
+        {testReports?.length ? (
+          <TestReportsTable testReports={testReports} newReportId={newReportId} isSessionSaving={isSessionSaving} />
+        ) : (
+          <EmptyTestResultScreen />
+        )}
       </Col>
     </Col>
   );
