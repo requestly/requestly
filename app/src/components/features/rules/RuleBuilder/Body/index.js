@@ -67,16 +67,15 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
         id="rule-builder-body"
       >
         <Col
-          span={22}
-          offset={1}
-          md={{
-            offset: showDocs ? 1 : 2,
-            span: showDocs ? 22 : 20,
-          }}
-          lg={{
-            offset: isSharedListView ? 2 : showDocs ? 1 : 4,
-            span: isSharedListView ? 20 : showDocs ? 22 : 16,
-          }}
+          span={24}
+          // md={{
+          //   offset: showDocs ? 1 : 2,
+          //   span: showDocs ? 22 : 20,
+          // }}
+          // lg={{
+          //   offset: isSharedListView ? 2 : showDocs ? 1 : 4,
+          //   span: isSharedListView ? 20 : showDocs ? 22 : 16,
+          // }}
         >
           <CardBody>
             {/* Info for some specific rule types */}

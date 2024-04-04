@@ -4,7 +4,6 @@
 
 .ant-row.rule-builder-body {
   height: 80vh;
-  /* padding-bottom: 4rem; */
   overflow: auto !important;
 }
 

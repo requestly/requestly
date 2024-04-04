@@ -84,7 +84,7 @@ const RuleEditor = (props) => {
           />
         ) : null}
         <Row style={{ height: "inherit", position: "relative" }}>
-          <Col span={viewAsPanel ? 15 : 24}>
+          <Col span={viewAsPanel ? 13 : 24}>
             <ProCard className="rule-editor-procard">
               <RuleBuilder />
             </ProCard>

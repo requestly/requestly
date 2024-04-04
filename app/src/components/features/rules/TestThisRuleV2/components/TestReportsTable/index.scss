@@ -1,4 +1,7 @@
 .test-reports-table {
+  border-radius: 4px;
+  border: 1px solid var(--surface-2);
+
   & .ant-table-thead > tr > th {
     padding: 10px;
   }
