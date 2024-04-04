@@ -3,11 +3,13 @@
   left: 0;
   right: 0;
   width: 100%;
+  transition: bottom 0.2s ease-out;
 }
 
 .bottom-sheet-panel-container {
   position: relative;
   height: 100% !important;
+  transition: none;
 
   & .ant-tabs.ant-tabs-card {
     height: 100%;

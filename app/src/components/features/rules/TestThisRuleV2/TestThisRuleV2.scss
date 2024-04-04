@@ -4,6 +4,7 @@
 
 .test-rule-input {
   height: 32px;
+  transition: none;
 
   &::placeholder {
     color: var(--neutrals-gray-400);

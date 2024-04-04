@@ -38,6 +38,7 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 // import DownArrow from "assets/icons/down-arrow.svg?react";
 import { useHasChanged } from "hooks";
 // import Help from "./Help";
+import { m } from "framer-motion";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -234,7 +235,7 @@ const RuleBuilder = (props) => {
   }
 
   return (
-    <>
+    <m.div layout transition={{ type: "linear", duration: 0.25 }} style={{ height: "inherit" }}>
       <ProductWalkthrough
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}
@@ -256,7 +257,7 @@ const RuleBuilder = (props) => {
           mode="CURRENT_RULE"
         />
       ) : null}
-    </>
+    </m.div>
   );
 };
 
