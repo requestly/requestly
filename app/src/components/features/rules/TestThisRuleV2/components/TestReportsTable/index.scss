@@ -74,3 +74,12 @@
     }
   }
 }
+
+.saving-test-session-status {
+  color: var(--text-subtle);
+
+  & .saving-test-session-spinner {
+    font-size: 14px;
+    color: var(--text-default);
+  }
+}
