@@ -235,7 +235,7 @@ const RuleBuilder = (props) => {
   }
 
   return (
-    <m.div layout transition={{ type: "linear", duration: 0.25 }} style={{ height: "inherit" }}>
+    <m.div layout transition={{ type: "linear", duration: 0.2 }} style={{ height: "inherit" }}>
       <ProductWalkthrough
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}

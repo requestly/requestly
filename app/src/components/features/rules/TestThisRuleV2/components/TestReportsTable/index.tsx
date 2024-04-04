@@ -1,29 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
-import { Table } from "antd";
+import React, { useMemo } from "react";
+import { Col, Row, Spin, Table } from "antd";
 
 import { TestReport } from "../../types";
 import { EmptyTestResultScreen } from "../EmptyTestResultScreen";
-import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
-import { useSelector } from "react-redux";
-import { getTestReportsByRuleId } from "../../helpers";
-import Logger from "lib/logger";
 import { getFormattedTimestamp } from "utils/DateTimeUtils";
 import { MdOutlineCheckCircle } from "@react-icons/all-files/md/MdOutlineCheckCircle";
 import { IoMdCloseCircleOutline } from "@react-icons/all-files/io/IoMdCloseCircleOutline";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOndemandVideo } from "@react-icons/all-files/md/MdOndemandVideo";
-import "./index.scss";
-
 import { RQButton } from "lib/design-system/components";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
+import { LoadingOutlined } from "@ant-design/icons";
+import "./index.scss";
 
-export const TestReportsTable = () => {
-  const appMode = useSelector(getAppMode);
-  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const [testReports, setTestReports] = useState<TestReport[]>(null);
-  const [refreshTestReports, setRefreshTestReports] = useState(true);
-  const [newReportId] = useState(null);
+interface TestReportsTableProps {
+  testReports: TestReport[];
+  newReportId: string;
+  isSessionSaving: boolean;
+}
+
+export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports, newReportId, isSessionSaving }) => {
   const { viewAsPanel } = useBottomSheetContext();
 
   const columns = useMemo(
@@ -65,48 +62,36 @@ export const TestReportsTable = () => {
         title: "",
         key: "actions",
         width: 175,
-        render: (_: any, record: TestReport) =>
-          record?.sessionLink && (
-            <div className="test-report-action-buttons-container">
-              <RQButton
-                size="small"
-                className="watch-test-session-btn"
-                type="default"
-                icon={<MdOndemandVideo />}
-                onClick={() => redirectToUrl(record.sessionLink, true)}
-              >
-                Watch session
-              </RQButton>
-              <RQButton className="test-report-delete-btn" iconOnly icon={<RiDeleteBin6Line />} />
-            </div>
-          ),
+        render: (_: any, record: TestReport) => (
+          <>
+            {record?.sessionLink && (
+              <div className="test-report-action-buttons-container">
+                <RQButton
+                  size="small"
+                  className="watch-test-session-btn"
+                  type="default"
+                  icon={<MdOndemandVideo />}
+                  onClick={() => redirectToUrl(record?.sessionLink, true)}
+                >
+                  Watch session
+                </RQButton>
+                <RQButton className="test-report-delete-btn" iconOnly icon={<RiDeleteBin6Line />} />
+              </div>
+            )}
+            {isSessionSaving && record.id === newReportId && (
+              <Row gutter={8} align="middle" className="saving-test-session-status">
+                <Col>
+                  <Spin indicator={<LoadingOutlined className="saving-test-session-spinner" spin />} />
+                </Col>
+                <Col>Creating session..</Col>
+              </Row>
+            )}
+          </>
+        ),
       },
     ],
-    [viewAsPanel]
+    [viewAsPanel, isSessionSaving, newReportId]
   );
-
-  useEffect(() => {
-    if (refreshTestReports) {
-      getTestReportsByRuleId(appMode, currentlySelectedRuleData.id)
-        .then((testReports: TestReport[]) => {
-          if (testReports.length) {
-            setTestReports(testReports);
-
-            const newTestReport = testReports.find((report: TestReport) => report.id === newReportId);
-            if (newTestReport) {
-              //  trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, newTestReport.appliedStatus);
-            }
-          }
-        })
-        .catch((error) => {
-          Logger.log(error);
-        })
-        .finally(() => {
-          setRefreshTestReports(false);
-          //  highlightReport();
-        });
-    }
-  }, [appMode, currentlySelectedRuleData.id, refreshTestReports, newReportId]);
 
   if (!testReports) {
     return <EmptyTestResultScreen />;
