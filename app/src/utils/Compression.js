@@ -3,15 +3,25 @@ import pako from "pako";
 import { RuleType } from "types";
 
 function decompressString(compressedString) {
-  const compressed = Buffer.from(compressedString, "base64");
-  const uncompressed = pako.inflate(compressed, { to: "string" });
-  return uncompressed;
+  try {
+    const compressed = Buffer.from(compressedString, "base64");
+    const uncompressed = pako.inflate(compressed, { to: "string" });
+    return uncompressed;
+  } catch (error) {
+    console.debug("Error decompressing string", error, compressedString);
+    return compressedString;
+  }
 }
 
 function compressString(uncompressedString) {
-  const compressed = pako.deflate(uncompressedString, { to: "string" });
-  const base64Compressed = Buffer.from(compressed).toString("base64");
-  return base64Compressed;
+  try {
+    const compressed = pako.deflate(uncompressedString, { to: "string" });
+    const base64Compressed = Buffer.from(compressed).toString("base64");
+    return base64Compressed;
+  } catch (error) {
+    console.debug("Error compressing string", error, uncompressedString);
+    return uncompressedString;
+  }
 }
 
 function decompressRecord(record) {
