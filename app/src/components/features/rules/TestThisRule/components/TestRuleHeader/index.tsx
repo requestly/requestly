@@ -6,7 +6,11 @@ import { RQButton, RQInput } from "lib/design-system/components";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import { trackTestRuleClicked } from "../../analytics";
 import { useSelector } from "react-redux";
-import { getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
+import {
+  getCurrentlySelectedRuleData,
+  getIsCurrentlySelectedRuleHasUnsavedChanges,
+  getUserAuthDetails,
+} from "store/selectors";
 import { prefixUrlWithHttps } from "utils/URLUtils";
 import { isValidUrl } from "utils/FormattingHelper";
 import { testRuleOnUrl } from "actions/ExtensionActions";
@@ -14,6 +18,7 @@ import { testRuleOnUrl } from "actions/ExtensionActions";
 export const TestRuleHeader = () => {
   const user = useSelector(getUserAuthDetails);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(true);
@@ -21,6 +26,7 @@ export const TestRuleHeader = () => {
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
+
     if (!pageUrl.length) {
       setError("Enter a page URL");
       return;
@@ -31,6 +37,12 @@ export const TestRuleHeader = () => {
       setError("Enter a valid page URL");
       return;
     }
+
+    if (isCurrentlySelectedRuleHasUnsavedChanges) {
+      setError("You have unsaved changes, please save the rule before testing it");
+      return;
+    }
+
     if (!user.loggedIn && doCaptureSession) {
       setError("You need to login to capture your test session");
       return;

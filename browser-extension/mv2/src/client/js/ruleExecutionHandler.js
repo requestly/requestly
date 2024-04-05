@@ -50,10 +50,7 @@ RQ.RuleExecutionHandler.setup = () => {
             showWidget: false,
           });
         }
-        RQ.RuleExecutionHandler.showTestRuleWidget(
-          message.ruleId,
-          message.record ? RQ.CONSTANTS.TEST_THIS_RULE_MODES.EXPLICIT : RQ.CONSTANTS.TEST_THIS_RULE_MODES.IMPLICIT
-        );
+        RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId, RQ.CONSTANTS.TEST_THIS_RULE_MODES.EXPLICIT);
         break;
     }
 
