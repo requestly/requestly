@@ -79,8 +79,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (record: RuleTableRecord) => {
-        return isRule(record) ? (
-          record?.description ? (
+        if (isRule(record)) {
+          return (
             <div className="rule-name-container">
               <Link
                 className="rule-name"
@@ -90,20 +90,46 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 {record.name}
               </Link>
 
-              <Tooltip title={record?.description} placement="right" showArrow={false}>
-                <span className="rule-description-icon">
-                  <RiInformationLine />
-                </span>
-              </Tooltip>
+              {record?.description ? (
+                <Tooltip title={record?.description} placement="right" showArrow={false}>
+                  <span className="rule-description-icon">
+                    <RiInformationLine />
+                  </span>
+                </Tooltip>
+              ) : null}
             </div>
-          ) : (
-            <Link to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`} state={{ source: "my_rules" }}>
-              {record.name}
-            </Link>
-          )
-        ) : (
-          record.name
-        );
+          );
+        } else {
+          const group = record;
+          const totalRules = group.children?.length ?? 0;
+
+          const activeRulesCount = (group.children || []).reduce((count, rule) => {
+            return count + (rule.status === RecordStatus.ACTIVE ? 1 : 0);
+          }, 0);
+
+          return (
+            <div className="group-name-container">
+              <div className="group-name">{group.name}</div>
+
+              {activeRulesCount > 0 ? (
+                <Tooltip
+                  placement="right"
+                  showArrow={false}
+                  title={
+                    <>
+                      <div>Active rules: {activeRulesCount}</div>
+                      <div>Total rules: {totalRules}</div>
+                    </>
+                  }
+                >
+                  <div className="group-rules-count-details">
+                    <div className="active-status" /> {activeRulesCount} / {totalRules}
+                  </div>
+                </Tooltip>
+              ) : null}
+            </div>
+          );
+        }
       },
       onCell: (record: RuleTableRecord) => {
         if (isGroup(record)) {
