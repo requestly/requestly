@@ -72,7 +72,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
       return StorageService(appMode)
         .saveRuleOrGroup(updatedRecord, { silentUpdate: true })
         .then(() => {
-          console.log("Rule updated in Storage Service");
+          Logger.log("Rule updated in Storage Service");
         })
         .catch(() => {
           dispatch(recordsActions.upsertRecord(originalRecord));
@@ -89,7 +89,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
       return StorageService(appMode)
         .saveMultipleRulesOrGroups(updatedRecords)
-        .then(() => console.log("Records updated in Storage Service"))
+        .then(() => Logger.log("Records updated in Storage Service"))
         .catch(() => dispatch(recordsActions.upsertRecords(originalRecords)));
     },
     [appMode, dispatch]
@@ -98,7 +98,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const createRuleAction = useCallback(
     (ruleType?: RuleType, source = "") => {
-      console.log("[DEBUG]", "createRuleAction");
+      Logger.log("[DEBUG]", "createRuleAction");
       if (ruleType) {
         trackRuleCreationWorkflowStartedEvent(ruleType, source);
       } else {
@@ -111,18 +111,18 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   );
 
   const createGroupAction = useCallback(() => {
-    console.log("[DEBUG]", "createGroupAction");
+    Logger.log("[DEBUG]", "createGroupAction");
     openCreateGroupModalAction();
   }, [openCreateGroupModalAction]);
 
   const importRecordsAction = useCallback(() => {
-    console.log("[DEBUG]", "importRecordsAction");
+    Logger.log("[DEBUG]", "importRecordsAction");
     openImportRecordsModalAction();
   }, [openImportRecordsModalAction]);
 
   const recordsUngroupAction = useCallback(
     async (records: StorageRecord[]) => {
-      console.log("[DEBUG]", "recordsUngroupAction");
+      Logger.log("[DEBUG]", "recordsUngroupAction", records);
 
       const updateRules = records.reduce(
         (rules, record) =>
@@ -140,7 +140,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   // FIXME: Use promise instead of callback
   const recordsChangeGroupAction = useCallback(
     (records?: StorageRecord[], onSuccess?: Function) => {
-      console.log("[DEBUG]", "recordsChangeGroup");
+      Logger.log("[DEBUG]", "recordsChangeGroup", records);
 
       if (!records) {
         return;
@@ -154,7 +154,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const recordsShareAction = useCallback(
     (records?: StorageRecord[], onSuccess?: Function) => {
-      console.log("[DEBUG]", "recordsShareAction");
+      Logger.log("[DEBUG]", "recordsShareAction", records);
       trackShareButtonClicked(onSuccess ? "bulk_action_bar" : "rules_list");
       if (user.loggedIn) {
         const rulesToShare = records.filter(isRule);
@@ -191,7 +191,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const recordsDeleteAction = useCallback(
     (records: StorageRecord[], onSuccess?: Function) => {
-      console.log("[DEBUG]", "recordsDeleteAction");
+      Logger.log("[DEBUG]", "recordsDeleteAction", records);
       openDeleteRecordsModalAction(records, onSuccess);
     },
     [openDeleteRecordsModalAction]
@@ -199,7 +199,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const recordsStatusToggleAction = useCallback(
     (records: StorageRecord[], showToast = true) => {
-      console.log("[DEBUG]", "recordsStatusToggleAction");
+      Logger.log("[DEBUG]", "recordsStatusToggleAction", records);
       const handleRecordStatusToggle = (record: StorageRecord, showToast = true) => {
         const newStatus = record.status === RecordStatus.ACTIVE ? RecordStatus.INACTIVE : RecordStatus.ACTIVE;
         const updatedRecord: StorageRecord = {
@@ -244,7 +244,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const recordDuplicateAction = useCallback(
     (record: StorageRecord) => {
-      console.log("[DEBUG]", "recordDuplicateAction");
+      Logger.log("[DEBUG]", "recordDuplicateAction", record);
       if (isGroup(record)) {
         return;
       }
@@ -256,7 +256,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const recordRenameAction = useCallback(
     (record: StorageRecord) => {
-      console.log("[DEBUG]", "recordRenameAction");
+      Logger.log("[DEBUG]", "recordRenameAction", record);
       if (isRule(record)) {
         return;
       }
@@ -268,7 +268,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const groupDeleteAction = useCallback(
     (group: Group) => {
-      console.log("[DEBUG]", "groupDeleteAction");
+      Logger.log("[DEBUG]", "groupDeleteAction", group);
       openGroupDeleteModalAction(group);
     },
     [openGroupDeleteModalAction]
@@ -276,7 +276,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const recordsPinAction = useCallback(
     (records: StorageRecord[]) => {
-      console.log("[DEBUG]", "recordsPinAction");
+      Logger.log("[DEBUG]", "recordsPinAction", records);
       const handlePinRecord = (record: StorageRecord) => {
         let currentOwner;
 
