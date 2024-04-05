@@ -2,12 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
-import { Checkbox, Col, Row } from "antd";
-import { RQButton, RQInput } from "lib/design-system/components";
+import { Col } from "antd";
 import { TestReportsTable } from "./components/TestReportsTable";
-import { prefixUrlWithHttps } from "utils/URLUtils";
-import { isValidUrl } from "utils/FormattingHelper";
-import { getTabSession, testRuleOnUrl } from "actions/ExtensionActions";
+import { getTabSession } from "actions/ExtensionActions";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { TestReport } from "./types";
@@ -23,16 +20,15 @@ import {
 import { DebugInfo, SessionSaveMode } from "views/features/sessions/SessionViewer/types";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { EmptyTestResultScreen } from "./components/EmptyTestResultScreen";
-import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
-import { trackTestRuleClicked, trackTestRuleReportGenerated, trackTestRuleSessionDraftSaved } from "./analytics";
+import { trackTestRuleReportGenerated, trackTestRuleSessionDraftSaved } from "./analytics";
 import "./TestThisRule.scss";
+import { TestRuleHeader } from "./components/TestRuleHeader";
 
 export const TestThisRule = () => {
   const location = useLocation();
@@ -40,9 +36,6 @@ export const TestThisRule = () => {
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const [pageUrl, setPageUrl] = useState("");
-  const [error, setError] = useState(null);
-  const [doCaptureSession, setDoCaptureSession] = useState(true);
   const [testReports, setTestReports] = useState<TestReport[]>(null);
   const [refreshTestReports, setRefreshTestReports] = useState(true);
   const [newReportId, setNewReportId] = useState(null);
@@ -51,30 +44,6 @@ export const TestThisRule = () => {
   const isNewRuleCreated = useRef(state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE);
 
   const { viewAsSidePanel, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
-
-  const handleStartTestRule = useCallback(() => {
-    trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
-    if (!pageUrl.length) {
-      setError("Enter a page URL");
-      return;
-    }
-    const urlToTest = prefixUrlWithHttps(pageUrl);
-
-    if (!isValidUrl(urlToTest)) {
-      setError("Enter a valid page URL");
-      return;
-    }
-    if (!user.loggedIn && doCaptureSession) {
-      setError("You need to login to capture your test session");
-      return;
-    }
-
-    if (error) {
-      setError(null);
-    }
-    setPageUrl(urlToTest);
-    testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
-  }, [pageUrl, error, doCaptureSession, currentlySelectedRuleData, user.loggedIn]);
 
   const handleSaveTestSession = useCallback(
     (tabId: number, reportId: string) => {
@@ -179,38 +148,7 @@ export const TestThisRule = () => {
 
   return (
     <Col className="test-this-rule-container">
-      {error && (
-        <div className="test-rule-error-message">
-          <MdOutlineWarningAmber />
-          <span>{error}</span>
-        </div>
-      )}
-      <Row align="middle" gutter={[8, 8]}>
-        <Col>
-          <RQInput
-            className="test-rule-input"
-            placeholder="Enter the URL you want to test"
-            value={pageUrl}
-            onChange={(event) => setPageUrl(event.target.value)}
-            onPressEnter={handleStartTestRule}
-            style={{
-              width: viewAsSidePanel ? "280px" : "388px",
-            }}
-          />
-        </Col>
-        <Col>
-          <RQButton type="primary" className="test-rule-btn" icon={<MdOutlineScience />} onClick={handleStartTestRule}>
-            Test Rule
-          </RQButton>
-        </Col>
-      </Row>
-      <Checkbox
-        checked={doCaptureSession}
-        onChange={(event) => setDoCaptureSession(event.target.checked)}
-        className="test-rule-checkbox"
-      >
-        Save the test session with video, console & network logs
-      </Checkbox>
+      <TestRuleHeader />
       <div className="mt-16 test-results-header">Results</div>
       <Col className="mt-8 test-reports-container">
         {testReports?.length ? (
