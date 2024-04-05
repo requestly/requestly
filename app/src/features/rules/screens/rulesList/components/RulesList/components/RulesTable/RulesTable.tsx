@@ -17,7 +17,7 @@ import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/
 import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import "./rulesTable.css";
-import { enhanceRecords } from "./utils/rules";
+import { enhanceRecords, normalizeRecords } from "./utils/rules";
 import { ContentListTable, useContentListTableContext, withContentListTableContext } from "componentsV2/ContentList";
 import { useRulesActionContext } from "features/rules/context/actions";
 
@@ -153,7 +153,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     clearSelectedRows();
                     trackRulesListBulkActionPerformed("ungroup");
                   };
-                  recordsUngroupAction(selectedRows).then(onSuccess);
+                  recordsUngroupAction(normalizeRecords(selectedRows)).then(onSuccess);
                 },
               },
               {
@@ -167,7 +167,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("change_group");
                   };
 
-                  recordsChangeGroupAction(selectedRows, onSuccess);
+                  recordsChangeGroupAction(normalizeRecords(selectedRows), onSuccess);
                 },
               },
               {
@@ -179,7 +179,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("share");
                   };
 
-                  recordsShareAction(selectedRows, onSuccess);
+                  recordsShareAction(normalizeRecords(selectedRows), onSuccess);
                 },
               },
               {
@@ -193,7 +193,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("delete");
                   };
 
-                  recordsDeleteAction(selectedRows, onSuccess);
+                  recordsDeleteAction(normalizeRecords(selectedRows), onSuccess);
                 },
               },
             ],
