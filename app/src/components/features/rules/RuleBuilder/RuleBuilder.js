@@ -35,9 +35,7 @@ import {
 } from "modules/analytics/events/common/rules";
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-// import DownArrow from "assets/icons/down-arrow.svg?react";
 import { useHasChanged } from "hooks";
-// import Help from "./Help";
 import { m } from "framer-motion";
 import "./RuleBuilder.css";
 

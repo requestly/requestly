@@ -13,26 +13,26 @@ interface BotttomSheetProps extends TabsProps {
 }
 
 export const BottomSheet: React.FC<BotttomSheetProps> = ({ height, items, defaultActiveKey }) => {
-  const { isOpen, viewAsPanel, toggleOpen, toggleViewAsPanel } = useBottomSheetContext();
+  const { isBottomSheetOpen, viewAsSidePanel, toggleBottomSheet, toggleViewAsSidePanel } = useBottomSheetContext();
 
   return (
     <Col
-      span={viewAsPanel ? 11 : 24}
-      className={`${viewAsPanel ? "bottom-sheet-panel-container" : "bottom-sheet-container "}`}
+      span={viewAsSidePanel ? 11 : 24}
+      className={`${viewAsSidePanel ? "bottom-sheet-panel-container" : "bottom-sheet-container "}`}
       style={{
-        bottom: viewAsPanel ? 0 : isOpen ? 0 : `-335px`,
-        height: viewAsPanel ? "100%" : `440px`,
+        bottom: viewAsSidePanel ? 0 : isBottomSheetOpen ? 0 : `-335px`,
+        height: viewAsSidePanel ? "100%" : `440px`,
       }}
     >
       <div className="bottom-sheet-action-buttons">
-        {!viewAsPanel && (
+        {!viewAsSidePanel && (
           <RQButton
             iconOnly
             type="default"
-            icon={isOpen ? <MdExpandMore /> : <MdExpandLess />}
+            icon={isBottomSheetOpen ? <MdExpandMore /> : <MdExpandLess />}
             onClick={() => {
-              if (!viewAsPanel) {
-                toggleOpen();
+              if (!viewAsSidePanel) {
+                toggleBottomSheet();
               }
             }}
           />
@@ -41,8 +41,8 @@ export const BottomSheet: React.FC<BotttomSheetProps> = ({ height, items, defaul
         <RQButton
           iconOnly
           type="default"
-          onClick={toggleViewAsPanel}
-          icon={viewAsPanel ? <BiDockBottom /> : <BiDockRight />}
+          onClick={toggleViewAsSidePanel}
+          icon={viewAsSidePanel ? <BiDockBottom /> : <BiDockRight />}
         />
       </div>
 

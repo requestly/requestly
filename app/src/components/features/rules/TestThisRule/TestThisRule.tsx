@@ -50,7 +50,7 @@ export const TestThisRule = () => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isNewRuleCreated = useRef(state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE);
 
-  const { viewAsPanel, isOpen, toggleOpen } = useBottomSheetContext();
+  const { viewAsSidePanel, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -131,12 +131,21 @@ export const TestThisRule = () => {
       (message: { testReportId: string; testPageTabId: string; record: boolean; appliedStatus: boolean }) => {
         setRefreshTestReports(true);
         setNewReportId(message.testReportId);
+        if (!viewAsSidePanel && !isBottomSheetOpen) {
+          toggleBottomSheet();
+        }
         if (message.record) {
           handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId);
         }
       }
     );
-  }, [currentlySelectedRuleData.ruleType, handleSaveTestSession]);
+  }, [
+    currentlySelectedRuleData.ruleType,
+    handleSaveTestSession,
+    isBottomSheetOpen,
+    toggleBottomSheet,
+    viewAsSidePanel,
+  ]);
 
   useEffect(() => {
     if (refreshTestReports) {
@@ -161,11 +170,12 @@ export const TestThisRule = () => {
   }, [appMode, currentlySelectedRuleData.id, refreshTestReports, newReportId, currentlySelectedRuleData.ruleType]);
 
   useEffect(() => {
-    if (isNewRuleCreated.current && !isOpen) {
-      toggleOpen();
+    // Open the bottom sheet when a new rule is created
+    if (isNewRuleCreated.current && !isBottomSheetOpen) {
+      toggleBottomSheet();
       isNewRuleCreated.current = false;
     }
-  }, [isOpen, toggleOpen]);
+  }, [isBottomSheetOpen, toggleBottomSheet]);
 
   return (
     <Col className="test-this-rule-container">
@@ -184,7 +194,7 @@ export const TestThisRule = () => {
             onChange={(event) => setPageUrl(event.target.value)}
             onPressEnter={handleStartTestRule}
             style={{
-              width: viewAsPanel ? "280px" : "388px",
+              width: viewAsSidePanel ? "280px" : "388px",
             }}
           />
         </Col>

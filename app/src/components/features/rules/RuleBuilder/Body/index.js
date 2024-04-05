@@ -66,17 +66,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
         className={`rule-builder-body ${isSharedListView ? "preview-rule-builder-body" : ""}`}
         id="rule-builder-body"
       >
-        <Col
-          span={24}
-          // md={{
-          //   offset: showDocs ? 1 : 2,
-          //   span: showDocs ? 22 : 20,
-          // }}
-          // lg={{
-          //   offset: isSharedListView ? 2 : showDocs ? 1 : 4,
-          //   span: isSharedListView ? 20 : showDocs ? 22 : 16,
-          // }}
-        >
+        <Col span={24}>
           <CardBody>
             {/* Info for some specific rule types */}
             <RuleInfoBanner appMode={appMode} ruleType={currentlySelectedRuleConfig.TYPE} />

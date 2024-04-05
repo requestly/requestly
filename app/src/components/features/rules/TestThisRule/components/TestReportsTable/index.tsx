@@ -35,7 +35,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const [reportIdBeingDeleted, setReportIdBeingDeleted] = useState(null);
 
-  const { viewAsPanel } = useBottomSheetContext();
+  const { viewAsSidePanel } = useBottomSheetContext();
 
   const handleTestReportDelete = useCallback(
     (reportId: string) => {
@@ -61,7 +61,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
       {
         title: "URL",
         key: "url",
-        width: viewAsPanel ? 200 : 240,
+        width: viewAsSidePanel ? 200 : 240,
         ellipsis: true,
         render: (_: any, record: TestReport) => <div className="text-white">{record.url}</div>,
       },
@@ -140,7 +140,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
       },
     ],
     [
-      viewAsPanel,
+      viewAsSidePanel,
       isSessionSaving,
       newReportId,
       handleTestReportDelete,
@@ -155,7 +155,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
       dataSource={testReports}
       className="test-reports-table"
       pagination={false}
-      scroll={{ y: viewAsPanel ? `calc(100vh - 380px)` : 150 }}
+      scroll={{ y: viewAsSidePanel ? `calc(100vh - 380px)` : 150 }}
     />
   );
 };

@@ -19,6 +19,8 @@ import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { BottomSheet, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { TestThisRule } from "components/features/rules/TestThisRule";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
@@ -29,7 +31,7 @@ const RuleEditor = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
-  const { viewAsPanel } = useBottomSheetContext();
+  const { viewAsSidePanel } = useBottomSheetContext();
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
@@ -84,12 +86,12 @@ const RuleEditor = (props) => {
           />
         ) : null}
         <Row style={{ height: "inherit", position: "relative" }}>
-          <Col span={viewAsPanel ? 13 : 24}>
+          <Col span={viewAsSidePanel ? 13 : 24}>
             <ProCard className="rule-editor-procard">
               <RuleBuilder />
             </ProCard>
           </Col>
-          {MODE === RULE_EDITOR_CONFIG.MODES.EDIT && (
+          {MODE === RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE) && (
             <BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />
           )}
         </Row>

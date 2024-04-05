@@ -1,23 +1,25 @@
 import React, { createContext, useState, useContext } from "react";
 
 interface BottomSheetContextProps {
-  isOpen: boolean;
-  viewAsPanel: boolean;
-  toggleOpen: () => void;
-  toggleViewAsPanel: () => void;
+  isBottomSheetOpen: boolean;
+  viewAsSidePanel: boolean;
+  toggleBottomSheet: () => void;
+  toggleViewAsSidePanel: () => void;
 }
 
 const BottomSheetContext = createContext<BottomSheetContextProps | undefined>(undefined);
 
 export const BottomSheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [viewAsPanel, setViewAsPanel] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [viewAsSidePanel, setViewSideAsPanel] = useState(false);
 
-  const toggleOpen = () => setIsOpen(!isOpen);
-  const toggleViewAsPanel = () => setViewAsPanel(!viewAsPanel);
+  const toggleBottomSheet = () => setIsBottomSheetOpen(!isBottomSheetOpen);
+  const toggleViewAsSidePanel = () => setViewSideAsPanel(!viewAsSidePanel);
 
   return (
-    <BottomSheetContext.Provider value={{ isOpen, viewAsPanel, toggleOpen, toggleViewAsPanel }}>
+    <BottomSheetContext.Provider
+      value={{ isBottomSheetOpen, viewAsSidePanel, toggleBottomSheet, toggleViewAsSidePanel }}
+    >
       {children}
     </BottomSheetContext.Provider>
   );
