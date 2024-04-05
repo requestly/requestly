@@ -64,18 +64,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   }, [mode, defaultName]);
 
   return (
-    <Col
-      span={24}
-      // offset={1}
-      // md={{
-      //   offset: showDocs ? 1 : 2,
-      //   span: showDocs ? 22 : 20,
-      // }}
-      // lg={{
-      //   offset: showDocs ? 1 : 4,
-      //   span: showDocs ? 22 : 16,
-      // }}
-    >
+    <Col span={24}>
       <Row className="editor-title-container">
         <Col span={20}>
           <Row className="editor-title-name">

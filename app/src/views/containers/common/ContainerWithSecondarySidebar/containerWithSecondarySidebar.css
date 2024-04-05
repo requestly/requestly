@@ -12,5 +12,5 @@
 .parent-container .outlet-container {
   flex-grow: 1;
   height: 100%;
-  overflow: hidden !important;
+  overflow: auto !important;
 }
