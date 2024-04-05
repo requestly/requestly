@@ -24,7 +24,7 @@ import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 
 type RulesActionContextType = {
-  createRuleAction: (ruleType?: RuleType, source?: string) => void;
+  createRuleAction: (ruleType?: RuleType, source?: string, groupId?: string) => void;
   createGroupAction: () => void;
   importRecordsAction: () => void;
   recordsUngroupAction: (records: StorageRecord[]) => Promise<any>; // TODO: add proper type
@@ -96,15 +96,16 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   );
   /*****/
 
+  // FIXME: Remove hard coded event source values and refactor this action
   const createRuleAction = useCallback(
-    (ruleType?: RuleType, source = "") => {
-      Logger.log("[DEBUG]", "createRuleAction");
+    (ruleType?: RuleType, source = "", groupId = "") => {
+      console.log("[DEBUG]", "createRuleAction");
       if (ruleType) {
         trackRuleCreationWorkflowStartedEvent(ruleType, source);
       } else {
         trackNewRuleButtonClicked("in_app");
       }
-      redirectToCreateNewRule(navigate, ruleType, "my_rules");
+      redirectToCreateNewRule(navigate, ruleType, groupId ? source : "my_rules", groupId);
       return;
     },
     [navigate]

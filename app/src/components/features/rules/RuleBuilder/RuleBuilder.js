@@ -112,7 +112,8 @@ const RuleBuilder = (props) => {
           dispatch,
           currentlySelectedRuleConfig,
           RULE_TYPE_TO_CREATE,
-          setCurrentlySelectedRule
+          setCurrentlySelectedRule,
+          location?.state?.groupId ?? ""
         );
         stableSetCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[RULE_TYPE_TO_CREATE], navigate);
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT) {
@@ -156,7 +157,7 @@ const RuleBuilder = (props) => {
     stableSetCurrentlySelectedRuleConfig,
     props.rule,
     appMode,
-    location,
+    location?.state?.groupId,
   ]);
 
   //If "all rules" are not already there in state, fetch them.

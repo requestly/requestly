@@ -1,6 +1,7 @@
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
+import { Button, Dropdown, Menu, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "../types";
@@ -22,15 +23,22 @@ import PATHS from "config/constants/sub/paths";
 import { isRule, isGroup } from "features/rules/utils";
 import { trackRulesListActionsClicked } from "features/rules/analytics";
 import { checkIsRuleGroupDisabled, normalizeRecord } from "../utils/rules";
-import { trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
+import { trackNewRuleButtonClicked, trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
+import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
+import { PremiumIcon } from "components/common/PremiumIcon";
+import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { RuleType } from "types";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
+  const { getFeatureLimitValue } = useFeatureLimiter();
+  const { createRuleAction } = useRulesActionContext();
   const {
     recordsChangeGroupAction,
     recordsShareAction,
@@ -42,6 +50,44 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordsPinAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
+
+  const getRuleTypesDropdownOverlay = useMemo(
+    () => (groupId: string) => {
+      const checkIsPremiumRule = (ruleType: RuleType) => {
+        const featureName = `${ruleType.toLowerCase()}_rule`;
+        return !getFeatureLimitValue(featureName as FeatureLimitType);
+      };
+
+      return (
+        <Menu>
+          {Object.values(RULE_TYPES_CONFIG)
+            .filter((ruleConfig) => ruleConfig.ID !== 11)
+            .map(({ ID, TYPE, ICON, NAME }, index) => (
+              <PremiumFeature
+                key={index}
+                popoverPlacement="topLeft"
+                onContinue={() => createRuleAction(TYPE, SOURCE.RULE_GROUP, groupId)}
+                features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
+                featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
+                source={SOURCE.RULE_GROUP}
+              >
+                <Menu.Item icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
+                  {NAME}
+                  {checkIsPremiumRule(TYPE) ? (
+                    <PremiumIcon
+                      placement="topLeft"
+                      source="rule_dropdown"
+                      featureType={`${TYPE.toLowerCase()}_rule` as FeatureLimitType}
+                    />
+                  ) : null}
+                </Menu.Item>
+              </PremiumFeature>
+            ))}
+        </Menu>
+      );
+    },
+    [createRuleAction, getFeatureLimitValue]
+  );
 
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
@@ -113,8 +159,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
 
               {activeRulesCount > 0 ? (
                 <Tooltip
-                  placement="right"
-                  showArrow={false}
+                  placement="top"
                   title={
                     <>
                       <div>Active rules: {activeRulesCount}</div>
@@ -127,6 +172,18 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                   </div>
                 </Tooltip>
               ) : null}
+
+              <Dropdown trigger={["click"]} placement="topLeft" overlay={getRuleTypesDropdownOverlay(group.id)}>
+                <Button
+                  className="add-rule-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
+                  }}
+                >
+                  <span>+</span> <span>Add rule</span>
+                </Button>
+              </Dropdown>
             </div>
           );
         }
