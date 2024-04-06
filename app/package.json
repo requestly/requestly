@@ -71,7 +71,7 @@
     "codemirror": "^5.65.2",
     "fflate": "^0.7.3",
     "file-saver": "^2.0.5",
-    "firebase": "^10.8.1",
+    "firebase": "^10.9.0",
     "framer-motion": "^10.16.16",
     "fuzzysort": "^2.0.4",
     "html-validate": "^8.9.1",
