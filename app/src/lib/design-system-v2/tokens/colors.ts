@@ -2,19 +2,19 @@ type SeedTokenKeys = "primary" | "neutral" | "success" | "error" | "warning";
 type MapTokenVariations = 0 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000;
 type MapTokenKeys = `${SeedTokenKeys}-${MapTokenVariations}`;
 type AliasTokenKeys =
-  | "primary-light"
+  | "primary-soft"
   | "primary-text"
   | "background"
-  | "surface-05"
+  | "surface-0"
   | "surface-1"
   | "surface-2"
   | "surface-3"
   | "text-placeholder"
   | "text-subtle"
   | "text-default"
-  | "error-light"
+  | "error-soft"
   | "error-text"
-  | "warning-light"
+  | "warning-soft"
   | "white-t-10"
   | "white"
   | "white-t-20"
@@ -128,19 +128,19 @@ const generateMapTokens = (seedTokens: SeedTokens) => {
 const generateAliasTokens = (mapTokens: MapTokens) => {
   const aliasTokens: AliasTokens = {
     // Generated from Map Tokens
-    "primary-light": mapTokens["primary-400"],
+    "primary-soft": mapTokens["primary-400"],
     "primary-text": mapTokens["primary-300"],
-    background: mapTokens["neutral-900"],
-    "surface-05": "#212121", // TODO: @vijay needs to link this with a map token
+    background: mapTokens["neutral-1000"],
+    "surface-0": mapTokens["neutral-900"],
     "surface-1": mapTokens["neutral-800"],
     "surface-2": mapTokens["neutral-700"],
     "surface-3": mapTokens["neutral-600"],
     "text-placeholder": mapTokens["neutral-400"],
     "text-subtle": mapTokens["neutral-300"],
     "text-default": "#FFFFFF", // This needs to be generated depending upon neutral color. Light in case of dark and dark in case of light
-    "error-light": mapTokens["error-400"],
+    "error-soft": mapTokens["error-400"],
     "error-text": mapTokens["error-300"],
-    "warning-light": mapTokens["warning-400"],
+    "warning-soft": mapTokens["warning-400"],
 
     // Hardcoded Colors
     "white-t-10": "#FFFFFF19",
