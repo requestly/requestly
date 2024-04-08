@@ -14,7 +14,7 @@ interface TitleProps {
   description: string;
   namePlaceholder: string;
   descriptionPlaceholder: string;
-  nameChangeCallback: (name: string) => void;
+  nameChangeCallback: (name: string, warnForUnsavedChanges?: boolean) => void;
   descriptionChangeCallback: (desc: string) => void;
   errors?: ValidationErrors;
   mode?: "create" | "edit";
@@ -59,7 +59,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
   useEffect(() => {
     if (!defaultName || mode === "edit") return;
 
-    nameChangeCallback(defaultName);
+    nameChangeCallback(defaultName, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, defaultName]);
 
