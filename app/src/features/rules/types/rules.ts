@@ -67,7 +67,6 @@ interface GroupRecord extends RecordMetaData {
   objectType: RecordType.GROUP;
   status: RecordStatus;
   isFavourite?: boolean;
-  children?: RuleRecord[];
 }
 
 interface RulePairSource {
