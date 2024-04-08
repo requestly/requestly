@@ -120,7 +120,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     try {
       // Reach the last node but not the leaf node.
-      for (i = 0; i < pathParts.length - 1; i++) {
+      for (let i = 0; i < pathParts.length - 1; i++) {
         jsonObject = jsonObject[pathParts[i]];
       }
 
