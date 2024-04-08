@@ -41,6 +41,7 @@ export const RuleTypesDropdown: React.FC<Props> = ({
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
               featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
               source={analyticEventSource}
+              onClickCallback={(e) => e?.domEvent?.stopPropagation?.()}
             >
               <Menu.Item icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
                 {NAME}
