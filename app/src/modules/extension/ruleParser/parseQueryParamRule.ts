@@ -19,7 +19,9 @@ const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryPar
     } else if (modification.type === QueryParamModificationType.REMOVE) {
       transform.queryTransform.removeParams.push(modification.param);
     } else {
+      // case remove all
       transform.query = "";
+      delete transform.queryTransform; // queryTransform is not needed if query is present
     }
   });
 
