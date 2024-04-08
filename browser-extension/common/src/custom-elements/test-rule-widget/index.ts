@@ -24,6 +24,8 @@ class RQTestRuleWidget extends RQDraggableWidget {
     setInnerHTML(this.shadowRoot, this._getDefaultMarkup());
   }
 
+  // TODO: BREAKDOWN THIS WIDGET CODES INTO SMALLER FUNCTIONS WHEN IMPLEMENTING THE IMPLICIT MODE
+
   connectedCallback() {
     this.setAttribute("draggable", "true");
     super.connectedCallback();
