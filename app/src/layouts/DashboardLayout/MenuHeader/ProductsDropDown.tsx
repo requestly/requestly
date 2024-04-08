@@ -100,7 +100,7 @@ const Products: React.FC<ProductsProps> = (props) => {
     {
       title: (
         <>
-          SessionBook <RQBadge badgeText="NEW" />
+          SessionBook <RQBadge badgeText="BETA" />
         </>
       ),
       icon: SessionImg,

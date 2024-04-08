@@ -63,7 +63,7 @@ export const PrimarySidebar: React.FC = () => {
             title={showTooltipForSessionIcon ? "View and manage your saved sessions here" : ""}
           >
             <span className="icon-with-badge">
-              <SessionIcon /> <RQBadge badgeText="NEW" />
+              <SessionIcon /> <RQBadge badgeText="BETA" />
             </span>
           </Tooltip>
         ),
