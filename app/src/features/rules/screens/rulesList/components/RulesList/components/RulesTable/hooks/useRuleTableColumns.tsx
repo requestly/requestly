@@ -171,7 +171,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           return <RuleTypeTag ruleType={record.ruleType} />;
         }
       },
-      defaultSortOrder: "ascend",
       sortDirections: ["ascend", "descend", "ascend"],
       showSorterTooltip: false,
       sorter: {
@@ -267,7 +266,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
-            return record1 > record2 ? -1 : 1;
+            return record1 < record2 ? -1 : 1;
           }
         },
       },

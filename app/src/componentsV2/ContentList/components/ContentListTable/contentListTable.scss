@@ -26,6 +26,10 @@
           width: var(--sorter-icon-size);
           height: var(--sorter-icon-size);
         }
+
+        .anticon.active svg {
+          color: var(--primary-light);
+        }
       }
     }
 
