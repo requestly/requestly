@@ -44,7 +44,6 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     recordsChangeGroupAction,
     recordsShareAction,
     recordsDeleteAction,
-    recordsStatusToggleAction,
     recordsStatusUpdateAction,
   } = useRulesActionContext();
 
@@ -86,7 +85,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       }, []);
 
       if (activePremiumRules.length) {
-        recordsStatusToggleAction(activePremiumRules, false);
+        recordsStatusUpdateAction(activePremiumRules, RecordStatus.INACTIVE);
       }
       setIsPremiumRulesToggleChecked(true);
     }
@@ -95,7 +94,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     user?.details?.isPremium,
     loading,
     isPremiumRulesToggleChecked,
-    recordsStatusToggleAction,
+    recordsStatusUpdateAction,
     isBackgateRestrictionEnabled,
     isUpgradePopoverEnabled,
   ]);

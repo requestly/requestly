@@ -32,7 +32,7 @@ type RulesActionContextType = {
   recordsChangeGroupAction: (records?: StorageRecord[], onSuccess?: Function) => void;
   recordsShareAction: (records?: StorageRecord[], onSuccess?: Function) => void;
   recordsDeleteAction: (records: StorageRecord[], onSuccess?: Function) => void;
-  recordsStatusToggleAction: (records: StorageRecord[], showToast?: boolean) => void;
+  recordStatusToggleAction: (records: StorageRecord, showToast?: boolean) => void;
   recordsStatusUpdateAction: (records: StorageRecord[], value: RecordStatus, onSuccess?: Function) => void;
   recordDuplicateAction: (record: StorageRecord) => void;
   recordRenameAction: (record: StorageRecord) => void;
@@ -199,51 +199,6 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openDeleteRecordsModalAction]
   );
 
-  const recordsStatusToggleAction = useCallback(
-    (records: StorageRecord[], showToast = true) => {
-      Logger.log("[DEBUG]", "recordsStatusToggleAction", records);
-      const handleRecordStatusToggle = (record: StorageRecord, showToast = true) => {
-        const newStatus = record.status === RecordStatus.ACTIVE ? RecordStatus.INACTIVE : RecordStatus.ACTIVE;
-        const updatedRecord: StorageRecord = {
-          ...record,
-          status: newStatus,
-        };
-
-        Logger.log("Writing storage in RulesTable changeRuleStatus");
-        updateRecordInStorage(updatedRecord, record).then(() => {
-          const isRecordRule = isRule(record);
-
-          //Push Notify
-          if (showToast) {
-            newStatus === RecordStatus.ACTIVE
-              ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
-              : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
-          }
-
-          if (!isRecordRule) {
-            trackGroupStatusToggled(newStatus === "Active");
-            return;
-          }
-
-          if (newStatus.toLowerCase() === "active") {
-            trackRQLastActivity("rule_activated");
-            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
-            trackRuleToggled(record.ruleType, "rules_list", newStatus);
-          } else {
-            trackRQLastActivity("rule_deactivated");
-            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
-            trackRuleToggled(record.ruleType, "rules_list", newStatus);
-          }
-        });
-      };
-
-      records.forEach((record) => {
-        handleRecordStatusToggle(record, showToast);
-      });
-    },
-    [updateRecordInStorage, userAttributes.num_active_rules]
-  );
-
   const recordsStatusUpdateAction = useCallback(
     (records: StorageRecord[], value: RecordStatus, onSuccess?: Function) => {
       Logger.log("[DEBUG]", "recordsStatusUpdateAction", records);
@@ -286,6 +241,27 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
       });
     },
     [updateRecordInStorage, userAttributes.num_active_rules]
+  );
+
+  const recordStatusToggleAction = useCallback(
+    (record: StorageRecord, showToast = true) => {
+      Logger.log("[DEBUG]", "recordStatusToggleAction", record);
+
+      const newStatus = record.status === RecordStatus.ACTIVE ? RecordStatus.INACTIVE : RecordStatus.ACTIVE;
+
+      const onSuccess = () => {
+        if (showToast) {
+          const isRecordRule = isRule(record);
+
+          newStatus === RecordStatus.ACTIVE
+            ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
+            : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
+        }
+      };
+
+      recordsStatusUpdateAction([record], newStatus, onSuccess);
+    },
+    [updateRecordInStorage, userAttributes.num_active_rules, recordsStatusUpdateAction]
   );
 
   const recordDuplicateAction = useCallback(
@@ -361,7 +337,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     recordsChangeGroupAction,
     recordsShareAction,
     recordsDeleteAction,
-    recordsStatusToggleAction,
+    recordStatusToggleAction,
     recordsStatusUpdateAction,
     recordDuplicateAction,
     recordRenameAction,
