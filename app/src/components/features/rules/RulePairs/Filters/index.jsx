@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactSelect from "react-select";
 import { Button, Modal, Row, Col, Input, Typography, Dropdown, Menu } from "antd";
@@ -77,19 +77,23 @@ const Filters = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
-  const isResponseRule = () => {
+  const isResponseRule = useMemo(() => {
     return currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE;
-  };
+  }, [currentlySelectedRuleData.ruleType]);
+
+  const isRequestRule = useMemo(() => {
+    return currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST;
+  }, [currentlySelectedRuleData.ruleType]);
 
   const hasLegacyPayloadFilter = () => {
     return ResponseRuleResourceType.UNKNOWN === currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
   };
 
-  const isRequestPayloadFilterCompatible = isResponseRule() && hasLegacyPayloadFilter();
+  const isRequestPayloadFilterCompatible = isResponseRule && hasLegacyPayloadFilter();
 
   const isHTTPMethodFilterCompatible = true;
-  const isPayloadUrlFilterCompatible = !isResponseRule() && !isDesktopMode();
-  const isResourceTypeFilterCompatible = !isResponseRule() && !isDesktopMode(); // this partially works on desktop
+  const isPayloadUrlFilterCompatible = !isResponseRule && !isRequestRule && !isDesktopMode();
+  const isResourceTypeFilterCompatible = !isResponseRule && !isRequestRule && !isDesktopMode(); // this partially works on desktop
 
   const getCurrentPageURLOperatorText = () => {
     switch (
