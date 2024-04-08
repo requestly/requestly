@@ -8,19 +8,19 @@ function decompressString(compressedString) {
     const uncompressed = pako.inflate(compressed, { to: "string" });
     return uncompressed;
   } catch (error) {
-    console.debug("Error decompressing string", error, compressedString);
-    return compressedString;
+    console.log("[DEBUG] Error decompressing string", error, compressedString);
+    throw compressedString;
   }
 }
 
 function compressString(uncompressedString) {
   try {
-    const compressed = pako.deflate(uncompressedString, { to: "string" });
+    const compressed = pako.deflate(uncompressedString);
     const base64Compressed = Buffer.from(compressed).toString("base64");
     return base64Compressed;
   } catch (error) {
-    console.debug("Error compressing string", error, uncompressedString);
-    return uncompressedString;
+    console.log("[DEBUG] Error compressing string", error, uncompressedString);
+    throw uncompressedString;
   }
 }
 
