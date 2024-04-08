@@ -10,16 +10,17 @@ import { RuleTableRecord } from "./types";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
+import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
 import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
-import "./rulesTable.css";
 import { enhanceRecords, normalizeRecords } from "./utils/rules";
 import { ContentListTable, useContentListTableContext, withContentListTableContext } from "componentsV2/ContentList";
 import { useRulesActionContext } from "features/rules/context/actions";
+import "./rulesTable.css";
 
 interface Props {
   records: StorageRecord[];
@@ -29,7 +30,7 @@ interface Props {
 }
 
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
-  const { clearSelectedRows } = useContentListTableContext();
+  const { selectedRows, clearSelectedRows } = useContentListTableContext();
 
   const user = useSelector(getUserAuthDetails);
   const allRecords = useSelector(getAllRecords);
@@ -44,6 +45,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     recordsShareAction,
     recordsDeleteAction,
     recordsStatusToggleAction,
+    recordsStatusUpdateAction,
   } = useRulesActionContext();
 
   useEffect(() => {
@@ -118,6 +120,15 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
   const isFeatureLimitbannerShown = isFeatureLimiterOn && user?.isLimitReached;
 
+  const toggleRecordsBulkOptionLabel = useMemo(() => {
+    const selectedRecords = selectedRows as StorageRecord[];
+    const isAllRecordsActive = selectedRecords.every((record) => {
+      return allRecordsMap[record.id].status === RecordStatus.ACTIVE;
+    });
+
+    return isAllRecordsActive ? "Deactivate" : "Activate";
+  }, [selectedRows, allRecordsMap]);
+
   return (
     <>
       {/* Add Modals Required in Rules List here */}
@@ -168,6 +179,24 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                   };
 
                   recordsChangeGroupAction(normalizeRecords(selectedRows), onSuccess);
+                },
+              },
+              {
+                label: toggleRecordsBulkOptionLabel,
+                icon: <MdOutlineToggleOn />,
+                onClick: (selectedRows) => {
+                  const onSuccess = () => {
+                    toast.success(`All records ${toggleRecordsBulkOptionLabel.toLowerCase()}d!`);
+                    clearSelectedRows();
+                    trackRulesListBulkActionPerformed("records_toggle");
+                  };
+
+                  const updatedValue =
+                    toggleRecordsBulkOptionLabel.toLowerCase() === "activate"
+                      ? RecordStatus.ACTIVE
+                      : RecordStatus.INACTIVE;
+
+                  recordsStatusUpdateAction(normalizeRecords(selectedRows), updatedValue, onSuccess);
                 },
               },
               {

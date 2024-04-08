@@ -23,6 +23,7 @@ import { trackGroupPinToggled, trackGroupStatusToggled } from "../analytics";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 
+// FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
   createRuleAction: (ruleType?: RuleType, source?: string) => void;
   createGroupAction: () => void;
@@ -32,6 +33,7 @@ type RulesActionContextType = {
   recordsShareAction: (records?: StorageRecord[], onSuccess?: Function) => void;
   recordsDeleteAction: (records: StorageRecord[], onSuccess?: Function) => void;
   recordsStatusToggleAction: (records: StorageRecord[], showToast?: boolean) => void;
+  recordsStatusUpdateAction: (records: StorageRecord[], value: RecordStatus, onSuccess?: Function) => void;
   recordDuplicateAction: (record: StorageRecord) => void;
   recordRenameAction: (record: StorageRecord) => void;
   groupDeleteAction: (group: Group) => void;
@@ -242,6 +244,50 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [updateRecordInStorage, userAttributes.num_active_rules]
   );
 
+  const recordsStatusUpdateAction = useCallback(
+    (records: StorageRecord[], value: RecordStatus, onSuccess?: Function) => {
+      Logger.log("[DEBUG]", "recordsStatusUpdateAction", records);
+
+      const handleRecordStatusUpdate = (record: StorageRecord, value: RecordStatus) => {
+        const newStatus = value;
+        const updatedRecord: StorageRecord = {
+          ...record,
+          status: newStatus,
+        };
+
+        Logger.log("Writing storage in RulesTable changeRuleStatus");
+
+        return updateRecordInStorage(updatedRecord, record).then(() => {
+          const isRecordRule = isRule(record);
+
+          if (!isRecordRule) {
+            trackGroupStatusToggled(newStatus === "Active");
+            return;
+          }
+
+          if (newStatus.toLowerCase() === "active") {
+            trackRQLastActivity("rule_activated");
+            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
+            trackRuleToggled(record.ruleType, "rules_list", newStatus);
+          } else {
+            trackRQLastActivity("rule_deactivated");
+            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
+            trackRuleToggled(record.ruleType, "rules_list", newStatus);
+          }
+        });
+      };
+
+      const allPromises = records.map((record) => {
+        return handleRecordStatusUpdate(record, value);
+      });
+
+      Promise.all(allPromises).then(() => {
+        onSuccess?.();
+      });
+    },
+    [updateRecordInStorage, userAttributes.num_active_rules]
+  );
+
   const recordDuplicateAction = useCallback(
     (record: StorageRecord) => {
       Logger.log("[DEBUG]", "recordDuplicateAction", record);
@@ -316,6 +362,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     recordsShareAction,
     recordsDeleteAction,
     recordsStatusToggleAction,
+    recordsStatusUpdateAction,
     recordDuplicateAction,
     recordRenameAction,
     groupDeleteAction,
