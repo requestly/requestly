@@ -34,9 +34,6 @@ const LINKS = {
   // Docs - Mock GraphQL API response
   REQUESTLY_DOCS_MOCK_GRAPHQL: "https://developers.requestly.io/http-rules/graphql-support",
 
-  // Docs - Android Debugger Overview
-  REQUESTLY_DOCS_ANDROID_DEBUGGER: "https://docs.requestly.io/android-debugger/overview",
-
   // Docs - HTTP modifications
   REQUESTLY_DOCS_HTTP_MODIFICATIONS: "https://docs.requestly.io/browser-extension/chrome/http-modifications/overview",
 
