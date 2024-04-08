@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Button, Dropdown, Menu, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
@@ -34,6 +34,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleType } from "types";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
+  const [_, setSearchParams] = useSearchParams();
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
@@ -66,7 +67,13 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               <PremiumFeature
                 key={index}
                 popoverPlacement="topLeft"
-                onContinue={() => createRuleAction(TYPE, SOURCE.RULE_GROUP, groupId)}
+                onContinue={() => {
+                  createRuleAction(TYPE, SOURCE.RULE_GROUP);
+                  setSearchParams((params) => {
+                    params.set("groupId", groupId);
+                    return params;
+                  });
+                }}
                 features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
                 featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
                 source={SOURCE.RULE_GROUP}

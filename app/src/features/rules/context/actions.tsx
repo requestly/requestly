@@ -98,14 +98,14 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   // FIXME: Remove hard coded event source values and refactor this action
   const createRuleAction = useCallback(
-    (ruleType?: RuleType, source = "", groupId = "") => {
+    (ruleType?: RuleType, source = "") => {
       console.log("[DEBUG]", "createRuleAction");
       if (ruleType) {
         trackRuleCreationWorkflowStartedEvent(ruleType, source);
       } else {
         trackNewRuleButtonClicked("in_app");
       }
-      redirectToCreateNewRule(navigate, ruleType, groupId ? source : "my_rules", groupId);
+      redirectToCreateNewRule(navigate, ruleType, source || "my_rules");
       return;
     },
     [navigate]
