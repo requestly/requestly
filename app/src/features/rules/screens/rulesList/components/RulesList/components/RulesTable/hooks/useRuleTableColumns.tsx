@@ -1,7 +1,6 @@
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Link, useSearchParams } from "react-router-dom";
-import { Button, Dropdown, Menu, MenuProps, Row, Switch, Table, Tooltip } from "antd";
+import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "../types";
@@ -27,18 +26,14 @@ import { trackNewRuleButtonClicked, trackRuleToggleAttempted } from "modules/ana
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
-import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { PremiumIcon } from "components/common/PremiumIcon";
-import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { RuleType } from "types";
+import { RuleTypesDropdown } from "features/rules/components/common/RuleTypesDropdown/RuleTypesDropdown";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const [_, setSearchParams] = useSearchParams();
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
-  const { getFeatureLimitValue } = useFeatureLimiter();
   const { createRuleAction } = useRulesActionContext();
   const {
     recordsChangeGroupAction,
@@ -51,52 +46,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordsPinAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
-
-  const getRuleTypesDropdownOverlay = useMemo(
-    () => (groupId: string) => {
-      const checkIsPremiumRule = (ruleType: RuleType) => {
-        const featureName = `${ruleType.toLowerCase()}_rule`;
-        return !getFeatureLimitValue(featureName as FeatureLimitType);
-      };
-
-      return (
-        <Menu>
-          {Object.values(RULE_TYPES_CONFIG)
-            .filter((ruleConfig) => ruleConfig.ID !== 11)
-            .map(({ ID, TYPE, ICON, NAME }, index) => (
-              <div key={index}>
-                <PremiumFeature
-                  popoverPlacement="topLeft"
-                  onContinue={() => {
-                    createRuleAction(TYPE, SOURCE.RULE_GROUP);
-                    setSearchParams((params) => {
-                      params.set("groupId", groupId);
-                      return params;
-                    });
-                  }}
-                  features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
-                  featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
-                  source={SOURCE.RULE_GROUP}
-                >
-                  <Menu.Item icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
-                    {NAME}
-                    {checkIsPremiumRule(TYPE) ? (
-                      <PremiumIcon
-                        key={index}
-                        placement="topLeft"
-                        source="rule_dropdown"
-                        featureType={`${TYPE.toLowerCase()}_rule` as FeatureLimitType}
-                      />
-                    ) : null}
-                  </Menu.Item>
-                </PremiumFeature>
-              </div>
-            ))}
-        </Menu>
-      );
-    },
-    [createRuleAction, getFeatureLimitValue]
-  );
 
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
@@ -182,12 +131,15 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 </Tooltip>
               ) : null}
 
-              <Dropdown
-                key={group.id}
-                destroyPopupOnHide
-                trigger={["click"]}
-                placement="topLeft"
-                overlay={getRuleTypesDropdownOverlay(group.id)}
+              <RuleTypesDropdown
+                analyticEventSource={SOURCE.RULE_GROUP}
+                onOptionClick={(ruleType) => {
+                  createRuleAction(ruleType, SOURCE.RULE_GROUP);
+                  setSearchParams((params) => {
+                    params.set("groupId", group.id);
+                    return params;
+                  });
+                }}
               >
                 <Button
                   className="add-rule-btn"
@@ -198,7 +150,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 >
                   <span>+</span> <span>Add rule</span>
                 </Button>
-              </Dropdown>
+              </RuleTypesDropdown>
             </div>
           );
         }
