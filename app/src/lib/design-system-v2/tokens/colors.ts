@@ -56,7 +56,7 @@ const DEFAULT_MAP_TOKENS: MapTokens = {
   "neutral-600": "#5C5C5C",
   "neutral-700": "#383838",
   "neutral-800": "#282828",
-  "neutral-900": "#1A1A1A",
+  "neutral-900": "#212121",
   "neutral-1000": "#1A1A1A",
   "success-0": "#A6E9C8",
   "success-100": "#A6E9C8",
