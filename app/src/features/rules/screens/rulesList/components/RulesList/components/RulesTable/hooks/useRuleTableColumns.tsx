@@ -150,7 +150,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
-            return a.modificationDate > b.modificationDate ? -1 : 1;
+            return a.name?.toLowerCase()?.localeCompare(b.name?.toLowerCase());
           }
         },
       },
@@ -170,6 +170,25 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         if (isRule(record)) {
           return <RuleTypeTag ruleType={record.ruleType} />;
         }
+      },
+      defaultSortOrder: "ascend",
+      sortDirections: ["ascend", "descend", "ascend"],
+      showSorterTooltip: false,
+      sorter: {
+        compare: (a, b) => {
+          if (isGroup(a) && !isGroup(b)) {
+            return -1;
+          } else if (!isGroup(a) && isGroup(b)) {
+            return 1;
+          } else if (isGroup(a) && isGroup(b)) {
+            return 0;
+          } else {
+            if (isGroup(a) || isGroup(b)) {
+              return 0;
+            }
+            return a.ruleType.toLowerCase()?.localeCompare(b.ruleType.toLowerCase());
+          }
+        },
       },
     },
     {
@@ -234,6 +253,23 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             </span>
           );
         } else return beautifiedDate;
+      },
+      defaultSortOrder: "ascend",
+      sortDirections: ["ascend", "descend", "ascend"],
+      showSorterTooltip: false,
+      sorter: {
+        compare: (a, b) => {
+          const record1 = a.modificationDate ? a.modificationDate : a.creationDate;
+          const record2 = b.modificationDate ? b.modificationDate : b.creationDate;
+
+          if (isGroup(a) && !isGroup(b)) {
+            return -1;
+          } else if (!isGroup(a) && isGroup(b)) {
+            return 1;
+          } else {
+            return record1 > record2 ? -1 : 1;
+          }
+        },
       },
     },
     {
