@@ -10,7 +10,11 @@
   z-index: 9999;
 }
 
-.modal-wrapper .ant-modal-content {
+.auth-modal-wrapper .ant-modal-content {
   background: transparent;
   box-shadow: none;
+}
+
+.auth-modal-wrapper .onboarding-auth-screen-wrapper {
+  margin-top: 0;
 }

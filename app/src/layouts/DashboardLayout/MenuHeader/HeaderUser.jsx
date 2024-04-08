@@ -12,7 +12,7 @@ import {
   redirectToProfileSettings,
   redirectToWorkspaceSettings,
 } from "utils/RedirectionUtils";
-import { handleLogoutButtonOnClick } from "components/authentication/AuthForm/actions";
+import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { parseGravatarImage } from "utils/Misc";

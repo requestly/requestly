@@ -1,5 +1,7 @@
 ---
 name: Feature request
-about: You want something added. 🎉
-labels: 'enhancement'
+about: Request a new feature 🎉
+labels: 
+  - type: enhancement
+  - issue
 ---
