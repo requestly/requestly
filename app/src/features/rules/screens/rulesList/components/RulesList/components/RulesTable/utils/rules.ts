@@ -11,7 +11,25 @@ export const convertToArray = <T>(record: T | T[]): T[] => {
   return Array.isArray(record) ? record : [record];
 };
 
+// RuleTableRecord -> StorageRecord
+export const normalizeRecord = (tableRecord: RuleTableRecord): StorageRecord => {
+  if (isGroup(tableRecord)) {
+    const _tableRecord = {
+      ...tableRecord,
+    };
+
+    delete _tableRecord.children;
+    return _tableRecord as StorageRecord;
+  }
+  return tableRecord as StorageRecord;
+};
+
+export const normalizeRecords = (tableRecords: RuleTableRecord[]): StorageRecord[] => {
+  return tableRecords.map(normalizeRecord);
+};
+
 // FIXME: Performance Improvements
+// Denormalize records
 export const recordsToContentTableRecordsAdapter = (records: StorageRecord[]): RuleTableRecord[] => {
   const adaptedRecordMap: { [id: StorageRecord["id"]]: RuleTableRecord } = {};
 

@@ -1,4 +1,4 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
   - about: "Help us in creating Requestly's Roadmap by upvoting existing issues or feature requests"
     name: "⬆️ Upvote features you want to see next in Requestly"

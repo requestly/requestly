@@ -93,3 +93,59 @@
 .rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
   color: var(--danger);
 }
+
+.rule-name-container,
+.group-name-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.rule-name-container .rule-name {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rule-name-container .rule-description-icon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: var(--text-light);
+}
+
+.group-name-container {
+  gap: 8px;
+}
+
+.group-name-container .group-name {
+  max-width: 262px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group-name-container .group-rules-count-details {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-light);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  border-radius: 32px;
+  border: 1px solid var(--surface-2);
+  flex-shrink: 0;
+  padding: 2px 4px;
+  cursor: default;
+}
+
+.group-name-container .group-rules-count-details .active-status {
+  width: 10px;
+  height: 10px;
+  background: var(--success);
+  flex-shrink: 0;
+  border-radius: 100%;
+}
