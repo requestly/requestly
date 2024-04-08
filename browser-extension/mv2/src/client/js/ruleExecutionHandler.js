@@ -129,6 +129,10 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToWidget = (ruleId) => {
   const testRuleWidget = document.querySelector("rq-test-rule-widget");
 
   if (testRuleWidget?.getAttribute("applied-status") === "false") {
+    if (testRuleWidget.getAttribute("rule-id") === ruleId) {
+      testRuleWidget.setAttribute("applied-status", true);
+    }
+
     testRuleWidget.dispatchEvent(
       new CustomEvent("new-rule-applied", {
         detail: {

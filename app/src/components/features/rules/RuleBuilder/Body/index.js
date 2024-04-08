@@ -48,20 +48,22 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
 
   return (
     <>
-      {!isSharedListView && (
-        <RQEditorTitle
-          mode={mode}
-          errors={ruleErrors}
-          showDocs={showDocs}
-          defaultName={defaultRuleName}
-          name={currentlySelectedRuleData.name}
-          namePlaceholder="Enter rule name"
-          nameChangeCallback={handleRuleNameChange}
-          descriptionPlaceholder="Add description (optional)"
-          description={currentlySelectedRuleData.description}
-          descriptionChangeCallback={handleDescriptionChange}
-        />
-      )}
+      <div className="rule-editor-title-container">
+        {!isSharedListView && (
+          <RQEditorTitle
+            mode={mode}
+            errors={ruleErrors}
+            showDocs={showDocs}
+            defaultName={defaultRuleName}
+            name={currentlySelectedRuleData.name}
+            namePlaceholder="Enter rule name"
+            nameChangeCallback={handleRuleNameChange}
+            descriptionPlaceholder="Add description (optional)"
+            description={currentlySelectedRuleData.description}
+            descriptionChangeCallback={handleDescriptionChange}
+          />
+        )}
+      </div>
       <Row
         className={`rule-builder-body ${isSharedListView ? "preview-rule-builder-body" : ""}`}
         id="rule-builder-body"

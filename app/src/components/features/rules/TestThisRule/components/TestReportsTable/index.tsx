@@ -95,10 +95,20 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
         title: "",
         key: "actions",
         width: 175,
-        render: (_: any, record: TestReport) => (
-          <>
-            {record?.sessionLink && (
-              <div className="test-report-action-buttons-container">
+        render: (_: any, record: TestReport) => {
+          if (isSessionSaving && record.id === newReportId) {
+            return (
+              <Row gutter={8} align="middle" className="saving-test-session-status">
+                <Col>
+                  <Spin indicator={<LoadingOutlined className="saving-test-session-spinner" spin />} />
+                </Col>
+                <Col>Creating session..</Col>
+              </Row>
+            );
+          }
+          return (
+            <div className="test-report-action-buttons-container">
+              {record.sessionLink && (
                 <RQButton
                   size="small"
                   className="watch-test-session-btn"
@@ -111,32 +121,26 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
                 >
                   Watch session
                 </RQButton>
-                <Popconfirm
-                  title="Are you sure to delete this test?"
-                  okText="Yes"
-                  cancelText="No"
-                  overlayClassName="test-report-delete-popconfirm"
-                  onConfirm={() => handleTestReportDelete(record.id)}
-                >
-                  <RQButton
-                    loading={reportIdBeingDeleted === record.id}
-                    className="test-report-delete-btn"
-                    iconOnly
-                    icon={<RiDeleteBin6Line />}
-                  />
-                </Popconfirm>
-              </div>
-            )}
-            {isSessionSaving && record.id === newReportId && (
-              <Row gutter={8} align="middle" className="saving-test-session-status">
-                <Col>
-                  <Spin indicator={<LoadingOutlined className="saving-test-session-spinner" spin />} />
-                </Col>
-                <Col>Creating session..</Col>
-              </Row>
-            )}
-          </>
-        ),
+              )}
+
+              <Popconfirm
+                title="Are you sure to delete this test?"
+                okText="Yes"
+                cancelText="No"
+                overlayClassName="test-report-delete-popconfirm"
+                onConfirm={() => handleTestReportDelete(record.id)}
+                showArrow={false}
+              >
+                <RQButton
+                  loading={reportIdBeingDeleted === record.id}
+                  className="test-report-delete-btn"
+                  iconOnly
+                  icon={<RiDeleteBin6Line />}
+                />
+              </Popconfirm>
+            </div>
+          );
+        },
       },
     ],
     [

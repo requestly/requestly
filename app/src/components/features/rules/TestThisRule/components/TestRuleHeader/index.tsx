@@ -53,7 +53,14 @@ export const TestRuleHeader = () => {
     }
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
-  }, [pageUrl, error, doCaptureSession, currentlySelectedRuleData, user.loggedIn]);
+  }, [
+    pageUrl,
+    error,
+    doCaptureSession,
+    currentlySelectedRuleData,
+    user.loggedIn,
+    isCurrentlySelectedRuleHasUnsavedChanges,
+  ]);
 
   return (
     <>
