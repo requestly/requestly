@@ -100,16 +100,18 @@ const SessionsIndexPage = () => {
       if (!documentSnapshots.empty) {
         documentSnapshots.forEach((doc) => {
           const recordData = doc.data();
-          records.push({
-            id: doc.id,
-            name: recordData.name,
-            duration: recordData.sessionAttributes.duration,
-            startTime: recordData.sessionAttributes.startTime,
-            url: recordData.sessionAttributes.url,
-            visibility: recordData.visibility,
-            eventsFilePath: recordData.eventsFilePath,
-            createdBy: recordData.createdBy || recordData.author,
-          });
+          if (!recordData?.isTestSession) {
+            records.push({
+              id: doc.id,
+              name: recordData.name,
+              duration: recordData.sessionAttributes.duration,
+              startTime: recordData.sessionAttributes.startTime,
+              url: recordData.sessionAttributes.url,
+              visibility: recordData.visibility,
+              eventsFilePath: recordData.eventsFilePath,
+              createdBy: recordData.createdBy || recordData.author,
+            });
+          }
         });
 
         setSessionRecordings(records);
