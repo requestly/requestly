@@ -119,6 +119,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
         <>
           {isDropdown ? (
             <Dropdown.Button
+              destroyPopupOnHide
               icon={icon}
               type={type as DropdownButtonType}
               trigger={["click"]}

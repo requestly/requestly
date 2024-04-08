@@ -64,31 +64,33 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           {Object.values(RULE_TYPES_CONFIG)
             .filter((ruleConfig) => ruleConfig.ID !== 11)
             .map(({ ID, TYPE, ICON, NAME }, index) => (
-              <PremiumFeature
-                key={index}
-                popoverPlacement="topLeft"
-                onContinue={() => {
-                  createRuleAction(TYPE, SOURCE.RULE_GROUP);
-                  setSearchParams((params) => {
-                    params.set("groupId", groupId);
-                    return params;
-                  });
-                }}
-                features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
-                featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
-                source={SOURCE.RULE_GROUP}
-              >
-                <Menu.Item icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
-                  {NAME}
-                  {checkIsPremiumRule(TYPE) ? (
-                    <PremiumIcon
-                      placement="topLeft"
-                      source="rule_dropdown"
-                      featureType={`${TYPE.toLowerCase()}_rule` as FeatureLimitType}
-                    />
-                  ) : null}
-                </Menu.Item>
-              </PremiumFeature>
+              <div key={index}>
+                <PremiumFeature
+                  popoverPlacement="topLeft"
+                  onContinue={() => {
+                    createRuleAction(TYPE, SOURCE.RULE_GROUP);
+                    setSearchParams((params) => {
+                      params.set("groupId", groupId);
+                      return params;
+                    });
+                  }}
+                  features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
+                  featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
+                  source={SOURCE.RULE_GROUP}
+                >
+                  <Menu.Item icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
+                    {NAME}
+                    {checkIsPremiumRule(TYPE) ? (
+                      <PremiumIcon
+                        key={index}
+                        placement="topLeft"
+                        source="rule_dropdown"
+                        featureType={`${TYPE.toLowerCase()}_rule` as FeatureLimitType}
+                      />
+                    ) : null}
+                  </Menu.Item>
+                </PremiumFeature>
+              </div>
             ))}
         </Menu>
       );
@@ -180,7 +182,13 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 </Tooltip>
               ) : null}
 
-              <Dropdown trigger={["click"]} placement="topLeft" overlay={getRuleTypesDropdownOverlay(group.id)}>
+              <Dropdown
+                key={group.id}
+                destroyPopupOnHide
+                trigger={["click"]}
+                placement="topLeft"
+                overlay={getRuleTypesDropdownOverlay(group.id)}
+              >
                 <Button
                   className="add-rule-btn"
                   onClick={(e) => {
