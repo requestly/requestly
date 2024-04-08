@@ -157,7 +157,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             <div className="group-name-container">
               <div className="group-name">{group.name}</div>
 
-              {activeRulesCount > 0 ? (
+              {totalRules > 0 ? (
                 <Tooltip
                   placement="top"
                   title={
