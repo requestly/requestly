@@ -50,7 +50,7 @@ RQ.RuleExecutionHandler.setup = () => {
             showWidget: false,
           });
         }
-        RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId, RQ.CONSTANTS.TEST_THIS_RULE_MODES.EXPLICIT);
+        RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
         break;
     }
 
@@ -73,7 +73,7 @@ RQ.RuleExecutionHandler.hasExecutedRules = () => {
   return RQ.RuleExecutionHandler.appliedRuleIds.size > 0;
 };
 
-RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId, mode) => {
+RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
   if (document.querySelector("rq-test-rule-widget")) {
     return;
   }
@@ -85,7 +85,6 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId, mode) => {
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
-  testRuleWidget.setAttribute("mode", mode);
   testRuleWidget.setAttribute("applied-status", RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId));
   RQ.RuleExecutionHandler.setWidgetInfoText(testRuleWidget, ruleDetails);
 

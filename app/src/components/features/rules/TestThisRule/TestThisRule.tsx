@@ -27,8 +27,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { trackTestRuleReportGenerated, trackTestRuleSessionDraftSaved } from "./analytics";
-import "./TestThisRule.scss";
 import { TestRuleHeader } from "./components/TestRuleHeader";
+import "./TestThisRule.scss";
 
 export const TestThisRule = () => {
   const location = useLocation();
