@@ -1334,6 +1334,7 @@ const RulesTable = ({
                         {isDropdown ? (
                           // TODO: refactor this with common component RuleTypesDropdown
                           <Dropdown.Button
+                            destroyPopupOnHide
                             icon={icon}
                             type={type}
                             trigger={["click"]}
