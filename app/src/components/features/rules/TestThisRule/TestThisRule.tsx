@@ -69,7 +69,8 @@ export const TestThisRule = () => {
             sessionMetadata,
             compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
             recordingOptionsToSave,
-            SOURCE.TEST_THIS_RULE
+            SOURCE.TEST_THIS_RULE,
+            true
           ).then((response) => {
             if (response.success) {
               trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
