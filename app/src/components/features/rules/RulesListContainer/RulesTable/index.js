@@ -1332,6 +1332,7 @@ const RulesTable = ({
                     <Tooltip key={index} title={isTooltipShown && isScreenSmall ? buttonText : null}>
                       <>
                         {isDropdown ? (
+                          // TODO: refactor this with common component RuleTypesDropdown
                           <Dropdown.Button
                             icon={icon}
                             type={type}
