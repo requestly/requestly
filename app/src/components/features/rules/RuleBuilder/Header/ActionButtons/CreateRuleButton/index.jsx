@@ -159,6 +159,7 @@ const CreateRuleButton = ({
     const fixedRuleData = runMinorFixesOnRule(dispatch, currentlySelectedRuleData);
     //Syntactic Validation
     const syntaxValidation = await transformAndValidateRuleFields(fixedRuleData);
+
     if (!syntaxValidation.success) {
       const validationError = syntaxValidation.validationError;
       switch (validationError.error) {
@@ -182,7 +183,7 @@ const CreateRuleButton = ({
           break;
       }
     } else {
-      const parsedRuleData = syntaxValidation.ruleData || currentlySelectedRuleData;
+      const parsedRuleData = syntaxValidation.ruleData || fixedRuleData;
       //Validation
       const ruleValidation = validateRule(parsedRuleData, dispatch, appMode);
       if (ruleValidation.result) {
