@@ -8,11 +8,7 @@ import { MdExpandLess } from "@react-icons/all-files/md/MdExpandLess";
 import { MdExpandMore } from "@react-icons/all-files/md/MdExpandMore";
 import "./BottomSheet.scss";
 
-interface BotttomSheetProps extends TabsProps {
-  height?: number;
-}
-
-export const BottomSheet: React.FC<BotttomSheetProps> = ({ height, items, defaultActiveKey }) => {
+export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) => {
   const { isBottomSheetOpen, viewAsSidePanel, toggleBottomSheet, toggleViewAsSidePanel } = useBottomSheetContext();
 
   return (
