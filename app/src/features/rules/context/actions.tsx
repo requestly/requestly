@@ -24,7 +24,7 @@ import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 
 type RulesActionContextType = {
-  createRuleAction: (ruleType?: RuleType, source?: string, groupId?: string) => void;
+  createRuleAction: (ruleType?: RuleType, source?: string) => void;
   createGroupAction: () => void;
   importRecordsAction: () => void;
   recordsUngroupAction: (records: StorageRecord[]) => Promise<any>; // TODO: add proper type
