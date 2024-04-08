@@ -1,11 +1,9 @@
 import { useCallback, useState } from "react";
-import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
+import { useSelector } from "react-redux";
 import { Checkbox, Col, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import { trackTestRuleClicked } from "../../analytics";
-import { useSelector } from "react-redux";
 import {
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
@@ -14,6 +12,10 @@ import {
 import { prefixUrlWithHttps } from "utils/URLUtils";
 import { isValidUrl } from "utils/FormattingHelper";
 import { testRuleOnUrl } from "actions/ExtensionActions";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
+import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
+import "./index.scss";
 
 export const TestRuleHeader = () => {
   const user = useSelector(getUserAuthDetails);
@@ -43,6 +45,11 @@ export const TestRuleHeader = () => {
       return;
     }
 
+    if (currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE) {
+      setError("Rule is inactive, please activate the rule before testing it");
+      return;
+    }
+
     if (!user.loggedIn && doCaptureSession) {
       setError("You need to login to capture your test session");
       return;
@@ -57,7 +64,9 @@ export const TestRuleHeader = () => {
     pageUrl,
     error,
     doCaptureSession,
-    currentlySelectedRuleData,
+    currentlySelectedRuleData.id,
+    currentlySelectedRuleData.ruleType,
+    currentlySelectedRuleData.status,
     user.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
   ]);
