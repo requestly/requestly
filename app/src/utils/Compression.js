@@ -26,6 +26,7 @@ function compressString(uncompressedString) {
 
 function decompressRecord(record) {
   const decompressedRecord = { ...record };
+  console.log("[DEBUG] Decompressing Record", record?.id);
   if (isRule(record)) {
     switch (record.ruleType) {
       case RuleType.RESPONSE:
