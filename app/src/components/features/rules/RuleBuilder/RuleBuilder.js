@@ -49,7 +49,7 @@ const RuleBuilder = (props) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { state } = location;
-  const ruleGroupId = searchParams.get("groupId") ?? "";
+  const ruleGroupId = searchParams.get("groupId") ?? undefined;
   const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(location, props.isSharedListViewRule);
 
   //Global State
