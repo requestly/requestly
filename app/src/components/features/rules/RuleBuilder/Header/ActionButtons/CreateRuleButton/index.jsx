@@ -98,7 +98,8 @@ const CreateRuleButton = ({
   //Constants
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const ruleCreatedEventSource = searchParams.get("source") ?? analyticEventRuleCreatedSource;
+  const ruleCreatedEventSource =
+    searchParams.get("source") ?? location?.state?.source ?? analyticEventRuleCreatedSource;
   const MODE = isRuleEditorModal ? ruleEditorModalMode : getModeData(location).MODE;
 
   //Global State
