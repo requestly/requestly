@@ -118,8 +118,8 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       <Tooltip key={index} title={isTooltipShown ? buttonText : null}>
         <>
           {isDropdown ? (
+            // TODO: refactor this with common component RuleTypesDropdown
             <Dropdown.Button
-              destroyPopupOnHide
               icon={icon}
               type={type as DropdownButtonType}
               trigger={["click"]}
