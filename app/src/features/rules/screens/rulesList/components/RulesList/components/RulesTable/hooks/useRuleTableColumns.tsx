@@ -37,7 +37,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordsChangeGroupAction,
     recordsShareAction,
     recordsDeleteAction,
-    recordsStatusToggleAction,
+    recordStatusToggleAction,
     recordDuplicateAction,
     recordRenameAction,
     groupDeleteAction,
@@ -163,7 +163,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
-            return a.modificationDate > b.modificationDate ? -1 : 1;
+            return a.name?.toLowerCase()?.localeCompare(b.name?.toLowerCase());
           }
         },
       },
@@ -184,6 +184,24 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           return <RuleTypeTag ruleType={record.ruleType} />;
         }
       },
+      sortDirections: ["ascend", "descend", "ascend"],
+      showSorterTooltip: false,
+      sorter: {
+        compare: (a, b) => {
+          if (isGroup(a) && !isGroup(b)) {
+            return -1;
+          } else if (!isGroup(a) && isGroup(b)) {
+            return 1;
+          } else if (isGroup(a) && isGroup(b)) {
+            return 0;
+          } else {
+            if (isGroup(a) || isGroup(b)) {
+              return 0;
+            }
+            return a.ruleType.toLowerCase()?.localeCompare(b.ruleType.toLowerCase());
+          }
+        },
+      },
     },
     {
       key: "status",
@@ -201,7 +219,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               }
               featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME} rule`}
               popoverPlacement="left"
-              onContinue={() => recordsStatusToggleAction([normalizeRecord(record)])}
+              onContinue={() => recordStatusToggleAction(normalizeRecord(record))}
               source="rule_list_status_switch"
               onClickCallback={() => trackRuleToggleAttempted(record.status)}
             >
@@ -221,7 +239,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
               onChange={(checked, e) => {
                 e.stopPropagation();
-                recordsStatusToggleAction([normalizeRecord(record)]);
+                recordStatusToggleAction(normalizeRecord(record));
               }}
             />
           );
@@ -247,6 +265,23 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             </span>
           );
         } else return beautifiedDate;
+      },
+      defaultSortOrder: "ascend",
+      sortDirections: ["ascend", "descend", "ascend"],
+      showSorterTooltip: false,
+      sorter: {
+        compare: (a, b) => {
+          const recordAModificationDate = a.modificationDate ? a.modificationDate : a.creationDate;
+          const recordBModificationDate = b.modificationDate ? b.modificationDate : b.creationDate;
+
+          if (isGroup(a) && !isGroup(b)) {
+            return -1;
+          } else if (!isGroup(a) && isGroup(b)) {
+            return 1;
+          } else {
+            return recordAModificationDate < recordBModificationDate ? -1 : 1;
+          }
+        },
       },
     },
     {
