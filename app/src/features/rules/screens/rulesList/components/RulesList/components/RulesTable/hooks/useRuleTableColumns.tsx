@@ -258,15 +258,15 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       showSorterTooltip: false,
       sorter: {
         compare: (a, b) => {
-          const record1 = a.modificationDate ? a.modificationDate : a.creationDate;
-          const record2 = b.modificationDate ? b.modificationDate : b.creationDate;
+          const recordAModificationDate = a.modificationDate ? a.modificationDate : a.creationDate;
+          const recordBModificationDate = b.modificationDate ? b.modificationDate : b.creationDate;
 
           if (isGroup(a) && !isGroup(b)) {
             return -1;
           } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
-            return record1 < record2 ? -1 : 1;
+            return recordAModificationDate < recordBModificationDate ? -1 : 1;
           }
         },
       },
