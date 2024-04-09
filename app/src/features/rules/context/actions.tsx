@@ -23,6 +23,7 @@ import { trackGroupPinToggled, trackGroupStatusToggled } from "../analytics";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 
+// FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
   createRuleAction: (ruleType?: RuleType, source?: string) => void;
   createGroupAction: () => void;
@@ -31,7 +32,8 @@ type RulesActionContextType = {
   recordsChangeGroupAction: (records?: StorageRecord[], onSuccess?: Function) => void;
   recordsShareAction: (records?: StorageRecord[], onSuccess?: Function) => void;
   recordsDeleteAction: (records: StorageRecord[], onSuccess?: Function) => void;
-  recordsStatusToggleAction: (records: StorageRecord[], showToast?: boolean) => void;
+  recordStatusToggleAction: (records: StorageRecord, showToast?: boolean) => void;
+  recordsStatusUpdateAction: (records: StorageRecord[], value: RecordStatus, onSuccess?: Function) => void;
   recordDuplicateAction: (record: StorageRecord) => void;
   recordRenameAction: (record: StorageRecord) => void;
   groupDeleteAction: (group: Group) => void;
@@ -197,26 +199,21 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openDeleteRecordsModalAction]
   );
 
-  const recordsStatusToggleAction = useCallback(
-    (records: StorageRecord[], showToast = true) => {
-      Logger.log("[DEBUG]", "recordsStatusToggleAction", records);
-      const handleRecordStatusToggle = (record: StorageRecord, showToast = true) => {
-        const newStatus = record.status === RecordStatus.ACTIVE ? RecordStatus.INACTIVE : RecordStatus.ACTIVE;
+  const recordsStatusUpdateAction = useCallback(
+    (records: StorageRecord[], value: RecordStatus, onSuccess?: Function) => {
+      Logger.log("[DEBUG]", "recordsStatusUpdateAction", records);
+
+      const handleRecordStatusUpdate = (record: StorageRecord, value: RecordStatus) => {
+        const newStatus = value;
         const updatedRecord: StorageRecord = {
           ...record,
           status: newStatus,
         };
 
         Logger.log("Writing storage in RulesTable changeRuleStatus");
-        updateRecordInStorage(updatedRecord, record).then(() => {
-          const isRecordRule = isRule(record);
 
-          //Push Notify
-          if (showToast) {
-            newStatus === RecordStatus.ACTIVE
-              ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
-              : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
-          }
+        return updateRecordInStorage(updatedRecord, record).then(() => {
+          const isRecordRule = isRule(record);
 
           if (!isRecordRule) {
             trackGroupStatusToggled(newStatus === "Active");
@@ -235,11 +232,36 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         });
       };
 
-      records.forEach((record) => {
-        handleRecordStatusToggle(record, showToast);
+      const allPromises = records.map((record) => {
+        return handleRecordStatusUpdate(record, value);
+      });
+
+      Promise.all(allPromises).then(() => {
+        onSuccess?.();
       });
     },
     [updateRecordInStorage, userAttributes.num_active_rules]
+  );
+
+  const recordStatusToggleAction = useCallback(
+    (record: StorageRecord, showToast = true) => {
+      Logger.log("[DEBUG]", "recordStatusToggleAction", record);
+
+      const newStatus = record.status === RecordStatus.ACTIVE ? RecordStatus.INACTIVE : RecordStatus.ACTIVE;
+
+      const onSuccess = () => {
+        if (showToast) {
+          const isRecordRule = isRule(record);
+
+          newStatus === RecordStatus.ACTIVE
+            ? toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`)
+            : toast.success(`${isRecordRule ? "Rule" : "Group"} is now ${newStatus.toLowerCase()}`);
+        }
+      };
+
+      recordsStatusUpdateAction([record], newStatus, onSuccess);
+    },
+    [updateRecordInStorage, userAttributes.num_active_rules, recordsStatusUpdateAction]
   );
 
   const recordDuplicateAction = useCallback(
@@ -315,7 +337,8 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     recordsChangeGroupAction,
     recordsShareAction,
     recordsDeleteAction,
-    recordsStatusToggleAction,
+    recordStatusToggleAction,
+    recordsStatusUpdateAction,
     recordDuplicateAction,
     recordRenameAction,
     groupDeleteAction,
