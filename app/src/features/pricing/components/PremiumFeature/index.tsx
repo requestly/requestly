@@ -23,7 +23,7 @@ interface PremiumFeatureProps {
   disabled?: boolean;
   source: string;
   featureName?: string;
-  onClickCallback?: () => void;
+  onClickCallback?: (e: any) => void;
 }
 
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
@@ -79,8 +79,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
-              onClick: () => {
-                onClickCallback?.();
+              onClick: (e: any) => {
+                onClickCallback?.(e);
                 if (isExceedingLimits && isUpgradePopoverEnabled) setOpenPopup(true);
                 else onContinue();
               },
@@ -147,8 +147,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         >
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
-              onClick: () => {
-                onClickCallback?.();
+              onClick: (e: any) => {
+                onClickCallback?.(e);
                 if (!isExceedingLimits || !features || disabled || !isUpgradePopoverEnabled) {
                   onContinue();
                 }
