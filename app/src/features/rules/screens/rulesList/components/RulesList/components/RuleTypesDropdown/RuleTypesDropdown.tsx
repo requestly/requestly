@@ -7,21 +7,23 @@ import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { RuleType } from "types";
+import { useRulesActionContext } from "features/rules/context/actions";
 
 interface Props {
-  onOptionClick: (ruleType: any) => void;
+  groupId?: string;
   children: React.ReactNode;
   analyticEventSource: string;
   placement?: DropDownProps["placement"];
 }
 
 export const RuleTypesDropdown: React.FC<Props> = ({
-  onOptionClick,
+  groupId,
   children,
   placement = "bottom",
   analyticEventSource,
 }) => {
   const { getFeatureLimitValue } = useFeatureLimiter();
+  const { createRuleAction } = useRulesActionContext();
 
   const checkIsPremiumRule = (ruleType: RuleType) => {
     const featureName = `${ruleType.toLowerCase()}_rule`;
@@ -37,7 +39,7 @@ export const RuleTypesDropdown: React.FC<Props> = ({
             <PremiumFeature
               key={index}
               popoverPlacement="topLeft"
-              onContinue={() => onOptionClick(TYPE)}
+              onContinue={() => createRuleAction(TYPE, analyticEventSource, groupId)}
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
               featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
               source={analyticEventSource}

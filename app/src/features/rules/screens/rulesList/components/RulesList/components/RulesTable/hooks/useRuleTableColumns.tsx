@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
@@ -27,14 +27,12 @@ import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { RuleTypesDropdown } from "features/rules/components/common/RuleTypesDropdown/RuleTypesDropdown";
+import { RuleTypesDropdown } from "../../RuleTypesDropdown/RuleTypesDropdown";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
-  const [_, setSearchParams] = useSearchParams();
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
-  const { createRuleAction } = useRulesActionContext();
   const {
     recordsChangeGroupAction,
     recordsShareAction,
@@ -131,16 +129,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 </Tooltip>
               ) : null}
 
-              <RuleTypesDropdown
-                analyticEventSource={SOURCE.RULE_GROUP}
-                onOptionClick={(ruleType) => {
-                  createRuleAction(ruleType, SOURCE.RULE_GROUP);
-                  setSearchParams((params) => {
-                    params.set("groupId", group.id);
-                    return params;
-                  });
-                }}
-              >
+              <RuleTypesDropdown groupId={group.id} analyticEventSource={SOURCE.RULE_GROUP}>
                 <Button
                   className="add-rule-btn"
                   onClick={(e) => {
