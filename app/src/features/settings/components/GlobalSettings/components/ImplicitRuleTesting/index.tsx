@@ -1,19 +1,19 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import SettingsItem from "../SettingsItem";
 import { StorageService } from "init";
 import ErrorCard from "components/misc/ErrorCard";
-import { RuleTypesSelector } from "./components/RuleTypesSelector";
+import { RuleTypesOptions } from "./components/RuleTypesOptions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import APP_CONSTANTS from "config/constants";
 
 export const ImplicitRuleTesting = () => {
   const appMode = useSelector(getAppMode);
-  const [isImplicitRuleTestingEnabled, setIsImplicitRuleTestingEnabled] = React.useState(false);
-  const [enabledRuleTypes, setEnabledRuleTypes] = React.useState(null);
-  const [widgetVisibility, setWidgetVisibility] = React.useState(
+  const [isImplicitRuleTestingEnabled, setIsImplicitRuleTestingEnabled] = useState(false);
+  const [enabledRuleTypes, setEnabledRuleTypes] = useState(null);
+  const [widgetVisibility, setWidgetVisibility] = useState(
     GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF
   );
 
@@ -53,7 +53,7 @@ export const ImplicitRuleTesting = () => {
       title="Show widget when rule is applied"
       caption="Enabling this option will display the widget on websites where any rules are enabled."
       settingsBody={
-        <RuleTypesSelector
+        <RuleTypesOptions
           enabledRuleTypes={enabledRuleTypes}
           setEnabledRuleTypes={setEnabledRuleTypes}
           isImplicitRuleTestingEnabled={isImplicitRuleTestingEnabled}
