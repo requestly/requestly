@@ -2,6 +2,28 @@
   padding: 1rem;
   background: var(--surface-1);
   border-radius: 4px;
-  max-width: 600px;
   margin: 1rem 0;
+}
+
+.widget-visibility-radio-group {
+  & .ant-radio-wrapper span {
+    font-size: 13px;
+  }
+}
+
+.rule-types-checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust minimum and maximum width as needed */
+  gap: 10px;
+  margin-top: 8px;
+
+  & .ant-checkbox-group-item span {
+    font-size: 13px;
+  }
+}
+
+.implicit-test-rule-settings-label {
+  font-weight: 500;
+  color: var(--text-default);
+  font-size: 13px;
 }
