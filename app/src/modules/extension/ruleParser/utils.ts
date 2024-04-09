@@ -46,11 +46,13 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
     }
   }
 
-  // Host patterns for operators other than EQUALS may false match other parts of URL as well. TODO: fix
   if (source.key === SourceKey.HOST) {
     switch (source.operator) {
       case SourceOperator.EQUALS:
-        return { urlFilter: `||${source.value}^` }; // host.com matches both host.com a.host.com
+        return {
+          regexFilter: `^(https?://)?(www.)?${source.value}([/:?#].*)?$`,
+          // source.value=host.com should match only the domain (host.com) and not match with the subdomain (a.host.com)
+        };
 
       case SourceOperator.CONTAINS:
         return { urlFilter: `||${source.value}*^` }; // host.c matches a.host.com but not ahost.com
@@ -58,7 +60,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
         return {
-          regexFilter: `^https?://${pattern}(/|$)`,
+          regexFilter: `^https?://${pattern}(/|$)(.*)`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
@@ -66,7 +68,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(createRegexForWildcardString(source.value));
         return {
-          regexFilter: `^https?://${pattern}(/|$)`,
+          regexFilter: `^https?://${pattern}(/|$)(.*)`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
