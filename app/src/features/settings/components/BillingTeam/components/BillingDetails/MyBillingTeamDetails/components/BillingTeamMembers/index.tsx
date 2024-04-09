@@ -101,61 +101,66 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         if (!isUserAdmin || record.id === user?.details?.profile?.uid || record.role === BillingTeamRoles.Manager) {
           return null;
         }
+        const handleRemoveMember = () => {
+          setLoadingRows([...loadingRows, record.id]);
+          trackBillingTeamActionClicked("remove_member");
+          removeMemberFromBillingTeam(billingId, record.id)
+            .then(() => {
+              toast.success("User removed from the billing team");
+              trackBillingTeamMemberRemoved(record.email, billingId);
+            })
+            .catch(() => {
+              toast.error("Error while removing user");
+            })
+            .finally(() => {
+              setLoadingRows(loadingRows.filter((row) => row !== record.id));
+            });
+        };
+        const handleRoleChange = (role: BillingTeamRoles) => {
+          setLoadingRows([...loadingRows, record.id]);
+          updateBillingTeamMemberRole(billingId, record.id, role as BillingTeamRoles)
+            .then(() => {
+              toast.success(`User role changed to ${role}`);
+              trackBillingTeamRoleChanged(record.email, role, billingId);
+            })
+            .catch(() => {
+              toast.error("Error while changing user role");
+            })
+            .finally(() => {
+              setLoadingRows(loadingRows.filter((row) => row !== record.id));
+            });
+        };
+        const removeAction = {
+          key: "remove",
+          label: (
+            <Popconfirm
+              title="Are you sure you want to remove this member?"
+              onConfirm={handleRemoveMember}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Row align="middle" gutter={8} onClick={() => trackBillingTeamActionClicked("remove_member")}>
+                <IoMdCloseCircleOutline fontSize={16} className="mr-8" />
+                Remove
+              </Row>
+            </Popconfirm>
+          ),
+        };
         return (
           <Row
             justify="end"
             align="middle"
             gutter={8}
-            className={`w-full  ${loadingRows.includes(record.id) ? "loading-cell" : ""}`}
+            className={`w-full ${loadingRows.includes(record.id) ? "loading-cell" : ""}`}
           >
-            <Col>
-              <Popconfirm
-                title="Are you sure you want to remove this user from the billing team?"
-                onConfirm={() => {
-                  setLoadingRows([...loadingRows, record.id]);
-                  trackBillingTeamActionClicked("remove_member");
-                  removeMemberFromBillingTeam(billingId, record.id)
-                    .then(() => {
-                      toast.success("User removed from the billing team");
-                      trackBillingTeamMemberRemoved(record.email, billingId);
-                    })
-                    .catch(() => {
-                      toast.error("Error while removing user");
-                    })
-                    .finally(() => {
-                      setLoadingRows(loadingRows.filter((row) => row !== record.id));
-                    });
-                }}
-                okText="Confirm"
-                cancelText="Cancel"
-              >
-                <RQButton
-                  type="text"
-                  icon={<IoMdCloseCircleOutline fontSize={14} />}
-                  className="remove-member-btn"
-                  disabled={!isUserAdmin}
-                >
-                  Remove
-                </RQButton>
-              </Popconfirm>
-            </Col>
             <Col>
               <Dropdown
                 menu={{
-                  items: items.map((item) => ({ ...item, disabled: item.key === record.role })),
+                  items: [...items, removeAction].map((item) => ({ ...item, disabled: item.key === record.role })),
                   onClick: ({ key }) => {
-                    setLoadingRows([...loadingRows, record.id]);
-                    updateBillingTeamMemberRole(billingId, record.id, key as BillingTeamRoles)
-                      .then(() => {
-                        toast.success(`User role changed to ${key}`);
-                        trackBillingTeamRoleChanged(record.email, key, billingId);
-                      })
-                      .catch(() => {
-                        toast.error("Error while changing user role");
-                      })
-                      .finally(() => {
-                        setLoadingRows(loadingRows.filter((row) => row !== record.id));
-                      });
+                    if (key !== "remove") {
+                      handleRoleChange(key as BillingTeamRoles);
+                    }
                   },
                 }}
                 trigger={["click"]}
