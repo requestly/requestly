@@ -104,6 +104,7 @@ export const SOURCE = {
   SIDEBAR_INVITE_BUTTON: "sidebar_invite_button",
   APP_ONBOARDING: "app_onboarding",
   BILLING_TEAM: "billing_team",
+  RULE_GROUP: "rule_group",
 };
 
 export const RULES = {

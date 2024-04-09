@@ -22,10 +22,12 @@ import PATHS from "config/constants/sub/paths";
 import { isRule, isGroup } from "features/rules/utils";
 import { trackRulesListActionsClicked } from "features/rules/analytics";
 import { checkIsRuleGroupDisabled, normalizeRecord } from "../utils/rules";
-import { trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
+import { trackNewRuleButtonClicked, trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { RuleTypesDropdownWrapper } from "../../RuleTypesDropdownWrapper/RuleTypesDropdownWrapper";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -111,10 +113,9 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             <div className="group-name-container">
               <div className="group-name">{group.name}</div>
 
-              {activeRulesCount > 0 ? (
+              {totalRules > 0 ? (
                 <Tooltip
-                  placement="right"
-                  showArrow={false}
+                  placement="top"
                   title={
                     <>
                       <div>Active rules: {activeRulesCount}</div>
@@ -127,6 +128,18 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                   </div>
                 </Tooltip>
               ) : null}
+
+              <RuleTypesDropdownWrapper groupId={group.id} analyticEventSource={SOURCE.RULE_GROUP}>
+                <Button
+                  className="add-rule-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
+                  }}
+                >
+                  <span>+</span> <span>Add rule</span>
+                </Button>
+              </RuleTypesDropdownWrapper>
             </div>
           );
         }
@@ -150,7 +163,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           } else if (!isGroup(a) && isGroup(b)) {
             return 1;
           } else {
-            return a.modificationDate > b.modificationDate ? -1 : 1;
+            return a.name?.toLowerCase()?.localeCompare(b.name?.toLowerCase());
           }
         },
       },
@@ -170,6 +183,24 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         if (isRule(record)) {
           return <RuleTypeTag ruleType={record.ruleType} />;
         }
+      },
+      sortDirections: ["ascend", "descend", "ascend"],
+      showSorterTooltip: false,
+      sorter: {
+        compare: (a, b) => {
+          if (isGroup(a) && !isGroup(b)) {
+            return -1;
+          } else if (!isGroup(a) && isGroup(b)) {
+            return 1;
+          } else if (isGroup(a) && isGroup(b)) {
+            return 0;
+          } else {
+            if (isGroup(a) || isGroup(b)) {
+              return 0;
+            }
+            return a.ruleType.toLowerCase()?.localeCompare(b.ruleType.toLowerCase());
+          }
+        },
       },
     },
     {
@@ -234,6 +265,23 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             </span>
           );
         } else return beautifiedDate;
+      },
+      defaultSortOrder: "ascend",
+      sortDirections: ["ascend", "descend", "ascend"],
+      showSorterTooltip: false,
+      sorter: {
+        compare: (a, b) => {
+          const recordAModificationDate = a.modificationDate ? a.modificationDate : a.creationDate;
+          const recordBModificationDate = b.modificationDate ? b.modificationDate : b.creationDate;
+
+          if (isGroup(a) && !isGroup(b)) {
+            return -1;
+          } else if (!isGroup(a) && isGroup(b)) {
+            return 1;
+          } else {
+            return recordAModificationDate < recordBModificationDate ? -1 : 1;
+          }
+        },
       },
     },
     {

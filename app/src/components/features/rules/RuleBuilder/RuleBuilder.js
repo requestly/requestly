@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import isEmpty from "is-empty";
 import { Button, Col, Row } from "antd";
 import { actions } from "../../../../../../app/src/store";
@@ -47,7 +47,9 @@ const { RULE_EDITOR_CONFIG, RULE_TYPES_CONFIG } = APP_CONSTANTS;
 const RuleBuilder = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { state } = location;
+  const ruleGroupId = searchParams.get("groupId") ?? undefined;
   const { MODE, RULE_TYPE_TO_CREATE, RULE_TO_EDIT_ID } = getModeData(location, props.isSharedListViewRule);
 
   //Global State
@@ -112,7 +114,8 @@ const RuleBuilder = (props) => {
           dispatch,
           currentlySelectedRuleConfig,
           RULE_TYPE_TO_CREATE,
-          setCurrentlySelectedRule
+          setCurrentlySelectedRule,
+          ruleGroupId
         );
         stableSetCurrentlySelectedRuleConfig(dispatch, RULE_TYPES_CONFIG[RULE_TYPE_TO_CREATE], navigate);
       } else if (MODE === RULE_EDITOR_CONFIG.MODES.EDIT) {
@@ -156,7 +159,7 @@ const RuleBuilder = (props) => {
     stableSetCurrentlySelectedRuleConfig,
     props.rule,
     appMode,
-    location,
+    ruleGroupId,
   ]);
 
   //If "all rules" are not already there in state, fetch them.

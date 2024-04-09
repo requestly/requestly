@@ -25,11 +25,14 @@ export const redirectToRules = (navigate, hardRedirect) => {
 };
 
 /* FEATURE - RULES - Create New Rule */
-export const redirectToCreateNewRule = (navigate, ruleType, source) => {
+export const redirectToCreateNewRule = (navigate, ruleType, source, groupId = "") => {
   if (ruleType) {
-    navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`, {
-      state: { source },
-    });
+    navigate(
+      groupId
+        ? `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}?groupId=${groupId}`
+        : `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`,
+      { state: { source } }
+    );
   } else {
     navigate(PATHS.RULES.CREATE);
   }
