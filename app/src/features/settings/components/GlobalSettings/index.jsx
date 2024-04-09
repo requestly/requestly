@@ -9,6 +9,7 @@ import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
 import ConsoleLogger from "./components/ConsoleLogger";
 import DataCollection from "./components/DataCollection";
 import RulesSyncing from "./components/RulesSyncing";
+import { ImplicitRuleTesting } from "./components/ImplicitRuleTesting";
 import "./index.scss";
 
 export const GlobalSettings = () => {
@@ -42,6 +43,7 @@ export const GlobalSettings = () => {
           <RulesSyncing />
           {user?.loggedIn ? <DataCollection /> : null}
         </div>
+        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? <ImplicitRuleTesting /> : null}
       </div>
     </div>
   );
