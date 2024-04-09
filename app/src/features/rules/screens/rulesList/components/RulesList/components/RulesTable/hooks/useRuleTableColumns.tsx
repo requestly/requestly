@@ -35,7 +35,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordsChangeGroupAction,
     recordsShareAction,
     recordsDeleteAction,
-    recordsStatusToggleAction,
+    recordStatusToggleAction,
     recordDuplicateAction,
     recordRenameAction,
     groupDeleteAction,
@@ -188,7 +188,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               }
               featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME} rule`}
               popoverPlacement="left"
-              onContinue={() => recordsStatusToggleAction([normalizeRecord(record)])}
+              onContinue={() => recordStatusToggleAction(normalizeRecord(record))}
               source="rule_list_status_switch"
               onClickCallback={() => trackRuleToggleAttempted(record.status)}
             >
@@ -208,7 +208,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               data-tour-id={index === 0 ? "rule-table-switch-status" : null}
               onChange={(checked, e) => {
                 e.stopPropagation();
-                recordsStatusToggleAction([normalizeRecord(record)]);
+                recordStatusToggleAction(normalizeRecord(record));
               }}
             />
           );
