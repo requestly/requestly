@@ -9,7 +9,7 @@ function decompressString(compressedString) {
     return uncompressed;
   } catch (error) {
     console.log("[DEBUG] Error decompressing string", error, compressedString);
-    throw compressedString;
+    throw error;
   }
 }
 
@@ -20,7 +20,7 @@ function compressString(uncompressedString) {
     return base64Compressed;
   } catch (error) {
     console.log("[DEBUG] Error compressing string", error, uncompressedString);
-    throw uncompressedString;
+    throw error;
   }
 }
 
