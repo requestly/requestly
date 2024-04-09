@@ -2,8 +2,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
 ((namespace) => {
   window[namespace] = window[namespace] || {};
-  window[namespace].responseRules = {};
-  window[namespace].requestRules = {};
+  window[namespace].responseRules = [];
+  window[namespace].requestRules = [];
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage
@@ -28,12 +28,84 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     ].some((nonJsonType) => obj instanceof nonJsonType);
   };
 
-  const isResponseRuleApplicableOnUrl = (url) => {
-    return window[namespace].responseRules.hasOwnProperty(getAbsoluteUrl(url));
+  const matchSourceUrl = (sourceObject, url) => {
+    const extractUrlComponent = (url, key) => {
+      const urlObj = new URL(getAbsoluteUrl(url));
+
+      switch (key) {
+        case "Url":
+          return url;
+        case "host":
+          return urlObj.host;
+        case "path":
+          return urlObj.pathname;
+        default:
+          return null;
+      }
+    };
+
+    const checkRegexMatch = (regexString, inputString) => {
+      const toRegex = (regexStr) => {
+        const matchRegExp = regexStr.match(new RegExp("^/(.+)/(|i|g|ig|gi)$"));
+
+        if (!matchRegExp) {
+          return null;
+        }
+
+        try {
+          return new RegExp(matchRegExp[1], matchRegExp[2]);
+        } catch {
+          return null;
+        }
+      };
+
+      if (!regexString.startsWith("/")) {
+        regexString = `/${regexString}/`; // Keeping enclosing slashes for regex as optional
+      }
+
+      const regex = toRegex(regexString);
+      return regex?.test(inputString);
+    };
+
+    const checkWildCardMatch = (wildCardString, inputString) => {
+      const regexString = "/^" + wildCardString.replaceAll("*", ".*") + "$/";
+      return checkRegexMatch(regexString, inputString);
+    };
+
+    const urlComponent = extractUrlComponent(url, sourceObject.key);
+    const value = sourceObject.value;
+
+    if (!urlComponent) {
+      return false;
+    }
+
+    switch (sourceObject.operator) {
+      case "Equals":
+        if (value === urlComponent) {
+          return true;
+        }
+        break;
+
+      case "Contains":
+        if (urlComponent.includes(value)) {
+          return true;
+        }
+        break;
+
+      case "Matches": {
+        return checkRegexMatch(value, urlComponent);
+      }
+
+      case "Wildcard_Matches": {
+        return checkWildCardMatch(value, urlComponent);
+      }
+    }
+
+    return false;
   };
 
-  const isRequestRuleApplicableOnUrl = (url) => {
-    return window[namespace].requestRules.hasOwnProperty(getAbsoluteUrl(url));
+  const isResponseRuleApplicableOnUrl = (url) => {
+    return !!getMatchedResponseRule(url);
   };
 
   /**
@@ -48,7 +120,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     try {
       // Reach the last node but not the leaf node.
-      for (i = 0; i < pathParts.length - 1; i++) {
+      for (let i = 0; i < pathParts.length - 1; i++) {
         jsonObject = jsonObject[pathParts[i]];
       }
 
@@ -101,23 +173,27 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const getMatchedResponseRule = (url) => {
-    return window[namespace].responseRules?.[getAbsoluteUrl(url)];
+    return window[namespace].responseRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
   const getMatchedRequestRule = (url) => {
-    return window[namespace].requestRules?.[getAbsoluteUrl(url)];
+    return window[namespace].requestRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
   const shouldServeResponseWithoutRequest = (responseModification) => {
     return responseModification.type === "static" && responseModification.serveWithoutRequest;
   };
 
-  const getCustomRequestBody = (requestModification, args) => {
+  const getFunctionFromCode = (code) => {
+    return new Function("args", `return (${code})(args);`);
+  };
+
+  const getCustomRequestBody = (requestRuleData, args) => {
     let requestBody;
-    if (requestModification.type === "static") {
-      requestBody = requestModification.value;
+    if (requestRuleData.request.type === "static") {
+      requestBody = requestRuleData.request.value;
     } else {
-      requestBody = requestModification.evaluator(args);
+      requestBody = getFunctionFromCode(requestRuleData.request.value)(args);
     }
 
     if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {
@@ -208,15 +284,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   // Intercept XMLHttpRequest
   const onReadyStateChange = async function () {
     if (this.readyState === this.HEADERS_RECEIVED || this.readyState === this.DONE) {
-      let url;
-
-      if (isResponseRuleApplicableOnUrl(this.responseURL)) {
-        url = this.responseURL;
-      } else if (isResponseRuleApplicableOnUrl(this.requestURL)) {
-        url = this.requestURL;
-      } else {
+      if (!this.responseRule) {
         return;
       }
+
+      const url = this.requestURL;
 
       const responseRuleData = getMatchedResponseRule(url);
       const { response: responseModification, source } = responseRuleData;
@@ -259,7 +331,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       if (this.readyState === this.DONE) {
         let customResponse =
           responseModification.type === "code"
-            ? responseRuleData.evaluator({
+            ? getFunctionFromCode(responseRuleData.response.value)({
                 method: this.method,
                 url,
                 requestHeaders: this.requestHeaders,
@@ -368,7 +440,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   const open = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method, url) {
     this.method = method;
-    this.requestURL = url;
+    this.requestURL = getAbsoluteUrl(url);
     open.apply(this, arguments);
   };
 
@@ -431,12 +503,12 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
 
-    const requestRule = canRequestBodyBeSent && getMatchedRequestRule(url);
+    const requestRuleData = canRequestBodyBeSent && getMatchedRequestRule(url);
 
-    if (requestRule) {
+    if (requestRuleData) {
       const originalRequestBody = await request.text();
       const requestBody =
-        getCustomRequestBody(requestRule.request, {
+        getCustomRequestBody(requestRuleData, {
           method,
           url,
           body: originalRequestBody,
@@ -457,7 +529,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       });
 
       notifyRequestRuleApplied({
-        ruleDetails: requestRule,
+        ruleDetails: requestRuleData,
         requestDetails: {
           url,
           method,
@@ -476,20 +548,20 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     let fetchedResponse;
     let exceptionCaught;
 
-    const responseRule = getMatchedResponseRule(url);
+    const responseRuleData = getMatchedResponseRule(url);
 
-    if (responseRule && shouldServeResponseWithoutRequest(responseRule.response)) {
-      const contentType = isJSON(responseRule.response.value) ? "application/json" : "text/plain";
+    if (responseRuleData && shouldServeResponseWithoutRequest(responseRuleData.response)) {
+      const contentType = isJSON(responseRuleData.response.value) ? "application/json" : "text/plain";
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
-        if (requestRule) {
+        if (requestRuleData) {
           fetchedResponse = await _fetch(request);
         } else {
           fetchedResponse = await getOriginalResponse();
         }
 
-        if (!responseRule) {
+        if (!responseRuleData) {
           return fetchedResponse;
         }
 
@@ -509,8 +581,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       }
       return fetchedResponse;
     }
-
-    const responseRuleData = getMatchedResponseRule(url);
 
     if (fetchedResponse?.status === 204) {
       // Return the same response when status is 204. fetch doesn't allow to create new response with empty body
@@ -565,7 +635,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         };
       }
 
-      customResponse = responseRuleData.evaluator(evaluatorArgs);
+      customResponse = getFunctionFromCode(responseRuleData.response.value)(evaluatorArgs);
 
       // evaluator might return us Object but response.value is string
       // So make the response consistent by converting to JSON String and then create the Response object
