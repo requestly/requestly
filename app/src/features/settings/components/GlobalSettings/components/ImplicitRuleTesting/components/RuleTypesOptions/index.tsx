@@ -7,15 +7,15 @@ import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.scss";
 
-interface RuleTypesSelectorProps {
+interface RuleTypesOptionsProps {
   enabledRuleTypes: string[];
-  setEnabledRuleTypes: (ruleTypes: string[]) => void;
   isImplicitRuleTestingEnabled: boolean;
   widgetVisibility: string;
+  setEnabledRuleTypes: (ruleTypes: string[]) => void;
   setWidgetVisibility: (visibility: string) => void;
 }
 
-export const RuleTypesSelector: React.FC<RuleTypesSelectorProps> = ({
+export const RuleTypesOptions: React.FC<RuleTypesOptionsProps> = ({
   enabledRuleTypes,
   setEnabledRuleTypes,
   isImplicitRuleTestingEnabled,
