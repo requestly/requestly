@@ -186,7 +186,6 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                 onClick: (selectedRows) => {
                   const onSuccess = () => {
                     toast.success(`All records ${toggleRecordsBulkOptionLabel.toLowerCase()}d!`);
-                    clearSelectedRows();
                     trackRulesListBulkActionPerformed("records_toggle");
                   };
 
