@@ -50,7 +50,8 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
     switch (source.operator) {
       case SourceOperator.EQUALS:
         return {
-          regexFilter: `^(https?://)?(www.)?${source.value}([/:?#].*)?$`, // host.com matches only host.com and should not match a.host.com
+          regexFilter: `^(https?://)?(www.)?${source.value}([/:?#].*)?$`,
+          // source.value=host.com should match only the domain (host.com) and not match with the subdomain (a.host.com)
         };
 
       case SourceOperator.CONTAINS:
