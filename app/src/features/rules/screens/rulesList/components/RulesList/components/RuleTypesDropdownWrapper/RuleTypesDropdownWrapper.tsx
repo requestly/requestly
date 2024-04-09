@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { DropDownProps, Dropdown, Menu } from "antd";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import APP_CONSTANTS from "config/constants";
@@ -16,7 +16,7 @@ interface Props {
   placement?: DropDownProps["placement"];
 }
 
-export const RuleTypesDropdown: React.FC<Props> = ({
+export const RuleTypesDropdownWrapper: React.FC<Props> = ({
   groupId,
   children,
   placement = "bottom",
@@ -25,10 +25,13 @@ export const RuleTypesDropdown: React.FC<Props> = ({
   const { getFeatureLimitValue } = useFeatureLimiter();
   const { createRuleAction } = useRulesActionContext();
 
-  const checkIsPremiumRule = (ruleType: RuleType) => {
-    const featureName = `${ruleType.toLowerCase()}_rule`;
-    return !getFeatureLimitValue(featureName as FeatureLimitType);
-  };
+  const checkIsPremiumRule = useCallback(
+    (ruleType: RuleType) => {
+      const featureName = `${ruleType.toLowerCase()}_rule`;
+      return !getFeatureLimitValue(featureName as FeatureLimitType);
+    },
+    [getFeatureLimitValue]
+  );
 
   const menuItems = useMemo(
     () => (
@@ -60,7 +63,7 @@ export const RuleTypesDropdown: React.FC<Props> = ({
           ))}
       </Menu>
     ),
-    []
+    [createRuleAction, analyticEventSource, groupId, checkIsPremiumRule]
   );
 
   return (

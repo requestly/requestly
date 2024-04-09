@@ -27,7 +27,7 @@ import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { RuleTypesDropdown } from "../../RuleTypesDropdown/RuleTypesDropdown";
+import { RuleTypesDropdownWrapper } from "../../RuleTypesDropdownWrapper/RuleTypesDropdownWrapper";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -129,7 +129,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 </Tooltip>
               ) : null}
 
-              <RuleTypesDropdown groupId={group.id} analyticEventSource={SOURCE.RULE_GROUP}>
+              <RuleTypesDropdownWrapper groupId={group.id} analyticEventSource={SOURCE.RULE_GROUP}>
                 <Button
                   className="add-rule-btn"
                   onClick={(e) => {
@@ -139,7 +139,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 >
                   <span>+</span> <span>Add rule</span>
                 </Button>
-              </RuleTypesDropdown>
+              </RuleTypesDropdownWrapper>
             </div>
           );
         }
