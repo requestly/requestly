@@ -59,9 +59,13 @@ export const RuleTypesSelector: React.FC<RuleTypesSelectorProps> = ({
   return (
     <div className="implicit-test-rule-settings-container">
       <div className="implicit-test-rule-settings-radio-btn">
-        <label>Show widget on:</label>
-        <div>
-          <Radio.Group value={widgetVisibility} onChange={(e) => handleWidgetVisibilityChange(e.target.value)}>
+        <label className="implicit-test-rule-settings-label">Show widget on:</label>
+        <div className="mt-8">
+          <Radio.Group
+            className="widget-visibility-radio-group"
+            value={widgetVisibility}
+            onChange={(e) => handleWidgetVisibilityChange(e.target.value)}
+          >
             <Radio value={GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.ALL}>All rules</Radio>
             <Radio value={GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC}>Specific rule</Radio>
           </Radio.Group>
@@ -70,8 +74,9 @@ export const RuleTypesSelector: React.FC<RuleTypesSelectorProps> = ({
 
       {widgetVisibility === GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC && (
         <div className="implicit-test-rule-types-list">
-          <label>Select rule type(s)</label>
+          <label className="implicit-test-rule-settings-label">Select rule type(s)</label>
           <Checkbox.Group
+            className="rule-types-checkbox-group"
             options={options}
             value={enabledRuleTypes}
             onChange={(value: string[]) => {
