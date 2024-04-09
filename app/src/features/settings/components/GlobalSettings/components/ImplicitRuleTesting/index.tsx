@@ -1,0 +1,71 @@
+import React, { useCallback, useEffect, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
+import SettingsItem from "../SettingsItem";
+import { StorageService } from "init";
+import ErrorCard from "components/misc/ErrorCard";
+import { RuleTypesSelector } from "./components/RuleTypesSelector";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import APP_CONSTANTS from "config/constants";
+
+export const ImplicitRuleTesting = () => {
+  const appMode = useSelector(getAppMode);
+  const [isImplicitRuleTestingEnabled, setIsImplicitRuleTestingEnabled] = React.useState(false);
+  const [enabledRuleTypes, setEnabledRuleTypes] = React.useState(null);
+  const [widgetVisibility, setWidgetVisibility] = React.useState(
+    GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF
+  );
+
+  const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.TEST_THIS_RULE), []);
+
+  const handleImplicitRuleTestingToggleChange = useCallback(
+    (status: boolean) => {
+      setIsImplicitRuleTestingEnabled(status);
+      StorageService(appMode).saveRecord({
+        [GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG]: {
+          ruleTypes: enabledRuleTypes,
+          visibility: status
+            ? GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC
+            : GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF,
+        },
+      });
+    },
+    [appMode, enabledRuleTypes]
+  );
+
+  useEffect(() => {
+    StorageService(appMode)
+      .getRecord(GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG)
+      .then((data) => {
+        setEnabledRuleTypes(data.ruleTypes);
+        setWidgetVisibility(data.visibility);
+        if (data.visibility === GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+          setIsImplicitRuleTestingEnabled(false);
+        } else setIsImplicitRuleTestingEnabled(true);
+      });
+  }, [appMode]);
+
+  return isCompatible ? (
+    <SettingsItem
+      isActive={isImplicitRuleTestingEnabled}
+      onChange={handleImplicitRuleTestingToggleChange}
+      title="Show widget when rule is applied"
+      caption="Enabling this option will display the widget on websites where any rules are enabled."
+      settingsBody={
+        <RuleTypesSelector
+          enabledRuleTypes={enabledRuleTypes}
+          setEnabledRuleTypes={setEnabledRuleTypes}
+          isImplicitRuleTestingEnabled={isImplicitRuleTestingEnabled}
+          widgetVisibility={widgetVisibility}
+          setWidgetVisibility={setWidgetVisibility}
+        />
+      }
+    />
+  ) : (
+    <ErrorCard
+      type="warning"
+      customErrorMessage="Please upgrade the extension to enable widget when rule is applied."
+    />
+  );
+};

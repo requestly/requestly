@@ -979,6 +979,16 @@ BG.Methods.handleExtensionInstalledOrUpdated = function (details) {
       });
     });
   }
+  RQ.StorageService.getRecord(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG).then((record) => {
+    if (record === undefined) {
+      RQ.StorageService.saveRecord({
+        implicit_rule_testing_widget_config: {
+          visibility: RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC,
+          ruleTypes: [RQ.RULE_TYPES.SCRIPT, RQ.RULE_TYPES.RESPONSE, RQ.RULE_TYPES.REQUEST],
+        },
+      });
+    }
+  });
 
   Logger.log("Requestly: " + details.reason);
 };
