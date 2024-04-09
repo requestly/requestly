@@ -62,7 +62,7 @@ export const RuleTypesDropdown: React.FC<Props> = ({
   );
 
   return (
-    <Dropdown destroyPopupOnHide trigger={["click"]} placement={placement} overlay={menuItems}>
+    <Dropdown trigger={["click"]} placement={placement} overlay={menuItems}>
       {children}
     </Dropdown>
   );
