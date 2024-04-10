@@ -39,8 +39,8 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const isUserAdmin =
     billingTeamMembers?.[user?.details?.profile?.uid] &&
     billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
-
   const [loadingRows, setLoadingRows] = useState<string[]>([]);
+
   const handleRemoveMember = useCallback(
     (id: string, email: string) => {
       setLoadingRows([...loadingRows, id]);
@@ -78,7 +78,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     [billingId, loadingRows]
   );
 
-  const MenuItems = useCallback(
+  const getMemberDropdownItems = useCallback(
     (id: string, email: string): MenuProps["items"] => {
       return [
         {
@@ -192,7 +192,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
               <Col>
                 <Dropdown
                   menu={{
-                    items: MenuItems(record.id, record.email).map((item) => ({
+                    items: getMemberDropdownItems(record.id, record.email).map((item) => ({
                       ...item,
                       disabled: isMenuItemDisabled(item.key as BillingAction, record.role),
                     })),
@@ -233,7 +233,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       billingTeamDetails?.billingExclude,
       isUserAdmin,
       user?.details?.profile?.uid,
-      MenuItems,
+      getMemberDropdownItems,
       handleRoleChange,
     ]
   );
