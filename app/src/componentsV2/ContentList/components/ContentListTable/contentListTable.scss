@@ -1,138 +1,147 @@
-.ant-table-thead tr.rq-content-table-header {
-  th,
-  &:hover th {
-    background: var(--surface-1);
-    border-bottom: 1px solid var(--surface-1);
-  }
+.rq-content-list-table-container {
+  background-color: var(--requestly-color-background);
+  padding: 16px 16px;
 
-  th,
-  th.ant-table-cell {
-    padding: 12px;
+  .rq-content-list-table {
+    background-color: inherit;
+    border: 1px solid var(--requestly-color-white-t-10);
+    border-radius: 4px;
 
-    .ant-table-column-title {
-      flex-grow: 0;
-      color: var(--text-default);
-      font-size: 13px;
-      font-weight: 400;
-      line-height: 20px;
-      letter-spacing: 0.25px;
-      white-space: nowrap;
-    }
+    .rq-content-list-table-header {
+      th,
+      &:hover th {
+        background: var(--requestly-color-surface-0);
+        border-bottom: 1px solid var(--requestly-color-white-t-10);
+      }
 
-    .ant-table-column-sorters {
-      .ant-table-column-sorter-inner {
-        .anticon svg {
-          --sorter-icon-size: 12px;
-          width: var(--sorter-icon-size);
-          height: var(--sorter-icon-size);
+      th,
+      th.ant-table-cell {
+        padding: 12px;
+
+        .ant-table-column-title {
+          flex-grow: 0;
+          color: var(--requestly-color-text-default);
+          font-size: 13px;
+          font-weight: 400;
+          line-height: 20px;
+          letter-spacing: 0.25px;
+          white-space: nowrap;
         }
 
-        .anticon.active svg {
-          color: var(--primary-light);
+        .ant-table-column-sorters {
+          .ant-table-column-sorter-inner {
+            .anticon svg {
+              --sorter-icon-size: 12px;
+              width: var(--sorter-icon-size);
+              height: var(--sorter-icon-size);
+            }
+
+            .anticon.active svg {
+              color: var(--requestly-color-primary-soft);
+            }
+          }
+        }
+
+        svg {
+          width: 16px;
+          height: 16px;
+          color: var(--text-light);
+        }
+
+        .ant-table-column-sorters {
+          column-gap: 8px;
+          justify-content: normal;
+
+          .ant-table-column-sorter {
+            margin-left: 0;
+          }
+        }
+      }
+
+      th.ant-table-cell:nth-child(2) {
+        .ant-table-column-title {
+          display: none;
         }
       }
     }
 
-    svg {
-      width: 16px;
-      height: 16px;
-      color: var(--text-light);
-    }
+    .rq-content-list-table-row {
+      background: var(--requestly-color-background);
 
-    .ant-table-column-sorters {
-      column-gap: 8px;
-      justify-content: normal;
+      .ant-table-cell-with-append {
+        .group-expand-icon {
+          flex-shrink: 0;
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+      }
 
-      .ant-table-column-sorter {
-        margin-left: 0;
+      &.ant-table-row-level-1 {
+        &:hover > .ant-table-cell {
+          background: var(--requestly-color-surface-0);
+        }
+
+        .ant-table-cell {
+          background: var(--requestly-color-black);
+
+          .ant-table-row-expand-icon {
+            display: none;
+          }
+        }
+      }
+
+      &.ant-table-row-selected {
+        background: var(--requestly-color-primary-1000);
+
+        .ant-table-cell {
+          background: var(--requestly-color-primary-1000);
+        }
+
+        &:hover {
+          .ant-table-cell {
+            background: var(--requestly-color-surface-0);
+          }
+        }
+      }
+
+      &:hover {
+        background: var(--requestly-color-surface-0);
+      }
+
+      & > td.ant-table-cell {
+        background: inherit;
+        color: var(--requestly-color-text-default);
+        border-bottom: 1px solid var(--requestly-color-white-t-10);
+
+        &:hover {
+          background: inherit;
+        }
+      }
+
+      .ant-table-selection-column {
+        border-left: 4px solid transparent;
+      }
+
+      button.ant-btn.ant-btn-icon-only {
+        flex-shrink: 0;
+        width: 40px;
+        height: 32px;
+      }
+
+      button.ant-btn.ant-btn-icon-only svg {
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+        color: var(--text-light);
+        transition: inherit;
+      }
+
+      button.ant-btn.ant-btn-icon-only:hover svg {
+        color: var(--requestly-color-text-default);
       }
     }
-  }
-
-  th.ant-table-cell:nth-child(2) {
-    .ant-table-column-title {
-      display: none;
-    }
-  }
-}
-
-tr.rq-content-table-row.ant-table-row {
-  background: var(--background);
-
-  .ant-table-cell-with-append {
-    .group-expand-icon {
-      flex-shrink: 0;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-  }
-
-  &.ant-table-row-level-1 {
-    &:hover > .ant-table-cell {
-      background: var(--surface-0_5);
-    }
-
-    .ant-table-cell {
-      // background: var(--black);
-      background: #0000004f;
-      border-bottom: 1px solid var(--surface-1);
-
-      .ant-table-row-expand-icon {
-        display: none;
-      }
-    }
-  }
-
-  &.ant-table-row-selected {
-    background: var(--highlight-dark-bg);
-    border-bottom: 1px solid var(--surface-1);
-
-    &:hover {
-      background: var(--highlight-dark-bg);
-    }
-  }
-
-  &:hover {
-    background: var(--surface-0_5);
-  }
-
-  & > td.ant-table-cell {
-    background: inherit;
-    color: var(--text-default);
-    border-bottom: 1px solid var(--surface-1);
-
-    &:hover {
-      background: inherit;
-    }
-  }
-
-  .ant-table-selection-column {
-    border-left: 4px solid transparent;
-  }
-
-  &.record-pinned .ant-table-selection-column {
-    border-left: 4px solid var(--warning);
-  }
-
-  button.ant-btn.ant-btn-icon-only {
-    flex-shrink: 0;
-    width: 40px;
-    height: 32px;
-  }
-
-  button.ant-btn.ant-btn-icon-only svg {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-    color: var(--text-light);
-    transition: inherit;
-  }
-
-  button.ant-btn.ant-btn-icon-only:hover svg,
-  .rules-actions-container .more-rule-actions-btn.ant-btn-icon-only svg {
-    color: var(--text-default);
   }
 }
 
