@@ -235,3 +235,34 @@ a {
 .rq-success {
   background: #104b2f;
 }
+
+#applied-rules-list {
+  margin-top: 8px;
+}
+
+.applied-rule-list-item {
+  border-radius: 8px;
+  background: #282828;
+  padding: 12px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.applied-rule-list-item:hover {
+  background: #383838;
+}
+
+.applied-rule-list-item:first-child {
+  margin-top: 0;
+}
+
+.applied-rules-list-header {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+}

@@ -5,6 +5,7 @@ import RQLogo from "../../../resources/icons/rqLogo-blue.svg";
 import RQLogoSmall from "../../../resources/icons/rqLogo-white.svg";
 import MinimizeIcon from "../../../resources/icons/minimze.svg";
 import InfoIcon from "../../../resources/icons/info.svg";
+import SettingsIcon from "../../../resources/icons/settings.svg";
 
 const DEFAULT_POSITION = { right: 16, top: 16 };
 
@@ -59,6 +60,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
                 <span id="logo-text">requestly</span>
             </div>
             <div id="actions-container">
+                <button id="settings-button" class="hidden">${SettingsIcon}</button>
                 <button id="minimize-button">${MinimizeIcon}</buttton>
             </div>
         </div>
