@@ -24,7 +24,9 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
   addWidgetListeners() {
     this.addEventListener("new-rule-applied", (evt: CustomEvent) => {
-      console.log("new-rule-applied event received in implicit test rule widget", evt.detail.appliedRuleId);
+      const isRuleAlreadyApplied = this.#appliedRules.some((rule) => rule.ruleId === evt.detail.appliedRuleId);
+      if (isRuleAlreadyApplied) return;
+
       this.#appliedRules.push({
         ruleId: evt.detail.appliedRuleId,
         ruleName: evt.detail.appliedRuleName,
