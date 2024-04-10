@@ -3,19 +3,30 @@ import pako from "pako";
 import { RuleType } from "types";
 
 function decompressString(compressedString) {
-  const compressed = Buffer.from(compressedString, "base64");
-  const uncompressed = pako.inflate(compressed, { to: "string" });
-  return uncompressed;
+  try {
+    const compressed = Buffer.from(compressedString, "base64");
+    const uncompressed = pako.inflate(compressed, { to: "string" });
+    return uncompressed;
+  } catch (error) {
+    console.log("[DEBUG] Error decompressing string", error, compressedString);
+    throw error;
+  }
 }
 
 function compressString(uncompressedString) {
-  const compressed = pako.deflate(uncompressedString, { to: "string" });
-  const base64Compressed = Buffer.from(compressed).toString("base64");
-  return base64Compressed;
+  try {
+    const compressed = pako.deflate(uncompressedString);
+    const base64Compressed = Buffer.from(compressed).toString("base64");
+    return base64Compressed;
+  } catch (error) {
+    console.log("[DEBUG] Error compressing string", error, uncompressedString);
+    throw error;
+  }
 }
 
 function decompressRecord(record) {
   const decompressedRecord = { ...record };
+  console.log("[DEBUG] Decompressing Record", record?.id);
   if (isRule(record)) {
     switch (record.ruleType) {
       case RuleType.RESPONSE:

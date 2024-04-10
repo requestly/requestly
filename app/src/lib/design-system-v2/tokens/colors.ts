@@ -147,7 +147,7 @@ const generateAliasTokens = (mapTokens: MapTokens) => {
     white: "#FFFFFF",
     "white-t-20": "#FFFFFF33",
     black: "#0E0E0E",
-    "black-t-70": "000000B2",
+    "black-t-70": "#000000B2",
   };
 
   return aliasTokens;
