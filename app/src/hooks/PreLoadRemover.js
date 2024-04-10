@@ -9,7 +9,7 @@ const PreLoadRemover = () => {
 
   useEffect(() => {
     if (hasAuthInitialized) {
-      Logger.timeLog("AuthHandler", "Auth initialized, removed preloader");
+      Logger.timeEnd("AuthHandler");
       removePreloader();
     }
   }, [hasAuthInitialized]);
