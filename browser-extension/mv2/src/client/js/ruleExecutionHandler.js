@@ -15,7 +15,22 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
   if (RQ.implicitTestRuleFlow) {
-    RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
+    chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+      const implicitTestRuleConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+      let notifyWidget = true;
+
+      if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+        notifyWidget = false;
+      } else if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
+        if (!implicitTestRuleConfig.ruleTypes.includes(rule.ruleType)) {
+          notifyWidget = false;
+        }
+      }
+
+      if (notifyWidget) {
+        RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
+      }
+    });
   } else {
     RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget(rule.id);
   }
