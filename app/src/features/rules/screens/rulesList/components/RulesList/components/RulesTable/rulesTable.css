@@ -94,8 +94,7 @@
   color: var(--danger);
 }
 
-.rule-name-container,
-.group-name-container {
+.rule-name-container {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -117,6 +116,9 @@
 }
 
 .group-name-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
   gap: 8px;
 }
 
@@ -148,4 +150,16 @@
   background: var(--success);
   flex-shrink: 0;
   border-radius: 100%;
+}
+
+.group-name-container .add-rule-btn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  height: 24px;
+}
+
+tr.rq-content-table-row.ant-table-row:hover .group-name-container .add-rule-btn {
+  display: flex;
 }
