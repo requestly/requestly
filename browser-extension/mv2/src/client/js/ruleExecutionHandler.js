@@ -74,14 +74,14 @@ RQ.RuleExecutionHandler.hasExecutedRules = () => {
 };
 
 RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
-  if (document.querySelector("rq-test-rule-widget")) {
+  if (document.querySelector("rq-explicit-test-rule-widget")) {
     return;
   }
 
   const ruleDetails = await RQ.RulesStore.getRule(ruleId);
   const { name: ruleName } = ruleDetails;
 
-  const testRuleWidget = document.createElement("rq-test-rule-widget");
+  const testRuleWidget = document.createElement("rq-explicit-test-rule-widget");
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
@@ -125,7 +125,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
 };
 
 RQ.RuleExecutionHandler.notifyRuleAppliedToWidget = (ruleId) => {
-  const testRuleWidget = document.querySelector("rq-test-rule-widget");
+  const testRuleWidget = document.querySelector("rq-explicit-test-rule-widget");
 
   if (testRuleWidget?.getAttribute("applied-status") === "false") {
     if (testRuleWidget.getAttribute("rule-id") === ruleId) {
