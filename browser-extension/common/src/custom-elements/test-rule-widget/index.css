@@ -88,7 +88,6 @@
 
 #content-container {
   padding: 12px;
-  background: #282828;
   border-radius: 8px;
   margin-top: 8px;
 }
@@ -215,6 +214,10 @@
 .secondary-text {
   font-size: 11px;
   color: #b0b0b5b3;
+}
+
+.rq-bg-secondary {
+  background: #282828;
 }
 
 .hidden {

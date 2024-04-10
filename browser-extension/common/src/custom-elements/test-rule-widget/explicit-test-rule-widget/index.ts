@@ -15,6 +15,8 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
     super.connectedCallback();
 
     const contentContainer = this.shadowRoot.getElementById("content-container");
+    contentContainer.classList.add("rq-bg-secondary");
+
     const explicitModeMarkup = `        
         <div id="rule-status-container">
           <div id="rule-status"></div>

@@ -43,14 +43,18 @@ RQ.RuleExecutionHandler.setup = () => {
         sendResponse();
         break;
 
-      case RQ.CLIENT_MESSAGES.START_RULE_TESTING:
+      case RQ.CLIENT_MESSAGES.START_EXPLICIT_RULE_TESTING:
         if (message.record) {
           chrome.runtime.sendMessage({
             action: RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
             showWidget: false,
           });
         }
-        RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
+        RQ.RuleExecutionHandler.showExplicitTestRuleWidget(message.ruleId);
+        break;
+
+      case RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
+        RQ.RuleExecutionHandler.showImplicitTestRuleWidget();
         break;
     }
 
@@ -73,7 +77,7 @@ RQ.RuleExecutionHandler.hasExecutedRules = () => {
   return RQ.RuleExecutionHandler.appliedRuleIds.size > 0;
 };
 
-RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
+RQ.RuleExecutionHandler.showExplicitTestRuleWidget = async (ruleId) => {
   if (document.querySelector("rq-explicit-test-rule-widget")) {
     return;
   }
@@ -97,6 +101,16 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
       appliedStatus: testRuleWidget?.getAttribute("applied-status") === "true",
     });
   });
+};
+
+RQ.RuleExecutionHandler.showImplicitTestRuleWidget = async () => {
+  if (document.querySelector("rq-implicit-test-rule-widget")) {
+    return;
+  }
+
+  const testRuleWidget = document.createElement("rq-implicit-test-rule-widget");
+  testRuleWidget.classList.add("rq-element");
+  document.documentElement.appendChild(testRuleWidget);
 };
 
 RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
