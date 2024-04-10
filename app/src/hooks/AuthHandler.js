@@ -34,7 +34,10 @@ const AuthHandler = (onComplete) => {
     hasAuthHandlerBeenSet = true;
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
+      Logger.time("AuthHandler");
+
       if (user) {
+        Logger.timeLog("AuthHandler", "User found");
         const authData = getAuthData(user);
         window.uid = authData?.uid;
         localStorage.setItem("__rq_uid", authData?.uid);
