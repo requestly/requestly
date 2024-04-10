@@ -1412,9 +1412,13 @@ BG.Methods.handleTestRuleOnClientPageLoad = (tab) => {
 
   if (testRuleData) {
     BG.Methods.sendMessageToClient(tab.id, {
-      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
+      action: RQ.CLIENT_MESSAGES.START_EXPLICIT_RULE_TESTING,
       ruleId: testRuleData.ruleId,
       record: testRuleData.record,
+    });
+  } else {
+    BG.Methods.sendMessageToClient(tab.id, {
+      action: RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING,
     });
   }
 };
