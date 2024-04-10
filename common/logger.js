@@ -20,19 +20,19 @@ var Logger = {
 
   time(...args) {
     if (this.enabled) {
-      console.time(this.ns, ...args);
+      console.time(...args);
     }
   },
 
   timeEnd(...args) {
     if (this.enabled) {
-      console.timeEnd(this.ns, ...args);
+      console.timeEnd(...args);
     }
   },
 
   timeLog(...args) {
     if (this.enabled) {
-      console.timeLog(this.ns, ...args);
+      console.timeLog(...args);
     }
   },
 };
