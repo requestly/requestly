@@ -20,12 +20,16 @@ export const initMessageHandler = () => {
     /* From any case, return true when sendResponse is called asynchronously */
     switch (message.action) {
       case EXTENSION_MESSAGES.HANDSHAKE_CLIENT:
-        initClientHandler({
-          tabId: sender.tab?.id,
-          frameIds: [sender.frameId],
+        isExtensionEnabled().then((enabled) => {
+          if (!enabled) return;
+
+          initClientHandler({
+            tabId: sender.tab?.id,
+            frameIds: [sender.frameId],
+          });
+          applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         });
-        applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
-        break;
+        return true;
 
       case CLIENT_MESSAGES.INIT_SESSION_RECORDING:
         initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url).then(sendResponse);
