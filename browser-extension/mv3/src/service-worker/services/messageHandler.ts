@@ -20,8 +20,8 @@ export const initMessageHandler = () => {
     /* From any case, return true when sendResponse is called asynchronously */
     switch (message.action) {
       case EXTENSION_MESSAGES.HANDSHAKE_CLIENT:
-        isExtensionEnabled().then((enabled) => {
-          if (!enabled) return;
+        isExtensionEnabled().then((isExtensionStatusEnabled) => {
+          if (!isExtensionStatusEnabled) return;
 
           initClientHandler({
             tabId: sender.tab?.id,

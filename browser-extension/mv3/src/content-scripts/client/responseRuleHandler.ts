@@ -1,9 +1,15 @@
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { ResponseRulePair, RuleType } from "common/types";
-import { executeDynamicScriptOnPage } from "../utils";
+import { executeDynamicScriptOnPage, isExtensionEnabled } from "../utils";
 import { PUBLIC_NAMESPACE } from "common/constants";
 
 const cacheResponseRules = async () => {
+  const isExtensionStatusEnabled = await isExtensionEnabled();
+
+  if (!isExtensionStatusEnabled) {
+    return;
+  }
+
   const reponseRules = await getEnabledRules(RuleType.RESPONSE);
 
   if (!reponseRules.length) {

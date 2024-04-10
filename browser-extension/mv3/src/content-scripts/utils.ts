@@ -1,3 +1,5 @@
+import { EXTENSION_MESSAGES } from "common/constants";
+
 // Dynamic because static scripts to be executed using chrome.scripting.executeScript({file:...})
 export const executeDynamicScriptOnPage = (code: string) => {
   const script = document.createElement("script");
@@ -5,4 +7,12 @@ export const executeDynamicScriptOnPage = (code: string) => {
   script.onload = () => script.remove();
   script.dataset.params = JSON.stringify({ code });
   (document.head || document.documentElement).appendChild(script);
+};
+
+export const isExtensionEnabled = () => {
+  return new Promise<boolean>((resolve) => {
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED }, (response) => {
+      resolve(response);
+    });
+  });
 };
