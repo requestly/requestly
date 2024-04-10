@@ -64,14 +64,14 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   }, [id]);
 
   return (
-    <>
+    <div className="rq-content-list-table-container">
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRows} />}
       <Table
-        className="rq-content-table"
+        className="rq-content-list-table"
         onHeaderRow={() => ({
-          className: "rq-content-table-header",
+          className: "rq-content-list-table-header",
         })}
-        rowClassName={(record) => `rq-content-table-row ${customRowClassName?.(record)}`}
+        rowClassName={(record) => `rq-content-list-table-row ${customRowClassName?.(record)}`}
         size={size}
         loading={loading}
         rowKey={rowKey}
@@ -96,7 +96,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
           expandedRowKeys,
         }}
       />
-    </>
+    </div>
   );
 };
 

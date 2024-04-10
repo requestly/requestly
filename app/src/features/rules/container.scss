@@ -1,0 +1,23 @@
+.rules-content-container {
+  background-color: var(--requestly-color-background);
+  flex-grow: 1;
+  height: 100%;
+  overflow: auto !important;
+}
+
+.rules-container {
+  height: 100%;
+  display: flex;
+
+  .secondary-sidebar-container {
+    width: 217px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-dark);
+  }
+
+  .outlet-container {
+    flex-grow: 1;
+    height: 100%;
+    overflow: auto !important;
+  }
+}
