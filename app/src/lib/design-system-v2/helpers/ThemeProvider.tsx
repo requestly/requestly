@@ -2,6 +2,7 @@ import React from "react";
 import { ThemeProvider as StyledComponentsThemeProvider, createGlobalStyle } from "styled-components";
 import { ColorTokens, generateColorTokens } from "../tokens/colors";
 import { generateCSSVariables } from "../utils";
+import { TypographyTokens, generateTypographyTokens } from "../tokens/typography";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -11,19 +12,24 @@ interface ThemeProviderProps {
 
 export interface Theme {
   colors: ColorTokens;
+  typography: TypographyTokens;
 }
 
 export const generateTheme = (primaryColor?: string, neutralColor?: string) => {
   const colorTokens = generateColorTokens(primaryColor, neutralColor);
-  // TODO: @wrongsahil - rename requestly to rq after old theme is removed
   const colorCssVariables = generateCSSVariables(colorTokens, "requestly-color-");
+
+  const typographyTokens = generateTypographyTokens();
+  const typographyCssVariables = generateCSSVariables(typographyTokens, "requestly-font-");
 
   const theme: Theme = {
     colors: colorTokens,
+    typography: typographyTokens,
   };
 
   const themeCssVariables = {
     ...colorCssVariables,
+    ...typographyCssVariables,
   };
 
   return { theme, themeCssVariables };
