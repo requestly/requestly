@@ -30,7 +30,7 @@ import {
   handleForgotPasswordButtonOnClick,
   handleGoogleSignIn,
   handleResetPasswordOnClick,
-} from "./actions";
+} from "features/onboarding/components/auth/components/Form/actions";
 
 //UTILS
 import { getQueryParamsAsMap } from "../../../utils/URLUtils";

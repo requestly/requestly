@@ -1,6 +1,6 @@
 import { ReducerKeys } from "store/constants";
 import { storageRecordAdapter } from "./slice";
-import { isRule } from "features/rules";
+import { isRule } from "features/rules/utils";
 
 const storeKey = ReducerKeys.RULES;
 const rulesEntitySelectors = storageRecordAdapter.getSelectors((state: any) => state[storeKey]["records"]);

@@ -1,0 +1,27 @@
+.rq-secondary-sidebar-item {
+  width: 100%;
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  column-gap: 15px;
+  font-size: 14px;
+  line-height: 16px;
+  padding: 7px 18px;
+  color: var(--gray-light);
+  border-radius: var(--border-radius-sm);
+}
+
+.rq-secondary-sidebar-item .icon__wrapper svg {
+  width: 17px;
+  height: 15px;
+}
+
+.rq-secondary-sidebar-active-item {
+  color: white;
+  background-color: var(--gray-dark);
+}
+
+.rq-secondary-sidebar-item:hover {
+  color: white;
+  background-color: var(--hover-color);
+}

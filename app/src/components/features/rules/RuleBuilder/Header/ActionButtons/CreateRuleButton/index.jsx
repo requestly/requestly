@@ -98,7 +98,8 @@ const CreateRuleButton = ({
   //Constants
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const ruleCreatedEventSource = searchParams.get("source") ?? analyticEventRuleCreatedSource;
+  const ruleCreatedEventSource =
+    searchParams.get("source") ?? location?.state?.source ?? analyticEventRuleCreatedSource;
   const MODE = isRuleEditorModal ? ruleEditorModalMode : getModeData(location).MODE;
 
   //Global State
@@ -159,6 +160,7 @@ const CreateRuleButton = ({
     const fixedRuleData = runMinorFixesOnRule(dispatch, currentlySelectedRuleData);
     //Syntactic Validation
     const syntaxValidation = await transformAndValidateRuleFields(fixedRuleData);
+
     if (!syntaxValidation.success) {
       const validationError = syntaxValidation.validationError;
       switch (validationError.error) {
@@ -182,7 +184,7 @@ const CreateRuleButton = ({
           break;
       }
     } else {
-      const parsedRuleData = syntaxValidation.ruleData || currentlySelectedRuleData;
+      const parsedRuleData = syntaxValidation.ruleData || fixedRuleData;
       //Validation
       const ruleValidation = validateRule(parsedRuleData, dispatch, appMode);
       if (ruleValidation.result) {

@@ -26,6 +26,7 @@ import APP_CONSTANTS from "config/constants";
 import { SyncType } from "utils/syncing/SyncUtils";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { decompressRecords } from "../../utils/Compression";
 
 type NodeRef = DatabaseReference;
 type Snapshot = DataSnapshot;
@@ -231,7 +232,7 @@ export const resetSyncThrottle = () => {
  *
  * @param {Object} params - The parameters for the function.
  * @param {Function} params.dispatch - Dispatch function to manage the state.
- * @param {Array} params.latestFirebaseRecords - Most recent records fetched from Firebase.
+ * @param {Record<string, any>} params.latestFirebaseRecords - Most recent records fetched from Firebase.
  * @param {string} params.uid - User ID.
  * @param {string} params.team_id - Team ID.
  * @param {('EXTENSION' | 'DESKTOP')}  params.appMode - Current mode of the app.
@@ -248,7 +249,7 @@ export const invokeSyncingIfRequired = async ({
   isSyncEnabled,
 }: {
   dispatch: Function;
-  latestFirebaseRecords?: any[];
+  latestFirebaseRecords?: Record<string, any>;
   uid?: string;
   team_id?: string;
   appMode?: "EXTENSION" | "DESKTOP";
@@ -376,7 +377,7 @@ const syncingNodeListener = (
         onValue(syncNodeRef, async (snap: Snapshot) => {
           await invokeSyncingIfRequired({
             dispatch,
-            latestFirebaseRecords: snap.val(),
+            latestFirebaseRecords: decompressRecords(snap.val()),
             uid,
             team_id,
             appMode,
@@ -392,7 +393,7 @@ const syncingNodeListener = (
         onValue(syncNodeRef, async (snap: Snapshot) => {
           await callInvokeSyncingIfRequiredIfNotCalledRecently({
             dispatch,
-            latestFirebaseRecords: snap.val(),
+            latestFirebaseRecords: decompressRecords(snap.val()),
             uid,
             team_id,
             appMode,
