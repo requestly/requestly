@@ -8,9 +8,10 @@
 }
 
 .primary-sidebar-container > button:last-child {
-  margin-bottom: 0;
+  margin-bottom: 48px;
   cursor: pointer;
   border-top: 1px solid var(--border-dark);
+  border-bottom: 1px solid var(--border-dark);
 }
 
 .primary-sidebar-container ul {
