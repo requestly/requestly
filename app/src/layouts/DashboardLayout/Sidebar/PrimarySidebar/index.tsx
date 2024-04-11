@@ -1,17 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
-import { getAppMode, getNetworkSessionSaveInProgress, getUserAuthDetails } from "store/selectors";
-import { ApiOutlined, HomeOutlined, MobileOutlined } from "@ant-design/icons";
+import { getAppMode, getNetworkSessionSaveInProgress } from "store/selectors";
+import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
 import MockServerIcon from "assets/icons/mock-server.svg?react";
-
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
-
 import { PrimarySidebarLink } from "./PrimarySidebarLink";
-import { isUserUsingAndroidDebugger } from "components/features/mobileDebugger/utils/sdkUtils";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import { PrimarySidebarItem } from "../type";
 import InviteButton from "./InviteButton";
@@ -25,15 +22,9 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
-  const [isAndroidDebuggerEnabled, setIsAndroidDebuggerEnabled] = useState(false);
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
-
-  useEffect(() => {
-    isUserUsingAndroidDebugger(user?.details?.profile?.uid).then(setIsAndroidDebuggerEnabled);
-  }, [user?.details?.profile?.uid]);
 
   const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
@@ -95,13 +86,6 @@ export const PrimarySidebar: React.FC = () => {
         display: true,
         activeColor: "var(--api-client)",
       },
-      {
-        id: 6,
-        title: "Android Debugger",
-        path: PATHS.MOBILE_DEBUGGER.INDEX,
-        icon: <MobileOutlined />,
-        display: isAndroidDebuggerEnabled,
-      },
     ];
 
     if (isDesktopSessionsCompatible) {
@@ -123,7 +107,7 @@ export const PrimarySidebar: React.FC = () => {
       };
     }
     return items;
-  }, [appMode, isAndroidDebuggerEnabled, isSavingNetworkSession, isDesktopSessionsCompatible]);
+  }, [appMode, isSavingNetworkSession, isDesktopSessionsCompatible]);
 
   return (
     <div className="primary-sidebar-container">
