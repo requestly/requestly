@@ -1,4 +1,4 @@
-import { UserSubscription } from "models/userSubscription";
+import { UserSubscription } from "backend/models/userSubscriptions";
 import firebaseApp from "../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 
