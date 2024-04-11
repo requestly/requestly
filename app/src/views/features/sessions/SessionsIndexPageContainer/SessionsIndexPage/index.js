@@ -100,7 +100,7 @@ const SessionsIndexPage = () => {
       if (!documentSnapshots.empty) {
         documentSnapshots.forEach((doc) => {
           const recordData = doc.data();
-          if (!recordData?.isTestSession) {
+          if (!recordData?.isInternal) {
             records.push({
               id: doc.id,
               name: recordData.name,
