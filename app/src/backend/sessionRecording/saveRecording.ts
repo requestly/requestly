@@ -14,7 +14,7 @@ export const saveRecording = async (
   events: any,
   options: RecordingOptions,
   source: string,
-  isTestSession: boolean = false
+  isInternal: boolean = false
 ): Promise<any> => {
   const db = getFirestore(firebaseApp);
   const ownerId = getOwnerId(uid, workspaceId);
@@ -39,7 +39,7 @@ export const saveRecording = async (
     updatedTs: Date.now(),
     createdTs: Date.now(),
     source,
-    isTestSession,
+    isInternal,
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)
