@@ -36,6 +36,7 @@ const BulkActionBar = <DataType,>({ config, selectedRows }: Props<DataType>) => 
             <Button
               key={index}
               className="rq-bulk-action-bar-action-btn"
+              loading={btnConfig.loading ?? false}
               icon={btnConfig.icon ?? null}
               danger={btnConfig.danger ?? false}
               type={btnConfig.type ?? "default"}
