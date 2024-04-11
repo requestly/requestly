@@ -6,14 +6,6 @@ export const updateUserCountry = (prevState, action) => {
   prevState.country = action.payload;
 };
 
-export const updateMobileDebuggerAppDetails = (prevState, action) => {
-  prevState.mobileDebugger.app = action.payload;
-};
-
-export const updateMobileDebuggerInterceptorDetails = (prevState, action) => {
-  prevState.mobileDebugger.interceptor = action.payload;
-};
-
 export const updateInitializations = (prevState, action) => {
   prevState.initializations[action.payload.initType] = action.payload.initValue;
 };
