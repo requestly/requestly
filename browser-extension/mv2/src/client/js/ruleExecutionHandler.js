@@ -1,6 +1,6 @@
 RQ.RuleExecutionHandler = {};
 RQ.RuleExecutionHandler.appliedRuleIds = new Set();
-RQ.implicitTestRuleFlow = false;
+RQ.implicitTestRuleFlowEnabled = false;
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
   const eventName = "rule_executed";
@@ -14,7 +14,7 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
-  if (RQ.implicitTestRuleFlow) {
+  if (RQ.implicitTestRuleFlowEnabled) {
     chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
       const implicitTestRuleConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
       let notifyWidget = true;
@@ -74,7 +74,7 @@ RQ.RuleExecutionHandler.setup = () => {
         break;
 
       case RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
-        RQ.implicitTestRuleFlow = true;
+        RQ.implicitTestRuleFlowEnabled = true;
         RQ.RuleExecutionHandler.showImplicitTestRuleWidget();
         break;
     }
@@ -196,11 +196,15 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
   implicitTestRuleWidget.style.display = "block";
 
   if (implicitTestRuleWidget) {
+    implicitTestRuleWidget.setAttribute("applied-rule-id", rule.id);
+    implicitTestRuleWidget.setAttribute("applied-rule-name", rule.name);
+    implicitTestRuleWidget.setAttribute("applied-rule-type", rule.ruleType);
     implicitTestRuleWidget.dispatchEvent(
       new CustomEvent("new-rule-applied", {
         detail: {
           appliedRuleId: rule.id,
           appliedRuleName: rule.name,
+          appliedRuleType: rule.ruleType,
         },
       })
     );
