@@ -1,0 +1,15 @@
+.secondary-sidebar-container {
+  height: 100%;
+  background-color: var(--component-background);
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-dark);
+  width: 217px;
+
+  &.collapsed {
+    width: 0;
+  }
+}
+
+.secondary-sidebar-container ul {
+  padding: 10px 10px 1.25rem 10px;
+}
