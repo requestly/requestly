@@ -1,6 +1,6 @@
 import firebaseApp from "../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import { User } from "../models/user";
+import { User } from "../models/users";
 
 export const getUser = async (userId: string): Promise<User | undefined> => {
   if (!userId) {
