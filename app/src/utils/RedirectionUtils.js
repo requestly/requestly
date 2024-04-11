@@ -436,22 +436,6 @@ export const redirectToTraffic = (navigate) => {
   navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
 };
 
-export const redirectToCreateNewApp = (navigate) => {
-  navigate(PATHS.MOBILE_DEBUGGER.NEW.ABSOLUTE);
-};
-
-export const redirectToMobileDebuggerHome = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}`);
-};
-
-export const redirectToMobileDebuggerInterceptor = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}/interceptor`);
-};
-
-export const redirectToMobileDebuggerUnauthorized = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}/unauthorized`);
-};
-
 export const redirectToDownloadPage = () => {
   window.open(APP_CONSTANTS.LINKS.REQUESTLY_DOWNLOAD_PAGE, "_blank");
 };
