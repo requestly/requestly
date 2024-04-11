@@ -15,16 +15,18 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
     super.connectedCallback();
 
     const contentContainer = this.shadowRoot.getElementById("content-container");
-    contentContainer.classList.add("rq-bg-secondary");
 
-    const explicitModeMarkup = `        
+    const explicitModeMarkup = `   
+     <div id="explicit-widget-container">  
         <div id="rule-status-container">
           <div id="rule-status"></div>
         </div>
         <div id="test-rule-details">
           <div id="rule-name" class="primary-text"></div>
           <button id="view-result-btn">View Results</button>
-        </div>`;
+        </div>
+      </div>
+        `;
 
     setInnerHTML(contentContainer, explicitModeMarkup);
     this.addWidgetListeners();
