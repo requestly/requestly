@@ -1,11 +1,13 @@
 import { RQTestRuleWidget } from "..";
-import { registerCustomElement, setInnerHTML } from "../../utils";
+import { registerCustomElement, setInnerHTML, getRuleTypeIcon } from "../../utils";
 import CheckIcon from "../../../../resources/icons/check.svg";
+import arrowRightIcon from "../../../../resources/icons/arrowRight.svg";
+import { RuleType } from "../../../types";
 
 const TAG_NAME = "rq-implicit-test-rule-widget";
 
 class RQImplicitTestRuleWidget extends RQTestRuleWidget {
-  #appliedRules: { ruleId: string; ruleName: string }[] = [];
+  #appliedRules: { ruleId: string; ruleName: string; ruleType: RuleType }[] = [];
 
   connectedCallback() {
     super.connectedCallback();
@@ -18,8 +20,19 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
     const settingsButton = this.shadowRoot.getElementById("settings-button");
     settingsButton.classList.remove("hidden");
-
     this.addWidgetListeners();
+
+    const appliedRuleId = this.attributes.getNamedItem("applied-rule-id")?.value;
+    const appliedRuleName = this.attributes.getNamedItem("applied-rule-name")?.value;
+    const appliedRuleType = this.attributes.getNamedItem("applied-rule-type")?.value;
+    if (appliedRuleId && appliedRuleName && appliedRuleType) {
+      this.#appliedRules.push({
+        ruleId: appliedRuleId,
+        ruleName: appliedRuleName,
+        ruleType: appliedRuleType as RuleType,
+      });
+      this.renderAppliedRules();
+    }
   }
 
   addWidgetListeners() {
@@ -30,6 +43,7 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
       this.#appliedRules.push({
         ruleId: evt.detail.appliedRuleId,
         ruleName: evt.detail.appliedRuleName,
+        ruleType: evt.detail.appliedRuleType,
       });
 
       this.renderAppliedRules();
@@ -50,7 +64,11 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     const appliedRulesMarkup = this.#appliedRules.map((rule) => {
       return `
         <div class="applied-rule-list-item">
-          <span>${rule.ruleName}</span>
+          <div class="applied-rule-item-details">
+            <span class="applied-rule-icon">${getRuleTypeIcon(rule.ruleType)}</span> 
+            <span class="applied-rule-name">${rule.ruleName}</span>
+          </div>
+         <span class="applied-rule-arrow-icon">${arrowRightIcon}</span>
         </div>`;
     });
 

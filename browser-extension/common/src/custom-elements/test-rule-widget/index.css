@@ -89,7 +89,6 @@
 #content-container {
   padding: 12px;
   border-radius: 8px;
-  margin-top: 8px;
 }
 
 #rule-status-container {
@@ -251,18 +250,57 @@ a {
   margin-top: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 .applied-rule-list-item:hover {
   background: #383838;
 }
 
+.applied-rule-list-item:hover .applied-rule-arrow-icon {
+  opacity: 1;
+}
+
 .applied-rule-list-item:first-child {
   margin-top: 0;
+}
+
+.applied-rule-item-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .applied-rules-list-header {
   font-size: 13px;
   color: #fff;
   font-weight: 500;
+}
+
+.applied-rule-icon {
+  align-self: center;
+}
+
+.applied-rule-icon svg {
+  width: 14px;
+  height: 14px;
+  position: relative;
+  top: 2px;
+}
+
+.applied-rule-arrow-icon {
+  transform: scale(1.2);
+  align-self: center;
+  transition: 0.2s all;
+  opacity: 0;
+}
+
+.applied-rule-name {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
