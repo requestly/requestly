@@ -14,7 +14,11 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
     const contentContainer = this.shadowRoot.getElementById("content-container");
     const minimizedStatusBtn = this.shadowRoot.getElementById("minimized-status-btn");
-    const widgetContent = `<div class="applied-rules-list-header">Rules applied on this page</div><div id="applied-rules-list"></div>`;
+    const widgetContent = `
+    <div id="implicit-widget-container">
+      <div id="applied-rules-list-header">Rules applied on this page</div>
+      <div id="applied-rules-list"></div>
+    </div>`;
     setInnerHTML(minimizedStatusBtn, `<span class="rq-success">${CheckIcon}</span>`);
     setInnerHTML(contentContainer, widgetContent);
 

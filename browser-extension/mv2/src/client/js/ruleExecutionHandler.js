@@ -15,22 +15,7 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
   if (RQ.implicitTestRuleFlowEnabled) {
-    chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
-      const implicitTestRuleConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
-      let notifyWidget = true;
-
-      if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
-        notifyWidget = false;
-      } else if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
-        if (!implicitTestRuleConfig.ruleTypes.includes(rule.ruleType)) {
-          notifyWidget = false;
-        }
-      }
-
-      if (notifyWidget) {
-        RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
-      }
-    });
+    checkAppliedRuleAndNotifyWidget(rule);
   } else {
     RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget(rule.id);
   }
@@ -209,4 +194,25 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
       })
     );
   }
+};
+
+const checkAppliedRuleAndNotifyWidget = (rule) => {
+  chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+    let notifyWidget = true;
+    const implicitTestRuleConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+
+    if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+      notifyWidget = false;
+      return;
+    }
+
+    if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
+      if (!implicitTestRuleConfig.ruleTypes.includes(rule.ruleType)) {
+        notifyWidget = false;
+        return;
+      }
+    }
+
+    if (notifyWidget) RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
+  });
 };
