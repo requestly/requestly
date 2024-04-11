@@ -19,7 +19,8 @@ type AliasTokenKeys =
   | "white"
   | "white-t-20"
   | "black"
-  | "black-t-70";
+  | "black-t-70"
+  | "black-t-20";
 
 export type SeedTokens = {
   [key in SeedTokenKeys]: string;
@@ -147,7 +148,8 @@ const generateAliasTokens = (mapTokens: MapTokens) => {
     white: "#FFFFFF",
     "white-t-20": "#FFFFFF33",
     black: "#0E0E0E",
-    "black-t-70": "000000B2",
+    "black-t-70": "#000000B3",
+    "black-t-20": "#00000033",
   };
 
   return aliasTokens;

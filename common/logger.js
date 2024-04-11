@@ -17,6 +17,24 @@ var Logger = {
       console.error(this.ns, ...args);
     }
   },
+
+  time(...args) {
+    if (this.enabled) {
+      console.time(...args);
+    }
+  },
+
+  timeEnd(...args) {
+    if (this.enabled) {
+      console.timeEnd(...args);
+    }
+  },
+
+  timeLog(...args) {
+    if (this.enabled) {
+      console.timeLog(...args);
+    }
+  },
 };
 
 let urlParams = new URLSearchParams(window.location.search);

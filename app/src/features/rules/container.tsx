@@ -11,16 +11,18 @@ import { DuplicateRuleModalWrapper } from "./modals/DuplicateRuleModalWrapper";
 import { UngroupOrDeleteRulesModalWrapper } from "./modals/UngroupOrDeleteRulesModalWrapper";
 import { RenameGroupModalWrapper } from "./modals/RenameGroupModalWrapper";
 
+import "./container.scss";
+
 const RulesFeatureContainer = () => {
   const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
   return (
-    <div className="parent-container">
+    <div className="rules-container">
       {!isSecondarySidebarCollapsed && (
         <div className="secondary-sidebar-container">
           <RulesSidebar />
         </div>
       )}
-      <div className="outlet-container">
+      <div className="rules-content-container">
         <RulesContextProvider>
           <>
             <RenameGroupModalWrapper />
