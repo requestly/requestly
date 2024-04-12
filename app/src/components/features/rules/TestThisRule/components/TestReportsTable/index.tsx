@@ -10,7 +10,6 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOndemandVideo } from "@react-icons/all-files/md/MdOndemandVideo";
 import { RQButton } from "lib/design-system/components";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import { LoadingOutlined } from "@ant-design/icons";
 import { trackTestRuleResultClicked } from "../../analytics";
 import "./index.scss";
@@ -23,16 +22,18 @@ interface TestReportsTableProps {
 export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports, deleteReport }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
-  const { viewAsSidePanel } = useBottomSheetContext();
-
   const columns = useMemo(
     () => [
       {
         title: "URL",
         key: "url",
-        width: viewAsSidePanel ? 200 : 240,
+        width: 220,
         ellipsis: true,
-        render: (_: any, record: TestReport) => <div className="text-white">{record.url}</div>,
+        render: (_: any, record: TestReport) => (
+          <div className="text-white test-report-url">
+            <span>{record.url}</span>
+          </div>
+        ),
       },
       {
         title: "Tested on",
@@ -107,7 +108,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports,
         },
       },
     ],
-    [viewAsSidePanel, deleteReport, currentlySelectedRuleData.ruleType]
+    [deleteReport, currentlySelectedRuleData.ruleType]
   );
 
   return (
@@ -116,7 +117,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports,
       dataSource={testReports}
       className="test-reports-table"
       pagination={false}
-      scroll={{ y: viewAsSidePanel ? `calc(100vh - 380px)` : 150 }}
+      scroll={{ y: "auto" }}
     />
   );
 };
