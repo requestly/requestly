@@ -7,6 +7,7 @@ import Status from "./ActionButtons/Status";
 import ActionButtons from "./ActionButtons";
 import PinButton from "./ActionButtons/PinButton";
 import EditorGroupDropdown from "./EditorGroupDropdown";
+import { HelpButton } from "./ActionButtons/HelpButton";
 import CloseButton from "./ActionButtons/CloseButton";
 import { TestRuleButton } from "./ActionButtons/TestRuleButton";
 import RuleOptions from "./RuleOptions";
@@ -52,6 +53,9 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
         </Col>
         <Col span={16} align="right" className="ml-auto rule-editor-header-actions-container">
           <Row gutter={8} wrap={false} justify="end" align="middle">
+            <Col>
+              <HelpButton />
+            </Col>
             <Col>
               <Status location={location} />
             </Col>

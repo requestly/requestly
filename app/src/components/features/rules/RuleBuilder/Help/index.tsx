@@ -6,7 +6,6 @@ import { NotionRenderer } from "react-notion";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { RQCollapse } from "lib/design-system/components/RQCollapse";
-import Cross from "assets/icons/cross.svg?react";
 import LeftArrow from "assets/icons/left-arrow.svg?react";
 import RightArrow from "assets/icons/right-arrow.svg?react";
 import { RuleType } from "types/rules";
@@ -15,11 +14,9 @@ import { snakeCase } from "lodash";
 import APP_CONSTANTS from "config/constants";
 import { rulesData } from "components/landing/ruleSelection/rules-data";
 import {
-  trackDocsSidebarClosed,
   trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
   trackDocsSidebarDemovideoWatched,
-  trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
 import "./Help.css";
 import "react-notion/src/styles.css";
@@ -80,10 +77,9 @@ const defaultMockUrls = {
 
 interface HelpProps {
   ruleType: RuleType;
-  setShowDocs: (showDocs: boolean) => void;
 }
 
-const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
+const Help: React.FC<HelpProps> = ({ ruleType }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
   const [notionPageData, setNotionPageData] = useState(null);
   const [tableOfContents, setTableOfContents] = useState(null);
@@ -158,16 +154,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
             )}
             Help
           </Col>
-
-          <Button
-            title="Close"
-            icon={<Cross />}
-            className="rule-editor-docs-close-btn"
-            onClick={() => {
-              setShowDocs(false);
-              trackDocsSidebarClosed(ruleType);
-            }}
-          />
         </Row>
 
         {isDocsVisible ? (
@@ -274,19 +260,6 @@ const Help: React.FC<HelpProps> = ({ ruleType, setShowDocs }) => {
           </>
         )}
       </div>
-
-      {/* footer */}
-      <Row className="rule-editor-help-footer">
-        <Button
-          className="ml-auto"
-          onClick={() => {
-            trackDocsSidebarContactUsClicked(ruleType);
-            window.open(APP_CONSTANTS.LINKS.CONTACT_US_PAGE, "_blank");
-          }}
-        >
-          Contact us
-        </Button>
-      </Row>
     </div>
   );
 };
