@@ -37,16 +37,33 @@ export const TestThisRule = () => {
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const [testReports, setTestReports] = useState<TestReport[]>(null);
-  const [refreshTestReports, setRefreshTestReports] = useState(true);
-  const [testReportBeingSavedId, setTestReportBeingSavedId] = useState(null);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isNewRuleCreated = useRef(state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE);
 
-  const { viewAsSidePanel, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
+  const { viewAsSidePanel, isBottomSheetOpen, openBottomSheet } = useBottomSheetContext();
+
+  const fetchAndUpdateTestReports = useCallback(
+    (testSessionBeingSaved?: string) => {
+      getTestReportsByRuleId(appMode, currentlySelectedRuleData?.id)
+        .then((testReports: TestReport[]) => {
+          const reports = testReports;
+          if (testSessionBeingSaved) {
+            const index = reports.findIndex((report) => report.id === testSessionBeingSaved);
+            if (index !== -1) {
+              reports[index].isSessionSaving = true;
+            }
+          }
+          setTestReports(reports);
+        })
+        .catch((error) => {
+          Logger.log(error);
+        });
+    },
+    [appMode, currentlySelectedRuleData?.id]
+  );
 
   const handleSaveTestSession = useCallback(
     (tabId: number, reportId: string) => {
-      setTestReportBeingSavedId(reportId);
       getTabSession(tabId)
         .then((tabSession) => {
           if (!tabSession) return;
@@ -77,8 +94,7 @@ export const TestThisRule = () => {
                 if (testReport) {
                   testReport.sessionLink = getSessionRecordingSharedLink(response?.firestoreId);
                   saveTestReport(appMode, reportId, testReport).then(() => {
-                    setRefreshTestReports(true);
-                    setTestReportBeingSavedId(null);
+                    fetchAndUpdateTestReports();
                   });
                 }
               });
@@ -87,11 +103,10 @@ export const TestThisRule = () => {
         })
         .catch((error) => {
           Logger.log(error);
-          setTestReportBeingSavedId(null);
           toast.error("Error saving test session");
         });
     },
-    [appMode, user.details?.profile?.uid, workspace?.id, setRefreshTestReports]
+    [appMode, user.details?.profile?.uid, workspace?.id, fetchAndUpdateTestReports]
   );
 
   const handleTestReportDelete = useCallback(
@@ -100,23 +115,23 @@ export const TestThisRule = () => {
         .then(() => {
           toast.success("Test deleted successfully");
           trackTestRuleReportDeleted(currentlySelectedRuleData.ruleType);
-          setRefreshTestReports(true);
+          fetchAndUpdateTestReports();
         })
         .catch((error) => {
           Logger.log(error);
         });
     },
-    [appMode, currentlySelectedRuleData.ruleType]
+    [appMode, currentlySelectedRuleData.ruleType, fetchAndUpdateTestReports]
   );
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
       (message: { testReportId: string; testPageTabId: string; record: boolean; appliedStatus: boolean }) => {
-        setRefreshTestReports(true);
+        fetchAndUpdateTestReports(message.testReportId);
         trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, message.appliedStatus);
-        if (!viewAsSidePanel && !isBottomSheetOpen) {
-          toggleBottomSheet();
+        if (!viewAsSidePanel) {
+          openBottomSheet();
         }
         if (message.record) {
           handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId);
@@ -126,33 +141,23 @@ export const TestThisRule = () => {
   }, [
     currentlySelectedRuleData.ruleType,
     handleSaveTestSession,
+    fetchAndUpdateTestReports,
     isBottomSheetOpen,
-    toggleBottomSheet,
+    openBottomSheet,
     viewAsSidePanel,
   ]);
 
   useEffect(() => {
-    if (refreshTestReports) {
-      getTestReportsByRuleId(appMode, currentlySelectedRuleData.id)
-        .then((testReports: TestReport[]) => {
-          setTestReports(testReports);
-        })
-        .catch((error) => {
-          Logger.log(error);
-        })
-        .finally(() => {
-          setRefreshTestReports(false);
-        });
-    }
-  }, [appMode, currentlySelectedRuleData.id, refreshTestReports, currentlySelectedRuleData.ruleType]);
+    fetchAndUpdateTestReports();
+  }, [fetchAndUpdateTestReports]);
 
   useEffect(() => {
     // Open the bottom sheet when a new rule is created
-    if (isNewRuleCreated.current && !isBottomSheetOpen) {
-      toggleBottomSheet();
+    if (isNewRuleCreated.current) {
+      openBottomSheet();
       isNewRuleCreated.current = false;
     }
-  }, [isBottomSheetOpen, toggleBottomSheet]);
+  }, [openBottomSheet]);
 
   return (
     <Col className="test-this-rule-container">
@@ -160,11 +165,7 @@ export const TestThisRule = () => {
       <div className="mt-16 test-results-header">Results</div>
       <Col className="mt-8 test-reports-container">
         {testReports?.length ? (
-          <TestReportsTable
-            testReports={testReports}
-            testReportBeingSavedId={testReportBeingSavedId}
-            deleteReport={handleTestReportDelete}
-          />
+          <TestReportsTable testReports={testReports} deleteReport={handleTestReportDelete} />
         ) : (
           <EmptyTestResultScreen />
         )}
