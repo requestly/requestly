@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
+import React, { useMemo } from "react";
+import { getCurrentlySelectedRuleData } from "store/selectors";
 import { useSelector } from "react-redux";
 import { Col, Popconfirm, Row, Spin, Table } from "antd";
 import { TestReport } from "../../types";
@@ -10,51 +10,25 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOndemandVideo } from "@react-icons/all-files/md/MdOndemandVideo";
 import { RQButton } from "lib/design-system/components";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { deleteTestReport } from "../../helpers";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import { LoadingOutlined } from "@ant-design/icons";
-import Logger from "lib/logger";
-import { toast } from "utils/Toast";
+import { trackTestRuleResultClicked } from "../../analytics";
 import "./index.scss";
-import { trackTestRuleReportDeleted, trackTestRuleResultClicked } from "../../analytics";
 
 interface TestReportsTableProps {
   testReports: TestReport[];
-  newReportId: string;
-  isSessionSaving: boolean;
-  refreshTestReports: () => void;
+  testReportBeingSavedId: string;
+  deleteReport: (reportId: string) => void;
 }
 
 export const TestReportsTable: React.FC<TestReportsTableProps> = ({
   testReports,
-  newReportId,
-  isSessionSaving,
-  refreshTestReports,
+  testReportBeingSavedId,
+  deleteReport,
 }) => {
-  const appMode = useSelector(getAppMode);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const [reportIdBeingDeleted, setReportIdBeingDeleted] = useState(null);
 
   const { viewAsSidePanel } = useBottomSheetContext();
-
-  const handleTestReportDelete = useCallback(
-    (reportId: string) => {
-      setReportIdBeingDeleted(reportId);
-      deleteTestReport(appMode, reportId)
-        .then(() => {
-          toast.success("Test deleted successfully");
-          trackTestRuleReportDeleted(currentlySelectedRuleData.ruleType);
-          refreshTestReports();
-        })
-        .catch((error) => {
-          Logger.log(error);
-        })
-        .finally(() => {
-          setReportIdBeingDeleted(null);
-        });
-    },
-    [appMode, refreshTestReports, currentlySelectedRuleData.ruleType]
-  );
 
   const columns = useMemo(
     () => [
@@ -96,9 +70,9 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
         key: "actions",
         width: 175,
         render: (_: any, record: TestReport) => {
-          if (isSessionSaving && record.id === newReportId) {
+          if (record.id === testReportBeingSavedId) {
             return (
-              <Row gutter={8} align="middle" className="saving-test-session-status">
+              <Row gutter={8} align="middle" justify="end" className="saving-test-session-status">
                 <Col>
                   <Spin indicator={<LoadingOutlined className="saving-test-session-spinner" spin />} />
                 </Col>
@@ -128,29 +102,17 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
                 okText="Yes"
                 cancelText="No"
                 overlayClassName="test-report-delete-popconfirm"
-                onConfirm={() => handleTestReportDelete(record.id)}
+                onConfirm={() => deleteReport(record.id)}
                 showArrow={false}
               >
-                <RQButton
-                  loading={reportIdBeingDeleted === record.id}
-                  className="test-report-delete-btn"
-                  iconOnly
-                  icon={<RiDeleteBin6Line />}
-                />
+                <RQButton className="test-report-delete-btn" iconOnly icon={<RiDeleteBin6Line />} />
               </Popconfirm>
             </div>
           );
         },
       },
     ],
-    [
-      viewAsSidePanel,
-      isSessionSaving,
-      newReportId,
-      handleTestReportDelete,
-      reportIdBeingDeleted,
-      currentlySelectedRuleData.ruleType,
-    ]
+    [viewAsSidePanel, testReportBeingSavedId, deleteReport, currentlySelectedRuleData.ruleType]
   );
 
   return (
