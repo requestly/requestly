@@ -17,6 +17,7 @@ import {
   trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
   trackDocsSidebarDemovideoWatched,
+  trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
 import "./Help.css";
 import "react-notion/src/styles.css";
@@ -260,6 +261,17 @@ const Help: React.FC<HelpProps> = ({ ruleType }) => {
           </>
         )}
       </div>
+      {/* footer */}
+      <Row className="rule-editor-help-footer">
+        <Button
+          onClick={() => {
+            trackDocsSidebarContactUsClicked(ruleType);
+            window.open(APP_CONSTANTS.LINKS.CONTACT_US_PAGE, "_blank");
+          }}
+        >
+          Contact us
+        </Button>
+      </Row>
     </div>
   );
 };

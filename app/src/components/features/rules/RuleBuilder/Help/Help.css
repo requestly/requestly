@@ -47,7 +47,7 @@
 }
 
 .rule-editor-help-lists {
-  height: 85vh;
+  height: 80vh;
   overflow: hidden;
 }
 
@@ -114,12 +114,10 @@
 .rule-editor-help-footer {
   margin-top: 10px;
   padding: 8px 1.25rem;
-  border-top: 1px solid var(--border-dark);
-  background-color: var(--component-dark-background);
 }
 /* docs */
 .rule-editor-docs {
-  height: 85vh;
+  height: 80vh;
   overflow: auto;
 }
 .rule-editor-docs-intro {
