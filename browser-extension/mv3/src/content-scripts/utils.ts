@@ -9,10 +9,6 @@ export const executeDynamicScriptOnPage = (code: string) => {
   (document.head || document.documentElement).appendChild(script);
 };
 
-export const isExtensionEnabled = () => {
-  return new Promise<boolean>((resolve) => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED }, (response) => {
-      resolve(response);
-    });
-  });
+export const isExtensionEnabled = (): Promise<boolean> => {
+  return chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED });
 };
