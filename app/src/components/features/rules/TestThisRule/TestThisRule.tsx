@@ -40,7 +40,7 @@ export const TestThisRule = () => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isNewRuleCreated = useRef(state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE);
 
-  const { viewAsSidePanel, isBottomSheetOpen, openBottomSheet } = useBottomSheetContext();
+  const { isSheetPlacedAtBottom, isBottomSheetOpen, openBottomSheet } = useBottomSheetContext();
 
   const fetchAndUpdateTestReports = useCallback(
     (testSessionBeingSaved?: string) => {
@@ -130,7 +130,7 @@ export const TestThisRule = () => {
       (message: { testReportId: string; testPageTabId: string; record: boolean; appliedStatus: boolean }) => {
         fetchAndUpdateTestReports(message.testReportId);
         trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, message.appliedStatus);
-        if (!viewAsSidePanel) {
+        if (isSheetPlacedAtBottom) {
           openBottomSheet();
         }
         if (message.record) {
@@ -144,7 +144,7 @@ export const TestThisRule = () => {
     fetchAndUpdateTestReports,
     isBottomSheetOpen,
     openBottomSheet,
-    viewAsSidePanel,
+    isSheetPlacedAtBottom,
   ]);
 
   useEffect(() => {
