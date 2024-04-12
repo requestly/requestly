@@ -17,15 +17,10 @@ import "./index.scss";
 
 interface TestReportsTableProps {
   testReports: TestReport[];
-  testReportBeingSavedId: string;
   deleteReport: (reportId: string) => void;
 }
 
-export const TestReportsTable: React.FC<TestReportsTableProps> = ({
-  testReports,
-  testReportBeingSavedId,
-  deleteReport,
-}) => {
+export const TestReportsTable: React.FC<TestReportsTableProps> = ({ testReports, deleteReport }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   const { viewAsSidePanel } = useBottomSheetContext();
@@ -70,7 +65,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
         key: "actions",
         width: 175,
         render: (_: any, record: TestReport) => {
-          if (record.id === testReportBeingSavedId) {
+          if (record?.isSessionSaving) {
             return (
               <Row gutter={8} align="middle" justify="end" className="saving-test-session-status">
                 <Col>
@@ -112,7 +107,7 @@ export const TestReportsTable: React.FC<TestReportsTableProps> = ({
         },
       },
     ],
-    [viewAsSidePanel, testReportBeingSavedId, deleteReport, currentlySelectedRuleData.ruleType]
+    [viewAsSidePanel, deleteReport, currentlySelectedRuleData.ruleType]
   );
 
   return (

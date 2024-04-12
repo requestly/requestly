@@ -5,6 +5,7 @@ interface BottomSheetContextProps {
   viewAsSidePanel: boolean;
   toggleBottomSheet: () => void;
   toggleViewAsSidePanel: () => void;
+  openBottomSheet: () => void;
 }
 
 const BottomSheetContext = createContext<BottomSheetContextProps | undefined>(undefined);
@@ -15,10 +16,11 @@ export const BottomSheetProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const toggleBottomSheet = () => setIsBottomSheetOpen(!isBottomSheetOpen);
   const toggleViewAsSidePanel = () => setViewSideAsPanel(!viewAsSidePanel);
+  const openBottomSheet = () => setIsBottomSheetOpen(true);
 
   return (
     <BottomSheetContext.Provider
-      value={{ isBottomSheetOpen, viewAsSidePanel, toggleBottomSheet, toggleViewAsSidePanel }}
+      value={{ isBottomSheetOpen, viewAsSidePanel, toggleBottomSheet, toggleViewAsSidePanel, openBottomSheet }}
     >
       {children}
     </BottomSheetContext.Provider>
