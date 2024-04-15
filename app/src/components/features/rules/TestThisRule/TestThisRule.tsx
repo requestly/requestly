@@ -4,7 +4,7 @@ import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "st
 import { Col } from "antd";
 import { TestReportsTable } from "./components/TestReportsTable";
 import { getTabSession } from "actions/ExtensionActions";
-import { useBottomSheetContext } from "componentsV2/BottomSheet";
+import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { TestReport } from "./types";
 import { deleteTestReport, getTestReportById, getTestReportsByRuleId, saveTestReport } from "./helpers";
@@ -35,7 +35,7 @@ export const TestThisRule = () => {
   const [testReports, setTestReports] = useState<TestReport[]>(null);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
-  const { isSheetPlacedAtBottom, isBottomSheetOpen, openBottomSheet } = useBottomSheetContext();
+  const { sheetPlacement, isBottomSheetOpen, toggleBottomSheet } = useBottomSheetContext();
 
   const fetchAndUpdateTestReports = useCallback(
     (testSessionBeingSaved?: string) => {
@@ -125,8 +125,8 @@ export const TestThisRule = () => {
       (message: { testReportId: string; testPageTabId: string; record: boolean; appliedStatus: boolean }) => {
         fetchAndUpdateTestReports(message.testReportId);
         trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, message.appliedStatus);
-        if (isSheetPlacedAtBottom) {
-          openBottomSheet();
+        if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
+          toggleBottomSheet();
         }
         if (message.record) {
           handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId);
@@ -138,8 +138,8 @@ export const TestThisRule = () => {
     handleSaveTestSession,
     fetchAndUpdateTestReports,
     isBottomSheetOpen,
-    openBottomSheet,
-    isSheetPlacedAtBottom,
+    toggleBottomSheet,
+    sheetPlacement,
   ]);
 
   useEffect(() => {

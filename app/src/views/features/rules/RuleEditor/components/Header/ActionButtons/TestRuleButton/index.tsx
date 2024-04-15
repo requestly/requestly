@@ -1,6 +1,6 @@
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { RQButton } from "lib/design-system/components";
-import { useBottomSheetContext } from "componentsV2/BottomSheet";
+import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { useLocation } from "react-router-dom";
 import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
@@ -10,7 +10,7 @@ import "./index.scss";
 
 export const TestRuleButton = () => {
   const location = useLocation();
-  const { toggleBottomSheet, isSheetPlacedAtBottom } = useBottomSheetContext();
+  const { toggleBottomSheet, sheetPlacement } = useBottomSheetContext();
 
   const MODE = getModeData(location).MODE;
 
@@ -22,7 +22,7 @@ export const TestRuleButton = () => {
         type="text"
         icon={<MdOutlineScience />}
         onClick={() => {
-          if (isSheetPlacedAtBottom) {
+          if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
             toggleBottomSheet();
           }
         }}

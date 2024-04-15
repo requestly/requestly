@@ -16,7 +16,7 @@ import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationM
 import EditorHeader from "./components/Header";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import { BottomSheet, BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { BottomSheet, BottomSheetLayout, BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { TestThisRule } from "components/features/rules/TestThisRule";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -33,7 +33,7 @@ const RuleEditor = (props) => {
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
 
-  const { isSheetPlacedAtBottom, openBottomSheet } = useBottomSheetContext();
+  const { sheetPlacement, toggleBottomSheet } = useBottomSheetContext();
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
@@ -78,10 +78,10 @@ const RuleEditor = (props) => {
 
   useEffect(() => {
     if (isNewRuleCreated) {
-      openBottomSheet();
+      toggleBottomSheet();
       setIsNewRuleCreated(false);
     }
-  }, [openBottomSheet, isNewRuleCreated]);
+  }, [toggleBottomSheet, isNewRuleCreated]);
 
   useEffect(() => {
     if (state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
@@ -101,8 +101,8 @@ const RuleEditor = (props) => {
           />
         ) : null}
         <BottomSheetLayout
-          contentWidth={isSheetPlacedAtBottom ? 24 : 13}
-          sheetWidth={isSheetPlacedAtBottom ? 24 : 11}
+          contentWidth={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 13}
+          sheetWidth={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 11}
           isSheetHidden={!(MODE === RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE))}
           bottomSheet={<BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />}
         >
