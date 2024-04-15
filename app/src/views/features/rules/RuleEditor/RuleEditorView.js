@@ -3,7 +3,7 @@ import RuleEditor from "./RuleEditor";
 
 const RuleEditorView = () => {
   return (
-    <BottomSheetProvider>
+    <BottomSheetProvider defaultPlacement="bottom">
       <RuleEditor />
     </BottomSheetProvider>
   );
