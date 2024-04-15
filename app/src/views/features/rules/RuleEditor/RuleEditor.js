@@ -31,7 +31,7 @@ const RuleEditor = (props) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
 
-  const { viewAsSidePanel } = useBottomSheetContext();
+  const { isSheetPlacedAtBottom } = useBottomSheetContext();
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
@@ -86,7 +86,7 @@ const RuleEditor = (props) => {
           />
         ) : null}
         <Row style={{ height: "inherit", position: "relative" }}>
-          <Col span={viewAsSidePanel ? 13 : 24}>
+          <Col span={isSheetPlacedAtBottom ? 24 : 13}>
             <ProCard className="rule-editor-procard">
               <RuleBuilder />
             </ProCard>
