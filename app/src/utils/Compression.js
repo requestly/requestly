@@ -82,6 +82,7 @@ function compressRecord(record) {
     switch (record.ruleType) {
       case RuleType.RESPONSE:
         record.pairs.forEach((pair, idx) => {
+          if (compressedRecord.pairs[idx].isCompressed) return;
           const compressedVal = compressString(pair?.response?.value ?? "");
           compressedRecord.pairs[idx].response.value = compressedVal;
           compressedRecord.pairs[idx].isCompressed = true;
@@ -90,6 +91,7 @@ function compressRecord(record) {
 
       case RuleType.REQUEST:
         record.pairs.forEach((pair, idx) => {
+          if (compressedRecord.pairs[idx].isCompressed) return;
           const compressedVal = compressString(pair?.request?.value ?? "");
           compressedRecord.pairs[idx].request.value = compressedVal;
           compressedRecord.pairs[idx].isCompressed = true;
@@ -99,7 +101,7 @@ function compressRecord(record) {
       case RuleType.SCRIPT:
         record.pairs.forEach((pair, idx) => {
           pair.scripts.forEach((script, sidx) => {
-            if (script.type === "code") {
+            if (script.type === "code" && !script.isCompressed) {
               compressedRecord.pairs[idx].scripts[sidx].value = compressString(script?.value ?? "");
               compressedRecord.pairs[idx].scripts[sidx].isCompressed = true;
             }
