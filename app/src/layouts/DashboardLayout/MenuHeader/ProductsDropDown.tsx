@@ -88,13 +88,23 @@ const Products: React.FC<ProductsProps> = (props) => {
 
   const products: ProductProps[] = [
     {
-      title: "Web Debugger",
+      title: "HTTP Rules (Web Debugger)",
       icon: RulesImg,
-      description: "Lightweight web debugging proxy to modify HTTPs request & response.",
+      description: "Intercept and modify requests, inject scripts, Map Local, Map Remote, etc.",
       handleClick: useCallback(() => {
         trackProductClickedInDropDown("web_debugger");
         props.toggleDropDown();
         redirectToRules(navigate);
+      }, [navigate, props]),
+    },
+    {
+      title: "Mock Server",
+      icon: MockServerImg,
+      description: "Generate mock API endpoints for testing when the backend isn’t ready.",
+      handleClick: useCallback(() => {
+        trackProductClickedInDropDown("mock_server");
+        props.toggleDropDown();
+        redirectToMocks(navigate);
       }, [navigate, props]),
     },
     {
@@ -104,7 +114,7 @@ const Products: React.FC<ProductsProps> = (props) => {
         </>
       ),
       icon: SessionImg,
-      description: "A Modern way to Capture, Report, Debug & fix bugs in web applications",
+      description: "Capture, report and debug with screen recording, network logs and console logs.",
       handleClick: useCallback(() => {
         trackProductClickedInDropDown("session_replay");
         props.toggleDropDown();
@@ -114,7 +124,7 @@ const Products: React.FC<ProductsProps> = (props) => {
     {
       title: "API Client",
       icon: ApiClientImg,
-      description: "Customise request headers, query parameters, and request body payloads.",
+      description: "Minimalistic Postman-like API client to test APIs.",
       handleClick: useCallback(() => {
         trackProductClickedInDropDown("api_client");
         props.toggleDropDown();
@@ -122,19 +132,9 @@ const Products: React.FC<ProductsProps> = (props) => {
       }, [navigate, props]),
     },
     {
-      title: "Mock Server",
-      icon: MockServerImg,
-      description: "Generate custom API responses without actually having a pre-built API or a backend server",
-      handleClick: useCallback(() => {
-        trackProductClickedInDropDown("mock_server");
-        props.toggleDropDown();
-        redirectToMocks(navigate);
-      }, [navigate, props]),
-    },
-    {
       title: "Desktop App",
       icon: DesktopImg,
-      description: "Inspect and modify HTTP(s) traffic from any browser, desktop app & mobile apps",
+      description: "Inspect and modify HTTP(s) traffic from any browser, terminal or app.            ",
       handleClick: useCallback(() => {
         trackProductClickedInDropDown("desktop_app");
         handleDesktopAppPromoClicked();
@@ -142,9 +142,9 @@ const Products: React.FC<ProductsProps> = (props) => {
       }, [props, handleDesktopAppPromoClicked]),
     },
     {
-      title: "Api Access",
+      title: "Requestly APIs",
       icon: ApiAccessImg,
-      description: "Easily test changes related to a PR without needing a staging environment",
+      description: "Integrate Requestly into your CI/CD Pipelines using Requestly REST APIs.",
       handleClick: useCallback(() => {
         trackProductClickedInDropDown("api_access");
         // todo: add typeform link
