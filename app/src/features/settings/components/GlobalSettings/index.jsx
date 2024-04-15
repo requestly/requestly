@@ -7,6 +7,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import DataCollection from "./components/DataCollection";
 import RulesSyncing from "./components/RulesSyncing";
 import { ImplicitRuleTesting } from "./components/ImplicitRuleTesting";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import APP_CONSTANTS from "config/constants";
 import "./index.scss";
 
 export const GlobalSettings = () => {
@@ -37,7 +39,10 @@ export const GlobalSettings = () => {
           <RulesSyncing />
           {user?.loggedIn ? <DataCollection /> : null}
         </div>
-        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? <ImplicitRuleTesting /> : null}
+        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
+        isFeatureCompatible(APP_CONSTANTS.FEATURES.TEST_THIS_RULE) ? (
+          <ImplicitRuleTesting />
+        ) : null}
       </div>
     </div>
   );
