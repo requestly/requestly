@@ -38,7 +38,6 @@ const ActiveWorkspace = () => {
       if (!allRulesConfig) return; // It's already empty - No cleanup required
       const allRulesConfigIds = Object.keys(allRulesConfig);
 
-      /* @nsr: should decompress target, but since only working with record keys so ignoring for now */
       // Fetch fresh rule definitions from Firebase
       const allRemoteRecords = (await getValueAsPromise(getRecordsSyncPath())) || {};
       const remoteRecords = {};

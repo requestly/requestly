@@ -294,16 +294,16 @@ export const invokeSyncingIfRequired = async ({
  * @param {string} uid - User ID.
  * @param {string} team_id - Team ID.
  *
- * @returns {Promise<Record<string, any>>} - Returns a Promise that resolves to the fetched Firebase records.
+ * @returns {Promise<any[]>} - Returns a Promise that resolves to the fetched Firebase records.
  */
 const fetchInitialFirebaseRecords = async (
   syncTarget: "teamSync" | "sync",
   uid: string,
   team_id: string
-): Promise<Record<string, any>> => {
+): Promise<any[]> => {
   const syncNodeRef = getNodeRef(getRecordsSyncPath(syncTarget, uid, team_id));
   const syncNodeRefNode = await get(syncNodeRef);
-  return decompressRecords(syncNodeRefNode.val());
+  return syncNodeRefNode.val();
 };
 
 /**
