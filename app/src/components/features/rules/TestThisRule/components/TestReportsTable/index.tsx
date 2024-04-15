@@ -10,7 +10,7 @@ import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOndemandVideo } from "@react-icons/all-files/md/MdOndemandVideo";
 import { RQButton } from "lib/design-system/components";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { deleteTestReport } from "../../helpers";
+import { deleteTestReport } from "../../utils/testReports";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import { LoadingOutlined } from "@ant-design/icons";
 import Logger from "lib/logger";
