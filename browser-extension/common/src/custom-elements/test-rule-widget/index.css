@@ -28,7 +28,8 @@
 }
 
 #container.minimized #content-container,
-#container.minimized #heading-container {
+#container.minimized #heading-container,
+#container.minimized #info-container {
   display: none;
 }
 
