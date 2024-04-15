@@ -9,7 +9,6 @@ import { getRecordsSyncPath } from "utils/syncing/syncDataUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import SettingsItem from "features/settings/components/GlobalSettings/components/SettingsItem";
 import { trackSettingsToggled } from "modules/analytics/events/misc/settings";
-import { decompressRecords } from "utils/Compression";
 
 const WorkspaceStatusSyncing = () => {
   const dispatch = useDispatch();
@@ -32,7 +31,7 @@ const WorkspaceStatusSyncing = () => {
         user.details.profile.uid,
         appMode,
         dispatch,
-        decompressRecords(syncNodeRefNode.val()),
+        syncNodeRefNode.val(),
         "teamSync",
         user.details.profile.uid
       );
