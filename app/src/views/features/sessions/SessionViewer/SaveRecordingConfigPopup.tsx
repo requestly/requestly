@@ -29,7 +29,7 @@ import {
   trackDraftSessionSaved,
 } from "modules/analytics/events/features/sessionRecording";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getTestReportById, saveTestReport } from "components/features/rules/TestThisRule/helpers";
+import { getTestReportById, saveTestReport } from "components/features/rules/TestThisRule/utils/testReports";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
