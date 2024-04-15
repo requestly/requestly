@@ -107,7 +107,9 @@ const RuleEditor = (props) => {
             </ProCard>
           </Col>
           {MODE === RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE) && (
-            <BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />
+            <Col span={isSheetPlacedAtBottom ? 24 : 11}>
+              <BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />
+            </Col>
           )}
         </Row>
       </Col>
