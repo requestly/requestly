@@ -7,20 +7,25 @@ import {
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { initImplicitTestRuleWidgetConfig } from "components/features/rules/TestThisRule";
 import "./extensionContextInvalidationNotice.scss";
+import { useSelector } from "react-redux";
+import { getAppMode } from "store/selectors";
 
 const ExtensionContextInvalidationNotice: React.FC = () => {
   const [visible, setVisible] = useState(false);
+  const appMode = useSelector(getAppMode);
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_EXTENSION_UPDATED,
       ({ oldVersion, newVersion }: { oldVersion: string; newVersion: string }) => {
         setVisible(true);
+        initImplicitTestRuleWidgetConfig(appMode);
         trackExtensionContextInvalidated(oldVersion, newVersion);
       }
     );
-  }, []);
+  }, [appMode]);
 
   const onReloadClicked = useCallback(() => {
     trackAppReloadedFromMessage();
