@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, Col, TabsProps } from "antd";
+import { Tabs, TabsProps } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useBottomSheetContext } from "./context";
 import { BiDockRight } from "@react-icons/all-files/bi/BiDockRight";
@@ -12,11 +12,10 @@ export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) =>
   const { isBottomSheetOpen, isSheetPlacedAtBottom, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
 
   return (
-    <Col
-      span={isSheetPlacedAtBottom ? 24 : 11}
+    <div
       className={`${isSheetPlacedAtBottom ? " bottom-sheet-container" : "bottom-sheet-panel-container"}`}
       style={{
-        bottom: !isSheetPlacedAtBottom ? 0 : isBottomSheetOpen ? 0 : `-335px`,
+        bottom: !isSheetPlacedAtBottom ? 0 : isBottomSheetOpen ? 0 : `-325px`,
         height: isSheetPlacedAtBottom ? "440px" : `100%`,
       }}
     >
@@ -43,6 +42,6 @@ export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) =>
       </div>
 
       <Tabs defaultActiveKey={defaultActiveKey} items={items} type="card" />
-    </Col>
+    </div>
   );
 };
