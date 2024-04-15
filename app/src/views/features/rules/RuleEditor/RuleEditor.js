@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation } from "react-router-dom";
-import { Row, Col } from "antd";
+import { Col } from "antd";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
 import ProCard from "@ant-design/pro-card";
 import {
@@ -16,7 +16,7 @@ import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationM
 import EditorHeader from "./components/Header";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import { BottomSheet, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { BottomSheet, BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { TestThisRule } from "components/features/rules/TestThisRule";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
@@ -100,18 +100,16 @@ const RuleEditor = (props) => {
             currentlySelectedRuleConfig={currentlySelectedRuleConfig}
           />
         ) : null}
-        <Row style={{ height: "inherit", position: "relative" }}>
-          <Col span={isSheetPlacedAtBottom ? 24 : 13}>
-            <ProCard className="rule-editor-procard">
-              <RuleBuilder />
-            </ProCard>
-          </Col>
-          {MODE === RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE) && (
-            <Col span={isSheetPlacedAtBottom ? 24 : 11}>
-              <BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />
-            </Col>
-          )}
-        </Row>
+        <BottomSheetLayout
+          contentWidth={isSheetPlacedAtBottom ? 24 : 13}
+          sheetWidth={isSheetPlacedAtBottom ? 24 : 11}
+          isSheetHidden={!(MODE === RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE))}
+          bottomSheet={<BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />}
+        >
+          <ProCard className="rule-editor-procard">
+            <RuleBuilder />
+          </ProCard>
+        </BottomSheetLayout>
       </Col>
     );
   };
