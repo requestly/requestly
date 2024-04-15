@@ -74,6 +74,12 @@
       font-size: 14px;
     }
   }
+
+  .test-report-url {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .saving-test-session-status {
