@@ -46,5 +46,5 @@ export const deleteTestReport = async (appMode: string, testReportId: string): P
   const allTestReports = await getAllTestReports(appMode);
   delete allTestReports[testReportId];
 
-  StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
+  await StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
 };
