@@ -22,12 +22,16 @@ export const ImplicitRuleTesting = () => {
   const handleImplicitRuleTestingToggleChange = useCallback(
     (status: boolean) => {
       setIsImplicitRuleTestingEnabled(status);
+
+      const newVisibility = status
+        ? GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC
+        : GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF;
+
+      setWidgetVisibility(newVisibility);
       StorageService(appMode).saveRecord({
         [GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG]: {
           ruleTypes: enabledRuleTypes,
-          visibility: status
-            ? GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC
-            : GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF,
+          visibility: newVisibility,
         },
       });
     },
