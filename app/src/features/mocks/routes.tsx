@@ -10,6 +10,7 @@ import FileViewerIndexPage from "components/features/filesLibrary/FileViewerInde
 import MockList from "components/features/mocksV2/MockList";
 import { MockType } from "components/features/mocksV2/types";
 import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
+import MocksFeaturecontainer from "./container";
 
 export const mockServerRoutes: RouteObject[] = [
   {
@@ -83,5 +84,47 @@ export const mockServerRoutes: RouteObject[] = [
   {
     path: joinPaths(PATHS.LEGACY.FILES_LIBRARY.ABSOLUTE, "/:id"),
     element: <Navigate to={joinPaths(PATHS.FILES.VIEWER.ABSOLUTE, "/:id")} />,
+  },
+
+  // V2 routes
+  {
+    path: "/v2" + PATHS.MOCK_SERVER.INDEX,
+    element: <MocksFeaturecontainer />,
+    children: [
+      //  MOCKS V2
+      {
+        index: true,
+        element: <Navigate to={PATHS.MOCK_SERVER_V2.INDEX} />,
+      },
+      {
+        index: true,
+        path: PATHS.MOCK_SERVER_V2.INDEX,
+        element: <MockList type={MockType.API} />,
+      },
+      {
+        path: PATHS.MOCK_SERVER_V2.CREATE.INDEX,
+        // @ts-ignore
+        element: <ProtectedRoute component={MockEditorIndex} isNew={true} mockType={MockType.API} />,
+      },
+      {
+        path: PATHS.MOCK_SERVER_V2.EDIT.INDEX,
+        // @ts-ignore
+        element: <ProtectedRoute component={MockEditorIndex} mockType={MockType.API} />,
+      },
+      // FILES V2
+      {
+        path: PATHS.FILE_SERVER_V2.INDEX,
+        element: <MockList type={MockType.FILE} />,
+      },
+      {
+        path: PATHS.FILE_SERVER_V2.CREATE.INDEX,
+        element: <ProtectedRoute component={FileMockEditorCreateView} />,
+      },
+      {
+        path: PATHS.FILE_SERVER_V2.EDIT.INDEX,
+        // @ts-ignore
+        element: <ProtectedRoute component={MockEditorIndex} mockType={MockType.FILE} />,
+      },
+    ],
   },
 ];
