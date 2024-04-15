@@ -1,24 +1,41 @@
 import React, { createContext, useState, useContext } from "react";
+import { BottomSheetPlacement } from "../types";
 
 interface BottomSheetContextProps {
   isBottomSheetOpen: boolean;
-  viewAsSidePanel: boolean;
+  isSheetPlacedAtBottom: boolean;
   toggleBottomSheet: () => void;
-  toggleViewAsSidePanel: () => void;
+  toggleSheetPlacement: () => void;
+  openBottomSheet: () => void;
+  changeSheetPlacement: (placement: BottomSheetPlacement) => void;
 }
 
 const BottomSheetContext = createContext<BottomSheetContextProps | undefined>(undefined);
 
-export const BottomSheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const BottomSheetProvider: React.FC<{ children: React.ReactNode; defaultPlacement: BottomSheetPlacement }> = ({
+  children,
+  defaultPlacement,
+}) => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-  const [viewAsSidePanel, setViewSideAsPanel] = useState(false);
+  const [isSheetPlacedAtBottom, setIsSheetPlacedAtBottom] = useState(defaultPlacement === "bottom");
 
   const toggleBottomSheet = () => setIsBottomSheetOpen(!isBottomSheetOpen);
-  const toggleViewAsSidePanel = () => setViewSideAsPanel(!viewAsSidePanel);
+  const toggleSheetPlacement = () => setIsSheetPlacedAtBottom(!isSheetPlacedAtBottom);
+  const openBottomSheet = () => setIsBottomSheetOpen(true);
+  const changeSheetPlacement = (placement: BottomSheetPlacement) => {
+    setIsSheetPlacedAtBottom(placement === "bottom");
+  };
 
   return (
     <BottomSheetContext.Provider
-      value={{ isBottomSheetOpen, viewAsSidePanel, toggleBottomSheet, toggleViewAsSidePanel }}
+      value={{
+        isBottomSheetOpen,
+        isSheetPlacedAtBottom,
+        toggleBottomSheet,
+        toggleSheetPlacement,
+        openBottomSheet,
+        changeSheetPlacement,
+      }}
     >
       {children}
     </BottomSheetContext.Provider>
@@ -28,7 +45,7 @@ export const BottomSheetProvider: React.FC<{ children: React.ReactNode }> = ({ c
 export const useBottomSheetContext = () => {
   const context = useContext(BottomSheetContext);
   if (!context) {
-    throw new Error("useBottomPanel must be used within a BottomPanelProvider");
+    throw new Error("useBottomSheetContext must be used within a BottomSheetProvider");
   }
   return context;
 };
