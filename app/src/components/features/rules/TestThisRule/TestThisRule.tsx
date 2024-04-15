@@ -8,7 +8,7 @@ import { getTabSession } from "actions/ExtensionActions";
 import { useBottomSheetContext } from "componentsV2/BottomSheet";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { TestReport } from "./types";
-import { getTestReportById, getTestReportsByRuleId, saveTestReport } from "./helpers";
+import { getTestReportById, getTestReportsByRuleId, saveTestReport } from "./utils/testReports";
 import { generateDraftSessionTitle } from "views/features/sessions/SessionViewer/utils";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
