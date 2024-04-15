@@ -9,7 +9,7 @@ import { actions } from "store";
 import { getAppMode } from "store/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytics/events/common/rules";
-import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
+import { deleteTestReportByRuleId } from "../TestThisRule/utils/testReports";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
