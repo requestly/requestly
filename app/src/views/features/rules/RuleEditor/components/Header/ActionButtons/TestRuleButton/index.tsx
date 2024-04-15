@@ -10,7 +10,7 @@ import "./index.scss";
 
 export const TestRuleButton = () => {
   const location = useLocation();
-  const { toggleBottomSheet, viewAsSidePanel } = useBottomSheetContext();
+  const { toggleBottomSheet, isSheetPlacedAtBottom } = useBottomSheetContext();
 
   const MODE = getModeData(location).MODE;
 
@@ -22,7 +22,7 @@ export const TestRuleButton = () => {
         type="text"
         icon={<MdOutlineScience />}
         onClick={() => {
-          if (!viewAsSidePanel) {
+          if (isSheetPlacedAtBottom) {
             toggleBottomSheet();
           }
         }}

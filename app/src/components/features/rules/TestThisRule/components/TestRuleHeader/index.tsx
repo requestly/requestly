@@ -24,7 +24,7 @@ export const TestRuleHeader = () => {
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(true);
-  const { viewAsSidePanel } = useBottomSheetContext();
+  const { isSheetPlacedAtBottom } = useBottomSheetContext();
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -88,7 +88,7 @@ export const TestRuleHeader = () => {
             onChange={(event) => setPageUrl(event.target.value)}
             onPressEnter={handleStartTestRule}
             style={{
-              width: viewAsSidePanel ? "280px" : "388px",
+              width: !isSheetPlacedAtBottom ? "280px" : "388px",
             }}
           />
         </Col>
