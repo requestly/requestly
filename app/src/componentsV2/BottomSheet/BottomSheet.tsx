@@ -1,5 +1,5 @@
 import React from "react";
-import { TabsProps, Tabs, Col } from "antd";
+import { Tabs, Col, TabsProps } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { useBottomSheetContext } from "./context";
 import { BiDockRight } from "@react-icons/all-files/bi/BiDockRight";
@@ -9,25 +9,25 @@ import { MdExpandMore } from "@react-icons/all-files/md/MdExpandMore";
 import "./BottomSheet.scss";
 
 export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) => {
-  const { isBottomSheetOpen, viewAsSidePanel, toggleBottomSheet, toggleViewAsSidePanel } = useBottomSheetContext();
+  const { isBottomSheetOpen, isSheetPlacedAtBottom, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
 
   return (
     <Col
-      span={viewAsSidePanel ? 11 : 24}
-      className={`${viewAsSidePanel ? "bottom-sheet-panel-container" : "bottom-sheet-container "}`}
+      span={isSheetPlacedAtBottom ? 24 : 11}
+      className={`${isSheetPlacedAtBottom ? " bottom-sheet-container" : "bottom-sheet-panel-container"}`}
       style={{
-        bottom: viewAsSidePanel ? 0 : isBottomSheetOpen ? 0 : `-335px`,
-        height: viewAsSidePanel ? "100%" : `440px`,
+        bottom: !isSheetPlacedAtBottom ? 0 : isBottomSheetOpen ? 0 : `-335px`,
+        height: isSheetPlacedAtBottom ? "440px" : `100%`,
       }}
     >
       <div className="bottom-sheet-action-buttons">
-        {!viewAsSidePanel && (
+        {isSheetPlacedAtBottom && (
           <RQButton
             iconOnly
             type="default"
             icon={isBottomSheetOpen ? <MdExpandMore /> : <MdExpandLess />}
             onClick={() => {
-              if (!viewAsSidePanel) {
+              if (isSheetPlacedAtBottom) {
                 toggleBottomSheet();
               }
             }}
@@ -37,8 +37,8 @@ export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) =>
         <RQButton
           iconOnly
           type="default"
-          onClick={toggleViewAsSidePanel}
-          icon={viewAsSidePanel ? <BiDockBottom /> : <BiDockRight />}
+          onClick={toggleSheetPlacement}
+          icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
         />
       </div>
 
