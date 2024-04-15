@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation } from "react-router-dom";
 import { Row, Col } from "antd";
@@ -25,13 +25,15 @@ import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
   const location = useLocation();
+  const { state } = location;
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
+  const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
 
-  const { isSheetPlacedAtBottom } = useBottomSheetContext();
+  const { isSheetPlacedAtBottom, openBottomSheet } = useBottomSheetContext();
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
@@ -73,6 +75,19 @@ const RuleEditor = (props) => {
     message: "Discard changes? Changes you made may not be saved.",
     when: isCurrentlySelectedRuleHasUnsavedChanges,
   });
+
+  useEffect(() => {
+    if (isNewRuleCreated) {
+      openBottomSheet();
+      setIsNewRuleCreated(false);
+    }
+  }, [openBottomSheet, isNewRuleCreated]);
+
+  useEffect(() => {
+    if (state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+      setIsNewRuleCreated(true);
+    }
+  }, [state?.source, MODE]);
 
   const renderRuleEditor = () => {
     return (

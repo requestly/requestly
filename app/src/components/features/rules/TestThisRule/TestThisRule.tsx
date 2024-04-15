@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "store/selectors";
 import { Col } from "antd";
@@ -25,20 +24,16 @@ import Logger from "lib/logger";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import APP_CONSTANTS from "config/constants";
 import { trackTestRuleReportDeleted, trackTestRuleReportGenerated, trackTestRuleSessionDraftSaved } from "./analytics";
 import { TestRuleHeader } from "./components/TestRuleHeader";
 import "./TestThisRule.scss";
 
 export const TestThisRule = () => {
-  const location = useLocation();
-  const { state } = location;
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const [testReports, setTestReports] = useState<TestReport[]>(null);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const isNewRuleCreated = useRef(state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE);
 
   const { isSheetPlacedAtBottom, isBottomSheetOpen, openBottomSheet } = useBottomSheetContext();
 
@@ -150,14 +145,6 @@ export const TestThisRule = () => {
   useEffect(() => {
     fetchAndUpdateTestReports();
   }, [fetchAndUpdateTestReports]);
-
-  useEffect(() => {
-    // Open the bottom sheet when a new rule is created
-    if (isNewRuleCreated.current) {
-      openBottomSheet();
-      isNewRuleCreated.current = false;
-    }
-  }, [openBottomSheet]);
 
   return (
     <Col className="test-this-rule-container">
