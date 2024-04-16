@@ -30,7 +30,7 @@ const RuleEditor = (props) => {
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
 
-  const { toggleBottomSheet } = useBottomSheetContext();
+  const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
@@ -59,6 +59,16 @@ const RuleEditor = (props) => {
       setIsNewRuleCreated(false);
     }
   }, [toggleBottomSheet, isNewRuleCreated]);
+
+  useEffect(() => {
+    if (
+      MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
+      state?.source !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
+      !isNewRuleCreated
+    ) {
+      if (isBottomSheetOpen) toggleBottomSheet(false);
+    }
+  }, [toggleBottomSheet, MODE, state, isNewRuleCreated, isBottomSheetOpen]);
 
   useEffect(() => {
     if (state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
