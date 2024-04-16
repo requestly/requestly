@@ -18,7 +18,7 @@ export const MockPickerModal: React.FC<Props> = ({ isVisible, onVisibilityChange
       onCancel={() => {
         onVisibilityChange(false);
       }}
-      width={1200}
+      width={800}
     >
       <div className="mock-picker-modal-body">
         <MockList mockSelectionCallback={mockSelectionCallback} source={MockListSource.PICKER_MODAL} />
