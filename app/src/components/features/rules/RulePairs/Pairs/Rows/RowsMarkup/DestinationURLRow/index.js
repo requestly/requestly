@@ -10,7 +10,6 @@ import { RedirectDestinationType } from "types/rules";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import isEmpty from "is-empty";
 import { isValidUrl } from "utils/FormattingHelper";
-import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import {
   displayFileSelector,
   handleOpenLocalFileInBrowser,
@@ -27,6 +26,7 @@ import { trackDesktopActionInterestCaptured } from "modules/analytics/events/mis
 import { trackMoreInfoClicked } from "modules/analytics/events/misc/moreInfo";
 import LINKS from "config/constants/sub/links";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
+import { MockPickerModal } from "features/mocks/modals";
 import "./index.css";
 
 const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
