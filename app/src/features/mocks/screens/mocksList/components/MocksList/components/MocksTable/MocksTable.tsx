@@ -283,11 +283,6 @@ export const MocksTable: React.FC<Props> = ({
       locale={{
         emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found" />,
       }}
-      onHeaderRow={() => {
-        return {
-          className: "rq-table-header",
-        };
-      }}
       onRow={(record) => {
         return {
           onClick: (e) => {
