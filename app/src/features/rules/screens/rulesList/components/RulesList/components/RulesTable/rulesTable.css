@@ -3,35 +3,37 @@
   justify-content: flex-end;
 }
 
-.rq-content-table-row > button {
+.rq-content-list-table-row.record-pinned .ant-table-selection-column {
+  border-left: 4px solid var(--requestly-color-warning) !important;
+}
+
+.rq-content-list-table-row > button {
   flex-shrink: 0;
   padding: 8px 12px;
 }
 
-.rq-content-table-row .rules-actions-container .more-rule-actions-btn.ant-btn-icon-only svg {
-  color: var(--text-default);
+.rq-content-list-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-pinned {
+  color: var(--requestly-color-warning);
 }
 
-.rq-content-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-pinned {
-  color: var(--warning);
+.rq-content-list-table-row
+  button.ant-btn.ant-btn-icon-only.pin-record-btn.pin-record-btn-pinned:hover
+  svg.record-pinned {
+  color: var(--requestly-color-warning);
 }
 
-.rq-content-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn.pin-record-btn-pinned:hover svg.record-pinned {
-  color: var(--warning);
+.rq-content-list-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-unpinned {
+  color: var(--requestly-color-text-default);
 }
 
-.rq-content-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-unpinned {
-  color: var(--text-default);
-}
-
-.rq-content-table-row .ant-table-cell-with-append:nth-child(2) {
+.rq-content-list-table-row .ant-table-cell-with-append:nth-child(2) {
   display: flex;
   align-items: center;
   flex-direction: row-reverse;
   padding: 16px 0;
 }
 
-.ant-table-body .ant-table-tbody .rq-content-table-row td.ant-table-cell:nth-child(2) {
+.ant-table-body .ant-table-tbody .rq-content-list-table-row td.ant-table-cell:nth-child(2) {
   padding: 12px 0;
 }
 
@@ -39,31 +41,26 @@
   background: #ffff0000;
 }
 
-.rq-content-table-row.ant-table-row td.ant-table-cell:nth-child(2) > button.ant-table-row-expand-icon,
-.rq-content-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
+.rq-content-list-table-row.ant-table-row td.ant-table-cell:nth-child(2) > button.ant-table-row-expand-icon,
+.rq-content-list-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
   flex-shrink: 0;
 }
 
-.rq-content-table-row td.ant-table-cell:nth-child(2) > button.ant-table-row-expand-icon {
+.rq-content-list-table-row td.ant-table-cell:nth-child(2) > button.ant-table-row-expand-icon {
   margin-top: 0px;
 }
 
-.rq-content-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
+.rq-content-list-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
   margin-left: 8px;
   margin-right: 7px;
 }
 
-.rq-content-table-row .ant-table-row .ant-table-row-level-1 td {
-  background: var(--black);
-  border-bottom: 1px solid var(--surface-1);
-}
-
 .rule-more-actions-dropdown .ant-dropdown-menu {
   padding: 4px;
-  background: var(--surface-1);
-  border: 1px solid var(--surface-2);
+  background: var(--requestly-color-surface-0);
+  border: 1px solid var(--requestly-color-surface-1);
   border-radius: var(--border-radius-sm);
-  box-shadow: 0px 8px 12px 0px #0000003d;
+  box-shadow: 0px 8px 12px 0px var(--requestly-color-black-t-20);
 }
 
 .rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
@@ -71,7 +68,7 @@
   height: 36px;
   margin: 0;
   padding: 8px 12px;
-  color: var(--text-default);
+  color: var(--requestly-color-text-default);
   font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.25px;
@@ -81,7 +78,7 @@
 
 .rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:hover {
   border-radius: 4px;
-  background: var(--surface-2);
+  background: var(--requestly-color-surface-1);
 }
 
 .rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item svg {
@@ -92,4 +89,74 @@
 
 .rule-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
   color: var(--danger);
+}
+
+.rule-name-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.rule-name-container .rule-name {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rule-name-container .rule-description-icon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: var(--requestly-color-text-placeholder);
+}
+
+.group-name-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.group-name-container .group-name {
+  max-width: 262px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group-name-container .group-rules-count-details {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--requestly-color-text-placeholder);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  border-radius: 32px;
+  border: 1px solid var(--requestly-color-surface-2);
+  flex-shrink: 0;
+  padding: 2px 4px;
+  cursor: default;
+}
+
+.group-name-container .group-rules-count-details .active-status {
+  width: 10px;
+  height: 10px;
+  background: var(--requestly-color-success);
+  flex-shrink: 0;
+  border-radius: 100%;
+}
+
+.group-name-container .add-rule-btn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  height: 24px;
+}
+
+tr.rq-content-list-table-row.ant-table-row:hover .group-name-container .add-rule-btn {
+  display: flex;
 }

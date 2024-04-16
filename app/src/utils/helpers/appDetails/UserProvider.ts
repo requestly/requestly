@@ -1,5 +1,5 @@
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
-
+/* was created for integrations but no longer used */
 export type User = {
   id: string;
   email?: string;
