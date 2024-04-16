@@ -61,10 +61,14 @@ const RuleEditor = (props) => {
   }, [toggleBottomSheet, isNewRuleCreated]);
 
   useEffect(() => {
-    if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+    if (
+      MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
+      state?.source !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
+      !isNewRuleCreated
+    ) {
       toggleBottomSheet(false);
     }
-  }, [toggleBottomSheet, MODE]);
+  }, [toggleBottomSheet, MODE, state, isNewRuleCreated]);
 
   useEffect(() => {
     if (state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
