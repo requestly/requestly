@@ -1,30 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation } from "react-router-dom";
-import { Row, Col } from "antd";
-import Split from "react-split";
+import { Col } from "antd";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
 import ProCard from "@ant-design/pro-card";
-import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getIsExtensionEnabled } from "store/selectors";
+import {
+  getAppMode,
+  getCurrentlySelectedRuleConfig,
+  getCurrentlySelectedRuleData,
+  getIsCurrentlySelectedRuleHasUnsavedChanges,
+  getIsExtensionEnabled,
+} from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
-import RuleEditorSplitPane from "../../../../components/features/rules/RuleEditorSplitPane";
+import EditorHeader from "./components/Header";
+import APP_CONSTANTS from "config/constants";
+import { getModeData } from "components/features/rules/RuleBuilder/actions";
+import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEditorBottomSheet";
 import "./RuleEditor.css";
 
-const INITIAL_PANE_SIZES = [92, 8];
-
-const RuleEditor = () => {
+const RuleEditor = (props) => {
   const location = useLocation();
+  const { state } = location;
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
+  const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
 
-  const { MODE, RULE_TYPE_TO_CREATE } = getModeData(location, null);
-  const [rulePaneSizes, setRulePaneSizes] = useState(INITIAL_PANE_SIZES);
+  const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
-  const expandRulePane = () => setRulePaneSizes([30, 70]);
-  const collapseRulesPlane = () => setRulePaneSizes(INITIAL_PANE_SIZES);
+  const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
+  const { MODE } = getModeData(location, props.isSharedListViewRule);
 
   useEffect(() => {
     const unloadListener = (e) => {
@@ -44,70 +53,46 @@ const RuleEditor = () => {
     when: isCurrentlySelectedRuleHasUnsavedChanges,
   });
 
-  const renderRuleEditor = () => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      // PATCH
-      // Sometimes RULE_TYPE_TO_CREATE contains the rule id.
-      // For time being, split the string to extract Rule Type. Ex: Redirect_ke4mv -> Redirect
-      const CURRENT_RULE_TYPE = RULE_TYPE_TO_CREATE.split("_")[0];
-
-      switch (CURRENT_RULE_TYPE) {
-        case GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT:
-        case GLOBAL_CONSTANTS.RULE_TYPES.REPLACE:
-        case GLOBAL_CONSTANTS.RULE_TYPES.QUERYPARAM:
-        case GLOBAL_CONSTANTS.RULE_TYPES.CANCEL:
-        case GLOBAL_CONSTANTS.RULE_TYPES.HEADERS:
-        case GLOBAL_CONSTANTS.RULE_TYPES.REQUEST:
-        case GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE:
-        case GLOBAL_CONSTANTS.RULE_TYPES.DELAY:
-        case GLOBAL_CONSTANTS.RULE_TYPES.USERAGENT:
-        case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT:
-          return (
-            <>
-              <Split
-                sizes={rulePaneSizes}
-                minSize={0}
-                gutterSize={20}
-                dragInterval={20}
-                direction="vertical"
-                cursor="row-resize"
-                onDragEnd={(paneSizes) => setRulePaneSizes(paneSizes)}
-                style={{
-                  height: location.pathname.includes("/rules/editor") ? "calc(100vh - 72px)" : "91vh",
-                }}
-              >
-                <Row className="overflow-hidden">
-                  <Col span={24}>
-                    <ProCard className="rule-editor-procard">
-                      <RuleBuilder />
-                    </ProCard>
-                  </Col>
-                </Row>
-                <Row className="overflow-hidden">
-                  <ProCard className="rule-editor-split-procard">
-                    <RuleEditorSplitPane
-                      mode={MODE}
-                      showExecutionLogs={true}
-                      expandRulePane={expandRulePane}
-                      collapseRulesPlane={collapseRulesPlane}
-                      ruleType={CURRENT_RULE_TYPE}
-                    />
-                  </ProCard>
-                </Row>
-              </Split>
-            </>
-          );
-
-        default:
-          break;
-      }
+  useEffect(() => {
+    if (isNewRuleCreated) {
+      toggleBottomSheet();
+      setIsNewRuleCreated(false);
     }
+  }, [toggleBottomSheet, isNewRuleCreated]);
+
+  useEffect(() => {
+    if (
+      MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
+      state?.source !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE &&
+      !isNewRuleCreated
+    ) {
+      if (isBottomSheetOpen) toggleBottomSheet(false);
+    }
+  }, [toggleBottomSheet, MODE, state, isNewRuleCreated, isBottomSheetOpen]);
+
+  useEffect(() => {
+    if (state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+      setIsNewRuleCreated(true);
+    }
+  }, [state?.source, MODE]);
+
+  const renderRuleEditor = () => {
     return (
-      <>
-        <ProCard className="rule-editor-procard">
-          <RuleBuilder />
-        </ProCard>
-      </>
+      <Col className="overflow-hidden h-full">
+        {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
+          <EditorHeader
+            mode={MODE}
+            location={location}
+            currentlySelectedRuleData={currentlySelectedRuleData}
+            currentlySelectedRuleConfig={currentlySelectedRuleConfig}
+          />
+        ) : null}
+        <BottomSheetLayout bottomSheet={<RuleEditorBottomSheet mode={MODE} />}>
+          <ProCard className="rule-editor-procard">
+            <RuleBuilder />
+          </ProCard>
+        </BottomSheetLayout>
+      </Col>
     );
   };
 

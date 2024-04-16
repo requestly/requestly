@@ -2,13 +2,18 @@ import styles from "./index.css";
 import { registerCustomElement, setInnerHTML } from "../utils";
 import { RQDraggableWidget } from "../abstract-classes/draggable-widget";
 import InfoIcon from "../../../resources/icons/info.svg";
+import RQLogo from "../../../resources/icons/rqLogo-blue.svg";
+import RQLogoSmall from "../../../resources/icons/rqLogo-white.svg";
+import MinimizeIcon from "../../../resources/icons/minimze.svg";
+import CheckIcon from "../../../resources/icons/check.svg";
+import PendingIcon from "../../../resources/icons/pending.svg";
 
 enum RQTestRuleWidgetEvent {
   VIEW_RESULTS = "view-results",
 }
 
 const TAG_NAME = "rq-test-rule-widget";
-const DEFAULT_POSITION = { right: 10, top: 10 };
+const DEFAULT_POSITION = { right: 16, top: 16 };
 
 class RQTestRuleWidget extends RQDraggableWidget {
   #testRuleId: string;
@@ -28,14 +33,6 @@ class RQTestRuleWidget extends RQDraggableWidget {
 
     const ruleName = this.shadowRoot.getElementById("rule-name");
     ruleName.textContent = "Testing " + this.attributes.getNamedItem("rule-name")?.value ?? null;
-
-    const iconPath = this.attributes.getNamedItem("icon-path")?.value;
-    if (iconPath) {
-      const iconContainer = this.shadowRoot.getElementById("icon-container");
-      const icon = document.createElement("img");
-      icon.setAttribute("src", iconPath);
-      iconContainer?.appendChild(icon);
-    }
 
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
     this.showRuleAppliedStatus(appliedStatus === "true");
@@ -61,6 +58,14 @@ class RQTestRuleWidget extends RQDraggableWidget {
         this.showRuleAppliedStatus(true);
       }
     });
+
+    this.shadowRoot.getElementById("minimize-button").addEventListener("click", () => {
+      this.toggleMinimize(true);
+    });
+
+    this.shadowRoot.getElementById("minimized-status-btn").addEventListener("click", () => {
+      this.toggleMinimize(false);
+    });
   }
 
   triggerEvent(name: RQTestRuleWidgetEvent, detail?: unknown) {
@@ -69,20 +74,48 @@ class RQTestRuleWidget extends RQDraggableWidget {
 
   showRuleAppliedStatus(appliedStatus: boolean) {
     const ruleStatusContainer = this.shadowRoot.getElementById("rule-status");
+    const minimizedStatusBtn = this.shadowRoot.getElementById("minimized-status-btn");
     if (appliedStatus) {
       setInnerHTML(
         ruleStatusContainer,
         `
-      ✅&nbsp;&nbsp;Rule applied
-    `
+        <span>${CheckIcon}</span>
+        <span id="rule-applied-status">RULE APPLIED</span>
+        `
+      );
+
+      setInnerHTML(
+        minimizedStatusBtn,
+        `
+        <span class="rq-success">${CheckIcon}</span>
+      `
       );
     } else {
       setInnerHTML(
         ruleStatusContainer,
         `
-      ❌&nbsp;&nbsp;Rule not applied yet
-    `
+        <span>${PendingIcon}</span>
+        <span id="rule-not-applied-status">RULE NOT APPLIED YET</span>
+        `
       );
+      setInnerHTML(
+        minimizedStatusBtn,
+        `
+        <span class="rq-warning">${PendingIcon}</span>
+      `
+      );
+    }
+  }
+
+  toggleMinimize(minimize: boolean) {
+    const container = this.shadowRoot.getElementById("container");
+    const minimizedDetails = this.shadowRoot.getElementById("minimized-details");
+    if (minimize) {
+      container.classList.add("minimized");
+      minimizedDetails.classList.add("visible");
+    } else {
+      container.classList.remove("minimized");
+      minimizedDetails.classList.remove("visible");
     }
   }
 
@@ -90,23 +123,32 @@ class RQTestRuleWidget extends RQDraggableWidget {
     return `
     <style>${styles}</style>
     <div id="container">
+      <div id="minimized-details">
+        <div id="minimized-logo">${RQLogoSmall}</div>
+        <button id="minimized-status-btn"></button>
+      </div>
       <div id="heading-container">
-      	<div>
-          <div id="icon-container"></div>
-          <div id="rule-name"></div>
+        <div id="logo-container"> 
+          <span id="heading-logo">${RQLogo}</span>
+          <span id="logo-text">requestly</span>
         </div>
-        <button id="view-result-btn">View Results</button>
+        <div id="actions-container">
+         <button id="minimize-button">${MinimizeIcon}</buttton>
+        </div>
       </div>
       <div id="content-container">
-        <div id="rule-status-container">
+         <div id="rule-status-container">
           <div id="rule-status"></div>
-          <div id="rule-status-comment" class="secondary-text">You can view detailed logs in console</div>
         </div>
-        <div id="info-container" class="hidden">
-          <div id="info-icon">${InfoIcon}</div>
-          <div id="info-text" class="secondary-text"></div>
+        <div id="test-rule-details">
+          <div id="rule-name" class="primary-text"></div>
+          <button id="view-result-btn">View Results</button>
         </div>
       </div>
+        <div id="info-container" class="hidden">
+          <div id="info-icon" class="secondary-text">${InfoIcon}</div>
+          <div id="info-text" class="secondary-text"></div>
+        </div>
     </div>
     `;
   }
