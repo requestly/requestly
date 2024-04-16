@@ -10,7 +10,7 @@ import { BottomSheetPlacement } from "./types";
 import "./BottomSheet.scss";
 
 export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) => {
-  const { isBottomSheetOpen, sheetPlacement, toggleBottomSheet, changeSheetPlacement } = useBottomSheetContext();
+  const { isBottomSheetOpen, sheetPlacement, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
   return (
@@ -38,7 +38,7 @@ export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) =>
         <RQButton
           iconOnly
           type="default"
-          onClick={() => changeSheetPlacement(sheetPlacement)}
+          onClick={toggleSheetPlacement}
           icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
         />
       </div>
