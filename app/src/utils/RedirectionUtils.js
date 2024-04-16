@@ -25,11 +25,14 @@ export const redirectToRules = (navigate, hardRedirect) => {
 };
 
 /* FEATURE - RULES - Create New Rule */
-export const redirectToCreateNewRule = (navigate, ruleType, source) => {
+export const redirectToCreateNewRule = (navigate, ruleType, source, groupId = "") => {
   if (ruleType) {
-    navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`, {
-      state: { source },
-    });
+    navigate(
+      groupId
+        ? `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}?groupId=${groupId}`
+        : `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`,
+      { state: { source } }
+    );
   } else {
     navigate(PATHS.RULES.CREATE);
   }
@@ -431,22 +434,6 @@ export const redirectToDiscord = (navigate, { newTab = true }) => {
 
 export const redirectToTraffic = (navigate) => {
   navigate(PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
-};
-
-export const redirectToCreateNewApp = (navigate) => {
-  navigate(PATHS.MOBILE_DEBUGGER.NEW.ABSOLUTE);
-};
-
-export const redirectToMobileDebuggerHome = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}`);
-};
-
-export const redirectToMobileDebuggerInterceptor = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}/interceptor`);
-};
-
-export const redirectToMobileDebuggerUnauthorized = (navigate, appId) => {
-  navigate(`${PATHS.MOBILE_DEBUGGER.ABSOLUTE}/${appId}/unauthorized`);
 };
 
 export const redirectToDownloadPage = () => {

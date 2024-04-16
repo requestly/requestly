@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation } from "react-router-dom";
-import { Row, Col } from "antd";
+import { Col } from "antd";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
 import ProCard from "@ant-design/pro-card";
 import {
@@ -16,45 +16,24 @@ import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationM
 import EditorHeader from "./components/Header";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import { BottomSheet, useBottomSheetContext } from "componentsV2/BottomSheet";
-import { TestThisRule } from "components/features/rules/TestThisRule";
-import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
+import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEditorBottomSheet";
 import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
   const location = useLocation();
+  const { state } = location;
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
+  const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
 
-  const { isSheetPlacedAtBottom } = useBottomSheetContext();
+  const { toggleBottomSheet } = useBottomSheetContext();
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
-
-  const BOTTOM_SHEET_TAB_KEYS = {
-    TEST_RULE: "TEST_RULE",
-  };
-
-  const bottomSheetTabItems = useMemo(() => {
-    return [
-      {
-        key: BOTTOM_SHEET_TAB_KEYS.TEST_RULE,
-        label: (
-          <div className="bottom-sheet-tab">
-            <MdOutlineScience />
-            <span>Test</span>
-          </div>
-        ),
-        children: <TestThisRule />,
-        forceRender: true,
-      },
-    ];
-  }, [BOTTOM_SHEET_TAB_KEYS.TEST_RULE]);
 
   useEffect(() => {
     const unloadListener = (e) => {
@@ -74,6 +53,19 @@ const RuleEditor = (props) => {
     when: isCurrentlySelectedRuleHasUnsavedChanges,
   });
 
+  useEffect(() => {
+    if (isNewRuleCreated) {
+      toggleBottomSheet();
+      setIsNewRuleCreated(false);
+    }
+  }, [toggleBottomSheet, isNewRuleCreated]);
+
+  useEffect(() => {
+    if (state?.source === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+      setIsNewRuleCreated(true);
+    }
+  }, [state?.source, MODE]);
+
   const renderRuleEditor = () => {
     return (
       <Col className="overflow-hidden h-full">
@@ -85,16 +77,11 @@ const RuleEditor = (props) => {
             currentlySelectedRuleConfig={currentlySelectedRuleConfig}
           />
         ) : null}
-        <Row style={{ height: "inherit", position: "relative" }}>
-          <Col span={isSheetPlacedAtBottom ? 24 : 13}>
-            <ProCard className="rule-editor-procard">
-              <RuleBuilder />
-            </ProCard>
-          </Col>
-          {MODE === RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE) && (
-            <BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />
-          )}
-        </Row>
+        <BottomSheetLayout bottomSheet={<RuleEditorBottomSheet mode={MODE} />}>
+          <ProCard className="rule-editor-procard">
+            <RuleBuilder />
+          </ProCard>
+        </BottomSheetLayout>
       </Col>
     );
   };

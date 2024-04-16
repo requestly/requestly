@@ -25,45 +25,38 @@ const ContentListHeader: React.FC<ContentListHeaderProps> = ({
   activeFilter,
 }) => {
   return (
-    <div>
-      <Row justify="space-between" align="bottom" className="content-header-container">
-        <Col span={12}>
-          <div className="content-header-title">{title}</div>
-          <div className="content-header-subtitle">{subtitle}</div>
-        </Col>
-        <Col className="ml-auto">
-          <Row align="middle" className="content-header-actions">
-            {actions.map((action) => (
-              <Col>{action}</Col>
-            ))}
-          </Row>
-        </Col>
-      </Row>
-      <Row align="middle" className="filters-container">
+    <div className="rq-content-list-header">
+      <div className="rq-content-list-header-filters">
         {searchValue !== undefined ? (
           <Input
             allowClear
             prefix={<SearchOutlined />}
-            placeholder="Search by rule name"
+            placeholder="Search"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="search-input"
+            className="rq-content-list-header-search-input"
           />
         ) : null}
-
-        {/* TODO: refactor with antd's Segmented component */}
-        <div className="filters">
+        <div className="filter-btns">
           {filters.length > 0
             ? filters.map(({ key, label, onClick }) => (
-                <div className={`filter-btn ${key === activeFilter ? "active" : ""}`}>
-                  <Button key={key} onClick={onClick} type={key === activeFilter ? "primary" : "text"}>
-                    {label}
-                  </Button>
-                </div>
+                <Button
+                  className={`filter-btn ${key === activeFilter ? "active" : ""}`}
+                  key={key}
+                  onClick={onClick}
+                  type={key === activeFilter ? "default" : "text"}
+                >
+                  {label}
+                </Button>
               ))
             : null}
         </div>
-      </Row>
+      </div>
+      <div className="rq-content-list-header-actions">
+        {actions.map((action) => (
+          <Col>{action}</Col>
+        ))}
+      </div>
     </div>
   );
 };

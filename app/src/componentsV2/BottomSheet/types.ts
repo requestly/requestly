@@ -1,1 +1,4 @@
-export type BottomSheetPlacement = "right" | "bottom";
+export enum BottomSheetPlacement {
+  RIGHT = "right",
+  BOTTOM = "bottom",
+}

@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { Checkbox, Col, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
-import { useBottomSheetContext } from "componentsV2/BottomSheet";
+import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { trackTestRuleClicked } from "../../analytics";
 import {
   getCurrentlySelectedRuleData,
@@ -24,7 +24,7 @@ export const TestRuleHeader = () => {
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(true);
-  const { isSheetPlacedAtBottom } = useBottomSheetContext();
+  const { sheetPlacement } = useBottomSheetContext();
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -88,7 +88,7 @@ export const TestRuleHeader = () => {
             onChange={(event) => setPageUrl(event.target.value)}
             onPressEnter={handleStartTestRule}
             style={{
-              width: isSheetPlacedAtBottom ? "388px" : "280px",
+              width: sheetPlacement === BottomSheetPlacement.RIGHT ? "280px" : "388px",
             }}
           />
         </Col>

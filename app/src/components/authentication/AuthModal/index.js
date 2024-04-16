@@ -6,6 +6,7 @@ import { AuthScreen } from "features/onboarding";
 import "./AuthModal.css";
 import closeIcon from "../../../assets/images/modal/close.svg";
 import APP_CONSTANTS from "../../../config/constants";
+import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
 
 const AuthModal = ({
   isOpen,
@@ -22,6 +23,12 @@ const AuthModal = ({
       toggle();
     }
   }, [user.loggedIn, toggle]);
+
+  useEffect(() => {
+    if (isOpen) {
+      trackAuthModalShownEvent(eventSource);
+    }
+  }, [isOpen, eventSource]);
 
   return (
     <>
