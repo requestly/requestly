@@ -13,5 +13,47 @@
         display: none;
       }
     }
+
+    .rq-mocks-list-table-row {
+      font-size: 13px;
+
+      .mock-tag {
+        font-size: 13px;
+        font-weight: 500;
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius-sm);
+        padding: 5px;
+      }
+
+      .mock-actions-container {
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.2s ease-in-out;
+
+        .ant-btn-icon-only {
+          &:hover {
+            background: var(--border);
+          }
+
+          svg {
+            color: var(--text-gray);
+            transition: 0.2s ease-in-out;
+          }
+
+          &:hover svg {
+            color: var(--white);
+          }
+        }
+      }
+
+      .mock-table-user-icon span {
+        margin-left: 15px;
+      }
+    }
+
+    .rq-mocks-list-table-row:hover .mock-actions-container {
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
 }

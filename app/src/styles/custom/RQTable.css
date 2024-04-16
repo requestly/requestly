@@ -55,6 +55,7 @@
   border-color: var(--border);
 }
 
+/* TODO: cleanup after new mock server table is live */
 .rq-table-row .mock-actions-container {
   opacity: 0;
   pointer-events: none;
