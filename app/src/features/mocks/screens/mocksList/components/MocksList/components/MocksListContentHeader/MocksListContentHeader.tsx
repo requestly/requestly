@@ -13,8 +13,8 @@ interface Props {
   mockType?: string;
   handleUploadAction?: () => void;
   handleCreateNew: () => void;
-  searchValue: string;
-  setSearchValue: (s: string) => void;
+  searchValue?: string;
+  setSearchValue?: (s: string) => void;
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
@@ -22,7 +22,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
   handleCreateNew,
   handleUploadAction,
   searchValue,
-  setSearchValue,
+  setSearchValue = () => {},
 }) => {
   const user = useSelector(getUserAuthDetails);
 
