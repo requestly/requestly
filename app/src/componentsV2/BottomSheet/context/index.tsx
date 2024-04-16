@@ -5,7 +5,7 @@ interface BottomSheetContextProps {
   isBottomSheetOpen: boolean;
   sheetPlacement: BottomSheetPlacement;
   toggleBottomSheet: () => void;
-  changeSheetPlacement: (placement: BottomSheetPlacement) => void;
+  toggleSheetPlacement: () => void;
 }
 
 const BottomSheetContext = createContext<BottomSheetContextProps | undefined>(undefined);
@@ -18,8 +18,8 @@ export const BottomSheetProvider: React.FC<{ children: React.ReactNode; defaultP
   const [sheetPlacement, setSheetPlacement] = useState(defaultPlacement);
 
   const toggleBottomSheet = () => setIsBottomSheetOpen(!isBottomSheetOpen);
-  const changeSheetPlacement = (placement: BottomSheetPlacement) => {
-    if (placement === BottomSheetPlacement.BOTTOM) {
+  const toggleSheetPlacement = () => {
+    if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
       setSheetPlacement(BottomSheetPlacement.RIGHT);
     } else {
       setSheetPlacement(BottomSheetPlacement.BOTTOM);
@@ -32,7 +32,7 @@ export const BottomSheetProvider: React.FC<{ children: React.ReactNode; defaultP
         isBottomSheetOpen,
         toggleBottomSheet,
         sheetPlacement,
-        changeSheetPlacement,
+        toggleSheetPlacement,
       }}
     >
       {children}
