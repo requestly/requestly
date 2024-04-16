@@ -1,1 +1,1 @@
-export { default as MocksListScreen } from "./MocksList";
+export { default as MocksListScreen } from "./MocksListScreen";
