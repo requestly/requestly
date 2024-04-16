@@ -241,6 +241,19 @@ a {
 
 #rq-applied-rules-list {
   margin-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+#rq-applied-rules-list::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+#rq-applied-rules-list::-webkit-scrollbar-thumb {
+  background: #353535;
+  border-radius: 8px;
 }
 
 #rq-applied-rules-list-header {
