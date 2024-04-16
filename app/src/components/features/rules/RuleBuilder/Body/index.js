@@ -22,9 +22,9 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
   const getEventObject = (name, value) => ({ target: { name, value } });
 
   const handleRuleNameChange = useCallback(
-    (name) => {
+    (name, warnForUnsavedChanges = true) => {
       const event = getEventObject("name", name);
-      onChangeHandler(currentlySelectedRuleData, dispatch, event);
+      onChangeHandler(currentlySelectedRuleData, dispatch, event, warnForUnsavedChanges);
     },
     [dispatch, currentlySelectedRuleData]
   );

@@ -202,15 +202,6 @@ export const TRASH = {
   RULES_RECOVERED: "trash_rules_recovered",
 };
 
-export const MOBILE_DEBUGGER = {
-  SDK_KEY_CREATED: "sdk_key_created",
-  SDK_KEY_CREATED_FAILURE: "sdk_key_created_failure",
-  DEVICE_ID_SELECTED: "device_id_selected",
-  DEVICE_ID_SELECTED_FAILURE: "device_id_selected_failure",
-  SHARE_CLICKED: "mobile_app_share_clicked",
-  SHARED: "mobile_app_shared",
-};
-
 export const EXECUTION_LOGS = {
   FETCHED: "execution_logs_fetched",
 };

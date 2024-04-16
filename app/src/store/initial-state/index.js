@@ -153,17 +153,6 @@ const INITIAL_STATE = {
   // country of current user
   country: "",
 
-  mobileDebugger: {
-    app: {
-      id: null,
-      name: null,
-      platform: null,
-    },
-    interceptor: {
-      deviceId: null,
-    },
-  },
-
   initializations: {
     auth: false,
   },

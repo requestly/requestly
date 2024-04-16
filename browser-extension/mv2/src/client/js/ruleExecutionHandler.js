@@ -1,6 +1,7 @@
 RQ.RuleExecutionHandler = {};
 RQ.RuleExecutionHandler.appliedRuleIds = new Set();
 RQ.implicitTestRuleFlowEnabled = false;
+RQ.implictTestRuleWidgetConfig = null;
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
   const eventName = "rule_executed";
@@ -27,10 +28,12 @@ RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
   }
 };
 
-RQ.RuleExecutionHandler.setup = () => {
+RQ.RuleExecutionHandler.setup = async () => {
   if (window !== window.top) {
     return;
   }
+
+  await getImplicitTestRuleWidgetConfig();
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
@@ -59,8 +62,13 @@ RQ.RuleExecutionHandler.setup = () => {
         break;
 
       case RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
-        RQ.implicitTestRuleFlowEnabled = true;
-        RQ.RuleExecutionHandler.showImplicitTestRuleWidget();
+        if (RQ.implictTestRuleWidgetConfig) {
+          if (RQ.implictTestRuleWidgetConfig.visibility !== RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+            RQ.implicitTestRuleFlowEnabled = true;
+            RQ.RuleExecutionHandler.showImplicitTestRuleWidget();
+          }
+        }
+
         break;
     }
 
@@ -120,16 +128,11 @@ RQ.RuleExecutionHandler.showImplicitTestRuleWidget = async () => {
   document.documentElement.appendChild(testRuleWidget);
 
   testRuleWidget.addEventListener("view_rule_in_editor", (data) => {
-    chrome.runtime.sendMessage({
-      action: RQ.EXTENSION_MESSAGES.VIEW_RULE_IN_EDITOR,
-      ruleId: data.detail.ruleId,
-    });
+    window.open(`${RQ.configs.WEB_URL}/rules/editor/edit/${data.detail.ruleId}`, "_blank");
   });
 
   testRuleWidget.addEventListener("open_app_settings", () => {
-    chrome.runtime.sendMessage({
-      action: RQ.EXTENSION_MESSAGES.OPEN_APP_SETTINGS,
-    });
+    window.open(`${RQ.configs.WEB_URL}/settings/global-settings`, "_blank");
   });
 };
 
@@ -196,23 +199,27 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
   }
 };
 
-const checkAppliedRuleAndNotifyWidget = (rule) => {
-  chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
-    let notifyWidget = true;
-    const implicitTestRuleConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+const getImplicitTestRuleWidgetConfig = async () => {
+  await chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+    RQ.implictTestRuleWidgetConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+  });
+};
 
-    if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+const checkAppliedRuleAndNotifyWidget = (rule) => {
+  let notifyWidget = true;
+  const implicitTestRuleConfig = RQ.implictTestRuleWidgetConfig;
+
+  if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+    notifyWidget = false;
+    return;
+  }
+
+  if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
+    if (!implicitTestRuleConfig.ruleTypes.includes(rule.ruleType)) {
       notifyWidget = false;
       return;
     }
+  }
 
-    if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
-      if (!implicitTestRuleConfig.ruleTypes.includes(rule.ruleType)) {
-        notifyWidget = false;
-        return;
-      }
-    }
-
-    if (notifyWidget) RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
-  });
+  if (notifyWidget) RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
 };
