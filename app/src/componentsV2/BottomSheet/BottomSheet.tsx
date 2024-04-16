@@ -38,12 +38,12 @@ export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) =>
         <RQButton
           iconOnly
           type="default"
-          onClick={toggleSheetPlacement}
+          onClick={() => toggleSheetPlacement()}
           icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
         />
       </div>
 
-      <Tabs defaultActiveKey={defaultActiveKey} items={items} type="card" />
+      <Tabs defaultActiveKey={defaultActiveKey} items={items} type="card" onTabClick={() => toggleBottomSheet(true)} />
     </div>
   );
 };
