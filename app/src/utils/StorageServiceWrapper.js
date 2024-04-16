@@ -108,7 +108,7 @@ class StorageServiceWrapper {
     };
     const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
       workspaceId: options.workspaceId,
-    }).then(this.saveRecord(formattedObject));
+    }).then(() => this.saveRecord(formattedObject));
     this.trackPromise(promise);
     return promise;
   }
@@ -120,7 +120,7 @@ class StorageServiceWrapper {
     });
     const promise = doSyncRecords(formattedObject, SYNC_CONSTANTS.SYNC_TYPES.UPDATE_RECORDS, this.appMode, {
       workspaceId: options.workspaceId,
-    }).then(this.saveRecord(formattedObject));
+    }).then(() => this.saveRecord(formattedObject));
     this.trackPromise(promise);
     return promise;
   }

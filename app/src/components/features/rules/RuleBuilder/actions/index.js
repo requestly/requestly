@@ -42,14 +42,15 @@ export const initiateBlankCurrentlySelectedRule = (
   dispatch,
   currentlySelectedRuleConfig,
   RULE_TYPE_TO_CREATE,
-  setCurrentlySelectedRule
+  setCurrentlySelectedRule,
+  groupId = ""
 ) => {
   if (currentlySelectedRuleConfig) {
     const extraRuleConfig = getRuleLevelInitialConfigs(RULE_TYPE_TO_CREATE);
     let blankRuleFormat = {
       creationDate: generateObjectCreationDate(),
       description: "",
-      groupId: "",
+      groupId: groupId,
       id: `${RULE_TYPE_TO_CREATE}_${generateObjectId()}`,
       isSample: false,
       name: "",

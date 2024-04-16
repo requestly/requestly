@@ -185,7 +185,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   return (
     <Modal
       open={isOpen}
-      onCancel={() => {
+      onCancel={(e) => {
+        e?.stopPropagation?.();
         setOpenPopup(false);
         setPostRequestMessage(null);
       }}
