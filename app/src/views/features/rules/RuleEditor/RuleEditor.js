@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation } from "react-router-dom";
 import { Col } from "antd";
@@ -16,11 +16,8 @@ import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationM
 import EditorHeader from "./components/Header";
 import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
-import { BottomSheet, BottomSheetLayout, BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
-import { TestThisRule } from "components/features/rules/TestThisRule";
-import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
-import FEATURES from "config/constants/sub/features";
+import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
+import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEditorBottomSheet";
 import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
@@ -33,30 +30,10 @@ const RuleEditor = (props) => {
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
 
-  const { sheetPlacement, toggleBottomSheet } = useBottomSheetContext();
+  const { toggleBottomSheet } = useBottomSheetContext();
 
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
   const { MODE } = getModeData(location, props.isSharedListViewRule);
-
-  const BOTTOM_SHEET_TAB_KEYS = {
-    TEST_RULE: "TEST_RULE",
-  };
-
-  const bottomSheetTabItems = useMemo(() => {
-    return [
-      {
-        key: BOTTOM_SHEET_TAB_KEYS.TEST_RULE,
-        label: (
-          <div className="bottom-sheet-tab">
-            <MdOutlineScience />
-            <span>Test</span>
-          </div>
-        ),
-        children: <TestThisRule />,
-        forceRender: true,
-      },
-    ];
-  }, [BOTTOM_SHEET_TAB_KEYS.TEST_RULE]);
 
   useEffect(() => {
     const unloadListener = (e) => {
@@ -100,12 +77,7 @@ const RuleEditor = (props) => {
             currentlySelectedRuleConfig={currentlySelectedRuleConfig}
           />
         ) : null}
-        <BottomSheetLayout
-          contentWidth={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 13}
-          sheetWidth={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 11}
-          isSheetHidden={!(MODE === RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE))}
-          bottomSheet={<BottomSheet defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.TEST_RULE} items={bottomSheetTabItems} />}
-        >
+        <BottomSheetLayout bottomSheet={<RuleEditorBottomSheet mode={MODE} />}>
           <ProCard className="rule-editor-procard">
             <RuleBuilder />
           </ProCard>
