@@ -123,10 +123,10 @@ export const TestThisRule = () => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
       (message: { testReportId: string; testPageTabId: string; record: boolean; appliedStatus: boolean }) => {
-        fetchAndUpdateTestReports(message.testReportId);
+        fetchAndUpdateTestReports(message?.record ? message.testReportId : null);
         trackTestRuleReportGenerated(currentlySelectedRuleData.ruleType, message.appliedStatus);
         if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
-          toggleBottomSheet();
+          toggleBottomSheet(true);
         }
         if (message.record) {
           handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId);
