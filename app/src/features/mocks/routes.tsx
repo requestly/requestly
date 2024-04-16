@@ -102,29 +102,10 @@ export const mockServerRoutes: RouteObject[] = [
         path: PATHS.MOCK_SERVER_V2.INDEX,
         element: <MocksListScreen type={MockType.API} />,
       },
-      {
-        path: PATHS.MOCK_SERVER_V2.CREATE.INDEX,
-        // @ts-ignore
-        element: <ProtectedRoute component={MockEditorIndex} isNew={true} mockType={MockType.API} />,
-      },
-      {
-        path: PATHS.MOCK_SERVER_V2.EDIT.INDEX,
-        // @ts-ignore
-        element: <ProtectedRoute component={MockEditorIndex} mockType={MockType.API} />,
-      },
       // FILES V2
       {
         path: PATHS.FILE_SERVER_V2.INDEX,
         element: <MocksListScreen type={MockType.FILE} />,
-      },
-      {
-        path: PATHS.FILE_SERVER_V2.CREATE.INDEX,
-        element: <ProtectedRoute component={FileMockEditorCreateView} />,
-      },
-      {
-        path: PATHS.FILE_SERVER_V2.EDIT.INDEX,
-        // @ts-ignore
-        element: <ProtectedRoute component={MockEditorIndex} mockType={MockType.FILE} />,
       },
     ],
   },
