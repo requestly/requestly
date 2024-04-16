@@ -28,12 +28,12 @@ RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
   }
 };
 
-RQ.RuleExecutionHandler.setup = () => {
+RQ.RuleExecutionHandler.setup = async () => {
   if (window !== window.top) {
     return;
   }
 
-  getImplicitTestRuleWidgetConfig();
+  await getImplicitTestRuleWidgetConfig();
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
@@ -199,8 +199,8 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
   }
 };
 
-const getImplicitTestRuleWidgetConfig = () => {
-  chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+const getImplicitTestRuleWidgetConfig = async () => {
+  await chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
     RQ.implictTestRuleWidgetConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
   });
 };
