@@ -23,6 +23,11 @@ RQ.CONSTANTS.MESSAGE_HANDLER_ACTIONS = {
   SUBMIT_ATTR: "submitAttr",
 };
 
+RQ.CONSTANTS.TEST_THIS_RULE_MODES = {
+  EXPLICIT: "explicit",
+  IMPLICIT: "implicit",
+};
+
 // Variables exposed directly on RQ object
 RQ.CLIENT_MESSAGES = {
   ADD_EVENT: "addEvent",

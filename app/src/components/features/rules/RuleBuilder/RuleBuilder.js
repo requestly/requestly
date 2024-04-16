@@ -2,9 +2,8 @@ import React, { useEffect, useState, useCallback, useRef, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import isEmpty from "is-empty";
-import { Button, Col, Row } from "antd";
+import { Col, Row } from "antd";
 import { actions } from "../../../../../../app/src/store";
-import Header from "./Header";
 import Body from "./Body";
 import ChangeRuleGroupModal from "../ChangeRuleGroupModal";
 import SpinnerCard from "../../../misc/SpinnerCard";
@@ -36,9 +35,8 @@ import {
 } from "modules/analytics/events/common/rules";
 import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import DownArrow from "assets/icons/down-arrow.svg?react";
 import { useHasChanged } from "hooks";
-import Help from "./Help";
+import { m } from "framer-motion";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -72,7 +70,7 @@ const RuleBuilder = (props) => {
   const [fetchAllRulesComplete, setFetchAllRulesComplete] = useState(false);
   const [isChangeRuleGroupModalActive, setIsChangeRuleGroupModalActive] = useState(false);
   const [startWalkthrough, setStartWalkthrough] = useState(false);
-  const [showDocs, setShowDocs] = useState(false);
+  const [showDocs] = useState(false);
   const isDocsVisible = useMemo(() => {
     return enableDocs && showDocs;
   }, [enableDocs, showDocs]);
@@ -238,48 +236,18 @@ const RuleBuilder = (props) => {
   }
 
   return (
-    <>
+    <m.div layout transition={{ type: "linear", duration: 0.2 }} style={{ height: "inherit" }}>
       <ProductWalkthrough
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
       />
-      {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
-        <Header
-          mode={MODE}
-          location={location}
-          currentlySelectedRuleData={currentlySelectedRuleData}
-          currentlySelectedRuleConfig={currentlySelectedRuleConfig}
-        />
-      ) : null}
-
-      <Row className="w-full relative">
-        <Col span={isDocsVisible ? 17 : 24}>
+      {/* TODO: NEEDS REFACTORING */}
+      <Row className="w-full relative rule-builder-container">
+        <Col span={24} className="rule-builder-body-wrapper">
           <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
         </Col>
-
-        {enableDocs ? (
-          <>
-            {!showDocs ? (
-              <Button
-                className="rule-editor-help-btn"
-                onClick={() => {
-                  setShowDocs(true);
-                }}
-              >
-                Help
-                <span>
-                  <DownArrow />
-                </span>
-              </Button>
-            ) : (
-              <Col span={7}>
-                <Help setShowDocs={setShowDocs} ruleType={currentlySelectedRuleData.ruleType} />
-              </Col>
-            )}
-          </>
-        ) : null}
       </Row>
 
       {/* Modals */}
@@ -290,7 +258,7 @@ const RuleBuilder = (props) => {
           mode="CURRENT_RULE"
         />
       ) : null}
-    </>
+    </m.div>
   );
 };
 
