@@ -29,7 +29,6 @@ interface Props {
   isLoading?: boolean;
   mocks: RQMockMetadataSchema[];
   mockType?: string;
-  handleCreateNew: () => void;
   handleNameClick: (mockId: string, isOldMock: boolean) => void;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;
   handleDeleteAction?: (mock: RQMockMetadataSchema) => void;
@@ -275,6 +274,7 @@ export const MocksTable: React.FC<Props> = ({
       id="mock-list-table"
       pagination={false}
       size="middle"
+      className="rq-mocks-list-table"
       customRowClassName={() => "rq-mocks-list-table-row"}
       scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(277px + 68px)" : "277px"})` }} // 68px is Feature limit banner height
       // @ts-ignore
