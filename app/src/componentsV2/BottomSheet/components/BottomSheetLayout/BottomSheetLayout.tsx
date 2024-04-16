@@ -1,26 +1,21 @@
 import React, { ReactNode } from "react";
 import { Col, Row } from "antd";
+import { useBottomSheetContext } from "componentsV2/BottomSheet/context";
+import { BottomSheetPlacement } from "componentsV2/BottomSheet/types";
 import "./BottomSheetLayout.scss";
 
 interface Props {
   bottomSheet: ReactNode;
   children: ReactNode;
-  sheetWidth: number;
-  contentWidth: number;
-  isSheetHidden?: boolean;
 }
 
-export const BottomSheetLayout: React.FC<Props> = ({
-  bottomSheet,
-  children,
-  isSheetHidden = false,
-  sheetWidth,
-  contentWidth,
-}) => {
+export const BottomSheetLayout: React.FC<Props> = ({ bottomSheet, children }) => {
+  const { sheetPlacement } = useBottomSheetContext();
+
   return (
     <Row className="bottomsheet-layout-container">
-      <Col span={contentWidth}>{children}</Col>
-      {!isSheetHidden && <Col span={sheetWidth}>{bottomSheet}</Col>}
+      <Col span={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 13}>{children}</Col>
+      <Col span={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 11}>{bottomSheet}</Col>
     </Row>
   );
 };
