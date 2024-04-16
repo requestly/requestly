@@ -9,7 +9,6 @@ import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleError
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
-import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import "./RuleBuilderBody.css";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
@@ -19,7 +18,6 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
-  const { sheetPlacement } = useBottomSheetContext();
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
@@ -70,7 +68,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
         className={`rule-builder-body ${isSharedListView ? "preview-rule-builder-body" : ""}`}
         id="rule-builder-body"
       >
-        <Col span={24} style={sheetPlacement === BottomSheetPlacement.BOTTOM ? { maxWidth: "840px" } : null}>
+        <Col span={24} style={{ maxWidth: "840px", minWidth: "300px" }}>
           <CardBody>
             {/* Info for some specific rule types */}
             <RuleInfoBanner appMode={appMode} ruleType={currentlySelectedRuleConfig.TYPE} />
