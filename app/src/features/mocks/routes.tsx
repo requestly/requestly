@@ -11,6 +11,7 @@ import MockList from "components/features/mocksV2/MockList";
 import { MockType } from "components/features/mocksV2/types";
 import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
 import MocksFeaturecontainer from "./container";
+import { MocksListScreen } from "./screens/mocksList";
 
 export const mockServerRoutes: RouteObject[] = [
   {
@@ -99,7 +100,7 @@ export const mockServerRoutes: RouteObject[] = [
       {
         index: true,
         path: PATHS.MOCK_SERVER_V2.INDEX,
-        element: <MockList type={MockType.API} />,
+        element: <MocksListScreen type={MockType.API} />,
       },
       {
         path: PATHS.MOCK_SERVER_V2.CREATE.INDEX,
@@ -114,7 +115,7 @@ export const mockServerRoutes: RouteObject[] = [
       // FILES V2
       {
         path: PATHS.FILE_SERVER_V2.INDEX,
-        element: <MockList type={MockType.FILE} />,
+        element: <MocksListScreen type={MockType.FILE} />,
       },
       {
         path: PATHS.FILE_SERVER_V2.CREATE.INDEX,
