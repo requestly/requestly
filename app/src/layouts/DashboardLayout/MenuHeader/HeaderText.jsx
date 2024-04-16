@@ -1,13 +1,12 @@
 import { useSelector } from "react-redux";
 import { Col, Row } from "antd";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { isPricingPage, isMobileInterceptorPage, isGoodbyePage } from "utils/PathUtils";
+import { Link, useNavigate } from "react-router-dom";
+import { isPricingPage, isGoodbyePage } from "utils/PathUtils";
 import RQ_LOGO from "assets/img/brand/rq_logo_full.svg";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode } from "store/selectors";
 import APP_CONSTANTS from "../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { FaStackOverflow } from "@react-icons/all-files/fa/FaStackOverflow";
-import MobileDebuggerAppSelector from "components/features/mobileDebugger/components/AppSelector";
 import { YoutubeFilled } from "@ant-design/icons";
 import { trackPromoHeaderClicked } from "modules/analytics/events/misc/promoHeader";
 import DesktopAppProxyInfo from "components/sections/Navbars/NavbarRightContent/DesktopAppProxyInfo";
@@ -18,12 +17,10 @@ const SHOW_STACK_OVERFLOW_BLOG_BANNER = false;
 const SHOW_MONTHLY_UPDATE_BANNER = false;
 
 export default function HeaderText() {
-  const location = useLocation();
   const navigate = useNavigate();
 
   // GLOBAL STATE
   const appMode = useSelector(getAppMode);
-  const user = useSelector(getUserAuthDetails);
 
   const renderSessionRecordingPromo = () => {
     return (
@@ -132,26 +129,12 @@ export default function HeaderText() {
     );
   };
 
-  const renderMobileInterceptorAppSelector = () => {
-    return (
-      <>
-        <Col span={4}>
-          <MobileDebuggerAppSelector />
-        </Col>
-      </>
-    );
-  };
-
   if (isPricingPage() || isGoodbyePage()) {
     return renderRequestlyFullLogo();
   }
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
     return renderProxyInfo();
-  }
-
-  if (isMobileInterceptorPage(location.pathname) && user.details?.isLoggedIn) {
-    return renderMobileInterceptorAppSelector();
   }
 
   if (SHOW_SESSION_RECORDING_BANNER) {

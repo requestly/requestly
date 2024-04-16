@@ -33,6 +33,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -47,6 +48,7 @@ const DashboardContent = () => {
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
+  const onboardingVariation = useFeatureValue("activation_without_onboarding", "variant");
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -187,7 +189,9 @@ const DashboardContent = () => {
               {...activeModals.pricingModal.props}
             />
           ) : null}
-          {shouldShowOnboarding() &&
+
+          {onboardingVariation === "control" &&
+            shouldShowOnboarding() &&
             appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
             !appOnboardingDetails.isOnboardingCompleted && (
               <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />

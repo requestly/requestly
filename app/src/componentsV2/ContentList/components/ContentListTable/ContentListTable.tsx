@@ -5,6 +5,7 @@ import { BulkActionBarConfig } from "./types";
 import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
 import "./contentListTable.scss";
 import { useContentListTableContext } from "./context";
+import Logger from "lib/logger";
 
 export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   id: string;
@@ -36,7 +37,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
 
   const handleOnExpandClick = useCallback(
     (expanded: boolean, record: DataType) => {
-      console.log("handleOnExpandClick", expanded, record);
+      Logger.log("handleOnExpandClick", expanded, record);
       let updatedExpandedRowKeys = new Set(expandedRowKeys);
       if (expanded) {
         updatedExpandedRowKeys = updatedExpandedRowKeys.add(record[rowKey]);
@@ -63,14 +64,14 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   }, [id]);
 
   return (
-    <>
+    <div className="rq-content-list-table-container">
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRows} />}
       <Table
-        className="rq-content-table"
+        className="rq-content-list-table"
         onHeaderRow={() => ({
-          className: "rq-content-table-header",
+          className: "rq-content-list-table-header",
         })}
-        rowClassName={(record) => `rq-content-table-row ${customRowClassName?.(record)}`}
+        rowClassName={(record) => `rq-content-list-table-row ${customRowClassName?.(record)}`}
         size={size}
         loading={loading}
         rowKey={rowKey}
@@ -95,7 +96,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
           expandedRowKeys,
         }}
       />
-    </>
+    </div>
   );
 };
 

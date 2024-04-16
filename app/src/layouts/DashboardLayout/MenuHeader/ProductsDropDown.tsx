@@ -21,7 +21,7 @@ import {
 } from "@ant-design/icons";
 
 import "./ProductsDropDown.scss";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import PATHS from "config/constants/sub/paths";
 import { DesktopAppPromoModal } from "./DesktopAppPromoModal";
 import {
@@ -86,73 +86,76 @@ const Products: React.FC<ProductsProps> = (props) => {
     setIsDesktopAppPromoModalOpen(false);
   }, []);
 
-  const products: ProductProps[] = [
-    {
-      title: "Web Debugger",
-      icon: RulesImg,
-      description: "Lightweight web debugging proxy to modify HTTPs request & response.",
-      handleClick: useCallback(() => {
-        trackProductClickedInDropDown("web_debugger");
-        props.toggleDropDown();
-        redirectToRules(navigate);
-      }, [navigate, props]),
-    },
-    {
-      title: (
-        <>
-          SessionBook <RQBadge badgeText="NEW" />
-        </>
-      ),
-      icon: SessionImg,
-      description: "A Modern way to Capture, Report, Debug & fix bugs in web applications",
-      handleClick: useCallback(() => {
-        trackProductClickedInDropDown("session_replay");
-        props.toggleDropDown();
-        redirectToSessionRecordingHome(navigate, isDesktopSessionsEnabled);
-      }, [navigate, props, isDesktopSessionsEnabled]),
-    },
-    {
-      title: "API Client",
-      icon: ApiClientImg,
-      description: "Customise request headers, query parameters, and request body payloads.",
-      handleClick: useCallback(() => {
-        trackProductClickedInDropDown("api_client");
-        props.toggleDropDown();
-        navigate(PATHS.API_CLIENT.INDEX);
-      }, [navigate, props]),
-    },
-    {
-      title: "Mock Server",
-      icon: MockServerImg,
-      description: "Generate custom API responses without actually having a pre-built API or a backend server",
-      handleClick: useCallback(() => {
-        trackProductClickedInDropDown("mock_server");
-        props.toggleDropDown();
-        redirectToMocks(navigate);
-      }, [navigate, props]),
-    },
-    {
-      title: "Desktop App",
-      icon: DesktopImg,
-      description: "Inspect and modify HTTP(s) traffic from any browser, desktop app & mobile apps",
-      handleClick: useCallback(() => {
-        trackProductClickedInDropDown("desktop_app");
-        handleDesktopAppPromoClicked();
-        props.toggleDropDown();
-      }, [props, handleDesktopAppPromoClicked]),
-    },
-    {
-      title: "Api Access",
-      icon: ApiAccessImg,
-      description: "Easily test changes related to a PR without needing a staging environment",
-      handleClick: useCallback(() => {
-        trackProductClickedInDropDown("api_access");
-        // todo: add typeform link
-        redirectToUrl(LINKS.REQUESTLY_API_DOCS, true);
-        props.toggleDropDown();
-      }, [props]),
-    },
-  ];
+  const products: ProductProps[] = useMemo(
+    () => [
+      {
+        title: "HTTP Rules (Web Debugger)",
+        icon: RulesImg,
+        description: "Intercept and modify requests, inject scripts, Map Local, Map Remote, etc.",
+        handleClick: () => {
+          trackProductClickedInDropDown("web_debugger");
+          props.toggleDropDown();
+          redirectToRules(navigate);
+        },
+      },
+      {
+        title: "Mock Server",
+        icon: MockServerImg,
+        description: "Generate mock API endpoints for testing when the backend isn’t ready.",
+        handleClick: () => {
+          trackProductClickedInDropDown("mock_server");
+          props.toggleDropDown();
+          redirectToMocks(navigate);
+        },
+      },
+      {
+        title: (
+          <>
+            SessionBook <RQBadge badgeText="BETA" />
+          </>
+        ),
+        icon: SessionImg,
+        description: "Capture, report and debug with screen recording, network logs and console logs.",
+        handleClick: () => {
+          trackProductClickedInDropDown("session_replay");
+          props.toggleDropDown();
+          redirectToSessionRecordingHome(navigate, isDesktopSessionsEnabled);
+        },
+      },
+      {
+        title: "API Client",
+        icon: ApiClientImg,
+        description: "Minimalistic Postman-like API client to test APIs.",
+        handleClick: () => {
+          trackProductClickedInDropDown("api_client");
+          props.toggleDropDown();
+          navigate(PATHS.API_CLIENT.INDEX);
+        },
+      },
+      {
+        title: "Desktop App",
+        icon: DesktopImg,
+        description: "Inspect and modify HTTP(s) traffic from any browser, terminal or app.            ",
+        handleClick: () => {
+          trackProductClickedInDropDown("desktop_app");
+          handleDesktopAppPromoClicked();
+          props.toggleDropDown();
+        },
+      },
+      {
+        title: "Requestly APIs",
+        icon: ApiAccessImg,
+        description: "Integrate Requestly into your CI/CD Pipelines using Requestly REST APIs.",
+        handleClick: () => {
+          trackProductClickedInDropDown("api_access");
+          // todo: add typeform link
+          redirectToUrl(LINKS.REQUESTLY_API_DOCS, true);
+          props.toggleDropDown();
+        },
+      },
+    ],
+    [props, navigate, isDesktopSessionsEnabled, handleDesktopAppPromoClicked]
+  );
 
   if (!isRequestlyApiEnabled) {
     products.splice(5, 1);
