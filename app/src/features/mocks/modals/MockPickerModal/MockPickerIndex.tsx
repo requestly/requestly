@@ -102,10 +102,7 @@ const MockPickerIndex: React.FC<Props> = ({
   if (mocks.length && !showCreateMockState) {
     return (
       <>
-        <MocksListContentHeader
-          handleUploadAction={handleUploadAction}
-          handleCreateNew={() => setShowCreateMockState(true)}
-        />
+        <MocksListContentHeader handleCreateNew={() => setShowCreateMockState(true)} />
 
         <MocksTable
           mocks={mocks}
