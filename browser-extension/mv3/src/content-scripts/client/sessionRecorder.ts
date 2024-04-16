@@ -1,4 +1,4 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES } from "common/constants";
 import { SessionRecordingConfig } from "common/types";
 
 type SendResponseCallback = (payload: unknown) => void;
@@ -11,11 +11,8 @@ export const initSessionRecording = () => {
 
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
-      case CLIENT_MESSAGES.START_RECORDING:
-        chrome.runtime.sendMessage(
-          { action: EXTENSION_MESSAGES.INIT_SESSION_RECORDING_WITH_NEW_CONFIG },
-          sendStartRecordingEvent
-        );
+      case CLIENT_MESSAGES.STOP_RECORDING:
+        sendMessageToClient("stopRecording", null);
     }
   });
 };

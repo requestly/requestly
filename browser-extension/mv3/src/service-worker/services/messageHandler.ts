@@ -8,6 +8,7 @@ import {
   getTabSession,
   initSessionRecording,
   onSessionRecordingStartedNotification,
+  stopRecording,
   watchRecording,
 } from "./sessionRecording";
 
@@ -36,12 +37,11 @@ export const initMessageHandler = () => {
         initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url).then(sendResponse);
         return true;
 
-      case EXTENSION_MESSAGES.INIT_SESSION_RECORDING_WITH_NEW_CONFIG:
-        initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url, true).then(sendResponse);
-        return true;
-
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
         onSessionRecordingStartedNotification(sender.tab.id);
+        break;
+      case EXTENSION_MESSAGES.STOP_RECORDING:
+        stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
         break;
 
       case EXTENSION_MESSAGES.GET_TAB_SESSION:

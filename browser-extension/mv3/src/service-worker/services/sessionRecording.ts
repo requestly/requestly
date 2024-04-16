@@ -1,5 +1,5 @@
 import { CLIENT_MESSAGES } from "common/constants";
-import { getRecord, saveRecord } from "common/storage";
+import { getRecord } from "common/storage";
 import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } from "common/types";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
@@ -35,26 +35,7 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingC
   return null;
 };
 
-export const initSessionRecording = async (
-  tabId: number,
-  frameId: number,
-  url: string,
-  setNewConfig: boolean = false
-) => {
-  if (setNewConfig) {
-    const newPageSource = {
-      key: SourceKey.HOST,
-      operator: SourceOperator.CONTAINS,
-      value: new URL(url).hostname,
-    };
-    const sessionRecordingConfig = await getRecord<SessionRecordingConfig>(CONFIG_STORAGE_KEY);
-    const pageSources = sessionRecordingConfig?.pageSources || [];
-
-    await saveRecord(CONFIG_STORAGE_KEY, {
-      ...sessionRecordingConfig,
-      pageSources: [newPageSource, ...pageSources],
-    });
-  }
+export const initSessionRecording = async (tabId: number, frameId: number, url: string) => {
   const config = await getSessionRecordingConfig(url);
 
   if (config) {
@@ -83,4 +64,12 @@ export const getTabSession = (tabId: number, callback: () => void) => {
 
 export const watchRecording = (tabId: number) => {
   chrome.tabs.create({ url: `${config.WEB_URL}/sessions/draft/${tabId}` });
+};
+
+export const stopRecording = (tabId: number, openRecording: boolean) => {
+  chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.STOP_RECORDING }).then(() => {
+    if (openRecording) {
+      watchRecording(tabId);
+    }
+  });
 };
