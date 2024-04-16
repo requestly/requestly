@@ -14,13 +14,7 @@ export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) =>
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
   return (
-    <div
-      className={`${isSheetPlacedAtBottom ? " bottom-sheet-container" : "bottom-sheet-panel-container"}`}
-      style={{
-        bottom: sheetPlacement === BottomSheetPlacement.RIGHT ? 0 : isBottomSheetOpen ? 0 : `-325px`,
-        height: isSheetPlacedAtBottom ? "440px" : `100%`,
-      }}
-    >
+    <>
       <div className="bottom-sheet-action-buttons">
         {isSheetPlacedAtBottom && (
           <RQButton
@@ -38,12 +32,12 @@ export const BottomSheet: React.FC<TabsProps> = ({ items, defaultActiveKey }) =>
         <RQButton
           iconOnly
           type="default"
-          onClick={toggleSheetPlacement}
+          onClick={() => toggleSheetPlacement()}
           icon={isSheetPlacedAtBottom ? <BiDockRight /> : <BiDockBottom />}
         />
       </div>
 
-      <Tabs defaultActiveKey={defaultActiveKey} items={items} type="card" />
-    </div>
+      <Tabs defaultActiveKey={defaultActiveKey} items={items} type="card" onTabClick={() => toggleBottomSheet(true)} />
+    </>
   );
 };
