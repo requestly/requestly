@@ -27,7 +27,7 @@
   border-radius: 20px;
 }
 
-#rq-container.minimized #rq-content-container,
+#rq-container.minimized #rq-test-rule-container,
 #rq-container.minimized #rq-heading-container,
 #rq-container.minimized #rq-info-container {
   display: none;
@@ -199,13 +199,13 @@
   width: 16px;
 }
 
-#rq-minimized-status-btn {
+#rq-test-rule-minimized-btn {
   padding: 0;
   background: transparent;
   border: none;
 }
 
-#rq-minimized-status-btn span {
+#rq-test-rule-minimized-btn span {
   padding: 6px;
   border-radius: 50%;
   display: flex;
@@ -213,7 +213,7 @@
   align-items: center;
   cursor: pointer;
 }
-#rq-minimized-status-btn span svg {
+#rq-test-rule-minimized-btn span svg {
   height: 20px;
   width: 20px;
 }

@@ -1,7 +1,7 @@
 RQ.RuleExecutionHandler = {};
 RQ.RuleExecutionHandler.appliedRuleIds = new Set();
-RQ.implicitTestRuleFlowEnabled = false;
-RQ.implictTestRuleWidgetConfig = null;
+RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled = false;
+RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = null;
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
   const eventName = "rule_executed";
@@ -15,7 +15,7 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
-  if (RQ.implicitTestRuleFlowEnabled) {
+  if (RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled) {
     checkAppliedRuleAndNotifyWidget(rule);
   } else {
     RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget(rule.id);
@@ -62,9 +62,12 @@ RQ.RuleExecutionHandler.setup = async () => {
         break;
 
       case RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
-        if (RQ.implictTestRuleWidgetConfig) {
-          if (RQ.implictTestRuleWidgetConfig.visibility !== RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
-            RQ.implicitTestRuleFlowEnabled = true;
+        if (RQ.RuleExecutionHandler.implictTestRuleWidgetConfig) {
+          if (
+            RQ.RuleExecutionHandler.implictTestRuleWidgetConfig.visibility !==
+            RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF
+          ) {
+            RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled = true;
             RQ.RuleExecutionHandler.showImplicitTestRuleWidget();
           }
         }
@@ -142,7 +145,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
   switch (ruleType) {
     case "Response":
       testRuleWidget.setAttribute(
-        "info-text-content",
+        "rq-test-rule-text",
         `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>.`
       );
       break;
@@ -152,7 +155,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
       });
       responseHeaderExists &&
         testRuleWidget.setAttribute(
-          "info-text-content",
+          "rq-test-rule-text",
           `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>.`
         );
       break;
@@ -201,13 +204,13 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
 
 const getImplicitTestRuleWidgetConfig = async () => {
   await chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
-    RQ.implictTestRuleWidgetConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+    RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
   });
 };
 
 const checkAppliedRuleAndNotifyWidget = (rule) => {
   let notifyWidget = true;
-  const implicitTestRuleConfig = RQ.implictTestRuleWidgetConfig;
+  const implicitTestRuleConfig = RQ.RuleExecutionHandler.implictTestRuleWidgetConfig;
 
   if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
     notifyWidget = false;

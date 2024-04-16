@@ -13,8 +13,8 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     super.connectedCallback();
 
     this.toggleMinimize(true);
-    const contentContainer = this.shadowRoot.getElementById("rq-content-container");
-    const minimizedStatusBtn = this.shadowRoot.getElementById("rq-minimized-status-btn");
+    const contentContainer = this.shadowRoot.getElementById("rq-test-rule-container");
+    const minimizedStatusBtn = this.shadowRoot.getElementById("rq-test-rule-minimized-btn");
     const widgetContent = `
     <div id="rq-implicit-widget-container">
       <div id="rq-applied-rules-list-header">Rules applied on this page</div>

@@ -14,7 +14,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
   connectedCallback() {
     super.connectedCallback();
 
-    const contentContainer = this.shadowRoot.getElementById("rq-content-container");
+    const contentContainer = this.shadowRoot.getElementById("rq-test-rule-container");
 
     const explicitModeMarkup = `   
      <div id="rq-explicit-widget-container">  
@@ -39,7 +39,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
     this.showRuleAppliedStatus(appliedStatus === "true");
 
-    const infoTextContent = this.attributes.getNamedItem("rq-info-text-content")?.value;
+    const infoTextContent = this.attributes.getNamedItem("rq-test-rule-text")?.value;
     if (infoTextContent) {
       const infoContainer = this.shadowRoot.getElementById("rq-info-container");
       const infoContainerText = this.shadowRoot.getElementById("rq-info-text");
@@ -68,7 +68,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
 
   showRuleAppliedStatus(appliedStatus: boolean) {
     const ruleStatusContainer = this.shadowRoot.getElementById("rq-rule-status");
-    const minimizedStatusBtn = this.shadowRoot.getElementById("rq-minimized-status-btn");
+    const minimizedStatusBtn = this.shadowRoot.getElementById("rq-test-rule-minimized-btn");
     if (appliedStatus) {
       setInnerHTML(
         ruleStatusContainer,
