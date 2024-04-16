@@ -105,6 +105,7 @@ export const SOURCE = {
   APP_ONBOARDING: "app_onboarding",
   BILLING_TEAM: "billing_team",
   TEST_THIS_RULE: "test_this_rule",
+  RULE_GROUP: "rule_group",
 };
 
 export const RULES = {
