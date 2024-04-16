@@ -1,4 +1,4 @@
-.bottom-sheet-container.ant-col {
+.bottom-sheet-container {
   position: absolute;
   left: 0;
   right: 0;
@@ -6,7 +6,7 @@
   transition: bottom 0.2s ease-out;
 }
 
-.bottom-sheet-panel-container.ant-col {
+.bottom-sheet-panel-container {
   position: relative;
   height: 100% !important;
   transition: none;
@@ -16,8 +16,8 @@
   }
 }
 
-.bottom-sheet-container.ant-col,
-.bottom-sheet-panel-container.ant-col {
+.bottom-sheet-container,
+.bottom-sheet-panel-container {
   border-top: 1px solid var(--surface-1);
   background: var(--surface-0_5);
 
@@ -32,7 +32,7 @@
   }
 
   & .ant-tabs-tab.ant-tabs-tab-active {
-    background: var(--surface-2);
+    background: var(--surface-2) !important;
 
     & .ant-tabs-tab-btn {
       color: var(--text-default);

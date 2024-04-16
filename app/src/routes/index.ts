@@ -4,7 +4,6 @@ import { apiClientRoutes } from "./apiClientRoutes";
 import { accountRoutes } from "./accountRoutes";
 import { authRoutes } from "./authRoutes";
 import { desktopRoutes } from "./desktopRoutes";
-import { mobileDebuggerRoutes } from "./mobileDebuggerRoutes";
 import { mockServerRoutes } from "./mockServerRoutes";
 import { onboardingRoutes } from "./onboardingRoutes";
 import { miscRoutes } from "./miscRoutes";
@@ -19,7 +18,6 @@ export const routes: RouteObject[] = [
   ...accountRoutes,
   ...authRoutes,
   ...desktopRoutes,
-  ...mobileDebuggerRoutes,
   ...mockServerRoutes,
   ...onboardingRoutes,
   ...settingRoutes,

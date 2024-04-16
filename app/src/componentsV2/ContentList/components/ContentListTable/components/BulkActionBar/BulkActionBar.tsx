@@ -36,6 +36,7 @@ const BulkActionBar = <DataType,>({ config, selectedRows }: Props<DataType>) => 
             <Button
               key={index}
               className="rq-bulk-action-bar-action-btn"
+              loading={btnConfig.loading ?? false}
               icon={btnConfig.icon ?? null}
               danger={btnConfig.danger ?? false}
               type={btnConfig.type ?? "default"}
@@ -48,11 +49,15 @@ const BulkActionBar = <DataType,>({ config, selectedRows }: Props<DataType>) => 
             </Button>
           );
         })}
+        <Button
+          type="text"
+          icon={<RiCloseLine />}
+          className="rq-bulk-action-bar-action-btn rq-bulk-action-bar-cancel-btn"
+          onClick={clearSelectedRows}
+        >
+          Cancel
+        </Button>
       </div>
-
-      <Button type="text" icon={<RiCloseLine />} className="rq-bulk-action-bar-cancel-btn" onClick={clearSelectedRows}>
-        Cancel
-      </Button>
     </div>
   );
 };
