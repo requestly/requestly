@@ -3,19 +3,30 @@ import pako from "pako";
 import { RuleType } from "types";
 
 function decompressString(compressedString) {
-  const compressed = Buffer.from(compressedString, "base64");
-  const uncompressed = pako.inflate(compressed, { to: "string" });
-  return uncompressed;
+  try {
+    const compressed = Buffer.from(compressedString, "base64");
+    const uncompressed = pako.inflate(compressed, { to: "string" });
+    return uncompressed;
+  } catch (error) {
+    console.log("[DEBUG] Error decompressing string", error, compressedString);
+    throw error;
+  }
 }
 
 function compressString(uncompressedString) {
-  const compressed = pako.deflate(uncompressedString, { to: "string" });
-  const base64Compressed = Buffer.from(compressed).toString("base64");
-  return base64Compressed;
+  try {
+    const compressed = pako.deflate(uncompressedString);
+    const base64Compressed = Buffer.from(compressed).toString("base64");
+    return base64Compressed;
+  } catch (error) {
+    console.log("[DEBUG] Error compressing string", error, uncompressedString);
+    throw error;
+  }
 }
 
 function decompressRecord(record) {
   const decompressedRecord = { ...record };
+  console.log("[DEBUG] Decompressing Record", record?.id);
   if (isRule(record)) {
     switch (record.ruleType) {
       case RuleType.RESPONSE:
@@ -23,6 +34,7 @@ function decompressRecord(record) {
           if (pair.isCompressed) {
             const decompressedVal = decompressString(pair?.response?.value ?? "");
             decompressedRecord.pairs[idx].response.value = decompressedVal;
+            decompressedRecord.pairs[idx].isCompressed = false;
           }
         });
         break;
@@ -32,6 +44,7 @@ function decompressRecord(record) {
           if (pair.isCompressed) {
             const decompressedVal = decompressString(pair?.request?.value ?? "");
             decompressedRecord.pairs[idx].request.value = decompressedVal;
+            decompressedRecord.pairs[idx].isCompressed = false;
           }
         });
         break;
@@ -41,8 +54,9 @@ function decompressRecord(record) {
           pair.scripts.forEach((script, sidx) => {
             if (script.type === "code" && script.isCompressed) {
               const ScriptValue = script?.value;
-              const compressedValue = decompressString(ScriptValue ?? "");
-              decompressedRecord.pairs[idx].scripts[sidx].value = compressedValue;
+              const decompressedVal = decompressString(ScriptValue ?? "");
+              decompressedRecord.pairs[idx].scripts[sidx].value = decompressedVal;
+              decompressedRecord.pairs[idx].scripts[sidx].isCompressed = false;
             }
           });
         });
@@ -68,6 +82,7 @@ function compressRecord(record) {
     switch (record.ruleType) {
       case RuleType.RESPONSE:
         record.pairs.forEach((pair, idx) => {
+          if (compressedRecord.pairs[idx].isCompressed) return;
           const compressedVal = compressString(pair?.response?.value ?? "");
           compressedRecord.pairs[idx].response.value = compressedVal;
           compressedRecord.pairs[idx].isCompressed = true;
@@ -76,6 +91,7 @@ function compressRecord(record) {
 
       case RuleType.REQUEST:
         record.pairs.forEach((pair, idx) => {
+          if (compressedRecord.pairs[idx].isCompressed) return;
           const compressedVal = compressString(pair?.request?.value ?? "");
           compressedRecord.pairs[idx].request.value = compressedVal;
           compressedRecord.pairs[idx].isCompressed = true;
@@ -85,7 +101,7 @@ function compressRecord(record) {
       case RuleType.SCRIPT:
         record.pairs.forEach((pair, idx) => {
           pair.scripts.forEach((script, sidx) => {
-            if (script.type === "code") {
+            if (script.type === "code" && !script.isCompressed) {
               compressedRecord.pairs[idx].scripts[sidx].value = compressString(script?.value ?? "");
               compressedRecord.pairs[idx].scripts[sidx].isCompressed = true;
             }

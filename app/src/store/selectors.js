@@ -173,16 +173,6 @@ export const getUserCountry = (state) => {
   return getGlobalState(state)["country"];
 };
 
-export const getMobileDebuggerAppDetails = (state) => {
-  const mobileDebuggerDetails = getGlobalState(state)["mobileDebugger"] || {};
-  return mobileDebuggerDetails["app"];
-};
-
-export const getMobileDebuggerInterceptorDetails = (state) => {
-  const mobileDebuggerDetails = getGlobalState(state)["mobileDebugger"] || {};
-  return mobileDebuggerDetails["interceptor"];
-};
-
 export const getAuthInitialization = (state) => {
   return getGlobalState(state)["initializations"]["auth"];
 };

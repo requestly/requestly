@@ -1,6 +1,13 @@
 export const updateUserInfo = (prevState, action) => {
   prevState.user.loggedIn = action.payload.loggedIn;
-  prevState.user.details = action.payload.details;
+  if (action.payload.details) {
+    prevState.user.details = {
+      ...(prevState.user.details || {}),
+      ...action.payload.details,
+    };
+  } else {
+    prevState.user.details = null;
+  }
 };
 
 export const updateUserProfile = (prevState, action) => {
