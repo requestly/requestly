@@ -1,13 +1,7 @@
-.rule-editor-help-container {
-  margin: 1.25rem;
-  border: 1px solid var(--border-dark);
-  border-radius: var(--border-radius-md);
-}
-
 .rule-editor-help-content {
   font-size: 14px;
   line-height: 22px;
-  padding: 1.25rem 0px 0px 1.25rem;
+  padding: 1rem;
 }
 
 .rule-editor-help-header {
@@ -53,7 +47,7 @@
 }
 
 .rule-editor-help-lists {
-  height: 65vh;
+  height: 80vh;
   overflow: hidden;
 }
 
@@ -120,16 +114,12 @@
 .rule-editor-help-footer {
   margin-top: 10px;
   padding: 8px 1.25rem;
-  border-top: 1px solid var(--border-dark);
-  background-color: var(--component-dark-background);
 }
-
 /* docs */
 .rule-editor-docs {
-  height: 65vh;
+  height: 80vh;
   overflow: auto;
 }
-
 .rule-editor-docs-intro {
   margin-top: 10px;
 }
