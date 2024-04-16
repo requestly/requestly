@@ -35,14 +35,6 @@ export const isInterceptTrafficPage = (pathname = window.location.pathname) => {
   return pathname.includes(APP_CONSTANTS.PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE);
 };
 
-export const isMobileInterceptorPage = (pathname = window.location.pathname) => {
-  return (
-    pathname !== APP_CONSTANTS.PATHS.MOBILE_DEBUGGER.RELATIVE &&
-    pathname.includes(APP_CONSTANTS.PATHS.MOBILE_DEBUGGER.RELATIVE) &&
-    !pathname.includes(APP_CONSTANTS.PATHS.MOBILE_DEBUGGER.NEW.RELATIVE)
-  );
-};
-
 export const getSessionRecordingSharedLink = (recordingId) => {
   return window.location.origin + APP_CONSTANTS.PATHS.SESSIONS.SAVED.ABSOLUTE + "/" + recordingId;
 };
