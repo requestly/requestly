@@ -1,0 +1,73 @@
+.bottom-sheet-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  transition: bottom 0.2s ease-out;
+}
+
+.bottom-sheet-panel-container {
+  position: relative;
+  height: 100% !important;
+  transition: none;
+
+  & .ant-tabs.ant-tabs-card {
+    height: 100%;
+  }
+}
+
+.bottom-sheet-container,
+.bottom-sheet-panel-container {
+  border-top: 1px solid var(--surface-1);
+  background: var(--surface-0_5);
+
+  & .ant-tabs-nav {
+    padding: 8px 1rem;
+    margin-bottom: 0;
+  }
+
+  & .ant-tabs-tab {
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+  }
+
+  & .ant-tabs-tab.ant-tabs-tab-active {
+    background: var(--surface-2);
+
+    & .ant-tabs-tab-btn {
+      color: var(--text-default);
+    }
+  }
+
+  & .ant-tabs-content-holder {
+    padding: 8px 1rem;
+  }
+
+  & .ant-tabs-content {
+    height: 100%;
+  }
+  & .ant-tabs-tabpane {
+    height: inherit;
+  }
+}
+
+.bottom-sheet-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bottom-sheet-action-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+  cursor: pointer;
+  z-index: 2;
+
+  & svg {
+    transform: scale(1.1);
+    color: var(--text-default);
+  }
+}

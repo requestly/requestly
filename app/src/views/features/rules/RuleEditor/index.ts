@@ -2,4 +2,4 @@
 
 // export default lazyload(() => import(/* webpackChunkName: "RuleEditor" */ "./RuleEditor"));
 
-export { default } from "./RuleEditor";
+export { default } from "./RuleEditorView";
