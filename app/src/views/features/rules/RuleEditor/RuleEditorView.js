@@ -1,9 +1,9 @@
-import { BottomSheetProvider } from "componentsV2/BottomSheet";
+import { BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import RuleEditor from "./RuleEditor";
 
 const RuleEditorView = () => {
   return (
-    <BottomSheetProvider defaultPlacement="bottom">
+    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
       <RuleEditor />
     </BottomSheetProvider>
   );

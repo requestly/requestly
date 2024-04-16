@@ -74,6 +74,11 @@ const RulesList: React.FC<Props> = () => {
           <>
             <div className="rq-rules-list-container">
               {isFeatureLimiterOn && user.isLimitReached ? <FeatureLimiterBanner /> : null}
+
+              {/* TODO: Temp Breadcrumb */}
+              <div className="rq-rules-table-breadcrumb">
+                <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">All</span>
+              </div>
               <RulesListContentHeader
                 searchValue={searchValue}
                 setSearchValue={setSearchValue}

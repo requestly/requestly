@@ -10,16 +10,17 @@ import { RuleTableRecord } from "./types";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
+import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
 import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
-import "./rulesTable.css";
-import { enhanceRecords } from "./utils/rules";
+import { enhanceRecords, normalizeRecords } from "./utils/rules";
 import { ContentListTable, useContentListTableContext, withContentListTableContext } from "componentsV2/ContentList";
 import { useRulesActionContext } from "features/rules/context/actions";
+import "./rulesTable.css";
 
 interface Props {
   records: StorageRecord[];
@@ -29,13 +30,16 @@ interface Props {
 }
 
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
-  const { clearSelectedRows } = useContentListTableContext();
+  const { selectedRows, clearSelectedRows } = useContentListTableContext();
 
   const user = useSelector(getUserAuthDetails);
   const allRecords = useSelector(getAllRecords);
-  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
+
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
   const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
+  const [isBulkRecordsStatusUpdating, setIsBulkRecordsStatusUpdating] = useState(false);
+
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
   const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
   const {
@@ -43,7 +47,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     recordsChangeGroupAction,
     recordsShareAction,
     recordsDeleteAction,
-    recordsStatusToggleAction,
+    recordsStatusUpdateAction,
   } = useRulesActionContext();
 
   useEffect(() => {
@@ -84,7 +88,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       }, []);
 
       if (activePremiumRules.length) {
-        recordsStatusToggleAction(activePremiumRules, false);
+        recordsStatusUpdateAction(activePremiumRules, RecordStatus.INACTIVE);
       }
       setIsPremiumRulesToggleChecked(true);
     }
@@ -93,7 +97,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     user?.details?.isPremium,
     loading,
     isPremiumRulesToggleChecked,
-    recordsStatusToggleAction,
+    recordsStatusUpdateAction,
     isBackgateRestrictionEnabled,
     isUpgradePopoverEnabled,
   ]);
@@ -117,6 +121,15 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   }, []);
 
   const isFeatureLimitbannerShown = isFeatureLimiterOn && user?.isLimitReached;
+
+  const toggleRecordsBulkOptionLabel = useMemo(() => {
+    const selectedRecords = selectedRows as StorageRecord[];
+    const isAllRecordsActive = selectedRecords.every((record) => {
+      return allRecordsMap[record.id].status === RecordStatus.ACTIVE;
+    });
+
+    return isAllRecordsActive ? "Deactivate" : "Activate";
+  }, [selectedRows, allRecordsMap]);
 
   return (
     <>
@@ -153,7 +166,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     clearSelectedRows();
                     trackRulesListBulkActionPerformed("ungroup");
                   };
-                  recordsUngroupAction(selectedRows).then(onSuccess);
+                  recordsUngroupAction(normalizeRecords(selectedRows)).then(onSuccess);
                 },
               },
               {
@@ -167,7 +180,27 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("change_group");
                   };
 
-                  recordsChangeGroupAction(selectedRows, onSuccess);
+                  recordsChangeGroupAction(normalizeRecords(selectedRows), onSuccess);
+                },
+              },
+              {
+                label: toggleRecordsBulkOptionLabel,
+                icon: <MdOutlineToggleOn />,
+                loading: isBulkRecordsStatusUpdating,
+                onClick: (selectedRows) => {
+                  const onSuccess = () => {
+                    setIsBulkRecordsStatusUpdating(false);
+                    toast.success(`All records ${toggleRecordsBulkOptionLabel.toLowerCase()}d!`);
+                    trackRulesListBulkActionPerformed("records_toggle");
+                  };
+
+                  const updatedValue =
+                    toggleRecordsBulkOptionLabel.toLowerCase() === "activate"
+                      ? RecordStatus.ACTIVE
+                      : RecordStatus.INACTIVE;
+
+                  setIsBulkRecordsStatusUpdating(true);
+                  recordsStatusUpdateAction(normalizeRecords(selectedRows), updatedValue, onSuccess);
                 },
               },
               {
@@ -179,7 +212,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("share");
                   };
 
-                  recordsShareAction(selectedRows, onSuccess);
+                  recordsShareAction(normalizeRecords(selectedRows), onSuccess);
                 },
               },
               {
@@ -193,7 +226,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                     trackRulesListBulkActionPerformed("delete");
                   };
 
-                  recordsDeleteAction(selectedRows, onSuccess);
+                  recordsDeleteAction(normalizeRecords(selectedRows), onSuccess);
                 },
               },
             ],
