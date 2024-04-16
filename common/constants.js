@@ -158,8 +158,6 @@ CONSTANTS.EXTENSION_MESSAGES = {
   TEST_RULE_ON_URL: "testRuleOnUrl",
   SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
   NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
-  VIEW_RULE_IN_EDITOR: "viewRuleInEditor",
-  OPEN_APP_SETTINGS: "openAppSettings",
 };
 
 CONSTANTS.HEADERS_TARGET = {

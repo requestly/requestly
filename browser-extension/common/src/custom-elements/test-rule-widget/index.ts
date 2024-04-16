@@ -28,7 +28,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
       this.toggleMinimize(true);
     });
 
-    this.shadowRoot.getElementById("rq-minimized-status-btn").addEventListener("click", (event) => {
+    this.shadowRoot.getElementById("rq-test-rule-minimized-btn").addEventListener("click", (event) => {
       event.stopPropagation();
       this.toggleMinimize(false);
     });
@@ -52,7 +52,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
     <div id="rq-container">
         <div id="rq-minimized-details">
             <div id="rq-minimized-logo">${RQLogoSmall}</div>
-            <button id="rq-minimized-status-btn"></button>
+            <button id="rq-test-rule-minimized-btn"></button>
         </div>
         <div id="rq-heading-container">
             <div id="rq-logo-container"> 
@@ -64,7 +64,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
                 <button id="rq-minimize-button">${MinimizeIcon}</buttton>
             </div>
         </div>
-        <div id="rq-content-container"></div>
+        <div id="rq-test-rule-container"></div>
          <div id="rq-info-container" class="hidden">
           <div id="rq-info-icon" class="secondary-text">${InfoIcon}</div>
           <div id="rq-info-text" class="secondary-text"></div>
