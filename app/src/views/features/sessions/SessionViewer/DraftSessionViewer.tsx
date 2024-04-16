@@ -16,6 +16,7 @@ import { getSessionRecordingMetaData } from "store/features/session-recording/se
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
+import { generateDraftSessionTitle } from "./utils";
 import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
@@ -65,14 +66,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const [isDiscardSessionClicked, setIsDiscardSessionClicked] = useState(false);
-
-  const generateDraftSessionTitle = useCallback((url: string) => {
-    const hostname = new URL(url).hostname.split(".").slice(0, -1).join(".");
-    const date = new Date();
-    const month = date.toLocaleString("default", { month: "short" });
-    const formattedDate = `${date.getDate()}${month}${date.getFullYear()}`;
-    return `${hostname}@${formattedDate}`;
-  }, []);
 
   const hasUserCreatedSessions = useMemo(
     () =>
@@ -166,7 +159,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
         setIsLoading(false);
       });
     }
-  }, [dispatch, tabId, user?.details?.profile?.email, generateDraftSessionTitle, testRuleDraftSession, source]);
+  }, [dispatch, tabId, user?.details?.profile?.email, testRuleDraftSession, source]);
 
   useEffect(() => {
     trackDraftSessionViewed(source, sessionRecordingMetadata?.recordingMode);

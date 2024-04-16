@@ -5,4 +5,5 @@ export type TestReport = {
   timestamp: number;
   appliedStatus: boolean;
   sessionLink?: string;
+  isSessionSaving?: boolean;
 };
