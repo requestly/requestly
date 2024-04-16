@@ -12,10 +12,10 @@ import {
 import { RQButton, RQEditorTitle, RQModal } from "lib/design-system/components";
 import RulePairs from "components/features/rules/RulePairs";
 import AddPairButton from "components/features/rules/RuleBuilder/Body/Columns/AddPairButton";
-import CreateRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/CreateRuleButton";
-import DeleteButton from "components/features/rules/RuleBuilder/Header/ActionButtons/DeleteButton";
-import PinButton from "components/features/rules/RuleBuilder/Header/ActionButtons/PinButton";
-import RuleStatusButton from "components/features/rules/RuleBuilder/Header/ActionButtons/Status";
+import CreateRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/CreateRuleButton";
+import DeleteButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/DeleteButton";
+import PinButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/PinButton";
+import RuleStatusButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/Status";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import { onChangeHandler } from "components/features/rules/RuleBuilder/Body/actions";
@@ -34,7 +34,7 @@ import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { Rule, Status } from "types";
 import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import "./RuleEditorModal.css";
-import ShareRuleButton from "components/features/rules/RuleBuilder/Header/ActionButtons/ShareRuleButton";
+import ShareRuleButton from "views/features/rules/RuleEditor/components/Header/ActionButtons/ShareRuleButton";
 
 enum EditorMode {
   EDIT = "edit",

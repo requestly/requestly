@@ -6,7 +6,7 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { generateObjectId } from "../../../../../utils/FormattingHelper";
 import APP_CONSTANTS from "config/constants";
-import { saveRule } from "../Header/ActionButtons/actions";
+import { saveRule } from "../../../../../views/features/rules/RuleEditor/components/Header/ActionButtons/actions";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import Logger from "lib/logger";
 

@@ -1,3 +1,13 @@
+.rule-builder-container {
+  width: 100%;
+  height: 100%;
+}
+
+.rule-builder-body-wrapper {
+  width: 100%;
+  padding: 0 1rem;
+}
+
 .rule-editor-help-btn.ant-btn {
   position: absolute;
   top: 20px;
