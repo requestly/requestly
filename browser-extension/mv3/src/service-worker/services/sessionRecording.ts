@@ -3,6 +3,7 @@ import { getRecord, saveRecord } from "common/storage";
 import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } from "common/types";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
+import config from "common/config";
 
 const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 
@@ -78,4 +79,8 @@ export const getTabSession = (tabId: number, callback: () => void) => {
     { frameId: 0 }, // top frame
     callback
   );
+};
+
+export const watchRecording = (tabId: number) => {
+  chrome.tabs.create({ url: `${config.WEB_URL}/sessions/draft/${tabId}` });
 };

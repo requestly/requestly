@@ -4,7 +4,12 @@ import { initClientHandler } from "./clientHandler";
 import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
 import { getExecutedRules } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
-import { getTabSession, initSessionRecording, onSessionRecordingStartedNotification } from "./sessionRecording";
+import {
+  getTabSession,
+  initSessionRecording,
+  onSessionRecordingStartedNotification,
+  watchRecording,
+} from "./sessionRecording";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -62,6 +67,10 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
         toggleExtensionStatus().then(sendResponse);
         return true;
+
+      case EXTENSION_MESSAGES.WATCH_RECORDING:
+        watchRecording(message.tabId ?? sender.tab?.id);
+        break;
     }
 
     return false;
