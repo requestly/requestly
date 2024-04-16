@@ -5,7 +5,7 @@
   right: 16px;
 }
 
-#container {
+#rq-container {
   border-radius: 1rem;
   padding: 12px 1rem;
   display: flex;
@@ -20,20 +20,20 @@
   transition: all 0.2s;
 }
 
-#container.minimized {
+#rq-container.minimized {
   width: fit-content;
   height: 56px;
   padding: 6px;
   border-radius: 20px;
 }
 
-#container.minimized #content-container,
-#container.minimized #heading-container,
-#container.minimized #info-container {
+#rq-container.minimized #rq-content-container,
+#rq-container.minimized #rq-heading-container,
+#rq-container.minimized #rq-info-container {
   display: none;
 }
 
-#rule-name {
+#rq-rule-name {
   font-size: 12px;
   margin: 4px 0;
   font-weight: bolder;
@@ -44,33 +44,33 @@
   white-space: nowrap;
 }
 
-#heading-container {
+#rq-heading-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 4px;
 }
 
-#logo-container {
+#rq-logo-container {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-#heading-container div {
+#rq-heading-container div {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-content: center;
 }
 
-#actions-container {
+#rq-actions-container {
   display: flex;
   flex-direction: row;
   gap: 4px;
 }
 
-#actions-container button {
+#rq-actions-container button {
   background: none;
   border: none;
   color: #fff;
@@ -83,36 +83,36 @@
   align-items: center;
 }
 
-#actions-container button:hover {
+#rq-actions-container button:hover {
   background: #383838;
 }
 
-#explicit-widget-container {
+#rq-explicit-widget-container {
   background: #282828;
   border-radius: 8px;
   padding: 12px;
   margin-top: 8px;
 }
 
-#implicit-widget-container {
+#rq-implicit-widget-container {
   padding: 0 4px;
   margin-top: 8px;
 }
 
-#rule-status-container {
+#rq-rule-status-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
 
-#test-rule-details {
+#rq-test-rule-details {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
 }
 
-#info-container {
+#rq-info-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -120,7 +120,7 @@
   margin-top: 8px;
 }
 
-#info-icon {
+#rq-info-icon {
   align-self: flex-start;
 }
 
@@ -128,18 +128,18 @@
   align-self: center;
 }
 
-#heading-logo {
+#rq-heading-logo {
   height: 16px;
   width: 16px;
 }
 
-#logo-text {
+#rq-logo-text {
   color: #fff;
   font-size: 11px;
   font-weight: 500;
 }
 
-#view-result-btn {
+#rq-view-result-btn {
   all: unset;
   background: #1e69ff;
   color: #fff;
@@ -148,13 +148,13 @@
   font-size: 12px;
 }
 
-#view-result-btn:hover {
+#rq-view-result-btn:hover {
   cursor: pointer;
   border-color: #0f4cd9;
   background: #0f4cd9;
 }
 
-#rule-status {
+#rq-rule-status {
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
@@ -180,7 +180,7 @@
   color: #e09400;
 }
 
-#minimized-details {
+#rq-minimized-details {
   display: none;
   pointer-events: none;
   flex-direction: column;
@@ -189,23 +189,23 @@
   gap: 3px;
 }
 
-#minimized-details.visible {
+#rq-minimized-details.visible {
   display: flex;
   pointer-events: auto;
 }
 
-#minimized-logo svg {
+#rq-minimized-logo svg {
   height: 16px;
   width: 16px;
 }
 
-#minimized-status-btn {
+#rq-minimized-status-btn {
   padding: 0;
   background: transparent;
   border: none;
 }
 
-#minimized-status-btn span {
+#rq-minimized-status-btn span {
   padding: 6px;
   border-radius: 50%;
   display: flex;
@@ -213,7 +213,7 @@
   align-items: center;
   cursor: pointer;
 }
-#minimized-status-btn span svg {
+#rq-minimized-status-btn span svg {
   height: 20px;
   width: 20px;
 }
@@ -239,17 +239,17 @@ a {
   background: #104b2f;
 }
 
-#applied-rules-list {
+#rq-applied-rules-list {
   margin-top: 8px;
 }
 
-#applied-rules-list-header {
+#rq-applied-rules-list-header {
   font-size: 13px;
   color: #fff;
   font-weight: 500;
 }
 
-.applied-rule-list-item {
+.rq-applied-rule-list-item {
   border-radius: 8px;
   background: #282828;
   padding: 12px;
@@ -266,43 +266,43 @@ a {
   gap: 10px;
 }
 
-.applied-rule-list-item:hover {
+.rq-applied-rule-list-item:hover {
   background: #383838;
 }
 
-.applied-rule-list-item:hover .applied-rule-arrow-icon {
+.rq-applied-rule-list-item:hover .rq-applied-rule-arrow-icon {
   opacity: 1;
 }
 
-.applied-rule-list-item:first-child {
+.rq-applied-rule-list-item:first-child {
   margin-top: 0;
 }
 
-.applied-rule-item-details {
+.rq-applied-rule-item-details {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.applied-rule-icon {
+.rq-applied-rule-icon {
   align-self: center;
 }
 
-.applied-rule-icon svg {
+.rq-applied-rule-icon svg {
   width: 14px;
   height: 14px;
   position: relative;
   top: 2px;
 }
 
-.applied-rule-arrow-icon {
+.rq-applied-rule-arrow-icon {
   transform: scale(1.2);
   align-self: center;
   transition: 0.2s all;
   opacity: 0;
 }
 
-.applied-rule-name {
+.rq-applied-rule-name {
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
