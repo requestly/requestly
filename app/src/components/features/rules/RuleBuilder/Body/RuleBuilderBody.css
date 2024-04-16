@@ -3,9 +3,11 @@
 }
 
 .ant-row.rule-builder-body {
-  height: 80vh;
-  padding-bottom: 4rem;
+  height: calc(100vh - 180px);
   overflow: auto !important;
+  padding-right: 8px;
+  padding-bottom: 6rem;
+  justify-content: center;
 }
 
 .ant-row.preview-rule-builder-body {
@@ -13,6 +15,8 @@
   padding-bottom: 0;
 }
 
-.rule-builder-body > .ant-col {
-  margin-bottom: 4rem;
+.rule-editor-title-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }

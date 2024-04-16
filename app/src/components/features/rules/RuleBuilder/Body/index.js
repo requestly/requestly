@@ -5,13 +5,11 @@ import { Row, Col } from "antd";
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 import APP_CONSTANTS from "../../../../../config/constants";
-import FEATURES from "config/constants/sub/features";
 import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
-import { TestThisRuleRow } from "../../TestThisRule";
-import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import "./RuleBuilderBody.css";
 
 const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
@@ -21,6 +19,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
+  const { sheetPlacement } = useBottomSheetContext();
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
@@ -51,36 +50,27 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
 
   return (
     <>
-      {!isSharedListView && (
-        <RQEditorTitle
-          mode={mode}
-          errors={ruleErrors}
-          showDocs={showDocs}
-          defaultName={defaultRuleName}
-          name={currentlySelectedRuleData.name}
-          namePlaceholder="Enter rule name"
-          nameChangeCallback={handleRuleNameChange}
-          descriptionPlaceholder="Add description (optional)"
-          description={currentlySelectedRuleData.description}
-          descriptionChangeCallback={handleDescriptionChange}
-        />
-      )}
+      <div className="rule-editor-title-container">
+        {!isSharedListView && (
+          <RQEditorTitle
+            mode={mode}
+            errors={ruleErrors}
+            showDocs={showDocs}
+            defaultName={defaultRuleName}
+            name={currentlySelectedRuleData.name}
+            namePlaceholder="Enter rule name"
+            nameChangeCallback={handleRuleNameChange}
+            descriptionPlaceholder="Add description (optional)"
+            description={currentlySelectedRuleData.description}
+            descriptionChangeCallback={handleDescriptionChange}
+          />
+        )}
+      </div>
       <Row
         className={`rule-builder-body ${isSharedListView ? "preview-rule-builder-body" : ""}`}
         id="rule-builder-body"
       >
-        <Col
-          span={22}
-          offset={1}
-          md={{
-            offset: showDocs ? 1 : 2,
-            span: showDocs ? 22 : 20,
-          }}
-          lg={{
-            offset: isSharedListView ? 2 : showDocs ? 1 : 4,
-            span: isSharedListView ? 20 : showDocs ? 22 : 16,
-          }}
-        >
+        <Col span={24} style={sheetPlacement === BottomSheetPlacement.BOTTOM ? { maxWidth: "840px" } : null}>
           <CardBody>
             {/* Info for some specific rule types */}
             <RuleInfoBanner appMode={appMode} ruleType={currentlySelectedRuleConfig.TYPE} />
@@ -95,9 +85,6 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
                   ) : null}
                 </Col>
               </Row>
-            ) : null}
-            {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && isFeatureCompatible(FEATURES.TEST_THIS_RULE) ? (
-              <TestThisRuleRow ruleId={currentlySelectedRuleData.id} />
             ) : null}
           </CardBody>
         </Col>

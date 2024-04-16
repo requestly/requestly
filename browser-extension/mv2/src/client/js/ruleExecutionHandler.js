@@ -85,7 +85,6 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
-  testRuleWidget.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
   testRuleWidget.setAttribute("applied-status", RQ.RuleExecutionHandler.appliedRuleIds.has(ruleId));
   RQ.RuleExecutionHandler.setWidgetInfoText(testRuleWidget, ruleDetails);
 
@@ -107,7 +106,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
     case "Response":
       testRuleWidget.setAttribute(
         "info-text-content",
-        `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>`
+        `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>.`
       );
       break;
     case "Headers":
@@ -117,7 +116,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
       responseHeaderExists &&
         testRuleWidget.setAttribute(
           "info-text-content",
-          `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>`
+          `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>.`
         );
       break;
     default:
@@ -129,6 +128,10 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToWidget = (ruleId) => {
   const testRuleWidget = document.querySelector("rq-test-rule-widget");
 
   if (testRuleWidget?.getAttribute("applied-status") === "false") {
+    if (testRuleWidget.getAttribute("rule-id") === ruleId) {
+      testRuleWidget.setAttribute("applied-status", true);
+    }
+
     testRuleWidget.dispatchEvent(
       new CustomEvent("new-rule-applied", {
         detail: {
