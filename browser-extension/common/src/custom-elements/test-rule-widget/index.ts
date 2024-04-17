@@ -23,20 +23,20 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
   }
 
   addListeners() {
-    this.shadowRoot.getElementById("rq-minimize-button").addEventListener("click", (event) => {
+    this.shadowRoot.getElementById("minimize-button").addEventListener("click", (event) => {
       event.stopPropagation();
       this.toggleMinimize(true);
     });
 
-    this.shadowRoot.getElementById("rq-test-rule-minimized-btn").addEventListener("click", (event) => {
+    this.shadowRoot.getElementById("test-rule-minimized-btn").addEventListener("click", (event) => {
       event.stopPropagation();
       this.toggleMinimize(false);
     });
   }
 
   toggleMinimize(minimize: boolean) {
-    const container = this.shadowRoot.getElementById("rq-container");
-    const minimizedDetails = this.shadowRoot.getElementById("rq-minimized-details");
+    const container = this.shadowRoot.getElementById("container");
+    const minimizedDetails = this.shadowRoot.getElementById("minimized-details");
     if (minimize) {
       container.classList.add("minimized");
       minimizedDetails.classList.add("visible");
@@ -49,25 +49,25 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
   _getDefaultMarkup() {
     return `
     <style>${styles}</style>
-    <div id="rq-container">
-        <div id="rq-minimized-details">
-            <div id="rq-minimized-logo">${RQLogoSmall}</div>
-            <button id="rq-test-rule-minimized-btn"></button>
+    <div id="container">
+        <div id="minimized-details">
+            <div id="minimized-logo">${RQLogoSmall}</div>
+            <button id="test-rule-minimized-btn"></button>
         </div>
-        <div id="rq-heading-container">
-            <div id="rq-logo-container"> 
-                <span id="rq-heading-logo">${RQLogo}</span>
-                <span id="rq-logo-text">requestly</span>
+        <div id="heading-container">
+            <div id="logo-container"> 
+                <span id="heading-logo">${RQLogo}</span>
+                <span id="logo-text">requestly</span>
             </div>
-            <div id="rq-actions-container">
-                <button id="rq-settings-button" class="hidden">${SettingsIcon}</button>
-                <button id="rq-minimize-button">${MinimizeIcon}</buttton>
+            <div id="actions-container">
+                <button id="settings-button" class="hidden">${SettingsIcon}</button>
+                <button id="minimize-button">${MinimizeIcon}</buttton>
             </div>
         </div>
-        <div id="rq-test-rule-container"></div>
-         <div id="rq-info-container" class="hidden">
-          <div id="rq-info-icon" class="secondary-text">${InfoIcon}</div>
-          <div id="rq-info-text" class="secondary-text"></div>
+        <div id="test-rule-container"></div>
+         <div id="info-container" class="hidden">
+          <div id="info-icon" class="secondary-text">${InfoIcon}</div>
+          <div id="info-text" class="secondary-text"></div>
         </div>
     </div>
     `;
