@@ -53,6 +53,10 @@ export const onSessionRecordingStartedNotification = (tabId: number) => {
   chrome.action.setBadgeBackgroundColor({ tabId, color: "#e34850" });
 };
 
+export const onSessionRecordingStoppedNotification = (tabId: number) => {
+  chrome.action.setBadgeText({ tabId, text: "" });
+};
+
 export const getTabSession = (tabId: number, callback: () => void) => {
   chrome.tabs.sendMessage(
     tabId,

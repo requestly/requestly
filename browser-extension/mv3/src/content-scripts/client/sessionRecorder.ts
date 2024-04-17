@@ -66,6 +66,11 @@ const addListeners = () => {
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
       });
+    } else if (event.data.action === "sessionRecordingStopped") {
+      isRecording = false;
+      chrome.runtime.sendMessage({
+        action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
+      });
     }
   });
 };
