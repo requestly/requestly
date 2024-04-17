@@ -1,5 +1,5 @@
 import { Avatar, Col, Popover, Row, Table } from "antd";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useHasChanged } from "hooks";
@@ -11,11 +11,9 @@ import { RQButton } from "lib/design-system/components";
 import { BillingTeamMember, BillingTeamRoles } from "../../../types";
 import { MdOutlinePaid } from "@react-icons/all-files/md/MdOutlinePaid";
 import { MdOutlineAdminPanelSettings } from "@react-icons/all-files/md/MdOutlineAdminPanelSettings";
-import { MdCheck } from "@react-icons/all-files/md/MdCheck";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import Logger from "lib/logger";
+import { RequestBillingTeamAccessModal } from "../modals/RequestBillingTeamAccessModal/RequestBillingTeamAccessModal";
 import "./index.scss";
 
 export const OtherBillingTeamDetails: React.FC = () => {
@@ -26,8 +24,7 @@ export const OtherBillingTeamDetails: React.FC = () => {
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId)) as Record<string, BillingTeamMember>;
   const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
   const [isPlanDetailsPopoverOpen, setIsPlanDetailsPopoverOpen] = useState(false);
-  const [isRequestingToJoin, setIsRequestingToJoin] = useState(false);
-  const [isRequestSent, setIsRequestSent] = useState(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const hasJoinedAnyTeam = useMemo(() => billingTeams.some((team) => user?.details?.profile?.uid in team.members), [
     billingTeams,
     user?.details?.profile?.uid,
@@ -84,22 +81,6 @@ export const OtherBillingTeamDetails: React.FC = () => {
     [membersTableSource.length]
   );
 
-  const handleSendRequest = useCallback(() => {
-    setIsRequestingToJoin(true);
-    const sendRequest = httpsCallable<{ billingId: string }, null>(
-      getFunctions(),
-      "premiumNotifications-requestEnterprisePlanFromAdmin"
-    );
-    sendRequest({ billingId })
-      .then(() => {
-        setIsRequestSent(true);
-      })
-      .catch((e) => {
-        Logger.log(e);
-      })
-      .finally(() => setIsRequestingToJoin(false));
-  }, [billingId]);
-
   useEffect(() => {
     if (hasBillingIdChanged) {
       setIsPlanDetailsPopoverOpen(false);
@@ -107,85 +88,87 @@ export const OtherBillingTeamDetails: React.FC = () => {
   }, [hasBillingIdChanged]);
 
   return (
-    <div className="display-row-center w-full">
-      <div className="w-full" style={{ maxWidth: "1000px" }}>
-        <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
-        <Col className="billing-teams-primary-card mt-8">
-          <Row
-            className="items-center other-team-members-table-header"
-            align="middle"
-            justify="space-between"
-            gutter={8}
-          >
-            <Col>
-              <Row align="middle" gutter={8}>
-                <Col
-                  style={{
-                    paddingRight: 0,
-                    paddingLeft: 0,
-                  }}
-                >
-                  <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
-                </Col>
-                <Col>
-                  <Popover
-                    overlayClassName="team-details-popover"
-                    open={isPlanDetailsPopoverOpen}
-                    content={
-                      <TeamDetailsPopover
-                        teamDetails={billingTeamDetails}
-                        closePopover={() => setIsPlanDetailsPopoverOpen(false)}
-                      />
-                    }
-                    showArrow={false}
-                    trigger="click"
-                    placement="bottomLeft"
-                    title={null}
-                  >
-                    <RQButton
-                      type="text"
-                      size="small"
-                      className="view-team-details-btn"
-                      onClick={() => setIsPlanDetailsPopoverOpen(true)}
-                    >
-                      View details
-                    </RQButton>
-                  </Popover>
-                </Col>
-              </Row>
-            </Col>
-
-            {!hasJoinedAnyTeam && (
+    <>
+      <div className="display-row-center w-full">
+        <div className="w-full" style={{ maxWidth: "1000px" }}>
+          <Col className="my-billing-team-title">{billingTeamDetails.name}</Col>
+          <Col className="billing-teams-primary-card mt-8">
+            <Row
+              className="items-center other-team-members-table-header"
+              align="middle"
+              justify="space-between"
+              gutter={8}
+            >
               <Col>
-                {isRequestSent ? (
-                  <div className="success display-flex items-center">
-                    <MdCheck style={{ marginRight: "4px" }} />
-                    Request sent
-                  </div>
-                ) : (
+                <Row align="middle" gutter={8}>
+                  <Col
+                    style={{
+                      paddingRight: 0,
+                      paddingLeft: 0,
+                    }}
+                  >
+                    <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
+                  </Col>
+                  <Col>
+                    <Popover
+                      overlayClassName="team-details-popover"
+                      open={isPlanDetailsPopoverOpen}
+                      content={
+                        <TeamDetailsPopover
+                          teamDetails={billingTeamDetails}
+                          closePopover={() => setIsPlanDetailsPopoverOpen(false)}
+                        />
+                      }
+                      showArrow={false}
+                      trigger="click"
+                      placement="bottomLeft"
+                      title={null}
+                    >
+                      <RQButton
+                        type="text"
+                        size="small"
+                        className="view-team-details-btn"
+                        onClick={() => setIsPlanDetailsPopoverOpen(true)}
+                      >
+                        View details
+                      </RQButton>
+                    </Popover>
+                  </Col>
+                </Row>
+              </Col>
+
+              {!hasJoinedAnyTeam && (
+                <Col>
                   <RQButton
-                    loading={isRequestingToJoin}
                     className="request-billing-team-btn"
                     type="default"
                     icon={<IoMdAdd />}
-                    onClick={handleSendRequest}
+                    onClick={() => setIsRequestModalOpen(true)}
                   >
                     Request to add
                   </RQButton>
-                )}
-              </Col>
-            )}
-          </Row>
-          <Table
-            className="billing-table"
-            dataSource={membersTableSource}
-            columns={columns}
-            pagination={false}
-            scroll={{ y: "65vh" }}
-            loading={!billingTeamMembers}
-          />
-        </Col>
+                </Col>
+              )}
+            </Row>
+            <Table
+              className="billing-table"
+              dataSource={membersTableSource}
+              columns={columns}
+              pagination={false}
+              scroll={{ y: "65vh" }}
+              loading={!billingTeamMembers}
+            />
+          </Col>
+        </div>
       </div>
-    </div>
+
+      {isRequestModalOpen && (
+        <RequestBillingTeamAccessModal
+          isOpen={isRequestModalOpen}
+          onClose={() => setIsRequestModalOpen(false)}
+          billingId={billingId}
+        />
+      )}
+    </>
   );
 };
