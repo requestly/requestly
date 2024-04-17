@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Spin } from "antd";
 import { trackBillingTeamAccessRequestResponded } from "features/settings/analytics";
 import { BillingTeamJoinRequestAction } from "../../types";
-import { LoadingOutlined } from "@ant-design/icons";
 import { PiWarningDiamondBold } from "@react-icons/all-files/pi/PiWarningDiamondBold";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
@@ -80,21 +78,11 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
           </RQButton>
         )
       }
-    >
-      <div className="review-request-content-container">
-        <div className="review-request-content">
-          {isLoading && (
-            <div className="review-request-loader-container">
-              <Spin indicator={<LoadingOutlined spin className="review-request-loader" />} />
-              <span className="review-request-loader-text">
-                {requestAction === BillingTeamJoinRequestAction.ACCEPT ? "Acepting" : "Declining"} joining request ...
-              </span>
-            </div>
-          )}
-
-          {reviewResult && <div className="review-request-result-text">{reviewResult.message}</div>}
-        </div>
-      </div>
-    </RequestReviewModal>
+      isLoading={isLoading}
+      loadingText={`${
+        requestAction === BillingTeamJoinRequestAction.ACCEPT ? "Acepting" : "Declining"
+      } joining request ...`}
+      result={reviewResult?.message}
+    />
   );
 };
