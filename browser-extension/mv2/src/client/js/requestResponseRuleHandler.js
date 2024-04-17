@@ -372,212 +372,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
 
-  // Intercept XMLHttpRequest
-  const onReadyStateChange = async function () {
-    if (this.readyState === this.HEADERS_RECEIVED || this.readyState === this.DONE) {
-      if (!this.responseRule) {
-        return;
-      }
-
-      const responseModification = this.responseRule.pairs[0].response;
-      const responseType = this.responseType;
-      const contentType = this.getResponseHeader("content-type");
-
-      isDebugMode &&
-        console.log("RQ", "Inside the XHR onReadyStateChange block for url", {
-          url: this.requestURL,
-          xhr: this,
-        });
-
-      if (this.readyState === this.HEADERS_RECEIVED) {
-        // For network failures, responseStatus=0 but we still return customResponse with status=200
-        const responseStatus = parseInt(responseModification.statusCode || this.status) || 200;
-        const responseStatusText = responseModification.statusText || this.statusText;
-
-        Object.defineProperty(this, "status", {
-          get: () => responseStatus,
-        });
-
-        Object.defineProperty(this, "statusText", {
-          get: () => responseStatusText,
-        });
-      }
-
-      if (this.readyState === this.DONE) {
-        let customResponse =
-          responseModification.type === "code"
-            ? getFunctionFromCode(responseModification.value)({
-                method: this.method,
-                url: this.requestURL,
-                requestHeaders: this.requestHeaders,
-                requestData: jsonifyValidJSONString(this.requestData),
-                responseType: contentType,
-                response: this.response,
-                responseJSON: jsonifyValidJSONString(this.response, true),
-              })
-            : responseModification.value;
-
-        // Convert customResponse back to rawText
-        // response.value is String and evaluator method might return string/object
-        if (isPromise(customResponse)) {
-          customResponse = await customResponse;
-        }
-
-        const isUnsupportedResponseType = responseType && !["json", "text"].includes(responseType);
-
-        // We do not support statically modifying responses of type - blob, arraybuffer, document etc.
-        if (responseModification.type === "static" && isUnsupportedResponseType) {
-          customResponse = this.response;
-        }
-
-        if (
-          !isUnsupportedResponseType &&
-          typeof customResponse === "object" &&
-          !(customResponse instanceof Blob) &&
-          (responseType === "json" || isContentTypeJSON(contentType))
-        ) {
-          customResponse = JSON.stringify(customResponse);
-        }
-
-        Object.defineProperty(this, "response", {
-          get: function () {
-            if (responseModification.type === "static" && responseType === "json") {
-              if (typeof customResponse === "object") {
-                return customResponse;
-              }
-
-              return jsonifyValidJSONString(customResponse);
-            }
-
-            return customResponse;
-          },
-        });
-
-        if (responseType === "" || responseType === "text") {
-          Object.defineProperty(this, "responseText", {
-            get: function () {
-              return customResponse;
-            },
-          });
-        }
-
-        const requestDetails = {
-          url: this.requestURL,
-          method: this.method,
-          type: "xmlhttprequest",
-          timeStamp: Date.now(),
-        };
-
-        notifyResponseRuleApplied({
-          rule: this.responseRule,
-          requestDetails,
-        });
-      }
-    }
-  };
-
-  const resolveXHR = (xhr, responseData) => {
-    Object.defineProperty(xhr, "readyState", { writable: true });
-    const updateReadyState = (readyState) => {
-      xhr.readyState = readyState;
-      xhr.dispatchEvent(new CustomEvent("readystatechange"));
-    };
-    const dispatchProgressEvent = (type) => {
-      xhr.dispatchEvent(new ProgressEvent(type));
-    };
-
-    dispatchProgressEvent("loadstart");
-
-    // update response headers
-    const contentType = isJSON(responseData) ? "application/json" : "text/plain";
-    xhr.getResponseHeader = (key) => {
-      if (key.toLowerCase() === "content-type") {
-        return contentType;
-      }
-      return null;
-    };
-    updateReadyState(xhr.HEADERS_RECEIVED);
-
-    // mark resolved
-    updateReadyState(xhr.DONE);
-    dispatchProgressEvent("load");
-    dispatchProgressEvent("loadend");
-  };
-
-  const XHR = XMLHttpRequest;
-  XMLHttpRequest = function () {
-    const xhr = new XHR();
-    xhr.addEventListener("readystatechange", onReadyStateChange.bind(xhr), false);
-    return xhr;
-  };
-  XMLHttpRequest.prototype = XHR.prototype;
-  Object.entries(XHR).map(([key, val]) => {
-    XMLHttpRequest[key] = val;
-  });
-
-  const open = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function (method, url) {
-    this.method = method;
-    this.requestURL = getAbsoluteUrl(url);
-    open.apply(this, arguments);
-  };
-
-  const send = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.send = function (data) {
-    this.requestData = data;
-
-    const requestRule = getRequestRule(this.requestURL);
-    if (requestRule) {
-      this.requestData = getCustomRequestBody(requestRule, {
-        method: this.method,
-        url: this.requestURL,
-        body: data,
-        bodyAsJson: jsonifyValidJSONString(data, true),
-      });
-
-      notifyRequestRuleApplied({
-        ruleDetails: requestRule,
-        requestDetails: {
-          url: this.requestURL,
-          method: this.method,
-          type: "xmlhttprequest",
-          timeStamp: Date.now(),
-        },
-      });
-    }
-
-    this.responseRule = getResponseRule({
-      url: this.requestURL,
-      requestData: jsonifyValidJSONString(this.requestData),
-      method: this.method,
-    });
-
-    if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule)) {
-      resolveXHR(this, this.responseRule.pairs[0].response.value);
-    } else {
-      // redirect/replace rule specific code that is applied only when redirect/replace rule matches the URL
-      const redirectRuleThatMatchesURL = getMatchingRedirectRule(this.requestURL);
-      const replaceRuleThatMatchesURL = getMatchingReplaceRule(this.requestURL);
-      if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
-        ignoredHeadersOnRedirect.forEach((header) => {
-          // Stores ignored header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
-          const originalHeaderValue = this.requestHeaders?.[header] || this.requestHeaders?.[header.toLowerCase()];
-          if (isExtensionEnabled() && originalHeaderValue) {
-            this.setRequestHeader(customHeaderPrefix + header, originalHeaderValue);
-          }
-        });
-      }
-      send.call(this, this.requestData);
-    }
-  };
-
-  let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
-  XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-    this.requestHeaders = this.requestHeaders || {};
-    this.requestHeaders[header] = value;
-    setRequestHeader.apply(this, arguments);
-  };
-
   // Intercept fetch API
   const _fetch = fetch;
   fetch = async (...args) => {
@@ -758,5 +552,304 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       statusText: responseModification.statusText || fetchedResponse?.statusText,
       headers: responseHeaders,
     });
+  };
+
+  // XHR Implementation
+  const updateXhrReadyState = (xhr, readyState) => {
+    console.log("RQ", "updateXhrReadyState", readyState);
+    Object.defineProperty(xhr, "readyState", { writable: true });
+    xhr.readyState = readyState;
+    xhr.dispatchEvent(new CustomEvent("readystatechange"));
+  };
+
+  const resolveXHR = (xhr, responseData) => {
+    Object.defineProperty(xhr, "readyState", { writable: true });
+    const updateReadyState = (readyState) => {
+      xhr.readyState = readyState;
+      xhr.dispatchEvent(new CustomEvent("readystatechange"));
+    };
+
+    xhr.dispatchEvent(new ProgressEvent("loadstart"));
+
+    // update response headers
+    const contentType = isJSON(responseData) ? "application/json" : "text/plain";
+    xhr.getResponseHeader = (key) => {
+      if (key.toLowerCase() === "content-type") {
+        return contentType;
+      }
+      return null;
+    };
+    updateReadyState(xhr.HEADERS_RECEIVED);
+
+    // mark resolved
+    updateReadyState(xhr.DONE);
+  };
+
+  const OriginalXMLHttpRequest = XMLHttpRequest;
+
+  const createProxyXHRObject = function () {
+    const actualXhr = this;
+
+    Object.defineProperties(actualXhr, {
+      timeout: {
+        get: function () {
+          return this.rqProxyXhr.timeout;
+        },
+        set: function (timeout) {
+          this.rqProxyXhr.timeout = timeout;
+        },
+      },
+    });
+
+    const dispatchEventToParent = (type) => {
+      console.log("RQ", "dispatchEventToParent", type);
+      actualXhr.dispatchEvent(new ProgressEvent(type));
+    };
+
+    const updateParentXHRReadyState = (readyState) => {
+      updateXhrReadyState(actualXhr, readyState);
+    };
+
+    const onReadyStateChange = async function () {
+      console.log("RQ", "Inside the XHR onReadyStateChange block for url", this.readyState);
+      if (!this.responseRule) {
+        return;
+      }
+      const responseModification = this.responseRule.pairs[0].response;
+
+      isDebugMode &&
+        console.log("RQ", "Inside the XHR onReadyStateChange block for url", {
+          url: this._requestURL,
+          xhr: this,
+        });
+
+      if (this.readyState === this.HEADERS_RECEIVED) {
+        // For network failures, responseStatus=0 but we still return customResponse with status=200
+        const responseStatus = parseInt(responseModification.statusCode || this.status) || 200;
+        const responseStatusText = responseModification.statusText || this.statusText;
+        const getResponseHeader = this.getResponseHeader;
+        const getAllResponseHeaders = this.getAllResponseHeaders;
+
+        Object.defineProperties(actualXhr, {
+          status: {
+            get: () => responseStatus,
+          },
+          statusText: {
+            get: () => responseStatusText,
+          },
+          getResponseHeader: {
+            value: getResponseHeader.bind(this),
+          },
+          getAllResponseHeaders: {
+            value: getAllResponseHeaders.bind(this),
+          },
+        });
+
+        updateParentXHRReadyState(this.HEADERS_RECEIVED);
+      } else if (this.readyState === this.DONE) {
+        const responseType = this.responseType;
+        const contentType = this.getResponseHeader("content-type");
+
+        updateParentXHRReadyState(this.LOADING);
+        let customResponse =
+          responseModification.type === "code"
+            ? getFunctionFromCode(responseModification.value)({
+                method: this._method,
+                url: this._requestURL,
+                requestHeaders: this._requestHeaders,
+                requestData: jsonifyValidJSONString(this._requestData),
+                responseType: contentType,
+                response: this.response,
+                responseJSON: jsonifyValidJSONString(this.response, true),
+              })
+            : responseModification.value;
+
+        // Convert customResponse back to rawText
+        // response.value is String and evaluator method might return string/object
+        if (isPromise(customResponse)) {
+          customResponse = await customResponse;
+        }
+
+        console.log("RQ", "customResponse", customResponse, responseType, contentType);
+
+        const isUnsupportedResponseType = responseType && !["json", "text"].includes(responseType);
+
+        // We do not support statically modifying responses of type - blob, arraybuffer, document etc.
+        if (responseModification.type === "static" && isUnsupportedResponseType) {
+          customResponse = this.response;
+        }
+
+        if (
+          !isUnsupportedResponseType &&
+          typeof customResponse === "object" &&
+          !(customResponse instanceof Blob) &&
+          (responseType === "json" || isContentTypeJSON(contentType))
+        ) {
+          customResponse = JSON.stringify(customResponse);
+        }
+        Object.defineProperty(actualXhr, "response", {
+          get: function () {
+            if (responseModification.type === "static" && responseType === "json") {
+              if (typeof customResponse === "object") {
+                return customResponse;
+              }
+
+              return jsonifyValidJSONString(customResponse);
+            }
+
+            return customResponse;
+          },
+        });
+
+        if (responseType === "" || responseType === "text") {
+          Object.defineProperty(actualXhr, "responseText", {
+            get: function () {
+              return customResponse;
+            },
+          });
+        }
+
+        const responseURL = this.responseURL;
+        const responseXML = this.responseXML;
+
+        Object.defineProperties(actualXhr, {
+          responseType: {
+            get: function () {
+              return responseType;
+            },
+          },
+          responseURL: {
+            get: function () {
+              return responseURL;
+            },
+          },
+          responseXML: {
+            get: function () {
+              return responseXML;
+            },
+          },
+        });
+
+        const requestDetails = {
+          url: this._requestURL,
+          method: this._method,
+          type: "xmlhttprequest",
+          timeStamp: Date.now(),
+        };
+
+        // mark resolved)
+        updateParentXHRReadyState(this.DONE);
+        dispatchEventToParent("load");
+        dispatchEventToParent("loadEnd");
+
+        notifyResponseRuleApplied({
+          rule: this.responseRule,
+          requestDetails,
+        });
+      } else {
+        updateParentXHRReadyState(this.readyState);
+      }
+    };
+
+    const xhr = new OriginalXMLHttpRequest();
+    xhr.addEventListener("readystatechange", onReadyStateChange.bind(xhr, this), false);
+    xhr.addEventListener("abort", dispatchEventToParent.bind(xhr, "abort"), false);
+    xhr.addEventListener("error", dispatchEventToParent.bind(xhr, "error"), false);
+    xhr.addEventListener("timeout", dispatchEventToParent.bind(xhr, "timeout"), false);
+    xhr.addEventListener("loadstart", dispatchEventToParent.bind(xhr, "loadstart"), false);
+
+    this.rqProxyXhr = xhr;
+  };
+
+  XMLHttpRequest = function () {
+    const xhr = new OriginalXMLHttpRequest();
+    createProxyXHRObject.call(xhr);
+    return xhr;
+  };
+
+  // TODO: Why this required? Check with @nafees/vaibhav
+  XMLHttpRequest.prototype = OriginalXMLHttpRequest.prototype;
+  Object.entries(OriginalXMLHttpRequest).map(([key, val]) => {
+    XMLHttpRequest[key] = val;
+  });
+
+  const open = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function (method, url) {
+    this._method = method;
+    this._requestURL = getAbsoluteUrl(url);
+    open.apply(this.rqProxyXhr, arguments);
+    open.apply(this, arguments);
+  };
+
+  const abort = XMLHttpRequest.prototype.abort;
+  XMLHttpRequest.prototype.abort = function () {
+    console.log("abort called");
+    abort.apply(this.rqProxyXhr, arguments);
+    abort.apply(this, arguments);
+  };
+
+  let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
+  XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
+    this._requestHeaders = this._requestHeaders || {};
+    this._requestHeaders[header] = value;
+    setRequestHeader.apply(this.rqProxyXhr, arguments);
+    setRequestHeader.apply(this, arguments);
+  };
+
+  const send = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.send = function (data) {
+    this._requestData = data;
+
+    const requestRule = getRequestRule(this._requestURL);
+    if (requestRule) {
+      this._requestData = getCustomRequestBody(requestRule, {
+        method: this._method,
+        url: this._requestURL,
+        body: data,
+        bodyAsJson: jsonifyValidJSONString(data, true),
+      });
+
+      notifyRequestRuleApplied({
+        ruleDetails: requestRule,
+        requestDetails: {
+          url: this._requestURL,
+          method: this._method,
+          type: "xmlhttprequest",
+          timeStamp: Date.now(),
+        },
+      });
+    }
+
+    this.responseRule = getResponseRule({
+      url: this._requestURL,
+      requestData: jsonifyValidJSONString(this._requestData),
+      method: this._method,
+    });
+    this.rqProxyXhr.responseRule = this.responseRule;
+
+    const redirectRuleThatMatchesURL = getMatchingRedirectRule(this._requestURL);
+    const replaceRuleThatMatchesURL = getMatchingReplaceRule(this._requestURL);
+    if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+      ignoredHeadersOnRedirect.forEach((header) => {
+        // Stores ignored header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
+        const originalHeaderValue = this._requestHeaders?.[header] || this._requestHeaders?.[header.toLowerCase()];
+        if (isExtensionEnabled() && originalHeaderValue) {
+          this.setRequestHeader(customHeaderPrefix + header, originalHeaderValue);
+        }
+      });
+    }
+
+    if (this.responseRule) {
+      console.log("RQ", "send and response rule matched", this.responseRule);
+      if (shouldServeResponseWithoutRequest(this.responseRule)) {
+        console.log("RQ", "send and response rule matched and serveWithoutRequest is true");
+        resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
+      } else {
+        send.call(this.rqProxyXhr, this._requestData);
+      }
+      return;
+    }
+
+    send.call(this, this._requestData);
   };
 };
