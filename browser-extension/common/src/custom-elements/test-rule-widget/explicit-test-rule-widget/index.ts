@@ -14,16 +14,16 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
   connectedCallback() {
     super.connectedCallback();
 
-    const contentContainer = this.shadowRoot.getElementById("rq-test-rule-container");
+    const contentContainer = this.shadowRoot.getElementById("test-rule-container");
 
     const explicitModeMarkup = `   
-     <div id="rq-explicit-widget-container">  
-        <div id="rq-rule-status-container">
-          <div id="rq-rule-status"></div>
+     <div id="explicit-widget-container">  
+        <div id="rule-status-container">
+          <div id="rule-status"></div>
         </div>
-        <div id="rq-test-rule-details">
-          <div id="rq-rule-name" class="primary-text"></div>
-          <button id="rq-view-result-btn">View Results</button>
+        <div id="test-rule-details">
+          <div id="rule-name" class="primary-text"></div>
+          <button id="view-result-btn">View Results</button>
         </div>
       </div>
         `;
@@ -33,7 +33,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
 
     this.#testRuleId = this.attributes.getNamedItem("rule-id")?.value;
 
-    const ruleName = this.shadowRoot.getElementById("rq-rule-name");
+    const ruleName = this.shadowRoot.getElementById("rule-name");
     ruleName.textContent = "Testing " + this.attributes.getNamedItem("rule-name")?.value ?? null;
 
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
@@ -41,15 +41,15 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
 
     const infoTextContent = this.attributes.getNamedItem("rq-test-rule-text")?.value;
     if (infoTextContent) {
-      const infoContainer = this.shadowRoot.getElementById("rq-info-container");
-      const infoContainerText = this.shadowRoot.getElementById("rq-info-text");
+      const infoContainer = this.shadowRoot.getElementById("info-container");
+      const infoContainerText = this.shadowRoot.getElementById("info-text");
       setInnerHTML(infoContainerText, infoTextContent);
       infoContainer.classList.remove("hidden");
     }
   }
 
   addWidgetListeners() {
-    this.shadowRoot.getElementById("rq-view-result-btn").addEventListener("click", (evt) => {
+    this.shadowRoot.getElementById("view-result-btn").addEventListener("click", (evt) => {
       evt.stopPropagation();
       this.triggerEvent(RQTestRuleWidgetEvent.VIEW_RESULTS);
     });
@@ -67,8 +67,8 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
   }
 
   showRuleAppliedStatus(appliedStatus: boolean) {
-    const ruleStatusContainer = this.shadowRoot.getElementById("rq-rule-status");
-    const minimizedStatusBtn = this.shadowRoot.getElementById("rq-test-rule-minimized-btn");
+    const ruleStatusContainer = this.shadowRoot.getElementById("rule-status");
+    const minimizedStatusBtn = this.shadowRoot.getElementById("test-rule-minimized-btn");
     if (appliedStatus) {
       setInnerHTML(
         ruleStatusContainer,
@@ -81,7 +81,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
       setInnerHTML(
         minimizedStatusBtn,
         `
-        <span class="rq-success">${CheckIcon}</span>
+        <span class="success">${CheckIcon}</span>
       `
       );
     } else {
@@ -95,7 +95,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
       setInnerHTML(
         minimizedStatusBtn,
         `
-        <span class="rq-warning">${PendingIcon}</span>
+        <span class="warning">${PendingIcon}</span>
       `
       );
     }
