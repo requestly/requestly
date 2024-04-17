@@ -1,0 +1,67 @@
+.review-request-modal {
+  .ant-modal-header {
+    border-bottom: 0;
+    padding: 1rem;
+    padding-bottom: 0;
+
+    .ant-modal-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: Inter;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 24px;
+      letter-spacing: 0.5px;
+
+      svg {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .ant-modal-body {
+    padding: 1rem;
+  }
+
+  .ant-modal-footer {
+    padding: 1rem;
+    padding-top: 8px;
+    border-top: 0;
+  }
+}
+
+.review-request-content {
+  padding: 12px 0;
+}
+
+.review-request-loader-container,
+.review-request-result-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.review-request-loader-container {
+  .review-request-loader {
+    color: var(--text-default);
+    font-size: 24px;
+  }
+}
+
+.review-request-loader-text {
+  color: var(--text-default);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+}
+
+.review-request-result-text {
+  color: var(--text-subtle);
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+  padding-right: 18px;
+}
