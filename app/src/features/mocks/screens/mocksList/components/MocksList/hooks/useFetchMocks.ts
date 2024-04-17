@@ -5,7 +5,7 @@ import {
   oldMockToNewMockMetadataAdapter,
 } from "components/features/mocksV2/utils/oldMockAdapter";
 import { MockType, RQMockMetadataSchema } from "features/mocks/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
@@ -19,7 +19,8 @@ export const useFetchMocks = (type: MockType = MockType.API) => {
   const [mocksList, setMocksList] = useState<RQMockMetadataSchema[]>([]);
   const [oldMocksList, setOldMocksList] = useState<RQMockMetadataSchema[]>([]);
 
-  // TODO: move this into service or action or utils
+  const mocks = useMemo(() => [...mocksList, ...oldMocksList], [mocksList, oldMocksList]);
+
   // TODO: Remove this after all mocks are migrated to new schema
   const fetchOldMocks = useCallback(() => {
     fetchUserMocks().then((list: any[]) => {
@@ -59,7 +60,6 @@ export const useFetchMocks = (type: MockType = MockType.API) => {
     });
   }, [type, uid]);
 
-  // TODO: move this into service or action or utils
   const fetchMocks = useCallback(() => {
     // API|FILE|null
     getMocks(uid, type, workspace?.id)
@@ -84,8 +84,9 @@ export const useFetchMocks = (type: MockType = MockType.API) => {
   }, [fetchMocks, fetchOldMocks, workspace, setOldMocksList]);
 
   return {
+    mocks,
     isLoading,
-    mocksList,
-    oldMocksList,
+    fetchOldMocks,
+    fetchMocks,
   };
 };

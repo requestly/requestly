@@ -1,5 +1,5 @@
 import SpinnerCard from "components/misc/SpinnerCard";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   redirectToFileMockEditorEditMock,
@@ -9,13 +9,10 @@ import {
 } from "utils/RedirectionUtils";
 import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import { MockListSource, MockType, RQMockMetadataSchema } from "features/mocks/types";
-import { GettingStartedWithMocks } from "components/features/mocksV2/MockList/GettingStartedWithMocks";
-import NewFileModal from "components/features/mocksV2/NewFileModal";
-import { DeleteMockModal } from "components/features/mocksV2/DeleteMockModal";
 import { useFetchMocks } from "./hooks/useFetchMocks";
-import { MocksListContentHeader, MocksTable } from "./components";
+import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
-import { MockUploaderModal } from "features/mocks/modals";
+import { DeleteMockModal, MockUploaderModal, NewFileModal } from "features/mocks/modals";
 import "./mocksList.scss";
 
 interface Props {
@@ -33,9 +30,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
 
-  const { isLoading, mocksList, oldMocksList } = useFetchMocks(type);
-
-  const mocks = useMemo(() => [...mocksList, ...oldMocksList], [mocksList, oldMocksList]);
+  const { isLoading, mocks, fetchOldMocks, fetchMocks } = useFetchMocks(type);
 
   useEffect(() => {
     // TODO: check for rerenders
@@ -123,7 +118,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         selectMockOnUpload={handleSelectAction}
       />
     </>
-  ) : mocksList.length + oldMocksList.length > 0 ? (
+  ) : mocks.length > 0 ? (
     <>
       <div className="rq-mocks-list-container">
         {/* TODO: Temp Breadcrumb */}
@@ -161,27 +156,16 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         visible={uploadModalVisibility}
         toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
       />
-      {/* <DeleteMockModal
-          visible={deleteModalVisibility}
-          toggleDeleteModalVisibility={(visible: boolean) => setDeleteModalVisibility(visible)}
-          mock={selectedMock}
-          callbackOnSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
-        /> */}
+
+      <DeleteMockModal
+        visible={deleteModalVisibility}
+        toggleDeleteModalVisibility={(visible: boolean) => setDeleteModalVisibility(visible)}
+        mock={selectedMock}
+        callbackOnSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
+      />
     </>
   ) : (
-    <>
-      <GettingStartedWithMocks
-        mockType={type}
-        handleCreateNew={handleCreateNewMock}
-        handleUploadAction={handleUploadAction}
-      />
-      <NewFileModal visible={fileModalVisibility} toggleModalVisiblity={(visible) => setFileModalVisibility(visible)} />
-      <MockUploaderModal
-        mockType={type}
-        visible={uploadModalVisibility}
-        toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
-      />
-    </>
+    <GettingStarted mockType={type} handleCreateNew={handleCreateNewMock} handleUploadAction={handleUploadAction} />
   );
 };
 
