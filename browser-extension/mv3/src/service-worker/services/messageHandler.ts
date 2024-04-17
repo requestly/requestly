@@ -13,6 +13,7 @@ import {
   stopRecording,
   watchRecording,
 } from "./sessionRecording";
+import { initCustomWidgets } from "./customWidgets";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -32,6 +33,7 @@ export const initMessageHandler = () => {
           tabId: sender.tab?.id,
           frameIds: [sender.frameId],
         });
+        initCustomWidgets(sender.tab?.id, sender.frameId);
         applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         break;
 

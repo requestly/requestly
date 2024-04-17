@@ -1,4 +1,4 @@
-import { CLIENT_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { SessionRecordingConfig } from "common/types";
 
 type SendResponseCallback = (payload: unknown) => void;
@@ -7,6 +7,8 @@ const sendResponseCallbacks: { [action: string]: SendResponseCallback } = {};
 let isRecording = false;
 let isExplicitRecording = false;
 let markRecordingIcon = false;
+let widgetPosition: { top?: number; bottom?: number; left?: number; right?: number };
+let recordingStartTime: number;
 
 export const initSessionRecording = () => {
   chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }).then(sendStartRecordingEvent);
@@ -45,6 +47,7 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
 
   if (isExplicitRecording) {
     markRecordingIcon = true;
+    recordingStartTime = Date.now();
   } else {
     markRecordingIcon = sessionRecordingConfig.markRecordingIcon ?? false;
   }
@@ -89,10 +92,14 @@ const addListeners = () => {
           markRecordingIcon,
         },
       });
+
+      showManualModeRecordingWidget();
     } else if (event.data.action === "sessionRecordingStopped") {
       isRecording = false;
       isExplicitRecording = false;
       markRecordingIcon = false;
+
+      hideManualModeWidget();
 
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -111,4 +118,53 @@ const sendMessageToClient = (action: string, payload: unknown, sendResponseCallb
   if (sendResponseCallback) {
     sendResponseCallbacks[action] = sendResponseCallback;
   }
+};
+
+const showManualModeRecordingWidget = () => {
+  let widget = getManualModeWidget();
+
+  if (!widget) {
+    widget = document.createElement("rq-session-recording-widget");
+    widget.classList.add("rq-element");
+    document.documentElement.appendChild(widget);
+
+    widget.addEventListener("stop", () => {
+      chrome.runtime.sendMessage({
+        action: EXTENSION_MESSAGES.STOP_RECORDING,
+        openRecording: true,
+      });
+    });
+
+    widget.addEventListener("discard", () => {
+      chrome.runtime.sendMessage({
+        action: EXTENSION_MESSAGES.STOP_RECORDING,
+      });
+    });
+
+    widget.addEventListener("moved", (evt: CustomEvent) => {
+      widgetPosition = evt.detail;
+    });
+  }
+
+  const recordingLimitInMilliseconds = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
+  const recordingTime = Date.now() - recordingStartTime;
+  const currentRecordingTime = recordingTime <= recordingLimitInMilliseconds ? recordingTime : null;
+
+  widget.dispatchEvent(
+    new CustomEvent("show", {
+      detail: {
+        currentRecordingTime,
+        position: widgetPosition,
+      },
+    })
+  );
+};
+
+const hideManualModeWidget = () => {
+  const widget = getManualModeWidget();
+  widget?.dispatchEvent(new CustomEvent("hide"));
+};
+
+const getManualModeWidget = () => {
+  return document.querySelector("rq-session-recording-widget");
 };
