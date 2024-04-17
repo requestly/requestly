@@ -93,13 +93,18 @@ const addListeners = () => {
         },
       });
 
-      showManualModeRecordingWidget();
+      if (isExplicitRecording) {
+        showManualModeRecordingWidget();
+      } else {
+        showAutoModeRecordingWidget();
+      }
     } else if (event.data.action === "sessionRecordingStopped") {
       isRecording = false;
       isExplicitRecording = false;
       markRecordingIcon = false;
 
       hideManualModeWidget();
+      hideAutoModeWidget();
 
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
@@ -167,4 +172,38 @@ const hideManualModeWidget = () => {
 
 const getManualModeWidget = () => {
   return document.querySelector("rq-session-recording-widget");
+};
+
+const showAutoModeRecordingWidget = () => {
+  const tagName = "rq-session-recording-auto-mode-widget";
+  let widget = document.querySelector(tagName);
+
+  if (!widget) {
+    widget = document.createElement(tagName);
+    widget.classList.add("rq-element");
+    document.documentElement.appendChild(widget);
+
+    widget.addEventListener("watch", () => {
+      chrome.runtime.sendMessage({
+        action: EXTENSION_MESSAGES.WATCH_RECORDING,
+      });
+    });
+
+    widget.addEventListener("moved", (evt: CustomEvent) => {
+      widgetPosition = evt.detail;
+    });
+  }
+
+  widget.dispatchEvent(
+    new CustomEvent("show", {
+      detail: {
+        position: widgetPosition,
+      },
+    })
+  );
+};
+
+const hideAutoModeWidget = () => {
+  let widget = document.querySelector("rq-session-recording-auto-mode-widget");
+  widget?.dispatchEvent(new CustomEvent("hide"));
 };
