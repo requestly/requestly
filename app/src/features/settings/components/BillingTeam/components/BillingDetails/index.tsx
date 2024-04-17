@@ -7,7 +7,7 @@ import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/featur
 import { Result } from "antd";
 import { MyBillingTeamDetails } from "./MyBillingTeamDetails";
 import { OtherBillingTeamDetails } from "./OtherBillingTeamDetails";
-import { ReviewJoinRequestModal } from "./components/ReviewJoinRequestModal/ReviewJoinRequestModal";
+import { ReviewJoinRequestModal } from "./modals/ReviewJoinRequestModal/ReviewJoinRequestModal";
 import { BillingTeamJoinRequestAction } from "./types";
 
 export const BillingTeamDetails = () => {

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal, Spin } from "antd";
 import { trackBillingTeamAccessRequestResponded } from "features/settings/analytics";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { BillingTeamJoinRequestAction } from "../../types";
 import { LoadingOutlined } from "@ant-design/icons";
 import { PiWarningDiamondBold } from "@react-icons/all-files/pi/PiWarningDiamondBold";
@@ -9,6 +8,7 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RQButton } from "lib/design-system/components";
 import Logger from "../../../../../../../../../../common/logger";
+import { reviewBillingTeamJoiningRequest } from "backend/billing/reviewJoinRequest";
 import "./ReviewJoinRequestModal.scss";
 
 interface ReviewJoinRequestModalProps {
@@ -33,18 +33,13 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
   useEffect(() => {
     if (!isActionCompleted) {
       trackBillingTeamAccessRequestResponded(requestAction, "loading");
-      const reviewBillingTeamJoiningRequest = httpsCallable(getFunctions(), "billing-reviewBillingTeamJoiningRequest");
-      reviewBillingTeamJoiningRequest({
-        billingId,
-        action: requestAction,
-        userId,
-      })
+      reviewBillingTeamJoiningRequest(billingId, requestAction, userId)
         .then((res: any) => {
           setReviewResult(res.data);
           trackBillingTeamAccessRequestResponded(requestAction, res.data.result.status);
           Logger.log("Billing team joining request reviewed");
         })
-        .catch((err) => {
+        .catch(() => {
           trackBillingTeamAccessRequestResponded(requestAction, "error");
           Logger.log("Error while reviewing billing team joining request");
         })

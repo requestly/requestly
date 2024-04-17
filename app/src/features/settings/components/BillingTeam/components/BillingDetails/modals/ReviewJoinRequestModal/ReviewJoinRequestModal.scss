@@ -1,10 +1,10 @@
 .review-request-modal {
-  & .ant-modal-header {
+  .ant-modal-header {
     border-bottom: 0;
     padding: 1rem;
     padding-bottom: 0;
 
-    & .ant-modal-title {
+    .ant-modal-title {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -14,17 +14,17 @@
       line-height: 24px;
       letter-spacing: 0.5px;
 
-      & svg {
+      svg {
         font-size: 20px;
       }
     }
   }
 
-  & .ant-modal-body {
+  .ant-modal-body {
     padding: 1rem;
   }
 
-  & .ant-modal-footer {
+  .ant-modal-footer {
     padding: 1rem;
     padding-top: 8px;
     border-top: 0;
@@ -44,7 +44,7 @@
 }
 
 .review-request-loader-container {
-  & .review-request-loader {
+  .review-request-loader {
     color: var(--text-default);
     font-size: 24px;
   }
