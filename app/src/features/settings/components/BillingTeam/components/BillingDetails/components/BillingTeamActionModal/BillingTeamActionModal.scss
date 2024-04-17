@@ -1,4 +1,4 @@
-.review-request-modal {
+.billing-team-action-modal {
   .ant-modal-header {
     border-bottom: 0;
     padding: 1rem;
@@ -31,26 +31,26 @@
   }
 }
 
-.review-request-content {
+.billing-team-action-content {
   padding: 12px 0;
 }
 
-.review-request-loader-container,
-.review-request-result-container {
+.billing-team-action-loader-container,
+.billing-team-action-result-container {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
 }
 
-.review-request-loader-container {
-  .review-request-loader {
+.billing-team-action-loader-container {
+  .billing-team-action-loader {
     color: var(--text-default);
     font-size: 24px;
   }
 }
 
-.review-request-loader-text {
+.billing-team-action-loader-text {
   color: var(--text-default);
   font-size: 1rem;
   font-weight: 500;
@@ -58,7 +58,7 @@
   letter-spacing: 0.5px;
 }
 
-.review-request-result-text {
+.billing-team-action-result-text {
   color: var(--text-subtle);
   font-size: 13px;
   line-height: 18px;
