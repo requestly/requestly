@@ -77,3 +77,16 @@ export const stopRecording = (tabId: number, openRecording: boolean) => {
     }
   });
 };
+
+export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget: boolean) => {
+  const sessionRecordingData = { explicit: true, showWidget };
+
+  injectWebAccessibleScript("libs/requestly-web-sdk.js", {
+    tabId: tab.id,
+  }).then(() => {
+    chrome.tabs.sendMessage(tab.id, {
+      action: CLIENT_MESSAGES.START_RECORDING,
+      payload: sessionRecordingData,
+    });
+  });
+};

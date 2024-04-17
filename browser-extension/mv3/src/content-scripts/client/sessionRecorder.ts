@@ -5,14 +5,16 @@ type SendResponseCallback = (payload: unknown) => void;
 
 const sendResponseCallbacks: { [action: string]: SendResponseCallback } = {};
 let isRecording = false;
+let isExplicitRecording = false;
 
 export const initSessionRecording = () => {
-  chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }, sendStartRecordingEvent);
+  chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }).then(sendStartRecordingEvent);
 
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
-      case CLIENT_MESSAGES.STOP_RECORDING:
-        sendMessageToClient("stopRecording", null);
+      case CLIENT_MESSAGES.START_RECORDING:
+        sendStartRecordingEvent(message.payload);
+        break;
     }
   });
 };
@@ -22,19 +24,23 @@ const isIframe = (): boolean => {
 };
 
 const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig) => {
-  if (sessionRecordingConfig) {
-    const isIFrame = isIframe();
-
-    if (!isIFrame) {
-      addListeners();
-    }
-    sendMessageToClient("startRecording", {
-      relayEventsToTop: isIFrame,
-      console: true,
-      network: true,
-      maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
-    });
+  if (!sessionRecordingConfig) {
+    return;
   }
+
+  const isIFrame = isIframe();
+
+  if (!isIFrame) {
+    addListeners();
+  }
+  sendMessageToClient("startRecording", {
+    relayEventsToTop: isIFrame,
+    console: true,
+    network: true,
+    maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
+  });
+
+  isExplicitRecording = sessionRecordingConfig.explicit ?? false;
 };
 
 const addListeners = () => {
@@ -49,6 +55,13 @@ const addListeners = () => {
           sendMessageToClient("getSessionData", null, sendResponse);
         }
         return true; // notify sender to wait for response and not resolve request immediately
+
+      case CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
+        sendResponse(isExplicitRecording);
+        break;
+
+      case CLIENT_MESSAGES.STOP_RECORDING:
+        sendMessageToClient("stopRecording", null);
     }
 
     return false;

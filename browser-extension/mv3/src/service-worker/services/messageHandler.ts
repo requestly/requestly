@@ -9,6 +9,7 @@ import {
   initSessionRecording,
   onSessionRecordingStartedNotification,
   onSessionRecordingStoppedNotification,
+  startRecordingExplicitly,
   stopRecording,
   watchRecording,
 } from "./sessionRecording";
@@ -43,6 +44,8 @@ export const initMessageHandler = () => {
         break;
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
         onSessionRecordingStoppedNotification(sender.tab.id);
+      case EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
+        startRecordingExplicitly(message.tab, message.showWidget);
         break;
       case EXTENSION_MESSAGES.STOP_RECORDING:
         stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
