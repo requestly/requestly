@@ -15,6 +15,7 @@ import Logger from "lib/logger";
 import { BillingTeamDetails, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import PATHS from "config/constants/sub/paths";
 
+// TODO: remove this index.ts file and move the functions to the appropriate files refer mocks directory for reference
 export const getBillingTeamInvoices = async (billingId: string) => {
   if (!billingId) {
     return null;
