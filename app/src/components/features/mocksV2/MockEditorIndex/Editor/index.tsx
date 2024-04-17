@@ -390,7 +390,13 @@ const MockEditor: React.FC<Props> = ({
         setPassword={setPassword}
         password={password}
       />
-      <div className="mock-editor-title-container">
+      <Col
+        className="mock-editor-title-container"
+        span={22}
+        offset={1}
+        md={{ offset: 2, span: 20 }}
+        lg={{ offset: 4, span: 16 }}
+      >
         <RQEditorTitle
           name={name}
           mode={isNew ? "create" : "edit"}
@@ -402,7 +408,7 @@ const MockEditor: React.FC<Props> = ({
           tagText={fileType}
           errors={errors}
         />
-      </div>
+      </Col>
       <Row className="mock-editor-container">
         <Col
           className="mock-editor-container-col"
