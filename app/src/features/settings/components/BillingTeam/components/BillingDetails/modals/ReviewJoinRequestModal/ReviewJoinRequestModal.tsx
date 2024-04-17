@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Modal, Spin } from "antd";
+import { Spin } from "antd";
 import { trackBillingTeamAccessRequestResponded } from "features/settings/analytics";
 import { BillingTeamJoinRequestAction } from "../../types";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -8,8 +8,8 @@ import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOut
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RQButton } from "lib/design-system/components";
 import Logger from "../../../../../../../../../../common/logger";
+import { RequestReviewModal } from "../../components/RequestReviewModal/RequestReviewModal";
 import { reviewBillingTeamJoiningRequest } from "backend/billing/reviewJoinRequest";
-import "./ReviewJoinRequestModal.scss";
 
 interface ReviewJoinRequestModalProps {
   isOpen: boolean;
@@ -64,7 +64,7 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
   }, []);
 
   return (
-    <Modal
+    <RequestReviewModal
       width={320}
       centered
       open={isOpen}
@@ -95,6 +95,6 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
           {reviewResult && <div className="review-request-result-text">{reviewResult.message}</div>}
         </div>
       </div>
-    </Modal>
+    </RequestReviewModal>
   );
 };
