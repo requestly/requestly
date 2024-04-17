@@ -2,7 +2,6 @@ import { Navigate, RouteObject } from "react-router-dom";
 import TemplatesIndexPage from "components/landing/ruleTemplates";
 import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer";
-// import RulesIndexView from "views/features/rules/RulesIndexView";
 import SharedListsIndexPage from "components/features/sharedLists/SharedListsIndexPage";
 import TrashIndexPage from "components/features/trash/TrashIndexPage";
 import RuleEditor from "views/features/rules/RuleEditor";
@@ -21,14 +20,6 @@ export const ruleRoutes: RouteObject[] = [
     path: PATHS.RULES.INDEX,
     element: <RulesContainer />,
     children: [
-      {
-        path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
-        element: <RuleEditor />,
-      },
-      {
-        path: joinPaths(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE, "/:ruleType"),
-        element: <RuleEditor />,
-      },
       {
         path: PATHS.SHARED_LISTS.RELATIVE,
         element: <SharedListsIndexPage />,
@@ -79,6 +70,15 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: `${PATHS.RULES.MY_RULES.RELATIVE}`,
         element: <RulesListScreen />,
+      },
+      // TODO:  VV Needs Refractoring below this VV
+      {
+        path: joinPaths(PATHS.RULE_EDITOR.RELATIVE, PATHS.ANY),
+        element: <RuleEditor />,
+      },
+      {
+        path: joinPaths(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE, "/:ruleType"),
+        element: <RuleEditor />,
       },
     ],
   },
