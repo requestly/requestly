@@ -6,6 +6,7 @@ type SendResponseCallback = (payload: unknown) => void;
 const sendResponseCallbacks: { [action: string]: SendResponseCallback } = {};
 let isRecording = false;
 let isExplicitRecording = false;
+let markRecordingIcon = false;
 
 export const initSessionRecording = () => {
   chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }).then(sendStartRecordingEvent);
@@ -41,6 +42,12 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
   });
 
   isExplicitRecording = sessionRecordingConfig.explicit ?? false;
+
+  if (isExplicitRecording) {
+    markRecordingIcon = true;
+  } else {
+    markRecordingIcon = sessionRecordingConfig.markRecordingIcon ?? false;
+  }
 };
 
 const addListeners = () => {
@@ -78,9 +85,15 @@ const addListeners = () => {
       isRecording = true;
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
+        payload: {
+          markRecordingIcon,
+        },
       });
     } else if (event.data.action === "sessionRecordingStopped") {
       isRecording = false;
+      isExplicitRecording = false;
+      markRecordingIcon = false;
+
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });

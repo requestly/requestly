@@ -40,10 +40,11 @@ export const initMessageHandler = () => {
         return true;
 
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
-        onSessionRecordingStartedNotification(sender.tab.id);
+        onSessionRecordingStartedNotification(sender.tab.id, message.payload.markRecordingIcon);
         break;
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
         onSessionRecordingStoppedNotification(sender.tab.id);
+        break;
       case EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
         startRecordingExplicitly(message.tab, message.showWidget);
         break;

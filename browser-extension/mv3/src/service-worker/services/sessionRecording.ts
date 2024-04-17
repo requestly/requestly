@@ -48,9 +48,11 @@ export const initSessionRecording = async (tabId: number, frameId: number, url: 
   return config;
 };
 
-export const onSessionRecordingStartedNotification = (tabId: number) => {
-  chrome.action.setBadgeText({ tabId, text: "REC" });
-  chrome.action.setBadgeBackgroundColor({ tabId, color: "#e34850" });
+export const onSessionRecordingStartedNotification = (tabId: number, markIcon: boolean) => {
+  if (markIcon) {
+    chrome.action.setBadgeText({ tabId, text: "REC" });
+    chrome.action.setBadgeBackgroundColor({ tabId, color: "#e34850" });
+  }
 };
 
 export const onSessionRecordingStoppedNotification = (tabId: number) => {
