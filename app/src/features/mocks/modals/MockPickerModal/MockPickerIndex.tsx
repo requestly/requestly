@@ -30,7 +30,6 @@ interface Props {
   handleUploadAction?: () => void;
 }
 
-// TODO: move component in features/mocks
 const MockPickerIndex: React.FC<Props> = ({
   mocks,
   handleItemSelect,
