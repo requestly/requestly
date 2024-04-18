@@ -5,16 +5,10 @@ import { trackExtensionInstalled } from "modules/analytics/events/misc/installat
 import { getExtensionInsallSource } from "store/selectors";
 import PATHS from "config/constants/sub/paths";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import { useInitImplicitWidgetConfig } from "components/features/rules/TestThisRule/hooks/useInitImplicitWidgetConfig";
 
 const ExtensionInstalled: React.FC = () => {
   const installSourcePage = useSelector(getExtensionInsallSource);
   const onboardingVariation = useFeatureValue("activation_without_onboarding", "variant");
-  const { initImplicitWidgetConfig } = useInitImplicitWidgetConfig();
-
-  useEffect(() => {
-    initImplicitWidgetConfig();
-  }, [initImplicitWidgetConfig]);
 
   useEffect(() => {
     trackExtensionInstalled();

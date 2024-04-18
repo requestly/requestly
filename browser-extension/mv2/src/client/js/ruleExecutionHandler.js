@@ -1,5 +1,7 @@
 RQ.RuleExecutionHandler = {};
 RQ.RuleExecutionHandler.appliedRuleIds = new Set();
+RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled = false;
+RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = null;
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
   const eventName = "rule_executed";
@@ -13,7 +15,11 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
-  RQ.RuleExecutionHandler.notifyRuleAppliedToWidget(rule.id);
+  if (RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled) {
+    RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget(rule);
+  } else {
+    RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget(rule.id);
+  }
 
   const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(rule.id);
   if (isFirstExecution) {
@@ -22,10 +28,12 @@ RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
   }
 };
 
-RQ.RuleExecutionHandler.setup = () => {
+RQ.RuleExecutionHandler.setup = async () => {
   if (window !== window.top) {
     return;
   }
+
+  RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig();
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
@@ -43,14 +51,20 @@ RQ.RuleExecutionHandler.setup = () => {
         sendResponse();
         break;
 
-      case RQ.CLIENT_MESSAGES.START_RULE_TESTING:
+      case RQ.CLIENT_MESSAGES.START_EXPLICIT_RULE_TESTING:
         if (message.record) {
           chrome.runtime.sendMessage({
             action: RQ.EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY,
             showWidget: false,
           });
         }
-        RQ.RuleExecutionHandler.showTestRuleWidget(message.ruleId);
+        RQ.RuleExecutionHandler.showExplicitTestRuleWidget(message.ruleId);
+        break;
+
+      case RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
+        RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled = true;
+        RQ.RuleExecutionHandler.showImplicitTestRuleWidget();
+
         break;
     }
 
@@ -73,15 +87,15 @@ RQ.RuleExecutionHandler.hasExecutedRules = () => {
   return RQ.RuleExecutionHandler.appliedRuleIds.size > 0;
 };
 
-RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
-  if (document.querySelector("rq-test-rule-widget")) {
+RQ.RuleExecutionHandler.showExplicitTestRuleWidget = async (ruleId) => {
+  if (document.querySelector("rq-explicit-test-rule-widget")) {
     return;
   }
 
   const ruleDetails = await RQ.RulesStore.getRule(ruleId);
   const { name: ruleName } = ruleDetails;
 
-  const testRuleWidget = document.createElement("rq-test-rule-widget");
+  const testRuleWidget = document.createElement("rq-explicit-test-rule-widget");
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
@@ -99,13 +113,48 @@ RQ.RuleExecutionHandler.showTestRuleWidget = async (ruleId) => {
   });
 };
 
+RQ.RuleExecutionHandler.showImplicitTestRuleWidget = async () => {
+  if (document.querySelector("rq-implicit-test-rule-widget")) {
+    return;
+  }
+
+  const testRuleWidget = document.createElement("rq-implicit-test-rule-widget");
+
+  testRuleWidget.classList.add("rq-element");
+  testRuleWidget.style.display = "none";
+
+  let appliedRules = [];
+  for (let ruleId of RQ.RuleExecutionHandler.appliedRuleIds.values()) {
+    const ruleDetails = await RQ.RulesStore.getRule(ruleId);
+    appliedRules.push({
+      ruleId: ruleDetails.id,
+      ruleName: ruleDetails.name,
+      ruleType: ruleDetails.ruleType,
+    });
+  }
+  if (appliedRules.length) {
+    testRuleWidget.style.display = "block";
+  }
+
+  testRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
+  document.documentElement.appendChild(testRuleWidget);
+
+  testRuleWidget.addEventListener("view_rule_in_editor", (data) => {
+    window.open(`${RQ.configs.WEB_URL}/rules/editor/edit/${data.detail.ruleId}`, "_blank");
+  });
+
+  testRuleWidget.addEventListener("open_app_settings", () => {
+    window.open(`${RQ.configs.WEB_URL}/settings/global-settings`, "_blank");
+  });
+};
+
 RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
   const { ruleType } = ruleDetails;
 
   switch (ruleType) {
     case "Response":
       testRuleWidget.setAttribute(
-        "info-text-content",
+        "rq-test-rule-text",
         `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>.`
       );
       break;
@@ -115,7 +164,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
       });
       responseHeaderExists &&
         testRuleWidget.setAttribute(
-          "info-text-content",
+          "rq-test-rule-text",
           `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>.`
         );
       break;
@@ -124,15 +173,15 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
   }
 };
 
-RQ.RuleExecutionHandler.notifyRuleAppliedToWidget = (ruleId) => {
-  const testRuleWidget = document.querySelector("rq-test-rule-widget");
+RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget = (ruleId) => {
+  const explicitTestRuleWidget = document.querySelector("rq-explicit-test-rule-widget");
 
-  if (testRuleWidget?.getAttribute("applied-status") === "false") {
-    if (testRuleWidget.getAttribute("rule-id") === ruleId) {
-      testRuleWidget.setAttribute("applied-status", true);
+  if (explicitTestRuleWidget?.getAttribute("applied-status") === "false") {
+    if (explicitTestRuleWidget.getAttribute("rule-id") === ruleId) {
+      explicitTestRuleWidget.setAttribute("applied-status", true);
     }
 
-    testRuleWidget.dispatchEvent(
+    explicitTestRuleWidget.dispatchEvent(
       new CustomEvent("new-rule-applied", {
         detail: {
           appliedRuleId: ruleId,
@@ -140,4 +189,43 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToWidget = (ruleId) => {
       })
     );
   }
+};
+
+RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
+  const implicitTestRuleWidget = document.querySelector("rq-implicit-test-rule-widget");
+  implicitTestRuleWidget.style.display = "block";
+
+  if (implicitTestRuleWidget) {
+    implicitTestRuleWidget.dispatchEvent(
+      new CustomEvent("new-rule-applied", {
+        detail: {
+          appliedRuleId: rule.id,
+          appliedRuleName: rule.name,
+          appliedRuleType: rule.ruleType,
+        },
+      })
+    );
+  }
+};
+
+RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
+  await chrome.storage.local.get(RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+    RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = result[RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+  });
+};
+
+RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget = (rule) => {
+  const implicitTestRuleConfig = RQ.RuleExecutionHandler.implictTestRuleWidgetConfig;
+
+  if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+    return;
+  }
+
+  if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
+    if (!implicitTestRuleConfig.ruleTypes.includes(rule.ruleType)) {
+      return;
+    }
+  }
+
+  RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
 };
