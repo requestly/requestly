@@ -590,17 +590,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   const createProxyXHRObject = function () {
     const actualXhr = this;
 
-    Object.defineProperties(actualXhr, {
-      timeout: {
-        get: function () {
-          return this.rqProxyXhr.timeout;
-        },
-        set: function (timeout) {
-          this.rqProxyXhr.timeout = timeout;
-        },
-      },
-    });
-
     const dispatchEventToParent = (type) => {
       console.log("RQ", "dispatchEventToParent", type);
       actualXhr.dispatchEvent(new ProgressEvent(type));
@@ -627,8 +616,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         // For network failures, responseStatus=0 but we still return customResponse with status=200
         const responseStatus = parseInt(responseModification.statusCode || this.status) || 200;
         const responseStatusText = responseModification.statusText || this.statusText;
-        const getResponseHeader = this.getResponseHeader;
-        const getAllResponseHeaders = this.getAllResponseHeaders;
 
         Object.defineProperties(actualXhr, {
           status: {
@@ -638,10 +625,10 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
             get: () => responseStatusText,
           },
           getResponseHeader: {
-            value: getResponseHeader.bind(this),
+            value: this.getResponseHeader.bind(this),
           },
           getAllResponseHeaders: {
-            value: getAllResponseHeaders.bind(this),
+            value: this.getAllResponseHeaders.bind(this),
           },
         });
 
@@ -738,9 +725,15 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         };
 
         // mark resolved)
-        updateParentXHRReadyState(this.DONE);
-        dispatchEventToParent("load");
-        dispatchEventToParent("loadEnd");
+        if (this._abort) {
+          // Note: This might get delayed due to async in code block
+          dispatchEventToParent("abort");
+          dispatchEventToParent("loadEnd");
+        } else {
+          updateParentXHRReadyState(this.DONE);
+          dispatchEventToParent("load");
+          dispatchEventToParent("loadEnd");
+        }
 
         notifyResponseRuleApplied({
           rule: this.responseRule,
@@ -757,6 +750,18 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     xhr.addEventListener("error", dispatchEventToParent.bind(xhr, "error"), false);
     xhr.addEventListener("timeout", dispatchEventToParent.bind(xhr, "timeout"), false);
     xhr.addEventListener("loadstart", dispatchEventToParent.bind(xhr, "loadstart"), false);
+
+    const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "timeout");
+
+    Object.defineProperty(actualXhr, "timeout", {
+      get: function () {
+        return descriptor.get.call(this);
+      },
+      set: function (value) {
+        xhr.timeout = value;
+        descriptor.set.call(this, value);
+      },
+    });
 
     this.rqProxyXhr = xhr;
   };
@@ -784,8 +789,10 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   const abort = XMLHttpRequest.prototype.abort;
   XMLHttpRequest.prototype.abort = function () {
     console.log("abort called");
-    abort.apply(this.rqProxyXhr, arguments);
+    this._abort = true;
+    this.rqProxyXhr._abort = true;
     abort.apply(this, arguments);
+    abort.apply(this.rqProxyXhr, arguments);
   };
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
