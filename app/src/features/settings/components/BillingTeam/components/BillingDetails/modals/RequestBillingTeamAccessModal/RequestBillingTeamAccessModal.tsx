@@ -62,7 +62,7 @@ export const RequestBillingTeamAccessModal: React.FC<RequestBillingTeamAccessMod
           </>
         )
       }
-      loadingText="Requesting access to billing team..."
+      loadingText="Sending joining request to admins..."
       result={getPostRequestResult()}
       footer={
         isLoading ? null : (
