@@ -17,6 +17,18 @@ interface ReviewJoinRequestModalProps {
   requestAction: BillingTeamJoinRequestAction;
 }
 
+enum ReviewResultCodes {
+  INVALID_ARGS = "invalid_args",
+  NO_BILLING_TEAM_FOUND = "no-billing-team-found",
+  NO_USER_FOUND = "no-user-found",
+  NOT_A_MEMBER = "not-a-member",
+  NO_ADMIN_ACCESS = "no-admin-access",
+  EXISTING_MEMBER = "existing-member",
+  REQUEST_APPROVED = "request-approved",
+  ERROR_ADDING_USER = "error-adding-user",
+  REQUEST_DECLINED = "request-declined",
+}
+
 export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
   isOpen,
   onClose,
@@ -61,16 +73,62 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
     }
   }, []);
 
+  const getResultTitle = useCallback(() => {
+    switch (reviewResult?.result?.code) {
+      case ReviewResultCodes.REQUEST_APPROVED:
+        return "Joining request approved";
+      case ReviewResultCodes.REQUEST_DECLINED:
+        return "Joining request declined";
+      case ReviewResultCodes.EXISTING_MEMBER:
+        return "Member already added";
+      default:
+        return "The request cannot be processed";
+    }
+  }, [reviewResult?.result?.code]);
+
+  const getResultMessage = useCallback(() => {
+    switch (reviewResult?.result?.code) {
+      case ReviewResultCodes.REQUEST_APPROVED:
+        return <>{reviewResult?.result?.userName ?? "User"} has been added to the Billing Team.</>;
+      case ReviewResultCodes.REQUEST_DECLINED:
+        return <>{reviewResult?.result?.userName ?? "User"} has not been added to the Billing Team.</>;
+      case ReviewResultCodes.EXISTING_MEMBER:
+        return <>{reviewResult?.result?.userName ?? "User"} is already a member of the Billing Team.</>;
+      case ReviewResultCodes.NO_ADMIN_ACCESS:
+        return "Only admins or billing managers can accept/decline requests.";
+      case ReviewResultCodes.NO_USER_FOUND:
+        return (
+          <>
+            User not found. Please reach out to us at <a href="mailto:contact@requestly.io">contact@requestly.io</a> for
+            assistance.
+          </>
+        );
+      default:
+        return (
+          <>
+            The billing team was not found. Please reach out to us at{" "}
+            <a href="mailto:contact@requestly.io">contact@requestly.io</a> for assistance.
+          </>
+        );
+    }
+  }, [reviewResult?.result?.code, reviewResult?.result?.userName]);
+
   return (
     <BillingTeamActionModal
-      width={320}
+      width={350}
       centered
       open={isOpen}
       wrapClassName="custom-rq-modal review-request-modal"
       onCancel={onClose}
       closable={false}
       maskClosable={false}
-      title={isLoading ? null : <>{getReviewResultIcon(reviewResult?.result?.status)} Review joining request</>}
+      title={
+        isLoading ? null : (
+          <>
+            {getReviewResultIcon(reviewResult?.result?.status)} {getResultTitle()}
+          </>
+        )
+      }
       footer={
         isLoading ? null : (
           <RQButton block type="primary" onClick={onClose}>
@@ -82,7 +140,7 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
       loadingText={`${
         requestAction === BillingTeamJoinRequestAction.ACCEPT ? "Acepting" : "Declining"
       } joining request ...`}
-      result={reviewResult?.message}
+      result={reviewResult ? getResultMessage() : null}
     />
   );
 };
