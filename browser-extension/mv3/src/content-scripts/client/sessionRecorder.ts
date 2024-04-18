@@ -31,6 +31,13 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
     return;
   }
 
+  const {
+    notify,
+    markRecordingIcon: markIcon = true,
+    explicit = false,
+    recordingStartTime: replayStartTime = Date.now(),
+  } = sessionRecordingConfig;
+
   const isIFrame = isIframe();
 
   if (!isIFrame) {
@@ -43,14 +50,16 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
     maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
   });
 
-  isExplicitRecording = sessionRecordingConfig.explicit ?? false;
+  isExplicitRecording = explicit;
+  markRecordingIcon = markIcon;
+
+  if (notify) {
+    showToast();
+  }
 
   if (isExplicitRecording) {
-    markRecordingIcon = true;
-    recordingStartTime = Date.now();
+    recordingStartTime = replayStartTime;
     hideAutoModeWidget();
-  } else {
-    markRecordingIcon = sessionRecordingConfig.markRecordingIcon ?? false;
   }
 };
 
@@ -207,4 +216,27 @@ const showAutoModeRecordingWidget = () => {
 const hideAutoModeWidget = () => {
   let widget = document.querySelector("rq-session-recording-auto-mode-widget");
   widget?.dispatchEvent(new CustomEvent("hide"));
+};
+
+const showToast = () => {
+  const rqToast = document.createElement("rq-toast");
+  rqToast.classList.add("rq-element");
+  rqToast.setAttribute("heading", "Requestly is recording session on this tab!");
+  rqToast.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
+  const rqToastContent = `
+  <div slot="content">
+    You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.
+  </div>
+  `;
+  try {
+    rqToast.innerHTML = rqToastContent;
+  } catch (e) {
+    // @ts-ignore
+    const trustedTypesPolicy = window.trustedTypes?.createPolicy?.("rq-html-policy", {
+      createHTML: (html: HTMLElement) => html,
+    });
+    rqToast.innerHTML = trustedTypesPolicy.createHTML(rqToastContent);
+  }
+
+  document.documentElement.appendChild(rqToast);
 };
