@@ -1,7 +1,7 @@
 RQ.RuleExecutionHandler = {};
 RQ.RuleExecutionHandler.appliedRuleIds = new Set();
-RQ.implicitTestRuleFlowEnabled = false;
-RQ.implictTestRuleWidgetConfig = null;
+RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled = false;
+RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = null;
 
 RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
   const eventName = "rule_executed";
@@ -15,8 +15,8 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
-  if (RQ.implicitTestRuleFlowEnabled) {
-    checkAppliedRuleAndNotifyWidget(rule);
+  if (RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled) {
+    RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget(rule);
   } else {
     RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget(rule.id);
   }
@@ -33,7 +33,7 @@ RQ.RuleExecutionHandler.setup = async () => {
     return;
   }
 
-  await getImplicitTestRuleWidgetConfig();
+  RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig();
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
@@ -62,12 +62,8 @@ RQ.RuleExecutionHandler.setup = async () => {
         break;
 
       case RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
-        if (RQ.implictTestRuleWidgetConfig) {
-          if (RQ.implictTestRuleWidgetConfig.visibility !== RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
-            RQ.implicitTestRuleFlowEnabled = true;
-            RQ.RuleExecutionHandler.showImplicitTestRuleWidget();
-          }
-        }
+        RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled = true;
+        RQ.RuleExecutionHandler.showImplicitTestRuleWidget();
 
         break;
     }
@@ -123,8 +119,24 @@ RQ.RuleExecutionHandler.showImplicitTestRuleWidget = async () => {
   }
 
   const testRuleWidget = document.createElement("rq-implicit-test-rule-widget");
+
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.style.display = "none";
+
+  let appliedRules = [];
+  for (let ruleId of RQ.RuleExecutionHandler.appliedRuleIds.values()) {
+    const ruleDetails = await RQ.RulesStore.getRule(ruleId);
+    appliedRules.push({
+      ruleId: ruleDetails.id,
+      ruleName: ruleDetails.name,
+      ruleType: ruleDetails.ruleType,
+    });
+  }
+  if (appliedRules.length) {
+    testRuleWidget.style.display = "block";
+  }
+
+  testRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
   document.documentElement.appendChild(testRuleWidget);
 
   testRuleWidget.addEventListener("view_rule_in_editor", (data) => {
@@ -142,7 +154,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
   switch (ruleType) {
     case "Response":
       testRuleWidget.setAttribute(
-        "info-text-content",
+        "rq-test-rule-text",
         `Response Modifications will not show up in the browser network devtools due to technical contraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-response-body/">details</a>.`
       );
       break;
@@ -152,7 +164,7 @@ RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
       });
       responseHeaderExists &&
         testRuleWidget.setAttribute(
-          "info-text-content",
+          "rq-test-rule-text",
           `Response Header Modifications will not show up in the browser network devtools due to technical constraints. Checkout docs for more <a target="_blank" href="https://developers.requestly.io/http-rules/modify-headers/">details</a>.`
         );
       break;
@@ -184,9 +196,6 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
   implicitTestRuleWidget.style.display = "block";
 
   if (implicitTestRuleWidget) {
-    implicitTestRuleWidget.setAttribute("applied-rule-id", rule.id);
-    implicitTestRuleWidget.setAttribute("applied-rule-name", rule.name);
-    implicitTestRuleWidget.setAttribute("applied-rule-type", rule.ruleType);
     implicitTestRuleWidget.dispatchEvent(
       new CustomEvent("new-rule-applied", {
         detail: {
@@ -199,27 +208,24 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
   }
 };
 
-const getImplicitTestRuleWidgetConfig = async () => {
-  await chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
-    RQ.implictTestRuleWidgetConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
+  await chrome.storage.local.get(RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+    RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = result[RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
   });
 };
 
-const checkAppliedRuleAndNotifyWidget = (rule) => {
-  let notifyWidget = true;
-  const implicitTestRuleConfig = RQ.implictTestRuleWidgetConfig;
+RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget = (rule) => {
+  const implicitTestRuleConfig = RQ.RuleExecutionHandler.implictTestRuleWidgetConfig;
 
   if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
-    notifyWidget = false;
     return;
   }
 
   if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
     if (!implicitTestRuleConfig.ruleTypes.includes(rule.ruleType)) {
-      notifyWidget = false;
       return;
     }
   }
 
-  if (notifyWidget) RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
+  RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget(rule);
 };

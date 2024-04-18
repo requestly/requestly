@@ -13,29 +13,23 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     super.connectedCallback();
 
     this.toggleMinimize(true);
-    const contentContainer = this.shadowRoot.getElementById("rq-content-container");
-    const minimizedStatusBtn = this.shadowRoot.getElementById("rq-minimized-status-btn");
+    const contentContainer = this.shadowRoot.getElementById("test-rule-container");
+    const minimizedStatusBtn = this.shadowRoot.getElementById("test-rule-minimized-btn");
     const widgetContent = `
-    <div id="rq-implicit-widget-container">
-      <div id="rq-applied-rules-list-header">Rules applied on this page</div>
-      <div id="rq-applied-rules-list"></div>
+    <div id="implicit-widget-container">
+      <div id="applied-rules-list-header">Rules applied on this page</div>
+      <div id="applied-rules-list"></div>
     </div>`;
-    setInnerHTML(minimizedStatusBtn, `<span class="rq-success">${CheckIcon}</span>`);
+    setInnerHTML(minimizedStatusBtn, `<span class="success">${CheckIcon}</span>`);
     setInnerHTML(contentContainer, widgetContent);
 
-    const settingsButton = this.shadowRoot.getElementById("rq-settings-button");
+    const settingsButton = this.shadowRoot.getElementById("settings-button");
     settingsButton.classList.remove("hidden");
     this.addWidgetListeners();
 
-    const appliedRuleId = this.attributes.getNamedItem("applied-rule-id")?.value;
-    const appliedRuleName = this.attributes.getNamedItem("applied-rule-name")?.value;
-    const appliedRuleType = this.attributes.getNamedItem("applied-rule-type")?.value;
-    if (appliedRuleId && appliedRuleName && appliedRuleType) {
-      this.#appliedRules.push({
-        ruleId: appliedRuleId,
-        ruleName: appliedRuleName,
-        ruleType: appliedRuleType as RuleType,
-      });
+    const appliedRules = JSON.parse(this.attributes.getNamedItem("applied-rules")?.value || "[]");
+    if (appliedRules.length) {
+      appliedRules.forEach((rule: any) => this.#appliedRules.push(rule));
       this.renderAppliedRules();
     }
   }
@@ -54,7 +48,7 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
       this.renderAppliedRules();
     });
 
-    this.shadowRoot.getElementById("rq-settings-button").addEventListener("click", () => {
+    this.shadowRoot.getElementById("settings-button").addEventListener("click", () => {
       this.dispatchEvent(new CustomEvent("open_app_settings"));
     });
   }
@@ -64,22 +58,22 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   }
 
   renderAppliedRules() {
-    const appliedRulesList = this.shadowRoot.getElementById("rq-applied-rules-list");
+    const appliedRulesList = this.shadowRoot.getElementById("applied-rules-list");
 
     const appliedRulesMarkup = this.#appliedRules.map((rule) => {
       return `
-        <div class="rq-applied-rule-list-item">
-          <div class="rq-applied-rule-item-details">
-            <span class="rq-applied-rule-icon">${getRuleTypeIcon(rule.ruleType)}</span> 
-            <span class="rq-applied-rule-name">${rule.ruleName}</span>
+        <div class="applied-rule-list-item">
+          <div class="applied-rule-item-details">
+            <span class="applied-rule-icon">${getRuleTypeIcon(rule.ruleType)}</span> 
+            <span class="applied-rule-name">${rule.ruleName}</span>
           </div>
-         <span class="rq-applied-rule-arrow-icon">${arrowRightIcon}</span>
+         <span class="applied-rule-arrow-icon">${arrowRightIcon}</span>
         </div>`;
     });
 
     setInnerHTML(appliedRulesList, appliedRulesMarkup.join(""));
 
-    appliedRulesList.querySelectorAll(".rq-applied-rule-list-item").forEach((ruleElement, index) => {
+    appliedRulesList.querySelectorAll(".applied-rule-list-item").forEach((ruleElement, index) => {
       ruleElement.addEventListener("click", () => {
         this.triggerAppliedRuleClickedEvent({
           ruleId: this.#appliedRules[index].ruleId,
