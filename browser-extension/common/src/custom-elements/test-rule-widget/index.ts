@@ -5,6 +5,7 @@ import RQLogo from "../../../resources/icons/rqLogo-blue.svg";
 import RQLogoSmall from "../../../resources/icons/rqLogo-white.svg";
 import MinimizeIcon from "../../../resources/icons/minimze.svg";
 import InfoIcon from "../../../resources/icons/info.svg";
+import SettingsIcon from "../../../resources/icons/settings.svg";
 
 const DEFAULT_POSITION = { right: 16, top: 16 };
 
@@ -27,7 +28,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
       this.toggleMinimize(true);
     });
 
-    this.shadowRoot.getElementById("minimized-status-btn").addEventListener("click", (event) => {
+    this.shadowRoot.getElementById("test-rule-minimized-btn").addEventListener("click", (event) => {
       event.stopPropagation();
       this.toggleMinimize(false);
     });
@@ -42,6 +43,13 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
     } else {
       container.classList.remove("minimized");
       minimizedDetails.classList.remove("visible");
+
+      // if expanded widget width is going out of screen, then  set its horizontal position to default
+
+      const boundingRect = this.getBoundingClientRect();
+      if (boundingRect.right > window.innerWidth) {
+        this.moveToPostion({ right: DEFAULT_POSITION.right, top: boundingRect.top });
+      }
     }
   }
 
@@ -51,7 +59,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
     <div id="container">
         <div id="minimized-details">
             <div id="minimized-logo">${RQLogoSmall}</div>
-            <button id="minimized-status-btn"></button>
+            <button id="test-rule-minimized-btn"></button>
         </div>
         <div id="heading-container">
             <div id="logo-container"> 
@@ -59,10 +67,11 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
                 <span id="logo-text">requestly</span>
             </div>
             <div id="actions-container">
+                <button id="settings-button" class="hidden">${SettingsIcon}</button>
                 <button id="minimize-button">${MinimizeIcon}</buttton>
             </div>
         </div>
-        <div id="content-container"></div>
+        <div id="test-rule-container"></div>
          <div id="info-container" class="hidden">
           <div id="info-icon" class="secondary-text">${InfoIcon}</div>
           <div id="info-text" class="secondary-text"></div>
