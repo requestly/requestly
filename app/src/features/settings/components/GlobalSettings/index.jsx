@@ -40,7 +40,7 @@ export const GlobalSettings = () => {
           {user?.loggedIn ? <DataCollection /> : null}
         </div>
         {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION &&
-        isFeatureCompatible(APP_CONSTANTS.FEATURES.TEST_THIS_RULE) ? (
+        isFeatureCompatible(APP_CONSTANTS.FEATURES.IMPLICIT_TEST_THIS_RULE) ? (
           <ImplicitRuleTesting />
         ) : null}
       </div>
