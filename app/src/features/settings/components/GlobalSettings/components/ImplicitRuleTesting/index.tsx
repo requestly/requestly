@@ -2,13 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import SettingsItem from "../SettingsItem";
-import { StorageService } from "init";
 import { RuleTypesOptions } from "./components/RuleTypesOptions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import APP_CONSTANTS from "config/constants";
-import { updateImplictRuleTestingWidgetConfig } from "./utils";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { getImplicitRuleTestingWidgetConfig, updateImplictRuleTestingWidgetConfig } from "./utils";
 
 export const ImplicitRuleTesting = () => {
   const appMode = useSelector(getAppMode);
@@ -39,15 +38,13 @@ export const ImplicitRuleTesting = () => {
   );
 
   useEffect(() => {
-    StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG)
-      .then((data) => {
-        setEnabledRuleTypes(data.ruleTypes);
-        setWidgetVisibility(data.visibility);
-        if (data.visibility === GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
-          setIsImplicitRuleTestingEnabled(false);
-        } else setIsImplicitRuleTestingEnabled(true);
-      });
+    getImplicitRuleTestingWidgetConfig(appMode).then((data) => {
+      setEnabledRuleTypes(data.ruleTypes);
+      setWidgetVisibility(data.visibility);
+      if (data.visibility === GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+        setIsImplicitRuleTestingEnabled(false);
+      } else setIsImplicitRuleTestingEnabled(true);
+    });
   }, [appMode]);
 
   return (
