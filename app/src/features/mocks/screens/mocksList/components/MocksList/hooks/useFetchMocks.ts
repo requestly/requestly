@@ -4,7 +4,7 @@ import {
   oldFileMockToNewMockMetadataAdapter,
   oldMockToNewMockMetadataAdapter,
 } from "components/features/mocksV2/utils/oldMockAdapter";
-import { MockType, RQMockMetadataSchema } from "features/mocks/types";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";

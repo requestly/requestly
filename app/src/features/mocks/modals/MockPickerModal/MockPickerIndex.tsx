@@ -8,7 +8,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { Space, Typography } from "antd";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
-import { FileType, MockType, RQMockMetadataSchema } from "features/mocks/types";
+import { FileType, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { MocksListContentHeader, MocksTable } from "features/mocks/screens/mocksList/components/MocksList/components";
 import { MockEditorDataSchema } from "components/features/mocksV2/MockEditorIndex/types";
 import {

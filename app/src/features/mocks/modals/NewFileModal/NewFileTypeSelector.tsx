@@ -10,7 +10,7 @@ import { IoLogoCss3 } from "@react-icons/all-files/io5/IoLogoCss3";
 import { IoLogoHtml5 } from "@react-icons/all-files/io5/IoLogoHtml5";
 import { IoLogoJavascript } from "@react-icons/all-files/io5/IoLogoJavascript";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { FileType } from "features/mocks/types";
+import { FileType } from "components/features/mocksV2/types";
 
 const FILE_TYPES_CONFIG = {
   [FileType.HTML]: {

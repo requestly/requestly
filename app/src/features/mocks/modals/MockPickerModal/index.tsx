@@ -1,6 +1,6 @@
 import React from "react";
 import { RQModal } from "lib/design-system/components";
-import { MockListSource } from "features/mocks/types";
+import { MockListSource } from "components/features/mocksV2/types";
 import MockList from "features/mocks/screens/mocksList/components/MocksList/MocksList";
 import "./mockPickerModal.scss";
 

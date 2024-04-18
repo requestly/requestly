@@ -4,7 +4,7 @@ import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { ButtonProps } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { ContentListHeader } from "componentsV2/ContentList";
-import { MockType } from "features/mocks/types";
+import { MockType } from "components/features/mocksV2/types";
 import { RQButton } from "lib/design-system/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/selectors";

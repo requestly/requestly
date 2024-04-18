@@ -9,7 +9,7 @@ import { AiOutlineQuestionCircle } from "@react-icons/all-files/ai/AiOutlineQues
 import { FiArrowUpRight } from "@react-icons/all-files/fi/FiArrowUpRight";
 import noMocksIcon from "../../../../../../../../../assets/img/icons/common/no-mocks.svg";
 import { SOURCE } from "modules/analytics/events/common/constants.js";
-import { MockType } from "features/mocks/types";
+import { MockType } from "components/features/mocksV2/types";
 import "./gettingStartedWithMocks.scss";
 
 interface Props {

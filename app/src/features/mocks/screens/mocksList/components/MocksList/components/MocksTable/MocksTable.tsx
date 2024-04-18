@@ -18,7 +18,7 @@ import { getUserAuthDetails } from "store/selectors";
 import CopyButton from "components/misc/CopyButton";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { MockType, RQMockMetadataSchema } from "features/mocks/types";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
 import REQUEST_METHOD_COLORS from "components/features/mocksV2/MockList/MocksTable/constants/requestMethodColors";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";

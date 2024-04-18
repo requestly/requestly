@@ -12,7 +12,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { redirectToFileMockEditorEditMock, redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { MockType, RQMockSchema } from "features/mocks/types";
+import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { createMockFromUploadedFile, generateFinalUrl } from "components/features/mocksV2/utils";
 
 const { Dragger } = Upload;

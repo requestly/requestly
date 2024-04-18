@@ -12,7 +12,7 @@ import * as FilesService from "../../../../utils/files/FilesService";
 import { deleteMock } from "backend/mocks/deleteMock";
 import { trackDeleteMockEvent } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { RQMockMetadataSchema } from "features/mocks/types";
+import { RQMockMetadataSchema } from "components/features/mocksV2/types";
 
 interface DeleteModalProps {
   visible: boolean;

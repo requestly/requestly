@@ -8,7 +8,7 @@ import {
   redirectToMockEditorEditMock,
 } from "utils/RedirectionUtils";
 import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
-import { MockListSource, MockType, RQMockMetadataSchema } from "features/mocks/types";
+import { MockListSource, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { GettingStartedWithMocks } from "./GettingStartedWithMocks/GettingStartedWithMocks";
 import { MockUploaderModal, NewFileModal } from "features/mocks/modals";
-import { MockType } from "features/mocks/types";
+import { MockType } from "components/features/mocksV2/types";
 
 interface Props {
   mockType: MockType;
