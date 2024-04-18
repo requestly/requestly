@@ -9,7 +9,7 @@ import { miscRoutes } from "./miscRoutes";
 import { ruleRoutes } from "features/rules/routes";
 import { desktopSessionsRoutes } from "./desktopSessionRoutes";
 import { settingRoutes } from "features/settings/routes";
-import { mockServerRoutes } from "features/mocks";
+import { mockServerRoutes } from "features/mocks/routes";
 
 export const routes: RouteObject[] = [
   ...ruleRoutes,
