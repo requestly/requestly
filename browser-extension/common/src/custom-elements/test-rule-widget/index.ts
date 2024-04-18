@@ -43,6 +43,13 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
     } else {
       container.classList.remove("minimized");
       minimizedDetails.classList.remove("visible");
+
+      // if expanded widget width is going out of screen, then  set its horizontal position to default
+
+      const boundingRect = this.getBoundingClientRect();
+      if (boundingRect.right > window.innerWidth) {
+        this.moveToPostion({ right: 16, top: boundingRect.top });
+      }
     }
   }
 
