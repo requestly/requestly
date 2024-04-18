@@ -48,6 +48,7 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
   if (isExplicitRecording) {
     markRecordingIcon = true;
     recordingStartTime = Date.now();
+    hideAutoModeWidget();
   } else {
     markRecordingIcon = sessionRecordingConfig.markRecordingIcon ?? false;
   }
