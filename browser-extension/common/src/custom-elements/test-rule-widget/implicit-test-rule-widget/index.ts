@@ -27,15 +27,9 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     settingsButton.classList.remove("hidden");
     this.addWidgetListeners();
 
-    const appliedRuleId = this.attributes.getNamedItem("applied-rule-id")?.value;
-    const appliedRuleName = this.attributes.getNamedItem("applied-rule-name")?.value;
-    const appliedRuleType = this.attributes.getNamedItem("applied-rule-type")?.value;
-    if (appliedRuleId && appliedRuleName && appliedRuleType) {
-      this.#appliedRules.push({
-        ruleId: appliedRuleId,
-        ruleName: appliedRuleName,
-        ruleType: appliedRuleType as RuleType,
-      });
+    const appliedRules = JSON.parse(this.attributes.getNamedItem("applied-rules")?.value || "[]");
+    if (appliedRules.length) {
+      appliedRules.forEach((rule: any) => this.#appliedRules.push(rule));
       this.renderAppliedRules();
     }
   }
