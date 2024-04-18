@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Typography } from "antd";
-import { useInitImplicitWidgetConfig } from "components/features/rules/TestThisRule/hooks/useInitImplicitWidgetConfig";
 import {
   trackAppReloadedFromMessage,
   trackExtensionContextInvalidated,
@@ -12,18 +11,16 @@ import "./extensionContextInvalidationNotice.scss";
 
 const ExtensionContextInvalidationNotice: React.FC = () => {
   const [visible, setVisible] = useState(false);
-  const { initImplicitWidgetConfig } = useInitImplicitWidgetConfig();
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_EXTENSION_UPDATED,
       ({ oldVersion, newVersion }: { oldVersion: string; newVersion: string }) => {
         setVisible(true);
-        initImplicitWidgetConfig();
         trackExtensionContextInvalidated(oldVersion, newVersion);
       }
     );
-  }, [initImplicitWidgetConfig]);
+  }, []);
 
   const onReloadClicked = useCallback(() => {
     trackAppReloadedFromMessage();
