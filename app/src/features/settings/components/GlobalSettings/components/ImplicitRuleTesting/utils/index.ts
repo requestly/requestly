@@ -7,3 +7,7 @@ export const updateImplictRuleTestingWidgetConfig = (appMode: string, config: Im
     [GLOBAL_CONSTANTS.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG]: config,
   });
 };
+
+export const getImplicitRuleTestingWidgetConfig = async (appMode: string) => {
+  return StorageService(appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG);
+};
