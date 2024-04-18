@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { BillingTeamActionModal } from "../../components/BillingTeamActionModal/BillingTeamActionModal";
+import React, { useEffect, useState } from "react";
+import { BillingTeamActionModal } from "../common/BillingTeamActionModal/BillingTeamActionModal";
 import { requestBillingTeamAccess } from "backend/billing/requestTeamAccess";
 import { RQButton } from "lib/design-system/components";
 import { PiWarningDiamondBold } from "@react-icons/all-files/pi/PiWarningDiamondBold";
@@ -21,7 +21,7 @@ export const RequestBillingTeamAccessModal: React.FC<RequestBillingTeamAccessMod
   const [isActionCompleted, setIsActionCompleted] = useState(false);
   const [isRequestSent, setIsRequestSent] = useState(false);
 
-  const getPostRequestResult = useCallback(() => {
+  const getPostRequestResult = () => {
     if (isActionCompleted) {
       if (isRequestSent) {
         return "Your request has been successfully sent to team manager and admin. They will review and respond to your request soon.";
@@ -29,7 +29,7 @@ export const RequestBillingTeamAccessModal: React.FC<RequestBillingTeamAccessMod
         return "Something went wrong, we couldn't send the request. Please try again later.";
       }
     }
-  }, [isRequestSent, isActionCompleted]);
+  };
 
   useEffect(() => {
     requestBillingTeamAccess(billingId)

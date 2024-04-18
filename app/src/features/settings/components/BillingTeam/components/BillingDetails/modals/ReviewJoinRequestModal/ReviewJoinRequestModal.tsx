@@ -5,7 +5,7 @@ import { PiWarningDiamondBold } from "@react-icons/all-files/pi/PiWarningDiamond
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RQButton } from "lib/design-system/components";
-import { BillingTeamActionModal } from "../../components/BillingTeamActionModal/BillingTeamActionModal";
+import { BillingTeamActionModal } from "../common/BillingTeamActionModal/BillingTeamActionModal";
 import { reviewBillingTeamJoiningRequest } from "backend/billing/reviewJoinRequest";
 import Logger from "../../../../../../../../../../common/logger";
 
