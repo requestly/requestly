@@ -606,7 +606,6 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
   }
 
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
-  BG.Methods.saveExecutionCount(rule);
   BG.Methods.sendAppliedRuleDetailsToClient(rule, requestDetails);
 };
 
