@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { getAppMode } from "store/selectors";
 import { useSelector } from "react-redux";
 import { Checkbox, Radio } from "antd";
-import { StorageService } from "init";
+import { updateImplictRuleTestingWidgetConfig } from "../../utils";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.scss";
@@ -34,21 +34,17 @@ export const RuleTypesOptions: React.FC<RuleTypesOptionsProps> = ({
 
   const handleWidgetVisibilityChange = (value: string) => {
     setWidgetVisibility(value);
-    StorageService(appMode).saveRecord({
-      [GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG]: {
-        ruleTypes: enabledRuleTypes,
-        visibility: value,
-      },
+    updateImplictRuleTestingWidgetConfig(appMode, {
+      ruleTypes: enabledRuleTypes,
+      visibility: value,
     });
   };
 
   const handleRuleTypeSelection = (value: string[]) => {
     setEnabledRuleTypes(value);
-    StorageService(appMode).saveRecord({
-      [GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG]: {
-        ruleTypes: value,
-        visibility: widgetVisibility,
-      },
+    updateImplictRuleTestingWidgetConfig(appMode, {
+      ruleTypes: value,
+      visibility: widgetVisibility,
     });
   };
 

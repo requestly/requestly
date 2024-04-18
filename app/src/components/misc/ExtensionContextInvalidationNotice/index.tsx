@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Typography } from "antd";
+import { useInitImplicitWidgetConfig } from "components/features/rules/TestThisRule/hooks/useInitImplicitWidgetConfig";
 import {
   trackAppReloadedFromMessage,
   trackExtensionContextInvalidated,
@@ -7,25 +8,22 @@ import {
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { initImplicitTestRuleWidgetConfig } from "components/features/rules/TestThisRule";
 import "./extensionContextInvalidationNotice.scss";
-import { useSelector } from "react-redux";
-import { getAppMode } from "store/selectors";
 
 const ExtensionContextInvalidationNotice: React.FC = () => {
   const [visible, setVisible] = useState(false);
-  const appMode = useSelector(getAppMode);
+  const { initImplicitWidgetConfig } = useInitImplicitWidgetConfig();
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_EXTENSION_UPDATED,
       ({ oldVersion, newVersion }: { oldVersion: string; newVersion: string }) => {
         setVisible(true);
-        initImplicitTestRuleWidgetConfig(appMode);
+        initImplicitWidgetConfig();
         trackExtensionContextInvalidated(oldVersion, newVersion);
       }
     );
-  }, [appMode]);
+  }, [initImplicitWidgetConfig]);
 
   const onReloadClicked = useCallback(() => {
     trackAppReloadedFromMessage();
