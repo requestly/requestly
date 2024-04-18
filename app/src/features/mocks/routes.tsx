@@ -10,7 +10,7 @@ import FileViewerIndexPage from "components/features/filesLibrary/FileViewerInde
 import MockList from "components/features/mocksV2/MockList";
 import { MockType } from "components/features/mocksV2/types";
 import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
-import MocksFeaturecontainer from "./container";
+import MocksFeatureContainer from "./container";
 import { MocksListScreen } from "./screens/mocksList";
 
 export const mockServerRoutes: RouteObject[] = [
@@ -90,7 +90,7 @@ export const mockServerRoutes: RouteObject[] = [
   // V2 routes
   {
     path: "/v2" + PATHS.MOCK_SERVER.INDEX,
-    element: <MocksFeaturecontainer />,
+    element: <MocksFeatureContainer />,
     children: [
       //  MOCKS V2
       {
