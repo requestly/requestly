@@ -7,6 +7,7 @@ import { applyScriptRules } from "./scriptRuleHandler";
 import {
   getTabSession,
   initSessionRecording,
+  launchUrlAndStartRecording,
   onSessionRecordingStartedNotification,
   onSessionRecordingStoppedNotification,
   startRecordingExplicitly,
@@ -49,6 +50,9 @@ export const initMessageHandler = () => {
         break;
       case EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
         startRecordingExplicitly(message.tab, message.showWidget);
+        break;
+      case EXTENSION_MESSAGES.START_RECORDING_ON_URL:
+        launchUrlAndStartRecording(message.url);
         break;
       case EXTENSION_MESSAGES.STOP_RECORDING:
         stopRecording(message.tabId ?? sender.tab.id, message.openRecording);

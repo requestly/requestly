@@ -21,7 +21,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["libs/executeScript.js"],
+      "resources": ["libs/executeScript.js", "resources/images/128x128.png"],
       "matches": ["<all_urls>"]
     }
   ],
