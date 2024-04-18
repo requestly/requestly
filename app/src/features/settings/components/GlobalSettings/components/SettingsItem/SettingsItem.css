@@ -1,6 +1,7 @@
 .setting-item-container {
   margin-bottom: 1.25rem;
   border-bottom: 1px solid var(--border-dark);
+  padding-bottom: 8px;
 }
 
 .setting-item-caption {

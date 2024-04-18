@@ -8,12 +8,8 @@ export const initImplicitTestRuleWidgetConfig = (appMode: string) => {
       if (record === undefined) {
         StorageService(appMode).saveRecord({
           [GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG]: {
-            visibility: GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC,
-            ruleTypes: [
-              GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT,
-              GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE,
-              GLOBAL_CONSTANTS.RULE_TYPES.REQUEST,
-            ],
+            visibility: GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.ALL,
+            ruleTypes: [],
           },
         });
       }

@@ -1135,24 +1135,8 @@ BG.Methods.addListenerForExtensionMessages = function () {
       case RQ.EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
         BG.Methods.saveTestRuleResult(message, sender.tab);
         break;
-
-      case RQ.EXTENSION_MESSAGES.VIEW_RULE_IN_EDITOR:
-        BG.Methods.viewRuleInEditor(message.ruleId);
-        break;
-
-      case RQ.EXTENSION_MESSAGES.OPEN_APP_SETTINGS:
-        BG.Methods.openAppSettings();
-        break;
     }
   });
-};
-
-BG.Methods.viewRuleInEditor = (ruleId) => {
-  chrome.tabs.create({ url: RQ.configs.WEB_URL + "/rules/editor/edit/" + ruleId });
-};
-
-BG.Methods.openAppSettings = () => {
-  chrome.tabs.create({ url: RQ.configs.WEB_URL + "/settings/global-settings" });
 };
 
 BG.Methods.handleClientPortConnections = () => {
