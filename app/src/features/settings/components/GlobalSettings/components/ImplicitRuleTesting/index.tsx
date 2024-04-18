@@ -8,6 +8,7 @@ import { RuleTypesOptions } from "./components/RuleTypesOptions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import APP_CONSTANTS from "config/constants";
+import { updateImplictRuleTestingWidgetConfig } from "./utils";
 
 export const ImplicitRuleTesting = () => {
   const appMode = useSelector(getAppMode);
@@ -28,11 +29,9 @@ export const ImplicitRuleTesting = () => {
         : GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF;
 
       setWidgetVisibility(newVisibility);
-      StorageService(appMode).saveRecord({
-        [GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG]: {
-          ruleTypes: enabledRuleTypes,
-          visibility: newVisibility,
-        },
+      updateImplictRuleTestingWidgetConfig(appMode, {
+        ruleTypes: enabledRuleTypes,
+        visibility: newVisibility,
       });
     },
     [appMode, enabledRuleTypes]
@@ -40,7 +39,7 @@ export const ImplicitRuleTesting = () => {
 
   useEffect(() => {
     StorageService(appMode)
-      .getRecord(GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG)
+      .getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG)
       .then((data) => {
         setEnabledRuleTypes(data.ruleTypes);
         setWidgetVisibility(data.visibility);

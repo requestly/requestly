@@ -11,8 +11,8 @@
   gap: 4px;
 }
 
-.test-rule-checkbox {
-  margin-top: 8px !important;
+.test-rule-checkbox.ant-checkbox-wrapper {
+  margin-top: 8px;
   color: var(--text-default);
   font-size: 13px;
   letter-spacing: 0.25px;
