@@ -48,7 +48,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
 
       const boundingRect = this.getBoundingClientRect();
       if (boundingRect.right > window.innerWidth) {
-        this.moveToPostion({ right: 16, top: boundingRect.top });
+        this.moveToPostion({ right: DEFAULT_POSITION.right, top: boundingRect.top });
       }
     }
   }
