@@ -1,4 +1,4 @@
-import { Avatar, Col, Popover, Row, Table } from "antd";
+import { Avatar, Col, Popover, Row, Table, Tooltip } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -139,14 +139,16 @@ export const OtherBillingTeamDetails: React.FC = () => {
 
               {!hasJoinedAnyTeam && (
                 <Col>
-                  <RQButton
-                    className="request-billing-team-btn"
-                    type="default"
-                    icon={<IoMdAdd />}
-                    onClick={() => setIsRequestModalOpen(true)}
-                  >
-                    Request to add
-                  </RQButton>
+                  <Tooltip title="On clicking, we'll notify the billing manager and admins to add you to the team plan.">
+                    <RQButton
+                      className="request-billing-team-btn"
+                      type="default"
+                      icon={<IoMdAdd />}
+                      onClick={() => setIsRequestModalOpen(true)}
+                    >
+                      Request Premium access
+                    </RQButton>
+                  </Tooltip>
                 </Col>
               )}
             </Row>
