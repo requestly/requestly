@@ -1,2 +1,2 @@
 export { TestThisRule } from "./TestThisRule";
-export * from "./helpers";
+export * from "./utils/testReports";
