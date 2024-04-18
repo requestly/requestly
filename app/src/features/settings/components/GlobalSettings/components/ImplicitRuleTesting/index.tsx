@@ -18,7 +18,7 @@ export const ImplicitRuleTesting = () => {
   );
   const isImplicitRuleTestingFlagEnabled = useFeatureIsOn("implicit_test_this_rule");
 
-  const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.TEST_THIS_RULE), []);
+  const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.IMPLICIT_TEST_THIS_RULE), []);
 
   const handleImplicitRuleTestingToggleChange = useCallback(
     (status: boolean) => {
