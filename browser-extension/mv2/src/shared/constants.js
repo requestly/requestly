@@ -49,7 +49,8 @@ RQ.CLIENT_MESSAGES = {
   SYNC_APPLIED_RULES: "syncAppliedRules",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
-  START_RULE_TESTING: "startRuleTesting",
+  START_EXPLICIT_RULE_TESTING: "startExplicitRuleTesting",
+  START_IMPLICIT_RULE_TESTING: "startImplicitRuleTesting",
 };
 
 RQ.CUSTOM_HEADER_PREFIX = "x-rq-";
