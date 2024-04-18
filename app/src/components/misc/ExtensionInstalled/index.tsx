@@ -2,20 +2,19 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { trackExtensionInstalled } from "modules/analytics/events/misc/installation";
-import { getAppMode, getExtensionInsallSource } from "store/selectors";
-import { initImplicitTestRuleWidgetConfig } from "components/features/rules/TestThisRule";
+import { getExtensionInsallSource } from "store/selectors";
 import PATHS from "config/constants/sub/paths";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { useInitImplicitWidgetConfig } from "components/features/rules/TestThisRule/hooks/useInitImplicitWidgetConfig";
 
 const ExtensionInstalled: React.FC = () => {
   const installSourcePage = useSelector(getExtensionInsallSource);
   const onboardingVariation = useFeatureValue("activation_without_onboarding", "variant");
-
-  const appMode = useSelector(getAppMode);
+  const { initImplicitWidgetConfig } = useInitImplicitWidgetConfig();
 
   useEffect(() => {
-    initImplicitTestRuleWidgetConfig(appMode);
-  }, [appMode]);
+    initImplicitWidgetConfig();
+  }, [initImplicitWidgetConfig]);
 
   useEffect(() => {
     trackExtensionInstalled();
