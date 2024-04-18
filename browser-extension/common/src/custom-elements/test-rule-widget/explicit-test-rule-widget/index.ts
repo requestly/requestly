@@ -14,15 +14,19 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
   connectedCallback() {
     super.connectedCallback();
 
-    const contentContainer = this.shadowRoot.getElementById("content-container");
-    const explicitModeMarkup = `        
+    const contentContainer = this.shadowRoot.getElementById("test-rule-container");
+
+    const explicitModeMarkup = `   
+     <div id="explicit-widget-container">  
         <div id="rule-status-container">
           <div id="rule-status"></div>
         </div>
         <div id="test-rule-details">
           <div id="rule-name" class="primary-text"></div>
           <button id="view-result-btn">View Results</button>
-        </div>`;
+        </div>
+      </div>
+        `;
 
     setInnerHTML(contentContainer, explicitModeMarkup);
     this.addWidgetListeners();
@@ -35,7 +39,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
     const appliedStatus = this.attributes.getNamedItem("applied-status")?.value;
     this.showRuleAppliedStatus(appliedStatus === "true");
 
-    const infoTextContent = this.attributes.getNamedItem("info-text-content")?.value;
+    const infoTextContent = this.attributes.getNamedItem("rq-test-rule-text")?.value;
     if (infoTextContent) {
       const infoContainer = this.shadowRoot.getElementById("info-container");
       const infoContainerText = this.shadowRoot.getElementById("info-text");
@@ -64,7 +68,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
 
   showRuleAppliedStatus(appliedStatus: boolean) {
     const ruleStatusContainer = this.shadowRoot.getElementById("rule-status");
-    const minimizedStatusBtn = this.shadowRoot.getElementById("minimized-status-btn");
+    const minimizedStatusBtn = this.shadowRoot.getElementById("test-rule-minimized-btn");
     if (appliedStatus) {
       setInnerHTML(
         ruleStatusContainer,
@@ -77,7 +81,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
       setInnerHTML(
         minimizedStatusBtn,
         `
-        <span class="rq-success">${CheckIcon}</span>
+        <span class="success">${CheckIcon}</span>
       `
       );
     } else {
@@ -91,7 +95,7 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
       setInnerHTML(
         minimizedStatusBtn,
         `
-        <span class="rq-warning">${PendingIcon}</span>
+        <span class="warning">${PendingIcon}</span>
       `
       );
     }
