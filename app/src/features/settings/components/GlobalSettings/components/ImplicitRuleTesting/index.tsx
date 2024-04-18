@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import SettingsItem from "../SettingsItem";
-import ErrorCard from "components/misc/ErrorCard";
 import { RuleTypesOptions } from "./components/RuleTypesOptions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import APP_CONSTANTS from "config/constants";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getImplicitRuleTestingWidgetConfig, updateImplictRuleTestingWidgetConfig } from "./utils";
 
 export const ImplicitRuleTesting = () => {
@@ -16,6 +16,7 @@ export const ImplicitRuleTesting = () => {
   const [widgetVisibility, setWidgetVisibility] = useState(
     GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF
   );
+  const isImplicitRuleTestingFlagEnabled = useFeatureIsOn("implicit_test_this_rule");
 
   const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.TEST_THIS_RULE), []);
 
@@ -46,26 +47,24 @@ export const ImplicitRuleTesting = () => {
     });
   }, [appMode]);
 
-  return isCompatible ? (
-    <SettingsItem
-      isActive={isImplicitRuleTestingEnabled}
-      onChange={handleImplicitRuleTestingToggleChange}
-      title="Show widget when rule is applied"
-      caption="Enabling this option will display the widget on websites where any rules are enabled."
-      settingsBody={
-        <RuleTypesOptions
-          enabledRuleTypes={enabledRuleTypes}
-          setEnabledRuleTypes={setEnabledRuleTypes}
-          isImplicitRuleTestingEnabled={isImplicitRuleTestingEnabled}
-          widgetVisibility={widgetVisibility}
-          setWidgetVisibility={setWidgetVisibility}
-        />
-      }
-    />
-  ) : (
-    <ErrorCard
-      type="warning"
-      customErrorMessage="Please upgrade the extension to enable widget when rule is applied."
-    />
+  return (
+    isCompatible &&
+    isImplicitRuleTestingFlagEnabled && (
+      <SettingsItem
+        isActive={isImplicitRuleTestingEnabled}
+        onChange={handleImplicitRuleTestingToggleChange}
+        title="Show widget when rule is applied"
+        caption="Enabling this option will display the widget on websites where any rules are enabled."
+        settingsBody={
+          <RuleTypesOptions
+            enabledRuleTypes={enabledRuleTypes}
+            setEnabledRuleTypes={setEnabledRuleTypes}
+            isImplicitRuleTestingEnabled={isImplicitRuleTestingEnabled}
+            widgetVisibility={widgetVisibility}
+            setWidgetVisibility={setWidgetVisibility}
+          />
+        }
+      />
+    )
   );
 };
