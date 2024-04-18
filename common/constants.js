@@ -28,6 +28,11 @@ CONSTANTS.PUBLIC_NAMESPACE = "__REQUESTLY__";
 
 CONSTANTS.CONSOLE_LOGGER_ENABLED = "console-logger-enabled";
 
+CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY = {
+  ALL: "all",
+  SPECIFIC: "specific",
+  OFF: "off",
+};
 /**
  * We are calling them as BLACK_LIST_DOMAINS
  * however the usage is code is as the URL containing these substrings, We don't touch those requests
@@ -206,6 +211,7 @@ CONSTANTS.STORAGE_KEYS = {
   USE_EVENTS_ENGINE: "useEventsEngine",
   SEND_EXECUTION_EVENTS: "sendExecutionEvents",
   TEST_REPORTS: "testReports",
+  IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
 };
 
 CONSTANTS.REQUEST_STATE = {
