@@ -209,8 +209,8 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
 };
 
 RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
-  await chrome.storage.local.get(RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
-    RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = result[RQ.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+  await chrome.storage.local.get(RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+    RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = result[RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
   });
 };
 
