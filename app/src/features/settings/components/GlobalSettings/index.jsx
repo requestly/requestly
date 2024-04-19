@@ -6,7 +6,6 @@ import * as ExtensionActions from "../../../../actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
-import ConsoleLogger from "./components/ConsoleLogger";
 import DataCollection from "./components/DataCollection";
 import RulesSyncing from "./components/RulesSyncing";
 import { ImplicitRuleTesting } from "./components/ImplicitRuleTesting";
@@ -25,7 +24,10 @@ export const GlobalSettings = () => {
     }
   }, [appMode, setStorageType]);
 
-  const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.EXTENSION_CONSOLE_LOGGER), []);
+  const isImplicitTestThisRuleCompatible = useMemo(
+    () => isFeatureCompatible(APP_CONSTANTS.FEATURES.IMPLICIT_TEST_THIS_RULE),
+    []
+  );
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !storageType) {
     return <InstallExtensionCTA heading="Requestly Extension Settings" eventPage="settings_page" />;
@@ -39,11 +41,12 @@ export const GlobalSettings = () => {
           Please enable the following settings to get the best experience
         </p>
         <div>
-          {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && <ConsoleLogger isCompatible={isCompatible} />}
           <RulesSyncing />
           {user?.loggedIn ? <DataCollection /> : null}
         </div>
-        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? <ImplicitRuleTesting /> : null}
+        {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isImplicitTestThisRuleCompatible ? (
+          <ImplicitRuleTesting />
+        ) : null}
       </div>
     </div>
   );
