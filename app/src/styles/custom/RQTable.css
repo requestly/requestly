@@ -7,6 +7,8 @@
   font-size: 13px;
   cursor: pointer;
 }
+
+/* TODO: cleanup - remove this after new mock server table is live */
 .rq-table-header .ant-table-cell {
   background: transparent;
   padding-left: 20px;
@@ -55,6 +57,7 @@
   border-color: var(--border);
 }
 
+/* TODO: cleanup after new mock server table is live */
 .rq-table-row .mock-actions-container {
   opacity: 0;
   pointer-events: none;
