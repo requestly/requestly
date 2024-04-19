@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Modal, Spin } from "antd";
 import { trackBillingTeamAccessRequestResponded } from "features/settings/analytics";
 import { BillingTeamJoinRequestAction } from "../../types";
-import { LoadingOutlined } from "@ant-design/icons";
 import { PiWarningDiamondBold } from "@react-icons/all-files/pi/PiWarningDiamondBold";
 import { MdCheckCircleOutline } from "@react-icons/all-files/md/MdCheckCircleOutline";
 import { MdWarningAmber } from "@react-icons/all-files/md/MdWarningAmber";
 import { RQButton } from "lib/design-system/components";
-import Logger from "../../../../../../../../../../common/logger";
+import { BillingTeamActionModal } from "../common/BillingTeamActionModal/BillingTeamActionModal";
 import { reviewBillingTeamJoiningRequest } from "backend/billing/reviewJoinRequest";
-import "./ReviewJoinRequestModal.scss";
+import Logger from "../../../../../../../../../../common/logger";
 
 interface ReviewJoinRequestModalProps {
   isOpen: boolean;
@@ -17,6 +15,18 @@ interface ReviewJoinRequestModalProps {
   billingId: string;
   userId: string;
   requestAction: BillingTeamJoinRequestAction;
+}
+
+enum ReviewResultMessage {
+  INVALID_ARGS = "invalid-args",
+  NO_BILLING_TEAM_FOUND = "no-billing-team-found",
+  NO_USER_FOUND = "no-user-found",
+  NOT_A_MEMBER = "not-a-member",
+  NO_ADMIN_ACCESS = "no-admin-access",
+  EXISTING_MEMBER = "existing-member",
+  REQUEST_APPROVED = "request-approved",
+  ERROR_ADDING_USER = "error-adding-user",
+  REQUEST_DECLINED = "request-declined",
 }
 
 export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
@@ -63,16 +73,62 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
     }
   }, []);
 
+  const getResultTitle = useCallback(() => {
+    switch (reviewResult?.result?.message) {
+      case ReviewResultMessage.REQUEST_APPROVED:
+        return "Joining request approved";
+      case ReviewResultMessage.REQUEST_DECLINED:
+        return "Joining request declined";
+      case ReviewResultMessage.EXISTING_MEMBER:
+        return "Member already added";
+      default:
+        return "The request cannot be processed";
+    }
+  }, [reviewResult?.result?.message]);
+
+  const getResultMessage = useCallback(() => {
+    switch (reviewResult?.result?.message) {
+      case ReviewResultMessage.REQUEST_APPROVED:
+        return <>{reviewResult?.result?.userName ?? "User"} has been added to the Billing Team.</>;
+      case ReviewResultMessage.REQUEST_DECLINED:
+        return <>{reviewResult?.result?.userName ?? "User"} has not been added to the Billing Team.</>;
+      case ReviewResultMessage.EXISTING_MEMBER:
+        return <>{reviewResult?.result?.userName ?? "User"} is already a member of the Billing Team.</>;
+      case ReviewResultMessage.NO_ADMIN_ACCESS:
+        return "Only admins or billing managers can accept/decline requests.";
+      case ReviewResultMessage.NO_USER_FOUND:
+        return (
+          <>
+            User not found. Please reach out to us at <a href="mailto:contact@requestly.io">contact@requestly.io</a> for
+            assistance.
+          </>
+        );
+      default:
+        return (
+          <>
+            The billing team was not found. Please reach out to us at{" "}
+            <a href="mailto:contact@requestly.io">contact@requestly.io</a> for assistance.
+          </>
+        );
+    }
+  }, [reviewResult?.result?.message, reviewResult?.result?.userName]);
+
   return (
-    <Modal
-      width={320}
+    <BillingTeamActionModal
+      width={350}
       centered
       open={isOpen}
       wrapClassName="custom-rq-modal review-request-modal"
       onCancel={onClose}
       closable={false}
       maskClosable={false}
-      title={isLoading ? null : <>{getReviewResultIcon(reviewResult?.result?.status)} Review joining request</>}
+      title={
+        isLoading ? null : (
+          <>
+            {getReviewResultIcon(reviewResult?.result?.status)} {getResultTitle()}
+          </>
+        )
+      }
       footer={
         isLoading ? null : (
           <RQButton block type="primary" onClick={onClose}>
@@ -80,21 +136,11 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
           </RQButton>
         )
       }
-    >
-      <div className="review-request-content-container">
-        <div className="review-request-content">
-          {isLoading && (
-            <div className="review-request-loader-container">
-              <Spin indicator={<LoadingOutlined spin className="review-request-loader" />} />
-              <span className="review-request-loader-text">
-                {requestAction === BillingTeamJoinRequestAction.ACCEPT ? "Acepting" : "Declining"} joining request ...
-              </span>
-            </div>
-          )}
-
-          {reviewResult && <div className="review-request-result-text">{reviewResult.message}</div>}
-        </div>
-      </div>
-    </Modal>
+      isLoading={isLoading}
+      loadingText={`${
+        requestAction === BillingTeamJoinRequestAction.ACCEPT ? "Acepting" : "Declining"
+      } joining request ...`}
+      result={reviewResult ? getResultMessage() : null}
+    />
   );
 };
