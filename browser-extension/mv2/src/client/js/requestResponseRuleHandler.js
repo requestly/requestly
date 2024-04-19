@@ -556,7 +556,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   // XHR Implementation
   const updateXhrReadyState = (xhr, readyState) => {
-    console.log("[RQ]", "updateXhrReadyState", readyState);
+    // console.log("[RQ]", "updateXhrReadyState", readyState);
     Object.defineProperty(xhr, "readyState", { writable: true });
     xhr.readyState = readyState;
     xhr.dispatchEvent(new CustomEvent("readystatechange"));
@@ -657,7 +657,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
           customResponse = await customResponse;
         }
 
-        console.log("[RQ]", "customResponse", { customResponse, responseType, contentType });
+        console.log("[RQ]", "Rule Applied - customResponse", { customResponse, responseType, contentType });
 
         const isUnsupportedResponseType = responseType && !["json", "text"].includes(responseType);
 
@@ -852,9 +852,9 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     }
 
     if (this.responseRule) {
-      console.log("RQ", "send and response rule matched", this.responseRule);
+      console.log("[RQ]", "send and response rule matched", this.responseRule);
       if (shouldServeResponseWithoutRequest(this.responseRule)) {
-        console.log("RQ", "send and response rule matched and serveWithoutRequest is true");
+        console.log("[RQ]", "send and response rule matched and serveWithoutRequest is true");
         resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
       } else {
         send.call(this.rqProxyXhr, this._requestData);
