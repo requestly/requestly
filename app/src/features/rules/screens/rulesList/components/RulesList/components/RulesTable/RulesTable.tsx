@@ -138,7 +138,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       <ContentListTable
         id="rules-list-table"
         size="middle"
-        scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(277px + 68px)" : "277px"})` }} // 68px is Feature limit banner height
+        scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(232px + 68px)" : "232px"})` }} // 68px is Feature limit banner height
         columns={columns}
         data={contentTableData}
         rowKey="id"
