@@ -49,6 +49,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     }
   }, [mockType, mocks?.length, isWorkspaceMode]);
 
+  // TODO: move all actions in a hook and use that
   const columns = useMocksTableColumns({
     mockType,
     handleNameClick,
