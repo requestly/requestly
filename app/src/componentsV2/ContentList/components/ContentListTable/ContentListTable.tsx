@@ -31,6 +31,8 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   scroll = { y: "calc(100vh - 277px)" },
   locale,
   onRecordSelection = () => {},
+  className = "",
+  onRow = (record: DataType) => ({}),
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -67,11 +69,12 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     <div className="rq-content-list-table-container">
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRows} />}
       <Table
-        className="rq-content-list-table"
+        className={`rq-content-list-table ${className}`}
         onHeaderRow={() => ({
           className: "rq-content-list-table-header",
         })}
         rowClassName={(record) => `rq-content-list-table-row ${customRowClassName?.(record)}`}
+        onRow={onRow}
         size={size}
         loading={loading}
         rowKey={rowKey}

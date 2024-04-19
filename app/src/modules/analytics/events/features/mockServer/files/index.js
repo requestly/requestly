@@ -1,6 +1,7 @@
 import { trackEvent } from "modules/analytics";
 import { MOCK_SERVER } from "../../constants";
 
+// TODO: cleanup
 export const trackCreateFileEvent = () => {
   const params = {};
   trackEvent(MOCK_SERVER.FILES.CREATED, params);
