@@ -75,11 +75,6 @@ RQ.RuleExecutionHandler.setup = async () => {
 RQ.RuleExecutionHandler.syncCachedAppliedRules = (appliedRuleDetails, isConsoleLoggerEnabled) => {
   appliedRuleDetails.forEach((appliedRuleDetail) => {
     RQ.RuleExecutionHandler.handleAppliedRule(appliedRuleDetail.rule);
-    RQ.ConsoleLogger.handleMessage({
-      requestDetails: appliedRuleDetail.requestDetails,
-      rule: appliedRuleDetail.rule,
-      isConsoleLoggerEnabled,
-    });
   });
 };
 
