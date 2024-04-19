@@ -556,7 +556,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   // XHR Implementation
   const updateXhrReadyState = (xhr, readyState) => {
-    console.log("RQ", "updateXhrReadyState", readyState);
+    console.log("[RQ]", "updateXhrReadyState", readyState);
     Object.defineProperty(xhr, "readyState", { writable: true });
     xhr.readyState = readyState;
     xhr.dispatchEvent(new CustomEvent("readystatechange"));
@@ -580,6 +580,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       return null;
     };
     updateReadyState(xhr.HEADERS_RECEIVED);
+    updateReadyState(xhr.LOADING);
 
     // mark resolved
     updateReadyState(xhr.DONE);
@@ -591,7 +592,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     const actualXhr = this;
 
     const dispatchEventToParent = (type) => {
-      console.log("RQ", "dispatchEventToParent", type);
+      console.log("[RQ]", `on${type}`);
       actualXhr.dispatchEvent(new ProgressEvent(type));
     };
 
@@ -600,17 +601,17 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     };
 
     const onReadyStateChange = async function () {
-      console.log("RQ", "Inside the XHR onReadyStateChange block for url", this.readyState);
+      console.log("[RQ]", "onReadyStateChange", {
+        state: this.readyState,
+        status: this.status,
+        response: this.response,
+        xhr: this,
+        url: this._requestURL,
+      });
       if (!this.responseRule) {
         return;
       }
       const responseModification = this.responseRule.pairs[0].response;
-
-      isDebugMode &&
-        console.log("RQ", "Inside the XHR onReadyStateChange block for url", {
-          url: this._requestURL,
-          xhr: this,
-        });
 
       if (this.readyState === this.HEADERS_RECEIVED) {
         // For network failures, responseStatus=0 but we still return customResponse with status=200
@@ -637,7 +638,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         const responseType = this.responseType;
         const contentType = this.getResponseHeader("content-type");
 
-        updateParentXHRReadyState(this.LOADING);
         let customResponse =
           responseModification.type === "code"
             ? getFunctionFromCode(responseModification.value)({
@@ -657,7 +657,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
           customResponse = await customResponse;
         }
 
-        console.log("RQ", "customResponse", customResponse, responseType, contentType);
+        console.log("[RQ]", "customResponse", { customResponse, responseType, contentType });
 
         const isUnsupportedResponseType = responseType && !["json", "text"].includes(responseType);
 
@@ -728,11 +728,11 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         if (this._abort) {
           // Note: This might get delayed due to async in code block
           dispatchEventToParent("abort");
-          dispatchEventToParent("loadEnd");
+          dispatchEventToParent("loadend");
         } else {
           updateParentXHRReadyState(this.DONE);
           dispatchEventToParent("load");
-          dispatchEventToParent("loadEnd");
+          dispatchEventToParent("loadend");
         }
 
         notifyResponseRuleApplied({
@@ -745,7 +745,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     };
 
     const xhr = new OriginalXMLHttpRequest();
-    xhr.addEventListener("readystatechange", onReadyStateChange.bind(xhr, this), false);
+    xhr.addEventListener("readystatechange", onReadyStateChange.bind(xhr), false);
     xhr.addEventListener("abort", dispatchEventToParent.bind(xhr, "abort"), false);
     xhr.addEventListener("error", dispatchEventToParent.bind(xhr, "error"), false);
     xhr.addEventListener("timeout", dispatchEventToParent.bind(xhr, "timeout"), false);
@@ -782,6 +782,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   XMLHttpRequest.prototype.open = function (method, url) {
     this._method = method;
     this._requestURL = getAbsoluteUrl(url);
+    this.rqProxyXhr._method = method;
+    this.rqProxyXhr._requestURL = getAbsoluteUrl(url);
     open.apply(this.rqProxyXhr, arguments);
     open.apply(this, arguments);
   };
@@ -799,6 +801,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
     this._requestHeaders = this._requestHeaders || {};
     this._requestHeaders[header] = value;
+    this.rqProxyXhr._requestHeaders = this.rqProxyXhr._requestHeaders || {};
+    this.rqProxyXhr._requestHeaders[header] = value;
     setRequestHeader.apply(this.rqProxyXhr, arguments);
     setRequestHeader.apply(this, arguments);
   };
@@ -806,6 +810,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (data) {
     this._requestData = data;
+    this.rqProxyXhr._requestData = data;
 
     const requestRule = getRequestRule(this._requestURL);
     if (requestRule) {
