@@ -1,25 +1,18 @@
-import { RQMockMetadataSchema, MockType } from "components/features/mocksV2/types";
-import { ContentListTableProps } from "componentsV2/ContentList";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
+import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
 import { Space, Table, Tooltip, Typography } from "antd";
-import {
-  AppstoreOutlined,
-  CalendarOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+import { RQMockMetadataSchema, MockType } from "components/features/mocksV2/types";
+import { ContentListTableProps } from "componentsV2/ContentList";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { CalendarOutlined, DeleteOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { UserIcon } from "components/common/UserIcon";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
-import REQUEST_METHOD_COLORS from "components/features/mocksV2/MockList/MocksTable/constants/requestMethodColors";
 import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
-import { IoMdLink } from "@react-icons/all-files/io/IoMdLink";
-import moment from "moment";
 import { RQButton } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import { MocksTableProps } from "../MocksTable";
+import REQUEST_METHOD_COLORS from "components/features/mocksV2/MockList/MocksTable/constants/requestMethodColors";
 
 // TODO: move all actions in a hook and use that
 export const useMocksTableColumns = ({
@@ -48,66 +41,38 @@ export const useMocksTableColumns = ({
       ),
       dataIndex: "name",
       ellipsis: true,
-      width: 140,
+      width: 320,
       render: (_: any, record: RQMockMetadataSchema) => {
         return (
-          <Typography.Text
-            ellipsis={true}
-            className="primary-cell"
+          <div
+            className="mock-details-container"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               handleNameClick(record.id, record.isOldMock);
             }}
           >
-            {record.name}
-          </Typography.Text>
-        );
-      },
-    },
-    {
-      title: (
-        <div className="rq-col-title">
-          <AppstoreOutlined />
-          {mockType ? (mockType === MockType.FILE ? "Type" : "Method") : "Method/Type"}
-        </div>
-      ),
-      dataIndex: "method",
-      width: 80,
-      render: (_: any, record: RQMockMetadataSchema) => {
-        return (
-          <>
-            <span
-              style={{
-                color:
-                  record?.type === MockType.API
-                    ? REQUEST_METHOD_COLORS[record.method]
-                    : fileTypeColorMap[record.fileType],
-              }}
-              className="mock-tag"
-            >
-              {record?.type === MockType.API ? record.method : record.fileType}
-            </span>
-          </>
-        );
-      },
-    },
-    {
-      title: (
-        <div className="rq-col-title">
-          <IoMdLink />
-          Endpoint
-        </div>
-      ),
-      dataIndex: "endpoint",
-      width: 140,
-      className: "text-gray",
-      ellipsis: true,
-      render: (_: any, record: RQMockMetadataSchema) => {
-        return (
-          <Typography.Text className="text-gray" ellipsis={true}>
-            {"/" + record.endpoint}
-          </Typography.Text>
+            <div className="mock-name-container">
+              <span
+                className="mock-type"
+                style={{
+                  color:
+                    record?.type === MockType.API
+                      ? REQUEST_METHOD_COLORS[record.method]
+                      : fileTypeColorMap[record.fileType],
+                }}
+              >
+                {record?.type === MockType.API ? record.method : record.fileType}
+              </span>
+
+              <Typography.Text ellipsis={true} className="primary-cell mock-name">
+                {record.name}
+              </Typography.Text>
+            </div>
+            <div className="mock-endpoint">
+              <Typography.Text ellipsis={true}>{"/" + record.endpoint}</Typography.Text>
+            </div>
+          </div>
         );
       },
     },
@@ -115,9 +80,13 @@ export const useMocksTableColumns = ({
       title: <div className="rq-col-title">Created by</div>,
       width: 70,
       responsive: ["lg"],
-      className: "text-gray mock-table-user-icon",
+      className: "text-gray",
       render: (_: any, record: RQMockMetadataSchema) => {
-        return <UserIcon uid={record.createdBy} />;
+        return (
+          <div className="mock-table-user-icon">
+            <UserIcon uid={record.createdBy} />
+          </div>
+        );
       },
     },
     {
@@ -232,7 +201,7 @@ export const useMocksTableColumns = ({
 
   if (!isWorkspaceMode) {
     //remove created by column from mock table in private workspace
-    columns.splice(4, 1);
+    columns.splice(2, 1);
   }
 
   return columns;
