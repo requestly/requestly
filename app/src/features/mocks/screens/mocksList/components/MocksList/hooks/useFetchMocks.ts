@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 
-export const useFetchMocks = (type: MockType = MockType.API) => {
+export const useFetchMocks = (type: MockType) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
