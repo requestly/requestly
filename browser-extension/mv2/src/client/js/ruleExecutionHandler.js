@@ -127,12 +127,12 @@ RQ.RuleExecutionHandler.showImplicitTestRuleWidget = async () => {
       ruleType: ruleDetails.ruleType,
     });
   }
+  testRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
+  document.documentElement.appendChild(testRuleWidget);
+
   if (appliedRules.length) {
     testRuleWidget.style.display = "block";
   }
-
-  testRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
-  document.documentElement.appendChild(testRuleWidget);
 
   testRuleWidget.addEventListener("view_rule_in_editor", (data) => {
     window.open(`${RQ.configs.WEB_URL}/rules/editor/edit/${data.detail.ruleId}`, "_blank");
