@@ -24,7 +24,7 @@ export const RequestBillingTeamAccessModal: React.FC<RequestBillingTeamAccessMod
   const getPostRequestResult = () => {
     if (isActionCompleted) {
       if (isRequestSent) {
-        return "Your request has been successfully sent to team manager and admin. They will review and respond to your request soon.";
+        return "Please check with the billing manager/admins for approval.";
       } else {
         return "Something went wrong, we couldn't send the request. Please try again later.";
       }
@@ -57,8 +57,15 @@ export const RequestBillingTeamAccessModal: React.FC<RequestBillingTeamAccessMod
       title={
         isLoading ? null : (
           <>
-            {isRequestSent ? <MdCheckCircleOutline className="success" /> : <PiWarningDiamondBold className="danger" />}{" "}
-            Request billing team access
+            {isRequestSent ? (
+              <>
+                <MdCheckCircleOutline className="success" /> Joining request sent successfully
+              </>
+            ) : (
+              <>
+                <PiWarningDiamondBold className="danger" /> Failed to send joining request
+              </>
+            )}
           </>
         )
       }
