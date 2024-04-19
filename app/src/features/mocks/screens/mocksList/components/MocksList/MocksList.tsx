@@ -165,7 +165,15 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       />
     </>
   ) : (
-    <GettingStarted mockType={type} handleCreateNew={handleCreateNewMock} handleUploadAction={handleUploadAction} />
+    <GettingStarted
+      mockType={type}
+      handleCreateNew={handleCreateNewMock}
+      handleUploadAction={handleUploadAction}
+      fileModalVisibility={fileModalVisibility}
+      setFileModalVisibility={setFileModalVisibility}
+      uploadModalVisibility={uploadModalVisibility}
+      setUploadModalVisibility={setUploadModalVisibility}
+    />
   );
 };
 

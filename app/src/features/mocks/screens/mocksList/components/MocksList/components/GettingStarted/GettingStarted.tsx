@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { GettingStartedWithMocks } from "./GettingStartedWithMocks/GettingStartedWithMocks";
 import { MockUploaderModal, NewFileModal } from "features/mocks/modals";
 import { MockType } from "components/features/mocksV2/types";
@@ -7,12 +7,21 @@ interface Props {
   mockType: MockType;
   handleCreateNew: () => void;
   handleUploadAction: () => void;
+  fileModalVisibility: boolean;
+  uploadModalVisibility: boolean;
+  setFileModalVisibility: React.Dispatch<React.SetStateAction<boolean>>;
+  setUploadModalVisibility: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const GettingStarted: React.FC<Props> = ({ mockType, handleCreateNew, handleUploadAction }) => {
-  const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
-  const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
-
+export const GettingStarted: React.FC<Props> = ({
+  mockType,
+  handleCreateNew,
+  handleUploadAction,
+  fileModalVisibility,
+  setFileModalVisibility,
+  uploadModalVisibility,
+  setUploadModalVisibility,
+}) => {
   return (
     <>
       <GettingStartedWithMocks
