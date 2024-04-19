@@ -17,8 +17,8 @@ interface ReviewJoinRequestModalProps {
   requestAction: BillingTeamJoinRequestAction;
 }
 
-enum ReviewResultCodes {
-  INVALID_ARGS = "invalid_args",
+enum ReviewResultMessage {
+  INVALID_ARGS = "invalid-args",
   NO_BILLING_TEAM_FOUND = "no-billing-team-found",
   NO_USER_FOUND = "no-user-found",
   NOT_A_MEMBER = "not-a-member",
@@ -74,29 +74,29 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
   }, []);
 
   const getResultTitle = useCallback(() => {
-    switch (reviewResult?.result?.code) {
-      case ReviewResultCodes.REQUEST_APPROVED:
+    switch (reviewResult?.result?.message) {
+      case ReviewResultMessage.REQUEST_APPROVED:
         return "Joining request approved";
-      case ReviewResultCodes.REQUEST_DECLINED:
+      case ReviewResultMessage.REQUEST_DECLINED:
         return "Joining request declined";
-      case ReviewResultCodes.EXISTING_MEMBER:
+      case ReviewResultMessage.EXISTING_MEMBER:
         return "Member already added";
       default:
         return "The request cannot be processed";
     }
-  }, [reviewResult?.result?.code]);
+  }, [reviewResult?.result?.message]);
 
   const getResultMessage = useCallback(() => {
-    switch (reviewResult?.result?.code) {
-      case ReviewResultCodes.REQUEST_APPROVED:
+    switch (reviewResult?.result?.message) {
+      case ReviewResultMessage.REQUEST_APPROVED:
         return <>{reviewResult?.result?.userName ?? "User"} has been added to the Billing Team.</>;
-      case ReviewResultCodes.REQUEST_DECLINED:
+      case ReviewResultMessage.REQUEST_DECLINED:
         return <>{reviewResult?.result?.userName ?? "User"} has not been added to the Billing Team.</>;
-      case ReviewResultCodes.EXISTING_MEMBER:
+      case ReviewResultMessage.EXISTING_MEMBER:
         return <>{reviewResult?.result?.userName ?? "User"} is already a member of the Billing Team.</>;
-      case ReviewResultCodes.NO_ADMIN_ACCESS:
+      case ReviewResultMessage.NO_ADMIN_ACCESS:
         return "Only admins or billing managers can accept/decline requests.";
-      case ReviewResultCodes.NO_USER_FOUND:
+      case ReviewResultMessage.NO_USER_FOUND:
         return (
           <>
             User not found. Please reach out to us at <a href="mailto:contact@requestly.io">contact@requestly.io</a> for
@@ -111,7 +111,7 @@ export const ReviewJoinRequestModal: React.FC<ReviewJoinRequestModalProps> = ({
           </>
         );
     }
-  }, [reviewResult?.result?.code, reviewResult?.result?.userName]);
+  }, [reviewResult?.result?.message, reviewResult?.result?.userName]);
 
   return (
     <BillingTeamActionModal
