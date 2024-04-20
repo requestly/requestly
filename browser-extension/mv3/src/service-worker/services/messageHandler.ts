@@ -29,7 +29,7 @@ export const initMessageHandler = () => {
           });
           applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         });
-        return true;
+        break;
 
       case CLIENT_MESSAGES.INIT_SESSION_RECORDING:
         initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url).then(sendResponse);

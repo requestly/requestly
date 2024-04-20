@@ -1,37 +1,8 @@
-import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
-import { RequestRulePair, RuleType } from "common/types";
-import { executeDynamicScriptOnPage, isExtensionEnabled } from "../utils";
-import { PUBLIC_NAMESPACE } from "common/constants";
+import { onRuleOrGroupChange } from "common/rulesStore";
+import { RuleType } from "common/types";
+import { cacheRulesOnPage } from "../utils";
 
-const cacheRequestRules = async () => {
-  const isExtensionStatusEnabled = await isExtensionEnabled();
-
-  if (!isExtensionStatusEnabled) {
-    return;
-  }
-
-  const requestRules = await getEnabledRules(RuleType.REQUEST);
-
-  if (!requestRules.length) {
-    return;
-  }
-
-  executeDynamicScriptOnPage(
-    `
-    window.${PUBLIC_NAMESPACE}=window.${PUBLIC_NAMESPACE}||{};
-    window.${PUBLIC_NAMESPACE}.requestRules=${JSON.stringify(
-      requestRules.map((rule) => {
-        const requestRulePair = rule.pairs[0] as RequestRulePair;
-        return {
-          id: rule.id,
-          source: requestRulePair.source,
-          request: requestRulePair.request,
-        };
-      })
-    )};
-    `
-  );
-};
+const cacheRequestRules = async () => cacheRulesOnPage(RuleType.REQUEST);
 
 export const initRequestRuleHandler = () => {
   onRuleOrGroupChange(cacheRequestRules);
