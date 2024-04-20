@@ -41,3 +41,10 @@ export const deleteTestReportByRuleId = async (appMode: string, ruleIdsToDelete:
 
   StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
 };
+
+export const deleteTestReport = async (appMode: string, testReportId: string): Promise<void> => {
+  const allTestReports = await getAllTestReports(appMode);
+  delete allTestReports[testReportId];
+
+  await StorageService(appMode).saveRecord({ [GLOBAL_CONSTANTS.STORAGE_KEYS.TEST_REPORTS]: allTestReports });
+};

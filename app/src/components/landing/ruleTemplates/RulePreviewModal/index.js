@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Modal, Button } from "antd";
 import RuleBuilder from "../../../features/rules/RuleBuilder";
-import { saveRule } from "../../../features/rules/RuleBuilder/Header/ActionButtons/actions/index";
+import { saveRule } from "../../../../views/features/rules/RuleEditor/components/Header/ActionButtons/actions/index";
 import { redirectToRuleEditor } from "../../../../utils/RedirectionUtils";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";

@@ -1,9 +1,13 @@
 import React from "react";
+import { useSelector } from "react-redux";
+
 import { SecondarySidebarItem } from "./components/SecondarySidebarItem/SecondarySidebarItem";
+import { getIsSecondarySidebarCollapsed } from "store/selectors";
 
-import "./SecondarySidebar.css";
+import "./SecondarySidebar.scss";
+import { m, AnimatePresence } from "framer-motion";
 
-interface Props {
+export interface SecondarySidebarProps {
   items: {
     title: string;
     path: string;
@@ -11,19 +15,35 @@ interface Props {
   }[];
 }
 
-const SecondarySidebar: React.FC<Props> = ({ items }) => {
+const SecondarySidebar: React.FC<SecondarySidebarProps> = ({ items }) => {
+  // Move this to local state once button is also moved to this component
+  const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
+
   return (
-    <div className="rq-secondary-sidebar-container">
-      <ul>
-        {items.map(({ path, title, icon }) => {
-          return (
-            <li key={title}>
-              <SecondarySidebarItem icon={icon} path={path} title={title} />
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <AnimatePresence>
+      {isSecondarySidebarCollapsed ? null : (
+        <m.div
+          initial={{ width: "217px" }} // TODO: Change this to 0 once shared and templates use same container
+          animate={{ width: "217px" }}
+          exit={{ width: "0" }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.2,
+          }}
+          className="secondary-sidebar-container"
+        >
+          <ul>
+            {items.map(({ path, title, icon }) => {
+              return (
+                <li key={title}>
+                  <SecondarySidebarItem icon={icon} path={path} title={title} />
+                </li>
+              );
+            })}
+          </ul>
+        </m.div>
+      )}
+    </AnimatePresence>
   );
 };
 

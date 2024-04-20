@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -7,40 +7,18 @@ import { getAvailableBillingTeams, getBillingTeamMemberById } from "store/featur
 import { Result } from "antd";
 import { MyBillingTeamDetails } from "./MyBillingTeamDetails";
 import { OtherBillingTeamDetails } from "./OtherBillingTeamDetails";
-import { toast } from "utils/Toast";
-import { trackBillingTeamAccessRequestResponded } from "features/settings/analytics";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import Logger from "lib/logger";
-
-enum BillingTeamJoinRequestAction {
-  ACCEPT = "accept",
-  REJECT = "reject",
-}
+import { ReviewJoinRequestModal } from "./modals/ReviewJoinRequestModal/ReviewJoinRequestModal";
+import { BillingTeamJoinRequestAction } from "./types";
 
 export const BillingTeamDetails = () => {
   const { billingId } = useParams();
   const user = useSelector(getUserAuthDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const [queryParams] = useSearchParams();
+  const [isRequestReviewModalOpen, setIsRequestReviewModalOpen] = useState(false);
 
-  const joinRequestAction = queryParams.get("joinRequestAction");
+  const joinRequestAction = queryParams.get("joinRequestAction") as BillingTeamJoinRequestAction;
   const userId = queryParams.get("userId");
-
-  const showReviewResultToast = useCallback((message: string, type: string, duration = 5) => {
-    switch (type) {
-      case "success":
-        toast.success(message, duration);
-        break;
-      case "warning":
-        toast.warn(message, duration);
-        break;
-      case "error":
-        toast.error(message, duration);
-        break;
-      default:
-        toast.info(message, duration);
-    }
-  }, []);
 
   const hasAccessToCurrentTeam = useCheckCurrentTeamAccess(billingId);
 
@@ -58,31 +36,9 @@ export const BillingTeamDetails = () => {
 
   useEffect(() => {
     if (user.loggedIn && billingId && joinRequestAction && userId) {
-      toast.loading(
-        `${
-          joinRequestAction === BillingTeamJoinRequestAction.ACCEPT ? "Approving" : "Declining"
-        } the joining request ...`,
-        5
-      );
-      trackBillingTeamAccessRequestResponded(joinRequestAction, "loading");
-      const reviewBillingTeamJoiningRequest = httpsCallable(getFunctions(), "billing-reviewBillingTeamJoiningRequest");
-      reviewBillingTeamJoiningRequest({
-        billingId,
-        action: joinRequestAction,
-        userId,
-      })
-        .then((res: any) => {
-          showReviewResultToast(res.data.message, res.data.result.status);
-          trackBillingTeamAccessRequestResponded(joinRequestAction, res.data.result.status);
-          Logger.log("Billing team joining request reviewed");
-        })
-        .catch((err: any) => {
-          toast.error(err.message, 5);
-          trackBillingTeamAccessRequestResponded(joinRequestAction, "error");
-          Logger.log("Error while reviewing billing team joining request");
-        });
+      setIsRequestReviewModalOpen(true);
     }
-  }, [billingId, joinRequestAction, userId, showReviewResultToast, user.loggedIn]);
+  }, [billingId, joinRequestAction, userId, user.loggedIn]);
 
   if (!user.loggedIn) {
     return null;
@@ -99,7 +55,20 @@ export const BillingTeamDetails = () => {
       </div>
     );
   }
-
-  if (hasAccessToCurrentTeam || userDetailsOfSelectedBillingTeam) return <MyBillingTeamDetails />;
-  else return <OtherBillingTeamDetails />;
+  return (
+    <>
+      <ReviewJoinRequestModal
+        isOpen={isRequestReviewModalOpen}
+        onClose={() => setIsRequestReviewModalOpen(false)}
+        billingId={billingId}
+        userId={userId}
+        requestAction={joinRequestAction}
+      />
+      {hasAccessToCurrentTeam || userDetailsOfSelectedBillingTeam ? (
+        <MyBillingTeamDetails />
+      ) : (
+        <OtherBillingTeamDetails />
+      )}
+    </>
+  );
 };

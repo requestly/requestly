@@ -9,11 +9,11 @@ import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/ic
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import CodeEditor from "components/misc/CodeEditor";
 import "./CustomScriptRow.css";
-import MockPickerModal from "components/features/mocksV2/MockPickerModal";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getDefaultScriptRender, createRenderedScript } from "./utils";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
+import { MockPickerModal } from "features/mocks/modals";
 
 const { Text } = Typography;
 

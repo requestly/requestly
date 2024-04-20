@@ -94,7 +94,7 @@ export const AppNotificationBanner = () => {
     (bannerId: string) => {
       switch (bannerId) {
         case "commercial_license": {
-          return !billingTeams.length;
+          return !user.details?.isPremium;
         }
         case "request_team_access": {
           return billingTeams?.length && !billingTeams?.some((team) => user?.details?.profile?.uid in team.members);
@@ -103,7 +103,7 @@ export const AppNotificationBanner = () => {
           return true;
       }
     },
-    [billingTeams, user?.details?.profile?.uid]
+    [billingTeams, user?.details?.profile?.uid, user.details?.isPremium]
   );
 
   const getBannerClassName = (bannerType: string) => {

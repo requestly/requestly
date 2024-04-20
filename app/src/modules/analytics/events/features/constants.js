@@ -102,6 +102,7 @@ export const RULES = {
   },
 };
 
+// TODO: cleanup
 export const MOCK_SERVER = {
   MOCKS: {
     DELETED: "mock_deleted",
@@ -115,6 +116,7 @@ export const MOCK_SERVER = {
   },
 };
 
+// TODO: cleanup
 export const MOCKSV2 = {
   DELETED: "mock_deleted",
   UPDATED: "mock_updated",
@@ -200,15 +202,6 @@ export const TEAMS = {
 
 export const TRASH = {
   RULES_RECOVERED: "trash_rules_recovered",
-};
-
-export const MOBILE_DEBUGGER = {
-  SDK_KEY_CREATED: "sdk_key_created",
-  SDK_KEY_CREATED_FAILURE: "sdk_key_created_failure",
-  DEVICE_ID_SELECTED: "device_id_selected",
-  DEVICE_ID_SELECTED_FAILURE: "device_id_selected_failure",
-  SHARE_CLICKED: "mobile_app_share_clicked",
-  SHARED: "mobile_app_shared",
 };
 
 export const EXECUTION_LOGS = {

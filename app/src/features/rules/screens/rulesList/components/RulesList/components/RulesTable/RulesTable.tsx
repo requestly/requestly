@@ -34,9 +34,12 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
   const user = useSelector(getUserAuthDetails);
   const allRecords = useSelector(getAllRecords);
-  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
+
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
   const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
+  const [isBulkRecordsStatusUpdating, setIsBulkRecordsStatusUpdating] = useState(false);
+
+  const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const isBackgateRestrictionEnabled = useFeatureValue("backgates_restriction", false);
   const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
   const {
@@ -135,7 +138,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       <ContentListTable
         id="rules-list-table"
         size="middle"
-        scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(277px + 68px)" : "277px"})` }} // 68px is Feature limit banner height
+        scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(232px + 68px)" : "232px"})` }} // 68px is Feature limit banner height
         columns={columns}
         data={contentTableData}
         rowKey="id"
@@ -183,8 +186,10 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
               {
                 label: toggleRecordsBulkOptionLabel,
                 icon: <MdOutlineToggleOn />,
+                loading: isBulkRecordsStatusUpdating,
                 onClick: (selectedRows) => {
                   const onSuccess = () => {
+                    setIsBulkRecordsStatusUpdating(false);
                     toast.success(`All records ${toggleRecordsBulkOptionLabel.toLowerCase()}d!`);
                     trackRulesListBulkActionPerformed("records_toggle");
                   };
@@ -194,6 +199,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
                       ? RecordStatus.ACTIVE
                       : RecordStatus.INACTIVE;
 
+                  setIsBulkRecordsStatusUpdating(true);
                   recordsStatusUpdateAction(normalizeRecords(selectedRows), updatedValue, onSuccess);
                 },
               },
