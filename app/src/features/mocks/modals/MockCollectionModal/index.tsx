@@ -44,7 +44,7 @@ export const MockCollectionModal: React.FC<Props> = ({
       setCollectionName("");
       setCollectionDescription("");
     };
-  }, [name, description]);
+  }, [name, description, visible]);
 
   const handleSaveClick = () => {
     if (collectionName.length === 0) {
@@ -57,7 +57,7 @@ export const MockCollectionModal: React.FC<Props> = ({
     } else {
       const collectionData = {
         name: collectionName,
-        description: collectionDescription,
+        desc: collectionDescription,
         type: mockType,
       };
 
