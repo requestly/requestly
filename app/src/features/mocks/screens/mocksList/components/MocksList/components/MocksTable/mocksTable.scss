@@ -18,15 +18,43 @@
   }
 
   .rq-mocks-list-table-row {
+    font-family: Inter;
     font-size: 13px;
     cursor: pointer;
 
-    .mock-tag {
-      font-size: 13px;
-      font-weight: 500;
-      border: 1px solid var(--border);
-      border-radius: var(--border-radius-sm);
-      padding: 5px;
+    .mock-details-container {
+      .mock-name-container {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .mock-name {
+          color: var(--white);
+          font-size: 13px;
+          font-weight: 500;
+          line-height: 18px;
+          letter-spacing: 0.25px;
+        }
+
+        .mock-type {
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
+      }
+
+      .mock-endpoint {
+        margin-top: 4px;
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 14px;
+        letter-spacing: 0.4px;
+
+        .ant-typography {
+          color: var(--text-subtle);
+        }
+      }
     }
 
     .mock-actions-container {
@@ -50,7 +78,7 @@
       }
     }
 
-    .mock-table-user-icon span {
+    .mock-table-user-icon {
       margin-left: 15px;
     }
   }
