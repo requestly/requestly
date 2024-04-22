@@ -20,7 +20,7 @@ export enum MockRecordType {
 export interface RQMockCollection {
   id?: string;
   name: string;
-  description?: string;
+  desc?: string;
   type: MockType;
   recordType: MockRecordType.COLLECTION;
   ownerId: string;

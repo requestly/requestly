@@ -22,6 +22,33 @@
     font-size: 13px;
     cursor: pointer;
 
+    .mock-collection-details-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .collection-icon {
+        width: 16px;
+        height: 16px;
+        color: var(--white);
+      }
+
+      .mock-collection-name {
+        color: var(--white);
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 18px;
+        letter-spacing: 0.25px;
+      }
+
+      .mock-collection-description {
+        color: var(--text-subtle);
+        font-size: 11px;
+        line-height: 14px;
+        letter-spacing: 0.4px;
+      }
+    }
+
     .mock-details-container {
       .mock-name-container {
         display: flex;
