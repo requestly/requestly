@@ -94,6 +94,11 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setDeleteModalVisibility(true);
   };
 
+  const handleUpdateCollection = (collection: RQMockMetadataSchema) => {
+    setSelectedMock(collection);
+    setCollectionModalVisibility(true);
+  };
+
   const handleSearch = (searchQuery: string) => {
     setSearchValue(searchQuery);
 
@@ -154,6 +159,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleEditAction={handleEditAction}
             handleUploadAction={handleUploadAction}
             handleDeleteAction={handleDeleteAction}
+            handleUpdateCollection={handleUpdateCollection}
           />
         </div>
       </div>
@@ -167,13 +173,16 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       />
 
       <DeleteMockModal
+        mock={selectedMock}
         visible={deleteModalVisibility}
         toggleDeleteModalVisibility={(visible: boolean) => setDeleteModalVisibility(visible)}
-        mock={selectedMock}
         callbackOnSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
       />
 
       <MockCollectionModal
+        id={selectedMock?.id}
+        name={selectedMock?.name}
+        description={selectedMock?.desc}
         mockType={type}
         visible={collectionModalVisibility}
         toggleModalVisibility={() => setCollectionModalVisibility((prev) => !prev)}

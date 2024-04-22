@@ -25,6 +25,7 @@ export interface MocksTableProps {
   handleEditAction?: (mockId: string, isOldMock: boolean) => void;
   handleSelectAction?: (url: string) => void;
   handleUploadAction?: () => void;
+  handleUpdateCollection?: (collection: RQMockMetadataSchema) => void;
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
@@ -36,6 +37,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   handleEditAction,
   handleSelectAction,
   handleDeleteAction,
+  handleUpdateCollection,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -59,6 +61,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     handleEditAction,
     handleDeleteAction,
     handleSelectAction,
+    handleUpdateCollection,
   });
 
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
@@ -84,7 +87,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
           onClick: (e) => {
             e.preventDefault();
 
-            if (isRecordMockCollection(record.recordType)) {
+            if (isRecordMockCollection(record)) {
               return;
             }
 
