@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 
-export const useFetchMocks = (type: MockType) => {
+export const useFetchMocks = (type: MockType, forceRender: boolean) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -81,7 +81,7 @@ export const useFetchMocks = (type: MockType) => {
     } else {
       setOldMocksList([]);
     }
-  }, [fetchMocks, fetchOldMocks, workspace, setOldMocksList]);
+  }, [fetchMocks, fetchOldMocks, workspace, setOldMocksList, forceRender]);
 
   return {
     mocks,
