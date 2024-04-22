@@ -6,6 +6,7 @@ import { RQModal } from "lib/design-system/components";
 import { createMockCollection } from "backend/mocks/createMockCollection";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { updateMockCollection } from "backend/mocks/updateMockCollection";
 import "./mockCollectionModal.scss";
 
 interface Props {
@@ -37,8 +38,8 @@ export const MockCollectionModal: React.FC<Props> = ({
   const [collectionDescription, setCollectionDescription] = useState("");
 
   useEffect(() => {
-    setCollectionName(name);
-    setCollectionDescription(description);
+    setCollectionName(name ?? "");
+    setCollectionDescription(description ?? "");
 
     return () => {
       setCollectionName("");
@@ -53,7 +54,22 @@ export const MockCollectionModal: React.FC<Props> = ({
     }
 
     if (id) {
-      // update
+      const collectionData = {
+        name: collectionName,
+        desc: collectionDescription,
+      };
+
+      setIsLoading(true);
+      updateMockCollection(uid, id, collectionData)
+        .then(() => {
+          console.log("Collection updated!");
+          message.success("Collection updated!");
+          toggleModalVisibility();
+          onSuccess?.();
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     } else {
       const collectionData = {
         name: collectionName,
