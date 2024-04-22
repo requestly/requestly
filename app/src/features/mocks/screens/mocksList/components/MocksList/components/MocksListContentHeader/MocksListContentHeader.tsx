@@ -8,11 +8,13 @@ import { MockType } from "components/features/mocksV2/types";
 import { RQButton } from "lib/design-system/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/selectors";
+import { MdOutlineCreateNewFolder } from "@react-icons/all-files/md/MdOutlineCreateNewFolder";
 
 interface Props {
   mockType?: string;
   handleUploadAction?: () => void;
   handleCreateNew: () => void;
+  handleCreateNewCollection?: () => void;
   searchValue?: string;
   setSearchValue?: (s: string) => void;
 }
@@ -20,6 +22,7 @@ interface Props {
 export const MocksListContentHeader: React.FC<Props> = ({
   mockType,
   handleCreateNew,
+  handleCreateNewCollection,
   handleUploadAction,
   searchValue,
   setSearchValue = () => {},
@@ -28,21 +31,8 @@ export const MocksListContentHeader: React.FC<Props> = ({
 
   const actionbuttonsData = [
     {
-      type: "primary" as ButtonProps["type"],
-      icon: <PlusOutlined />,
-      buttonText: "Create New",
-      onClickHandler: () => (user?.loggedIn || mockType === MockType.FILE) && handleCreateNew?.(),
-      isAuthRequired: true,
-      authPopover: {
-        title: "You need to sign up to create API mocks",
-        disabled: mockType === MockType.FILE,
-        callback: handleCreateNew,
-        source: SOURCE.CREATE_API_MOCK,
-      },
-    },
-    {
       hide: !handleUploadAction,
-      type: "default" as ButtonProps["type"],
+      type: "text" as ButtonProps["type"],
       icon: <CloudUploadOutlined />,
       buttonText: `Upload ${mockType === MockType.FILE ? "File" : "JSON"}`,
       onClickHandler: () => user?.details?.isLoggedIn && handleUploadAction(),
@@ -50,6 +40,32 @@ export const MocksListContentHeader: React.FC<Props> = ({
       authPopover: {
         title: "You need to sign up to upload mocks",
         callback: handleUploadAction,
+        source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
+      },
+    },
+    {
+      hide: !handleCreateNewCollection,
+      type: "default" as ButtonProps["type"],
+      icon: <MdOutlineCreateNewFolder className="anticon" />,
+      buttonText: "New Collection",
+      onClickHandler: () => user?.details?.isLoggedIn && handleCreateNewCollection?.(),
+      isAuthRequired: true,
+      authPopover: {
+        title: "You need to sign up to create a collection!",
+        callback: handleCreateNewCollection,
+        source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
+      },
+    },
+    {
+      type: "primary" as ButtonProps["type"],
+      icon: <PlusOutlined />,
+      buttonText: mockType === MockType.API ? "New Mock" : "New File",
+      onClickHandler: () => (user?.loggedIn || mockType === MockType.FILE) && handleCreateNew?.(),
+      isAuthRequired: true,
+      authPopover: {
+        title: "You need to sign up to create API mocks",
+        disabled: mockType === MockType.FILE,
+        callback: handleCreateNew,
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
