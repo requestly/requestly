@@ -12,7 +12,7 @@ import { MockListSource, MockType, RQMockMetadataSchema } from "components/featu
 import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
-import { DeleteMockModal, MockUploaderModal, NewFileModal } from "features/mocks/modals";
+import { DeleteMockModal, MockCollectionModal, MockUploaderModal, NewFileModal } from "features/mocks/modals";
 import "./mocksList.scss";
 
 interface Props {
@@ -27,10 +27,14 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(false);
   const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
+  const [collectionModalVisibility, setCollectionModalVisibility] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
 
-  const { isLoading, mocks, fetchOldMocks, fetchMocks } = useFetchMocks(type);
+  // TODO: Remove force render and maintain the mocks in context
+  const [forceRender, setForceRender] = useState(false);
+
+  const { isLoading, mocks, fetchOldMocks, fetchMocks } = useFetchMocks(type, forceRender);
 
   useEffect(() => {
     // TODO: check for rerenders
@@ -48,6 +52,10 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     }
     trackNewMockButtonClicked(type, "mock_list");
     return redirectToMockEditorCreateMock(navigate);
+  };
+
+  const handleCreateNewCollection = () => {
+    setCollectionModalVisibility(true);
   };
 
   const handleNameClick = (mockId: string, isOldMock: boolean) => {
@@ -132,6 +140,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
           searchValue={searchValue}
           setSearchValue={handleSearch}
           handleCreateNew={handleCreateNewMock}
+          handleCreateNewCollection={handleCreateNewCollection}
           handleUploadAction={handleUploadAction}
         />
 
@@ -162,6 +171,13 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         toggleDeleteModalVisibility={(visible: boolean) => setDeleteModalVisibility(visible)}
         mock={selectedMock}
         callbackOnSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
+      />
+
+      <MockCollectionModal
+        mockType={type}
+        visible={collectionModalVisibility}
+        toggleModalVisibility={() => setCollectionModalVisibility((prev) => !prev)}
+        onSuccess={() => setForceRender((prev) => !prev)}
       />
     </>
   ) : (
