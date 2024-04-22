@@ -4,7 +4,7 @@ import { getOwnerId } from "backend/utils";
 import Logger from "lib/logger";
 import { MockRecordType, RQMockCollection } from "components/features/mocksV2/types";
 
-type MockCollectionData = Pick<RQMockCollection, "name" | "description" | "type">;
+type MockCollectionData = Pick<RQMockCollection, "name" | "desc" | "type">;
 
 export const createMockCollection = async (
   uid: string,

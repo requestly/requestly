@@ -9,10 +9,12 @@ import { CalendarOutlined, DeleteOutlined, EditOutlined, InfoCircleOutlined } fr
 import { UserIcon } from "components/common/UserIcon";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
 import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
+import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { RQButton } from "lib/design-system/components";
 import CopyButton from "components/misc/CopyButton";
 import { MocksTableProps } from "../MocksTable";
 import REQUEST_METHOD_COLORS from "components/features/mocksV2/MockList/MocksTable/constants/requestMethodColors";
+import { isRecordMockCollection } from "../utils";
 
 // TODO: move all actions in a hook and use that
 export const useMocksTableColumns = ({
@@ -40,13 +42,30 @@ export const useMocksTableColumns = ({
       ellipsis: true,
       width: 320,
       render: (_: any, record: RQMockMetadataSchema) => {
-        return (
+        return isRecordMockCollection(record.recordType) ? (
+          <div className="mock-collection-details-container">
+            <span className="collection-icon">
+              <MdOutlineFolder />
+            </span>
+
+            <Typography.Text ellipsis={true} className="mock-collection-name">
+              {record.name}
+            </Typography.Text>
+
+            <Typography.Text ellipsis={true} className="mock-collection-description">
+              {record.desc}
+            </Typography.Text>
+          </div>
+        ) : (
           <div
             className="mock-details-container"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleNameClick(record.id, record.isOldMock);
+
+              if (!isRecordMockCollection(record.recordType)) {
+                handleNameClick(record.id, record.isOldMock);
+              }
             }}
           >
             <div className="mock-name-container">

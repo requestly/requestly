@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Empty } from "antd";
 import APP_CONSTANTS from "config/constants";
@@ -9,6 +9,7 @@ import { RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { generateFinalUrl } from "components/features/mocksV2/utils";
 import { ContentListTable } from "componentsV2/ContentList";
 import { useMocksTableColumns } from "./hooks/useMocksTableColumns";
+import { isRecordMockCollection, mocksToContentTableDataAdapter } from "./utils";
 import "./mocksTable.scss";
 
 export interface MocksTableProps {
@@ -48,6 +49,8 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     }
   }, [mockType, mocks?.length, isWorkspaceMode]);
 
+  const contentTableAdaptedMocks = useMemo(() => mocksToContentTableDataAdapter(mocks), [mocks]);
+
   // TODO: move all actions in a hook and use that
   const columns = useMocksTableColumns({
     mockType,
@@ -67,7 +70,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       customRowClassName={() => "rq-mocks-list-table-row"}
       // @ts-ignore
       columns={columns}
-      data={mocks}
+      data={contentTableAdaptedMocks}
       locale={{
         emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found" />,
       }}
@@ -75,6 +78,11 @@ export const MocksTable: React.FC<MocksTableProps> = ({
         return {
           onClick: (e) => {
             e.preventDefault();
+
+            if (isRecordMockCollection(record.recordType)) {
+              return;
+            }
+
             const url = record.isOldMock ? record.url : generateFinalUrl(record.endpoint, user?.details?.profile?.uid);
             handleItemSelect(record.id, url, record.isOldMock);
           },
