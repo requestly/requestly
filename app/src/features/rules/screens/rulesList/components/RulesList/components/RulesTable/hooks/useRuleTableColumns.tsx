@@ -209,6 +209,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: 120,
       render: (_, record: RuleTableRecord, index) => {
         if (isRule(record)) {
+          const isRuleGroupDisabled = checkIsRuleGroupDisabled(allRecordsMap, record);
           return (
             <PremiumFeature
               disabled={record.status === RecordStatus.ACTIVE}
@@ -223,12 +224,17 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               source="rule_list_status_switch"
               onClickCallback={() => trackRuleToggleAttempted(record.status)}
             >
-              <Switch
-                size="small"
-                checked={record.status === RecordStatus.ACTIVE}
-                disabled={checkIsRuleGroupDisabled(allRecordsMap, record)}
-                data-tour-id={index === 0 ? "rule-table-switch-status" : null}
-              />
+              <Tooltip
+                placement="bottom"
+                title={isRuleGroupDisabled ? "Please enable the group to enable/disable the rules inside them." : null}
+              >
+                <Switch
+                  size="small"
+                  checked={record.status === RecordStatus.ACTIVE}
+                  disabled={isRuleGroupDisabled}
+                  data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+                />
+              </Tooltip>
             </PremiumFeature>
           );
         } else {
