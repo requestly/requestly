@@ -20,6 +20,7 @@ export const InitImplicitWidgetConfigHandler = () => {
           getImplicitRuleTestingWidgetConfig(appMode).then((record) => {
             if (record === undefined) {
               updateImplictRuleTestingWidgetConfig(appMode, {
+                enabled: true,
                 visibility: GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.ALL,
                 ruleTypes: [],
               });

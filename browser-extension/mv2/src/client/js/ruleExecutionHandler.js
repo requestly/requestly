@@ -212,7 +212,7 @@ RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = async () => 
 RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget = (rule) => {
   const implicitTestRuleConfig = RQ.RuleExecutionHandler.implictTestRuleWidgetConfig;
 
-  if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
+  if (!implicitTestRuleConfig.enabled) {
     return;
   }
 

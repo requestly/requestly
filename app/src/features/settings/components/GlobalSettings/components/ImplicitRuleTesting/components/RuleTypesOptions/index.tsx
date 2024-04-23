@@ -35,6 +35,7 @@ export const RuleTypesOptions: React.FC<RuleTypesOptionsProps> = ({
   const handleWidgetVisibilityChange = (value: string) => {
     setWidgetVisibility(value);
     updateImplictRuleTestingWidgetConfig(appMode, {
+      enabled: true,
       ruleTypes: enabledRuleTypes,
       visibility: value,
     });
@@ -43,6 +44,7 @@ export const RuleTypesOptions: React.FC<RuleTypesOptionsProps> = ({
   const handleRuleTypeSelection = (value: string[]) => {
     setEnabledRuleTypes(value);
     updateImplictRuleTestingWidgetConfig(appMode, {
+      enabled: true,
       ruleTypes: value,
       visibility: widgetVisibility,
     });

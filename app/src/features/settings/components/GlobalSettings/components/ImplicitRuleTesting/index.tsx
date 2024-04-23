@@ -14,7 +14,7 @@ export const ImplicitRuleTesting = () => {
   const [isImplicitRuleTestingEnabled, setIsImplicitRuleTestingEnabled] = useState(false);
   const [enabledRuleTypes, setEnabledRuleTypes] = useState(null);
   const [widgetVisibility, setWidgetVisibility] = useState(
-    GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF
+    GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.ALL
   );
   const implicitRuleTestingFlag = useFeatureValue("implicit_test_this_rule", null);
 
@@ -24,26 +24,22 @@ export const ImplicitRuleTesting = () => {
     (status: boolean) => {
       setIsImplicitRuleTestingEnabled(status);
 
-      const newVisibility = status
-        ? GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC
-        : GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF;
-
-      setWidgetVisibility(newVisibility);
       updateImplictRuleTestingWidgetConfig(appMode, {
+        enabled: status,
         ruleTypes: enabledRuleTypes,
-        visibility: newVisibility,
+        visibility: widgetVisibility,
       });
     },
-    [appMode, enabledRuleTypes]
+    [appMode, enabledRuleTypes, widgetVisibility]
   );
 
   useEffect(() => {
     getImplicitRuleTestingWidgetConfig(appMode).then((data) => {
       setEnabledRuleTypes(data.ruleTypes);
       setWidgetVisibility(data.visibility);
-      if (data.visibility === GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF) {
-        setIsImplicitRuleTestingEnabled(false);
-      } else setIsImplicitRuleTestingEnabled(true);
+      if (data.enabled) {
+        setIsImplicitRuleTestingEnabled(true);
+      } else setIsImplicitRuleTestingEnabled(false);
     });
   }, [appMode]);
 
