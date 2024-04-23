@@ -1,0 +1,19 @@
+.rq-templates-table {
+  .template-name {
+    color: var(--link-color);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .template-description {
+    font-size: 13px;
+  }
+
+  .templates-actions-container {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
