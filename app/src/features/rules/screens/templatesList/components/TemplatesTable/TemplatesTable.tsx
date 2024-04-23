@@ -8,7 +8,7 @@ const TemplatesTable = () => {
   const tableColumns = useTemplatesTableColumns();
 
   return (
-    <>
+    <div className="rq-templates-table">
       <ContentListTable
         id="templates-list-table"
         size="large"
@@ -20,7 +20,7 @@ const TemplatesTable = () => {
         disableRowSelection
         scroll={{ y: `calc(100vh - 210px)` }}
       />
-    </>
+    </div>
   );
 };
 

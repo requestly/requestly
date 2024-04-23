@@ -10,9 +10,7 @@ export const TemplatesList = () => {
           Templates
         </Typography.Title>
       </div>
-      <div className="rq-templates-table">
-        <TemplatesTable />
-      </div>
+      <TemplatesTable />
     </>
   );
 };

@@ -1,6 +1,7 @@
 import { Button, Table } from "antd";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { TemplateRecord } from "../types";
+import RuleTypeTag from "components/common/RuleTypeTag";
 
 const useTemplatesTableColumns = () => {
   const columns: ContentListTableProps<TemplateRecord>["columns"] = [
@@ -9,30 +10,49 @@ const useTemplatesTableColumns = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
-      render: (name: string) => name,
+      width: 320,
+      render: (name: string) => <div className="template-name">{name}</div>,
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      render: (description: string) => description,
+      width: 420,
+      render: (description: string) => <div className="template-description">{description}</div>,
     },
     {
-      title: "Rule",
-      dataIndex: "data.ruleDefinition.ruleType",
+      title: "Rule type",
       key: "rule",
-      render: (ruleType: string) => ruleType,
+      width: 160,
+      render: (_: any, record: TemplateRecord) => {
+        let ruleTypes: string[] = [];
+
+        if (record.tags?.length) {
+          ruleTypes = record.tags;
+        } else if (!record.isSharedList) {
+          ruleTypes = [record.data.ruleDefinition.ruleType];
+        }
+
+        return (
+          <>
+            {ruleTypes.map((ruleType, index) => (
+              <div key={index}>
+                <RuleTypeTag ruleType={ruleType} title={ruleType.toUpperCase()} />
+              </div>
+            ))}
+          </>
+        );
+      },
     },
     {
       title: "",
-      dataIndex: "action",
       key: "action",
       width: 120,
       render: (_: any, record: TemplateRecord) => {
         return (
-          <Button type="default" size="small">
-            Use this
-          </Button>
+          <div className="templates-actions-container">
+            <Button type="default">Use this</Button>
+          </div>
         );
       },
     },
