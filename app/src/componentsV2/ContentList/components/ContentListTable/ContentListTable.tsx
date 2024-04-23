@@ -17,6 +17,7 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   bulkActionBarConfig?: BulkActionBarConfig<DataType>;
   locale: TableProps<DataType>["locale"];
   onRecordSelection?: (selectedRows: DataType[]) => void;
+  disableRowSelection?: boolean;
 }
 
 const ContentListTable = <DataType extends { [key: string]: any }>({
@@ -33,6 +34,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   onRecordSelection = () => {},
   className = "",
   onRow = (record: DataType) => ({}),
+  disableRowSelection = false,
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -83,14 +85,18 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
         pagination={false}
         scroll={scroll}
         locale={locale}
-        rowSelection={{
-          checkStrictly: false,
-          selectedRowKeys: selectedRows.map((record) => (record as any)[rowKey]),
-          onChange: (selectedRowKeys, selectedRows) => {
-            onRecordSelection(selectedRows);
-            setSelectedRows(selectedRows);
-          },
-        }}
+        rowSelection={
+          disableRowSelection
+            ? null
+            : {
+                checkStrictly: false,
+                selectedRowKeys: selectedRows.map((record) => (record as any)[rowKey]),
+                onChange: (selectedRowKeys, selectedRows) => {
+                  onRecordSelection(selectedRows);
+                  setSelectedRows(selectedRows);
+                },
+              }
+        }
         expandable={{
           expandRowByClick: true,
           rowExpandable: () => true,

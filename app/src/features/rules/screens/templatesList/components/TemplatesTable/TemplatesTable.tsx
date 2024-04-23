@@ -17,6 +17,8 @@ const TemplatesTable = () => {
         locale={{
           emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Templates found" />,
         }}
+        disableRowSelection
+        scroll={{ y: `calc(100vh - 210px)` }}
       />
     </>
   );
