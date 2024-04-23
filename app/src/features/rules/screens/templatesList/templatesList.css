@@ -1,0 +1,10 @@
+.templates-list-screen {
+  width: 100%;
+  background: var(--requestly-color-background);
+  padding: 1rem;
+  padding-bottom: 0;
+}
+
+.templates-list-title.ant-typography {
+  font-weight: 500;
+}
