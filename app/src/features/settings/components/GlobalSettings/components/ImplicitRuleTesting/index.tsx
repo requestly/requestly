@@ -16,7 +16,7 @@ export const ImplicitRuleTesting = () => {
   const [widgetVisibility, setWidgetVisibility] = useState(
     GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.OFF
   );
-  const implicitRuleTestingFlag = useFeatureValue("implicit_test_this_rule", "null");
+  const implicitRuleTestingFlag = useFeatureValue("implicit_test_this_rule", null);
 
   const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.IMPLICIT_TEST_THIS_RULE), []);
 
@@ -49,7 +49,7 @@ export const ImplicitRuleTesting = () => {
 
   return (
     isCompatible &&
-    implicitRuleTestingFlag === "enabled" && (
+    implicitRuleTestingFlag?.enabled && (
       <SettingsItem
         isActive={isImplicitRuleTestingEnabled}
         onChange={handleImplicitRuleTestingToggleChange}
