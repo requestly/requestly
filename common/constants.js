@@ -31,8 +31,8 @@ CONSTANTS.CONSOLE_LOGGER_ENABLED = "console-logger-enabled";
 CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY = {
   ALL: "all",
   SPECIFIC: "specific",
-  OFF: "off",
 };
+
 /**
  * We are calling them as BLACK_LIST_DOMAINS
  * however the usage is code is as the URL containing these substrings, We don't touch those requests
