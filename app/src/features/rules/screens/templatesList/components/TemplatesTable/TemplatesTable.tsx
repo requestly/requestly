@@ -5,6 +5,7 @@ import useTemplatesTableColumns from "./hooks/useTemplatesTableColumns";
 import { useState } from "react";
 import { TemplatePreviewModal } from "../../modals/TemplatePreviewModal/TemplatePreviewModal";
 import { TemplateRecord } from "./types";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./templatesTable.scss";
 
 const TemplatesTable = () => {
@@ -25,7 +26,7 @@ const TemplatesTable = () => {
           rule={templateToPreview}
           isOpen={isTemplatePreviewModalVisible}
           toggle={() => setIsTemplatePreviewModalVisible(false)}
-          source="templates_screen"
+          source={SOURCE.TEMPLATES_SCREEN}
         />
       )}
       <div className="rq-templates-table">

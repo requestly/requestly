@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { snakeCase } from "lodash";
-import { trackTemplateImportCompleted, trackTemplateImportStarted } from "modules/analytics/events/features/templates";
+import { trackTemplateImportCompleted, trackTemplateImportStarted } from "../../analytics";
 import { actions } from "store";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { generateObjectId } from "utils/FormattingHelper";
