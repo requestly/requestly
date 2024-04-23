@@ -7,7 +7,7 @@ import { createMockCollection } from "backend/mocks/createMockCollection";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateMockCollection } from "backend/mocks/updateMockCollection";
-import "./mockCollectionModal.scss";
+import "./createMockCollectionModal.scss";
 
 interface Props {
   id?: string;
@@ -19,7 +19,7 @@ interface Props {
   onSuccess?: () => void;
 }
 
-export const MockCollectionModal: React.FC<Props> = ({
+export const CreateMockCollectionModal: React.FC<Props> = ({
   id,
   name = "",
   description = "",
@@ -92,7 +92,7 @@ export const MockCollectionModal: React.FC<Props> = ({
   };
 
   return (
-    <RQModal centered open={visible} footer={null} onCancel={toggleModalVisibility} className="mock-collection-modal">
+    <RQModal open={visible} footer={null} onCancel={toggleModalVisibility} className="mock-collection-modal">
       <div className="collection-modal-header">New collection</div>
       <div className="collection-modal-content">
         <label className="collection-name-label">
