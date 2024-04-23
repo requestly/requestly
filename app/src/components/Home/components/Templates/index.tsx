@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Col, Row, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
-import RulePreviewModal from "components/landing/ruleTemplates/RulePreviewModal";
+import { TemplatePreviewModal, templates } from "features/rules";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import APP_CONSTANTS from "config/constants";
 import {
@@ -10,7 +10,6 @@ import {
   trackHomeViewAllTemplatesClicked,
   trackTemplatesScrolled,
 } from "components/Home/analytics";
-import templatesMap from "../../../landing/ruleTemplates/templates.json";
 import { RuleType } from "types";
 import PATHS from "config/constants/sub/paths";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -25,7 +24,7 @@ export const Templates: React.FC = () => {
   const [hasScrolledHorizontally, setHasScrolledHorizontally] = useState(false);
   const [isRowScrolledRight, setIsRowScrolledRight] = useState(false);
 
-  const filteredTemplates = useMemo(() => templatesMap.templates.filter((template: any) => template.isFeatured), []);
+  const filteredTemplates = useMemo(() => templates.filter((template: any) => template.isFeatured), []);
 
   const handleShowRulePreview = (ruleData: any) => {
     setRuleToPreview(ruleData);
@@ -72,7 +71,7 @@ export const Templates: React.FC = () => {
   return (
     <>
       {isPreviewModalOpen && (
-        <RulePreviewModal
+        <TemplatePreviewModal
           isOpen={isPreviewModalOpen}
           toggle={() => setIsPreviewModalOpen((prev) => !prev)}
           rule={ruleToPreview}
