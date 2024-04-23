@@ -6,7 +6,7 @@ interface SettingsItemProps extends SwitchProps {
   title: string;
   caption?: string;
   isActive: boolean;
-  toolTipTitle?: React.ReactNode;
+  toolTipTitle?: ReactNode;
   settingsBody?: ReactNode;
   onChange: (status: boolean, event?: React.MouseEvent<HTMLButtonElement>) => void;
 }
