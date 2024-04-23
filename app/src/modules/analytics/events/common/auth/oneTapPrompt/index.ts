@@ -4,3 +4,7 @@ import { AUTH } from "../../constants";
 export const trackOneTapPromptVisible = () => {
   trackEvent(AUTH.AUTH_ONE_TAP_PROMPT.VISIBLE);
 };
+
+export const trackOneTapSigninAttempted = () => {
+  trackEvent(AUTH.AUTH_ONE_TAP_PROMPT.ATTEMPTED);
+};
