@@ -409,9 +409,15 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   const createProxyXHRObject = function () {
     const actualXhr = this;
 
-    const dispatchEventToParent = (type) => {
-      console.log("[RQ]", `on${type}`);
-      actualXhr.dispatchEvent(new ProgressEvent(type));
+    const dispatchEventToParent = (type, e) => {
+      console.log("[RQ]", `on${type}`, e);
+      actualXhr.dispatchEvent(
+        new ProgressEvent(type, {
+          lengthComputable: e?.lengthComputable,
+          loaded: e?.loaded,
+          total: e?.total,
+        })
+      );
     };
 
     const updateParentXHRReadyState = (readyState) => {
@@ -568,6 +574,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     xhr.addEventListener("error", dispatchEventToParent.bind(xhr, "error"), false);
     xhr.addEventListener("timeout", dispatchEventToParent.bind(xhr, "timeout"), false);
     xhr.addEventListener("loadstart", dispatchEventToParent.bind(xhr, "loadstart"), false);
+    xhr.addEventListener("progress", dispatchEventToParent.bind(xhr, "progress"), false);
 
     const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "timeout");
 
