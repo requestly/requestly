@@ -209,28 +209,43 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: 120,
       render: (_, record: RuleTableRecord, index) => {
         if (isRule(record)) {
-          return (
-            <PremiumFeature
-              disabled={record.status === RecordStatus.ACTIVE}
-              features={
-                PREMIUM_RULE_TYPES.includes(record.ruleType)
-                  ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
-                  : [FeatureLimitType.num_active_rules]
-              }
-              featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME} rule`}
-              popoverPlacement="left"
-              onContinue={() => recordStatusToggleAction(normalizeRecord(record))}
-              source="rule_list_status_switch"
-              onClickCallback={() => trackRuleToggleAttempted(record.status)}
-            >
-              <Switch
-                size="small"
-                checked={record.status === RecordStatus.ACTIVE}
-                disabled={checkIsRuleGroupDisabled(allRecordsMap, record)}
-                data-tour-id={index === 0 ? "rule-table-switch-status" : null}
-              />
-            </PremiumFeature>
-          );
+          const isRuleGroupDisabled = checkIsRuleGroupDisabled(allRecordsMap, record);
+          if (isRuleGroupDisabled) {
+            return (
+              <Tooltip
+                title={isRuleGroupDisabled ? "Please enable the group to enable/disable the rules inside them." : null}
+              >
+                <Switch
+                  disabled
+                  size="small"
+                  checked={record.status === RecordStatus.ACTIVE}
+                  data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+                />
+              </Tooltip>
+            );
+          } else {
+            return (
+              <PremiumFeature
+                disabled={record.status === RecordStatus.ACTIVE}
+                features={
+                  PREMIUM_RULE_TYPES.includes(record.ruleType)
+                    ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
+                    : [FeatureLimitType.num_active_rules]
+                }
+                featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[record.ruleType as any]?.NAME} rule`}
+                popoverPlacement="left"
+                onContinue={() => recordStatusToggleAction(normalizeRecord(record))}
+                source="rule_list_status_switch"
+                onClickCallback={() => trackRuleToggleAttempted(record.status)}
+              >
+                <Switch
+                  size="small"
+                  checked={record.status === RecordStatus.ACTIVE}
+                  data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+                />
+              </PremiumFeature>
+            );
+          }
         } else {
           return (
             <Switch
