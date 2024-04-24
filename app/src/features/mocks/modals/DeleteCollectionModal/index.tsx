@@ -10,16 +10,16 @@ import deleteIcon from "../assets/delete.svg";
 import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
 import { DEFAULT_COLLECTION_ID } from "features/mocks/constants";
 import { deleteMocks } from "backend/mocks/deleteMocks";
-import "./deleteMockCollectionModal.scss";
+import "./deleteCollectionModal.scss";
 
-interface DeleteMockCollectionModalProps {
+interface DeleteCollectionModalProps {
   visible: boolean;
   collection: RQMockCollection;
   toggleModalVisibility: (visible: boolean) => void;
   onSuccess?: () => void;
 }
 
-export const DeleteMockCollectionModal: React.FC<DeleteMockCollectionModalProps> = ({
+export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
   visible,
   collection,
   toggleModalVisibility,
