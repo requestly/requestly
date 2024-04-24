@@ -9,6 +9,11 @@ const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 
 const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingConfig> => {
   const sessionRecordingConfig = await getRecord<SessionRecordingConfig>(CONFIG_STORAGE_KEY);
+
+  if (!sessionRecordingConfig) {
+    return null;
+  }
+
   let pageSources = sessionRecordingConfig?.pageSources || [];
 
   if (await isExtensionEnabled()) {
@@ -72,6 +77,17 @@ export const watchRecording = (tabId: number) => {
   chrome.tabs.create({ url: `${config.WEB_URL}/sessions/draft/${tabId}` });
 };
 
+const startRecording = (tabId: number, config: Record<string, any>) => {
+  injectWebAccessibleScript("libs/requestly-web-sdk.js", {
+    tabId: tabId,
+  }).then(() => {
+    chrome.tabs.sendMessage(tabId, {
+      action: CLIENT_MESSAGES.START_RECORDING,
+      payload: config,
+    });
+  });
+};
+
 export const stopRecording = (tabId: number, openRecording: boolean) => {
   chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.STOP_RECORDING }).then(() => {
     if (openRecording) {
@@ -83,12 +99,11 @@ export const stopRecording = (tabId: number, openRecording: boolean) => {
 export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget: boolean) => {
   const sessionRecordingData = { explicit: true, showWidget };
 
-  injectWebAccessibleScript("libs/requestly-web-sdk.js", {
-    tabId: tab.id,
-  }).then(() => {
-    chrome.tabs.sendMessage(tab.id, {
-      action: CLIENT_MESSAGES.START_RECORDING,
-      payload: sessionRecordingData,
-    });
+  startRecording(tab.id, sessionRecordingData);
+};
+
+export const launchUrlAndStartRecording = (url: string) => {
+  chrome.tabs.create({ url }, (tab) => {
+    startRecording(tab.id, { explicit: true, notify: true });
   });
 };

@@ -65,6 +65,8 @@ export interface SessionRecordingConfig {
   };
   explicit?: boolean;
   markRecordingIcon?: boolean;
+  notify?: boolean;
+  recordingStartTime?: number;
 }
 
 export interface RulePair {
