@@ -22,6 +22,7 @@ const deleteMockFromFirebase = async (mockId: string): Promise<boolean> => {
 
   const success = await updateDoc(docRef, {
     deleted: true,
+    collectionId: "",
     updatedTs: Timestamp.now().toMillis(),
   })
     .then(() => {
