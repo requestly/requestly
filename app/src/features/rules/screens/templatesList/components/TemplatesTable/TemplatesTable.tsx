@@ -32,7 +32,7 @@ const TemplatesTable = () => {
       <div className="rq-templates-table">
         <ContentListTable
           id="templates-list-table"
-          size="large"
+          size="small"
           columns={tableColumns}
           data={templateRecords}
           locale={{
