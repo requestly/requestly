@@ -18,9 +18,13 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     }
 
     if (event.data.action === "startRecording") {
+      window[namespace]?.sessionRecorder?.stop?.();
       window[namespace].sessionRecorder = new Requestly.SessionRecorder(event.data.payload);
       window[namespace].sessionRecorder.start();
       sendMessageToExtension("sessionRecordingStarted");
+    } else if (event.data.action === "stopRecording") {
+      window[namespace].sessionRecorder.stop();
+      sendMessageToExtension("sessionRecordingStopped");
     } else if (event.data.action === "getSessionData") {
       sendResponseToExtension(event.data.action, window[namespace].sessionRecorder.getSession());
     }
