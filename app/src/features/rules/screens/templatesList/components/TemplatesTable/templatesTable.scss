@@ -16,6 +16,15 @@
   .templates-actions-container {
     display: flex;
     justify-content: flex-end;
+
+    .ant-btn {
+      opacity: 0.5;
+      transition: all 0.2s;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
   }
 
   .template-rule-tags {
@@ -27,5 +36,9 @@
     .rule-type-tag {
       color: var(--requestly-color-neutral-300);
     }
+  }
+
+  .ant-table.ant-table-small .ant-table-tbody > tr > td {
+    padding: 8px 12px;
   }
 }
