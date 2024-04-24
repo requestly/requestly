@@ -36,6 +36,8 @@ interface Props {
 
 const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const navigate = useNavigate();
+
+  // TODO: Move all the actions and local state in context
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
   const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(false);
   const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
@@ -47,6 +49,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
 
   // TODO: Remove force render and maintain the mocks in context
+  // TODO: Remove this after actions refactor
   const [forceRender, setForceRender] = useState(false);
 
   const { isLoading, mocks, fetchOldMocks, fetchMocks } = useFetchMocks(type, forceRender);
