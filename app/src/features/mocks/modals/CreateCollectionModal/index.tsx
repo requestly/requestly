@@ -19,7 +19,7 @@ interface Props {
   onSuccess?: () => void;
 }
 
-export const CreateMockCollectionModal: React.FC<Props> = ({
+export const CreateCollectionModal: React.FC<Props> = ({
   id,
   name = "",
   description = "",

@@ -14,7 +14,7 @@ import { GettingStarted, MocksListContentHeader, MocksTable } from "./components
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
 import {
   DeleteMockModal,
-  CreateMockCollectionModal,
+  CreateCollectionModal,
   MockUploaderModal,
   NewFileModal,
   DeleteCollectionModal,
@@ -198,7 +198,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         onSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
       />
 
-      <CreateMockCollectionModal
+      <CreateCollectionModal
         id={selectedMock?.id}
         name={selectedMock?.name}
         description={selectedMock?.desc}
