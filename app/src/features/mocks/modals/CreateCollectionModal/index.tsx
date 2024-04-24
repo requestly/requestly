@@ -6,7 +6,7 @@ import { RQModal } from "lib/design-system/components";
 import { createCollection } from "backend/mocks/createCollection";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { updateMockCollection } from "backend/mocks/updateMockCollection";
+import { updateCollection } from "backend/mocks/updateCollection";
 import "./createCollectionModal.scss";
 
 interface Props {
@@ -47,7 +47,7 @@ export const CreateCollectionModal: React.FC<Props> = ({
     };
   }, [name, description, visible]);
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     if (collectionName.length === 0) {
       message.error("Collection name cannot be empty!");
       return;
@@ -60,7 +60,7 @@ export const CreateCollectionModal: React.FC<Props> = ({
       };
 
       setIsLoading(true);
-      updateMockCollection(uid, id, collectionData)
+      updateCollection(uid, id, collectionData)
         .then(() => {
           console.log("Collection updated!");
           message.success("Collection updated!");

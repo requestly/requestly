@@ -2,7 +2,7 @@ import firebaseApp from "../../firebase";
 import { doc, getFirestore, Timestamp, updateDoc } from "firebase/firestore";
 import { RQMockCollection } from "components/features/mocksV2/types";
 
-export const updateMockCollection = async (
+export const updateCollection = async (
   uid: string,
   collectionId: string,
   collectionData: Partial<RQMockCollection>
@@ -11,12 +11,12 @@ export const updateMockCollection = async (
     return null;
   }
 
-  const result = await updateMockCollectionFromFirebase(uid, collectionId, collectionData);
+  const result = await updateCollectionFromFirebase(uid, collectionId, collectionData);
 
   return result;
 };
 
-const updateMockCollectionFromFirebase = async (
+const updateCollectionFromFirebase = async (
   uid: string,
   collectionId: string,
   collectionData: Partial<RQMockCollection>
