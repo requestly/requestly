@@ -174,7 +174,6 @@ class TabService {
     const send = () => this.sendMessage(tabId, ...args);
 
     if (tab.documentLifecycle === "active" || tab.documentLifecycle === undefined) {
-      console.log("!!!debug", "direct send message:", args, ...args);
       send();
     } else {
       this.pushToQueue(tabId, send);
