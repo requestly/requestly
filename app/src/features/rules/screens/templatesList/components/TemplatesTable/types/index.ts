@@ -8,6 +8,13 @@ interface TemplateRuleDefinition extends RuleRecord {
   version?: number;
 }
 
+export type TemplateData = {
+  targetAppMode: string[];
+  ruleDefinition?: TemplateRuleDefinition;
+  shareId?: string;
+  sharedListName?: string;
+};
+
 export type TemplateRecord = {
   name: string;
   description: string;
@@ -15,10 +22,5 @@ export type TemplateRecord = {
   isFeatured: boolean;
   imageURL?: string;
   tags?: string[];
-  data: {
-    targetAppMode: string[];
-    ruleDefinition?: TemplateRuleDefinition;
-    shareId?: string;
-    sharedListName?: string;
-  };
+  data: TemplateData;
 };
