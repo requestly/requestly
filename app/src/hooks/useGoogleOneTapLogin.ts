@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails, getAppMode } from "store/selectors";
 import { handleOnetapSignIn } from "actions/FirebaseActions";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import { trackOneTapSigninAttempted } from "modules/analytics/events/common/auth/oneTapPrompt";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -33,7 +32,6 @@ export const useGoogleOneTapLogin = () => {
 
   const handleSignIn = async (credential: CredentialResponse) => {
     handleOnetapSignIn(credential).then((res) => {
-      trackOneTapSigninAttempted();
       setIsNewUser(res.is_new_user);
       setIsLoggedInUsingOneTap(true);
     });
