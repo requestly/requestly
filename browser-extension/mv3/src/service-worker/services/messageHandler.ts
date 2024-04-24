@@ -7,12 +7,14 @@ import { applyScriptRules } from "./scriptRuleHandler";
 import {
   getTabSession,
   initSessionRecording,
+  launchUrlAndStartRecording,
   onSessionRecordingStartedNotification,
   onSessionRecordingStoppedNotification,
   startRecordingExplicitly,
   stopRecording,
   watchRecording,
 } from "./sessionRecording";
+import { initCustomWidgets } from "./customWidgets";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -32,6 +34,7 @@ export const initMessageHandler = () => {
           tabId: sender.tab?.id,
           frameIds: [sender.frameId],
         });
+        initCustomWidgets(sender.tab?.id, sender.frameId);
         applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         break;
 
@@ -47,6 +50,9 @@ export const initMessageHandler = () => {
         break;
       case EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
         startRecordingExplicitly(message.tab, message.showWidget);
+        break;
+      case EXTENSION_MESSAGES.START_RECORDING_ON_URL:
+        launchUrlAndStartRecording(message.url);
         break;
       case EXTENSION_MESSAGES.STOP_RECORDING:
         stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
