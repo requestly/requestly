@@ -5,7 +5,7 @@ import { Button, message } from "antd";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { updateMockCollection } from "backend/mocks/updateMockCollection";
+import { updateCollection } from "backend/mocks/updateCollection";
 import deleteIcon from "../assets/delete.svg";
 import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
 import { DEFAULT_COLLECTION_ID } from "features/mocks/constants";
@@ -43,7 +43,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
     // update state
 
     await updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID);
-    await updateMockCollection(uid, collection.id, { deleted: true });
+    await updateCollection(uid, collection.id, { deleted: true });
 
     console.log("Collection deleted!");
 
@@ -59,7 +59,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
     const mockIds = collection.children?.map((mock) => mock.id);
 
     await deleteMocks(uid, mockIds, teamId);
-    await updateMockCollection(uid, collection.id, { deleted: true });
+    await updateCollection(uid, collection.id, { deleted: true });
 
     onSuccess?.();
     message.success("Collection and mocks deleted!");
