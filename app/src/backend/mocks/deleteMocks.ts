@@ -13,9 +13,8 @@ export const deleteMocks = async (uid: string, mockIds: string[], teamId?: strin
 };
 
 const deleteMocksFromFirebase = async (uid: string, ownerId: string, mockIds: string[]): Promise<boolean> => {
-  const db = getFirestore(firebaseApp);
-
   try {
+    const db = getFirestore(firebaseApp);
     const mocksbatch = writeBatch(db);
     const userMocksMetadataRef = collection(db, "user-mocks-metadata");
     const userDocRef = doc(userMocksMetadataRef, ownerId);
