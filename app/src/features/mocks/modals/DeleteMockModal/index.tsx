@@ -17,16 +17,11 @@ import { RQMockMetadataSchema } from "components/features/mocksV2/types";
 interface DeleteModalProps {
   visible: boolean;
   mock: RQMockMetadataSchema;
-  toggleDeleteModalVisibility: (visible: boolean) => void;
-  callbackOnSuccess: () => void;
+  toggleModalVisibility: (visible: boolean) => void;
+  onSuccess: () => void;
 }
 
-export const DeleteMockModal: React.FC<DeleteModalProps> = ({
-  visible,
-  mock,
-  toggleDeleteModalVisibility,
-  callbackOnSuccess,
-}) => {
+export const DeleteMockModal: React.FC<DeleteModalProps> = ({ visible, mock, toggleModalVisibility, onSuccess }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -40,13 +35,13 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
       deleteMock(mock.id).then((res: any) => {
         if (res?.data?.success) {
           setIsDeleting(false);
-          toggleDeleteModalVisibility(false);
+          toggleModalVisibility(false);
           toast.info("Mock deleted");
           // delete the object from storage
           if (mock.oldMockFilePath) {
             FilesService.deleteFileFromStorage(mock.oldMockFilePath);
           }
-          callbackOnSuccess();
+          onSuccess();
         } else {
           toast.error("Mock cannot be deleted. Try again.");
         }
@@ -55,9 +50,9 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
       deleteMock(uid, mock.id, workspace?.id)
         .then(() => {
           trackDeleteMockEvent(mock.id, mock.type, mock.fileType);
-          callbackOnSuccess();
+          onSuccess();
           setIsDeleting(false);
-          toggleDeleteModalVisibility(false);
+          toggleModalVisibility(false);
           toast.success(`Mock Deleted. Id=${mock.id}`);
         })
         .catch((err) => {
@@ -67,7 +62,7 @@ export const DeleteMockModal: React.FC<DeleteModalProps> = ({
   };
 
   const handleCancel = () => {
-    toggleDeleteModalVisibility(false);
+    toggleModalVisibility(false);
   };
 
   return (
