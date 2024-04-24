@@ -79,6 +79,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       id="mock-list-table"
       pagination={false}
       size="middle"
+      rowKey="id"
       className="rq-mocks-list-table"
       customRowClassName={() => "rq-mocks-list-table-row"}
       scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(232px + 68px)" : "232px"})` }} // 68px is Feature limit banner height
