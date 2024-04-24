@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails, getAppMode } from "store/selectors";
 import { handleOnetapSignIn } from "actions/FirebaseActions";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import { trackOneTapPromptVisible } from "modules/analytics/events/common/auth/oneTapPrompt";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -46,17 +45,14 @@ export const useGoogleOneTapLogin = () => {
       disabled: isAppOpenedInIframe() || user?.loggedIn || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       prompt_parent_id: "one-tap-container",
       callback: handleSignIn,
+      use_fedcm_for_prompt: true,
     };
   }, [user?.loggedIn, appMode]);
 
   const listener = useEffect(() => {
     if (script === "ready" && !config.disabled && window.google) {
       window.google.accounts.id.initialize({ ...config });
-      window.google.accounts.id.prompt((notification: any) => {
-        if (notification.isDisplayed()) {
-          trackOneTapPromptVisible();
-        }
-      });
+      window.google.accounts.id.prompt();
     }
   }, [script, config]);
 

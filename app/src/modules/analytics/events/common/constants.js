@@ -55,6 +55,7 @@ export const AUTH = {
   },
   AUTH_ONE_TAP_PROMPT: {
     VISIBLE: "auth_one_tap_prompt_visible",
+    ATTEMPTED: "auth_one_tap_prompt_attempted",
   },
   POPOVER: {
     SHOWN: "popover_at_signup_shown",
