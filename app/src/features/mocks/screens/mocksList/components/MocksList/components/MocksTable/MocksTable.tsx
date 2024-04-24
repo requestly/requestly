@@ -75,6 +75,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       id="mock-list-table"
       pagination={false}
       size="middle"
+      rowKey="id"
       className="rq-mocks-list-table"
       customRowClassName={() => "rq-mocks-list-table-row"}
       // @ts-ignore

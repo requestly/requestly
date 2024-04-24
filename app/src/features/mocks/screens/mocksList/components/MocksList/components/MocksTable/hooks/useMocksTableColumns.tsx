@@ -39,6 +39,7 @@ export const useMocksTableColumns = ({
   const columns: ContentListTableProps<RQMockMetadataSchema>["columns"] = [
     Table.SELECTION_COLUMN,
     {
+      key: "id",
       title: (
         <div className="rq-col-title">
           <HiOutlineBookOpen />
@@ -100,6 +101,7 @@ export const useMocksTableColumns = ({
       },
     },
     {
+      key: "createdBy",
       title: <div className="rq-col-title">Created by</div>,
       width: 70,
       responsive: ["lg"],
@@ -113,6 +115,7 @@ export const useMocksTableColumns = ({
       },
     },
     {
+      key: "lastUpdatedBy",
       title: (
         <div className="rq-col-title">
           <CalendarOutlined />
@@ -136,6 +139,7 @@ export const useMocksTableColumns = ({
       },
     },
     {
+      key: "actions",
       align: "right",
       width: 70,
       render: (_: any, record: RQMockMetadataSchema) => {
