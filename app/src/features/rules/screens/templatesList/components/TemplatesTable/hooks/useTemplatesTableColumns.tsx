@@ -45,7 +45,9 @@ const useTemplatesTableColumns: (props: Props) => ContentListTableProps<Template
         }
         return (
           <>
-            <div className="template-name">{record.name}</div>
+            <div className="template-name" onClick={() => handlePreviewTemplate(record)}>
+              {record.name}
+            </div>
             <div className="template-rule-tags">
               {ruleTypes.map((ruleType, index) => (
                 <RuleTypeTag ruleType={ruleType} title={ruleType.toUpperCase()} />
