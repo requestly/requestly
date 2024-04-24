@@ -2,17 +2,26 @@ type TabId = chrome.tabs.Tab["id"];
 
 enum DataScope {
   TAB = "tabData", // tab-level data
-  PAGE = "pageData", // page-level data, will wipe out when page unloads
+  // PAGE = "pageData", // page-level data, will wipe out when page unloads
 }
 
 type TabData = chrome.tabs.Tab & {
-  [DataScope.TAB]?: Record<string, string>;
+  [DataScope.TAB]?: Record<string, any>;
+  documentLifecycle?: chrome.webNavigation.WebNavigationTransitionCallbackDetails["documentLifecycle"];
 };
 
 class TabService {
   static instance: TabService = null;
 
-  map: Record<number, TabData> = {};
+  static getInstance() {
+    if (!TabService.instance) {
+      TabService.instance = new TabService();
+    }
+
+    return TabService.instance;
+  }
+
+  private map: Record<number, TabData> = {};
 
   constructor() {
     if (!TabService.instance) {
@@ -24,39 +33,14 @@ class TabService {
     return TabService.instance;
   }
 
-  static getInstance() {
-    if (!TabService.instance) {
-      TabService.instance = new TabService();
-    }
-
-    return TabService.instance;
-  }
-
-  initTabs() {
+  private initTabs() {
     chrome.tabs.query({}, (tabs) => {
       this.map = {};
       tabs.forEach((tab) => this.addOrUpdateTab(tab));
     });
   }
 
-  addOrUpdateTab(tab: chrome.tabs.Tab) {
-    // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
-    if (tab.id !== chrome.tabs.TAB_ID_NONE) {
-      this.map[tab.id] = tab;
-    }
-  }
-
-  createNewTab(url: string, openerTabId: TabId, callback: Function) {
-    chrome.tabs.create({ url, openerTabId }, (tab) => {
-      callback(tab);
-    });
-  }
-
-  removeTab(tabId: TabId) {
-    delete this.map[tabId];
-  }
-
-  addEventListeners() {
+  private addEventListeners() {
     chrome.tabs.onCreated.addListener((tab) => this.addOrUpdateTab(tab));
 
     chrome.tabs.onRemoved.addListener((tabId) => this.removeTab(tabId));
@@ -91,6 +75,63 @@ class TabService {
       },
       { urls: ["<all_urls>"] }
     );
+
+    chrome.webNavigation.onCommitted.addListener((navigatedTabData) => {
+      const tab = this.getTab(navigatedTabData.tabId);
+
+      if (tab) {
+        this.addOrUpdateTab({ ...tab, documentLifecycle: navigatedTabData.documentLifecycle });
+
+        if (navigatedTabData.documentLifecycle === "active") {
+          tab[DataScope.TAB].messageQueue?.forEach((sendMessage: Function) => {
+            sendMessage();
+          });
+          this.clearMessageQueue(navigatedTabData.tabId);
+        }
+      }
+    });
+  }
+
+  private sendMessage(tabId: TabId, ...args: [any, any?, ((response: any) => void)?]) {
+    chrome.tabs.sendMessage(tabId, ...args);
+  }
+
+  private pushToQueue(tabId: TabId, message: any) {
+    const tab = this.getTab(tabId);
+
+    if (!tab) {
+      return;
+    }
+
+    if (!tab[DataScope.TAB].messageQueue) {
+      tab[DataScope.TAB].messageQueue = [];
+    }
+
+    tab[DataScope.TAB].messageQueue.push(message);
+  }
+
+  private clearMessageQueue(tabId: TabId) {
+    const tab = this.getTab(tabId);
+    if (tab && tab[DataScope.TAB] && tab[DataScope.TAB].messageQueue) {
+      tab[DataScope.TAB].messageQueue = [];
+    }
+  }
+
+  addOrUpdateTab(tab: TabData) {
+    // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
+    if (tab.id !== chrome.tabs.TAB_ID_NONE) {
+      this.map[tab.id] = tab;
+    }
+  }
+
+  createNewTab(url: string, openerTabId: TabId, callback: Function) {
+    chrome.tabs.create({ url, openerTabId }, (tab) => {
+      callback(tab);
+    });
+  }
+
+  removeTab(tabId: TabId) {
+    delete this.map[tabId];
   }
 
   getTabs() {
@@ -127,63 +168,18 @@ class TabService {
     chrome.tabs.remove(tabId);
   }
 
-  ensureTabLoadingComplete(tabId: TabId) {
-    return new Promise<void>((resolve, reject) => {
-      const tab = this.getTab(tabId);
+  sendMessageToTab(tabId: TabId, ...args: [any, any?, ((response: any) => void)?]) {
+    const tab = this.getTab(tabId);
 
-      if (tab) {
-        if (tab.status === "complete") {
-          resolve();
-        } else {
-          const handler = (currentTabId: TabId, tabChangeInfo: chrome.tabs.TabChangeInfo) => {
-            if (currentTabId === tabId && tabChangeInfo.status === "complete") {
-              chrome.tabs.onUpdated.removeListener(handler);
-              resolve();
-            }
-          };
-          chrome.tabs.onUpdated.addListener(handler);
-        }
-      } else {
-        reject();
-      }
-    });
+    const send = () => this.sendMessage(tabId, ...args);
+
+    if (tab.documentLifecycle === "active" || tab.documentLifecycle === undefined) {
+      console.log("!!!debug", "direct send message:", args, ...args);
+      send();
+    } else {
+      this.pushToQueue(tabId, send);
+    }
   }
-
-  // setDataForScope(scope: DataScope, tabId: TabId, key: any, value: any) {
-  //   const tab = this.getTab(tabId);
-
-  //   if (!tab) {
-  //     return;
-  //   }
-
-  //   // null safe for firefox as in firefox get/set happen before tab updation whereas
-  //   // in chrome get/set happens after tab updation
-  //   if (tab[scope]) {
-  //     tab[scope][key] = value;
-  //   } else {
-  //     tab[scope] = { [key]: value };
-  //   }
-  // }
-
-  // getDataForScope(scope: DataScope, tabId: TabId, key: any, defaultValue: any) {
-  //   const tab = this.getTab(tabId);
-
-  //   if (!tab) {
-  //     return;
-  //   }
-
-  //   return tab[scope]?.[key] || defaultValue;
-  // }
-
-  // removeDataForScope(scope: DataScope, tabId: TabId, key: any) {
-  //   const tab = this.getTab(tabId);
-
-  //   if (!tab || !tab[scope]) {
-  //     return;
-  //   }
-
-  //   delete tab[scope][key];
-  // }
 
   setData(tabId: TabId, key: any, value: any) {
     const tab = this.getTab(tabId);

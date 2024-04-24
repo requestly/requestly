@@ -14,6 +14,7 @@ interface SessionRecorderState {
 }
 
 const sendResponseCallbacks: { [action: string]: SendResponseCallback } = {};
+let isRecorderInitialized = false;
 const sessionRecorderState: SessionRecorderState = {
   isRecording: false,
   isExplicitRecording: false,
@@ -52,10 +53,24 @@ const isIframe = (): boolean => {
   return window.top !== window;
 };
 
-const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig) => {
+const initRecorder = async () => {
+  return new Promise<void>((resolve) => {
+    if (isRecorderInitialized) {
+      resolve();
+    }
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.INIT_SESSION_RECORDER }, () => {
+      isRecorderInitialized = true;
+      resolve();
+    });
+  });
+};
+
+const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingConfig) => {
   if (!sessionRecordingConfig) {
     return;
   }
+
+  await initRecorder();
 
   const {
     notify,

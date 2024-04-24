@@ -8,6 +8,7 @@ import {
   cacheRecordedSessionOnClientPageUnload,
   getTabSession,
   handleSessionRecordingOnClientPageLoad,
+  initSessionRecordingSDK,
   launchUrlAndStartRecording,
   onSessionRecordingStartedNotification,
   onSessionRecordingStoppedNotification,
@@ -39,7 +40,9 @@ export const initMessageHandler = () => {
         applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
-
+      case EXTENSION_MESSAGES.INIT_SESSION_RECORDER:
+        initSessionRecordingSDK(sender.tab.id, sender.frameId).then(() => sendResponse());
+        return true;
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
         onSessionRecordingStartedNotification(sender.tab.id, message.payload.markRecordingIcon);
         break;
