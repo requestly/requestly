@@ -102,6 +102,7 @@ export const RULES = {
   },
 };
 
+// TODO: cleanup
 export const MOCK_SERVER = {
   MOCKS: {
     DELETED: "mock_deleted",
@@ -115,6 +116,7 @@ export const MOCK_SERVER = {
   },
 };
 
+// TODO: cleanup
 export const MOCKSV2 = {
   DELETED: "mock_deleted",
   UPDATED: "mock_updated",

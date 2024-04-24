@@ -1,20 +1,20 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { MockServerContainer } from "views/containers/MockServerContainer";
 import { joinPaths } from "utils/PathUtils";
 import FilesLibraryIndexPage from "components/features/filesLibrary/FilesLibraryIndexPage";
 import MyFilesLibraryView from "components/features/filesLibrary/FilesLibraryTableContainer/MyFilesView";
 import FileMockEditorCreateView from "views/features/mocksV2/FileMockEditorCreateView";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import FileViewerIndexPage from "components/features/filesLibrary/FileViewerIndexPage";
-import MockList from "components/features/mocksV2/MockList";
 import { MockType } from "components/features/mocksV2/types";
 import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
+import MocksFeatureContainer from "./container";
+import { MocksListScreen } from "./screens/mocksList";
 
 export const mockServerRoutes: RouteObject[] = [
   {
-    path: PATHS.MOCK_SERVER.RELATIVE,
-    element: <MockServerContainer />,
+    path: PATHS.MOCK_SERVER.INDEX,
+    element: <MocksFeatureContainer />,
     children: [
       /** @deprecated */
       {
@@ -48,7 +48,7 @@ export const mockServerRoutes: RouteObject[] = [
       {
         index: true,
         path: PATHS.MOCK_SERVER_V2.RELATIVE,
-        element: <MockList type={MockType.API} />,
+        element: <MocksListScreen type={MockType.API} />,
       },
       {
         path: PATHS.MOCK_SERVER_V2.CREATE.RELATIVE,
@@ -63,7 +63,7 @@ export const mockServerRoutes: RouteObject[] = [
       // FILES V2
       {
         path: PATHS.FILE_SERVER_V2.RELATIVE,
-        element: <MockList type={MockType.FILE} />,
+        element: <MocksListScreen type={MockType.FILE} />,
       },
       {
         path: PATHS.FILE_SERVER_V2.CREATE.RELATIVE,

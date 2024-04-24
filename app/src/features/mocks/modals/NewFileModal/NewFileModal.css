@@ -1,0 +1,45 @@
+.new-file-modal .new-file-modal-title {
+  font-weight: 500;
+  font-size: 1.25rem;
+}
+.new-file-modal .new-file-modal-description {
+  color: var(--text-gray);
+  margin: 0;
+  margin-top: 8px;
+}
+.new-file-modal .new-file-modal-description a {
+  text-decoration: underline;
+  color: var(--text-gray);
+}
+.new-file-modal .new-file-modal-card {
+  background: var(--component-background) !important;
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+}
+.new-file-modal .new-file-modal-card .ant-card-body,
+.new-file-modal .new-file-modal-card .ant-card-actions {
+  background: var(--component-background);
+  padding: 0;
+}
+.new-file-modal .new-file-modal-card .ant-card-actions > li {
+  margin: 0;
+  margin-top: 1.125rem;
+}
+.new-file-modal .new-file-modal-card .create-file-btn {
+  width: 100%;
+  display: flex;
+  font-weight: 500;
+  flex-wrap: wrap;
+  justify-content: space-between !important;
+}
+.new-file-modal .file-type-cards-container {
+  margin-top: 1rem;
+}
+.file-card-meta {
+  display: flex;
+}
+.file-card-meta .ant-card-meta-avatar {
+  padding: 0;
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
