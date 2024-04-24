@@ -15,10 +15,11 @@ import { toast } from "utils/Toast";
 import { Button, Col, Modal, Row } from "antd";
 import RuleBuilder from "components/features/rules/RuleBuilder";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { TemplateData } from "../../components/TemplatesTable/types";
 import "./templatePreviewModal.css";
 
 interface TemplatePreviewModalProps {
-  rule: any;
+  rule: TemplateData;
   isOpen: boolean;
   toggle: () => void;
   source: string;
@@ -33,7 +34,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({ rule
 
   const createdBy = user?.details?.profile?.uid || null;
   const currentOwner = user?.details?.profile?.uid || null;
-  const saveRuleTemplate = (ruleObj: any) => {
+  const saveRuleTemplate = (ruleObj: TemplateData) => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       if (!isExtensionInstalled()) {
         dispatch(
