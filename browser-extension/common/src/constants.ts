@@ -42,6 +42,7 @@ export const CLIENT_MESSAGES = {
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   EXECUTE_SCRIPT: "executeScript",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
+  CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD: "cacheRecordedSessionOnPageUnload",
 };
 
 export const STORAGE_TYPE = "local";

@@ -3,13 +3,25 @@ import { SessionRecordingConfig } from "common/types";
 
 type SendResponseCallback = (payload: unknown) => void;
 
+interface SessionRecorderState {
+  isRecording: boolean;
+  isExplicitRecording: boolean;
+  markRecordingIcon: boolean;
+  recordingMode?: string;
+  widgetPosition?: { top?: number; bottom?: number; left?: number; right?: number };
+  recordingStartTime?: number;
+  showWidget?: boolean;
+}
+
 const sendResponseCallbacks: { [action: string]: SendResponseCallback } = {};
-let isRecording = false;
-let isExplicitRecording = false;
-let markRecordingIcon = false;
-let widgetPosition: { top?: number; bottom?: number; left?: number; right?: number };
-let recordingStartTime: number;
-let showRecordingWidget = false;
+const sessionRecorderState: SessionRecorderState = {
+  isRecording: false,
+  isExplicitRecording: false,
+  markRecordingIcon: false,
+  widgetPosition: null,
+  recordingStartTime: null,
+  showWidget: false,
+};
 
 export const initSessionRecording = () => {
   chrome.runtime.onMessage.addListener((message) => {
@@ -29,7 +41,7 @@ const sendPageShowPersistedEvent = () => {
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE,
         payload: {
-          isRecordingSession: isRecording,
+          isRecordingSession: sessionRecorderState.isRecording,
         },
       });
     }
@@ -47,10 +59,11 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
 
   const {
     notify,
-    markRecordingIcon: markIcon = true,
+    markRecordingIcon = true,
     explicit = false,
-    recordingStartTime: replayStartTime = Date.now(),
+    recordingStartTime = Date.now(),
     showWidget,
+    widgetPosition,
   } = sessionRecordingConfig;
 
   const isIFrame = isIframe();
@@ -65,16 +78,17 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
     maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
   });
 
-  isExplicitRecording = explicit;
-  markRecordingIcon = markIcon;
-  showRecordingWidget = showWidget;
+  sessionRecorderState.isExplicitRecording = explicit;
+  sessionRecorderState.markRecordingIcon = markRecordingIcon;
+  sessionRecorderState.showWidget = showWidget;
+  sessionRecorderState.widgetPosition = widgetPosition;
 
   if (notify) {
     showToast();
   }
 
-  if (isExplicitRecording) {
-    recordingStartTime = replayStartTime;
+  if (explicit) {
+    sessionRecorderState.recordingStartTime = recordingStartTime;
     hideAutoModeWidget();
   }
 };
@@ -83,17 +97,17 @@ const addListeners = () => {
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
       case CLIENT_MESSAGES.IS_RECORDING_SESSION:
-        sendResponse(isRecording);
+        sendResponse(sessionRecorderState.isRecording);
         break;
 
       case CLIENT_MESSAGES.GET_TAB_SESSION:
-        if (isRecording) {
+        if (sessionRecorderState.isRecording) {
           sendMessageToClient("getSessionData", null, sendResponse);
         }
         return true; // notify sender to wait for response and not resolve request immediately
 
       case CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
-        sendResponse(isExplicitRecording);
+        sendResponse(sessionRecorderState.isExplicitRecording);
         break;
 
       case CLIENT_MESSAGES.STOP_RECORDING:
@@ -111,25 +125,25 @@ const addListeners = () => {
     if (event.data.response) {
       sendResponseToRuntime(event.data.action, event.data.payload);
     } else if (event.data.action === "sessionRecordingStarted") {
-      isRecording = true;
+      sessionRecorderState.isRecording = true;
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
         payload: {
-          markRecordingIcon,
+          markRecordingIcon: sessionRecorderState.markRecordingIcon,
         },
       });
 
-      if (showRecordingWidget) {
-        if (isExplicitRecording) {
+      if (sessionRecorderState.showWidget) {
+        if (sessionRecorderState.isExplicitRecording) {
           showManualModeRecordingWidget();
         } else {
           showAutoModeRecordingWidget();
         }
       }
     } else if (event.data.action === "sessionRecordingStopped") {
-      isRecording = false;
-      isExplicitRecording = false;
-      markRecordingIcon = false;
+      sessionRecorderState.isRecording = false;
+      sessionRecorderState.isExplicitRecording = false;
+      sessionRecorderState.markRecordingIcon = false;
 
       hideManualModeWidget();
       hideAutoModeWidget();
@@ -138,6 +152,20 @@ const addListeners = () => {
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
     }
+  });
+
+  window.addEventListener("beforeunload", () => {
+    sendMessageToClient("getSessionData", null, (session) => {
+      chrome.runtime.sendMessage({
+        action: CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD,
+        payload: {
+          session,
+          widgetPosition: sessionRecorderState.widgetPosition,
+          recordingMode: sessionRecorderState.recordingMode,
+          recordingStartTime: sessionRecorderState.recordingStartTime,
+        },
+      });
+    });
   });
 };
 
@@ -175,19 +203,19 @@ const showManualModeRecordingWidget = () => {
     });
 
     widget.addEventListener("moved", (evt: CustomEvent) => {
-      widgetPosition = evt.detail;
+      sessionRecorderState.widgetPosition = evt.detail;
     });
   }
 
   const recordingLimitInMilliseconds = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
-  const recordingTime = Date.now() - recordingStartTime;
+  const recordingTime = Date.now() - sessionRecorderState.recordingStartTime;
   const currentRecordingTime = recordingTime <= recordingLimitInMilliseconds ? recordingTime : null;
 
   widget.dispatchEvent(
     new CustomEvent("show", {
       detail: {
         currentRecordingTime,
-        position: widgetPosition,
+        position: sessionRecorderState.widgetPosition,
       },
     })
   );
@@ -218,14 +246,14 @@ const showAutoModeRecordingWidget = () => {
     });
 
     widget.addEventListener("moved", (evt: CustomEvent) => {
-      widgetPosition = evt.detail;
+      sessionRecorderState.widgetPosition = evt.detail;
     });
   }
 
   widget.dispatchEvent(
     new CustomEvent("show", {
       detail: {
-        position: widgetPosition,
+        position: sessionRecorderState.widgetPosition,
       },
     })
   );

@@ -63,11 +63,12 @@ export interface SessionRecordingConfig {
     isActive: boolean;
     mode: AutoRecordingMode;
   };
-  explicit?: boolean;
-  markRecordingIcon?: boolean;
   notify?: boolean;
-  recordingStartTime?: number;
+  explicit?: boolean;
   showWidget?: boolean;
+  markRecordingIcon?: boolean;
+  widgetPosition?: { top?: number; bottom?: number; left?: number; right?: number };
+  recordingStartTime?: number;
 }
 
 export interface RulePair {
