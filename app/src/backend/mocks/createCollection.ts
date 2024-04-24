@@ -6,7 +6,7 @@ import { MockRecordType, RQMockCollection } from "components/features/mocksV2/ty
 
 type MockCollectionData = Pick<RQMockCollection, "name" | "desc" | "type">;
 
-export const createMockCollection = async (
+export const createCollection = async (
   uid: string,
   mockCollectionData: MockCollectionData,
   teamId?: string
@@ -15,12 +15,12 @@ export const createMockCollection = async (
     return null;
   }
 
-  const mockCollection = await createMockCollectionFromFirebase(uid, mockCollectionData, teamId);
+  const mockCollection = await createCollectionFromFirebase(uid, mockCollectionData, teamId);
 
   return mockCollection;
 };
 
-const createMockCollectionFromFirebase = async (
+const createCollectionFromFirebase = async (
   uid: string,
   mockCollectionData: MockCollectionData,
   teamId?: string

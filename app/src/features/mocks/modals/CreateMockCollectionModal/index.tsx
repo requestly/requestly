@@ -3,11 +3,11 @@ import { useSelector } from "react-redux";
 import { Button, Input, message } from "antd";
 import { MockType } from "components/features/mocksV2/types";
 import { RQModal } from "lib/design-system/components";
-import { createMockCollection } from "backend/mocks/createMockCollection";
+import { createCollection } from "backend/mocks/createCollection";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateMockCollection } from "backend/mocks/updateMockCollection";
-import "./createMockCollectionModal.scss";
+import "./createCollectionModal.scss";
 
 interface Props {
   id?: string;
@@ -78,7 +78,7 @@ export const CreateMockCollectionModal: React.FC<Props> = ({
       };
 
       setIsLoading(true);
-      createMockCollection(uid, collectionData, teamId)
+      createCollection(uid, collectionData, teamId)
         .then((mockCollection) => {
           console.log({ mockCollection });
           message.success("Collection created!");
