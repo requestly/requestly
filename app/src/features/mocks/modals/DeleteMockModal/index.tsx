@@ -14,14 +14,14 @@ import { trackDeleteMockEvent } from "modules/analytics/events/features/mocksV2"
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQMockMetadataSchema } from "components/features/mocksV2/types";
 
-interface DeleteModalProps {
+interface Props {
   visible: boolean;
   mock: RQMockMetadataSchema;
   toggleModalVisibility: (visible: boolean) => void;
   onSuccess: () => void;
 }
 
-export const DeleteMockModal: React.FC<DeleteModalProps> = ({ visible, mock, toggleModalVisibility, onSuccess }) => {
+export const DeleteMockModal: React.FC<Props> = ({ visible, mock, toggleModalVisibility, onSuccess }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
