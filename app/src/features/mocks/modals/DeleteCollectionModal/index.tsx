@@ -39,8 +39,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
     setIsDeletingOnlyCollection(true);
     const mockIds = collection.children?.map((mock) => mock.id);
 
-    const updatedMocks = collection.children?.map((mock) => ({ ...mock, collectionId: "" }));
-    // update state
+    // FIXME: Instead of force rerender, update the local state
 
     await updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID);
     await updateCollections(uid, [{ id: collection.id, deleted: true }]);
