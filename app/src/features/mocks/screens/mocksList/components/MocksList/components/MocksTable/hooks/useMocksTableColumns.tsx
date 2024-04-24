@@ -29,6 +29,7 @@ export const useMocksTableColumns = ({
   handleSelectAction,
   handleUpdateCollectionAction,
   handleDeleteCollectionAction,
+  handleUpdateMockCollectionAction,
 }: Partial<MocksTableProps>) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -215,6 +216,7 @@ export const useMocksTableColumns = ({
             key: 2,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
+              handleUpdateMockCollectionAction(record);
             },
             label: (
               <Row>
