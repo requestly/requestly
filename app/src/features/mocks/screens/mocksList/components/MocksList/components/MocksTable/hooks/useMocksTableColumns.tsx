@@ -1,17 +1,21 @@
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
-import { Space, Table, Tooltip, Typography } from "antd";
+import { Button, Dropdown, MenuProps, Row, Table, Typography, message } from "antd";
 import { RQMockMetadataSchema, MockType } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { CalendarOutlined, DeleteOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { CalendarOutlined, EditOutlined } from "@ant-design/icons";
 import { UserIcon } from "components/common/UserIcon";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
 import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
+import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
+import { MdOutlineDriveFileMove } from "@react-icons/all-files/md/MdOutlineDriveFileMove";
+import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
+import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
+import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RQButton } from "lib/design-system/components";
-import CopyButton from "components/misc/CopyButton";
 import { MocksTableProps } from "../MocksTable";
 import REQUEST_METHOD_COLORS from "components/features/mocksV2/MockList/MocksTable/constants/requestMethodColors";
 import { isRecordMockCollection } from "../utils";
@@ -23,6 +27,8 @@ export const useMocksTableColumns = ({
   handleEditAction,
   handleDeleteAction,
   handleSelectAction,
+  handleUpdateCollectionAction,
+  handleDeleteCollectionAction,
 }: Partial<MocksTableProps>) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -45,7 +51,7 @@ export const useMocksTableColumns = ({
       ellipsis: true,
       width: 320,
       render: (_: any, record: RQMockMetadataSchema) => {
-        return isRecordMockCollection(record.recordType) ? (
+        return isRecordMockCollection(record) ? (
           <div className="mock-collection-details-container">
             <span className="collection-icon">
               <MdOutlineFolder />
@@ -66,7 +72,7 @@ export const useMocksTableColumns = ({
               e.preventDefault();
               e.stopPropagation();
 
-              if (!isRecordMockCollection(record.recordType)) {
+              if (!isRecordMockCollection(record)) {
                 handleNameClick(record.id, record.isOldMock);
               }
             }}
@@ -132,87 +138,139 @@ export const useMocksTableColumns = ({
       },
     },
     {
-      title: (
-        <div className="rq-col-title">
-          <InfoCircleOutlined />
-          Actions
-        </div>
-      ),
-      width: 130,
+      align: "right",
+      width: 70,
       render: (_: any, record: RQMockMetadataSchema) => {
-        return (
-          <Space className="mock-actions-container">
-            {handleEditAction ? (
-              <Tooltip title="Edit">
-                <RQButton
-                  type="text"
-                  icon={<EditOutlined />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditAction(record.id, record.isOldMock);
-                  }}
-                ></RQButton>
-              </Tooltip>
-            ) : null}
-            {handleDeleteAction ? (
-              <Tooltip title="Delete">
-                <RQButton
-                  type="text"
-                  icon={<DeleteOutlined />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteAction(record);
-                  }}
-                ></RQButton>
-              </Tooltip>
-            ) : null}
+        const collectionActions: MenuProps["items"] = [
+          {
+            key: 0,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              handleUpdateCollectionAction(record);
+            },
+            label: (
+              <Row>
+                <RiEdit2Line /> Rename
+              </Row>
+            ),
+          },
+          {
+            key: 1,
+            danger: true,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              handleDeleteCollectionAction(record);
+            },
+            label: (
+              <Row>
+                <RiDeleteBinLine />
+                Delete
+              </Row>
+            ),
+          },
+        ];
 
-            {mockType && (
-              <CopyButton
-                title="Copy Link"
-                copyText={
-                  record.isOldMock
-                    ? record.url
-                    : generateFinalUrl(
-                        record.endpoint,
-                        user?.details?.profile?.uid,
-                        user?.details?.username,
-                        teamId,
-                        record?.password
-                      )
-                }
-                disableTooltip={true}
-                showIcon={false}
-                type="primary"
-              />
-            )}
+        const mockActions: MenuProps["items"] = [
+          {
+            key: 0,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
 
-            {handleSelectAction ? (
-              <RQButton
-                size="small"
-                type="primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  let url = "";
-                  if (record.isOldMock) {
-                    url = record.url;
-                  } else {
-                    // Not sending username as it might change
-                    url = generateFinalUrl(
-                      record.endpoint,
-                      user?.details?.profile?.uid,
-                      null,
-                      teamId,
-                      record?.password
-                    );
-                  }
-                  handleSelectAction(url);
-                }}
-              >
-                Select
-              </RQButton>
-            ) : null}
-          </Space>
+              // TODO: Refactor this into separate action and use that
+              const copyText = record.isOldMock
+                ? record.url
+                : generateFinalUrl(
+                    record.endpoint,
+                    user?.details?.profile?.uid,
+                    user?.details?.username,
+                    teamId,
+                    record?.password
+                  );
+
+              navigator.clipboard.writeText(copyText).then(() => {
+                message.success("Link copied!");
+              });
+            },
+            label: (
+              <Row>
+                <RiFileCopy2Line />
+                Copy
+              </Row>
+            ),
+          },
+          {
+            key: 1,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              handleEditAction?.(record.id, record.isOldMock);
+            },
+            label: (
+              <Row>
+                <EditOutlined />
+                Edit
+              </Row>
+            ),
+          },
+          {
+            key: 2,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+            },
+            label: (
+              <Row>
+                <MdOutlineDriveFileMove /> Move
+              </Row>
+            ),
+          },
+          {
+            key: 3,
+            danger: true,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              handleDeleteAction(record);
+            },
+            label: (
+              <Row>
+                <RiDeleteBinLine />
+                Delete
+              </Row>
+            ),
+          },
+        ];
+
+        return handleSelectAction ? (
+          <RQButton
+            size="small"
+            type="primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              let url = "";
+              if (record.isOldMock) {
+                url = record.url;
+              } else {
+                // Not sending username as it might change
+                url = generateFinalUrl(record.endpoint, user?.details?.profile?.uid, null, teamId, record?.password);
+              }
+              handleSelectAction(url);
+            }}
+          >
+            Select
+          </RQButton>
+        ) : (
+          <Dropdown
+            menu={{ items: isRecordMockCollection(record) ? collectionActions : mockActions }}
+            trigger={["click"]}
+            overlayClassName="rule-more-actions-dropdown"
+          >
+            <Button
+              type="text"
+              className="more-rule-actions-btn"
+              icon={<MdOutlineMoreHoriz />}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            />
+          </Dropdown>
         );
       },
     },
