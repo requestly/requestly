@@ -62,30 +62,6 @@ const useTemplatesTableColumns: (props: Props) => ContentListTableProps<Template
       width: 420,
       render: (description: string) => <div className="template-description">{description}</div>,
     },
-    // {
-    //   title: "Rule type",
-    //   key: "rule",
-    //   width: 160,
-    //   render: (_: any, record: TemplateRecord) => {
-    //     let ruleTypes: string[] = [];
-
-    //     if (record.tags?.length) {
-    //       ruleTypes = record.tags;
-    //     } else if (!record.isSharedList) {
-    //       ruleTypes = [record.data.ruleDefinition.ruleType];
-    //     }
-
-    //     return (
-    //       <>
-    //         {ruleTypes.map((ruleType, index) => (
-    //           <div key={index}>
-    //             <RuleTypeTag ruleType={ruleType} title={ruleType.toUpperCase()} />
-    //           </div>
-    //         ))}
-    //       </>
-    //     );
-    //   },
-    // },
     {
       title: "",
       key: "action",
