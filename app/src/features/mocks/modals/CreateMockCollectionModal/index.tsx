@@ -15,7 +15,7 @@ interface Props {
   description?: string;
   mockType: MockType;
   visible: boolean;
-  toggleModalVisibility: () => void;
+  toggleModalVisibility: (visible: boolean) => void;
   onSuccess?: () => void;
 }
 
@@ -64,7 +64,7 @@ export const CreateMockCollectionModal: React.FC<Props> = ({
         .then(() => {
           console.log("Collection updated!");
           message.success("Collection updated!");
-          toggleModalVisibility();
+          toggleModalVisibility(false);
           onSuccess?.();
         })
         .finally(() => {
@@ -82,7 +82,7 @@ export const CreateMockCollectionModal: React.FC<Props> = ({
         .then((mockCollection) => {
           console.log({ mockCollection });
           message.success("Collection created!");
-          toggleModalVisibility();
+          toggleModalVisibility(false);
           onSuccess?.();
         })
         .finally(() => {
@@ -91,8 +91,12 @@ export const CreateMockCollectionModal: React.FC<Props> = ({
     }
   };
 
+  const handleCancel = () => {
+    toggleModalVisibility(false);
+  };
+
   return (
-    <RQModal open={visible} footer={null} onCancel={toggleModalVisibility} className="mock-collection-modal">
+    <RQModal open={visible} footer={null} onCancel={handleCancel} className="mock-collection-modal">
       <div className="collection-modal-header">New collection</div>
       <div className="collection-modal-content">
         <label className="collection-name-label">
@@ -122,8 +126,8 @@ export const CreateMockCollectionModal: React.FC<Props> = ({
         </label>
       </div>
       <div className="collection-modal-actions">
-        <Button onClick={toggleModalVisibility}>Cancel</Button>
-        <Button loading={isLoading} onClick={handleSaveClick}>
+        <Button onClick={handleCancel}>Cancel</Button>
+        <Button loading={isLoading} onClick={handleSaveClick} disabled={!collectionName}>
           Save
         </Button>
       </div>

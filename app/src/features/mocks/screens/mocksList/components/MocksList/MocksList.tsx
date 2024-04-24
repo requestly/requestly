@@ -188,8 +188,14 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       <DeleteMockModal
         mock={selectedMock}
         visible={deleteModalVisibility}
-        toggleDeleteModalVisibility={(visible: boolean) => setDeleteModalVisibility(visible)}
-        callbackOnSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
+        toggleModalVisibility={(visible: boolean) => {
+          setDeleteModalVisibility(visible);
+
+          if (!visible) {
+            setSelectedMock(null);
+          }
+        }}
+        onSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
       />
 
       <CreateMockCollectionModal
@@ -198,14 +204,33 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         description={selectedMock?.desc}
         mockType={type}
         visible={collectionModalVisibility}
-        toggleModalVisibility={() => setCollectionModalVisibility((prev) => !prev)}
-        onSuccess={() => setForceRender((prev) => !prev)}
+        toggleModalVisibility={(visible: boolean) => {
+          setCollectionModalVisibility(visible);
+
+          if (!visible) {
+            setSelectedMock(null);
+          }
+        }}
+        onSuccess={() => {
+          setForceRender((prev) => !prev);
+          setSelectedMock(null);
+        }}
       />
 
       <DeleteMockCollectionModal
         collection={(selectedMock as unknown) as RQMockCollection}
         visible={deleteCollectionModalVisibility}
-        toggleModalVisibility={() => setDeleteCollectionModalVisibility((prev) => !prev)}
+        toggleModalVisibility={(visible: boolean) => {
+          setDeleteCollectionModalVisibility(visible);
+
+          if (!visible) {
+            setSelectedMock(null);
+          }
+        }}
+        onSuccess={() => {
+          setForceRender((prev) => !prev);
+          setSelectedMock(null);
+        }}
       />
     </>
   ) : (

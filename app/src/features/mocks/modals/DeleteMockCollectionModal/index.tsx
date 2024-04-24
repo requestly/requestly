@@ -15,14 +15,15 @@ import "./deleteMockCollectionModal.scss";
 interface DeleteMockCollectionModalProps {
   visible: boolean;
   collection: RQMockCollection;
-  toggleModalVisibility: () => void;
-  callbackOnSuccess?: () => void;
+  toggleModalVisibility: (visible: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export const DeleteMockCollectionModal: React.FC<DeleteMockCollectionModalProps> = ({
   visible,
   collection,
   toggleModalVisibility,
+  onSuccess,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -46,9 +47,10 @@ export const DeleteMockCollectionModal: React.FC<DeleteMockCollectionModalProps>
 
     console.log("Collection deleted!");
 
+    onSuccess?.();
     message.success("Collection deleted!");
     setIsDeletingOnlyCollection(false);
-    toggleModalVisibility();
+    toggleModalVisibility(false);
     // force re-render
   };
 
@@ -59,9 +61,14 @@ export const DeleteMockCollectionModal: React.FC<DeleteMockCollectionModalProps>
     await deleteMocks(uid, mockIds, teamId);
     await updateMockCollection(uid, collection.id, { deleted: true });
 
+    onSuccess?.();
     message.success("Collection and mocks deleted!");
     setIsDeletingOnlyCollection(false);
-    toggleModalVisibility();
+    toggleModalVisibility(false);
+  };
+
+  const handleCancel = () => {
+    toggleModalVisibility(false);
   };
 
   return (
@@ -69,7 +76,7 @@ export const DeleteMockCollectionModal: React.FC<DeleteMockCollectionModalProps>
       width={320}
       open={visible}
       destroyOnClose={true}
-      onCancel={toggleModalVisibility}
+      onCancel={handleCancel}
       className="delete-collection-modal"
     >
       <img width={32} height={32} src={deleteIcon} alt="Delete collection" className="icon" />
