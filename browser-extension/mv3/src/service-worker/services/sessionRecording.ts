@@ -61,7 +61,7 @@ export const onSessionRecordingStoppedNotification = (tabId: number) => {
 };
 
 export const getTabSession = (tabId: number, callback: () => void) => {
-  chrome.tabs.sendMessage(
+  tabService.sendMessageToTab(
     tabId,
     { action: CLIENT_MESSAGES.GET_TAB_SESSION },
     { frameId: 0 }, // top frame
@@ -81,7 +81,7 @@ const startRecording = (tabId: number, config: Record<string, any>) => {
 };
 
 export const stopRecording = (tabId: number, openRecording: boolean) => {
-  chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.STOP_RECORDING }).then(() => {
+  tabService.sendMessageToTab(tabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, () => {
     tabService.removeData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING);
   });
 

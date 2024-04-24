@@ -4,6 +4,7 @@ import { getVariable, onVariableChange, setVariable, Variable } from "../variabl
 import { Rule } from "common/types";
 import { getRecords } from "common/storage";
 import { CLIENT_MESSAGES } from "common/constants";
+import { tabService } from "../../external/tabService/tabService";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
@@ -12,14 +13,26 @@ interface RuleIdsMap {
 }
 
 const getExecutedRequestResponseRuleIds = async (tabId: number): Promise<string[]> => {
-  return await chrome.tabs.sendMessage(tabId, {
-    action: CLIENT_MESSAGES.GET_APPLIED_REQUEST_RESPONSE_RULES,
+  return new Promise((resolve) => {
+    tabService.sendMessageToTab(
+      tabId,
+      {
+        action: CLIENT_MESSAGES.GET_APPLIED_REQUEST_RESPONSE_RULES,
+      },
+      resolve
+    );
   });
 };
 
 const getExecutedScriptRuleIds = async (tabId: number): Promise<string[]> => {
-  return await chrome.tabs.sendMessage(tabId, {
-    action: CLIENT_MESSAGES.GET_APPLIED_SCRIPT_RULES,
+  return new Promise((resolve) => {
+    tabService.sendMessageToTab(
+      tabId,
+      {
+        action: CLIENT_MESSAGES.GET_APPLIED_SCRIPT_RULES,
+      },
+      resolve
+    );
   });
 };
 

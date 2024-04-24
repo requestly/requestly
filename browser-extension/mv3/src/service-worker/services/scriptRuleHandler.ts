@@ -4,6 +4,7 @@ import { RuleType, ScriptObject, ScriptRulePair } from "common/types";
 import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectScript } from "./utils";
+import { tabService } from "../../external/tabService/tabService";
 
 export const applyScriptRules = async (tabId: number, frameId: number, url: string) => {
   if (isBlacklistedURL(url)) {
@@ -32,7 +33,7 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
   }
 
   if (appliedScriptRuleIds.size > 0) {
-    chrome.tabs.sendMessage(tabId, {
+    tabService.sendMessageToTab(tabId, {
       action: CLIENT_MESSAGES.UPDATE_APPLIED_SCRIPT_RULES,
       ruleIds: Array.from(appliedScriptRuleIds),
     });
