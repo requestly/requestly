@@ -29,6 +29,7 @@ export const CLIENT_MESSAGES = {
   ADD_EXECUTION_EVENT: "addExecutionEvent",
   INIT_SESSION_RECORDING: "initSessionRecording",
   NOTIFY_SESSION_RECORDING_STARTED: "notifySessionRecordingStarted",
+  NOTIFY_SESSION_RECORDING_STOPPED: "notifySessionRecordingStopped",
   IS_RECORDING_SESSION: "isRecordingSession",
   GET_TAB_SESSION: "getTabSession",
   GET_APPLIED_REQUEST_RESPONSE_RULES: "getAppliedRequestResponseRules",

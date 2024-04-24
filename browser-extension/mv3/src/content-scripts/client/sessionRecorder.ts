@@ -1,21 +1,21 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES } from "common/constants";
 import { SessionRecordingConfig } from "common/types";
 
 type SendResponseCallback = (payload: unknown) => void;
 
 const sendResponseCallbacks: { [action: string]: SendResponseCallback } = {};
 let isRecording = false;
+let isExplicitRecording = false;
+let markRecordingIcon = false;
 
 export const initSessionRecording = () => {
-  chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }, sendStartRecordingEvent);
+  chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }).then(sendStartRecordingEvent);
 
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
       case CLIENT_MESSAGES.START_RECORDING:
-        chrome.runtime.sendMessage(
-          { action: EXTENSION_MESSAGES.INIT_SESSION_RECORDING_WITH_NEW_CONFIG },
-          sendStartRecordingEvent
-        );
+        sendStartRecordingEvent(message.payload);
+        break;
     }
   });
 };
@@ -25,18 +25,28 @@ const isIframe = (): boolean => {
 };
 
 const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig) => {
-  if (sessionRecordingConfig) {
-    const isIFrame = isIframe();
+  if (!sessionRecordingConfig) {
+    return;
+  }
 
-    if (!isIFrame) {
-      addListeners();
-    }
-    sendMessageToClient("startRecording", {
-      relayEventsToTop: isIFrame,
-      console: true,
-      network: true,
-      maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
-    });
+  const isIFrame = isIframe();
+
+  if (!isIFrame) {
+    addListeners();
+  }
+  sendMessageToClient("startRecording", {
+    relayEventsToTop: isIFrame,
+    console: true,
+    network: true,
+    maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
+  });
+
+  isExplicitRecording = sessionRecordingConfig.explicit ?? false;
+
+  if (isExplicitRecording) {
+    markRecordingIcon = true;
+  } else {
+    markRecordingIcon = sessionRecordingConfig.markRecordingIcon ?? false;
   }
 };
 
@@ -48,10 +58,15 @@ const addListeners = () => {
         break;
 
       case CLIENT_MESSAGES.GET_TAB_SESSION:
-        if (isRecording) {
-          sendMessageToClient("getSessionData", null, sendResponse);
-        }
+        sendMessageToClient("getSessionData", null, sendResponse);
         return true; // notify sender to wait for response and not resolve request immediately
+
+      case CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
+        sendResponse(isExplicitRecording);
+        break;
+
+      case CLIENT_MESSAGES.STOP_RECORDING:
+        sendMessageToClient("stopRecording", null);
     }
 
     return false;
@@ -68,6 +83,17 @@ const addListeners = () => {
       isRecording = true;
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
+        payload: {
+          markRecordingIcon,
+        },
+      });
+    } else if (event.data.action === "sessionRecordingStopped") {
+      isRecording = false;
+      isExplicitRecording = false;
+      markRecordingIcon = false;
+
+      chrome.runtime.sendMessage({
+        action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
     }
   });
