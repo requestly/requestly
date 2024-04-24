@@ -1,4 +1,13 @@
 .rq-mocks-list-table {
+  .ant-table-cell.ant-table-selection-column .ant-checkbox-wrapper {
+    display: none;
+  }
+
+  // TODO: Temp fix, remove this after selection column is shown
+  .ant-table-cell.ant-table-cell-with-append {
+    margin-top: 7px;
+  }
+
   .rq-col-title {
     display: flex;
     align-items: center;
