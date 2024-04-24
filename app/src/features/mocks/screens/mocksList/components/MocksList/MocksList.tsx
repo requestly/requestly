@@ -8,7 +8,13 @@ import {
   redirectToMockEditorEditMock,
 } from "utils/RedirectionUtils";
 import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
-import { MockListSource, MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import {
+  MockListSource,
+  MockRecordType,
+  MockType,
+  RQMockCollection,
+  RQMockMetadataSchema,
+} from "components/features/mocksV2/types";
 import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
@@ -18,6 +24,7 @@ import {
   MockUploaderModal,
   NewFileModal,
   DeleteCollectionModal,
+  UpdateMockCollectionModal,
 } from "features/mocks/modals";
 import "./mocksList.scss";
 
@@ -35,6 +42,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
   const [collectionModalVisibility, setCollectionModalVisibility] = useState<boolean>(false);
   const [deleteCollectionModalVisibility, setDeleteCollectionModalVisibility] = useState<boolean>(false);
+  const [updateMockCollectionModalVisibility, setUpdateMockCollectionModalVisibility] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
 
@@ -111,6 +119,11 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setDeleteCollectionModalVisibility(true);
   };
 
+  const handleUpdateMockCollectionAction = (mock: RQMockMetadataSchema) => {
+    setSelectedMock(mock);
+    setUpdateMockCollectionModalVisibility(true);
+  };
+
   const handleSearch = (searchQuery: string) => {
     setSearchValue(searchQuery);
 
@@ -123,6 +136,10 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       setFilteredMocks([...mocks]);
     }
   };
+
+  const collections = (mocks.filter(
+    (mock) => mock?.recordType === MockRecordType.COLLECTION
+  ) as unknown) as RQMockCollection[];
 
   return isLoading ? (
     <SpinnerCard customLoadingMessage="Loading Mocks" />
@@ -173,6 +190,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleDeleteAction={handleDeleteAction}
             handleUpdateCollectionAction={handleUpdateCollectionAction}
             handleDeleteCollectionAction={handleDeleteCollectionAction}
+            handleUpdateMockCollectionAction={handleUpdateMockCollectionAction}
           />
         </div>
       </div>
@@ -222,6 +240,23 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         visible={deleteCollectionModalVisibility}
         toggleModalVisibility={(visible: boolean) => {
           setDeleteCollectionModalVisibility(visible);
+
+          if (!visible) {
+            setSelectedMock(null);
+          }
+        }}
+        onSuccess={() => {
+          setForceRender((prev) => !prev);
+          setSelectedMock(null);
+        }}
+      />
+
+      <UpdateMockCollectionModal
+        mock={selectedMock}
+        collections={collections}
+        visible={updateMockCollectionModalVisibility}
+        toggleModalVisibility={(visible: boolean) => {
+          setUpdateMockCollectionModalVisibility(visible);
 
           if (!visible) {
             setSelectedMock(null);

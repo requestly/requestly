@@ -26,6 +26,7 @@ export interface MocksTableProps {
   handleUploadAction?: () => void;
   handleUpdateCollectionAction?: (collection: RQMockMetadataSchema) => void;
   handleDeleteCollectionAction?: (collection: RQMockMetadataSchema) => void;
+  handleUpdateMockCollectionAction?: (mock: RQMockMetadataSchema) => void;
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
@@ -39,6 +40,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   handleDeleteAction,
   handleUpdateCollectionAction,
   handleDeleteCollectionAction,
+  handleUpdateMockCollectionAction,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -64,6 +66,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     handleSelectAction,
     handleUpdateCollectionAction,
     handleDeleteCollectionAction,
+    handleUpdateMockCollectionAction,
   });
 
   return (
