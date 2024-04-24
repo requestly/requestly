@@ -8,11 +8,17 @@ import {
   redirectToMockEditorEditMock,
 } from "utils/RedirectionUtils";
 import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
-import { MockListSource, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockListSource, MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
-import { DeleteMockModal, MockCollectionModal, MockUploaderModal, NewFileModal } from "features/mocks/modals";
+import {
+  DeleteMockModal,
+  CreateMockCollectionModal,
+  MockUploaderModal,
+  NewFileModal,
+  DeleteMockCollectionModal,
+} from "features/mocks/modals";
 import "./mocksList.scss";
 
 interface Props {
@@ -28,6 +34,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
   const [collectionModalVisibility, setCollectionModalVisibility] = useState<boolean>(false);
+  const [deleteCollectionModalVisibility, setDeleteCollectionModalVisibility] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
 
@@ -94,9 +101,14 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setDeleteModalVisibility(true);
   };
 
-  const handleUpdateCollection = (collection: RQMockMetadataSchema) => {
+  const handleUpdateCollectionAction = (collection: RQMockMetadataSchema) => {
     setSelectedMock(collection);
     setCollectionModalVisibility(true);
+  };
+
+  const handleDeleteCollectionAction = (collection: RQMockMetadataSchema) => {
+    setSelectedMock(collection);
+    setDeleteCollectionModalVisibility(true);
   };
 
   const handleSearch = (searchQuery: string) => {
@@ -159,7 +171,8 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleEditAction={handleEditAction}
             handleUploadAction={handleUploadAction}
             handleDeleteAction={handleDeleteAction}
-            handleUpdateCollection={handleUpdateCollection}
+            handleUpdateCollectionAction={handleUpdateCollectionAction}
+            handleDeleteCollectionAction={handleDeleteCollectionAction}
           />
         </div>
       </div>
@@ -179,7 +192,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         callbackOnSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
       />
 
-      <MockCollectionModal
+      <CreateMockCollectionModal
         id={selectedMock?.id}
         name={selectedMock?.name}
         description={selectedMock?.desc}
@@ -187,6 +200,12 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         visible={collectionModalVisibility}
         toggleModalVisibility={() => setCollectionModalVisibility((prev) => !prev)}
         onSuccess={() => setForceRender((prev) => !prev)}
+      />
+
+      <DeleteMockCollectionModal
+        collection={(selectedMock as unknown) as RQMockCollection}
+        visible={deleteCollectionModalVisibility}
+        toggleModalVisibility={() => setDeleteCollectionModalVisibility((prev) => !prev)}
       />
     </>
   ) : (

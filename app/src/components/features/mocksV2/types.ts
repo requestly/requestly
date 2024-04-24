@@ -17,20 +17,6 @@ export enum MockRecordType {
   COLLECTION = "collection",
 }
 
-export interface RQMockCollection {
-  id?: string;
-  name: string;
-  desc?: string;
-  type: MockType;
-  recordType: MockRecordType.COLLECTION;
-  ownerId: string;
-  deleted?: boolean;
-  createdTs?: number;
-  updatedTs?: number;
-  createdBy?: string;
-  lastUpdatedBy?: string;
-}
-
 // Extends MockSchema and adds powers Requestly Mock Server specific features
 export interface RQMockMetadataSchema extends MockMetadataSchema {
   type: MockType;
@@ -41,6 +27,21 @@ export interface RQMockMetadataSchema extends MockMetadataSchema {
   recordType?: MockRecordType;
   isFavourite?: boolean;
   collectionId?: string;
+  createdBy?: string;
+  lastUpdatedBy?: string;
+}
+
+export interface RQMockCollection {
+  id?: string;
+  name: string;
+  desc?: string;
+  type: MockType;
+  recordType: MockRecordType.COLLECTION;
+  ownerId: string;
+  children?: RQMockMetadataSchema[];
+  deleted?: boolean;
+  createdTs?: number;
+  updatedTs?: number;
   createdBy?: string;
   lastUpdatedBy?: string;
 }

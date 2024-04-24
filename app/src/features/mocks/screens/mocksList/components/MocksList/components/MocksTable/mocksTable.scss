@@ -73,10 +73,6 @@
     }
 
     .mock-actions-container {
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s ease-in-out;
-
       .ant-btn-icon-only {
         &:hover {
           background: var(--border);
@@ -96,10 +92,5 @@
     .mock-table-user-icon {
       margin-left: 15px;
     }
-  }
-
-  .rq-mocks-list-table-row:hover .mock-actions-container {
-    opacity: 1;
-    pointer-events: auto;
   }
 }
