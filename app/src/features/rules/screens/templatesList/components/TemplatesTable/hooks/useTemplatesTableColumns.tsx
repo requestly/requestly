@@ -33,22 +33,8 @@ const useTemplatesTableColumns: (props: Props) => ContentListTableProps<Template
     Table.SELECTION_COLUMN,
     {
       title: "Name",
-      dataIndex: "name",
       key: "name",
       width: 320,
-      render: (name: string) => <div className="template-name">{name}</div>,
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      width: 420,
-      render: (description: string) => <div className="template-description">{description}</div>,
-    },
-    {
-      title: "Rule type",
-      key: "rule",
-      width: 160,
       render: (_: any, record: TemplateRecord) => {
         let ruleTypes: string[] = [];
 
@@ -57,18 +43,49 @@ const useTemplatesTableColumns: (props: Props) => ContentListTableProps<Template
         } else if (!record.isSharedList) {
           ruleTypes = [record.data.ruleDefinition.ruleType];
         }
-
         return (
           <>
-            {ruleTypes.map((ruleType, index) => (
-              <div key={index}>
+            <div className="template-name">{record.name}</div>
+            <div className="template-rule-tags">
+              {ruleTypes.map((ruleType, index) => (
                 <RuleTypeTag ruleType={ruleType} title={ruleType.toUpperCase()} />
-              </div>
-            ))}
+              ))}
+            </div>
           </>
         );
       },
     },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      width: 420,
+      render: (description: string) => <div className="template-description">{description}</div>,
+    },
+    // {
+    //   title: "Rule type",
+    //   key: "rule",
+    //   width: 160,
+    //   render: (_: any, record: TemplateRecord) => {
+    //     let ruleTypes: string[] = [];
+
+    //     if (record.tags?.length) {
+    //       ruleTypes = record.tags;
+    //     } else if (!record.isSharedList) {
+    //       ruleTypes = [record.data.ruleDefinition.ruleType];
+    //     }
+
+    //     return (
+    //       <>
+    //         {ruleTypes.map((ruleType, index) => (
+    //           <div key={index}>
+    //             <RuleTypeTag ruleType={ruleType} title={ruleType.toUpperCase()} />
+    //           </div>
+    //         ))}
+    //       </>
+    //     );
+    //   },
+    // },
     {
       title: "",
       key: "action",

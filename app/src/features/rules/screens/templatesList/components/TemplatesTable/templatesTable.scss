@@ -10,10 +10,22 @@
 
   .template-description {
     font-size: 13px;
+    color: var(--requestly-color-neutral-300);
   }
 
   .templates-actions-container {
     display: flex;
     justify-content: flex-end;
+  }
+
+  .template-rule-tags {
+    display: flex;
+    margin-top: 5px;
+    gap: 8px;
+    align-items: center;
+
+    .rule-type-tag {
+      color: var(--requestly-color-neutral-300);
+    }
   }
 }
