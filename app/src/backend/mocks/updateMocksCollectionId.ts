@@ -1,5 +1,5 @@
 import firebaseApp from "../../firebase";
-import { Timestamp, doc, getDoc, getFirestore, writeBatch } from "firebase/firestore";
+import { Timestamp, doc, getFirestore, writeBatch } from "firebase/firestore";
 
 export const updateMocksCollectionId = async (
   uid: string,
@@ -19,15 +19,8 @@ const updateMocksCollectionIdFromFirebase = async (
   mockIds: string[],
   updatedCollectionId: string
 ): Promise<boolean> => {
-  const db = getFirestore(firebaseApp);
-  const docRef = doc(db, "mocks", updatedCollectionId);
-  const snapshot = await getDoc(docRef);
-
-  if (!snapshot.exists()) {
-    return;
-  }
-
   try {
+    const db = getFirestore(firebaseApp);
     const mocksbatch = writeBatch(db);
 
     mockIds.forEach((id) => {
