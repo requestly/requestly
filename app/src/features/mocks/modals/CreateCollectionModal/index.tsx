@@ -6,7 +6,7 @@ import { RQModal } from "lib/design-system/components";
 import { createCollection } from "backend/mocks/createCollection";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { updateCollection } from "backend/mocks/updateCollection";
+import { updateCollections } from "backend/mocks/updateCollections";
 import "./createCollectionModal.scss";
 
 interface Props {
@@ -54,13 +54,16 @@ export const CreateCollectionModal: React.FC<Props> = ({
     }
 
     if (id) {
-      const collectionData = {
-        name: collectionName,
-        desc: collectionDescription,
-      };
+      const collectionData = [
+        {
+          id,
+          name: collectionName,
+          desc: collectionDescription,
+        },
+      ];
 
       setIsLoading(true);
-      updateCollection(uid, id, collectionData)
+      updateCollections(uid, collectionData)
         .then(() => {
           console.log("Collection updated!");
           message.success("Collection updated!");
