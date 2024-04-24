@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
-import { Button, Col, Input, Row } from "antd";
+import { Button, Col, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { Filter, FilterType } from "./type";
 import "./contentListHeader.scss";
 
 export interface ContentListHeaderProps {
-  title: ReactNode;
-  subtitle: ReactNode;
+  title?: ReactNode;
+  subtitle?: ReactNode;
   actions?: ReactNode[];
   searchValue?: string;
   setSearchValue?: (s: string) => void;
