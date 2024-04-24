@@ -9,6 +9,7 @@ let isExplicitRecording = false;
 let markRecordingIcon = false;
 let widgetPosition: { top?: number; bottom?: number; left?: number; right?: number };
 let recordingStartTime: number;
+let showRecordingWidget = false;
 
 export const initSessionRecording = () => {
   chrome.runtime.onMessage.addListener((message) => {
@@ -49,6 +50,7 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
     markRecordingIcon: markIcon = true,
     explicit = false,
     recordingStartTime: replayStartTime = Date.now(),
+    showWidget,
   } = sessionRecordingConfig;
 
   const isIFrame = isIframe();
@@ -65,6 +67,7 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
 
   isExplicitRecording = explicit;
   markRecordingIcon = markIcon;
+  showRecordingWidget = showWidget;
 
   if (notify) {
     showToast();
@@ -116,10 +119,12 @@ const addListeners = () => {
         },
       });
 
-      if (isExplicitRecording) {
-        showManualModeRecordingWidget();
-      } else {
-        showAutoModeRecordingWidget();
+      if (showRecordingWidget) {
+        if (isExplicitRecording) {
+          showManualModeRecordingWidget();
+        } else {
+          showAutoModeRecordingWidget();
+        }
       }
     } else if (event.data.action === "sessionRecordingStopped") {
       isRecording = false;
