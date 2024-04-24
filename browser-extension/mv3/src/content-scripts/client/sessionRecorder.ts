@@ -64,6 +64,7 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
     recordingStartTime = Date.now(),
     showWidget,
     widgetPosition,
+    previousSession,
   } = sessionRecordingConfig;
 
   const isIFrame = isIframe();
@@ -76,6 +77,7 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
     console: true,
     network: true,
     maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
+    previousSession: !isIFrame ? previousSession : null,
   });
 
   sessionRecorderState.isExplicitRecording = explicit;
@@ -101,9 +103,7 @@ const addListeners = () => {
         break;
 
       case CLIENT_MESSAGES.GET_TAB_SESSION:
-        if (sessionRecorderState.isRecording) {
-          sendMessageToClient("getSessionData", null, sendResponse);
-        }
+        sendMessageToClient("getSessionData", null, sendResponse);
         return true; // notify sender to wait for response and not resolve request immediately
 
       case CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
@@ -157,7 +157,7 @@ const addListeners = () => {
   window.addEventListener("beforeunload", () => {
     sendMessageToClient("getSessionData", null, (session) => {
       chrome.runtime.sendMessage({
-        action: CLIENT_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD,
+        action: EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD,
         payload: {
           session,
           widgetPosition: sessionRecorderState.widgetPosition,

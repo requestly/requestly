@@ -69,6 +69,7 @@ export interface SessionRecordingConfig {
   markRecordingIcon?: boolean;
   widgetPosition?: { top?: number; bottom?: number; left?: number; right?: number };
   recordingStartTime?: number;
+  previousSession?: any;
 }
 
 export interface RulePair {

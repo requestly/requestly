@@ -105,6 +105,7 @@ export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget:
   }
 
   const sessionRecordingData = { explicit: true, showWidget };
+  tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
   startRecording(tab.id, sessionRecordingData);
 };
@@ -154,6 +155,18 @@ export const handleSessionRecordingOnClientPageLoad = async (tab: chrome.tabs.Ta
         notify: false,
         previousSession: null,
       });
+    });
+  }
+};
+
+export const cacheRecordedSessionOnClientPageUnload = (tabId: number, payload: any) => {
+  const sessionRecordingData = tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING);
+  if (sessionRecordingData) {
+    tabService.setData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING, {
+      ...sessionRecordingData,
+      previousSession: payload.session,
+      widgetPosition: payload.widgetPosition,
+      recordingStartTime: payload.recordingStartTime,
     });
   }
 };

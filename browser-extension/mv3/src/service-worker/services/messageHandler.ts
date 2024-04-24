@@ -5,6 +5,7 @@ import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
 import { getExecutedRules } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
+  cacheRecordedSessionOnClientPageUnload,
   getTabSession,
   handleSessionRecordingOnClientPageLoad,
   launchUrlAndStartRecording,
@@ -81,6 +82,10 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.WATCH_RECORDING:
         watchRecording(message.tabId ?? sender.tab?.id);
+        break;
+
+      case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
+        cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
     }
 
