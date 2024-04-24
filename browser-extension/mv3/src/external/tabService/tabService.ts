@@ -173,6 +173,7 @@ class TabService {
 
     const send = () => this.sendMessage(tabId, ...args);
 
+    // message queue to handle the prerendered pages. If the tab is not active/prerendered, push the message to queue
     if (tab.documentLifecycle === "active" || tab.documentLifecycle === undefined) {
       send();
     } else {
