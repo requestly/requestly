@@ -58,9 +58,7 @@ const addListeners = () => {
         break;
 
       case CLIENT_MESSAGES.GET_TAB_SESSION:
-        if (isRecording) {
-          sendMessageToClient("getSessionData", null, sendResponse);
-        }
+        sendMessageToClient("getSessionData", null, sendResponse);
         return true; // notify sender to wait for response and not resolve request immediately
 
       case CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
