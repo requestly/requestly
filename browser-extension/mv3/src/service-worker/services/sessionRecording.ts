@@ -170,3 +170,11 @@ export const cacheRecordedSessionOnClientPageUnload = (tabId: number, payload: a
     });
   }
 };
+
+export const stopRecordingOnAllTabs = () => {
+  Object.values(tabService.getTabs()).forEach(({ id: tabId }) => {
+    if (tabId && tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING)) {
+      stopRecording(tabId, false);
+    }
+  });
+};
