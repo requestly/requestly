@@ -52,9 +52,7 @@ export const useGoogleOneTapLogin = () => {
   const listener = useEffect(() => {
     if (script === "ready" && !config.disabled && window.google) {
       window.google.accounts.id.initialize({ ...config });
-      window.google.accounts.id.prompt(() => {
-        // tried showing the one tap sign in prompt
-      });
+      window.google.accounts.id.prompt();
     }
   }, [script, config]);
 
