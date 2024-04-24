@@ -42,12 +42,12 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingC
   return null;
 };
 
-export const initSessionRecordingSDK = async (tabId: number, frameId: number) => {
-  await injectWebAccessibleScript("libs/requestly-web-sdk.js", {
-    tabId,
-    frameIds: [frameId],
-  });
-};
+// const initSessionRecordingSDK = async (tabId: number, frameId: number) => {
+//   await injectWebAccessibleScript("libs/requestly-web-sdk.js", {
+//     tabId,
+//     frameIds: [frameId],
+//   });
+// };
 
 export const onSessionRecordingStartedNotification = (tabId: number, markIcon: boolean) => {
   if (markIcon) {
@@ -73,8 +73,8 @@ export const watchRecording = (tabId: number) => {
   chrome.tabs.create({ url: `${config.WEB_URL}/sessions/draft/${tabId}` });
 };
 
-const startRecording = (tabId: number, config: Record<string, any>) => {
-  injectWebAccessibleScript("libs/requestly-web-sdk.js", {
+const startRecording = async (tabId: number, config: Record<string, any>) => {
+  await injectWebAccessibleScript("libs/requestly-web-sdk.js", {
     tabId: tabId,
   }).then(() => {
     chrome.tabs.sendMessage(tabId, {
@@ -86,13 +86,24 @@ const startRecording = (tabId: number, config: Record<string, any>) => {
 
 export const stopRecording = (tabId: number, openRecording: boolean) => {
   chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.STOP_RECORDING }).then(() => {
-    if (openRecording) {
-      watchRecording(tabId);
-    }
+    tabService.removeData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING);
   });
+
+  if (openRecording) {
+    watchRecording(tabId);
+  }
 };
 
-export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget: boolean) => {
+export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget: boolean = true) => {
+  const sessionRecordingConfig = await getSessionRecordingConfig(tab.url);
+
+  const sessionRecordingDataExist = !!tabService.getData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING);
+  // Auto recording is on for current tab if sessionRecordingConfig exist,
+  // so forcefully start explicit recording.
+  if (!sessionRecordingConfig && sessionRecordingDataExist) {
+    return;
+  }
+
   const sessionRecordingData = { explicit: true, showWidget };
 
   startRecording(tab.id, sessionRecordingData);
@@ -100,7 +111,11 @@ export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget:
 
 export const launchUrlAndStartRecording = (url: string) => {
   chrome.tabs.create({ url }, (tab) => {
-    startRecording(tab.id, { explicit: true, notify: true });
+    tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, {
+      notify: true,
+      explicit: true,
+      showWidget: true,
+    });
   });
 };
 
@@ -133,19 +148,12 @@ export const handleSessionRecordingOnClientPageLoad = async (tab: chrome.tabs.Ta
   }
 
   if (sessionRecordingData) {
-    initSessionRecordingSDK(tab.id, frameId);
-
-    chrome.tabs
-      .sendMessage(tab.id, {
-        action: CLIENT_MESSAGES.START_RECORDING,
-        payload: sessionRecordingData,
-      })
-      .then(() => {
-        tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, {
-          ...sessionRecordingData,
-          notify: false,
-          previousSession: null,
-        });
+    startRecording(tab.id, sessionRecordingData).then(() => {
+      tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, {
+        ...sessionRecordingData,
+        notify: false,
+        previousSession: null,
       });
+    });
   }
 };
