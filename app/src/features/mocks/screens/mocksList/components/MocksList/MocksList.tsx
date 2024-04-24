@@ -17,7 +17,7 @@ import {
   CreateMockCollectionModal,
   MockUploaderModal,
   NewFileModal,
-  DeleteMockCollectionModal,
+  DeleteCollectionModal,
 } from "features/mocks/modals";
 import "./mocksList.scss";
 
@@ -217,7 +217,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         }}
       />
 
-      <DeleteMockCollectionModal
+      <DeleteCollectionModal
         collection={(selectedMock as unknown) as RQMockCollection}
         visible={deleteCollectionModalVisibility}
         toggleModalVisibility={(visible: boolean) => {
