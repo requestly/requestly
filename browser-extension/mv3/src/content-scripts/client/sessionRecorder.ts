@@ -84,6 +84,7 @@ const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig)
   sessionRecorderState.markRecordingIcon = markRecordingIcon;
   sessionRecorderState.showWidget = showWidget;
   sessionRecorderState.widgetPosition = widgetPosition;
+  sessionRecorderState.recordingMode = explicit ? "manual" : "auto";
 
   if (notify) {
     showToast();
