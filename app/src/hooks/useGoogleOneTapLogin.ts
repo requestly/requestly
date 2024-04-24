@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useScript } from "./useScript";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails, getAppMode } from "store/selectors";
@@ -6,6 +6,8 @@ import { handleOnetapSignIn } from "actions/FirebaseActions";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import PATHS from "config/constants/sub/paths";
+import { useHasChanged } from "./useHasChanged";
 
 //google signIn client libary for fetching user cred
 const googleSignInScriptURL: string = "https://accounts.google.com/gsi/client";
@@ -23,12 +25,32 @@ interface CredentialResponse {
   client_id: string;
 }
 
+export const shouldShowOneTapPrompt = () => {
+  if (
+    window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||
+    window.location.href.includes(PATHS.AUTH.EMAIL_ACTION.RELATIVE) ||
+    window.location.href.includes(PATHS.AUTH.EMAIL_LINK_SIGNIN.RELATIVE)
+  ) {
+    return false;
+  }
+  return true;
+};
+
 export const useGoogleOneTapLogin = () => {
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
+  const [oneTapScriptInitialized, setOneTapScriptInitialized] = useState<boolean>(false);
+  const [onetapPromptShown, setShownOnetapPromptShown] = useState<boolean>(false);
   const [loggedInUsingOneTap, setIsLoggedInUsingOneTap] = useState<boolean>(false);
-  const script = useScript(googleSignInScriptURL);
+  const scriptStatus = useScript(googleSignInScriptURL);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const userLoginHasChanged = useHasChanged(user?.loggedIn);
+
+  useEffect(() => {
+    if (userLoginHasChanged && !user?.loggedIn && onetapPromptShown) {
+      setShownOnetapPromptShown(false);
+    }
+  }, [userLoginHasChanged, user?.loggedIn, onetapPromptShown]);
 
   const handleSignIn = async (credential: CredentialResponse) => {
     handleOnetapSignIn(credential).then((res) => {
@@ -50,11 +72,18 @@ export const useGoogleOneTapLogin = () => {
   }, [user?.loggedIn, appMode]);
 
   const listener = useEffect(() => {
-    if (script === "ready" && !config.disabled && window.google) {
+    if (scriptStatus === "ready" && !config.disabled && window.google && !oneTapScriptInitialized) {
       window.google.accounts.id.initialize({ ...config });
-      window.google.accounts.id.prompt();
+      setOneTapScriptInitialized(true);
     }
-  }, [script, config]);
+  }, [scriptStatus, config, oneTapScriptInitialized]);
+
+  const promptOneTap = useCallback(() => {
+    if (oneTapScriptInitialized && window.google && !onetapPromptShown) {
+      window.google.accounts.id.prompt();
+      setShownOnetapPromptShown(true);
+    }
+  }, [oneTapScriptInitialized, onetapPromptShown]);
 
   useEffect(() => {
     if (!user?.loggedIn) {
@@ -64,7 +93,8 @@ export const useGoogleOneTapLogin = () => {
   }, [user?.loggedIn]);
 
   return {
-    promptOneTapOnLoad: () => listener,
+    initializeOnetap: () => listener,
+    promptOneTap,
     isNewUser,
     loggedInUsingOneTap,
   };
