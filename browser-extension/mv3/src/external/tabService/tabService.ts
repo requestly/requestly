@@ -200,7 +200,7 @@ class TabService {
     }
   }
 
-  getData(tabId: TabId, key: any, defaultValue: any) {
+  getData(tabId: TabId, key: any, defaultValue?: any) {
     const tab = this.getTab(tabId);
 
     if (!tab) {

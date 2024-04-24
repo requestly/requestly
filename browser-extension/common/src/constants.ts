@@ -41,6 +41,7 @@ export const CLIENT_MESSAGES = {
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   EXECUTE_SCRIPT: "executeScript",
+  NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
 };
 
 export const STORAGE_TYPE = "local";

@@ -6,7 +6,7 @@ import { getExecutedRules } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   getTabSession,
-  initSessionRecording,
+  handleSessionRecordingOnClientPageLoad,
   launchUrlAndStartRecording,
   onSessionRecordingStartedNotification,
   onSessionRecordingStoppedNotification,
@@ -36,11 +36,8 @@ export const initMessageHandler = () => {
         });
         initCustomWidgets(sender.tab?.id, sender.frameId);
         applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
+        handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
-
-      case CLIENT_MESSAGES.INIT_SESSION_RECORDING:
-        initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url).then(sendResponse);
-        return true;
 
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
         onSessionRecordingStartedNotification(sender.tab.id, message.payload.markRecordingIcon);

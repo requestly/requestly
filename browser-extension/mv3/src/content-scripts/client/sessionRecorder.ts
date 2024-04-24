@@ -11,13 +11,26 @@ let widgetPosition: { top?: number; bottom?: number; left?: number; right?: numb
 let recordingStartTime: number;
 
 export const initSessionRecording = () => {
-  chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }).then(sendStartRecordingEvent);
-
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
       case CLIENT_MESSAGES.START_RECORDING:
         sendStartRecordingEvent(message.payload);
         break;
+    }
+  });
+
+  sendPageShowPersistedEvent();
+};
+
+const sendPageShowPersistedEvent = () => {
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+      chrome.runtime.sendMessage({
+        action: CLIENT_MESSAGES.NOTIFY_PAGE_LOADED_FROM_CACHE,
+        payload: {
+          isRecordingSession: isRecording,
+        },
+      });
     }
   });
 };
