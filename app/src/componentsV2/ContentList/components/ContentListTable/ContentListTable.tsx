@@ -47,6 +47,8 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
         updatedExpandedRowKeys.delete(record[rowKey]);
       }
       setExpandedRowsKeys(Array.from(updatedExpandedRowKeys));
+
+      // FIXME: localStorage gets overrided by the another instance of the table
       localStorage.setItem(
         "content-list-table-expanded-rows",
         JSON.stringify({
