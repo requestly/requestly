@@ -1,6 +1,6 @@
 .rq-content-list-table-container {
   background-color: var(--requestly-color-background);
-  padding: 16px 16px;
+  margin: 16px 16px;
 
   .rq-content-list-table {
     background-color: inherit;
@@ -115,9 +115,9 @@
         color: var(--requestly-color-text-default);
         border-bottom: 1px solid var(--requestly-color-white-t-10);
 
-        &:hover {
-          background: inherit;
-        }
+        // &:hover {
+        // background: inherit;
+        // }
       }
 
       .ant-table-selection-column {
