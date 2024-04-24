@@ -107,7 +107,7 @@ export default [
     plugins: commonPlugins,
   },
   {
-    input: "src/utility-scripts/executeScript.js",
+    input: "src/external/executeScript.js",
     output: {
       file: `${OUTPUT_DIR}/libs/executeScript.js`,
       format: "iife",

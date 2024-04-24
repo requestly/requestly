@@ -85,7 +85,7 @@ class TabService {
     chrome.webRequest.onBeforeRequest.addListener(
       (details) => {
         if (details.type === "main_frame") {
-          const tab = this.getTab(details.tabId) || { id: details.tabId };
+          const tab = this.getTab(details.tabId) || ({ id: details.tabId } as TabData);
           this.addOrUpdateTab({ ...tab, url: details.url });
         }
       },
