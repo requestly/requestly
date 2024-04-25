@@ -450,7 +450,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     const requestRule = getMatchedRequestRule(this.requestURL);
     if (requestRule) {
-      this.requestData = getCustomRequestBody(requestRule.request, {
+      this.requestData = getCustomRequestBody(requestRule, {
         method: this.method,
         url: this.requestURL,
         body: data,
