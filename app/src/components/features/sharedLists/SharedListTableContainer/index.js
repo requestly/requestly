@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Typography, Tooltip, Space, Input, message, Button } from "antd";
-import DeleteSharedListModal from "../DeleteSharedListModal";
+import DeleteSharedListModal from "../../../../features/rules/screens/sharedLists/components/SharedLists/modals/DeleteSharedListModal";
 //UTILS
 import { getUserAuthDetails, getAppMode } from "../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../utils/AnalyticsUtils";

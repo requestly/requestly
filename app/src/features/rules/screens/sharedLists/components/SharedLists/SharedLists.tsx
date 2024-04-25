@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useFetchSharedLists } from "./hooks/useFetchSharedLists";
 import { SharedListsContentHeader } from "./components/SharedListsContentHeader/SharedListsContentHeader";
 import { SharedListsTable } from "./components/SharedListsTable/SharedListsTable";
-import CreateSharedListCTA from "../CreateSharedListCTA";
+import CreateSharedListCTA from "./components/CreateSharedListCTA";
 import SpinnerCard from "components/misc/SpinnerCard";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getIsExtensionEnabled } from "store/selectors";

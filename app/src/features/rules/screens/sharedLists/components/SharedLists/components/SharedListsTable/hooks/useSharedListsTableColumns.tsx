@@ -14,7 +14,11 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
 
-export const useSharedListsTableColumns = () => {
+interface Props {
+  handleDeleteSharedListClick: (sharedListId: string) => void;
+}
+
+export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Props) => {
   const navigate = useNavigate();
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
 
@@ -86,7 +90,11 @@ export const useSharedListsTableColumns = () => {
         return (
           <div className="sharedlist-table-actions-container">
             <Tooltip title="Delete">
-              <RQButton icon={<RiDeleteBinLine />} iconOnly />
+              <RQButton
+                icon={<RiDeleteBinLine />}
+                iconOnly
+                onClick={() => handleDeleteSharedListClick(record.shareId)}
+              />
             </Tooltip>
             <CopyToClipboard text={sharedListURL} onCopy={() => handleOnURLCopy(record.shareId)}>
               <Tooltip title={record.shareId === copiedSharedListId ? "Copied!" : "Copy URL"}>

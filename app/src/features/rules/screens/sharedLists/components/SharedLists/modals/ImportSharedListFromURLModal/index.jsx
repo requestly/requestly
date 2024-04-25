@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Input, Modal, message } from "antd";
 import { GlobalOutlined, ImportOutlined } from "@ant-design/icons";
 import { isValidRQUrl } from "utils/FormattingHelper";
-import { getSharedListIdFromImportURL, getSharedListNameFromUrl, fetchSharedListData } from "../../utils";
+import { getSharedListIdFromImportURL, getSharedListNameFromUrl, fetchSharedListData } from "../../../../utils";
 import { useNavigate } from "react-router-dom";
 import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 
