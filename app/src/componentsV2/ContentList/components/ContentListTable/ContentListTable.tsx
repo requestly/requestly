@@ -84,9 +84,8 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
         scroll={scroll}
         locale={locale}
         rowSelection={
-          !bulkActionBarConfig
-            ? null
-            : {
+          bulkActionBarConfig
+            ? {
                 checkStrictly: false,
                 selectedRowKeys: selectedRows.map((record) => (record as any)[rowKey]),
                 onChange: (selectedRowKeys, selectedRows) => {
@@ -94,6 +93,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
                   setSelectedRows(selectedRows);
                 },
               }
+            : null
         }
         expandable={{
           expandRowByClick: true,
