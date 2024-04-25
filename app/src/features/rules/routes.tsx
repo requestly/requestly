@@ -14,6 +14,7 @@ import RootComponent from "components/redirects/RootComponent";
 // V2 Imports
 import RulesContainerV2 from "./container";
 import { RulesListScreen } from "./screens/rulesList";
+import { SharedListsScreen } from "./screens/sharedLists";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -79,6 +80,10 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: joinPaths(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE, "/:ruleType"),
         element: <RuleEditor />,
+      },
+      {
+        path: `v2/${PATHS.SHARED_LISTS.RELATIVE}`,
+        element: <SharedListsScreen />,
       },
     ],
   },

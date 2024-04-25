@@ -53,7 +53,7 @@ const ContentListHeader: React.FC<ContentListHeaderProps> = ({
         </div>
       </div>
       <div className="rq-content-list-header-actions">
-        {actions.map((action) => (
+        {actions?.map((action) => (
           <Col>{action}</Col>
         ))}
       </div>
