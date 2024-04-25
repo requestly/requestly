@@ -40,7 +40,7 @@ export const useGoogleOneTapLogin = () => {
   const [isNewUser, setIsNewUser] = useState<boolean>(false);
   const [oneTapScriptInitialized, setOneTapScriptInitialized] = useState<boolean>(false);
   const [oneTapPromptShown, setOneTapPromptShown] = useState<boolean>(false);
-  const [loggedInUsingOneTap, setIsLoggedInUsingOneTap] = useState<boolean>(false);
+  const [isLoggedInUsingOneTapPrompt, setIsLoggedInUsingOneTapPrompt] = useState<boolean>(false);
   const scriptStatus = useScript(googleSignInScriptURL);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
@@ -55,7 +55,7 @@ export const useGoogleOneTapLogin = () => {
   const handleSignIn = async (credential: CredentialResponse) => {
     handleOnetapSignIn(credential).then((res) => {
       setIsNewUser(res.is_new_user);
-      setIsLoggedInUsingOneTap(true);
+      setIsLoggedInUsingOneTapPrompt(true);
     });
   };
 
@@ -88,15 +88,15 @@ export const useGoogleOneTapLogin = () => {
   useEffect(() => {
     if (!user?.loggedIn) {
       setIsNewUser(false);
-      setIsLoggedInUsingOneTap(false);
+      setIsLoggedInUsingOneTapPrompt(false);
     }
   }, [user?.loggedIn]);
 
   return {
-    initializeOnetap: () => listener,
+    initializeOneTap: () => listener,
     promptOneTap,
     shouldShowOneTapPrompt,
     isNewUser,
-    loggedInUsingOneTap,
+    isLoggedInUsingOneTapPrompt,
   };
 };

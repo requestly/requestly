@@ -10,7 +10,7 @@ interface FormProps {
 }
 
 export const OnboardingAuthForm: React.FC<FormProps> = ({ callback }) => {
-  const { isNewUser, loggedInUsingOneTap } = useGoogleOneTapLogin();
+  const { isNewUser, isLoggedInUsingOneTapPrompt } = useGoogleOneTapLogin();
   const [authMode, setAuthMode] = useState(APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP);
 
   useEffect(() => {
@@ -18,10 +18,10 @@ export const OnboardingAuthForm: React.FC<FormProps> = ({ callback }) => {
   }, []);
 
   useEffect(() => {
-    if (loggedInUsingOneTap) {
+    if (isLoggedInUsingOneTapPrompt) {
       callback.onSignInSuccess(null, isNewUser);
     }
-  }, [callback, isNewUser, loggedInUsingOneTap]);
+  }, [callback, isNewUser, isLoggedInUsingOneTapPrompt]);
   return (
     <>
       <AuthForm
