@@ -30,6 +30,11 @@ export const initSessionRecording = () => {
       case CLIENT_MESSAGES.START_RECORDING:
         sendStartRecordingEvent(message.payload);
         break;
+      case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
+        if (!sessionRecorderState.isRecording) {
+          chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
+        }
+        break;
     }
   });
 
