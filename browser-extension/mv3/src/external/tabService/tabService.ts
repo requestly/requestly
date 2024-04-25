@@ -8,6 +8,7 @@ enum DataScope {
 type TabData = chrome.tabs.Tab & {
   [DataScope.TAB]?: Record<string, any>;
   documentLifecycle?: chrome.webNavigation.WebNavigationTransitionCallbackDetails["documentLifecycle"];
+  frameId?: chrome.webNavigation.WebNavigationTransitionCallbackDetails["frameId"];
 };
 
 class TabService {
@@ -80,9 +81,13 @@ class TabService {
       const tab = this.getTab(navigatedTabData.tabId);
 
       if (tab) {
-        this.addOrUpdateTab({ ...tab, documentLifecycle: navigatedTabData.documentLifecycle });
+        this.addOrUpdateTab({
+          ...tab,
+          documentLifecycle: navigatedTabData.documentLifecycle,
+          frameId: navigatedTabData.frameId,
+        });
 
-        if (navigatedTabData.documentLifecycle === "active") {
+        if (navigatedTabData.documentLifecycle === "active" && navigatedTabData.frameId === 0) {
           tab[DataScope.TAB].messageQueue?.forEach((sendMessage: Function) => {
             sendMessage();
           });
