@@ -17,7 +17,6 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   bulkActionBarConfig?: BulkActionBarConfig<DataType>;
   locale: TableProps<DataType>["locale"];
   onRecordSelection?: (selectedRows: DataType[]) => void;
-  disableRowSelection?: boolean;
 }
 
 const ContentListTable = <DataType extends { [key: string]: any }>({
@@ -34,7 +33,6 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   onRecordSelection = () => {},
   className = "",
   onRow = (record: DataType) => ({}),
-  disableRowSelection = false,
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -86,7 +84,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
         scroll={scroll}
         locale={locale}
         rowSelection={
-          disableRowSelection
+          !bulkActionBarConfig
             ? null
             : {
                 checkStrictly: false,
