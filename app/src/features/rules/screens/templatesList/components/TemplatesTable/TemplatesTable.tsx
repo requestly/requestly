@@ -2,13 +2,16 @@ import { ContentListTable, withContentListTableContext } from "componentsV2/Cont
 import { Empty } from "antd";
 import templateRecords from "./constants/templates";
 import useTemplatesTableColumns from "./hooks/useTemplatesTableColumns";
-import { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { TemplatePreviewModal } from "../../modals/TemplatePreviewModal/TemplatePreviewModal";
 import { TemplateRecord } from "./types";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./templatesTable.scss";
 
-const TemplatesTable = () => {
+interface TemplatesTableProps {
+  searchValue: string;
+}
+const TemplatesTable: React.FC<TemplatesTableProps> = ({ searchValue }) => {
   const [isTemplatePreviewModalVisible, setIsTemplatePreviewModalVisible] = useState(false);
   const [templateToPreview, setTemplateToPreview] = useState(null);
 
@@ -16,6 +19,12 @@ const TemplatesTable = () => {
     setTemplateToPreview(template.data);
     setIsTemplatePreviewModalVisible(true);
   };
+
+  const filteredRecords = useMemo(() => {
+    return templateRecords.filter((record) => {
+      return record.name.toLowerCase().includes(searchValue.toLowerCase());
+    });
+  }, [searchValue]);
 
   const tableColumns = useTemplatesTableColumns({ handlePreviewTemplateInModal });
 
@@ -34,12 +43,11 @@ const TemplatesTable = () => {
           id="templates-list-table"
           size="small"
           columns={tableColumns}
-          data={templateRecords}
+          data={filteredRecords}
           locale={{
             emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Templates found" />,
           }}
-          disableRowSelection
-          scroll={{ y: `calc(100vh - 210px)` }}
+          scroll={{ y: `calc(100vh - 232px)` }}
         />
       </div>
     </>
