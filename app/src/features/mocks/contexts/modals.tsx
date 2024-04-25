@@ -7,6 +7,9 @@ type MocksModalsContextType = {
 
   openDeleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
   setOpenDeleteCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
+
+  openDeleteMockModalAction: (record: RQMockMetadataSchema) => void;
+  setOpenDeleteMockModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 };
 
 const MocksModalsContext = createContext<MocksModalsContextType>(null);
@@ -24,12 +27,17 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
   const [openDeleteCollectionModalAction, setOpenDeleteCollectionModalAction] = useState<ModalAction>(
     () => DEFAULT_ACTION
   );
+  const [openDeleteMockModalAction, setOpenDeleteMockModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
 
   const value = {
     openCollectionModalAction,
     setOpenCollectionModalAction,
+
     openDeleteCollectionModalAction,
     setOpenDeleteCollectionModalAction,
+
+    openDeleteMockModalAction,
+    setOpenDeleteMockModalAction,
   };
 
   return <MocksModalsContext.Provider value={value}>{children}</MocksModalsContext.Provider>;

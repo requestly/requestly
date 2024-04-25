@@ -27,7 +27,6 @@ export const useMocksTableColumns = ({
   mockType,
   handleNameClick,
   handleEditAction,
-  handleDeleteAction,
   handleSelectAction,
   handleUpdateMockCollectionAction,
   handleStarMockAction,
@@ -37,7 +36,7 @@ export const useMocksTableColumns = ({
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const { updateCollectionNameAction, deleteCollectionModalAction } = useMocksActionContext();
+  const { updateCollectionNameAction, deleteCollectionModalAction, deleteMockModalAction } = useMocksActionContext();
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
     {
@@ -252,7 +251,7 @@ export const useMocksTableColumns = ({
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleDeleteAction(record);
+              deleteMockModalAction(record);
             },
             label: (
               <Row>

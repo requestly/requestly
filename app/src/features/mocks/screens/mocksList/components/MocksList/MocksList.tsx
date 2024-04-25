@@ -24,12 +24,12 @@ import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
 import {
-  DeleteMockModal,
   MockUploaderModal,
   NewFileModal,
   UpdateMockCollectionModal,
   CreateCollectionModalWrapper,
   DeleteCollectionModalWrapper,
+  DeleteMockModalWrapper,
 } from "features/mocks/modals";
 import "./mocksList.scss";
 import { message } from "antd";
@@ -55,7 +55,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
   // TODO: Move all the actions and local state in context
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
-  const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(false);
   const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
   const [updateMockCollectionModalVisibility, setUpdateMockCollectionModalVisibility] = useState<boolean>(false);
@@ -67,7 +66,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   // TODO: Remove this after actions refactor
   const [forceRender, setForceRender] = useState(false);
 
-  const { isLoading, mocks, fetchOldMocks, fetchMocks } = useFetchMocks(type, forceRender);
+  const { isLoading, mocks } = useFetchMocks(type, forceRender);
 
   useEffect(() => {
     const filteredRecords = getQuickFilteredRecords(mocks, filter);
@@ -120,11 +119,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const handleUploadAction = () => {
     trackMockUploadWorkflowStarted(type);
     setUploadModalVisibility(true);
-  };
-
-  const handleDeleteAction = (mock: RQMockMetadataSchema) => {
-    setSelectedMock(mock);
-    setDeleteModalVisibility(true);
   };
 
   const handleUpdateMockCollectionAction = (mock: RQMockMetadataSchema) => {
@@ -208,7 +202,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleNameClick={handleNameClick}
             handleEditAction={handleEditAction}
             handleUploadAction={handleUploadAction}
-            handleDeleteAction={handleDeleteAction}
             handleUpdateMockCollectionAction={handleUpdateMockCollectionAction}
             handleStarMockAction={handleStarMockAction}
           />
@@ -223,21 +216,11 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
       />
 
-      <DeleteMockModal
-        mock={selectedMock}
-        visible={deleteModalVisibility}
-        toggleModalVisibility={(visible: boolean) => {
-          setDeleteModalVisibility(visible);
-
-          if (!visible) {
-            setSelectedMock(null);
-          }
-        }}
-        onSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
-      />
-
       <CreateCollectionModalWrapper />
       <DeleteCollectionModalWrapper />
+
+      {/* keep this at top level, in container */}
+      <DeleteMockModalWrapper />
 
       <UpdateMockCollectionModal
         mock={selectedMock}
