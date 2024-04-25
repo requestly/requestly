@@ -1,16 +1,21 @@
-import React from "react";
-import { SharedList } from "../../types";
-import { ContentListTable } from "componentsV2/ContentList";
+import React, { useMemo } from "react";
 import { Empty } from "antd";
-import "./sharedListsTable.scss";
+import { ContentListTable } from "componentsV2/ContentList";
 import { useSharedListsTableColumns } from "./hooks/useSharedListsTableColumns";
+import { SharedList } from "../../types";
+import "./sharedListsTable.scss";
 
 interface SharedListsTableProps {
   sharedLists: SharedList[];
+  searchValue: string;
 }
 
-export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists }) => {
+export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists, searchValue }) => {
   const tableColumns = useSharedListsTableColumns();
+
+  const filteredSharedLists = useMemo(() => {
+    return sharedLists.filter((sharedList) => sharedList.listName.toLowerCase().includes(searchValue.toLowerCase()));
+  }, [sharedLists, searchValue]);
 
   return (
     <div className="sharedlists-table-container">
@@ -18,7 +23,7 @@ export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists 
         id="sharedlists-table"
         size="small"
         columns={tableColumns}
-        data={sharedLists}
+        data={filteredSharedLists}
         locale={{
           emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Templates found" />,
         }}

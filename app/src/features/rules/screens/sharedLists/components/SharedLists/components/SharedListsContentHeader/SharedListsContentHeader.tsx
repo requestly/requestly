@@ -14,7 +14,7 @@ export const SharedListsContentHeader: React.FC<SharedListsContentHeaderProps> =
   return (
     <div className="sharedlist-table-header">
       <div className="sharedlist-table-breadcrumb">
-        <span className="breadcrumb-1">Shared Lists</span> {" > "} <span className="breadcrumb-2">All</span>
+        <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">Shared lists</span>
       </div>
       <ContentListHeader searchValue={searchValue} setSearchValue={handleSearchValueUpdate} />
     </div>

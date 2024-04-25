@@ -34,7 +34,7 @@ export const SharedLists = () => {
           searchValue={searchValue}
           handleSearchValueUpdate={(value: string) => setSearchValue(value)}
         />
-        <SharedListsTable sharedLists={sharedLists} />
+        <SharedListsTable sharedLists={sharedLists} searchValue={searchValue} />
       </div>
     );
   } else return <CreateSharedListCTA />;
