@@ -5,17 +5,19 @@ type SendResponseCallback = (payload: unknown) => void;
 
 const sendResponseCallbacks: { [action: string]: SendResponseCallback } = {};
 let isRecording = false;
+let isExplicitRecording = false;
+let markRecordingIcon = false;
+let widgetPosition: { top?: number; bottom?: number; left?: number; right?: number };
+let recordingStartTime: number;
 
 export const initSessionRecording = () => {
-  chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }, sendStartRecordingEvent);
+  chrome.runtime.sendMessage({ action: CLIENT_MESSAGES.INIT_SESSION_RECORDING }).then(sendStartRecordingEvent);
 
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
       case CLIENT_MESSAGES.START_RECORDING:
-        chrome.runtime.sendMessage(
-          { action: EXTENSION_MESSAGES.INIT_SESSION_RECORDING_WITH_NEW_CONFIG },
-          sendStartRecordingEvent
-        );
+        sendStartRecordingEvent(message.payload);
+        break;
     }
   });
 };
@@ -25,18 +27,39 @@ const isIframe = (): boolean => {
 };
 
 const sendStartRecordingEvent = (sessionRecordingConfig: SessionRecordingConfig) => {
-  if (sessionRecordingConfig) {
-    const isIFrame = isIframe();
+  if (!sessionRecordingConfig) {
+    return;
+  }
 
-    if (!isIFrame) {
-      addListeners();
-    }
-    sendMessageToClient("startRecording", {
-      relayEventsToTop: isIFrame,
-      console: true,
-      network: true,
-      maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
-    });
+  const {
+    notify,
+    markRecordingIcon: markIcon = true,
+    explicit = false,
+    recordingStartTime: replayStartTime = Date.now(),
+  } = sessionRecordingConfig;
+
+  const isIFrame = isIframe();
+
+  if (!isIFrame) {
+    addListeners();
+  }
+  sendMessageToClient("startRecording", {
+    relayEventsToTop: isIFrame,
+    console: true,
+    network: true,
+    maxDuration: (sessionRecordingConfig.maxDuration || 5) * 60 * 1000, // minutes -> milliseconds
+  });
+
+  isExplicitRecording = explicit;
+  markRecordingIcon = markIcon;
+
+  if (notify) {
+    showToast();
+  }
+
+  if (isExplicitRecording) {
+    recordingStartTime = replayStartTime;
+    hideAutoModeWidget();
   }
 };
 
@@ -48,10 +71,15 @@ const addListeners = () => {
         break;
 
       case CLIENT_MESSAGES.GET_TAB_SESSION:
-        if (isRecording) {
-          sendMessageToClient("getSessionData", null, sendResponse);
-        }
+        sendMessageToClient("getSessionData", null, sendResponse);
         return true; // notify sender to wait for response and not resolve request immediately
+
+      case CLIENT_MESSAGES.IS_EXPLICIT_RECORDING_SESSION:
+        sendResponse(isExplicitRecording);
+        break;
+
+      case CLIENT_MESSAGES.STOP_RECORDING:
+        sendMessageToClient("stopRecording", null);
     }
 
     return false;
@@ -68,6 +96,26 @@ const addListeners = () => {
       isRecording = true;
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED,
+        payload: {
+          markRecordingIcon,
+        },
+      });
+
+      if (isExplicitRecording) {
+        showManualModeRecordingWidget();
+      } else {
+        showAutoModeRecordingWidget();
+      }
+    } else if (event.data.action === "sessionRecordingStopped") {
+      isRecording = false;
+      isExplicitRecording = false;
+      markRecordingIcon = false;
+
+      hideManualModeWidget();
+      hideAutoModeWidget();
+
+      chrome.runtime.sendMessage({
+        action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
     }
   });
@@ -83,4 +131,110 @@ const sendMessageToClient = (action: string, payload: unknown, sendResponseCallb
   if (sendResponseCallback) {
     sendResponseCallbacks[action] = sendResponseCallback;
   }
+};
+
+const showManualModeRecordingWidget = () => {
+  let widget = getManualModeWidget();
+
+  if (!widget) {
+    widget = document.createElement("rq-session-recording-widget");
+    widget.classList.add("rq-element");
+    document.documentElement.appendChild(widget);
+
+    widget.addEventListener("stop", () => {
+      chrome.runtime.sendMessage({
+        action: EXTENSION_MESSAGES.STOP_RECORDING,
+        openRecording: true,
+      });
+    });
+
+    widget.addEventListener("discard", () => {
+      chrome.runtime.sendMessage({
+        action: EXTENSION_MESSAGES.STOP_RECORDING,
+      });
+    });
+
+    widget.addEventListener("moved", (evt: CustomEvent) => {
+      widgetPosition = evt.detail;
+    });
+  }
+
+  const recordingLimitInMilliseconds = 5 * 60 * 1000; // 5 mins * 60 secs * 1000 ms
+  const recordingTime = Date.now() - recordingStartTime;
+  const currentRecordingTime = recordingTime <= recordingLimitInMilliseconds ? recordingTime : null;
+
+  widget.dispatchEvent(
+    new CustomEvent("show", {
+      detail: {
+        currentRecordingTime,
+        position: widgetPosition,
+      },
+    })
+  );
+};
+
+const hideManualModeWidget = () => {
+  const widget = getManualModeWidget();
+  widget?.dispatchEvent(new CustomEvent("hide"));
+};
+
+const getManualModeWidget = () => {
+  return document.querySelector("rq-session-recording-widget");
+};
+
+const showAutoModeRecordingWidget = () => {
+  const tagName = "rq-session-recording-auto-mode-widget";
+  let widget = document.querySelector(tagName);
+
+  if (!widget) {
+    widget = document.createElement(tagName);
+    widget.classList.add("rq-element");
+    document.documentElement.appendChild(widget);
+
+    widget.addEventListener("watch", () => {
+      chrome.runtime.sendMessage({
+        action: EXTENSION_MESSAGES.WATCH_RECORDING,
+      });
+    });
+
+    widget.addEventListener("moved", (evt: CustomEvent) => {
+      widgetPosition = evt.detail;
+    });
+  }
+
+  widget.dispatchEvent(
+    new CustomEvent("show", {
+      detail: {
+        position: widgetPosition,
+      },
+    })
+  );
+};
+
+const hideAutoModeWidget = () => {
+  let widget = document.querySelector("rq-session-recording-auto-mode-widget");
+  widget?.dispatchEvent(new CustomEvent("hide"));
+};
+
+const showToast = () => {
+  const rqToast = document.createElement("rq-toast");
+  rqToast.classList.add("rq-element");
+  rqToast.setAttribute("heading", "Requestly is recording session on this tab!");
+  rqToast.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
+  const rqToastContent = `
+  <div slot="content">
+    You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.
+  </div>
+  `;
+  try {
+    rqToast.innerHTML = rqToastContent;
+  } catch (e) {
+    // @ts-ignore
+    const trustedTypesPolicy = window.trustedTypes?.createPolicy?.("rq-html-policy", {
+      createHTML: (html: HTMLElement) => html,
+    });
+    rqToast.innerHTML = trustedTypesPolicy.createHTML(rqToastContent);
+  }
+
+  document.documentElement.appendChild(rqToast);
 };

@@ -11,6 +11,8 @@ import { toast } from "utils/Toast";
 import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import "./index.scss";
+import { getSSOProviderId } from "backend/auth/sso";
+import { loginWithSSO } from "actions/FirebaseActions";
 
 interface Props {
   email: string;
@@ -24,7 +26,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
   const [isNoConnectionFoundCardVisible, setIsNoConnectionFoundCardVisible] = useState(false);
   const domain = getDomainFromEmail(email);
 
-  const handleCaptureSSOInterest = useCallback(() => {
+  const handleLoginWithSSO = useCallback(async () => {
     if (!email) {
       toast.error("Please enter your email");
       return;
@@ -34,6 +36,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
       toast.error("Please enter a valid email");
       return;
     }
+
     trackLoginAttemptedEvent({
       auth_provider: AUTH_PROVIDERS.SSO,
       email,
@@ -44,19 +47,25 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
     });
 
     setIsLoading(true);
-    const captureSSOInterest = httpsCallable(getFunctions(), "auth-captureSSOInterest");
 
-    captureSSOInterest({ email })
-      .then(() => {
-        Logger.log("SSO interest captured successfully");
-      })
-      .catch((error) => {
-        Logger.log("Error capturing SSO interest", error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-        setIsNoConnectionFoundCardVisible(true);
-      });
+    const providerId = await getSSOProviderId(email);
+    setIsNoConnectionFoundCardVisible(false);
+
+    if (providerId) {
+      await loginWithSSO(providerId);
+    } else {
+      setIsNoConnectionFoundCardVisible(true);
+      const captureSSOInterest = httpsCallable(getFunctions(), "auth-captureSSOInterest");
+
+      captureSSOInterest({ email })
+        .then(() => {
+          Logger.log("SSO interest captured successfully");
+        })
+        .catch((error) => {
+          Logger.log("Error capturing SSO interest", error);
+        });
+    }
+    setIsLoading(false);
   }, [email, source]);
 
   return (
@@ -76,7 +85,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
           <div>
             <div className="text-bold sso-not-found-card-header">Unknown SSO connection for {domain}</div>
             <div className="sso-not-found-card-text">
-              Don’t have Requestly enterprise plan yet? Contact us at{" "}
+              Don't have Requestly enterprise plan yet? Contact us at{" "}
               <a className="sso-not-found-card-link" href="mailto:sales@requestly.io">
                 sales@requestly.io
               </a>{" "}
@@ -90,10 +99,13 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
         <AuthFormInput
           id="email"
           value={email}
-          onValueChange={(email) => setEmail(email)}
+          onValueChange={(email) => {
+            setEmail(email);
+            setIsNoConnectionFoundCardVisible(false);
+          }}
           placeholder="E.g., you@company.com"
           label="Your work email"
-          onPressEnter={handleCaptureSSOInterest}
+          onPressEnter={handleLoginWithSSO}
         />
       </div>
       <RQButton
@@ -102,7 +114,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
         type="primary"
         className="sso-screen-continue-btn mt-16"
         loading={isLoading}
-        onClick={handleCaptureSSOInterest}
+        onClick={handleLoginWithSSO}
       >
         Continue
       </RQButton>
