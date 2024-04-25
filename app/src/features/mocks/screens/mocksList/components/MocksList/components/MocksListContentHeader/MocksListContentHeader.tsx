@@ -11,6 +11,9 @@ import { getUserAuthDetails } from "store/selectors";
 import { MdOutlineCreateNewFolder } from "@react-icons/all-files/md/MdOutlineCreateNewFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { isRecordMock } from "../MocksTable/utils";
+import { useMocksActionContext } from "features/mocks/contexts/actions";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   mockType?: string;
@@ -18,7 +21,6 @@ interface Props {
   mocks: RQMockMetadataSchema[];
   handleUploadAction?: () => void;
   handleCreateNew: () => void;
-  handleCreateNewCollection?: () => void;
   searchValue?: string;
   setSearchValue?: (s: string) => void;
   filter: MockTableHeaderFilter;
@@ -31,17 +33,19 @@ export const MocksListContentHeader: React.FC<Props> = ({
   mockType,
   filter,
   handleCreateNew,
-  handleCreateNewCollection,
   handleUploadAction,
   searchValue,
   setSearchValue = () => {},
   setFilter,
 }) => {
   const user = useSelector(getUserAuthDetails);
+  const { pathname } = useLocation();
+  const { createNewCollectionAction } = useMocksActionContext();
+  const isRulesEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const actionbuttonsData = [
     {
-      hide: !handleUploadAction,
+      hide: isRulesEditor,
       type: "text" as ButtonProps["type"],
       icon: <CloudUploadOutlined />,
       buttonText: `Upload ${mockType === MockType.FILE ? "File" : "JSON"}`,
@@ -54,22 +58,22 @@ export const MocksListContentHeader: React.FC<Props> = ({
       },
     },
     {
-      hide: !handleCreateNewCollection,
+      hide: isRulesEditor,
       type: "default" as ButtonProps["type"],
       icon: <MdOutlineCreateNewFolder className="anticon" />,
       buttonText: "New Collection",
-      onClickHandler: () => user?.details?.isLoggedIn && handleCreateNewCollection?.(),
+      onClickHandler: () => user?.details?.isLoggedIn && createNewCollectionAction(mockType),
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to create a collection!",
-        callback: handleCreateNewCollection,
+        callback: () => createNewCollectionAction(mockType),
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
     {
       type: "primary" as ButtonProps["type"],
       icon: <PlusOutlined />,
-      buttonText: mockType === MockType.API ? "New Mock" : "New File",
+      buttonText: mockType ? (mockType === MockType.API ? "New Mock" : "New File") : "New Mock",
       onClickHandler: () => (user?.loggedIn || mockType === MockType.FILE) && handleCreateNew?.(),
       isAuthRequired: true,
       authPopover: {
