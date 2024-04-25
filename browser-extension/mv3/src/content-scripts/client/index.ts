@@ -19,6 +19,9 @@ if (document.doctype?.name === "html" || document.contentType?.includes("html"))
       case CLIENT_MESSAGES.EXECUTE_SCRIPT:
         executeDynamicScriptOnPage(message.code);
         break;
+      case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
+        chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
+        break;
     }
     return false;
   });

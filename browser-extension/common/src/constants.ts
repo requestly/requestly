@@ -24,6 +24,7 @@ export const EXTENSION_MESSAGES = {
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
   CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD: "cacheRecordedSessionOnPageUnload",
   INIT_SESSION_RECORDER: "initSessionRecorder",
+  CLIENT_PAGE_LOADED: "clientPageLoaded",
 };
 
 export const CLIENT_MESSAGES = {

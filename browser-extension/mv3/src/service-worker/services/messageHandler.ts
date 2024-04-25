@@ -38,7 +38,10 @@ export const initMessageHandler = () => {
           frameIds: [sender.frameId],
         });
         initCustomWidgets(sender.tab?.id, sender.frameId);
-        applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
+        applyScriptRules(sender.tab?.id, sender.frameId, sender.tab.url);
+        break;
+
+      case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
 

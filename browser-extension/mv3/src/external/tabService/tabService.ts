@@ -1,3 +1,5 @@
+import { EXTENSION_MESSAGES } from "common/constants";
+
 type TabId = chrome.tabs.Tab["id"];
 
 enum DataScope {
@@ -62,9 +64,20 @@ class TabService {
       const newTabState = {
         ...tab,
         [DataScope.TAB]: existingTab[DataScope.TAB] || {},
+        documentLifecycle: existingTab.documentLifecycle,
+        frameId: existingTab.frameId,
       };
 
       this.addOrUpdateTab(newTabState);
+
+      if (tab.status === "complete" && existingTab.documentLifecycle === "active" && existingTab.frameId === 0) {
+        this.sendMessage(tabId, { action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED }, () => {
+          existingTab[DataScope.TAB].messageQueue?.forEach((sendMessage: Function) => {
+            sendMessage();
+          });
+          this.clearMessageQueue(tabId);
+        });
+      }
     });
 
     chrome.webRequest.onBeforeRequest.addListener(
@@ -83,16 +96,10 @@ class TabService {
       if (tab) {
         this.addOrUpdateTab({
           ...tab,
-          documentLifecycle: navigatedTabData.documentLifecycle,
-          frameId: navigatedTabData.frameId,
+          documentLifecycle:
+            tab.documentLifecycle !== "active" ? navigatedTabData.documentLifecycle : tab.documentLifecycle,
+          frameId: tab.frameId !== 0 ? navigatedTabData.frameId : tab.frameId,
         });
-
-        if (navigatedTabData.documentLifecycle === "active" && navigatedTabData.frameId === 0) {
-          tab[DataScope.TAB].messageQueue?.forEach((sendMessage: Function) => {
-            sendMessage();
-          });
-          this.clearMessageQueue(navigatedTabData.tabId);
-        }
       }
     });
   }
@@ -179,7 +186,7 @@ class TabService {
     const send = () => this.sendMessage(tabId, ...args);
 
     // message queue to handle the prerendered pages. If the tab is not active/prerendered, push the message to queue
-    if (tab.documentLifecycle === "active" || tab.documentLifecycle === undefined) {
+    if (tab.status === "complete" && tab.documentLifecycle === "active") {
       send();
     } else {
       this.pushToQueue(tabId, send);
