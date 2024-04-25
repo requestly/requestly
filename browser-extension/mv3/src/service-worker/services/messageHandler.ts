@@ -17,13 +17,12 @@ import {
   watchRecording,
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
-import { tabService } from "../../external/tabService/tabService";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
   getAppTabs().then((tabs) => {
     tabs.forEach(({ id }) => {
-      tabService.sendMessageToTab(id, messageObject, callback);
+      chrome.tabs.sendMessage(id, messageObject, callback);
     });
   });
 };

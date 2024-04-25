@@ -71,12 +71,7 @@ class TabService {
       this.addOrUpdateTab(newTabState);
 
       if (tab.status === "complete" && existingTab.documentLifecycle === "active" && existingTab.frameId === 0) {
-        this.sendMessage(tabId, { action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED }, () => {
-          existingTab[DataScope.TAB].messageQueue?.forEach((sendMessage: Function) => {
-            sendMessage();
-          });
-          this.clearMessageQueue(tabId);
-        });
+        this.sendMessage(tabId, { action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
       }
     });
 
@@ -106,27 +101,6 @@ class TabService {
 
   private sendMessage(tabId: TabId, ...args: [any, any?, ((response: any) => void)?]) {
     chrome.tabs.sendMessage(tabId, ...args);
-  }
-
-  private pushToQueue(tabId: TabId, message: any) {
-    const tab = this.getTab(tabId);
-
-    if (!tab) {
-      return;
-    }
-
-    if (!tab[DataScope.TAB].messageQueue) {
-      tab[DataScope.TAB].messageQueue = [];
-    }
-
-    tab[DataScope.TAB].messageQueue.push(message);
-  }
-
-  private clearMessageQueue(tabId: TabId) {
-    const tab = this.getTab(tabId);
-    if (tab && tab[DataScope.TAB] && tab[DataScope.TAB].messageQueue) {
-      tab[DataScope.TAB].messageQueue = [];
-    }
   }
 
   addOrUpdateTab(tab: TabData) {
@@ -178,19 +152,6 @@ class TabService {
 
   closeTab(tabId: TabId) {
     chrome.tabs.remove(tabId);
-  }
-
-  sendMessageToTab(tabId: TabId, ...args: [any, any?, ((response: any) => void)?]) {
-    const tab = this.getTab(tabId);
-
-    const send = () => this.sendMessage(tabId, ...args);
-
-    // message queue to handle the prerendered pages. If the tab is not active/prerendered, push the message to queue
-    if (tab.status === "complete" && tab.documentLifecycle === "active") {
-      send();
-    } else {
-      this.pushToQueue(tabId, send);
-    }
   }
 
   setData(tabId: TabId, key: any, value: any) {
