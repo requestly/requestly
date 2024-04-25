@@ -14,6 +14,7 @@ export const EXTENSION_MESSAGES = {
   GET_RULES_AND_GROUPS: "getRulesAndGroups",
   GET_TAB_SESSION: "getTabSession",
   HANDSHAKE_CLIENT: "handshakeClient",
+  GET_API_RESPONSE: "getAPIResponse",
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_NO_RULES_PRESENT: "checkIfNoRulesPresent",
   INIT_SESSION_RECORDING_WITH_NEW_CONFIG: "initSessionRecordingWithNewConfig",
