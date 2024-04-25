@@ -40,7 +40,7 @@ export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists,
           columns={tableColumns}
           data={filteredSharedLists}
           locale={{
-            emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Templates found" />,
+            emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Shared list found" />,
           }}
           scroll={{ y: `calc(100vh - 232px)` }}
         />
