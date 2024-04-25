@@ -20,6 +20,7 @@ import { RQButton } from "lib/design-system/components";
 import { MocksTableProps } from "../MocksTable";
 import REQUEST_METHOD_COLORS from "components/features/mocksV2/MockList/MocksTable/constants/requestMethodColors";
 import { isRecordMockCollection } from "../utils";
+import { useMocksActionContext } from "features/mocks/contexts/actions";
 
 // TODO: move all actions in a hook and use that
 export const useMocksTableColumns = ({
@@ -28,7 +29,6 @@ export const useMocksTableColumns = ({
   handleEditAction,
   handleDeleteAction,
   handleSelectAction,
-  handleUpdateCollectionAction,
   handleDeleteCollectionAction,
   handleUpdateMockCollectionAction,
   handleStarMockAction,
@@ -37,6 +37,8 @@ export const useMocksTableColumns = ({
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+
+  const { updateCollectionNameAction } = useMocksActionContext();
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
     {
@@ -169,7 +171,7 @@ export const useMocksTableColumns = ({
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleUpdateCollectionAction(record);
+              updateCollectionNameAction(mockType, record);
             },
             label: (
               <Row>

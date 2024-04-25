@@ -25,11 +25,11 @@ import { GettingStarted, MocksListContentHeader, MocksTable } from "./components
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
 import {
   DeleteMockModal,
-  CreateCollectionModal,
   MockUploaderModal,
   NewFileModal,
   DeleteCollectionModal,
   UpdateMockCollectionModal,
+  CreateCollectionModalWrapper,
 } from "features/mocks/modals";
 import "./mocksList.scss";
 import { message } from "antd";
@@ -58,7 +58,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [deleteModalVisibility, setDeleteModalVisibility] = useState<boolean>(false);
   const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
-  const [collectionModalVisibility, setCollectionModalVisibility] = useState<boolean>(false);
   const [deleteCollectionModalVisibility, setDeleteCollectionModalVisibility] = useState<boolean>(false);
   const [updateMockCollectionModalVisibility, setUpdateMockCollectionModalVisibility] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
@@ -91,10 +90,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     }
     trackNewMockButtonClicked(type, "mock_list");
     return redirectToMockEditorCreateMock(navigate);
-  };
-
-  const handleCreateNewCollection = () => {
-    setCollectionModalVisibility(true);
   };
 
   const handleNameClick = (mockId: string, isOldMock: boolean) => {
@@ -133,11 +128,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setDeleteModalVisibility(true);
   };
 
-  const handleUpdateCollectionAction = (collection: RQMockMetadataSchema) => {
-    setSelectedMock(collection);
-    setCollectionModalVisibility(true);
-  };
-
   const handleDeleteCollectionAction = (collection: RQMockMetadataSchema) => {
     setSelectedMock(collection);
     setDeleteCollectionModalVisibility(true);
@@ -173,7 +163,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     }
   };
 
-  const collections = (mocks.filter((mock) => isRecordMockCollection(mock)) as unknown) as RQMockCollection[];
+  const collections = mocks.filter((mock) => isRecordMockCollection(mock)) as unknown as RQMockCollection[];
 
   return isLoading ? (
     <SpinnerCard customLoadingMessage="Loading Mocks" />
@@ -210,7 +200,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
           searchValue={searchValue}
           setSearchValue={handleSearch}
           handleCreateNew={handleCreateNewMock}
-          handleCreateNewCollection={handleCreateNewCollection}
           handleUploadAction={handleUploadAction}
           filter={filter}
           setFilter={setFilter}
@@ -226,7 +215,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleEditAction={handleEditAction}
             handleUploadAction={handleUploadAction}
             handleDeleteAction={handleDeleteAction}
-            handleUpdateCollectionAction={handleUpdateCollectionAction}
             handleDeleteCollectionAction={handleDeleteCollectionAction}
             handleUpdateMockCollectionAction={handleUpdateMockCollectionAction}
             handleStarMockAction={handleStarMockAction}
@@ -255,27 +243,10 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         onSuccess={selectedMock?.isOldMock ? fetchOldMocks : fetchMocks}
       />
 
-      <CreateCollectionModal
-        id={selectedMock?.id}
-        name={selectedMock?.name}
-        description={selectedMock?.desc}
-        mockType={type}
-        visible={collectionModalVisibility}
-        toggleModalVisibility={(visible: boolean) => {
-          setCollectionModalVisibility(visible);
-
-          if (!visible) {
-            setSelectedMock(null);
-          }
-        }}
-        onSuccess={() => {
-          _forceRender();
-          setSelectedMock(null);
-        }}
-      />
+      <CreateCollectionModalWrapper />
 
       <DeleteCollectionModal
-        collection={(selectedMock as unknown) as RQMockCollection}
+        collection={selectedMock as unknown as RQMockCollection}
         visible={deleteCollectionModalVisibility}
         toggleModalVisibility={(visible: boolean) => {
           setDeleteCollectionModalVisibility(visible);
