@@ -683,13 +683,13 @@ export const loginWithSSO = async (providerId) => {
 
   const auth = getAuth(firebaseApp);
 
-  signInWithPopup(auth, provider)
+  return signInWithPopup(auth, provider)
     .then((result) => {
-      console.log({ result });
+      // console.log({ result });
       result.user
         .getIdToken()
         .then((tokenValue) => {
-          console.log({ tokenValue });
+          // console.log({ tokenValue });
         })
         .catch((err) => console.log(err));
       // User is signed in.
