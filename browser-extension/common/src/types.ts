@@ -63,6 +63,10 @@ export interface SessionRecordingConfig {
     isActive: boolean;
     mode: AutoRecordingMode;
   };
+  explicit?: boolean;
+  markRecordingIcon?: boolean;
+  notify?: boolean;
+  recordingStartTime?: number;
 }
 
 export interface RulePair {

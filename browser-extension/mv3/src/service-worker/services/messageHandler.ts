@@ -4,7 +4,17 @@ import { initClientHandler } from "./clientHandler";
 import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
 import { getExecutedRules } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
-import { getTabSession, initSessionRecording, onSessionRecordingStartedNotification } from "./sessionRecording";
+import {
+  getTabSession,
+  initSessionRecording,
+  launchUrlAndStartRecording,
+  onSessionRecordingStartedNotification,
+  onSessionRecordingStoppedNotification,
+  startRecordingExplicitly,
+  stopRecording,
+  watchRecording,
+} from "./sessionRecording";
+import { initCustomWidgets } from "./customWidgets";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -29,18 +39,28 @@ export const initMessageHandler = () => {
           });
           applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         });
+        initCustomWidgets(sender.tab?.id, sender.frameId);
+        applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         break;
 
       case CLIENT_MESSAGES.INIT_SESSION_RECORDING:
         initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url).then(sendResponse);
         return true;
 
-      case EXTENSION_MESSAGES.INIT_SESSION_RECORDING_WITH_NEW_CONFIG:
-        initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url, true).then(sendResponse);
-        return true;
-
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
-        onSessionRecordingStartedNotification(sender.tab.id);
+        onSessionRecordingStartedNotification(sender.tab.id, message.payload.markRecordingIcon);
+        break;
+      case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
+        onSessionRecordingStoppedNotification(sender.tab.id);
+        break;
+      case EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
+        startRecordingExplicitly(message.tab, message.showWidget);
+        break;
+      case EXTENSION_MESSAGES.START_RECORDING_ON_URL:
+        launchUrlAndStartRecording(message.url);
+        break;
+      case EXTENSION_MESSAGES.STOP_RECORDING:
+        stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
         break;
 
       case EXTENSION_MESSAGES.GET_TAB_SESSION:
@@ -66,6 +86,10 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
         toggleExtensionStatus().then(sendResponse);
         return true;
+
+      case EXTENSION_MESSAGES.WATCH_RECORDING:
+        watchRecording(message.tabId ?? sender.tab?.id);
+        break;
     }
 
     return false;

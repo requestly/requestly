@@ -21,11 +21,15 @@ const DashboardLayout = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { pathname } = location;
-  const { promptOneTapOnLoad } = useGoogleOneTapLogin();
+  const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
 
-  promptOneTapOnLoad();
+  initializeOneTap();
+
+  if (shouldShowOneTapPrompt()) {
+    promptOneTap();
+  }
 
   const isSidebarVisible = useMemo(
     () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname)),
