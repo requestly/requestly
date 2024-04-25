@@ -25,7 +25,6 @@ export interface MocksTableProps {
   handleEditAction?: (mockId: string, isOldMock: boolean) => void;
   handleSelectAction?: (url: string) => void;
   handleUploadAction?: () => void;
-  handleDeleteCollectionAction?: (collection: RQMockMetadataSchema) => void;
   handleUpdateMockCollectionAction?: (mock: RQMockMetadataSchema) => void;
   handleStarMockAction?: (mock: RQMockSchema) => void;
 }
@@ -39,7 +38,6 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   handleEditAction,
   handleSelectAction,
   handleDeleteAction,
-  handleDeleteCollectionAction,
   handleUpdateMockCollectionAction,
   handleStarMockAction,
 }) => {
@@ -65,7 +63,6 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     handleEditAction,
     handleDeleteAction,
     handleSelectAction,
-    handleDeleteCollectionAction,
     handleUpdateMockCollectionAction,
     handleStarMockAction,
   });
