@@ -2,7 +2,6 @@ import React from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { Row } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { RQModal } from "lib/design-system/components";
 import Logger from "lib/logger";
@@ -13,6 +12,8 @@ import { deleteMock } from "backend/mocks/deleteMock";
 import { trackDeleteMockEvent } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQMockMetadataSchema } from "components/features/mocksV2/types";
+import deleteIcon from "../assets/delete.svg";
+import "./deleteMockModal.scss";
 
 interface Props {
   visible: boolean;
@@ -66,31 +67,19 @@ export const DeleteMockModal: React.FC<Props> = ({ visible, mock, toggleModalVis
   };
 
   return (
-    <RQModal centered open={visible} destroyOnClose={true} onCancel={handleCancel}>
-      <div className="rq-modal-content">
-        <div className="header">Delete Mock</div>
-        <div className="text-gray text-sm mt-1">
-          <p>
-            Do you really want to delete <span className="text-bold text-white">{mock?.name}</span> mock?
-          </p>
-        </div>
+    <RQModal open={visible} destroyOnClose={true} onCancel={handleCancel} className="delete-mock-modal">
+      <img width={32} height={32} src={deleteIcon} alt="Delete collection" className="icon" />
+      <div className="header">Delete this mock?</div>
+      <div className="description">
+        This action will permanently delete this mock. <br /> Are you sure you want to delete?
       </div>
-      <div className="rq-modal-footer">
-        <Row justify="end">
-          <RQButton type="default" onClick={handleCancel}>
-            Cancel
-          </RQButton>
-          <RQButton
-            danger
-            type="primary"
-            loading={isDeleting}
-            disabled={isDeleting}
-            onClick={handleOnConfirm}
-            className="ml-2"
-          >
-            {isDeleting ? "Deleting" : "Delete"}
-          </RQButton>
-        </Row>
+      <div className="actions">
+        <RQButton block type="default" onClick={handleCancel}>
+          Cancel
+        </RQButton>
+        <RQButton block danger type="primary" loading={isDeleting} disabled={isDeleting} onClick={handleOnConfirm}>
+          Delete
+        </RQButton>
       </div>
     </RQModal>
   );
