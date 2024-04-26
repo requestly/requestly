@@ -1,0 +1,44 @@
+.rq-templates-table {
+  .template-name {
+    color: var(--link-color);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .template-description {
+    font-size: 13px;
+    color: var(--requestly-color-neutral-300);
+  }
+
+  .templates-actions-container {
+    display: flex;
+    justify-content: flex-end;
+
+    .ant-btn {
+      opacity: 0.5;
+      transition: all 0.2s;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .template-rule-tags {
+    display: flex;
+    margin-top: 4px;
+    gap: 8px;
+    align-items: center;
+
+    .rule-type-tag {
+      color: var(--requestly-color-neutral-300);
+    }
+  }
+
+  .ant-table.ant-table-small .ant-table-tbody > tr > td {
+    padding: 8px 12px;
+  }
+}

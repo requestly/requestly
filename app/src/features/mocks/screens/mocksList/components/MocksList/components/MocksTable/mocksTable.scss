@@ -1,20 +1,8 @@
 .rq-mocks-list-table {
-  .ant-table-cell.ant-table-selection-column .ant-checkbox-wrapper {
-    display: none;
-  }
-
   .rq-col-title {
     display: flex;
     align-items: center;
     gap: 8px;
-  }
-
-  .ant-table-cell.ant-table-selection-column {
-    max-width: 0px;
-
-    .ant-checkbox-wrapper {
-      display: none;
-    }
   }
 
   .rq-mocks-list-table-row {
