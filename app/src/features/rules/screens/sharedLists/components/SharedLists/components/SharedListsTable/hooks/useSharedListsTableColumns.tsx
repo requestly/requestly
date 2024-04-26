@@ -9,7 +9,7 @@ import { MdOutlineFileCopy } from "@react-icons/all-files/md/MdOutlineFileCopy";
 // @ts-ignore
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { getSharedListURL } from "utils/PathUtils";
-import { trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
+import { trackSharedListUrlCopied } from "../../../analytics";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +23,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
 
   const handleOnURLCopy = useCallback((id: string) => {
-    trackSharedListUrlCopied("shared_list_list");
+    trackSharedListUrlCopied("shared_list_list", id);
     setCopiedSharedListId(id);
     trackRQLastActivity("sharedList_url_copied");
     setTimeout(() => {

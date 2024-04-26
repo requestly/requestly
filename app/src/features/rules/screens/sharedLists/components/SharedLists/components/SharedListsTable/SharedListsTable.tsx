@@ -7,6 +7,7 @@ import DeleteSharedListModal from "../../modals/DeleteSharedListModal";
 import { useSharedListsTableColumns } from "./hooks/useSharedListsTableColumns";
 import { SharedList } from "../../types";
 import "./sharedListsTable.scss";
+import { trackSharedListDeleteClicked } from "../../analytics";
 
 interface SharedListsTableProps {
   sharedLists: SharedList[];
@@ -23,6 +24,7 @@ export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists,
   }, [sharedLists, searchValue]);
 
   const handleDeleteSharedListClick = (sharedListId: string) => {
+    trackSharedListDeleteClicked(sharedListId);
     setSharedListIdsToDelete([sharedListId]);
     setIsDeleteSharedListModalVisible(true);
   };
