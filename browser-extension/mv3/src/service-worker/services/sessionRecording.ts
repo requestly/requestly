@@ -4,8 +4,7 @@ import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } 
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
 import config from "common/config";
-import { tabService } from "../../external/tabService/tabService";
-import { TAB_SERVICE_DATA } from "../../external/tabService/constants";
+import { TAB_SERVICE_DATA, tabService } from "./tabService";
 
 const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 

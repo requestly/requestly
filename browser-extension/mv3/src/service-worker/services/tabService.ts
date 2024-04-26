@@ -192,3 +192,7 @@ class TabService {
 const tabService = TabService.getInstance();
 
 export { tabService };
+
+export const TAB_SERVICE_DATA = {
+  SESSION_RECORDING: "sessionRecording",
+};
