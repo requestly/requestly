@@ -42,7 +42,6 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
     Table.SELECTION_COLUMN,
     {
       title: "Name",
-      dataIndex: "listName",
       key: "listName",
       width: 400,
       render: (_: any, record: SharedList) => {
@@ -58,7 +57,6 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
     },
     {
       title: "Created on ",
-      dataIndex: "creationDate",
       key: "creationDate",
       width: 150,
       render: (creationDate: number) => {
@@ -67,7 +65,6 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
     },
     {
       title: "Imported",
-      dataIndex: "importCount",
       key: "importCount",
       width: 100,
 
