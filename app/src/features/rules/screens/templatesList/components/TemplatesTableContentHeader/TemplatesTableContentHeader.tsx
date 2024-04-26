@@ -1,6 +1,6 @@
-import { BreadCrumb } from "componentsV2/BreadCrumb";
-import { ContentListHeader } from "componentsV2/ContentList";
 import React from "react";
+import { ContentListHeader } from "componentsV2/ContentList";
+import "./templatesTableContentHeader.scss";
 
 interface TemplatesTableContentHeaderProps {
   searchValue: string;
@@ -13,7 +13,9 @@ export const TemplatesTableContentHeader: React.FC<TemplatesTableContentHeaderPr
 }) => {
   return (
     <>
-      <BreadCrumb items={["Rules", "Templates"]} />
+      <div className="templates-table-breadcrumb">
+        <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">Templates</span>
+      </div>
       <ContentListHeader searchValue={searchValue} setSearchValue={handleSearchValueUpdate} />
     </>
   );
