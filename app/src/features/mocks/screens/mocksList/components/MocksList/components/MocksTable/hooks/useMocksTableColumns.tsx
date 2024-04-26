@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
 import { Button, Dropdown, MenuProps, Row, Table, Typography, message } from "antd";
-import { RQMockMetadataSchema, MockType } from "components/features/mocksV2/types";
+import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { CalendarOutlined, EditOutlined } from "@ant-design/icons";
@@ -10,6 +10,7 @@ import { UserIcon } from "components/common/UserIcon";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
 import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
+import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineDriveFileMove } from "@react-icons/all-files/md/MdOutlineDriveFileMove";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
@@ -30,13 +31,14 @@ export const useMocksTableColumns = ({
   handleUpdateCollectionAction,
   handleDeleteCollectionAction,
   handleUpdateMockCollectionAction,
+  handleStarMockAction,
 }: Partial<MocksTableProps>) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const columns: ContentListTableProps<RQMockMetadataSchema>["columns"] = [
+  const columns: ContentListTableProps<RQMockSchema>["columns"] = [
     {
       ...Table.SELECTION_COLUMN,
       width: 0,
@@ -52,8 +54,10 @@ export const useMocksTableColumns = ({
       dataIndex: "name",
       ellipsis: true,
       width: 320,
-      render: (_: any, record: RQMockMetadataSchema) => {
-        return isRecordMockCollection(record) ? (
+      render: (_: any, record: RQMockSchema) => {
+        const isCollection = isRecordMockCollection(record);
+
+        return isCollection ? (
           <div className="mock-collection-details-container">
             <span className="collection-icon">
               <MdOutlineFolder />
@@ -68,36 +72,50 @@ export const useMocksTableColumns = ({
             </Typography.Text>
           </div>
         ) : (
-          <div
-            className="mock-details-container"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              if (!isRecordMockCollection(record)) {
-                handleNameClick(record.id, record.isOldMock);
-              }
-            }}
-          >
-            <div className="mock-name-container">
-              <span
-                className="mock-type"
-                style={{
-                  color:
-                    record?.type === MockType.API
-                      ? REQUEST_METHOD_COLORS[record.method]
-                      : fileTypeColorMap[record.fileType],
+          <div className="mock-name-details-container">
+            {isCollection ? null : (
+              <Button
+                type="text"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStarMockAction(record);
                 }}
+                className="mock-star-btn"
               >
-                {record?.type === MockType.API ? record.method : record.fileType}
-              </span>
+                <MdOutlineStarOutline className={record.isFavourite ? "starred" : "unstarred"} />
+              </Button>
+            )}
+            <div
+              className="mock-details-container"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-              <Typography.Text ellipsis={true} className="primary-cell mock-name">
-                {record.name}
-              </Typography.Text>
-            </div>
-            <div className="mock-endpoint">
-              <Typography.Text ellipsis={true}>{"/" + record.endpoint}</Typography.Text>
+                if (!isRecordMockCollection(record)) {
+                  handleNameClick(record.id, record.isOldMock);
+                }
+              }}
+            >
+              <div className="mock-name-container">
+                <span
+                  className="mock-type"
+                  style={{
+                    color:
+                      record?.type === MockType.API
+                        ? REQUEST_METHOD_COLORS[record.method]
+                        : fileTypeColorMap[record.fileType],
+                  }}
+                >
+                  {record?.type === MockType.API ? record.method : record.fileType}
+                </span>
+
+                <Typography.Text ellipsis={true} className="primary-cell mock-name">
+                  {record.name}
+                </Typography.Text>
+              </div>
+              <div className="mock-endpoint">
+                <Typography.Text ellipsis={true}>{"/" + record.endpoint}</Typography.Text>
+              </div>
             </div>
           </div>
         );
@@ -109,7 +127,7 @@ export const useMocksTableColumns = ({
       width: 70,
       responsive: ["lg"],
       className: "text-gray",
-      render: (_: any, record: RQMockMetadataSchema) => {
+      render: (_: any, record: RQMockSchema) => {
         return (
           <div className="mock-table-user-icon">
             <UserIcon uid={record.createdBy} />
@@ -128,7 +146,7 @@ export const useMocksTableColumns = ({
       width: 120,
       responsive: ["lg"],
       className: "text-gray",
-      render: (_: any, record: RQMockMetadataSchema) => {
+      render: (_: any, record: RQMockSchema) => {
         return (
           <>
             {moment(record.updatedTs).format("MMM DD, YYYY") + (record.isOldMock ? "." : "")}{" "}
@@ -145,7 +163,7 @@ export const useMocksTableColumns = ({
       key: "actions",
       align: "right",
       width: 70,
-      render: (_: any, record: RQMockMetadataSchema) => {
+      render: (_: any, record: RQMockSchema) => {
         const collectionActions: MenuProps["items"] = [
           {
             key: 0,

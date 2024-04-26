@@ -1,5 +1,5 @@
 import SpinnerCard from "components/misc/SpinnerCard";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   redirectToFileMockEditorEditMock,
@@ -14,6 +14,7 @@ import {
   MockType,
   RQMockCollection,
   RQMockMetadataSchema,
+  RQMockSchema,
 } from "components/features/mocksV2/types";
 import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
@@ -27,6 +28,11 @@ import {
   UpdateMockCollectionModal,
 } from "features/mocks/modals";
 import "./mocksList.scss";
+import { message } from "antd";
+import { updateMock } from "backend/mocks/updateMock";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
 interface Props {
   source?: MockListSource;
@@ -36,6 +42,10 @@ interface Props {
 
 const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const navigate = useNavigate();
+  const user = useSelector(getUserAuthDetails);
+  const uid = user?.details?.profile?.uid;
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const teamId = workspace?.id;
 
   // TODO: Move all the actions and local state in context
   const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
@@ -58,6 +68,10 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     // TODO: check for rerenders
     setFilteredMocks([...mocks]);
   }, [mocks]);
+
+  const _forceRender = useCallback(() => {
+    setForceRender((prev) => !prev);
+  }, []);
 
   const handleCreateNewMock = () => {
     if (source === MockListSource.PICKER_MODAL) {
@@ -127,6 +141,16 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setUpdateMockCollectionModalVisibility(true);
   };
 
+  const handleStarMockAction = (record: RQMockSchema) => {
+    const isStarred = record.isFavourite;
+
+    message.loading(isStarred ? "Removing from starred mocks" : "Adding into starred mocks", 3);
+    updateMock(uid, record.id, { ...record, isFavourite: !record.isFavourite }, teamId).then(() => {
+      message.success(isStarred ? "Mock unstarred!" : "Mock starred!");
+      _forceRender();
+    });
+  };
+
   const handleSearch = (searchQuery: string) => {
     setSearchValue(searchQuery);
 
@@ -194,6 +218,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleUpdateCollectionAction={handleUpdateCollectionAction}
             handleDeleteCollectionAction={handleDeleteCollectionAction}
             handleUpdateMockCollectionAction={handleUpdateMockCollectionAction}
+            handleStarMockAction={handleStarMockAction}
           />
         </div>
       </div>
@@ -233,7 +258,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
           }
         }}
         onSuccess={() => {
-          setForceRender((prev) => !prev);
+          _forceRender();
           setSelectedMock(null);
         }}
       />
@@ -249,7 +274,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
           }
         }}
         onSuccess={() => {
-          setForceRender((prev) => !prev);
+          _forceRender();
           setSelectedMock(null);
         }}
       />
@@ -266,7 +291,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
           }
         }}
         onSuccess={() => {
-          setForceRender((prev) => !prev);
+          _forceRender();
           setSelectedMock(null);
         }}
       />

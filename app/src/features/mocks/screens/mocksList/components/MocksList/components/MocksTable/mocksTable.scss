@@ -26,6 +26,11 @@
     font-family: Inter;
     font-size: 13px;
     cursor: pointer;
+    border-left: 1px solid transparent;
+
+    &.starred {
+      border-left: 4px solid var(--rq-mocks-list-table-row);
+    }
 
     .mock-collection-details-container {
       display: flex;
@@ -54,37 +59,64 @@
       }
     }
 
-    .mock-details-container {
-      .mock-name-container {
-        display: flex;
-        align-items: center;
-        gap: 4px;
+    .mock-name-details-container {
+      display: flex;
+      align-items: center;
 
-        .mock-name {
-          color: var(--white);
-          font-size: 13px;
-          font-weight: 500;
-          line-height: 18px;
-          letter-spacing: 0.25px;
+      .mock-star-btn {
+        display: flex;
+        height: 24px;
+        padding: 0px 5px;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        // margin-left: -13px;
+        margin-right: 8px;
+        flex-shrink: 0;
+
+        .unstarred {
+          color: var(--requestly-color-text-placeholder);
         }
 
-        .mock-type {
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 1px;
-          text-transform: uppercase;
+        .starred {
+          color: var(--requestly-color-warning);
         }
       }
 
-      .mock-endpoint {
-        margin-top: 4px;
-        font-size: 11px;
-        font-weight: 400;
-        line-height: 14px;
-        letter-spacing: 0.4px;
+      .mock-details-container {
+        .mock-name-container {
+          display: flex;
+          align-items: center;
+          gap: 4px;
 
-        .ant-typography {
-          color: var(--text-subtle);
+          .mock-name {
+            color: var(--white);
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 18px;
+            letter-spacing: 0.25px;
+          }
+
+          .mock-type {
+            margin-top: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+          }
+        }
+
+        .mock-endpoint {
+          margin-top: 4px;
+          font-size: 11px;
+          font-weight: 400;
+          line-height: 14px;
+          letter-spacing: 0.4px;
+
+          .ant-typography {
+            color: var(--text-subtle);
+          }
         }
       }
     }
