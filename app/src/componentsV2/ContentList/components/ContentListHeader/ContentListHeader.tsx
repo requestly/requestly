@@ -38,7 +38,7 @@ const ContentListHeader: React.FC<ContentListHeaderProps> = ({
           />
         ) : null}
         <div className="filter-btns">
-          {filters.length > 0
+          {filters?.length > 0
             ? filters.map(({ key, label, onClick }) => (
                 <Button
                   className={`filter-btn ${key === activeFilter ? "active" : ""}`}
@@ -53,9 +53,7 @@ const ContentListHeader: React.FC<ContentListHeaderProps> = ({
         </div>
       </div>
       <div className="rq-content-list-header-actions">
-        {actions?.map((action) => (
-          <Col>{action}</Col>
-        ))}
+        {actions?.length > 0 ? actions.map((action) => <Col>{action}</Col>) : null}
       </div>
     </div>
   );

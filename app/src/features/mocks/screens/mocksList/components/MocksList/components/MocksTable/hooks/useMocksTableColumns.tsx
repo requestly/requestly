@@ -28,10 +28,7 @@ export const useMocksTableColumns = ({
   const teamId = workspace?.id;
 
   const columns: ContentListTableProps<RQMockMetadataSchema>["columns"] = [
-    {
-      ...Table.SELECTION_COLUMN,
-      width: 0,
-    },
+    Table.SELECTION_COLUMN,
     {
       title: (
         <div className="rq-col-title">
