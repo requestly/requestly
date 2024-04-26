@@ -5,7 +5,7 @@ import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { generateFinalUrl } from "components/features/mocksV2/utils";
 import { ContentListTable } from "componentsV2/ContentList";
 import { useMocksTableColumns } from "./hooks/useMocksTableColumns";
@@ -27,6 +27,7 @@ export interface MocksTableProps {
   handleUpdateCollectionAction?: (collection: RQMockMetadataSchema) => void;
   handleDeleteCollectionAction?: (collection: RQMockMetadataSchema) => void;
   handleUpdateMockCollectionAction?: (mock: RQMockMetadataSchema) => void;
+  handleStarMockAction?: (mock: RQMockSchema) => void;
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
@@ -41,6 +42,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   handleUpdateCollectionAction,
   handleDeleteCollectionAction,
   handleUpdateMockCollectionAction,
+  handleStarMockAction,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -67,6 +69,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     handleUpdateCollectionAction,
     handleDeleteCollectionAction,
     handleUpdateMockCollectionAction,
+    handleStarMockAction,
   });
 
   return (
@@ -77,7 +80,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       size="middle"
       rowKey="id"
       className="rq-mocks-list-table"
-      customRowClassName={() => "rq-mocks-list-table-row"}
+      customRowClassName={(record) => `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"}`}
       // @ts-ignore
       columns={columns}
       data={contentTableAdaptedMocks}
