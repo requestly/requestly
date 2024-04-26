@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFetchSharedLists } from "./hooks/useFetchSharedLists";
 import { SharedListsContentHeader } from "./components/SharedListsContentHeader/SharedListsContentHeader";
@@ -9,6 +9,7 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getIsExtensionEnabled } from "store/selectors";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import TeamFeatureComingSoon from "components/landing/TeamFeatureComingSoon";
+import { SharedList } from "./types";
 import "./sharedLists.scss";
 
 export const SharedLists = () => {
@@ -16,6 +17,13 @@ export const SharedLists = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [searchValue, setSearchValue] = useState("");
   const { sharedLists, isSharedListsLoading } = useFetchSharedLists();
+
+  const filteredSharedLists = useMemo(() => {
+    if (!sharedLists) return [];
+    else {
+      return sharedLists?.filter((list: SharedList) => list.listName.toLowerCase().includes(searchValue.toLowerCase()));
+    }
+  }, [sharedLists, searchValue]);
 
   if (!isExtensionEnabled) {
     return <ExtensionDeactivationMessage />;
@@ -34,7 +42,7 @@ export const SharedLists = () => {
           searchValue={searchValue}
           handleSearchValueUpdate={(value: string) => setSearchValue(value)}
         />
-        <SharedListsTable sharedLists={sharedLists} searchValue={searchValue} />
+        <SharedListsTable sharedLists={filteredSharedLists} searchValue={searchValue} />
       </div>
     );
   } else return <CreateSharedListCTA />;
