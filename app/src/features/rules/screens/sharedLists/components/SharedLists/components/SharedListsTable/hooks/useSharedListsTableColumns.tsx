@@ -86,6 +86,11 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
 
         return (
           <div className="sharedlist-table-actions-container">
+            <CopyToClipboard text={sharedListURL} onCopy={() => handleOnURLCopy(record.shareId)}>
+              <Tooltip title={record.shareId === copiedSharedListId ? "Copied!" : "Copy URL"}>
+                <RQButton icon={<MdOutlineFileCopy />} iconOnly />
+              </Tooltip>
+            </CopyToClipboard>
             <Tooltip title="Delete">
               <RQButton
                 icon={<RiDeleteBinLine />}
@@ -93,11 +98,6 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
                 onClick={() => handleDeleteSharedListClick(record.shareId)}
               />
             </Tooltip>
-            <CopyToClipboard text={sharedListURL} onCopy={() => handleOnURLCopy(record.shareId)}>
-              <Tooltip title={record.shareId === copiedSharedListId ? "Copied!" : "Copy URL"}>
-                <RQButton icon={<MdOutlineFileCopy />} iconOnly />
-              </Tooltip>
-            </CopyToClipboard>
           </div>
         );
       },
