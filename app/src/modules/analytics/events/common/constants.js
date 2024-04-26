@@ -107,6 +107,7 @@ export const SOURCE = {
   BILLING_TEAM: "billing_team",
   TEST_THIS_RULE: "test_this_rule",
   RULE_GROUP: "rule_group",
+  TEMPLATES_SCREEN: "templates_screen",
 };
 
 export const RULES = {

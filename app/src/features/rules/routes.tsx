@@ -1,5 +1,4 @@
 import { Navigate, RouteObject } from "react-router-dom";
-import TemplatesIndexPage from "components/landing/ruleTemplates";
 import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer";
 import SharedListsIndexPage from "components/features/sharedLists/SharedListsIndexPage";
@@ -14,6 +13,7 @@ import RootComponent from "components/redirects/RootComponent";
 // V2 Imports
 import RulesContainerV2 from "./container";
 import { RulesListScreen } from "./screens/rulesList";
+import { TemplatesList } from "./screens/templatesList";
 
 export const ruleRoutes: RouteObject[] = [
   {
@@ -35,10 +35,6 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: PATHS.SHARED_LISTS.IMPORT_LIST.RELATIVE, // for desktop app
         element: <ProtectedRoute component={ImportSharedListIndexPage} />,
-      },
-      {
-        path: PATHS.RULES.TEMPLATES.RELATIVE,
-        element: <TemplatesIndexPage />,
       },
       {
         path: PATHS.RULES.TRASH.RELATIVE,
@@ -79,6 +75,10 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: joinPaths(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE, "/:ruleType"),
         element: <RuleEditor />,
+      },
+      {
+        path: PATHS.RULES.TEMPLATES.RELATIVE,
+        element: <TemplatesList />,
       },
     ],
   },
