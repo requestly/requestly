@@ -51,7 +51,7 @@ interface RecordMetaData {
   modificationDate: number;
 }
 
-interface RuleRecord extends RecordMetaData {
+export interface RuleRecord extends RecordMetaData {
   id: string;
   name: string;
   description: string;
