@@ -1,7 +1,6 @@
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { RequestRulePair, RuleType } from "common/types";
-import { executeDynamicScriptOnPage } from "../utils";
-import { PUBLIC_NAMESPACE } from "common/constants";
+import { cacheRulesOnPage } from "../utils";
 
 const cacheRequestRules = async () => {
   const requestRules = await getEnabledRules(RuleType.REQUEST);
@@ -10,10 +9,8 @@ const cacheRequestRules = async () => {
     return;
   }
 
-  executeDynamicScriptOnPage(
-    `
-    window.${PUBLIC_NAMESPACE}=window.${PUBLIC_NAMESPACE}||{};
-    window.${PUBLIC_NAMESPACE}.requestRules=${JSON.stringify(
+  cacheRulesOnPage(
+    JSON.stringify(
       requestRules.map((rule) => {
         const requestRulePair = rule.pairs[0] as RequestRulePair;
         return {
@@ -22,8 +19,8 @@ const cacheRequestRules = async () => {
           request: requestRulePair.request,
         };
       })
-    )};
-    `
+    ),
+    RuleType.REQUEST
   );
 };
 

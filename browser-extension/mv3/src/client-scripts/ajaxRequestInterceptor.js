@@ -2,8 +2,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
 ((namespace) => {
   window[namespace] = window[namespace] || {};
-  window[namespace].responseRules = [];
-  window[namespace].requestRules = [];
+  window[namespace].ResponseRules = [];
+  window[namespace].RequestRules = [];
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage
@@ -173,11 +173,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const getMatchedResponseRule = (url) => {
-    return window[namespace].responseRules?.findLast((rule) => matchSourceUrl(rule.source, url));
+    return window[namespace].ResponseRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
   const getMatchedRequestRule = (url) => {
-    return window[namespace].requestRules?.findLast((rule) => matchSourceUrl(rule.source, url));
+    return window[namespace].RequestRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
   const shouldServeResponseWithoutRequest = (responseModification) => {

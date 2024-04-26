@@ -107,9 +107,9 @@ export default [
     plugins: commonPlugins,
   },
   {
-    input: "src/utility-scripts/executeScript.js",
+    input: "src/utility-scripts/cacheRules.js",
     output: {
-      file: `${OUTPUT_DIR}/libs/executeScript.js`,
+      file: `${OUTPUT_DIR}/libs/cacheRules.js`,
       format: "iife",
     },
     plugins: commonPlugins,
