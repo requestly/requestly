@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+npm i -g web-ext
+
 echo -e "\n***** Installing common code's dependencies *****"
 cd common
 rm -rf node_modules
