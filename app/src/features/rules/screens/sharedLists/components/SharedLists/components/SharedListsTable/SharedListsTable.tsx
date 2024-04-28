@@ -11,10 +11,9 @@ import "./sharedListsTable.scss";
 
 interface SharedListsTableProps {
   sharedLists: SharedList[];
-  searchValue: string;
 }
 
-export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists, searchValue }) => {
+export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists }) => {
   const user = useSelector(getUserAuthDetails);
   const [isDeleteSharedListModalVisible, setIsDeleteSharedListModalVisible] = useState(false);
   const [sharedListIdsToDelete, setSharedListIdsToDelete] = useState([]);
