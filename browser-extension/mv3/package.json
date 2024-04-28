@@ -30,7 +30,7 @@
     "@requestly/web-sdk": "0.14.2",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-typescript": "^11.0.0",
-    "@types/chrome": "^0.0.200",
+    "@types/chrome": "^0.0.266",
     "archiver": "^5.3.1",
     "node-sass": "^8.0.0",
     "rollup": "^2.79.1",
