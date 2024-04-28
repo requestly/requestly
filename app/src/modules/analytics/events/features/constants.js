@@ -76,9 +76,7 @@ export const SHARED_LIST = {
   IMPORT_STARTED: "sharedList_import_started",
   IMPORT_FAILED: "sharedList_import_failed",
   IMPORT_COMPLETED: "sharedList_import_completed",
-  URL_COPIED: "sharedList_url_copied",
   NOTIFY_CLICKED: "sharedList_notify_button_clicked",
-  DELETE_CLICKED: "shared_list_delete_clicked",
   VISIBILITY_TOGGLED: "shared_list_visibility_toggled",
   RECIPIENT_ADDED: "shared_list_recipient_added",
 };
