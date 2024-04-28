@@ -17,6 +17,7 @@ import {
   watchRecording,
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
+import { getAPIResponse } from "./apiClient";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -74,6 +75,10 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.GET_RULES_AND_GROUPS:
         getRulesAndGroups().then(sendResponse);
+        return true;
+
+      case EXTENSION_MESSAGES.GET_API_RESPONSE:
+        getAPIResponse(message.apiRequest).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.GET_EXECUTED_RULES:
