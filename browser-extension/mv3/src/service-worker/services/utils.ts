@@ -2,6 +2,7 @@ import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "comm
 import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
 import { updateActivationStatus } from "./contextMenu";
 import { getAllSupportedWebURLs } from "../../utils";
+import { stopRecordingOnAllTabs } from "./sessionRecording";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -166,6 +167,10 @@ export const toggleExtensionStatus = async () => {
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
   updateActivationStatus(updatedStatus);
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);
+
+  if (!updatedStatus) {
+    stopRecordingOnAllTabs();
+  }
 
   return updatedStatus;
 };

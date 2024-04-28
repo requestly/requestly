@@ -17,13 +17,15 @@ export const EXTENSION_MESSAGES = {
   GET_API_RESPONSE: "getAPIResponse",
   GET_EXECUTED_RULES: "getExecutedRules",
   CHECK_IF_NO_RULES_PRESENT: "checkIfNoRulesPresent",
-  INIT_SESSION_RECORDING_WITH_NEW_CONFIG: "initSessionRecordingWithNewConfig",
   START_RECORDING_EXPLICITLY: "startRecordingExplicitly",
   START_RECORDING_ON_URL: "startRecordingOnUrl",
   STOP_RECORDING: "stopRecording",
   WATCH_RECORDING: "watchRecording",
   CHECK_IF_EXTENSION_ENABLED: "checkIfExtensionEnabled",
   TOGGLE_EXTENSION_STATUS: "toggleExtensionStatus",
+  CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD: "cacheRecordedSessionOnPageUnload",
+  INIT_SESSION_RECORDER: "initSessionRecorder",
+  CLIENT_PAGE_LOADED: "clientPageLoaded",
 };
 
 export const CLIENT_MESSAGES = {
@@ -42,6 +44,7 @@ export const CLIENT_MESSAGES = {
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   EXECUTE_SCRIPT: "executeScript",
+  NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
 };
 
 export const STORAGE_TYPE = "local";
