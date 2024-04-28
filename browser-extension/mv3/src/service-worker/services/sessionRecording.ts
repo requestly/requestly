@@ -125,9 +125,9 @@ export const handleSessionRecordingOnClientPageLoad = async (tab: chrome.tabs.Ta
       sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
       const recordingMode = sessionRecordingConfig?.autoRecording?.mode;
 
-      sessionRecordingData.showWidget = recordingMode === "custom";
+      sessionRecordingData.showWidget = recordingMode === AutoRecordingMode.CUSTOM;
 
-      if (recordingMode === "allPages") {
+      if (recordingMode === AutoRecordingMode.ALL_PAGES) {
         sessionRecordingData.markRecordingIcon = false;
       }
 
