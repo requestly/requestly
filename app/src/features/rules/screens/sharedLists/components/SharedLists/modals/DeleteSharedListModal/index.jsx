@@ -8,11 +8,11 @@ import isEmpty from "is-empty";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 //ACTIONS
-import { deleteSharedList, refreshPendingStatus } from "./actions";
+import { deleteSharedList } from "backend/sharedList";
 import { LoadingOutlined } from "@ant-design/icons";
 import { actions } from "store";
 
-const DeleteSharedListModal = ({ sharedListIdsToDeleteArray, userId, isOpen, toggle }) => {
+const DeleteSharedListModal = ({ sharedListIdsToDelete, userId, isOpen, toggle }) => {
   //Global State
   const dispatch = useDispatch();
 
@@ -51,7 +51,7 @@ const DeleteSharedListModal = ({ sharedListIdsToDeleteArray, userId, isOpen, tog
   };
 
   const renderConfirmation = () => {
-    if (isEmpty(sharedListIdsToDeleteArray)) {
+    if (isEmpty(sharedListIdsToDelete)) {
       return renderWarningMessage();
     } else {
       return (
@@ -64,7 +64,7 @@ const DeleteSharedListModal = ({ sharedListIdsToDeleteArray, userId, isOpen, tog
               <b>Are you sure to delete the selected lists?</b>
               <p>
                 <b>Total Lists Selected: </b>
-                {sharedListIdsToDeleteArray.length} <br />
+                {sharedListIdsToDelete.length} <br />
               </p>
             </Col>
           </Row>
@@ -110,13 +110,13 @@ const DeleteSharedListModal = ({ sharedListIdsToDeleteArray, userId, isOpen, tog
 
   const doDeleteSharedLists = (cb) => {
     const allPromises = [];
-    sharedListIdsToDeleteArray.forEach((sharedListId) => {
+    sharedListIdsToDelete.forEach((sharedListId) => {
       allPromises.push(deleteSharedList(sharedListId, dispatch));
     });
     return Promise.all(allPromises);
   };
 
-  const stableDoDeleteSharedLists = useCallback(doDeleteSharedLists, [dispatch, sharedListIdsToDeleteArray]);
+  const stableDoDeleteSharedLists = useCallback(doDeleteSharedLists, [dispatch, sharedListIdsToDelete]);
 
   const updateCurrentlySelectedLists = (dispatch, newValue) => {
     dispatch(actions.updateSelectedSharedLists(newValue));
@@ -131,7 +131,7 @@ const DeleteSharedListModal = ({ sharedListIdsToDeleteArray, userId, isOpen, tog
         //Unselect all lists
         updateCurrentlySelectedLists(dispatch, {});
         //Mark flag to Refresh Lists on index page
-        refreshPendingStatus(dispatch);
+        dispatch(actions.updateRefreshPendingStatus({ type: "sharedLists" }));
         //Close the modal -> Unmount this component
         toggle();
       });

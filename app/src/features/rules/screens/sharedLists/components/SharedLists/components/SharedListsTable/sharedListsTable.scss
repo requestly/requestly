@@ -1,0 +1,28 @@
+.sharedlists-table-container {
+  .sharedlist-name {
+    color: var(--link-color);
+    cursor: pointer;
+    transition: 0.2s all;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .sharedlist-table-actions-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+
+    & .ant-btn {
+      color: var(--requestly-color-neutral-0);
+    }
+  }
+
+  .rq-content-list-table-header {
+    .ant-table-cell:nth-child(2),
+    .ant-table-cell:nth-child(3) {
+      text-align: center;
+    }
+  }
+}
