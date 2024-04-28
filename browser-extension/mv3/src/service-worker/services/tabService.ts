@@ -14,26 +14,11 @@ type TabData = chrome.tabs.Tab & {
 };
 
 class TabService {
-  static instance: TabService = null;
-
-  static getInstance() {
-    if (!TabService.instance) {
-      TabService.instance = new TabService();
-    }
-
-    return TabService.instance;
-  }
-
   private map: Record<number, TabData> = {};
 
   constructor() {
-    if (!TabService.instance) {
-      TabService.instance = this;
-      this.initTabs();
-      this.addEventListeners();
-    }
-
-    return TabService.instance;
+    this.initTabs();
+    this.addEventListeners();
   }
 
   private initTabs() {
@@ -189,9 +174,8 @@ class TabService {
     delete tab[DataScope.TAB][key];
   }
 }
-const tabService = TabService.getInstance();
 
-export { tabService };
+export const tabService = new TabService();
 
 export const TAB_SERVICE_DATA = {
   SESSION_RECORDING: "sessionRecording",
