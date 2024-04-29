@@ -198,6 +198,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         </div>
 
         <MocksListContentHeader
+          allrecords={mocks}
           mocks={filteredMocks}
           mockType={type}
           searchValue={searchValue}
