@@ -5,7 +5,7 @@ import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { MockType, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { generateFinalUrl } from "components/features/mocksV2/utils";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ContentListTable } from "componentsV2/ContentList";
@@ -24,7 +24,7 @@ export interface MocksTableProps {
   handleEditAction?: (mockId: string, isOldMock: boolean) => void;
   handleSelectAction?: (url: string) => void;
   handleUploadAction?: () => void;
-  handleStarMockAction?: (mock: RQMockSchema) => void;
+  forceRender: () => void;
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
@@ -35,7 +35,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   handleItemSelect,
   handleEditAction,
   handleSelectAction,
-  handleStarMockAction,
+  forceRender,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -58,7 +58,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     handleNameClick,
     handleEditAction,
     handleSelectAction,
-    handleStarMockAction,
+    forceRender,
   });
 
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");

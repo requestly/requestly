@@ -7,17 +7,12 @@ import {
   redirectToMockEditorCreateMock,
   redirectToMockEditorEditMock,
 } from "utils/RedirectionUtils";
-import {
-  trackMockStarToggledEvent,
-  trackMockUploadWorkflowStarted,
-  trackNewMockButtonClicked,
-} from "modules/analytics/events/features/mocksV2";
+import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import {
   MockListSource,
   MockTableHeaderFilter,
   MockType,
   RQMockMetadataSchema,
-  RQMockSchema,
 } from "components/features/mocksV2/types";
 import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
@@ -31,11 +26,6 @@ import {
   UpdateMockCollectionModalWrapper,
 } from "features/mocks/modals";
 import "./mocksList.scss";
-import { message } from "antd";
-import { updateMock } from "backend/mocks/updateMock";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getQuickFilteredRecords } from "./utils";
 
 interface Props {
@@ -46,10 +36,6 @@ interface Props {
 
 const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const navigate = useNavigate();
-  const user = useSelector(getUserAuthDetails);
-  const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
 
   // TODO: Move all the actions and local state in context
   const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
@@ -117,18 +103,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setUploadModalVisibility(true);
   };
 
-  const handleStarMockAction = (record: RQMockSchema) => {
-    const isStarred = record.isFavourite;
-    const updatedValue = !isStarred;
-
-    message.loading(isStarred ? "Removing from starred mocks" : "Adding into starred mocks", 3);
-    updateMock(uid, record.id, { ...record, isFavourite: updatedValue }, teamId).then(() => {
-      trackMockStarToggledEvent(record.id, record.type, record?.fileType, updatedValue);
-      message.success(isStarred ? "Mock unstarred!" : "Mock starred!");
-      _forceRender();
-    });
-  };
-
   const handleSearch = (searchQuery: string) => {
     setSearchValue(searchQuery);
 
@@ -191,7 +165,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleNameClick={handleNameClick}
             handleEditAction={handleEditAction}
             handleUploadAction={handleUploadAction}
-            handleStarMockAction={handleStarMockAction}
+            forceRender={_forceRender}
           />
         </div>
       </div>

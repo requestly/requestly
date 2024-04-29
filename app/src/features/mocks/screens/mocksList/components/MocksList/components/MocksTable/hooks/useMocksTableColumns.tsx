@@ -28,7 +28,7 @@ export const useMocksTableColumns = ({
   handleNameClick,
   handleEditAction,
   handleSelectAction,
-  handleStarMockAction,
+  forceRender,
 }: Partial<MocksTableProps>) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -40,6 +40,7 @@ export const useMocksTableColumns = ({
     deleteCollectionModalAction,
     deleteMockModalAction,
     updateMockCollectionModalAction,
+    toggleMockStarAction,
   } = useMocksActionContext();
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
@@ -82,7 +83,7 @@ export const useMocksTableColumns = ({
                 type="text"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStarMockAction(record);
+                  toggleMockStarAction(record, forceRender);
                 }}
                 className="mock-star-btn"
               >

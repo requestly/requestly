@@ -1,7 +1,13 @@
 import React, { createContext, useCallback, useContext } from "react";
 import Logger from "../../../../../common/logger";
 import { useMocksModalsContext } from "./modals";
-import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
+import { message } from "antd";
+import { updateMock } from "backend/mocks/updateMock";
+import { getUserAuthDetails } from "store/selectors";
+import { useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { trackMockStarToggledEvent } from "modules/analytics/events/features/mocksV2";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -9,6 +15,7 @@ type MocksActionContextType = {
   deleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
   deleteMockModalAction: (record: RQMockMetadataSchema) => void;
   updateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
+  toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -18,6 +25,11 @@ interface RulesProviderProps {
 }
 
 export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ children }) => {
+  const user = useSelector(getUserAuthDetails);
+  const uid = user?.details?.profile?.uid;
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const teamId = workspace?.id;
+
   const {
     openCollectionModalAction,
     openDeleteCollectionModalAction,
@@ -65,12 +77,29 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openUpdateMockCollectionModalAction]
   );
 
+  const toggleMockStarAction = useCallback(
+    (record: RQMockSchema, onSuccess?: () => void) => {
+      const isStarred = record.isFavourite;
+      const updatedValue = !isStarred;
+
+      message.loading(isStarred ? "Removing from starred mocks" : "Adding into starred mocks", 3);
+
+      updateMock(uid, record.id, { ...record, isFavourite: updatedValue }, teamId).then(() => {
+        trackMockStarToggledEvent(record.id, record.type, record?.fileType, updatedValue);
+        message.success(isStarred ? "Mock unstarred!" : "Mock starred!");
+        onSuccess?.();
+      });
+    },
+    [teamId]
+  );
+
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
     deleteCollectionModalAction,
     deleteMockModalAction,
     updateMockCollectionModalAction,
+    toggleMockStarAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;
