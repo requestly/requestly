@@ -7,6 +7,7 @@ import { createCollection } from "backend/mocks/createCollection";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
+import { trackMockCollectionCreated, trackMockCollectionUpdated } from "modules/analytics/events/features/mocksV2";
 import "./createCollectionModal.scss";
 
 interface Props {
@@ -65,7 +66,7 @@ export const CreateCollectionModal: React.FC<Props> = ({
       setIsLoading(true);
       updateCollections(uid, collectionData)
         .then(() => {
-          console.log("Collection updated!");
+          trackMockCollectionUpdated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
           message.success("Collection updated!");
           toggleModalVisibility(false);
           onSuccess?.();
@@ -83,7 +84,7 @@ export const CreateCollectionModal: React.FC<Props> = ({
       setIsLoading(true);
       createCollection(uid, collectionData, teamId)
         .then((mockCollection) => {
-          console.log({ mockCollection });
+          trackMockCollectionCreated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
           message.success("Collection created!");
           toggleModalVisibility(false);
           onSuccess?.();
