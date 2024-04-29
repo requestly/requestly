@@ -1,9 +1,9 @@
+import React, { useEffect, useState } from "react";
 import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { DeleteCollectionModal } from "./DeleteCollectionModal";
-import { useEffect, useState } from "react";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 
-export const DeleteCollectionModalWrapper = () => {
+export const DeleteCollectionModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
   const [collection, setCollection] = useState<RQMockCollection>();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -28,6 +28,7 @@ export const DeleteCollectionModalWrapper = () => {
       visible={isVisible}
       collection={(collection as unknown) as RQMockCollection}
       toggleModalVisibility={onClose}
+      onSuccess={forceRender}
     />
   );
 };

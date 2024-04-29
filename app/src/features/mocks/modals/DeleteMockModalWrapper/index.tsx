@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DeleteMockModal } from "./DeleteMockModal";
 import { RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 
-export const DeleteMockModalWrapper = () => {
+export const DeleteMockModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [mock, setMock] = useState<RQMockMetadataSchema>();
 
@@ -23,5 +23,5 @@ export const DeleteMockModalWrapper = () => {
     setMock(undefined);
   };
 
-  return <DeleteMockModal mock={mock} visible={isVisible} toggleModalVisibility={onClose} />;
+  return <DeleteMockModal mock={mock} visible={isVisible} toggleModalVisibility={onClose} onSuccess={forceRender} />;
 };

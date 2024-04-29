@@ -3,7 +3,7 @@ import { CreateCollectionModal } from "./CreateCollectionModal";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 
-export const CreateCollectionModalWrapper: React.FC = () => {
+export const CreateCollectionModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
   const [collection, setCollection] = useState<RQMockMetadataSchema>();
   const [mockType, setMockType] = useState<MockType>();
   const [isVisible, setIsVisible] = useState(false);
@@ -37,6 +37,7 @@ export const CreateCollectionModalWrapper: React.FC = () => {
       mockType={mockType}
       visible={isVisible}
       toggleModalVisibility={onClose}
+      onSuccess={forceRender}
     />
   ) : null;
 };

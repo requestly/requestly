@@ -151,7 +151,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     }
   };
 
-  const collections = mocks.filter((mock) => isRecordMockCollection(mock)) as unknown as RQMockCollection[];
+  const collections = (mocks.filter((mock) => isRecordMockCollection(mock)) as unknown) as RQMockCollection[];
 
   return isLoading ? (
     <SpinnerCard customLoadingMessage="Loading Mocks" />
@@ -216,11 +216,12 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
       />
 
-      <CreateCollectionModalWrapper />
-      <DeleteCollectionModalWrapper />
+      {/* FIXME: Remove force re-render and instead update the local state */}
+      <CreateCollectionModalWrapper forceRender={_forceRender} />
+      <DeleteCollectionModalWrapper forceRender={_forceRender} />
 
       {/* keep this at top level, in container */}
-      <DeleteMockModalWrapper />
+      <DeleteMockModalWrapper forceRender={_forceRender} />
 
       <UpdateMockCollectionModal
         mock={selectedMock}
