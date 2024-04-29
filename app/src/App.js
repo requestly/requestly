@@ -26,6 +26,7 @@ import { useIsExtensionEnabled } from "hooks";
 import { LazyMotion, domMax } from "framer-motion";
 import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
+import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -76,6 +77,7 @@ const App = () => {
       <ThemeProvider>
         <ConfigProvider locale={enUS}>
           <GrowthBookProvider growthbook={growthbook}>
+            <InitImplicitWidgetConfigHandler />
             <LocalUserAttributesHelperComponent />
             <FeatureUsageEvent />
             <LazyMotion features={domMax} strict>

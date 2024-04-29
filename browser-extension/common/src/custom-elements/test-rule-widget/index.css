@@ -27,7 +27,7 @@
   border-radius: 20px;
 }
 
-#container.minimized #content-container,
+#container.minimized #test-rule-container,
 #container.minimized #heading-container,
 #container.minimized #info-container {
   display: none;
@@ -87,10 +87,15 @@
   background: #383838;
 }
 
-#content-container {
-  padding: 12px;
+#explicit-widget-container {
   background: #282828;
   border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+#implicit-widget-container {
+  padding: 0 4px;
   margin-top: 8px;
 }
 
@@ -194,13 +199,13 @@
   width: 16px;
 }
 
-#minimized-status-btn {
+#test-rule-minimized-btn {
   padding: 0;
   background: transparent;
   border: none;
 }
 
-#minimized-status-btn span {
+#test-rule-minimized-btn span {
   padding: 6px;
   border-radius: 50%;
   display: flex;
@@ -208,7 +213,7 @@
   align-items: center;
   cursor: pointer;
 }
-#minimized-status-btn span svg {
+#test-rule-minimized-btn span svg {
   height: 20px;
   width: 20px;
 }
@@ -226,10 +231,93 @@ a {
   color: #9370db;
 }
 
-.rq-warning {
+.warning {
   background: #5c3111;
 }
 
-.rq-success {
+.success {
   background: #104b2f;
+}
+
+#applied-rules-list {
+  margin-top: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+#applied-rules-list::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+#applied-rules-list::-webkit-scrollbar-thumb {
+  background: #353535;
+  border-radius: 8px;
+}
+
+#applied-rules-list-header {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.applied-rule-list-item {
+  border-radius: 8px;
+  background: #282828;
+  padding: 12px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.applied-rule-list-item:hover {
+  background: #383838;
+}
+
+.applied-rule-list-item:hover .applied-rule-arrow-icon {
+  opacity: 1;
+}
+
+.applied-rule-list-item:first-child {
+  margin-top: 0;
+}
+
+.applied-rule-item-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.applied-rule-icon {
+  align-self: center;
+}
+
+.applied-rule-icon svg {
+  width: 14px;
+  height: 14px;
+  position: relative;
+  top: 2px;
+}
+
+.applied-rule-arrow-icon {
+  transform: scale(1.2);
+  align-self: center;
+  transition: 0.2s all;
+  opacity: 0;
+}
+
+.applied-rule-name {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

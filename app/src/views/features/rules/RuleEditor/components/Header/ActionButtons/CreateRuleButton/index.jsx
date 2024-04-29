@@ -32,7 +32,6 @@ import {
   trackRuleSaveClicked,
 } from "modules/analytics/events/common/rules";
 import { snakeCase } from "lodash";
-import ruleInfoDialog from "./RuleInfoDialog";
 import { ResponseRuleResourceType } from "types/rules";
 import { runMinorFixesOnRule } from "utils/rules/misc";
 import { PremiumFeature } from "features/pricing";
@@ -219,7 +218,6 @@ const CreateRuleButton = ({
               rule_type = currentlySelectedRuleData.ruleType;
             }
             if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
-              ruleInfoDialog(currentlySelectedRuleData.ruleType, appMode);
               trackRuleCreatedEvent({
                 rule_type,
                 description: currentlySelectedRuleData.description,
