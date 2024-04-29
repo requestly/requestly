@@ -7,7 +7,11 @@ import {
   redirectToMockEditorCreateMock,
   redirectToMockEditorEditMock,
 } from "utils/RedirectionUtils";
-import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
+import {
+  trackMockStarToggledEvent,
+  trackMockUploadWorkflowStarted,
+  trackNewMockButtonClicked,
+} from "modules/analytics/events/features/mocksV2";
 import {
   MockListSource,
   MockTableHeaderFilter,
@@ -146,9 +150,11 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
   const handleStarMockAction = (record: RQMockSchema) => {
     const isStarred = record.isFavourite;
+    const updatedValue = !isStarred;
 
     message.loading(isStarred ? "Removing from starred mocks" : "Adding into starred mocks", 3);
-    updateMock(uid, record.id, { ...record, isFavourite: !record.isFavourite }, teamId).then(() => {
+    updateMock(uid, record.id, { ...record, isFavourite: updatedValue }, teamId).then(() => {
+      trackMockStarToggledEvent(record.id, record.type, record?.fileType, updatedValue);
       message.success(isStarred ? "Mock unstarred!" : "Mock starred!");
       _forceRender();
     });

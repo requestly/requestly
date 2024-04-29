@@ -48,6 +48,7 @@ const createMockFromFirebase = async (uid: string, mockData: RQMockSchema, teamI
   const ownerId = getOwnerId(uid, teamId);
 
   const mockId: string | null = await addDoc(rootMocksCollectionRef, {
+    collectionId: "",
     ...mockData,
     recordType: MockRecordType.MOCK,
     createdBy: uid,

@@ -112,6 +112,11 @@ export const MOCK_SERVER = {
     UPDATED: "file_updated",
     CREATED: "file_created",
   },
+  COLLECTIONS: {
+    DELETED: "mock_collection_deleted",
+    UPDATED: "mock_collection_updated",
+    CREATED: "mock_collection_created",
+  },
 };
 
 // TODO: cleanup
@@ -120,6 +125,7 @@ export const MOCKSV2 = {
   UPDATED: "mock_updated",
   CREATED: "mock_created",
   SELECTED: "mock_selected",
+  STAR_TOGGLED: "mock_star_toggled",
   NEW_MOCK_BUTTON_CLICKED: "new_mock_button_clicked",
   MOCK_EDITOR_OPENED: "mock_editor_opened",
   MOCK_EDITOR_CLOSED: "mock_editor_closed",
@@ -138,6 +144,11 @@ export const MOCKSV2 = {
   MOCK_PASSWORD_SAVED: "mock_password_saved",
   MOCK_PASSWORD_SAVE_ERROR: "mock_password_save_error",
   MOCK_PASSWORD_DELETED: "mock_password_deleted",
+
+  // collections
+  MOCK_COLLECTION_CREATED: "mock_collection_created",
+  MOCK_COLLECTION_UPDATED: "mock_collection_updated",
+  MOCK_COLLECTION_DELETED: "mock_collection_deleted",
 };
 
 export const API_CLIENT = {
