@@ -2,8 +2,7 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { getRule } from "common/rulesStore";
 import { Rule } from "common/types";
 
-const appliedRequestResponseRuleIds = new Set<string>();
-const appliedScriptRuleIds = new Set<string>();
+const appliedRuleIds = new Set<string>();
 
 export const initRuleExecutionHandler = () => {
   window.addEventListener("message", function (event) {
@@ -14,7 +13,7 @@ export const initRuleExecutionHandler = () => {
     switch (event.data.action) {
       case "response_rule_applied":
       case "request_rule_applied":
-        appliedRequestResponseRuleIds.add(event.data.ruleId);
+        appliedRuleIds.add(event.data.ruleId);
         notifyRuleAppliedToExplicitWidget(event.data.ruleId);
         break;
     }
@@ -22,17 +21,11 @@ export const initRuleExecutionHandler = () => {
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
-      case CLIENT_MESSAGES.GET_APPLIED_REQUEST_RESPONSE_RULES:
-        sendResponse(Array.from(appliedRequestResponseRuleIds));
-        break;
       case CLIENT_MESSAGES.UPDATE_APPLIED_SCRIPT_RULES:
         message.ruleIds.forEach((ruleId: string) => {
-          appliedScriptRuleIds.add(ruleId);
+          appliedRuleIds.add(ruleId);
           notifyRuleAppliedToExplicitWidget(ruleId);
         });
-        break;
-      case CLIENT_MESSAGES.GET_APPLIED_SCRIPT_RULES:
-        sendResponse(Array.from(appliedScriptRuleIds));
         break;
       case CLIENT_MESSAGES.START_EXPLICIT_RULE_TESTING:
         if (message.record) {
@@ -60,7 +53,6 @@ const showExplicitTestRuleWidget = async (ruleId: string) => {
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
-  const appliedRuleIds = new Set([...appliedRequestResponseRuleIds, ...appliedScriptRuleIds]);
   testRuleWidget.setAttribute("applied-status", appliedRuleIds.has(ruleId).toString());
   setWidgetInfoText(testRuleWidget, ruleDetails);
 

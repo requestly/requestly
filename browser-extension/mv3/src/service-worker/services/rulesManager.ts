@@ -11,15 +11,9 @@ interface RuleIdsMap {
   [id: string]: string;
 }
 
-const getExecutedRequestResponseRuleIds = async (tabId: number): Promise<string[]> => {
+const getExecutedRuleIds = async (tabId: number): Promise<string[]> => {
   return await chrome.tabs.sendMessage(tabId, {
-    action: CLIENT_MESSAGES.GET_APPLIED_REQUEST_RESPONSE_RULES,
-  });
-};
-
-const getExecutedScriptRuleIds = async (tabId: number): Promise<string[]> => {
-  return await chrome.tabs.sendMessage(tabId, {
-    action: CLIENT_MESSAGES.GET_APPLIED_SCRIPT_RULES,
+    action: CLIENT_MESSAGES.GET_APPLIED_RULES,
   });
 };
 
@@ -28,7 +22,9 @@ export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
     tabId,
   });
 
-  const appliedRuleIds = new Set<string>();
+  const nonDNRExecutedRules = await getExecutedRuleIds(tabId);
+
+  const appliedRuleIds = new Set<string>(nonDNRExecutedRules);
 
   const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
 
@@ -36,12 +32,6 @@ export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
     (matchedRule) =>
       matchedRule.rule.rulesetId === "_dynamic" && appliedRuleIds.add(ruleIdsMap[matchedRule.rule.ruleId])
   );
-
-  const appliedResponseRuleIds = await getExecutedRequestResponseRuleIds(tabId);
-  appliedResponseRuleIds.forEach((ruleId) => appliedRuleIds.add(ruleId));
-
-  const appliedScriptRuleIds = await getExecutedScriptRuleIds(tabId);
-  appliedScriptRuleIds.forEach((ruleId) => appliedRuleIds.add(ruleId));
 
   if (appliedRuleIds.size > 0) {
     return await getRecords(Array.from(appliedRuleIds));
