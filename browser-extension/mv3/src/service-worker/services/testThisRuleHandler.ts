@@ -92,10 +92,9 @@ export const handleTestRuleOnClientPageLoad = (tab: chrome.tabs.Tab) => {
       ruleId: testRuleData.ruleId,
       record: testRuleData.record,
     });
+  } else {
+    chrome.tabs.sendMessage(tab.id, {
+      action: CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING,
+    });
   }
-  // else {
-  //   BG.Methods.sendMessageToClient(tab.id, {
-  //     action: RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING,
-  //   });
-  // }
 };

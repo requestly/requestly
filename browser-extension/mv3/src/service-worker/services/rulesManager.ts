@@ -34,7 +34,7 @@ export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
   );
 
   if (appliedRuleIds.size > 0) {
-    return await getRecords(Array.from(appliedRuleIds));
+    return getRecords(Array.from(appliedRuleIds));
   }
 
   return [];

@@ -1,10 +1,16 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
+import config from "common/config";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/constants";
 import { getRule } from "common/rulesStore";
+import { getRecord } from "common/storage";
 import { Rule } from "common/types";
 
 const appliedRuleIds = new Set<string>();
+let implicitTestRuleFlowEnabled = false;
+let implictTestRuleWidgetConfig: Record<string, any> = null;
 
 export const initRuleExecutionHandler = () => {
+  fetchAndStoreImplicitTestRuleWidgetConfig();
+
   window.addEventListener("message", function (event) {
     if (event.source !== window || event.data.source !== "requestly:client") {
       return;
@@ -14,7 +20,7 @@ export const initRuleExecutionHandler = () => {
       case "response_rule_applied":
       case "request_rule_applied":
         appliedRuleIds.add(event.data.ruleId);
-        notifyRuleAppliedToExplicitWidget(event.data.ruleId);
+        handleAppliedRuleNotification(event.data.ruleId);
         break;
     }
   });
@@ -24,8 +30,11 @@ export const initRuleExecutionHandler = () => {
       case CLIENT_MESSAGES.UPDATE_APPLIED_SCRIPT_RULES:
         message.ruleIds.forEach((ruleId: string) => {
           appliedRuleIds.add(ruleId);
-          notifyRuleAppliedToExplicitWidget(ruleId);
+          handleAppliedRuleNotification(ruleId);
         });
+        break;
+      case CLIENT_MESSAGES.GET_APPLIED_RULES:
+        sendResponse(Array.from(appliedRuleIds));
         break;
       case CLIENT_MESSAGES.START_EXPLICIT_RULE_TESTING:
         if (message.record) {
@@ -36,8 +45,9 @@ export const initRuleExecutionHandler = () => {
         }
         showExplicitTestRuleWidget(message.ruleId);
         break;
-      case CLIENT_MESSAGES.GET_APPLIED_RULES:
-        sendResponse(Array.from(appliedRuleIds));
+      case CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
+        implicitTestRuleFlowEnabled = true;
+        showImplicitTestRuleWidget();
         break;
     }
     return false;
@@ -112,3 +122,98 @@ const notifyRuleAppliedToExplicitWidget = (ruleId: string) => {
     );
   }
 };
+
+export const showImplicitTestRuleWidget = async () => {
+  if (document.querySelector("rq-implicit-test-rule-widget")) {
+    return;
+  }
+
+  const testRuleWidget = document.createElement("rq-implicit-test-rule-widget");
+
+  testRuleWidget.classList.add("rq-element");
+  testRuleWidget.style.display = "none";
+
+  let appliedRules = [];
+  for (let ruleId of appliedRuleIds.values()) {
+    const ruleDetails = await getRule(ruleId);
+    appliedRules.push({
+      ruleId: ruleDetails.id,
+      ruleName: ruleDetails.name,
+      ruleType: ruleDetails.ruleType,
+    });
+  }
+  testRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
+  document.documentElement.appendChild(testRuleWidget);
+
+  if (appliedRules.length) {
+    testRuleWidget.style.display = "block";
+  }
+
+  testRuleWidget.addEventListener("view_rule_in_editor", (data: any) => {
+    window.open(`${config.WEB_URL}/rules/editor/edit/${data.detail.ruleId}`, "_blank");
+  });
+
+  testRuleWidget.addEventListener("open_app_settings", () => {
+    window.open(`${config.WEB_URL}/settings/global-settings`, "_blank");
+  });
+};
+
+const notifyRuleAppliedToImplicitWidget = async (ruleId: string) => {
+  const rule = await getRule(ruleId);
+
+  if (!shouldShowImplicitWidget(rule.ruleType)) {
+    return;
+  }
+
+  const implicitTestRuleWidget = document.querySelector("rq-implicit-test-rule-widget") as HTMLElement;
+
+  if (implicitTestRuleWidget) {
+    implicitTestRuleWidget.dispatchEvent(
+      new CustomEvent("new-rule-applied", {
+        detail: {
+          appliedRuleId: rule.id,
+          appliedRuleName: rule.name,
+          appliedRuleType: rule.ruleType,
+        },
+      })
+    );
+    implicitTestRuleWidget.style.display = "block";
+  }
+};
+
+const fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
+  getRecord(STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG).then((result: any) => {
+    if (result) {
+      implictTestRuleWidgetConfig = result[STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+    }
+  });
+};
+
+const handleAppliedRuleNotification = async (ruleId: string) => {
+  if (implicitTestRuleFlowEnabled) {
+    notifyRuleAppliedToImplicitWidget(ruleId);
+  } else {
+    notifyRuleAppliedToExplicitWidget(ruleId);
+  }
+};
+
+const shouldShowImplicitWidget = (ruleType: string) => {
+  const implicitConfig = implictTestRuleWidgetConfig;
+
+  if (!implicitConfig || !implicitConfig.enabled) {
+    return false;
+  }
+
+  if (implicitConfig.visibility === ImplicitWidgetVisibility.SPECIFIC) {
+    if (!implicitConfig.ruleTypes.includes(ruleType)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+enum ImplicitWidgetVisibility {
+  ALL = "all",
+  SPECIFIC = "specific",
+}

@@ -48,6 +48,7 @@ export const CLIENT_MESSAGES = {
   EXECUTE_SCRIPT: "executeScript",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
   START_EXPLICIT_RULE_TESTING: "startExplicitRuleTesting",
+  START_IMPLICIT_RULE_TESTING: "startImplicitRuleTesting",
 };
 
 export const STORAGE_TYPE = "local";
@@ -71,6 +72,7 @@ export const STORAGE_KEYS = {
   LAST_SYNCED_TS: "last-synced-ts",
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
+  IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
 };
 
 export const LINKS = {
