@@ -1,31 +1,39 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
-import { ButtonProps } from "antd";
+import { Badge, ButtonProps } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
-import { ContentListHeader } from "componentsV2/ContentList";
-import { MockType } from "components/features/mocksV2/types";
+import { ContentListHeader, ContentListHeaderProps } from "componentsV2/ContentList";
+import { MockTableHeaderFilter, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { RQButton } from "lib/design-system/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { MdOutlineCreateNewFolder } from "@react-icons/all-files/md/MdOutlineCreateNewFolder";
+import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
+import { isRecordMock } from "../MocksTable/utils";
 
 interface Props {
   mockType?: string;
+  mocks: RQMockMetadataSchema[];
   handleUploadAction?: () => void;
   handleCreateNew: () => void;
   handleCreateNewCollection?: () => void;
   searchValue?: string;
   setSearchValue?: (s: string) => void;
+  filter: MockTableHeaderFilter;
+  setFilter: (filter: MockTableHeaderFilter) => void;
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
+  mocks,
   mockType,
+  filter,
   handleCreateNew,
   handleCreateNewCollection,
   handleUploadAction,
   searchValue,
   setSearchValue = () => {},
+  setFilter,
 }) => {
   const user = useSelector(getUserAuthDetails);
 
@@ -111,7 +119,51 @@ export const MocksListContentHeader: React.FC<Props> = ({
     }
   };
 
+  const contentHeaderFilters: ContentListHeaderProps["filters"] = useMemo(
+    () => [
+      {
+        key: "all",
+        label: (
+          <div className="label">
+            All{" "}
+            {mocks.length ? (
+              <Badge count={mocks.filter((record) => isRecordMock(record)).length} overflowCount={20} />
+            ) : null}
+          </div>
+        ),
+        onClick: () => {
+          setFilter("all");
+        },
+      },
+      {
+        key: "starred",
+        label: (
+          <div className="label">
+            <MdOutlineStarOutline className="icon" />
+            Starred
+            {mocks.length ? (
+              <Badge
+                overflowCount={20}
+                count={mocks.filter((record) => isRecordMock(record) && record.isFavourite).length}
+              />
+            ) : null}
+          </div>
+        ),
+        onClick: () => {
+          setFilter("starred");
+        },
+      },
+    ],
+    [mocks, setFilter]
+  );
+
   return (
-    <ContentListHeader {...contentListHeaderSearchProps} title={getMockTableTitle()} actions={contentHeaderActions} />
+    <ContentListHeader
+      {...contentListHeaderSearchProps}
+      title={getMockTableTitle()}
+      actions={contentHeaderActions}
+      activeFilter={filter}
+      filters={contentHeaderFilters}
+    />
   );
 };

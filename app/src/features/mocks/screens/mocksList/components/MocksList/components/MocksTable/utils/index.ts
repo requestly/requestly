@@ -1,5 +1,9 @@
 import { MockRecordType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 
+export const isRecordMock = (record: RQMockMetadataSchema) => {
+  return !record.recordType || record.recordType === MockRecordType.MOCK;
+};
+
 export const isRecordMockCollection = (record: RQMockMetadataSchema) => {
   return record.recordType === MockRecordType.COLLECTION;
 };

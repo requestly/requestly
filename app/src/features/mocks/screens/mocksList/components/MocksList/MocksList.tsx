@@ -10,7 +10,7 @@ import {
 import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import {
   MockListSource,
-  MockRecordType,
+  MockTableHeaderFilter,
   MockType,
   RQMockCollection,
   RQMockMetadataSchema,
@@ -33,6 +33,8 @@ import { updateMock } from "backend/mocks/updateMock";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getQuickFilteredRecords } from "./utils";
+import { isRecordMockCollection } from "./components/MocksTable/utils";
 
 interface Props {
   source?: MockListSource;
@@ -57,6 +59,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [updateMockCollectionModalVisibility, setUpdateMockCollectionModalVisibility] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
+  const [filter, setFilter] = useState<MockTableHeaderFilter>("all");
 
   // TODO: Remove force render and maintain the mocks in context
   // TODO: Remove this after actions refactor
@@ -65,9 +68,9 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const { isLoading, mocks, fetchOldMocks, fetchMocks } = useFetchMocks(type, forceRender);
 
   useEffect(() => {
-    // TODO: check for rerenders
-    setFilteredMocks([...mocks]);
-  }, [mocks]);
+    const filteredRecords = getQuickFilteredRecords(mocks, filter);
+    setFilteredMocks(filteredRecords);
+  }, [filter, mocks]);
 
   const _forceRender = useCallback(() => {
     setForceRender((prev) => !prev);
@@ -164,9 +167,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     }
   };
 
-  const collections = (mocks.filter(
-    (mock) => mock?.recordType === MockRecordType.COLLECTION
-  ) as unknown) as RQMockCollection[];
+  const collections = (mocks.filter((mock) => isRecordMockCollection(mock)) as unknown) as RQMockCollection[];
 
   return isLoading ? (
     <SpinnerCard customLoadingMessage="Loading Mocks" />
@@ -197,12 +198,15 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         </div>
 
         <MocksListContentHeader
+          mocks={filteredMocks}
           mockType={type}
           searchValue={searchValue}
           setSearchValue={handleSearch}
           handleCreateNew={handleCreateNewMock}
           handleCreateNewCollection={handleCreateNewCollection}
           handleUploadAction={handleUploadAction}
+          filter={filter}
+          setFilter={setFilter}
         />
 
         <div className="mocks-table-container">
