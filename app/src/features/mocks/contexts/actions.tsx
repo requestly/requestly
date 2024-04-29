@@ -1,13 +1,19 @@
 import React, { createContext, useCallback, useContext } from "react";
 import Logger from "../../../../../common/logger";
 import { useMocksModalsContext } from "./modals";
-import { MockType, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
+import { MockListSource, MockType, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { message } from "antd";
 import { updateMock } from "backend/mocks/updateMock";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { trackMockStarToggledEvent, trackMockUploadWorkflowStarted } from "modules/analytics/events/features/mocksV2";
+import {
+  trackMockStarToggledEvent,
+  trackMockUploadWorkflowStarted,
+  trackNewMockButtonClicked,
+} from "modules/analytics/events/features/mocksV2";
+import { useNavigate } from "react-router-dom";
+import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -17,6 +23,8 @@ type MocksActionContextType = {
   updateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
   mockUploaderModalAction: (mockType: MockType) => void;
+  newFileModalAction: () => void;
+  createNewMock: (mockType: MockType, source: MockListSource) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -26,6 +34,7 @@ interface RulesProviderProps {
 }
 
 export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ children }) => {
+  const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -37,6 +46,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openDeleteMockModalAction,
     openUpdateMockCollectionModalAction,
     openMockUploaderModalAction,
+    openNewFileModalAction,
   } = useMocksModalsContext();
 
   const createNewCollectionAction = useCallback(
@@ -104,6 +114,28 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openMockUploaderModalAction]
   );
 
+  const newFileModalAction = useCallback(() => {
+    Logger.log("[DEBUG]", "newFileModalAction", {});
+    openNewFileModalAction();
+  }, [openNewFileModalAction]);
+
+  const createNewMock = useCallback(
+    (type: MockType, source: MockListSource) => {
+      Logger.log("[DEBUG]", "createNewMock", { source, type });
+
+      if (source === MockListSource.PICKER_MODAL) {
+        trackNewMockButtonClicked(type, "picker_modal");
+        return redirectToMockEditorCreateMock(navigate, true);
+      }
+      if (type === MockType.FILE) {
+        return openNewFileModalAction();
+      }
+      trackNewMockButtonClicked(type, "mock_list");
+      return redirectToMockEditorCreateMock(navigate);
+    },
+    [openNewFileModalAction, navigate]
+  );
+
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
@@ -112,6 +144,8 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     updateMockCollectionModalAction,
     toggleMockStarAction,
     mockUploaderModalAction,
+    newFileModalAction,
+    createNewMock,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;

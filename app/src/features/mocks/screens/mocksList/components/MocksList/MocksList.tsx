@@ -4,10 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   redirectToFileMockEditorEditMock,
   redirectToFileViewer,
-  redirectToMockEditorCreateMock,
   redirectToMockEditorEditMock,
 } from "utils/RedirectionUtils";
-import { trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import {
   MockListSource,
   MockTableHeaderFilter,
@@ -18,12 +16,12 @@ import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
 import {
-  NewFileModal,
   CreateCollectionModalWrapper,
   DeleteCollectionModalWrapper,
   DeleteMockModalWrapper,
   UpdateMockCollectionModalWrapper,
   MockUploaderModalWrapper,
+  NewFileModalWrapper,
 } from "features/mocks/modals";
 import "./mocksList.scss";
 import { getQuickFilteredRecords } from "./utils";
@@ -38,7 +36,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const navigate = useNavigate();
 
   // TODO: Move all the actions and local state in context
-  const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
   const [filter, setFilter] = useState<MockTableHeaderFilter>("all");
@@ -57,19 +54,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const _forceRender = useCallback(() => {
     setForceRender((prev) => !prev);
   }, []);
-
-  const handleCreateNewMock = () => {
-    if (source === MockListSource.PICKER_MODAL) {
-      trackNewMockButtonClicked(type, "picker_modal");
-      return redirectToMockEditorCreateMock(navigate, true);
-    }
-    // TODO: Change this to a constant
-    if (type === MockType.FILE) {
-      return setFileModalVisibility(true);
-    }
-    trackNewMockButtonClicked(type, "mock_list");
-    return redirectToMockEditorCreateMock(navigate);
-  };
 
   const handleNameClick = (mockId: string, isOldMock: boolean) => {
     handleEditAction(mockId, isOldMock);
@@ -133,12 +117,12 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         </div>
 
         <MocksListContentHeader
+          source={source}
           allrecords={mocks}
           mocks={filteredMocks}
           mockType={type}
           searchValue={searchValue}
           setSearchValue={handleSearch}
-          handleCreateNew={handleCreateNewMock}
           filter={filter}
           setFilter={setFilter}
         />
@@ -156,7 +140,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         </div>
       </div>
 
-      <NewFileModal visible={fileModalVisibility} toggleModalVisiblity={(visible) => setFileModalVisibility(visible)} />
+      <NewFileModalWrapper />
 
       <MockUploaderModalWrapper />
 
@@ -169,12 +153,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       <UpdateMockCollectionModalWrapper forceRender={_forceRender} mocks={mocks} />
     </>
   ) : (
-    <GettingStarted
-      mockType={type}
-      handleCreateNew={handleCreateNewMock}
-      fileModalVisibility={fileModalVisibility}
-      setFileModalVisibility={setFileModalVisibility}
-    />
+    <GettingStarted mockType={type} source={source} />
   );
 };
 

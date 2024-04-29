@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NewFileTypeSelector from "../NewFileModal/NewFileTypeSelector";
+import NewFileTypeSelector from "../NewFileModalWrapper/NewFileModal/NewFileTypeSelector";
 import { RQButton } from "lib/design-system/components";
 import { trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -102,7 +102,7 @@ const MockPickerIndex: React.FC<Props> = ({
   if (mocks.length && !showCreateMockState) {
     return (
       <>
-        <MocksListContentHeader handleCreateNew={() => setShowCreateMockState(true)} />
+        <MocksListContentHeader />
 
         <MocksTable
           mocks={mocks}

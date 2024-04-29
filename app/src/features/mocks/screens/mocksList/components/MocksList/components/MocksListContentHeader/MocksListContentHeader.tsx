@@ -4,7 +4,12 @@ import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { Badge, ButtonProps } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { ContentListHeader, ContentListHeaderProps } from "componentsV2/ContentList";
-import { MockType, MockTableHeaderFilter, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import {
+  MockType,
+  MockTableHeaderFilter,
+  RQMockMetadataSchema,
+  MockListSource,
+} from "components/features/mocksV2/types";
 import { RQButton } from "lib/design-system/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/selectors";
@@ -16,10 +21,10 @@ import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 
 interface Props {
+  source?: MockListSource;
   mockType?: MockType;
   allrecords?: RQMockMetadataSchema[];
   mocks?: RQMockMetadataSchema[];
-  handleCreateNew: () => void;
   searchValue?: string;
   setSearchValue?: (s: string) => void;
   filter?: MockTableHeaderFilter;
@@ -27,18 +32,18 @@ interface Props {
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
+  source,
   mocks,
   allrecords,
   mockType,
   filter,
-  handleCreateNew,
   searchValue,
   setSearchValue = () => {},
   setFilter,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
-  const { createNewCollectionAction, mockUploaderModalAction } = useMocksActionContext() ?? {};
+  const { createNewCollectionAction, mockUploaderModalAction, createNewMock } = useMocksActionContext() ?? {};
   const isRulesEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const actionbuttonsData = [
@@ -72,12 +77,12 @@ export const MocksListContentHeader: React.FC<Props> = ({
       type: "primary" as ButtonProps["type"],
       icon: <PlusOutlined />,
       buttonText: mockType ? (mockType === MockType.API ? "New Mock" : "New File") : "New Mock",
-      onClickHandler: () => (user?.loggedIn || mockType === MockType.FILE) && handleCreateNew?.(),
+      onClickHandler: () => (user?.loggedIn || mockType === MockType.FILE) && createNewMock?.(mockType, source),
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to create API mocks",
         disabled: mockType === MockType.FILE,
-        callback: handleCreateNew,
+        callback: () => createNewMock?.(mockType, source),
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
