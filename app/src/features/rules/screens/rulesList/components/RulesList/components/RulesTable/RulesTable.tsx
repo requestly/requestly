@@ -20,7 +20,9 @@ import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import { enhanceRecords, normalizeRecords } from "./utils/rules";
 import { ContentListTable, useContentListTableContext, withContentListTableContext } from "componentsV2/ContentList";
 import { useRulesActionContext } from "features/rules/context/actions";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./rulesTable.css";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
 
 interface Props {
   records: StorageRecord[];
@@ -101,6 +103,28 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     isBackgateRestrictionEnabled,
     isUpgradePopoverEnabled,
   ]);
+
+  useEffect(() => {
+    const updatedCountMap: Record<string, number> = {};
+    allRecords.reduce((accumulator, record) => {
+      if (isRule(record)) {
+        if (accumulator[record.ruleType]) {
+          accumulator[record.ruleType] += 1;
+        } else {
+          accumulator[record.ruleType] = 1;
+        }
+      }
+      return accumulator;
+    }, updatedCountMap);
+
+    Object.keys(GLOBAL_CONSTANTS.RULE_TYPES).forEach((ruleType) => {
+      if (!updatedCountMap[ruleType]) {
+        submitAttrUtil(ruleType + "_rules", 0);
+      }
+
+      submitAttrUtil(ruleType + "_rules", updatedCountMap[ruleType]);
+    });
+  }, [allRecords]);
 
   const getSelectionCount = useCallback((selectedRows: StorageRecord[]) => {
     let groups = 0;
