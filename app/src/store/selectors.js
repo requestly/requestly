@@ -294,3 +294,7 @@ export const getAllEditorToast = (state) => {
 export const getToastForEditor = (state, id) => {
   return getGlobalState(state).editorToast[id];
 };
+
+export const getIsAppBannerVisible = (state) => {
+  return getGlobalState(state).misc.nonPersist?.isAppBannerVisible;
+};

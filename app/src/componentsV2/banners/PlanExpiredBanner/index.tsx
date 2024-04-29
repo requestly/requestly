@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
@@ -11,8 +12,19 @@ export const PlanExpiredBanner = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
+  const [isBannerVisible, setIsBannerVisible] = useState(false);
 
-  if (user?.details?.planDetails?.status === "canceled" && !isPlanExpiredBannerClosed) {
+  useEffect(() => {
+    if (user?.details?.planDetails?.status === "canceled" && !isPlanExpiredBannerClosed) {
+      setIsBannerVisible(true);
+      dispatch(actions.updateIsAppBannerVisible(true));
+    } else {
+      setIsBannerVisible(false);
+      dispatch(actions.updateIsAppBannerVisible(false));
+    }
+  }, [user?.details?.planDetails?.status, isPlanExpiredBannerClosed, dispatch]);
+
+  if (isBannerVisible) {
     return (
       <div className="plan-expired-banner">
         <span className="plan-expired-banner-badge">PLAN EXPIRED</span>

@@ -7,6 +7,8 @@ import { TemplatePreviewModal } from "../../modals/TemplatePreviewModal/Template
 import { TemplateRecord } from "./types";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./templatesTable.scss";
+import { useSelector } from "react-redux";
+import { getIsAppBannerVisible } from "store/selectors";
 
 interface TemplatesTableProps {
   searchValue: string;
@@ -14,6 +16,7 @@ interface TemplatesTableProps {
 const TemplatesTable: React.FC<TemplatesTableProps> = ({ searchValue }) => {
   const [isTemplatePreviewModalVisible, setIsTemplatePreviewModalVisible] = useState(false);
   const [templateToPreview, setTemplateToPreview] = useState(null);
+  const isAppBannerVisible = useSelector(getIsAppBannerVisible);
 
   const handlePreviewTemplateInModal = (template: TemplateRecord) => {
     setTemplateToPreview(template.data);
@@ -47,7 +50,7 @@ const TemplatesTable: React.FC<TemplatesTableProps> = ({ searchValue }) => {
           locale={{
             emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Templates found" />,
           }}
-          scroll={{ y: `calc(100vh - 232px)` }}
+          scroll={isAppBannerVisible ? { y: `calc(100vh - 232px - 48px)` } : undefined}
         />
       </div>
     </>

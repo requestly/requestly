@@ -94,16 +94,24 @@ export const AppNotificationBanner = () => {
     (bannerId: string) => {
       switch (bannerId) {
         case "commercial_license": {
-          return !user.details?.isPremium;
+          if (!user.details?.isPremium) {
+            dispatch(actions.updateIsAppBannerVisible(true));
+            return true;
+          } else return false;
         }
         case "request_team_access": {
-          return billingTeams?.length && !billingTeams?.some((team) => user?.details?.profile?.uid in team.members);
+          if (billingTeams?.length && !billingTeams?.some((team) => user?.details?.profile?.uid in team.members)) {
+            dispatch(actions.updateIsAppBannerVisible(true));
+            return true;
+          } else return false;
         }
-        default:
+        default: {
+          dispatch(actions.updateIsAppBannerVisible(true));
           return true;
+        }
       }
     },
-    [billingTeams, user?.details?.profile?.uid, user.details?.isPremium]
+    [billingTeams, user?.details?.profile?.uid, user.details?.isPremium, dispatch]
   );
 
   const getBannerClassName = (bannerType: string) => {
@@ -118,6 +126,7 @@ export const AppNotificationBanner = () => {
   const handleCloseBannerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    dispatch(actions.updateIsAppBannerVisible(false));
     dispatch(actions.updateAppNotificationBannerDismissTs(new Date().getTime()));
   };
 

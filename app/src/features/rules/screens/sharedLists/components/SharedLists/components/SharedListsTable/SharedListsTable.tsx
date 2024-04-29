@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getIsAppBannerVisible, getUserAuthDetails } from "store/selectors";
 import { Empty } from "antd";
 import { ContentListTable } from "componentsV2/ContentList";
 import DeleteSharedListModal from "../../modals/DeleteSharedListModal";
@@ -15,6 +15,7 @@ interface SharedListsTableProps {
 
 export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists }) => {
   const user = useSelector(getUserAuthDetails);
+  const isAppBannerVisible = useSelector(getIsAppBannerVisible);
   const [isDeleteSharedListModalVisible, setIsDeleteSharedListModalVisible] = useState(false);
   const [sharedListIdsToDelete, setSharedListIdsToDelete] = useState([]);
 
@@ -39,7 +40,7 @@ export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists 
           locale={{
             emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Shared list found" />,
           }}
-          scroll={{ y: `calc(100vh - 232px)` }}
+          scroll={isAppBannerVisible ? { y: `calc(100vh - 232px - 48px)` } : undefined}
         />
       </div>
       {isDeleteSharedListModalVisible && (
