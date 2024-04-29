@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 //UTILS
-import { redirectToRules } from "../../../../utils/RedirectionUtils";
+import { redirectToRules } from "utils/RedirectionUtils";
 import { getAppMode } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { FeatureBanner } from "components/common/featureBanner";
-import File from "../../../../assets/img/icons/common/file.svg";
-import ImportSharedListFromURLModal from "../ImportSharedListFromURLModal";
+import FileIcon from "../../assets/file.svg";
+import ImportSharedListFromURLModal from "../../modals/ImportSharedListFromURLModal";
 
 //CONSTANTS
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -55,7 +55,7 @@ const CreateSharedListCTA = () => {
     <>
       <FeatureBanner
         title="Share Rules with other users"
-        bannerImg={File}
+        bannerImg={FileIcon}
         bannerTitle="Shared lists"
         description={renderEmptyListDescription()}
       />

@@ -4,6 +4,7 @@ import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } 
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
 import config from "common/config";
+import { TAB_SERVICE_DATA, tabService } from "./tabService";
 
 const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 
@@ -40,17 +41,11 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingC
   return null;
 };
 
-export const initSessionRecording = async (tabId: number, frameId: number, url: string) => {
-  const config = await getSessionRecordingConfig(url);
-
-  if (config) {
-    await injectWebAccessibleScript("libs/requestly-web-sdk.js", {
-      tabId,
-      frameIds: [frameId],
-    });
-  }
-
-  return config;
+export const initSessionRecordingSDK = async (tabId: number, frameId: number) => {
+  await injectWebAccessibleScript("libs/requestly-web-sdk.js", {
+    tabId,
+    frameIds: [frameId],
+  });
 };
 
 export const onSessionRecordingStartedNotification = (tabId: number, markIcon: boolean) => {
@@ -78,32 +73,102 @@ export const watchRecording = (tabId: number) => {
 };
 
 const startRecording = (tabId: number, config: Record<string, any>) => {
-  injectWebAccessibleScript("libs/requestly-web-sdk.js", {
-    tabId: tabId,
-  }).then(() => {
-    chrome.tabs.sendMessage(tabId, {
-      action: CLIENT_MESSAGES.START_RECORDING,
-      payload: config,
-    });
+  chrome.tabs.sendMessage(tabId, {
+    action: CLIENT_MESSAGES.START_RECORDING,
+    payload: config,
   });
 };
 
 export const stopRecording = (tabId: number, openRecording: boolean) => {
-  chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.STOP_RECORDING }).then(() => {
-    if (openRecording) {
-      watchRecording(tabId);
-    }
+  chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.STOP_RECORDING }, () => {
+    tabService.removeData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING);
   });
+
+  if (openRecording) {
+    watchRecording(tabId);
+  }
 };
 
-export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget: boolean) => {
+export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget: boolean = true) => {
+  const sessionRecordingConfig = await getSessionRecordingConfig(tab.url);
+
+  const sessionRecordingDataExist = !!tabService.getData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING);
+  // Auto recording is on for current tab if sessionRecordingConfig exist,
+  // so forcefully start explicit recording.
+  if (!sessionRecordingConfig && sessionRecordingDataExist) {
+    return;
+  }
+
   const sessionRecordingData = { explicit: true, showWidget };
+  tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
 
   startRecording(tab.id, sessionRecordingData);
 };
 
 export const launchUrlAndStartRecording = (url: string) => {
   chrome.tabs.create({ url }, (tab) => {
-    startRecording(tab.id, { explicit: true, notify: true });
+    tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, {
+      notify: true,
+      explicit: true,
+      showWidget: true,
+    });
+  });
+};
+
+export const handleSessionRecordingOnClientPageLoad = async (tab: chrome.tabs.Tab, frameId: number) => {
+  let sessionRecordingData = tabService.getData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING);
+
+  if (!sessionRecordingData) {
+    const sessionRecordingConfig = await getSessionRecordingConfig(tab.url);
+
+    if (sessionRecordingConfig) {
+      sessionRecordingData = { config: sessionRecordingConfig, url: tab.url };
+      const recordingMode = sessionRecordingConfig?.autoRecording?.mode;
+
+      sessionRecordingData.showWidget = recordingMode === AutoRecordingMode.CUSTOM;
+
+      if (recordingMode === AutoRecordingMode.ALL_PAGES) {
+        sessionRecordingData.markRecordingIcon = false;
+      }
+
+      tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, sessionRecordingData);
+    }
+  } else if (!sessionRecordingData.explicit) {
+    // stop recording if config was changed to turn off auto-recording for the session URL
+    const sessionRecordingConfig = await getSessionRecordingConfig(sessionRecordingData.url);
+
+    if (!sessionRecordingConfig) {
+      stopRecording(tab.id, false);
+      return;
+    }
+  }
+
+  if (sessionRecordingData) {
+    startRecording(tab.id, sessionRecordingData);
+    tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, {
+      ...sessionRecordingData,
+      notify: false,
+      previousSession: null,
+    });
+  }
+};
+
+export const cacheRecordedSessionOnClientPageUnload = (tabId: number, payload: any) => {
+  const sessionRecordingData = tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING);
+  if (sessionRecordingData) {
+    tabService.setData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING, {
+      ...sessionRecordingData,
+      previousSession: payload.session,
+      widgetPosition: payload.widgetPosition,
+      recordingStartTime: payload.recordingStartTime,
+    });
+  }
+};
+
+export const stopRecordingOnAllTabs = () => {
+  Object.values(tabService.getTabs()).forEach(({ id: tabId }) => {
+    if (tabId && tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING)) {
+      stopRecording(tabId, false);
+    }
   });
 };
