@@ -381,12 +381,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   };
 
   const resolveXHR = (xhr, responseData) => {
-    Object.defineProperty(xhr, "readyState", { writable: true });
-    const updateReadyState = (readyState) => {
-      xhr.readyState = readyState;
-      xhr.dispatchEvent(new CustomEvent("readystatechange"));
-    };
-
     xhr.dispatchEvent(new ProgressEvent("loadstart"));
 
     // update response headers
@@ -397,11 +391,11 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       }
       return null;
     };
-    updateReadyState(xhr.HEADERS_RECEIVED);
-    updateReadyState(xhr.LOADING);
+    updateXhrReadyState(xhr, xhr.HEADERS_RECEIVED);
+    updateXhrReadyState(xhr, xhr.LOADING);
 
     // mark resolved
-    updateReadyState(xhr.DONE);
+    updateXhrReadyState(xhr, xhr.DONE);
   };
 
   const OriginalXMLHttpRequest = XMLHttpRequest;
@@ -409,7 +403,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   const createProxyXHRObject = function () {
     const actualXhr = this;
 
-    const dispatchEventToParent = (type, e) => {
+    const dispatchEventToActualXHR = (type, e) => {
       console.log("[RQ]", `on${type}`, e);
       actualXhr.dispatchEvent(
         new ProgressEvent(type, {
@@ -420,7 +414,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       );
     };
 
-    const updateParentXHRReadyState = (readyState) => {
+    const updateActualXHRReadyState = (readyState) => {
       updateXhrReadyState(actualXhr, readyState);
     };
 
@@ -457,7 +451,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
           },
         });
 
-        updateParentXHRReadyState(this.HEADERS_RECEIVED);
+        updateActualXHRReadyState(this.HEADERS_RECEIVED);
       } else if (this.readyState === this.DONE) {
         const responseType = this.responseType;
         const contentType = this.getResponseHeader("content-type");
@@ -551,12 +545,12 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         // mark resolved)
         if (this._abort) {
           // Note: This might get delayed due to async in code block
-          dispatchEventToParent("abort");
-          dispatchEventToParent("loadend");
+          dispatchEventToActualXHR("abort");
+          dispatchEventToActualXHR("loadend");
         } else {
-          updateParentXHRReadyState(this.DONE);
-          dispatchEventToParent("load");
-          dispatchEventToParent("loadend");
+          updateActualXHRReadyState(this.DONE);
+          dispatchEventToActualXHR("load");
+          dispatchEventToActualXHR("loadend");
         }
 
         notifyResponseRuleApplied({
@@ -564,17 +558,17 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
           requestDetails,
         });
       } else {
-        updateParentXHRReadyState(this.readyState);
+        updateActualXHRReadyState(this.readyState);
       }
     };
 
     const xhr = new OriginalXMLHttpRequest();
     xhr.addEventListener("readystatechange", onReadyStateChange.bind(xhr), false);
-    xhr.addEventListener("abort", dispatchEventToParent.bind(xhr, "abort"), false);
-    xhr.addEventListener("error", dispatchEventToParent.bind(xhr, "error"), false);
-    xhr.addEventListener("timeout", dispatchEventToParent.bind(xhr, "timeout"), false);
-    xhr.addEventListener("loadstart", dispatchEventToParent.bind(xhr, "loadstart"), false);
-    xhr.addEventListener("progress", dispatchEventToParent.bind(xhr, "progress"), false);
+    xhr.addEventListener("abort", dispatchEventToActualXHR.bind(xhr, "abort"), false);
+    xhr.addEventListener("error", dispatchEventToActualXHR.bind(xhr, "error"), false);
+    xhr.addEventListener("timeout", dispatchEventToActualXHR.bind(xhr, "timeout"), false);
+    xhr.addEventListener("loadstart", dispatchEventToActualXHR.bind(xhr, "loadstart"), false);
+    xhr.addEventListener("progress", dispatchEventToActualXHR.bind(xhr, "progress"), false);
 
     const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "timeout");
 
@@ -597,7 +591,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     return xhr;
   };
 
-  // TODO: Why this required? Check with @nafees/vaibhav
   XMLHttpRequest.prototype = OriginalXMLHttpRequest.prototype;
   Object.entries(OriginalXMLHttpRequest).map(([key, val]) => {
     XMLHttpRequest[key] = val;
@@ -605,8 +598,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   const open = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method, url) {
-    this._method = method;
-    this._requestURL = getAbsoluteUrl(url);
     this.rqProxyXhr._method = method;
     this.rqProxyXhr._requestURL = getAbsoluteUrl(url);
     open.apply(this.rqProxyXhr, arguments);
@@ -634,14 +625,13 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (data) {
-    this._requestData = data;
     this.rqProxyXhr._requestData = data;
 
-    const requestRule = getRequestRule(this._requestURL);
+    const requestRule = getRequestRule(this.rqProxyXhr._requestURL);
     if (requestRule) {
-      this._requestData = getCustomRequestBody(requestRule, {
-        method: this._method,
-        url: this._requestURL,
+      this.rqProxyXhr._requestData = getCustomRequestBody(requestRule, {
+        method: this.rqProxyXhr._method,
+        url: this.rqProxyXhr._requestURL,
         body: data,
         bodyAsJson: jsonifyValidJSONString(data, true),
       });
@@ -649,8 +639,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       notifyRequestRuleApplied({
         ruleDetails: requestRule,
         requestDetails: {
-          url: this._requestURL,
-          method: this._method,
+          url: this.rqProxyXhr._requestURL,
+          method: this.rqProxyXhr._method,
           type: "xmlhttprequest",
           timeStamp: Date.now(),
         },
@@ -658,14 +648,14 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     }
 
     this.responseRule = getResponseRule({
-      url: this._requestURL,
-      requestData: jsonifyValidJSONString(this._requestData),
-      method: this._method,
+      url: this.rqProxyXhr._requestURL,
+      requestData: jsonifyValidJSONString(this.rqProxyXhr._requestData),
+      method: this.rqProxyXhr._method,
     });
     this.rqProxyXhr.responseRule = this.responseRule;
 
-    const redirectRuleThatMatchesURL = getMatchingRedirectRule(this._requestURL);
-    const replaceRuleThatMatchesURL = getMatchingReplaceRule(this._requestURL);
+    const redirectRuleThatMatchesURL = getMatchingRedirectRule(this.rqProxyXhr._requestURL);
+    const replaceRuleThatMatchesURL = getMatchingReplaceRule(this.rqProxyXhr._requestURL);
     if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
       ignoredHeadersOnRedirect.forEach((header) => {
         // Stores ignored header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
@@ -682,12 +672,12 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         console.log("[RQ]", "send and response rule matched and serveWithoutRequest is true");
         resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
       } else {
-        send.call(this.rqProxyXhr, this._requestData);
+        send.call(this.rqProxyXhr, this.rqProxyXhr._requestData);
       }
       return;
     }
 
-    send.call(this, this._requestData);
+    send.call(this, this.rqProxyXhr._requestData);
   };
 
   // Intercept fetch API
