@@ -14,6 +14,7 @@ import { isRecordMock } from "../MocksTable/utils";
 
 interface Props {
   mockType?: string;
+  allrecords: RQMockMetadataSchema[];
   mocks: RQMockMetadataSchema[];
   handleUploadAction?: () => void;
   handleCreateNew: () => void;
@@ -26,6 +27,7 @@ interface Props {
 
 export const MocksListContentHeader: React.FC<Props> = ({
   mocks,
+  allrecords,
   mockType,
   filter,
   handleCreateNew,
@@ -126,8 +128,8 @@ export const MocksListContentHeader: React.FC<Props> = ({
         label: (
           <div className="label">
             All{" "}
-            {mocks.length ? (
-              <Badge count={mocks.filter((record) => isRecordMock(record)).length} overflowCount={20} />
+            {allrecords?.length ? (
+              <Badge count={allrecords?.filter((record) => isRecordMock(record)).length} overflowCount={20} />
             ) : null}
           </div>
         ),
@@ -141,10 +143,10 @@ export const MocksListContentHeader: React.FC<Props> = ({
           <div className="label">
             <MdOutlineStarOutline className="icon" />
             Starred
-            {mocks.length ? (
+            {mocks?.length ? (
               <Badge
                 overflowCount={20}
-                count={mocks.filter((record) => isRecordMock(record) && record.isFavourite).length}
+                count={mocks?.filter((record) => isRecordMock(record) && record.isFavourite).length}
               />
             ) : null}
           </div>

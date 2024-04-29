@@ -85,7 +85,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       columns={columns}
       data={contentTableAdaptedMocks}
       locale={{
-        emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found" />,
+        emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No mock/file found!" />,
       }}
       onRow={(record) => {
         return {
