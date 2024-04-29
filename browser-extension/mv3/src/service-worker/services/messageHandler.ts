@@ -5,8 +5,10 @@ import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
 import { getExecutedRules } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
+  cacheRecordedSessionOnClientPageUnload,
   getTabSession,
-  initSessionRecording,
+  handleSessionRecordingOnClientPageLoad,
+  initSessionRecordingSDK,
   launchUrlAndStartRecording,
   onSessionRecordingStartedNotification,
   onSessionRecordingStoppedNotification,
@@ -36,25 +38,33 @@ export const initMessageHandler = () => {
           frameIds: [sender.frameId],
         });
         initCustomWidgets(sender.tab?.id, sender.frameId);
-        applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
+        applyScriptRules(sender.tab?.id, sender.frameId, sender.tab.url);
         break;
 
-      case CLIENT_MESSAGES.INIT_SESSION_RECORDING:
-        initSessionRecording(sender.tab?.id, sender.frameId, sender.tab.url).then(sendResponse);
+      case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
+        handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
+        break;
+
+      case EXTENSION_MESSAGES.INIT_SESSION_RECORDER:
+        initSessionRecordingSDK(sender.tab.id, sender.frameId).then(() => sendResponse());
         return true;
 
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STARTED:
         onSessionRecordingStartedNotification(sender.tab.id, message.payload.markRecordingIcon);
         break;
+
       case CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED:
         onSessionRecordingStoppedNotification(sender.tab.id);
         break;
+
       case EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
         startRecordingExplicitly(message.tab, message.showWidget);
         break;
+
       case EXTENSION_MESSAGES.START_RECORDING_ON_URL:
         launchUrlAndStartRecording(message.url);
         break;
+
       case EXTENSION_MESSAGES.STOP_RECORDING:
         stopRecording(message.tabId ?? sender.tab.id, message.openRecording);
         break;
@@ -89,6 +99,10 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.WATCH_RECORDING:
         watchRecording(message.tabId ?? sender.tab?.id);
+        break;
+
+      case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
+        cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
     }
 
