@@ -18,9 +18,9 @@ import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RQButton } from "lib/design-system/components";
 import { MocksTableProps } from "../MocksTable";
-import REQUEST_METHOD_COLORS from "components/features/mocksV2/MockList/MocksTable/constants/requestMethodColors";
 import { isRecordMockCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
+import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 
 // TODO: move all actions in a hook and use that
 export const useMocksTableColumns = ({
