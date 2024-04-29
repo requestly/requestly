@@ -148,12 +148,10 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
           );
         }
 
-        return member.isOwner ? (
-          <span>Admin access</span>
-        ) : (
+        return (
           <MemberRoleDropdown
             showLoader
-            isHoverEffect={isLoggedInUserAdmin || member.id === loggedInUserId}
+            isHoverEffect={isLoggedInUserAdmin && member.id !== loggedInUserId}
             placement="bottomLeft"
             isAdmin={member.isAdmin}
             memberId={member.id}
