@@ -51,3 +51,5 @@ export interface RQMockSchema extends MockSchema, RQMockMetadataSchema {}
 export enum MockListSource {
   PICKER_MODAL,
 }
+
+export type MockTableHeaderFilter = "all" | "starred";
