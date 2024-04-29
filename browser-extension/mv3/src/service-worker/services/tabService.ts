@@ -55,6 +55,9 @@ class TabService {
 
       this.addOrUpdateTab(newTabState);
 
+      if (!Object.keys(changeInfo).includes("status")) {
+        return;
+      }
       if (tab.status === "complete" && existingTab.documentLifecycle === "active" && existingTab.frameId === 0) {
         this.sendMessage(tabId, { action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
       }
