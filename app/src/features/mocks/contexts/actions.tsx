@@ -8,6 +8,7 @@ type MocksActionContextType = {
   updateCollectionNameAction: (mockType: MockType, record: RQMockMetadataSchema) => void;
   deleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
   deleteMockModalAction: (record: RQMockMetadataSchema) => void;
+  updateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -21,6 +22,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openCollectionModalAction,
     openDeleteCollectionModalAction,
     openDeleteMockModalAction,
+    openUpdateMockCollectionModalAction,
   } = useMocksModalsContext();
 
   const createNewCollectionAction = useCallback(
@@ -55,11 +57,20 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openDeleteMockModalAction]
   );
 
+  const updateMockCollectionModalAction = useCallback(
+    (record: RQMockMetadataSchema) => {
+      Logger.log("[DEBUG]", "updateMockCollectionModalAction", { record });
+      openUpdateMockCollectionModalAction(record);
+    },
+    [openUpdateMockCollectionModalAction]
+  );
+
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
     deleteCollectionModalAction,
     deleteMockModalAction,
+    updateMockCollectionModalAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;

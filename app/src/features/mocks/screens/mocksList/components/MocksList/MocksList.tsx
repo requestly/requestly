@@ -16,7 +16,6 @@ import {
   MockListSource,
   MockTableHeaderFilter,
   MockType,
-  RQMockCollection,
   RQMockMetadataSchema,
   RQMockSchema,
 } from "components/features/mocksV2/types";
@@ -26,10 +25,10 @@ import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerInd
 import {
   MockUploaderModal,
   NewFileModal,
-  UpdateMockCollectionModal,
   CreateCollectionModalWrapper,
   DeleteCollectionModalWrapper,
   DeleteMockModalWrapper,
+  UpdateMockCollectionModalWrapper,
 } from "features/mocks/modals";
 import "./mocksList.scss";
 import { message } from "antd";
@@ -38,7 +37,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getQuickFilteredRecords } from "./utils";
-import { isRecordMockCollection } from "./components/MocksTable/utils";
 
 interface Props {
   source?: MockListSource;
@@ -54,10 +52,8 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const teamId = workspace?.id;
 
   // TODO: Move all the actions and local state in context
-  const [selectedMock, setSelectedMock] = useState<RQMockMetadataSchema>(null);
   const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
   const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
-  const [updateMockCollectionModalVisibility, setUpdateMockCollectionModalVisibility] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
   const [filter, setFilter] = useState<MockTableHeaderFilter>("all");
@@ -121,11 +117,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setUploadModalVisibility(true);
   };
 
-  const handleUpdateMockCollectionAction = (mock: RQMockMetadataSchema) => {
-    setSelectedMock(mock);
-    setUpdateMockCollectionModalVisibility(true);
-  };
-
   const handleStarMockAction = (record: RQMockSchema) => {
     const isStarred = record.isFavourite;
     const updatedValue = !isStarred;
@@ -150,8 +141,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       setFilteredMocks([...mocks]);
     }
   };
-
-  const collections = (mocks.filter((mock) => isRecordMockCollection(mock)) as unknown) as RQMockCollection[];
 
   return isLoading ? (
     <SpinnerCard customLoadingMessage="Loading Mocks" />
@@ -202,7 +191,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleNameClick={handleNameClick}
             handleEditAction={handleEditAction}
             handleUploadAction={handleUploadAction}
-            handleUpdateMockCollectionAction={handleUpdateMockCollectionAction}
             handleStarMockAction={handleStarMockAction}
           />
         </div>
@@ -220,25 +208,9 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       <CreateCollectionModalWrapper forceRender={_forceRender} />
       <DeleteCollectionModalWrapper forceRender={_forceRender} />
 
-      {/* keep this at top level, in container */}
+      {/* keep this at top level, below modals will be used at multiple places */}
       <DeleteMockModalWrapper forceRender={_forceRender} />
-
-      <UpdateMockCollectionModal
-        mock={selectedMock}
-        collections={collections}
-        visible={updateMockCollectionModalVisibility}
-        toggleModalVisibility={(visible: boolean) => {
-          setUpdateMockCollectionModalVisibility(visible);
-
-          if (!visible) {
-            setSelectedMock(null);
-          }
-        }}
-        onSuccess={() => {
-          _forceRender();
-          setSelectedMock(null);
-        }}
-      />
+      <UpdateMockCollectionModalWrapper forceRender={_forceRender} mocks={mocks} />
     </>
   ) : (
     <GettingStarted
