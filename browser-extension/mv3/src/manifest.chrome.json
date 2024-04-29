@@ -55,7 +55,8 @@
     "scripting",
     "storage",
     "tabs",
-    "webRequest"
+    "webRequest",
+    "webNavigation"
   ],
   "host_permissions": ["<all_urls>"],
   "commands": {}

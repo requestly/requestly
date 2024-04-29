@@ -17,7 +17,8 @@ import { SharedLinkVisibility } from "./types";
 import Logger from "lib/logger";
 import { getAllRecords } from "store/features/rules/selectors";
 import { StorageRecord } from "features/rules/types/rules";
-import { trackSharedListCreatedEvent, trackSharedListUrlCopied } from "modules/analytics/events/features/sharedList";
+import { trackSharedListCreatedEvent } from "modules/analytics/events/features/sharedList";
+import { trackSharedListUrlCopied } from "features/rules/screens/sharedLists";
 import "./index.css";
 import EmailInputWithDomainBasedSuggestions from "../EmailInputWithDomainBasedSuggestions";
 

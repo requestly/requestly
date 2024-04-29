@@ -1,5 +1,5 @@
 import { StorageService } from "init";
-import { TestReport } from "./types";
+import { TestReport } from "../types";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 

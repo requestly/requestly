@@ -4,8 +4,6 @@ import { initSessionRecording } from "./sessionRecorder";
 import { initResponseRuleHandler } from "./responseRuleHandler";
 import { initRequestRuleHandler } from "./requestRuleHandler";
 
-console.log("Hello from Requestly!");
-
 if (document.doctype?.name === "html" || document.contentType?.includes("html")) {
   chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.HANDSHAKE_CLIENT });
   initSessionRecording();
