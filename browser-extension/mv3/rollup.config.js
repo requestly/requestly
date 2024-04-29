@@ -107,9 +107,9 @@ export default [
     plugins: commonPlugins,
   },
   {
-    input: "src/utility-scripts/cacheRules.js",
+    input: "src/utility-scripts/cacheJson/cacheJsonOnPage.js",
     output: {
-      file: `${OUTPUT_DIR}/libs/cacheRules.js`,
+      file: `${OUTPUT_DIR}/libs/cacheJson.js`,
       format: "iife",
     },
     plugins: commonPlugins,
