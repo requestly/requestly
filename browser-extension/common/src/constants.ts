@@ -26,6 +26,9 @@ export const EXTENSION_MESSAGES = {
   CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD: "cacheRecordedSessionOnPageUnload",
   INIT_SESSION_RECORDER: "initSessionRecorder",
   CLIENT_PAGE_LOADED: "clientPageLoaded",
+  SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
+  NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
+  TEST_RULE_ON_URL: "testRuleOnUrl",
 };
 
 export const CLIENT_MESSAGES = {
@@ -45,6 +48,7 @@ export const CLIENT_MESSAGES = {
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   EXECUTE_SCRIPT: "executeScript",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
+  START_EXPLICIT_RULE_TESTING: "startExplicitRuleTesting",
 };
 
 export const STORAGE_TYPE = "local";
@@ -67,6 +71,7 @@ export const RULE_TITLES = {
 export const STORAGE_KEYS = {
   LAST_SYNCED_TS: "last-synced-ts",
   LAST_UPDATED_TS: "last-updated-ts",
+  TEST_REPORTS: "testReports",
 };
 
 export const LINKS = {
