@@ -374,7 +374,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   // XHR Implementation
   const updateXhrReadyState = (xhr, readyState) => {
-    // console.log("[RQ]", "updateXhrReadyState", readyState);
     Object.defineProperty(xhr, "readyState", { writable: true });
     xhr.readyState = readyState;
     xhr.dispatchEvent(new CustomEvent("readystatechange"));
@@ -404,7 +403,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     const actualXhr = this;
 
     const dispatchEventToActualXHR = (type, e) => {
-      console.log("[RQ]", `on${type}`, e);
+      isDebugMode && console.log("[RQ]", `on${type}`, e);
       actualXhr.dispatchEvent(
         new ProgressEvent(type, {
           lengthComputable: e?.lengthComputable,
@@ -419,13 +418,14 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     };
 
     const onReadyStateChange = async function () {
-      console.log("[RQ]", "onReadyStateChange", {
-        state: this.readyState,
-        status: this.status,
-        response: this.response,
-        xhr: this,
-        url: this._requestURL,
-      });
+      isDebugMode &&
+        console.log("[RQ]", "onReadyStateChange", {
+          state: this.readyState,
+          status: this.status,
+          response: this.response,
+          xhr: this,
+          url: this._requestURL,
+        });
       if (!this.responseRule) {
         return;
       }
@@ -475,7 +475,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
           customResponse = await customResponse;
         }
 
-        console.log("[RQ]", "Rule Applied - customResponse", { customResponse, responseType, contentType });
+        isDebugMode &&
+          console.log("[RQ]", "Rule Applied - customResponse", { customResponse, responseType, contentType });
 
         const isUnsupportedResponseType = responseType && !["json", "text"].includes(responseType);
 
@@ -606,7 +607,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   const abort = XMLHttpRequest.prototype.abort;
   XMLHttpRequest.prototype.abort = function () {
-    console.log("abort called");
+    isDebugMode && console.log("abort called");
     this._abort = true;
     this.rqProxyXhr._abort = true;
     abort.apply(this, arguments);
@@ -667,9 +668,9 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     }
 
     if (this.responseRule) {
-      console.log("[RQ]", "send and response rule matched", this.responseRule);
+      isDebugMode && console.log("[RQ]", "send and response rule matched", this.responseRule);
       if (shouldServeResponseWithoutRequest(this.responseRule)) {
-        console.log("[RQ]", "send and response rule matched and serveWithoutRequest is true");
+        isDebugMode && console.log("[RQ]", "send and response rule matched and serveWithoutRequest is true");
         resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
       } else {
         send.call(this.rqProxyXhr, this.rqProxyXhr._requestData);
