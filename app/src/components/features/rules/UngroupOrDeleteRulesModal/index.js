@@ -13,7 +13,7 @@ import { addRecordsToTrash } from "utils/trash/TrashUtils";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
-import { deleteTestReportByRuleId } from "../TestThisRule/helpers";
+import { deleteTestReportByRuleId } from "../TestThisRule/utils/testReports";
 import { unselectAllRecords } from "../actions";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 

@@ -26,7 +26,6 @@
 
         if (!RQ.ClientUtils.isAppPage()) {
           RQ.RuleExecutionHandler.setup();
-          RQ.ConsoleLogger.setup();
           RQ.RequestResponseRuleHandler.setup();
           RQ.ScriptRuleHandler.setup();
           RQ.UserAgentRuleHandler.setup();
