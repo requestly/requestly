@@ -105,25 +105,26 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   ]);
 
   useEffect(() => {
-    const updatedCountMap: Record<string, number> = {};
-    allRecords.reduce((accumulator, record) => {
-      if (isRule(record)) {
-        if (accumulator[record.ruleType]) {
-          accumulator[record.ruleType] += 1;
-        } else {
-          accumulator[record.ruleType] = 1;
+    if (allRecords) {
+      const updatedCountMap = allRecords.reduce((accumulator, record) => {
+        if (isRule(record)) {
+          if (accumulator[record.ruleType]) {
+            accumulator[record.ruleType] += 1;
+          } else {
+            accumulator[record.ruleType] = 1;
+          }
         }
-      }
-      return accumulator;
-    }, updatedCountMap);
+        return accumulator;
+      }, {} as Record<string, number>);
 
-    Object.keys(GLOBAL_CONSTANTS.RULE_TYPES).forEach((ruleType) => {
-      if (!updatedCountMap[ruleType]) {
-        submitAttrUtil(ruleType + "_rules", 0);
-      }
+      Object.values(GLOBAL_CONSTANTS.RULE_TYPES).forEach((ruleType) => {
+        if (!updatedCountMap[ruleType]) {
+          submitAttrUtil(ruleType + "_rules", 0);
+        }
 
-      submitAttrUtil(ruleType + "_rules", updatedCountMap[ruleType]);
-    });
+        submitAttrUtil(ruleType + "_rules", updatedCountMap[ruleType]);
+      });
+    }
   }, [allRecords]);
 
   const getSelectionCount = useCallback((selectedRows: StorageRecord[]) => {
