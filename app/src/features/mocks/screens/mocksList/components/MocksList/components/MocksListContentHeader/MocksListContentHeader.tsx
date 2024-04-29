@@ -17,14 +17,13 @@ import PATHS from "config/constants/sub/paths";
 
 interface Props {
   mockType?: MockType;
-  allrecords: RQMockMetadataSchema[];
-  mocks: RQMockMetadataSchema[];
-  handleUploadAction?: () => void;
+  allrecords?: RQMockMetadataSchema[];
+  mocks?: RQMockMetadataSchema[];
   handleCreateNew: () => void;
   searchValue?: string;
   setSearchValue?: (s: string) => void;
-  filter: MockTableHeaderFilter;
-  setFilter: (filter: MockTableHeaderFilter) => void;
+  filter?: MockTableHeaderFilter;
+  setFilter?: (filter: MockTableHeaderFilter) => void;
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
@@ -33,14 +32,13 @@ export const MocksListContentHeader: React.FC<Props> = ({
   mockType,
   filter,
   handleCreateNew,
-  handleUploadAction,
   searchValue,
   setSearchValue = () => {},
   setFilter,
 }) => {
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
-  const { createNewCollectionAction } = useMocksActionContext();
+  const { createNewCollectionAction, mockUploaderModalAction } = useMocksActionContext() ?? {};
   const isRulesEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const actionbuttonsData = [
@@ -49,11 +47,11 @@ export const MocksListContentHeader: React.FC<Props> = ({
       type: "text" as ButtonProps["type"],
       icon: <CloudUploadOutlined />,
       buttonText: `Upload ${mockType === MockType.FILE ? "File" : "JSON"}`,
-      onClickHandler: () => user?.details?.isLoggedIn && handleUploadAction(),
+      onClickHandler: () => user?.details?.isLoggedIn && mockUploaderModalAction(mockType),
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to upload mocks",
-        callback: handleUploadAction,
+        callback: () => mockUploaderModalAction(mockType),
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
@@ -112,8 +110,6 @@ export const MocksListContentHeader: React.FC<Props> = ({
       );
     });
 
-  const contentListHeaderSearchProps = mockType ? { searchValue: searchValue, setSearchValue: setSearchValue } : {};
-
   const getMockTableTitle = () => {
     switch (mockType) {
       case MockType.API:
@@ -163,13 +159,15 @@ export const MocksListContentHeader: React.FC<Props> = ({
     [mocks, setFilter]
   );
 
-  return (
-    <ContentListHeader
-      {...contentListHeaderSearchProps}
-      title={getMockTableTitle()}
-      actions={contentHeaderActions}
-      activeFilter={filter}
-      filters={contentHeaderFilters}
-    />
-  );
+  const contentListHeaderSearchProps = mockType
+    ? {
+        activeFilter: filter,
+        searchValue: searchValue,
+        setSearchValue: setSearchValue,
+        title: getMockTableTitle(),
+        filters: contentHeaderFilters,
+      }
+    : {};
+
+  return <ContentListHeader {...contentListHeaderSearchProps} actions={contentHeaderActions} />;
 };

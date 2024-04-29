@@ -7,7 +7,7 @@ import { updateMock } from "backend/mocks/updateMock";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { trackMockStarToggledEvent } from "modules/analytics/events/features/mocksV2";
+import { trackMockStarToggledEvent, trackMockUploadWorkflowStarted } from "modules/analytics/events/features/mocksV2";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -16,6 +16,7 @@ type MocksActionContextType = {
   deleteMockModalAction: (record: RQMockMetadataSchema) => void;
   updateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
+  mockUploaderModalAction: (mockType: MockType) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -35,6 +36,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openDeleteCollectionModalAction,
     openDeleteMockModalAction,
     openUpdateMockCollectionModalAction,
+    openMockUploaderModalAction,
   } = useMocksModalsContext();
 
   const createNewCollectionAction = useCallback(
@@ -93,6 +95,15 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [teamId]
   );
 
+  const mockUploaderModalAction = useCallback(
+    (mockType: MockType) => {
+      Logger.log("[DEBUG]", "mockUploaderModalAction", { mockType });
+      trackMockUploadWorkflowStarted(mockType);
+      openMockUploaderModalAction(mockType);
+    },
+    [openMockUploaderModalAction]
+  );
+
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
@@ -100,6 +111,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     deleteMockModalAction,
     updateMockCollectionModalAction,
     toggleMockStarAction,
+    mockUploaderModalAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;

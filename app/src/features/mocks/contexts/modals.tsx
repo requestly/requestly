@@ -13,6 +13,9 @@ type MocksModalsContextType = {
 
   openUpdateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
   setOpenUpdateMockCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
+
+  openMockUploaderModalAction: (mockType: MockType) => void;
+  setOpenMockUploaderModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 };
 
 const MocksModalsContext = createContext<MocksModalsContextType>(null);
@@ -34,6 +37,7 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
   const [openUpdateMockCollectionModalAction, setOpenUpdateMockCollectionModalAction] = useState<ModalAction>(
     () => DEFAULT_ACTION
   );
+  const [openMockUploaderModalAction, setOpenMockUploaderModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
 
   const value = {
     openCollectionModalAction,
@@ -47,6 +51,9 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
 
     openUpdateMockCollectionModalAction,
     setOpenUpdateMockCollectionModalAction,
+
+    openMockUploaderModalAction,
+    setOpenMockUploaderModalAction,
   };
 
   return <MocksModalsContext.Provider value={value}>{children}</MocksModalsContext.Provider>;

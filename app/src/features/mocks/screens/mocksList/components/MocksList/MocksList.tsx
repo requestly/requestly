@@ -7,7 +7,7 @@ import {
   redirectToMockEditorCreateMock,
   redirectToMockEditorEditMock,
 } from "utils/RedirectionUtils";
-import { trackMockUploadWorkflowStarted, trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
+import { trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import {
   MockListSource,
   MockTableHeaderFilter,
@@ -18,12 +18,12 @@ import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
 import {
-  MockUploaderModal,
   NewFileModal,
   CreateCollectionModalWrapper,
   DeleteCollectionModalWrapper,
   DeleteMockModalWrapper,
   UpdateMockCollectionModalWrapper,
+  MockUploaderModalWrapper,
 } from "features/mocks/modals";
 import "./mocksList.scss";
 import { getQuickFilteredRecords } from "./utils";
@@ -39,7 +39,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
   // TODO: Move all the actions and local state in context
   const [fileModalVisibility, setFileModalVisibility] = useState<boolean>(false);
-  const [uploadModalVisibility, setUploadModalVisibility] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
   const [filter, setFilter] = useState<MockTableHeaderFilter>("all");
@@ -98,11 +97,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     mockSelectionCallback(url);
   };
 
-  const handleUploadAction = () => {
-    trackMockUploadWorkflowStarted(type);
-    setUploadModalVisibility(true);
-  };
-
   const handleSearch = (searchQuery: string) => {
     setSearchValue(searchQuery);
 
@@ -122,18 +116,12 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     <>
       <MockPickerIndex
         mocks={mocks}
-        handleUploadAction={handleUploadAction}
         handleItemSelect={handleItemSelect}
         handleSelectAction={handleSelectAction}
         handleNameClick={handleNameClick}
       />
 
-      <MockUploaderModal
-        mockType={type}
-        visible={uploadModalVisibility}
-        toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
-        selectMockOnUpload={handleSelectAction}
-      />
+      <MockUploaderModalWrapper selectMockOnUpload={handleSelectAction} />
     </>
   ) : mocks.length > 0 ? (
     <>
@@ -151,7 +139,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
           searchValue={searchValue}
           setSearchValue={handleSearch}
           handleCreateNew={handleCreateNewMock}
-          handleUploadAction={handleUploadAction}
           filter={filter}
           setFilter={setFilter}
         />
@@ -164,7 +151,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
             handleItemSelect={handleItemSelect}
             handleNameClick={handleNameClick}
             handleEditAction={handleEditAction}
-            handleUploadAction={handleUploadAction}
             forceRender={_forceRender}
           />
         </div>
@@ -172,11 +158,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
       <NewFileModal visible={fileModalVisibility} toggleModalVisiblity={(visible) => setFileModalVisibility(visible)} />
 
-      <MockUploaderModal
-        mockType={type}
-        visible={uploadModalVisibility}
-        toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
-      />
+      <MockUploaderModalWrapper />
 
       {/* FIXME: Remove force re-render and instead update the local state */}
       <CreateCollectionModalWrapper forceRender={_forceRender} />
@@ -190,11 +172,8 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     <GettingStarted
       mockType={type}
       handleCreateNew={handleCreateNewMock}
-      handleUploadAction={handleUploadAction}
       fileModalVisibility={fileModalVisibility}
       setFileModalVisibility={setFileModalVisibility}
-      uploadModalVisibility={uploadModalVisibility}
-      setUploadModalVisibility={setUploadModalVisibility}
     />
   );
 };

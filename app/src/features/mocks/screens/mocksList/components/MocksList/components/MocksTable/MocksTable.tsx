@@ -23,8 +23,7 @@ export interface MocksTableProps {
   // actions
   handleEditAction?: (mockId: string, isOldMock: boolean) => void;
   handleSelectAction?: (url: string) => void;
-  handleUploadAction?: () => void;
-  forceRender: () => void;
+  forceRender?: () => void;
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
@@ -35,7 +34,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   handleItemSelect,
   handleEditAction,
   handleSelectAction,
-  forceRender,
+  forceRender = () => {},
 }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);

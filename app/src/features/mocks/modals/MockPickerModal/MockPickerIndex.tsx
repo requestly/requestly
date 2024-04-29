@@ -18,23 +18,23 @@ import {
   defaultJsEditorMock,
 } from "components/features/mocksV2/MockEditorIndex/constants";
 import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
+import { useMocksActionContext } from "features/mocks/contexts/actions";
 
 interface Props {
   mocks: RQMockMetadataSchema[];
-  mockType?: string;
+  mockType?: MockType;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;
   handleNameClick: (mockId: string, isOldMock: boolean) => void;
 
   // actions
   handleSelectAction?: (url: string) => void;
-  handleUploadAction?: () => void;
 }
 
 const MockPickerIndex: React.FC<Props> = ({
   mocks,
+  mockType,
   handleItemSelect,
   handleSelectAction,
-  handleUploadAction,
   handleNameClick,
 }) => {
   const [showEditor, setShowEditor] = useState<boolean>(false);
@@ -42,6 +42,7 @@ const MockPickerIndex: React.FC<Props> = ({
   const [selectedMockData, setSelectedMockData] = useState<MockEditorDataSchema>(null);
   const [showFileTypeSelector, setShowFileTypeSelector] = useState<boolean>(false);
   const [showCreateMockState, setShowCreateMockState] = useState<boolean>(false);
+  const { mockUploaderModalAction } = useMocksActionContext() ?? {};
 
   const user = useSelector(getUserAuthDetails);
 
@@ -121,14 +122,14 @@ const MockPickerIndex: React.FC<Props> = ({
         <Space className="mt-8">
           <AuthConfirmationPopover
             title="You need to sign up to upload mocks"
-            callback={handleUploadAction}
+            callback={() => mockUploaderModalAction(mockType)}
             source={"upload_mock"}
           >
             <RQButton
               type="default"
               icon={<AiOutlineCloudUpload />}
               className="upload-btn"
-              onClick={() => user?.loggedIn && handleUploadAction()}
+              onClick={() => user?.loggedIn && mockUploaderModalAction(mockType)}
             >
               <span> Upload file/JSON</span>
             </RQButton>
