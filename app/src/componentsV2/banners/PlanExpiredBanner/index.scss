@@ -1,3 +1,7 @@
+.plan-expired-banner + .app-layout {
+  height: calc(100vh - 48px);
+}
+
 .plan-expired-banner {
   position: relative;
   background: var(--red-red-700);
