@@ -106,7 +106,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
   useEffect(() => {
     if (allRecords) {
-      const updatedCountMap = allRecords.reduce((accumulator, record) => {
+      const ruleTypesCountMap = allRecords.reduce((accumulator, record) => {
         if (isRule(record)) {
           if (accumulator[record.ruleType]) {
             accumulator[record.ruleType] += 1;
@@ -118,11 +118,11 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       }, {} as Record<string, number>);
 
       Object.values(GLOBAL_CONSTANTS.RULE_TYPES).forEach((ruleType) => {
-        if (!updatedCountMap[ruleType]) {
+        if (!ruleTypesCountMap[ruleType]) {
           submitAttrUtil(ruleType + "_rules", 0);
         }
 
-        submitAttrUtil(ruleType + "_rules", updatedCountMap[ruleType]);
+        submitAttrUtil(ruleType + "_rules", ruleTypesCountMap[ruleType]);
       });
     }
   }, [allRecords]);
