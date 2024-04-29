@@ -149,9 +149,7 @@ const TeamMembersTable = ({ teamId, isTeamAdmin, refresh, callback }) => {
         }
 
         return member.isOwner ? (
-          <span>
-            <Badge status="success" /> Owner
-          </span>
+          <span>Admin access</span>
         ) : (
           <MemberRoleDropdown
             showLoader
