@@ -100,12 +100,12 @@ const MemberRoleDropdown: React.FC<MemberRoleDropdownProps> = ({
       overlay={items}
       trigger={["click"]}
       {...props}
-      disabled={isLoading || (memberId !== loggedInUserId && !isLoggedInUserAdmin)}
+      disabled={isLoading || (memberId !== loggedInUserId && !isLoggedInUserAdmin) || memberId === loggedInUserId}
     >
       <div className={`dropdown-trigger ${isHoverEffect ? "member-role-dropdown-trigger" : ""}`}>
         <Typography.Text className={!props.disabled && "cursor-pointer"}>
           {isAdmin ? "Admin" : "Member"} access{" "}
-          {(isLoggedInUserAdmin || memberId === loggedInUserId) && (
+          {isLoggedInUserAdmin && memberId !== loggedInUserId && (
             <img
               width="10px"
               height="6px"
