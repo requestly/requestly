@@ -36,6 +36,9 @@ export const initRuleExecutionHandler = () => {
         }
         showExplicitTestRuleWidget(message.ruleId);
         break;
+      case CLIENT_MESSAGES.GET_APPLIED_RULES:
+        sendResponse(Array.from(appliedRuleIds));
+        break;
     }
     return false;
   });

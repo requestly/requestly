@@ -12,7 +12,7 @@ interface RuleIdsMap {
 }
 
 const getExecutedRuleIds = async (tabId: number): Promise<string[]> => {
-  return await chrome.tabs.sendMessage(tabId, {
+  return chrome.tabs.sendMessage(tabId, {
     action: CLIENT_MESSAGES.GET_APPLIED_RULES,
   });
 };
