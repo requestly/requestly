@@ -4,7 +4,7 @@ import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { Badge, ButtonProps } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { ContentListHeader, ContentListHeaderProps } from "componentsV2/ContentList";
-import { MockTableHeaderFilter, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockType, MockTableHeaderFilter, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { RQButton } from "lib/design-system/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/selectors";
@@ -16,7 +16,7 @@ import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 
 interface Props {
-  mockType?: string;
+  mockType?: MockType;
   allrecords: RQMockMetadataSchema[];
   mocks: RQMockMetadataSchema[];
   handleUploadAction?: () => void;
