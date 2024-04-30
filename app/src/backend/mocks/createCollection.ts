@@ -15,12 +15,12 @@ export const createCollection = async (
     return null;
   }
 
-  const mockCollection = await createCollectionFromFirebase(uid, mockCollectionData, teamId);
+  const mockCollection = await createCollectionInFirebase(uid, mockCollectionData, teamId);
 
   return mockCollection;
 };
 
-const createCollectionFromFirebase = async (
+const createCollectionInFirebase = async (
   uid: string,
   mockCollectionData: MockCollectionData,
   teamId?: string

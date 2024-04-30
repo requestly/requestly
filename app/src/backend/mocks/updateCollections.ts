@@ -7,15 +7,12 @@ export const updateCollections = async (uid: string, collections: Partial<RQMock
     return null;
   }
 
-  const result = await updateCollectionsFromFirebase(uid, collections);
+  const result = await updateCollectionsInFirebase(uid, collections);
 
   return result;
 };
 
-const updateCollectionsFromFirebase = async (
-  uid: string,
-  collections: Partial<RQMockCollection>[]
-): Promise<boolean> => {
+const updateCollectionsInFirebase = async (uid: string, collections: Partial<RQMockCollection>[]): Promise<boolean> => {
   try {
     const db = getFirestore(firebaseApp);
     const collectionsBatch = writeBatch(db);

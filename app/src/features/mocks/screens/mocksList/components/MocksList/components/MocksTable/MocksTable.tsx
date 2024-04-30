@@ -9,7 +9,7 @@ import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/type
 import { generateFinalUrl } from "components/features/mocksV2/utils";
 import { ContentListTable } from "componentsV2/ContentList";
 import { useMocksTableColumns } from "./hooks/useMocksTableColumns";
-import { isRecordMockCollection, mocksToContentTableDataAdapter } from "./utils";
+import { isRecordMockCollection, recordsToContentTableDataAdapter } from "./utils";
 import "./mocksTable.scss";
 
 export interface MocksTableProps {
@@ -48,7 +48,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     }
   }, [mockType, mocks?.length, isWorkspaceMode]);
 
-  const contentTableAdaptedMocks = useMemo(() => mocksToContentTableDataAdapter(mocks), [mocks]);
+  const contentTableAdaptedRecords = useMemo(() => recordsToContentTableDataAdapter(mocks), [mocks]);
 
   // TODO: move all actions in a hook and use that
   const columns = useMocksTableColumns({
@@ -70,7 +70,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       customRowClassName={(record) => `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"}`}
       // @ts-ignore
       columns={columns}
-      data={contentTableAdaptedMocks}
+      data={contentTableAdaptedRecords}
       locale={{
         emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No mock/file found!" />,
       }}

@@ -12,30 +12,30 @@ export const isMockInCollection = (mock: RQMockMetadataSchema) => {
   return !!mock.collectionId;
 };
 
-export const mocksToContentTableDataAdapter = (mocks: RQMockMetadataSchema[]) => {
+export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]) => {
   const mockCollections: {
     [id: RQMockMetadataSchema["id"]]: RQMockMetadataSchema & { children: RQMockMetadataSchema[] };
   } = {};
 
-  mocks.forEach((mock) => {
-    if (isRecordMockCollection(mock)) {
-      mockCollections[mock.id] = { ...mock, children: [] };
+  records.forEach((record) => {
+    if (isRecordMockCollection(record)) {
+      mockCollections[record.id] = { ...record, children: [] };
     }
   });
 
-  const otherMocks: RQMockMetadataSchema[] = [];
+  const otherRecords: RQMockMetadataSchema[] = [];
 
-  mocks.forEach((mock) => {
-    if (isMockInCollection(mock)) {
-      if (mockCollections[mock.collectionId]) {
-        mockCollections[mock.collectionId].children.push(mock);
+  records.forEach((record) => {
+    if (isMockInCollection(record)) {
+      if (mockCollections[record.collectionId]) {
+        mockCollections[record.collectionId].children.push(record);
       }
-    } else if (!isRecordMockCollection(mock)) {
-      otherMocks.push(mock);
+    } else if (!isRecordMockCollection(record)) {
+      otherRecords.push(record);
     }
   });
 
-  const filteredMocks = [...Object.values(mockCollections), ...otherMocks];
+  const filteredRecords = [...Object.values(mockCollections), ...otherRecords];
 
-  return filteredMocks;
+  return filteredRecords;
 };
