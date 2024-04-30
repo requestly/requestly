@@ -36,7 +36,7 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
   addWidgetListeners() {
     this.addEventListener("new-rule-applied", (evt: CustomEvent) => {
-      this.setAttribute("applied_listener_active", "true");
+      this.dispatchEvent(new CustomEvent("rule_applied_listener_active"));
       const isRuleAlreadyApplied = this.#appliedRules.some((rule) => rule.ruleId === evt.detail.appliedRuleId);
       if (isRuleAlreadyApplied) return;
 
