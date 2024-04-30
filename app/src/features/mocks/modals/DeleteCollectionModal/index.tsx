@@ -10,6 +10,7 @@ import deleteIcon from "../assets/delete.svg";
 import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
 import { DEFAULT_COLLECTION_ID } from "features/mocks/constants";
 import { deleteMocks } from "backend/mocks/deleteMocks";
+import { trackMockCollectionDeleted } from "modules/analytics/events/features/mocksV2";
 import "./deleteCollectionModal.scss";
 
 interface DeleteCollectionModalProps {
@@ -33,24 +34,20 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
   const [isDeletingOnlyCollection, setIsDeletingOnlyCollection] = useState(false);
   const [isDeletingCollectionAndMocks, setIsDeletingCollectionAndMocks] = useState(false);
 
-  // console.log({ collection });
-
   const handleDeleteOnlyCollection = async () => {
     setIsDeletingOnlyCollection(true);
     const mockIds = collection.children?.map((mock) => mock.id);
 
-    // FIXME: Instead of force rerender, update the local state
-
     await updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID);
     await updateCollections(uid, [{ id: collection.id, deleted: true }]);
 
-    console.log("Collection deleted!");
+    trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_only_collection");
 
+    // FIXME: Instead of force rerender, update the local state
     onSuccess?.();
     message.success("Collection deleted!");
     setIsDeletingOnlyCollection(false);
     toggleModalVisibility(false);
-    // force re-render
   };
 
   const handleDeleteCollectionAndMocks = async () => {
@@ -59,6 +56,8 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
 
     await deleteMocks(uid, mockIds, teamId);
     await updateCollections(uid, [{ id: collection.id, deleted: true }]);
+
+    trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_mocks_and_collection");
 
     onSuccess?.();
     message.success("Collection and mocks deleted!");

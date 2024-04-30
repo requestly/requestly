@@ -93,7 +93,7 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType, selectOnS
       setSavingInProgress(false);
       if (success) {
         toast.success("Mock Updated Successfully");
-        trackUpdateMockEvent(mockId, mockType, finalMockData?.fileType);
+        trackUpdateMockEvent(mockId, mockType, finalMockData?.fileType, finalMockData?.collectionId);
         return setMockEditorData(data);
       }
       toast.error("Mock Update Error");

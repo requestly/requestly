@@ -6,6 +6,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQModal } from "lib/design-system/components";
 import { Button, Select, SelectProps, message } from "antd";
 import { updateMock } from "backend/mocks/updateMock";
+import { trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
 import "./updateMockCollectionModal.scss";
 
 interface Props {
@@ -43,6 +44,7 @@ export const UpdateMockCollectionModal: React.FC<Props> = ({
     // @ts-ignore
     updateMock(uid, mock.id, { ...mock, collectionId }, teamId)
       .then(() => {
+        trackUpdateMockEvent(mock.id, mock.type, mock?.fileType, collectionId);
         onSuccess?.();
         message.success(`Moved to "${collectionName}"`);
         toggleModalVisibility(false);
