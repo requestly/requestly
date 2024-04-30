@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
-import deleteIcon from "../assets/delete.svg";
+import deleteIcon from "../../assets/delete.svg";
 import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
 import { DEFAULT_COLLECTION_ID } from "features/mocks/constants";
 import { deleteMocks } from "backend/mocks/deleteMocks";

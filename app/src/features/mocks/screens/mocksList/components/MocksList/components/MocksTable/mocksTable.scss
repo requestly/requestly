@@ -77,6 +77,8 @@
       }
 
       .mock-details-container {
+        overflow: hidden;
+
         .mock-name-container {
           display: flex;
           align-items: center;
