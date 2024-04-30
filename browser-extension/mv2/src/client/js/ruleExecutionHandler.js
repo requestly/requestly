@@ -127,6 +127,14 @@ RQ.RuleExecutionHandler.showImplicitTestRuleWidget = async () => {
   testRuleWidget.addEventListener("open_app_settings", () => {
     window.open(`${RQ.configs.WEB_URL}/settings/global-settings`, "_blank");
   });
+
+  testRuleWidget.addEventListener("rule_applied_listener_active", async () => {
+    const ruleIds = Array.from(RQ.RuleExecutionHandler.appliedRuleIds);
+    for (let ruleId of ruleIds) {
+      const ruleDetails = await RQ.RulesStore.getRule(ruleId);
+      RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget(ruleDetails);
+    }
+  });
 };
 
 RQ.RuleExecutionHandler.setWidgetInfoText = (testRuleWidget, ruleDetails) => {
@@ -176,20 +184,6 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = async (rule) => {
   const implicitTestRuleWidget = document.querySelector("rq-implicit-test-rule-widget");
 
   if (implicitTestRuleWidget) {
-    if (implicitTestRuleWidget.getAttribute("applied_listener_active") === "false") {
-      const appliedRules = [];
-      const ruleIds = Array.from(RQ.RuleExecutionHandler.appliedRuleIds);
-      for (let ruleId of ruleIds) {
-        const ruleDetails = await RQ.RulesStore.getRule(ruleId);
-        appliedRules.push({
-          ruleId: ruleDetails.id,
-          ruleName: ruleDetails.name,
-          ruleType: ruleDetails.ruleType,
-        });
-      }
-      implicitTestRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
-    }
-
     implicitTestRuleWidget.dispatchEvent(
       new CustomEvent("new-rule-applied", {
         detail: {
