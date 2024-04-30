@@ -108,6 +108,7 @@ export const SOURCE = {
   TEST_THIS_RULE: "test_this_rule",
   RULE_GROUP: "rule_group",
   TEMPLATES_SCREEN: "templates_screen",
+  PLAN_EXPIRED_BANNER: "plan_expired_banner",
 };
 
 export const RULES = {

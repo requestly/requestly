@@ -6,6 +6,8 @@ import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { actions } from "store";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { getPrettyPlanName } from "utils/FormattingHelper";
+import APP_CONSTANTS from "config/constants";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
 export const PlanExpiredBanner = () => {
@@ -15,7 +17,10 @@ export const PlanExpiredBanner = () => {
   const [isBannerVisible, setIsBannerVisible] = useState(false);
 
   useEffect(() => {
-    if (user?.details?.planDetails?.status === "canceled" && !isPlanExpiredBannerClosed) {
+    if (
+      user?.details?.planDetails?.status === APP_CONSTANTS.SUBSCRIPTION_STATUS.CANCELLED &&
+      !isPlanExpiredBannerClosed
+    ) {
       setIsBannerVisible(true);
       dispatch(actions.updateIsAppBannerVisible(true));
     } else {
@@ -40,7 +45,7 @@ export const PlanExpiredBanner = () => {
               actions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,
-                newProps: { selectedPlan: null, source: "plan_expired_banner" },
+                newProps: { selectedPlan: null, source: SOURCE.PLAN_EXPIRED_BANNER },
               })
             );
           }}
