@@ -10,11 +10,11 @@ export const updateMocksCollectionId = async (
     return null;
   }
 
-  const result = await updateMocksCollectionIdFromFirebase(uid, mockIds, updatedCollectionId);
+  const result = await updateMocksCollectionIdInFirebase(uid, mockIds, updatedCollectionId);
   return result;
 };
 
-const updateMocksCollectionIdFromFirebase = async (
+const updateMocksCollectionIdInFirebase = async (
   uid: string,
   mockIds: string[],
   updatedCollectionId: string
