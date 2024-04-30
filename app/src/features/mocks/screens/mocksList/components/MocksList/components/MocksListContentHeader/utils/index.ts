@@ -1,5 +1,5 @@
 import { MockTableHeaderFilter, RQMockMetadataSchema } from "components/features/mocksV2/types";
-import { isRecordMock, isRecordMockCollection } from "../components/MocksTable/utils";
+import { isRecordMock, isRecordMockCollection } from "../../MocksTable/utils";
 
 export const getQuickFilteredRecords = (records: RQMockMetadataSchema[], filterType: MockTableHeaderFilter) => {
   switch (filterType) {
