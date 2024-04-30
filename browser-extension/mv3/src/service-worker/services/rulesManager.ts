@@ -4,6 +4,7 @@ import { getVariable, onVariableChange, setVariable, Variable } from "../variabl
 import { Rule } from "common/types";
 import { getRecords } from "common/storage";
 import { CLIENT_MESSAGES } from "common/constants";
+import { isExtensionEnabled } from "./utils";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
@@ -104,8 +105,8 @@ const addExtensionRules = async (): Promise<void> => {
 const applyExtensionRules = async (): Promise<void> => {
   await deleteExtensionRules();
 
-  const isExtensionEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
-  if (isExtensionEnabled) {
+  const isExtensionStatusEnabled = await isExtensionEnabled();
+  if (isExtensionStatusEnabled) {
     await addExtensionRules();
   }
 };

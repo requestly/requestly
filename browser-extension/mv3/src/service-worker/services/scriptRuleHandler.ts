@@ -10,8 +10,7 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
     return;
   }
 
-  const enabledRules = await getEnabledRules();
-  const scriptRules = enabledRules.filter((rule) => rule.ruleType === RuleType.SCRIPT);
+  const scriptRules = await getEnabledRules(RuleType.SCRIPT);
   const scripts: ScriptObject[] = [];
 
   const appliedScriptRuleIds = new Set<string>();
