@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RQModal } from "lib/design-system/components";
 import { RQMockCollection } from "components/features/mocksV2/types";
-import { Button, message } from "antd";
+import { Button } from "antd";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -11,6 +11,7 @@ import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
 import { DEFAULT_COLLECTION_ID } from "features/mocks/constants";
 import { deleteMocks } from "backend/mocks/deleteMocks";
 import { trackMockCollectionDeleted } from "modules/analytics/events/features/mocksV2";
+import { toast } from "utils/Toast";
 import "./deleteCollectionModal.scss";
 
 interface DeleteCollectionModalProps {
@@ -35,34 +36,44 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
   const [isDeletingCollectionAndMocks, setIsDeletingCollectionAndMocks] = useState(false);
 
   const handleDeleteOnlyCollection = async () => {
-    setIsDeletingOnlyCollection(true);
-    const mockIds = collection.children?.map((mock) => mock.id);
+    try {
+      setIsDeletingOnlyCollection(true);
+      const mockIds = collection.children?.map((mock) => mock.id);
 
-    await updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID);
-    await updateCollections(uid, [{ id: collection.id, deleted: true }]);
+      await updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID);
+      await updateCollections(uid, [{ id: collection.id, deleted: true }]);
 
-    trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_only_collection");
+      trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_only_collection");
 
-    // FIXME: Instead of force rerender, update the local state
-    onSuccess?.();
-    message.success("Collection deleted!");
-    setIsDeletingOnlyCollection(false);
-    toggleModalVisibility(false);
+      toast.success("Collection deleted!");
+      toggleModalVisibility(false);
+    } catch (error) {
+      // do nothing
+    } finally {
+      // FIXME: Instead of force rerender, update the local state
+      onSuccess?.();
+      setIsDeletingOnlyCollection(false);
+    }
   };
 
   const handleDeleteCollectionAndMocks = async () => {
-    setIsDeletingCollectionAndMocks(true);
-    const mockIds = collection.children?.map((mock) => mock.id);
+    try {
+      setIsDeletingCollectionAndMocks(true);
+      const mockIds = collection.children?.map((mock) => mock.id);
 
-    await deleteMocks(uid, mockIds, teamId);
-    await updateCollections(uid, [{ id: collection.id, deleted: true }]);
+      await deleteMocks(uid, mockIds, teamId);
+      await updateCollections(uid, [{ id: collection.id, deleted: true }]);
 
-    trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_mocks_and_collection");
+      trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_mocks_and_collection");
 
-    onSuccess?.();
-    message.success("Collection and mocks deleted!");
-    setIsDeletingOnlyCollection(false);
-    toggleModalVisibility(false);
+      toast.success("Collection and mocks deleted!");
+      toggleModalVisibility(false);
+    } catch (error) {
+      // do nothing
+    } finally {
+      onSuccess?.();
+      setIsDeletingCollectionAndMocks(false);
+    }
   };
 
   const handleCancel = () => {
