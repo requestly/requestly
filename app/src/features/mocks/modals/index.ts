@@ -1,7 +1,9 @@
-export { DeleteMockModal } from "./DeleteMockModal";
 export { MockPickerModal } from "./MockPickerModal";
-export { MockUploaderModal } from "./MockUploaderModal";
-export { NewFileModal } from "./NewFileModal";
-export { CreateCollectionModal } from "./CreateCollectionModal";
-export { DeleteCollectionModal } from "./DeleteCollectionModal";
-export { UpdateMockCollectionModal } from "./UpdateMockCollectionModal";
+export { CreateCollectionModalWrapper } from "./CreateCollectionModalWrapper";
+export { DeleteCollectionModalWrapper } from "./DeleteCollectionModalWrapper";
+export { DeleteMockModalWrapper } from "./DeleteMockModalWrapper";
+export { UpdateMockCollectionModalWrapper } from "./UpdateMockCollectionModalWrapper";
+export { MockUploaderModalWrapper } from "./MockUploaderModalWrapper";
+export { NewFileModalWrapper } from "./NewFileModalWrapper";
+export { NewFileModal } from "./NewFileModalWrapper/NewFileModal";
+export { MockUploaderModal } from "./MockUploaderModalWrapper/MockUploaderModal";

@@ -52,11 +52,13 @@ const ContentListHeader: React.FC<ContentListHeaderProps> = ({
             : null}
         </div>
       </div>
-      <div className="rq-content-list-header-actions">
-        {actions.map((action) => (
-          <Col>{action}</Col>
-        ))}
-      </div>
+      {actions ? (
+        <div className="rq-content-list-header-actions">
+          {actions.map((action, index) => (
+            <Col key={index}>{action}</Col>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 };

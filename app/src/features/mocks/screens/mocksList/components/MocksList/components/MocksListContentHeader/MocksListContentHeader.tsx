@@ -4,78 +4,101 @@ import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { Badge, ButtonProps } from "antd";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { ContentListHeader, ContentListHeaderProps } from "componentsV2/ContentList";
-import { MockTableHeaderFilter, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import {
+  MockType,
+  MockTableHeaderFilter,
+  RQMockMetadataSchema,
+  MockListSource,
+} from "components/features/mocksV2/types";
 import { RQButton } from "lib/design-system/components";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { MdOutlineCreateNewFolder } from "@react-icons/all-files/md/MdOutlineCreateNewFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { isRecordMock } from "../MocksTable/utils";
+import { useMocksActionContext } from "features/mocks/contexts/actions";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
-  mockType?: string;
-  allrecords: RQMockMetadataSchema[];
-  mocks: RQMockMetadataSchema[];
-  handleUploadAction?: () => void;
-  handleCreateNew: () => void;
-  handleCreateNewCollection?: () => void;
+  source?: MockListSource;
+  mockType?: MockType;
+  allrecords?: RQMockMetadataSchema[];
+  mocks?: RQMockMetadataSchema[];
   searchValue?: string;
   setSearchValue?: (s: string) => void;
-  filter: MockTableHeaderFilter;
-  setFilter: (filter: MockTableHeaderFilter) => void;
+  filter?: MockTableHeaderFilter;
+  setFilter?: (filter: MockTableHeaderFilter) => void;
+  handleCreateNewMockFromPickerModal?: () => void;
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
+  source,
   mocks,
   allrecords,
   mockType,
   filter,
-  handleCreateNew,
-  handleCreateNewCollection,
-  handleUploadAction,
   searchValue,
-  setSearchValue = () => {},
   setFilter,
+  setSearchValue = () => {},
+  handleCreateNewMockFromPickerModal = () => {},
 }) => {
   const user = useSelector(getUserAuthDetails);
+  const { pathname } = useLocation();
+  const { createNewCollectionAction, mockUploaderModalAction, createNewMock } = useMocksActionContext() ?? {};
+  const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const actionbuttonsData = [
     {
-      hide: !handleUploadAction,
+      hide: isRuleEditor,
       type: "text" as ButtonProps["type"],
       icon: <CloudUploadOutlined />,
       buttonText: `Upload ${mockType === MockType.FILE ? "File" : "JSON"}`,
-      onClickHandler: () => user?.details?.isLoggedIn && handleUploadAction(),
+      onClickHandler: () => user?.details?.isLoggedIn && mockUploaderModalAction(mockType),
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to upload mocks",
-        callback: handleUploadAction,
+        callback: () => mockUploaderModalAction(mockType),
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
     {
-      hide: !handleCreateNewCollection,
+      hide: isRuleEditor,
       type: "default" as ButtonProps["type"],
       icon: <MdOutlineCreateNewFolder className="anticon" />,
       buttonText: "New Collection",
-      onClickHandler: () => user?.details?.isLoggedIn && handleCreateNewCollection?.(),
+      onClickHandler: () => user?.details?.isLoggedIn && createNewCollectionAction(mockType),
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to create a collection!",
-        callback: handleCreateNewCollection,
+        callback: () => createNewCollectionAction(mockType),
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
     {
       type: "primary" as ButtonProps["type"],
       icon: <PlusOutlined />,
-      buttonText: mockType === MockType.API ? "New Mock" : "New File",
-      onClickHandler: () => (user?.loggedIn || mockType === MockType.FILE) && handleCreateNew?.(),
+      buttonText: mockType ? (mockType === MockType.API ? "New Mock" : "New File") : "New Mock",
+      onClickHandler: () => {
+        if (user?.loggedIn || mockType === MockType.FILE) {
+          if (source === MockListSource.PICKER_MODAL) {
+            handleCreateNewMockFromPickerModal();
+          } else {
+            createNewMock?.(mockType, source);
+          }
+        }
+      },
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to create API mocks",
         disabled: mockType === MockType.FILE,
-        callback: handleCreateNew,
+        callback: () => {
+          if (source === MockListSource.PICKER_MODAL) {
+            handleCreateNewMockFromPickerModal();
+          } else {
+            createNewMock?.(mockType, source);
+          }
+        },
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
@@ -107,8 +130,6 @@ export const MocksListContentHeader: React.FC<Props> = ({
         </AuthConfirmationPopover>
       );
     });
-
-  const contentListHeaderSearchProps = mockType ? { searchValue: searchValue, setSearchValue: setSearchValue } : {};
 
   const getMockTableTitle = () => {
     switch (mockType) {
@@ -159,13 +180,15 @@ export const MocksListContentHeader: React.FC<Props> = ({
     [mocks, setFilter]
   );
 
-  return (
-    <ContentListHeader
-      {...contentListHeaderSearchProps}
-      title={getMockTableTitle()}
-      actions={contentHeaderActions}
-      activeFilter={filter}
-      filters={contentHeaderFilters}
-    />
-  );
+  const contentListHeaderSearchProps = mockType
+    ? {
+        activeFilter: filter,
+        searchValue: searchValue,
+        setSearchValue: setSearchValue,
+        title: getMockTableTitle(),
+        filters: contentHeaderFilters,
+      }
+    : {};
+
+  return <ContentListHeader {...contentListHeaderSearchProps} actions={contentHeaderActions} />;
 };

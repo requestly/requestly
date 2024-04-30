@@ -1,3 +1,4 @@
+import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
@@ -18,25 +19,33 @@ import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RQButton } from "lib/design-system/components";
 import { MocksTableProps } from "../MocksTable";
-import REQUEST_METHOD_COLORS from "components/features/mocksV2/MockList/MocksTable/constants/requestMethodColors";
 import { isRecordMockCollection } from "../utils";
+import { useMocksActionContext } from "features/mocks/contexts/actions";
+import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
+import PATHS from "config/constants/sub/paths";
 
 // TODO: move all actions in a hook and use that
 export const useMocksTableColumns = ({
   mockType,
   handleNameClick,
   handleEditAction,
-  handleDeleteAction,
   handleSelectAction,
-  handleUpdateCollectionAction,
-  handleDeleteCollectionAction,
-  handleUpdateMockCollectionAction,
-  handleStarMockAction,
+  forceRender,
 }: Partial<MocksTableProps>) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const { pathname } = useLocation();
+  const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
+
+  const {
+    updateCollectionNameAction,
+    deleteCollectionModalAction,
+    deleteMockModalAction,
+    updateMockCollectionModalAction,
+    toggleMockStarAction,
+  } = useMocksActionContext();
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
     {
@@ -73,12 +82,12 @@ export const useMocksTableColumns = ({
           </div>
         ) : (
           <div className="mock-name-details-container">
-            {isCollection ? null : (
+            {isCollection || isRuleEditor ? null : (
               <Button
                 type="text"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStarMockAction(record);
+                  toggleMockStarAction(record, forceRender);
                 }}
                 className="mock-star-btn"
               >
@@ -169,7 +178,7 @@ export const useMocksTableColumns = ({
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleUpdateCollectionAction(record);
+              updateCollectionNameAction(mockType, record);
             },
             label: (
               <Row>
@@ -182,7 +191,7 @@ export const useMocksTableColumns = ({
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleDeleteCollectionAction(record);
+              deleteCollectionModalAction(record);
             },
             label: (
               <Row>
@@ -238,7 +247,7 @@ export const useMocksTableColumns = ({
             key: 2,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleUpdateMockCollectionAction(record);
+              updateMockCollectionModalAction(record);
             },
             label: (
               <Row>
@@ -251,7 +260,7 @@ export const useMocksTableColumns = ({
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              handleDeleteAction(record);
+              deleteMockModalAction(record);
             },
             label: (
               <Row>

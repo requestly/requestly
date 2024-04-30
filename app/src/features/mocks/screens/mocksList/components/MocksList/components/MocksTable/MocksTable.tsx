@@ -5,7 +5,7 @@ import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { generateFinalUrl } from "components/features/mocksV2/utils";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { ContentListTable } from "componentsV2/ContentList";
@@ -16,19 +16,14 @@ import "./mocksTable.scss";
 export interface MocksTableProps {
   isLoading?: boolean;
   mocks: RQMockMetadataSchema[];
-  mockType?: string;
+  mockType?: MockType;
   handleNameClick: (mockId: string, isOldMock: boolean) => void;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;
-  handleDeleteAction?: (mock: RQMockMetadataSchema) => void;
 
   // actions
   handleEditAction?: (mockId: string, isOldMock: boolean) => void;
   handleSelectAction?: (url: string) => void;
-  handleUploadAction?: () => void;
-  handleUpdateCollectionAction?: (collection: RQMockMetadataSchema) => void;
-  handleDeleteCollectionAction?: (collection: RQMockMetadataSchema) => void;
-  handleUpdateMockCollectionAction?: (mock: RQMockMetadataSchema) => void;
-  handleStarMockAction?: (mock: RQMockSchema) => void;
+  forceRender?: () => void;
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
@@ -39,11 +34,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   handleItemSelect,
   handleEditAction,
   handleSelectAction,
-  handleDeleteAction,
-  handleUpdateCollectionAction,
-  handleDeleteCollectionAction,
-  handleUpdateMockCollectionAction,
-  handleStarMockAction,
+  forceRender = () => {},
 }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -65,12 +56,8 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     mockType,
     handleNameClick,
     handleEditAction,
-    handleDeleteAction,
     handleSelectAction,
-    handleUpdateCollectionAction,
-    handleDeleteCollectionAction,
-    handleUpdateMockCollectionAction,
-    handleStarMockAction,
+    forceRender,
   });
 
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
