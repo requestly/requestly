@@ -1,4 +1,8 @@
 .rq-mocks-list-table {
+  .ant-table-row-indent + .ant-table-row-expand-icon {
+    margin-top: 1px;
+  }
+
   .rq-col-title {
     display: flex;
     align-items: center;
@@ -14,6 +18,18 @@
 
     &.starred {
       border-left: 4px solid var(--rq-mocks-list-table-row);
+    }
+
+    &.mock-row {
+      .ant-table-row-indent + .ant-table-row-expand-icon {
+        display: none;
+      }
+    }
+
+    &.ant-table-row-level-1 {
+      .mock-name-details-container {
+        padding-left: 10px;
+      }
     }
 
     .mock-collection-details-container {
@@ -46,7 +62,7 @@
     .mock-name-details-container {
       display: flex;
       align-items: center;
-      padding: 0 4px;
+      padding: 0 2px;
 
       .mock-star-btn {
         display: flex;

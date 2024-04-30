@@ -5,7 +5,7 @@ import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockRecordType, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { generateFinalUrl } from "components/features/mocksV2/utils";
 import { ContentListTable } from "componentsV2/ContentList";
 import { useMocksTableColumns } from "./hooks/useMocksTableColumns";
@@ -67,7 +67,11 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       size="middle"
       rowKey="id"
       className="rq-mocks-list-table"
-      customRowClassName={(record) => `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"}`}
+      customRowClassName={(record) =>
+        `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"} ${
+          record.recordType === MockRecordType.MOCK ? "mock-row" : "collection-row"
+        }`
+      }
       // @ts-ignore
       columns={columns}
       data={contentTableAdaptedRecords}
