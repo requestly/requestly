@@ -14,10 +14,17 @@
     font-family: Inter;
     font-size: 13px;
     cursor: pointer;
-    border-left: 1px solid transparent;
 
-    &.starred {
-      border-left: 4px solid var(--rq-mocks-list-table-row);
+    &.mock-row {
+      .ant-table-cell:first-child {
+        border-left: 4px solid transparent;
+      }
+    }
+
+    &.mock-row.starred {
+      .ant-table-cell:first-child {
+        border-left: 4px solid var(--requestly-color-warning);
+      }
     }
 
     &.mock-row {
@@ -28,7 +35,7 @@
 
     &.ant-table-row-level-1 {
       .mock-name-details-container {
-        padding-left: 10px;
+        padding-left: 6px;
       }
     }
 
@@ -62,7 +69,6 @@
     .mock-name-details-container {
       display: flex;
       align-items: center;
-      padding: 0 2px;
 
       .mock-star-btn {
         display: flex;
