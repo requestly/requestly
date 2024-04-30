@@ -8,7 +8,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
 import { trackMockCollectionCreated, trackMockCollectionUpdated } from "modules/analytics/events/features/mocksV2";
-import "./createCollectionModal.scss";
+import "./createOrUpdateCollectionModal.scss";
 
 interface Props {
   id?: string;
@@ -20,7 +20,7 @@ interface Props {
   onSuccess?: () => void;
 }
 
-export const CreateCollectionModal: React.FC<Props> = ({
+export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
   id,
   name = "",
   description = "",

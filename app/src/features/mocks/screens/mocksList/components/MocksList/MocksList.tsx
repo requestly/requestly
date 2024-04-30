@@ -16,7 +16,7 @@ import { useFetchMocks } from "./hooks/useFetchMocks";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
 import {
-  CreateCollectionModalWrapper,
+  CreateOrUpdateCollectionModalWrapper,
   DeleteCollectionModalWrapper,
   DeleteMockModalWrapper,
   UpdateMockCollectionModalWrapper,
@@ -140,7 +140,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       <MockUploaderModalWrapper />
 
       {/* FIXME: Remove force re-render and instead update the local state */}
-      <CreateCollectionModalWrapper forceRender={_forceRender} />
+      <CreateOrUpdateCollectionModalWrapper forceRender={_forceRender} />
       <DeleteCollectionModalWrapper forceRender={_forceRender} />
 
       {/* keep this at top level, below modals will be used at multiple places */}

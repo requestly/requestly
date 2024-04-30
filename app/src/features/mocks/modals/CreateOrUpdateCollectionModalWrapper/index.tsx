@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { CreateCollectionModal } from "./CreateCollectionModal";
+import { CreateOrUpdateCollectionModal } from "./CreateOrUpdateCollectionModal";
 import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 
-export const CreateCollectionModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
+export const CreateOrUpdateCollectionModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
   const [collection, setCollection] = useState<RQMockMetadataSchema>();
   const [mockType, setMockType] = useState<MockType>();
   const [isVisible, setIsVisible] = useState(false);
@@ -30,7 +30,7 @@ export const CreateCollectionModalWrapper: React.FC<{ forceRender: () => void }>
   };
 
   return isVisible ? (
-    <CreateCollectionModal
+    <CreateOrUpdateCollectionModal
       id={collection?.id}
       name={collection?.name}
       description={collection?.desc}
