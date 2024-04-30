@@ -7,19 +7,19 @@ import { RQModal } from "lib/design-system/components";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import * as FilesService from "../../../../utils/files/FilesService";
+import * as FilesService from "../../../../../utils/files/FilesService";
 import { deleteMock } from "backend/mocks/deleteMock";
 import { trackDeleteMockEvent } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQMockMetadataSchema } from "components/features/mocksV2/types";
-import deleteIcon from "../assets/delete.svg";
+import deleteIcon from "../../assets/delete.svg";
 import "./deleteMockModal.scss";
 
 interface Props {
   visible: boolean;
   mock: RQMockMetadataSchema;
   toggleModalVisibility: (visible: boolean) => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 export const DeleteMockModal: React.FC<Props> = ({ visible, mock, toggleModalVisibility, onSuccess }) => {
@@ -42,7 +42,7 @@ export const DeleteMockModal: React.FC<Props> = ({ visible, mock, toggleModalVis
           if (mock.oldMockFilePath) {
             FilesService.deleteFileFromStorage(mock.oldMockFilePath);
           }
-          onSuccess();
+          onSuccess?.();
         } else {
           toast.error("Mock cannot be deleted. Try again.");
         }
@@ -51,7 +51,7 @@ export const DeleteMockModal: React.FC<Props> = ({ visible, mock, toggleModalVis
       deleteMock(uid, mock.id, workspace?.id)
         .then(() => {
           trackDeleteMockEvent(mock.id, mock.type, mock.fileType);
-          onSuccess();
+          onSuccess?.();
           setIsDeleting(false);
           toggleModalVisibility(false);
           toast.success(`Mock Deleted. Id=${mock.id}`);

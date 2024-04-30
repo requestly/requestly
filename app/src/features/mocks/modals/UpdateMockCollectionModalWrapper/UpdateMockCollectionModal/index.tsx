@@ -14,7 +14,7 @@ interface Props {
   mock: RQMockMetadataSchema;
   collections?: RQMockCollection[];
   toggleModalVisibility: (visible: boolean) => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 type SelectOption = { label: string; value: string };
