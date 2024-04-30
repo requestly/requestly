@@ -2,7 +2,6 @@ import React, { createContext, useCallback, useContext } from "react";
 import Logger from "../../../../../common/logger";
 import { useMocksModalsContext } from "./modals";
 import { MockListSource, MockType, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
-import { message } from "antd";
 import { updateMock } from "backend/mocks/updateMock";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
@@ -14,6 +13,7 @@ import {
 } from "modules/analytics/events/features/mocksV2";
 import { useNavigate } from "react-router-dom";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
+import { toast } from "utils/Toast";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -94,11 +94,11 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       const isStarred = record.isFavourite;
       const updatedValue = !isStarred;
 
-      message.loading(isStarred ? "Removing from starred mocks" : "Adding into starred mocks", 3);
+      toast.loading(isStarred ? "Unstarring Mock..." : "Starring Mock...", 3);
 
       updateMock(uid, record.id, { ...record, isFavourite: updatedValue }, teamId).then(() => {
         trackMockStarToggledEvent(record.id, record.type, record?.fileType, updatedValue);
-        message.success(isStarred ? "Mock unstarred!" : "Mock starred!");
+        toast.success(isStarred ? "Mock unstarred!" : "Mock starred!");
         onSuccess?.();
       });
     },
