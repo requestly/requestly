@@ -44,11 +44,11 @@ export const MocksListContentHeader: React.FC<Props> = ({
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
   const { createNewCollectionAction, mockUploaderModalAction, createNewMock } = useMocksActionContext() ?? {};
-  const isRulesEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
+  const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const actionbuttonsData = [
     {
-      hide: isRulesEditor,
+      hide: isRuleEditor,
       type: "text" as ButtonProps["type"],
       icon: <CloudUploadOutlined />,
       buttonText: `Upload ${mockType === MockType.FILE ? "File" : "JSON"}`,
@@ -61,7 +61,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
       },
     },
     {
-      hide: isRulesEditor,
+      hide: isRuleEditor,
       type: "default" as ButtonProps["type"],
       icon: <MdOutlineCreateNewFolder className="anticon" />,
       buttonText: "New Collection",

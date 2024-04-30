@@ -1,3 +1,4 @@
+import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
@@ -21,6 +22,7 @@ import { MocksTableProps } from "../MocksTable";
 import { isRecordMockCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
+import PATHS from "config/constants/sub/paths";
 
 // TODO: move all actions in a hook and use that
 export const useMocksTableColumns = ({
@@ -34,6 +36,8 @@ export const useMocksTableColumns = ({
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
+  const { pathname } = useLocation();
+  const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const {
     updateCollectionNameAction,
@@ -78,7 +82,7 @@ export const useMocksTableColumns = ({
           </div>
         ) : (
           <div className="mock-name-details-container">
-            {isCollection ? null : (
+            {isCollection || isRuleEditor ? null : (
               <Button
                 type="text"
                 onClick={(e) => {
