@@ -394,7 +394,7 @@ const MockEditor: React.FC<Props> = ({
       />
       <Col
         className="mock-editor-title-container"
-        span={24}
+        span={22}
         offset={1}
         md={isEditorOpenInModal ? null : { offset: 2, span: 20 }}
         lg={isEditorOpenInModal ? null : { offset: 4, span: 16 }}
