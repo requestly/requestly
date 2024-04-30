@@ -55,6 +55,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setForceRender((prev) => !prev);
   }, []);
 
+  // TODO: move into actions
   const handleNameClick = (mockId: string, isOldMock: boolean) => {
     handleEditAction(mockId, isOldMock);
   };
