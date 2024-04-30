@@ -101,7 +101,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
 
   return (
     <RQModal destroyOnClose open={visible} footer={null} onCancel={handleCancel} className="mock-collection-modal">
-      <div className="collection-modal-header">New collection</div>
+      <div className="collection-modal-header">{name ? "Update Collection" : "New collection"}</div>
       <div className="collection-modal-content">
         <label className="collection-name-label">
           <span>Collection name</span>
