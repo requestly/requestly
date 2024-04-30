@@ -8,7 +8,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { Space, Typography } from "antd";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
-import { FileType, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { FileType, MockListSource, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { MocksListContentHeader, MocksTable } from "features/mocks/screens/mocksList/components/MocksList/components";
 import { MockEditorDataSchema } from "components/features/mocksV2/MockEditorIndex/types";
 import {
@@ -102,7 +102,10 @@ const MockPickerIndex: React.FC<Props> = ({
   if (mocks.length && !showCreateMockState) {
     return (
       <>
-        <MocksListContentHeader />
+        <MocksListContentHeader
+          source={MockListSource.PICKER_MODAL}
+          handleCreateNewMockFromPickerModal={() => setShowCreateMockState(true)}
+        />
 
         <MocksTable
           mocks={mocks}

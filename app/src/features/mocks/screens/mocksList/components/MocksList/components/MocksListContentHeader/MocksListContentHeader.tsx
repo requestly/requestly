@@ -29,6 +29,7 @@ interface Props {
   setSearchValue?: (s: string) => void;
   filter?: MockTableHeaderFilter;
   setFilter?: (filter: MockTableHeaderFilter) => void;
+  handleCreateNewMockFromPickerModal?: () => void;
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
@@ -38,8 +39,9 @@ export const MocksListContentHeader: React.FC<Props> = ({
   mockType,
   filter,
   searchValue,
-  setSearchValue = () => {},
   setFilter,
+  setSearchValue = () => {},
+  handleCreateNewMockFromPickerModal = () => {},
 }) => {
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
@@ -77,12 +79,26 @@ export const MocksListContentHeader: React.FC<Props> = ({
       type: "primary" as ButtonProps["type"],
       icon: <PlusOutlined />,
       buttonText: mockType ? (mockType === MockType.API ? "New Mock" : "New File") : "New Mock",
-      onClickHandler: () => (user?.loggedIn || mockType === MockType.FILE) && createNewMock?.(mockType, source),
+      onClickHandler: () => {
+        if (user?.loggedIn || mockType === MockType.FILE) {
+          if (source === MockListSource.PICKER_MODAL) {
+            handleCreateNewMockFromPickerModal();
+          } else {
+            createNewMock?.(mockType, source);
+          }
+        }
+      },
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to create API mocks",
         disabled: mockType === MockType.FILE,
-        callback: () => createNewMock?.(mockType, source),
+        callback: () => {
+          if (source === MockListSource.PICKER_MODAL) {
+            handleCreateNewMockFromPickerModal();
+          } else {
+            createNewMock?.(mockType, source);
+          }
+        },
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
