@@ -1,5 +1,5 @@
 import SpinnerCard from "components/misc/SpinnerCard";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   redirectToFileMockEditorEditMock,
@@ -24,7 +24,6 @@ import {
   NewFileModalWrapper,
 } from "features/mocks/modals";
 import "./mocksList.scss";
-import { getQuickFilteredRecords } from "./utils";
 
 interface Props {
   source?: MockListSource;
@@ -45,11 +44,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [forceRender, setForceRender] = useState(false);
 
   const { isLoading, mocks } = useFetchMocks(type, forceRender);
-
-  useEffect(() => {
-    const filteredRecords = getQuickFilteredRecords(mocks, filter);
-    setFilteredMocks(filteredRecords);
-  }, [filter, mocks]);
 
   const _forceRender = useCallback(() => {
     setForceRender((prev) => !prev);
@@ -119,13 +113,13 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
         <MocksListContentHeader
           source={source}
-          allrecords={mocks}
-          mocks={filteredMocks}
+          records={mocks}
           mockType={type}
           searchValue={searchValue}
           setSearchValue={handleSearch}
           filter={filter}
           setFilter={setFilter}
+          setFilteredMocks={setFilteredMocks}
         />
 
         <div className="mocks-table-container">

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { Badge, ButtonProps } from "antd";
@@ -19,34 +19,43 @@ import { isRecordMock } from "../MocksTable/utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { getQuickFilteredRecords } from "./utils";
 
 interface Props {
   source?: MockListSource;
   mockType?: MockType;
-  allrecords?: RQMockMetadataSchema[];
-  mocks?: RQMockMetadataSchema[];
+  records?: RQMockMetadataSchema[];
   searchValue?: string;
   setSearchValue?: (s: string) => void;
   filter?: MockTableHeaderFilter;
   setFilter?: (filter: MockTableHeaderFilter) => void;
+  setFilteredMocks?: (mocks: RQMockMetadataSchema[]) => void;
   handleCreateNewMockFromPickerModal?: () => void;
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
   source,
-  mocks,
-  allrecords,
+  records,
   mockType,
   filter,
   searchValue,
   setFilter,
   setSearchValue = () => {},
+  setFilteredMocks = () => {},
   handleCreateNewMockFromPickerModal = () => {},
 }) => {
+  const [mocks, setMocks] = useState<RQMockMetadataSchema[]>([]);
+
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
   const { createNewCollectionAction, mockUploaderModalAction, createNewMock } = useMocksActionContext() ?? {};
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
+
+  useEffect(() => {
+    const filteredRecords = getQuickFilteredRecords(records, filter);
+    setMocks(filteredRecords);
+    setFilteredMocks(filteredRecords);
+  }, [filter, records]);
 
   const actionbuttonsData = [
     {
@@ -149,8 +158,8 @@ export const MocksListContentHeader: React.FC<Props> = ({
         label: (
           <div className="label">
             All{" "}
-            {allrecords?.length ? (
-              <Badge count={allrecords?.filter((record) => isRecordMock(record)).length} overflowCount={20} />
+            {records?.length ? (
+              <Badge count={records?.filter((record) => isRecordMock(record)).length} overflowCount={20} />
             ) : null}
           </div>
         ),
