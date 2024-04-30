@@ -57,6 +57,13 @@
         line-height: 14px;
         letter-spacing: 0.4px;
       }
+
+      // .mock-collection-name,
+      // .mock-collection-description {
+      //   text-overflow: ellipsis;
+      //   white-space: nowrap;
+      //   overflow: hidden;
+      // }
     }
 
     .mock-name-details-container {
@@ -85,6 +92,8 @@
       }
 
       .mock-details-container {
+        overflow: hidden;
+
         .mock-name-container {
           display: flex;
           align-items: center;
