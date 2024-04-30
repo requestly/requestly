@@ -606,9 +606,6 @@ BG.Methods.logRuleApplied = function (rule, requestDetails, modification) {
   }
 
   BG.Methods.sendLogToDevTools(rule, requestDetails, modification);
-  BG.Methods.saveExecutionLog(rule, requestDetails, modification);
-  BG.Methods.sendLogToConsoleLogger(rule, requestDetails, modification);
-  BG.Methods.saveExecutionCount(rule);
   BG.Methods.sendAppliedRuleDetailsToClient(rule, requestDetails);
 };
 
@@ -1402,9 +1399,13 @@ BG.Methods.handleTestRuleOnClientPageLoad = (tab) => {
 
   if (testRuleData) {
     BG.Methods.sendMessageToClient(tab.id, {
-      action: RQ.CLIENT_MESSAGES.START_RULE_TESTING,
+      action: RQ.CLIENT_MESSAGES.START_EXPLICIT_RULE_TESTING,
       ruleId: testRuleData.ruleId,
       record: testRuleData.record,
+    });
+  } else {
+    BG.Methods.sendMessageToClient(tab.id, {
+      action: RQ.CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING,
     });
   }
 };

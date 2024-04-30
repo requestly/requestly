@@ -1,7 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer";
-import SharedListsIndexPage from "components/features/sharedLists/SharedListsIndexPage";
 import TrashIndexPage from "components/features/trash/TrashIndexPage";
 import RuleEditor from "views/features/rules/RuleEditor";
 import SharedListViewerIndexPage from "components/features/sharedLists/SharedListViewerIndexPage";
@@ -13,6 +12,7 @@ import RootComponent from "components/redirects/RootComponent";
 // V2 Imports
 import RulesContainerV2 from "./container";
 import { RulesListScreen } from "./screens/rulesList";
+import { SharedListsScreen } from "./screens/sharedLists";
 import { TemplatesList } from "./screens/templatesList";
 
 export const ruleRoutes: RouteObject[] = [
@@ -20,10 +20,6 @@ export const ruleRoutes: RouteObject[] = [
     path: PATHS.RULES.INDEX,
     element: <RulesContainer />,
     children: [
-      {
-        path: PATHS.SHARED_LISTS.RELATIVE,
-        element: <SharedListsIndexPage />,
-      },
       {
         path: joinPaths(PATHS.SHARED_LISTS.VIEWER.RELATIVE, PATHS.ANY),
         element: <SharedListViewerIndexPage />,
@@ -75,6 +71,10 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: joinPaths(PATHS.RULE_EDITOR.CREATE_RULE.RELATIVE, "/:ruleType"),
         element: <RuleEditor />,
+      },
+      {
+        path: PATHS.SHARED_LISTS.RELATIVE,
+        element: <SharedListsScreen />,
       },
       {
         path: PATHS.RULES.TEMPLATES.RELATIVE,

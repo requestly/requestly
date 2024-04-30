@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Col, Row, Switch, SwitchProps, Tooltip } from "antd";
 import "./SettingsItem.css";
 
@@ -6,7 +6,8 @@ interface SettingsItemProps extends SwitchProps {
   title: string;
   caption?: string;
   isActive: boolean;
-  toolTipTitle: React.ReactNode;
+  toolTipTitle?: ReactNode;
+  settingsBody?: ReactNode;
   onChange: (status: boolean, event?: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -15,6 +16,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
   caption,
   isActive,
   onChange,
+  settingsBody,
   toolTipTitle = "",
   ...props
 }) => {
@@ -23,8 +25,9 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
       <Col span={22}>
         <div className="title">{title}</div>
         {!!caption && <p className="setting-item-caption">{caption}</p>}
+        {settingsBody}
       </Col>
-      <Col span={2}>
+      <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
         <Tooltip title={toolTipTitle}>
           <Switch checked={isActive} onChange={onChange} {...props} />
         </Tooltip>

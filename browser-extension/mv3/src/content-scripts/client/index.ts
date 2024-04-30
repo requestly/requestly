@@ -1,7 +1,6 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
+import { EXTENSION_MESSAGES } from "common/constants";
 import { initRuleExecutionHandler } from "./ruleExecution";
 import { initSessionRecording } from "./sessionRecorder";
-import { executeDynamicScriptOnPage } from "../utils";
 import { initResponseRuleHandler } from "./responseRuleHandler";
 import { initRequestRuleHandler } from "./requestRuleHandler";
 
@@ -11,13 +10,4 @@ if (document.doctype?.name === "html" || document.contentType?.includes("html"))
   initRuleExecutionHandler();
   initResponseRuleHandler();
   initRequestRuleHandler();
-
-  chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
-    switch (message.action) {
-      case CLIENT_MESSAGES.EXECUTE_SCRIPT:
-        executeDynamicScriptOnPage(message.code);
-        break;
-    }
-    return false;
-  });
 }

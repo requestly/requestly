@@ -47,19 +47,9 @@ export const trackSharedListImportCompleted = (id) => {
   trackEvent(SHARED_LIST.IMPORT_COMPLETED, params); // add session id
 };
 
-export const trackSharedListUrlCopied = (source, id, access_type) => {
-  const params = { source, id, access_type };
-  trackEvent(SHARED_LIST.URL_COPIED, params);
-};
-
 export const trackSharedListNotifyClicked = () => {
   const params = {};
   trackEvent(SHARED_LIST.NOTIFY_CLICKED, params);
-};
-
-export const trackSharedListDeleteClicked = (id) => {
-  const params = { id };
-  trackEvent(SHARED_LIST.DELETE_CLICKED, params);
 };
 
 export const trackSharedListVisibilityToggled = (visibility) => {

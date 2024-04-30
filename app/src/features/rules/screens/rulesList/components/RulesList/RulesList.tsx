@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import RulesTable from "./components/RulesTable/RulesTable";
 import { getAllRecordsMap, getAllRecords } from "store/features/rules/selectors";
@@ -19,6 +19,8 @@ import "./rulesList.scss";
 import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
 import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { isRule } from "features/rules/utils";
 
 interface Props {}
 
@@ -48,6 +50,29 @@ const RulesList: React.FC<Props> = () => {
 
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
+
+  useEffect(() => {
+    if (allRecords) {
+      const ruleTypesCountMap = allRecords.reduce((accumulator, record) => {
+        if (isRule(record)) {
+          if (accumulator[record.ruleType]) {
+            accumulator[record.ruleType] += 1;
+          } else {
+            accumulator[record.ruleType] = 1;
+          }
+        }
+        return accumulator;
+      }, {} as Record<string, number>);
+
+      Object.values(GLOBAL_CONSTANTS.RULE_TYPES).forEach((ruleType) => {
+        if (!ruleTypesCountMap[ruleType]) {
+          submitAttrUtil(ruleType + "_rules", 0);
+        }
+
+        submitAttrUtil(ruleType + "_rules", ruleTypesCountMap[ruleType]);
+      });
+    }
+  }, [allRecords]);
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
