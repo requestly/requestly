@@ -36,7 +36,6 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
   addWidgetListeners() {
     this.addEventListener("new-rule-applied", (evt: CustomEvent) => {
-      this.dispatchEvent(new CustomEvent("rule_applied_listener_active"));
       const isRuleAlreadyApplied = this.#appliedRules.some((rule) => rule.ruleId === evt.detail.appliedRuleId);
       if (isRuleAlreadyApplied) return;
 
@@ -52,6 +51,8 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     this.shadowRoot.getElementById("settings-button").addEventListener("click", () => {
       this.dispatchEvent(new CustomEvent("open_app_settings"));
     });
+
+    this.dispatchEvent(new CustomEvent("rule_applied_listener_active"));
   }
 
   triggerAppliedRuleClickedEvent(detail: any) {
