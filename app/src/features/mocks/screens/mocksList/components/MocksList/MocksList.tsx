@@ -106,6 +106,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
           setSearchValue={handleSearch}
           filter={filter}
           setFilter={setFilter}
+          setFilteredMocks={setFilteredMocks}
         />
 
         <div className="mocks-table-container">
