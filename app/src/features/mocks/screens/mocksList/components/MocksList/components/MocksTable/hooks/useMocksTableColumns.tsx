@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
-import { Button, Dropdown, MenuProps, Row, Table, Typography, message } from "antd";
+import { Button, Dropdown, MenuProps, Row, Typography, message } from "antd";
 import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -49,10 +49,6 @@ export const useMocksTableColumns = ({
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
     {
-      ...Table.SELECTION_COLUMN,
-      width: 0,
-    },
-    {
       key: "id",
       title: (
         <div className="rq-col-title">
@@ -62,7 +58,7 @@ export const useMocksTableColumns = ({
       ),
       dataIndex: "name",
       ellipsis: true,
-      width: 320,
+      width: 300,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
 
@@ -272,23 +268,25 @@ export const useMocksTableColumns = ({
         ];
 
         return handleSelectAction ? (
-          <RQButton
-            size="small"
-            type="primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              let url = "";
-              if (record.isOldMock) {
-                url = record.url;
-              } else {
-                // Not sending username as it might change
-                url = generateFinalUrl(record.endpoint, user?.details?.profile?.uid, null, teamId, record?.password);
-              }
-              handleSelectAction(url);
-            }}
-          >
-            Select
-          </RQButton>
+          isRecordMockCollection(record) ? null : (
+            <RQButton
+              size="small"
+              type="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                let url = "";
+                if (record.isOldMock) {
+                  url = record.url;
+                } else {
+                  // Not sending username as it might change
+                  url = generateFinalUrl(record.endpoint, user?.details?.profile?.uid, null, teamId, record?.password);
+                }
+                handleSelectAction(url);
+              }}
+            >
+              Select
+            </RQButton>
+          )
         ) : (
           <Dropdown
             menu={{ items: isRecordMockCollection(record) ? collectionActions : mockActions }}
