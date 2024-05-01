@@ -40,6 +40,8 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
       setIsDeletingOnlyCollection(true);
       const mockIds = collection.children?.map((mock) => mock.id);
 
+      // FIXME: This might break when multiple people working in workspace
+      //        since we are using UI as a source for mockIds
       await updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID);
       await updateCollections(uid, [{ id: collection.id, deleted: true }]);
 
