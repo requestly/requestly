@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Empty } from "antd";
 import APP_CONSTANTS from "config/constants";
@@ -14,8 +15,8 @@ import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
-import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { trackMocksListBulkActionPerformed } from "modules/analytics/events/features/mocksV2";
 import "./mocksTable.scss";
 
 export interface MocksTableProps {
@@ -43,7 +44,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   handleSelectAction,
   forceRender = () => {},
 }) => {
-  const { selectedRows, clearSelectedRows } = useContentListTableContext();
+  const { clearSelectedRows } = useContentListTableContext();
 
   const { pathname } = useLocation();
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
@@ -74,7 +75,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     forceRender,
   });
 
-  const { deleteMocksModalAction, updateMocksCollectionModalAction, removeMocksFromCollectionAction } =
+  const { deleteRecordsModalAction, updateMocksCollectionModalAction, removeMocksFromCollectionAction } =
     useMocksActionContext() ?? {};
 
   const getSelectionCount = useCallback((selectedRows: RQMockMetadataSchema[]) => {
@@ -95,13 +96,6 @@ export const MocksTable: React.FC<MocksTableProps> = ({
 
     return `${collectionString}${collectionString && mockString ? " and " : ""}${mockString} selected`;
   }, []);
-
-  const recordsDeleteAction = async (selectedRows: RQMockMetadataSchema[], onSuccess: () => void) => {
-    console.log(selectedRows);
-    // handleRecordsDeletion(selectedRows).then(() => {
-    //   onSuccess();
-    // });
-  };
 
   return (
     <ContentListTable
@@ -147,7 +141,13 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                     label: "Move",
                     icon: <RiFolderSharedLine />,
                     onClick: (selectedRows) => {
-                      updateMocksCollectionModalAction(selectedRows);
+                      const onSuccess = () => {
+                        trackMocksListBulkActionPerformed("move_mocks_into_collection", mockType);
+                        forceRender();
+                        clearSelectedRows();
+                      };
+
+                      updateMocksCollectionModalAction(selectedRows, onSuccess);
                     },
                   },
                   {
@@ -155,8 +155,9 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                     icon: <ImUngroup />,
                     onClick: (selectedRows) => {
                       const onSuccess = () => {
-                        clearSelectedRows();
+                        trackMocksListBulkActionPerformed("remove_mocks_from_collections", mockType);
                         forceRender();
+                        clearSelectedRows();
                       };
 
                       removeMocksFromCollectionAction(selectedRows, onSuccess);
@@ -168,11 +169,12 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                     icon: <RiDeleteBin2Line />,
                     onClick: (selectedRows) => {
                       const onSuccess = () => {
-                        console.log("Delete Duccess");
+                        trackMocksListBulkActionPerformed("delete", mockType);
+                        forceRender();
                         clearSelectedRows();
                       };
 
-                      recordsDeleteAction(normalizeRecords(selectedRows), onSuccess);
+                      deleteRecordsModalAction(selectedRows, onSuccess);
                     },
                   },
                 ],

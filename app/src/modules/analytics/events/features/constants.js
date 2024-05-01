@@ -149,6 +149,9 @@ export const MOCKSV2 = {
   MOCK_COLLECTION_CREATED: "mock_collection_created",
   MOCK_COLLECTION_UPDATED: "mock_collection_updated",
   MOCK_COLLECTION_DELETED: "mock_collection_deleted",
+
+  // bulk action
+  MOCKS_LIST_BULK_ACTION_PERFORMED: "mocks_list_bulk_action_performed",
 };
 
 export const API_CLIENT = {

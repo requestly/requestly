@@ -48,7 +48,7 @@ export const useMocksTableColumns = ({
     updateMocksCollectionModalAction,
     toggleMockStarAction,
     removeMocksFromCollectionAction,
-  } = useMocksActionContext();
+  } = useMocksActionContext() ?? {};
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
     {
