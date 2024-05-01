@@ -1,0 +1,19 @@
+.shared-list-viewer-record-name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.shared-list-viewer-rule-name {
+  color: var(--link-color);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.shared-list-viewer-table thead tr th:nth-child(2),
+.shared-list-viewer-table tbody tr th:nth-child(3) {
+  text-align: center;
+}

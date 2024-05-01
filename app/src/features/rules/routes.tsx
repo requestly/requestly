@@ -3,7 +3,6 @@ import PATHS from "config/constants/sub/paths";
 import { RulesContainer } from "views/containers/RulesContainer";
 import TrashIndexPage from "components/features/trash/TrashIndexPage";
 import RuleEditor from "views/features/rules/RuleEditor";
-import SharedListViewerIndexPage from "components/features/sharedLists/SharedListViewerIndexPage";
 import { joinPaths } from "utils/PathUtils";
 import ImportSharedListIndexPage from "components/features/sharedLists/ImportSharedListIndexPage";
 import ProtectedRoute from "components/authentication/ProtectedRoute";
@@ -14,16 +13,17 @@ import RulesContainerV2 from "./container";
 import { RulesListScreen } from "./screens/rulesList";
 import { SharedListsScreen } from "./screens/sharedLists";
 import { TemplatesList } from "./screens/templatesList";
+import { SharedListViewerScreen } from "./screens/sharedListViewer";
 
 export const ruleRoutes: RouteObject[] = [
   {
     path: PATHS.RULES.INDEX,
     element: <RulesContainer />,
     children: [
-      {
-        path: joinPaths(PATHS.SHARED_LISTS.VIEWER.RELATIVE, PATHS.ANY),
-        element: <SharedListViewerIndexPage />,
-      },
+      // {
+      //   path: joinPaths(PATHS.SHARED_LISTS.VIEWER.RELATIVE, PATHS.ANY),
+      //   element: <SharedListViewerIndexPage />,
+      // },
       {
         path: PATHS.SHARED_LISTS.VIEWER.RELATIVE, // currently broken in prod
         element: <Navigate to={PATHS.SHARED_LISTS.ABSOLUTE} />,
@@ -75,6 +75,10 @@ export const ruleRoutes: RouteObject[] = [
       {
         path: PATHS.SHARED_LISTS.RELATIVE,
         element: <SharedListsScreen />,
+      },
+      {
+        path: joinPaths(PATHS.SHARED_LISTS.VIEWER.RELATIVE, PATHS.ANY),
+        element: <SharedListViewerScreen />,
       },
       {
         path: PATHS.RULES.TEMPLATES.RELATIVE,
