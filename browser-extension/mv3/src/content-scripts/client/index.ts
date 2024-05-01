@@ -3,6 +3,8 @@ import { initRuleExecutionHandler } from "./ruleExecution";
 import { initSessionRecording } from "./sessionRecorder";
 import { initResponseRuleHandler } from "./responseRuleHandler";
 import { initRequestRuleHandler } from "./requestRuleHandler";
+import { initRedirectRuleHandler } from "./redirectRuleHandler";
+import { initReplaceRuleHandler } from "./replaceRuleHandler";
 import { Variable, getVariable } from "../../service-worker/variable";
 
 if (document.doctype?.name === "html" || document.contentType?.includes("html")) {
@@ -13,6 +15,8 @@ if (document.doctype?.name === "html" || document.contentType?.includes("html"))
       initRuleExecutionHandler();
       initResponseRuleHandler();
       initRequestRuleHandler();
+      initRedirectRuleHandler();
+      initReplaceRuleHandler();
     }
   });
 }

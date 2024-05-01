@@ -1,9 +1,11 @@
-import { PUBLIC_NAMESPACE } from "common/constants";
+import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants";
 
-((namespace) => {
+((namespace, ignoredHeadersOnRedirect) => {
   window[namespace] = window[namespace] || {};
   window[namespace].responseRules = [];
   window[namespace].requestRules = [];
+  window[namespace].redirectRules = [];
+  window[namespace].replaceRules = [];
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage
@@ -180,11 +182,45 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return window[namespace].requestRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
+  const getMatchedRedirectRule = (url) => {
+    return window[namespace].redirectRules?.findLast((rule) =>
+      rule.pairs.some((pair) => matchSourceUrl(pair.source, url))
+    );
+  };
+
+  const getMatchedReplaceRule = (url) => {
+    return window[namespace].replaceRules?.findLast((rule) =>
+      rule.pairs.some((pair) => matchSourceUrl(pair.source, url))
+    );
+  };
+
+  const getCorrespondingDestinationURL = (url, rule) => {
+    const pair = rule.pairs.find((pair) => matchSourceUrl(pair.source, url));
+    return pair.destination;
+  };
+
+  const continueOnTimeout = async () => {
+    return new Promise((resolve) => setTimeout(resolve, 1000));
+  };
+
+  const continueOnEvent = async () => {
+    return new Promise((resolve, reject) => {
+      window.addEventListener("message", function handler(event) {
+        if (event.data.action === "fetch_intercepted_reply_back") {
+          console.log("!!!debug", "fetch_intercepted_reply_back");
+          resolve();
+          window.removeEventListener("message", handler);
+        }
+      });
+    });
+  };
+
   const shouldServeResponseWithoutRequest = (responseModification) => {
     return responseModification.type === "static" && responseModification.serveWithoutRequest;
   };
 
   const getFunctionFromCode = (code) => {
+    console.log("!!!debug", "in getFunctionFromCode");
     return new Function("args", `return (${code})(args);`);
   };
 
@@ -267,6 +303,18 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         action: "request_rule_applied",
         ruleId: message.ruleDetails.id,
         requestDetails: message["requestDetails"],
+      },
+      window.location.href
+    );
+  };
+
+  const notifyRequestIntercepted = (message) => {
+    window.top.postMessage(
+      {
+        source: "requestly:client",
+        action: "request_intercepted",
+        requestDetails: message.requestDetails,
+        actionDetails: message.actionDetails,
       },
       window.location.href
     );
@@ -445,10 +493,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const send = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.send = function (data) {
+  XMLHttpRequest.prototype.send = async function (data) {
     this.requestData = data;
 
     const requestRule = getMatchedRequestRule(this.requestURL);
+
     if (requestRule) {
       this.requestData = getCustomRequestBody(requestRule, {
         method: this.method,
@@ -473,6 +522,41 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule.response)) {
       resolveXHR(this, this.responseRule.response.value);
     } else {
+      const redirectRuleThatMatchesURL = getMatchedRedirectRule(this.requestURL);
+      const replaceRuleThatMatchesURL = getMatchedReplaceRule(this.requestURL);
+
+      let ignoredHeadersValues = [];
+
+      if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+        ignoredHeadersOnRedirect.forEach((header) => {
+          const originalHeaderValue = this.requestHeaders?.[header] || this.requestHeaders?.[header.toLowerCase()];
+          if (originalHeaderValue) {
+            ignoredHeadersValues.push({ header, value: originalHeaderValue });
+          }
+        });
+
+        if (ignoredHeadersValues.length > 0) {
+          console.time("fetch_intercepted_XHR");
+          notifyRequestIntercepted({
+            requestDetails: {
+              url: this.requestURL,
+              method: this.method,
+              type: "xmlhttprequest",
+              timeStamp: Date.now(),
+            },
+            actionDetails: {
+              type: "forward_ignored_headers",
+              ignoredHeadersValues,
+              destinationUrl: getCorrespondingDestinationURL(
+                this.requestURL,
+                redirectRuleThatMatchesURL || replaceRuleThatMatchesURL
+              ),
+            },
+          });
+          await Promise.race([continueOnEvent(), continueOnTimeout()]);
+          console.timeEnd("fetch_intercepted_XHR");
+        }
+      }
       send.apply(this, arguments);
     }
   };
@@ -499,6 +583,41 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     let url = getAbsoluteUrl(request.url);
     const method = request.method;
+
+    const requestDetails = {
+      url,
+      method,
+      type: "fetch",
+      timeStamp: Date.now(),
+    };
+
+    const redirectRuleThatMatchesURL = getMatchedRedirectRule(url);
+    const replaceRuleThatMatchesURL = getMatchedReplaceRule(url);
+
+    const ignoredHeadersValues = [];
+
+    if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+      ignoredHeadersOnRedirect.forEach((header) => {
+        const originalHeaderValue = request.headers.get(header);
+        if (originalHeaderValue) {
+          ignoredHeadersValues.push({ header, value: originalHeaderValue });
+        }
+      });
+    }
+
+    if (ignoredHeadersValues.length > 0) {
+      console.time("fetch_intercepted");
+      notifyRequestIntercepted({
+        requestDetails: requestDetails,
+        actionDetails: {
+          type: "forward_ignored_headers",
+          ignoredHeadersValues,
+          destinationUrl: getCorrespondingDestinationURL(url, redirectRuleThatMatchesURL || replaceRuleThatMatchesURL),
+        },
+      });
+      await Promise.race([continueOnEvent(), continueOnTimeout()]);
+      console.timeEnd("fetch_intercepted");
+    }
 
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
@@ -549,6 +668,28 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     let exceptionCaught;
 
     const responseRuleData = getMatchedResponseRule(url);
+
+    // if (
+    //   responseRuleData &&
+    //   responseRuleData.response.type === "code" &&
+    //   !shouldServeResponseWithoutRequest(responseRuleData.response)
+    // ) {
+    //   console.log("!!!debug", "before", Date.now());
+    //   window.postMessage({
+    //     request: {
+    //       url: request.url,
+    //       method: request.method,
+    //       headers: Array.from(request.headers.entries()),
+    //       pageUrl: window.location.href,
+    //     },
+    //     action: "fetch_intercepted",
+    //     source: "requestly:client",
+    //   });
+    //   // await pauseWithSetTimeout();
+    //   // await pauseWithReply();
+    //   await Promise.race([pauseWithSetTimeout(), pauseWithReply()]);
+    //   console.log("!!!debug", "after", Date.now());
+    // }
 
     if (responseRuleData && shouldServeResponseWithoutRequest(responseRuleData.response)) {
       const contentType = isJSON(responseRuleData.response.value) ? "application/json" : "text/plain";
@@ -650,13 +791,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       customResponse = responseRuleData.response.value;
     }
 
-    const requestDetails = {
-      url,
-      method,
-      type: "fetch",
-      timeStamp: Date.now(),
-    };
-
     notifyResponseRuleApplied({ ruleDetails: responseRuleData, requestDetails });
 
     // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
@@ -670,4 +804,4 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       headers: responseHeaders,
     });
   };
-})(PUBLIC_NAMESPACE);
+})(PUBLIC_NAMESPACE, IGNORED_HEADERS_ON_REDIRECT);
