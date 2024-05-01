@@ -8,10 +8,10 @@ type MocksModalsContextType = {
   openDeleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
   setOpenDeleteCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openDeletRecordsModalAction: (records: RQMockMetadataSchema[]) => void;
+  openDeletRecordsModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   setOpenDeleteRecordsModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openUpdateMocksCollectionModalAction: (records: RQMockMetadataSchema[]) => void;
+  openUpdateMocksCollectionModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   setOpenUpdateMocksCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
   openMockUploaderModalAction: (mockType: MockType) => void;

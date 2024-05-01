@@ -13,13 +13,15 @@ export const UpdateMocksCollectionModalWrapper: React.FC<{
 }> = ({ mocks, forceRender }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [mocksToBeUpdated, setMocksToBeUpdated] = useState<RQMockMetadataSchema[]>([]);
+  const [onSuccess, setOnSuccess] = useState(() => () => {});
 
   const { setOpenUpdateMocksCollectionModalAction } = useMocksModalsContext();
 
   useEffect(() => {
-    const openModal = (records: RQMockMetadataSchema[]) => {
+    const openModal = (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
       const mocks = records.filter(isRecordMock);
       setMocksToBeUpdated(mocks);
+      setOnSuccess(() => onSuccess);
       setIsVisible(true);
     };
 
@@ -39,7 +41,10 @@ export const UpdateMocksCollectionModalWrapper: React.FC<{
       collections={collections}
       visible={isVisible}
       toggleModalVisibility={onClose}
-      onSuccess={forceRender}
+      onSuccess={() => {
+        forceRender();
+        onSuccess();
+      }}
     />
   ) : null;
 };
