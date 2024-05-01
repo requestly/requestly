@@ -23,7 +23,7 @@ type MocksActionContextType = {
   updateCollectionNameAction: (mockType: MockType, record: RQMockMetadataSchema) => void;
   deleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
   deleteMockModalAction: (record: RQMockMetadataSchema) => void;
-  updateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
+  updateMocksCollectionModalAction: (records: RQMockMetadataSchema[]) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
   mockUploaderModalAction: (mockType: MockType) => void;
   newFileModalAction: () => void;
@@ -48,7 +48,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openCollectionModalAction,
     openDeleteCollectionModalAction,
     openDeleteMockModalAction,
-    openUpdateMockCollectionModalAction,
+    openUpdateMocksCollectionModalAction,
     openMockUploaderModalAction,
     openNewFileModalAction,
   } = useMocksModalsContext();
@@ -85,12 +85,12 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openDeleteMockModalAction]
   );
 
-  const updateMockCollectionModalAction = useCallback(
-    (record: RQMockMetadataSchema) => {
-      Logger.log("[DEBUG]", "updateMockCollectionModalAction", { record });
-      openUpdateMockCollectionModalAction(record);
+  const updateMocksCollectionModalAction = useCallback(
+    (records: RQMockMetadataSchema[]) => {
+      Logger.log("[DEBUG]", "updateMocksCollectionModalAction", { records });
+      openUpdateMocksCollectionModalAction(records);
     },
-    [openUpdateMockCollectionModalAction]
+    [openUpdateMocksCollectionModalAction]
   );
 
   const toggleMockStarAction = useCallback(
@@ -157,7 +157,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     updateCollectionNameAction,
     deleteCollectionModalAction,
     deleteMockModalAction,
-    updateMockCollectionModalAction,
+    updateMocksCollectionModalAction,
     toggleMockStarAction,
     mockUploaderModalAction,
     newFileModalAction,

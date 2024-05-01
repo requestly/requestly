@@ -11,8 +11,8 @@ type MocksModalsContextType = {
   openDeleteMockModalAction: (record: RQMockMetadataSchema) => void;
   setOpenDeleteMockModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openUpdateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
-  setOpenUpdateMockCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
+  openUpdateMocksCollectionModalAction: (records: RQMockMetadataSchema[]) => void;
+  setOpenUpdateMocksCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
   openMockUploaderModalAction: (mockType: MockType) => void;
   setOpenMockUploaderModalAction: React.Dispatch<React.SetStateAction<() => void>>;
@@ -37,7 +37,7 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
     () => DEFAULT_ACTION
   );
   const [openDeleteMockModalAction, setOpenDeleteMockModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
-  const [openUpdateMockCollectionModalAction, setOpenUpdateMockCollectionModalAction] = useState<ModalAction>(
+  const [openUpdateMocksCollectionModalAction, setOpenUpdateMocksCollectionModalAction] = useState<ModalAction>(
     () => DEFAULT_ACTION
   );
   const [openMockUploaderModalAction, setOpenMockUploaderModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
@@ -53,8 +53,8 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
     openDeleteMockModalAction,
     setOpenDeleteMockModalAction,
 
-    openUpdateMockCollectionModalAction,
-    setOpenUpdateMockCollectionModalAction,
+    openUpdateMocksCollectionModalAction,
+    setOpenUpdateMocksCollectionModalAction,
 
     openMockUploaderModalAction,
     setOpenMockUploaderModalAction,

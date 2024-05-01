@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
-import { UpdateMockCollectionModal } from "./UpdateMockCollectionModal";
+import { UpdateMocksCollectionModal } from "./UpdateMocksCollectionModal";
 import { isRecordMockCollection } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
 
-export const UpdateMockCollectionModalWrapper: React.FC<{ forceRender: () => void; mocks: RQMockMetadataSchema[] }> = ({
-  mocks,
-  forceRender,
-}) => {
+export const UpdateMocksCollectionModalWrapper: React.FC<{
+  forceRender: () => void;
+  mocks: RQMockMetadataSchema[];
+}> = ({ mocks, forceRender }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [mock, setMock] = useState<RQMockMetadataSchema>();
+  const [mocksToBeUpdated, setMocksToBeUpdated] = useState<RQMockMetadataSchema[]>([]);
 
-  const { setOpenUpdateMockCollectionModalAction } = useMocksModalsContext();
+  const { setOpenUpdateMocksCollectionModalAction } = useMocksModalsContext();
 
   useEffect(() => {
-    const openModal = (record: RQMockMetadataSchema) => {
-      setMock(record);
+    const openModal = (records: RQMockMetadataSchema[]) => {
+      setMocksToBeUpdated(records);
       setIsVisible(true);
     };
 
-    setOpenUpdateMockCollectionModalAction(() => openModal);
-  }, [setOpenUpdateMockCollectionModalAction]);
+    setOpenUpdateMocksCollectionModalAction(() => openModal);
+  }, [setOpenUpdateMocksCollectionModalAction]);
 
   const onClose = () => {
     setIsVisible(false);
-    setMock(undefined);
+    setMocksToBeUpdated([]);
   };
 
   const collections = (mocks.filter((mock) => isRecordMockCollection(mock)) as unknown) as RQMockCollection[];
 
   return isVisible ? (
-    <UpdateMockCollectionModal
-      mock={mock}
+    <UpdateMocksCollectionModal
+      mocks={mocksToBeUpdated}
       collections={collections}
       visible={isVisible}
       toggleModalVisibility={onClose}
