@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 import { UpdateMocksCollectionModal } from "./UpdateMocksCollectionModal";
-import { isRecordMockCollection } from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
+import {
+  isRecordMock,
+  isRecordMockCollection,
+} from "features/mocks/screens/mocksList/components/MocksList/components/MocksTable/utils";
 
 export const UpdateMocksCollectionModalWrapper: React.FC<{
   forceRender: () => void;
@@ -15,7 +18,8 @@ export const UpdateMocksCollectionModalWrapper: React.FC<{
 
   useEffect(() => {
     const openModal = (records: RQMockMetadataSchema[]) => {
-      setMocksToBeUpdated(records);
+      const mocks = records.filter(isRecordMock);
+      setMocksToBeUpdated(mocks);
       setIsVisible(true);
     };
 
