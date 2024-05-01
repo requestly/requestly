@@ -526,20 +526,19 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
       const redirectRuleThatMatchesURL = getMatchedRedirectRule(this.requestURL);
       const replaceRuleThatMatchesURL = getMatchedReplaceRule(this.requestURL);
 
-      let ignoredHeadersValues = [];
-
       if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+        const ignoredHeadersValues = [];
+        const redirectedUrl = getCorrespondingDestinationURL(
+          this.requestURL,
+          redirectRuleThatMatchesURL || replaceRuleThatMatchesURL
+        );
+
         ignoredHeadersOnRedirect.forEach((header) => {
           const originalHeaderValue = this.requestHeaders?.[header] || this.requestHeaders?.[header.toLowerCase()];
           if (originalHeaderValue) {
             ignoredHeadersValues.push({ name: header, value: originalHeaderValue });
           }
         });
-
-        const redirectedUrl = getCorrespondingDestinationURL(
-          this.requestURL,
-          redirectRuleThatMatchesURL || replaceRuleThatMatchesURL
-        );
 
         if (ignoredHeadersValues.length > 0 && redirectedUrl) {
           //TODO @nafees87n to remove this log
@@ -598,31 +597,34 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
     const redirectRuleThatMatchesURL = getMatchedRedirectRule(url);
     const replaceRuleThatMatchesURL = getMatchedReplaceRule(url);
 
-    const ignoredHeadersValues = [];
-    const redirectedUrl = getCorrespondingDestinationURL(url, redirectRuleThatMatchesURL || replaceRuleThatMatchesURL);
-
     if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+      const ignoredHeadersValues = [];
+      const redirectedUrl = getCorrespondingDestinationURL(
+        url,
+        redirectRuleThatMatchesURL || replaceRuleThatMatchesURL
+      );
+
       ignoredHeadersOnRedirect.forEach((header) => {
         const originalHeaderValue = request.headers.get(header);
         if (originalHeaderValue) {
           ignoredHeadersValues.push({ name: header, value: originalHeaderValue });
         }
       });
-    }
 
-    if (ignoredHeadersValues.length > 0 && redirectedUrl) {
-      //TODO @nafees87n to remove this log
-      console.time("fetch_intercepted");
-      notifyRequestIntercepted({
-        requestDetails: requestDetails,
-        actionDetails: {
-          type: "forward_ignored_headers",
-          ignoredHeaders: ignoredHeadersValues,
-          destinationUrl: redirectedUrl,
-        },
-      });
-      await continueOnRequestProcessed();
-      console.timeEnd("fetch_intercepted");
+      if (ignoredHeadersValues.length > 0 && redirectedUrl) {
+        //TODO @nafees87n to remove this log
+        console.time("fetch_intercepted");
+        notifyRequestIntercepted({
+          requestDetails: requestDetails,
+          actionDetails: {
+            type: "forward_ignored_headers",
+            ignoredHeaders: ignoredHeadersValues,
+            destinationUrl: redirectedUrl,
+          },
+        });
+        await continueOnRequestProcessed();
+        console.timeEnd("fetch_intercepted");
+      }
     }
 
     // Request body can be sent only for request methods other than GET and HEAD.
