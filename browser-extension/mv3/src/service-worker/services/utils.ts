@@ -161,7 +161,7 @@ export const isExtensionEnabled = async (): Promise<boolean> => {
 };
 
 export const toggleExtensionStatus = async () => {
-  const extensionEnabledStatus = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
+  const extensionEnabledStatus = await isExtensionEnabled();
 
   const updatedStatus = !extensionEnabledStatus;
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
