@@ -43,7 +43,6 @@ export const CLIENT_MESSAGES = {
   STOP_RECORDING: "stopRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
-  EXECUTE_SCRIPT: "executeScript",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
 };
 

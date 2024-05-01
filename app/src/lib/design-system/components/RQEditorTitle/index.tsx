@@ -143,7 +143,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
           )}
         </Row>
       </Col>
-      <>{tagText?.length && <Col className="mock-tag editor-title-tag">{tagText}</Col>}</>
+      <Row justify="end">{tagText?.length && <Col className="mock-tag editor-title-tag">{tagText}</Col>}</Row>
     </Row>
   );
 };

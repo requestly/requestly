@@ -12,7 +12,7 @@ import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
-import { getUserAuthDetails } from "store/selectors";
+import { getIsAppBannerVisible, getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
 import { getAllRecords } from "store/features/rules/selectors";
@@ -34,6 +34,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
   const user = useSelector(getUserAuthDetails);
   const allRecords = useSelector(getAllRecords);
+  const isAppBannerVisible = useSelector(getIsAppBannerVisible);
 
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
   const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
@@ -131,6 +132,15 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     return isAllRecordsActive ? "Deactivate" : "Activate";
   }, [selectedRows, allRecordsMap]);
 
+  const getTableScrollHeight = () => {
+    const featureLimiterBannerHeight = "68px";
+    const appBannerHeight = "48px";
+
+    return `calc(100vh - 232px - ${isFeatureLimitbannerShown ? featureLimiterBannerHeight : "0px"} - ${
+      isAppBannerVisible ? appBannerHeight : "0px"
+    })`;
+  };
+
   return (
     <>
       {/* Add Modals Required in Rules List here */}
@@ -138,7 +148,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       <ContentListTable
         id="rules-list-table"
         size="middle"
-        scroll={{ y: `calc(100vh - ${isFeatureLimitbannerShown ? "(232px + 68px)" : "232px"})` }} // 68px is Feature limit banner height
+        scroll={{ y: getTableScrollHeight() }}
         columns={columns}
         data={contentTableData}
         rowKey="id"

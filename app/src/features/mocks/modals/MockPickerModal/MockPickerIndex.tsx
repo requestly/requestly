@@ -94,6 +94,7 @@ const MockPickerIndex: React.FC<Props> = ({
         fileType={selectedMockData?.fileType}
         selectOnSave={handleSelectAction}
         handleCloseEditorFromPicker={handleCloseEditor}
+        isEditorOpenInModal={true}
       />
     );
   }

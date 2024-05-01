@@ -51,6 +51,8 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     this.shadowRoot.getElementById("settings-button").addEventListener("click", () => {
       this.dispatchEvent(new CustomEvent("open_app_settings"));
     });
+
+    this.dispatchEvent(new CustomEvent("rule_applied_listener_active"));
   }
 
   triggerAppliedRuleClickedEvent(detail: any) {
