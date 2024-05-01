@@ -6,13 +6,15 @@ import { useMocksModalsContext } from "features/mocks/contexts/modals";
 export const DeletRecordsModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [records, setRecords] = useState<RQMockMetadataSchema[]>([]);
+  const [onSuccess, setOnSuccess] = useState(() => () => {});
 
   const { setOpenDeleteRecordsModalAction } = useMocksModalsContext();
 
   useEffect(() => {
-    const openModal = (records: RQMockMetadataSchema[]) => {
+    const openModal = (records: RQMockMetadataSchema[], onSuccess = () => {}) => {
       setIsVisible(true);
       setRecords(records);
+      setOnSuccess(() => onSuccess);
     };
 
     setOpenDeleteRecordsModalAction(() => openModal);
@@ -24,6 +26,14 @@ export const DeletRecordsModalWrapper: React.FC<{ forceRender: () => void }> = (
   };
 
   return (
-    <DeleteRecordsModal records={records} visible={isVisible} toggleModalVisibility={onClose} onSuccess={forceRender} />
+    <DeleteRecordsModal
+      records={records}
+      visible={isVisible}
+      toggleModalVisibility={onClose}
+      onSuccess={() => {
+        forceRender();
+        onSuccess();
+      }}
+    />
   );
 };

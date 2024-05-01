@@ -18,8 +18,8 @@ interface Props {
 
 export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleModalVisibility, onSuccess }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { deleteRecordsAction } = useMocksActionContext();
-  const recordType = records.length === 1 ? (isRecordMock(records[0]) ? "mock" : "collection") : "records";
+  const { deleteRecordsAction } = useMocksActionContext() ?? {};
+  const recordType = records.length === 1 ? (isRecordMock(records[0]) ? "Mock" : "Collection") : "Records";
 
   const handleOnConfirm = () => {
     setIsDeleting(true);
@@ -28,7 +28,7 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
       onSuccess?.();
       setIsDeleting(false);
       toggleModalVisibility(false);
-      toast.info(`${recordType.toUpperCase()} deleted!`);
+      toast.info(`${recordType} deleted!`);
     };
 
     deleteRecordsAction(records, onDeleted);
@@ -41,9 +41,9 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
   return (
     <RQModal open={visible} destroyOnClose={true} onCancel={handleCancel} className="delete-mock-modal">
       <img width={32} height={32} src={deleteIcon} alt="Delete collection" className="icon" />
-      <div className="header">Delete this {recordType}?</div>
+      <div className="header">Delete {recordType.toLowerCase()}?</div>
       <div className="description">
-        This action will permanently delete this {recordType}. <br /> Are you sure you want to delete?
+        This action will permanently delete this {recordType.toLowerCase()}. <br /> Are you sure you want to delete?
       </div>
       <div className="actions">
         <RQButton block type="default" onClick={handleCancel}>
