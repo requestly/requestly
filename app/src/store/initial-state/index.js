@@ -206,6 +206,7 @@ const INITIAL_STATE = {
       networkSessionSaveInProgress: false, // todo: check if requried
       timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
+      isAppBannerVisible: false,
     },
   },
 };

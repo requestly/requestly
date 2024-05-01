@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
+import { getUserAuthDetails } from "store/selectors";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage, isSettingsPage } from "utils/PathUtils.js";
 import Footer from "../../components/sections/Footer";
@@ -23,7 +23,6 @@ const DashboardLayout = () => {
   const { pathname } = location;
   const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
   const user = useSelector(getUserAuthDetails);
-  const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
 
   initializeOneTap();
 
@@ -64,15 +63,7 @@ const DashboardLayout = () => {
     <>
       <AppNotificationBanner />
       <PlanExpiredBanner />
-      <div
-        className="app-layout app-dashboard-layout"
-        style={{
-          height:
-            user?.details?.planDetails?.status === "canceled" && !isPlanExpiredBannerClosed
-              ? "calc(100vh - 46px)"
-              : "100vh",
-        }}
-      >
+      <div className="app-layout app-dashboard-layout">
         <div className="app-header">
           {" "}
           <MenuHeader />
