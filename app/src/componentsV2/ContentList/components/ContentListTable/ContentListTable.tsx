@@ -28,7 +28,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   customRowClassName = (record: DataType) => "",
   bulkActionBarConfig,
   size = "middle",
-  scroll = { y: "calc(100vh - 277px)" },
+  scroll = { y: "calc(100vh - 232px)" }, // 232px is the height of the content header + top header + footer
   locale,
   onRecordSelection = () => {},
   className = "",

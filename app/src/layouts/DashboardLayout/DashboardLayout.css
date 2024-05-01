@@ -4,7 +4,7 @@
   --app-sidebar-width: 80px;
 
   width: 100vw;
-  height: 100vh;
+  height: clamp(calc(100vh - 48px), 100vh, 100vh);
   display: grid;
   background-color: var(--body-background);
 }
