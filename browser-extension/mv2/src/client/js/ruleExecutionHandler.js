@@ -15,16 +15,16 @@ RQ.RuleExecutionHandler.sendRuleExecutionEvent = (rule) => {
 };
 
 RQ.RuleExecutionHandler.handleAppliedRule = (rule) => {
-  if (RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled) {
-    RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget(rule);
-  } else {
-    RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget(rule.id);
-  }
-
   const isFirstExecution = !RQ.RuleExecutionHandler.appliedRuleIds.has(rule.id);
   if (isFirstExecution) {
     RQ.RuleExecutionHandler.appliedRuleIds.add(rule.id);
     RQ.RuleExecutionHandler.sendRuleExecutionEvent(rule);
+  }
+
+  if (RQ.RuleExecutionHandler.implicitTestRuleFlowEnabled) {
+    RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget(rule);
+  } else {
+    RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget(rule.id);
   }
 };
 
@@ -118,21 +118,7 @@ RQ.RuleExecutionHandler.showImplicitTestRuleWidget = async () => {
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.style.display = "none";
 
-  let appliedRules = [];
-  for (let ruleId of RQ.RuleExecutionHandler.appliedRuleIds.values()) {
-    const ruleDetails = await RQ.RulesStore.getRule(ruleId);
-    appliedRules.push({
-      ruleId: ruleDetails.id,
-      ruleName: ruleDetails.name,
-      ruleType: ruleDetails.ruleType,
-    });
-  }
-  testRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
   document.documentElement.appendChild(testRuleWidget);
-
-  if (appliedRules.length) {
-    testRuleWidget.style.display = "block";
-  }
 
   testRuleWidget.addEventListener("view_rule_in_editor", (data) => {
     window.open(`${RQ.configs.WEB_URL}/rules/editor/edit/${data.detail.ruleId}`, "_blank");
@@ -140,6 +126,14 @@ RQ.RuleExecutionHandler.showImplicitTestRuleWidget = async () => {
 
   testRuleWidget.addEventListener("open_app_settings", () => {
     window.open(`${RQ.configs.WEB_URL}/settings/global-settings`, "_blank");
+  });
+
+  testRuleWidget.addEventListener("rule_applied_listener_active", async () => {
+    const ruleIds = Array.from(RQ.RuleExecutionHandler.appliedRuleIds);
+    for (let ruleId of ruleIds) {
+      const ruleDetails = await RQ.RulesStore.getRule(ruleId);
+      RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget(ruleDetails);
+    }
   });
 };
 
@@ -188,7 +182,6 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget = (ruleId) => {
 
 RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
   const implicitTestRuleWidget = document.querySelector("rq-implicit-test-rule-widget");
-  implicitTestRuleWidget.style.display = "block";
 
   if (implicitTestRuleWidget) {
     implicitTestRuleWidget.dispatchEvent(
@@ -200,11 +193,13 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
         },
       })
     );
+
+    implicitTestRuleWidget.style.display = "block";
   }
 };
 
-RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
-  await chrome.storage.local.get(RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = () => {
+  chrome.storage.local.get(RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
     RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = result[RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
   });
 };
@@ -212,12 +207,12 @@ RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = async () => 
 RQ.RuleExecutionHandler.checkAppliedRuleAndNotifyWidget = (rule) => {
   const implicitTestRuleConfig = RQ.RuleExecutionHandler.implictTestRuleWidgetConfig;
 
-  if (!implicitTestRuleConfig.enabled) {
+  if (!implicitTestRuleConfig?.enabled) {
     return;
   }
 
-  if (implicitTestRuleConfig.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
-    if (!implicitTestRuleConfig.ruleTypes.includes(rule.ruleType)) {
+  if (implicitTestRuleConfig?.visibility === RQ.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.SPECIFIC) {
+    if (!implicitTestRuleConfig?.ruleTypes.includes(rule.ruleType)) {
       return;
     }
   }
