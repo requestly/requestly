@@ -66,14 +66,19 @@ const updateRequestSpecificRules = async (
     condition: chrome.declarativeNetRequest.RuleCondition;
   }
 ) => {
-  let ruleId = Date.now() % 10000000;
+  let ruleId = parseInt(`${Date.now() % 1000000}${Math.floor(Math.random() * 1000)}`);
   console.log("!!!debug", "ruleID", ruleId);
   const sessionRulesMap = tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP);
-  let removeId = [];
+  let removeRuleIds = [];
   if (sessionRulesMap?.[requestUrl]) {
     ruleId = sessionRulesMap[requestUrl];
-    removeId.push(ruleId);
+    removeRuleIds.push(ruleId);
   }
+
+  tabService.setData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP, {
+    ...sessionRulesMap,
+    [requestUrl]: ruleId,
+  });
 
   return updateSessionRules({
     addRules: [
@@ -82,12 +87,7 @@ const updateRequestSpecificRules = async (
         ...ruleDetails,
       },
     ],
-    removeRuleIds: removeId,
-  }).then(() => {
-    tabService.setData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP, {
-      ...sessionRulesMap,
-      [requestUrl]: ruleId,
-    });
+    removeRuleIds,
   });
 };
 
