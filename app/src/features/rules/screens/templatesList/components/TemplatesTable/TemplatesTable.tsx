@@ -50,7 +50,8 @@ const TemplatesTable: React.FC<TemplatesTableProps> = ({ searchValue }) => {
           locale={{
             emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Templates found" />,
           }}
-          scroll={isAppBannerVisible ? { y: `calc(100vh - 232px - 48px)` } : undefined}
+          scroll={isAppBannerVisible ? { y: "calc(100vh - 232px - 48px)" } : undefined}
+          // 232px is the height of the content header + top header + footer, 48px is the height of the app banner
         />
       </div>
     </>

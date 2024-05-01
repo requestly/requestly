@@ -40,7 +40,8 @@ export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists 
           locale={{
             emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Shared list found" />,
           }}
-          scroll={isAppBannerVisible ? { y: `calc(100vh - 232px - 48px)` } : undefined}
+          scroll={isAppBannerVisible ? { y: "calc(100vh - 232px - 48px)" } : undefined}
+          // 232px is the height of the content header + top header + footer, 48px is the height of the app banner
         />
       </div>
       {isDeleteSharedListModalVisible && (
