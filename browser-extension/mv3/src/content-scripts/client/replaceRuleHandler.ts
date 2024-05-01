@@ -7,7 +7,7 @@ const cacheReplaceRules = async () => {
 
   if (replaceRules.length) {
     cacheJsonOnPage({
-      redirectRules: replaceRules.map((rule) => {
+      replaceRules: replaceRules.map((rule) => {
         return {
           id: rule.id,
           pairs: rule.pairs,
