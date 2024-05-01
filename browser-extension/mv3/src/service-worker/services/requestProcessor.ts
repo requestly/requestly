@@ -2,10 +2,28 @@ import { CLIENT_MESSAGES } from "common/constants";
 import { updateSessionRules } from "./rulesManager";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 
-export const processRequest = async (requestDetails, actionDetails) => {
+interface RequestDetails {
+  tabId: number;
+  url: string;
+  method: string;
+  type: "xmlhttprequest" | "fetch";
+  timestamp: number;
+}
+
+interface ActionDetails {
+  type: ActionType;
+  ignoredHeaders?: { name: string; value: string }[];
+  destinationUrl?: string;
+}
+
+enum ActionType {
+  FORWARD_IGNORED_HEADERS = "forward_ignored_headers",
+}
+
+export const processRequest = async (requestDetails: RequestDetails, actionDetails: ActionDetails) => {
   try {
     switch (actionDetails.type) {
-      case "forward_ignored_headers":
+      case ActionType.FORWARD_IGNORED_HEADERS:
         console.log("!!!debug", "forward::", { requestDetails, actionDetails });
         await forwardIgnoredHeaders(requestDetails, actionDetails).then(() => {
           chrome.declarativeNetRequest.getSessionRules().then((rules) => {
@@ -21,7 +39,7 @@ export const processRequest = async (requestDetails, actionDetails) => {
   }
 };
 
-const forwardIgnoredHeaders = async (requestDetails, actionDetails) => {
+const forwardIgnoredHeaders = async (requestDetails: RequestDetails, actionDetails: ActionDetails) => {
   return updateRequestSpecificRules(requestDetails.tabId, requestDetails.url, {
     action: {
       requestHeaders: actionDetails.ignoredHeaders.map((header: { name: string; value: string }) => ({
@@ -35,7 +53,7 @@ const forwardIgnoredHeaders = async (requestDetails, actionDetails) => {
       urlFilter: `|${actionDetails.destinationUrl}`,
       resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
       tabIds: [requestDetails.tabId],
-      requestMethods: [requestDetails.method.toLowerCase()],
+      requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
     },
   });
 };

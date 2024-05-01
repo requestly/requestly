@@ -199,20 +199,18 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
     return pair.destination;
   };
 
-  const continueOnTimeout = async () => {
-    return new Promise((resolve) => setTimeout(resolve, 1000));
-  };
-
-  const continueOnEvent = async () => {
-    return new Promise((resolve, reject) => {
-      window.addEventListener("message", function handler(event) {
-        if (event.data.action === "notifyRequestProcessed") {
-          console.log("!!!debug", "notifyRequestProcessed");
-          resolve();
-          window.removeEventListener("message", handler);
-        }
-      });
-    });
+  const continueOnRequestProcessed = async () => {
+    return Promise.race([
+      new Promise((resolve) => setTimeout(resolve, 1000)),
+      new Promise((resolve) => {
+        window.addEventListener("message", function handler(event) {
+          if (event.data.action === "notifyRequestProcessed") {
+            resolve();
+            window.removeEventListener("message", handler);
+          }
+        });
+      }),
+    ]);
   };
 
   const shouldServeResponseWithoutRequest = (responseModification) => {
@@ -553,7 +551,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
               ),
             },
           });
-          await Promise.race([continueOnEvent(), continueOnTimeout()]);
+          await continueOnRequestProcessed();
           console.timeEnd("fetch_intercepted_XHR");
         }
       }
@@ -615,7 +613,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
           destinationUrl: getCorrespondingDestinationURL(url, redirectRuleThatMatchesURL || replaceRuleThatMatchesURL),
         },
       });
-      await Promise.race([continueOnEvent(), continueOnTimeout()]);
+      await continueOnRequestProcessed();
       console.timeEnd("fetch_intercepted");
     }
 
