@@ -180,7 +180,7 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToExplicitWidget = (ruleId) => {
   }
 };
 
-RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = async (rule) => {
+RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = (rule) => {
   const implicitTestRuleWidget = document.querySelector("rq-implicit-test-rule-widget");
 
   if (implicitTestRuleWidget) {
@@ -198,8 +198,8 @@ RQ.RuleExecutionHandler.notifyRuleAppliedToImplicitWidget = async (rule) => {
   }
 };
 
-RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
-  await chrome.storage.local.get(RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
+RQ.RuleExecutionHandler.fetchAndStoreImplicitTestRuleWidgetConfig = () => {
+  chrome.storage.local.get(RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG, function (result) {
     RQ.RuleExecutionHandler.implictTestRuleWidgetConfig = result[RQ.STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
   });
 };
