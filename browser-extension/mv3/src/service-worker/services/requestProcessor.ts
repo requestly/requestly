@@ -24,16 +24,13 @@ export const processRequest = async (requestDetails: RequestDetails, actionDetai
   try {
     switch (actionDetails.type) {
       case ActionType.FORWARD_IGNORED_HEADERS:
-        console.log("!!!debug", "forward::", { requestDetails, actionDetails });
         await forwardIgnoredHeaders(requestDetails, actionDetails).then(() => {
-          chrome.declarativeNetRequest.getSessionRules().then((rules) => {
-            console.log("!!!debug", "sessionRules rules", rules);
-          });
+          chrome.declarativeNetRequest.getSessionRules();
         });
         break;
     }
   } catch (e) {
-    console.log("!!!debug", "error in sw", e);
+    // Do nothing
   } finally {
     notifyRequestProcessedToTab(requestDetails.tabId);
   }
@@ -67,9 +64,11 @@ const updateRequestSpecificRules = async (
   }
 ) => {
   let ruleId = parseInt(`${Date.now() % 1000000}${Math.floor(Math.random() * 1000)}`);
-  console.log("!!!debug", "ruleID", ruleId);
+
   const sessionRulesMap = tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP);
+
   let removeRuleIds = [];
+
   if (sessionRulesMap?.[requestUrl]) {
     ruleId = sessionRulesMap[requestUrl];
     removeRuleIds.push(ruleId);

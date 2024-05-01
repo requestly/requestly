@@ -222,7 +222,6 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
   };
 
   const getFunctionFromCode = (code) => {
-    console.log("!!!debug", "in getFunctionFromCode");
     return new Function("args", `return (${code})(args);`);
   };
 
@@ -673,28 +672,6 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
     let exceptionCaught;
 
     const responseRuleData = getMatchedResponseRule(url);
-
-    // if (
-    //   responseRuleData &&
-    //   responseRuleData.response.type === "code" &&
-    //   !shouldServeResponseWithoutRequest(responseRuleData.response)
-    // ) {
-    //   console.log("!!!debug", "before", Date.now());
-    //   window.postMessage({
-    //     request: {
-    //       url: request.url,
-    //       method: request.method,
-    //       headers: Array.from(request.headers.entries()),
-    //       pageUrl: window.location.href,
-    //     },
-    //     action: "fetch_intercepted",
-    //     source: "requestly:client",
-    //   });
-    //   // await pauseWithSetTimeout();
-    //   // await pauseWithReply();
-    //   await Promise.race([pauseWithSetTimeout(), pauseWithReply()]);
-    //   console.log("!!!debug", "after", Date.now());
-    // }
 
     if (responseRuleData && shouldServeResponseWithoutRequest(responseRuleData.response)) {
       const contentType = isJSON(responseRuleData.response.value) ? "application/json" : "text/plain";

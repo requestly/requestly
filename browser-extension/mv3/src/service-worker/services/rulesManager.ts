@@ -14,7 +14,6 @@ interface RuleIdsMap {
 }
 
 const getExecutedRequestResponseRuleIds = async (tabId: number): Promise<string[]> => {
-  console.log("!!!debug", "all Tabs", tabService.getTabs());
   return await chrome.tabs.sendMessage(tabId, {
     action: CLIENT_MESSAGES.GET_APPLIED_REQUEST_RESPONSE_RULES,
   });
@@ -34,7 +33,6 @@ export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
   const appliedRuleIds = new Set<string>();
 
   const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
-  console.log("!!!debug", "rules matchedInfo", rulesMatchedInfo);
   rulesMatchedInfo.forEach(
     (matchedRule) =>
       matchedRule.rule.rulesetId === "_dynamic" && appliedRuleIds.add(ruleIdsMap[matchedRule.rule.ruleId])

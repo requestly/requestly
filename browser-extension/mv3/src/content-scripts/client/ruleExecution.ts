@@ -15,7 +15,6 @@ export const initRuleExecutionHandler = () => {
         appliedRequestResponseRuleIds.add(event.data.ruleId);
         break;
       case EXTENSION_MESSAGES.REQUEST_INTERCEPTED:
-        console.log("!!!debug", "request_intercepted", event.data);
         chrome.runtime.sendMessage({
           action: event.data.action,
           requestDetails: event.data.requestDetails,
