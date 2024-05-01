@@ -206,8 +206,8 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
   const continueOnEvent = async () => {
     return new Promise((resolve, reject) => {
       window.addEventListener("message", function handler(event) {
-        if (event.data.action === "fetch_intercepted_reply_back") {
-          console.log("!!!debug", "fetch_intercepted_reply_back");
+        if (event.data.action === "notifyRequestProcessed") {
+          console.log("!!!debug", "notifyRequestProcessed");
           resolve();
           window.removeEventListener("message", handler);
         }
@@ -309,10 +309,10 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
   };
 
   const notifyRequestIntercepted = (message) => {
-    window.top.postMessage(
+    window.postMessage(
       {
         source: "requestly:client",
-        action: "request_intercepted",
+        action: "requestIntercepted",
         requestDetails: message.requestDetails,
         actionDetails: message.actionDetails,
       },
@@ -531,7 +531,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
         ignoredHeadersOnRedirect.forEach((header) => {
           const originalHeaderValue = this.requestHeaders?.[header] || this.requestHeaders?.[header.toLowerCase()];
           if (originalHeaderValue) {
-            ignoredHeadersValues.push({ header, value: originalHeaderValue });
+            ignoredHeadersValues.push({ name: header, value: originalHeaderValue });
           }
         });
 
@@ -546,7 +546,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
             },
             actionDetails: {
               type: "forward_ignored_headers",
-              ignoredHeadersValues,
+              ignoredHeaders: ignoredHeadersValues,
               destinationUrl: getCorrespondingDestinationURL(
                 this.requestURL,
                 redirectRuleThatMatchesURL || replaceRuleThatMatchesURL
@@ -600,7 +600,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
       ignoredHeadersOnRedirect.forEach((header) => {
         const originalHeaderValue = request.headers.get(header);
         if (originalHeaderValue) {
-          ignoredHeadersValues.push({ header, value: originalHeaderValue });
+          ignoredHeadersValues.push({ name: header, value: originalHeaderValue });
         }
       });
     }
@@ -611,7 +611,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
         requestDetails: requestDetails,
         actionDetails: {
           type: "forward_ignored_headers",
-          ignoredHeadersValues,
+          ignoredHeaders: ignoredHeadersValues,
           destinationUrl: getCorrespondingDestinationURL(url, redirectRuleThatMatchesURL || replaceRuleThatMatchesURL),
         },
       });

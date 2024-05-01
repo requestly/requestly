@@ -1,4 +1,4 @@
-import { CLIENT_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 
 export const initRuleExecutionHandler = () => {
   const appliedRequestResponseRuleIds = new Set<string>();
@@ -14,6 +14,14 @@ export const initRuleExecutionHandler = () => {
       case "request_rule_applied":
         appliedRequestResponseRuleIds.add(event.data.ruleId);
         break;
+      case EXTENSION_MESSAGES.REQUEST_INTERCEPTED:
+        console.log("!!!debug", "request_intercepted", event.data);
+        chrome.runtime.sendMessage({
+          action: event.data.action,
+          requestDetails: event.data.requestDetails,
+          actionDetails: event.data.actionDetails,
+        });
+        break;
     }
   });
 
@@ -27,6 +35,9 @@ export const initRuleExecutionHandler = () => {
         break;
       case CLIENT_MESSAGES.GET_APPLIED_SCRIPT_RULES:
         sendResponse(Array.from(appliedScriptRuleIds));
+        break;
+      case CLIENT_MESSAGES.NOTIFY_REQUEST_PROCESSED:
+        window.postMessage({ source: "requestly:client", action: message.action }, window.location.href);
         break;
     }
     return false;

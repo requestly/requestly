@@ -5,6 +5,7 @@ import { Rule } from "common/types";
 import { getRecords } from "common/storage";
 import { CLIENT_MESSAGES } from "common/constants";
 import { isExtensionEnabled } from "./utils";
+import { tabService } from "./tabService";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
@@ -13,6 +14,7 @@ interface RuleIdsMap {
 }
 
 const getExecutedRequestResponseRuleIds = async (tabId: number): Promise<string[]> => {
+  console.log("!!!debug", "all Tabs", tabService.getTabs());
   return await chrome.tabs.sendMessage(tabId, {
     action: CLIENT_MESSAGES.GET_APPLIED_REQUEST_RESPONSE_RULES,
   });
@@ -32,7 +34,7 @@ export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
   const appliedRuleIds = new Set<string>();
 
   const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
-
+  console.log("!!!debug", "rules matchedInfo", rulesMatchedInfo);
   rulesMatchedInfo.forEach(
     (matchedRule) =>
       matchedRule.rule.rulesetId === "_dynamic" && appliedRuleIds.add(ruleIdsMap[matchedRule.rule.ruleId])
@@ -54,6 +56,12 @@ export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
 const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
   return new Promise((resolve) => {
     chrome.declarativeNetRequest.updateDynamicRules(options, resolve);
+  });
+};
+
+export const updateSessionRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
+  return new Promise((resolve) => {
+    chrome.declarativeNetRequest.updateSessionRules(options, resolve);
   });
 };
 

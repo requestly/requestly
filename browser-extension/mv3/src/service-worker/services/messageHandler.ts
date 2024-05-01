@@ -18,6 +18,7 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
+import { processRequest } from "./requestProcessor";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -107,6 +108,10 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
+        break;
+
+      case EXTENSION_MESSAGES.REQUEST_INTERCEPTED:
+        processRequest({ ...message.requestDetails, tabId: sender.tab.id }, message.actionDetails);
         break;
     }
 
