@@ -5,7 +5,6 @@ import { Rule } from "common/types";
 import { getRecords } from "common/storage";
 import { CLIENT_MESSAGES } from "common/constants";
 import { isExtensionEnabled } from "./utils";
-import { tabService } from "./tabService";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
