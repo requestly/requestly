@@ -196,7 +196,11 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
 
   const getCorrespondingDestinationURL = (url, rule) => {
     const pair = rule.pairs.find((pair) => matchSourceUrl(pair.source, url));
-    return pair.destination;
+    const redirectedUrl = pair.destination || url.replace(pair.from, pair.to);
+    if (redirectedUrl === url) {
+      return null;
+    }
+    return redirectedUrl;
   };
 
   const continueOnRequestProcessed = async () => {
@@ -533,7 +537,12 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
           }
         });
 
-        if (ignoredHeadersValues.length > 0) {
+        const redirectedUrl = getCorrespondingDestinationURL(
+          this.requestURL,
+          redirectRuleThatMatchesURL || replaceRuleThatMatchesURL
+        );
+
+        if (ignoredHeadersValues.length > 0 && redirectedUrl) {
           console.time("fetch_intercepted_XHR");
           notifyRequestIntercepted({
             requestDetails: {
@@ -545,10 +554,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
             actionDetails: {
               type: "forward_ignored_headers",
               ignoredHeaders: ignoredHeadersValues,
-              destinationUrl: getCorrespondingDestinationURL(
-                this.requestURL,
-                redirectRuleThatMatchesURL || replaceRuleThatMatchesURL
-              ),
+              destinationUrl: redirectedUrl,
             },
           });
           await continueOnRequestProcessed();
@@ -593,6 +599,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
     const replaceRuleThatMatchesURL = getMatchedReplaceRule(url);
 
     const ignoredHeadersValues = [];
+    const redirectedUrl = getCorrespondingDestinationURL(url, redirectRuleThatMatchesURL || replaceRuleThatMatchesURL);
 
     if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
       ignoredHeadersOnRedirect.forEach((header) => {
@@ -603,14 +610,14 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
       });
     }
 
-    if (ignoredHeadersValues.length > 0) {
+    if (ignoredHeadersValues.length > 0 && redirectedUrl) {
       console.time("fetch_intercepted");
       notifyRequestIntercepted({
         requestDetails: requestDetails,
         actionDetails: {
           type: "forward_ignored_headers",
           ignoredHeaders: ignoredHeadersValues,
-          destinationUrl: getCorrespondingDestinationURL(url, redirectRuleThatMatchesURL || replaceRuleThatMatchesURL),
+          destinationUrl: redirectedUrl,
         },
       });
       await continueOnRequestProcessed();
