@@ -34,11 +34,13 @@ interface Props {
   onSave: Function;
   onClose: Function;
   mockType?: MockType;
+  isEditorOpenInModal?: boolean;
 }
 
 const MockEditor: React.FC<Props> = ({
   isNew = false,
   isEditorReadOnly = false,
+  isEditorOpenInModal = false,
   savingInProgress = false,
   mockData,
   onSave = () => {},
@@ -394,8 +396,8 @@ const MockEditor: React.FC<Props> = ({
         className="mock-editor-title-container"
         span={22}
         offset={1}
-        md={{ offset: 2, span: 20 }}
-        lg={{ offset: 4, span: 16 }}
+        md={isEditorOpenInModal ? null : { offset: 2, span: 20 }}
+        lg={isEditorOpenInModal ? null : { offset: 4, span: 16 }}
       >
         <RQEditorTitle
           name={name}
