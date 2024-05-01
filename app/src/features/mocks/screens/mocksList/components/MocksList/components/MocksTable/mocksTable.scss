@@ -15,6 +15,10 @@
     font-size: 13px;
     cursor: pointer;
 
+    td.ant-table-cell:nth-child(2) {
+      flex-direction: row;
+    }
+
     &.mock-row {
       .ant-table-cell:first-child {
         border-left: 4px solid transparent;
@@ -30,6 +34,12 @@
     &.mock-row {
       .ant-table-row-indent + .ant-table-row-expand-icon {
         display: none;
+      }
+    }
+
+    &.collection-row {
+      .mock-collection-details-container {
+        padding: 7px 0;
       }
     }
 
