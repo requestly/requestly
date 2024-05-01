@@ -542,6 +542,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
         );
 
         if (ignoredHeadersValues.length > 0 && redirectedUrl) {
+          //TODO @nafees87n to remove this log
           console.time("fetch_intercepted_XHR");
           notifyRequestIntercepted({
             requestDetails: {
@@ -610,6 +611,7 @@ import { IGNORED_HEADERS_ON_REDIRECT, PUBLIC_NAMESPACE } from "common/constants"
     }
 
     if (ignoredHeadersValues.length > 0 && redirectedUrl) {
+      //TODO @nafees87n to remove this log
       console.time("fetch_intercepted");
       notifyRequestIntercepted({
         requestDetails: requestDetails,
