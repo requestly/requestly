@@ -13,7 +13,7 @@ import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerInd
 import {
   CreateOrUpdateCollectionModalWrapper,
   DeleteCollectionModalWrapper,
-  DeleteMockModalWrapper,
+  DeletRecordsModalWrapper,
   UpdateMocksCollectionModalWrapper,
   MockUploaderModalWrapper,
   NewFileModalWrapper,
@@ -132,7 +132,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
       <DeleteCollectionModalWrapper forceRender={_forceRender} />
 
       {/* keep this at top level, below modals will be used at multiple places */}
-      <DeleteMockModalWrapper forceRender={_forceRender} />
+      <DeletRecordsModalWrapper forceRender={_forceRender} />
       <UpdateMocksCollectionModalWrapper forceRender={_forceRender} mocks={mockRecords} />
     </>
   ) : (
