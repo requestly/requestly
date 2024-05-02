@@ -66,7 +66,10 @@ export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]
     }
   });
 
-  const filteredRecords = [...Object.values(mockCollections), ...otherRecords];
+  const filteredRecords = [
+    ...Object.values(mockCollections).sort((a, b) => Number(a.createdTs) - Number(b.createdTs)),
+    ...otherRecords,
+  ];
 
   return filteredRecords;
 };
