@@ -51,6 +51,7 @@ const forwardIgnoredHeaders = async (requestDetails: RequestDetails, actionDetai
       resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
       tabIds: [requestDetails.tabId],
       requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
+      //TODO @nafees87n exclude requestly.io initiator domains for all the session rules
     },
   });
 };
