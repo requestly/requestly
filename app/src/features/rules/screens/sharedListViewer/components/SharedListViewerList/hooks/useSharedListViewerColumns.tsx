@@ -1,11 +1,16 @@
-import { Table } from "antd";
+import { Row, Table } from "antd";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/types";
 import { isRule } from "features/rules/utils";
+import { RQButton } from "lib/design-system/components";
 import moment from "moment";
 
-export const useSharedListViewerColumns = () => {
+interface Props {
+  handleViewSharedListRule: (rule: RuleTableRecord) => void;
+}
+
+export const useSharedListViewerColumns = ({ handleViewSharedListRule }: Props) => {
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.EXPAND_COLUMN,
     {
@@ -39,6 +44,20 @@ export const useSharedListViewerColumns = () => {
 
           return <div className="text-center">{beautifiedDate}</div>;
         } else return null;
+      },
+    },
+    {
+      title: "",
+      render: (_: any, record: RuleTableRecord) => {
+        if (isRule(record)) {
+          return (
+            <Row justify="end">
+              <RQButton type="default" onClick={() => handleViewSharedListRule(record)}>
+                View
+              </RQButton>
+            </Row>
+          );
+        }
       },
     },
   ];
