@@ -256,11 +256,80 @@
       }
     }
 
-    .last-modified {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 4px;
-      margin-left: 13px;
+        .mock-details-container {
+          overflow: hidden;
+
+          .mock-name-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            .mock-name {
+              color: var(--white);
+              font-size: 13px;
+              font-weight: 500;
+              line-height: 18px;
+              letter-spacing: 0.25px;
+            }
+
+            .mock-type {
+              margin-top: 2px;
+              font-size: 9px;
+              font-weight: 600;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+            }
+          }
+
+          .mock-endpoint {
+            margin-top: 4px;
+            font-size: 11px;
+            font-weight: 400;
+            line-height: 14px;
+            letter-spacing: 0.4px;
+
+            .ant-typography {
+              color: var(--text-subtle);
+            }
+          }
+        }
+      }
+
+      .mock-description-icon {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        color: var(--requestly-color-text-placeholder);
+        flex-shrink: 0;
+      }
+
+      .mock-actions-container {
+        .ant-btn-icon-only {
+          &:hover {
+            background: var(--border);
+          }
+
+          svg {
+            color: var(--text-gray);
+            transition: 0.2s ease-in-out;
+          }
+
+          &:hover svg {
+            color: var(--white);
+          }
+        }
+      }
+
+      .mock-table-user-icon {
+        margin-left: 15px;
+      }
+
+      .last-modified {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+        margin-left: 13px;
+      }
     }
   }
 }
