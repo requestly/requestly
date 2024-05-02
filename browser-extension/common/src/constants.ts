@@ -48,6 +48,7 @@ export const CLIENT_MESSAGES = {
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
   START_EXPLICIT_RULE_TESTING: "startExplicitRuleTesting",
   START_IMPLICIT_RULE_TESTING: "startImplicitRuleTesting",
+  SYNC_APPLIED_RULES: "syncAppliedRules",
 };
 
 export const STORAGE_TYPE = "local";

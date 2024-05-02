@@ -2,7 +2,7 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
 import { initClientHandler } from "./clientHandler";
 import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
-import { getExecutedRules } from "./rulesManager";
+import { getExecutedRules, handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -51,6 +51,7 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
+        handleRuleExecutionsOnClientPageLoad(sender.tab.id);
         handleTestRuleOnClientPageLoad(sender.tab);
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;

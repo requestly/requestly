@@ -36,6 +36,12 @@ export const initRuleExecutionHandler = () => {
       case CLIENT_MESSAGES.GET_APPLIED_RULES:
         sendResponse(Array.from(appliedRuleIds));
         break;
+      case CLIENT_MESSAGES.SYNC_APPLIED_RULES:
+        message.appliedRuleIds.forEach((ruleId: string) => {
+          appliedRuleIds.add(ruleId);
+          handleAppliedRuleNotification(ruleId);
+        });
+        break;
       case CLIENT_MESSAGES.START_EXPLICIT_RULE_TESTING:
         if (message.record) {
           chrome.runtime.sendMessage({

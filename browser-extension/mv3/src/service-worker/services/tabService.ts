@@ -206,4 +206,5 @@ export const tabService = new TabService();
 export const TAB_SERVICE_DATA = {
   SESSION_RECORDING: "sessionRecording",
   TEST_RULE_DATA: "testRuleData",
+  APPLIED_RULE_DETAILS: "appliedRuleDetails",
 };
