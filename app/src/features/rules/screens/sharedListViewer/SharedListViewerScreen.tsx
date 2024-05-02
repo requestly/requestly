@@ -6,7 +6,13 @@ import { SharedListViewerList } from "./components/SharedListViewerList/SharedLi
 
 export const SharedListViewerScreen = () => {
   const sharedListId = getSharedListIdFromURL(window.location.pathname);
-  const { isLoading, sharedListGroupsMap, sharedListGroupwiseRulesMap } = useFetchSharedListData({
+  const {
+    isLoading,
+    sharedListGroupsMap,
+    sharedListGroupwiseRulesMap,
+    sharedListGroups,
+    sharedListRules,
+  } = useFetchSharedListData({
     sharedListId,
   });
   const [searchValue, setSearchValue] = useState("");
@@ -20,6 +26,9 @@ export const SharedListViewerScreen = () => {
       <SharedListsContentHeader
         searchValue={searchValue}
         handleSearchValueUpdate={(value: string) => setSearchValue(value)}
+        sharedListGroups={sharedListGroups}
+        sharedListRules={sharedListRules}
+        sharedListId={sharedListId}
       />
       <SharedListViewerList records={filteredRecords} isLoading={isLoading} />
     </>

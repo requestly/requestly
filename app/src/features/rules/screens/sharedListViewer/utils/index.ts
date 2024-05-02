@@ -97,3 +97,20 @@ export const getFilterSharedListRecords = (
   // @ts-ignore
   return recordsToContentTableDataAdapter(result);
 };
+
+export const generateGroupwiseRulesMap = (rules: Rule[]) => {
+  return rules.reduce(
+    (map: Record<string, Rule[]>, rule: Rule) => {
+      const { groupId } = rule;
+      const groupKey = groupId || "ungrouped";
+      if (!map[groupKey]) {
+        map[groupKey] = [];
+      }
+      map[groupKey].push(rule);
+      return map;
+    },
+    {
+      ungrouped: [],
+    }
+  );
+};
