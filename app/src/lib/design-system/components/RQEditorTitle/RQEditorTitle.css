@@ -47,8 +47,9 @@
   border-radius: 0;
   transition: 0.05s ease-in-out;
 }
-.editor-title-name .editor-title-name-wrapper .ant-input {
+.editor-title-name .editor-title-name-wrapper input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
   max-width: 360px;
+  padding-left: 0;
 }
 
 .editor-title-description .ant-input,

@@ -38,12 +38,16 @@ export const initMessageHandler = () => {
     /* From any case, return true when sendResponse is called asynchronously */
     switch (message.action) {
       case EXTENSION_MESSAGES.HANDSHAKE_CLIENT:
-        initClientHandler({
-          tabId: sender.tab?.id,
-          frameIds: [sender.frameId],
+        isExtensionEnabled().then((isExtensionStatusEnabled) => {
+          if (!isExtensionStatusEnabled) return;
+
+          initClientHandler({
+            tabId: sender.tab?.id,
+            frameIds: [sender.frameId],
+          });
+          initCustomWidgets(sender.tab?.id, sender.frameId);
+          applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         });
-        initCustomWidgets(sender.tab?.id, sender.frameId);
-        applyScriptRules(sender.tab?.id, sender.frameId, sender.tab.url);
         break;
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:

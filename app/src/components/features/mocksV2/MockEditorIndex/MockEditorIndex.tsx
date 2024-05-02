@@ -26,11 +26,19 @@ interface Props {
   mockType?: MockType;
   fileType?: FileType;
   //for mockpicker
+  isEditorOpenInModal?: boolean;
   selectOnSave?: (url: string) => void;
   handleCloseEditorFromPicker?: () => void;
 }
 
-const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType, selectOnSave, handleCloseEditorFromPicker }) => {
+const MockEditorIndex: React.FC<Props> = ({
+  isNew,
+  mockType,
+  fileType,
+  selectOnSave,
+  handleCloseEditorFromPicker,
+  isEditorOpenInModal = false,
+}) => {
   const { mockId } = useParams();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
@@ -137,6 +145,7 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType, selectOnS
         onClose={handleCloseEditorFromPicker ?? handleOnClose}
         mockData={mockData}
         savingInProgress={savingInProgress}
+        isEditorOpenInModal={isEditorOpenInModal}
       />
     );
   } else {
@@ -154,6 +163,7 @@ const MockEditorIndex: React.FC<Props> = ({ isNew, mockType, fileType, selectOnS
         mockData={mockEditorData}
         onClose={handleCloseEditorFromPicker ?? handleOnClose}
         savingInProgress={savingInProgress}
+        isEditorOpenInModal={isEditorOpenInModal}
       />
     );
   }
