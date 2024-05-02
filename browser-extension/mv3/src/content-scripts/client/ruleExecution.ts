@@ -52,8 +52,10 @@ export const initRuleExecutionHandler = () => {
         showExplicitTestRuleWidget(message.ruleId);
         break;
       case CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
-        implicitTestRuleFlowEnabled = true;
-        showImplicitTestRuleWidget();
+        if (implictTestRuleWidgetConfig?.enabled) {
+          implicitTestRuleFlowEnabled = true;
+          showImplicitTestRuleWidget();
+        }
         break;
     }
     return false;
@@ -142,11 +144,13 @@ export const showImplicitTestRuleWidget = async () => {
   let appliedRules = [];
   for (let ruleId of appliedRuleIds.values()) {
     const ruleDetails = await getRule(ruleId);
-    appliedRules.push({
-      ruleId: ruleDetails.id,
-      ruleName: ruleDetails.name,
-      ruleType: ruleDetails.ruleType,
-    });
+    if (shouldShowImplicitWidget(ruleDetails.ruleType)) {
+      appliedRules.push({
+        ruleId: ruleDetails.id,
+        ruleName: ruleDetails.name,
+        ruleType: ruleDetails.ruleType,
+      });
+    }
   }
   testRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
   document.documentElement.appendChild(testRuleWidget);
@@ -190,7 +194,7 @@ const notifyRuleAppliedToImplicitWidget = async (ruleId: string) => {
 const fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
   getRecord(STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG).then((result: any) => {
     if (result) {
-      implictTestRuleWidgetConfig = result[STORAGE_KEYS.IMPLICIT_RULE_TESTING_WIDGET_CONFIG];
+      implictTestRuleWidgetConfig = result;
     }
   });
 };
