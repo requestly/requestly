@@ -12,7 +12,7 @@ import {
   MockType,
   RQMockMetadataSchema,
 } from "components/features/mocksV2/types";
-import { useFetchMocks } from "./hooks/useFetchMocks";
+import { useFetchMockRecords } from "./hooks/useFetchMockRecords";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
 import {
@@ -39,11 +39,9 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
   const [filter, setFilter] = useState<MockTableHeaderFilter>("all");
 
-  // TODO: Remove force render and maintain the mocks in context
-  // TODO: Remove this after actions refactor
   const [forceRender, setForceRender] = useState(false);
 
-  const { isLoading, mocks } = useFetchMocks(type, forceRender);
+  const { isLoading, mocks } = useFetchMockRecords(type, forceRender);
 
   const _forceRender = useCallback(() => {
     setForceRender((prev) => !prev);
