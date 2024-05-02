@@ -157,7 +157,7 @@ export const useMocksTableColumns = ({
       render: (_: any, record: RQMockSchema) => {
         return (
           <div className="mock-table-user-icon">
-            <UserIcon uid={record.createdBy} />
+            <UserIcon uid={record.createdBy ?? record.lastUpdatedBy} />
           </div>
         );
       },
@@ -343,7 +343,7 @@ export const useMocksTableColumns = ({
 
   if (!isWorkspaceMode) {
     //remove created by column from mock table in private workspace
-    columns.splice(2, 1);
+    columns.splice(1, 1);
   }
 
   return columns;
