@@ -96,15 +96,17 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
       </div>
 
       <div className="actions">
-        <Button
-          block
-          type="default"
-          onClick={handleDeleteOnlyCollection}
-          loading={isDeletingOnlyCollection}
-          disabled={isDeletingCollectionAndMocks}
-        >
-          Keep the mocks
-        </Button>
+        {collection?.children?.length === 0 ? null : (
+          <Button
+            block
+            type="default"
+            onClick={handleDeleteOnlyCollection}
+            loading={isDeletingOnlyCollection}
+            disabled={isDeletingCollectionAndMocks}
+          >
+            Keep the mocks
+          </Button>
+        )}
         <Button
           block
           danger
