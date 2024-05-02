@@ -7,10 +7,10 @@ import moment from "moment";
 
 export const useSharedListViewerColumns = () => {
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
-    Table.SELECTION_COLUMN,
+    Table.EXPAND_COLUMN,
     {
       title: "Rule Details",
-      width: 500,
+      width: 400,
       render: (_: any, record: RuleTableRecord) => (
         <div className={`shared-list-viewer-record-name ${isRule(record) ? "shared-list-viewer-rule-name" : ""}`}>
           {record.name}

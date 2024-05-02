@@ -17,13 +17,11 @@ export const SharedListViewerList: React.FC<Props> = ({ records, isLoading }) =>
     <ContentListTable
       columns={columns}
       data={records}
+      rowKey="id"
       id="shared-list-viewer-table"
       className="shared-list-viewer-table"
       locale={{
         emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Shared list found" />,
-      }}
-      expandable={{
-        defaultExpandAllRows: true,
       }}
       loading={isLoading}
     />

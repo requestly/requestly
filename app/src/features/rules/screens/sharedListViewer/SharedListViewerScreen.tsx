@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SharedListsContentHeader } from "./components/SharedListViewerContentHeader/SharedListViewerContentHeader";
 import { useFetchSharedListData } from "./hooks/useFetchSharedListData";
-import { getSharedListIdFromURL } from "./utils";
+import { getFilterSharedListRecords, getSharedListIdFromURL } from "./utils";
 import { SharedListViewerList } from "./components/SharedListViewerList/SharedListViewerList";
 
 export const SharedListViewerScreen = () => {
   const sharedListId = getSharedListIdFromURL(window.location.pathname);
-  const { isLoading, sharedListRecords } = useFetchSharedListData({ sharedListId });
+  const { isLoading, sharedListGroupsMap, sharedListGroupwiseRulesMap } = useFetchSharedListData({
+    sharedListId,
+  });
   const [searchValue, setSearchValue] = useState("");
 
-  console.log(isLoading, sharedListRecords);
+  const filteredRecords = useMemo(() => {
+    return getFilterSharedListRecords(sharedListGroupwiseRulesMap, sharedListGroupsMap, searchValue);
+  }, [searchValue, sharedListGroupwiseRulesMap, sharedListGroupsMap]);
 
   return (
     <>
@@ -17,7 +21,7 @@ export const SharedListViewerScreen = () => {
         searchValue={searchValue}
         handleSearchValueUpdate={(value: string) => setSearchValue(value)}
       />
-      <SharedListViewerList records={sharedListRecords} isLoading={isLoading} />
+      <SharedListViewerList records={filteredRecords} isLoading={isLoading} />
     </>
   );
 };
