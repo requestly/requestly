@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
-import { Button, Dropdown, MenuProps, Row, Typography, message } from "antd";
+import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message } from "antd";
 import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -14,6 +14,7 @@ import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineDriveFileMove } from "@react-icons/all-files/md/MdOutlineDriveFileMove";
+import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
@@ -67,14 +68,21 @@ export const useMocksTableColumns = ({
             <span className="collection-icon">
               <MdOutlineFolder />
             </span>
-
             <Typography.Text ellipsis={true} className="mock-collection-name">
               {record.name}
             </Typography.Text>
 
-            <Typography.Text ellipsis={true} className="mock-collection-description">
-              {record.desc}
-            </Typography.Text>
+            {record?.desc ? (
+              <Tooltip
+                showArrow={false}
+                placement="right"
+                title={<span className="mock-collection-description">{record?.desc}</span>}
+              >
+                <span className="mock-description-icon">
+                  <RiInformationLine />
+                </span>
+              </Tooltip>
+            ) : null}
           </div>
         ) : (
           <div className="mock-name-details-container">
@@ -117,6 +125,18 @@ export const useMocksTableColumns = ({
                 <Typography.Text ellipsis={true} className="primary-cell mock-name">
                   {record.name}
                 </Typography.Text>
+
+                {record?.desc ? (
+                  <Tooltip
+                    showArrow={false}
+                    placement="right"
+                    title={<span className="mock-description">{record?.desc}</span>}
+                  >
+                    <span className="mock-description-icon">
+                      <RiInformationLine />
+                    </span>
+                  </Tooltip>
+                ) : null}
               </div>
               <div className="mock-endpoint">
                 <Typography.Text ellipsis={true}>{"/" + record.endpoint}</Typography.Text>

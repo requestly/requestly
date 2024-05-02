@@ -57,13 +57,6 @@
         line-height: 18px;
         letter-spacing: 0.25px;
       }
-
-      .mock-collection-description {
-        color: var(--text-subtle);
-        font-size: 11px;
-        line-height: 14px;
-        letter-spacing: 0.4px;
-      }
     }
 
     .mock-name-details-container {
@@ -130,6 +123,14 @@
       }
     }
 
+    .mock-description-icon {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      color: var(--requestly-color-text-placeholder);
+      flex-shrink: 0;
+    }
+
     .mock-actions-container {
       .ant-btn-icon-only {
         &:hover {
@@ -151,4 +152,9 @@
       margin-left: 15px;
     }
   }
+}
+
+.mock-description {
+  font-size: 13px;
+  line-height: 14px;
 }
