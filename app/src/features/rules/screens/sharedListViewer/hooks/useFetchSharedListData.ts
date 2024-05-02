@@ -13,6 +13,7 @@ export const useFetchSharedListData = ({ sharedListId }: Props) => {
   const [sharedListGroupwiseRulesMap, setSharedListGroupwiseRulesMap] = useState<Record<string, Rule[]>>({});
   const [sharedListGroups, setSharedListGroups] = useState<Group[]>([]);
   const [sharedListRules, setSharedListRules] = useState<Rule[]>([]);
+  const [isSharedListPresent, setIsSharedListPresent] = useState(true);
 
   useEffect(() => {
     if (isLoading) {
@@ -32,6 +33,7 @@ export const useFetchSharedListData = ({ sharedListId }: Props) => {
         })
         .catch((e) => {
           Logger.log("Error in fetching shared list data", e);
+          setIsSharedListPresent(false);
         })
         .finally(() => {
           setIsLoading(false);
@@ -45,5 +47,6 @@ export const useFetchSharedListData = ({ sharedListId }: Props) => {
     sharedListGroupwiseRulesMap,
     sharedListGroups,
     sharedListRules,
+    isSharedListPresent,
   };
 };
