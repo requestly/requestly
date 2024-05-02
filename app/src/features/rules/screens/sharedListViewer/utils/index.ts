@@ -2,8 +2,7 @@ import { Rule } from "types";
 import { Group } from "types";
 import { recordsToContentTableDataAdapter } from "../../rulesList/components/RulesList/components/RulesTable/utils";
 
-//CONSTANTS
-
+// TODO: Performance improvements
 export const getFilterSharedListRecords = (
   sharedListGroupwiseRulesMap: Record<string, Rule[]>,
   sharedListGroupsMap: Record<string, Group>,

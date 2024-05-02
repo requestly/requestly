@@ -6,7 +6,7 @@ import {
   getSharedListIdFromImportURL,
   getSharedListNameFromUrl,
   fetchSharedListData,
-} from "features/rules/screens/sharedLists/utils";
+} from "features/rules/screens/sharedLists";
 import { useNavigate } from "react-router-dom";
 import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 const ImportSharedListIndexPage = () => {
