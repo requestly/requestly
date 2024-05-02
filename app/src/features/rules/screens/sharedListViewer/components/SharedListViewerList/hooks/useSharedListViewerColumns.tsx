@@ -15,34 +15,33 @@ export const useSharedListViewerColumns = ({ handleViewSharedListRule }: Props) 
     Table.EXPAND_COLUMN,
     {
       title: "Rule Details",
-      width: 400,
+      width: 500,
       render: (_: any, record: RuleTableRecord) => (
-        <div className={`shared-list-viewer-record-name ${isRule(record) ? "shared-list-viewer-rule-name" : ""}`}>
+        <div
+          className={`shared-list-viewer-record-name ${isRule(record) ? "shared-list-viewer-rule-name" : ""}`}
+          onClick={() => handleViewSharedListRule(record)}
+        >
           {record.name}
         </div>
       ),
     },
     {
       title: "Type",
-      width: 200,
+      width: 300,
       render: (_: any, record: RuleTableRecord) => {
         if (isRule(record)) {
-          return (
-            <div className="text-center">
-              <RuleTypeTag ruleType={record.ruleType} />
-            </div>
-          );
+          return <RuleTypeTag ruleType={record.ruleType} />;
         } else return null;
       },
     },
     {
       title: "Last Modified",
-      width: 200,
+      width: 300,
       render: (_: any, record: RuleTableRecord) => {
         if (isRule(record)) {
           const beautifiedDate = moment(record.modificationDate).format("MMM DD, YYYY");
 
-          return <div className="text-center">{beautifiedDate}</div>;
+          return <div>{beautifiedDate}</div>;
         } else return null;
       },
     },
@@ -52,7 +51,11 @@ export const useSharedListViewerColumns = ({ handleViewSharedListRule }: Props) 
         if (isRule(record)) {
           return (
             <Row justify="end">
-              <RQButton type="default" onClick={() => handleViewSharedListRule(record)}>
+              <RQButton
+                type="default"
+                className="view-shared-list-rule-btn"
+                onClick={() => handleViewSharedListRule(record)}
+              >
                 View
               </RQButton>
             </Row>

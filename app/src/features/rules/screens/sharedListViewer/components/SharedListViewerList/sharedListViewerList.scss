@@ -12,8 +12,25 @@
     text-decoration: underline;
   }
 }
+.shared-list-viewer-table {
+  tr .ant-table-row-expand-icon {
+    display: none;
+  }
+  tr[data-row-key^="Group"] .ant-table-row-expand-icon {
+    display: block;
+  }
 
-.shared-list-viewer-table thead tr th:nth-child(2),
-.shared-list-viewer-table thead tr th:nth-child(3) {
-  text-align: center;
+  .rq-content-list-table-header th.ant-table-cell::after,
+  .rq-content-list-table-header th.ant-table-cell::before {
+    display: none;
+  }
+
+  .view-shared-list-rule-btn {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
