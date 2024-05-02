@@ -14,6 +14,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
+import { isRecordMock } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
+import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
+import { DEFAULT_COLLECTION_ID } from "../constants";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
@@ -25,6 +28,7 @@ type MocksActionContextType = {
   mockUploaderModalAction: (mockType: MockType) => void;
   newFileModalAction: () => void;
   createNewMock: (mockType: MockType, source: MockListSource) => void;
+  removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -136,6 +140,18 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openNewFileModalAction, navigate]
   );
 
+  const removeMocksFromCollectionAction = useCallback(
+    async (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
+      const mockIds = records.filter(isRecordMock).map((mock) => mock.id);
+
+      updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID).then(() => {
+        toast.success(`${mockIds.length > 1 ? "Mocks" : "Mock"} removed from collection!`);
+        onSuccess?.();
+      });
+    },
+    []
+  );
+
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
@@ -146,6 +162,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     mockUploaderModalAction,
     newFileModalAction,
     createNewMock,
+    removeMocksFromCollectionAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;

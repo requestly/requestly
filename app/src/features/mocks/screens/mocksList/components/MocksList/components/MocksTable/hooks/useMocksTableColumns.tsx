@@ -14,6 +14,7 @@ import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { MdOutlineDriveFileMove } from "@react-icons/all-files/md/MdOutlineDriveFileMove";
+import { MdOutlineRemoveCircleOutline } from "@react-icons/all-files/md/MdOutlineRemoveCircleOutline";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
@@ -46,6 +47,7 @@ export const useMocksTableColumns = ({
     deleteMockModalAction,
     updateMockCollectionModalAction,
     toggleMockStarAction,
+    removeMocksFromCollectionAction,
   } = useMocksActionContext();
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
@@ -263,6 +265,18 @@ export const useMocksTableColumns = ({
             key: 2,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
+              removeMocksFromCollectionAction([record], forceRender);
+            },
+            label: (
+              <Row>
+                <MdOutlineRemoveCircleOutline /> Remove
+              </Row>
+            ),
+          },
+          {
+            key: 3,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
               updateMockCollectionModalAction(record);
             },
             label: (
@@ -272,7 +286,7 @@ export const useMocksTableColumns = ({
             ),
           },
           {
-            key: 3,
+            key: 4,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
