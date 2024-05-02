@@ -149,7 +149,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
         onSuccess?.();
       });
     },
-    []
+    [uid]
   );
 
   const value = {
