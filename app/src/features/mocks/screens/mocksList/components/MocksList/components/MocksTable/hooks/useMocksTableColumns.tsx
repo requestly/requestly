@@ -85,7 +85,7 @@ export const useMocksTableColumns = ({
       ),
       dataIndex: "name",
       ellipsis: true,
-      width: 400,
+      width: isWorkspaceMode ? (isRuleEditor ? 120 : 350) : isRuleEditor ? 300 : 420,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
 
@@ -163,8 +163,7 @@ export const useMocksTableColumns = ({
     {
       key: "createdBy",
       title: <div className="rq-col-title">Created by</div>,
-      width: 70,
-      responsive: ["lg"],
+      width: 65,
       className: "text-gray",
       render: (_: any, record: RQMockSchema) => {
         return (
@@ -200,7 +199,7 @@ export const useMocksTableColumns = ({
     {
       key: "actions",
       align: "right",
-      width: 90,
+      width: isWorkspaceMode ? (isRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
         const collectionActions: MenuProps["items"] = [
           {
@@ -356,6 +355,11 @@ export const useMocksTableColumns = ({
   if (!isWorkspaceMode) {
     //remove created by column from mock table in private workspace
     columns.splice(4, 1);
+  }
+
+  if (isRuleEditor) {
+    // remove star mock column in modal view
+    columns.splice(2, 1);
   }
 
   return columns;

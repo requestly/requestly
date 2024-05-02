@@ -1,4 +1,4 @@
-.mocks-table-container {
+.rq-content-list-table-container {
   .rq-mocks-list-table.rq-content-list-table {
     .ant-table-row-indent + .ant-table-row-expand-icon {
       margin-top: 1px;
@@ -228,4 +228,21 @@
 
 .mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
   color: var(--danger);
+}
+
+.rq-modal {
+  .rq-mocks-list-table.rq-content-list-table {
+    .rq-mocks-list-table-row {
+      &.collection-row {
+        td.ant-table-cell.ant-table-cell-with-append:nth-child(1) {
+          padding: 19px 0;
+          display: flex;
+
+          .ant-table-row-expand-icon {
+            margin-left: 20px;
+          }
+        }
+      }
+    }
+  }
 }
