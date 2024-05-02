@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { Badge, ButtonProps } from "antd";
@@ -19,7 +19,6 @@ import { isRecordMock } from "../MocksTable/utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { getQuickFilteredRecords } from "./utils";
 
 interface Props {
   source?: MockListSource;
@@ -30,7 +29,6 @@ interface Props {
   setSearchValue?: (s: string) => void;
   filter?: MockTableHeaderFilter;
   setFilter?: (filter: MockTableHeaderFilter) => void;
-  setFilteredMocks?: (mocks: RQMockMetadataSchema[]) => void;
   handleCreateNewMockFromPickerModal?: () => void;
 }
 
@@ -43,21 +41,12 @@ export const MocksListContentHeader: React.FC<Props> = ({
   searchValue,
   setFilter,
   setSearchValue = () => {},
-  setFilteredMocks = () => {},
   handleCreateNewMockFromPickerModal = () => {},
 }) => {
-  const [mocks, setMocks] = useState<RQMockMetadataSchema[]>([]);
-
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
   const { createNewCollectionAction, uploadMockAction, createNewMockAction } = useMocksActionContext() ?? {};
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
-
-  useEffect(() => {
-    const filteredRecords = getQuickFilteredRecords(records, filter);
-    setMocks(filteredRecords);
-    setFilteredMocks(filteredRecords);
-  }, [filter, records]);
 
   const actionbuttonsData = [
     {
