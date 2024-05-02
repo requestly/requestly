@@ -21,6 +21,7 @@ import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 
 interface Props {
+  records: RQMockMetadataSchema[];
   mockRecords: RQMockMetadataSchema[];
   mockType?: MockType;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;
@@ -31,6 +32,7 @@ interface Props {
 }
 
 const MockPickerIndex: React.FC<Props> = ({
+  records,
   mockRecords,
   mockType,
   handleItemSelect,
@@ -109,7 +111,8 @@ const MockPickerIndex: React.FC<Props> = ({
         />
 
         <MocksTable
-          mockRecords={mockRecords}
+          records={records}
+          filteredRecords={mockRecords}
           handleItemSelect={handleItemSelect}
           handleNameClick={handleNameClick}
           handleSelectAction={handleSelectAction}

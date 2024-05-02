@@ -9,12 +9,13 @@ import { MockRecordType, MockType, RQMockMetadataSchema } from "components/featu
 import { generateFinalUrl } from "components/features/mocksV2/utils";
 import { ContentListTable } from "componentsV2/ContentList";
 import { useMocksTableColumns } from "./hooks/useMocksTableColumns";
-import { isRecordMockCollection, recordsToContentTableDataAdapter } from "./utils";
+import { enhanceRecords, isRecordMockCollection, recordsToContentTableDataAdapter } from "./utils";
 import "./mocksTable.scss";
 
 export interface MocksTableProps {
   isLoading?: boolean;
-  mockRecords: RQMockMetadataSchema[];
+  records: RQMockMetadataSchema[];
+  filteredRecords: RQMockMetadataSchema[];
   mockType?: MockType;
   handleNameClick: (mockId: string, isOldMock: boolean) => void;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;
@@ -26,7 +27,8 @@ export interface MocksTableProps {
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
-  mockRecords,
+  records,
+  filteredRecords,
   mockType,
   isLoading = false,
   handleNameClick,
@@ -41,14 +43,17 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   useEffect(() => {
     if (!isWorkspaceMode) {
       if (mockType === "FILE") {
-        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_FILES, mockRecords?.length);
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_FILES, filteredRecords?.length);
       } else {
-        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_MOCKS, mockRecords?.length);
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_MOCKS, filteredRecords?.length);
       }
     }
-  }, [mockType, mockRecords?.length, isWorkspaceMode]);
+  }, [mockType, filteredRecords?.length, isWorkspaceMode]);
 
-  const contentTableAdaptedRecords = useMemo(() => recordsToContentTableDataAdapter(mockRecords), [mockRecords]);
+  const contentTableAdaptedRecords = useMemo(() => {
+    const enhancedRecords = enhanceRecords(filteredRecords, records);
+    return recordsToContentTableDataAdapter(enhancedRecords);
+  }, [filteredRecords]);
 
   // TODO: move all actions in a hook and use that
   const columns = useMocksTableColumns({

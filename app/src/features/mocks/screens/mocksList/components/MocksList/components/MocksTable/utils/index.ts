@@ -12,6 +12,36 @@ export const isMockInCollection = (mock: RQMockMetadataSchema) => {
   return !!mock.collectionId;
 };
 
+export const enhanceRecords = (
+  filteredRecords: RQMockMetadataSchema[],
+  allRecords: RQMockMetadataSchema[]
+): RQMockMetadataSchema[] => {
+  const allRecordsMap: { [id: string]: RQMockMetadataSchema } = {};
+  const enhancedRecordsMap: { [id: string]: RQMockMetadataSchema } = {};
+
+  allRecords.forEach((record) => {
+    allRecordsMap[record.id] = record;
+  });
+
+  filteredRecords.forEach((record) => {
+    enhancedRecordsMap[record.id] = record;
+  });
+
+  allRecords.forEach((record) => {
+    // Add all the child mocks if collection exists
+    if (enhancedRecordsMap[record.collectionId]) {
+      enhancedRecordsMap[record.id] = record;
+    }
+
+    // Add the collection if child mock already present
+    if (enhancedRecordsMap[record.id] && record.collectionId && !enhancedRecordsMap[record.collectionId]) {
+      enhancedRecordsMap[record.collectionId] = allRecordsMap[record.collectionId];
+    }
+  });
+
+  return Object.values(enhancedRecordsMap);
+};
+
 export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]) => {
   const mockCollections: {
     [id: RQMockMetadataSchema["id"]]: RQMockMetadataSchema & { children: RQMockMetadataSchema[] };

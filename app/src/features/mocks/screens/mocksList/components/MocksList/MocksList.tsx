@@ -1,17 +1,12 @@
-import SpinnerCard from "components/misc/SpinnerCard";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SpinnerCard from "components/misc/SpinnerCard";
 import {
   redirectToFileMockEditorEditMock,
   redirectToFileViewer,
   redirectToMockEditorEditMock,
 } from "utils/RedirectionUtils";
-import {
-  MockListSource,
-  MockTableHeaderFilter,
-  MockType,
-  RQMockMetadataSchema,
-} from "components/features/mocksV2/types";
+import { MockListSource, MockTableHeaderFilter, MockType } from "components/features/mocksV2/types";
 import { useFetchMockRecords } from "./hooks/useFetchMockRecords";
 import { GettingStarted, MocksListContentHeader, MocksTable } from "./components";
 import MockPickerIndex from "features/mocks/modals/MockPickerModal/MockPickerIndex";
@@ -23,6 +18,7 @@ import {
   MockUploaderModalWrapper,
   NewFileModalWrapper,
 } from "features/mocks/modals";
+import { getFilteredRecords } from "./components/MocksListContentHeader/utils";
 import "./mocksList.scss";
 
 interface Props {
@@ -34,14 +30,15 @@ interface Props {
 const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const navigate = useNavigate();
 
-  // TODO: Move all the actions and local state in context
   const [searchValue, setSearchValue] = useState<string>("");
-  const [filteredMocks, setFilteredMocks] = useState<RQMockMetadataSchema[]>([]);
   const [filter, setFilter] = useState<MockTableHeaderFilter>("all");
-
   const [forceRender, setForceRender] = useState(false);
 
   const { isLoading, mockRecords } = useFetchMockRecords(type, forceRender);
+
+  const filteredRecords = useMemo(() => {
+    return getFilteredRecords(searchValue, filter, mockRecords);
+  }, [filter, searchValue, mockRecords]);
 
   const _forceRender = useCallback(() => {
     setForceRender((prev) => !prev);
@@ -76,15 +73,6 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
   const handleSearch = (searchQuery: string) => {
     setSearchValue(searchQuery);
-
-    if (searchQuery) {
-      const searchedMocks = mockRecords.filter((mock: RQMockMetadataSchema) => {
-        return mock.name.toLowerCase().includes(searchQuery.toLowerCase());
-      });
-      setFilteredMocks([...searchedMocks]);
-    } else {
-      setFilteredMocks([...mockRecords]);
-    }
   };
 
   return isLoading ? (
@@ -92,7 +80,8 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   ) : source === MockListSource.PICKER_MODAL ? (
     <>
       <MockPickerIndex
-        mockRecords={mockRecords}
+        records={mockRecords}
+        mockRecords={filteredRecords}
         handleItemSelect={handleItemSelect}
         handleSelectAction={handleSelectAction}
         handleNameClick={handleNameClick}
@@ -112,19 +101,20 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
         <MocksListContentHeader
           source={source}
           records={mockRecords}
+          mockRecords={filteredRecords}
           mockType={type}
           searchValue={searchValue}
           setSearchValue={handleSearch}
           filter={filter}
           setFilter={setFilter}
-          setFilteredMocks={setFilteredMocks}
         />
 
         <div className="mocks-table-container">
           <MocksTable
             isLoading={isLoading}
             mockType={type}
-            mockRecords={filteredMocks}
+            records={mockRecords}
+            filteredRecords={filteredRecords}
             handleItemSelect={handleItemSelect}
             handleNameClick={handleNameClick}
             handleEditAction={handleEditAction}
