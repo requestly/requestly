@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
-import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message } from "antd";
+import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table } from "antd";
 import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
@@ -51,6 +51,30 @@ export const useMocksTableColumns = ({
   } = useMocksActionContext() ?? {};
 
   const columns: ContentListTableProps<RQMockSchema>["columns"] = [
+    Table.SELECTION_COLUMN,
+    {
+      key: "isFavourite",
+      dataIndex: "isFavourite",
+      title: "",
+      width: 50,
+      render: (_: any, record: RQMockSchema) => {
+        const isCollection = isRecordMockCollection(record);
+
+        return isCollection || isRuleEditor ? null : (
+          <Button
+            type="text"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleMockStarAction(record, forceRender);
+            }}
+            className="mock-star-btn"
+          >
+            <MdOutlineStarOutline className={record.isFavourite ? "starred" : "unstarred"} />
+          </Button>
+        );
+      },
+    },
+    Table.EXPAND_COLUMN,
     {
       key: "id",
       title: (
@@ -61,7 +85,7 @@ export const useMocksTableColumns = ({
       ),
       dataIndex: "name",
       ellipsis: true,
-      width: 300,
+      width: 400,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
 
@@ -88,18 +112,6 @@ export const useMocksTableColumns = ({
           </div>
         ) : (
           <div className="mock-name-details-container">
-            {isCollection || isRuleEditor ? null : (
-              <Button
-                type="text"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleMockStarAction(record, forceRender);
-                }}
-                className="mock-star-btn"
-              >
-                <MdOutlineStarOutline className={record.isFavourite ? "starred" : "unstarred"} />
-              </Button>
-            )}
             <div
               className="mock-details-container"
               onClick={(e) => {
@@ -170,7 +182,7 @@ export const useMocksTableColumns = ({
           Last Modified
         </div>
       ),
-      width: 120,
+      width: 110,
       className: "text-gray",
       render: (_: any, record: RQMockSchema) => {
         return (
@@ -188,7 +200,7 @@ export const useMocksTableColumns = ({
     {
       key: "actions",
       align: "right",
-      width: 70,
+      width: 90,
       render: (_: any, record: RQMockSchema) => {
         const collectionActions: MenuProps["items"] = [
           {
@@ -262,6 +274,7 @@ export const useMocksTableColumns = ({
           },
           {
             key: 2,
+            disabled: !record.collectionId,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
               updateMocksCollectionModalAction([record]);
@@ -342,7 +355,7 @@ export const useMocksTableColumns = ({
 
   if (!isWorkspaceMode) {
     //remove created by column from mock table in private workspace
-    columns.splice(1, 1);
+    columns.splice(4, 1);
   }
 
   return columns;
