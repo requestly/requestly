@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CloudUploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { Badge, ButtonProps } from "antd";
@@ -19,43 +19,34 @@ import { isRecordMock } from "../MocksTable/utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { getQuickFilteredRecords } from "./utils";
 
 interface Props {
   source?: MockListSource;
   mockType?: MockType;
   records?: RQMockMetadataSchema[];
+  mockRecords?: RQMockMetadataSchema[];
   searchValue?: string;
   setSearchValue?: (s: string) => void;
   filter?: MockTableHeaderFilter;
   setFilter?: (filter: MockTableHeaderFilter) => void;
-  setFilteredMocks?: (mocks: RQMockMetadataSchema[]) => void;
   handleCreateNewMockFromPickerModal?: () => void;
 }
 
 export const MocksListContentHeader: React.FC<Props> = ({
   source,
   records,
+  mockRecords,
   mockType,
   filter,
   searchValue,
   setFilter,
   setSearchValue = () => {},
-  setFilteredMocks = () => {},
   handleCreateNewMockFromPickerModal = () => {},
 }) => {
-  const [mocks, setMocks] = useState<RQMockMetadataSchema[]>([]);
-
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
   const { createNewCollectionAction, mockUploaderModalAction, createNewMock } = useMocksActionContext() ?? {};
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
-
-  useEffect(() => {
-    const filteredRecords = getQuickFilteredRecords(records, filter);
-    setMocks(filteredRecords);
-    setFilteredMocks(filteredRecords);
-  }, [filter, records]);
 
   const actionbuttonsData = [
     {
@@ -173,10 +164,10 @@ export const MocksListContentHeader: React.FC<Props> = ({
           <div className="label">
             <MdOutlineStarOutline className="icon" />
             Starred
-            {mocks?.length ? (
+            {mockRecords?.length ? (
               <Badge
                 overflowCount={20}
-                count={mocks?.filter((record) => isRecordMock(record) && record.isFavourite).length}
+                count={mockRecords?.filter((record) => isRecordMock(record) && record.isFavourite).length}
               />
             ) : null}
           </div>
@@ -186,7 +177,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
         },
       },
     ],
-    [mocks, setFilter]
+    [mockRecords, setFilter]
   );
 
   const contentListHeaderSearchProps = mockType
