@@ -17,7 +17,7 @@ import {
   trackSharedListImportCompleted,
   trackSharedListImportFailed,
   trackSharedListImportStartedEvent,
-} from "modules/analytics/events/features/sharedList";
+} from "../../analytics";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Group, Rule } from "types";
