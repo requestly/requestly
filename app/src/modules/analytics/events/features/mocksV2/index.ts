@@ -165,5 +165,4 @@ export const trackMockCollectionDeleted = (
 export const trackMocksListBulkActionPerformed = (action: string, mockType: MockType) => {
   const params = { action, mockType };
   trackEvent(MOCKSV2.MOCKS_LIST_BULK_ACTION_PERFORMED, params);
-  console.log(MOCKSV2.MOCKS_LIST_BULK_ACTION_PERFORMED, params);
 };

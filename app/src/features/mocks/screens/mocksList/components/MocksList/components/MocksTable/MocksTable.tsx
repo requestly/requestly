@@ -143,7 +143,6 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                     onClick: (selectedRows) => {
                       const onSuccess = () => {
                         trackMocksListBulkActionPerformed("move_mocks_into_collection", mockType);
-                        forceRender();
                         clearSelectedRows();
                       };
 
@@ -170,7 +169,6 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                     onClick: (selectedRows) => {
                       const onSuccess = () => {
                         trackMocksListBulkActionPerformed("delete", mockType);
-                        forceRender();
                         clearSelectedRows();
                       };
 
