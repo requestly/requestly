@@ -20,10 +20,6 @@ export const ruleRoutes: RouteObject[] = [
     path: PATHS.RULES.INDEX,
     element: <RulesContainer />,
     children: [
-      // {
-      //   path: joinPaths(PATHS.SHARED_LISTS.VIEWER.RELATIVE, PATHS.ANY),
-      //   element: <SharedListViewerIndexPage />,
-      // },
       {
         path: PATHS.SHARED_LISTS.VIEWER.RELATIVE, // currently broken in prod
         element: <Navigate to={PATHS.SHARED_LISTS.ABSOLUTE} />,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { fetchSharedListData, generateGroupwiseRulesMap } from "../utils";
+import { fetchSharedListData } from "../../sharedLists/utils";
+import { generateGroupwiseRulesMap } from "../utils";
 import Logger from "../../../../../../../common/logger";
 import { Group, Rule } from "types";
 
