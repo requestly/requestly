@@ -14,7 +14,7 @@ import "./mocksTable.scss";
 
 export interface MocksTableProps {
   isLoading?: boolean;
-  mocks: RQMockMetadataSchema[];
+  mockRecords: RQMockMetadataSchema[];
   mockType?: MockType;
   handleNameClick: (mockId: string, isOldMock: boolean) => void;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;
@@ -26,7 +26,7 @@ export interface MocksTableProps {
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
-  mocks,
+  mockRecords,
   mockType,
   isLoading = false,
   handleNameClick,
@@ -41,14 +41,14 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   useEffect(() => {
     if (!isWorkspaceMode) {
       if (mockType === "FILE") {
-        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_FILES, mocks?.length);
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_FILES, mockRecords?.length);
       } else {
-        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_MOCKS, mocks?.length);
+        submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_MOCKS, mockRecords?.length);
       }
     }
-  }, [mockType, mocks?.length, isWorkspaceMode]);
+  }, [mockType, mockRecords?.length, isWorkspaceMode]);
 
-  const contentTableAdaptedRecords = useMemo(() => recordsToContentTableDataAdapter(mocks), [mocks]);
+  const contentTableAdaptedRecords = useMemo(() => recordsToContentTableDataAdapter(mockRecords), [mockRecords]);
 
   // TODO: move all actions in a hook and use that
   const columns = useMocksTableColumns({

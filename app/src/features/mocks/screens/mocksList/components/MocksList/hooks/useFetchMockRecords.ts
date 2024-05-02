@@ -19,7 +19,7 @@ export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
   const [mocksList, setMocksList] = useState<RQMockMetadataSchema[]>([]);
   const [oldMocksList, setOldMocksList] = useState<RQMockMetadataSchema[]>([]);
 
-  const mocks = useMemo(() => [...mocksList, ...oldMocksList], [mocksList, oldMocksList]);
+  const mockRecords = useMemo(() => [...mocksList, ...oldMocksList], [mocksList, oldMocksList]);
 
   // TODO: Remove this after all mocks are migrated to new schema
   const fetchOldMocks = useCallback(() => {
@@ -84,7 +84,7 @@ export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
   }, [fetchMocks, fetchOldMocks, workspace, setOldMocksList, forceRender]);
 
   return {
-    mocks,
+    mockRecords,
     isLoading,
     fetchOldMocks,
     fetchMocks,

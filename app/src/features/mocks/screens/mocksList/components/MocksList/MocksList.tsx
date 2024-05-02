@@ -41,7 +41,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
   const [forceRender, setForceRender] = useState(false);
 
-  const { isLoading, mocks } = useFetchMockRecords(type, forceRender);
+  const { isLoading, mockRecords } = useFetchMockRecords(type, forceRender);
 
   const _forceRender = useCallback(() => {
     setForceRender((prev) => !prev);
@@ -78,12 +78,12 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     setSearchValue(searchQuery);
 
     if (searchQuery) {
-      const searchedMocks = mocks.filter((mock: RQMockMetadataSchema) => {
+      const searchedMocks = mockRecords.filter((mock: RQMockMetadataSchema) => {
         return mock.name.toLowerCase().includes(searchQuery.toLowerCase());
       });
       setFilteredMocks([...searchedMocks]);
     } else {
-      setFilteredMocks([...mocks]);
+      setFilteredMocks([...mockRecords]);
     }
   };
 
@@ -92,7 +92,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   ) : source === MockListSource.PICKER_MODAL ? (
     <>
       <MockPickerIndex
-        mocks={mocks}
+        mockRecords={mockRecords}
         handleItemSelect={handleItemSelect}
         handleSelectAction={handleSelectAction}
         handleNameClick={handleNameClick}
@@ -100,7 +100,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
       <MockUploaderModalWrapper selectMockOnUpload={handleSelectAction} />
     </>
-  ) : mocks.length > 0 ? (
+  ) : mockRecords.length > 0 ? (
     <>
       <div className="rq-mocks-list-container">
         {/* TODO: Temp Breadcrumb */}
@@ -111,7 +111,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
         <MocksListContentHeader
           source={source}
-          records={mocks}
+          records={mockRecords}
           mockType={type}
           searchValue={searchValue}
           setSearchValue={handleSearch}
@@ -124,7 +124,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
           <MocksTable
             isLoading={isLoading}
             mockType={type}
-            mocks={filteredMocks}
+            mockRecords={filteredMocks}
             handleItemSelect={handleItemSelect}
             handleNameClick={handleNameClick}
             handleEditAction={handleEditAction}
@@ -143,7 +143,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
       {/* keep this at top level, below modals will be used at multiple places */}
       <DeleteMockModalWrapper forceRender={_forceRender} />
-      <UpdateMockCollectionModalWrapper forceRender={_forceRender} mocks={mocks} />
+      <UpdateMockCollectionModalWrapper forceRender={_forceRender} mocks={mockRecords} />
     </>
   ) : (
     <GettingStarted mockType={type} source={source} />

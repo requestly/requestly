@@ -21,7 +21,7 @@ import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 
 interface Props {
-  mocks: RQMockMetadataSchema[];
+  mockRecords: RQMockMetadataSchema[];
   mockType?: MockType;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;
   handleNameClick: (mockId: string, isOldMock: boolean) => void;
@@ -31,7 +31,7 @@ interface Props {
 }
 
 const MockPickerIndex: React.FC<Props> = ({
-  mocks,
+  mockRecords,
   mockType,
   handleItemSelect,
   handleSelectAction,
@@ -80,8 +80,8 @@ const MockPickerIndex: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    setShowCreateMockState(!mocks?.length);
-  }, [mocks?.length]);
+    setShowCreateMockState(!mockRecords?.length);
+  }, [mockRecords?.length]);
 
   if (showFileTypeSelector) {
     return <NewFileTypeSelector handleTypeSelection={handleTypeSelection} />;
@@ -100,7 +100,7 @@ const MockPickerIndex: React.FC<Props> = ({
     );
   }
 
-  if (mocks.length && !showCreateMockState) {
+  if (mockRecords.length && !showCreateMockState) {
     return (
       <>
         <MocksListContentHeader
@@ -109,7 +109,7 @@ const MockPickerIndex: React.FC<Props> = ({
         />
 
         <MocksTable
-          mocks={mocks}
+          mockRecords={mockRecords}
           handleItemSelect={handleItemSelect}
           handleNameClick={handleNameClick}
           handleSelectAction={handleSelectAction}
@@ -119,7 +119,7 @@ const MockPickerIndex: React.FC<Props> = ({
   } else if (showCreateMockState) {
     return (
       <div className="empty-mocks-picker-container">
-        <Typography.Title level={4}>{mocks?.length ? "Create mock" : "No mocks created yet"}</Typography.Title>
+        <Typography.Title level={4}>{mockRecords?.length ? "Create mock" : "No mocks created yet"}</Typography.Title>
         <Typography.Text type="secondary" className="mt-8">
           Create mocks APIs or files with different status codes, delay, response headers or body.
         </Typography.Text>
