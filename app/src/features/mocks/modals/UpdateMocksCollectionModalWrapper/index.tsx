@@ -43,7 +43,7 @@ export const UpdateMocksCollectionModalWrapper: React.FC<{
       toggleModalVisibility={onClose}
       onSuccess={() => {
         forceRender();
-        onSuccess();
+        onSuccess?.();
       }}
     />
   ) : null;
