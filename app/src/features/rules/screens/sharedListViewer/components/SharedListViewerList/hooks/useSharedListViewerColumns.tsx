@@ -15,7 +15,7 @@ export const useSharedListViewerColumns = ({ handleViewSharedListRule }: Props) 
     Table.EXPAND_COLUMN,
     {
       title: "Rule Details",
-      width: 500,
+      width: 400,
       render: (_: any, record: RuleTableRecord) => (
         <div
           className={`shared-list-viewer-record-name ${isRule(record) ? "shared-list-viewer-rule-name" : ""}`}
@@ -27,7 +27,7 @@ export const useSharedListViewerColumns = ({ handleViewSharedListRule }: Props) 
     },
     {
       title: "Type",
-      width: 300,
+      width: 250,
       render: (_: any, record: RuleTableRecord) => {
         if (isRule(record)) {
           return <RuleTypeTag ruleType={record.ruleType} />;
@@ -36,7 +36,7 @@ export const useSharedListViewerColumns = ({ handleViewSharedListRule }: Props) 
     },
     {
       title: "Last Modified",
-      width: 300,
+      width: 200,
       render: (_: any, record: RuleTableRecord) => {
         if (isRule(record)) {
           const beautifiedDate = moment(record.modificationDate).format("MMM DD, YYYY");
