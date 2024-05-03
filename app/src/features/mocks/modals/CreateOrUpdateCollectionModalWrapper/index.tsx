@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { CreateOrUpdateCollectionModal } from "./CreateOrUpdateCollectionModal";
-import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection } from "components/features/mocksV2/types";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 
 export const CreateOrUpdateCollectionModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
-  const [collection, setCollection] = useState<RQMockMetadataSchema>();
+  const [collection, setCollection] = useState<RQMockCollection>();
   const [mockType, setMockType] = useState<MockType>();
   const [isVisible, setIsVisible] = useState(false);
 
   const { setOpenCollectionModalAction } = useMocksModalsContext();
 
   useEffect(() => {
-    const openModal = (mockType: MockType, record?: RQMockMetadataSchema) => {
+    const openModal = (mockType: MockType, record?: RQMockCollection) => {
       setIsVisible(true);
       setMockType(mockType);
 
       if (record) {
-        setCollection(record);
+        setCollection((record as unknown) as RQMockCollection);
       }
     };
 
@@ -34,6 +34,7 @@ export const CreateOrUpdateCollectionModalWrapper: React.FC<{ forceRender: () =>
       id={collection?.id}
       name={collection?.name}
       description={collection?.desc}
+      path={collection?.path}
       mockType={mockType}
       visible={isVisible}
       toggleModalVisibility={onClose}

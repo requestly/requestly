@@ -5,6 +5,7 @@ import {
   MockListSource,
   MockRecordType,
   MockType,
+  RQMockCollection,
   RQMockMetadataSchema,
   RQMockSchema,
 } from "components/features/mocksV2/types";
@@ -26,7 +27,7 @@ import { DEFAULT_COLLECTION_ID } from "../constants";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
-  updateCollectionNameAction: (mockType: MockType, record: RQMockMetadataSchema) => void;
+  updateCollectionNameAction: (mockType: MockType, record: RQMockCollection) => void;
   deleteCollectionAction: (record: RQMockMetadataSchema) => void;
   deleteRecordsAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   updateMocksCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
@@ -68,7 +69,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   );
 
   const updateCollectionNameAction = useCallback(
-    (mockType: MockType, record: RQMockMetadataSchema) => {
+    (mockType: MockType, record: RQMockCollection) => {
       Logger.log("[DEBUG]", "updateCollectionNameAction", { record, mockType });
       openCollectionModalAction(mockType, record);
     },
