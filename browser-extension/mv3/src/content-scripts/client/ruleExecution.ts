@@ -141,24 +141,6 @@ export const showImplicitTestRuleWidget = async () => {
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.style.display = "none";
 
-  let appliedRules = [];
-  for (let ruleId of appliedRuleIds.values()) {
-    const ruleDetails = await getRule(ruleId);
-    if (shouldShowImplicitWidget(ruleDetails.ruleType)) {
-      appliedRules.push({
-        ruleId: ruleDetails.id,
-        ruleName: ruleDetails.name,
-        ruleType: ruleDetails.ruleType,
-      });
-    }
-  }
-  testRuleWidget.setAttribute("applied-rules", JSON.stringify(appliedRules));
-  document.documentElement.appendChild(testRuleWidget);
-
-  if (appliedRules.length) {
-    testRuleWidget.style.display = "block";
-  }
-
   testRuleWidget.addEventListener("view_rule_in_editor", (data: any) => {
     window.open(`${config.WEB_URL}/rules/editor/edit/${data.detail.ruleId}`, "_blank");
   });
@@ -166,6 +148,14 @@ export const showImplicitTestRuleWidget = async () => {
   testRuleWidget.addEventListener("open_app_settings", () => {
     window.open(`${config.WEB_URL}/settings/global-settings`, "_blank");
   });
+
+  testRuleWidget.addEventListener("rule_applied_listener_active", () => {
+    appliedRuleIds.forEach((ruleId) => {
+      notifyRuleAppliedToImplicitWidget(ruleId);
+    });
+  });
+
+  document.documentElement.appendChild(testRuleWidget);
 };
 
 const notifyRuleAppliedToImplicitWidget = async (ruleId: string) => {
