@@ -32,7 +32,7 @@ export const DeletRecordsModalWrapper: React.FC<{ forceRender: () => void }> = (
       toggleModalVisibility={onClose}
       onSuccess={() => {
         forceRender();
-        onSuccess();
+        onSuccess?.();
       }}
     />
   );
