@@ -32,8 +32,7 @@
   flex-direction: row-reverse;
   padding: 16px 0;
 }
-
-.ant-table-body .ant-table-tbody .rq-content-list-table-row td.ant-table-cell:nth-child(2) {
+.rule-list-table .ant-table-body .ant-table-tbody .rq-content-list-table-row td.ant-table-cell:nth-child(2) {
   padding: 12px 0;
 }
 

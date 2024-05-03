@@ -24,7 +24,7 @@ import {
 } from "modules/analytics/events/features/sharedList";
 import { trackTemplateImportCompleted } from "modules/analytics/events/features/templates";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { getSharedListIdFromURL } from "../SharedListViewerIndexPage/actions";
+import { getSharedListIdFromURL } from "features/rules/screens/sharedLists";
 import { actions } from "store";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";

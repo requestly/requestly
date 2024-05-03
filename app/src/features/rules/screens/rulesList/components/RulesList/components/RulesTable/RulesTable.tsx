@@ -147,6 +147,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
       <ContentListTable
         id="rules-list-table"
+        className="rules-list-table"
         size="middle"
         scroll={{ y: getTableScrollHeight() }}
         columns={columns}
