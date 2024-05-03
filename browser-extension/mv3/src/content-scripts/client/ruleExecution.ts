@@ -151,7 +151,7 @@ export const showImplicitTestRuleWidget = async () => {
 
   testRuleWidget.addEventListener("rule_applied_listener_active", () => {
     appliedRuleIds.forEach((ruleId) => {
-      notifyRuleAppliedToImplicitWidget(ruleId);
+      handleAppliedRuleNotification(ruleId);
     });
   });
 
