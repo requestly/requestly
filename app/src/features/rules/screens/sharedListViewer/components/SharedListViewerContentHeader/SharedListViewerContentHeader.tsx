@@ -58,7 +58,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
   const isUpgradePopoverEnabled = useFeatureValue("show_upgrade_popovers", false);
 
   const handleImportListOnClick = useCallback(() => {
-    trackSharedListImportStartedEvent(sharedListId);
+    trackSharedListImportStartedEvent(sharedListId, sharedListRules.length);
 
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !isExtensionInstalled()) {
       dispatch(
@@ -71,7 +71,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
           },
         })
       );
-      trackSharedListImportFailed(sharedListId);
+      trackSharedListImportFailed(sharedListId, sharedListRules.length);
       return;
     }
 
@@ -109,7 +109,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
 
       addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
         toast.info(`Successfully imported rules`);
-        trackSharedListImportCompleted(sharedListId);
+        trackSharedListImportCompleted(sharedListId, sharedListRules.length);
         redirectToRules(navigate);
       });
     });

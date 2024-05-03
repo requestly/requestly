@@ -20,11 +20,10 @@ export const SharedListViewerScreen = () => {
   const sharedListId = getSharedListIdFromURL(window.location.pathname);
   const {
     isLoading,
-    sharedListGroupsMap,
-    sharedListGroupwiseRulesMap,
     sharedListGroups,
     sharedListRules,
     isSharedListPresent,
+    sharedListRecordsMap,
   } = useFetchSharedListData({
     sharedListId,
   });
@@ -33,8 +32,8 @@ export const SharedListViewerScreen = () => {
   const [searchValue, setSearchValue] = useState("");
 
   const filteredRecords = useMemo(() => {
-    return getFilterSharedListRecords(sharedListGroupwiseRulesMap, sharedListGroupsMap, searchValue);
-  }, [searchValue, sharedListGroupwiseRulesMap, sharedListGroupsMap]);
+    return getFilterSharedListRecords([...sharedListGroups, ...sharedListRules], searchValue);
+  }, [searchValue, sharedListGroups, sharedListRules]);
 
   const promptUserToSignup = (source: string) => {
     dispatch(
@@ -65,7 +64,7 @@ export const SharedListViewerScreen = () => {
           sharedListRules={sharedListRules}
           sharedListId={sharedListId}
         />
-        <SharedListViewerList records={filteredRecords} isLoading={isLoading} />
+        <SharedListViewerList records={filteredRecords} recordsMap={sharedListRecordsMap} isLoading={isLoading} />
       </>
     );
   } else {

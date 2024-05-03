@@ -11,11 +11,11 @@ interface SharedListViewerModalProps {
 
 export const SharedListViewerModal: React.FC<SharedListViewerModalProps> = ({ rule, isOpen, toggle }) => {
   if (!rule) {
-    return <span></span>;
+    return null;
   }
   return (
     <Modal
-      className="modal-dialog-centered max-width-80-percent "
+      className="modal-dialog-centered"
       open={isOpen}
       onCancel={toggle}
       footer={null}
