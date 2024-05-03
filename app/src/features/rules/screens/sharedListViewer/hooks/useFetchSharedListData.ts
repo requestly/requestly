@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const useFetchSharedListData = ({ sharedListId }: Props) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [sharedListGroups, setSharedListGroups] = useState<Group[]>([]);
   const [sharedListRules, setSharedListRules] = useState<Rule[]>([]);
   const [isSharedListPresent, setIsSharedListPresent] = useState(true);
