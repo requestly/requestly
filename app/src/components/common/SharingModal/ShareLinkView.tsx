@@ -4,7 +4,7 @@ import { getAppMode } from "store/selectors";
 import { Radio, Space, Tooltip } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { CopyValue } from "components/misc/CopyValue";
-import { getSharedListIdFromImportURL } from "components/features/sharedLists/SharedListViewerIndexPage/actions";
+import { getSharedListIdFromImportURL } from "features/rules/screens/sharedLists";
 import { createSharedList } from "./actions";
 import { getFormattedDate } from "utils/DateTimeUtils";
 import { getSharedListURL } from "utils/PathUtils";

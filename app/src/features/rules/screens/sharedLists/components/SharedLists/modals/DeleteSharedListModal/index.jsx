@@ -8,7 +8,7 @@ import isEmpty from "is-empty";
 import { FaTrash } from "@react-icons/all-files/fa/FaTrash";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 //ACTIONS
-import { deleteSharedList } from "backend/sharedList";
+import { deleteSharedList } from "backend/sharedList/deleteSharedList";
 import { LoadingOutlined } from "@ant-design/icons";
 import { actions } from "store";
 
