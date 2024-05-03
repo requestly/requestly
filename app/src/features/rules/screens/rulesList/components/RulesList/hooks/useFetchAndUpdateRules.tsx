@@ -10,6 +10,7 @@ import { Group, Rule, RecordStatus, RecordType } from "features/rules/types/rule
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
+import Logger from "../../../../../../../../../common/logger";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -27,6 +28,10 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    Logger.log(
+      "DBG: Fetching rules and groups triggered",
+      JSON.stringify({ hasIsRulesListHardRefreshPendingChanged, isRulesListRefreshPending })
+    );
     if (hasIsRulesListHardRefreshPendingChanged) {
       setIsLoading(true);
     }
@@ -34,42 +39,51 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     // FIXME: This can be fetched in one call. getRecords([RULE, GROUP]);
     const groupsPromise = StorageService(appMode).getRecords(RecordType.GROUP);
     const rulesPromise = StorageService(appMode).getRecords(RecordType.RULE);
-    Promise.all([groupsPromise, rulesPromise]).then(async (data) => {
-      const groups = data[0] as Group[];
-      const rules = data[1] as Rule[];
+    Promise.all([groupsPromise, rulesPromise])
+      .then(async (data) => {
+        const groups = data[0] as Group[];
+        const rules = data[1] as Rule[];
 
-      // FIXME: This can be removed/improved. Move this logic to src/features
-      const isGroupsSanitizationPassedResult = await isGroupsSanitizationPassed({ rules, groups, appMode });
+        Logger.log("DBG: fetched data", JSON.stringify({ rules, groups }));
 
-      const finalRecords = [...isGroupsSanitizationPassedResult.updatedRules, ...groups];
+        // FIXME: This can be removed/improved. Move this logic to src/features
+        const isGroupsSanitizationPassedResult = await isGroupsSanitizationPassed({ rules, groups, appMode });
 
-      dispatch(recordsActions.setAllRecords(finalRecords));
+        const finalRecords = [...isGroupsSanitizationPassedResult.updatedRules, ...groups];
 
-      setIsLoading(false);
+        dispatch(recordsActions.setAllRecords(finalRecords));
 
-      // TODO: Cleanup
-      //ANALYTICS
-      const ruleTypes = rules.reduce((result, { ruleType }) => result.add(ruleType), new Set());
-      const activePremiumRules = rules.filter(
-        (rule) => rule.status === RecordStatus.ACTIVE && PREMIUM_RULE_TYPES.includes(rule.ruleType)
-      );
-      const numRuleTypes = parseInt(window.localStorage.getItem("num_rule_types") || "0");
-      submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
-      submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
-      submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);
-      submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES, ruleTypes.size);
-      window.localStorage.setItem("num_rule_types", JSON.stringify(ruleTypes.size));
-      submitAttrUtil(
-        TRACKING.ATTR.NUM_ACTIVE_RULES,
-        rules.filter((rule) => rule.status === RecordStatus.ACTIVE).length
-      );
-      submitAttrUtil(TRACKING.ATTR.NUM_GROUPS, groups.length);
-      submitAttrUtil(TRACKING.ATTR.NUM_RULES_PINNED, rules.filter((rule) => rule.isFavourite).length);
-      submitAttrUtil(
-        TRACKING.ATTR.NUM_ACTIVE_GROUPS,
-        groups.filter((group) => group.status === RecordStatus.ACTIVE).length
-      );
-    });
+        setIsLoading(false);
+
+        // TODO: Cleanup
+        //ANALYTICS
+
+        Logger.log("DBG: submitting num_rules as - ", rules.length);
+
+        const ruleTypes = rules.reduce((result, { ruleType }) => result.add(ruleType), new Set());
+        const activePremiumRules = rules.filter(
+          (rule) => rule.status === RecordStatus.ACTIVE && PREMIUM_RULE_TYPES.includes(rule.ruleType)
+        );
+        const numRuleTypes = parseInt(window.localStorage.getItem("num_rule_types") || "0");
+        submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
+        submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
+        submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);
+        submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES, ruleTypes.size);
+        window.localStorage.setItem("num_rule_types", JSON.stringify(ruleTypes.size));
+        submitAttrUtil(
+          TRACKING.ATTR.NUM_ACTIVE_RULES,
+          rules.filter((rule) => rule.status === RecordStatus.ACTIVE).length
+        );
+        submitAttrUtil(TRACKING.ATTR.NUM_GROUPS, groups.length);
+        submitAttrUtil(TRACKING.ATTR.NUM_RULES_PINNED, rules.filter((rule) => rule.isFavourite).length);
+        submitAttrUtil(
+          TRACKING.ATTR.NUM_ACTIVE_GROUPS,
+          groups.filter((group) => group.status === RecordStatus.ACTIVE).length
+        );
+      })
+      .catch((err) => {
+        Logger.error("DBG: Error in fetching rules and groups", err);
+      });
   }, [
     dispatch,
     setIsLoading,
