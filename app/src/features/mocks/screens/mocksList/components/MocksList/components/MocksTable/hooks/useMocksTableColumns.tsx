@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table } from "antd";
-import { MockType, RQMockSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { EditOutlined } from "@ant-design/icons";
@@ -78,6 +78,8 @@ export const useMocksTableColumns = ({
       width: isWorkspaceMode ? (isRuleEditor ? 110 : 290) : isRuleEditor ? 290 : 360,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
+        const collectionPath = ((record as unknown) as RQMockCollection)?.path ?? "";
+        const beautifiedCollectionPath = collectionPath[0] === "/" ? collectionPath : "/" + collectionPath;
 
         return isCollection ? (
           <div className="mock-collection-details-container">
@@ -87,6 +89,12 @@ export const useMocksTableColumns = ({
             <Typography.Text ellipsis={true} className="mock-collection-name">
               {record.name}
             </Typography.Text>
+
+            {collectionPath ? (
+              <Typography.Text className="collection-path" ellipsis={true}>
+                {beautifiedCollectionPath}
+              </Typography.Text>
+            ) : null}
 
             {record?.desc ? (
               <Tooltip
@@ -191,7 +199,7 @@ export const useMocksTableColumns = ({
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              updateCollectionNameAction(mockType, record);
+              updateCollectionNameAction(mockType, (record as unknown) as RQMockCollection);
             },
             label: (
               <Row>
