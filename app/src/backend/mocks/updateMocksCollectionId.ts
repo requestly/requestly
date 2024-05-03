@@ -1,33 +1,61 @@
+import { getOwnerId } from "backend/utils";
 import firebaseApp from "../../firebase";
 import { Timestamp, doc, getFirestore, writeBatch } from "firebase/firestore";
 
 export const updateMocksCollectionId = async (
   uid: string,
   mockIds: string[],
-  updatedCollectionId: string
+  updatedCollectionId: string,
+  updatedCollectionPath: string,
+  teamId?: string
 ): Promise<boolean> => {
   if (!uid) {
     return null;
   }
 
-  const result = await updateMocksCollectionIdInFirebase(uid, mockIds, updatedCollectionId);
+  const ownerId = getOwnerId(uid, teamId);
+  const result = await updateMocksCollectionIdInFirebase(
+    uid,
+    ownerId,
+    mockIds,
+    updatedCollectionId,
+    updatedCollectionPath
+  );
   return result;
 };
 
 const updateMocksCollectionIdInFirebase = async (
   uid: string,
+  ownerId: string,
   mockIds: string[],
-  updatedCollectionId: string
+  updatedCollectionId: string,
+  updatedCollectionPath: string
 ): Promise<boolean> => {
   try {
     const db = getFirestore(firebaseApp);
     const mocksbatch = writeBatch(db);
+    const userMocksMetadataDocRef = doc(db, "user-mocks-metadata", ownerId);
 
-    mockIds.forEach((id) => {
-      const mockRef = doc(db, "mocks", id);
+    const selectorData = {
+      collectionId: updatedCollectionId,
+      collectionPath: updatedCollectionPath,
+    };
+
+    mockIds.forEach((mockId) => {
+      const mockRef = doc(db, "mocks", mockId);
       mocksbatch.set(
         mockRef,
         { collectionId: updatedCollectionId, lastUpdatedBy: uid, updatedTs: Timestamp.now().toMillis() },
+        { merge: true }
+      );
+
+      mocksbatch.set(
+        userMocksMetadataDocRef,
+        {
+          mockSelectors: {
+            [mockId]: selectorData,
+          },
+        },
         { merge: true }
       );
     });
