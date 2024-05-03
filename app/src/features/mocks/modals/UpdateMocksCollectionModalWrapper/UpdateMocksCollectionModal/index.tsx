@@ -71,7 +71,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
     setCollectionId(collectionId);
     setCollectionName((option as SelectOption).label);
     // @ts-ignore
-    setCollectionPath(option.path);
+    setCollectionPath(option.path ?? "");
   };
 
   const handleSearchCollection: SelectProps<string, SelectOption>["filterOption"] = (searchValue, option) => {

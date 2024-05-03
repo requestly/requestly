@@ -8,7 +8,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
 import deleteIcon from "../../assets/delete.svg";
 import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
-import { DEFAULT_COLLECTION_ID } from "features/mocks/constants";
+import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "features/mocks/constants";
 import { deleteMocks } from "backend/mocks/deleteMocks";
 import { trackMockCollectionDeleted } from "modules/analytics/events/features/mocksV2";
 import { toast } from "utils/Toast";
@@ -42,7 +42,7 @@ export const DeleteCollectionModal: React.FC<DeleteCollectionModalProps> = ({
 
       // FIXME: This might break when multiple people working in workspace
       //        since we are using UI as a source for mockIds
-      await updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID);
+      await updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, teamId);
       await updateCollections(uid, [{ id: collection.id, deleted: true }]);
 
       trackMockCollectionDeleted("mocksTable", mockIds?.length, "delete_only_collection");

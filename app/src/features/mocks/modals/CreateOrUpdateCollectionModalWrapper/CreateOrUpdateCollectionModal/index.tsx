@@ -43,8 +43,6 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
   const [collectionDescription, setCollectionDescription] = useState("");
   const [collectionPath, setCollectionPath] = useState("");
 
-  console.log({ collectionPath });
-
   useEffect(() => {
     setCollectionName(name ?? "");
     setCollectionDescription(description ?? "");
@@ -87,7 +85,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
     }
 
     if (id) {
-      const collectionData = [
+      const collectionsData = [
         {
           id,
           name: collectionName,
@@ -97,7 +95,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
       ];
 
       setIsLoading(true);
-      updateCollections(uid, collectionData)
+      updateCollections(uid, collectionsData)
         .then(() => {
           trackMockCollectionUpdated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
           toast.success("Collection updated!");
@@ -108,7 +106,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           setIsLoading(false);
         });
     } else {
-      const collectionData = {
+      const collectionsData = {
         type: mockType,
         name: collectionName,
         desc: collectionDescription,
@@ -116,7 +114,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
       };
 
       setIsLoading(true);
-      createCollection(uid, collectionData, teamId)
+      createCollection(uid, collectionsData, teamId)
         .then((mockCollection) => {
           trackMockCollectionCreated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
           toast.success("Collection created!");

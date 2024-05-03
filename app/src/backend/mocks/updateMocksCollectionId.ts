@@ -6,7 +6,7 @@ export const updateMocksCollectionId = async (
   uid: string,
   mockIds: string[],
   updatedCollectionId: string,
-  updatedCollectionPath: string,
+  updatedCollectionPath: string = "",
   teamId?: string
 ): Promise<boolean> => {
   if (!uid) {
