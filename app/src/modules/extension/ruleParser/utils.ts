@@ -17,6 +17,16 @@ const parseRegex = (regex: string): { pattern: string; flags?: string } => {
   return { pattern: regex };
 };
 
+export const migratePathOperator = (source: RulePairSource): boolean => {
+  if (source.key === SourceKey.PATH) {
+    source.operator = SourceOperator.CONTAINS;
+    source.key = SourceKey.URL;
+
+    return true;
+  }
+  return false;
+};
+
 const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   // rules like query, headers, script, delay can be applied on all URLs
   if (source.value === "") {
@@ -75,6 +85,8 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
     }
   }
 
+  // deprecated
+  // TODO: to be removed
   if (source.key === SourceKey.PATH) {
     switch (source.operator) {
       case SourceOperator.EQUALS: {
