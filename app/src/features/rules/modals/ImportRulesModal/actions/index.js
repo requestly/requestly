@@ -81,11 +81,12 @@ const setUnknownGroupIdsToUngroupped = (rulesArray, groupsIdObject) => {
 export const processDataToImport = (incomingArray, user, allRules, overwrite = true) => {
   const data = filterRulesAndGroups(incomingArray);
 
-  let rules = data.rules.map((rule) => parseExtensionRules(rule));
-  if (isExtensionManifestVersion3()) {
-    rules = runRuleMigrations(rules.filter((object) => isObjectValid(object)));
-  }
+  let rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
   const groups = data.groups.filter((object) => isObjectValid(object));
+
+  if (isExtensionManifestVersion3()) {
+    rules = rules.map((rule) => parseExtensionRules(rule));
+  }
 
   if (!overwrite) {
     setNewIdofRules(rules);
