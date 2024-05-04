@@ -42,7 +42,6 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
     Table.SELECTION_COLUMN,
     {
       title: "Name",
-      key: "listName",
       width: 400,
       render: (_: any, record: SharedList) => {
         return (
@@ -57,21 +56,21 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
     },
     {
       title: "Created on ",
-      key: "creationDate",
       width: 150,
-      render: (creationDate: number) => {
-        return <div className="text-center">{moment(creationDate).format("DD MMM YYYY")}</div>;
+      render: (_: any, record: SharedList) => {
+        return <div className="text-center">{moment(record.creationDate).format("DD MMM YYYY")}</div>;
       },
     },
     {
       title: "Imported",
-      key: "importCount",
       width: 100,
 
-      render: (importCount: number) => {
+      render: (_: any, record: SharedList) => {
         return (
           <div className="text-center">
-            {importCount > 0 ? `${importCount} ${importCount === 1 ? "time" : "times"}` : "Not yet"}
+            {record.importCount > 0
+              ? `${record.importCount} ${record.importCount === 1 ? "time" : "times"}`
+              : "Not yet"}
           </div>
         );
       },
@@ -79,7 +78,6 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
 
     {
       title: "",
-      key: "actions",
       width: 300,
       render: (_: any, record: SharedList) => {
         const sharedListURL = getSharedListURL(record.shareId, record.listName);
