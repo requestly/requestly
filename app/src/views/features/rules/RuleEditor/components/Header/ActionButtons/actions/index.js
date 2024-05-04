@@ -12,15 +12,16 @@ import * as Sentry from "@sentry/react";
 import { detectUnsettledPromise } from "utils/FunctionUtils";
 
 export const saveRule = async (appMode, ruleObject, callback) => {
-  //Set the modification date of rule
-  const ruleToSave = {
+  let ruleToSave = {
     ...ruleObject,
-    modificationDate: generateObjectCreationDate(),
   };
 
   if (isExtensionManifestVersion3()) {
-    ruleToSave.extensionRules = parseExtensionRules(ruleObject);
+    ruleToSave = parseExtensionRules(ruleToSave);
   }
+
+  //Set the modification date of rule
+  ruleToSave.modificationDate = generateObjectCreationDate();
 
   //Save the rule
   Logger.log("Writing to storage in saveRule");
