@@ -1,4 +1,4 @@
-import { fetchSharedLists } from "backend/sharedList";
+import { fetchSharedLists } from "backend/sharedList/deleteSharedList";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getIsExtensionEnabled, getIsRefreshSharesListsPending, getUserAuthDetails } from "store/selectors";
