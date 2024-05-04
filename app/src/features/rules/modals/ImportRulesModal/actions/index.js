@@ -6,6 +6,8 @@ import Logger from "lib/logger";
 import { runRuleMigrations } from "utils/rules/ruleMigrations";
 import APP_CONSTANTS from "config/constants";
 import { RecordStatus } from "features/rules";
+import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
+import { parseExtensionRules } from "modules/extension/ruleParser";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
@@ -78,7 +80,11 @@ const setUnknownGroupIdsToUngroupped = (rulesArray, groupsIdObject) => {
 
 export const processDataToImport = (incomingArray, user, allRules, overwrite = true) => {
   const data = filterRulesAndGroups(incomingArray);
-  const rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
+
+  let rules = data.rules.map((rule) => parseExtensionRules(rule));
+  if (isExtensionManifestVersion3()) {
+    rules = runRuleMigrations(rules.filter((object) => isObjectValid(object)));
+  }
   const groups = data.groups.filter((object) => isObjectValid(object));
 
   if (!overwrite) {
