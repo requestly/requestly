@@ -13,6 +13,9 @@ interface RuleIdsMap {
 }
 
 const getExecutedRequestResponseRuleIds = async (tabId: number): Promise<string[]> => {
+  chrome.declarativeNetRequest.getSessionRules((sessionRules) => {
+    console.log("!!!debug", "sessionRules::", sessionRules);
+  });
   return await chrome.tabs.sendMessage(tabId, {
     action: CLIENT_MESSAGES.GET_APPLIED_REQUEST_RESPONSE_RULES,
   });
@@ -54,6 +57,12 @@ export const getExecutedRules = async (tabId: number): Promise<Rule[]> => {
 const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
   return new Promise((resolve) => {
     chrome.declarativeNetRequest.updateDynamicRules(options, resolve);
+  });
+};
+
+export const updateSessionRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
+  return new Promise((resolve) => {
+    chrome.declarativeNetRequest.updateSessionRules(options, resolve);
   });
 };
 

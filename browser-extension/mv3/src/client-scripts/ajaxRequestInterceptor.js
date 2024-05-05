@@ -277,7 +277,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
 
-  const notifyOnBeforeRequest = (requestDetails) => {
+  const notifyOnBeforeRequest = async (requestDetails) => {
     window.postMessage(
       {
         source: "requestly:client",
@@ -502,11 +502,13 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule.response)) {
       resolveXHR(this, this.responseRule.response.value);
     } else {
+      console.log("!!!debug", "XHR headers", this.requestHeaders);
       await notifyOnBeforeRequest({
         url: this.requestURL,
         method: this.method,
         type: "xmlhttprequest",
         initiatorDomain: location.origin,
+        requestHeaders: this.requestHeaders ?? {},
       });
       send.apply(this, arguments);
     }
@@ -514,7 +516,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
   XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-    this.requestHeaders = this.requestHeaders || {};
+    this.requestHeaders = this.requestHeaders ?? {};
     this.requestHeaders[header] = value;
     setRequestHeader.apply(this, arguments);
   };
@@ -590,11 +592,18 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
+        console.log("!!!debug", "header entries", url, Object.fromEntries([...request.headers.entries()]));
+        const headersObject = {};
+        request.headers.forEach((value, key) => {
+          console.log("!!!debug", "headers", { key, value });
+          headersObject[key] = value;
+        });
         await notifyOnBeforeRequest({
           url,
           method,
           type: "fetch",
           initiatorDomain: location.origin,
+          requestHeaders: headersObject,
         });
 
         if (requestRuleData) {

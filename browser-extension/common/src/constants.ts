@@ -74,3 +74,5 @@ export const LINKS = {
   REQUESTLY_EXTENSION_TROUBLESHOOTING:
     "https://docs.requestly.io/browser-extension/chrome/category/troubleshooting?source=popup",
 };
+
+export const IGNORED_HEADERS_ON_REDIRECT = ["Authorization"];

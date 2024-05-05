@@ -74,6 +74,9 @@ export interface SessionRecordingConfig {
 
 export interface RulePair {
   source: UrlSource;
+  destination?: string;
+  to?: string;
+  from?: string;
 }
 
 export interface Rule extends Record<string, unknown> {
