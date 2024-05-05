@@ -1,4 +1,4 @@
-import { CLIENT_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 
 export const initRuleExecutionHandler = () => {
   const appliedRequestResponseRuleIds = new Set<string>();
@@ -13,6 +13,17 @@ export const initRuleExecutionHandler = () => {
       case "response_rule_applied":
       case "request_rule_applied":
         appliedRequestResponseRuleIds.add(event.data.ruleId);
+        break;
+      case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
+        chrome.runtime.sendMessage(event.data, () => {
+          window.postMessage(
+            {
+              source: "requestly:client",
+              action: CLIENT_MESSAGES.ON_BEFORE_AJAX_REQUEST_PROCESSED,
+            },
+            window.location.href
+          );
+        });
         break;
     }
   });

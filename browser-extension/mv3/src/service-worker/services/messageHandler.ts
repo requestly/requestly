@@ -18,6 +18,7 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
+import { onBeforeAJAXRequest } from "./requestProcessor";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -108,6 +109,10 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
+
+      case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
+        onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
+        return true;
     }
 
     return false;
