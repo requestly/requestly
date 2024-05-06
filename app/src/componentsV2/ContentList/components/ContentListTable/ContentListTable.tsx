@@ -47,9 +47,14 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
         updatedExpandedRowKeys.delete(record[rowKey]);
       }
       setExpandedRowsKeys(Array.from(updatedExpandedRowKeys));
+
+      const EXPANDED_ROWS_LOCAL_STORAGE_KEY = "content-list-table-expanded-rows";
+      const expandedRows = JSON.parse(localStorage.getItem(EXPANDED_ROWS_LOCAL_STORAGE_KEY) || null) ?? {};
+
       localStorage.setItem(
-        "content-list-table-expanded-rows",
+        EXPANDED_ROWS_LOCAL_STORAGE_KEY,
         JSON.stringify({
+          ...expandedRows,
           [id]: Array.from(updatedExpandedRowKeys),
         })
       );
