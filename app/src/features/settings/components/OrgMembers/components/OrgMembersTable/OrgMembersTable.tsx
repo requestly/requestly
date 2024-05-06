@@ -10,6 +10,7 @@ interface OrgMembersTableProps {
   members: OrgMember[];
   setSearchValue: (value: string) => void;
   memberActions?: (record: OrgMember) => ReactNode;
+  tableActions?: ReactNode;
   emptyView?: ReactNode;
 }
 
@@ -18,6 +19,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   setSearchValue,
   members,
   memberActions,
+  tableActions,
   isLoading,
   emptyView,
 }) => {
@@ -74,13 +76,14 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
             className="org-member-table-header-input"
             suffix={<SearchOutlined />}
           />
+          <div>{tableActions}</div>
         </Col>
         <Table
           className="billing-table"
           dataSource={members}
           columns={columns}
           pagination={false}
-          scroll={{ y: "74vh" }}
+          scroll={{ y: "82vh" }}
           loading={isLoading}
           locale={{
             emptyText: emptyView ?? (

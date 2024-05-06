@@ -5,9 +5,13 @@ import "./emptyMembersTableView.scss";
 
 interface EmptyMembersTableViewProps {
   searchValue: string;
+  toggleInviteFormVisibility: () => void;
 }
 
-export const EmptyMembersTableView: React.FC<EmptyMembersTableViewProps> = ({ searchValue }) => {
+export const EmptyMembersTableView: React.FC<EmptyMembersTableViewProps> = ({
+  searchValue,
+  toggleInviteFormVisibility,
+}) => {
   return (
     <div className="empty-members-table-view">
       <img src={EmptyIcon} alt="empty list" />
@@ -15,7 +19,7 @@ export const EmptyMembersTableView: React.FC<EmptyMembersTableViewProps> = ({ se
       <div className="empty-members-table-description">
         Please click the button below to invite and add members in your billing team.
       </div>
-      <RQButton className="mt-24" type="primary">
+      <RQButton className="mt-24" type="primary" onClick={toggleInviteFormVisibility}>
         Invite & add to billing team
       </RQButton>
     </div>

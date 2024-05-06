@@ -13,6 +13,7 @@ interface AppMembersDrawerProps {
 export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onClose }) => {
   const [searchValue, setSearchValue] = useState("");
   const { isLoading, organizationMembers } = useFetchOrgMembers();
+  const [isInviteFormVisible, setIsInviteFormVisible] = useState(false);
 
   return (
     <Drawer
@@ -31,12 +32,17 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
         </Col>
       </Row>
       <Col className="billing-team-members-drawer-body">
-        <AddMembersTable
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          isLoading={isLoading}
-          members={organizationMembers}
-        />
+        {isInviteFormVisible ? (
+          <div>INVITE FORM HERE</div>
+        ) : (
+          <AddMembersTable
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
+            isLoading={isLoading}
+            members={organizationMembers}
+            toggleInviteFormVisibility={() => setIsInviteFormVisible(!isInviteFormVisible)}
+          />
+        )}
       </Col>
     </Drawer>
   );
