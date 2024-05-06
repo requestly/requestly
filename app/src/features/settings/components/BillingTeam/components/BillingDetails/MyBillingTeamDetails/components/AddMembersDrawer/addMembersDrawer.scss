@@ -8,7 +8,7 @@
   }
 
   .ant-drawer-body {
-    background: var(--surface-0_5);
+    background: var(--requestly-color-surface-0);
     padding: 0;
   }
 
@@ -31,7 +31,6 @@
   }
 
   &-body {
-    padding: 1rem;
     position: relative;
   }
 
@@ -42,5 +41,14 @@
     bottom: 10px;
     width: 100%;
     padding: 0 1rem;
+  }
+
+  .org-member-table {
+    border: none;
+
+    .org-member-table-header {
+      padding: 1rem;
+      border-bottom: 0;
+    }
   }
 }
