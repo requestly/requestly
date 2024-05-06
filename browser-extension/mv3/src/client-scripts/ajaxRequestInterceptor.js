@@ -502,7 +502,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule.response)) {
       resolveXHR(this, this.responseRule.response.value);
     } else {
-      console.log("!!!debug", "XHR headers", this.requestHeaders);
       console.time("XHR");
       await notifyOnBeforeRequest({
         url: this.requestURL,
@@ -597,7 +596,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         console.time("fetch");
         const headersObject = {};
         request.headers.forEach((value, key) => {
-          console.log("!!!debug", "headers", { key, value });
           headersObject[key] = value;
         });
         await notifyOnBeforeRequest({

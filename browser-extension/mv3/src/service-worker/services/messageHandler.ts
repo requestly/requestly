@@ -18,7 +18,7 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
-import { onBeforeAJAXRequest } from "./requestProcessor";
+import { requestProcessor } from "./requestProcessor";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -111,7 +111,7 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
-        onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
+        requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
         return true;
     }
 
