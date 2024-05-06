@@ -5,13 +5,16 @@ import { getUserAuthDetails } from "store/selectors";
 import { OrgTableActions } from "./components/AddMembersTableActions/OrgTableActions";
 import { OrgMember } from "features/settings/components/OrgMembers/types";
 import { EmptyMembersTableView } from "./components/EmptyMembersTableView/EmptyMembersTableView";
+import { RQButton } from "lib/design-system/components";
+import { MdOutlinePersonAdd } from "@react-icons/all-files/md/MdOutlinePersonAdd";
 import "./addMembersTable.scss";
 
 interface AddMembersTableProps {
   searchValue: string;
-  setSearchValue: (value: string) => void;
   isLoading: boolean;
   members: OrgMember[];
+  setSearchValue: (value: string) => void;
+  toggleInviteFormVisibility: () => void;
 }
 
 export const AddMembersTable: React.FC<AddMembersTableProps> = ({
@@ -19,6 +22,7 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({
   setSearchValue,
   members,
   isLoading,
+  toggleInviteFormVisibility,
 }) => {
   const user = useSelector(getUserAuthDetails);
 
@@ -37,7 +41,19 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({
         setSearchValue={setSearchValue}
         members={searchedMembers}
         memberActions={(record) => <OrgTableActions record={record} />}
-        emptyView={<EmptyMembersTableView searchValue={searchValue} />}
+        tableActions={
+          <RQButton
+            type="default"
+            className="invite-people-btn"
+            icon={<MdOutlinePersonAdd />}
+            onClick={toggleInviteFormVisibility}
+          >
+            Invite people
+          </RQButton>
+        }
+        emptyView={
+          <EmptyMembersTableView searchValue={searchValue} toggleInviteFormVisibility={toggleInviteFormVisibility} />
+        }
       />
     </div>
   );
