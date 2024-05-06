@@ -62,12 +62,6 @@ const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRu
   });
 };
 
-export const updateSessionRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
-  return new Promise((resolve) => {
-    chrome.declarativeNetRequest.updateSessionRules(options, resolve);
-  });
-};
-
 const deleteExtensionRules = async (): Promise<void> => {
   const extensionRules = await chrome.declarativeNetRequest.getDynamicRules();
 
