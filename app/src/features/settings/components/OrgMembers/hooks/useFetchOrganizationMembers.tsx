@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { OrgMember } from "../types";
 
 export const useFetchOrgMembers = () => {
   const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(true);
-  const [organizationMembers, setOrganizationMembers] = useState<{ total: number; users: unknown[] }>(null);
+  const [organizationMembers, setOrganizationMembers] = useState<{ total: number; users: OrgMember[] }>(null);
 
   useEffect(() => {
     if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {

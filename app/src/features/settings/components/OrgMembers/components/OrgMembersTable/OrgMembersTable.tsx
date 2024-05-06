@@ -1,14 +1,15 @@
 import React, { ReactNode, useMemo } from "react";
 import { Col, Empty, Input, Row, Table, TableProps } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+import { OrgMember } from "../../types";
 import "./orgMembersTable.scss";
 
 interface OrgMembersTableProps {
   isLoading: boolean;
   searchValue: string;
-  members: any[];
+  members: OrgMember[];
   setSearchValue: (value: string) => void;
-  actions?: (record: any) => ReactNode;
+  actions?: (record: OrgMember) => ReactNode;
 }
 
 export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
@@ -18,13 +19,13 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   actions,
   isLoading,
 }) => {
-  const columns: TableProps<any>["columns"] = useMemo(
+  const columns: TableProps<OrgMember>["columns"] = useMemo(
     () => [
       {
         title: "Member",
         key: "member",
         width: 350,
-        render: (_: any, record: any) => {
+        render: (_: any, record) => {
           return (
             <Row align="middle" gutter={8}>
               <Col>
@@ -45,13 +46,13 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
         defaultSortOrder: "ascend",
         showSorterTooltip: false,
         sorter: {
-          compare: (a: any, b: any) => a.email.localeCompare(b.email),
+          compare: (a, b) => a.email.localeCompare(b.email),
         },
       },
       {
         title: "",
         key: "action",
-        render: (_: any, record: any) => {
+        render: (_: any, record) => {
           return actions?.(record);
         },
       },
