@@ -3,7 +3,6 @@ import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { Rule, RuleType } from "common/types";
 import { matchSourceUrl } from "./ruleMatcher";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
-import { updateSessionRules } from "./rulesManager";
 
 interface AJAXRequestDetails {
   url: string;
@@ -13,58 +12,53 @@ interface AJAXRequestDetails {
   requestHeaders: Record<string, string>;
 }
 
-interface ActionDetails {
-  type: ActionType;
-  ignoredHeadersValue?: { name: string; value: string }[];
-  redirectedUrl?: string;
-}
-
-enum ActionType {
-  FORWARD_IGNORED_HEADERS = "forward_ignored_headers",
-}
-
 class RequestProcessor {
   private cachedRules: Record<string, Rule[]> = {
     redirectRules: [],
     replaceRules: [],
   };
 
-  private cacheRules = async () => {
+  private updateCachedRules = async () => {
+    console.log("!!!debug", "cacheRules", this.cachedRules);
     this.cachedRules.redirectRules = await getEnabledRules(RuleType.REDIRECT);
     this.cachedRules.replaceRules = await getEnabledRules(RuleType.REPLACE);
   };
 
   constructor() {
-    this.cacheRules();
-    onRuleOrGroupChange(this.cacheRules);
+    this.updateCachedRules();
+    onRuleOrGroupChange(this.updateCachedRules.bind(this));
   }
 
-  private processRequest = async (requestDetails: AJAXRequestDetails): Promise<ActionDetails | null> => {
-    if (this.hasIgnoredHeadersInRequest(requestDetails.requestHeaders)) {
-      const matchedRedirectRule = this.findMatchingRule(this.cachedRules.redirectRules, requestDetails.url);
-
-      if (matchedRedirectRule) {
-        return this.createActionDetails(matchedRedirectRule, requestDetails, ActionType.FORWARD_IGNORED_HEADERS);
-      }
-
-      const matchedReplaceRule = this.findMatchingRule(this.cachedRules.replaceRules, requestDetails.url);
-
-      if (matchedReplaceRule) {
-        return this.createActionDetails(matchedReplaceRule, requestDetails, ActionType.FORWARD_IGNORED_HEADERS);
-      }
+  private forwardIgnoredHeadersOnRedirect = async (tabId: number, requestDetails: AJAXRequestDetails) => {
+    if (!this.hasIgnoredHeadersInRequest(requestDetails.requestHeaders)) {
+      return;
     }
 
-    return null;
-  };
+    if (!this.cachedRules.redirectRules.length && !this.cachedRules.replaceRules.length) {
+      return;
+    }
 
-  private forwardIgnoredHeaders = async (
-    tabId: number,
-    requestDetails: AJAXRequestDetails,
-    actionDetails: ActionDetails
-  ) => {
+    const matchedRule = this.findMatchingRule(
+      [...this.cachedRules.redirectRules, ...this.cachedRules.replaceRules],
+      requestDetails.url
+    );
+
+    console.log("!!!debug", "matched rule", matchedRule);
+
+    if (!matchedRule) {
+      return;
+    }
+
+    const ignoredHeaderValues = IGNORED_HEADERS_ON_REDIRECT.map((header) => ({
+      name: header,
+      value: requestDetails.requestHeaders[header] || requestDetails.requestHeaders[header.toLowerCase()],
+    }));
+
+    const redirectedUrl = this.getRedirectedUrl(requestDetails.url, matchedRule);
+
     return this.updateRequestSpecificRules(tabId, requestDetails.url, {
       action: {
-        requestHeaders: actionDetails.ignoredHeadersValue.map((header: { name: string; value: string }) => ({
+        requestHeaders: ignoredHeaderValues.map((header: { name: string; value: string }) => ({
           header: header.name,
           value: header.value,
           operation: chrome.declarativeNetRequest.HeaderOperation.SET,
@@ -72,7 +66,7 @@ class RequestProcessor {
         type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
       },
       condition: {
-        urlFilter: `|${actionDetails.redirectedUrl}`,
+        urlFilter: `|${redirectedUrl}`,
         resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
         tabIds: [tabId],
         requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
@@ -87,24 +81,6 @@ class RequestProcessor {
 
   private findMatchingRule = (rules: Rule[], url: string): Rule | undefined => {
     return rules.find((rule) => rule.pairs.some((pair) => matchSourceUrl(pair.source, url)));
-  };
-
-  private createActionDetails = (
-    matchedRule: Rule,
-    requestDetails: AJAXRequestDetails,
-    actionType: ActionType
-  ): ActionDetails => {
-    switch (actionType) {
-      case ActionType.FORWARD_IGNORED_HEADERS:
-        return {
-          type: ActionType.FORWARD_IGNORED_HEADERS,
-          ignoredHeadersValue: IGNORED_HEADERS_ON_REDIRECT.map((header) => ({
-            name: header,
-            value: requestDetails.requestHeaders[header] || requestDetails.requestHeaders[header.toLowerCase()],
-          })),
-          redirectedUrl: this.getRedirectedUrl(requestDetails.url, matchedRule),
-        };
-    }
   };
 
   private getRedirectedUrl = (requestUrl: string, matchedRule: Rule) => {
@@ -140,7 +116,7 @@ class RequestProcessor {
       [requestUrl]: ruleId,
     });
 
-    return updateSessionRules({
+    return chrome.declarativeNetRequest.updateSessionRules({
       addRules: [
         {
           id: ruleId,
@@ -151,26 +127,12 @@ class RequestProcessor {
     });
   };
 
-  onBeforeAJAXRequest = async (tabId: number, requestDetails: AJAXRequestDetails) => {
+  onBeforeAJAXRequest = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
     if (Object.values(this.cachedRules).every((rules) => rules.length === 0)) {
       return;
     }
 
-    console.time("processRequest");
-    const requestActionDetails = await this.processRequest(requestDetails);
-    console.timeEnd("processRequest");
-    if (!requestActionDetails) {
-      return;
-    }
-
-    switch (requestActionDetails.type) {
-      case ActionType.FORWARD_IGNORED_HEADERS:
-        console.time("forwardIgnoredHeaders");
-        await this.forwardIgnoredHeaders(tabId, requestDetails, requestActionDetails);
-        console.timeEnd("forwardIgnoredHeaders");
-    }
-
-    return;
+    await this.forwardIgnoredHeadersOnRedirect(tabId, requestDetails);
   };
 }
 
