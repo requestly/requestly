@@ -9,9 +9,9 @@ import parseReplaceRule from "./parseReplaceRule";
 import parseScriptRule from "./parseScriptRule";
 import parseUserAgentRule from "./parseUserAgentRule";
 
-type ExtensionRuleParser = (rule: Rule) => Rule;
+type ExtensionRuleParser = (rule: Rule) => ExtensionRule[];
 
-const parsers: { [key in RuleType]?: (rule: Rule) => ExtensionRule[] } = {
+const parsers: { [key in RuleType]?: ExtensionRuleParser } = {
   [RuleType.REDIRECT]: parseRedirectRule,
   [RuleType.CANCEL]: parseCancelRule,
   [RuleType.QUERYPARAM]: parseQueryParamRule,
@@ -22,10 +22,13 @@ const parsers: { [key in RuleType]?: (rule: Rule) => ExtensionRule[] } = {
   [RuleType.SCRIPT]: parseScriptRule,
 };
 
-export const parseExtensionRules: ExtensionRuleParser = (rule) => {
-  const extensionRules = parsers[rule.ruleType]?.(rule);
+const parseExtensionRules: ExtensionRuleParser = (rule) => {
+  return parsers[rule.ruleType]?.(rule);
+};
+
+export const migrateRuleToMV3 = (rule: Rule): Rule => {
   return {
     ...rule,
-    extensionRules,
+    extensionRules: parseExtensionRules(rule),
   };
 };

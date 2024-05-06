@@ -1,4 +1,4 @@
-import { RulePairSource, SourceKey, SourceOperator } from "../../../types/rules";
+import { Rule, RulePairSource, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
@@ -17,14 +17,19 @@ const parseRegex = (regex: string): { pattern: string; flags?: string } => {
   return { pattern: regex };
 };
 
-export const migratePathOperator = (source: RulePairSource): boolean => {
+const migratePathOperator = (source: RulePairSource): void => {
   if (source.key === SourceKey.PATH) {
     source.operator = SourceOperator.CONTAINS;
     source.key = SourceKey.URL;
-
-    return true;
   }
-  return false;
+};
+
+export const checkIfPathOperatorExists = (rule: Rule): boolean => {
+  return rule.pairs.some((pair) => pair.source.key === SourceKey.PATH);
+};
+
+export const checkIfPageUrlFilterExists = (rule: Rule): boolean => {
+  return rule.pairs.some((pair) => pair.source?.filters?.some((filter: any) => filter.pageUrl != null));
 };
 
 const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
@@ -114,7 +119,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
 
 export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   const condition: ExtensionRuleCondition = {};
-  const filters = source.filters?.filter((filter) => filter !== null);
+  const filters = source.filters?.filter((filter) => filter == null);
 
   const requestMethods = new Set<ExtensionRequestMethod>();
   const resourceTypes = new Set<ExtensionResourceType>();
@@ -140,6 +145,7 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
 };
 
 export const parseConditionFromSource = (source: RulePairSource): ExtensionRuleCondition => {
+  migratePathOperator(source);
   return {
     ...parseUrlParametersFromSource(source),
     ...parseFiltersFromSource(source),

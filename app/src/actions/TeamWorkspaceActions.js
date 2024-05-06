@@ -83,7 +83,7 @@ export const switchWorkspace = async (
 
   if (!skipStorageClearing) {
     Logger.log("Clearing storage in switchWorkspace");
-    await StorageService(appMode).clearDB();
+    await clearStorageBeforeSwitching(appMode);
   }
 
   // Just in case
@@ -114,4 +114,16 @@ export const switchWorkspace = async (
 
 export const clearCurrentlyActiveWorkspace = async (dispatch, appMode) => {
   await switchWorkspace({ teamId: null, teamName: null, teamMembersCount: null }, dispatch, null, appMode);
+};
+
+const clearStorageBeforeSwitching = async (appMode) => {
+  const mv3MigrationStatus =
+    (await StorageService(appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.MV3_MIGRATION_STATUS)) ?? {};
+  await StorageService(appMode).clearDB();
+
+  StorageService(appMode).saveRecord({
+    [GLOBAL_CONSTANTS.STORAGE_KEYS.MV3_MIGRATION_STATUS]: {
+      ...mv3MigrationStatus,
+    },
+  });
 };
