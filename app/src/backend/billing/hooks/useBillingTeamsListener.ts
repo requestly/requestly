@@ -2,13 +2,13 @@ import { useCallback, useEffect } from "react";
 import firebaseApp from "../../../firebase";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
+import { collection, getFirestore, onSnapshot, or, query, where } from "firebase/firestore";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import { getAuth } from "firebase/auth";
 import { billingActions } from "store/features/billing/slice";
 import { getBillingTeamMembersProfile } from "..";
 import Logger from "lib/logger";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 
 let unsubscribeBillingTeamsListener: () => void = null;
 
@@ -33,17 +33,17 @@ export const useBillingTeamsListener = () => {
     if (!user.loggedIn) {
       return;
     }
+    console.log({ uid: user?.details?.profile?.uid, email: user?.details?.profile?.email });
     const domain = getDomainFromEmail(user?.details?.profile?.email);
     const db = getFirestore(firebaseApp);
-    let billingTeamsQuery;
-    if (isCompanyEmail(user?.details?.profile?.email)) {
-      billingTeamsQuery = query(collection(db, "billing"), where("ownerDomain", "==", domain));
-    } else {
-      billingTeamsQuery = query(collection(db, "billing"), where(`members.${user?.details?.profile?.uid}`, "!=", null));
-    }
+    const billingTeamsQuery = query(
+      collection(db, "billing"),
+      or(where("ownerDomain", "==", domain), where(`members.${user?.details?.profile?.uid}`, "!=", null))
+    );
 
     unsubscribeBillingTeamsListener = onSnapshot(billingTeamsQuery, (billingTeams) => {
       const billingTeamDetails = billingTeams.docs.map((billingTeam) => {
+        console.log({ billingTeam: billingTeam.data() });
         return {
           ...(billingTeam.data() as BillingTeamDetails),
           id: billingTeam.id,
