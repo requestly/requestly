@@ -1,54 +1,23 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import React, { ReactNode, useMemo } from "react";
 import { Col, Empty, Input, Row, Table, TableProps } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { trackBillingTeamNoMemberFound } from "features/settings/analytics";
-import { OrgTableActions } from "./components/OrgTableActions";
-import "./index.scss";
+import "./orgMembersTable.scss";
 
 interface OrgMembersTableProps {
-  source: string;
+  isLoading: boolean;
+  searchValue: string;
+  members: any[];
+  setSearchValue: (value: string) => void;
+  actions?: (record: any) => ReactNode;
 }
 
-export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ source }) => {
-  const user = useSelector(getUserAuthDetails);
-  const [organizationMembers, setOrganizationMembers] = useState<{ total: number; users: unknown[] }>(null);
-  const [search, setSearch] = useState("");
-  const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
-
-  const searchedMembers = useMemo(() => {
-    if (!organizationMembers?.users) return [];
-    return organizationMembers?.users?.filter((member: any) => {
-      return member?.email?.includes(search) && member?.email !== user?.details?.profile?.email;
-    });
-  }, [organizationMembers?.users, search, user?.details?.profile?.email]);
-
-  useEffect(() => {
-    if (user.loggedIn && !isCompanyEmail(user?.details?.profile?.email)) {
-      trackBillingTeamNoMemberFound("personal_email", source);
-      setOrganizationMembers({ total: 0, users: [] });
-    }
-    if (user?.details?.profile?.isEmailVerified && isCompanyEmail(user?.details?.profile?.email)) {
-      getOrganizationUsers({
-        domain: getDomainFromEmail(user?.details?.profile?.email),
-      }).then((res: any) => {
-        if (res.data.total <= 1) {
-          trackBillingTeamNoMemberFound("no_org_member_available", source);
-        }
-        setOrganizationMembers(res.data);
-      });
-    }
-  }, [
-    getOrganizationUsers,
-    user.loggedIn,
-    user?.details?.profile?.email,
-    user?.details?.profile?.isEmailVerified,
-    source,
-  ]);
-
+export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
+  searchValue,
+  setSearchValue,
+  members,
+  actions,
+  isLoading,
+}) => {
   const columns: TableProps<any>["columns"] = useMemo(
     () => [
       {
@@ -83,12 +52,12 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ source }) => {
         title: "",
         key: "action",
         render: (_: any, record: any) => {
-          return <OrgTableActions record={record} />;
+          return actions?.(record);
         },
       },
     ],
 
-    []
+    [actions]
   );
 
   return (
@@ -96,8 +65,8 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ source }) => {
       <Col className="org-member-table">
         <Col className="org-member-table-header">
           <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Search members"
             className="org-member-table-header-input"
             suffix={<SearchOutlined />}
@@ -105,17 +74,17 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({ source }) => {
         </Col>
         <Table
           className="billing-table"
-          dataSource={searchedMembers}
+          dataSource={members}
           columns={columns}
           pagination={false}
           scroll={{ y: "74vh" }}
-          loading={!organizationMembers?.users}
+          loading={isLoading}
           locale={{
             emptyText: (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={
-                  !organizationMembers?.users.length ? (
+                  !members.length ? (
                     <>
                       Couldn't find member?{" "}
                       <a className="external-link" href="mailto:contact@requestly.io">
