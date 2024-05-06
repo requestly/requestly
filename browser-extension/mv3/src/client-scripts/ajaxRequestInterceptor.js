@@ -503,6 +503,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       resolveXHR(this, this.responseRule.response.value);
     } else {
       console.log("!!!debug", "XHR headers", this.requestHeaders);
+      console.time("XHR");
       await notifyOnBeforeRequest({
         url: this.requestURL,
         method: this.method,
@@ -510,6 +511,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         initiatorDomain: location.origin,
         requestHeaders: this.requestHeaders ?? {},
       });
+      console.timeEnd("XHR");
       send.apply(this, arguments);
     }
   };
@@ -592,7 +594,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
-        console.log("!!!debug", "header entries", url, Object.fromEntries([...request.headers.entries()]));
+        console.time("fetch");
         const headersObject = {};
         request.headers.forEach((value, key) => {
           console.log("!!!debug", "headers", { key, value });
@@ -605,6 +607,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           initiatorDomain: location.origin,
           requestHeaders: headersObject,
         });
+        console.timeEnd("fetch");
 
         if (requestRuleData) {
           fetchedResponse = await _fetch(request);

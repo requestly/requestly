@@ -28,22 +28,25 @@ export const onBeforeAJAXRequest = async (tabId: number, requestDetails: AJAXReq
     tabId,
     requestDetails,
   });
+  console.time("processRequest");
   const requestActionDetails = await processRequest(requestDetails);
-
+  console.timeEnd("processRequest");
   if (!requestActionDetails) {
     return;
   }
 
   switch (requestActionDetails.type) {
     case ActionType.FORWARD_IGNORED_HEADERS:
+      console.time("forwardIgnoredHeaders");
       await forwardIgnoredHeaders(tabId, requestDetails, requestActionDetails);
+      console.timeEnd("forwardIgnoredHeaders");
   }
 
   return;
 };
 
 const processRequest = async (requestDetails: AJAXRequestDetails): Promise<ActionDetails | null> => {
-  if (hasIgnoredHeadersInRequest(requestDetails.requestHeaders, requestDetails.url)) {
+  if (hasIgnoredHeadersInRequest(requestDetails.requestHeaders)) {
     const redirectRules = await getEnabledRules(RuleType.REDIRECT);
     const matchedRedirectRule = findMatchingRule(redirectRules, requestDetails.url);
 
@@ -86,13 +89,7 @@ const forwardIgnoredHeaders = async (
   });
 };
 
-const hasIgnoredHeadersInRequest = (requestHeaders: Record<string, string>, url) => {
-  if (!requestHeaders) {
-    console.log("!!!debug", "no header undefined", {
-      requestHeaders,
-      url,
-    });
-  }
+const hasIgnoredHeadersInRequest = (requestHeaders: Record<string, string>) => {
   return IGNORED_HEADERS_ON_REDIRECT.some((header) => requestHeaders[header] || requestHeaders[header.toLowerCase()]);
 };
 
