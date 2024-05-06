@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { EXTENSION_MESSAGES, LINKS } from "../../../constants";
+import React, { useCallback } from "react";
+import { LINKS } from "../../../constants";
 import { Rule } from "../../../types";
 import RuleItem from "../common/RuleItem";
 import { updateItemInCollection } from "../../utils";
@@ -8,27 +8,11 @@ import { PrimaryActionButton } from "../common/PrimaryActionButton";
 import { EmptyPopupTab } from "../PopupTabs/EmptyPopupTab";
 
 interface ExecutedRulesProps {
-  setExecutedRulesCount: (count: number) => void;
+  executedRules: Rule[];
+  setExecutedRules: React.Dispatch<React.SetStateAction<Rule[]>>;
 }
 
-const ExecutedRules: React.FC<ExecutedRulesProps> = ({ setExecutedRulesCount }) => {
-  const [executedRules, setExecutedRules] = useState<Rule[]>([]);
-
-  useEffect(() => {
-    chrome.tabs.query({ currentWindow: true, active: true }, ([activeTab]) => {
-      chrome.runtime.sendMessage(
-        {
-          tabId: activeTab.id,
-          action: EXTENSION_MESSAGES.GET_EXECUTED_RULES,
-        },
-        (rules) => {
-          setExecutedRules(rules);
-          setExecutedRulesCount(rules.length);
-        }
-      );
-    });
-  }, []);
-
+const ExecutedRules: React.FC<ExecutedRulesProps> = ({ executedRules, setExecutedRules }) => {
   const updateExecutedRule = useCallback((updatedRule: Rule) => {
     setExecutedRules((executedRules) => updateItemInCollection<Rule>(executedRules, updatedRule));
   }, []);

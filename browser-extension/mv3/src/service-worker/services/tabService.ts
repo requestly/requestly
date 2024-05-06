@@ -94,7 +94,7 @@ class TabService {
   addOrUpdateTab(tab: TabData) {
     // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
     if (tab.id !== chrome.tabs.TAB_ID_NONE) {
-      this.map[tab.id] = tab;
+      this.map[tab.id] = { ...this.map[tab.id], ...tab };
     }
   }
 
@@ -142,10 +142,33 @@ class TabService {
     chrome.tabs.remove(tabId);
   }
 
+  ensureTabLoadingComplete(tabId: TabId): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const tab = this.getTab(tabId);
+
+      if (tab) {
+        if (tab.status === "complete") {
+          resolve();
+        } else {
+          const handler = (currentTabId: TabId, tabChangeInfo: chrome.tabs.TabChangeInfo) => {
+            if (currentTabId === tabId && tabChangeInfo.status === "complete") {
+              chrome.tabs.onUpdated.removeListener(handler);
+              resolve();
+            }
+          };
+          chrome.tabs.onUpdated.addListener(handler);
+        }
+      } else {
+        reject();
+      }
+    });
+  }
+
   setData(tabId: TabId, key: any, value: any) {
     const tab = this.getTab(tabId);
 
     if (!tab) {
+      this.addOrUpdateTab({ id: tabId, [DataScope.TAB]: { [key]: value } } as TabData);
       return;
     }
     // null safe for firefox as in firefox get/set happen before tab updation whereas
@@ -182,4 +205,6 @@ export const tabService = new TabService();
 
 export const TAB_SERVICE_DATA = {
   SESSION_RECORDING: "sessionRecording",
+  TEST_RULE_DATA: "testRuleData",
+  APPLIED_RULE_DETAILS: "appliedRuleDetails",
 };
