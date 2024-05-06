@@ -33,7 +33,6 @@ export const useBillingTeamsListener = () => {
     if (!user.loggedIn) {
       return;
     }
-    console.log({ uid: user?.details?.profile?.uid, email: user?.details?.profile?.email });
     const domain = getDomainFromEmail(user?.details?.profile?.email);
     const db = getFirestore(firebaseApp);
     const billingTeamsQuery = query(
@@ -43,7 +42,6 @@ export const useBillingTeamsListener = () => {
 
     unsubscribeBillingTeamsListener = onSnapshot(billingTeamsQuery, (billingTeams) => {
       const billingTeamDetails = billingTeams.docs.map((billingTeam) => {
-        console.log({ billingTeam: billingTeam.data() });
         return {
           ...(billingTeam.data() as BillingTeamDetails),
           id: billingTeam.id,
