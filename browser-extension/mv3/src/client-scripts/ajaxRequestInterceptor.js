@@ -291,7 +291,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     return Promise.race([
       new Promise((resolve) => {
-        setTimeout(resolve, 1000);
+        setTimeout(resolve, 2000);
       }),
       new Promise((resolve) => {
         onBeforeAjaxRequestAckHandler = (event) => {
