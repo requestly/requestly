@@ -1,0 +1,14 @@
+.add-members-table-wrapper {
+  .org-member-table {
+    border: none;
+
+    .org-member-table-header {
+      padding: 1rem;
+      border-bottom: 0;
+    }
+
+    .ant-table-empty .ant-table-tbody > tr.ant-table-placeholder td {
+      border-bottom: none;
+    }
+  }
+}

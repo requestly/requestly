@@ -15,11 +15,11 @@ export const OrgMembersView = () => {
   const [searchValue, setSearchValue] = useState("");
 
   const searchedMembers = useMemo(() => {
-    if (!organizationMembers?.users) return [];
-    return organizationMembers?.users?.filter((member: any) => {
+    if (!organizationMembers) return [];
+    return organizationMembers?.filter((member: any) => {
       return member?.email?.includes(searchValue) && member?.email !== user?.details?.profile?.email;
     });
-  }, [organizationMembers?.users, searchValue, user?.details?.profile?.email]);
+  }, [organizationMembers, searchValue, user?.details?.profile?.email]);
 
   return (
     <Col className="org-members-table-container">

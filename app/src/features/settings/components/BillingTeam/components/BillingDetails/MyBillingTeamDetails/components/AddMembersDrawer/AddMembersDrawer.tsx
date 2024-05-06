@@ -3,6 +3,7 @@ import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { Col, Drawer, Row } from "antd";
 import { AddMembersTable } from "./components/AddMembersTable/AddMembersTable";
 import "./addMembersDrawer.scss";
+import { useFetchOrgMembers } from "features/settings/components/OrgMembers/hooks/useFetchOrganizationMembers";
 
 interface AppMembersDrawerProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface AppMembersDrawerProps {
 
 export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onClose }) => {
   const [searchValue, setSearchValue] = useState("");
+  const { isLoading, organizationMembers } = useFetchOrgMembers();
 
   return (
     <Drawer
@@ -29,7 +31,12 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
         </Col>
       </Row>
       <Col className="billing-team-members-drawer-body">
-        <AddMembersTable searchValue={searchValue} setSearchValue={setSearchValue} />
+        <AddMembersTable
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+          isLoading={isLoading}
+          members={organizationMembers}
+        />
       </Col>
     </Drawer>
   );

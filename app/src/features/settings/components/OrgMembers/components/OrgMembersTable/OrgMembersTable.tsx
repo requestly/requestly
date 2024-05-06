@@ -9,15 +9,17 @@ interface OrgMembersTableProps {
   searchValue: string;
   members: OrgMember[];
   setSearchValue: (value: string) => void;
-  actions?: (record: OrgMember) => ReactNode;
+  memberActions?: (record: OrgMember) => ReactNode;
+  emptyView?: ReactNode;
 }
 
 export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   searchValue,
   setSearchValue,
   members,
-  actions,
+  memberActions,
   isLoading,
+  emptyView,
 }) => {
   const columns: TableProps<OrgMember>["columns"] = useMemo(
     () => [
@@ -53,12 +55,12 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
         title: "",
         key: "action",
         render: (_: any, record) => {
-          return actions?.(record);
+          return memberActions?.(record);
         },
       },
     ],
 
-    [actions]
+    [memberActions]
   );
 
   return (
@@ -81,7 +83,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
           scroll={{ y: "74vh" }}
           loading={isLoading}
           locale={{
-            emptyText: (
+            emptyText: emptyView ?? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={

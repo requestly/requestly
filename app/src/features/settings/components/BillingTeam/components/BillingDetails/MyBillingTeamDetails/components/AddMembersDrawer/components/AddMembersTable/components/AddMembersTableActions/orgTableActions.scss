@@ -1,0 +1,21 @@
+.billing-team-members-add-btn.ant-btn {
+  gap: 8px;
+  color: var(--neutrals-gray-300) !important;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: var(--white) !important;
+    border-color: var(--surface-3) !important;
+  }
+}
+
+.billing-team-members-added-label {
+  color: var(--neutrals-gray-300);
+  padding-right: 5px;
+
+  & svg {
+    position: relative;
+    top: 3px;
+  }
+}

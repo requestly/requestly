@@ -3,31 +3,42 @@ import { OrgMembersTable } from "features/settings/components/OrgMembers/compone
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { OrgTableActions } from "./components/AddMembersTableActions/OrgTableActions";
-import { useFetchOrgMembers } from "features/settings/components/OrgMembers/hooks/useFetchOrganizationMembers";
+import { OrgMember } from "features/settings/components/OrgMembers/types";
+import { EmptyMembersTableView } from "./components/EmptyMembersTableView/EmptyMembersTableView";
+import "./addMembersTable.scss";
 
 interface AddMembersTableProps {
   searchValue: string;
   setSearchValue: (value: string) => void;
+  isLoading: boolean;
+  members: OrgMember[];
 }
 
-export const AddMembersTable: React.FC<AddMembersTableProps> = ({ searchValue, setSearchValue }) => {
+export const AddMembersTable: React.FC<AddMembersTableProps> = ({
+  searchValue,
+  setSearchValue,
+  members,
+  isLoading,
+}) => {
   const user = useSelector(getUserAuthDetails);
-  const { isLoading, organizationMembers } = useFetchOrgMembers();
 
   const searchedMembers = useMemo(() => {
-    if (!organizationMembers?.users) return [];
-    return organizationMembers?.users?.filter((member: any) => {
+    if (!members) return [];
+    return members?.filter((member: any) => {
       return member?.email?.includes(searchValue) && member?.email !== user?.details?.profile?.email;
     });
-  }, [organizationMembers?.users, searchValue, user?.details?.profile?.email]);
+  }, [members, searchValue, user?.details?.profile?.email]);
 
   return (
-    <OrgMembersTable
-      isLoading={isLoading}
-      searchValue={searchValue}
-      setSearchValue={setSearchValue}
-      members={searchedMembers}
-      actions={(record) => <OrgTableActions record={record} />}
-    />
+    <div className="add-members-table-wrapper">
+      <OrgMembersTable
+        isLoading={isLoading}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        members={searchedMembers}
+        memberActions={(record) => <OrgTableActions record={record} />}
+        emptyView={<EmptyMembersTableView searchValue={searchValue} />}
+      />
+    </div>
   );
 };
