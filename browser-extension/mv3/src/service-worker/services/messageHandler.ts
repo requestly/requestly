@@ -2,7 +2,7 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
 import { initClientHandler } from "./clientHandler";
 import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
-import { getExecutedRules } from "./rulesManager";
+import { getExecutedRules, handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -19,6 +19,11 @@ import {
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
 import { requestProcessor } from "./requestProcessor";
+import {
+  handleTestRuleOnClientPageLoad,
+  launchUrlAndStartRuleTesting,
+  saveTestRuleResult,
+} from "./testThisRuleHandler";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -47,6 +52,8 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
+        handleRuleExecutionsOnClientPageLoad(sender.tab.id);
+        handleTestRuleOnClientPageLoad(sender.tab);
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
 
@@ -63,7 +70,7 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.START_RECORDING_EXPLICITLY:
-        startRecordingExplicitly(message.tab, message.showWidget);
+        startRecordingExplicitly(message.tab ?? sender.tab, message.showWidget);
         break;
 
       case EXTENSION_MESSAGES.START_RECORDING_ON_URL:
@@ -113,6 +120,14 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
         requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
         return true;
+
+      case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
+        launchUrlAndStartRuleTesting(message, sender.tab.id);
+        break;
+
+      case EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
+        saveTestRuleResult(message, sender.tab);
+        break;
     }
 
     return false;

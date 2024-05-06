@@ -27,6 +27,9 @@ export const EXTENSION_MESSAGES = {
   INIT_SESSION_RECORDER: "initSessionRecorder",
   CLIENT_PAGE_LOADED: "clientPageLoaded",
   ON_BEFORE_AJAX_REQUEST: "onBeforeAjaxRequest",
+  SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
+  NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
+  TEST_RULE_ON_URL: "testRuleOnUrl",
 };
 
 export const CLIENT_MESSAGES = {
@@ -37,8 +40,7 @@ export const CLIENT_MESSAGES = {
   NOTIFY_SESSION_RECORDING_STOPPED: "notifySessionRecordingStopped",
   IS_RECORDING_SESSION: "isRecordingSession",
   GET_TAB_SESSION: "getTabSession",
-  GET_APPLIED_REQUEST_RESPONSE_RULES: "getAppliedRequestResponseRules",
-  GET_APPLIED_SCRIPT_RULES: "getAppliedScriptRules",
+  GET_APPLIED_RULES: "getAppliedRules",
   UPDATE_APPLIED_SCRIPT_RULES: "updateAppliedScriptRules",
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
@@ -46,6 +48,9 @@ export const CLIENT_MESSAGES = {
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
   ON_BEFORE_AJAX_REQUEST_PROCESSED: "onBeforeAjaxRequest:processed",
+  START_EXPLICIT_RULE_TESTING: "startExplicitRuleTesting",
+  START_IMPLICIT_RULE_TESTING: "startImplicitRuleTesting",
+  SYNC_APPLIED_RULES: "syncAppliedRules",
 };
 
 export const STORAGE_TYPE = "local";
@@ -68,6 +73,8 @@ export const RULE_TITLES = {
 export const STORAGE_KEYS = {
   LAST_SYNCED_TS: "last-synced-ts",
   LAST_UPDATED_TS: "last-updated-ts",
+  TEST_REPORTS: "testReports",
+  IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
 };
 
 export const LINKS = {

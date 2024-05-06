@@ -73,10 +73,12 @@ export interface SessionRecordingConfig {
 }
 
 export interface RulePair {
+  id: string;
   source: UrlSource;
   destination?: string;
   to?: string;
   from?: string;
+  modifications?: any;
 }
 
 export interface Rule extends Record<string, unknown> {
