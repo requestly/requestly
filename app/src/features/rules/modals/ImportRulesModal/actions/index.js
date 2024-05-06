@@ -7,7 +7,7 @@ import { runRuleMigrations } from "utils/rules/ruleMigrations";
 import APP_CONSTANTS from "config/constants";
 import { RecordStatus } from "features/rules";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
-import { parseExtensionRules } from "modules/extension/ruleParser";
+import { migrateRuleToMV3 } from "modules/extension/ruleParser";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
@@ -85,7 +85,7 @@ export const processDataToImport = (incomingArray, user, allRules, overwrite = t
   const groups = data.groups.filter((object) => isObjectValid(object));
 
   if (isExtensionManifestVersion3()) {
-    rules = rules.map((rule) => parseExtensionRules(rule));
+    rules = rules.map((rule) => migrateRuleToMV3(rule));
   }
 
   if (!overwrite) {
