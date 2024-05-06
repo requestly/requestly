@@ -19,7 +19,6 @@ class RequestProcessor {
   };
 
   private updateCachedRules = async () => {
-    console.log("!!!debug", "cacheRules", this.cachedRules);
     this.cachedRules.redirectRules = await getEnabledRules(RuleType.REDIRECT);
     this.cachedRules.replaceRules = await getEnabledRules(RuleType.REPLACE);
   };
@@ -42,8 +41,6 @@ class RequestProcessor {
       [...this.cachedRules.redirectRules, ...this.cachedRules.replaceRules],
       requestDetails.url
     );
-
-    console.log("!!!debug", "matched rule", matchedRule);
 
     if (!matchedRule) {
       return;

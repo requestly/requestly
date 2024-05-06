@@ -502,8 +502,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule.response)) {
       resolveXHR(this, this.responseRule.response.value);
     } else {
-      //TODO @nafees87n remove log
-      console.time("XHR");
       await notifyOnBeforeRequest({
         url: this.requestURL,
         method: this.method,
@@ -511,7 +509,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         initiatorDomain: location.origin,
         requestHeaders: this.requestHeaders ?? {},
       });
-      console.timeEnd("XHR");
       send.apply(this, arguments);
     }
   };
@@ -594,8 +591,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
-        //TODO @nafees87n remove log
-        console.time("fetch");
         const headersObject = {};
         request.headers.forEach((value, key) => {
           headersObject[key] = value;
@@ -607,7 +602,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           initiatorDomain: location.origin,
           requestHeaders: headersObject,
         });
-        console.timeEnd("fetch");
 
         if (requestRuleData) {
           fetchedResponse = await _fetch(request);
