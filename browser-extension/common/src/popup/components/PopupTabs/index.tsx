@@ -8,7 +8,7 @@ import ExternalLinkIcon from "../../../../resources/icons/externalLink.svg";
 import ArrowIcon from "../../../../resources/icons/arrowDown.svg";
 import { PushpinOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { icons } from "../../ruleTypeIcons";
-import { RuleType } from "../../../types";
+import { Rule, RuleType } from "../../../types";
 import { EVENT, sendEvent } from "../../events";
 import config from "../../../config";
 import "./popupTabs.css";
@@ -21,8 +21,8 @@ export enum PopupTabKey {
 }
 
 const PopupTabs: React.FC = () => {
-  const [executedRulesCount, setExecutedRulesCount] = useState(0);
   const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(false);
+  const [executedRules, setExecutedRules] = useState<Rule[]>([]);
   const [activeTabKey, setActiveTabKey] = useState(PopupTabKey.PINNED_RULES);
 
   useEffect(() => {
@@ -33,9 +33,9 @@ const PopupTabs: React.FC = () => {
           action: EXTENSION_MESSAGES.GET_EXECUTED_RULES,
         },
         (rules) => {
-          setExecutedRulesCount(rules.length);
           if (rules.length) {
             setActiveTabKey(PopupTabKey.EXECUTED_RULES);
+            setExecutedRules(rules);
           }
         }
       );
@@ -70,13 +70,13 @@ const PopupTabs: React.FC = () => {
           <span>
             <CheckCircleOutlined />
             Executed rules
-            <Badge size="small" count={executedRulesCount} overflowCount={20} className="popup-tab-badge" />
+            <Badge size="small" count={executedRules.length} overflowCount={20} className="popup-tab-badge" />
           </span>
         ),
-        children: <ExecutedRules setExecutedRulesCount={setExecutedRulesCount} />,
+        children: <ExecutedRules executedRules={executedRules} setExecutedRules={setExecutedRules} />,
       },
     ];
-  }, [executedRulesCount]);
+  }, [executedRules]);
 
   const handleRulesDropdownItemClick = (url: string, ruleType?: RuleType) => {
     if (ruleType) {
