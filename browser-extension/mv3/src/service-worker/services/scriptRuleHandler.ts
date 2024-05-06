@@ -4,6 +4,7 @@ import { RuleType, ScriptObject, ScriptRulePair } from "common/types";
 import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectScript } from "./utils";
+import { TAB_SERVICE_DATA, tabService } from "./tabService";
 
 export const applyScriptRules = async (tabId: number, frameId: number, url: string) => {
   if (isBlacklistedURL(url)) {
@@ -35,5 +36,10 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
       action: CLIENT_MESSAGES.UPDATE_APPLIED_SCRIPT_RULES,
       ruleIds: Array.from(appliedScriptRuleIds),
     });
+
+    const appliedRuleDetails = tabService.getData(tabId, TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, []);
+    appliedRuleDetails.push(...Array.from(appliedScriptRuleIds));
+
+    tabService.setData(tabId, TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, appliedRuleDetails);
   }
 };

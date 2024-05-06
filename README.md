@@ -20,9 +20,9 @@
   </a>
 </p>
 
-<h3 align="center">⚡ Build, Test & Debug web and mobile apps 10x faster </h2>
+<h3 align="center">⚡ HTTP Interceptor for browsers </h2>
 
-**Bring the power of Charles Proxy, Fiddler & Postman together** with beautiful, modern UI & collaboration features. Available as a browser extension on all major browsers & desktop apps on all platforms. [Install Requestly](https://requestly.com/downloads)
+**Requestly was built to save developers time by intercepting and modifying HTTP Requests. It has now developed into an open-source alternative to Charles Proxy and Telerik Fiddler that works directly in browsers without VPN and proxy Issues. It is used by more than 200,000+ front-end developers and 11,000+ companies worldwide.**
 
 
 

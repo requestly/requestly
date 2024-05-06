@@ -67,3 +67,13 @@ export const trackRulesSelected = (num_rules: number) => {
   const params = { num_rules };
   trackEvent(RULES.RULES_SELECTED, params);
 };
+
+export const trackRulesListLoaded = (
+  num_rules: number,
+  num_active_rules: number,
+  num_active_premium_rules: number,
+  num_groups: number
+) => {
+  const params = { num_rules, num_active_rules, num_active_premium_rules, num_groups };
+  trackEvent(RULES.RULES_LIST_LOADED, params);
+};
