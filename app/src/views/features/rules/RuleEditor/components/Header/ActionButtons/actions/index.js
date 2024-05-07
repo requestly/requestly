@@ -3,7 +3,7 @@ import { redirectToRules } from "../../../../../../../../utils/RedirectionUtils"
 //EXTERNALS
 import { StorageService } from "../../../../../../../../init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
-import { migrateRuleToMV3 } from "modules/extension/ruleParser";
+import { migrateRuleToMV3 } from "modules/extension/utils";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { trackErrorInRuleCreation, trackRuleEditorClosed } from "modules/analytics/events/common/rules";
 import { cloneDeep, snakeCase } from "lodash";

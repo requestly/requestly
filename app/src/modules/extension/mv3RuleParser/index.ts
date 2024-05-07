@@ -22,13 +22,6 @@ const parsers: { [key in RuleType]?: ExtensionRuleParser } = {
   [RuleType.SCRIPT]: parseScriptRule,
 };
 
-const parseExtensionRules: ExtensionRuleParser = (rule) => {
+export const parseExtensionRules: ExtensionRuleParser = (rule) => {
   return parsers[rule.ruleType]?.(rule);
-};
-
-export const migrateRuleToMV3 = (rule: Rule): Rule => {
-  return {
-    ...rule,
-    extensionRules: parseExtensionRules(rule),
-  };
 };
