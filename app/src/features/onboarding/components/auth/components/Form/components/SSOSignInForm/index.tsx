@@ -8,7 +8,7 @@ import Logger from "lib/logger";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { getDomainFromEmail, getEmailType, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
-import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
+import { trackLoginAttemptedEvent, trackLoginFailedEvent } from "modules/analytics/events/common/auth/login";
 import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import "./index.scss";
 import { getSSOProviderId } from "backend/auth/sso";
@@ -52,9 +52,16 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
     setIsNoConnectionFoundCardVisible(false);
 
     if (providerId) {
-      await loginWithSSO(providerId);
+      await loginWithSSO(providerId, email);
     } else {
       setIsNoConnectionFoundCardVisible(true);
+      trackLoginFailedEvent({
+        auth_provider: AUTH_PROVIDERS.SSO,
+        email,
+        place: window.location.href,
+        source,
+        error_message: "SSO connection not found",
+      });
       const captureSSOInterest = httpsCallable(getFunctions(), "auth-captureSSOInterest");
 
       captureSSOInterest({ email })

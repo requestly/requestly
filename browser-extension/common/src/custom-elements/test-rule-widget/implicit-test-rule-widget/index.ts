@@ -66,7 +66,7 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
       return `
         <div class="applied-rule-list-item">
           <div class="applied-rule-item-details">
-            <span class="applied-rule-icon">${getRuleTypeIcon(rule.ruleType)}</span> 
+            <span class="applied-rule-icon">${getRuleTypeIcon(rule.ruleType)}</span>
             <span class="applied-rule-name">${rule.ruleName}</span>
           </div>
          <span class="applied-rule-arrow-icon">${arrowRightIcon}</span>

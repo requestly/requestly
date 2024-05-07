@@ -1,4 +1,4 @@
-import { initMessageHandler } from "./messageHandler";
+import { initMessageHandler, initExtensionMessageListener } from "./messageHandler";
 
 document.documentElement.setAttribute("rq-ext-version", chrome.runtime.getManifest()["version"]);
 
@@ -9,3 +9,4 @@ document.documentElement.setAttribute("rq-ext-mv", "3");
 document.documentElement.setAttribute("rq-ext-id", chrome.runtime.id);
 
 initMessageHandler();
+initExtensionMessageListener();
