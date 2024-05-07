@@ -24,6 +24,18 @@ const migratePathOperator = (source: RulePairSource): void => {
   }
 };
 
+const migratePageURLtoPageDomain = (source: RulePairSource): void => {
+  const sourceFilters = source.filters[0];
+  if (sourceFilters.pageUrl) {
+    let pageDomain = [];
+    try {
+      pageDomain.push(new URL(sourceFilters.pageUrl.value).hostname);
+    } catch (e) {
+      // Do Nothing
+    }
+  }
+};
+
 export const checkIfPathOperatorExists = (rule: Rule): boolean => {
   return rule.pairs.some((pair) => pair.source.key === SourceKey.PATH);
 };
@@ -146,6 +158,7 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
 
 export const parseConditionFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   migratePathOperator(source);
+  migratePageURLtoPageDomain(source);
   return {
     ...parseUrlParametersFromSource(source),
     ...parseFiltersFromSource(source),
