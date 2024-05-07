@@ -268,7 +268,7 @@ export const useMocksTableColumns = ({
             },
             label: (
               <div className="mock-action">
-                <MdOutlineRemoveCircleOutline /> Remove from Collection
+                <MdOutlineRemoveCircleOutline /> Remove from collection
               </div>
             ),
           },
