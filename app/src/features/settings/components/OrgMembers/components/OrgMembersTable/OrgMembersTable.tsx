@@ -12,6 +12,7 @@ interface OrgMembersTableProps {
   memberActions?: (record: OrgMember) => ReactNode;
   tableActions?: ReactNode;
   emptyView?: ReactNode;
+  actions?: (member: OrgMember) => ReactNode;
 }
 
 export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
@@ -29,21 +30,21 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
         title: "Member",
         key: "member",
         width: 350,
-        render: (_: any, record) => {
+        render: (_: any, member) => {
           return (
             <Row align="middle" gutter={8}>
               <Col>
                 <img
                   className="org-member-avatar"
                   src={
-                    record?.photoURL.length
-                      ? record?.photoURL
+                    member?.photoURL.length
+                      ? member?.photoURL
                       : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
                   }
-                  alt={record?.email}
+                  alt={member?.email}
                 />
               </Col>
-              <Col className="org-member-email">{record?.email}</Col>
+              <Col className="org-member-email">{member?.email}</Col>
             </Row>
           );
         },
@@ -56,8 +57,8 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
       {
         title: "",
         key: "action",
-        render: (_: any, record) => {
-          return memberActions?.(record);
+        render: (_: any, member) => {
+          return memberActions?.(member);
         },
       },
     ],
