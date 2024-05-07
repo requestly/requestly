@@ -26,7 +26,7 @@ const migratePathOperator = (source: RulePairSource): void => {
 
 const migratePageURLtoPageDomain = (source: RulePairSource): void => {
   const sourceFilters = source.filters[0];
-  if (sourceFilters.pageUrl) {
+  if (sourceFilters.pageUrl && sourceFilters.pageUrl.value) {
     let pageDomain = [];
     try {
       pageDomain.push(new URL(sourceFilters.pageUrl.value).hostname);
@@ -131,10 +131,11 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
 
 export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   const condition: ExtensionRuleCondition = {};
-  const filters = source.filters?.filter((filter) => filter == null);
+  const filters = source.filters?.filter((filter) => filter != null);
 
   const requestMethods = new Set<ExtensionRequestMethod>();
   const resourceTypes = new Set<ExtensionResourceType>();
+  let pageDomains: string[];
 
   filters?.forEach((filter) => {
     filter?.requestMethod?.forEach((method) => {
@@ -143,6 +144,9 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
     filter?.resourceType?.forEach((resourceType) => {
       resourceTypes.add(resourceType as ExtensionResourceType);
     });
+    if (filter?.pageDomains?.length) {
+      pageDomains = filter?.pageDomains;
+    }
   });
 
   if (requestMethods.size) {
@@ -151,6 +155,10 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
 
   if (resourceTypes.size) {
     condition.resourceTypes = Array.from(resourceTypes);
+  }
+
+  if (pageDomains?.length) {
+    condition.initiatorDomains = pageDomains;
   }
 
   return condition;
