@@ -72,11 +72,11 @@ export const MocksTable: React.FC<MocksTableProps> = ({
       size="middle"
       rowKey="id"
       className="rq-mocks-list-table"
-      customRowClassName={(record) =>
-        `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"} ${
-          record.recordType === MockRecordType.MOCK ? "mock-row" : "collection-row"
-        }`
-      }
+      customRowClassName={(record) => {
+        return `rq-mocks-list-table-row ${record.isFavourite ? "starred" : "unstarred"} ${
+          record.recordType === MockRecordType.COLLECTION ? "collection-row" : "mock-row"
+        }`;
+      }}
       // @ts-ignore
       columns={columns}
       data={contentTableAdaptedRecords}
