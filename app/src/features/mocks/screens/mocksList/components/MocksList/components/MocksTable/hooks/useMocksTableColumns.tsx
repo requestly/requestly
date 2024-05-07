@@ -171,18 +171,17 @@ export const useMocksTableColumns = ({
         </div>
       ),
       width: 120,
-      responsive: ["lg"],
       className: "text-gray",
       render: (_: any, record: RQMockSchema) => {
         return (
-          <>
+          <div className="last-modified">
             {moment(record.updatedTs).format("MMM DD, YYYY") + (record.isOldMock ? "." : "")}{" "}
             {isWorkspaceMode && (
               <>
                 by <UserIcon uid={record.lastUpdatedBy ?? record.createdBy} />
               </>
             )}
-          </>
+          </div>
         );
       },
     },
@@ -242,10 +241,10 @@ export const useMocksTableColumns = ({
               });
             },
             label: (
-              <Row>
+              <div className="mock-action">
                 <RiFileCopy2Line />
-                Copy
-              </Row>
+                Copy URL
+              </div>
             ),
           },
           {
@@ -255,10 +254,10 @@ export const useMocksTableColumns = ({
               handleEditAction?.(record.id, record.isOldMock);
             },
             label: (
-              <Row>
+              <div className="mock-action">
                 <EditOutlined />
                 Edit
-              </Row>
+              </div>
             ),
           },
           {
@@ -268,9 +267,9 @@ export const useMocksTableColumns = ({
               removeMocksFromCollectionAction([record], forceRender);
             },
             label: (
-              <Row>
-                <MdOutlineRemoveCircleOutline /> Remove
-              </Row>
+              <div className="mock-action">
+                <MdOutlineRemoveCircleOutline /> Remove from Collection
+              </div>
             ),
           },
           {
@@ -280,9 +279,9 @@ export const useMocksTableColumns = ({
               updateMockCollectionModalAction(record);
             },
             label: (
-              <Row>
+              <div className="mock-action">
                 <MdOutlineDriveFileMove /> Move
-              </Row>
+              </div>
             ),
           },
           {
@@ -293,10 +292,10 @@ export const useMocksTableColumns = ({
               deleteMockModalAction(record);
             },
             label: (
-              <Row>
+              <div className="mock-action">
                 <RiDeleteBinLine />
                 Delete
-              </Row>
+              </div>
             ),
           },
         ];
@@ -325,7 +324,7 @@ export const useMocksTableColumns = ({
           <Dropdown
             menu={{ items: isRecordMockCollection(record) ? collectionActions : mockActions }}
             trigger={["click"]}
-            overlayClassName="rule-more-actions-dropdown"
+            overlayClassName="mocks-more-actions-dropdown"
           >
             <Button
               type="text"
