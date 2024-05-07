@@ -255,10 +255,60 @@
         }
       }
     }
+
+    .last-modified {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 4px;
+      margin-left: 13px;
+    }
   }
 }
 
 .mock-description {
   font-size: 13px;
   line-height: 14px;
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu {
+  width: 215px;
+  padding: 4px;
+  background: var(--requestly-color-surface-0);
+  border: 1px solid var(--requestly-color-surface-1);
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0px 8px 12px 0px var(--requestly-color-black-t-20);
+
+  .mock-action {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+  width: 205px;
+  height: 36px;
+  margin: 0;
+  padding: 8px 12px;
+  color: var(--requestly-color-text-default);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  display: flex;
+  align-items: center;
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:hover {
+  border-radius: 4px;
+  background: var(--requestly-color-surface-1);
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
+  color: var(--danger);
 }
