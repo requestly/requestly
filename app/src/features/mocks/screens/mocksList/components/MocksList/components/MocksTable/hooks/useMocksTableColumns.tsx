@@ -264,11 +264,11 @@ export const useMocksTableColumns = ({
             key: 2,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              removeMocksFromCollectionAction([record], forceRender);
+              updateMockCollectionModalAction(record);
             },
             label: (
               <div className="mock-action">
-                <MdOutlineRemoveCircleOutline /> Remove from collection
+                <MdOutlineDriveFileMove /> Move
               </div>
             ),
           },
@@ -276,11 +276,11 @@ export const useMocksTableColumns = ({
             key: 3,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              updateMockCollectionModalAction(record);
+              removeMocksFromCollectionAction([record], forceRender);
             },
             label: (
               <div className="mock-action">
-                <MdOutlineDriveFileMove /> Move
+                <MdOutlineRemoveCircleOutline /> Remove from collection
               </div>
             ),
           },
