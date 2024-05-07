@@ -2,7 +2,7 @@
   .rq-mocks-list-table.rq-content-list-table {
     .ant-table-row-indent + .ant-table-row-expand-icon {
       margin-top: 1px;
-      margin-right: 18px;
+      margin-right: 12px;
     }
 
     .rq-col-title {
@@ -60,7 +60,7 @@
         }
 
         .mock-star-btn {
-          margin-right: -4px;
+          margin-right: -10px;
         }
       }
 
@@ -72,7 +72,7 @@
         align-items: center;
         gap: 6px;
         font-size: 14px;
-        margin-right: 11px;
+        margin-right: 7px;
         flex-shrink: 0;
 
         .unstarred {

@@ -55,8 +55,7 @@ export const useMocksTableColumns = ({
     {
       key: "isFavourite",
       dataIndex: "isFavourite",
-      title: "",
-      width: 50,
+      width: 20,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
 
