@@ -258,7 +258,6 @@ export const useMocksTableColumns = ({
           },
           {
             key: 2,
-            disabled: !record.collectionId,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
               updateMocksCollectionAction([record]);
