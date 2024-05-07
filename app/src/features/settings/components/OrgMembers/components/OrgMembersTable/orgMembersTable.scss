@@ -9,9 +9,6 @@
   &-header {
     padding: 8px 1rem;
     border-bottom: 1px solid var(--surface-2);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 
     &-input {
       width: 280px;
@@ -27,6 +24,11 @@
         }
       }
     }
+  }
+  .org-members-table-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
@@ -56,5 +58,11 @@
 
   .ant-spin-nested-loading > div > .ant-spin {
     background: var(--background);
+  }
+
+  .org-members-table-count {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+    padding-top: 8px;
   }
 }
