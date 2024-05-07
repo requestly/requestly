@@ -22,6 +22,7 @@ import {
 } from "modules/analytics/events/features/testUrlModal";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import "./RequestSourceRow.css";
+import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 
 const { Text } = Typography;
 
@@ -126,23 +127,28 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const renderSourceKeys = useMemo(() => {
     return (
       <Menu>
-        {sourceKeys.map(({ id, title, ruleKey }) => (
-          <Menu.Item
-            key={id}
-            onClick={(event) => {
-              dispatch(
-                actions.updateRulePairAtGivenPath({
-                  pairIndex,
-                  updates: {
-                    [APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS]: ruleKey,
-                  },
-                })
-              );
-            }}
-          >
-            {title}
-          </Menu.Item>
-        ))}
+        {sourceKeys.map(({ id, title, ruleKey }) => {
+          if (isExtensionManifestVersion3() && ruleKey === GLOBAL_CONSTANTS.RULE_KEYS.PATH) {
+            return null;
+          }
+          return (
+            <Menu.Item
+              key={id}
+              onClick={(event) => {
+                dispatch(
+                  actions.updateRulePairAtGivenPath({
+                    pairIndex,
+                    updates: {
+                      [APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS]: ruleKey,
+                    },
+                  })
+                );
+              }}
+            >
+              {title}
+            </Menu.Item>
+          );
+        })}
       </Menu>
     );
   }, [dispatch, sourceKeys, pairIndex]);

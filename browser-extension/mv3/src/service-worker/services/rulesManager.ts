@@ -14,6 +14,10 @@ interface RuleIdsMap {
 }
 
 const getExecutedRuleIds = async (tabId: number): Promise<string[]> => {
+  console.log("!!!debug", "tab map", tabService.getTabs());
+  chrome.declarativeNetRequest.getSessionRules().then((rules) => {
+    console.log("!!!debug", "sessino rules", rules);
+  });
   return chrome.tabs.sendMessage(tabId, {
     action: CLIENT_MESSAGES.GET_APPLIED_RULES,
   });
