@@ -271,7 +271,7 @@
 }
 
 .mocks-more-actions-dropdown .ant-dropdown-menu {
-  width: 215px;
+  width: max-content;
   padding: 4px;
   background: var(--requestly-color-surface-0);
   border: 1px solid var(--requestly-color-surface-1);
@@ -286,7 +286,7 @@
 }
 
 .mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
-  width: 205px;
+  width: 100%;
   height: 36px;
   margin: 0;
   padding: 8px 12px;
