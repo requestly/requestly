@@ -90,7 +90,6 @@ const AuthHandler: React.FC<{}> = () => {
       Logger.timeLog("AuthHandler-blockingOperations", "START");
       const authData = getAuthData(user);
       window.uid = user.uid;
-      localStorage.setItem("__rq_uid", user.uid);
 
       try {
         // FIXME: getOrUpdateUserSyncState, checkUserBackupState taking too long for large workspace, can this be improved or moved to non-blocking operations?
@@ -195,6 +194,8 @@ const AuthHandler: React.FC<{}> = () => {
         // Unset isSyncEnabled in window
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
+
+        // set amplitude anon id to local storage:
 
         dispatch(
           // @ts-ignore
