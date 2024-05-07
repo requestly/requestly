@@ -24,14 +24,18 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
   const [isPostUserAdditionViewVisible, setIsPostUserAdditionViewVisible] = useState(false);
   const [externalDomainEmails, setExternalDomainEmails] = useState([]);
   const [isExternalDomainWarningBannerClosed, setIsExternalDomainWarningBannerClosed] = useState(false);
+  const [nonExisitingEmails, setNonExisitingEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [emails, setEmails] = useState([]);
 
   const handleAddMembersToBillingTeam = useCallback(() => {
     setIsLoading(true);
     addUsersToBillingTeam(billingId, emails)
-      .then(() => {
+      .then((res: any) => {
         setIsPostUserAdditionViewVisible(true);
+        if (res.data.result?.failedEmails.length) {
+          setNonExisitingEmails(res.data.result.failedEmails);
+        }
       })
       .catch((error) => {
         Logger.log("Error adding members to billing team", error);
@@ -51,14 +55,15 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
     [billingTeamDetails?.ownerDomain]
   );
 
-  if (isPostUserAdditionViewVisible)
+  if (isPostUserAdditionViewVisible) {
     return (
       <PostUserAdditionView
         toggleInviteFormVisibility={toggleInviteFormVisibility}
         closeAddMembersDrawer={closeAddMembersDrawer}
+        nonExisitingEmails={nonExisitingEmails}
       />
     );
-  else {
+  } else {
     return (
       <div className="billing-team-invite-members-form-wrapper">
         {externalDomainEmails.length && !isExternalDomainWarningBannerClosed ? (
