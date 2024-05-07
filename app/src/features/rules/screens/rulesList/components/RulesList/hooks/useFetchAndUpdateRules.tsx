@@ -8,15 +8,14 @@ import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndex
 import { recordsActions } from "store/features/rules/slice";
 import { Group, RecordStatus, RecordType, Rule } from "features/rules/types/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import Logger from "../../../../../../../../../common/logger";
 import { trackRulesListLoaded } from "features/rules/analytics";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
-import { migrateRuleToMV3 } from "modules/extension/ruleParser";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { checkIfPageUrlFilterExists, checkIfPathOperatorExists } from "modules/extension/ruleParser/utils";
+import { checkIfPageUrlFilterExists, checkIfPathOperatorExists } from "modules/extension/mv3RuleParser/utils";
+import { getMV3MigrationStatus, migrateRuleToMV3, saveMV3MigrationStatus } from "modules/extension/utils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -54,8 +53,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
 
         if (isExtensionManifestVersion3()) {
           const currentWorkspaceId = activeWorkspace?.id ?? "private";
-          const mv3MigrationStatus =
-            (await StorageService(appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.MV3_MIGRATION_STATUS)) ?? {};
+          const mv3MigrationStatus = await getMV3MigrationStatus(appMode);
 
           if (!mv3MigrationStatus[currentWorkspaceId]?.rulesMigrated) {
             //TODO: rules types are not standardized. Need to standardize them
@@ -71,14 +69,12 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
             StorageService(appMode)
               .saveMultipleRulesOrGroups(rules, { workspaceId: activeWorkspace.id })
               .then(() => {
-                StorageService(appMode).saveRecord({
-                  [GLOBAL_CONSTANTS.STORAGE_KEYS.MV3_MIGRATION_STATUS]: {
-                    ...mv3MigrationStatus,
-                    [currentWorkspaceId]: {
-                      rulesMigrated: true,
-                      pathMigratedRuleIds,
-                      pageUrlMigratedRuleIds,
-                    },
+                saveMV3MigrationStatus(appMode, {
+                  ...mv3MigrationStatus,
+                  [currentWorkspaceId]: {
+                    rulesMigrated: true,
+                    pathMigratedRuleIds,
+                    pageUrlMigratedRuleIds,
                   },
                 });
               });
