@@ -2,11 +2,11 @@ import React, { useMemo } from "react";
 import { OrgMembersTable } from "features/settings/components/OrgMembers/components/OrgMembersTable/OrgMembersTable";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { OrgTableActions } from "./components/AddMembersTableActions/OrgTableActions";
 import { OrgMember } from "features/settings/components/OrgMembers/types";
 import { EmptyMembersTableView } from "./components/EmptyMembersTableView/EmptyMembersTableView";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlinePersonAdd } from "@react-icons/all-files/md/MdOutlinePersonAdd";
+import { AddMembersTableActions } from "./components/AddMembersTableActions/AddMembersTableActions";
 import "./addMembersTable.scss";
 
 interface AddMembersTableProps {
@@ -40,7 +40,7 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         members={searchedMembers}
-        memberActions={(record) => <OrgTableActions record={record} />}
+        memberActions={(member) => <AddMembersTableActions member={member} />}
         tableActions={
           <RQButton
             type="default"
