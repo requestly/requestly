@@ -39,5 +39,5 @@ export const useFetchOrgMembers = () => {
     }
   }, [user.loggedIn, user?.details?.profile?.email, user?.details?.profile?.isEmailVerified]);
 
-  return { isLoading, organizationMembers };
+  return { isLoading, organizationMembers: organizationMembers?.users };
 };

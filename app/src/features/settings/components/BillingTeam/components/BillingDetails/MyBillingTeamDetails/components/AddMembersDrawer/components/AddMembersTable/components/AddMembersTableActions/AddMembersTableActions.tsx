@@ -12,14 +12,15 @@ import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { trackBillingTeamActionClicked, trackBillingTeamMemberAdded } from "features/settings/analytics";
 import { addUsersToBillingTeam } from "backend/billing";
+import { OrgMember } from "features/settings/components/OrgMembers/types";
 
-export const OrgTableActions: React.FC<{ record: any }> = ({ record }) => {
+export const AddMembersTableActions: React.FC<{ member: OrgMember }> = ({ member }) => {
   const { billingId } = useParams();
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const user = useSelector(getUserAuthDetails);
   const isUserAdded = useMemo(
-    () => Object.values(billingTeamMembers ?? {}).some((member) => member.email === record.email),
-    [billingTeamMembers, record.email]
+    () => Object.values(billingTeamMembers ?? {}).some((billingTeamMember) => billingTeamMember.email === member.email),
+    [billingTeamMembers, member.email]
   );
 
   const [isAddingUser, setIsAddingUser] = useState(false);
@@ -30,16 +31,16 @@ export const OrgTableActions: React.FC<{ record: any }> = ({ record }) => {
 
   const handleAddUserToBillingTeam = useCallback(() => {
     setIsAddingUser(true);
-    addUsersToBillingTeam(billingId, [record.email])
+    addUsersToBillingTeam(billingId, [member.email])
       .then(() => {
-        trackBillingTeamMemberAdded(record.email, billingId);
+        trackBillingTeamMemberAdded(member.email, billingId);
       })
       .catch((e) => {
         Logger.log(e);
         toast.error("Could not add user to billing team, Please contact support");
       })
       .finally(() => setIsAddingUser(false));
-  }, [billingId, record.email]);
+  }, [billingId, member.email]);
 
   return (
     <>

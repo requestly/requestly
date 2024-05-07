@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { OrgMembersTable } from "features/settings/components/OrgMembers/components/OrgMembersTable/OrgMembersTable";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { OrgTableActions } from "./components/AddMembersTableActions/OrgTableActions";
+import { AddMembersTableActions } from "./components/AddMembersTableActions/AddMembersTableActions";
 import { useFetchOrgMembers } from "features/settings/components/OrgMembers/hooks/useFetchOrganizationMembers";
 
 interface AddMembersTableProps {
@@ -15,11 +15,11 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({ searchValue, s
   const { isLoading, organizationMembers } = useFetchOrgMembers();
 
   const searchedMembers = useMemo(() => {
-    if (!organizationMembers?.users) return [];
-    return organizationMembers?.users?.filter((member: any) => {
+    if (!organizationMembers) return [];
+    return organizationMembers?.filter((member: any) => {
       return member?.email?.includes(searchValue) && member?.email !== user?.details?.profile?.email;
     });
-  }, [organizationMembers?.users, searchValue, user?.details?.profile?.email]);
+  }, [organizationMembers, searchValue, user?.details?.profile?.email]);
 
   return (
     <OrgMembersTable
@@ -27,7 +27,7 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({ searchValue, s
       searchValue={searchValue}
       setSearchValue={setSearchValue}
       members={searchedMembers}
-      actions={(record) => <OrgTableActions record={record} />}
+      actions={(member) => <AddMembersTableActions member={member} />}
     />
   );
 };
