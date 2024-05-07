@@ -19,11 +19,13 @@ import {
   trackRequestMethodFilterModifiedEvent,
   trackRequestPayloadKeyFilterModifiedEvent,
   trackRequestPayloadValueFilterModifiedEvent,
+  trackPageDomainsFilterModifiedEvent,
 } from "modules/analytics/events/common/rules/filters";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
 import { debounce, snakeCase } from "lodash";
 import { actions } from "store";
+import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 
 const { Text, Link } = Typography;
 
@@ -148,6 +150,10 @@ const Filters = (props) => {
   const LOG_ANALYTICS = {};
   LOG_ANALYTICS.PAGE_URL_MODIFIED = () => {
     trackPageUrlFilterModifiedEvent(currentlySelectedRuleData.ruleType);
+  };
+
+  LOG_ANALYTICS.PAGE_DOMAINS_MODIFIED = () => {
+    trackPageDomainsFilterModifiedEvent(currentlySelectedRuleData.ruleType);
   };
   LOG_ANALYTICS.RESOURCE_TYPE_MODIFIED = () => {
     trackResourceTypeFilterModifiedEvent(currentlySelectedRuleData.ruleType);
@@ -350,49 +356,89 @@ const Filters = (props) => {
           alignItems: "center",
         }}
       >
-        <Col span={3}>
-          <span>Page URL</span>
-        </Col>
-        <Col span={6} align="center">
-          <Dropdown overlay={urlOperatorOptions} disabled={props.isInputDisabled}>
-            <Text
-              strong
-              className="ant-dropdown-link cursor-pointer capitalize uppercase"
-              onClick={(e) => {
-                e.preventDefault();
-                LOG_ANALYTICS.PAGE_URL_MODIFIED(e);
-              }}
-            >
-              {getCurrentPageURLOperatorText()} <DownOutlined />
-            </Text>
-          </Dropdown>
-        </Col>
-        <Col span={12}>
-          <Input
-            placeholder={generatePlaceholderText(
-              getObjectValue(
-                currentlySelectedRuleData,
-                pairIndex,
-                APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR
-              )
-            )}
-            name="description"
-            type="text"
-            value={getObjectValue(
-              currentlySelectedRuleData,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE
-            )}
-            onChange={(e) => {
-              e?.preventDefault?.();
-              updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE);
-              LOG_ANALYTICS.PAGE_URL_MODIFIED();
-            }}
-            disabled={getCurrentPageURLOperatorText() === "Select" ? true : props.isInputDisabled}
-          />
-        </Col>
-        <Col align="right" span={3}>
-          {renderClearFilterIcon(GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL)}
+        {isExtensionManifestVersion3() ? (
+          <>
+            <Col span={5}>
+              <span>Page Domain</span>
+            </Col>
+            <Col span={17}>
+              <Input
+                placeholder={"mydomain.com"}
+                name="description"
+                type="text"
+                value={getObjectValue(
+                  currentlySelectedRuleData,
+                  pairIndex,
+                  APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_DOMAINS
+                )}
+                onChange={(e) => {
+                  e?.preventDefault?.();
+                  dispatch(
+                    actions.updateRulePairAtGivenPath({
+                      pairIndex,
+                      updates: {
+                        [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_DOMAINS]: [e.target.value],
+                      },
+                    })
+                  );
+                  LOG_ANALYTICS.PAGE_DOMAINS_MODIFIED();
+                }}
+                disabled={getCurrentPageURLOperatorText() === "Select" ? true : props.isInputDisabled}
+              />
+            </Col>
+          </>
+        ) : (
+          <>
+            <Col span={3}>
+              <span>Page URL</span>
+            </Col>
+            <Col span={6} align="center">
+              <Dropdown overlay={urlOperatorOptions} disabled={props.isInputDisabled}>
+                <Text
+                  strong
+                  className="ant-dropdown-link cursor-pointer capitalize uppercase"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    LOG_ANALYTICS.PAGE_URL_MODIFIED(e);
+                  }}
+                >
+                  {getCurrentPageURLOperatorText()} <DownOutlined />
+                </Text>
+              </Dropdown>
+            </Col>
+            <Col span={12}>
+              <Input
+                placeholder={generatePlaceholderText(
+                  getObjectValue(
+                    currentlySelectedRuleData,
+                    pairIndex,
+                    APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR
+                  )
+                )}
+                name="description"
+                type="text"
+                value={getObjectValue(
+                  currentlySelectedRuleData,
+                  pairIndex,
+                  APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE
+                )}
+                onChange={(e) => {
+                  e?.preventDefault?.();
+                  updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE);
+                  LOG_ANALYTICS.PAGE_URL_MODIFIED();
+                }}
+                disabled={getCurrentPageURLOperatorText() === "Select" ? true : props.isInputDisabled}
+              />
+            </Col>
+          </>
+        )}
+
+        <Col align="right" span={2}>
+          {renderClearFilterIcon(
+            isExtensionManifestVersion3()
+              ? GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_DOMAINS
+              : GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
+          )}
         </Col>
       </Row>
     ) : null;
