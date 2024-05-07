@@ -70,21 +70,28 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
     <Col>
       <Col className="org-member-table">
         <Col className="org-member-table-header">
-          <Input
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search members"
-            className="org-member-table-header-input"
-            suffix={<SearchOutlined />}
-          />
-          <div>{tableActions}</div>
+          <div className="org-members-table-header-actions">
+            <Input
+              type="search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Search members"
+              className="org-member-table-header-input"
+              suffix={<SearchOutlined />}
+            />
+            <div>{tableActions}</div>
+          </div>
+          <div className="org-members-table-count">
+            {members.length} {members.length === 1 ? "member" : "members"}
+          </div>
         </Col>
+
         <Table
           className="billing-table"
           dataSource={members}
           columns={columns}
           pagination={false}
-          scroll={{ y: "82vh" }}
+          scroll={{ y: "80vh" }}
           loading={isLoading}
           locale={{
             emptyText: emptyView ?? (
