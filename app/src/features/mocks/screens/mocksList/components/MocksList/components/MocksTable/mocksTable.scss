@@ -57,6 +57,10 @@
         .mock-name-details-container {
           padding-left: 6px;
         }
+
+        .mock-star-btn {
+          margin-right: 5px;
+        }
       }
 
       .mock-star-btn {
@@ -67,7 +71,7 @@
         align-items: center;
         gap: 6px;
         font-size: 14px;
-        margin-right: auto;
+        margin-right: 20px;
         flex-shrink: 0;
 
         .unstarred {
@@ -213,6 +217,10 @@
   letter-spacing: 0.25px;
   display: flex;
   align-items: center;
+
+  &.ant-dropdown-menu-item-disabled {
+    opacity: 0.6;
+  }
 }
 
 .mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:hover {
