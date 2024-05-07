@@ -1,12 +1,7 @@
-import { getMocks } from "backend/mocks/getMocks";
-import { fetchUserMocks } from "components/features/filesLibrary/FilesLibraryIndexPage/actions";
-import {
-  oldFileMockToNewMockMetadataAdapter,
-  oldMockToNewMockMetadataAdapter,
-} from "components/features/mocksV2/utils/oldMockAdapter";
-import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { getMocks } from "backend/mocks/getMocks";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 
@@ -16,77 +11,67 @@ export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
   const workspace = useSelector(getCurrentlyActiveWorkspace);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [mocksList, setMocksList] = useState<RQMockMetadataSchema[]>([]);
-  const [oldMocksList, setOldMocksList] = useState<RQMockMetadataSchema[]>([]);
+  const [mockRecords, setMockRecords] = useState<RQMockMetadataSchema[]>([]);
 
-  const mockRecords = useMemo(() => [...mocksList, ...oldMocksList], [mocksList, oldMocksList]);
+  // const [oldMocksList, setOldMocksList] = useState<RQMockMetadataSchema[]>([]);
+  // const mockRecords = useMemo(() => [...mockRecords, ...oldMocksList], [mockRecords, oldMocksList]);
 
-  // TODO: Remove this after all mocks are migrated to new schema
-  const fetchOldMocks = useCallback(() => {
-    fetchUserMocks().then((list: any[]) => {
-      let mocksData = [];
-      let filesData = [];
-      let i = 0;
-      for (i = 0; i < list.length; i++) {
-        if (list[i]?.isMock === true) {
-          mocksData.push(list[i]);
-        } else {
-          filesData.push(list[i]);
-        }
-      }
+  // deprecated
+  // const fetchOldMocks = useCallback(() => {
+  //   fetchUserMocks().then((list: any[]) => {
+  //     let mocksData = [];
+  //     let filesData = [];
+  //     let i = 0;
+  //     for (i = 0; i < list.length; i++) {
+  //       if (list[i]?.isMock === true) {
+  //         mocksData.push(list[i]);
+  //       } else {
+  //         filesData.push(list[i]);
+  //       }
+  //     }
 
-      let adaptedData: RQMockMetadataSchema[] = [];
-      if (type === MockType.API) {
-        // mocksData
-        adaptedData = mocksData.map((oldData) => {
-          return oldMockToNewMockMetadataAdapter(uid, oldData);
-        });
-      } else if (type === MockType.FILE) {
-        // filesData
-        adaptedData = filesData.map((oldData) => {
-          return oldFileMockToNewMockMetadataAdapter(uid, oldData);
-        });
-      } else {
-        // mocksData + filesData
-        const mocksAdaptedData = mocksData.map((oldData) => {
-          return oldMockToNewMockMetadataAdapter(uid, oldData);
-        });
-        const filesAdaptedData = filesData.map((oldData) => {
-          return oldFileMockToNewMockMetadataAdapter(uid, oldData);
-        });
-        adaptedData = [...mocksAdaptedData, ...filesAdaptedData];
-      }
-      setOldMocksList([...adaptedData]);
-    });
-  }, [type, uid]);
-
-  const fetchMocks = useCallback(() => {
-    // API|FILE|null
-    getMocks(uid, type, workspace?.id)
-      .then((data) => {
-        setMocksList(data);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        setMocksList([]);
-        setIsLoading(false);
-      });
-  }, [type, uid, workspace]);
+  //     let adaptedData: RQMockMetadataSchema[] = [];
+  //     if (type === MockType.API) {
+  //       // mocksData
+  //       adaptedData = mocksData.map((oldData) => {
+  //         return oldMockToNewMockMetadataAdapter(uid, oldData);
+  //       });
+  //     } else if (type === MockType.FILE) {
+  //       // filesData
+  //       adaptedData = filesData.map((oldData) => {
+  //         return oldFileMockToNewMockMetadataAdapter(uid, oldData);
+  //       });
+  //     } else {
+  //       // mocksData + filesData
+  //       const mocksAdaptedData = mocksData.map((oldData) => {
+  //         return oldMockToNewMockMetadataAdapter(uid, oldData);
+  //       });
+  //       const filesAdaptedData = filesData.map((oldData) => {
+  //         return oldFileMockToNewMockMetadataAdapter(uid, oldData);
+  //       });
+  //       adaptedData = [...mocksAdaptedData, ...filesAdaptedData];
+  //     }
+  //     setOldMocksList([...adaptedData]);
+  //   });
+  // }, [type, uid]);
 
   useEffect(() => {
-    fetchMocks();
-    /* only fetch old mocks in private workspace */
-    if (!workspace?.id) {
-      fetchOldMocks();
-    } else {
-      setOldMocksList([]);
-    }
-  }, [fetchMocks, fetchOldMocks, workspace, setOldMocksList, forceRender]);
+    const fetchMocks = () => {
+      // API|FILE|null
+      getMocks(uid, type, workspace?.id)
+        .then((data) => {
+          console.log({ data });
+          setMockRecords([...data]);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setMockRecords([]);
+          setIsLoading(false);
+        });
+    };
 
-  return {
-    mockRecords,
-    isLoading,
-    fetchOldMocks,
-    fetchMocks,
-  };
+    fetchMocks();
+  }, [uid, type, workspace?.id, forceRender]);
+
+  return { mockRecords, isLoading };
 };

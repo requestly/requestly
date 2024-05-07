@@ -45,7 +45,7 @@ const createCollectionInFirebase = async (
 
     Logger.log(`Mock collection document created ${docRef.id}`);
 
-    updateDoc(docRef, { id: docRef.id });
+    await updateDoc(docRef, { id: docRef.id });
 
     return { ...collectionData, id: docRef.id } as RQMockCollection;
   } catch (err) {
