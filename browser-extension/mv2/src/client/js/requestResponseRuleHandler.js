@@ -608,7 +608,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
   const abort = XMLHttpRequest.prototype.abort;
   XMLHttpRequest.prototype.abort = function () {
     isDebugMode && console.log("abort called");
-    this._abort = true;
     this.rqProxyXhr._abort = true;
     abort.apply(this, arguments);
     abort.apply(this.rqProxyXhr, arguments);
@@ -616,8 +615,6 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
   XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-    this._requestHeaders = this._requestHeaders || {};
-    this._requestHeaders[header] = value;
     this.rqProxyXhr._requestHeaders = this.rqProxyXhr._requestHeaders || {};
     this.rqProxyXhr._requestHeaders[header] = value;
     setRequestHeader.apply(this.rqProxyXhr, arguments);
@@ -660,7 +657,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
       ignoredHeadersOnRedirect.forEach((header) => {
         // Stores ignored header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
-        const originalHeaderValue = this._requestHeaders?.[header] || this._requestHeaders?.[header.toLowerCase()];
+        const originalHeaderValue =
+          this.rqProxyXhr._requestHeaders?.[header] || this.rqProxyXhr._requestHeaders?.[header.toLowerCase()];
         if (isExtensionEnabled() && originalHeaderValue) {
           this.setRequestHeader(customHeaderPrefix + header, originalHeaderValue);
         }
