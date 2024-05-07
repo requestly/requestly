@@ -67,7 +67,7 @@ class RequestProcessor {
         resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
         tabIds: [tabId],
         requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
-        excludedInitiatorDomains: ["requestly.io,requestly.com"],
+        excludedInitiatorDomains: ["requestly.io", "requestly.com"],
       },
     });
   };
