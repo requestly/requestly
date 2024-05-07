@@ -3,6 +3,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  ul > li {
+    list-style: initial;
+  }
 }
 
 .post-user-addition-animation-container {
