@@ -137,13 +137,21 @@ export const generateFinalUrlParts = (
   };
 };
 
-export const generateFinalUrl = (
-  endpoint: string,
-  uid: string,
-  username: string = null,
-  teamId?: string,
-  password?: string
-) => {
+export const generateFinalUrl = ({
+  endpoint,
+  uid,
+  username = null,
+  collectionPath = "",
+  teamId,
+  password,
+}: {
+  endpoint: string;
+  uid: string;
+  username?: string;
+  collectionPath?: string;
+  teamId?: string;
+  password?: string;
+}) => {
   return generateFinalUrlParts(endpoint, uid, username, teamId, password).url;
 };
 

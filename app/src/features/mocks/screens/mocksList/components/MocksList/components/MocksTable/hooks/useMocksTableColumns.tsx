@@ -231,13 +231,13 @@ export const useMocksTableColumns = ({
               // TODO: Refactor this into separate action and use that
               const copyText = record.isOldMock
                 ? record.url
-                : generateFinalUrl(
-                    record.endpoint,
-                    user?.details?.profile?.uid,
-                    user?.details?.username,
+                : generateFinalUrl({
+                    endpoint: record.endpoint,
+                    uid: user?.details?.profile?.uid,
+                    username: user?.details?.username,
                     teamId,
-                    record?.password
-                  );
+                    password: record?.password,
+                  });
 
               navigator.clipboard.writeText(copyText).then(() => {
                 message.success("Link copied!");
@@ -318,7 +318,13 @@ export const useMocksTableColumns = ({
                   url = record.url;
                 } else {
                   // Not sending username as it might change
-                  url = generateFinalUrl(record.endpoint, user?.details?.profile?.uid, null, teamId, record?.password);
+                  url = generateFinalUrl({
+                    endpoint: record.endpoint,
+                    uid: user?.details?.profile?.uid,
+                    username: null,
+                    teamId,
+                    password: record?.password,
+                  });
                 }
                 handleSelectAction(url);
               }}

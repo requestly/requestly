@@ -125,7 +125,9 @@ export const MocksTable: React.FC<MocksTableProps> = ({
               return;
             }
 
-            const url = record.isOldMock ? record.url : generateFinalUrl(record.endpoint, user?.details?.profile?.uid);
+            const url = record.isOldMock
+              ? record.url
+              : generateFinalUrl({ endpoint: record.endpoint, uid: user?.details?.profile?.uid });
             handleItemSelect(record.id, url, record.isOldMock);
           },
         };
