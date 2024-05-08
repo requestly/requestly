@@ -10,6 +10,11 @@ export const migrateRuleToMV3 = (rule: Rule): Rule => {
   };
 };
 
+enum RuleMigrationChange {
+  SOURCE_PATH_MIGRATED = "source_path_migrated",
+  SOURCE_PAGEURL_MIGRATED = "source_pageUrl_migrated",
+}
+
 export const getMV3MigrationData = () => {
   const mv3MigrationStatus = window.localStorage.getItem(MV3_MIGRATION_DATA);
   try {
@@ -47,7 +52,7 @@ const generateRuleMigrationData = (rule: Rule, currentWorkspaceId: string) => {
 
   rule.pairs.forEach((pair) => {
     if (pair.source.key === SourceKey.PATH) {
-      ruleMigrationData.migrationChanges.push("source_path_migrated");
+      ruleMigrationData.migrationChanges.push(RuleMigrationChange.SOURCE_PATH_MIGRATED);
 
       ruleMigrationData.oldRuleSources[pair.id] = {
         sourcePathData: {
@@ -61,7 +66,7 @@ const generateRuleMigrationData = (rule: Rule, currentWorkspaceId: string) => {
 
     // Detect page URL source filter
     if (pair.source?.filters?.some((filter: any) => filter.pageUrl != null)) {
-      ruleMigrationData.migrationChanges.push("source_pageUrl_migrated");
+      ruleMigrationData.migrationChanges.push(RuleMigrationChange.SOURCE_PAGEURL_MIGRATED);
 
       const filters = pair.source.filters[0];
       ruleMigrationData.oldRuleSources[pair.id] = {
