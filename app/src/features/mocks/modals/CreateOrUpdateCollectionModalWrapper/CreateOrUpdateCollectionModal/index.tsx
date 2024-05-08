@@ -64,8 +64,8 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
     }
 
     try {
-      const baseUrl = "https://requestly.com";
-      const url = baseUrl + (path[0] === "/" ? path : "/" + path);
+      const baseUrl = "https://requestly.com/";
+      const url = baseUrl + (path[0] === "/" ? path.slice(1) : path);
       const parsedUrl = new URL(url); // Handles all the path cases
 
       return parsedUrl.pathname;
