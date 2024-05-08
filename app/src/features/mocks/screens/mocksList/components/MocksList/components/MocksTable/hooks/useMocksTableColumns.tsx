@@ -202,7 +202,7 @@ export const useMocksTableColumns = ({
             },
             label: (
               <Row>
-                <RiEdit2Line /> Rename
+                <RiEdit2Line /> Edit
               </Row>
             ),
           },
