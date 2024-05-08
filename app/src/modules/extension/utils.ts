@@ -24,14 +24,12 @@ export const getMV3MigrationData = () => {
   }
 };
 
-export const saveMV3MigrationData = (migrationStatus: any) => {
-  window.localStorage.setItem(MV3_MIGRATION_DATA, JSON.stringify(migrationStatus));
+export const saveMV3MigrationData = (migrationData: any) => {
+  window.localStorage.setItem(MV3_MIGRATION_DATA, JSON.stringify(migrationData));
 };
 
 export const detectAndGenerateMV3RulesMigrationData = (rules: Rule[], currentWorkspaceId: string) => {
-  const rulesMigrationData = rules
-    .map((rule) => generateRuleMigrationData(rule, currentWorkspaceId))
-    .filter((data) => !!data);
+  const rulesMigrationData = rules.map((rule) => generateRuleMigrationData(rule)).filter((data) => !!data);
 
   const migrationData = getMV3MigrationData();
 
@@ -41,7 +39,7 @@ export const detectAndGenerateMV3RulesMigrationData = (rules: Rule[], currentWor
   return currentWorkspaceRulesMigrationData;
 };
 
-const generateRuleMigrationData = (rule: Rule, currentWorkspaceId: string) => {
+const generateRuleMigrationData = (rule: Rule) => {
   const ruleMigrationData: Record<string, any> = {
     id: rule.id,
     migrationChanges: [],
