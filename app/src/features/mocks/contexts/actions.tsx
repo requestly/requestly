@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { isRecordMock } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
-import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
+import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
 
 type MocksActionContextType = {
@@ -155,7 +155,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       Logger.log("[DEBUG]", "removeMocksFromCollectionAction", { records });
       const mockIds = records.filter(isRecordMock).map((mock) => mock.id);
 
-      updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, teamId).then(() => {
+      updateMocksCollection(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, teamId).then(() => {
         toast.success(`${mockIds.length > 1 ? "Mocks" : "Mock"} removed from collection!`);
         onSuccess?.();
       });

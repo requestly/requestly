@@ -4,7 +4,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { RQModal } from "lib/design-system/components";
 import { Button, Select, SelectProps, message } from "antd";
-import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
+import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { toast } from "utils/Toast";
 import { createCollection } from "backend/mocks/createCollection";
 import { trackMockCollectionCreated } from "modules/analytics/events/features/mocksV2";
@@ -51,7 +51,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
     setIsLoading(true);
     const mockIds = mocks?.map((mock) => mock.id);
 
-    return updateMocksCollectionId(uid, mockIds, collectionId, collectionPath, teamId)
+    return updateMocksCollection(uid, mockIds, collectionId, collectionPath, teamId)
       .then(() => {
         // TODO: add analytic event
         onSuccess?.();

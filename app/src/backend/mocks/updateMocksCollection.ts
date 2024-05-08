@@ -2,7 +2,7 @@ import { getOwnerId } from "backend/utils";
 import firebaseApp from "../../firebase";
 import { Timestamp, doc, getFirestore, writeBatch } from "firebase/firestore";
 
-export const updateMocksCollectionId = async (
+export const updateMocksCollection = async (
   uid: string,
   mockIds: string[],
   updatedCollectionId: string,
@@ -14,7 +14,7 @@ export const updateMocksCollectionId = async (
   }
 
   const ownerId = getOwnerId(uid, teamId);
-  const result = await updateMocksCollectionIdInFirebase(
+  const result = await updateMocksCollectionInFirebase(
     uid,
     ownerId,
     mockIds,
@@ -24,7 +24,7 @@ export const updateMocksCollectionId = async (
   return result;
 };
 
-const updateMocksCollectionIdInFirebase = async (
+const updateMocksCollectionInFirebase = async (
   uid: string,
   ownerId: string,
   mockIds: string[],
