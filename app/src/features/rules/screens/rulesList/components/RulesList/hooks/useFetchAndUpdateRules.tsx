@@ -14,8 +14,12 @@ import Logger from "../../../../../../../../../common/logger";
 import { trackRulesListLoaded } from "features/rules/analytics";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { checkIfPageUrlFilterExists, checkIfPathOperatorExists } from "modules/extension/mv3RuleParser/utils";
-import { getMV3MigrationStatus, migrateRuleToMV3, saveMV3MigrationStatus } from "modules/extension/utils";
+import {
+  detectAndGenerateMV3RulesMigrationData,
+  getMV3MigrationData,
+  migrateRuleToMV3,
+  saveMV3MigrationData,
+} from "modules/extension/utils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -51,34 +55,35 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         const groups = data[0] as Group[];
         let rules = data[1] as Rule[];
 
-        if (isExtensionManifestVersion3()) {
-          const currentWorkspaceId = activeWorkspace?.id ?? "private";
-          const mv3MigrationStatus = await getMV3MigrationStatus(appMode);
+        try {
+          if (isExtensionManifestVersion3()) {
+            const currentWorkspaceId = activeWorkspace?.id ?? "private";
+            const mv3MigrationData = getMV3MigrationData();
 
-          if (!mv3MigrationStatus[currentWorkspaceId]?.rulesMigrated) {
-            //TODO: rules types are not standardized. Need to standardize them
-            //@ts-ignore
-            const pathMigratedRuleIds = rules.filter((rule) => checkIfPathOperatorExists(rule)).map((rule) => rule.id);
-            const pageUrlMigratedRuleIds = rules
+            if (!mv3MigrationData?.[currentWorkspaceId]?.rulesMigrated) {
+              //TODO: rules types are not standardized. Need to standardize them
+
               //@ts-ignore
-              .filter((rule) => checkIfPageUrlFilterExists(rule))
-              .map((rule) => rule.id);
-            //@ts-ignore
-            rules = rules.map((rule) => migrateRuleToMV3(rule));
+              const rulesMigrationData = detectAndGenerateMV3RulesMigrationData(rules, currentWorkspaceId);
 
-            StorageService(appMode)
-              .saveMultipleRulesOrGroups(rules, { workspaceId: activeWorkspace.id })
-              .then(() => {
-                saveMV3MigrationStatus(appMode, {
-                  ...mv3MigrationStatus,
-                  [currentWorkspaceId]: {
-                    rulesMigrated: true,
-                    pathMigratedRuleIds,
-                    pageUrlMigratedRuleIds,
-                  },
+              //@ts-ignore
+              rules = rules.map((rule) => migrateRuleToMV3(rule));
+
+              StorageService(appMode)
+                .saveMultipleRulesOrGroups(rules, { workspaceId: activeWorkspace.id })
+                .then(() => {
+                  saveMV3MigrationData({
+                    ...mv3MigrationData,
+                    [currentWorkspaceId]: {
+                      rulesMigrated: true,
+                      rulesMigrationData: rulesMigrationData,
+                    },
+                  });
                 });
-              });
+            }
           }
+        } catch (e) {
+          console.error("DBG: Error in migrating rules to MV3", e);
         }
 
         Logger.log("DBG: fetched data", JSON.stringify({ rules, groups }));

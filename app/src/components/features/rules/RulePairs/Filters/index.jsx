@@ -383,7 +383,7 @@ const Filters = (props) => {
                   );
                   LOG_ANALYTICS.PAGE_DOMAINS_MODIFIED();
                 }}
-                disabled={getCurrentPageURLOperatorText() === "Select" ? true : props.isInputDisabled}
+                disabled={props.isInputDisabled}
               />
             </Col>
           </>
