@@ -35,6 +35,7 @@ export const CreateOrUpdateCollectionModalWrapper: React.FC<{ forceRender: () =>
       name={collection?.name}
       description={collection?.desc}
       path={collection?.path}
+      mocks={collection?.children ?? []}
       mockType={mockType}
       visible={isVisible}
       toggleModalVisibility={onClose}

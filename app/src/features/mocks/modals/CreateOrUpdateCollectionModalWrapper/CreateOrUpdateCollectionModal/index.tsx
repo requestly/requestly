@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button, Input, Row, Tooltip } from "antd";
-import { MockType } from "components/features/mocksV2/types";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { RQModal } from "lib/design-system/components";
 import { createCollection } from "backend/mocks/createCollection";
 import { getUserAuthDetails } from "store/selectors";
@@ -9,6 +9,7 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { trackMockCollectionCreated, trackMockCollectionUpdated } from "modules/analytics/events/features/mocksV2";
+import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { toast } from "utils/Toast";
 import "./createOrUpdateCollectionModal.scss";
 
@@ -16,6 +17,7 @@ interface Props {
   id?: string;
   name?: string;
   description?: string;
+  mocks?: RQMockMetadataSchema[];
   path?: string;
   mockType: MockType;
   visible: boolean;
@@ -27,7 +29,8 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
   id,
   name = "",
   description = "",
-  path = "",
+  path: oldPath = "",
+  mocks = [],
   mockType,
   visible,
   toggleModalVisibility,
@@ -46,14 +49,14 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
   useEffect(() => {
     setCollectionName(name ?? "");
     setCollectionDescription(description ?? "");
-    setCollectionPath(path ?? "");
+    setCollectionPath(oldPath ?? "");
 
     return () => {
       setCollectionName("");
       setCollectionDescription("");
       setCollectionPath("");
     };
-  }, [name, description, visible]);
+  }, [name, description, oldPath, visible]);
 
   const getCorrectedCollectionPath = (path: string = "") => {
     if (path === "" || path === "/") {
@@ -72,58 +75,65 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
   };
 
   const handleSaveClick = async () => {
-    if (collectionName.length === 0) {
-      toast.error("Collection name cannot be empty!");
-      return;
-    }
+    try {
+      setIsLoading(true);
 
-    const correctedCollectionPath = getCorrectedCollectionPath(collectionPath);
+      if (collectionName.length === 0) {
+        toast.error("Collection name cannot be empty!");
+        return;
+      }
 
-    if (correctedCollectionPath === undefined) {
-      toast.error("Please enter valid path!");
-      return;
-    }
+      const correctedCollectionPath = getCorrectedCollectionPath(collectionPath);
 
-    if (id) {
-      const collectionsData = [
-        {
-          id,
+      if (correctedCollectionPath === undefined) {
+        toast.error("Please enter valid path!");
+        return;
+      }
+
+      if (id) {
+        const collectionsData = [
+          {
+            id,
+            name: collectionName,
+            desc: collectionDescription,
+            path: correctedCollectionPath,
+          },
+        ];
+
+        const isPathUpdated = oldPath !== correctedCollectionPath;
+
+        if (isPathUpdated) {
+          const mockIds = mocks?.map((mock) => mock.id);
+
+          // TODO: Improve this as it will make one more call to update the collection id
+          await updateMocksCollection(uid, mockIds, id, collectionPath, teamId);
+        }
+
+        await updateCollections(uid, collectionsData);
+
+        trackMockCollectionUpdated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
+        toast.success("Collection updated!");
+        toggleModalVisibility(false);
+        onSuccess?.();
+      } else {
+        const collectionsData = {
+          type: mockType,
           name: collectionName,
           desc: collectionDescription,
           path: correctedCollectionPath,
-        },
-      ];
+        };
 
-      setIsLoading(true);
-      updateCollections(uid, collectionsData)
-        .then(() => {
-          trackMockCollectionUpdated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
-          toast.success("Collection updated!");
-          toggleModalVisibility(false);
-          onSuccess?.();
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      const collectionsData = {
-        type: mockType,
-        name: collectionName,
-        desc: collectionDescription,
-        path: correctedCollectionPath,
-      };
+        await createCollection(uid, collectionsData, teamId);
 
-      setIsLoading(true);
-      createCollection(uid, collectionsData, teamId)
-        .then((mockCollection) => {
-          trackMockCollectionCreated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
-          toast.success("Collection created!");
-          toggleModalVisibility(false);
-          onSuccess?.();
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+        trackMockCollectionCreated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
+        toast.success("Collection created!");
+        toggleModalVisibility(false);
+        onSuccess?.();
+      }
+    } catch (error) {
+      // do nothing
+    } finally {
+      setIsLoading(false);
     }
   };
 
