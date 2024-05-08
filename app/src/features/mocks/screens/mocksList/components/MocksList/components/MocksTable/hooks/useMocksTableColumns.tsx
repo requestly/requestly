@@ -91,7 +91,7 @@ export const useMocksTableColumns = ({
 
             {collectionPath ? (
               <Typography.Text className="collection-path" ellipsis={true}>
-                {collectionPath}
+                {"/" + collectionPath}
               </Typography.Text>
             ) : null}
 
