@@ -79,7 +79,6 @@ export const useMocksTableColumns = ({
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
         const collectionPath = ((record as unknown) as RQMockCollection)?.path ?? "";
-        const beautifiedCollectionPath = collectionPath[0] === "/" ? collectionPath : "/" + collectionPath;
 
         return isCollection ? (
           <div className="mock-collection-details-container">
@@ -92,7 +91,7 @@ export const useMocksTableColumns = ({
 
             {collectionPath ? (
               <Typography.Text className="collection-path" ellipsis={true}>
-                {beautifiedCollectionPath}
+                {collectionPath}
               </Typography.Text>
             ) : null}
 
