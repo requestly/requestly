@@ -148,6 +148,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
         <label className="collection-name-label">
           <span>Collection name</span>
           <Input
+            required
             autoFocus
             value={collectionName}
             placeholder="E.g. APIs V1"
