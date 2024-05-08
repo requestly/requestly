@@ -22,17 +22,6 @@ export const initRuleExecutionHandler = () => {
         appliedRuleIds.add(event.data.ruleId);
         handleAppliedRuleNotification(event.data.ruleId);
         break;
-      case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
-        chrome.runtime.sendMessage(event.data, () => {
-          window.postMessage(
-            {
-              source: "requestly:client",
-              action: CLIENT_MESSAGES.ON_BEFORE_AJAX_REQUEST_PROCESSED,
-            },
-            window.location.href
-          );
-        });
-        break;
     }
   });
 

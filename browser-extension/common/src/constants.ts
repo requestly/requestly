@@ -30,6 +30,7 @@ export const EXTENSION_MESSAGES = {
   SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
   NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
   TEST_RULE_ON_URL: "testRuleOnUrl",
+  RULE_EXECUTED: "ruleExecuted",
 };
 
 export const CLIENT_MESSAGES = {
