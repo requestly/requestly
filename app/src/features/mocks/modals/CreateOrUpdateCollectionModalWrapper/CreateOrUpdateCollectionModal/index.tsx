@@ -10,6 +10,7 @@ import { updateCollections } from "backend/mocks/updateCollections";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { trackMockCollectionCreated, trackMockCollectionUpdated } from "modules/analytics/events/features/mocksV2";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
+import { cleanupEndpoint, validateEndpoint } from "components/features/mocksV2/MockEditorIndex/utils";
 import { toast } from "utils/Toast";
 import "./createOrUpdateCollectionModal.scss";
 
@@ -45,6 +46,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
   const [collectionName, setCollectionName] = useState("");
   const [collectionDescription, setCollectionDescription] = useState("");
   const [collectionPath, setCollectionPath] = useState("");
+  const [isCollectionPathValid, setIsCollectionPathValid] = useState(true);
 
   useEffect(() => {
     setCollectionName(name ?? "");
@@ -58,24 +60,9 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
     };
   }, [name, description, oldPath, visible]);
 
-  const getCorrectedCollectionPath = (path: string = "") => {
-    if (path === "" || path === "/") {
-      return path;
-    }
-
-    try {
-      const baseUrl = "https://requestly.com/";
-      const url = baseUrl + (path[0] === "/" ? path.slice(1) : path);
-      const parsedUrl = new URL(url); // Handles all the path cases
-
-      return parsedUrl.pathname;
-    } catch (error) {
-      return;
-    }
-  };
-
   const handleSaveClick = async () => {
     try {
+      setIsCollectionPathValid(true);
       setIsLoading(true);
 
       if (collectionName.length === 0) {
@@ -83,12 +70,17 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
         return;
       }
 
-      const correctedCollectionPath = getCorrectedCollectionPath(collectionPath);
+      if (collectionPath) {
+        const error = validateEndpoint(collectionPath, "Collection path");
 
-      if (correctedCollectionPath === undefined) {
-        toast.error("Please enter valid path!");
-        return;
+        if (error) {
+          toast.error(error);
+          setIsCollectionPathValid(false);
+          return;
+        }
       }
+
+      const cleanedUpPath = cleanupEndpoint(collectionPath);
 
       if (id) {
         const collectionsData = [
@@ -96,11 +88,11 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
             id,
             name: collectionName,
             desc: collectionDescription,
-            path: correctedCollectionPath,
+            path: cleanedUpPath,
           },
         ];
 
-        const isPathUpdated = oldPath !== correctedCollectionPath;
+        const isPathUpdated = oldPath !== cleanedUpPath;
 
         if (isPathUpdated) {
           const mockIds = mocks?.map((mock) => mock.id);
@@ -120,7 +112,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           type: mockType,
           name: collectionName,
           desc: collectionDescription,
-          path: correctedCollectionPath,
+          path: cleanedUpPath,
         };
 
         await createCollection(uid, collectionsData, teamId);
@@ -182,9 +174,11 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
           </Row>
           <Input
             autoFocus
+            status={!isCollectionPathValid ? "error" : ""}
             value={collectionPath}
             placeholder="e.g. /apis/v1"
             onChange={(e) => {
+              setIsCollectionPathValid(true);
               setCollectionPath(e.target.value);
             }}
           />
