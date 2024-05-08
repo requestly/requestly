@@ -63,6 +63,7 @@ class RequestProcessor {
         type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
       },
       condition: {
+        // Exact URL is not used because for replace rules, a marker query param is add which changes the URL so exact URL doesn't match
         urlFilter: `|${redirectedUrl}`,
         resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
         tabIds: [tabId],
