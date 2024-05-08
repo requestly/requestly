@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import firebaseApp from "../../../firebase";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
+import { collection, getDocs, getFirestore, onSnapshot, query, where } from "firebase/firestore";
 import { BillingTeamDetails } from "features/settings/components/BillingTeam/types";
 import { getAuth } from "firebase/auth";
 import { billingActions } from "store/features/billing/slice";
@@ -35,20 +35,34 @@ export const useBillingTeamsListener = () => {
     }
     const domain = getDomainFromEmail(user?.details?.profile?.email);
     const db = getFirestore(firebaseApp);
-    let billingTeamsQuery;
-    if (isCompanyEmail(user?.details?.profile?.email)) {
-      billingTeamsQuery = query(collection(db, "billing"), where("ownerDomain", "==", domain));
-    } else {
-      billingTeamsQuery = query(collection(db, "billing"), where(`members.${user?.details?.profile?.uid}`, "!=", null));
-    }
+    const billingTeamsQuery = query(
+      collection(db, "billing"),
+      where(`members.${user?.details?.profile?.uid}`, "!=", null)
+    );
 
-    unsubscribeBillingTeamsListener = onSnapshot(billingTeamsQuery, (billingTeams) => {
+    unsubscribeBillingTeamsListener = onSnapshot(billingTeamsQuery, async (billingTeams) => {
+      const userBillingTeamIds = new Set();
       const billingTeamDetails = billingTeams.docs.map((billingTeam) => {
+        userBillingTeamIds.add(billingTeam.id);
         return {
           ...(billingTeam.data() as BillingTeamDetails),
           id: billingTeam.id,
         };
       });
+
+      if (isCompanyEmail(user?.details?.profile?.email)) {
+        const domainBillingTeamsQuery = query(collection(db, "billing"), where("ownerDomain", "==", domain));
+        const querySnapshot = await getDocs(domainBillingTeamsQuery);
+        querySnapshot.forEach((doc) => {
+          if (!userBillingTeamIds.has(doc.id)) {
+            billingTeamDetails.push({
+              ...(doc.data() as BillingTeamDetails),
+              id: doc.id,
+            });
+          }
+        });
+      }
+
       dispatch(billingActions.setAvailableBillingTeams(billingTeamDetails));
       Promise.all(
         billingTeamDetails.map((billingTeam) => {
