@@ -3,20 +3,26 @@ import { ExtensionRule, ExtensionRuleAction, HeadersRuleOperation, ModifyHeaderI
 import { parseConditionFromSource } from "./utils";
 
 const parseHeaders = (headers: HeadersRuleModificationData[]): ModifyHeaderInfo[] => {
-  return headers.map((header) => {
-    if (header.type === HeaderRuleActionType.REMOVE) {
-      return {
-        header: header.header,
-        operation: "remove" as HeadersRuleOperation,
-      };
-    } else {
-      return {
-        header: header.header,
-        value: header.value,
-        operation: "set" as HeadersRuleOperation,
-      };
-    }
-  });
+  return headers
+    .map((header) => {
+      if (header.value === "rq_request_initiator_origin()") {
+        return null;
+      }
+
+      if (header.type === HeaderRuleActionType.REMOVE) {
+        return {
+          header: header.header,
+          operation: "remove" as HeadersRuleOperation,
+        };
+      } else {
+        return {
+          header: header.header,
+          value: header.value,
+          operation: "set" as HeadersRuleOperation,
+        };
+      }
+    })
+    .filter(Boolean);
 };
 
 const parseHeadersRule = (rule: HeadersRule): ExtensionRule[] => {
