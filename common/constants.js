@@ -213,7 +213,6 @@ CONSTANTS.STORAGE_KEYS = {
   SEND_EXECUTION_EVENTS: "sendExecutionEvents",
   TEST_REPORTS: "testReports",
   IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
-  MV3_MIGRATION_STATUS: "mv3MigrationStatus",
 };
 
 CONSTANTS.REQUEST_STATE = {

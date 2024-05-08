@@ -1,4 +1,4 @@
-import { Rule, RulePairSource, SourceKey, SourceOperator } from "../../../types/rules";
+import { RulePairSource, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
@@ -25,23 +25,18 @@ const migratePathOperator = (source: RulePairSource): void => {
 };
 
 const migratePageURLtoPageDomain = (source: RulePairSource): void => {
-  const sourceFilters = source.filters[0];
-  if (sourceFilters.pageUrl && sourceFilters.pageUrl.value) {
-    let pageDomain = [];
-    try {
-      pageDomain.push(new URL(sourceFilters.pageUrl.value).hostname);
-    } catch (e) {
-      // Do Nothing
+  if (source.filters && source.filters.length > 0) {
+    const sourceFilters = source.filters[0];
+    if (sourceFilters.pageUrl && sourceFilters.pageUrl.value) {
+      let pageDomain = [];
+      try {
+        pageDomain.push(new URL(sourceFilters.pageUrl.value).hostname);
+        delete sourceFilters.pageUrl;
+      } catch (e) {
+        // Do Nothing
+      }
     }
   }
-};
-
-export const checkIfPathOperatorExists = (rule: Rule): boolean => {
-  return rule.pairs.some((pair) => pair.source.key === SourceKey.PATH);
-};
-
-export const checkIfPageUrlFilterExists = (rule: Rule): boolean => {
-  return rule.pairs.some((pair) => pair.source?.filters?.some((filter: any) => filter.pageUrl != null));
 };
 
 const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
