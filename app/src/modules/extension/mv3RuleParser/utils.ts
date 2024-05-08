@@ -31,9 +31,8 @@ const migratePageURLtoPageDomain = (source: RulePairSource): void => {
       let pageDomain = [];
       try {
         pageDomain.push(new URL(sourceFilters.pageUrl.value).hostname);
+      } finally {
         delete sourceFilters.pageUrl;
-      } catch (e) {
-        // Do Nothing
       }
     }
   }
