@@ -16,7 +16,6 @@ import { getValueAsPromise } from "./FirebaseActions";
 import { getRecordsSyncPath, parseRemoteRecords } from "utils/syncing/syncDataUtils";
 import { setSyncState } from "utils/syncing/SyncUtils";
 import { isArray } from "lodash";
-import { getMV3MigrationStatus, saveMV3MigrationStatus } from "modules/extension/utils";
 
 export const showSwitchWorkspaceSuccessToast = (teamName) => {
   // Show toast
@@ -84,7 +83,7 @@ export const switchWorkspace = async (
 
   if (!skipStorageClearing) {
     Logger.log("Clearing storage in switchWorkspace");
-    await clearStorageBeforeSwitching(appMode);
+    await StorageService(appMode).clearDB();
   }
 
   // Just in case
@@ -115,12 +114,4 @@ export const switchWorkspace = async (
 
 export const clearCurrentlyActiveWorkspace = async (dispatch, appMode) => {
   await switchWorkspace({ teamId: null, teamName: null, teamMembersCount: null }, dispatch, null, appMode);
-};
-
-const clearStorageBeforeSwitching = async (appMode) => {
-  const mv3MigrationStatus = await getMV3MigrationStatus(appMode);
-
-  await StorageService(appMode).clearDB();
-
-  saveMV3MigrationStatus(appMode, mv3MigrationStatus);
 };
