@@ -35,6 +35,8 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
     ];
   }, [BOTTOM_SHEET_TAB_KEYS.TEST_RULE]);
 
+  console.log("TEST LOG");
+
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener(
       GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
