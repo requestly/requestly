@@ -6,24 +6,24 @@ export const cleanupEndpoint = (endpoint: string) => {
   return cleanedEndpoint;
 };
 
-export const validateEndpoint = (endpoint: string) => {
+export const validateEndpoint = (endpoint: string, messagePrefix = "Endpoint") => {
   if (!endpoint) {
-    return "Endpoint is required";
+    return `${messagePrefix} is required`;
   }
 
   if (endpoint.startsWith("/")) {
-    return "Endpoint cannot start with '/'";
+    return `${messagePrefix} cannot start with '/'`;
   }
 
   if (endpoint.endsWith("/")) {
-    return "Endpoint cannot end with '/'";
+    return `${messagePrefix} cannot end with '/'`;
   }
 
   const pattern = /^[A-Za-z0-9_.\-/]+$/;
   if (endpoint.match(pattern)) {
     return null;
   } else {
-    return "Endpoint can only contain letters, numbers, '_', '-' & '/'";
+    return `${messagePrefix} can only contain letters, numbers, '_', '-' & '/'`;
   }
 };
 
