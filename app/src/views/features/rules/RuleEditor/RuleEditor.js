@@ -19,6 +19,7 @@ import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEditorBottomSheet";
 import "./RuleEditor.css";
+import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 
 const RuleEditor = (props) => {
   const location = useLocation();
@@ -75,6 +76,15 @@ const RuleEditor = (props) => {
       setIsNewRuleCreated(true);
     }
   }, [state?.source, MODE]);
+
+  useEffect(() => {
+    PageScriptMessageHandler.addMessageListener(
+      GLOBAL_CONSTANTS.EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED,
+      (message) => {
+        console.log("DEBUGG:: Test Rule Report Updated", message);
+      }
+    );
+  }, []);
 
   const renderRuleEditor = () => {
     return (
