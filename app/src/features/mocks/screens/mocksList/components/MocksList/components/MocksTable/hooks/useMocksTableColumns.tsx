@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table } from "antd";
-import { MockType, RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { EditOutlined } from "@ant-design/icons";
@@ -20,7 +20,7 @@ import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RQButton } from "lib/design-system/components";
 import { MocksTableProps } from "../MocksTable";
-import { isRecordMockCollection } from "../utils";
+import { isRecordMock, isRecordMockCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
@@ -31,7 +31,8 @@ export const useMocksTableColumns = ({
   handleEditAction,
   handleSelectAction,
   forceRender,
-}: Partial<MocksTableProps>) => {
+  allRecordsMap,
+}: Partial<MocksTableProps> & { allRecordsMap: { [id: string]: RQMockMetadataSchema } }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -193,6 +194,11 @@ export const useMocksTableColumns = ({
       align: "right",
       width: isWorkspaceMode ? (isRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
+        const collectionPath =
+          isRecordMock(record) && record.collectionId
+            ? ((allRecordsMap[record.collectionId] as unknown) as RQMockCollection).path
+            : "";
+
         const collectionActions: MenuProps["items"] = [
           {
             key: 0,
@@ -237,6 +243,7 @@ export const useMocksTableColumns = ({
                     username: user?.details?.username,
                     teamId,
                     password: record?.password,
+                    collectionPath,
                   });
 
               navigator.clipboard.writeText(copyText).then(() => {
@@ -324,6 +331,7 @@ export const useMocksTableColumns = ({
                     username: null,
                     teamId,
                     password: record?.password,
+                    collectionPath,
                   });
                 }
                 handleSelectAction(url);

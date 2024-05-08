@@ -7,25 +7,40 @@ import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { generateFinalUrlParts } from "components/features/mocksV2/utils";
 import CopyButton from "components/misc/CopyButton";
+import { LoadingOutlined } from "@ant-design/icons";
 
 interface EndpointProps {
   isNew: boolean;
   errors: ValidationErrors;
   mockType: MockType;
   endpoint: string;
+  collectionPath?: string;
   setEndpoint: (endpoint: string) => void;
   password: string;
+  isMockCollectionLoading?: boolean;
 }
 
 const MockEditorEndpoint = forwardRef(
-  ({ isNew, errors, mockType, endpoint, setEndpoint, password }: EndpointProps, ref) => {
+  (
+    {
+      isNew,
+      errors,
+      mockType,
+      endpoint,
+      setEndpoint,
+      password,
+      collectionPath,
+      isMockCollectionLoading = false,
+    }: EndpointProps,
+    ref
+  ) => {
     const user = useSelector(getUserAuthDetails);
     const username = user?.details?.username;
     const uid = user?.details?.profile?.uid;
     const workspace = useSelector(getCurrentlyActiveWorkspace);
     const teamId = workspace?.id;
 
-    const { url } = generateFinalUrlParts(endpoint, uid, username, teamId, password);
+    const { url } = generateFinalUrlParts({ endpoint, uid, username, teamId, password, collectionPath });
 
     const renderAddonAfter = () => {
       return <CopyButton type="ghost" title="Copy URL" copyText={url} disabled={isNew} />;
@@ -41,7 +56,7 @@ const MockEditorEndpoint = forwardRef(
             <Input
               // @ts-ignore
               ref={ref}
-              addonBefore="/"
+              addonBefore={isMockCollectionLoading ? <LoadingOutlined /> : "/" + collectionPath}
               required
               id="endpoint"
               addonAfter={renderAddonAfter()}

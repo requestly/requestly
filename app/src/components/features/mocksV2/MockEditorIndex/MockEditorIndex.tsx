@@ -1,6 +1,6 @@
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   redirectToFileMockEditorEditMock,
   redirectToFileMocksList,
@@ -40,19 +40,17 @@ const MockEditorIndex: React.FC<Props> = ({
   isEditorOpenInModal = false,
 }) => {
   const { mockId } = useParams();
-  let [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
-  const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
   const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
-
-  const mockCollectionId = searchParams.get("cid");
+  const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
+  const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (!mockId) {
@@ -72,17 +70,24 @@ const MockEditorIndex: React.FC<Props> = ({
 
       setIsMockLoading(false);
     });
+  }, [mockId, uid, teamId]);
 
-    if (!mockCollectionId) {
+  useEffect(() => {
+    if (!mockEditorData?.collectionId) {
       return;
     }
 
-    getMock(uid, mockCollectionId, teamId).then((data: any) => {
-      if (data) {
-        setMockCollectionData(data);
-      }
-    });
-  }, [mockId, uid, teamId, mockCollectionId]);
+    setIsMockCollectionLoading(true);
+    getMock(uid, mockEditorData.collectionId, teamId)
+      .then((data: any) => {
+        if (data) {
+          setMockCollectionData(data);
+        }
+      })
+      .finally(() => {
+        setIsMockCollectionLoading(false);
+      });
+  }, [mockEditorData?.collectionId]);
 
   const onMockSave = (data: MockEditorDataSchema) => {
     setSavingInProgress(true);
@@ -182,6 +187,7 @@ const MockEditorIndex: React.FC<Props> = ({
         onClose={handleCloseEditorFromPicker ?? handleOnClose}
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
+        isMockCollectionLoading={isMockCollectionLoading}
       />
     );
   }

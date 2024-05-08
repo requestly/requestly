@@ -76,12 +76,13 @@ export const mockDataToEditorDataAdapter = (mockData: RQMockSchema): MockEditorD
     body: mockData.responses[0]?.body || "",
     responseId: mockData.responses[0]?.id,
     password: mockData.password ?? "",
+    collectionId: mockData.collectionId ?? "",
   };
 
   return mockEditorData;
 };
 
-const generateEndpointPrefix = (username: string = null, teamId?: string) => {
+const generateEndpointPrefix = (username: string = null, teamId?: string, collectionPath?: string) => {
   let prefix = "";
 
   if (isEnvBeta() || isEnvDevWithBeta()) {
@@ -96,6 +97,10 @@ const generateEndpointPrefix = (username: string = null, teamId?: string) => {
     } else {
       prefix = "https://requestly.tech/api/mockv2/";
     }
+  }
+
+  if (collectionPath) {
+    return `${prefix}${collectionPath}/`;
   }
 
   return prefix;
@@ -119,14 +124,22 @@ const generateEndpointSuffix = (username: string, uid?: string, teamId?: string,
   return `?${searchParams.toString()}`;
 };
 
-export const generateFinalUrlParts = (
-  endpoint: string,
-  uid: string,
-  username: string = null,
-  teamId?: string,
-  password?: string
-) => {
-  let prefix = generateEndpointPrefix(username, teamId);
+export const generateFinalUrlParts = ({
+  endpoint,
+  uid,
+  teamId,
+  password,
+  username = null,
+  collectionPath = "",
+}: {
+  endpoint: string;
+  uid: string;
+  username: string;
+  teamId?: string;
+  password?: string;
+  collectionPath?: string;
+}) => {
+  let prefix = generateEndpointPrefix(username, teamId, collectionPath);
   let suffix = generateEndpointSuffix(username, uid, teamId, password);
 
   return {
@@ -140,19 +153,19 @@ export const generateFinalUrlParts = (
 export const generateFinalUrl = ({
   endpoint,
   uid,
-  username = null,
-  collectionPath = "",
   teamId,
   password,
+  username = null,
+  collectionPath = "",
 }: {
   endpoint: string;
   uid: string;
   username?: string;
-  collectionPath?: string;
   teamId?: string;
   password?: string;
+  collectionPath?: string;
 }) => {
-  return generateFinalUrlParts(endpoint, uid, username, teamId, password).url;
+  return generateFinalUrlParts({ endpoint, uid, username, teamId, password, collectionPath }).url;
 };
 
 const getMockEditorDataForFile = (fileType: string, name: string, data: string) => {
