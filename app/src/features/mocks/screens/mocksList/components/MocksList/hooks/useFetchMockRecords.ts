@@ -60,7 +60,6 @@ export const useFetchMockRecords = (type: MockType, forceRender: boolean) => {
       // API|FILE|null
       getMocks(uid, type, workspace?.id)
         .then((data) => {
-          console.log({ data });
           setMockRecords([...data]);
           setIsLoading(false);
         })
