@@ -1,6 +1,6 @@
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   redirectToFileMockEditorEditMock,
   redirectToFileMocksList,
@@ -12,7 +12,7 @@ import MockEditor from "./Editor/index";
 import { MockEditorDataSchema } from "./types";
 import { editorDataToMockDataConverter, generateFinalUrl, mockDataToEditorDataAdapter } from "../utils";
 import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, defaultJsEditorMock } from "./constants";
-import { FileType, MockType } from "../types";
+import { FileType, MockType, RQMockCollection } from "../types";
 import { getMock } from "backend/mocks/getMock";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
@@ -40,32 +40,49 @@ const MockEditorIndex: React.FC<Props> = ({
   isEditorOpenInModal = false,
 }) => {
   const { mockId } = useParams();
+  let [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
 
+  const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
   const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
 
+  const mockCollectionId = searchParams.get("cid");
+
   useEffect(() => {
-    if (mockId) {
-      setIsMockLoading(true);
-      getMock(uid, mockId, teamId).then((data: any) => {
-        if (data) {
-          const editorData = mockDataToEditorDataAdapter(data);
-          setMockEditorData(editorData);
-        } else {
-          // TODO: Handle case when No mock is found. Show a message that mock now found
-          // Right now the UI will break
-          setMockEditorData(null);
-        }
-        setIsMockLoading(false);
-      });
+    if (!mockId) {
+      return;
     }
-  }, [mockId, uid, teamId]);
+
+    setIsMockLoading(true);
+    getMock(uid, mockId, teamId).then((data: any) => {
+      if (data) {
+        const editorData = mockDataToEditorDataAdapter(data);
+        setMockEditorData(editorData);
+      } else {
+        // TODO: Handle case when No mock is found. Show a message that mock now found
+        // Right now the UI will break
+        setMockEditorData(null);
+      }
+
+      setIsMockLoading(false);
+    });
+
+    if (!mockCollectionId) {
+      return;
+    }
+
+    getMock(uid, mockCollectionId, teamId).then((data: any) => {
+      if (data) {
+        setMockCollectionData(data);
+      }
+    });
+  }, [mockId, uid, teamId, mockCollectionId]);
 
   const onMockSave = (data: MockEditorDataSchema) => {
     setSavingInProgress(true);
@@ -78,13 +95,13 @@ const MockEditorIndex: React.FC<Props> = ({
           toast.success("Mock Created Successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
           if (selectOnSave) {
-            const url = generateFinalUrl(
-              finalMockData.endpoint,
-              user?.details?.profile?.uid,
-              null,
-              teamId,
-              data?.password
-            );
+            const url = generateFinalUrl({
+              endpoint: finalMockData.endpoint,
+              uid: user?.details?.profile?.uid,
+              username: null,
+              teamId: teamId,
+              password: data?.password,
+            });
             selectOnSave(url);
             return;
           }
@@ -161,6 +178,7 @@ const MockEditorIndex: React.FC<Props> = ({
         mockType={mockType}
         onSave={onMockSave}
         mockData={mockEditorData}
+        mockCollectionData={mockCollectionData}
         onClose={handleCloseEditorFromPicker ?? handleOnClose}
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
