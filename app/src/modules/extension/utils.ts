@@ -16,31 +16,31 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
     return rules;
   }
 
-  const migrationData = getMV3MigrationData();
-  const workspaceId = currentWorkspaceId ?? "private";
+  const migrationStatus = getMV3MigrationStatus();
+  const workspaceId = currentWorkspaceId ? currentWorkspaceId : null;
 
-  if (migrationData?.[workspaceId]?.rulesMigrated) {
-    return rules;
-  }
+  // if (migrationStatus?.[workspaceId]?.rulesMigrated) {
+  //   return rules;
+  // }
 
   const rulesMigrationLogs: Record<string, any>[] = [];
 
   const migratedRules = rules.map((rule) => {
-    const { rule: migratedRule, ruleMigrationLog } = migrateRuleToMV3(rule);
+    const { rule: migratedRule, ruleMigrationLogs } = migrateRuleToMV3(rule);
 
-    if (ruleMigrationLog) {
-      rulesMigrationLogs.push(ruleMigrationLog);
+    if (ruleMigrationLogs) {
+      rulesMigrationLogs.push(ruleMigrationLogs);
     }
 
     return migratedRule;
   });
 
   StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
-    .saveMultipleRulesOrGroups(migratedRules, { workspaceId: currentWorkspaceId })
+    .saveMultipleRulesOrGroups(migratedRules, { workspaceId: workspaceId })
     .then(() => {
-      saveMV3MigrationData({
-        ...migrationData,
-        [workspaceId]: {
+      saveMV3MigrationStatus({
+        ...migrationStatus,
+        [workspaceId ? workspaceId : "private"]: {
           rulesMigrated: true,
           rulesMigrationLogs,
         },
@@ -55,11 +55,21 @@ export const migrateRuleToMV3 = (rule: Rule) => {
     return;
   }
 
-  const ruleMigrationLog = generateRuleMigrationLog(rule);
+  const ruleMigrationLogs: Record<string, any> = {
+    id: rule.id,
+    migrationChanges: [],
+  };
 
   rule.pairs.forEach((pair) => {
-    migratePathOperator(pair.source);
-    migratePageURLtoPageDomain(pair.source);
+    const pathMigrationStatus = migratePathOperator(pair.source);
+    if (pathMigrationStatus) {
+      ruleMigrationLogs.migrationChanges.push(pathMigrationStatus);
+    }
+
+    const pageUrlMigrationStatus = migratePageURLtoPageDomain(pair.source);
+    if (pageUrlMigrationStatus) {
+      ruleMigrationLogs.migrationChanges.push(pageUrlMigrationStatus);
+    }
   });
 
   return {
@@ -67,11 +77,11 @@ export const migrateRuleToMV3 = (rule: Rule) => {
       ...rule,
       extensionRules: parseDNRRules(rule),
     },
-    ruleMigrationLog,
+    ruleMigrationLogs: ruleMigrationLogs.migrationChanges.length ? ruleMigrationLogs : null,
   };
 };
 
-export const getMV3MigrationData = () => {
+export const getMV3MigrationStatus = () => {
   const mv3MigrationStatus = window.localStorage.getItem(MV3_MIGRATION_DATA);
   try {
     return JSON.parse(mv3MigrationStatus);
@@ -80,69 +90,57 @@ export const getMV3MigrationData = () => {
   }
 };
 
-export const saveMV3MigrationData = (migrationData: any) => {
+export const saveMV3MigrationStatus = (migrationData: any) => {
   window.localStorage.setItem(MV3_MIGRATION_DATA, JSON.stringify(migrationData));
 };
 
-const generateRuleMigrationLog = (rule: Rule) => {
-  const ruleMigrationLog: Record<string, any> = {
-    id: rule.id,
-    migrationChanges: [],
-    oldRuleSources: {},
-  };
-
-  let isOldDataPresent = false;
-
-  rule.pairs.forEach((pair) => {
-    if (pair.source.key === SourceKey.PATH) {
-      ruleMigrationLog.migrationChanges.push(RuleMigrationChange.SOURCE_PATH_MIGRATED);
-
-      ruleMigrationLog.oldRuleSources[pair.id] = {
-        sourcePathData: {
-          key: pair.source.key,
-          operator: pair.source.operator,
-          value: pair.source.value,
-        },
-      };
-      isOldDataPresent = true;
-    }
-
-    // Detect page URL source filter
-    if (pair.source?.filters?.some((filter: any) => filter.pageUrl != null)) {
-      ruleMigrationLog.migrationChanges.push(RuleMigrationChange.SOURCE_PAGEURL_MIGRATED);
-
-      const filters = pair.source.filters[0];
-      ruleMigrationLog.oldRuleSources[pair.id] = {
-        sourcePageUrlData: {
-          ...filters.pageUrl,
-        },
-      };
-      isOldDataPresent = true;
-    }
-  });
-
-  return isOldDataPresent ? ruleMigrationLog : null;
-};
-
-const migratePathOperator = (source: RulePairSource): void => {
+const migratePathOperator = (
+  source: RulePairSource
+): {
+  type: RuleMigrationChange;
+  oldSource: RulePairSource;
+} => {
   if (source.key === SourceKey.PATH) {
     source.operator = SourceOperator.CONTAINS;
     source.key = SourceKey.URL;
+
+    return {
+      type: RuleMigrationChange.SOURCE_PATH_MIGRATED,
+      oldSource: {
+        ...source,
+      },
+    };
   }
 };
 
-const migratePageURLtoPageDomain = (source: RulePairSource): void => {
+const migratePageURLtoPageDomain = (
+  source: RulePairSource
+): {
+  type: RuleMigrationChange;
+  oldSource: RulePairSource;
+} => {
   if (source.filters && source.filters.length > 0) {
     const sourceFilters = source.filters[0];
+
     if (sourceFilters.pageUrl && sourceFilters.pageUrl.value) {
-      let pageDomain = [];
+      let migrationLog = null;
+      let pageDomains = [];
       try {
-        pageDomain.push(new URL(sourceFilters.pageUrl.value).hostname);
+        pageDomains.push(new URL(sourceFilters.pageUrl.value).hostname);
       } catch (e) {
         // Ignore
       } finally {
+        migrationLog = {
+          type: RuleMigrationChange.SOURCE_PAGEURL_MIGRATED,
+          oldSource: {
+            ...source,
+            filters: [{ ...sourceFilters }],
+          },
+        };
         delete sourceFilters.pageUrl;
       }
+
+      return migrationLog;
     }
   }
 };
