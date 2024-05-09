@@ -22,20 +22,20 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string =
     return rules;
   }
 
-  const rulesMigrationData: Record<string, any>[] = [];
+  const rulesMigrationLogs: Record<string, any>[] = [];
 
   const migratedRules = rules.map((rule) => {
-    const { rule: migratedRule, ruleMigrationData } = migrateRuleToMV3(rule);
+    const { rule: migratedRule, ruleMigrationLog } = migrateRuleToMV3(rule);
 
-    if (ruleMigrationData) {
-      rulesMigrationData.push(ruleMigrationData);
+    if (ruleMigrationLog) {
+      rulesMigrationLogs.push(ruleMigrationLog);
     }
 
     return migratedRule;
   });
 
   const currentWorkspaceRulesMigrationData = migrationData?.[currentWorkspaceId]?.rulesMigrationData ?? [];
-  currentWorkspaceRulesMigrationData.push(...rulesMigrationData);
+  currentWorkspaceRulesMigrationData.push(...rulesMigrationLogs);
 
   StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
     .saveMultipleRulesOrGroups(migratedRules, { workspaceId: currentWorkspaceId })
@@ -44,7 +44,7 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string =
         ...migrationData,
         [currentWorkspaceId]: {
           rulesMigrated: true,
-          rulesMigrationData: rulesMigrationData,
+          rulesMigrationData: rulesMigrationLogs,
         },
       });
     });
@@ -57,7 +57,7 @@ export const migrateRuleToMV3 = (rule: Rule) => {
     return;
   }
 
-  const ruleMigrationData = generateRuleMigrationData(rule);
+  const ruleMigrationLog = generateRuleMigrationLog(rule);
 
   rule.pairs.forEach((pair) => {
     migratePathOperator(pair.source);
@@ -69,7 +69,7 @@ export const migrateRuleToMV3 = (rule: Rule) => {
       ...rule,
       extensionRules: parseDNRRules(rule),
     },
-    ruleMigrationData,
+    ruleMigrationLog,
   };
 };
 
@@ -86,8 +86,8 @@ export const saveMV3MigrationData = (migrationData: any) => {
   window.localStorage.setItem(MV3_MIGRATION_DATA, JSON.stringify(migrationData));
 };
 
-const generateRuleMigrationData = (rule: Rule) => {
-  const ruleMigrationData: Record<string, any> = {
+const generateRuleMigrationLog = (rule: Rule) => {
+  const ruleMigrationLog: Record<string, any> = {
     id: rule.id,
     migrationChanges: [],
     oldRuleSources: {},
@@ -97,9 +97,9 @@ const generateRuleMigrationData = (rule: Rule) => {
 
   rule.pairs.forEach((pair) => {
     if (pair.source.key === SourceKey.PATH) {
-      ruleMigrationData.migrationChanges.push(RuleMigrationChange.SOURCE_PATH_MIGRATED);
+      ruleMigrationLog.migrationChanges.push(RuleMigrationChange.SOURCE_PATH_MIGRATED);
 
-      ruleMigrationData.oldRuleSources[pair.id] = {
+      ruleMigrationLog.oldRuleSources[pair.id] = {
         sourcePathData: {
           key: pair.source.key,
           operator: pair.source.operator,
@@ -111,10 +111,10 @@ const generateRuleMigrationData = (rule: Rule) => {
 
     // Detect page URL source filter
     if (pair.source?.filters?.some((filter: any) => filter.pageUrl != null)) {
-      ruleMigrationData.migrationChanges.push(RuleMigrationChange.SOURCE_PAGEURL_MIGRATED);
+      ruleMigrationLog.migrationChanges.push(RuleMigrationChange.SOURCE_PAGEURL_MIGRATED);
 
       const filters = pair.source.filters[0];
-      ruleMigrationData.oldRuleSources[pair.id] = {
+      ruleMigrationLog.oldRuleSources[pair.id] = {
         sourcePageUrlData: {
           ...filters.pageUrl,
         },
@@ -123,7 +123,7 @@ const generateRuleMigrationData = (rule: Rule) => {
     }
   });
 
-  return isOldDataPresent ? ruleMigrationData : null;
+  return isOldDataPresent ? ruleMigrationLog : null;
 };
 
 const migratePathOperator = (source: RulePairSource): void => {
