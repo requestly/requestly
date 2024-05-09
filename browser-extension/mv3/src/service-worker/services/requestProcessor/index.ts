@@ -3,7 +3,7 @@ import { Rule, RuleType } from "common/types";
 import { matchRequestWithRuleSource, populateRedirectedUrl } from "../ruleMatcher";
 import { TAB_SERVICE_DATA, tabService } from "../tabService";
 import { AJAXRequestDetails, SessionRuleType } from "./types";
-import { forwardAuthHeaderOnRedirect } from "./handleRedirectAuthHeader";
+import { forwardHeadersOnRedirect } from "./handleHeadersOnRedirect";
 
 class RequestProcessor {
   cachedRules: Record<string, Rule[]> = {
@@ -73,7 +73,7 @@ class RequestProcessor {
       return;
     }
 
-    await forwardAuthHeaderOnRedirect(tabId, requestDetails);
+    await forwardHeadersOnRedirect(tabId, requestDetails);
   };
 }
 
