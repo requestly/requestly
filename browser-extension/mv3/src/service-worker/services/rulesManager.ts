@@ -63,11 +63,17 @@ const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRu
 };
 
 const deleteExtensionRules = async (): Promise<void> => {
-  const extensionRules = await chrome.declarativeNetRequest.getDynamicRules();
+  const dynamicRules = await chrome.declarativeNetRequest.getDynamicRules();
+  const sessionRules = await chrome.declarativeNetRequest.getSessionRules();
 
-  await updateDynamicRules({
-    removeRuleIds: extensionRules.map((extensionRule) => extensionRule.id),
-  });
+  await Promise.all([
+    updateDynamicRules({
+      removeRuleIds: dynamicRules.map((extensionRule) => extensionRule.id),
+    }),
+    chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds: sessionRules.map((extensionRule) => extensionRule.id),
+    }),
+  ]);
 };
 
 const addExtensionRules = async (): Promise<void> => {
@@ -108,6 +114,7 @@ const addExtensionRules = async (): Promise<void> => {
 };
 
 const applyExtensionRules = async (): Promise<void> => {
+  console.log("!!!debug", "apply extension rules");
   await deleteExtensionRules();
 
   const isExtensionStatusEnabled = await isExtensionEnabled();
