@@ -11,14 +11,15 @@ enum RuleMigrationChange {
   SOURCE_PAGEURL_MIGRATED = "source_pageUrl_migrated",
 }
 
-export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string = "private"): Rule[] => {
+export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string): Rule[] => {
   if (!isExtensionManifestVersion3()) {
     return rules;
   }
 
   const migrationData = getMV3MigrationData();
+  const workspaceId = currentWorkspaceId ?? "private";
 
-  if (migrationData?.[currentWorkspaceId]?.rulesMigrated) {
+  if (migrationData?.[workspaceId]?.rulesMigrated) {
     return rules;
   }
 
@@ -34,17 +35,14 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string =
     return migratedRule;
   });
 
-  const currentWorkspaceRulesMigrationData = migrationData?.[currentWorkspaceId]?.rulesMigrationData ?? [];
-  currentWorkspaceRulesMigrationData.push(...rulesMigrationLogs);
-
   StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
     .saveMultipleRulesOrGroups(migratedRules, { workspaceId: currentWorkspaceId })
     .then(() => {
       saveMV3MigrationData({
         ...migrationData,
-        [currentWorkspaceId]: {
+        [workspaceId]: {
           rulesMigrated: true,
-          rulesMigrationData: rulesMigrationLogs,
+          rulesMigrationLogs,
         },
       });
     });
@@ -140,6 +138,8 @@ const migratePageURLtoPageDomain = (source: RulePairSource): void => {
       let pageDomain = [];
       try {
         pageDomain.push(new URL(sourceFilters.pageUrl.value).hostname);
+      } catch (e) {
+        // Ignore
       } finally {
         delete sourceFilters.pageUrl;
       }
