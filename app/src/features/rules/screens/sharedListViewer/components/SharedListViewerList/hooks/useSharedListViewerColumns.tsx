@@ -19,7 +19,11 @@ export const useSharedListViewerColumns = ({ handleViewSharedListRule }: Props) 
       render: (_: any, record: RuleTableRecord) => (
         <div
           className={`shared-list-viewer-record-name ${isRule(record) ? "shared-list-viewer-rule-name" : ""}`}
-          onClick={() => handleViewSharedListRule(record)}
+          onClick={() => {
+            if (isRule(record)) {
+              handleViewSharedListRule(record);
+            }
+          }}
         >
           {record.name}
         </div>
