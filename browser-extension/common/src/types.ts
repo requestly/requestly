@@ -48,7 +48,36 @@ export interface UrlSource {
   key: SourceKey;
   operator: SourceOperator;
   value: string;
-  filters?: unknown[];
+  filters?: RuleSourceFilter[];
+}
+
+export interface RuleSourceFilter {
+  pageDomains: string[];
+  requestMethod: HttpRequestMethod;
+  resourceType: ResourceType[];
+}
+
+enum ResourceType {
+  XHR = "xmlhttprequest",
+  JS = "script",
+  CSS = "stylesheet",
+  Image = "image",
+  Media = "media",
+  Font = "font",
+  WebSocket = "websocket",
+  MainDocument = "main_frame",
+  IFrameDocument = "sub_frame",
+}
+
+enum HttpRequestMethod {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  DELETE = "DELETE",
+  PATCH = "PATCH",
+  OPTIONS = "OPTIONS",
+  CONNECT = "CONNECT",
+  HEAD = "HEAD",
 }
 
 export enum AutoRecordingMode {
