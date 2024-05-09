@@ -3,23 +3,24 @@ import { redirectToRules } from "../../../../../../../../utils/RedirectionUtils"
 //EXTERNALS
 import { StorageService } from "../../../../../../../../init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
-import { migrateRuleToMV3 } from "modules/extension/utils";
+import { parseDNRRules } from "modules/extension/mv3RuleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { trackErrorInRuleCreation, trackRuleEditorClosed } from "modules/analytics/events/common/rules";
-import { cloneDeep, snakeCase } from "lodash";
+import { snakeCase } from "lodash";
 import Logger from "lib/logger";
 import * as Sentry from "@sentry/react";
 import { detectUnsettledPromise } from "utils/FunctionUtils";
 
 export const saveRule = async (appMode, ruleObject, callback) => {
-  let ruleToSave = cloneDeep(ruleObject);
+  //Set the modification date of rule
+  const ruleToSave = {
+    ...ruleObject,
+    modificationDate: generateObjectCreationDate(),
+  };
 
   if (isExtensionManifestVersion3()) {
-    ruleToSave = migrateRuleToMV3(ruleToSave);
+    ruleToSave.extensionRules = parseDNRRules(ruleToSave);
   }
-
-  //Set the modification date of rule
-  ruleToSave.modificationDate = generateObjectCreationDate();
 
   //Save the rule
   Logger.log("Writing to storage in saveRule");
