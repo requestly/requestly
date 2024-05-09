@@ -50,7 +50,7 @@ const MockEditorIndex: React.FC<Props> = ({
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
   const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
-  const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(true);
+  const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (!mockId) {
