@@ -29,11 +29,11 @@ class RequestProcessor {
   }
 
   private forwardIgnoredHeadersOnRedirect = async (tabId: number, requestDetails: AJAXRequestDetails) => {
-    if (!this.hasIgnoredHeadersInRequest(requestDetails.requestHeaders)) {
-      return;
-    }
-
-    if (!this.cachedRules.redirectRules.length && !this.cachedRules.replaceRules.length) {
+    if (
+      !IGNORED_HEADERS_ON_REDIRECT.some(
+        (header) => requestDetails.requestHeaders[header] || requestDetails.requestHeaders[header.toLowerCase()]
+      )
+    ) {
       return;
     }
 
@@ -71,10 +71,6 @@ class RequestProcessor {
         excludedInitiatorDomains: ["requestly.io", "requestly.com"],
       },
     });
-  };
-
-  private hasIgnoredHeadersInRequest = (requestHeaders: Record<string, string>) => {
-    return IGNORED_HEADERS_ON_REDIRECT.some((header) => requestHeaders[header] || requestHeaders[header.toLowerCase()]);
   };
 
   private findMatchingRule = (rules: Rule[], url: string): Rule | undefined => {
