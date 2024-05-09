@@ -138,7 +138,7 @@ class RequestProcessor {
     matchedRule.pairs.forEach((pair) => {
       if (matchSourceUrl(pair.source, requestDetails.url)) {
         if (pair.modifications?.Request?.length) {
-          pair.modifications.Request.forEach((header) => {
+          pair.modifications.Request.forEach((header: { header: string; type: string; value: string }) => {
             if (header.value === "rq_request_initiator_origin()") {
               headerKeyValueMap.Request[header.header] = requestDetails.initiatorDomain;
             }
@@ -146,7 +146,7 @@ class RequestProcessor {
         }
 
         if (pair.modifications?.Response?.length) {
-          pair.modifications.Response.forEach((header) => {
+          pair.modifications.Response.forEach((header: { header: string; type: string; value: string }) => {
             if (header.value === "rq_request_initiator_origin()") {
               headerKeyValueMap.Response[header.header] = requestDetails.initiatorDomain;
             }
