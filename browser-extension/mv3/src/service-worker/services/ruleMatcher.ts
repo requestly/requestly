@@ -1,4 +1,12 @@
-import { UrlSource, SourceKey, SourceOperator, RuleSourceFilter, Rule, RuleType } from "common/types";
+import {
+  UrlSource,
+  SourceKey,
+  SourceOperator,
+  RuleSourceFilter,
+  Rule,
+  RuleType,
+  SourceFilterTypes,
+} from "common/types";
 import { AJAXRequestDetails } from "./requestProcessor/types";
 
 const toRegex = (regexStr: string): RegExp => {
@@ -87,22 +95,19 @@ const matchRequestWithRuleSourceFilters = function (
     return true;
   }
 
-  return sourceFilters.every((sourceObject) => {
-    Object.entries(sourceObject).forEach(([key, values]) => {
-      switch (key) {
-        case "pageDomains":
-          return values.includes(requestDetails.initiatorDomain);
-        case "requestMethod":
-          return values.includes(requestDetails.method);
-        case "resourceType":
-          // Check if type corresponds to the values used in the UI
-          return values.includes(requestDetails.type);
-        default:
-          return true;
-      }
-    });
+  const sourceObject = Array.isArray(sourceFilters) ? sourceFilters[0] : sourceFilters;
 
-    return true;
+  return Object.entries(sourceObject).every(([key, values]) => {
+    switch (key) {
+      case SourceFilterTypes.PAGE_DOMAINS:
+        return values.includes(requestDetails.initiatorDomain);
+      case SourceFilterTypes.REQUEST_METHOD:
+        return values.includes(requestDetails.method);
+      case SourceFilterTypes.RESOURCE_TYPE:
+        return values.includes(requestDetails.type);
+      default:
+        return true;
+    }
   });
 };
 

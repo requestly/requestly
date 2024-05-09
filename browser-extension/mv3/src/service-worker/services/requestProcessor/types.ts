@@ -7,5 +7,5 @@ export interface AJAXRequestDetails {
 }
 
 export enum SessionRuleType {
-  AUTH_HEADER = "auth_header",
+  FORWARD_IGNORED_HEADERS = "forwardIgnoredHeaders",
 }

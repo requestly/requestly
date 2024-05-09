@@ -36,23 +36,24 @@ class RequestProcessor {
       action: chrome.declarativeNetRequest.RuleAction;
       condition: chrome.declarativeNetRequest.RuleCondition;
     },
-    sessionRuleType?: SessionRuleType
+    sessionRuleType: SessionRuleType
   ) => {
     let ruleId = parseInt(`${Date.now() % 1000000}${Math.floor(Math.random() * 1000)}`);
 
-    const sessionRulesMap = tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP);
+    const sessionRulesMap = tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP) ?? {};
+    const sessionRuleTypeMap = sessionRulesMap?.[sessionRuleType] ?? {};
 
     let removeRuleIds = [];
 
-    if (sessionRulesMap?.[requestUrl]) {
-      ruleId = sessionRulesMap[sessionRuleType][requestUrl];
+    if (sessionRuleTypeMap[requestUrl]) {
+      ruleId = sessionRuleTypeMap[requestUrl];
       removeRuleIds.push(ruleId);
     }
 
     tabService.setData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP, {
       ...sessionRulesMap,
       [sessionRuleType]: {
-        ...sessionRulesMap[sessionRuleType],
+        ...sessionRuleTypeMap,
         [requestUrl]: ruleId,
       },
     });

@@ -42,6 +42,12 @@ export enum SourceOperator {
   WILDCARD_MATCHES = "Wildcard_Matches",
 }
 
+export enum SourceFilterTypes {
+  PAGE_DOMAINS = "pageDomains",
+  REQUEST_METHOD = "requestMethod",
+  RESOURCE_TYPE = "resourceType",
+}
+
 export interface UrlSource {
   id?: string;
   isActive?: boolean;

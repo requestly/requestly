@@ -1,4 +1,4 @@
-import { AJAXRequestDetails } from "./types";
+import { AJAXRequestDetails, SessionRuleType } from "./types";
 import { requestProcessor } from ".";
 
 export const IGNORED_HEADERS_ON_REDIRECT = ["Authorization"];
@@ -26,24 +26,29 @@ export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJ
 
   const redirectedUrl = requestProcessor.getRedirectedUrl(matchedRule, requestDetails);
 
-  return requestProcessor.updateRequestSpecificRules(tabId, requestDetails.url, {
-    action: {
-      requestHeaders: ignoredHeaderValues.map((header: { name: string; value: string }) => ({
-        header: header.name,
-        value: header.value,
-        operation: chrome.declarativeNetRequest.HeaderOperation.SET,
-      })),
-      type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+  return requestProcessor.updateRequestSpecificRules(
+    tabId,
+    requestDetails.url,
+    {
+      action: {
+        requestHeaders: ignoredHeaderValues.map((header: { name: string; value: string }) => ({
+          header: header.name,
+          value: header.value,
+          operation: chrome.declarativeNetRequest.HeaderOperation.SET,
+        })),
+        type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+      },
+      condition: {
+        // Exact URL is not used because for replace rules, a marker query param is added which changes the URL so exact URL doesn't match
+        urlFilter: `|${redirectedUrl}`,
+        resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
+        tabIds: [tabId],
+        requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
+        excludedInitiatorDomains: ["requestly.io", "requestly.com"],
+      },
     },
-    condition: {
-      // Exact URL is not used because for replace rules, a marker query param is added which changes the URL so exact URL doesn't match
-      urlFilter: `|${redirectedUrl}`,
-      resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
-      tabIds: [tabId],
-      requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
-      excludedInitiatorDomains: ["requestly.io", "requestly.com"],
-    },
-  });
+    SessionRuleType.FORWARD_IGNORED_HEADERS
+  );
 };
 
 const checkIfHeaderExists = (requestHeaders: AJAXRequestDetails["requestHeaders"], header: string) => {

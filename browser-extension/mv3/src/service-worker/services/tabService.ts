@@ -105,11 +105,16 @@ class TabService {
   }
 
   removeTab(tabId: TabId) {
-    const sessionMap = this.getData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP) as Record<string, number[]>;
+    const sessionRulesMap = this.getData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP) as Record<
+      string,
+      Record<string, number>
+    >;
     let ruleIdsToDelete: number[] = [];
 
-    if (sessionMap) {
-      ruleIdsToDelete = Object.values(sessionMap).flat();
+    if (sessionRulesMap) {
+      for (const sessionRuleType of Object.values(sessionRulesMap)) {
+        ruleIdsToDelete.push(...Object.values(sessionRuleType));
+      }
       chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: ruleIdsToDelete });
     }
 
