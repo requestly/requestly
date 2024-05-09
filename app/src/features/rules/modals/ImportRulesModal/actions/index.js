@@ -85,7 +85,7 @@ export const processDataToImport = (incomingArray, user, allRules, overwrite = t
   const groups = data.groups.filter((object) => isObjectValid(object));
 
   if (isExtensionManifestVersion3()) {
-    rules = rules.map((rule) => migrateRuleToMV3(rule));
+    rules = rules.map((rule) => migrateRuleToMV3(rule).rule);
   }
 
   if (!overwrite) {

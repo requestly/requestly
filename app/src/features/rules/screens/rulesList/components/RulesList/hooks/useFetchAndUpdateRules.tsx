@@ -12,14 +12,8 @@ import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import Logger from "../../../../../../../../../common/logger";
 import { trackRulesListLoaded } from "features/rules/analytics";
-import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import {
-  detectAndGenerateMV3RulesMigrationData,
-  getMV3MigrationData,
-  migrateRuleToMV3,
-  saveMV3MigrationData,
-} from "modules/extension/utils";
+import { migrateAllRulesToMV3 } from "modules/extension/utils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -55,36 +49,8 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         const groups = data[0] as Group[];
         let rules = data[1] as Rule[];
 
-        try {
-          if (isExtensionManifestVersion3()) {
-            const currentWorkspaceId = activeWorkspace?.id ?? "private";
-            const mv3MigrationData = getMV3MigrationData();
-
-            if (!mv3MigrationData?.[currentWorkspaceId]?.rulesMigrated) {
-              //TODO: rules types are not standardized. Need to standardize them
-
-              //@ts-ignore
-              const rulesMigrationData = detectAndGenerateMV3RulesMigrationData(rules, currentWorkspaceId);
-
-              //@ts-ignore
-              rules = rules.map((rule) => migrateRuleToMV3(rule));
-
-              StorageService(appMode)
-                .saveMultipleRulesOrGroups(rules, { workspaceId: activeWorkspace.id })
-                .then(() => {
-                  saveMV3MigrationData({
-                    ...mv3MigrationData,
-                    [currentWorkspaceId]: {
-                      rulesMigrated: true,
-                      rulesMigrationData: rulesMigrationData,
-                    },
-                  });
-                });
-            }
-          }
-        } catch (e) {
-          console.error("DBG: Error in migrating rules to MV3", e);
-        }
+        //@ts-ignore
+        rules = migrateAllRulesToMV3(rules, activeWorkspace.id);
 
         Logger.log("DBG: fetched data", JSON.stringify({ rules, groups }));
 

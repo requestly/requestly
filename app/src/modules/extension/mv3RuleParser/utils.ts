@@ -17,27 +17,6 @@ const parseRegex = (regex: string): { pattern: string; flags?: string } => {
   return { pattern: regex };
 };
 
-const migratePathOperator = (source: RulePairSource): void => {
-  if (source.key === SourceKey.PATH) {
-    source.operator = SourceOperator.CONTAINS;
-    source.key = SourceKey.URL;
-  }
-};
-
-const migratePageURLtoPageDomain = (source: RulePairSource): void => {
-  if (source.filters && source.filters.length > 0) {
-    const sourceFilters = source.filters[0];
-    if (sourceFilters.pageUrl && sourceFilters.pageUrl.value) {
-      let pageDomain = [];
-      try {
-        pageDomain.push(new URL(sourceFilters.pageUrl.value).hostname);
-      } finally {
-        delete sourceFilters.pageUrl;
-      }
-    }
-  }
-};
-
 const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   // rules like query, headers, script, delay can be applied on all URLs
   if (source.value === "") {
@@ -159,8 +138,6 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
 };
 
 export const parseConditionFromSource = (source: RulePairSource): ExtensionRuleCondition => {
-  migratePathOperator(source);
-  migratePageURLtoPageDomain(source);
   return {
     ...parseUrlParametersFromSource(source),
     ...parseFiltersFromSource(source),
