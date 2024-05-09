@@ -592,7 +592,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     } else {
       try {
         const headersObject = {};
-        request.headers.forEach((value, key) => {
+        request?.headers?.forEach((value, key) => {
           headersObject[key] = value;
         });
         await notifyOnBeforeRequest({
