@@ -103,7 +103,13 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
 
         await updateCollections(uid, collectionsData);
 
-        trackMockCollectionUpdated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
+        trackMockCollectionUpdated(
+          "mocksTable",
+          workspace?.id,
+          workspace?.name,
+          workspace?.membersCount,
+          !!cleanedUpPath
+        );
         toast.success("Collection updated!");
         toggleModalVisibility(false);
         onSuccess?.();
@@ -117,7 +123,13 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
 
         await createCollection(uid, collectionsData, teamId);
 
-        trackMockCollectionCreated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
+        trackMockCollectionCreated(
+          "mocksTable",
+          workspace?.id,
+          workspace?.name,
+          workspace?.membersCount,
+          !!cleanedUpPath
+        );
         toast.success("Collection created!");
         toggleModalVisibility(false);
         onSuccess?.();

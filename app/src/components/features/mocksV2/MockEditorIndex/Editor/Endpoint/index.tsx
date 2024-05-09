@@ -43,7 +43,7 @@ const MockEditorEndpoint = forwardRef(
     const { url } = generateFinalUrlParts({ endpoint, uid, username, teamId, password, collectionPath });
 
     const renderAddonAfter = () => {
-      return <CopyButton type="ghost" title="Copy URL" copyText={url} disabled={isNew} />;
+      return <CopyButton type="ghost" title="Copy URL" copyText={url} disabled={isNew || isMockCollectionLoading} />;
     };
 
     return (
