@@ -14,9 +14,6 @@ interface RuleIdsMap {
 }
 
 const getExecutedRuleIds = async (tabId: number): Promise<string[]> => {
-  console.log("!!!debug", "tab MAP", tabService.getTabs());
-  chrome.declarativeNetRequest.getSessionRules().then((rules) => console.log("!!!debug", "session rules", rules));
-
   return chrome.tabs.sendMessage(tabId, {
     action: CLIENT_MESSAGES.GET_APPLIED_RULES,
   });

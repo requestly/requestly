@@ -17,7 +17,7 @@ const toRegex = (regexStr: string): RegExp => {
   }
   try {
     return new RegExp(matchRegExp[1], matchRegExp[2]);
-  } catch {
+  } catch (e) {
     return null;
   }
 };
@@ -31,8 +31,12 @@ const checkRegexMatch = (regexString: string, inputString: string): boolean => {
   return regex?.test(inputString);
 };
 
+const createRegexForWildcardString = (wildCardString: string): string => {
+  return "/^" + wildCardString.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(.*)") + "$/";
+};
+
 const checkWildCardMatch = (wildCardString: string, inputString: string): boolean => {
-  const regexString = "/^" + wildCardString.replaceAll("*", ".*") + "$/";
+  const regexString = createRegexForWildcardString(wildCardString);
   return checkRegexMatch(regexString, inputString);
 };
 
@@ -155,7 +159,8 @@ export const populateRedirectedUrl = (rule: Rule, requestDetails: AJAXRequestDet
 
     case RuleType.REDIRECT: {
       if (matchedPair.source.operator === SourceOperator.MATCHES) {
-        const matches = toRegex(matchedPair.source.value).exec(requestDetails.url);
+        const matches = toRegex(matchedPair.source.value)?.exec(requestDetails.url);
+
         if (!matches) {
           return matchedPair.destination;
         }
@@ -163,9 +168,10 @@ export const populateRedirectedUrl = (rule: Rule, requestDetails: AJAXRequestDet
         return populateMatchesInString(matchedPair.destination, matches);
       } else if (matchedPair.source.operator === SourceOperator.WILDCARD_MATCHES) {
         const wildCardString = matchedPair.source.value;
-        const regexString = "/^" + wildCardString.replaceAll("*", ".*") + "$/";
+        const regexString = createRegexForWildcardString(wildCardString);
 
-        const matches = toRegex(regexString).exec(requestDetails.url);
+        const matches = toRegex(regexString)?.exec(requestDetails.url);
+
         if (!matches) {
           return matchedPair.destination;
         }
