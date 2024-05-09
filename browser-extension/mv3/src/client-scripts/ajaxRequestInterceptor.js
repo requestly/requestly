@@ -598,7 +598,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         await notifyOnBeforeRequest({
           url,
           method,
-          type: "fetch",
+          type: "xmlhttprequest",
           initiatorDomain: location.origin,
           requestHeaders: headersObject,
         });

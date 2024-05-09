@@ -1,7 +1,7 @@
 export interface AJAXRequestDetails {
   url: string;
   method: string;
-  type: "xmlhttprequest" | "fetch";
+  type: "xmlhttprequest";
   initiatorDomain: string;
   requestHeaders: Record<string, string>;
 }
