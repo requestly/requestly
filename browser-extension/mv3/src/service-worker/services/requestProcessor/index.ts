@@ -4,16 +4,19 @@ import { matchRequestWithRuleSource, populateRedirectedUrl } from "../ruleMatche
 import { TAB_SERVICE_DATA, tabService } from "../tabService";
 import { AJAXRequestDetails, SessionRuleType } from "./types";
 import { forwardHeadersOnRedirect } from "./handleHeadersOnRedirect";
+import { handleInitiatorDomainFunction } from "./handleInitiatorDomainFunction";
 
 class RequestProcessor {
   cachedRules: Record<string, Rule[]> = {
     redirectRules: [],
     replaceRules: [],
+    headerRules: [],
   };
 
   private updateCachedRules = async () => {
     this.cachedRules.redirectRules = await getEnabledRules(RuleType.REDIRECT);
     this.cachedRules.replaceRules = await getEnabledRules(RuleType.REPLACE);
+    this.cachedRules.headerRules = await getEnabledRules(RuleType.HEADERS);
   };
 
   constructor() {
@@ -75,6 +78,7 @@ class RequestProcessor {
     }
 
     await forwardHeadersOnRedirect(tabId, requestDetails);
+    await handleInitiatorDomainFunction(tabId, requestDetails);
   };
 }
 

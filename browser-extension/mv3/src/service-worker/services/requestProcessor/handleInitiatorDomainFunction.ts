@@ -1,5 +1,11 @@
-export const handlePredefinedFunctions = async (tabId: number, requestDetails: AJAXRequestDetails) => {
-  const matchedRule = this.findMatchingRule(this.cachedRules.headerRules, requestDetails.url);
+import { requestProcessor } from ".";
+import { matchRequestWithRuleSource } from "../ruleMatcher";
+import { AJAXRequestDetails, SessionRuleType } from "./types";
+
+const INITIATOR_DOMAIN_FUNCTION = "rq_request_initiator_origin()";
+
+export const handleInitiatorDomainFunction = async (tabId: number, requestDetails: AJAXRequestDetails) => {
+  const matchedRule = requestProcessor.findMatchingRule(requestProcessor.cachedRules.headerRules, requestDetails);
 
   if (!matchedRule) {
     return;
@@ -11,10 +17,10 @@ export const handlePredefinedFunctions = async (tabId: number, requestDetails: A
   };
 
   matchedRule.pairs.forEach((pair) => {
-    if (matchSourceUrl(pair.source, requestDetails.url)) {
+    if (matchRequestWithRuleSource(pair.source, requestDetails)) {
       if (pair.modifications?.Request?.length) {
         pair.modifications.Request.forEach((header: { header: string; type: string; value: string }) => {
-          if (header.value === "rq_request_initiator_origin()") {
+          if (header.value === INITIATOR_DOMAIN_FUNCTION) {
             headerKeyValueMap.Request[header.header] = requestDetails.initiatorDomain;
           }
         });
@@ -22,7 +28,7 @@ export const handlePredefinedFunctions = async (tabId: number, requestDetails: A
 
       if (pair.modifications?.Response?.length) {
         pair.modifications.Response.forEach((header: { header: string; type: string; value: string }) => {
-          if (header.value === "rq_request_initiator_origin()") {
+          if (header.value === INITIATOR_DOMAIN_FUNCTION) {
             headerKeyValueMap.Response[header.header] = requestDetails.initiatorDomain;
           }
         });
@@ -55,17 +61,22 @@ export const handlePredefinedFunctions = async (tabId: number, requestDetails: A
     return;
   }
 
-  await this.updateRequestSpecificRules(tabId, requestDetails.url, {
-    action: {
-      ...ruleAction,
-      type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+  await requestProcessor.updateRequestSpecificRules(
+    tabId,
+    requestDetails.url,
+    {
+      action: {
+        ...ruleAction,
+        type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+      },
+      condition: {
+        urlFilter: `|${requestDetails.url}|`,
+        resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
+        tabIds: [tabId],
+        requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
+        excludedInitiatorDomains: ["requestly.io", "requestly.com"],
+      },
     },
-    condition: {
-      urlFilter: `|${requestDetails.url}|`,
-      resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
-      tabIds: [tabId],
-      requestMethods: [requestDetails.method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod],
-      excludedInitiatorDomains: ["requestly.io", "requestly.com"],
-    },
-  });
+    SessionRuleType.INITIATOR_DOMAIN
+  );
 };
