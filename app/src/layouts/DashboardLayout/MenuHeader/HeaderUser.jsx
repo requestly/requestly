@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Dropdown, Col, Avatar, Spin, Button, Tooltip } from "antd";
+import { Dropdown, Col, Avatar, Spin, Button } from "antd";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import {
@@ -30,7 +29,6 @@ export default function HeaderUser() {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const appMode = useSelector(getAppMode);
-  const trialDuration = useFeatureValue("trial_days_duration", 30);
 
   const userName = user.loggedIn ? user?.details?.profile?.displayName ?? "User" : null;
   const userPhoto =
@@ -151,35 +149,27 @@ export default function HeaderUser() {
       ) : (
         <>
           <Col>
-            <Tooltip
-              title="No credit card required"
-              color="#000"
-              placement="bottom"
-              showArrow={false}
-              overlayClassName="signup-btn-popover"
+            <Button
+              style={{ fontWeight: 500 }}
+              type="primary"
+              className="layout-header-signup-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newValue: true,
+                    newProps: {
+                      redirectURL: window.location.href,
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+                      eventSource: SOURCE.NAVBAR,
+                    },
+                  })
+                );
+              }}
             >
-              <Button
-                style={{ fontWeight: 500 }}
-                type="primary"
-                className="layout-header-signup-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  dispatch(
-                    actions.toggleActiveModal({
-                      modalName: "authModal",
-                      newValue: true,
-                      newProps: {
-                        redirectURL: window.location.href,
-                        authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
-                        eventSource: SOURCE.NAVBAR,
-                      },
-                    })
-                  );
-                }}
-              >
-                Get a {trialDuration}-day free trial
-              </Button>
-            </Tooltip>
+              Sign Up
+            </Button>
           </Col>
         </>
       )}

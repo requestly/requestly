@@ -372,45 +372,97 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
   const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
 
-  // Intercept XMLHttpRequest
-  const onReadyStateChange = async function () {
-    if (this.readyState === this.HEADERS_RECEIVED || this.readyState === this.DONE) {
+  // XHR Implementation
+  const updateXhrReadyState = (xhr, readyState) => {
+    Object.defineProperty(xhr, "readyState", { writable: true });
+    xhr.readyState = readyState;
+    xhr.dispatchEvent(new CustomEvent("readystatechange"));
+  };
+
+  const resolveXHR = (xhr, responseData) => {
+    xhr.dispatchEvent(new ProgressEvent("loadstart"));
+
+    // update response headers
+    const contentType = isJSON(responseData) ? "application/json" : "text/plain";
+    xhr.getResponseHeader = (key) => {
+      if (key.toLowerCase() === "content-type") {
+        return contentType;
+      }
+      return null;
+    };
+    updateXhrReadyState(xhr, xhr.HEADERS_RECEIVED);
+    updateXhrReadyState(xhr, xhr.LOADING);
+
+    // mark resolved
+    updateXhrReadyState(xhr, xhr.DONE);
+  };
+
+  const OriginalXMLHttpRequest = XMLHttpRequest;
+
+  const createProxyXHRObject = function () {
+    const actualXhr = this;
+
+    const dispatchEventToActualXHR = (type, e) => {
+      isDebugMode && console.log("[RQ]", `on${type}`, e);
+      actualXhr.dispatchEvent(
+        new ProgressEvent(type, {
+          lengthComputable: e?.lengthComputable,
+          loaded: e?.loaded,
+          total: e?.total,
+        })
+      );
+    };
+
+    const updateActualXHRReadyState = (readyState) => {
+      updateXhrReadyState(actualXhr, readyState);
+    };
+
+    const onReadyStateChange = async function () {
+      isDebugMode &&
+        console.log("[RQ]", "onReadyStateChange", {
+          state: this.readyState,
+          status: this.status,
+          response: this.response,
+          xhr: this,
+          url: this._requestURL,
+        });
       if (!this.responseRule) {
         return;
       }
-
       const responseModification = this.responseRule.pairs[0].response;
-      const responseType = this.responseType;
-      const contentType = this.getResponseHeader("content-type");
-
-      isDebugMode &&
-        console.log("RQ", "Inside the XHR onReadyStateChange block for url", {
-          url: this.requestURL,
-          xhr: this,
-        });
 
       if (this.readyState === this.HEADERS_RECEIVED) {
         // For network failures, responseStatus=0 but we still return customResponse with status=200
         const responseStatus = parseInt(responseModification.statusCode || this.status) || 200;
         const responseStatusText = responseModification.statusText || this.statusText;
 
-        Object.defineProperty(this, "status", {
-          get: () => responseStatus,
+        Object.defineProperties(actualXhr, {
+          status: {
+            get: () => responseStatus,
+          },
+          statusText: {
+            get: () => responseStatusText,
+          },
+          getResponseHeader: {
+            value: this.getResponseHeader.bind(this),
+          },
+          getAllResponseHeaders: {
+            value: this.getAllResponseHeaders.bind(this),
+          },
         });
 
-        Object.defineProperty(this, "statusText", {
-          get: () => responseStatusText,
-        });
-      }
+        updateActualXHRReadyState(this.HEADERS_RECEIVED);
+      } else if (this.readyState === this.DONE) {
+        const responseType = this.responseType;
+        const contentType = this.getResponseHeader("content-type");
 
-      if (this.readyState === this.DONE) {
         let customResponse =
           responseModification.type === "code"
             ? getFunctionFromCode(responseModification.value)({
-                method: this.method,
-                url: this.requestURL,
-                requestHeaders: this.requestHeaders,
-                requestData: jsonifyValidJSONString(this.requestData),
+                method: this._method,
+                url: this._requestURL,
+                requestHeaders: this._requestHeaders,
+                requestData: jsonifyValidJSONString(this._requestData),
                 responseType: contentType,
                 response: this.response,
                 responseJSON: jsonifyValidJSONString(this.response, true),
@@ -422,6 +474,9 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         if (isPromise(customResponse)) {
           customResponse = await customResponse;
         }
+
+        isDebugMode &&
+          console.log("[RQ]", "Rule Applied - customResponse", { customResponse, responseType, contentType });
 
         const isUnsupportedResponseType = responseType && !["json", "text"].includes(responseType);
 
@@ -438,8 +493,7 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         ) {
           customResponse = JSON.stringify(customResponse);
         }
-
-        Object.defineProperty(this, "response", {
+        Object.defineProperty(actualXhr, "response", {
           get: function () {
             if (responseModification.type === "static" && responseType === "json") {
               if (typeof customResponse === "object") {
@@ -454,83 +508,128 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
         });
 
         if (responseType === "" || responseType === "text") {
-          Object.defineProperty(this, "responseText", {
+          Object.defineProperty(actualXhr, "responseText", {
             get: function () {
               return customResponse;
             },
           });
         }
 
+        const responseURL = this.responseURL;
+        const responseXML = this.responseXML;
+
+        Object.defineProperties(actualXhr, {
+          responseType: {
+            get: function () {
+              return responseType;
+            },
+          },
+          responseURL: {
+            get: function () {
+              return responseURL;
+            },
+          },
+          responseXML: {
+            get: function () {
+              return responseXML;
+            },
+          },
+        });
+
         const requestDetails = {
-          url: this.requestURL,
-          method: this.method,
+          url: this._requestURL,
+          method: this._method,
           type: "xmlhttprequest",
           timeStamp: Date.now(),
         };
+
+        // mark resolved)
+        if (this._abort) {
+          // Note: This might get delayed due to async in code block
+          dispatchEventToActualXHR("abort");
+          dispatchEventToActualXHR("loadend");
+        } else {
+          updateActualXHRReadyState(this.DONE);
+          dispatchEventToActualXHR("load");
+          dispatchEventToActualXHR("loadend");
+        }
 
         notifyResponseRuleApplied({
           rule: this.responseRule,
           requestDetails,
         });
+      } else {
+        updateActualXHRReadyState(this.readyState);
       }
-    }
-  };
-
-  const resolveXHR = (xhr, responseData) => {
-    Object.defineProperty(xhr, "readyState", { writable: true });
-    const updateReadyState = (readyState) => {
-      xhr.readyState = readyState;
-      xhr.dispatchEvent(new CustomEvent("readystatechange"));
-    };
-    const dispatchProgressEvent = (type) => {
-      xhr.dispatchEvent(new ProgressEvent(type));
     };
 
-    dispatchProgressEvent("loadstart");
-
-    // update response headers
-    const contentType = isJSON(responseData) ? "application/json" : "text/plain";
-    xhr.getResponseHeader = (key) => {
-      if (key.toLowerCase() === "content-type") {
-        return contentType;
-      }
-      return null;
-    };
-    updateReadyState(xhr.HEADERS_RECEIVED);
-
-    // mark resolved
-    updateReadyState(xhr.DONE);
-    dispatchProgressEvent("load");
-    dispatchProgressEvent("loadend");
-  };
-
-  const XHR = XMLHttpRequest;
-  XMLHttpRequest = function () {
-    const xhr = new XHR();
+    const xhr = new OriginalXMLHttpRequest();
     xhr.addEventListener("readystatechange", onReadyStateChange.bind(xhr), false);
+    xhr.addEventListener("abort", dispatchEventToActualXHR.bind(xhr, "abort"), false);
+    xhr.addEventListener("error", dispatchEventToActualXHR.bind(xhr, "error"), false);
+    xhr.addEventListener("timeout", dispatchEventToActualXHR.bind(xhr, "timeout"), false);
+    xhr.addEventListener("loadstart", dispatchEventToActualXHR.bind(xhr, "loadstart"), false);
+    xhr.addEventListener("progress", dispatchEventToActualXHR.bind(xhr, "progress"), false);
+
+    const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "timeout");
+
+    Object.defineProperty(actualXhr, "timeout", {
+      get: function () {
+        return descriptor.get.call(this);
+      },
+      set: function (value) {
+        xhr.timeout = value;
+        descriptor.set.call(this, value);
+      },
+    });
+
+    this.rqProxyXhr = xhr;
+  };
+
+  XMLHttpRequest = function () {
+    const xhr = new OriginalXMLHttpRequest();
+    createProxyXHRObject.call(xhr);
     return xhr;
   };
-  XMLHttpRequest.prototype = XHR.prototype;
-  Object.entries(XHR).map(([key, val]) => {
+
+  XMLHttpRequest.prototype = OriginalXMLHttpRequest.prototype;
+  Object.entries(OriginalXMLHttpRequest).map(([key, val]) => {
     XMLHttpRequest[key] = val;
   });
 
   const open = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method, url) {
-    this.method = method;
-    this.requestURL = getAbsoluteUrl(url);
+    this.rqProxyXhr._method = method;
+    this.rqProxyXhr._requestURL = getAbsoluteUrl(url);
+    open.apply(this.rqProxyXhr, arguments);
     open.apply(this, arguments);
+  };
+
+  const abort = XMLHttpRequest.prototype.abort;
+  XMLHttpRequest.prototype.abort = function () {
+    isDebugMode && console.log("abort called");
+    this.rqProxyXhr._abort = true;
+    abort.apply(this, arguments);
+    abort.apply(this.rqProxyXhr, arguments);
+  };
+
+  let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
+  XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
+    this.rqProxyXhr._requestHeaders = this.rqProxyXhr._requestHeaders || {};
+    this.rqProxyXhr._requestHeaders[header] = value;
+    setRequestHeader.apply(this.rqProxyXhr, arguments);
+    setRequestHeader.apply(this, arguments);
   };
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (data) {
-    this.requestData = data;
+    this.rqProxyXhr._requestData = data;
 
-    const requestRule = getRequestRule(this.requestURL);
+    const requestRule = getRequestRule(this.rqProxyXhr._requestURL);
     if (requestRule) {
-      this.requestData = getCustomRequestBody(requestRule, {
-        method: this.method,
-        url: this.requestURL,
+      this.rqProxyXhr._requestData = getCustomRequestBody(requestRule, {
+        method: this.rqProxyXhr._method,
+        url: this.rqProxyXhr._requestURL,
         body: data,
         bodyAsJson: jsonifyValidJSONString(data, true),
       });
@@ -538,8 +637,8 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
       notifyRequestRuleApplied({
         ruleDetails: requestRule,
         requestDetails: {
-          url: this.requestURL,
-          method: this.method,
+          url: this.rqProxyXhr._requestURL,
+          method: this.rqProxyXhr._method,
           type: "xmlhttprequest",
           timeStamp: Date.now(),
         },
@@ -547,35 +646,37 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
     }
 
     this.responseRule = getResponseRule({
-      url: this.requestURL,
-      requestData: jsonifyValidJSONString(this.requestData),
-      method: this.method,
+      url: this.rqProxyXhr._requestURL,
+      requestData: jsonifyValidJSONString(this.rqProxyXhr._requestData),
+      method: this.rqProxyXhr._method,
     });
+    this.rqProxyXhr.responseRule = this.responseRule;
 
-    if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule)) {
-      resolveXHR(this, this.responseRule.pairs[0].response.value);
-    } else {
-      // redirect/replace rule specific code that is applied only when redirect/replace rule matches the URL
-      const redirectRuleThatMatchesURL = getMatchingRedirectRule(this.requestURL);
-      const replaceRuleThatMatchesURL = getMatchingReplaceRule(this.requestURL);
-      if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
-        ignoredHeadersOnRedirect.forEach((header) => {
-          // Stores ignored header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
-          const originalHeaderValue = this.requestHeaders?.[header] || this.requestHeaders?.[header.toLowerCase()];
-          if (isExtensionEnabled() && originalHeaderValue) {
-            this.setRequestHeader(customHeaderPrefix + header, originalHeaderValue);
-          }
-        });
-      }
-      send.call(this, this.requestData);
+    const redirectRuleThatMatchesURL = getMatchingRedirectRule(this.rqProxyXhr._requestURL);
+    const replaceRuleThatMatchesURL = getMatchingReplaceRule(this.rqProxyXhr._requestURL);
+    if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
+      ignoredHeadersOnRedirect.forEach((header) => {
+        // Stores ignored header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
+        const originalHeaderValue =
+          this.rqProxyXhr._requestHeaders?.[header] || this.rqProxyXhr._requestHeaders?.[header.toLowerCase()];
+        if (isExtensionEnabled() && originalHeaderValue) {
+          this.setRequestHeader(customHeaderPrefix + header, originalHeaderValue);
+        }
+      });
     }
-  };
 
-  let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
-  XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-    this.requestHeaders = this.requestHeaders || {};
-    this.requestHeaders[header] = value;
-    setRequestHeader.apply(this, arguments);
+    if (this.responseRule) {
+      isDebugMode && console.log("[RQ]", "send and response rule matched", this.responseRule);
+      if (shouldServeResponseWithoutRequest(this.responseRule)) {
+        isDebugMode && console.log("[RQ]", "send and response rule matched and serveWithoutRequest is true");
+        resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
+      } else {
+        send.call(this.rqProxyXhr, this.rqProxyXhr._requestData);
+      }
+      return;
+    }
+
+    send.call(this, this.rqProxyXhr._requestData);
   };
 
   // Intercept fetch API
