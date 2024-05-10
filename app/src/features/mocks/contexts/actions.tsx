@@ -30,7 +30,7 @@ type MocksActionContextType = {
   updateMocksCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
   uploadMockAction: (mockType: MockType) => void;
-  newFileModalAction: () => void;
+  createNewFileAction: () => void;
   createNewMockAction: (mockType: MockType, source: MockListSource) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   deleteRecordsAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
@@ -123,8 +123,8 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openMockUploaderModalAction]
   );
 
-  const newFileModalAction = useCallback(() => {
-    Logger.log("[DEBUG]", "newFileModalAction", {});
+  const createNewFileAction = useCallback(() => {
+    Logger.log("[DEBUG]", "createNewFileAction", {});
     openNewFileModalAction();
   }, [openNewFileModalAction]);
 
@@ -207,7 +207,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     updateMocksCollectionAction,
     toggleMockStarAction,
     uploadMockAction,
-    newFileModalAction,
+    createNewFileAction,
     createNewMockAction,
     removeMocksFromCollectionAction,
     deleteRecordsAction,
