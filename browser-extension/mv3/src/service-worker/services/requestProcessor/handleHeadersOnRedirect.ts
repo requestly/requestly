@@ -8,10 +8,11 @@ export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJ
     return;
   }
 
-  const { matchedRule, matchedRuleInfo } = requestProcessor.findMatchingRule(
-    [...requestProcessor.cachedRules.redirectRules, ...requestProcessor.cachedRules.replaceRules],
-    requestDetails
-  );
+  const { matchedRule, matchedRuleInfo } =
+    requestProcessor.findMatchingRule(
+      [...requestProcessor.cachedRules.redirectRules, ...requestProcessor.cachedRules.replaceRules],
+      requestDetails
+    ) ?? {};
 
   if (!matchedRule) {
     return;
