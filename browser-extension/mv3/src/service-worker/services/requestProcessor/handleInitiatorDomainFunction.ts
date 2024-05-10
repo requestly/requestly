@@ -1,11 +1,10 @@
 import { requestProcessor } from ".";
-import { matchRequestWithRuleSource } from "../ruleMatcher";
 import { AJAXRequestDetails, SessionRuleType } from "./types";
 
 const INITIATOR_DOMAIN_FUNCTION = "rq_request_initiator_origin()";
 
 export const handleInitiatorDomainFunction = async (tabId: number, requestDetails: AJAXRequestDetails) => {
-  const matchedRule = requestProcessor.findMatchingRule(requestProcessor.cachedRules.headerRules, requestDetails);
+  const { matchedRule } = requestProcessor.findMatchingRule(requestProcessor.cachedRules.headerRules, requestDetails);
 
   if (!matchedRule) {
     return;
@@ -15,24 +14,23 @@ export const handleInitiatorDomainFunction = async (tabId: number, requestDetail
     Request: {},
     Response: {},
   };
+  ``;
 
   matchedRule.pairs.forEach((pair) => {
-    if (matchRequestWithRuleSource(pair.source, requestDetails)) {
-      if (pair.modifications?.Request?.length) {
-        pair.modifications.Request.forEach((header: { header: string; type: string; value: string }) => {
-          if (header.value === INITIATOR_DOMAIN_FUNCTION) {
-            headerKeyValueMap.Request[header.header] = requestDetails.initiatorDomain;
-          }
-        });
-      }
+    if (pair.modifications?.Request?.length) {
+      pair.modifications.Request.forEach((header: { header: string; type: string; value: string }) => {
+        if (header.value === INITIATOR_DOMAIN_FUNCTION) {
+          headerKeyValueMap.Request[header.header] = requestDetails.initiatorDomain;
+        }
+      });
+    }
 
-      if (pair.modifications?.Response?.length) {
-        pair.modifications.Response.forEach((header: { header: string; type: string; value: string }) => {
-          if (header.value === INITIATOR_DOMAIN_FUNCTION) {
-            headerKeyValueMap.Response[header.header] = requestDetails.initiatorDomain;
-          }
-        });
-      }
+    if (pair.modifications?.Response?.length) {
+      pair.modifications.Response.forEach((header: { header: string; type: string; value: string }) => {
+        if (header.value === INITIATOR_DOMAIN_FUNCTION) {
+          headerKeyValueMap.Response[header.header] = requestDetails.initiatorDomain;
+        }
+      });
     }
   });
 
