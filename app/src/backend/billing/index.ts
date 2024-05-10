@@ -157,3 +157,11 @@ export const fetchBillingInformation = async (billingId: string) => {
     return res.data;
   });
 };
+
+export const revokeBillingTeamInvite = async (billingId: string, email: string) => {
+  if (!billingId || !email) {
+    return null;
+  }
+  const revokeInvite = httpsCallable(getFunctions(), "billing-revokeInvite");
+  return revokeInvite({ billingId, userEmail: email });
+};
