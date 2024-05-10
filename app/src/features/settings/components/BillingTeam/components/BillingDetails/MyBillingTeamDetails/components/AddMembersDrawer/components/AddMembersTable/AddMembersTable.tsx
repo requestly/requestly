@@ -7,6 +7,7 @@ import { EmptyMembersTableView } from "./components/EmptyMembersTableView/EmptyM
 import { RQButton } from "lib/design-system/components";
 import { MdOutlinePersonAdd } from "@react-icons/all-files/md/MdOutlinePersonAdd";
 import { AddMembersTableActions } from "./components/AddMembersTableActions/AddMembersTableActions";
+import { trackBillingTeamInviteMemberClicked } from "features/settings/analytics";
 import "./addMembersTable.scss";
 
 interface AddMembersTableProps {
@@ -46,7 +47,10 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({
             type="default"
             className="invite-people-btn"
             icon={<MdOutlinePersonAdd />}
-            onClick={toggleInviteFormVisibility}
+            onClick={() => {
+              toggleInviteFormVisibility();
+              trackBillingTeamInviteMemberClicked("header");
+            }}
           >
             Invite people
           </RQButton>,
