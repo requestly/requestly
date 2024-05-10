@@ -41,9 +41,9 @@ export const useBillingTeamsListener = () => {
     );
 
     unsubscribeBillingTeamsListener = onSnapshot(billingTeamsQuery, async (billingTeams) => {
-      const userBillingTeamIds: string[] = [];
+      const userBillingTeamIds = new Set();
       const billingTeamDetails = billingTeams.docs.map((billingTeam) => {
-        userBillingTeamIds.push(billingTeam.id);
+        userBillingTeamIds.add(billingTeam.id);
         return {
           ...(billingTeam.data() as BillingTeamDetails),
           id: billingTeam.id,
@@ -54,7 +54,7 @@ export const useBillingTeamsListener = () => {
         const domainBillingTeamsQuery = query(collection(db, "billing"), where("ownerDomain", "==", domain));
         const querySnapshot = await getDocs(domainBillingTeamsQuery);
         querySnapshot.forEach((doc) => {
-          if (!userBillingTeamIds.includes(doc.id)) {
+          if (!userBillingTeamIds.has(doc.id)) {
             billingTeamDetails.push({
               ...(doc.data() as BillingTeamDetails),
               id: doc.id,

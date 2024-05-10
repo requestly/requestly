@@ -35,6 +35,10 @@
     padding: 0;
   }
 
+  input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
+    padding: 0;
+  }
+
   .ant-table-column-sorter {
     display: none;
   }
