@@ -1,6 +1,6 @@
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { Rule, RuleType } from "common/types";
-import { matchRequestWithRuleSource, populateRedirectedUrl } from "../ruleMatcher";
+import { getMatchedRuleForRequest } from "../ruleMatcher";
 import { TAB_SERVICE_DATA, tabService } from "../tabService";
 import { AJAXRequestDetails, SessionRuleType } from "./types";
 import { forwardHeadersOnRedirect } from "./handleHeadersOnRedirect";
@@ -24,12 +24,14 @@ class RequestProcessor {
     onRuleOrGroupChange(this.updateCachedRules.bind(this));
   }
 
-  findMatchingRule = (rules: Rule[], requestDetails: AJAXRequestDetails): Rule | undefined => {
-    return rules.find((rule) => rule.pairs.some((pair) => matchRequestWithRuleSource(pair.source, requestDetails)));
-  };
-
-  getRedirectedUrl = (matchedRule: Rule, requestDetails: AJAXRequestDetails) => {
-    return populateRedirectedUrl(matchedRule, requestDetails);
+  findMatchingRule = (rules: Rule[], requestDetails: AJAXRequestDetails) => {
+    for (const rule of rules) {
+      const matchedRule = getMatchedRuleForRequest(rule, requestDetails);
+      if (matchedRule) {
+        return matchedRule;
+      }
+    }
+    return null;
   };
 
   updateRequestSpecificRules = async (

@@ -6,6 +6,7 @@ import {
   Rule,
   RuleType,
   SourceFilterTypes,
+  RulePair,
 } from "common/types";
 import { AJAXRequestDetails } from "./requestProcessor/types";
 
@@ -115,10 +116,26 @@ const matchRequestWithRuleSourceFilters = function (
   });
 };
 
-export const matchRequestWithRuleSource = function (source: UrlSource, requestDetails: AJAXRequestDetails) {
-  return (
-    matchSourceUrl(source, requestDetails.url) && matchRequestWithRuleSourceFilters(source.filters, requestDetails)
+export const getMatchedRuleForRequest = function (rule: Rule, requestDetails: AJAXRequestDetails) {
+  const matchedPair = rule?.pairs?.find(
+    (pair) =>
+      matchSourceUrl(pair.source, requestDetails.url) &&
+      matchRequestWithRuleSourceFilters(pair.source.filters, requestDetails)
   );
+
+  if (!matchedPair) {
+    return null;
+  }
+
+  const redirectedDestinationUrl = populateRedirectedUrl(matchedPair, rule.ruleType, requestDetails);
+
+  return {
+    matchedRule: rule,
+    matchedRuleInfo: {
+      source: matchedPair.source,
+      redirectedDestinationUrl: redirectedDestinationUrl,
+    },
+  };
 };
 
 /**
@@ -145,12 +162,10 @@ export const populateMatchesInString = function (finalString: string, matches: s
   return finalString;
 };
 
-export const populateRedirectedUrl = (rule: Rule, requestDetails: AJAXRequestDetails) => {
-  const matchedPair = rule.pairs.find((pair) => matchRequestWithRuleSource(pair.source, requestDetails));
-
-  switch (rule.ruleType) {
+export const populateRedirectedUrl = (rulePair: RulePair, ruleType: RuleType, requestDetails: AJAXRequestDetails) => {
+  switch (ruleType) {
     case RuleType.REPLACE:
-      const redirectedUrl = requestDetails.url.replace(matchedPair.from, matchedPair.to);
+      const redirectedUrl = requestDetails.url.replace(rulePair.from, rulePair.to);
       if (redirectedUrl === requestDetails.url) {
         return null;
       } else {
@@ -158,27 +173,27 @@ export const populateRedirectedUrl = (rule: Rule, requestDetails: AJAXRequestDet
       }
 
     case RuleType.REDIRECT: {
-      if (matchedPair.source.operator === SourceOperator.MATCHES) {
-        const matches = toRegex(matchedPair.source.value)?.exec(requestDetails.url);
+      if (rulePair.source.operator === SourceOperator.MATCHES) {
+        const matches = toRegex(rulePair.source.value)?.exec(requestDetails.url);
 
         if (!matches) {
-          return matchedPair.destination;
+          return rulePair.destination;
         }
 
-        return populateMatchesInString(matchedPair.destination, matches);
-      } else if (matchedPair.source.operator === SourceOperator.WILDCARD_MATCHES) {
-        const wildCardString = matchedPair.source.value;
+        return populateMatchesInString(rulePair.destination, matches);
+      } else if (rulePair.source.operator === SourceOperator.WILDCARD_MATCHES) {
+        const wildCardString = rulePair.source.value;
         const regexString = createRegexForWildcardString(wildCardString);
 
         const matches = toRegex(regexString)?.exec(requestDetails.url);
 
         if (!matches) {
-          return matchedPair.destination;
+          return rulePair.destination;
         }
 
-        return populateMatchesInString(matchedPair.destination, matches);
+        return populateMatchesInString(rulePair.destination, matches);
       } else {
-        return matchedPair.destination;
+        return rulePair.destination;
       }
     }
 
