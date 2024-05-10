@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { getDomainFromEmail, isCompanyEmail } from "utils/FormattingHelper";
 import { OrgMember } from "../types";
+import Logger from "../../../../../../../common/logger";
 
 export const useFetchOrgMembers = () => {
   const user = useSelector(getUserAuthDetails);
@@ -31,7 +32,7 @@ export const useFetchOrgMembers = () => {
           setOrganizationMembers(res.data);
         })
         .catch((error) => {
-          console.error("Error fetching organization members", error);
+          Logger.log("Error fetching organization members", error);
         })
         .finally(() => {
           setIsLoading(false);
