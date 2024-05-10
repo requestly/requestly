@@ -21,7 +21,7 @@ import { DEFAULT_COLLECTION_ID } from "../constants";
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
   updateCollectionNameAction: (mockType: MockType, record: RQMockMetadataSchema) => void;
-  deleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
+  deleteCollectionAction: (record: RQMockMetadataSchema) => void;
   deleteRecordsAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   updateMocksCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
@@ -69,9 +69,9 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openCollectionModalAction]
   );
 
-  const deleteCollectionModalAction = useCallback(
+  const deleteCollectionAction = useCallback(
     (record: RQMockMetadataSchema) => {
-      Logger.log("[DEBUG]", "deleteCollectionModalAction", { record });
+      Logger.log("[DEBUG]", "deleteCollectionAction", { record });
       openDeleteCollectionModalAction(record);
     },
     [openDeleteCollectionModalAction]
@@ -156,7 +156,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
-    deleteCollectionModalAction,
+    deleteCollectionAction,
     deleteRecordsAction,
     updateMocksCollectionAction,
     toggleMockStarAction,
