@@ -9,6 +9,9 @@ interface OrgMembersTableProps {
   searchValue: string;
   members: OrgMember[];
   setSearchValue: (value: string) => void;
+  memberActions?: (record: OrgMember) => ReactNode[];
+  tableActions?: ReactNode[];
+  emptyView?: ReactNode;
   actions?: (member: OrgMember) => ReactNode;
 }
 
@@ -16,8 +19,10 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   searchValue,
   setSearchValue,
   members,
-  actions,
+  memberActions,
+  tableActions,
   isLoading,
+  emptyView,
 }) => {
   const columns: TableProps<OrgMember>["columns"] = useMemo(
     () => [
@@ -53,35 +58,43 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
         title: "",
         key: "action",
         render: (_: any, member) => {
-          return actions?.(member);
+          return <div className="org-member-row-actions">{memberActions?.(member)}</div>;
         },
       },
     ],
 
-    [actions]
+    [memberActions]
   );
 
   return (
     <Col>
       <Col className="org-member-table">
         <Col className="org-member-table-header">
-          <Input
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search members"
-            className="org-member-table-header-input"
-            suffix={<SearchOutlined />}
-          />
+          <div className="org-members-table-header-actions">
+            <Input
+              type="search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Search members"
+              className="org-member-table-header-input"
+              suffix={<SearchOutlined />}
+            />
+            <div className="org-members-table-actions">{tableActions}</div>
+          </div>
+          <div className="org-members-table-count">
+            {members.length} {members.length === 1 ? "member" : "members"}
+          </div>
         </Col>
+
         <Table
           className="billing-table"
           dataSource={members}
           columns={columns}
           pagination={false}
-          scroll={{ y: "74vh" }}
+          scroll={{ y: "78vh" }}
           loading={isLoading}
           locale={{
-            emptyText: (
+            emptyText: emptyView ?? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={

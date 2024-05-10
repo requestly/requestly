@@ -11,7 +11,7 @@
     border-bottom: 1px solid var(--surface-2);
 
     &-input {
-      width: 224px;
+      width: 280px;
       border-radius: 4px;
       border: 1px solid var(--requestly-color-white-t-20);
       background: transparent;
@@ -24,6 +24,15 @@
         }
       }
     }
+  }
+  .org-members-table-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
+    padding: 0;
   }
 
   input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
@@ -55,25 +64,19 @@
     background: var(--background);
   }
 
-  .billing-team-members-add-btn.ant-btn {
-    gap: 8px;
-    color: var(--neutrals-gray-300) !important;
-
-    &:hover,
-    &:focus,
-    &:active {
-      color: var(--white) !important;
-      border-color: var(--surface-3) !important;
-    }
+  .org-members-table-count {
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-subtle);
+    padding-top: 8px;
   }
 
-  .billing-team-members-added-label {
-    color: var(--neutrals-gray-300);
-    padding-right: 5px;
+  .org-members-table-actions,
+  .org-member-row-actions {
+    display: flex;
+    gap: 8px;
+  }
 
-    & svg {
-      position: relative;
-      top: 3px;
-    }
+  .org-member-row-actions {
+    justify-content: flex-end;
   }
 }

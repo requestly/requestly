@@ -13,6 +13,7 @@ import { toast } from "utils/Toast";
 import { trackBillingTeamActionClicked, trackBillingTeamMemberAdded } from "features/settings/analytics";
 import { addUsersToBillingTeam } from "backend/billing";
 import { OrgMember } from "features/settings/components/OrgMembers/types";
+import "./orgTableActions.scss";
 
 export const AddMembersTableActions: React.FC<{ member: OrgMember }> = ({ member }) => {
   const { billingId } = useParams();
@@ -56,7 +57,7 @@ export const AddMembersTableActions: React.FC<{ member: OrgMember }> = ({ member
           {isUserAdmin && (
             <Row justify="end">
               <RQButton
-                type="default"
+                type="text"
                 icon={<IoMdAdd />}
                 className="billing-team-members-add-btn"
                 loading={isAddingUser}
