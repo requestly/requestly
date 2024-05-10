@@ -4,7 +4,8 @@ import { AJAXRequestDetails, SessionRuleType } from "./types";
 const INITIATOR_DOMAIN_FUNCTION = "rq_request_initiator_origin()";
 
 export const handleInitiatorDomainFunction = async (tabId: number, requestDetails: AJAXRequestDetails) => {
-  const { matchedRule } = requestProcessor.findMatchingRule(requestProcessor.cachedRules.headerRules, requestDetails);
+  const { matchedRule } =
+    requestProcessor.findMatchingRule(requestProcessor.cachedRules.headerRules, requestDetails) ?? {};
 
   if (!matchedRule) {
     return;
