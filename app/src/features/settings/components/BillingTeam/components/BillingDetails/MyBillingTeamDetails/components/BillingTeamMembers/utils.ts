@@ -1,7 +1,24 @@
 import { BillingAction } from "./types";
-import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamMemberStatus, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 
-export const isMenuItemDisabled = (action: BillingAction, role: BillingTeamRoles) => {
-  if (action === BillingAction.MAKE_ADMIN && role === BillingTeamRoles.Admin) return true;
-  if (action === BillingAction.MAKE_MEMBER && role === BillingTeamRoles.Member) return true;
+export const isMenuItemDisabled = (action: BillingAction, role: BillingTeamRoles, status: BillingTeamMemberStatus) => {
+  if (action === BillingAction.MAKE_ADMIN) {
+    if (role === BillingTeamRoles.Admin) {
+      return true;
+    }
+
+    if (status === BillingTeamMemberStatus.PENDING) {
+      return true;
+    }
+  }
+
+  if (action === BillingAction.MAKE_MEMBER) {
+    if (role === BillingTeamRoles.Member) {
+      return true;
+    }
+
+    if (status === BillingTeamMemberStatus.PENDING) {
+      return true;
+    }
+  }
 };
