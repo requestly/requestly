@@ -27,7 +27,7 @@ type MocksActionContextType = {
   updateCollectionNameAction: (mockType: MockType, record: RQMockMetadataSchema) => void;
   deleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
   deleteRecordsModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
-  updateMocksCollectionModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
+  updateMocksCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
   mockUploaderModalAction: (mockType: MockType) => void;
   newFileModalAction: () => void;
@@ -90,9 +90,9 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openDeletRecordsModalAction]
   );
 
-  const updateMocksCollectionModalAction = useCallback(
+  const updateMocksCollectionAction = useCallback(
     (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
-      Logger.log("[DEBUG]", "updateMocksCollectionModalAction", { records });
+      Logger.log("[DEBUG]", "updateMocksCollectionAction", { records });
       openUpdateMocksCollectionModalAction(records, onSuccess);
     },
     [openUpdateMocksCollectionModalAction]
@@ -204,7 +204,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     updateCollectionNameAction,
     deleteCollectionModalAction,
     deleteRecordsModalAction,
-    updateMocksCollectionModalAction,
+    updateMocksCollectionAction,
     toggleMockStarAction,
     mockUploaderModalAction,
     newFileModalAction,

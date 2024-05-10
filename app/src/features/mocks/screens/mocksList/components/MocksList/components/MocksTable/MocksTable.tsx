@@ -75,7 +75,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     forceRender,
   });
 
-  const { deleteRecordsModalAction, updateMocksCollectionModalAction, removeMocksFromCollectionAction } =
+  const { deleteRecordsModalAction, updateMocksCollectionAction, removeMocksFromCollectionAction } =
     useMocksActionContext() ?? {};
 
   const getBulkActionBarInfoText = useCallback((selectedRows: RQMockMetadataSchema[]) => {
@@ -146,7 +146,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                         clearSelectedRows();
                       };
 
-                      updateMocksCollectionModalAction(selectedRows, onSuccess);
+                      updateMocksCollectionAction(selectedRows, onSuccess);
                     },
                   },
                   {
