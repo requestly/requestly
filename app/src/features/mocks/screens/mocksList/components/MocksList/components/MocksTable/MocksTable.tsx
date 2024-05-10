@@ -150,7 +150,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                     },
                   },
                   {
-                    label: "Move out from collection",
+                    label: "Remove from Collection",
                     icon: <ImUngroup />,
                     onClick: (selectedRows) => {
                       const onSuccess = () => {
