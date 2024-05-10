@@ -114,7 +114,6 @@ const addExtensionRules = async (): Promise<void> => {
 };
 
 const applyExtensionRules = async (): Promise<void> => {
-  console.log("!!!debug", "apply extension rules");
   await deleteExtensionRules();
 
   const isExtensionStatusEnabled = await isExtensionEnabled();
