@@ -8,11 +8,16 @@ import CreatableSelect from "react-select/creatable";
 import { MultiValue } from "react-select";
 
 interface Props {
+  autoFocus?: boolean;
   onChange: (emails: string[]) => void;
   transparentBackground?: boolean;
 }
 
-const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, transparentBackground = false }) => {
+const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
+  onChange,
+  transparentBackground = false,
+  autoFocus = false,
+}) => {
   const user = useSelector(getUserAuthDetails);
   const userEmail = user?.details?.profile?.email;
 
@@ -58,6 +63,7 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({ onChange, trans
 
   return (
     <CreatableSelect
+      autoFocus={autoFocus}
       isMulti={true}
       isClearable={false}
       options={suggestionOptions}
