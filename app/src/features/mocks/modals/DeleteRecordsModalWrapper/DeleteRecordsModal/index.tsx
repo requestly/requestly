@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
 import { RQModal } from "lib/design-system/components";
@@ -29,64 +29,6 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
 
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const deleteMockAction = useCallback(
-    async (mock: RQMockMetadataSchema, onSuccess?: () => void) => {
-      if (mock.isOldMock) {
-        const functions = getFunctions();
-        const deleteOldMock = httpsCallable(functions, "deleteMock");
-
-        return deleteOldMock(mock.id).then((res: any) => {
-          if (res?.data?.success) {
-            if (mock.oldMockFilePath) {
-              FilesService.deleteFileFromStorage(mock.oldMockFilePath);
-            }
-            trackDeleteMockEvent(mock.id, mock?.type, mock?.fileType);
-            onSuccess?.();
-          }
-        });
-      } else {
-        return deleteMock(uid, mock.id, workspace?.id)
-          .then(() => {
-            trackDeleteMockEvent(mock.id, mock?.type, mock?.fileType);
-            onSuccess?.();
-          })
-          .catch((err) => {
-            Logger.log("Error while deleting mock", err);
-          });
-      }
-    },
-    [uid, workspace?.id]
-  );
-
-  const deleteRecordsAction = useCallback((records: RQMockMetadataSchema[], onSuccess?: () => void) => {
-    const allPromises: Promise<void>[] = [];
-
-    records.forEach((record) => {
-      allPromises.push(deleteMockAction(record));
-    });
-
-    Promise.allSettled(allPromises).then(() => {
-      onSuccess?.();
-    });
-  }, []);
-
-  const handleOnConfirm = () => {
-    setIsDeleting(true);
-
-    const onDeleted = () => {
-      onSuccess?.();
-      setIsDeleting(false);
-      toggleModalVisibility(false);
-      toast.info(`${recordType} deleted!`);
-    };
-
-    deleteRecordsAction(records, onDeleted);
-  };
-
-  const handleCancel = () => {
-    toggleModalVisibility(false);
-  };
-
   const recordType =
     records.length === 1
       ? isRecordMock(records[0])
@@ -95,6 +37,57 @@ export const DeleteRecordsModal: React.FC<Props> = ({ visible, records, toggleMo
           : "File"
         : "Collection"
       : "Records";
+
+  const deleteRecordAction = async (mock: RQMockMetadataSchema, onSuccess?: () => void) => {
+    if (mock.isOldMock) {
+      const functions = getFunctions();
+      const deleteOldMock = httpsCallable(functions, "deleteMock");
+
+      return deleteOldMock(mock.id).then((res: any) => {
+        if (res?.data?.success) {
+          if (mock.oldMockFilePath) {
+            FilesService.deleteFileFromStorage(mock.oldMockFilePath);
+          }
+          trackDeleteMockEvent(mock.id, mock?.type, mock?.fileType);
+          onSuccess?.();
+        }
+      });
+    } else {
+      return deleteMock(uid, mock.id, workspace?.id)
+        .then(() => {
+          trackDeleteMockEvent(mock.id, mock?.type, mock?.fileType);
+          onSuccess?.();
+        })
+        .catch((err) => {
+          Logger.log("Error while deleting mock", err);
+        });
+    }
+  };
+
+  const deleteRecordsAction = (records: RQMockMetadataSchema[]) => {
+    const allPromises: Promise<void>[] = [];
+
+    records.forEach((record) => {
+      allPromises.push(deleteRecordAction(record));
+    });
+
+    return Promise.allSettled(allPromises);
+  };
+
+  const handleOnConfirm = () => {
+    setIsDeleting(true);
+
+    deleteRecordsAction(records).then(() => {
+      onSuccess?.();
+      setIsDeleting(false);
+      toggleModalVisibility(false);
+      toast.info(`${recordType} deleted!`);
+    });
+  };
+
+  const handleCancel = () => {
+    toggleModalVisibility(false);
+  };
 
   return (
     <RQModal open={visible} destroyOnClose={true} onCancel={handleCancel} className="delete-mock-modal">

@@ -44,7 +44,7 @@ export const useMocksTableColumns = ({
   const {
     updateCollectionNameAction,
     deleteCollectionModalAction,
-    deleteRecordsModalAction,
+    deleteRecordsAction,
     updateMocksCollectionAction,
     toggleMockStarAction,
     removeMocksFromCollectionAction,
@@ -300,7 +300,7 @@ export const useMocksTableColumns = ({
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              deleteRecordsModalAction([record]);
+              deleteRecordsAction([record]);
             },
             label: (
               <div className="mock-action">

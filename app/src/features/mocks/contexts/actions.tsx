@@ -22,7 +22,7 @@ type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
   updateCollectionNameAction: (mockType: MockType, record: RQMockMetadataSchema) => void;
   deleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
-  deleteRecordsModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
+  deleteRecordsAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   updateMocksCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
   uploadMockAction: (mockType: MockType) => void;
@@ -77,9 +77,9 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openDeleteCollectionModalAction]
   );
 
-  const deleteRecordsModalAction = useCallback(
+  const deleteRecordsAction = useCallback(
     (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
-      Logger.log("[DEBUG]", "deleteRecordsModalAction", { records });
+      Logger.log("[DEBUG]", "deleteRecordsAction", { records });
       openDeleteRecordsModalAction(records, onSuccess);
     },
     [openDeleteRecordsModalAction]
@@ -157,7 +157,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     createNewCollectionAction,
     updateCollectionNameAction,
     deleteCollectionModalAction,
-    deleteRecordsModalAction,
+    deleteRecordsAction,
     updateMocksCollectionAction,
     toggleMockStarAction,
     uploadMockAction,
