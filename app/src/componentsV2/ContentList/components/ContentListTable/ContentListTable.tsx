@@ -19,6 +19,8 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   onRecordSelection?: (selectedRows: DataType[]) => void;
 }
 
+const EXPANDED_ROWS_LOCAL_STORAGE_KEY = "content-list-table-expanded-rows";
+
 const ContentListTable = <DataType extends { [key: string]: any }>({
   id,
   columns,
@@ -47,9 +49,13 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
         updatedExpandedRowKeys.delete(record[rowKey]);
       }
       setExpandedRowsKeys(Array.from(updatedExpandedRowKeys));
+
+      const expandedRows = JSON.parse(localStorage.getItem(EXPANDED_ROWS_LOCAL_STORAGE_KEY) || null) ?? {};
+
       localStorage.setItem(
-        "content-list-table-expanded-rows",
+        EXPANDED_ROWS_LOCAL_STORAGE_KEY,
         JSON.stringify({
+          ...expandedRows,
           [id]: Array.from(updatedExpandedRowKeys),
         })
       );
@@ -58,7 +64,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   );
 
   useEffect(() => {
-    const expandedRowsData = localStorage.getItem("content-list-table-expanded-rows");
+    const expandedRowsData = localStorage.getItem(EXPANDED_ROWS_LOCAL_STORAGE_KEY);
     const currentListTableExpandedRows = expandedRowsData ? JSON.parse(expandedRowsData)[id] : [];
     if (currentListTableExpandedRows) {
       setExpandedRowsKeys(currentListTableExpandedRows);
