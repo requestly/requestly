@@ -33,7 +33,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!emails.length) {
-        toast.warn("Please enter email(s) to send invitation/add users");
+        toast.warn("Please enter email(s) to proceed");
         return;
       }
       setIsLoading(true);
@@ -86,7 +86,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
           You can invite multiple members by typing their email and pressing `Enter` key.
         </div>
         <div className="invite-emails-wrapper">
-          <EmailInputWithDomainBasedSuggestions transparentBackground onChange={handleEmailsChange} />
+          <EmailInputWithDomainBasedSuggestions autoFocus transparentBackground onChange={handleEmailsChange} />
         </div>
         <div className="billing-team-invite-members-form-actions">
           <RQButton loading={isLoading} type="primary" htmlType="submit">
