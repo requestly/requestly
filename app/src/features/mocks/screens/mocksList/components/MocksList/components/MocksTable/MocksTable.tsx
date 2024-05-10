@@ -152,6 +152,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
                   {
                     label: "Remove from Collection",
                     icon: <ImUngroup />,
+                    hidden: (selectedRows) => !selectedRows.some((row) => row?.collectionId?.length > 0),
                     onClick: (selectedRows) => {
                       const onSuccess = () => {
                         trackMocksListBulkActionPerformed("remove_mocks_from_collections", mockType);
