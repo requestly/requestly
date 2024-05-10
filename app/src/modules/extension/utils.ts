@@ -35,6 +35,8 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
     return migratedRule;
   });
 
+  console.log("!!!debug", "rulesMigeationLogs all rules", rulesMigrationLogs);
+
   StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
     .saveMultipleRulesOrGroups(migratedRules, { workspaceId: workspaceId })
     .then(() => {
@@ -63,11 +65,13 @@ export const migrateRuleToMV3 = (rule: Rule) => {
   rule.pairs.forEach((pair) => {
     const pathMigrationStatus = migratePathOperator(pair.source);
     if (pathMigrationStatus) {
+      console.log("!!!debug", "pathMigration Status", pathMigrationStatus);
       ruleMigrationLogs.migrationChanges.push(pathMigrationStatus);
     }
 
     const pageUrlMigrationStatus = migratePageURLtoPageDomain(pair.source);
     if (pageUrlMigrationStatus) {
+      console.log("!!!debug", "pageURLMigrationStatus", pageUrlMigrationStatus);
       ruleMigrationLogs.migrationChanges.push(pageUrlMigrationStatus);
     }
   });
@@ -124,7 +128,7 @@ const migratePageURLtoPageDomain = (
 
     if (sourceFilters.pageUrl && sourceFilters.pageUrl.value) {
       let migrationLog = null;
-      let pageDomains = [];
+      const pageDomains = [];
       try {
         pageDomains.push(new URL(sourceFilters.pageUrl.value).hostname);
       } catch (e) {
@@ -137,7 +141,9 @@ const migratePageURLtoPageDomain = (
             filters: [{ ...sourceFilters }],
           },
         };
+        sourceFilters.pageDomains = pageDomains;
         delete sourceFilters.pageUrl;
+        console.log("!!!debug", "sourceFilters", sourceFilters, source.filters[0]);
       }
 
       return migrationLog;
