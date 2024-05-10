@@ -311,6 +311,8 @@ export const useMocksTableColumns = ({
           },
         ];
 
+        const updatedMockActions = mockActions.filter((action) => (record.collectionId ? true : action.key !== 3));
+
         return handleSelectAction ? (
           isRecordMockCollection(record) ? null : (
             <RQButton
@@ -333,7 +335,7 @@ export const useMocksTableColumns = ({
           )
         ) : (
           <Dropdown
-            menu={{ items: isRecordMockCollection(record) ? collectionActions : mockActions }}
+            menu={{ items: isRecordMockCollection(record) ? collectionActions : updatedMockActions }}
             trigger={["click"]}
             overlayClassName="mocks-more-actions-dropdown"
           >
