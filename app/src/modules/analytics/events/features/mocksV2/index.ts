@@ -1,5 +1,6 @@
 import { trackEvent } from "modules/analytics";
 import { MOCKSV2 } from "../constants";
+import { MockType } from "components/features/mocksV2/types";
 
 export const trackCreateMockEvent = (
   id: string,
@@ -158,4 +159,10 @@ export const trackMockCollectionDeleted = (
 ) => {
   const params = { source, num_mocks, type };
   trackEvent(MOCKSV2.MOCK_COLLECTION_DELETED, params);
+};
+
+// bulk actions
+export const trackMocksListBulkActionPerformed = (action: string, mockType: MockType) => {
+  const params = { action, mockType };
+  trackEvent(MOCKSV2.MOCKS_LIST_BULK_ACTION_PERFORMED, params);
 };

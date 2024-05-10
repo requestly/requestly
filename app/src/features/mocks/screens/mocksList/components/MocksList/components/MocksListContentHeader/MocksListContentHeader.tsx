@@ -45,7 +45,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
-  const { createNewCollectionAction, mockUploaderModalAction, createNewMock } = useMocksActionContext() ?? {};
+  const { createNewCollectionAction, mockUploaderModalAction, createNewMockAction } = useMocksActionContext() ?? {};
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const actionbuttonsData = [
@@ -84,7 +84,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
           if (source === MockListSource.PICKER_MODAL) {
             handleCreateNewMockFromPickerModal();
           } else {
-            createNewMock?.(mockType, source);
+            createNewMockAction?.(mockType, source);
           }
         }
       },
@@ -96,7 +96,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
           if (source === MockListSource.PICKER_MODAL) {
             handleCreateNewMockFromPickerModal();
           } else {
-            createNewMock?.(mockType, source);
+            createNewMockAction?.(mockType, source);
           }
         },
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,

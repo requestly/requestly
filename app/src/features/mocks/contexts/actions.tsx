@@ -7,6 +7,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import {
+  trackDeleteMockEvent,
   trackMockStarToggledEvent,
   trackMockUploadWorkflowStarted,
   trackNewMockButtonClicked,
@@ -17,18 +18,23 @@ import { toast } from "utils/Toast";
 import { isRecordMock } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
 import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
 import { DEFAULT_COLLECTION_ID } from "../constants";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import * as FilesService from "../../../utils/files/FilesService";
+import { deleteMock } from "backend/mocks/deleteMock";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
   updateCollectionNameAction: (mockType: MockType, record: RQMockMetadataSchema) => void;
   deleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
-  deleteMockModalAction: (record: RQMockMetadataSchema) => void;
-  updateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
+  deleteRecordsModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
+  updateMocksCollectionModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
   mockUploaderModalAction: (mockType: MockType) => void;
   newFileModalAction: () => void;
-  createNewMock: (mockType: MockType, source: MockListSource) => void;
+  createNewMockAction: (mockType: MockType, source: MockListSource) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
+  deleteMockAction: (mock: RQMockMetadataSchema, onSuccess?: () => void) => void;
+  deleteRecordsAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -47,8 +53,8 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const {
     openCollectionModalAction,
     openDeleteCollectionModalAction,
-    openDeleteMockModalAction,
-    openUpdateMockCollectionModalAction,
+    openDeletRecordsModalAction,
+    openUpdateMocksCollectionModalAction,
     openMockUploaderModalAction,
     openNewFileModalAction,
   } = useMocksModalsContext();
@@ -77,20 +83,20 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [openDeleteCollectionModalAction]
   );
 
-  const deleteMockModalAction = useCallback(
-    (record: RQMockMetadataSchema) => {
-      Logger.log("[DEBUG]", "deleteMockModalAction", { record });
-      openDeleteMockModalAction(record);
+  const deleteRecordsModalAction = useCallback(
+    (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
+      Logger.log("[DEBUG]", "deleteRecordsModalAction", { records });
+      openDeletRecordsModalAction(records, onSuccess);
     },
-    [openDeleteMockModalAction]
+    [openDeletRecordsModalAction]
   );
 
-  const updateMockCollectionModalAction = useCallback(
-    (record: RQMockMetadataSchema) => {
-      Logger.log("[DEBUG]", "updateMockCollectionModalAction", { record });
-      openUpdateMockCollectionModalAction(record);
+  const updateMocksCollectionModalAction = useCallback(
+    (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
+      Logger.log("[DEBUG]", "updateMocksCollectionModalAction", { records });
+      openUpdateMocksCollectionModalAction(records, onSuccess);
     },
-    [openUpdateMockCollectionModalAction]
+    [openUpdateMocksCollectionModalAction]
   );
 
   const toggleMockStarAction = useCallback(
@@ -123,9 +129,9 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     openNewFileModalAction();
   }, [openNewFileModalAction]);
 
-  const createNewMock = useCallback(
+  const createNewMockAction = useCallback(
     (type: MockType, source: MockListSource) => {
-      Logger.log("[DEBUG]", "createNewMock", { source, type });
+      Logger.log("[DEBUG]", "createNewMockAction", { source, type });
 
       if (source === MockListSource.PICKER_MODAL) {
         trackNewMockButtonClicked(type, "picker_modal");
@@ -142,6 +148,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
   const removeMocksFromCollectionAction = useCallback(
     async (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
+      Logger.log("[DEBUG]", "removeMocksFromCollectionAction", { records });
       const mockIds = records.filter(isRecordMock).map((mock) => mock.id);
 
       updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID).then(() => {
@@ -152,17 +159,60 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [uid]
   );
 
+  const deleteMockAction = useCallback(
+    async (mock: RQMockMetadataSchema, onSuccess?: () => void) => {
+      if (mock.isOldMock) {
+        const functions = getFunctions();
+        const deleteOldMock = httpsCallable(functions, "deleteMock");
+
+        return deleteOldMock(mock.id).then((res: any) => {
+          if (res?.data?.success) {
+            if (mock.oldMockFilePath) {
+              FilesService.deleteFileFromStorage(mock.oldMockFilePath);
+            }
+            trackDeleteMockEvent(mock.id, mock?.type, mock?.fileType);
+            onSuccess?.();
+          }
+        });
+      } else {
+        return deleteMock(uid, mock.id, workspace?.id)
+          .then(() => {
+            trackDeleteMockEvent(mock.id, mock?.type, mock?.fileType);
+            onSuccess?.();
+          })
+          .catch((err) => {
+            Logger.log("Error while deleting mock", err);
+          });
+      }
+    },
+    [uid, workspace?.id]
+  );
+
+  const deleteRecordsAction = useCallback((records: RQMockMetadataSchema[], onSuccess?: () => void) => {
+    const allPromises: Promise<void>[] = [];
+
+    records.forEach((record) => {
+      allPromises.push(deleteMockAction(record));
+    });
+
+    Promise.allSettled(allPromises).then(() => {
+      onSuccess?.();
+    });
+  }, []);
+
   const value = {
     createNewCollectionAction,
     updateCollectionNameAction,
     deleteCollectionModalAction,
-    deleteMockModalAction,
-    updateMockCollectionModalAction,
+    deleteRecordsModalAction,
+    updateMocksCollectionModalAction,
     toggleMockStarAction,
     mockUploaderModalAction,
     newFileModalAction,
-    createNewMock,
+    createNewMockAction,
     removeMocksFromCollectionAction,
+    deleteMockAction,
+    deleteRecordsAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;

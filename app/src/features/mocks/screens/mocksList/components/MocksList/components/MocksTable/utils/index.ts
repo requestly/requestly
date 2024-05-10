@@ -1,4 +1,5 @@
 import { MockRecordType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockTableRecord } from "../types";
 
 export const isRecordMock = (record: RQMockMetadataSchema) => {
   return !record.recordType || record.recordType === MockRecordType.MOCK;
@@ -44,7 +45,7 @@ export const enhanceRecords = (
 
 export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]) => {
   const mockCollections: {
-    [id: RQMockMetadataSchema["id"]]: RQMockMetadataSchema & { children: RQMockMetadataSchema[] };
+    [id: RQMockMetadataSchema["id"]]: MockTableRecord;
   } = {};
 
   records.forEach((record) => {
@@ -65,7 +66,26 @@ export const recordsToContentTableDataAdapter = (records: RQMockMetadataSchema[]
     }
   });
 
-  const filteredRecords = [...Object.values(mockCollections), ...otherRecords];
+  const filteredRecords = [
+    ...Object.values(mockCollections).sort((a, b) => Number(a.createdTs) - Number(b.createdTs)),
+    ...otherRecords,
+  ];
 
   return filteredRecords;
+};
+
+export const normalizeRecord = (tableRecord: MockTableRecord): RQMockMetadataSchema => {
+  if (isRecordMockCollection(tableRecord)) {
+    const _tableRecord = {
+      ...tableRecord,
+    };
+
+    delete _tableRecord.children;
+    return _tableRecord as RQMockMetadataSchema;
+  }
+  return tableRecord as RQMockMetadataSchema;
+};
+
+export const normalizeRecords = (tableRecords: MockTableRecord[]): RQMockMetadataSchema[] => {
+  return tableRecords.map(normalizeRecord);
 };

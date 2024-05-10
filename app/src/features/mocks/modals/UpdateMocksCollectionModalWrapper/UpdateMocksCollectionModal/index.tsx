@@ -2,16 +2,15 @@ import React, { useEffect, useState } from "react";
 import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQModal } from "lib/design-system/components";
-import { Button, Select, SelectProps, message } from "antd";
-import { updateMock } from "backend/mocks/updateMock";
-import { trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
-import "./updateMockCollectionModal.scss";
+import { Button, Select, SelectProps } from "antd";
+import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
+import { toast } from "utils/Toast";
+import "./updateMocksCollectionModal.scss";
 
 interface Props {
   visible: boolean;
-  mock: RQMockMetadataSchema;
+  mocks: RQMockMetadataSchema[];
   collections?: RQMockCollection[];
   toggleModalVisibility: (visible: boolean) => void;
   onSuccess?: () => void;
@@ -19,8 +18,8 @@ interface Props {
 
 type SelectOption = { label: string; value: string };
 
-export const UpdateMockCollectionModal: React.FC<Props> = ({
-  mock,
+export const UpdateMocksCollectionModal: React.FC<Props> = ({
+  mocks,
   visible,
   collections,
   toggleModalVisibility,
@@ -28,25 +27,26 @@ export const UpdateMockCollectionModal: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const teamId = workspace?.id;
 
   const [isLoading, setIsLoading] = useState(false);
   const [collectionId, setCollectionId] = useState("");
   const [collectionName, setCollectionName] = useState("");
 
   useEffect(() => {
-    setCollectionId(mock?.collectionId);
-  }, [mock?.collectionId]);
+    if (mocks.length === 1) {
+      setCollectionId(mocks[0]?.collectionId);
+    }
+  }, [mocks]);
 
-  const handleMoveCollection = () => {
+  const handleMoveMocks = () => {
     setIsLoading(true);
-    // @ts-ignore
-    updateMock(uid, mock.id, { ...mock, collectionId }, teamId)
+    const mockIds = mocks?.map((mock) => mock.id);
+
+    updateMocksCollectionId(uid, mockIds, collectionId)
       .then(() => {
-        trackUpdateMockEvent(mock.id, mock.type, mock?.fileType, collectionId);
+        // TODO: add analytic event
         onSuccess?.();
-        message.success(`Moved to "${collectionName}"`);
+        toast.success(`Moved to "${collectionName}"`);
         toggleModalVisibility(false);
       })
       .finally(() => {
@@ -100,8 +100,8 @@ export const UpdateMockCollectionModal: React.FC<Props> = ({
         <Button
           type="primary"
           loading={isLoading}
-          onClick={handleMoveCollection}
-          disabled={mock?.collectionId === collectionId}
+          onClick={handleMoveMocks}
+          disabled={mocks?.length === 1 && mocks?.[0]?.collectionId === collectionId}
         >
           Move
         </Button>

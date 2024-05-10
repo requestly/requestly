@@ -8,11 +8,11 @@ type MocksModalsContextType = {
   openDeleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
   setOpenDeleteCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openDeleteMockModalAction: (record: RQMockMetadataSchema) => void;
-  setOpenDeleteMockModalAction: React.Dispatch<React.SetStateAction<() => void>>;
+  openDeletRecordsModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
+  setOpenDeleteRecordsModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openUpdateMockCollectionModalAction: (record: RQMockMetadataSchema) => void;
-  setOpenUpdateMockCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
+  openUpdateMocksCollectionModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
+  setOpenUpdateMocksCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
   openMockUploaderModalAction: (mockType: MockType) => void;
   setOpenMockUploaderModalAction: React.Dispatch<React.SetStateAction<() => void>>;
@@ -36,8 +36,8 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
   const [openDeleteCollectionModalAction, setOpenDeleteCollectionModalAction] = useState<ModalAction>(
     () => DEFAULT_ACTION
   );
-  const [openDeleteMockModalAction, setOpenDeleteMockModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
-  const [openUpdateMockCollectionModalAction, setOpenUpdateMockCollectionModalAction] = useState<ModalAction>(
+  const [openDeletRecordsModalAction, setOpenDeleteRecordsModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
+  const [openUpdateMocksCollectionModalAction, setOpenUpdateMocksCollectionModalAction] = useState<ModalAction>(
     () => DEFAULT_ACTION
   );
   const [openMockUploaderModalAction, setOpenMockUploaderModalAction] = useState<ModalAction>(() => DEFAULT_ACTION);
@@ -50,11 +50,11 @@ export const MocksModalsContextProvider: React.FC<MocksModalsContextProviderProp
     openDeleteCollectionModalAction,
     setOpenDeleteCollectionModalAction,
 
-    openDeleteMockModalAction,
-    setOpenDeleteMockModalAction,
+    openDeletRecordsModalAction,
+    setOpenDeleteRecordsModalAction,
 
-    openUpdateMockCollectionModalAction,
-    setOpenUpdateMockCollectionModalAction,
+    openUpdateMocksCollectionModalAction,
+    setOpenUpdateMocksCollectionModalAction,
 
     openMockUploaderModalAction,
     setOpenMockUploaderModalAction,

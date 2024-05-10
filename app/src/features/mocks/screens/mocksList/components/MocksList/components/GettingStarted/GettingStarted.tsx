@@ -10,13 +10,13 @@ interface Props {
 }
 
 export const GettingStarted: React.FC<Props> = ({ mockType, source }) => {
-  const { mockUploaderModalAction, createNewMock } = useMocksActionContext() ?? {};
+  const { mockUploaderModalAction, createNewMockAction } = useMocksActionContext() ?? {};
 
   return (
     <>
       <GettingStartedWithMocks
         mockType={mockType}
-        handleCreateNew={() => createNewMock(mockType, source)}
+        handleCreateNew={() => createNewMockAction(mockType, source)}
         handleUploadAction={() => mockUploaderModalAction(mockType)}
       />
 
