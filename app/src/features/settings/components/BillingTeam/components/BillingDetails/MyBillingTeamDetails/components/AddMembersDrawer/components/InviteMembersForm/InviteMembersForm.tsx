@@ -8,6 +8,7 @@ import { PostUserAdditionView } from "./components/PostUserAdditionView/PostUser
 import { ExternalDomainWarningBanner } from "./components/ExternalDomainWarningBanner/ExternalDomainWarningBanner";
 import Logger from "../../../../../../../../../../../../../common/logger";
 import "./inviteMembersForm.scss";
+import { toast } from "utils/Toast";
 
 interface InviteMembersFormProps {
   billingId: string;
@@ -29,6 +30,10 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
   const [emails, setEmails] = useState([]);
 
   const handleAddMembersToBillingTeam = useCallback(() => {
+    if (!emails.length) {
+      toast.warn("Please enter email(s) to send invitation/add users");
+      return;
+    }
     setIsLoading(true);
     addUsersToBillingTeam(billingId, emails)
       .then((res: any) => {
@@ -65,7 +70,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
     );
   } else {
     return (
-      <div className="billing-team-invite-members-form-wrapper">
+      <form className="billing-team-invite-members-form-wrapper" onSubmit={handleAddMembersToBillingTeam}>
         {externalDomainEmails.length && !isExternalDomainWarningBannerClosed ? (
           <ExternalDomainWarningBanner
             emails={externalDomainEmails}
@@ -80,14 +85,14 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
           <EmailInputWithDomainBasedSuggestions transparentBackground onChange={handleEmailsChange} />
         </div>
         <div className="billing-team-invite-members-form-actions">
-          <RQButton loading={isLoading} type="primary" onClick={handleAddMembersToBillingTeam}>
+          <RQButton loading={isLoading} type="primary" htmlType="submit">
             Add to billing team
           </RQButton>
           <RQButton disabled={isLoading} type="default" onClick={toggleInviteFormVisibility}>
             Back to members list
           </RQButton>
         </div>
-      </div>
+      </form>
     );
   }
 };

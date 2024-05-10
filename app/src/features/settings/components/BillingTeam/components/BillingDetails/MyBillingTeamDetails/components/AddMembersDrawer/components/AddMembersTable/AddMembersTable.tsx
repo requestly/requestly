@@ -40,8 +40,8 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         members={searchedMembers}
-        memberActions={(member) => <AddMembersTableActions member={member} />}
-        tableActions={
+        memberActions={(member) => [<AddMembersTableActions member={member} />]}
+        tableActions={[
           <RQButton
             type="default"
             className="invite-people-btn"
@@ -49,8 +49,8 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({
             onClick={toggleInviteFormVisibility}
           >
             Invite people
-          </RQButton>
-        }
+          </RQButton>,
+        ]}
         emptyView={
           <EmptyMembersTableView searchValue={searchValue} toggleInviteFormVisibility={toggleInviteFormVisibility} />
         }
