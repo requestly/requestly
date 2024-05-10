@@ -26,24 +26,30 @@ const parseHeaders = (headers: HeadersRuleModificationData[]): ModifyHeaderInfo[
 };
 
 const parseHeadersRule = (rule: HeadersRule): ExtensionRule[] => {
-  return rule.pairs.map(
-    (rulePair): ExtensionRule => {
-      const condition = parseConditionFromSource(rulePair.source);
-      const action: ExtensionRuleAction = {
-        type: RuleActionType.MODIFY_HEADERS,
-      };
+  return rule.pairs
+    .map(
+      (rulePair): ExtensionRule => {
+        const condition = parseConditionFromSource(rulePair.source);
+        const action: ExtensionRuleAction = {
+          type: RuleActionType.MODIFY_HEADERS,
+        };
 
-      if (rulePair.modifications?.Request?.length) {
-        action.requestHeaders = parseHeaders(rulePair.modifications?.Request);
+        if (rulePair.modifications?.Request?.length) {
+          action.requestHeaders = parseHeaders(rulePair.modifications?.Request);
+        }
+
+        if (rulePair.modifications?.Response?.length) {
+          action.responseHeaders = parseHeaders(rulePair.modifications?.Response);
+        }
+
+        if (!(action.requestHeaders?.length || action.responseHeaders?.length)) {
+          return null;
+        }
+
+        return { action, condition };
       }
-
-      if (rulePair.modifications?.Response?.length) {
-        action.responseHeaders = parseHeaders(rulePair.modifications?.Response);
-      }
-
-      return { action, condition };
-    }
-  );
+    )
+    .filter(Boolean);
 };
 
 export default parseHeadersRule;
