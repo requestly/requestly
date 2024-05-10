@@ -3,7 +3,7 @@ import { DeleteRecordsModal } from "./DeleteRecordsModal";
 import { RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 
-export const DeletRecordsModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
+export const DeleteRecordsModalWrapper: React.FC<{ forceRender: () => void }> = ({ forceRender }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [records, setRecords] = useState<RQMockMetadataSchema[]>([]);
   const [onSuccess, setOnSuccess] = useState(() => () => {});

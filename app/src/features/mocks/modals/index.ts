@@ -1,7 +1,7 @@
 export { MockPickerModal } from "./MockPickerModal";
 export { CreateOrUpdateCollectionModalWrapper } from "./CreateOrUpdateCollectionModalWrapper";
 export { DeleteCollectionModalWrapper } from "./DeleteCollectionModalWrapper";
-export { DeletRecordsModalWrapper } from "./DeletRecordsModalWrapper";
+export { DeleteRecordsModalWrapper } from "./DeleteRecordsModalWrapper";
 export { UpdateMocksCollectionModalWrapper } from "./UpdateMocksCollectionModalWrapper";
 export { MockUploaderModalWrapper } from "./MockUploaderModalWrapper";
 export { NewFileModalWrapper } from "./NewFileModalWrapper";
