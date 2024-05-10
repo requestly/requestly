@@ -9,6 +9,11 @@ import { ExternalDomainWarningBanner } from "./components/ExternalDomainWarningB
 import Logger from "../../../../../../../../../../../../../common/logger";
 import "./inviteMembersForm.scss";
 import { toast } from "utils/Toast";
+import {
+  trackBillingTeamInviteSendingFailed,
+  trackBillingTeamInviteSentSuccessfully,
+} from "features/settings/analytics";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 
 interface InviteMembersFormProps {
   billingId: string;
@@ -40,8 +45,18 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
       addUsersToBillingTeam(billingId, emails)
         .then((res: any) => {
           setIsPostUserAdditionViewVisible(true);
+          const hasExternalDomainUser = emails.some(
+            (email) => getDomainFromEmail(email) !== billingTeamDetails?.ownerDomain
+          );
           if (res.data.result?.failedEmails.length) {
             setNonExisitingEmails(res.data.result.failedEmails);
+            if (res.data.result?.addedEmails.length) {
+              trackBillingTeamInviteSendingFailed("partial", hasExternalDomainUser);
+            } else {
+              trackBillingTeamInviteSendingFailed("failed", hasExternalDomainUser);
+            }
+          } else {
+            trackBillingTeamInviteSentSuccessfully(hasExternalDomainUser);
           }
         })
         .catch((error) => {
@@ -51,7 +66,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
           setIsLoading(false);
         });
     },
-    [billingId, emails]
+    [billingId, emails, billingTeamDetails?.ownerDomain]
   );
 
   const handleEmailsChange = useCallback(
