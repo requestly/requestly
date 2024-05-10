@@ -29,26 +29,30 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [emails, setEmails] = useState([]);
 
-  const handleAddMembersToBillingTeam = useCallback(() => {
-    if (!emails.length) {
-      toast.warn("Please enter email(s) to send invitation/add users");
-      return;
-    }
-    setIsLoading(true);
-    addUsersToBillingTeam(billingId, emails)
-      .then((res: any) => {
-        setIsPostUserAdditionViewVisible(true);
-        if (res.data.result?.failedEmails.length) {
-          setNonExisitingEmails(res.data.result.failedEmails);
-        }
-      })
-      .catch((error) => {
-        Logger.log("Error adding members to billing team", error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [billingId, emails]);
+  const handleAddMembersToBillingTeam = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!emails.length) {
+        toast.warn("Please enter email(s) to send invitation/add users");
+        return;
+      }
+      setIsLoading(true);
+      addUsersToBillingTeam(billingId, emails)
+        .then((res: any) => {
+          setIsPostUserAdditionViewVisible(true);
+          if (res.data.result?.failedEmails.length) {
+            setNonExisitingEmails(res.data.result.failedEmails);
+          }
+        })
+        .catch((error) => {
+          Logger.log("Error adding members to billing team", error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    },
+    [billingId, emails]
+  );
 
   const handleEmailsChange = useCallback(
     (emails: string[]) => {
