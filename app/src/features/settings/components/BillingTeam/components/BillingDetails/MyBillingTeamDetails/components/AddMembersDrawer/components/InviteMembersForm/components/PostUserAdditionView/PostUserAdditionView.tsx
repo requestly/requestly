@@ -36,11 +36,11 @@ export const PostUserAdditionView: React.FC<PostUserAdditionViewProps> = ({
       <div className="post-user-addition-view-title">All set from your end</div>
       {/* TEMP */}
       {/* TODO: REMOVE THIS AFTER INVITE FLOW IS IMPLEMENTED */}
-      {nonExisitingEmails?.length && (
+      {nonExisitingEmails?.length ? (
         <div className="mt-16">
           <Alert message={nonExistingUsersAlertContent} type="warning" className="w-full" />
         </div>
-      )}
+      ) : null}
 
       <div className="post-user-addition-view-actions">
         <RQButton type="primary" onClick={toggleInviteFormVisibility}>
