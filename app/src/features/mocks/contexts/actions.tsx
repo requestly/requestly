@@ -52,7 +52,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const {
     openCollectionModalAction,
     openDeleteCollectionModalAction,
-    openDeletRecordsModalAction,
+    openDeleteRecordsModalAction,
     openUpdateMocksCollectionModalAction,
     openMockUploaderModalAction,
     openNewFileModalAction,
@@ -85,9 +85,9 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const deleteRecordsModalAction = useCallback(
     (records: RQMockMetadataSchema[], onSuccess?: () => void) => {
       Logger.log("[DEBUG]", "deleteRecordsModalAction", { records });
-      openDeletRecordsModalAction(records, onSuccess);
+      openDeleteRecordsModalAction(records, onSuccess);
     },
-    [openDeletRecordsModalAction]
+    [openDeleteRecordsModalAction]
   );
 
   const updateMocksCollectionAction = useCallback(
