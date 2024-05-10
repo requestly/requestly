@@ -39,7 +39,6 @@ type MocksActionContextType = {
   createNewFileAction: () => void;
   createNewMockAction: (mockType: MockType, source: MockListSource) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
-  deleteRecordsAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
 };
 
 const MocksActionContext = createContext<MocksActionContextType>(null);
@@ -219,7 +218,6 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     createNewFileAction,
     createNewMockAction,
     removeMocksFromCollectionAction,
-    deleteRecordsAction,
   };
 
   return <MocksActionContext.Provider value={value}>{children}</MocksActionContext.Provider>;
