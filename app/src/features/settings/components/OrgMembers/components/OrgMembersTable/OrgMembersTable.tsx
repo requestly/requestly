@@ -37,7 +37,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                 <img
                   className="org-member-avatar"
                   src={
-                    member?.photoURL.length
+                    member?.photoURL?.length
                       ? member?.photoURL
                       : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
                   }
@@ -82,7 +82,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
             <div>{tableActions}</div>
           </div>
           <div className="org-members-table-count">
-            {members.length} {members.length === 1 ? "member" : "members"}
+            {members?.length} {members?.length === 1 ? "member" : "members"}
           </div>
         </Col>
 
@@ -98,7 +98,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={
-                  !members.length ? (
+                  !members?.length ? (
                     <>
                       Couldn't find member?{" "}
                       <a className="external-link" href="mailto:contact@requestly.io">

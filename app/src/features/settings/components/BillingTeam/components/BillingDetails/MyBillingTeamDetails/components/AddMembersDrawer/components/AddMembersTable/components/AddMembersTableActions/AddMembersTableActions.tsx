@@ -7,7 +7,7 @@ import { RQButton } from "lib/design-system/components";
 import { TbChecks } from "@react-icons/all-files/tb/TbChecks";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { getBillingTeamMembers } from "store/features/billing/selectors";
-import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamMemberStatus, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
 import { trackBillingTeamActionClicked, trackBillingTeamMemberAdded } from "features/settings/analytics";
@@ -45,12 +45,12 @@ export const AddMembersTableActions: React.FC<{ member: OrgMember }> = ({ member
 
   return (
     <>
-      {isUserAdded ? (
+      {isUserAdded || member?.status === BillingTeamMemberStatus.PENDING ? (
         <Row gutter={8} align="middle" justify="end" className="billing-team-members-added-label">
           <Col>
             <TbChecks fontSize={14} />
           </Col>
-          <Col>Added</Col>
+          <Col>{isUserAdded ? "Added" : "Invitation sent"}</Col>
         </Row>
       ) : (
         <>

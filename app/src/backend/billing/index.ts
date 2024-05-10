@@ -163,5 +163,5 @@ export const revokeBillingTeamInvite = async (billingId: string, email: string) 
     return null;
   }
   const revokeInvite = httpsCallable(getFunctions(), "billing-revokeInvite");
-  return revokeInvite({ billingId, userEmail: email });
+  return revokeInvite({ billingId, userEmails: [email] });
 };

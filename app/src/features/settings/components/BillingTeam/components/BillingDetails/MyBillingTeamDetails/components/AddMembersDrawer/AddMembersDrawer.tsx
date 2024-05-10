@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { Col, Drawer, Row } from "antd";
 import { AddMembersTable } from "./components/AddMembersTable/AddMembersTable";
@@ -7,6 +7,10 @@ import { useFetchOrgMembers } from "features/settings/components/OrgMembers/hook
 import { RQButton } from "lib/design-system/components";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { InviteMembersForm } from "./components/InviteMembersForm/InviteMembersForm";
+import { useSelector } from "react-redux";
+import { getBillingTeamById } from "store/features/billing/selectors";
+import { BillingTeamMemberStatus } from "features/settings/components/BillingTeam/types";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import "./addMembersDrawer.scss";
 
 interface AppMembersDrawerProps {
@@ -19,6 +23,22 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
   const { isLoading, organizationMembers } = useFetchOrgMembers();
   const [isInviteFormVisible, setIsInviteFormVisible] = useState(false);
   const { billingId } = useParams();
+  const billingTeamDetails = useSelector(getBillingTeamById(billingId));
+
+  const tableRecords = useMemo(() => {
+    const records = organizationMembers || [];
+    console.log("billingTeamDetails", records);
+
+    billingTeamDetails?.pendingMembers.forEach((pendingMemberEmail) => {
+      records.push({
+        email: pendingMemberEmail,
+        status: BillingTeamMemberStatus.PENDING,
+        domain: getDomainFromEmail(pendingMemberEmail),
+      });
+    });
+
+    return records;
+  }, [billingTeamDetails.pendingMembers, organizationMembers]);
 
   return (
     <Drawer
@@ -63,7 +83,7 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
             searchValue={searchValue}
             setSearchValue={setSearchValue}
             isLoading={isLoading}
-            members={organizationMembers}
+            members={tableRecords}
             toggleInviteFormVisibility={() => setIsInviteFormVisible(!isInviteFormVisible)}
           />
         )}
