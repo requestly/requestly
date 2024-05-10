@@ -29,7 +29,7 @@ type MocksActionContextType = {
   deleteRecordsModalAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   updateMocksCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
-  mockUploaderModalAction: (mockType: MockType) => void;
+  uploadMockAction: (mockType: MockType) => void;
   newFileModalAction: () => void;
   createNewMockAction: (mockType: MockType, source: MockListSource) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
@@ -114,9 +114,9 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [teamId]
   );
 
-  const mockUploaderModalAction = useCallback(
+  const uploadMockAction = useCallback(
     (mockType: MockType) => {
-      Logger.log("[DEBUG]", "mockUploaderModalAction", { mockType });
+      Logger.log("[DEBUG]", "uploadMockAction", { mockType });
       trackMockUploadWorkflowStarted(mockType);
       openMockUploaderModalAction(mockType);
     },
@@ -206,7 +206,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
     deleteRecordsModalAction,
     updateMocksCollectionAction,
     toggleMockStarAction,
-    mockUploaderModalAction,
+    uploadMockAction,
     newFileModalAction,
     createNewMockAction,
     removeMocksFromCollectionAction,

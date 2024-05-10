@@ -44,7 +44,7 @@ const MockPickerIndex: React.FC<Props> = ({
   const [selectedMockData, setSelectedMockData] = useState<MockEditorDataSchema>(null);
   const [showFileTypeSelector, setShowFileTypeSelector] = useState<boolean>(false);
   const [showCreateMockState, setShowCreateMockState] = useState<boolean>(false);
-  const { mockUploaderModalAction } = useMocksActionContext() ?? {};
+  const { uploadMockAction } = useMocksActionContext() ?? {};
 
   const user = useSelector(getUserAuthDetails);
 
@@ -129,14 +129,14 @@ const MockPickerIndex: React.FC<Props> = ({
         <Space className="mt-8">
           <AuthConfirmationPopover
             title="You need to sign up to upload mocks"
-            callback={() => mockUploaderModalAction(mockType)}
+            callback={() => uploadMockAction(mockType)}
             source={"upload_mock"}
           >
             <RQButton
               type="default"
               icon={<AiOutlineCloudUpload />}
               className="upload-btn"
-              onClick={() => user?.loggedIn && mockUploaderModalAction(mockType)}
+              onClick={() => user?.loggedIn && uploadMockAction(mockType)}
             >
               <span> Upload file/JSON</span>
             </RQButton>

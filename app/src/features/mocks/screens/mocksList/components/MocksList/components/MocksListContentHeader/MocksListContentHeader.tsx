@@ -45,7 +45,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
 }) => {
   const user = useSelector(getUserAuthDetails);
   const { pathname } = useLocation();
-  const { createNewCollectionAction, mockUploaderModalAction, createNewMockAction } = useMocksActionContext() ?? {};
+  const { createNewCollectionAction, uploadMockAction, createNewMockAction } = useMocksActionContext() ?? {};
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const actionbuttonsData = [
@@ -54,11 +54,11 @@ export const MocksListContentHeader: React.FC<Props> = ({
       type: "text" as ButtonProps["type"],
       icon: <CloudUploadOutlined />,
       buttonText: `Upload ${mockType === MockType.FILE ? "File" : "JSON"}`,
-      onClickHandler: () => user?.details?.isLoggedIn && mockUploaderModalAction(mockType),
+      onClickHandler: () => user?.details?.isLoggedIn && uploadMockAction(mockType),
       isAuthRequired: true,
       authPopover: {
         title: "You need to sign up to upload mocks",
-        callback: () => mockUploaderModalAction(mockType),
+        callback: () => uploadMockAction(mockType),
         source: mockType === MockType.API ? SOURCE.CREATE_API_MOCK : SOURCE.CREATE_FILE_MOCK,
       },
     },
