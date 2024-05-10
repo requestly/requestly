@@ -36,9 +36,12 @@ export const PostUserAdditionView: React.FC<PostUserAdditionViewProps> = ({
       <div className="post-user-addition-view-title">All set from your end</div>
       {/* TEMP */}
       {/* TODO: REMOVE THIS AFTER INVITE FLOW IS IMPLEMENTED */}
-      <div className="mt-16">
-        <Alert message={nonExistingUsersAlertContent} type="warning" className="w-full" />
-      </div>
+      {nonExisitingEmails?.length && (
+        <div className="mt-16">
+          <Alert message={nonExistingUsersAlertContent} type="warning" className="w-full" />
+        </div>
+      )}
+
       <div className="post-user-addition-view-actions">
         <RQButton type="primary" onClick={toggleInviteFormVisibility}>
           Back to members list
