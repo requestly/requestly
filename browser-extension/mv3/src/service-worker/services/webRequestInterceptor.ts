@@ -1,6 +1,6 @@
 import { getEnabledRules } from "common/rulesStore";
 import { RuleType } from "common/types";
-import { matchSourceUrl } from "./ruleMatcher";
+import { matchRuleWithRequest } from "./ruleMatcher";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 
 const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
@@ -19,11 +19,15 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
         case RuleType.QUERYPARAM:
         case RuleType.CANCEL:
         case RuleType.DELAY:
-          rule.pairs.forEach((pair) => {
-            if (matchSourceUrl(pair.source, details.url)) {
-              ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
-            }
+          const { isApplied } = matchRuleWithRequest(rule, {
+            url: details.url,
+            method: details.method,
+            type: details.type as any,
+            initiatorDomain: details.initiator,
           });
+          if (isApplied) {
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
+          }
           break;
         default:
           break;
@@ -38,16 +42,16 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
       switch (rule.ruleType) {
         case RuleType.HEADERS:
         case RuleType.USERAGENT:
-          rule.pairs.forEach((pair) => {
-            // Match only in case of Request Modifications
-            // TODO: Fix for useragent rule. Should only apply on main frame requests
-            // @ts-ignore
-            if (pair.modifications?.Request && pair.modifications?.Request?.length > 0) {
-              if (matchSourceUrl(pair.source, details.url)) {
-                ruleExecutionHandler.onRuleExecuted(rule, details);
-              }
-            }
+          // TODO: Match only incase of any request header pair
+          const { isApplied } = matchRuleWithRequest(rule, {
+            url: details.url,
+            method: details.method,
+            type: details.type as any,
+            initiatorDomain: details.initiator,
           });
+          if (isApplied) {
+            ruleExecutionHandler.onRuleExecuted(rule, details);
+          }
           break;
         default:
           // Do nothing
@@ -62,14 +66,16 @@ const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails)
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
         case RuleType.HEADERS:
-          rule.pairs.forEach((pair) => {
-            // @ts-ignore
-            if (pair.modifications?.Response && pair.modifications?.Response?.length > 0) {
-              if (matchSourceUrl(pair.source, details.url)) {
-                ruleExecutionHandler.onRuleExecuted(rule, details);
-              }
-            }
+          // TODO: Match only incase of any response header pair
+          const { isApplied } = matchRuleWithRequest(rule, {
+            url: details.url,
+            method: details.method,
+            type: details.type as any,
+            initiatorDomain: details.initiator,
           });
+          if (isApplied) {
+            ruleExecutionHandler.onRuleExecuted(rule, details);
+          }
           break;
         default:
           break;
