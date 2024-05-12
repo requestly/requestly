@@ -199,3 +199,13 @@ export const populateRedirectedUrl = (rulePair: RulePair, ruleType: RuleType, re
       return null;
   }
 };
+
+export const findMatchingRule = (rules: Rule[], requestDetails: AJAXRequestDetails) => {
+  for (const rule of rules) {
+    const matchedRule = matchRuleWithRequest(rule, requestDetails);
+    if (matchedRule) {
+      return matchedRule;
+    }
+  }
+  return null;
+};
