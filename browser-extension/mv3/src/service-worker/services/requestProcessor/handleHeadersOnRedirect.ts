@@ -8,13 +8,13 @@ export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJ
     return;
   }
 
-  const { matchedRule, matchedRuleInfo } =
+  const { isApplied, destinationUrl } =
     requestProcessor.findMatchingRule(
       [...requestProcessor.cachedRules.redirectRules, ...requestProcessor.cachedRules.replaceRules],
       requestDetails
     ) ?? {};
 
-  if (!matchedRule) {
+  if (!isApplied) {
     return;
   }
 
@@ -25,7 +25,7 @@ export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJ
     return headerKey ? { name: headerKey, value: requestDetails.requestHeaders[headerKey] } : null;
   }).filter((headerObject) => headerObject !== null);
 
-  const redirectedUrl = matchedRuleInfo.redirectedDestinationUrl;
+  const redirectedUrl = destinationUrl;
 
   return requestProcessor.updateRequestSpecificRules(
     tabId,

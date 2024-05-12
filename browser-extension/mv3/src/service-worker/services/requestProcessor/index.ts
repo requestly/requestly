@@ -1,6 +1,6 @@
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { Rule, RuleType } from "common/types";
-import { getMatchedRuleForRequest } from "../ruleMatcher";
+import { matchRuleWithRequest } from "../ruleMatcher";
 import { TAB_SERVICE_DATA, tabService } from "../tabService";
 import { AJAXRequestDetails, SessionRuleType } from "./types";
 import { forwardHeadersOnRedirect } from "./handleHeadersOnRedirect";
@@ -23,7 +23,7 @@ class RequestProcessor {
 
   findMatchingRule = (rules: Rule[], requestDetails: AJAXRequestDetails) => {
     for (const rule of rules) {
-      const matchedRule = getMatchedRuleForRequest(rule, requestDetails);
+      const matchedRule = matchRuleWithRequest(rule, requestDetails);
       if (matchedRule) {
         return matchedRule;
       }
