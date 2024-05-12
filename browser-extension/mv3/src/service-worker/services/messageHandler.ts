@@ -18,6 +18,7 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
+import { requestProcessor } from "./requestProcessor";
 import {
   handleTestRuleOnClientPageLoad,
   launchUrlAndStartRuleTesting,
@@ -115,6 +116,10 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
+
+      case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
+        requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
+        return true;
 
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
         launchUrlAndStartRuleTesting(message, sender.tab.id);
