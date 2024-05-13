@@ -3,7 +3,6 @@ import { parseDNRRules } from "./mv3RuleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import APP_CONSTANTS from "config/constants";
 
 const MV3_MIGRATION_DATA = "mv3MigrationData";
 
@@ -20,10 +19,10 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
   const migrationStatus = getMV3MigrationStatus();
   const workspaceId = currentWorkspaceId ? currentWorkspaceId : null;
 
-  console.log("!!!debug", "migration Staus", migrationStatus);
-  if (migrationStatus?.[workspaceId ?? "private"]?.rulesMigrated) {
-    return rules;
-  }
+  // console.log("!!!debug", "migration Staus", migrationStatus);
+  // if (migrationStatus?.[workspaceId ?? "private"]?.rulesMigrated) {
+  //   return rules;
+  // }
 
   const rulesMigrationLogs: Record<string, any>[] = [];
 
@@ -42,7 +41,7 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
   StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
     .saveMultipleRulesOrGroups(migratedRules, { workspaceId: workspaceId })
     .then(() => {
-      StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION).saveRecord({ [APP_CONSTANTS.LAST_UPDATED_TS]: Date.now() });
+      // StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION).saveRecord({ [APP_CONSTANTS.LAST_UPDATED_TS]: Date.now() });
       saveMV3MigrationStatus({
         ...migrationStatus,
         [workspaceId ? workspaceId : "private"]: {
