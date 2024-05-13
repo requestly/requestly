@@ -12,6 +12,12 @@ enum RuleMigrationChange {
 }
 
 export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string): Rule[] => {
+  // return rules;
+  console.log("[Debug] Migrating Rules to MV3", { rules, isFirstSyncComplete: window.isFirstSyncComplete });
+  if (!window.isFirstSyncComplete) {
+    return rules;
+  }
+
   console.log("[Debug] Before Migration", { rules });
 
   const rulesMigrationLogs: Record<string, any> = {};
