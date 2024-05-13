@@ -2,15 +2,14 @@ import { EXTENSION_MESSAGES } from "common/constants";
 
 type TabId = chrome.tabs.Tab["id"];
 
-enum DataScope {
+export enum DataScope {
   TAB = "tabData", // tab-level data
-  // PAGE = "pageData", // page-level data, will wipe out when page unloads
+  PAGE = "pageData", // page-level data, will wipe out when page unloads
 }
 
 type TabData = chrome.tabs.Tab & {
   [DataScope.TAB]?: Record<string, any>;
-  documentLifecycle?: chrome.webNavigation.WebNavigationTransitionCallbackDetails["documentLifecycle"];
-  frameId?: chrome.webNavigation.WebNavigationTransitionCallbackDetails["frameId"];
+  [DataScope.PAGE]?: Record<string, any>;
 };
 
 class TabService {
@@ -49,20 +48,13 @@ class TabService {
       const newTabState = {
         ...tab,
         [DataScope.TAB]: existingTab[DataScope.TAB] || {},
-        documentLifecycle: existingTab.documentLifecycle,
-        frameId: existingTab.frameId,
+        [DataScope.PAGE]: existingTab[DataScope.PAGE] || {},
       };
 
       this.addOrUpdateTab(newTabState);
-
-      if (!Object.keys(changeInfo).includes("status")) {
-        return;
-      }
-      if (tab.status === "complete" && existingTab.documentLifecycle === "active" && existingTab.frameId === 0) {
-        this.sendMessage(tabId, { action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
-      }
     });
 
+    // Why?
     chrome.webRequest.onBeforeRequest.addListener(
       (details) => {
         if (details.type === "main_frame") {
@@ -74,15 +66,18 @@ class TabService {
     );
 
     chrome.webNavigation.onCommitted.addListener((navigatedTabData) => {
-      const tab = this.getTab(navigatedTabData.tabId);
+      if (navigatedTabData.frameId === 0) {
+        this.resetPageData(navigatedTabData.tabId);
+      }
+    });
 
-      if (tab) {
-        this.addOrUpdateTab({
-          ...tab,
-          documentLifecycle:
-            tab.documentLifecycle !== "active" ? navigatedTabData.documentLifecycle : tab.documentLifecycle,
-          frameId: tab.frameId !== 0 ? navigatedTabData.frameId : tab.frameId,
-        });
+    chrome.webNavigation.onDOMContentLoaded.addListener((navigatedTabData) => {
+      if (navigatedTabData.frameId === 0) {
+        const tab = this.getTab(navigatedTabData.tabId);
+
+        if (tab) {
+          this.sendMessage(navigatedTabData.tabId, { action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
+        }
       }
     });
   }
@@ -177,48 +172,112 @@ class TabService {
     });
   }
 
-  setData(tabId: TabId, key: any, value: any) {
+  setDataForScope(scope: DataScope, tabId: TabId, key: string, value: any) {
     const tab = this.getTab(tabId);
 
     if (!tab) {
       this.addOrUpdateTab({ id: tabId, [DataScope.TAB]: { [key]: value } } as TabData);
       return;
     }
+
     // null safe for firefox as in firefox get/set happen before tab updation whereas
     // in chrome get/set happens after tab updation
-    if (tab[DataScope.TAB]) {
-      tab[DataScope.TAB][key] = value;
+    if (tab[scope]) {
+      tab[scope][key] = value;
     } else {
-      tab[DataScope.TAB] = { [key]: value };
+      tab[scope] = { [key]: value };
     }
   }
 
-  getData(tabId: TabId, key: any, defaultValue?: any) {
+  getDataForScope(scope: DataScope, tabId: TabId, key: string, defaultValue: any) {
     const tab = this.getTab(tabId);
 
     if (!tab) {
       return;
     }
 
-    return tab[DataScope.TAB]?.[key] || defaultValue;
+    return tab[scope]?.[key] || defaultValue;
   }
 
-  removeData(tabId: TabId, key: any) {
+  removeDataForScope(scope: DataScope, tabId: TabId, key: string) {
     const tab = this.getTab(tabId);
 
-    if (!tab || !tab[DataScope.TAB]) {
+    if (!tab || !tab[scope]) {
       return;
     }
 
-    delete tab[DataScope.TAB][key];
+    delete tab[scope][key];
   }
+
+  setData(tabId: TabId, key: any, value: any) {
+    this.setDataForScope(DataScope.TAB, tabId, key, value);
+  }
+
+  getData(tabId: TabId, key: any, defaultValue?: any) {
+    return this.getDataForScope(DataScope.TAB, tabId, key, defaultValue);
+  }
+
+  removeData(tabId: TabId, key: any) {
+    this.removeDataForScope(DataScope.TAB, tabId, key);
+  }
+
+  setPageData(tabId: TabId, key: any, value: any) {
+    this.setDataForScope(DataScope.PAGE, tabId, key, value);
+  }
+
+  getPageData(tabId: TabId, key: any, defaultValue?: any) {
+    return this.getDataForScope(DataScope.PAGE, tabId, key, defaultValue);
+  }
+
+  removePageData(tabId: TabId, key: any) {
+    this.removeDataForScope(DataScope.PAGE, tabId, key);
+  }
+
+  resetPageData(tabId: TabId) {
+    const tab = this.getTab(tabId);
+
+    if (tab?.[DataScope.PAGE]) {
+      tab[DataScope.PAGE] = {};
+    }
+  }
+
+  // DO we really need this
+  // promisifiedSetIcon(tabId, path) {
+  //   return new Promise((resolve) => {
+  //     chrome.browserAction.setIcon({ tabId, path }, resolve);
+  //   });
+  // }
+
+  // // do not pass tabId to set icon globally
+  // setExtensionIcon(path, tabId) {
+  //   if (typeof tabId === "undefined") {
+  //     chrome.browserAction.setIcon({ path });
+  //     return;
+  //   }
+
+  //   // on invoking setIcon multiple times simultaneously in a tab may lead to inconsistency without synchronization
+  //   let setIconSynchronizer = this.getPageData(tabId, "setIconSynchronizer");
+  //   if (!setIconSynchronizer) {
+  //     setIconSynchronizer = Promise.resolve();
+  //   }
+
+  //   this.setPageData(
+  //     tabId,
+  //     "setIconSynchronizer",
+  //     setIconSynchronizer.then(() => this.promisifiedSetIcon(tabId, path))
+  //   );
 }
 
 export const tabService = new TabService();
+
+// TODO: Add this only when debug enabled
+// @ts-ignore
+self.tabService = tabService;
 
 export const TAB_SERVICE_DATA = {
   SESSION_RECORDING: "sessionRecording",
   SESSION_RULES_MAP: "sessionRulesMap",
   TEST_RULE_DATA: "testRuleData",
   APPLIED_RULE_DETAILS: "appliedRuleDetails",
+  RULES_EXECUTION_LOGS: "rulesExecutionLogs",
 };

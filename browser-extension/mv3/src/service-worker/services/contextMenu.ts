@@ -1,5 +1,5 @@
 import { onVariableChange, setVariable, Variable } from "../variable";
-import { disableExtensionIcon, enableExtensionIcon } from "./extensionIcon";
+import extensionIconManager from "./extensionIconManager";
 import { isExtensionEnabled } from "./utils";
 
 // TODO: fix circular dependency
@@ -20,9 +20,9 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
   });
 
   if (isExtensionEnabled) {
-    enableExtensionIcon();
+    extensionIconManager.markExtensionEnabled();
   } else {
-    disableExtensionIcon();
+    extensionIconManager.markExtensionDisabled();
   }
 
   // sendMessageToApp({ isExtensionEnabled });

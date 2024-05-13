@@ -253,7 +253,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       {
         source: "requestly:client",
         action: "response_rule_applied",
-        ruleId: message.ruleDetails.id,
+        rule: message.ruleDetails,
         requestDetails: message["requestDetails"],
       },
       window.location.href
@@ -265,7 +265,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       {
         source: "requestly:client",
         action: "request_rule_applied",
-        ruleId: message.ruleDetails.id,
+        rule: message.ruleDetails,
         requestDetails: message["requestDetails"],
       },
       window.location.href
