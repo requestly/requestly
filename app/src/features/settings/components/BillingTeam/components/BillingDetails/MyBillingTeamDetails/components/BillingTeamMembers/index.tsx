@@ -67,7 +67,6 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
 
   const handleInvokePendingMemberInvite = useCallback(
     (inviteId: string, email: string, id: string) => {
-      trackBillingTeamActionClicked("revoke_invite");
       revokeBillingTeamInvite(inviteId, email)
         .then(() => {
           toast.success("Invite revoked successfully");
@@ -102,7 +101,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
 
   const handleRemoveMember = useCallback(
     (id: string, email: string, status: BillingTeamMemberStatus, inviteId?: string) => {
-      trackBillingTeamActionClicked("remove_member");
+      trackBillingTeamActionClicked(BillingAction.REMOVE);
       setLoadingRows([...loadingRows, id]);
       if (status === BillingTeamMemberStatus.PENDING) {
         handleInvokePendingMemberInvite(inviteId, email, id);
