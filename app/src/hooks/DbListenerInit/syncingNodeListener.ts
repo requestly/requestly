@@ -178,6 +178,7 @@ export const doSync = async (
     if (!tsResult) {
       // This means some updates have been performed locally and they have not been synced with firebase yet
       // Handle conflicts
+      console.log("[DEBUG] doSync - handle conflicts");
       allSyncedRecords = await resolveLocalConflictsAndSaveToFirebase(appMode, allSyncedRecords);
       await setLastSyncTarget(appMode, syncTarget, uid, team_id);
     }

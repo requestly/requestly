@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
@@ -34,6 +34,7 @@ import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { MV3MigrationModal, MigrationInfoCard } from "features/rules/modals/MV3MigrationModal/";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -97,6 +98,12 @@ const DashboardContent = () => {
       {isInsideIframe ? null : (
         <>
           {/* MODALS */}
+          {activeModals.mv3InfoModal.isActive ? (
+            <MV3MigrationModal
+              isOpen={activeModals.mv3InfoModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "mv3InfoModal" }))}
+            />
+          ) : null}
           {activeModals.loadingModal.isActive ? (
             <SpinnerModal isOpen={activeModals.loadingModal.isActive} toggle={() => toggleSpinnerModal()} />
           ) : null}
@@ -203,6 +210,8 @@ const DashboardContent = () => {
           appOnboardingDetails.isOnboardingCompleted ? (
             <RequestBillingTeamAccessReminder />
           ) : null}
+
+          <MigrationInfoCard />
         </>
       )}
     </>
