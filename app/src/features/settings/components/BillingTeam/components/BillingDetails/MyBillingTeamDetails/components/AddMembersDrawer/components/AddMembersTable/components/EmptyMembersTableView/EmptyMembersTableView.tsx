@@ -1,6 +1,7 @@
 import React from "react";
 import { RQButton } from "lib/design-system/components";
 import EmptyIcon from "./assets/empty.svg";
+import { trackBillingTeamInviteMemberClicked } from "features/settings/analytics";
 import "./emptyMembersTableView.scss";
 
 interface EmptyMembersTableViewProps {
@@ -23,7 +24,14 @@ export const EmptyMembersTableView: React.FC<EmptyMembersTableViewProps> = ({
       <div className="empty-members-table-description">
         Please click the button below to invite and add members in your billing team.
       </div>
-      <RQButton className="mt-24" type="primary" onClick={toggleInviteFormVisibility}>
+      <RQButton
+        className="mt-24"
+        type="primary"
+        onClick={() => {
+          toggleInviteFormVisibility();
+          trackBillingTeamInviteMemberClicked("member_not_found");
+        }}
+      >
         Invite & add to billing team
       </RQButton>
     </div>

@@ -65,7 +65,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
 
   return (
     <Row className="editor-title-container">
-      <Col span={20}>
+      <Col>
         <Row className="editor-title-name">
           {name.length === 0 || isNameEditable ? (
             <div className="editor-title-name-wrapper">

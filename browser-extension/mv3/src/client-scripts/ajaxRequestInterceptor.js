@@ -277,6 +277,35 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
 
+  const notifyOnBeforeRequest = async (requestDetails) => {
+    window.postMessage(
+      {
+        source: "requestly:client",
+        action: "onBeforeAjaxRequest",
+        requestDetails,
+      },
+      window.location.href
+    );
+
+    let onBeforeAjaxRequestAckHandler;
+
+    return Promise.race([
+      new Promise((resolve) => {
+        setTimeout(resolve, 2000);
+      }),
+      new Promise((resolve) => {
+        onBeforeAjaxRequestAckHandler = (event) => {
+          if (event.data.action === "onBeforeAjaxRequest:processed") {
+            resolve();
+          }
+        };
+        window.addEventListener("message", onBeforeAjaxRequestAckHandler);
+      }),
+    ]).finally(() => {
+      window.removeEventListener("message", onBeforeAjaxRequestAckHandler);
+    });
+  };
+
   /**
    * ********** Within Context Functions end here *************
    */
@@ -445,7 +474,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const send = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.send = function (data) {
+  XMLHttpRequest.prototype.send = async function (data) {
     this.requestData = data;
 
     const requestRule = getMatchedRequestRule(this.requestURL);
@@ -473,13 +502,20 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule.response)) {
       resolveXHR(this, this.responseRule.response.value);
     } else {
+      await notifyOnBeforeRequest({
+        url: this.requestURL,
+        method: this.method,
+        type: "xmlhttprequest",
+        initiatorDomain: location.origin,
+        requestHeaders: this.requestHeaders ?? {},
+      });
       send.apply(this, arguments);
     }
   };
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
   XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-    this.requestHeaders = this.requestHeaders || {};
+    this.requestHeaders = this.requestHeaders ?? {};
     this.requestHeaders[header] = value;
     setRequestHeader.apply(this, arguments);
   };
@@ -555,6 +591,18 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
+        const headersObject = {};
+        request?.headers?.forEach((value, key) => {
+          headersObject[key] = value;
+        });
+        await notifyOnBeforeRequest({
+          url,
+          method,
+          type: "xmlhttprequest",
+          initiatorDomain: location.origin,
+          requestHeaders: headersObject,
+        });
+
         if (requestRuleData) {
           fetchedResponse = await _fetch(request);
         } else {

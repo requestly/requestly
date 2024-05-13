@@ -9,8 +9,8 @@ interface OrgMembersTableProps {
   searchValue: string;
   members: OrgMember[];
   setSearchValue: (value: string) => void;
-  memberActions?: (record: OrgMember) => ReactNode;
-  tableActions?: ReactNode;
+  memberActions?: (record: OrgMember) => ReactNode[];
+  tableActions?: ReactNode[];
   emptyView?: ReactNode;
   actions?: (member: OrgMember) => ReactNode;
 }
@@ -58,7 +58,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
         title: "",
         key: "action",
         render: (_: any, member) => {
-          return memberActions?.(member);
+          return <div className="org-member-row-actions">{memberActions?.(member)}</div>;
         },
       },
     ],
@@ -79,10 +79,10 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
               className="org-member-table-header-input"
               suffix={<SearchOutlined />}
             />
-            <div>{tableActions}</div>
+            <div className="org-members-table-actions">{tableActions}</div>
           </div>
           <div className="org-members-table-count">
-            {members?.length} {members?.length === 1 ? "member" : "members"}
+            {members.length} {members.length === 1 ? "member" : "members"}
           </div>
         </Col>
 
@@ -91,7 +91,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
           dataSource={members}
           columns={columns}
           pagination={false}
-          scroll={{ y: "80vh" }}
+          scroll={{ y: "78vh" }}
           loading={isLoading}
           locale={{
             emptyText: emptyView ?? (

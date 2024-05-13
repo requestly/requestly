@@ -1,78 +1,257 @@
-.rq-mocks-list-table {
-  .rq-col-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+.rq-content-list-table-container {
+  .rq-mocks-list-table.rq-content-list-table {
+    .ant-table-row-indent + .ant-table-row-expand-icon {
+      margin-top: 1px;
+      margin-right: 12px;
+    }
 
-  .rq-mocks-list-table-row {
-    font-family: Inter;
-    font-size: 13px;
-    cursor: pointer;
+    .rq-col-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 90px;
+    }
 
-    .mock-details-container {
-      .mock-name-container {
+    .ant-table-selection-column {
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
+
+    .rq-mocks-list-table-row {
+      font-family: Inter;
+      font-size: 13px;
+      cursor: pointer;
+
+      &.mock-row {
+        .ant-table-cell:first-child {
+          border-left: 4px solid transparent;
+        }
+      }
+
+      &.mock-row.starred {
+        .ant-table-cell:first-child {
+          border-left: 4px solid var(--requestly-color-warning);
+        }
+      }
+
+      &.mock-row {
+        .ant-table-row-indent + .ant-table-row-expand-icon {
+          display: none;
+        }
+
+        td.ant-table-cell.ant-table-cell-with-append:nth-child(2) {
+          padding: 18px 0;
+        }
+      }
+
+      &.collection-row {
+        .mock-collection-details-container {
+          padding: 7px 0;
+        }
+
+        td.ant-table-cell.ant-table-cell-with-append:nth-child(2) {
+          padding: 19px 0;
+        }
+      }
+
+      &.ant-table-row-level-1 {
+        .mock-name-details-container {
+          padding-left: 6px;
+        }
+
+        .mock-star-btn {
+          margin-right: -10px;
+        }
+      }
+
+      .mock-star-btn {
+        display: flex;
+        height: 24px;
+        padding: 4px 8px;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        margin-right: 5px;
+        flex-shrink: 0;
+
+        .unstarred {
+          color: var(--requestly-color-text-placeholder);
+        }
+
+        .starred {
+          color: var(--requestly-color-warning);
+        }
+      }
+
+      .mock-collection-details-container {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 8px;
 
-        .mock-name {
+        .collection-icon {
+          width: 16px;
+          height: 16px;
+          color: var(--white);
+        }
+
+        .mock-collection-name {
           color: var(--white);
           font-size: 13px;
           font-weight: 500;
           line-height: 18px;
           letter-spacing: 0.25px;
         }
+      }
 
-        .mock-type {
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 1px;
-          text-transform: uppercase;
+      .mock-name-details-container {
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+
+        .mock-details-container {
+          overflow: hidden;
+
+          .mock-name-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            .mock-name {
+              color: var(--white);
+              font-size: 13px;
+              font-weight: 500;
+              line-height: 18px;
+              letter-spacing: 0.25px;
+            }
+
+            .mock-type {
+              margin-top: 2px;
+              font-size: 9px;
+              font-weight: 600;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+            }
+          }
+
+          .mock-endpoint {
+            margin-top: 4px;
+            font-size: 11px;
+            font-weight: 400;
+            line-height: 14px;
+            letter-spacing: 0.4px;
+
+            .ant-typography {
+              color: var(--text-subtle);
+            }
+          }
         }
       }
 
-      .mock-endpoint {
-        margin-top: 4px;
-        font-size: 11px;
-        font-weight: 400;
-        line-height: 14px;
-        letter-spacing: 0.4px;
+      .mock-description-icon {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        color: var(--requestly-color-text-placeholder);
+        flex-shrink: 0;
+      }
 
-        .ant-typography {
-          color: var(--text-subtle);
+      .mock-actions-container {
+        .ant-btn-icon-only {
+          &:hover {
+            background: var(--border);
+          }
+
+          svg {
+            color: var(--text-gray);
+            transition: 0.2s ease-in-out;
+          }
+
+          &:hover svg {
+            color: var(--white);
+          }
         }
       }
-    }
 
-    .mock-actions-container {
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s ease-in-out;
-
-      .ant-btn-icon-only {
-        &:hover {
-          background: var(--border);
-        }
-
-        svg {
-          color: var(--text-gray);
-          transition: 0.2s ease-in-out;
-        }
-
-        &:hover svg {
-          color: var(--white);
-        }
+      .mock-table-user-icon {
+        margin-left: 15px;
       }
-    }
 
-    .mock-table-user-icon {
-      margin-left: 15px;
+      .last-modified {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+        margin-left: 13px;
+      }
     }
   }
+}
 
-  .rq-mocks-list-table-row:hover .mock-actions-container {
-    opacity: 1;
-    pointer-events: auto;
+.mock-description {
+  font-size: 13px;
+  line-height: 14px;
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu {
+  width: max-content;
+  padding: 4px;
+  background: var(--requestly-color-surface-0);
+  border: 1px solid var(--requestly-color-surface-1);
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0px 8px 12px 0px var(--requestly-color-black-t-20);
+
+  .mock-action {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  padding: 8px 12px;
+  color: var(--requestly-color-text-default);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  display: flex;
+  align-items: center;
+
+  &.ant-dropdown-menu-item-disabled {
+    opacity: 0.6;
+  }
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:hover {
+  border-radius: 4px;
+  background: var(--requestly-color-surface-1);
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item svg {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.mocks-more-actions-dropdown .ant-dropdown-menu .ant-dropdown-menu-item.ant-dropdown-menu-item-danger {
+  color: var(--danger);
+}
+
+.rq-modal {
+  .rq-mocks-list-table.rq-content-list-table {
+    .rq-mocks-list-table-row {
+      &.collection-row {
+        td.ant-table-cell.ant-table-cell-with-append:nth-child(1) {
+          padding: 19px 0;
+          display: flex;
+
+          .ant-table-row-expand-icon {
+            margin-left: 20px;
+          }
+        }
+      }
+    }
   }
 }

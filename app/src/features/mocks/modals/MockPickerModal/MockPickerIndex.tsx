@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NewFileTypeSelector from "../NewFileModal/NewFileTypeSelector";
+import NewFileTypeSelector from "../NewFileModalWrapper/NewFileModal/NewFileTypeSelector";
 import { RQButton } from "lib/design-system/components";
 import { trackNewMockButtonClicked } from "modules/analytics/events/features/mocksV2";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -8,7 +8,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { Space, Typography } from "antd";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
-import { FileType, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { FileType, MockListSource, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { MocksListContentHeader, MocksTable } from "features/mocks/screens/mocksList/components/MocksList/components";
 import { MockEditorDataSchema } from "components/features/mocksV2/MockEditorIndex/types";
 import {
@@ -18,23 +18,25 @@ import {
   defaultJsEditorMock,
 } from "components/features/mocksV2/MockEditorIndex/constants";
 import MockEditorIndex from "components/features/mocksV2/MockEditorIndex";
+import { useMocksActionContext } from "features/mocks/contexts/actions";
 
 interface Props {
-  mocks: RQMockMetadataSchema[];
-  mockType?: string;
+  records: RQMockMetadataSchema[];
+  mockRecords: RQMockMetadataSchema[];
+  mockType?: MockType;
   handleItemSelect: (mockId: string, url: string, isOldMock: boolean) => void;
   handleNameClick: (mockId: string, isOldMock: boolean) => void;
 
   // actions
   handleSelectAction?: (url: string) => void;
-  handleUploadAction?: () => void;
 }
 
 const MockPickerIndex: React.FC<Props> = ({
-  mocks,
+  records,
+  mockRecords,
+  mockType,
   handleItemSelect,
   handleSelectAction,
-  handleUploadAction,
   handleNameClick,
 }) => {
   const [showEditor, setShowEditor] = useState<boolean>(false);
@@ -42,6 +44,7 @@ const MockPickerIndex: React.FC<Props> = ({
   const [selectedMockData, setSelectedMockData] = useState<MockEditorDataSchema>(null);
   const [showFileTypeSelector, setShowFileTypeSelector] = useState<boolean>(false);
   const [showCreateMockState, setShowCreateMockState] = useState<boolean>(false);
+  const { uploadMockAction } = useMocksActionContext() ?? {};
 
   const user = useSelector(getUserAuthDetails);
 
@@ -79,8 +82,8 @@ const MockPickerIndex: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    setShowCreateMockState(!mocks?.length);
-  }, [mocks?.length]);
+    setShowCreateMockState(!mockRecords?.length);
+  }, [mockRecords?.length]);
 
   if (showFileTypeSelector) {
     return <NewFileTypeSelector handleTypeSelection={handleTypeSelection} />;
@@ -99,13 +102,17 @@ const MockPickerIndex: React.FC<Props> = ({
     );
   }
 
-  if (mocks.length && !showCreateMockState) {
+  if (mockRecords.length && !showCreateMockState) {
     return (
       <>
-        <MocksListContentHeader handleCreateNew={() => setShowCreateMockState(true)} />
+        <MocksListContentHeader
+          source={MockListSource.PICKER_MODAL}
+          handleCreateNewMockFromPickerModal={() => setShowCreateMockState(true)}
+        />
 
         <MocksTable
-          mocks={mocks}
+          records={records}
+          filteredRecords={mockRecords}
           handleItemSelect={handleItemSelect}
           handleNameClick={handleNameClick}
           handleSelectAction={handleSelectAction}
@@ -115,21 +122,21 @@ const MockPickerIndex: React.FC<Props> = ({
   } else if (showCreateMockState) {
     return (
       <div className="empty-mocks-picker-container">
-        <Typography.Title level={4}>{mocks?.length ? "Create mock" : "No mocks created yet"}</Typography.Title>
+        <Typography.Title level={4}>{mockRecords?.length ? "Create mock" : "No mocks created yet"}</Typography.Title>
         <Typography.Text type="secondary" className="mt-8">
           Create mocks APIs or files with different status codes, delay, response headers or body.
         </Typography.Text>
         <Space className="mt-8">
           <AuthConfirmationPopover
             title="You need to sign up to upload mocks"
-            callback={handleUploadAction}
+            callback={() => uploadMockAction(mockType)}
             source={"upload_mock"}
           >
             <RQButton
               type="default"
               icon={<AiOutlineCloudUpload />}
               className="upload-btn"
-              onClick={() => user?.loggedIn && handleUploadAction()}
+              onClick={() => user?.loggedIn && uploadMockAction(mockType)}
             >
               <span> Upload file/JSON</span>
             </RQButton>

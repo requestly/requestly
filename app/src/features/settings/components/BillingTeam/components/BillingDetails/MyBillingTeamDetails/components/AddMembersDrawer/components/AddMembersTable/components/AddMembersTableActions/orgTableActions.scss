@@ -1,12 +1,12 @@
 .billing-team-members-add-btn.ant-btn {
   gap: 8px;
-  color: var(--neutrals-gray-300) !important;
+  color: var(--neutrals-gray-300);
 
   &:hover,
   &:focus,
   &:active {
-    color: var(--white) !important;
-    border-color: var(--surface-3) !important;
+    color: var(--white);
+    border-color: var(--surface-3);
   }
 }
 

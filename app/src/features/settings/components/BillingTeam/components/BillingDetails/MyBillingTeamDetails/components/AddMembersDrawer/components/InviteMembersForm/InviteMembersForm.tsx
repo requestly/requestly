@@ -65,7 +65,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
     );
   } else {
     return (
-      <div className="billing-team-invite-members-form-wrapper">
+      <form className="billing-team-invite-members-form-wrapper" onSubmit={handleAddMembersToBillingTeam}>
         {externalDomainEmails.length && !isExternalDomainWarningBannerClosed ? (
           <ExternalDomainWarningBanner
             emails={externalDomainEmails}
@@ -77,17 +77,17 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
           You can invite multiple members by typing their email and pressing `Enter` key.
         </div>
         <div className="invite-emails-wrapper">
-          <EmailInputWithDomainBasedSuggestions transparentBackground onChange={handleEmailsChange} />
+          <EmailInputWithDomainBasedSuggestions autoFocus transparentBackground onChange={handleEmailsChange} />
         </div>
         <div className="billing-team-invite-members-form-actions">
-          <RQButton loading={isLoading} type="primary" onClick={handleAddMembersToBillingTeam}>
+          <RQButton loading={isLoading} type="primary" htmlType="submit">
             Add to billing team
           </RQButton>
           <RQButton disabled={isLoading} type="default" onClick={toggleInviteFormVisibility}>
             Back to members list
           </RQButton>
         </div>
-      </div>
+      </form>
     );
   }
 };
