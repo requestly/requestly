@@ -62,10 +62,6 @@ export const initiateBlankCurrentlySelectedRule = (
       ...extraRuleConfig,
     };
 
-    if (currentlySelectedRuleConfig.VERSION) {
-      blankRuleFormat.version = currentlySelectedRuleConfig.VERSION;
-    }
-
     if (isExtensionManifestVersion3() && "REMOVE_CSP_HEADER" in currentlySelectedRuleConfig) {
       blankRuleFormat.removeCSPHeader = currentlySelectedRuleConfig.REMOVE_CSP_HEADER;
     }
