@@ -1,42 +1,28 @@
 import React from "react";
 import { GettingStartedWithMocks } from "./GettingStartedWithMocks/GettingStartedWithMocks";
-import { MockUploaderModal, NewFileModal } from "features/mocks/modals";
-import { MockType } from "components/features/mocksV2/types";
+import { MockUploaderModalWrapper, NewFileModalWrapper } from "features/mocks/modals";
+import { MockListSource, MockType } from "components/features/mocksV2/types";
+import { useMocksActionContext } from "features/mocks/contexts/actions";
 
 interface Props {
   mockType: MockType;
-  handleCreateNew: () => void;
-  handleUploadAction: () => void;
-  fileModalVisibility: boolean;
-  uploadModalVisibility: boolean;
-  setFileModalVisibility: React.Dispatch<React.SetStateAction<boolean>>;
-  setUploadModalVisibility: React.Dispatch<React.SetStateAction<boolean>>;
+  source: MockListSource;
 }
 
-export const GettingStarted: React.FC<Props> = ({
-  mockType,
-  handleCreateNew,
-  handleUploadAction,
-  fileModalVisibility,
-  setFileModalVisibility,
-  uploadModalVisibility,
-  setUploadModalVisibility,
-}) => {
+export const GettingStarted: React.FC<Props> = ({ mockType, source }) => {
+  const { uploadMockAction, createNewMockAction } = useMocksActionContext() ?? {};
+
   return (
     <>
       <GettingStartedWithMocks
         mockType={mockType}
-        handleCreateNew={handleCreateNew}
-        handleUploadAction={handleUploadAction}
+        handleCreateNew={() => createNewMockAction(mockType, source)}
+        handleUploadAction={() => uploadMockAction(mockType)}
       />
 
-      <NewFileModal visible={fileModalVisibility} toggleModalVisiblity={(visible) => setFileModalVisibility(visible)} />
-
-      <MockUploaderModal
-        mockType={mockType}
-        visible={uploadModalVisibility}
-        toggleModalVisibility={(visible) => setUploadModalVisibility(visible)}
-      />
+      {/* TODO: move this into container */}
+      <NewFileModalWrapper />
+      <MockUploaderModalWrapper />
     </>
   );
 };

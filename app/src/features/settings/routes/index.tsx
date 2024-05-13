@@ -10,7 +10,7 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { BillingTeamContainer } from "../components/BillingTeam";
-import { OrgMembersView } from "../components/OrgMembers";
+import { OrgMembersView } from "../components/OrgMembers/OrgMembers";
 import Profile from "../components/Profile/ManageAccount";
 import { BillingTeamDetails } from "../components/BillingTeam/components/BillingDetails";
 import { BillingList } from "../components/BillingTeam/components/BillingList";
