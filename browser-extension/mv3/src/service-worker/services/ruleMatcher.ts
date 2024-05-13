@@ -116,7 +116,7 @@ const matchRequestWithRuleSourceFilters = function (
   });
 };
 
-export const getMatchedRuleForRequest = function (rule: Rule, requestDetails: AJAXRequestDetails) {
+export const matchRuleWithRequest = function (rule: Rule, requestDetails: AJAXRequestDetails) {
   const matchedPair = rule?.pairs?.find(
     (pair) =>
       matchSourceUrl(pair.source, requestDetails.url) &&
@@ -127,14 +127,12 @@ export const getMatchedRuleForRequest = function (rule: Rule, requestDetails: AJ
     return null;
   }
 
-  const redirectedDestinationUrl = populateRedirectedUrl(matchedPair, rule.ruleType, requestDetails);
+  const destinationUrl = populateRedirectedUrl(matchedPair, rule.ruleType, requestDetails);
 
   return {
-    matchedRule: rule,
-    matchedRuleInfo: {
-      source: matchedPair.source,
-      redirectedDestinationUrl: redirectedDestinationUrl,
-    },
+    isApplied: true,
+    matchedPair: matchedPair,
+    destinationUrl: destinationUrl,
   };
 };
 
@@ -200,4 +198,14 @@ export const populateRedirectedUrl = (rulePair: RulePair, ruleType: RuleType, re
     default:
       return null;
   }
+};
+
+export const findMatchingRule = (rules: Rule[], requestDetails: AJAXRequestDetails) => {
+  for (const rule of rules) {
+    const matchedRule = matchRuleWithRequest(rule, requestDetails);
+    if (matchedRule) {
+      return matchedRule;
+    }
+  }
+  return null;
 };

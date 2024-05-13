@@ -1,20 +1,18 @@
 import { AJAXRequestDetails, SessionRuleType } from "./types";
-import { requestProcessor } from ".";
+import { findMatchingRule } from "../ruleMatcher";
+import { updateRequestSpecificRules } from "../rulesManager";
+import { Rule } from "common/types";
 
 export const IGNORED_HEADERS_ON_REDIRECT = ["Authorization"];
 
-export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJAXRequestDetails) => {
+export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJAXRequestDetails, rules: Rule[]) => {
   if (!IGNORED_HEADERS_ON_REDIRECT.some((header) => checkIfHeaderExists(requestDetails.requestHeaders, header))) {
     return;
   }
 
-  const { matchedRule, matchedRuleInfo } =
-    requestProcessor.findMatchingRule(
-      [...requestProcessor.cachedRules.redirectRules, ...requestProcessor.cachedRules.replaceRules],
-      requestDetails
-    ) ?? {};
+  const { isApplied, destinationUrl } = findMatchingRule(rules, requestDetails) ?? {};
 
-  if (!matchedRule) {
+  if (!isApplied) {
     return;
   }
 
@@ -25,9 +23,9 @@ export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJ
     return headerKey ? { name: headerKey, value: requestDetails.requestHeaders[headerKey] } : null;
   }).filter((headerObject) => headerObject !== null);
 
-  const redirectedUrl = matchedRuleInfo.redirectedDestinationUrl;
+  const redirectedUrl = destinationUrl;
 
-  return requestProcessor.updateRequestSpecificRules(
+  return updateRequestSpecificRules(
     tabId,
     requestDetails.url,
     {

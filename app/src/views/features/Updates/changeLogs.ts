@@ -8,6 +8,14 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.5.8",
+    logs: [
+      "[ENGG-1588] feat: async support in response rule - XHR requests (#1611)",
+      "ENGG-1478 Explicit and Implicit test this rule flow improvement (#1615)",
+      "[ENGG-1413] fix: rule without status field should be treated disabled (#1518)",
+    ],
+  },
+  {
     version: "24.3.5",
     logs: [
       "fix: auto recording logo (#1481)",

@@ -6,6 +6,7 @@ import { getRecords } from "common/storage";
 import { CLIENT_MESSAGES } from "common/constants";
 import { isExtensionEnabled } from "./utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
+import { SessionRuleType } from "./requestProcessor/types";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
@@ -126,4 +127,44 @@ export const initRulesManager = async (): Promise<void> => {
   onRuleOrGroupChange(applyExtensionRules);
   onVariableChange(Variable.IS_EXTENSION_ENABLED, applyExtensionRules);
   applyExtensionRules();
+};
+
+export const updateRequestSpecificRules = async (
+  tabId: number,
+  requestUrl: string,
+  ruleDetails: {
+    action: chrome.declarativeNetRequest.RuleAction;
+    condition: chrome.declarativeNetRequest.RuleCondition;
+  },
+  sessionRuleType: SessionRuleType
+) => {
+  let ruleId = parseInt(`${Date.now() % 1000000}${Math.floor(Math.random() * 1000)}`);
+
+  const sessionRulesMap = tabService.getData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP) ?? {};
+  const sessionRuleTypeMap = sessionRulesMap?.[sessionRuleType] ?? {};
+
+  let removeRuleIds = [];
+
+  if (sessionRuleTypeMap[requestUrl]) {
+    ruleId = sessionRuleTypeMap[requestUrl];
+    removeRuleIds.push(ruleId);
+  }
+
+  tabService.setData(tabId, TAB_SERVICE_DATA.SESSION_RULES_MAP, {
+    ...sessionRulesMap,
+    [sessionRuleType]: {
+      ...sessionRuleTypeMap,
+      [requestUrl]: ruleId,
+    },
+  });
+
+  return chrome.declarativeNetRequest.updateSessionRules({
+    addRules: [
+      {
+        id: ruleId,
+        ...ruleDetails,
+      },
+    ],
+    removeRuleIds,
+  });
 };
