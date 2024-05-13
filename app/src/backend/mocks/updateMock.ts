@@ -1,6 +1,6 @@
 import firebaseApp from "../../firebase";
 import { doc, getFirestore, Timestamp, updateDoc } from "firebase/firestore";
-import { RQMockSchema } from "components/features/mocksV2/types";
+import { MockRecordType, RQMockSchema } from "components/features/mocksV2/types";
 import { getOwnerId } from "backend/utils";
 import { updateUserMockSelectorsMap, uploadResponseBodyFiles } from "./common";
 import { BODY_IN_BUCKET_ENABLED } from "./constants";
@@ -53,6 +53,7 @@ export const updateMockFromFirebase = async (
   const success = await updateDoc(docRef, {
     lastUpdatedBy: updaterId,
     ...mockData,
+    recordType: MockRecordType.MOCK,
     updatedTs: Timestamp.now().toMillis(),
   })
     .then(() => {
