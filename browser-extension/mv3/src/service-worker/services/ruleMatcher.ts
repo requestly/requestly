@@ -205,7 +205,7 @@ export const populateRedirectedUrl = (rulePair: RulePair, ruleType: RuleType, re
 export const findMatchingRule = (rules: Rule[], requestDetails: AJAXRequestDetails) => {
   for (const rule of rules) {
     const matchedRule = matchRuleWithRequest(rule, requestDetails);
-    if (matchedRule) {
+    if (matchedRule.isApplied) {
       return matchedRule;
     }
   }

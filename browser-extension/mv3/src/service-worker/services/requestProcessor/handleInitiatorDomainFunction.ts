@@ -10,7 +10,7 @@ export const handleInitiatorDomainFunction = async (
   requestDetails: AJAXRequestDetails,
   rules: Rule[]
 ) => {
-  const { isApplied, matchedPair } = findMatchingRule(rules, requestDetails);
+  const { isApplied, matchedPair } = findMatchingRule(rules, requestDetails) ?? {};
 
   if (!isApplied) {
     return;
