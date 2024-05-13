@@ -106,7 +106,7 @@ const matchRequestWithRuleSourceFilters = function (
   sourceFilters: RuleSourceFilter[],
   requestDetails: AJAXRequestDetails
 ) {
-  if (!sourceFilters || !requestDetails) {
+  if (!sourceFilters || !requestDetails || (Array.isArray(sourceFilters) && sourceFilters?.length === 0)) {
     return true;
   }
 
