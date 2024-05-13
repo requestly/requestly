@@ -3,7 +3,7 @@ export interface AJAXRequestDetails {
   method: string;
   type: "xmlhttprequest";
   initiatorDomain: string;
-  requestHeaders: Record<string, string>;
+  requestHeaders?: Record<string, string>;
 }
 
 export enum SessionRuleType {

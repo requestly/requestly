@@ -166,7 +166,8 @@ export const toggleExtensionStatus = async () => {
   const updatedStatus = !extensionEnabledStatus;
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
   updateActivationStatus(updatedStatus);
-  onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);
+  // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
+  onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
 
   if (!updatedStatus) {
     stopRecordingOnAllTabs();
