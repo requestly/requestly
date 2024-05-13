@@ -39,6 +39,7 @@ export const BillingTeamContainer: React.FC = () => {
           : `You need to login to view this billing team`
       );
       dispatch(
+        // @ts-ignore
         actions.toggleActiveModal({
           modalName: "authModal",
           newValue: true,
@@ -67,6 +68,7 @@ export const BillingTeamContainer: React.FC = () => {
               type="primary"
               onClick={() => {
                 dispatch(
+                  // @ts-ignore
                   actions.toggleActiveModal({
                     modalName: "authModal",
                     newValue: true,

@@ -1,10 +1,9 @@
-import { CLIENT_MESSAGES } from "common/constants";
 import { getEnabledRules } from "common/rulesStore";
 import { RuleType, ScriptObject, ScriptRulePair } from "common/types";
 import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectScript } from "./utils";
-import { TAB_SERVICE_DATA, tabService } from "./tabService";
+import ruleExecutionHandler from "./ruleExecutionHandler";
 
 export const applyScriptRules = async (tabId: number, frameId: number, url: string) => {
   if (isBlacklistedURL(url)) {
@@ -32,14 +31,12 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
   }
 
   if (appliedScriptRuleIds.size > 0) {
-    chrome.tabs.sendMessage(tabId, {
-      action: CLIENT_MESSAGES.UPDATE_APPLIED_SCRIPT_RULES,
-      ruleIds: Array.from(appliedScriptRuleIds),
+    // FIXME: Performance can be improved
+    scriptRules.forEach((rule) => {
+      ruleExecutionHandler.onRuleExecuted(rule, {
+        url: url,
+        tabId: tabId,
+      } as chrome.webRequest.WebRequestDetails);
     });
-
-    const appliedRuleDetails = tabService.getData(tabId, TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, []);
-    appliedRuleDetails.push(...Array.from(appliedScriptRuleIds));
-
-    tabService.setData(tabId, TAB_SERVICE_DATA.APPLIED_RULE_DETAILS, appliedRuleDetails);
   }
 };

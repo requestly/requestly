@@ -206,9 +206,8 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                 descriptionChangeCallback={(description) => handleRuleTitleChange("description", description)}
                 descriptionPlaceholder="Add description (optional)"
               />
-
               <Col span={7}>
-                <Row align="middle" justify="space-evenly" wrap={false}>
+                <Row align="middle" justify="end" wrap={false} className="rule-editor-modal-actions">
                   <RuleStatusButton location={window.location} isRuleEditorModal={true} />
                   {mode === EditorMode.EDIT && (
                     <>

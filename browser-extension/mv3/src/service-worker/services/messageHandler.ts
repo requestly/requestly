@@ -2,7 +2,7 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
 import { initClientHandler } from "./clientHandler";
 import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
-import { getExecutedRules, handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
+// import { handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -18,11 +18,13 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
+import { requestProcessor } from "./requestProcessor";
 import {
   handleTestRuleOnClientPageLoad,
   launchUrlAndStartRuleTesting,
   saveTestRuleResult,
 } from "./testThisRuleHandler";
+import ruleExecutionHandler from "./ruleExecutionHandler";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -51,7 +53,7 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
-        handleRuleExecutionsOnClientPageLoad(sender.tab.id);
+        ruleExecutionHandler.processTabCachedRulesExecutions(sender.tab.id);
         handleTestRuleOnClientPageLoad(sender.tab);
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
@@ -93,7 +95,7 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.GET_EXECUTED_RULES:
-        getExecutedRules(message.tabId).then(sendResponse);
+        ruleExecutionHandler.getExecutedRules(message.tabId).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT:
@@ -116,12 +118,21 @@ export const initMessageHandler = () => {
         cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
 
+      case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
+        requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
+        return true;
+
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
         launchUrlAndStartRuleTesting(message, sender.tab.id);
         break;
 
       case EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
         saveTestRuleResult(message, sender.tab);
+        break;
+
+      case EXTENSION_MESSAGES.RULE_EXECUTED:
+        const requestDetails = { ...message.requestDetails, tabId: message.requestDetails?.tabId || sender.tab?.id };
+        ruleExecutionHandler.onRuleExecuted(message.rule, requestDetails);
         break;
     }
 

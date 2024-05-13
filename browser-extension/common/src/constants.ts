@@ -26,9 +26,11 @@ export const EXTENSION_MESSAGES = {
   CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD: "cacheRecordedSessionOnPageUnload",
   INIT_SESSION_RECORDER: "initSessionRecorder",
   CLIENT_PAGE_LOADED: "clientPageLoaded",
+  ON_BEFORE_AJAX_REQUEST: "onBeforeAjaxRequest",
   SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
   NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
   TEST_RULE_ON_URL: "testRuleOnUrl",
+  RULE_EXECUTED: "ruleExecuted",
 };
 
 export const CLIENT_MESSAGES = {
@@ -46,6 +48,7 @@ export const CLIENT_MESSAGES = {
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
+  ON_BEFORE_AJAX_REQUEST_PROCESSED: "onBeforeAjaxRequest:processed",
   START_EXPLICIT_RULE_TESTING: "startExplicitRuleTesting",
   START_IMPLICIT_RULE_TESTING: "startImplicitRuleTesting",
   SYNC_APPLIED_RULES: "syncAppliedRules",

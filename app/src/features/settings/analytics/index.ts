@@ -64,3 +64,19 @@ export const trackJoinBillingTeamReminderViewed = () => {
 export const trackBillingTeamAccessRequestResponded = (action: string, status: string) => {
   trackEvent(SETTINGS.BILLING.BILLING_TEAM_ACCESS_REQUEST_RESPONDED, { action, status });
 };
+
+export const trackBillingTeamInviteMemberClicked = (source: string) => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVITE_MEMBER_CLICKED, { source });
+};
+
+export const trackBillingTeamInviteMemberEmailEntered = () => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVITE_MEMBER_EMAIL_ENTERRED);
+};
+
+export const trackBillingTeamInviteSentSuccessfully = (hasExternalDomainUser: boolean) => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVITE_SENT_SUCCESSFULLY, { hasExternalDomainUser });
+};
+
+export const trackBillingTeamInviteSendingFailed = (status: string, hasExternalDomainUser: boolean) => {
+  trackEvent(SETTINGS.BILLING.BILLING_TEAM_INVITE_SENDING_FAILED, { status, hasExternalDomainUser });
+};
