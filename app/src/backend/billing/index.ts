@@ -165,3 +165,13 @@ export const revokeBillingTeamInvite = async (inviteId: string, email: string) =
   const revokeInvite = httpsCallable(getFunctions(), "billing-revokeBillingTeamInvite");
   return revokeInvite({ inviteId, userEmail: email });
 };
+
+export const inviteUsersToBillingTeam = async (billingId: string, userEmails: string[]) => {
+  if (!billingId || !userEmails) {
+    return null;
+  }
+
+  const inviteUsers = httpsCallable(getFunctions(), "billing-createBillingTeamInvites");
+
+  return inviteUsers({ userEmails, billingId });
+};
