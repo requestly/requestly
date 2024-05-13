@@ -9,12 +9,14 @@ import Logger from "lib/logger";
 import * as Sentry from "@sentry/react";
 import { detectUnsettledPromise } from "utils/FunctionUtils";
 import { migrateRuleToMV3 } from "modules/extension/utils";
-import { parseDNRRules } from "modules/extension/mv3RuleParser";
 
 export const saveRule = async (appMode, ruleObject, callback) => {
   let ruleToSave = cloneDeep(ruleObject);
 
-  ruleToSave.extensionRules = parseDNRRules(ruleToSave);
+  delete ruleToSave["version"];
+  ruleToSave = migrateRuleToMV3(ruleToSave).rule;
+  // TODO: Remove above and uncomment below after all users migrated to MV3. This is just to maintain backward compatibility for path URL filter
+  // ruleToSave.extensionRules = parseDNRRules(ruleToSave);
 
   //Set the modification date of rule
   ruleToSave.modificationDate = generateObjectCreationDate();
