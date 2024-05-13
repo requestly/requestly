@@ -678,14 +678,19 @@ export async function updateUserInFirebaseAuthUser(data) {
   });
 }
 
-export const loginWithSSO = async (providerId) => {
+export const loginWithSSO = async (providerId, email) => {
   const provider = new SAMLAuthProvider(providerId);
 
   const auth = getAuth(firebaseApp);
 
   return signInWithPopup(auth, provider)
     .then((result) => {
-      // console.log({ result });
+      trackLoginSuccessEvent({
+        auth_provider: AUTH_PROVIDERS.SSO,
+        email: result?.user?.email,
+        uid: result?.user?.uid,
+      });
+
       result.user
         .getIdToken()
         .then((tokenValue) => {
@@ -698,6 +703,12 @@ export const loginWithSSO = async (providerId) => {
       // as an object in the firebase.sign_in_attributes custom claim.
     })
     .catch((error) => {
+      trackLoginFailedEvent({
+        auth_provider: AUTH_PROVIDERS.SSO,
+        email,
+        place: window.location.href,
+        error_message: error?.message || "SSO Login Failed",
+      });
       console.log(error);
       // Handle error.
     });

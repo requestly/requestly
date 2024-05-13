@@ -36,3 +36,11 @@
 .view-rule-toast-btn.ant-btn:focus {
   background: rgba(255, 255, 255, 0.03);
 }
+
+.rule-editor-modal.ant-modal .editor-title-container {
+  width: auto;
+}
+
+.rule-editor-modal.ant-modal .rule-editor-modal-actions {
+  gap: 1rem;
+}

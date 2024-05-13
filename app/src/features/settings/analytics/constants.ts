@@ -2,6 +2,7 @@ export const SETTINGS = {
   APP_SETTINGS_VIEWED: "app_settings_viewed",
   APP_SETTINGS_SIDEBAR_CLICKED: "app_settings_sidebar_clicked",
 
+  // TODO: Move these constants inside billin folder
   BILLING: {
     BILLING_TEAM_VIEWED: "billing_team_viewed",
     BILLING_TEAM_NAVIGATED: "billing_team_navigated",
@@ -14,6 +15,10 @@ export const SETTINGS = {
     REQUEST_BILLING_TEAM_ACCESS_MODAL_VIEWED: "request_billing_team_access_modal_viewed",
     JOIN_BILLING_TEAM_REMINDER_VIEWED: "join_billing_team_reminder_viewed",
     BILLING_TEAM_ACCESS_REQUEST_RESPONDED: "billing_team_access_request_responded",
+    BILLING_TEAM_INVITE_MEMBER_CLICKED: "billing_team_invite_member_clicked",
+    BILLING_TEAM_INVITE_MEMBER_EMAIL_ENTERRED: "billing_team_invite_member_email_enterred",
+    BILLING_TEAM_INVITE_SENT_SUCCESSFULLY: "billing_team_invite_sent_successfully",
+    BILLING_TEAM_INVITE_SENDING_FAILED: "billing_team_invite_sending_failed",
   },
 
   WORKSPACE: {

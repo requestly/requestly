@@ -19,4 +19,8 @@
   .org-members-table-count {
     padding-top: 1rem;
   }
+
+  .ant-spin-nested-loading > div > .ant-spin {
+    background: var(--requestly-color-surface-0);
+  }
 }

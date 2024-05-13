@@ -35,6 +35,10 @@
     padding: 0;
   }
 
+  input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
+    padding: 0;
+  }
+
   .ant-table-column-sorter {
     display: none;
   }
@@ -64,5 +68,15 @@
     font-size: var(--requestly-font-size-sm);
     color: var(--requestly-color-text-subtle);
     padding-top: 8px;
+  }
+
+  .org-members-table-actions,
+  .org-member-row-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .org-member-row-actions {
+    justify-content: flex-end;
   }
 }

@@ -7,6 +7,7 @@ import { EmptyMembersTableView } from "./components/EmptyMembersTableView/EmptyM
 import { RQButton } from "lib/design-system/components";
 import { MdOutlinePersonAdd } from "@react-icons/all-files/md/MdOutlinePersonAdd";
 import { AddMembersTableActions } from "./components/AddMembersTableActions/AddMembersTableActions";
+import { trackBillingTeamInviteMemberClicked } from "features/settings/analytics";
 import "./addMembersTable.scss";
 
 interface AddMembersTableProps {
@@ -40,17 +41,20 @@ export const AddMembersTable: React.FC<AddMembersTableProps> = ({
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         members={searchedMembers}
-        memberActions={(member) => <AddMembersTableActions member={member} />}
-        tableActions={
+        memberActions={(member) => [<AddMembersTableActions member={member} />]}
+        tableActions={[
           <RQButton
             type="default"
             className="invite-people-btn"
             icon={<MdOutlinePersonAdd />}
-            onClick={toggleInviteFormVisibility}
+            onClick={() => {
+              toggleInviteFormVisibility();
+              trackBillingTeamInviteMemberClicked("header");
+            }}
           >
             Invite people
-          </RQButton>
-        }
+          </RQButton>,
+        ]}
         emptyView={
           <EmptyMembersTableView searchValue={searchValue} toggleInviteFormVisibility={toggleInviteFormVisibility} />
         }
