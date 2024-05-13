@@ -8,7 +8,9 @@ const deleteObjectAtPath = (currentlySelectedRuleData, setCurrentlySelectedRule,
   if (typeof targetPath === "string") {
     setCurrentlySelectedRule(dispatch, omit(copyOfCurrentlySelectedRule, [`pairs[${pairIndex}].${targetPath}`]), true);
   } else {
-    let arrayOfCompleteTargetPaths = targetPath.map((targetPath) => `pairs[${pairIndex}].${targetPath}`);
+    let arrayOfCompleteTargetPaths = targetPath.map(
+      (_targetPath) => `pairs[${pairIndex}].${getFilterObjectPath(_targetPath)}`
+    );
     setCurrentlySelectedRule(dispatch, omit(copyOfCurrentlySelectedRule, arrayOfCompleteTargetPaths), true);
   }
 };

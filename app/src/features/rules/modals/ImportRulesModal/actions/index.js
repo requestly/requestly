@@ -6,7 +6,6 @@ import Logger from "lib/logger";
 import { runRuleMigrations } from "utils/rules/ruleMigrations";
 import APP_CONSTANTS from "config/constants";
 import { RecordStatus } from "features/rules";
-import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { migrateRuleToMV3 } from "modules/extension/utils";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
@@ -84,9 +83,7 @@ export const processDataToImport = (incomingArray, user, allRules, overwrite = t
   let rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
   const groups = data.groups.filter((object) => isObjectValid(object));
 
-  if (isExtensionManifestVersion3()) {
-    rules = rules.map((rule) => migrateRuleToMV3(rule).rule);
-  }
+  rules = rules.map((rule) => migrateRuleToMV3(rule).rule);
 
   if (!overwrite) {
     setNewIdofRules(rules);
