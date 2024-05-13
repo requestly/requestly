@@ -29,7 +29,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
 
   const handleAddMembersToBillingTeam = useCallback(() => {
     setIsLoading(true);
-    const inviteUsers = httpsCallable(getFunctions(), "billing-createInvite");
+    const inviteUsers = httpsCallable(getFunctions(), "billing-createBillingTeamInvites");
 
     inviteUsers({
       userEmails: emails,
