@@ -10,7 +10,7 @@ export const forwardHeadersOnRedirect = async (tabId: number, requestDetails: AJ
     return;
   }
 
-  const { isApplied, destinationUrl } = findMatchingRule(rules, requestDetails) ?? {};
+  const { isApplied, destinationUrl } = findMatchingRule(rules, requestDetails);
 
   if (!isApplied) {
     return;

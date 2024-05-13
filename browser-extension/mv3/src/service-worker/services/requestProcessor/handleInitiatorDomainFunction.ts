@@ -1,13 +1,18 @@
-import { requestProcessor } from ".";
+import { Rule } from "common/types";
+import { findMatchingRule } from "../ruleMatcher";
+import { updateRequestSpecificRules } from "../rulesManager";
 import { AJAXRequestDetails, SessionRuleType } from "./types";
 
 const INITIATOR_DOMAIN_FUNCTION = "rq_request_initiator_origin()";
 
-export const handleInitiatorDomainFunction = async (tabId: number, requestDetails: AJAXRequestDetails) => {
-  const { matchedRule } =
-    requestProcessor.findMatchingRule(requestProcessor.cachedRules.headerRules, requestDetails) ?? {};
+export const handleInitiatorDomainFunction = async (
+  tabId: number,
+  requestDetails: AJAXRequestDetails,
+  rules: Rule[]
+) => {
+  const { isApplied, matchedPair } = findMatchingRule(rules, requestDetails);
 
-  if (!matchedRule) {
+  if (!isApplied) {
     return;
   }
 
@@ -17,23 +22,21 @@ export const handleInitiatorDomainFunction = async (tabId: number, requestDetail
   };
   ``;
 
-  matchedRule.pairs.forEach((pair) => {
-    if (pair.modifications?.Request?.length) {
-      pair.modifications.Request.forEach((header: { header: string; type: string; value: string }) => {
-        if (header.value === INITIATOR_DOMAIN_FUNCTION) {
-          headerKeyValueMap.Request[header.header] = requestDetails.initiatorDomain;
-        }
-      });
-    }
+  if (matchedPair.modifications?.Request?.length) {
+    matchedPair.modifications.Request.forEach((header: { header: string; type: string; value: string }) => {
+      if (header.value === INITIATOR_DOMAIN_FUNCTION) {
+        headerKeyValueMap.Request[header.header] = requestDetails.initiatorDomain;
+      }
+    });
+  }
 
-    if (pair.modifications?.Response?.length) {
-      pair.modifications.Response.forEach((header: { header: string; type: string; value: string }) => {
-        if (header.value === INITIATOR_DOMAIN_FUNCTION) {
-          headerKeyValueMap.Response[header.header] = requestDetails.initiatorDomain;
-        }
-      });
-    }
-  });
+  if (matchedPair.modifications?.Response?.length) {
+    matchedPair.modifications.Response.forEach((header: { header: string; type: string; value: string }) => {
+      if (header.value === INITIATOR_DOMAIN_FUNCTION) {
+        headerKeyValueMap.Response[header.header] = requestDetails.initiatorDomain;
+      }
+    });
+  }
 
   const ruleAction: {
     requestHeaders?: chrome.declarativeNetRequest.RuleAction["requestHeaders"];
@@ -60,7 +63,7 @@ export const handleInitiatorDomainFunction = async (tabId: number, requestDetail
     return;
   }
 
-  await requestProcessor.updateRequestSpecificRules(
+  await updateRequestSpecificRules(
     tabId,
     requestDetails.url,
     {

@@ -124,7 +124,9 @@ export const matchRuleWithRequest = function (rule: Rule, requestDetails: AJAXRe
   );
 
   if (!matchedPair) {
-    return null;
+    return {
+      isApplied: false,
+    };
   }
 
   const destinationUrl = populateRedirectedUrl(matchedPair, rule.ruleType, requestDetails);
