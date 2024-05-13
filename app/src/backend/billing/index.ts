@@ -158,10 +158,10 @@ export const fetchBillingInformation = async (billingId: string) => {
   });
 };
 
-export const revokeBillingTeamInvite = async (billingId: string, email: string) => {
-  if (!billingId || !email) {
+export const revokeBillingTeamInvite = async (inviteId: string, email: string) => {
+  if (!inviteId || !email) {
     return null;
   }
-  const revokeInvite = httpsCallable(getFunctions(), "billing-revokeInvite");
-  return revokeInvite({ billingId, userEmails: [email] });
+  const revokeInvite = httpsCallable(getFunctions(), "billing-revokeBillingTeamInvite");
+  return revokeInvite({ inviteId, userEmail: email });
 };

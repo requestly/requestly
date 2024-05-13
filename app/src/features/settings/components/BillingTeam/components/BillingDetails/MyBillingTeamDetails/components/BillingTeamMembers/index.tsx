@@ -50,13 +50,14 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     const members = billingTeamMembers ? Object.values(billingTeamMembers) : [];
     if (billingTeamDetails?.pendingMembers) {
       members.push(
-        ...billingTeamDetails.pendingMembers.map((userEmail) => {
+        ...Object.keys(billingTeamDetails?.pendingMembers).map((email) => {
           return {
-            id: userEmail,
-            email: userEmail,
+            id: email,
+            email: email,
             displayName: "",
             role: BillingTeamRoles.Member,
             status: BillingTeamMemberStatus.PENDING,
+            inviteId: billingTeamDetails?.pendingMembers?.[email]?.inviteId,
           };
         })
       );
@@ -64,38 +65,52 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     return members;
   }, [billingTeamDetails?.pendingMembers, billingTeamMembers]);
 
-  const handleRemoveMember = useCallback(
-    (id: string, email: string, status: BillingTeamMemberStatus) => {
-      setLoadingRows([...loadingRows, id]);
-      if (status === BillingTeamMemberStatus.PENDING) {
-        trackBillingTeamActionClicked("revoke_invite");
-        revokeBillingTeamInvite(billingId, email)
-          .then(() => {
-            toast.success("Invite revoked successfully");
-            trackBillingTeamMemberRemoved(email, billingId);
-          })
-          .catch(() => {
-            toast.error("Error while revoking invite");
-          })
-          .finally(() => {
-            setLoadingRows(loadingRows.filter((row) => row !== id));
-          });
-      } else {
-        trackBillingTeamActionClicked("remove_member");
-        removeMemberFromBillingTeam(billingId, id)
-          .then(() => {
-            toast.success("User removed from the billing team");
-            trackBillingTeamMemberRemoved(email, billingId);
-          })
-          .catch(() => {
-            toast.error("Error while removing user");
-          })
-          .finally(() => {
-            setLoadingRows(loadingRows.filter((row) => row !== id));
-          });
-      }
+  const handleInvokePendingMemberInvite = useCallback(
+    (inviteId: string, email: string, id: string) => {
+      trackBillingTeamActionClicked("revoke_invite");
+      revokeBillingTeamInvite(inviteId, email)
+        .then(() => {
+          toast.success("Invite revoked successfully");
+          trackBillingTeamMemberRemoved(email, billingId);
+        })
+        .catch(() => {
+          toast.error("Error while revoking invite");
+        })
+        .finally(() => {
+          setLoadingRows(loadingRows.filter((row) => row !== id));
+        });
     },
     [billingId, loadingRows]
+  );
+
+  const handleRemoveMemberFromBillingTeam = useCallback(
+    (id: string, email: string) => {
+      removeMemberFromBillingTeam(billingId, id)
+        .then(() => {
+          toast.success("User removed from the billing team");
+          trackBillingTeamMemberRemoved(email, billingId);
+        })
+        .catch(() => {
+          toast.error("Error while removing user");
+        })
+        .finally(() => {
+          setLoadingRows(loadingRows.filter((row) => row !== id));
+        });
+    },
+    [billingId, loadingRows]
+  );
+
+  const handleRemoveMember = useCallback(
+    (id: string, email: string, status: BillingTeamMemberStatus, inviteId?: string) => {
+      trackBillingTeamActionClicked("remove_member");
+      setLoadingRows([...loadingRows, id]);
+      if (status === BillingTeamMemberStatus.PENDING) {
+        handleInvokePendingMemberInvite(inviteId, email, id);
+      } else {
+        handleRemoveMemberFromBillingTeam(id, email);
+      }
+    },
+    [loadingRows, handleInvokePendingMemberInvite, handleRemoveMemberFromBillingTeam]
   );
 
   const handleRoleChange = useCallback(
@@ -117,7 +132,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   );
 
   const getMemberDropdownItems = useCallback(
-    (id: string, email: string, status: BillingTeamMemberStatus): MenuProps["items"] => {
+    (id: string, email: string, status: BillingTeamMemberStatus, inviteId?: string): MenuProps["items"] => {
       return [
         {
           key: BillingAction.MAKE_ADMIN,
@@ -142,7 +157,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
           label: (
             <Popconfirm
               title="Are you sure you want to remove this member?"
-              onConfirm={() => handleRemoveMember(id, email, status)}
+              onConfirm={() => handleRemoveMember(id, email, status, inviteId)}
               okText="Yes"
               cancelText="No"
               showArrow={false}
@@ -252,10 +267,12 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
               <Col>
                 <Dropdown
                   menu={{
-                    items: getMemberDropdownItems(record.id, record.email, record?.status).map((item) => ({
-                      ...item,
-                      disabled: isMenuItemDisabled(item.key as BillingAction, record.role, record?.status),
-                    })),
+                    items: getMemberDropdownItems(record.id, record.email, record?.status, record?.inviteId).map(
+                      (item) => ({
+                        ...item,
+                        disabled: isMenuItemDisabled(item.key as BillingAction, record.role, record?.status),
+                      })
+                    ),
                     onClick: ({ key }) => {
                       switch (key) {
                         case BillingAction.MAKE_ADMIN:

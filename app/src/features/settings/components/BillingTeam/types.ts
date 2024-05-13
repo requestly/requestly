@@ -18,7 +18,11 @@ export interface BillingTeamDetails {
   minUsers?: number;
   maxUsers?: number;
   isStripeIndia?: boolean;
-  pendingMembers?: string[];
+  pendingMembers?: {
+    [email: string]: {
+      inviteId: string;
+    };
+  };
 }
 
 export enum BillingTeamRoles {

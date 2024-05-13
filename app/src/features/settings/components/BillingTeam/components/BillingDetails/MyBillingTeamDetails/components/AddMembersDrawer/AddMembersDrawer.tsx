@@ -8,9 +8,10 @@ import { RQButton } from "lib/design-system/components";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { InviteMembersForm } from "./components/InviteMembersForm/InviteMembersForm";
 import { useSelector } from "react-redux";
-import { getBillingTeamById } from "store/features/billing/selectors";
+import { getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { BillingTeamMemberStatus } from "features/settings/components/BillingTeam/types";
 import { getDomainFromEmail } from "utils/FormattingHelper";
+import { AddMembersDrawerRecord } from "./types";
 import "./addMembersDrawer.scss";
 
 interface AppMembersDrawerProps {
@@ -24,21 +25,34 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
   const [isInviteFormVisible, setIsInviteFormVisible] = useState(false);
   const { billingId } = useParams();
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
+  const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
 
   const tableRecords = useMemo(() => {
-    const records = organizationMembers || [];
-    console.log("billingTeamDetails", records);
-
-    billingTeamDetails?.pendingMembers.forEach((pendingMemberEmail) => {
-      records.push({
-        email: pendingMemberEmail,
-        status: BillingTeamMemberStatus.PENDING,
-        domain: getDomainFromEmail(pendingMemberEmail),
+    const externalDomainMembers = Object.values(billingTeamMembers)
+      .filter((member) => {
+        return getDomainFromEmail(member.email) !== billingTeamDetails?.ownerDomain;
+      })
+      .map((member) => {
+        return {
+          email: member.email,
+          domain: member.domain,
+        };
       });
-    });
+    const orgMembers = organizationMembers || [];
+    const newRecords: AddMembersDrawerRecord[] = [...externalDomainMembers, ...orgMembers];
 
-    return records;
-  }, [billingTeamDetails.pendingMembers, organizationMembers]);
+    if (billingTeamDetails?.pendingMembers) {
+      Object.keys(billingTeamDetails?.pendingMembers)?.forEach((email) => {
+        newRecords.push({
+          email: email,
+          status: BillingTeamMemberStatus.PENDING,
+          domain: getDomainFromEmail(email),
+        });
+      });
+    }
+
+    return newRecords;
+  }, [billingTeamDetails?.pendingMembers, organizationMembers, billingTeamMembers, billingTeamDetails?.ownerDomain]);
 
   return (
     <Drawer
