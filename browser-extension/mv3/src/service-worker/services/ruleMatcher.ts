@@ -42,8 +42,17 @@ const checkWildCardMatch = (wildCardString: string, inputString: string): boolea
   return checkRegexMatch(regexString, inputString);
 };
 
-const extractUrlComponent = (url: string, key: SourceKey): string => {
-  const urlObj = new URL(url);
+const extractUrlComponent = (url: string, key: SourceKey): string | null => {
+  let urlObj = null;
+  try {
+    urlObj = new URL(url);
+  } catch (err) {
+    // NOOP
+  }
+
+  if (!urlObj) {
+    return undefined;
+  }
 
   switch (key) {
     case SourceKey.URL:

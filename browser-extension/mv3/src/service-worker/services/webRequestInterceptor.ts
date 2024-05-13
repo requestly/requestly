@@ -43,13 +43,13 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
         case RuleType.HEADERS:
         case RuleType.USERAGENT:
           // TODO: Match only incase of any request header pair
-          const { isApplied } = matchRuleWithRequest(rule, {
+          const { isApplied, matchedPair } = matchRuleWithRequest(rule, {
             url: details.url,
             method: details.method,
             type: details.type as any,
             initiatorDomain: details.initiator,
           });
-          if (isApplied) {
+          if (isApplied && matchedPair.modifications?.Request && matchedPair.modifications?.Request?.length > 0) {
             ruleExecutionHandler.onRuleExecuted(rule, details);
           }
           break;
@@ -67,13 +67,13 @@ const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails)
       switch (rule.ruleType) {
         case RuleType.HEADERS:
           // TODO: Match only incase of any response header pair
-          const { isApplied } = matchRuleWithRequest(rule, {
+          const { isApplied, matchedPair } = matchRuleWithRequest(rule, {
             url: details.url,
             method: details.method,
             type: details.type as any,
             initiatorDomain: details.initiator,
           });
-          if (isApplied) {
+          if (isApplied && matchedPair.modifications?.Response && matchedPair.modifications?.Response?.length > 0) {
             ruleExecutionHandler.onRuleExecuted(rule, details);
           }
           break;
