@@ -11,37 +11,8 @@ let implictTestRuleWidgetConfig: Record<string, any> = null;
 export const initRuleExecutionHandler = () => {
   fetchAndStoreImplicitTestRuleWidgetConfig();
 
-  window.addEventListener("message", function (event) {
-    if (event.source !== window || event.data.source !== "requestly:client") {
-      return;
-    }
-
-    switch (event.data.action) {
-      case "response_rule_applied":
-      case "request_rule_applied":
-        appliedRuleIds.add(event.data.ruleId);
-        handleAppliedRuleNotification(event.data.ruleId);
-        break;
-    }
-  });
-
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     switch (message.action) {
-      case CLIENT_MESSAGES.UPDATE_APPLIED_SCRIPT_RULES:
-        message.ruleIds.forEach((ruleId: string) => {
-          appliedRuleIds.add(ruleId);
-          handleAppliedRuleNotification(ruleId);
-        });
-        break;
-      case CLIENT_MESSAGES.GET_APPLIED_RULES:
-        sendResponse(Array.from(appliedRuleIds));
-        break;
-      case CLIENT_MESSAGES.SYNC_APPLIED_RULES:
-        message.appliedRuleIds.forEach((ruleId: string) => {
-          appliedRuleIds.add(ruleId);
-          handleAppliedRuleNotification(ruleId);
-        });
-        break;
       case CLIENT_MESSAGES.START_EXPLICIT_RULE_TESTING:
         if (message.record) {
           chrome.runtime.sendMessage({

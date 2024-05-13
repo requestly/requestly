@@ -9,6 +9,7 @@ import {
   RulePair,
 } from "common/types";
 import { AJAXRequestDetails } from "./requestProcessor/types";
+import { isBlacklistedURL } from "../../utils";
 
 const toRegex = (regexStr: string): RegExp => {
   const matchRegExp = regexStr.match(new RegExp("^/(.+)/(|i|g|ig|gi)$"));
@@ -41,8 +42,17 @@ const checkWildCardMatch = (wildCardString: string, inputString: string): boolea
   return checkRegexMatch(regexString, inputString);
 };
 
-const extractUrlComponent = (url: string, key: SourceKey): string => {
-  const urlObj = new URL(url);
+const extractUrlComponent = (url: string, key: SourceKey): string | null => {
+  let urlObj = null;
+  try {
+    urlObj = new URL(url);
+  } catch (err) {
+    // NOOP
+  }
+
+  if (!urlObj) {
+    return undefined;
+  }
 
   switch (key) {
     case SourceKey.URL:
@@ -117,6 +127,10 @@ const matchRequestWithRuleSourceFilters = function (
 };
 
 export const matchRuleWithRequest = function (rule: Rule, requestDetails: AJAXRequestDetails) {
+  if (isBlacklistedURL(requestDetails.initiatorDomain)) {
+    return {};
+  }
+
   const matchedPair = rule?.pairs?.find(
     (pair) =>
       matchSourceUrl(pair.source, requestDetails.url) &&
