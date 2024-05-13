@@ -6,8 +6,9 @@ import { RQButton } from "lib/design-system/components";
 import { PostUserAdditionView } from "./components/PostUserAdditionView/PostUserAdditionView";
 import { ExternalDomainWarningBanner } from "./components/ExternalDomainWarningBanner/ExternalDomainWarningBanner";
 import Logger from "../../../../../../../../../../../../../common/logger";
-import "./inviteMembersForm.scss";
 import { inviteUsersToBillingTeam } from "backend/billing";
+import "./inviteMembersForm.scss";
+import { toast } from "utils/Toast";
 
 interface InviteMembersFormProps {
   billingId: string;
@@ -27,20 +28,30 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [emails, setEmails] = useState([]);
 
-  const handleInviteMembersToBillingTeam = useCallback(() => {
-    setIsLoading(true);
+  const handleInviteMembersToBillingTeam = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-    inviteUsersToBillingTeam(billingId, emails)
-      .then(() => {
-        setIsPostUserAdditionViewVisible(true);
-      })
-      .catch((error) => {
-        Logger.log("Error adding members to billing team", error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [billingId, emails]);
+      if (!emails.length) {
+        toast.warn("Please enter email(s) to proceed");
+        return;
+      }
+
+      setIsLoading(true);
+
+      inviteUsersToBillingTeam(billingId, emails)
+        .then(() => {
+          setIsPostUserAdditionViewVisible(true);
+        })
+        .catch((error) => {
+          Logger.log("Error adding members to billing team", error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    },
+    [billingId, emails]
+  );
 
   const handleEmailsChange = useCallback(
     (emails: string[]) => {
