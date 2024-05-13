@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import React, { useMemo, useState } from "react";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { Col, Drawer, Row } from "antd";
@@ -7,7 +8,6 @@ import { useFetchOrgMembers } from "features/settings/components/OrgMembers/hook
 import { RQButton } from "lib/design-system/components";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { InviteMembersForm } from "./components/InviteMembersForm/InviteMembersForm";
-import { useSelector } from "react-redux";
 import { getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
 import { BillingTeamMemberStatus } from "features/settings/components/BillingTeam/types";
 import { getDomainFromEmail } from "utils/FormattingHelper";
@@ -28,17 +28,27 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
 
   const tableRecords = useMemo(() => {
-    const externalDomainMembers = Object.values(billingTeamMembers)
-      .filter((member) => {
-        return getDomainFromEmail(member.email) !== billingTeamDetails?.ownerDomain;
-      })
-      .map((member) => {
-        return {
-          email: member.email,
-          domain: member.domain,
-        };
-      });
+    /* 
+      Add members drawer table consists records from 3 sources:
+      1. External domain members
+      2. Organization members
+      3. Pending members
+    */
+
+    const externalDomainMembers =
+      Object.values(billingTeamMembers)
+        .filter((member) => {
+          return getDomainFromEmail(member.email) !== billingTeamDetails?.ownerDomain;
+        })
+        .map((member) => {
+          return {
+            email: member.email,
+            domain: member.domain,
+          };
+        }) || [];
+
     const orgMembers = organizationMembers || [];
+
     const newRecords: AddMembersDrawerRecord[] = [...externalDomainMembers, ...orgMembers];
 
     if (billingTeamDetails?.pendingMembers) {

@@ -7,7 +7,7 @@ import { PostUserAdditionView } from "./components/PostUserAdditionView/PostUser
 import { ExternalDomainWarningBanner } from "./components/ExternalDomainWarningBanner/ExternalDomainWarningBanner";
 import Logger from "../../../../../../../../../../../../../common/logger";
 import "./inviteMembersForm.scss";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { inviteUsersToBillingTeam } from "backend/billing";
 
 interface InviteMembersFormProps {
   billingId: string;
@@ -27,14 +27,10 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [emails, setEmails] = useState([]);
 
-  const handleAddMembersToBillingTeam = useCallback(() => {
+  const handleInviteMembersToBillingTeam = useCallback(() => {
     setIsLoading(true);
-    const inviteUsers = httpsCallable(getFunctions(), "billing-createBillingTeamInvites");
 
-    inviteUsers({
-      userEmails: emails,
-      billingId,
-    })
+    inviteUsersToBillingTeam(billingId, emails)
       .then(() => {
         setIsPostUserAdditionViewVisible(true);
       })
@@ -65,7 +61,7 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
     );
   } else {
     return (
-      <form className="billing-team-invite-members-form-wrapper" onSubmit={handleAddMembersToBillingTeam}>
+      <form className="billing-team-invite-members-form-wrapper" onSubmit={handleInviteMembersToBillingTeam}>
         {externalDomainEmails.length && !isExternalDomainWarningBannerClosed ? (
           <ExternalDomainWarningBanner
             emails={externalDomainEmails}

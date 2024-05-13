@@ -21,4 +21,6 @@ export const isMenuItemDisabled = (action: BillingAction, role: BillingTeamRoles
       return true;
     }
   }
+
+  return false;
 };
