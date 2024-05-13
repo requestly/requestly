@@ -118,6 +118,7 @@ const resolveLocalConflictsAndSaveToFirebase = async (
   appMode: "EXTENSION" | "DESKTOP",
   recordsOnFirebase: any[]
 ): Promise<any[]> => {
+  console.log("!!!debug", "resolveLocalConflictsAndSaveToFirebase");
   const localRecords: any[] = await getAllLocalRecords(appMode, false);
   const resolvedRecords: any[] = handleLocalConflicts(recordsOnFirebase, localRecords);
 
@@ -175,7 +176,9 @@ export const doSync = async (
     // At this stage we are sure that we want to sync with this target only, target is consistent
     // Now let's check if there are any local update that we should prioritize
     const tsResult: boolean = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);
+    console.log("!!!debug", "tsResult", tsResult);
     if (!tsResult) {
+      console.log("!!!debug", "intsResilt");
       // This means some updates have been performed locally and they have not been synced with firebase yet
       // Handle conflicts
       allSyncedRecords = await resolveLocalConflictsAndSaveToFirebase(appMode, allSyncedRecords);
