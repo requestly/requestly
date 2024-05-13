@@ -384,7 +384,7 @@ export const mergeRecords = (firebaseRecords, localRecords) => {
 // assumption: Only rule/group "status" and "isFavourite" can cause a conflict. Prioritize local status
 export const handleLocalConflicts = (firebaseRecords, localRecords) => {
   const firebaseRecordsCopy = _.cloneDeep(firebaseRecords) || [];
-  console.log("!!!debug", "localRecords", localRecords);
+
   const output = firebaseRecordsCopy.map((objectItem) => {
     const localRecordIndex = localRecords.findIndex((record) => record.id === objectItem.id);
     if (localRecordIndex !== -1) {

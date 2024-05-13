@@ -22,7 +22,6 @@ import {
 } from "modules/analytics/events/features/testUrlModal";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import "./RequestSourceRow.css";
-import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 
 const { Text } = Typography;
 
@@ -71,8 +70,12 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     (pairIndex) => {
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
       return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).length;
+        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
+            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
+          ).length
+        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
+            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
+          ).length.length;
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
@@ -88,11 +91,6 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
         id: 2,
         title: "Host",
         ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.HOST,
-      },
-      {
-        id: 3,
-        title: "Path",
-        ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
       },
     ],
     []
@@ -128,9 +126,6 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     return (
       <Menu>
         {sourceKeys.map(({ id, title, ruleKey }) => {
-          if (isExtensionManifestVersion3() && ruleKey === GLOBAL_CONSTANTS.RULE_KEYS.PATH) {
-            return null;
-          }
           return (
             <Menu.Item
               key={id}

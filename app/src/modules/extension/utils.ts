@@ -1,4 +1,4 @@
-import { Rule, RulePairSource, SourceKey, SourceOperator } from "types";
+import { Rule, RulePairSource, SourceFilter, SourceKey, SourceOperator } from "types";
 import { parseDNRRules } from "./mv3RuleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { StorageService } from "init";
@@ -12,7 +12,7 @@ enum RuleMigrationChange {
 }
 
 export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string): Rule[] => {
-  if (!isExtensionManifestVersion3() || rules.length === 0) {
+  if (rules.length === 0) {
     return rules;
   }
 
@@ -55,10 +55,6 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
 };
 
 export const migrateRuleToMV3 = (rule: Rule) => {
-  if (!isExtensionManifestVersion3()) {
-    return;
-  }
-
   const ruleMigrationLogs: Record<string, any> = {
     id: rule.id,
     migrationChanges: [],
@@ -67,13 +63,11 @@ export const migrateRuleToMV3 = (rule: Rule) => {
   rule.pairs.forEach((pair) => {
     const pathMigrationStatus = migratePathOperator(pair.source);
     if (pathMigrationStatus) {
-      console.log("!!!debug", "pathMigration Status", pathMigrationStatus);
       ruleMigrationLogs.migrationChanges.push(pathMigrationStatus);
     }
 
     const pageUrlMigrationStatus = migratePageURLtoPageDomain(pair.source);
     if (pageUrlMigrationStatus) {
-      console.log("!!!debug", "pageURLMigrationStatus", pageUrlMigrationStatus);
       ruleMigrationLogs.migrationChanges.push(pageUrlMigrationStatus);
     }
   });
@@ -125,17 +119,24 @@ const migratePageURLtoPageDomain = (
   type: RuleMigrationChange;
   oldSource: RulePairSource;
 } => {
-  if (source.filters && source.filters.length > 0) {
-    const sourceFilters = source.filters[0];
+  if (source.filters) {
+    const sourceFilters =
+      //@ts-ignore
+      Array.isArray(source.filters) && source.filters.length ? source.filters[0] : (source.filters as SourceFilter);
 
-    if (sourceFilters.pageUrl && sourceFilters.pageUrl.value) {
-      let migrationLog = null;
-      const pageDomains = [];
+    let migrationLog = null;
+    let pageDomains: string[];
+
+    if (sourceFilters?.pageUrl?.value && !sourceFilters?.pageDomains) {
       try {
-        pageDomains.push(new URL(sourceFilters.pageUrl.value).hostname);
+        pageDomains = [new URL(sourceFilters?.pageUrl?.value).hostname];
       } catch (e) {
-        // Ignore
+        pageDomains = [sourceFilters?.pageUrl?.value];
       } finally {
+        if (pageDomains?.length > 0) {
+          sourceFilters.pageDomains = pageDomains;
+        }
+
         migrationLog = {
           type: RuleMigrationChange.SOURCE_PAGEURL_MIGRATED,
           oldSource: {
@@ -143,12 +144,16 @@ const migratePageURLtoPageDomain = (
             filters: [{ ...sourceFilters }],
           },
         };
-        sourceFilters.pageDomains = pageDomains;
-        delete sourceFilters.pageUrl;
-        console.log("!!!debug", "sourceFilters", sourceFilters, source.filters[0]);
       }
-
-      return migrationLog;
     }
+
+    //For backward compatibility until MV3 is release
+    if (!isExtensionManifestVersion3() && sourceFilters?.pageDomains?.length > 0) {
+      sourceFilters.pageUrl = {};
+      sourceFilters.pageUrl.value = sourceFilters.pageDomains[0];
+      sourceFilters.pageUrl.operator = SourceOperator.CONTAINS;
+    }
+
+    return migrationLog;
   }
 };
