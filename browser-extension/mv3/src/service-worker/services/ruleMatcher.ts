@@ -9,6 +9,7 @@ import {
   RulePair,
 } from "common/types";
 import { AJAXRequestDetails } from "./requestProcessor/types";
+import { isBlacklistedURL } from "../../utils";
 
 const toRegex = (regexStr: string): RegExp => {
   const matchRegExp = regexStr.match(new RegExp("^/(.+)/(|i|g|ig|gi)$"));
@@ -117,6 +118,11 @@ const matchRequestWithRuleSourceFilters = function (
 };
 
 export const matchRuleWithRequest = function (rule: Rule, requestDetails: AJAXRequestDetails) {
+  if (isBlacklistedURL(requestDetails.initiatorDomain)) {
+    console.log("blacklist", { requestDetails });
+    return {};
+  }
+
   const matchedPair = rule?.pairs?.find(
     (pair) =>
       matchSourceUrl(pair.source, requestDetails.url) &&
