@@ -9,11 +9,12 @@ import Logger from "lib/logger";
 import * as Sentry from "@sentry/react";
 import { detectUnsettledPromise } from "utils/FunctionUtils";
 import { migrateRuleToMV3 } from "modules/extension/utils";
+import { parseDNRRules } from "modules/extension/mv3RuleParser";
 
 export const saveRule = async (appMode, ruleObject, callback) => {
   let ruleToSave = cloneDeep(ruleObject);
 
-  ruleToSave = migrateRuleToMV3(ruleToSave).rule;
+  ruleToSave.extensionRules = parseDNRRules(ruleToSave);
 
   //Set the modification date of rule
   ruleToSave.modificationDate = generateObjectCreationDate();

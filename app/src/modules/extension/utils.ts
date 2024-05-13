@@ -15,14 +15,17 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
   console.log("[Debug] Before Migration", { rules });
 
   const rulesMigrationLogs: Record<string, any> = {};
+  const migratedRules: Rule[] = [];
 
-  const migratedRules = rules.map((rule) => {
-    const { rule: migratedRule, ruleMigrationLogs } = migrateRuleToMV3(rule);
-
+  const finalRules = rules.map((rule) => {
+    const { rule: migratedRule, ruleMigrationLogs, isMigrated } = migrateRuleToMV3(rule);
     if (ruleMigrationLogs) {
       rulesMigrationLogs[migratedRule.id] = ruleMigrationLogs;
     }
 
+    if (isMigrated) {
+      migratedRules.push(migratedRule);
+    }
     return migratedRule;
   });
 
@@ -32,25 +35,28 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
 
   console.log("[Debug] After Migration", { currentWorkspaceMigrationData, rulesMigrationLogs, migratedRules });
 
-  StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
-    .saveMultipleRulesOrGroups(migratedRules, { workspaceId: workspaceId })
-    .then(() => {
-      // StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION).saveRecord({ [APP_CONSTANTS.LAST_UPDATED_TS]: Date.now() });
-      saveMV3MigrationData({
-        ...migrationData,
-        [workspaceId ? workspaceId : "private"]: {
-          rulesMigrationLogs: { ...currentWorkspaceMigrationData?.rulesMigrationLogs, ...rulesMigrationLogs },
-        },
+  if (migratedRules.length > 0) {
+    console.log("[Debug] Saving Migrated Rules", { migratedRules });
+    StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
+      .saveMultipleRulesOrGroups(migratedRules, { workspaceId: workspaceId })
+      .then(() => {
+        saveMV3MigrationData({
+          ...migrationData,
+          [workspaceId ? workspaceId : "private"]: {
+            rulesMigrationLogs: { ...currentWorkspaceMigrationData?.rulesMigrationLogs, ...rulesMigrationLogs },
+          },
+        });
       });
-    });
+  }
 
-  return migratedRules;
+  return finalRules;
 };
 
-export const migrateRuleToMV3 = (rule: Rule): { rule: Rule; ruleMigrationLogs: any } => {
+export const migrateRuleToMV3 = (rule: Rule): { isMigrated: boolean; rule: Rule; ruleMigrationLogs: any } => {
   if (rule?.version === "3.0.0") {
     console.log("[Debug] Rule already migrated to v3.0.0", { rule });
     return {
+      isMigrated: false,
       rule,
       ruleMigrationLogs: null,
     };
@@ -81,6 +87,7 @@ export const migrateRuleToMV3 = (rule: Rule): { rule: Rule; ruleMigrationLogs: a
   console.log("[Debug] Migrated Rule", { beforeRule: rule, finalRule });
 
   return {
+    isMigrated: true,
     rule: finalRule,
     ruleMigrationLogs: ruleMigrationLogs.length ? ruleMigrationLogs : null,
   };
