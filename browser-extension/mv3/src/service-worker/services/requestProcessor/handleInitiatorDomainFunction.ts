@@ -20,7 +20,6 @@ export const handleInitiatorDomainFunction = async (
     Request: {},
     Response: {},
   };
-  ``;
 
   if (matchedPair.modifications?.Request?.length) {
     matchedPair.modifications.Request.forEach((header: { header: string; type: string; value: string }) => {
