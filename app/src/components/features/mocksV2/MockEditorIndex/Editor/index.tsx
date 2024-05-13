@@ -81,7 +81,6 @@ const MockEditor: React.FC<Props> = ({
 
   const collectionPath = mockCollectionData?.path ?? "";
 
-  // TODO: update
   const finalUrl = useMemo(
     () => generateFinalUrl({ endpoint, uid: user?.details?.profile?.uid, username, teamId, password }),
     [endpoint, teamId, user?.details?.profile?.uid, username, password]
