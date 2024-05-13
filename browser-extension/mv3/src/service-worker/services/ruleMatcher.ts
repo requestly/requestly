@@ -119,7 +119,6 @@ const matchRequestWithRuleSourceFilters = function (
 
 export const matchRuleWithRequest = function (rule: Rule, requestDetails: AJAXRequestDetails) {
   if (isBlacklistedURL(requestDetails.initiatorDomain)) {
-    console.log("blacklist", { requestDetails });
     return {};
   }
 
