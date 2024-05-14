@@ -195,6 +195,9 @@ const AuthHandler: React.FC<{}> = () => {
         // Unset isSyncEnabled in window
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
+        localStorage.removeItem("__rq_uid");
+
+        // set amplitude anon id to local storage:
 
         dispatch(
           // @ts-ignore

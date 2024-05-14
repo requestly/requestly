@@ -12,7 +12,15 @@
       window.location.href = 'https://app.requestly.io';
     }
 
-    if ("https://app.requestly.io/goodbye/" === window.location.href) { const a = { api_key: "62ff1b46909e50358cfca0668d41f011", events: [{ user_id: localStorage.getItem("__rq_uid") || Math.random().toString(36).slice(2, 10), event_type: "extension_uninstalled" }] }, b = new Blob([JSON.stringify(a)]); navigator.sendBeacon("https://api2.amplitude.com/2/httpapi", b) }
+    const deviceId = localStorage.getItem("__amplitude_deviceId")
+    const uid = localStorage.getItem("__rq_uid")
+
+    const eventObject = { device_id: deviceId, event_type: "extension_uninstalled" }
+    const attributes = {extension_uninstall_date: new Date().toISOString().split("T")[0]}
+
+    if(uid) eventObject["user_id"] = uid
+
+    if ("https://app.requestly.io/goodbye/" === window.location.href && deviceId) { const a = { api_key: "62ff1b46909e50358cfca0668d41f011", events: [eventObject], user_properties: attributes }, b = new Blob([JSON.stringify(a)]); navigator.sendBeacon("https://api2.amplitude.com/2/httpapi", b) }
   </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
