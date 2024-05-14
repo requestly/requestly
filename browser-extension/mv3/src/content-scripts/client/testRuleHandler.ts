@@ -8,7 +8,7 @@ let implicitTestRuleFlowEnabled = false;
 let explicitTestRuleFlowEnabled = false;
 let implictTestRuleWidgetConfig: Record<string, any> = null;
 
-export const initRuleExecutionHandler = () => {
+export const initTestRuleHandler = () => {
   fetchAndStoreImplicitTestRuleWidgetConfig();
 
   chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
