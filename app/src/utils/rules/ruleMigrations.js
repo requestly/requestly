@@ -62,7 +62,7 @@ const setSourceFilterFormatOfSingleRulePairs = (rule) => {
 
 export const runRuleMigrations = (rules) => {
   return rules.map((rule) => {
-    let temp = migrateHeaderRuleToV2(rule);
+    let temp = migrateHeaderRuleToV2({ ...rule });
     return setSourceFilterFormatOfSingleRulePairs(temp);
   });
 };

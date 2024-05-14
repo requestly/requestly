@@ -201,85 +201,64 @@ export const validateRule = (rule, dispatch, appMode) => {
 
   //Headers Rule
   else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.HEADERS) {
-    if (rule.version > 1) {
-      rule.pairs.every((pair, index) => {
-        if (pair.modifications.Request?.length === 0 && pair.modifications.Response?.length === 0) {
-          output = {
-            result: false,
-            message:
-              index > 0
-                ? `One of the rule conditions is empty. Please add some header modification to the condition.`
-                : `Please add atleast one modification to the rule.`,
-            error: "missing modification",
-          };
-        }
+    rule.pairs.every((pair, index) => {
+      if (pair.modifications.Request?.length === 0 && pair.modifications.Response?.length === 0) {
+        output = {
+          result: false,
+          message:
+            index > 0
+              ? `One of the rule conditions is empty. Please add some header modification to the condition.`
+              : `Please add atleast one modification to the rule.`,
+          error: "missing modification",
+        };
+      }
 
-        // Iterate over request headers
-        pair.modifications.Request?.forEach((modification) => {
-          //Header name shouldn't be empty
-          if (isEmpty(modification.header)) {
-            output = {
-              result: false,
-              message: `Please enter the request header name`,
-              error: "missing request header name",
-            };
-          }
-          //Header value shouldn't be empty unless you're removing it
-          if (modification.type !== "Remove" && isEmpty(modification.value)) {
-            output = {
-              result: false,
-              message: `Please enter the request header value`,
-              error: "missing request header value",
-            };
-          }
-        });
-
-        // Iterate over response headers
-        pair.modifications.Response?.forEach((modification) => {
-          //Header name shouldn't be empty
-          if (isEmpty(modification.header)) {
-            output = {
-              result: false,
-              message: `Please enter the response header name`,
-              error: "missing response header name",
-            };
-          }
-          //Header value shouldn't be empty unless you're removing it
-          if (modification.type !== "Remove" && isEmpty(modification.value)) {
-            output = {
-              result: false,
-              message: `Please enter the response header value`,
-              error: "missing request header value",
-            };
-          }
-        });
-
-        if (output?.result === false) {
-          return false;
-        } else {
-          return true;
-        }
-      });
-    } else {
-      rule.pairs.forEach((pair) => {
+      // Iterate over request headers
+      pair.modifications.Request?.forEach((modification) => {
         //Header name shouldn't be empty
-        if (isEmpty(pair.header)) {
+        if (isEmpty(modification.header)) {
           output = {
             result: false,
-            message: `Please enter the header name`,
-            error: "missing header name",
+            message: `Please enter the request header name`,
+            error: "missing request header name",
           };
         }
         //Header value shouldn't be empty unless you're removing it
-        if (pair.type !== "Remove" && isEmpty(pair.value)) {
+        if (modification.type !== "Remove" && isEmpty(modification.value)) {
           output = {
             result: false,
-            message: `Please enter the header value`,
-            error: "missing header value",
+            message: `Please enter the request header value`,
+            error: "missing request header value",
           };
         }
       });
-    }
+
+      // Iterate over response headers
+      pair.modifications.Response?.forEach((modification) => {
+        //Header name shouldn't be empty
+        if (isEmpty(modification.header)) {
+          output = {
+            result: false,
+            message: `Please enter the response header name`,
+            error: "missing response header name",
+          };
+        }
+        //Header value shouldn't be empty unless you're removing it
+        if (modification.type !== "Remove" && isEmpty(modification.value)) {
+          output = {
+            result: false,
+            message: `Please enter the response header value`,
+            error: "missing request header value",
+          };
+        }
+      });
+
+      if (output?.result === false) {
+        return false;
+      } else {
+        return true;
+      }
+    });
   }
 
   //Query Param Rule

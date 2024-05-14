@@ -122,6 +122,7 @@ CONSTANTS.RULE_SOURCE_FILTER_TYPES = {
   RESOURCE_TYPE: "resourceType",
   REQUEST_METHOD: "requestMethod",
   REQUEST_DATA: "requestPayload",
+  PAGE_DOMAINS: "pageDomains",
 };
 
 CONSTANTS.MODIFICATION_TYPES = {

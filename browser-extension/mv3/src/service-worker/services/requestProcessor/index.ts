@@ -2,16 +2,19 @@ import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { Rule, RuleType } from "common/types";
 import { AJAXRequestDetails } from "./types";
 import { forwardHeadersOnRedirect } from "./handleHeadersOnRedirect";
+import { handleInitiatorDomainFunction } from "./handleInitiatorDomainFunction";
 
 class RequestProcessor {
   cachedRules: Record<string, Rule[]> = {
     redirectRules: [],
     replaceRules: [],
+    headerRules: [],
   };
 
   private updateCachedRules = async () => {
     this.cachedRules.redirectRules = await getEnabledRules(RuleType.REDIRECT);
     this.cachedRules.replaceRules = await getEnabledRules(RuleType.REPLACE);
+    this.cachedRules.headerRules = await getEnabledRules(RuleType.HEADERS);
   };
 
   constructor() {
@@ -28,6 +31,8 @@ class RequestProcessor {
       ...requestProcessor.cachedRules.redirectRules,
       ...requestProcessor.cachedRules.replaceRules,
     ]);
+
+    await handleInitiatorDomainFunction(tabId, requestDetails, requestProcessor.cachedRules.headerRules);
   };
 }
 

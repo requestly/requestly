@@ -2,6 +2,7 @@ import React from "react";
 import { RQModal } from "lib/design-system/components";
 import { MockListSource } from "components/features/mocksV2/types";
 import MockList from "features/mocks/screens/mocksList/components/MocksList/MocksList";
+import { MocksContextProvider } from "features/mocks/contexts";
 import "./mockPickerModal.scss";
 
 interface Props {
@@ -21,7 +22,9 @@ export const MockPickerModal: React.FC<Props> = ({ isVisible, onVisibilityChange
       width={800}
     >
       <div className="mock-picker-modal-body">
-        <MockList mockSelectionCallback={mockSelectionCallback} source={MockListSource.PICKER_MODAL} />
+        <MocksContextProvider>
+          <MockList mockSelectionCallback={mockSelectionCallback} source={MockListSource.PICKER_MODAL} />
+        </MocksContextProvider>
       </div>
     </RQModal>
   );
