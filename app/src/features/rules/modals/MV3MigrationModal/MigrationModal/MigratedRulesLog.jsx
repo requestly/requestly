@@ -15,6 +15,7 @@ import RuleIcon from "components/common/RuleIcon";
 import { IoWarningOutline } from "@react-icons/all-files/io5/IoWarningOutline";
 import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
 import { CiMail } from "@react-icons/all-files/ci/CiMail";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 const MigratedRules = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
@@ -55,8 +56,9 @@ const MigratedRules = () => {
           setShowMigrationLogs(false);
         });
     }, [migrateRuleEntry, appMode, currentRule]);
+
     const handleOnClick = () => {
-      redirectToRuleEditor(navigate, currentRule.id, "mv3_modal", true);
+      redirectToRuleEditor(navigate, currentRule.id, SOURCE.MV3_MODAL, true);
     };
 
     return failedToFetchRule ? undefined : currentRule ? (
