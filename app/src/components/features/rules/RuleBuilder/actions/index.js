@@ -58,7 +58,7 @@ export const initiateBlankCurrentlySelectedRule = (
       pairs: [],
       ruleType: RULE_TYPE_TO_CREATE,
       status: GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE,
-      schema_version: "3.0.0",
+      schemaVersion: "3.0.0",
       ...extraRuleConfig,
     };
 

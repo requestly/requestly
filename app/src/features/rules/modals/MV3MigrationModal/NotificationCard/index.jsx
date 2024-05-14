@@ -19,8 +19,16 @@ export function NotificationCard() {
   const { openMigratonModalAction } = useRulesModalsContext();
 
   const closeCard = useCallback((e) => {
+    const migrationData = getMV3MigrationData();
+    saveMV3MigrationData({
+      ...migrationData,
+      [currentlyActiveWorkspace?.id ?? "private"]: {
+        ...migrationData[currentlyActiveWorkspace?.id ?? "private"],
+        migrationModalViewed: true,
+      },
+    });
     setIsVisible(false);
-  }, []);
+  }, [currentlyActiveWorkspace?.id]);
 
   const migratedRulesLogs = useMemo(() => {
     const migrationData = getMV3MigrationData();
@@ -37,17 +45,9 @@ export function NotificationCard() {
 
     if (
       Object.keys(migratedRulesLogs).length > 0 &&
-      !migrationData[currentlyActiveWorkspace?.id ?? "private"]?.migrationModalShown
+      !migrationData[currentlyActiveWorkspace?.id ?? "private"]?.migrationModalViewed
     ) {
       setIsVisible(true);
-
-      saveMV3MigrationData({
-        ...migrationData,
-        [currentlyActiveWorkspace?.id ?? "private"]: {
-          ...migrationData[currentlyActiveWorkspace?.id ?? "private"],
-          migrationModalShown: true,
-        },
-      });
     }
   }, [currentlyActiveWorkspace?.id, migratedRulesLogs]);
 

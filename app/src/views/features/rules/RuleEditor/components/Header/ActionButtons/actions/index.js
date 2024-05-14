@@ -13,7 +13,7 @@ import { migrateRuleToMV3 } from "modules/extension/utils";
 export const saveRule = async (appMode, ruleObject, callback) => {
   let ruleToSave = cloneDeep(ruleObject);
 
-  delete ruleToSave["schema_version"];
+  delete ruleToSave["schemaVersion"];
   ruleToSave = migrateRuleToMV3(ruleToSave).rule;
   // TODO: Remove above and uncomment below after all users migrated to MV3. This is just to maintain backward compatibility for path URL filter
   // ruleToSave.extensionRules = parseDNRRules(ruleToSave);
