@@ -83,3 +83,30 @@
 .generate-ai-response-button {
   margin-top: 0.5rem;
 }
+
+.add-header {
+  margin-bottom: 16px;
+  border: 1px dashed #3e3f42;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+}
+
+.header-section {
+  margin-bottom: 16px;
+}
+
+.header-row {
+  margin-bottom: 4px;
+}
+
+.error-message {
+  color: red;
+}
+
+.add-header-span {
+  margin-right: 8px;
+  font-weight: bold;
+}
