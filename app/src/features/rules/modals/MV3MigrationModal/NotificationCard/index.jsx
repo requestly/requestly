@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRulesModalsContext } from "features/rules/context/modals";
 
 import { RQButton } from "lib/design-system/components";
@@ -8,10 +7,14 @@ import { Typography } from "antd";
 import BellAnimation from "./BellAnimation";
 import { CloseOutlined } from "@ant-design/icons";
 import "./card.scss";
+import { getMV3MigrationData } from "modules/extension/utils";
+import { useSelector } from "react-redux";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { isEmpty } from "lodash";
 
 export function NotificationCard() {
-  const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   const { openMigratonModalAction } = useRulesModalsContext();
 
@@ -19,11 +22,21 @@ export function NotificationCard() {
     setIsVisible(false);
   }, []);
 
+  const migratedRulesLogs = useMemo(() => {
+    const migrationData = getMV3MigrationData();
+
+    const migratedRulesLogs = migrationData?.[currentlyActiveWorkspace?.id ?? "private"]?.rulesMigrationLogs;
+
+    if (isEmpty(migratedRulesLogs)) return {};
+
+    return migratedRulesLogs;
+  }, [currentlyActiveWorkspace]);
+
   useEffect(() => {
-    if (location.search.includes("showMigrationInfoCard")) {
+    if (Object.keys(migratedRulesLogs).length > 0) {
       setIsVisible(true);
     }
-  }, [location.search]);
+  }, [migratedRulesLogs]);
 
   const handleOnClick = useCallback(() => {
     closeCard();
