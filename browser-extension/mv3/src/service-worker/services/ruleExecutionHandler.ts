@@ -2,6 +2,7 @@ import { Rule } from "common/types";
 import extensionIconManager from "./extensionIconManager";
 import { DataScope, TAB_SERVICE_DATA, tabService } from "./tabService";
 import { getRecords } from "common/storage";
+import { CLIENT_MESSAGES } from "common/constants";
 
 interface RulesExecutionLog {
   ruleId: string;
@@ -40,6 +41,11 @@ class RuleExecutionHandler {
     const tabDataScope = isMainFrameRequest ? DataScope.TAB : DataScope.PAGE;
 
     extensionIconManager.markRuleExecuted(requestDetails.tabId);
+
+    chrome.tabs.sendMessage(requestDetails.tabId, {
+      action: CLIENT_MESSAGES.NOTIFY_RULE_EXECUTED,
+      rule,
+    });
 
     const rulesExecutionLogs: RulesExecutionLog[] =
       tabService.getDataForScope(tabDataScope, requestDetails.tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS, []) || [];

@@ -4,8 +4,8 @@ import { getRule } from "common/rulesStore";
 import { getRecord } from "common/storage";
 import { Rule } from "common/types";
 
-const appliedRuleIds = new Set<string>();
 let implicitTestRuleFlowEnabled = false;
+let explicitTestRuleFlowEnabled = false;
 let implictTestRuleWidgetConfig: Record<string, any> = null;
 
 export const initRuleExecutionHandler = () => {
@@ -20,33 +20,57 @@ export const initRuleExecutionHandler = () => {
             showWidget: false,
           });
         }
+        explicitTestRuleFlowEnabled = true;
         showExplicitTestRuleWidget(message.ruleId);
         break;
+
       case CLIENT_MESSAGES.START_IMPLICIT_RULE_TESTING:
         if (implictTestRuleWidgetConfig?.enabled) {
           implicitTestRuleFlowEnabled = true;
           showImplicitTestRuleWidget();
         }
         break;
+
+      case CLIENT_MESSAGES.NOTIFY_RULE_EXECUTED:
+        handleAppliedRuleNotification(message.rule);
+        break;
     }
     return false;
   });
 };
 
-const showExplicitTestRuleWidget = async (ruleId: string) => {
-  if (document.querySelector("rq-explicit-test-rule-widget")) {
-    return;
+const getExecutedRules = async () => {
+  return chrome.runtime.sendMessage(EXTENSION_MESSAGES.GET_EXECUTED_RULES);
+};
+
+const showExplicitTestRuleWidget = async (ruleId: string, forceShow = false) => {
+  const widget = document.querySelector("rq-explicit-test-rule-widget");
+
+  if (widget) {
+    if (forceShow) {
+      widget.remove();
+    } else {
+      return;
+    }
   }
 
   const ruleDetails = await getRule(ruleId);
   const { name: ruleName } = ruleDetails;
 
+  let appliedRules: Rule[];
+
+  if (forceShow) {
+    appliedRules = await getExecutedRules();
+  }
+
   const testRuleWidget = document.createElement("rq-explicit-test-rule-widget");
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
-  testRuleWidget.setAttribute("applied-status", appliedRuleIds.has(ruleId).toString());
   setWidgetInfoText(testRuleWidget, ruleDetails);
+
+  const isRuleApplied = forceShow ? true : appliedRules?.some((rule: Rule) => rule.id === ruleId) ?? false;
+  testRuleWidget.setAttribute("applied-status", isRuleApplied.toString());
 
   document.documentElement.appendChild(testRuleWidget);
 
@@ -87,6 +111,11 @@ const setWidgetInfoText = (testRuleWidget: HTMLElement, ruleDetails: Rule) => {
 const notifyRuleAppliedToExplicitWidget = (ruleId: string) => {
   const explicitTestRuleWidget = document.querySelector("rq-explicit-test-rule-widget");
 
+  if (!explicitTestRuleWidget) {
+    showExplicitTestRuleWidget(ruleId, true);
+    return;
+  }
+
   if (explicitTestRuleWidget?.getAttribute("applied-status") === "false") {
     if (explicitTestRuleWidget.getAttribute("rule-id") === ruleId) {
       explicitTestRuleWidget.setAttribute("applied-status", "true");
@@ -120,19 +149,34 @@ export const showImplicitTestRuleWidget = async () => {
     window.open(`${config.WEB_URL}/settings/global-settings`, "_blank");
   });
 
-  testRuleWidget.addEventListener("rule_applied_listener_active", () => {
-    appliedRuleIds.forEach((ruleId) => {
-      handleAppliedRuleNotification(ruleId);
-    });
-  });
+  // testRuleWidget.addEventListener("rule_applied_listener_active", () => {
+  //   appliedRuleIds.forEach((ruleId) => {
+  //     handleAppliedRuleNotification(ruleId);
+  //   });
+  // });
 
   document.documentElement.appendChild(testRuleWidget);
+
+  const appliedRules = await getExecutedRules();
+
+  if (appliedRules) {
+    appliedRules?.forEach((rule: Rule) => {
+      notifyRuleAppliedToImplicitWidget(rule);
+    });
+  }
 };
 
-const notifyRuleAppliedToImplicitWidget = async (ruleId: string) => {
-  const rule = await getRule(ruleId);
+const notifyRuleAppliedToImplicitWidget = async (rule: Rule) => {
+  let ruleName = rule.name;
+  let ruleType = rule.ruleType;
 
-  if (!shouldShowImplicitWidget(rule.ruleType)) {
+  if (!ruleName || !ruleType) {
+    const ruleDetails = await getRule(rule.id);
+    ruleName = ruleDetails.name;
+    ruleType = ruleDetails.ruleType;
+  }
+
+  if (!shouldShowImplicitWidget(ruleType)) {
     return;
   }
 
@@ -143,8 +187,8 @@ const notifyRuleAppliedToImplicitWidget = async (ruleId: string) => {
       new CustomEvent("new-rule-applied", {
         detail: {
           appliedRuleId: rule.id,
-          appliedRuleName: rule.name,
-          appliedRuleType: rule.ruleType,
+          appliedRuleName: ruleName,
+          appliedRuleType: ruleType,
         },
       })
     );
@@ -160,11 +204,11 @@ const fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
   });
 };
 
-const handleAppliedRuleNotification = async (ruleId: string) => {
+const handleAppliedRuleNotification = async (rule: Rule) => {
   if (implicitTestRuleFlowEnabled) {
-    notifyRuleAppliedToImplicitWidget(ruleId);
-  } else {
-    notifyRuleAppliedToExplicitWidget(ruleId);
+    notifyRuleAppliedToImplicitWidget(rule);
+  } else if (explicitTestRuleFlowEnabled) {
+    notifyRuleAppliedToExplicitWidget(rule.id);
   }
 };
 
