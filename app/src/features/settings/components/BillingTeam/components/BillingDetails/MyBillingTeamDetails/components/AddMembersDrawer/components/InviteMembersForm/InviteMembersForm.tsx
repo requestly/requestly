@@ -9,6 +9,11 @@ import Logger from "../../../../../../../../../../../../../common/logger";
 import { inviteUsersToBillingTeam } from "backend/billing";
 import "./inviteMembersForm.scss";
 import { toast } from "utils/Toast";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import {
+  trackBillingTeamInviteSendingFailed,
+  trackBillingTeamInviteSentSuccessfully,
+} from "features/settings/analytics";
 
 interface InviteMembersFormProps {
   billingId: string;
@@ -38,19 +43,25 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
       }
 
       setIsLoading(true);
+      const hasExternalDomainUser = emails.some(
+        (email) => getDomainFromEmail(email) !== billingTeamDetails?.ownerDomain
+      );
 
       inviteUsersToBillingTeam(billingId, emails)
         .then(() => {
           setIsPostUserAdditionViewVisible(true);
+
+          trackBillingTeamInviteSentSuccessfully(hasExternalDomainUser);
         })
         .catch((error) => {
           Logger.log("Error adding members to billing team", error);
+          trackBillingTeamInviteSendingFailed(hasExternalDomainUser);
         })
         .finally(() => {
           setIsLoading(false);
         });
     },
-    [billingId, emails]
+    [billingId, emails, billingTeamDetails?.ownerDomain]
   );
 
   const handleEmailsChange = useCallback(
