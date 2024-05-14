@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { actions } from "store";
-import { useDispatch } from "react-redux";
+import { useRulesModalsContext } from "features/rules/context/modals";
 
 import { RQButton } from "lib/design-system/components";
 import { Typography } from "antd";
@@ -10,13 +9,13 @@ import BellAnimation from "./BellAnimation";
 import { CloseOutlined } from "@ant-design/icons";
 import "./card.scss";
 
-export function MigrationInfoCard() {
+export function NotificationCard() {
   const location = useLocation();
-  const dispatch = useDispatch();
   const [isVisible, setIsVisible] = useState(false);
 
-  const handleClose = useCallback((e) => {
-    e.stopPropagation();
+  const { openMigratonModalAction } = useRulesModalsContext();
+
+  const closeCard = useCallback((e) => {
     setIsVisible(false);
   }, []);
 
@@ -24,19 +23,19 @@ export function MigrationInfoCard() {
     if (location.search.includes("showMigrationInfoCard")) {
       setIsVisible(true);
     }
-  }, [location]);
+  }, [location.search]);
 
   const handleOnClick = useCallback(() => {
-    console.log("Open modal, close this card");
-    dispatch(
-      actions.toggleActiveModal({
-        modalName: "mv3InfoModal",
-      })
-    );
-  }, [dispatch]);
+    closeCard();
+    openMigratonModalAction();
+  }, [closeCard, openMigratonModalAction]);
+
+  if (!isVisible) {
+    return null;
+  }
 
   return (
-    <div className={`notification-card-container ${isVisible ? "visible" : "hidden"}`} onClick={handleOnClick}>
+    <div className={`notification-card-container`} onClick={handleOnClick}>
       <div className="content-container">
         <BellAnimation className="notification-icon" />
         <div className="content">
@@ -46,7 +45,13 @@ export function MigrationInfoCard() {
           </Typography.Text>
         </div>
       </div>
-      <div className="close-container" onClick={handleClose}>
+      <div
+        className="close-container"
+        onClick={(e) => {
+          e.stopPropagation();
+          closeCard();
+        }}
+      >
         <RQButton icon={<CloseOutlined />} type="text" />
       </div>
     </div>
