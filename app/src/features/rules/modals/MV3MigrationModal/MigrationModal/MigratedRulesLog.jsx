@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
 import { StorageService } from "init";
 import { useSelector } from "react-redux";
@@ -16,68 +16,67 @@ import { IoWarningOutline } from "@react-icons/all-files/io5/IoWarningOutline";
 import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
 import { CiMail } from "@react-icons/all-files/ci/CiMail";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { RuleMigrationChange, getMV3MigrationData } from "modules/extension/utils";
+import { isEmpty } from "lodash";
+
+const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
+  const navigate = useNavigate();
+
+  const handleOnClick = () => {
+    redirectToRuleEditor(navigate, currentRule.id, SOURCE.MV3_MODAL, true);
+  };
+
+  return !currentRule ? null : (
+    <div className="migrated-rules-item">
+      <div className="migrated-rule-name" onClick={handleOnClick}>
+        <RuleIcon ruleType={currentRule.ruleType} /> {currentRule.name} <RxExternalLink />
+      </div>
+      <ul>
+        {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PATH_MIGRATED) && (
+          <li className="migrated-rule-description">Path contains changed to → Url contains.</li>
+        )}
+        {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PAGEURL_MIGRATED) && (
+          <li className="migrated-rule-description">Page URL contains changed to → Page Domain.</li>
+        )}
+      </ul>
+    </div>
+  );
+};
 
 const MigratedRules = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const appMode = useSelector(getAppMode);
 
-  const getMigratedRulesFromLocalStorage = useCallback(() => {
-    const migratedRules = localStorage.getItem("migratedToMV3");
-    const localStorageRulesObject = migratedRules ? JSON.parse(migratedRules) : {};
-    const migrationLogs = localStorageRulesObject?.[currentlyActiveWorkspace?.id];
-    if (migrationLogs?.rulesMigrated) return migrationLogs.rulesMigrationLogs;
-    return [];
+  const [rulesData, setRulesData] = useState({});
+
+  const migratedRulesLogs = useMemo(() => {
+    const migrationData = getMV3MigrationData();
+
+    const migratedRulesLogs = migrationData?.[currentlyActiveWorkspace?.id ?? "private"]?.rulesMigrationLogs;
+
+    if (isEmpty(migratedRulesLogs)) return {};
+
+    return migratedRulesLogs;
   }, [currentlyActiveWorkspace]);
 
-  const migratedRules = getMigratedRulesFromLocalStorage();
+  useEffect(() => {
+    if (Object.keys(migratedRulesLogs).length) {
+      Object.keys(migratedRulesLogs).forEach((ruleId) => {
+        StorageService(appMode)
+          .getRecord(ruleId)
+          .then((rule) => {
+            if (rule) {
+              setRulesData((prev) => ({ ...prev, [ruleId]: rule }));
+            }
+          })
+          .catch((err) => {
+            // setFailedToFetchRule(true);
+          });
+      });
+    }
+  }, [appMode, migratedRulesLogs]);
 
-  const [showMigrationLogs, setShowMigrationLogs] = useState(migratedRules?.length);
-
-  const MigratedRuleTile = ({ migrateRuleEntry }) => {
-    const navigate = useNavigate();
-    const appMode = useSelector(getAppMode);
-    const [failedToFetchRule, setFailedToFetchRule] = useState(false);
-    const [currentRule, setCurrentRule] = useState(null);
-    useEffect(() => {
-      if (!migrateRuleEntry || currentRule) return;
-      StorageService(appMode)
-        .getRecord(migrateRuleEntry.id)
-        .then((rule) => {
-          if (!rule) {
-            setFailedToFetchRule(true);
-            setShowMigrationLogs(false);
-            return;
-          } else {
-            setCurrentRule(rule);
-          }
-        })
-        .catch((err) => {
-          setFailedToFetchRule(true);
-          setShowMigrationLogs(false);
-        });
-    }, [migrateRuleEntry, appMode, currentRule]);
-
-    const handleOnClick = () => {
-      redirectToRuleEditor(navigate, currentRule.id, SOURCE.MV3_MODAL, true);
-    };
-
-    return failedToFetchRule ? null : currentRule ? (
-      <div className="migrated-rules-item">
-        <div className="migrated-rule-name" onClick={handleOnClick}>
-          <RuleIcon ruleType={currentRule.ruleType} /> {currentRule.name} <RxExternalLink />
-        </div>
-        <ul>
-          {migrateRuleEntry.migrationChanges.some((e) => e.type === "source_path_migrated") && (
-            <li className="migrated-rule-description">Path contains changed to → Url contains.</li>
-          )}
-          {migrateRuleEntry.migrationChanges.some((e) => e.type === "source_pageUrl_migrated") && (
-            <li className="migrated-rule-description">Page Url contains changed to → Page Domain contains.</li>
-          )}
-        </ul>
-      </div>
-    ) : null;
-  };
-
-  return showMigrationLogs ? (
+  return Object.keys(rulesData).length > 0 ? (
     <div className="section migrated-rules">
       <div className="header">
         <div className="migrated-rules title">
@@ -89,8 +88,8 @@ const MigratedRules = () => {
       </div>
 
       <div className="content">
-        {migratedRules.map((rule, idx) => (
-          <MigratedRuleTile migrateRuleEntry={rule} key={idx} />
+        {Object.values(rulesData).map((ruleData, idx) => (
+          <MigratedRuleTile currentRule={ruleData} ruleMigrationData={migratedRulesLogs[ruleData.id]} key={idx} />
         ))}
       </div>
 
