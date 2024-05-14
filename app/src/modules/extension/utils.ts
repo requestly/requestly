@@ -3,7 +3,11 @@ import { parseDNRRules } from "./mv3RuleParser";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { StorageService } from "init";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { trackMv3MigrationCompleted, trackMv3MigrationStarted } from "modules/analytics/events/migrations";
+import {
+  trackMv3MigrationCompleted,
+  trackMv3MigrationRulesMigrated,
+  trackMv3MigrationStarted,
+} from "modules/analytics/events/migrations";
 
 const MV3_MIGRATION_DATA = "mv3MigrationData";
 
@@ -13,7 +17,7 @@ export enum RuleMigrationChange {
 }
 
 export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string): Rule[] => {
-  return rules;
+  // return rules;
   console.log("[Debug] Migrating Rules to MV3", { rules, isFirstSyncComplete: window.isFirstSyncComplete });
   if (!window.isFirstSyncComplete) {
     return rules;
@@ -55,9 +59,10 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
             rulesMigrationLogs: { ...currentWorkspaceMigrationData?.rulesMigrationLogs, ...rulesMigrationLogs },
           },
         });
-        trackMv3MigrationCompleted(migratedRules.length);
+        trackMv3MigrationRulesMigrated(rules.length, migratedRules.length);
       });
   }
+  trackMv3MigrationCompleted(rules.length, migratedRules.length);
 
   return finalRules;
 };
