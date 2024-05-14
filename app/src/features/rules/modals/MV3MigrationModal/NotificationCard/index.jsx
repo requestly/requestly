@@ -36,7 +36,7 @@ export function MigrationInfoCard() {
   }, [dispatch]);
 
   return (
-    <div className={`card-container ${isVisible ? "visible" : "hidden"}`} onClick={handleOnClick}>
+    <div className={`notification-card-container ${isVisible ? "visible" : "hidden"}`} onClick={handleOnClick}>
       <div className="content-container">
         <BellAnimation className="notification-icon" />
         <div className="content">

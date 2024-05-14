@@ -48,14 +48,17 @@ export const MV3MigrationModal = (props) => {
         toggleModal();
       }}
       footer={null}
-      className="modal-container"
+      className="mv3-modal-container"
       closable={true}
       destroyOnClose
+      centered
     >
       <Header />
-      <InfoSection />
-      <MigratedRules />
-      <ChangeLog />
+      <div className="modal-content">
+        <InfoSection />
+        <MigratedRules />
+        <ChangeLog />
+      </div>
     </Modal>
   );
 };
