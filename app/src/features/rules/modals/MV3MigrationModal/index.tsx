@@ -1,2 +1,2 @@
 export { MV3MigrationModal } from "./MigrationModal";
-export { MigrationInfoCard } from "./NotificationCard";
+export { NotificationCard } from "./NotificationCard";

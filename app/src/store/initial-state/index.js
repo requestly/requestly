@@ -138,10 +138,6 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
-    mv3InfoModal: {
-      isActive: false,
-      props: {},
-    },
   },
 
   desktopSpecificDetails: {

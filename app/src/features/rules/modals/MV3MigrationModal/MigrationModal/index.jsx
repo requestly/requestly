@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import ChangeLog from "./ChangeLog";
 import MigratedRules from "./MigratedRulesLog";
 
@@ -7,6 +8,7 @@ import BannerImage from "./modalImage.svg";
 import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
 
 import "./modal.scss";
+import { useRulesModalsContext } from "features/rules/context/modals";
 
 const Header = () => {
   return (
@@ -39,15 +41,21 @@ const InfoSection = () => {
   );
 };
 
-export const MV3MigrationModal = (props) => {
-  const { toggleModal, isOpen } = props;
+export const MV3MigrationModal = () => {
+  const { setOpenMigrationModalAction } = useRulesModalsContext();
+
+  const [isModalActive, setIsModalActive] = useState(false);
+
+  useEffect(() => {
+    setOpenMigrationModalAction(() => () => setIsModalActive(true));
+  }, [setOpenMigrationModalAction]);
 
   return (
     <Modal
-      open={isOpen}
+      open={isModalActive}
       onCancel={(e) => {
         e.preventDefault();
-        toggleModal();
+        setIsModalActive(false);
       }}
       footer={null}
       className="mv3-modal-container"
