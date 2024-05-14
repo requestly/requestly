@@ -51,7 +51,6 @@ const MigratedRules = () => {
           }
         })
         .catch((err) => {
-          console.error("Error while fetching rule", err);
           setFailedToFetchRule(true);
           setShowMigrationLogs(false);
         });
@@ -61,7 +60,7 @@ const MigratedRules = () => {
       redirectToRuleEditor(navigate, currentRule.id, SOURCE.MV3_MODAL, true);
     };
 
-    return failedToFetchRule ? undefined : currentRule ? (
+    return failedToFetchRule ? null : currentRule ? (
       <div className="migrated-rules-item">
         <div className="migrated-rule-name" onClick={handleOnClick}>
           <RuleIcon ruleType={currentRule.ruleType} /> {currentRule.name} <RxExternalLink />
