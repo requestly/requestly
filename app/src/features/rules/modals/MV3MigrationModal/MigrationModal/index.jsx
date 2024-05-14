@@ -27,7 +27,9 @@ const Header = () => {
 const InfoSection = () => {
   return (
     <div className="section description">
-      <Typography.Text className="title">What is MV3</Typography.Text>
+      <div className="mb-12">
+        <Typography.Text className="title">What is MV3</Typography.Text>
+      </div>
       <div className="text">
         Chrome has introduced Manifest V3 guidelines to enhance the security and performance of browser extensions. The
         new Requestly Extension, built on Manifest V3, provides users with the features they previously enjoyed, while
