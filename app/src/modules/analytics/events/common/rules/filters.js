@@ -5,6 +5,10 @@ export const trackPageUrlFilterModifiedEvent = (rule_type) => {
   trackRuleFilterModified("page_url", rule_type);
 };
 
+export const trackPageDomainsFilterModifiedEvent = (rule_type) => {
+  trackRuleFilterModified("page_domains", rule_type);
+};
+
 export const trackResourceTypeFilterModifiedEvent = (rule_type) => {
   trackRuleFilterModified("resource_type", rule_type);
 };

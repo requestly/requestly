@@ -58,12 +58,9 @@ export const initiateBlankCurrentlySelectedRule = (
       pairs: [],
       ruleType: RULE_TYPE_TO_CREATE,
       status: GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE,
+      version: "3.0.0",
       ...extraRuleConfig,
     };
-
-    if (currentlySelectedRuleConfig.VERSION) {
-      blankRuleFormat.version = currentlySelectedRuleConfig.VERSION;
-    }
 
     if (isExtensionManifestVersion3() && "REMOVE_CSP_HEADER" in currentlySelectedRuleConfig) {
       blankRuleFormat.removeCSPHeader = currentlySelectedRuleConfig.REMOVE_CSP_HEADER;

@@ -70,8 +70,12 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     (pairIndex) => {
       const copyOfCurrentlySelectedRule = JSON.parse(JSON.stringify(currentlySelectedRuleData));
       return isSourceFilterFormatUpgraded(pairIndex, copyOfCurrentlySelectedRule)
-        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).length
-        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).length;
+        ? Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters[0] || {}).filter(
+            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
+          ).length
+        : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
+            (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
+          ).length.length;
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
@@ -87,11 +91,6 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
         id: 2,
         title: "Host",
         ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.HOST,
-      },
-      {
-        id: 3,
-        title: "Path",
-        ruleKey: GLOBAL_CONSTANTS.RULE_KEYS.PATH,
       },
     ],
     []
@@ -126,23 +125,25 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
   const renderSourceKeys = useMemo(() => {
     return (
       <Menu>
-        {sourceKeys.map(({ id, title, ruleKey }) => (
-          <Menu.Item
-            key={id}
-            onClick={(event) => {
-              dispatch(
-                actions.updateRulePairAtGivenPath({
-                  pairIndex,
-                  updates: {
-                    [APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS]: ruleKey,
-                  },
-                })
-              );
-            }}
-          >
-            {title}
-          </Menu.Item>
-        ))}
+        {sourceKeys.map(({ id, title, ruleKey }) => {
+          return (
+            <Menu.Item
+              key={id}
+              onClick={(event) => {
+                dispatch(
+                  actions.updateRulePairAtGivenPath({
+                    pairIndex,
+                    updates: {
+                      [APP_CONSTANTS.PATH_FROM_PAIR.RULE_KEYS]: ruleKey,
+                    },
+                  })
+                );
+              }}
+            >
+              {title}
+            </Menu.Item>
+          );
+        })}
       </Menu>
     );
   }, [dispatch, sourceKeys, pairIndex]);
