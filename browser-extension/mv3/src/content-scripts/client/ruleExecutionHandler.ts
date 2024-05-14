@@ -2,7 +2,7 @@ import { Rule } from "common/types";
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { handleAppliedRuleNotification } from "./testRuleHandler";
 
-class ClientRuleExecutionHandler {
+class RuleExecutionHandler {
   constructor() {
     this.initListeners();
   }
@@ -29,5 +29,5 @@ class ClientRuleExecutionHandler {
   };
 }
 
-const clientRuleExecutionHandler = new ClientRuleExecutionHandler();
-export default clientRuleExecutionHandler;
+const ruleExecutionHandler = new RuleExecutionHandler();
+export default ruleExecutionHandler;

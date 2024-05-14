@@ -3,7 +3,7 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/consta
 import { getRule } from "common/rulesStore";
 import { getRecord } from "common/storage";
 import { Rule } from "common/types";
-import clientRuleExecutionHandler from "./clientRuleExecutionHandler";
+import RuleExecutionHandler from "./ruleExecutionHandler";
 
 let implicitTestRuleFlowEnabled = false;
 let explicitTestRuleFlowEnabled = false;
@@ -53,7 +53,7 @@ const showExplicitTestRuleWidget = async (ruleId: string, forceShow = false) => 
   let appliedRules: Rule[];
 
   if (forceShow) {
-    appliedRules = await clientRuleExecutionHandler.getExecutedRules();
+    appliedRules = await RuleExecutionHandler.getExecutedRules();
   }
 
   const testRuleWidget = document.createElement("rq-explicit-test-rule-widget");
@@ -150,7 +150,7 @@ export const showImplicitTestRuleWidget = async () => {
 
   document.documentElement.appendChild(testRuleWidget);
 
-  const appliedRules = await clientRuleExecutionHandler.getExecutedRules();
+  const appliedRules = await RuleExecutionHandler.getExecutedRules();
 
   if (appliedRules) {
     appliedRules?.forEach((rule: Rule) => {
