@@ -27,6 +27,7 @@ import { LazyMotion, domMax } from "framer-motion";
 import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
+import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -43,6 +44,7 @@ const App = () => {
   // useInitializeNewUserSessionRecordingConfig();
 
   submitAppDetailAttributes();
+  useAppUpdateChecker();
 
   if (!isEmpty(window.location.hash)) {
     //Support legacy URL formats
