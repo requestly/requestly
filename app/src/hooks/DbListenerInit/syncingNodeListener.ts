@@ -175,11 +175,9 @@ export const doSync = async (
     // At this stage we are sure that we want to sync with this target only, target is consistent
     // Now let's check if there are any local update that we should prioritize
     const tsResult: boolean = await checkIfNoUpdateHasBeenPerformedSinceLastSync(appMode);
-
     if (!tsResult) {
       // This means some updates have been performed locally and they have not been synced with firebase yet
       // Handle conflicts
-      console.log("[DEBUG] doSync - handle conflicts");
       allSyncedRecords = await resolveLocalConflictsAndSaveToFirebase(appMode, allSyncedRecords);
       await setLastSyncTarget(appMode, syncTarget, uid, team_id);
     }
