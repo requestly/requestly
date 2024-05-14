@@ -7,7 +7,7 @@ import { Typography } from "antd";
 import BellAnimation from "./BellAnimation";
 import { CloseOutlined } from "@ant-design/icons";
 import "./card.scss";
-import { getMV3MigrationData } from "modules/extension/utils";
+import { getMV3MigrationData, saveMV3MigrationData } from "modules/extension/utils";
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { isEmpty } from "lodash";
@@ -33,10 +33,23 @@ export function NotificationCard() {
   }, [currentlyActiveWorkspace]);
 
   useEffect(() => {
-    if (Object.keys(migratedRulesLogs).length > 0) {
+    const migrationData = getMV3MigrationData();
+
+    if (
+      Object.keys(migratedRulesLogs).length > 0 &&
+      !migrationData[currentlyActiveWorkspace?.id ?? "private"]?.migrationModalShown
+    ) {
       setIsVisible(true);
+
+      saveMV3MigrationData({
+        ...migrationData,
+        [currentlyActiveWorkspace?.id ?? "private"]: {
+          ...migrationData[currentlyActiveWorkspace?.id ?? "private"],
+          migrationModalShown: true,
+        },
+      });
     }
-  }, [migratedRulesLogs]);
+  }, [currentlyActiveWorkspace?.id, migratedRulesLogs]);
 
   const handleOnClick = useCallback(() => {
     closeCard();
