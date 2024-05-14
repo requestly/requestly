@@ -45,7 +45,9 @@ const ChangeLog = () => {
   return (
     <div className="changeLog section">
       <div className="changeLog-container">
-        <Typography.Text className="changeLog title">Change Log</Typography.Text>
+        <div className="mb-12">
+          <Typography.Text className="changeLog title">Change Log</Typography.Text>
+        </div>
         <Collapse
           className="changeLog-collapse"
           expandIconPosition="end"

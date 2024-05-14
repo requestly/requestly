@@ -77,9 +77,13 @@
     padding: 24px;
   }
 
-  .section .title {
-    font-size: 18px;
-    color: white;
+  .title {
+    color: var(--requestly-color-text-default);
+    font-size: var(--requestly-font-size-lg);
+    font-style: normal;
+    font-weight: var(--requestly-font-weight-bold);
+    line-height: 150%; /* 22.5px */
+    margin-bottom: 1.5rem;
   }
 
   .description .text {
@@ -247,14 +251,6 @@
   .changeLog-body {
     border-radius: 4px;
     background: var(--requestly-color-surface-0);
-  }
-
-  .changeLog .title {
-    color: var(--requestly-color-text-subtle);
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 150%; /* 22.5px */
   }
 
   .changeLog-collapse {
