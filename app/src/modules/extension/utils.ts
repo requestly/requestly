@@ -8,6 +8,7 @@ import {
   trackMv3MigrationRulesMigrated,
   trackMv3MigrationStarted,
 } from "modules/analytics/events/migrations";
+import Logger from "lib/logger";
 
 const MV3_MIGRATION_DATA = "mv3MigrationData";
 
@@ -18,15 +19,16 @@ export enum RuleMigrationChange {
 
 export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string): Rule[] => {
   // return rules;
-  console.log("[Debug] Migrating Rules to MV3", { rules, isFirstSyncComplete: window.isFirstSyncComplete });
   if (!window.isFirstSyncComplete) {
     return rules;
   }
 
+  Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migration started", {
+    rules,
+    isFirstSyncComplete: window.isFirstSyncComplete,
+    currentWorkspaceId,
+  });
   trackMv3MigrationStarted(rules.length);
-
-  console.log("[Debug] Before Migration", { rules });
-
   const rulesMigrationLogs: Record<string, any> = {};
   const migratedRules: Rule[] = [];
 
@@ -46,10 +48,8 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
   const migrationData = getMV3MigrationData() || {};
   const currentWorkspaceMigrationData = migrationData[workspaceId ? workspaceId : "private"];
 
-  console.log("[Debug] After Migration", { currentWorkspaceMigrationData, rulesMigrationLogs, migratedRules });
-
   if (migratedRules.length > 0) {
-    console.log("[Debug] Saving Migrated Rules", { migratedRules });
+    Logger.log("[Debug][MV3.migrateAllRulesToMV3] Saving Migrated Rules", { migratedRules, currentWorkspaceId });
     StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
       .saveMultipleRulesOrGroups(migratedRules, { workspaceId: workspaceId })
       .then(() => {
@@ -59,17 +59,24 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
             rulesMigrationLogs: { ...currentWorkspaceMigrationData?.rulesMigrationLogs, ...rulesMigrationLogs },
           },
         });
+        Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migrated Successfully", { migratedRules });
         trackMv3MigrationRulesMigrated(rules.length, migratedRules.length);
       });
   }
+
   trackMv3MigrationCompleted(rules.length, migratedRules.length);
+  Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migration ended", {
+    currentWorkspaceMigrationData,
+    rulesMigrationLogs,
+    migratedRules,
+    finalRules,
+  });
 
   return finalRules;
 };
 
 export const migrateRuleToMV3 = (rule: Rule): { isMigrated: boolean; rule: Rule; ruleMigrationLogs: any } => {
   if (rule?.schemaVersion === "3.0.0") {
-    console.log("[Debug] Rule already migrated to v3.0.0", { rule });
     return {
       isMigrated: false,
       rule,
@@ -78,17 +85,16 @@ export const migrateRuleToMV3 = (rule: Rule): { isMigrated: boolean; rule: Rule;
   }
 
   const ruleMigrationLogs: Record<string, any>[] = [];
+  Logger.log("[Debug][MV3.migrateRuleToMV3] Rule Migration Started", { rule });
 
   rule.pairs.forEach((pair) => {
     const pathMigrationStatus = migratePathOperator(pair.source);
     if (pathMigrationStatus) {
-      console.log("!!!debug", "pathMigration Status", pathMigrationStatus);
       ruleMigrationLogs.push(pathMigrationStatus);
     }
 
     const pageUrlMigrationStatus = migratePageURLtoPageDomain(pair.source);
     if (pageUrlMigrationStatus) {
-      console.log("!!!debug", "pageURLMigrationStatus", pageUrlMigrationStatus);
       ruleMigrationLogs.push(pageUrlMigrationStatus);
     }
   });
@@ -99,7 +105,7 @@ export const migrateRuleToMV3 = (rule: Rule): { isMigrated: boolean; rule: Rule;
     schemaVersion: "3.0.0",
   };
 
-  console.log("[Debug] Migrated Rule", { beforeRule: rule, finalRule });
+  Logger.log("[Debug][MV3.migrateRuleToMV3] Rule Migration Ended", { finalRule, ruleMigrationLogs });
 
   return {
     isMigrated: true,
