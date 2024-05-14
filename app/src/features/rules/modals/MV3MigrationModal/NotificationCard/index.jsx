@@ -11,6 +11,11 @@ import { getMV3MigrationData, saveMV3MigrationData } from "modules/extension/uti
 import { useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { isEmpty } from "lodash";
+import {
+  trackMigrationNotificationClicked,
+  trackMigrationNotificationClosed,
+  trackMigrationNotificationShown,
+} from "features/rules/analytics";
 
 export function NotificationCard() {
   const [isVisible, setIsVisible] = useState(false);
@@ -18,17 +23,20 @@ export function NotificationCard() {
 
   const { openMigratonModalAction } = useRulesModalsContext();
 
-  const closeCard = useCallback((e) => {
-    const migrationData = getMV3MigrationData();
-    saveMV3MigrationData({
-      ...migrationData,
-      [currentlyActiveWorkspace?.id ?? "private"]: {
-        ...migrationData[currentlyActiveWorkspace?.id ?? "private"],
-        migrationModalViewed: true,
-      },
-    });
-    setIsVisible(false);
-  }, [currentlyActiveWorkspace?.id]);
+  const closeCard = useCallback(
+    (e) => {
+      const migrationData = getMV3MigrationData();
+      saveMV3MigrationData({
+        ...migrationData,
+        [currentlyActiveWorkspace?.id ?? "private"]: {
+          ...migrationData[currentlyActiveWorkspace?.id ?? "private"],
+          migrationModalViewed: true,
+        },
+      });
+      setIsVisible(false);
+    },
+    [currentlyActiveWorkspace?.id]
+  );
 
   const migratedRulesLogs = useMemo(() => {
     const migrationData = getMV3MigrationData();
@@ -47,11 +55,13 @@ export function NotificationCard() {
       Object.keys(migratedRulesLogs).length > 0 &&
       !migrationData[currentlyActiveWorkspace?.id ?? "private"]?.migrationModalViewed
     ) {
+      trackMigrationNotificationShown();
       setIsVisible(true);
     }
   }, [currentlyActiveWorkspace?.id, migratedRulesLogs]);
 
   const handleOnClick = useCallback(() => {
+    trackMigrationNotificationClicked();
     closeCard();
     openMigratonModalAction();
   }, [closeCard, openMigratonModalAction]);
@@ -75,6 +85,7 @@ export function NotificationCard() {
         className="close-container"
         onClick={(e) => {
           e.stopPropagation();
+          trackMigrationNotificationClosed();
           closeCard();
         }}
       >

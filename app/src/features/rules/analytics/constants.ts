@@ -16,3 +16,7 @@ export const RULES = {
   RULES_SELECTED: "rules_selected",
   RULES_LIST_LOADED: "rules_list_loaded",
 };
+
+export const MIGRATION_NOTIFICATION_SHOWN = "migration_notification_shown";
+export const MIGRATION_NOTIFICATION_CLICKED = "migration_notification_clicked";
+export const MIGRATION_NOTIFICATION_CLOSED = "migration_notification_closed";
