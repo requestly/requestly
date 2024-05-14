@@ -18,8 +18,10 @@ const Header = () => {
         <Typography.Text className="title">
           Better privacy, security, and performance with Requestly MV3 Extension updates.
         </Typography.Text>
-        <a href="todo.com" className="external-link">
-          Read more about it <RxExternalLink />
+        {/* @TODO: Add link to the post */}
+        <a href="todo.com" className="external-link icon__wrapper">
+          Read more about it &nbsp;
+          <RxExternalLink />
         </a>
       </div>
     </div>
