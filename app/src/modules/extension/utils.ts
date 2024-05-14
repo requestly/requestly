@@ -13,7 +13,7 @@ export enum RuleMigrationChange {
 }
 
 export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string): Rule[] => {
-  // return rules;
+  return rules;
   console.log("[Debug] Migrating Rules to MV3", { rules, isFirstSyncComplete: window.isFirstSyncComplete });
   if (!window.isFirstSyncComplete) {
     return rules;
@@ -63,7 +63,7 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
 };
 
 export const migrateRuleToMV3 = (rule: Rule): { isMigrated: boolean; rule: Rule; ruleMigrationLogs: any } => {
-  if (rule?.version === "3.0.0") {
+  if (rule?.schema_version === "3.0.0") {
     console.log("[Debug] Rule already migrated to v3.0.0", { rule });
     return {
       isMigrated: false,
@@ -91,7 +91,7 @@ export const migrateRuleToMV3 = (rule: Rule): { isMigrated: boolean; rule: Rule;
   const finalRule = {
     ...rule,
     extensionRules: parseDNRRules(rule),
-    version: "3.0.0",
+    schema_version: "3.0.0",
   };
 
   console.log("[Debug] Migrated Rule", { beforeRule: rule, finalRule });
