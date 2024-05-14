@@ -15,12 +15,14 @@ const Header = () => {
     <div className="modal-header">
       <img src={BannerImage} alt="Requestly Logo" className="banner-img" />
       <div className="header">
-        <Typography.Text className="title">
-          Better privacy, security, and performance with Requestly MV3 Extension updates.
-        </Typography.Text>
-        {/* @TODO: Add link to the post */}
-        <a href="todo.com" className="external-link icon__wrapper">
-          Read more about it &nbsp;
+        <Typography.Text className="title">Rules upgraded to support upcoming MV3 extension</Typography.Text>
+        <a
+          href="https://github.com/requestly/requestly/issues/1690"
+          className="external-link icon__wrapper"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Read about the release here &nbsp;
           <RxExternalLink />
         </a>
       </div>
@@ -31,13 +33,13 @@ const Header = () => {
 const InfoSection = () => {
   return (
     <div className="section description">
-      <div className="mb-12">
+      {/* <div className="mb-12">
         <Typography.Text className="title">What is MV3</Typography.Text>
-      </div>
+      </div> */}
       <div className="text">
-        Chrome has introduced Manifest V3 guidelines to enhance the security and performance of browser extensions. The
-        new Requestly Extension, built on Manifest V3, provides users with the features they previously enjoyed, while
-        also offering improved security and performance.
+        To support our upcoming MV3 extension release, we've migrated some of your rules to the new schema. All your
+        rules should work as expected, but some rules need to be verified before use as there might be some changes.
+        Please review the impacted rules listed below.
       </div>
     </div>
   );
@@ -69,7 +71,7 @@ export const MV3MigrationModal = () => {
       <div className="modal-content">
         <InfoSection />
         <MigratedRules />
-        <ChangeLog />
+        {/* <ChangeLog /> */}
       </div>
     </Modal>
   );

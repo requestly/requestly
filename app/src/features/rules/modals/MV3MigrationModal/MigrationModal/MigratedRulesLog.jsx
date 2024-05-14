@@ -33,10 +33,16 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
       </div>
       <ul>
         {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PATH_MIGRATED) && (
-          <li className="migrated-rule-description">Path contains changed to → Url contains.</li>
+          <li className="migrated-rule-description">
+            <Typography.Text code>Path</Typography.Text> source changed to → <Typography.Text code>URL</Typography.Text>
+            .
+          </li>
         )}
         {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PAGEURL_MIGRATED) && (
-          <li className="migrated-rule-description">Page URL contains changed to → Page Domain.</li>
+          <li className="migrated-rule-description">
+            <Typography.Text code>Page URL</Typography.Text> source filter changed to →{" "}
+            <Typography.Text code>Page Domains</Typography.Text>.
+          </li>
         )}
       </ul>
     </div>

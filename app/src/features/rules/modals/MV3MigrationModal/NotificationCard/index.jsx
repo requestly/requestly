@@ -75,9 +75,9 @@ export function NotificationCard() {
       <div className="content-container">
         <BellAnimation className="notification-icon" />
         <div className="content">
-          <Typography.Text className="content-header">Important updates!</Typography.Text>
+          <Typography.Text className="content-header">Important update!</Typography.Text>
           <Typography.Text className="content-text">
-            We have upgraded to Chrome MV3. Click here to know more.
+            Rules upgraded to support MV3 changes. Click here to know more.
           </Typography.Text>
         </div>
       </div>
