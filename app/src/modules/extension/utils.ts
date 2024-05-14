@@ -6,7 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const MV3_MIGRATION_DATA = "mv3MigrationData";
 
-enum RuleMigrationChange {
+export enum RuleMigrationChange {
   SOURCE_PATH_MIGRATED = "source_path_migrated",
   SOURCE_PAGEURL_MIGRATED = "source_pageUrl_migrated",
 }
