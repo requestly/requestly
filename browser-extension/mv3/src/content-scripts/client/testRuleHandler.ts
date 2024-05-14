@@ -3,6 +3,7 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/consta
 import { getRule } from "common/rulesStore";
 import { getRecord } from "common/storage";
 import { Rule } from "common/types";
+import clientRuleExecutionHandler from "./clientRuleExecutionHandler";
 
 let implicitTestRuleFlowEnabled = false;
 let explicitTestRuleFlowEnabled = false;
@@ -30,17 +31,9 @@ export const initTestRuleHandler = () => {
           showImplicitTestRuleWidget();
         }
         break;
-
-      case CLIENT_MESSAGES.NOTIFY_RULE_EXECUTED:
-        handleAppliedRuleNotification(message.rule);
-        break;
     }
     return false;
   });
-};
-
-const getExecutedRules = async () => {
-  return chrome.runtime.sendMessage(EXTENSION_MESSAGES.GET_EXECUTED_RULES);
 };
 
 const showExplicitTestRuleWidget = async (ruleId: string, forceShow = false) => {
@@ -60,7 +53,7 @@ const showExplicitTestRuleWidget = async (ruleId: string, forceShow = false) => 
   let appliedRules: Rule[];
 
   if (forceShow) {
-    appliedRules = await getExecutedRules();
+    appliedRules = await clientRuleExecutionHandler.getExecutedRules();
   }
 
   const testRuleWidget = document.createElement("rq-explicit-test-rule-widget");
@@ -157,7 +150,7 @@ export const showImplicitTestRuleWidget = async () => {
 
   document.documentElement.appendChild(testRuleWidget);
 
-  const appliedRules = await getExecutedRules();
+  const appliedRules = await clientRuleExecutionHandler.getExecutedRules();
 
   if (appliedRules) {
     appliedRules?.forEach((rule: Rule) => {
@@ -204,7 +197,7 @@ const fetchAndStoreImplicitTestRuleWidgetConfig = async () => {
   });
 };
 
-const handleAppliedRuleNotification = async (rule: Rule) => {
+export const handleAppliedRuleNotification = async (rule: Rule) => {
   if (implicitTestRuleFlowEnabled) {
     notifyRuleAppliedToImplicitWidget(rule);
   } else if (explicitTestRuleFlowEnabled) {
