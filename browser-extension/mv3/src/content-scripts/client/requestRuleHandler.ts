@@ -1,10 +1,9 @@
-import { onRuleOrGroupChange } from "common/rulesStore";
+import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { RequestRulePair, RuleType } from "common/types";
 import { cacheJsonOnPage } from "../../utility-scripts/cacheJson/cacheJsonUtils";
-import rulesStorageService from "../../rulesStorageService";
 
 const cacheRequestRules = async () => {
-  const requestRules = await rulesStorageService.getEnabledRules(RuleType.REQUEST);
+  const requestRules = await getEnabledRules(RuleType.REQUEST);
 
   if (!requestRules.length) {
     return;

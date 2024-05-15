@@ -57,6 +57,8 @@ class RulesStorageService {
       return false;
     });
   };
+
+  //TODO: add onRuleOrGroupChange listener here then only it can be used in content scripts
 }
 
 const rulesStorageService = new RulesStorageService();
