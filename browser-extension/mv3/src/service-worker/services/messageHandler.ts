@@ -49,12 +49,12 @@ export const initMessageHandler = () => {
           });
           initCustomWidgets(sender.tab?.id, sender.frameId);
           applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
-          handleTestRuleOnClientPageLoad(sender.tab);
         });
         break;
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
         ruleExecutionHandler.processTabCachedRulesExecutions(sender.tab.id);
+        handleTestRuleOnClientPageLoad(sender.tab);
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
 
