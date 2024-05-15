@@ -9,78 +9,78 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
     return;
   }
 
-  const enabledRules = rulesStorageService.getEnabledRules();
+  rulesStorageService.getEnabledRules().then((enabledRules) => {
+    let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
-  let isMainFrameRequest = details.type === "main_frame" ? true : false;
-
-  enabledRules.forEach((rule) => {
-    switch (rule.ruleType) {
-      case RuleType.REDIRECT:
-      case RuleType.REPLACE:
-      case RuleType.QUERYPARAM:
-      case RuleType.CANCEL:
-      case RuleType.DELAY:
-        const { isApplied } = matchRuleWithRequest(rule, {
-          url: details.url,
-          method: details.method,
-          type: details.type as any,
-          initiatorDomain: details.initiator,
-        });
-        if (isApplied) {
-          ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
-        }
-        break;
-      default:
-        break;
-    }
+    enabledRules.forEach((rule) => {
+      switch (rule.ruleType) {
+        case RuleType.REDIRECT:
+        case RuleType.REPLACE:
+        case RuleType.QUERYPARAM:
+        case RuleType.CANCEL:
+        case RuleType.DELAY:
+          const { isApplied } = matchRuleWithRequest(rule, {
+            url: details.url,
+            method: details.method,
+            type: details.type as any,
+            initiatorDomain: details.initiator,
+          });
+          if (isApplied) {
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
+          }
+          break;
+        default:
+          break;
+      }
+    });
   });
 };
 
 const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails) => {
-  const enabledRules = rulesStorageService.getEnabledRules();
-
-  enabledRules.forEach((rule) => {
-    switch (rule.ruleType) {
-      case RuleType.HEADERS:
-      case RuleType.USERAGENT:
-        // TODO: Match only incase of any request header pair
-        const { isApplied, matchedPair } = matchRuleWithRequest(rule, {
-          url: details.url,
-          method: details.method,
-          type: details.type as any,
-          initiatorDomain: details.initiator,
-        });
-        if (isApplied && matchedPair.modifications?.Request && matchedPair.modifications?.Request?.length > 0) {
-          ruleExecutionHandler.onRuleExecuted(rule, details);
-        }
-        break;
-      default:
-        // Do nothing
-        break;
-    }
+  rulesStorageService.getEnabledRules().then((enabledRules) => {
+    enabledRules.forEach((rule) => {
+      switch (rule.ruleType) {
+        case RuleType.HEADERS:
+        case RuleType.USERAGENT:
+          // TODO: Match only incase of any request header pair
+          const { isApplied, matchedPair } = matchRuleWithRequest(rule, {
+            url: details.url,
+            method: details.method,
+            type: details.type as any,
+            initiatorDomain: details.initiator,
+          });
+          if (isApplied && matchedPair.modifications?.Request && matchedPair.modifications?.Request?.length > 0) {
+            ruleExecutionHandler.onRuleExecuted(rule, details);
+          }
+          break;
+        default:
+          // Do nothing
+          break;
+      }
+    });
   });
 };
 
 const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails) => {
-  const enabledRules = rulesStorageService.getEnabledRules();
-
-  enabledRules.forEach((rule) => {
-    switch (rule.ruleType) {
-      case RuleType.HEADERS:
-        // TODO: Match only incase of any response header pair
-        const { isApplied, matchedPair } = matchRuleWithRequest(rule, {
-          url: details.url,
-          method: details.method,
-          type: details.type as any,
-          initiatorDomain: details.initiator,
-        });
-        if (isApplied && matchedPair.modifications?.Response && matchedPair.modifications?.Response?.length > 0) {
-          ruleExecutionHandler.onRuleExecuted(rule, details);
-        }
-        break;
-      default:
-        break;
-    }
+  rulesStorageService.getEnabledRules().then((enabledRules) => {
+    enabledRules.forEach((rule) => {
+      switch (rule.ruleType) {
+        case RuleType.HEADERS:
+          // TODO: Match only incase of any response header pair
+          const { isApplied, matchedPair } = matchRuleWithRequest(rule, {
+            url: details.url,
+            method: details.method,
+            type: details.type as any,
+            initiatorDomain: details.initiator,
+          });
+          if (isApplied && matchedPair.modifications?.Response && matchedPair.modifications?.Response?.length > 0) {
+            ruleExecutionHandler.onRuleExecuted(rule, details);
+          }
+          break;
+        default:
+          break;
+      }
+    });
   });
 };
 

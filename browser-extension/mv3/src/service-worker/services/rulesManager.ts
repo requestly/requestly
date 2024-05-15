@@ -1,9 +1,10 @@
 import config from "common/config";
-import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
+import { onRuleOrGroupChange } from "common/rulesStore";
 import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
 import { isExtensionEnabled } from "./utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
+import rulesStorageService from "../../rulesStorageService";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
@@ -32,7 +33,7 @@ const deleteExtensionRules = async (): Promise<void> => {
 };
 
 const addExtensionRules = async (): Promise<void> => {
-  const enabledRules = await getEnabledRules();
+  const enabledRules = await rulesStorageService.getEnabledRules();
   const parsedExtensionRules: chrome.declarativeNetRequest.Rule[] = [];
 
   const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});

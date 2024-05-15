@@ -1,16 +1,16 @@
-import { getEnabledRules } from "common/rulesStore";
 import { RuleType, ScriptObject, ScriptRulePair } from "common/types";
 import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectScript } from "./utils";
 import ruleExecutionHandler from "./ruleExecutionHandler";
+import rulesStorageService from "../../rulesStorageService";
 
 export const applyScriptRules = async (tabId: number, frameId: number, url: string) => {
   if (isBlacklistedURL(url)) {
     return;
   }
 
-  const scriptRules = await getEnabledRules(RuleType.SCRIPT);
+  const scriptRules = await rulesStorageService.getEnabledRules(RuleType.SCRIPT);
   const scripts: ScriptObject[] = [];
 
   const appliedScriptRuleIds = new Set<string>();
