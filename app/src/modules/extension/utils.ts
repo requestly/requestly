@@ -32,8 +32,11 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
   const rulesMigrationLogs: Record<string, any> = {};
   const migratedRules: Rule[] = [];
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const forceMigrate = urlParams.get("updatedToMv3") != null;
+
   const finalRules = rules.map((rule) => {
-    const { rule: migratedRule, ruleMigrationLogs, isMigrated } = migrateRuleToMV3(rule);
+    const { rule: migratedRule, ruleMigrationLogs, isMigrated } = migrateRuleToMV3(rule, forceMigrate);
     if (ruleMigrationLogs) {
       rulesMigrationLogs[migratedRule.id] = ruleMigrationLogs;
     }
@@ -75,8 +78,11 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
   return finalRules;
 };
 
-export const migrateRuleToMV3 = (rule: Rule): { isMigrated: boolean; rule: Rule; ruleMigrationLogs: any } => {
-  if (rule?.schemaVersion === "3.0.0") {
+export const migrateRuleToMV3 = (
+  rule: Rule,
+  forceMigrate = false
+): { isMigrated: boolean; rule: Rule; ruleMigrationLogs: any } => {
+  if (rule?.schemaVersion === "3.0.0" && !forceMigrate) {
     return {
       isMigrated: false,
       rule,
@@ -85,7 +91,7 @@ export const migrateRuleToMV3 = (rule: Rule): { isMigrated: boolean; rule: Rule;
   }
 
   const ruleMigrationLogs: Record<string, any>[] = [];
-  Logger.log("[Debug][MV3.migrateRuleToMV3] Rule Migration Started", { rule });
+  Logger.log("[Debug][MV3.migrateRuleToMV3] Rule Migration Started", { rule, forceMigrate });
 
   rule.pairs.forEach((pair) => {
     const pathMigrationStatus = migratePathOperator(pair.source);
