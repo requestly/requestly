@@ -57,7 +57,6 @@ export const AddMembersTableActions: React.FC<{ member: OrgMember }> = ({ member
           {isUserAdmin && (
             <Row justify="end">
               <RQButton
-                type="text"
                 icon={<IoMdAdd />}
                 className="billing-team-members-add-btn"
                 loading={isAddingUser}

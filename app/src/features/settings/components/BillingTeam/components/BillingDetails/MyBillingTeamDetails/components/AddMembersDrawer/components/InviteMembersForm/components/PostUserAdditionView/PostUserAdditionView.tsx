@@ -19,6 +19,9 @@ export const PostUserAdditionView: React.FC<PostUserAdditionViewProps> = ({
         <LottieAnimation animationData={animationData} animationName="member added successfully" />
       </div>
       <div className="post-user-addition-view-title">All set from your end</div>
+      <div className="post-user-addition-view-description">
+        An email notification has been sent to the users that you have added them to the billing team.
+      </div>
       <div className="post-user-addition-view-actions">
         <RQButton type="primary" onClick={toggleInviteFormVisibility}>
           Back to members list

@@ -7,22 +7,26 @@ import { PostUserAdditionView } from "./components/PostUserAdditionView/PostUser
 import { ExternalDomainWarningBanner } from "./components/ExternalDomainWarningBanner/ExternalDomainWarningBanner";
 import Logger from "../../../../../../../../../../../../../common/logger";
 import { inviteUsersToBillingTeam } from "backend/billing";
-import "./inviteMembersForm.scss";
 import { toast } from "utils/Toast";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import {
   trackBillingTeamInviteSendingFailed,
   trackBillingTeamInviteSentSuccessfully,
 } from "features/settings/analytics";
+import "./inviteMembersForm.scss";
 
 interface InviteMembersFormProps {
   billingId: string;
+  searchValue: string;
+  setSearchValue: (value: string) => void;
   toggleInviteFormVisibility: () => void;
   closeAddMembersDrawer: () => void;
 }
 
 export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
   billingId,
+  searchValue,
+  setSearchValue,
   toggleInviteFormVisibility,
   closeAddMembersDrawer,
 }) => {
@@ -95,13 +99,25 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
           You can invite multiple members by typing their email and pressing `Enter` key.
         </div>
         <div className="invite-emails-wrapper">
-          <EmailInputWithDomainBasedSuggestions autoFocus transparentBackground onChange={handleEmailsChange} />
+          <EmailInputWithDomainBasedSuggestions
+            autoFocus
+            transparentBackground
+            onChange={handleEmailsChange}
+            defaultValue={searchValue}
+          />
         </div>
         <div className="billing-team-invite-members-form-actions">
           <RQButton loading={isLoading} type="primary" htmlType="submit">
             Add to billing team
           </RQButton>
-          <RQButton disabled={isLoading} type="default" onClick={toggleInviteFormVisibility}>
+          <RQButton
+            disabled={isLoading}
+            type="default"
+            onClick={() => {
+              toggleInviteFormVisibility();
+              setSearchValue("");
+            }}
+          >
             Back to members list
           </RQButton>
         </div>

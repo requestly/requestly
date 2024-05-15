@@ -101,6 +101,8 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
             toggleInviteFormVisibility={() => setIsInviteFormVisible(!isInviteFormVisible)}
             closeAddMembersDrawer={onClose}
             billingId={billingId}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
           />
         ) : (
           <AddMembersTable
