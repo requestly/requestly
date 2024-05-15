@@ -36,34 +36,22 @@ export const initTestRuleHandler = () => {
   });
 };
 
-const showExplicitTestRuleWidget = async (ruleId: string, forceShow = false) => {
+const showExplicitTestRuleWidget = async (ruleId: string) => {
   const widget = document.querySelector("rq-explicit-test-rule-widget");
 
   if (widget) {
-    if (forceShow) {
-      widget.remove();
-    } else {
-      return;
-    }
+    return;
   }
 
   const ruleDetails = await getRule(ruleId);
   const { name: ruleName } = ruleDetails;
-
-  let appliedRules: Rule[];
-
-  if (forceShow) {
-    appliedRules = await RuleExecutionHandler.getExecutedRules();
-  }
 
   const testRuleWidget = document.createElement("rq-explicit-test-rule-widget");
   testRuleWidget.classList.add("rq-element");
   testRuleWidget.setAttribute("rule-id", ruleId);
   testRuleWidget.setAttribute("rule-name", ruleName);
   setWidgetInfoText(testRuleWidget, ruleDetails);
-
-  const isRuleApplied = forceShow ? true : appliedRules?.some((rule: Rule) => rule.id === ruleId) ?? false;
-  testRuleWidget.setAttribute("applied-status", isRuleApplied.toString());
+  testRuleWidget.setAttribute("applied-status", "false");
 
   document.documentElement.appendChild(testRuleWidget);
 
@@ -74,6 +62,14 @@ const showExplicitTestRuleWidget = async (ruleId: string, forceShow = false) => 
       appliedStatus: testRuleWidget?.getAttribute("applied-status") === "true",
     });
   });
+
+  const appliedRules = await RuleExecutionHandler.getExecutedRules();
+
+  if (appliedRules) {
+    appliedRules?.forEach((rule: Rule) => {
+      notifyRuleAppliedToExplicitWidget(rule.id);
+    });
+  }
 };
 
 const setWidgetInfoText = (testRuleWidget: HTMLElement, ruleDetails: Rule) => {
@@ -105,7 +101,6 @@ const notifyRuleAppliedToExplicitWidget = (ruleId: string) => {
   const explicitTestRuleWidget = document.querySelector("rq-explicit-test-rule-widget");
 
   if (!explicitTestRuleWidget) {
-    showExplicitTestRuleWidget(ruleId, true);
     return;
   }
 
