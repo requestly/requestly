@@ -77,7 +77,7 @@ export function NotificationCard() {
         <div className="content">
           <Typography.Text className="content-header">Important update!</Typography.Text>
           <Typography.Text className="content-text">
-            Rules upgraded to support MV3 changes. Click here to know more.
+            Rules updated to support upcoming MV3 changes. Click here to know more.
           </Typography.Text>
         </div>
       </div>
