@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ChangeLog from "./ChangeLog";
+// import ChangeLog from "./ChangeLog";
 import MigratedRules from "./MigratedRulesLog";
 
 import { Modal, Typography } from "antd";
@@ -9,13 +9,16 @@ import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
 
 import "./modal.scss";
 import { useRulesModalsContext } from "features/rules/context/modals";
+import { CiMail } from "@react-icons/all-files/ci/CiMail";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import LINKS from "config/constants/sub/links";
 
 const Header = () => {
   return (
     <div className="modal-header">
-      <img src={BannerImage} alt="Requestly Logo" className="banner-img" />
+      <img src={BannerImage} alt="Requestly Logo" className="banner-img" width={150} />
       <div className="header">
-        <Typography.Text className="title">Rules upgraded to support upcoming MV3 extension</Typography.Text>
+        <Typography.Text className="title">Important Changes to your HTTP Rules data</Typography.Text>
         <a
           href="https://github.com/requestly/requestly/issues/1690"
           className="external-link icon__wrapper"
@@ -37,9 +40,9 @@ const InfoSection = () => {
         <Typography.Text className="title">What is MV3</Typography.Text>
       </div> */}
       <div className="text">
-        To support our upcoming MV3 extension release, we've migrated some of your rules to the new schema. All your
-        rules should work as expected, but some rules need to be verified before use as there might be some changes.
-        Please review the impacted rules listed below.
+        To support our upcoming MV3 extension release, we've migrated some of your rules to the new schema.{" "}
+        <b>All your rules should work as expected</b>, but some rules need to be verified before use as there might be
+        some changes. Please review the impacted rules listed below.
       </div>
     </div>
   );
@@ -72,6 +75,25 @@ export const MV3MigrationModal = () => {
         <InfoSection />
         <MigratedRules />
         {/* <ChangeLog /> */}
+      </div>
+      <div className="migration-modal-footer">
+        <Typography.Text className="text-with-images">
+          Contact us if you have any questions or need assistance.
+          <a
+            href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`}
+            className="blue-text"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <CiMail /> Contact Us
+          </a>
+        </Typography.Text>
+        <Typography.Text className="text-with-images">
+          To report Issues related to MV3, please open an issue here{" "}
+          <a href={`${LINKS.REQUESTLY_GITHUB_ISSUES}`} className="red-text" target="_blank" rel="noreferrer">
+            Report Issue <RxExternalLink />
+          </a>
+        </Typography.Text>
       </div>
     </Modal>
   );

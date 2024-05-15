@@ -6,18 +6,16 @@ import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import LINKS from "config/constants/sub/links";
-
-import { Typography } from "antd";
+import { Popover, Typography } from "antd";
 
 import RuleIcon from "components/common/RuleIcon";
 import { IoWarningOutline } from "@react-icons/all-files/io5/IoWarningOutline";
 import { RxExternalLink } from "@react-icons/all-files/rx/RxExternalLink";
-import { CiMail } from "@react-icons/all-files/ci/CiMail";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleMigrationChange, getMV3MigrationData } from "modules/extension/utils";
 import { isEmpty } from "lodash";
+import pathContainsImg from "./path-contains.png";
+import pageUrlSourceFilterImg from "./source-filter-page-url.png";
 
 const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
   const navigate = useNavigate();
@@ -34,14 +32,29 @@ const MigratedRuleTile = ({ currentRule, ruleMigrationData }) => {
       <ul>
         {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PATH_MIGRATED) && (
           <li className="migrated-rule-description">
-            <Typography.Text code>Path</Typography.Text> source changed to → <Typography.Text code>URL</Typography.Text>
-            .
+            <Popover content={<img src={pathContainsImg} width={200} alt="path-migration" />} trigger="hover">
+              <a
+                href="https://developers.requestly.com/http-rules/map-local-url-redirect/#72394d506ece433288b806a0f2d80589"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Typography.Text code>Path</Typography.Text>
+              </a>
+            </Popover>{" "}
+            source condition changed to → <Typography.Text code>URL</Typography.Text>.
           </li>
         )}
         {ruleMigrationData.some((e) => e.type === RuleMigrationChange.SOURCE_PAGEURL_MIGRATED) && (
           <li className="migrated-rule-description">
-            <Typography.Text code>Page URL</Typography.Text> source filter changed to →{" "}
-            <Typography.Text code>Page Domains</Typography.Text>.
+            <Popover
+              content={<img src={pageUrlSourceFilterImg} width={200} alt="page-url-source-filter-migration" />}
+              trigger="hover"
+            >
+              <a href="https://developers.requestly.com/http-rules/advance-targeting/" target="_blank" rel="noreferrer">
+                <Typography.Text code>Page URL</Typography.Text>{" "}
+              </a>
+            </Popover>
+            advance filter changed to → <Typography.Text code>Page Domains</Typography.Text>.
           </li>
         )}
       </ul>
@@ -97,21 +110,6 @@ const MigratedRules = () => {
         {Object.values(rulesData).map((ruleData, idx) => (
           <MigratedRuleTile currentRule={ruleData} ruleMigrationData={migratedRulesLogs[ruleData.id]} key={idx} />
         ))}
-      </div>
-
-      <div className="text">
-        <Typography.Text className="text-with-images">
-          Contact us if you have any questions or need assistance.
-          <a href={`mailto:${GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}`} className=" blue-text">
-            <CiMail /> Contact Us
-          </a>
-        </Typography.Text>
-        <Typography.Text className="text-with-images">
-          To report Issues related to MV3, please open an issue here{" "}
-          <a href={`${LINKS.REQUESTLY_GITHUB_ISSUES}`} className="red-text">
-            Report Issue <RxExternalLink />
-          </a>
-        </Typography.Text>
       </div>
     </div>
   ) : null;
