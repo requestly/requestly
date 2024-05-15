@@ -1,4 +1,4 @@
-import { RulePairSource, SourceKey, SourceOperator } from "../../../types/rules";
+import { RulePairSource, SourceFilter, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
@@ -104,7 +104,9 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
 
 export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   const condition: ExtensionRuleCondition = {};
-  const filters = source.filters?.filter((filter) => filter != null);
+  const filters =
+    //@ts-ignore
+    Array.isArray(source.filters) && source.filters.length ? source.filters : [source.filters as SourceFilter];
 
   const requestMethods = new Set<ExtensionRequestMethod>();
   const resourceTypes = new Set<ExtensionResourceType>();
