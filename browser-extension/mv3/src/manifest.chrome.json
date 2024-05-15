@@ -49,14 +49,15 @@
     ]
   },
   "permissions": [
+    "storage",
     "contextMenus",
     "declarativeNetRequest",
     "declarativeNetRequestFeedback",
     "scripting",
-    "storage",
     "tabs",
     "webRequest",
-    "webNavigation"
+    "webNavigation",
+    "unlimitedStorage"
   ],
   "host_permissions": ["<all_urls>"],
   "commands": {}
