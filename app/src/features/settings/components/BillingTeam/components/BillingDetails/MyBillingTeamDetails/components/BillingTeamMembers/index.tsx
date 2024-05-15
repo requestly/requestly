@@ -8,6 +8,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { BillingTeamMemberStatus, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import { BillingAction } from "./types";
 import { removeMemberFromBillingTeam, revokeBillingTeamInvite, updateBillingTeamMemberRole } from "backend/billing";
+import { ActionLoadingModal } from "componentsV2/modals/ActionLoadingModal";
 import { toast } from "utils/Toast";
 import type { MenuProps } from "antd";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
@@ -41,6 +42,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     billingTeamMembers?.[user?.details?.profile?.uid] &&
     billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
   const [loadingRows, setLoadingRows] = useState<string[]>([]);
+  const [isLoadingModalVisible, setIsLoadingModalVisible] = useState(false);
 
   const checkIsPendingMember = useCallback((member: any) => {
     return member.status === BillingTeamMemberStatus.PENDING;
@@ -77,6 +79,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         })
         .finally(() => {
           setLoadingRows(loadingRows.filter((row) => row !== id));
+          setIsLoadingModalVisible(false);
         });
     },
     [billingId, loadingRows]
@@ -94,6 +97,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         })
         .finally(() => {
           setLoadingRows(loadingRows.filter((row) => row !== id));
+          setIsLoadingModalVisible(false);
         });
     },
     [billingId, loadingRows]
@@ -103,6 +107,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
     (id: string, email: string, status: BillingTeamMemberStatus, inviteId?: string) => {
       trackBillingTeamActionClicked(BillingAction.REMOVE);
       setLoadingRows([...loadingRows, id]);
+      setIsLoadingModalVisible(true);
       if (status === BillingTeamMemberStatus.PENDING) {
         handleInvokePendingMemberInvite(inviteId, email, id);
       } else {
@@ -341,6 +346,12 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
           loading={!billingTeamMembers}
         />
       </Col>
+      <ActionLoadingModal
+        isOpen={isLoadingModalVisible}
+        onClose={() => setIsLoadingModalVisible(false)}
+        title="Removing user..."
+        message="Pleae wait while we process your request"
+      />
     </>
   );
 };
