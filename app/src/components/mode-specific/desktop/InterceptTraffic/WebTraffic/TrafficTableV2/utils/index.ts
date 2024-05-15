@@ -114,8 +114,8 @@ export const createResponseMock = (ruleParams: {
     responseRulePair.source.operator = GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS;
   } else if (ruleParams.urlMatcher === GLOBAL_CONSTANTS.RULE_KEYS.PATH) {
     responseRulePair.source.value = ruleParams.requestDetails.path;
-    responseRulePair.source.key = ruleParams.urlMatcher;
-    responseRulePair.source.operator = GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS;
+    responseRulePair.source.key = GLOBAL_CONSTANTS.RULE_KEYS.URL;
+    responseRulePair.source.operator = GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS;
   } else if (ruleParams.urlMatcher === "path_query") {
     const urlObject = new URL(ruleParams.requestUrl);
     responseRulePair.source.value = urlObject.pathname + urlObject.search;
