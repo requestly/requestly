@@ -95,7 +95,7 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.GET_EXECUTED_RULES:
-        ruleExecutionHandler.getExecutedRules(message.tabId).then(sendResponse);
+        ruleExecutionHandler.getExecutedRules(message.tabId ?? sender.tab.id).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT:

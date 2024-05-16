@@ -1,38 +1,28 @@
-import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
-import { Rule, RuleType } from "common/types";
 import { AJAXRequestDetails } from "./types";
 import { forwardHeadersOnRedirect } from "./handleHeadersOnRedirect";
 import { handleInitiatorDomainFunction } from "./handleInitiatorDomainFunction";
+import rulesStorageService from "../../../rulesStorageService";
+import { RuleType } from "common/types";
 
 class RequestProcessor {
-  cachedRules: Record<string, Rule[]> = {
-    redirectRules: [],
-    replaceRules: [],
-    headerRules: [],
-  };
-
-  private updateCachedRules = async () => {
-    this.cachedRules.redirectRules = await getEnabledRules(RuleType.REDIRECT);
-    this.cachedRules.replaceRules = await getEnabledRules(RuleType.REPLACE);
-    this.cachedRules.headerRules = await getEnabledRules(RuleType.HEADERS);
-  };
-
-  constructor() {
-    this.updateCachedRules();
-    onRuleOrGroupChange(this.updateCachedRules.bind(this));
-  }
+  constructor() {}
 
   onBeforeAJAXRequest = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
-    if (Object.values(this.cachedRules).every((rules) => rules.length === 0)) {
+    const enabledRules = await rulesStorageService.getEnabledRules();
+
+    if (enabledRules.length === 0) {
       return;
     }
 
-    await forwardHeadersOnRedirect(tabId, requestDetails, [
-      ...requestProcessor.cachedRules.redirectRules,
-      ...requestProcessor.cachedRules.replaceRules,
-    ]);
+    const redirectReplaceRules = enabledRules.filter(
+      (rule) => rule.ruleType === RuleType.REDIRECT || rule.ruleType === RuleType.REPLACE
+    );
 
-    await handleInitiatorDomainFunction(tabId, requestDetails, requestProcessor.cachedRules.headerRules);
+    const headerRules = enabledRules.filter((rule) => rule.ruleType === RuleType.HEADERS);
+
+    await forwardHeadersOnRedirect(tabId, requestDetails, redirectReplaceRules);
+
+    await handleInitiatorDomainFunction(tabId, requestDetails, headerRules);
   };
 }
 
