@@ -1,5 +1,4 @@
 import { ReplaceRule } from "../../../types/rules";
-import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRule, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
@@ -10,10 +9,10 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
 
   rule.pairs.forEach((rulePair, pairIndex) => {
     if (!rulePair.source.value) {
-      extensionRules.push({
+      const ruleCondition = {
         condition: {
           regexFilter: `(.*)${rulePair.from}(.*)`,
-          excludedRequestDomains: BLACKLISTED_DOMAINS,
+          ...parseConditionFromSource(rulePair.source),
         },
         action: {
           type: RuleActionType.REDIRECT,
@@ -21,7 +20,9 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
             regexSubstitution: `\\1${rulePair.to}\\2`,
           },
         },
-      });
+      };
+      delete ruleCondition.condition.urlFilter;
+      extensionRules.push(ruleCondition);
       return;
     }
 

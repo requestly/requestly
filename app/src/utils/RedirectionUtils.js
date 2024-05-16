@@ -44,10 +44,14 @@ export const redirectToCreateRuleEditor = (navigate, rule) => {
 };
 
 /* FEATURE - RULES - Edit a Rule */
-export const redirectToRuleEditor = (navigate, ruleId, source) => {
-  navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
-    state: { source },
-  });
+export const redirectToRuleEditor = (navigate, ruleId, source, newTab = false) => {
+  if (newTab) {
+    window.open(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, "_blank");
+  } else {
+    navigate(`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${ruleId}`, {
+      state: { source },
+    });
+  }
 };
 
 /* FEATURE - SHARED LIST */

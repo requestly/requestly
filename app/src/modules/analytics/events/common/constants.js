@@ -109,6 +109,7 @@ export const SOURCE = {
   RULE_GROUP: "rule_group",
   TEMPLATES_SCREEN: "templates_screen",
   PLAN_EXPIRED_BANNER: "plan_expired_banner",
+  MV3_MODAL: "mv3_modal",
 };
 
 export const RULES = {

@@ -6,12 +6,14 @@ import { StorageService } from "init";
 import { useDispatch } from "react-redux";
 import { isGroupsSanitizationPassed } from "components/features/rules/RulesIndexPage/actions";
 import { recordsActions } from "store/features/rules/slice";
-import { Group, Rule, RecordStatus, RecordType } from "features/rules/types/rules";
+import { Group, RecordStatus, RecordType, Rule } from "features/rules/types/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import Logger from "../../../../../../../../../common/logger";
 import { trackRulesListLoaded } from "features/rules/analytics";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { migrateAllRulesToMV3 } from "modules/extension/utils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -23,6 +25,8 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
   const appMode = useSelector(getAppMode);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const isRulesListHardRefreshPending = useSelector(getIsHardRefreshRulesPending);
+  const activeWorkspace = useSelector(getCurrentlyActiveWorkspace);
+
   const hasIsRulesListRefreshPendingChanged = useHasChanged(isRulesListRefreshPending);
   const hasIsRulesListHardRefreshPendingChanged = useHasChanged(isRulesListHardRefreshPending);
 
@@ -43,7 +47,10 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     Promise.all([groupsPromise, rulesPromise])
       .then(async (data) => {
         const groups = data[0] as Group[];
-        const rules = data[1] as Rule[];
+        let rules = data[1] as Rule[];
+
+        //@ts-ignore
+        rules = migrateAllRulesToMV3(rules, activeWorkspace.id);
 
         Logger.log("DBG: fetched data", JSON.stringify({ rules, groups }));
 
@@ -91,6 +98,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     appMode,
     hasIsRulesListRefreshPendingChanged,
     hasIsRulesListHardRefreshPendingChanged,
+    activeWorkspace.id,
   ]);
 };
 

@@ -6,6 +6,7 @@ import Logger from "lib/logger";
 import { runRuleMigrations } from "utils/rules/ruleMigrations";
 import APP_CONSTANTS from "config/constants";
 import { RecordStatus } from "features/rules";
+import { migrateRuleToMV3 } from "modules/extension/utils";
 //CONSTANTS
 const { RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 
@@ -78,8 +79,11 @@ const setUnknownGroupIdsToUngroupped = (rulesArray, groupsIdObject) => {
 
 export const processDataToImport = (incomingArray, user, allRules, overwrite = true) => {
   const data = filterRulesAndGroups(incomingArray);
-  const rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
+
+  let rules = runRuleMigrations(data.rules.filter((object) => isObjectValid(object)));
   const groups = data.groups.filter((object) => isObjectValid(object));
+
+  rules = rules.map((rule) => migrateRuleToMV3(rule).rule);
 
   if (!overwrite) {
     setNewIdofRules(rules);
