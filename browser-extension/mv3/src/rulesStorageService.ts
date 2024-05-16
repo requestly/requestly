@@ -31,6 +31,14 @@ class RulesStorageService {
     return this.groups;
   };
 
+  getRule = async (id: string): Promise<Rule> => {
+    return this.getAllRules().then((rules) => rules.find((rule) => rule.id === id));
+  };
+
+  getRules = async (ids: string[]): Promise<Rule[]> => {
+    return this.getAllRules().then((rules) => rules.filter((rule) => ids.includes(rule.id)));
+  };
+
   getEnabledRules = async (ruleType?: RuleType): Promise<Rule[]> => {
     const rules = await this.getAllRules();
     const groups = await this.getAllGroups();
@@ -58,7 +66,7 @@ class RulesStorageService {
     });
   };
 
-  //TODO: add onRuleOrGroupChange listener here then only it can be used in content scripts/ or wherever onRuleOrGroupChange is being used
+  //TODO: add onRuleOrGroupChange listener here then only it can be used wherever onRuleOrGroupChange listener on storage is being used
 }
 
 const rulesStorageService = new RulesStorageService();

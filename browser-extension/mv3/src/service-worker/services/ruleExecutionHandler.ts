@@ -1,7 +1,7 @@
 import { Rule } from "common/types";
 import extensionIconManager from "./extensionIconManager";
 import { DataScope, TAB_SERVICE_DATA, tabService } from "./tabService";
-import { getRecords } from "common/storage";
+import rulesStorageService from "../../rulesStorageService";
 import { CLIENT_MESSAGES } from "common/constants";
 
 interface RulesExecutionLog {
@@ -18,7 +18,8 @@ class RuleExecutionHandler {
 
     const appliedRuleIds = rulesExecutionLogs.map((executionLog) => executionLog.ruleId).filter((id) => !!id);
     const uniqueAppliedRuleIds = Array.from(new Set(appliedRuleIds));
-    const appliedRules = await getRecords(uniqueAppliedRuleIds);
+    const appliedRules = await rulesStorageService.getRules(uniqueAppliedRuleIds);
+
     return appliedRules;
   };
 
