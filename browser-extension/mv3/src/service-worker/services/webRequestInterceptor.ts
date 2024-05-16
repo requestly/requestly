@@ -1,7 +1,7 @@
-import { getEnabledRules } from "common/rulesStore";
 import { RuleType } from "common/types";
 import { matchRuleWithRequest } from "./ruleMatcher";
 import ruleExecutionHandler from "./ruleExecutionHandler";
+import rulesStorageService from "../../rulesStorageService";
 
 const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
   // @ts-ignore
@@ -9,7 +9,7 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
     return;
   }
 
-  getEnabledRules().then((enabledRules) => {
+  rulesStorageService.getEnabledRules().then((enabledRules) => {
     let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
     enabledRules.forEach((rule) => {
@@ -37,7 +37,7 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
 };
 
 const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails) => {
-  getEnabledRules().then((enabledRules) => {
+  rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
         case RuleType.HEADERS:
@@ -62,7 +62,7 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
 };
 
 const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails) => {
-  getEnabledRules().then((enabledRules) => {
+  rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
         case RuleType.HEADERS:

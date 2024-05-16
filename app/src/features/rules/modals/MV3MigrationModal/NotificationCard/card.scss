@@ -19,6 +19,7 @@
   /* effect-glass */
   box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(12px);
+  z-index: 999999;
 
   .content-container {
     display: flex;
