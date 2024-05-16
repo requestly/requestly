@@ -1,5 +1,11 @@
 import { trackEvent } from "modules/analytics";
-import { GROUPS, RULES } from "./constants";
+import {
+  GROUPS,
+  MIGRATION_NOTIFICATION_CLICKED,
+  MIGRATION_NOTIFICATION_CLOSED,
+  MIGRATION_NOTIFICATION_SHOWN,
+  RULES,
+} from "./constants";
 
 // groups
 export const trackGroupStatusToggled = (enabled: boolean) => {
@@ -76,4 +82,19 @@ export const trackRulesListLoaded = (
 ) => {
   const params = { num_rules, num_active_rules, num_active_premium_rules, num_groups };
   trackEvent(RULES.RULES_LIST_LOADED, params);
+};
+
+export const trackMigrationNotificationShown = () => {
+  const params = {};
+  trackEvent(MIGRATION_NOTIFICATION_SHOWN, params);
+};
+
+export const trackMigrationNotificationClicked = () => {
+  const params = {};
+  trackEvent(MIGRATION_NOTIFICATION_CLICKED, params);
+};
+
+export const trackMigrationNotificationClosed = () => {
+  const params = {};
+  trackEvent(MIGRATION_NOTIFICATION_CLOSED, params);
 };

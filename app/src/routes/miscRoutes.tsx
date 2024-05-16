@@ -19,6 +19,10 @@ export const miscRoutes: RouteObject[] = [
     element: <ExtensionInstalled />,
   },
   {
+    path: PATHS.EXTENSION_UPDATED.RELATIVE,
+    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE + "?updatedToMV3"} />,
+  },
+  {
     path: PATHS.INSTALL_EXTENSION.RELATIVE,
     // @ts-ignore: takes few props
     element: <InstallExtensionCTA />,

@@ -52,6 +52,7 @@ export const CLIENT_MESSAGES = {
   START_EXPLICIT_RULE_TESTING: "startExplicitRuleTesting",
   START_IMPLICIT_RULE_TESTING: "startImplicitRuleTesting",
   SYNC_APPLIED_RULES: "syncAppliedRules",
+  NOTIFY_RULE_EXECUTED: "notifyRuleExecuted",
 };
 
 export const STORAGE_TYPE = "local";
