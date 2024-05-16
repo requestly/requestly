@@ -3,24 +3,23 @@ import { redirectToRules } from "../../../../../../../../utils/RedirectionUtils"
 //EXTERNALS
 import { StorageService } from "../../../../../../../../init";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
-import { parseExtensionRules } from "modules/extension/ruleParser";
-import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { trackErrorInRuleCreation, trackRuleEditorClosed } from "modules/analytics/events/common/rules";
-import { snakeCase } from "lodash";
+import { cloneDeep, snakeCase } from "lodash";
 import Logger from "lib/logger";
 import * as Sentry from "@sentry/react";
 import { detectUnsettledPromise } from "utils/FunctionUtils";
+import { migrateRuleToMV3 } from "modules/extension/utils";
 
 export const saveRule = async (appMode, ruleObject, callback) => {
-  //Set the modification date of rule
-  const ruleToSave = {
-    ...ruleObject,
-    modificationDate: generateObjectCreationDate(),
-  };
+  let ruleToSave = cloneDeep(ruleObject);
 
-  if (isExtensionManifestVersion3()) {
-    ruleToSave.extensionRules = parseExtensionRules(ruleObject);
-  }
+  delete ruleToSave["schemaVersion"];
+  ruleToSave = migrateRuleToMV3(ruleToSave).rule;
+  // TODO: Remove above and uncomment below after all users migrated to MV3. This is just to maintain backward compatibility for path URL filter
+  // ruleToSave.extensionRules = parseDNRRules(ruleToSave);
+
+  //Set the modification date of rule
+  ruleToSave.modificationDate = generateObjectCreationDate();
 
   //Save the rule
   Logger.log("Writing to storage in saveRule");

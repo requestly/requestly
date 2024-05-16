@@ -1,4 +1,4 @@
-import { RulePairSource, SourceKey, SourceOperator } from "../../../types/rules";
+import { RulePairSource, SourceFilter, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
@@ -75,6 +75,8 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
     }
   }
 
+  // deprecated
+  // TODO: to be removed
   if (source.key === SourceKey.PATH) {
     switch (source.operator) {
       case SourceOperator.EQUALS: {
@@ -102,10 +104,13 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
 
 export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
   const condition: ExtensionRuleCondition = {};
-  const filters = source.filters?.filter((filter) => filter !== null);
+  const filters =
+    //@ts-ignore
+    Array.isArray(source.filters) && source.filters.length ? source.filters : [source.filters as SourceFilter];
 
   const requestMethods = new Set<ExtensionRequestMethod>();
   const resourceTypes = new Set<ExtensionResourceType>();
+  let pageDomains: string[];
 
   filters?.forEach((filter) => {
     filter?.requestMethod?.forEach((method) => {
@@ -114,6 +119,9 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
     filter?.resourceType?.forEach((resourceType) => {
       resourceTypes.add(resourceType as ExtensionResourceType);
     });
+    if (filter?.pageDomains?.length) {
+      pageDomains = filter?.pageDomains;
+    }
   });
 
   if (requestMethods.size) {
@@ -122,6 +130,10 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
 
   if (resourceTypes.size) {
     condition.resourceTypes = Array.from(resourceTypes);
+  }
+
+  if (pageDomains?.length) {
+    condition.initiatorDomains = pageDomains;
   }
 
   return condition;
