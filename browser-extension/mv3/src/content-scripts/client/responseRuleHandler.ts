@@ -3,14 +3,14 @@ import { ResponseRulePair, RuleType } from "common/types";
 import { cacheJsonOnPage } from "../../utility-scripts/cacheJson/cacheJsonUtils";
 
 const cacheResponseRules = async () => {
-  const reponseRules = await getEnabledRules(RuleType.RESPONSE);
+  const responseRules = await getEnabledRules(RuleType.RESPONSE);
 
-  if (!reponseRules.length) {
+  if (!responseRules.length) {
     return;
   }
 
   cacheJsonOnPage({
-    responseRules: reponseRules.map((rule) => {
+    responseRules: responseRules.map((rule) => {
       const responseRulePair = rule.pairs[0] as ResponseRulePair;
       return {
         id: rule.id,

@@ -5,6 +5,7 @@ import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
 import config from "common/config";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
+import extensionIconManager from "./extensionIconManager";
 
 const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 
@@ -50,13 +51,12 @@ export const initSessionRecordingSDK = async (tabId: number, frameId: number) =>
 
 export const onSessionRecordingStartedNotification = (tabId: number, markIcon: boolean) => {
   if (markIcon) {
-    chrome.action.setBadgeText({ tabId, text: "REC" });
-    chrome.action.setBadgeBackgroundColor({ tabId, color: "#e34850" });
+    extensionIconManager.markRecording(tabId);
   }
 };
 
 export const onSessionRecordingStoppedNotification = (tabId: number) => {
-  chrome.action.setBadgeText({ tabId, text: "" });
+  extensionIconManager.markNotRecording(tabId);
 };
 
 export const getTabSession = (tabId: number, callback: () => void) => {

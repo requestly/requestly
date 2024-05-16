@@ -18,7 +18,9 @@ class RuleExecutionHandler {
   };
 
   getExecutedRules = async () => {
-    return chrome.runtime.sendMessage(EXTENSION_MESSAGES.GET_EXECUTED_RULES);
+    return chrome.runtime.sendMessage({
+      action: EXTENSION_MESSAGES.GET_EXECUTED_RULES,
+    });
   };
 
   onRuleExecuted = (
