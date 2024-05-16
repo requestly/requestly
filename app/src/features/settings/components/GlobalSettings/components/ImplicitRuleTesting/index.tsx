@@ -6,7 +6,6 @@ import { RuleTypesOptions } from "./components/RuleTypesOptions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import APP_CONSTANTS from "config/constants";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { getImplicitRuleTestingWidgetConfig, updateImplictRuleTestingWidgetConfig } from "./utils";
 
 export const ImplicitRuleTesting = () => {
@@ -16,7 +15,6 @@ export const ImplicitRuleTesting = () => {
   const [widgetVisibility, setWidgetVisibility] = useState(
     GLOBAL_CONSTANTS.IMPLICIT_RULE_TESTING_WIDGET_VISIBILITY.ALL
   );
-  const implicitRuleTestingFlag = useFeatureValue("implicit_test_this_rule", null);
 
   const isCompatible = useMemo(() => isFeatureCompatible(APP_CONSTANTS.FEATURES.IMPLICIT_TEST_THIS_RULE), []);
 
@@ -44,8 +42,7 @@ export const ImplicitRuleTesting = () => {
   }, [appMode]);
 
   return (
-    isCompatible &&
-    implicitRuleTestingFlag?.enabled && (
+    isCompatible && (
       <SettingsItem
         isActive={isImplicitRuleTestingEnabled}
         onChange={handleImplicitRuleTestingToggleChange}
