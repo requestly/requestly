@@ -14,6 +14,7 @@ import Logger from "../../../../../../../../../common/logger";
 import { trackRulesListLoaded } from "features/rules/analytics";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { migrateAllRulesToMV3 } from "modules/extension/utils";
+import { sendIndividualRuleTypesCountAttributes } from "../utils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -86,6 +87,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
           TRACKING.ATTR.NUM_ACTIVE_GROUPS,
           groups.filter((group) => group.status === RecordStatus.ACTIVE).length
         );
+        sendIndividualRuleTypesCountAttributes(rules);
         trackRulesListLoaded(rules.length, activeRulesCount, activePremiumRules.length, groups.length);
       })
       .catch((err) => {

@@ -1,5 +1,8 @@
 import { FilterType } from "componentsV2/ContentList";
 import { RecordStatus, StorageRecord } from "features/rules/types/rules";
+import { submitAttrUtil } from "utils/AnalyticsUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { Rule } from "../../../../../types/rules";
 
 // FIXME: Performance Improvements
 // TODO: REname
@@ -31,5 +34,26 @@ const getQuickFilteredRecords = (records: StorageRecord[], filterType: FilterTyp
       });
     default:
       return records;
+  }
+};
+
+export const sendIndividualRuleTypesCountAttributes = (rules: Rule[]) => {
+  if (rules) {
+    const ruleTypesCountMap = rules.reduce((accumulator, rule) => {
+      if (accumulator[rule.ruleType]) {
+        accumulator[rule.ruleType] += 1;
+      } else {
+        accumulator[rule.ruleType] = 1;
+      }
+      return accumulator;
+    }, {} as Record<string, number>);
+
+    Object.values(GLOBAL_CONSTANTS.RULE_TYPES).forEach((ruleType) => {
+      if (!ruleTypesCountMap[ruleType]) {
+        submitAttrUtil(ruleType + "_rules", 0);
+      }
+
+      submitAttrUtil(ruleType + "_rules", ruleTypesCountMap[ruleType]);
+    });
   }
 };
