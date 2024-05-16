@@ -35,10 +35,21 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
   const urlParams = new URLSearchParams(window.location.search);
   const forceMigrate = urlParams.get("updatedToMv3") != null;
 
+  let pathImpactedRulesCount = 0;
+  let pageUrlImpactedRulesCount = 0;
+
   const finalRules = rules.map((rule) => {
-    const { rule: migratedRule, ruleMigrationLogs, isMigrated } = migrateRuleToMV3(rule, forceMigrate);
+    const {
+      rule: migratedRule,
+      ruleMigrationLogs,
+      isMigrated,
+      isPathImpactedRule,
+      isPageUrlImpactedRule,
+    } = migrateRuleToMV3(rule, forceMigrate);
     if (ruleMigrationLogs) {
       rulesMigrationLogs[migratedRule.id] = ruleMigrationLogs;
+      pathImpactedRulesCount += isPathImpactedRule ? 1 : 0;
+      pageUrlImpactedRulesCount += isPageUrlImpactedRule ? 1 : 0;
     }
 
     if (isMigrated) {
@@ -63,7 +74,13 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
           },
         });
         Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migrated Successfully", { migratedRules });
-        trackMv3MigrationRulesMigrated(rules.length, migratedRules.length);
+        trackMv3MigrationRulesMigrated(
+          rules.length,
+          migratedRules.length,
+          rulesMigrationLogs ? Object.keys(rulesMigrationLogs).length : 0,
+          pathImpactedRulesCount,
+          pageUrlImpactedRulesCount
+        );
       });
   }
 
@@ -81,7 +98,13 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
 export const migrateRuleToMV3 = (
   rule: Rule,
   forceMigrate = false
-): { isMigrated: boolean; rule: Rule; ruleMigrationLogs: any } => {
+): {
+  isMigrated: boolean;
+  rule: Rule;
+  ruleMigrationLogs: any;
+  isPathImpactedRule?: boolean;
+  isPageUrlImpactedRule?: boolean;
+} => {
   if (rule?.schemaVersion === "3.0.0" && !forceMigrate) {
     return {
       isMigrated: false,
@@ -93,15 +116,20 @@ export const migrateRuleToMV3 = (
   const ruleMigrationLogs: Record<string, any>[] = [];
   Logger.log("[Debug][MV3.migrateRuleToMV3] Rule Migration Started", { rule, forceMigrate });
 
+  let isPathImpactedRule = false;
+  let isPageUrlImpactedRule = false;
+
   rule.pairs.forEach((pair) => {
     const pathMigrationStatus = migratePathOperator(pair.source);
     if (pathMigrationStatus) {
       ruleMigrationLogs.push(pathMigrationStatus);
+      isPathImpactedRule = true;
     }
 
     const pageUrlMigrationStatus = migratePageURLtoPageDomain(pair.source);
     if (pageUrlMigrationStatus) {
       ruleMigrationLogs.push(pageUrlMigrationStatus);
+      isPageUrlImpactedRule = true;
     }
   });
 
@@ -117,6 +145,8 @@ export const migrateRuleToMV3 = (
     isMigrated: true,
     rule: finalRule,
     ruleMigrationLogs: ruleMigrationLogs.length ? ruleMigrationLogs : null,
+    isPathImpactedRule: isPathImpactedRule,
+    isPageUrlImpactedRule: isPageUrlImpactedRule,
   };
 };
 
