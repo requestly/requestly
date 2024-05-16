@@ -9,9 +9,9 @@ import parseReplaceRule from "./parseReplaceRule";
 import parseScriptRule from "./parseScriptRule";
 import parseUserAgentRule from "./parseUserAgentRule";
 
-type ExtensionRuleParser = (rule: Rule) => ExtensionRule[];
+type DNRRuleParser = (rule: Rule) => ExtensionRule[];
 
-const parsers: { [key in RuleType]?: ExtensionRuleParser } = {
+const parsers: { [key in RuleType]?: DNRRuleParser } = {
   [RuleType.REDIRECT]: parseRedirectRule,
   [RuleType.CANCEL]: parseCancelRule,
   [RuleType.QUERYPARAM]: parseQueryParamRule,
@@ -22,6 +22,6 @@ const parsers: { [key in RuleType]?: ExtensionRuleParser } = {
   [RuleType.SCRIPT]: parseScriptRule,
 };
 
-export const parseExtensionRules: ExtensionRuleParser = (rule) => {
+export const parseDNRRules: DNRRuleParser = (rule) => {
   return parsers[rule.ruleType]?.(rule);
 };

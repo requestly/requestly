@@ -16,8 +16,8 @@ class RQExplicitTestRuleWidget extends RQTestRuleWidget {
 
     const contentContainer = this.shadowRoot.getElementById("test-rule-container");
 
-    const explicitModeMarkup = `   
-     <div id="explicit-widget-container">  
+    const explicitModeMarkup = `
+     <div id="explicit-widget-container">
         <div id="rule-status-container">
           <div id="rule-status"></div>
         </div>

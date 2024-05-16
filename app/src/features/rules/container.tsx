@@ -9,6 +9,7 @@ import { DeleteRecordsModalWrapper } from "./modals/DeleteRecordsModalWrapper";
 import { DuplicateRuleModalWrapper } from "./modals/DuplicateRuleModalWrapper";
 import { UngroupOrDeleteRulesModalWrapper } from "./modals/UngroupOrDeleteRulesModalWrapper";
 import { RenameGroupModalWrapper } from "./modals/RenameGroupModalWrapper";
+import { MV3MigrationModal, NotificationCard } from "./modals/MV3MigrationModal";
 import { SecondarySidebarLayout } from "componentsV2/SecondarySidebar";
 
 import "./container.scss";
@@ -25,6 +26,8 @@ const RulesFeatureContainer = () => {
           <ChangeRuleGroupModalWrapper />
           <CreateNewRuleGroupModalWrapper />
           <DeleteRecordsModalWrapper />
+          <MV3MigrationModal />
+          <NotificationCard />
           <Outlet />
         </>
       </RulesContextProvider>

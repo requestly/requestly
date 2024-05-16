@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactSelect from "react-select";
-import { Button, Modal, Row, Col, Input, Typography, Dropdown, Menu } from "antd";
+import { Button, Modal, Row, Col, Input, Typography } from "antd";
 //UTILITIES
 import { getCurrentlySelectedRuleData } from "../../../../../store/selectors";
 //EXTERNALS
@@ -11,7 +11,7 @@ import APP_CONSTANTS from "config/constants";
 import deleteObjectAtPath from "./actions/deleteObjectAtPath";
 import getObjectValue from "./actions/getObjectValue";
 import { getReactSelectValue, setReactSelectValue } from "./actions/reactSelect";
-import { CloseCircleOutlined, DownOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined } from "@ant-design/icons";
 import { isDesktopMode } from "utils/AppUtils";
 import {
   trackPageUrlFilterModifiedEvent,
@@ -19,13 +19,14 @@ import {
   trackRequestMethodFilterModifiedEvent,
   trackRequestPayloadKeyFilterModifiedEvent,
   trackRequestPayloadValueFilterModifiedEvent,
+  trackPageDomainsFilterModifiedEvent,
 } from "modules/analytics/events/common/rules/filters";
 import { setCurrentlySelectedRule } from "../../RuleBuilder/actions";
 import { ResponseRuleResourceType } from "types/rules";
 import { debounce, snakeCase } from "lodash";
 import { actions } from "store";
 
-const { Text, Link } = Typography;
+const { Link } = Typography;
 
 const debouncedTrackPayloadKeyModifiedEvent = debounce(trackRequestPayloadKeyFilterModifiedEvent, 500);
 
@@ -55,21 +56,6 @@ const REQUEST_METHOD_OPTIONS = [
   { label: "HEAD", value: "HEAD" },
 ];
 
-const generatePlaceholderText = (operator) => {
-  switch (operator) {
-    case GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS:
-      return "e.g. http://www.example.com";
-    case GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS:
-      return "e.g. facebook";
-    case GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES:
-      return "e.g. *://*.mydomain.com/*";
-    case GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES:
-      return "e.g. /example-([0-9]+)/ig";
-    default:
-      return "Select a condition first";
-  }
-};
-
 const Filters = (props) => {
   const { pairIndex } = props;
 
@@ -95,25 +81,6 @@ const Filters = (props) => {
   const isPayloadUrlFilterCompatible = !isResponseRule && !isRequestRule && !isDesktopMode();
   const isResourceTypeFilterCompatible = !isResponseRule && !isRequestRule && !isDesktopMode(); // this partially works on desktop
 
-  const getCurrentPageURLOperatorText = () => {
-    switch (
-      getObjectValue(currentlySelectedRuleData, pairIndex, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR)
-    ) {
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES:
-        return "Wildcard";
-      case GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES:
-        return "RegEx";
-      case "":
-        return "Select";
-      default:
-        return getObjectValue(
-          currentlySelectedRuleData,
-          pairIndex,
-          APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR
-        );
-    }
-  };
-
   const clearRequestPayload = (value) => {
     if (value === "") {
       deleteObjectAtPath(
@@ -133,7 +100,12 @@ const Filters = (props) => {
         deleteObjectAtPath(
           currentlySelectedRuleData,
           setCurrentlySelectedRule,
-          `source.filters.${filterToClear}`,
+          filterToClear === GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_DOMAINS
+            ? [
+                `source.filters.${filterToClear}`,
+                `source.filters.${GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL}`,
+              ]
+            : `source.filters.${filterToClear}`,
           pairIndex,
           dispatch
         );
@@ -148,6 +120,10 @@ const Filters = (props) => {
   const LOG_ANALYTICS = {};
   LOG_ANALYTICS.PAGE_URL_MODIFIED = () => {
     trackPageUrlFilterModifiedEvent(currentlySelectedRuleData.ruleType);
+  };
+
+  LOG_ANALYTICS.PAGE_DOMAINS_MODIFIED = () => {
+    trackPageDomainsFilterModifiedEvent(currentlySelectedRuleData.ruleType);
   };
   LOG_ANALYTICS.RESOURCE_TYPE_MODIFIED = () => {
     trackResourceTypeFilterModifiedEvent(currentlySelectedRuleData.ruleType);
@@ -168,20 +144,6 @@ const Filters = (props) => {
     );
   };
 
-  const updateSourceOperator = useCallback(
-    (operator) => {
-      dispatch(
-        actions.updateRulePairAtGivenPath({
-          pairIndex,
-          updates: {
-            [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR]: operator,
-          },
-        })
-      );
-    },
-    [dispatch, pairIndex]
-  );
-
   const updateSourceRequestPayload = useCallback(
     (event, path) => {
       dispatch(
@@ -194,25 +156,6 @@ const Filters = (props) => {
       );
     },
     [dispatch, pairIndex]
-  );
-
-  const urlOperatorOptions = (
-    <Menu>
-      <Menu.Item key={1}>
-        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.EQUALS)}>Equals</span>
-      </Menu.Item>
-      <Menu.Item key={2}>
-        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.CONTAINS)}>Contains</span>
-      </Menu.Item>
-      <Menu.Item key={3}>
-        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES)}>Matches (RegEx)</span>
-      </Menu.Item>
-      <Menu.Item key={4}>
-        <span onClick={(e) => updateSourceOperator(GLOBAL_CONSTANTS.RULE_OPERATORS.WILDCARD_MATCHES)}>
-          Matches (Wildcard)
-        </span>
-      </Menu.Item>
-    </Menu>
   );
 
   const renderRequestPayloadInput = () => {
@@ -350,49 +293,39 @@ const Filters = (props) => {
           alignItems: "center",
         }}
       >
-        <Col span={3}>
-          <span>Page URL</span>
-        </Col>
-        <Col span={6} align="center">
-          <Dropdown overlay={urlOperatorOptions} disabled={props.isInputDisabled}>
-            <Text
-              strong
-              className="ant-dropdown-link cursor-pointer capitalize uppercase"
-              onClick={(e) => {
-                e.preventDefault();
-                LOG_ANALYTICS.PAGE_URL_MODIFIED(e);
-              }}
-            >
-              {getCurrentPageURLOperatorText()} <DownOutlined />
-            </Text>
-          </Dropdown>
-        </Col>
-        <Col span={12}>
-          <Input
-            placeholder={generatePlaceholderText(
-              getObjectValue(
+        <>
+          <Col span={5}>
+            <span>Page Domain</span>
+          </Col>
+          <Col span={17}>
+            <Input
+              placeholder={"mydomain.com"}
+              name="description"
+              type="text"
+              value={getObjectValue(
                 currentlySelectedRuleData,
                 pairIndex,
-                APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_OPERATOR
-              )
-            )}
-            name="description"
-            type="text"
-            value={getObjectValue(
-              currentlySelectedRuleData,
-              pairIndex,
-              APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE
-            )}
-            onChange={(e) => {
-              e?.preventDefault?.();
-              updateSourceRequestPayload(e, APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_URL_VALUE);
-              LOG_ANALYTICS.PAGE_URL_MODIFIED();
-            }}
-            disabled={getCurrentPageURLOperatorText() === "Select" ? true : props.isInputDisabled}
-          />
-        </Col>
-        <Col align="right" span={3}>
-          {renderClearFilterIcon(GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL)}
+                APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_DOMAINS
+              )}
+              onChange={(e) => {
+                e?.preventDefault?.();
+                dispatch(
+                  actions.updateRulePairAtGivenPath({
+                    pairIndex,
+                    updates: {
+                      [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_DOMAINS]: [e.target.value],
+                    },
+                  })
+                );
+                LOG_ANALYTICS.PAGE_DOMAINS_MODIFIED();
+              }}
+              disabled={props.isInputDisabled}
+            />
+          </Col>
+        </>
+
+        <Col align="right" span={2}>
+          {renderClearFilterIcon(GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_DOMAINS)}
         </Col>
       </Row>
     ) : null;

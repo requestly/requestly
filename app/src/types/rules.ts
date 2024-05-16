@@ -82,6 +82,8 @@ export interface SourceFilter {
   requestMethod?: string[];
   resourceType?: string[];
   requestPayload?: { key: string; value: string };
+  pageUrl: Record<string, string>;
+  pageDomains: string[];
 }
 
 export interface RulePairSource {
