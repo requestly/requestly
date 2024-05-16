@@ -1,6 +1,6 @@
 import config from "common/config";
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/constants";
-import { getRule } from "common/rulesStore";
+import rulesStorageService from "../../rulesStorageService";
 import { getRecord } from "common/storage";
 import { Rule } from "common/types";
 import RuleExecutionHandler from "./ruleExecutionHandler";
@@ -43,7 +43,7 @@ const showExplicitTestRuleWidget = async (ruleId: string) => {
     return;
   }
 
-  const ruleDetails = await getRule(ruleId);
+  const ruleDetails = await rulesStorageService.getRule(ruleId);
   const { name: ruleName } = ruleDetails;
 
   const testRuleWidget = document.createElement("rq-explicit-test-rule-widget");
@@ -159,7 +159,7 @@ const notifyRuleAppliedToImplicitWidget = async (rule: Rule) => {
   let ruleType = rule.ruleType;
 
   if (!ruleName || !ruleType) {
-    const ruleDetails = await getRule(rule.id);
+    const ruleDetails = await rulesStorageService.getRule(rule.id);
     ruleName = ruleDetails.name;
     ruleType = ruleDetails.ruleType;
   }
