@@ -9,12 +9,14 @@ import { MultiValue } from "react-select";
 
 interface Props {
   autoFocus?: boolean;
+  defaultValue: string;
   onChange: (emails: string[]) => void;
   transparentBackground?: boolean;
 }
 
 const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
   onChange,
+  defaultValue = "",
   transparentBackground = false,
   autoFocus = false,
 }) => {
@@ -46,6 +48,13 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
     });
   }, [getOrganizationUsers, userEmail]);
 
+  useEffect(() => {
+    // Set default value if it is a valid email
+    if (isEmailValid(defaultValue)) {
+      onChange([defaultValue]);
+    }
+  }, [defaultValue, onChange]);
+
   const handleEmailChange = useCallback(
     (
       emails: MultiValue<{
@@ -63,6 +72,16 @@ const EmailInputWithDomainBasedSuggestions: React.FC<Props> = ({
 
   return (
     <CreatableSelect
+      defaultValue={
+        isEmailValid(defaultValue)
+          ? [
+              {
+                label: defaultValue,
+                value: defaultValue,
+              },
+            ]
+          : []
+      }
       autoFocus={autoFocus}
       isMulti={true}
       isClearable={false}
