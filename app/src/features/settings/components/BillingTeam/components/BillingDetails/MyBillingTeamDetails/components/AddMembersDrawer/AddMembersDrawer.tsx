@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
-import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import React, { useMemo, useState } from "react";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { Col, Drawer, Row } from "antd";
 import { AddMembersTable } from "./components/AddMembersTable/AddMembersTable";
@@ -7,6 +8,10 @@ import { useFetchOrgMembers } from "features/settings/components/OrgMembers/hook
 import { RQButton } from "lib/design-system/components";
 import { MdArrowBack } from "@react-icons/all-files/md/MdArrowBack";
 import { InviteMembersForm } from "./components/InviteMembersForm/InviteMembersForm";
+import { getBillingTeamById, getBillingTeamMembers } from "store/features/billing/selectors";
+import { BillingTeamMemberStatus } from "features/settings/components/BillingTeam/types";
+import { getDomainFromEmail } from "utils/FormattingHelper";
+import { AddMembersDrawerRecord } from "./types";
 import "./addMembersDrawer.scss";
 
 interface AppMembersDrawerProps {
@@ -19,11 +24,55 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
   const { isLoading, organizationMembers } = useFetchOrgMembers();
   const [isInviteFormVisible, setIsInviteFormVisible] = useState(false);
   const { billingId } = useParams();
+  const billingTeamDetails = useSelector(getBillingTeamById(billingId));
+  const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
+
+  const handleDrawerClose = () => {
+    setSearchValue("");
+    setIsInviteFormVisible(false);
+    onClose();
+  };
+
+  const tableRecords = useMemo(() => {
+    /* 
+      Add members drawer table consists records from 3 sources:
+      1. External domain members
+      2. Organization members
+      3. Pending members
+    */
+
+    const externalDomainMembers =
+      Object.values(billingTeamMembers)
+        .filter((member) => {
+          return getDomainFromEmail(member.email) !== billingTeamDetails?.ownerDomain;
+        })
+        .map((member) => {
+          return {
+            email: member.email,
+            domain: member.domain,
+          };
+        }) || [];
+
+    const orgMembers = organizationMembers || [];
+
+    const newRecords: AddMembersDrawerRecord[] = [...externalDomainMembers, ...orgMembers];
+
+    if (billingTeamDetails?.pendingMembers) {
+      Object.keys(billingTeamDetails?.pendingMembers)?.forEach((email) => {
+        newRecords.push({
+          email: email,
+          status: BillingTeamMemberStatus.PENDING,
+          domain: getDomainFromEmail(email),
+        });
+      });
+    }
+
+    return newRecords;
+  }, [billingTeamDetails?.pendingMembers, organizationMembers, billingTeamMembers, billingTeamDetails?.ownerDomain]);
 
   return (
     <Drawer
       placement="right"
-      onClose={onClose}
       open={isOpen}
       width={640}
       closeIcon={null}
@@ -48,7 +97,7 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
           )}
         </Col>
         <Col>
-          <IoMdClose onClick={onClose} />
+          <IoMdClose onClick={handleDrawerClose} />
         </Col>
       </Row>
       <Col className="billing-team-members-drawer-body">
@@ -57,13 +106,15 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
             toggleInviteFormVisibility={() => setIsInviteFormVisible(!isInviteFormVisible)}
             closeAddMembersDrawer={onClose}
             billingId={billingId}
+            searchValue={searchValue}
+            setSearchValue={setSearchValue}
           />
         ) : (
           <AddMembersTable
             searchValue={searchValue}
             setSearchValue={setSearchValue}
             isLoading={isLoading}
-            members={organizationMembers}
+            members={tableRecords}
             toggleInviteFormVisibility={() => setIsInviteFormVisible(!isInviteFormVisible)}
           />
         )}
