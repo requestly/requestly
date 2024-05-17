@@ -3,26 +3,30 @@ import { useSelector } from "react-redux";
 import { getBillingTeamById } from "store/features/billing/selectors";
 import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { RQButton } from "lib/design-system/components";
-import { addUsersToBillingTeam } from "backend/billing";
 import { PostUserAdditionView } from "./components/PostUserAdditionView/PostUserAdditionView";
 import { ExternalDomainWarningBanner } from "./components/ExternalDomainWarningBanner/ExternalDomainWarningBanner";
 import Logger from "../../../../../../../../../../../../../common/logger";
-import "./inviteMembersForm.scss";
+import { inviteUsersToBillingTeam } from "backend/billing";
 import { toast } from "utils/Toast";
+import { getDomainFromEmail } from "utils/FormattingHelper";
 import {
   trackBillingTeamInviteSendingFailed,
   trackBillingTeamInviteSentSuccessfully,
 } from "features/settings/analytics";
-import { getDomainFromEmail } from "utils/FormattingHelper";
+import "./inviteMembersForm.scss";
 
 interface InviteMembersFormProps {
   billingId: string;
+  searchValue: string;
+  setSearchValue: (value: string) => void;
   toggleInviteFormVisibility: () => void;
   closeAddMembersDrawer: () => void;
 }
 
 export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
   billingId,
+  searchValue,
+  setSearchValue,
   toggleInviteFormVisibility,
   closeAddMembersDrawer,
 }) => {
@@ -30,37 +34,32 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
   const [isPostUserAdditionViewVisible, setIsPostUserAdditionViewVisible] = useState(false);
   const [externalDomainEmails, setExternalDomainEmails] = useState([]);
   const [isExternalDomainWarningBannerClosed, setIsExternalDomainWarningBannerClosed] = useState(false);
-  const [nonExisitingEmails, setNonExisitingEmails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [emails, setEmails] = useState([]);
 
-  const handleAddMembersToBillingTeam = useCallback(
+  const handleInviteMembersToBillingTeam = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+
       if (!emails.length) {
         toast.warn("Please enter email(s) to proceed");
         return;
       }
+
       setIsLoading(true);
-      addUsersToBillingTeam(billingId, emails)
-        .then((res: any) => {
+      const hasExternalDomainUser = emails.some(
+        (email) => getDomainFromEmail(email) !== billingTeamDetails?.ownerDomain
+      );
+
+      inviteUsersToBillingTeam(billingId, emails)
+        .then(() => {
           setIsPostUserAdditionViewVisible(true);
-          const hasExternalDomainUser = emails.some(
-            (email) => getDomainFromEmail(email) !== billingTeamDetails?.ownerDomain
-          );
-          if (res.data.result?.failedEmails.length) {
-            setNonExisitingEmails(res.data.result.failedEmails);
-            if (res.data.result?.addedEmails.length) {
-              trackBillingTeamInviteSendingFailed("partial", hasExternalDomainUser);
-            } else {
-              trackBillingTeamInviteSendingFailed("failed", hasExternalDomainUser);
-            }
-          } else {
-            trackBillingTeamInviteSentSuccessfully(hasExternalDomainUser);
-          }
+
+          trackBillingTeamInviteSentSuccessfully(hasExternalDomainUser);
         })
         .catch((error) => {
           Logger.log("Error adding members to billing team", error);
+          trackBillingTeamInviteSendingFailed(hasExternalDomainUser);
         })
         .finally(() => {
           setIsLoading(false);
@@ -84,12 +83,11 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
       <PostUserAdditionView
         toggleInviteFormVisibility={toggleInviteFormVisibility}
         closeAddMembersDrawer={closeAddMembersDrawer}
-        nonExisitingEmails={nonExisitingEmails}
       />
     );
   } else {
     return (
-      <form className="billing-team-invite-members-form-wrapper" onSubmit={handleAddMembersToBillingTeam}>
+      <form className="billing-team-invite-members-form-wrapper" onSubmit={handleInviteMembersToBillingTeam}>
         {externalDomainEmails.length && !isExternalDomainWarningBannerClosed ? (
           <ExternalDomainWarningBanner
             emails={externalDomainEmails}
@@ -101,13 +99,25 @@ export const InviteMembersForm: React.FC<InviteMembersFormProps> = ({
           You can invite multiple members by typing their email and pressing `Enter` key.
         </div>
         <div className="invite-emails-wrapper">
-          <EmailInputWithDomainBasedSuggestions autoFocus transparentBackground onChange={handleEmailsChange} />
+          <EmailInputWithDomainBasedSuggestions
+            autoFocus
+            transparentBackground
+            onChange={handleEmailsChange}
+            defaultValue={searchValue}
+          />
         </div>
         <div className="billing-team-invite-members-form-actions">
           <RQButton loading={isLoading} type="primary" htmlType="submit">
             Add to billing team
           </RQButton>
-          <RQButton disabled={isLoading} type="default" onClick={toggleInviteFormVisibility}>
+          <RQButton
+            disabled={isLoading}
+            type="default"
+            onClick={() => {
+              toggleInviteFormVisibility();
+              setSearchValue("");
+            }}
+          >
             Back to members list
           </RQButton>
         </div>

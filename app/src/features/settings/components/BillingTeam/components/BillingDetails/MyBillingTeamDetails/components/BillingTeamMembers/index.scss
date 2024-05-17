@@ -1,3 +1,9 @@
+.my-billing-team-members-table {
+  .icon__wrapper.danger {
+    color: var(--requestly-color-error-text);
+  }
+}
+
 .billing-team-members-section-header {
   padding: 8px 1rem;
   border-bottom: 1px solid var(--surface-2);
