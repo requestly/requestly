@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Avatar, Col, Dropdown, Popconfirm, Row, Table } from "antd";
+import { Avatar, Col, Dropdown, Popconfirm, Row, Table, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getBillingTeamMembers, getBillingTeamById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/selectors";
@@ -225,10 +225,15 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                 )}
                 {checkIsPendingMember(record) && (
                   <Col>
-                    <Row className="icon__wrapper danger" align="middle">
-                      <BsPersonFillExclamation style={{ marginRight: "2px" }} />
-                      <span className="caption">Not joined</span>
-                    </Row>
+                    <Tooltip
+                      title="User added to billing team. They can access premium features once they sign up."
+                      color="#000"
+                    >
+                      <Row className="icon__wrapper danger" align="middle">
+                        <BsPersonFillExclamation style={{ marginRight: "2px" }} />
+                        <span className="caption">Not Yet joined</span>
+                      </Row>
+                    </Tooltip>
                   </Col>
                 )}
               </Row>
