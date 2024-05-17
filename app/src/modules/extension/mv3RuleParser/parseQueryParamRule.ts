@@ -20,6 +20,7 @@ const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryPar
       transform.queryTransform.removeParams.push(modification.param);
     } else {
       transform.query = "";
+      delete transform.queryTransform;
     }
   });
 
