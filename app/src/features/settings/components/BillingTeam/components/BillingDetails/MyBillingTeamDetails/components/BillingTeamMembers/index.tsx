@@ -1,13 +1,14 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Avatar, Col, Dropdown, Popconfirm, Row, Table } from "antd";
+import { Avatar, Col, Dropdown, Popconfirm, Row, Table, Tooltip } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { getBillingTeamMembers, getBillingTeamById } from "store/features/billing/selectors";
 import { getUserAuthDetails } from "store/selectors";
-import { BillingTeamRoles } from "features/settings/components/BillingTeam/types";
+import { BillingTeamMemberStatus, BillingTeamRoles } from "features/settings/components/BillingTeam/types";
 import { BillingAction } from "./types";
-import { removeMemberFromBillingTeam, updateBillingTeamMemberRole } from "backend/billing";
+import { removeMemberFromBillingTeam, revokeBillingTeamInvite, updateBillingTeamMemberRole } from "backend/billing";
+import { ActionLoadingModal } from "componentsV2/modals/ActionLoadingModal";
 import { toast } from "utils/Toast";
 import type { MenuProps } from "antd";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
@@ -19,12 +20,14 @@ import { MdPersonOutline } from "@react-icons/all-files/md/MdPersonOutline";
 import { MdOutlineMoneyOffCsred } from "@react-icons/all-files/md/MdOutlineMoneyOffCsred";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { isMenuItemDisabled } from "./utils";
-import "./index.scss";
 import {
   trackBillingTeamActionClicked,
   trackBillingTeamMemberRemoved,
   trackBillingTeamRoleChanged,
 } from "features/settings/analytics";
+import { UserOutlined } from "@ant-design/icons";
+import { BsPersonFillExclamation } from "@react-icons/all-files/bs/BsPersonFillExclamation";
+import "./index.scss";
 
 interface Props {
   openDrawer: () => void;
@@ -35,16 +38,55 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   const user = useSelector(getUserAuthDetails);
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
-  const membersTableSource = billingTeamMembers ? Object.values(billingTeamMembers) : [];
   const isUserAdmin =
     billingTeamMembers?.[user?.details?.profile?.uid] &&
     billingTeamMembers?.[user?.details?.profile?.uid]?.role !== BillingTeamRoles.Member;
   const [loadingRows, setLoadingRows] = useState<string[]>([]);
+  const [isLoadingModalVisible, setIsLoadingModalVisible] = useState(false);
 
-  const handleRemoveMember = useCallback(
+  const checkIsPendingMember = useCallback((member: any) => {
+    return member.status === BillingTeamMemberStatus.PENDING;
+  }, []);
+
+  const membersTableSource = useMemo(() => {
+    const members = billingTeamMembers ? Object.values(billingTeamMembers) : [];
+    if (billingTeamDetails?.pendingMembers) {
+      members.push(
+        ...Object.keys(billingTeamDetails?.pendingMembers).map((email) => {
+          return {
+            id: email,
+            email: email,
+            displayName: "",
+            role: BillingTeamRoles.Member,
+            status: BillingTeamMemberStatus.PENDING,
+            inviteId: billingTeamDetails?.pendingMembers?.[email]?.inviteId,
+          };
+        })
+      );
+    }
+    return members;
+  }, [billingTeamDetails?.pendingMembers, billingTeamMembers]);
+
+  const handleInvokePendingMemberInvite = useCallback(
+    (inviteId: string, email: string, id: string) => {
+      revokeBillingTeamInvite(inviteId, email)
+        .then(() => {
+          toast.success("Invite revoked successfully");
+          trackBillingTeamMemberRemoved(email, billingId);
+        })
+        .catch(() => {
+          toast.error("Error while revoking invite");
+        })
+        .finally(() => {
+          setLoadingRows(loadingRows.filter((row) => row !== id));
+          setIsLoadingModalVisible(false);
+        });
+    },
+    [billingId, loadingRows]
+  );
+
+  const handleRemoveMemberFromBillingTeam = useCallback(
     (id: string, email: string) => {
-      setLoadingRows([...loadingRows, id]);
-      trackBillingTeamActionClicked("remove_member");
       removeMemberFromBillingTeam(billingId, id)
         .then(() => {
           toast.success("User removed from the billing team");
@@ -55,9 +97,24 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         })
         .finally(() => {
           setLoadingRows(loadingRows.filter((row) => row !== id));
+          setIsLoadingModalVisible(false);
         });
     },
     [billingId, loadingRows]
+  );
+
+  const handleRemoveMember = useCallback(
+    (id: string, email: string, status: BillingTeamMemberStatus, inviteId?: string) => {
+      trackBillingTeamActionClicked(BillingAction.REMOVE);
+      setLoadingRows([...loadingRows, id]);
+      setIsLoadingModalVisible(true);
+      if (status === BillingTeamMemberStatus.PENDING) {
+        handleInvokePendingMemberInvite(inviteId, email, id);
+      } else {
+        handleRemoveMemberFromBillingTeam(id, email);
+      }
+    },
+    [loadingRows, handleInvokePendingMemberInvite, handleRemoveMemberFromBillingTeam]
   );
 
   const handleRoleChange = useCallback(
@@ -79,7 +136,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
   );
 
   const getMemberDropdownItems = useCallback(
-    (id: string, email: string): MenuProps["items"] => {
+    (id: string, email: string, status: BillingTeamMemberStatus, inviteId?: string): MenuProps["items"] => {
       return [
         {
           key: BillingAction.MAKE_ADMIN,
@@ -104,7 +161,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
           label: (
             <Popconfirm
               title="Are you sure you want to remove this member?"
-              onConfirm={() => handleRemoveMember(id, email)}
+              onConfirm={() => handleRemoveMember(id, email, status, inviteId)}
               okText="Yes"
               cancelText="No"
               showArrow={false}
@@ -130,12 +187,20 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         render: (_: any, record: Record<string, any>) => (
           <Row className={`${loadingRows.includes(record.id) ? "loading-cell" : ""}`}>
             <div className="billing-team-member-avatar-wrapper">
-              <Avatar size={34} shape="circle" src={record.photoUrl} alt={record.displayName} />
+              {record?.photoUrl ? (
+                <Avatar size={34} shape="circle" src={record.photoUrl} alt={record.displayName} />
+              ) : (
+                <Avatar size={34} shape="circle" icon={<UserOutlined />} alt="User icon" />
+              )}
             </div>
-            <div>
+            <div className={checkIsPendingMember(record) ? "display-row-center" : ""}>
               <Row align={"middle"} gutter={4}>
                 <Col>
-                  <span className="text-bold text-white">{`${record.displayName ?? "User"}`}</span>
+                  {checkIsPendingMember(record) ? (
+                    <>{record.email}</>
+                  ) : (
+                    <span className="text-bold text-white">{`${record.displayName ?? "User"}`}</span>
+                  )}
                 </Col>
                 <Col>
                   {record.role === BillingTeamRoles.Manager ? (
@@ -158,10 +223,25 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
                     </Row>
                   </Col>
                 )}
+                {checkIsPendingMember(record) && (
+                  <Col>
+                    <Tooltip
+                      title="User added to billing team. They can access premium features once they sign up."
+                      color="#000"
+                    >
+                      <Row className="icon__wrapper danger" align="middle">
+                        <BsPersonFillExclamation style={{ marginRight: "2px" }} />
+                        <span className="caption">Not Yet joined</span>
+                      </Row>
+                    </Tooltip>
+                  </Col>
+                )}
               </Row>
-              <div>
-                <span className="billing-team-member-email">{record.email}</span>
-              </div>
+              {!checkIsPendingMember(record) && (
+                <div>
+                  <span className="billing-team-member-email">{record.email}</span>
+                </div>
+              )}
             </div>
           </Row>
         ),
@@ -192,10 +272,12 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
               <Col>
                 <Dropdown
                   menu={{
-                    items: getMemberDropdownItems(record.id, record.email).map((item) => ({
-                      ...item,
-                      disabled: isMenuItemDisabled(item.key as BillingAction, record.role),
-                    })),
+                    items: getMemberDropdownItems(record.id, record.email, record?.status, record?.inviteId).map(
+                      (item) => ({
+                        ...item,
+                        disabled: isMenuItemDisabled(item.key as BillingAction, record.role, record?.status),
+                      })
+                    ),
                     onClick: ({ key }) => {
                       switch (key) {
                         case BillingAction.MAKE_ADMIN:
@@ -235,6 +317,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
       user?.details?.profile?.uid,
       getMemberDropdownItems,
       handleRoleChange,
+      checkIsPendingMember,
     ]
   );
 
@@ -264,6 +347,12 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
           loading={!billingTeamMembers}
         />
       </Col>
+      <ActionLoadingModal
+        isOpen={isLoadingModalVisible}
+        onClose={() => setIsLoadingModalVisible(false)}
+        title="Removing user..."
+        message="Pleae wait while we process your request"
+      />
     </>
   );
 };
