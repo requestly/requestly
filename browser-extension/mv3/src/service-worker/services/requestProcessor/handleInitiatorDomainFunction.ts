@@ -75,7 +75,7 @@ export const handleInitiatorDomainFunction = async (
         resourceTypes: [chrome.declarativeNetRequest.ResourceType.XMLHTTPREQUEST],
         tabIds: [tabId],
         requestMethods:
-          matchedPair?.source?.filters[0]?.requestMethod?.map(
+          matchedPair?.source?.filters?.[0]?.requestMethod?.map(
             (method) => method.toLowerCase() as chrome.declarativeNetRequest.RequestMethod
           ) ?? undefined,
         excludedInitiatorDomains: ["requestly.io", "requestly.com"],
