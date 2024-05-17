@@ -27,6 +27,12 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
   const billingTeamDetails = useSelector(getBillingTeamById(billingId));
   const billingTeamMembers = useSelector(getBillingTeamMembers(billingId));
 
+  const handleDrawerClose = () => {
+    setSearchValue("");
+    setIsInviteFormVisible(false);
+    onClose();
+  };
+
   const tableRecords = useMemo(() => {
     /* 
       Add members drawer table consists records from 3 sources:
@@ -67,7 +73,6 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
   return (
     <Drawer
       placement="right"
-      onClose={onClose}
       open={isOpen}
       width={640}
       closeIcon={null}
@@ -92,7 +97,7 @@ export const AppMembersDrawer: React.FC<AppMembersDrawerProps> = ({ isOpen, onCl
           )}
         </Col>
         <Col>
-          <IoMdClose onClick={onClose} />
+          <IoMdClose onClick={handleDrawerClose} />
         </Col>
       </Row>
       <Col className="billing-team-members-drawer-body">
