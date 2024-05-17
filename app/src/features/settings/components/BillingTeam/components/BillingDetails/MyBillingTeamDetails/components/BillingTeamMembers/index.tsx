@@ -246,11 +246,7 @@ export const BillingTeamMembers: React.FC<Props> = ({ openDrawer }) => {
         dataIndex: "joiningDate",
         render: (joiningDate: number, record: any) => (
           <div className={`text-white ${loadingRows.includes(record.id) ? "loading-cell" : ""}`}>
-            {joiningDate
-              ? getLongFormatDateString(new Date(joiningDate))
-              : checkIsPendingMember(record)
-              ? "Yet to join"
-              : "-"}
+            {joiningDate ? getLongFormatDateString(new Date(joiningDate)) : "-"}
           </div>
         ),
       },

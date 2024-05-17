@@ -37,7 +37,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                 <img
                   className="org-member-avatar"
                   src={
-                    member?.photoURL?.length
+                    member?.photoURL
                       ? member?.photoURL
                       : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
                   }
