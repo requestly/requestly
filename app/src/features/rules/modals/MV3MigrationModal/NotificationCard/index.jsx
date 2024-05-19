@@ -58,9 +58,9 @@ export function NotificationCard() {
     return (
       Object.keys(migratedRulesLogs).length > 0 &&
       !migrationData[currentlyActiveWorkspace?.id ?? "private"]?.migrationModalViewed &&
-      Object.keys(migratedRulesLogs).some((ruleId) => {
+      Object.keys(migratedRulesLogs).some(async (ruleId) => {
         let doesRuleExist = false;
-        StorageService(appMode)
+        await StorageService(appMode)
           .getRecord(ruleId)
           .then((rule) => {
             doesRuleExist = !!rule;
