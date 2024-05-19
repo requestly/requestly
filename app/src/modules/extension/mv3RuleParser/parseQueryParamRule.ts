@@ -10,7 +10,7 @@ const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryPar
     },
   };
 
-  modifications.forEach((modification) => {
+  for (const modification of modifications) {
     if (modification.type === QueryParamModificationType.ADD) {
       transform.queryTransform.addOrReplaceParams.push({
         key: modification.param,
@@ -23,8 +23,9 @@ const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryPar
       transform.query = "";
       // queryTransform is not needed if query is present
       delete transform.queryTransform;
+      break;
     }
-  });
+  }
 
   return transform;
 };
