@@ -1,6 +1,5 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
-import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
-import { updateActivationStatus } from "./contextMenu";
+import { getVariable, setVariable, Variable } from "../variable";
 import { getAllSupportedWebURLs } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 
@@ -38,28 +37,32 @@ const addJSFromURL = (
   url: string,
   attributes: { name: string; value: string }[] = [],
   executeAfterPageLoad = false
-): void => {
-  const addScript = () => {
-    const script = document.createElement("script");
+): Promise<void> => {
+  return new Promise((resolve) => {
+    const addScript = () => {
+      const script = document.createElement("script");
 
-    if (attributes.length) {
-      attributes.forEach(({ name: attrName, value: attrVal }) => {
-        script.setAttribute(attrName, attrVal ?? "");
-      });
+      if (attributes.length) {
+        attributes.forEach(({ name: attrName, value: attrVal }) => {
+          script.setAttribute(attrName, attrVal ?? "");
+        });
+      } else {
+        script.type = "text/javascript";
+      }
+
+      script.classList.add("__RQ_SCRIPT__");
+      script.src = url;
+      script.onload = () => resolve();
+
+      const parent = document.head || document.documentElement;
+      parent.appendChild(script);
+    };
+    if (executeAfterPageLoad && document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", addScript);
     } else {
-      script.type = "text/javascript";
+      addScript();
     }
-
-    script.classList.add("__RQ_SCRIPT__");
-    script.src = url;
-    const parent = document.head || document.documentElement;
-    parent.appendChild(script);
-  };
-  if (executeAfterPageLoad && document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", addScript);
-  } else {
-    addScript();
-  }
+  });
 };
 
 /* Do not refer any external variable in below function other than arguments */
@@ -165,9 +168,9 @@ export const toggleExtensionStatus = async () => {
 
   const updatedStatus = !extensionEnabledStatus;
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
-  updateActivationStatus(updatedStatus);
+  // updateActivationStatus(updatedStatus);
   // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
-  onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
+  // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
 
   if (!updatedStatus) {
     stopRecordingOnAllTabs();
