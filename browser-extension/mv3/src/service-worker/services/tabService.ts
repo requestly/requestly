@@ -151,8 +151,8 @@ class TabService {
   }
 
   ensureTabLoadingComplete(tabId: TabId): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const tab = this.getTab(tabId);
+    return new Promise(async (resolve, reject) => {
+      const tab = await chrome.tabs.get(tabId);
 
       if (tab) {
         if (tab.status === "complete") {

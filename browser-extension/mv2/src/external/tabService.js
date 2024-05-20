@@ -110,23 +110,23 @@
 
     ensureTabLoadingComplete(tabId) {
       return new Promise((resolve, reject) => {
-        const tab = this.getTab(tabId);
-
-        if (tab) {
-          if (tab.status === "complete") {
-            resolve();
+        chrome.tabs.get(tabId, (tab) => {
+          if (tab) {
+            if (tab.status === "complete") {
+              resolve();
+            } else {
+              const handler = (currentTabId, tabChangeInfo) => {
+                if (currentTabId === tabId && tabChangeInfo.status === "complete") {
+                  chrome.tabs.onUpdated.removeListener(handler);
+                  resolve();
+                }
+              };
+              chrome.tabs.onUpdated.addListener(handler);
+            }
           } else {
-            const handler = (currentTabId, tabChangeInfo) => {
-              if (currentTabId === tabId && tabChangeInfo.status === "complete") {
-                chrome.tabs.onUpdated.removeListener(handler);
-                resolve();
-              }
-            };
-            chrome.tabs.onUpdated.addListener(handler);
+            reject();
           }
-        } else {
-          reject();
-        }
+        });
       });
     }
 
