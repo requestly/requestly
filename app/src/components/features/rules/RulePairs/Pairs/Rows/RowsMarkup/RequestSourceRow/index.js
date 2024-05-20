@@ -75,7 +75,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
           ).length
         : Object.keys(currentlySelectedRuleData.pairs[pairIndex].source.filters || {}).filter(
             (key) => key !== GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL
-          ).length.length;
+          ).length;
     },
     [currentlySelectedRuleData, isSourceFilterFormatUpgraded]
   );
