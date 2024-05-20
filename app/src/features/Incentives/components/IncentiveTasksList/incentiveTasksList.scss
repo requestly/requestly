@@ -51,7 +51,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 97%;
+      width: 95%;
 
       .incentive-task-title-container {
         display: flex;
@@ -72,9 +72,29 @@
 
       .task-credit-value {
         font-size: var(--requestly-font-size-xs);
+        color: var(--requestly-color-text-subtle);
         span {
           color: var(--requestly-color-text-default);
           font-weight: 500;
+        }
+      }
+
+      svg.task-checked-icon {
+        color: var(--requestly-color-success);
+      }
+    }
+
+    .incentive-task-header.completed-task {
+      .incentive-task-title-container {
+        .incentive-task-title {
+          text-decoration: line-through;
+          color: var(--requestly-color-text-subtle);
+        }
+      }
+
+      .task-credit-value {
+        span {
+          color: var(--requestly-color-success);
         }
       }
     }

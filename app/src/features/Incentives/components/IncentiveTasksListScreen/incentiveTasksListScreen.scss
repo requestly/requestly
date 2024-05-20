@@ -1,0 +1,13 @@
+.incentive-task-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  background: var(--requestly-color-surface-0);
+
+  .incentive-task-screen-content {
+    width: 100%;
+    max-width: 768px;
+    margin-top: 1rem;
+  }
+}
