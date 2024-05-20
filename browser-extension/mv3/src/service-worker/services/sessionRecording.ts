@@ -73,7 +73,7 @@ export const watchRecording = (tabId: number) => {
 };
 
 const startRecording = (tabId: number, config: Record<string, any>) => {
-  chrome.tabs.sendMessage(tabId, {
+  return chrome.tabs.sendMessage(tabId, {
     action: CLIENT_MESSAGES.START_RECORDING,
     payload: config,
   });
@@ -144,11 +144,12 @@ export const handleSessionRecordingOnClientPageLoad = async (tab: chrome.tabs.Ta
   }
 
   if (sessionRecordingData) {
-    startRecording(tab.id, sessionRecordingData);
-    tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, {
-      ...sessionRecordingData,
-      notify: false,
-      previousSession: null,
+    startRecording(tab.id, sessionRecordingData).then(() => {
+      tabService.setData(tab.id, TAB_SERVICE_DATA.SESSION_RECORDING, {
+        ...sessionRecordingData,
+        notify: false,
+        previousSession: null,
+      });
     });
   }
 };
