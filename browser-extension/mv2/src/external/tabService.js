@@ -110,8 +110,6 @@
 
     ensureTabLoadingComplete(tabId) {
       return new Promise((resolve, reject) => {
-        const tab = this.getTab(tabId);
-
         chrome.tabs.get(tabId, (tab) => {
           if (tab) {
             if (tab.status === "complete") {
