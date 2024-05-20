@@ -102,6 +102,14 @@ export const matchSourceUrl = (sourceObject: UrlSource, url: string): boolean =>
   return false;
 };
 
+const createInitiatorDomainRegex = (domain: string) => {
+  // Escape the domain dots
+  const escapedDomain = domain.replace(/\./g, "\\.");
+  // Create the regex pattern
+  const pattern = `^([a-zA-Z0-9-]+\\.)*${escapedDomain}$`;
+  return new RegExp(pattern);
+};
+
 const matchRequestWithRuleSourceFilters = function (
   sourceFilters: RuleSourceFilter[],
   requestDetails: AJAXRequestDetails
@@ -115,7 +123,16 @@ const matchRequestWithRuleSourceFilters = function (
   return Object.entries(sourceObject).every(([key, values]) => {
     switch (key) {
       case SourceFilterTypes.PAGE_DOMAINS:
-        return values.includes(requestDetails.initiatorDomain);
+        try {
+          const urlHost = new URL(requestDetails.url).hostname;
+          return values.some((value: string) => {
+            // Create a regex to match the value as a domain or subdomain as happens with pageDomains field in DNR
+            const pattern = createInitiatorDomainRegex(value);
+            return pattern.test(urlHost);
+          });
+        } catch (e) {
+          return values.includes(requestDetails.initiatorDomain);
+        }
       case SourceFilterTypes.REQUEST_METHOD:
         return values.includes(requestDetails.method);
       case SourceFilterTypes.RESOURCE_TYPE:
