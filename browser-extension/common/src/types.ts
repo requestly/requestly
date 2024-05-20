@@ -59,7 +59,7 @@ export interface UrlSource {
 
 export interface RuleSourceFilter {
   pageDomains: string[];
-  requestMethod: HttpRequestMethod;
+  requestMethod: HttpRequestMethod[];
   resourceType: ResourceType[];
 }
 
