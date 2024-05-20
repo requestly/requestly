@@ -52,8 +52,8 @@ class ExtensionIconManager {
 
     if (newConfigKey && config[newConfigKey] !== newConfigValue) {
       config = { ...config, [newConfigKey]: newConfigValue };
-      window.tabService.setPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG, config);
     }
+    window.tabService.setPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG, config);
 
     window.tabService.setExtensionIcon(this.#getIcon(config), tabId);
   }
