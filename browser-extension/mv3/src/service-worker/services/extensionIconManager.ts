@@ -68,13 +68,7 @@ class ExtensionIconManager {
 
   #updateIconStateForAllTabs() {
     const tabsMap = tabService.getTabs();
-    const tabsWithIconConfig = Object.values(tabsMap).filter((tab) => {
-      if (tab && tab.pageData) {
-        return !!tab.pageData[this.#CONSTANTS.PAGE_DATA_ICON_CONFIG];
-      }
-      return false;
-    });
-    tabsWithIconConfig.forEach((tab) => this.#updateIconState(tab.id));
+    Object.values(tabsMap).forEach((tab) => this.#updateIconState(tab.id));
   }
 
   #setExtensionIcon(path: string, tabId?: number) {
@@ -88,14 +82,12 @@ class ExtensionIconManager {
   markExtensionEnabled = () => {
     this.#isExtensionDisabled = false;
     this.#setExtensionIcon(this.#icons.DEFAULT);
-    // tabService.setExtensionIcon(this.#icons.DEFAULT);
     this.#updateIconStateForAllTabs();
   };
 
   markExtensionDisabled = () => {
     this.#isExtensionDisabled = true;
     this.#setExtensionIcon(this.#icons.DISABLED);
-    // tabService.setExtensionIcon(this.#icons.DISABLED);
     this.#updateIconStateForAllTabs();
   };
 
