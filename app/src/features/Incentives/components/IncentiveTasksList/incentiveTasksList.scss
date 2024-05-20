@@ -1,0 +1,87 @@
+.incentive-tasks-list-container {
+  .incentive-tasks-list {
+    .incentive-tasks-list-collapse.ant-collapse {
+      border: none;
+      background: none;
+
+      .ant-collapse-item {
+        border-bottom: none;
+        padding: 1rem;
+        background: var(--requestly-color-surface-1);
+        border-radius: 8px;
+        border: 1px solid var(--requestly-color-white-t-10);
+
+        .ant-collapse-arrow {
+          right: 0;
+        }
+      }
+
+      .ant-collapse-item:first-child {
+        margin-top: 24px;
+      }
+
+      .ant-collapse-item:not(:first-child) {
+        margin-top: 8px;
+      }
+
+      .ant-collapse-content {
+        border-top: none;
+        margin-top: 10px;
+        border-radius: 4px;
+      }
+    }
+
+    .collapse-arrow-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 4px;
+      border: 1px solid var(--requestly-color-white-t-10);
+      background: var(--requestly-color-white-t-10);
+      padding: 5px;
+      height: 24px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .collapse-arrow-down.rotate {
+      transform: rotate(180deg);
+    }
+
+    .incentive-task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 97%;
+
+      .incentive-task-title-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        svg {
+          color: var(--requestly-color-text-subtle);
+          width: 1rem;
+          height: 1rem;
+        }
+        .incentive-task-title {
+          font-size: var(--requestly-font-size-sm);
+          color: var(--requestly-color-text-default);
+          font-weight: 500;
+        }
+      }
+
+      .task-credit-value {
+        font-size: var(--requestly-font-size-xs);
+        span {
+          color: var(--requestly-color-text-default);
+          font-weight: 500;
+        }
+      }
+    }
+
+    .incentive-task-content {
+      padding: 1rem;
+      border-radius: 4px;
+    }
+  }
+}
