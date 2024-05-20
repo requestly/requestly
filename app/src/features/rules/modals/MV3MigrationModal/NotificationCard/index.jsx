@@ -20,10 +20,11 @@ import { StorageService } from "init";
 import { getAppMode } from "store/selectors";
 
 export function NotificationCard() {
-  const [isVisible, setIsVisible] = useState(false);
-
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const appMode = useSelector(getAppMode);
+
+  const [isVisible, setIsVisible] = useState(false);
+  const [doesAnyRuleExist, setDoesAnyRuleExist] = useState(false);
 
   const { openMigratonModalAction } = useRulesModalsContext();
 
@@ -58,24 +59,30 @@ export function NotificationCard() {
     return (
       Object.keys(migratedRulesLogs).length > 0 &&
       !migrationData[currentlyActiveWorkspace?.id ?? "private"]?.migrationModalViewed &&
-      Object.keys(migratedRulesLogs).some(async (ruleId) => {
-        let doesRuleExist = false;
-        await StorageService(appMode)
-          .getRecord(ruleId)
-          .then((rule) => {
-            doesRuleExist = !!rule;
-          });
-        return doesRuleExist;
-      })
+      doesAnyRuleExist
     );
-  }, [appMode, currentlyActiveWorkspace?.id, migratedRulesLogs]);
+  }, [currentlyActiveWorkspace?.id, doesAnyRuleExist, migratedRulesLogs]);
 
   useEffect(() => {
     if (isShowNotification) {
       trackMigrationNotificationShown();
       setIsVisible(true);
+    } else {
+      setIsVisible(false);
     }
   }, [isShowNotification]);
+
+  useEffect(() => {
+    Object.keys(migratedRulesLogs).forEach((ruleId) => {
+      StorageService(appMode)
+        .getRecord(ruleId)
+        .then((rule) => {
+          if (rule) {
+            setDoesAnyRuleExist(true);
+          }
+        });
+    });
+  });
 
   const handleOnClick = useCallback(() => {
     trackMigrationNotificationClicked();
