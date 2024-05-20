@@ -27,7 +27,16 @@ const AuthPage = (props) => {
 
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
 
-  const authMethod = params.has("method") ? params.get("method") : null;
+  const getCaseInsensitiveParam = (paramName) => {
+    for (const [key, value] of params.entries()) {
+      if (key.toLowerCase() === paramName.toLowerCase()) {
+        return value;
+      }
+    }
+    return null;
+  };
+
+  const authMethod = getCaseInsensitiveParam("method");
 
   const postSignInSteps = () => {
     if (params.has("redirectUrl")) {
