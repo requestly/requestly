@@ -54,13 +54,13 @@ class ExtensionIconManager {
     return this.#icons.DEFAULT;
   }
 
-  #updateIconState(tabId?: number, newConfigKey?: keyof ExtensionIconConfig, newConfigValue?: boolean) {
-    let config = tabService.getPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG) || this.#getDefaultConfig();
+  #updateIconState(tabId: number, newConfigKey?: keyof ExtensionIconConfig, newConfigValue?: boolean) {
+    let config = tabService.getPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG) ?? this.#getDefaultConfig();
 
     if (newConfigKey && config[newConfigKey] !== newConfigValue) {
       config = { ...config, [newConfigKey]: newConfigValue };
-      tabService.setPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG, config);
     }
+    tabService.setPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG, config);
 
     this.#setExtensionIcon(this.#getIcon(config), tabId);
     // tabService.setExtensionIcon(this.#getIcon(config), tabId);
