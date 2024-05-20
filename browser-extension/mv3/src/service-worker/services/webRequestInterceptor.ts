@@ -9,9 +9,9 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
     return;
   }
 
-  rulesStorageService.getEnabledRules().then((enabledRules) => {
-    let isMainFrameRequest = details.type === "main_frame" ? true : false;
+  let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
+  rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
         case RuleType.REDIRECT:
@@ -37,6 +37,8 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
 };
 
 const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails) => {
+  let isMainFrameRequest = details.type === "main_frame" ? true : false;
+
   rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
@@ -50,7 +52,7 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
             initiatorDomain: details.initiator,
           });
           if (isApplied && matchedPair.modifications?.Request && matchedPair.modifications?.Request?.length > 0) {
-            ruleExecutionHandler.onRuleExecuted(rule, details);
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
           }
           break;
         default:
@@ -62,6 +64,8 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
 };
 
 const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails) => {
+  let isMainFrameRequest = details.type === "main_frame" ? true : false;
+
   rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
@@ -74,7 +78,7 @@ const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails)
             initiatorDomain: details.initiator,
           });
           if (isApplied && matchedPair.modifications?.Response && matchedPair.modifications?.Response?.length > 0) {
-            ruleExecutionHandler.onRuleExecuted(rule, details);
+            ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
           }
           break;
         default:
