@@ -1,2 +1,2 @@
 export { IncentiveTasksListScreen } from "./components/IncentiveTasksListScreen/IncentiveTasksListScreen";
-export { IncentiveTasksListModal } from "./components/IncentiveTasksListModal/IncentiveTasksListModal";
+export { IncentiveTasksListModal } from "./modals/IncentiveTasksListModal/IncentiveTasksListModal";
