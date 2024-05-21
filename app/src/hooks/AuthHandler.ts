@@ -6,7 +6,7 @@ import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import { actions } from "store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
-import { getAppMode, getUserAttributes } from "store/selectors";
+import { getAppMode, getIsAuthHandlerBeenSet, getUserAttributes } from "store/selectors";
 import { getPlanName, isPremiumUser } from "utils/PremiumUtils";
 import moment from "moment";
 import { getAndUpdateInstallationDate } from "utils/Misc";
@@ -18,12 +18,12 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUser } from "backend/user/getUser";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
-let hasAuthHandlerBeenSet = false;
 
 const AuthHandler: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
+  const hasAuthHandlerBeenSet = useSelector(getIsAuthHandlerBeenSet);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
   const getOrganizationUsers = useMemo(() => httpsCallable(getFunctions(), "users-getOrganizationUsers"), []);
@@ -173,7 +173,6 @@ const AuthHandler: React.FC<{}> = () => {
 
   useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
-    hasAuthHandlerBeenSet = true;
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
       Logger.time("AuthHandler");
@@ -189,6 +188,8 @@ const AuthHandler: React.FC<{}> = () => {
             });
           }
         });
+        // @ts-expect-error
+        dispatch(actions.updateHasAuthHandlerBeenSet(true));
       } else {
         // No user is signed in, Unset UID in window object
         window.uid = null;
@@ -210,9 +211,12 @@ const AuthHandler: React.FC<{}> = () => {
             initValue: true,
           })
         );
+        // @ts-expect-error
+        dispatch(actions.updateHasAuthHandlerBeenSet(true));
       }
     });
   }, [
+    hasAuthHandlerBeenSet,
     dispatch,
     appMode,
     getEnterpriseAdminDetails,
