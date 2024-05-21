@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal } from "antd";
-import { IncentiveTasksList } from "../IncentiveTasksList/IncentiveTasksList";
+import { IncentiveTasksList } from "../../components/IncentiveTasksList/IncentiveTasksList";
 import "./incentiveTasksListModal.scss";
 
 interface IncentiveTasksListModalProps {
