@@ -16,6 +16,10 @@ import { useNavigate } from "react-router-dom";
 import { RuleType } from "types";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 
+/* TODO: REFACTOR THIS COMPONENT 
+  Currently created a separate component for create new rule button with rule types dropdown
+*/
+
 export const NewRuleButtonWithDropdown = () => {
   const navigate = useNavigate();
   const { getFeatureLimitValue } = useFeatureLimiter();
