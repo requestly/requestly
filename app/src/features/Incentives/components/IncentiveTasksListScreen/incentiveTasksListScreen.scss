@@ -9,5 +9,10 @@
     width: 100%;
     max-width: 768px;
     margin-top: 1rem;
+
+    .incentive-tasks-list {
+      max-height: 74vh;
+      overflow-y: auto;
+    }
   }
 }

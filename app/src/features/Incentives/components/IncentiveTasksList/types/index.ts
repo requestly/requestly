@@ -1,3 +1,4 @@
+import { Dispatch } from "@reduxjs/toolkit";
 import { ReactNode } from "react";
 
 export enum IncentiveTask {
@@ -14,8 +15,6 @@ export type IncentiveTaskListItem = {
   title: string;
   icon: ReactNode;
   description: string;
-  helpLink: {
-    text: string;
-    url: string;
-  };
+  action: ({ navigate, dispatch }: { navigate: unknown; dispatch: Dispatch }) => ReactNode;
+  helpLink?: ReactNode;
 };

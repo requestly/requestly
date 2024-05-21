@@ -5,9 +5,13 @@ import { incentiveTasksList } from "./constants/incentiveTasks";
 import { PiCaretDownBold } from "@react-icons/all-files/pi/PiCaretDownBold";
 import { MdCheckCircle } from "@react-icons/all-files/md/MdCheckCircle";
 import { IncentiveTaskListItem } from "./types";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import "./incentiveTasksList.scss";
 
 export const IncentiveTasksList = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const renderTaskHeader = (task: IncentiveTaskListItem) => {
     // TODO: HANDLE COMPLETE TASKS
     const isTaskCompleted = false;
@@ -43,7 +47,16 @@ export const IncentiveTasksList = () => {
         >
           {incentiveTasksList.map((task, index) => (
             <Collapse.Panel header={renderTaskHeader(task)} key={index}>
-              <div className="incentive-task-content">{task.description}</div>
+              <div className="incentive-task-content">
+                <div className="incentive-task-description">{task.description}</div>
+                <div className="incentive-task-actions">
+                  {task.action({
+                    dispatch,
+                    navigate,
+                  })}
+                  <div className="incentive-task-help-link">{task?.helpLink}</div>
+                </div>
+              </div>
             </Collapse.Panel>
           ))}
         </Collapse>
