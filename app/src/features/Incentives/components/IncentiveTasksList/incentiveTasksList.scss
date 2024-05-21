@@ -1,5 +1,7 @@
 .incentive-tasks-list-container {
   .incentive-tasks-list {
+    padding-right: 4px;
+
     .incentive-tasks-list-collapse.ant-collapse {
       border: none;
       background: none;
@@ -102,6 +104,26 @@
     .incentive-task-content {
       padding: 1rem;
       border-radius: 4px;
+
+      .incentive-task-description {
+        font-size: var(--requestly-font-size-sm);
+        color: var(--requestly-color-text-subtle);
+      }
+
+      .incentive-task-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+
+        .rule-selection-dropdown-btn {
+          width: auto;
+        }
+
+        .incentive-task-help-link {
+          font-size: var(--requestly-font-size-xs);
+        }
+      }
     }
   }
 }
