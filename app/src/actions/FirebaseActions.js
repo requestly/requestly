@@ -531,6 +531,7 @@ export function checkUserAuthState(callback) {
 }
 
 export async function checkUserBackupState(uid) {
+  console.log("DBG: checkUserBackupState");
   const database = getDatabase();
   const userProfileRef = ref(database, `users/${uid}/profile`);
   let backupStatus = false;
@@ -551,6 +552,7 @@ export async function checkUserBackupState(uid) {
 
 /* Syncing is not enable when storage is remote */
 export async function getOrUpdateUserSyncState(uid, appMode) {
+  console.log("DBG: getOrUpdateUserSyncState");
   const database = getDatabase();
   const userProfileRef = ref(database, getUserProfilePath(uid));
   let syncStatus = null;

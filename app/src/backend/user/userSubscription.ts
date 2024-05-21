@@ -3,6 +3,7 @@ import firebaseApp from "../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 
 export const getUserSubscription = async (uid: string): Promise<UserSubscription> => {
+  console.log("DBG getUserSubscription");
   const db = getFirestore(firebaseApp);
   const userSubscriptionDocRef = doc(db, "individualSubscriptions", uid);
 

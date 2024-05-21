@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentlyActiveWorkspace, getCurrentlyActiveWorkspaceMembers } from "store/features/teams/selectors";
-import { getAppMode, getUserAuthDetails } from "../../store/selectors";
+import { getAppMode, getIsAuthHandlerBeenSet, getUserAuthDetails } from "../../store/selectors";
 import availableTeamsListener from "./availableTeamsListener";
 import syncingNodeListener from "./syncingNodeListener";
 import userNodeListener from "./userNodeListener";
@@ -23,6 +23,8 @@ const DBListeners = () => {
   const appMode = useSelector(getAppMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const currentTeamMembers = useSelector(getCurrentlyActiveWorkspaceMembers);
+  const hasAuthHandlerBeenSet = useSelector(getIsAuthHandlerBeenSet);
+
   let unsubscribeUserNodeRef = useRef(null);
   window.unsubscribeSyncingNodeRef = useRef(null);
   let unsubscribeAvailableTeams = useRef(null);
@@ -41,6 +43,7 @@ const DBListeners = () => {
 
   // Listens to /sync/{id}/metadata or /teamSync/{id}/metadata changes
   useEffect(() => {
+    if (!hasAuthHandlerBeenSet) return;
     if (hasAuthStateChanged || !window.isFirstSyncComplete) {
       dispatch(actions.updateIsRulesListLoading(true));
     }
@@ -74,6 +77,7 @@ const DBListeners = () => {
       dispatch(actions.updateIsRulesListLoading(false));
     }
   }, [
+    hasAuthHandlerBeenSet,
     appMode,
     currentlyActiveWorkspace.id,
     dispatch,
