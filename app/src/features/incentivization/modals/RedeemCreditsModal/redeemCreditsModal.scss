@@ -1,12 +1,19 @@
-.redeem-credits-modal.rq-modal.ant-modal {
+.redeem-credits-modal.ant-modal {
   min-width: 416px !important;
 }
 
-.redeem-credits-modal.empty.rq-modal.ant-modal {
+.redeem-credits-modal.empty.ant-modal {
   min-width: 480px !important;
 }
 
-.redeem-credits-modal.rq-modal.ant-modal {
+.redeem-credits-modal.ant-modal {
+  .ant-modal-header {
+    border-bottom: none;
+  }
+  .ant-modal-body {
+    padding: 0;
+  }
+
   .credits-not-available {
     padding: 24px;
     display: flex;

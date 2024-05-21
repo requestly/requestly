@@ -1,5 +1,6 @@
 import React from "react";
-import { RQButton, RQModal } from "lib/design-system/components";
+import { Modal } from "antd";
+import { RQButton } from "lib/design-system/components";
 import emptyWallet from "./empty_wallet.svg";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import "./redeemCreditsModal.scss";
@@ -28,11 +29,13 @@ export const RedeemCreditsModal: React.FC = () => {
   ];
 
   return (
-    <RQModal
+    <Modal
       closable={!isEmpty}
       width={isEmpty ? 480 : 416}
       open={true}
-      className={`redeem-credits-modal ${isEmpty ? "empty" : ""}`}
+      footer={null}
+      title={isEmpty ? null : "Redeem credits and upgrade"}
+      className={`custom-rq-modal redeem-credits-modal ${isEmpty ? "empty" : ""}`}
     >
       {isEmpty ? (
         <div className="credits-not-available">
@@ -54,7 +57,6 @@ export const RedeemCreditsModal: React.FC = () => {
       ) : (
         <div className="credits-available">
           <div className="content">
-            <div className="title">Redeem credits and upgrade</div>
             <div className="description">
               You have earned <span className="credits-earned">${totalCreditsEarned} credits</span> till now. Use your
               credits to upgrade to Requestly Pro plan.
@@ -86,6 +88,6 @@ export const RedeemCreditsModal: React.FC = () => {
           </div>
         </div>
       )}
-    </RQModal>
+    </Modal>
   );
 };
