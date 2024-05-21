@@ -8,6 +8,7 @@ import { Button } from "antd";
 import { redirectToMocks, redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { actions } from "store";
 
+// TODO: ADD HELP LINKS
 export const incentiveTasksList: IncentiveTaskListItem[] = [
   {
     id: IncentiveTask.CREATE_FIRST_RULE,
@@ -16,10 +17,7 @@ export const incentiveTasksList: IncentiveTaskListItem[] = [
       "Use rules to intercept & modify network requests, headers, API requests, inject scripts & much more. Upon creating your first rule you will earn $25 Free credits for professional plan.",
     icon: <MdPlaylistAdd />,
     action: () => <NewRuleButtonWithDropdown />,
-    helpLink: {
-      text: "Learn how to create Rules",
-      url: "https://docs.automatio.co/rules",
-    },
+    helpLink: <a href="#">Learn how to create Rules</a>,
   },
   {
     id: IncentiveTask.CREATE_PREMIUM_RULE,
@@ -28,10 +26,7 @@ export const incentiveTasksList: IncentiveTaskListItem[] = [
       "Use rules to intercept & modify network requests, headers, API requests, inject scripts & much more. Upon creating your first rule you will earn $25 Free credits for professional plan.",
     icon: <MdPlaylistAdd />,
     action: () => <NewRuleButtonWithDropdown />,
-    helpLink: {
-      text: "Learn how to create Rules",
-      url: "https://docs.automatio.co/rules",
-    },
+    helpLink: <a href="#">Learn how to create Rules</a>,
   },
   {
     id: IncentiveTask.CREATE_A_TEAM_WORKSPACE,
@@ -62,12 +57,9 @@ export const incentiveTasksList: IncentiveTaskListItem[] = [
         Create a new workspace
       </Button>
     ),
-
-    helpLink: {
-      text: "Learn how to create Team Workspace",
-      url: "https://docs.automatio.co/team-workspace",
-    },
+    helpLink: <a href="#">Learn how to create Team Workspace</a>,
   },
+
   {
     id: IncentiveTask.CREATE_API_MOCK,
     title: "Create an API Mock",
@@ -79,10 +71,7 @@ export const incentiveTasksList: IncentiveTaskListItem[] = [
       </Button>
     ),
 
-    helpLink: {
-      text: "Learn how to create API Mock",
-      url: "https://docs.automatio.co/api-mock",
-    },
+    helpLink: <a href="#">Learn how to create API Mock</a>,
   },
   {
     id: IncentiveTask.RECORD_A_SESSION,
@@ -95,9 +84,6 @@ export const incentiveTasksList: IncentiveTaskListItem[] = [
         Record a session
       </Button>
     ),
-    helpLink: {
-      text: "Learn how to record a session",
-      url: "https://docs.automatio.co/session-recording",
-    },
+    helpLink: <a href="#">Learn how to record a session</a>,
   },
 ];
