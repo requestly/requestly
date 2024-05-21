@@ -6,9 +6,10 @@ import Logger from "lib/logger";
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   animationName: string;
   animationData: unknown;
+  loop?: boolean;
 }
 
-const LottieAnimation: React.FC<Props> = ({ animationName, animationData, ...props }) => {
+const LottieAnimation: React.FC<Props> = ({ animationName, animationData, loop = true, ...props }) => {
   const lottieContainerRef = useRef();
 
   useEffect(() => {
@@ -19,13 +20,13 @@ const LottieAnimation: React.FC<Props> = ({ animationName, animationData, ...pro
         container: lottieContainerRef.current,
         animationData: animationData,
         renderer: "svg", // "canvas", "html"
-        loop: true, // boolean
+        loop, // boolean
         autoplay: true, // boolean
       });
     } catch (e) {
       Logger.log("Failed to load animation", animationName, e);
     }
-  }, [animationName, animationData]);
+  }, [animationName, animationData, loop]);
 
   return <div {...props} ref={lottieContainerRef} />;
 };
