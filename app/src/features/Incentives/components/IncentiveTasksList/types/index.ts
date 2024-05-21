@@ -16,8 +16,5 @@ export type IncentiveTaskListItem = {
   icon: ReactNode;
   description: string;
   action: ({ navigate, dispatch }: { navigate: unknown; dispatch: Dispatch }) => ReactNode;
-  helpLink: {
-    text: string;
-    url: string;
-  };
+  helpLink?: ReactNode;
 };

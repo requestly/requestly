@@ -54,11 +54,7 @@ export const IncentiveTasksList = () => {
                     dispatch,
                     navigate,
                   })}
-                  <div className="incentive-task-help-link">
-                    <a href={task.helpLink.url} target="_blank" rel="noreferrer">
-                      {task.helpLink.text}
-                    </a>
-                  </div>
+                  <div className="incentive-task-help-link">{task?.helpLink}</div>
                 </div>
               </div>
             </Collapse.Panel>
