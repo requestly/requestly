@@ -28,7 +28,6 @@ import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsLi
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
 import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
-import { RedeemCreditsModal } from "features/incentivization/modals/RedeemCreditsModal/RedeemCreditsModal";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -68,7 +67,6 @@ const App = () => {
 
   return (
     <>
-      <RedeemCreditsModal /> {/* TODO: Remove modal from here after dev  */}
       <ExtensionContextInvalidationNotice />
       <AuthHandler />
       <PreLoadRemover />

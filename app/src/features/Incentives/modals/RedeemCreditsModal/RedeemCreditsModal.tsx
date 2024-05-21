@@ -1,11 +1,16 @@
 import React from "react";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
-import emptyWallet from "./empty_wallet.svg";
+import emptyWallet from "./assets/empty_wallet.svg";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import "./redeemCreditsModal.scss";
 
-export const RedeemCreditsModal: React.FC = () => {
+interface RedeemCreditsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, onClose }) => {
   const isEmpty = false; // TODO: remove this
   const totalCreditsEarned = 105;
 
@@ -32,7 +37,8 @@ export const RedeemCreditsModal: React.FC = () => {
     <Modal
       closable={!isEmpty}
       width={isEmpty ? 480 : 416}
-      open={true}
+      open={isOpen}
+      onCancel={onClose}
       footer={null}
       title={isEmpty ? null : "Redeem credits and upgrade"}
       className={`custom-rq-modal redeem-credits-modal ${isEmpty ? "empty" : ""}`}
