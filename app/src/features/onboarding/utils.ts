@@ -2,6 +2,8 @@ import PATHS from "config/constants/sub/paths";
 
 export const shouldShowOnboarding = () => {
   if (
+    window.location.href.includes(PATHS.AUTH.SIGN_IN.RELATIVE) ||
+    window.location.href.includes(PATHS.AUTH.SIGN_UP.RELATIVE) ||
     window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||
     window.location.href.includes("/invite") ||
     window.location.href.includes(PATHS.AUTH.EMAIL_ACTION.RELATIVE) ||
