@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { Button, Progress } from "antd";
 import { MdRedeem } from "@react-icons/all-files/md/MdRedeem";
 import { RedeemCreditsModal } from "features/Incentives";
 import "./creditsProgessbar.scss";
-import { useState } from "react";
 
 export const CreditsProgressBar = () => {
   const [isRedeemModalVisible, setIsRedeemModalVisible] = useState(false);
