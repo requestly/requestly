@@ -185,7 +185,22 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const getFunctionFromCode = (code) => {
-    return new Function("args", `return (${code})(args);`);
+    try {
+      return new Function("args", `return (${code})(args);`);
+    } catch (e) {
+      console.log("!!!debug", "", e);
+      notifyOnCSPError({
+        initiatorDomain: location.origin,
+        url: location.href,
+      }).then(() => {
+        console.log(
+          `%cRequestly%c Please reload the page for this rule to work`,
+          "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
+          "color: red; font-style: italic"
+        );
+      });
+      return () => {};
+    }
   };
 
   const getCustomRequestBody = (requestRuleData, args) => {
@@ -306,6 +321,35 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     });
   };
 
+  const notifyOnCSPError = async (requestDetails) => {
+    window.postMessage(
+      {
+        source: "requestly:client",
+        action: "onCSPError",
+        requestDetails,
+      },
+      window.location.href
+    );
+
+    let onCSPErrorAckHandler;
+
+    return Promise.race([
+      new Promise((resolve) => {
+        setTimeout(resolve, 2000);
+      }),
+      new Promise((resolve) => {
+        onCSPErrorAckHandler = (event) => {
+          if (event.data.action === "onCSPError:processed") {
+            resolve();
+          }
+        };
+        window.addEventListener("message", onCSPErrorAckHandler);
+      }),
+    ]).finally(() => {
+      window.removeEventListener("message", onCSPErrorAckHandler);
+    });
+  };
+
   /**
    * ********** Within Context Functions end here *************
    */
@@ -370,6 +414,10 @@ import { PUBLIC_NAMESPACE } from "common/constants";
                 responseJSON: jsonifyValidJSONString(this.response),
               })
             : responseModification.value;
+
+        if (typeof customResponse === "undefined") {
+          return;
+        }
 
         // Convert customResponse back to rawText
         // response.value is String and evaluator method might return string/object
@@ -486,15 +534,17 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         bodyAsJson: jsonifyValidJSONString(data),
       });
 
-      notifyRequestRuleApplied({
-        ruleDetails: requestRule,
-        requestDetails: {
-          url: this.requestURL,
-          method: this.method,
-          type: "xmlhttprequest",
-          timeStamp: Date.now(),
-        },
-      });
+      if (typeof this.requestData !== "undefined") {
+        notifyRequestRuleApplied({
+          ruleDetails: requestRule,
+          requestDetails: {
+            url: this.requestURL,
+            method: this.method,
+            type: "xmlhttprequest",
+            timeStamp: Date.now(),
+          },
+        });
+      }
     }
 
     this.responseRule = getMatchedResponseRule(this.requestURL);
@@ -551,28 +601,30 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           bodyAsJson: jsonifyValidJSONString(originalRequestBody),
         }) || {};
 
-      request = new Request(request.url, {
-        method,
-        body: requestBody,
-        headers: request.headers,
-        referrer: request.referrer,
-        referrerPolicy: request.referrerPolicy,
-        mode: request.mode,
-        credentials: request.credentials,
-        cache: request.cache,
-        redirect: request.redirect,
-        integrity: request.integrity,
-      });
-
-      notifyRequestRuleApplied({
-        ruleDetails: requestRuleData,
-        requestDetails: {
-          url,
+      if (typeof requestBody !== undefined) {
+        request = new Request(request.url, {
           method,
-          type: "fetch",
-          timeStamp: Date.now(),
-        },
-      });
+          body: requestBody,
+          headers: request.headers,
+          referrer: request.referrer,
+          referrerPolicy: request.referrerPolicy,
+          mode: request.mode,
+          credentials: request.credentials,
+          cache: request.cache,
+          redirect: request.redirect,
+          integrity: request.integrity,
+        });
+
+        notifyRequestRuleApplied({
+          ruleDetails: requestRuleData,
+          requestDetails: {
+            url,
+            method,
+            type: "fetch",
+            timeStamp: Date.now(),
+          },
+        });
+      }
     }
 
     let requestData;
@@ -684,6 +736,10 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       }
 
       customResponse = getFunctionFromCode(responseRuleData.response.value)(evaluatorArgs);
+
+      if (typeof customResponse === "undefined") {
+        return fetchedResponse;
+      }
 
       // evaluator might return us Object but response.value is string
       // So make the response consistent by converting to JSON String and then create the Response object
