@@ -10,7 +10,7 @@ const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryPar
     },
   };
 
-  modifications.forEach((modification) => {
+  for (const modification of modifications) {
     if (modification.type === QueryParamModificationType.ADD) {
       transform.queryTransform.addOrReplaceParams.push({
         key: modification.param,
@@ -19,9 +19,13 @@ const parseQueryParams = (modifications: QueryParamRuleModification[]): QueryPar
     } else if (modification.type === QueryParamModificationType.REMOVE) {
       transform.queryTransform.removeParams.push(modification.param);
     } else {
+      // case remove all
       transform.query = "";
+      // queryTransform is not needed if query is present
+      delete transform.queryTransform;
+      break;
     }
-  });
+  }
 
   return transform;
 };

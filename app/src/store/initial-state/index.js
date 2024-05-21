@@ -138,6 +138,11 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+
+    creditsModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {

@@ -34,6 +34,7 @@ import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { IncentiveTasksListModal } from "features/Incentives";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -187,6 +188,13 @@ const DashboardContent = () => {
               isOpen={activeModals.pricingModal.isActive}
               toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "pricingModal" }))}
               {...activeModals.pricingModal.props}
+            />
+          ) : null}
+
+          {activeModals.creditsModal.isActive ? (
+            <IncentiveTasksListModal
+              isOpen={activeModals.creditsModal.isActive}
+              toggleModal={() => dispatch(actions.toggleActiveModal({ modalName: "creditsModal" }))}
             />
           ) : null}
 

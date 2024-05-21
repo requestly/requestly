@@ -1,3 +1,5 @@
+import { BillingTeamMemberStatus } from "../../BillingTeam/types";
+
 export type OrgMember = {
   isVerified?: boolean;
   photoURL?: string;
@@ -6,4 +8,5 @@ export type OrgMember = {
   signupTs?: number;
   email: string;
   username?: string;
+  status?: BillingTeamMemberStatus;
 };

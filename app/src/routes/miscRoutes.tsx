@@ -12,6 +12,7 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import AppSumoModal from "components/landing/Appsumo/Appsumo";
 import { ImportFromCharlesWrapperView } from "components/features/rules/ImportFromCharlesModal";
 import { Home } from "components/Home";
+import { IncentiveTasksListScreen } from "features/Incentives";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -66,6 +67,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.APPSUMO.RELATIVE,
     element: <ProtectedRoute component={AppSumoModal} />,
+  },
+  {
+    path: PATHS.CREDITS.RELATIVE,
+    element: <IncentiveTasksListScreen />,
   },
   {
     path: PATHS.ANY,
