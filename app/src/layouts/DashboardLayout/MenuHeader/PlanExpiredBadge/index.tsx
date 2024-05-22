@@ -32,6 +32,7 @@ export const PlanExpiredBadge = () => {
         </span>
         <span>{capitalize(getPlanNameFromId(user?.details?.planDetails?.planId))} plan expired</span>
       </div>
+      {/* TEMPORARILY HIDDEN AS HEADER IS OVERPOPULATED WITH MANY BUTTONS  */}
       {/* <RQButton
         type="primary"
         onClick={() => {

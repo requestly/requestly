@@ -59,7 +59,7 @@ const MenuHeader = () => {
           dispatch(
             actions.updateProductTourCompleted({
               tour: TOUR_TYPES.MISCELLANEOUS,
-              // TODO: FIX THIS, SUBTOUR SHOULD BE PASSED AS A CONSTANT
+              // TODO: FIX WALKTHROUGH COMPONENT, SUBTOUR SHOULD BE PASSED AS A CONSTANT
               subTour: "askAI",
             })
           )

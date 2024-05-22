@@ -381,7 +381,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       ...tourTooltipPresets,
       title: "Ask AI",
       target: getTourTarget(MISC_TOURS.APP_ENGAGEMENT.ASK_AI),
-      content: "Interact with our AI bot and answers about anything in Requestly.",
+      content: "Interact with our AI bot which answers about anything in Requestly.",
       pointerPlacement: PointerPlacement.TOP_75,
       customNextButtonText: "Got it!",
       disableOverlay: true,
