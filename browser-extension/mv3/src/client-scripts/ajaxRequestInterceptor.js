@@ -300,62 +300,41 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
 
-  const notifyOnBeforeRequest = async (requestDetails) => {
+  const postMessageAndWaitForAck = async (message, action) => {
     window.postMessage(
       {
+        ...message,
+        action,
         source: "requestly:client",
-        action: "onBeforeAjaxRequest",
-        requestDetails,
       },
       window.location.href
     );
 
-    let onBeforeAjaxRequestAckHandler;
+    let ackHandler;
+
+    const ackAction = `${action}:processed`;
 
     return Promise.race([
+      new Promise((resolve) => setTimeout(resolve, 2000)),
       new Promise((resolve) => {
-        setTimeout(resolve, 2000);
-      }),
-      new Promise((resolve) => {
-        onBeforeAjaxRequestAckHandler = (event) => {
-          if (event.data.action === "onBeforeAjaxRequest:processed") {
+        ackHandler = (event) => {
+          if (event.data.action === action) {
             resolve();
           }
         };
-        window.addEventListener("message", onBeforeAjaxRequestAckHandler);
+        window.addEventListener("message", ackHandler);
       }),
     ]).finally(() => {
-      window.removeEventListener("message", onBeforeAjaxRequestAckHandler);
+      window.removeEventListener("message", ackHandler);
     });
   };
 
+  const notifyOnBeforeRequest = async (requestDetails) => {
+    return postMessageAndWaitForAck({ requestDetails }, "onBeforeRequest");
+  };
+
   const notifyOnErrorOccurred = async (requestDetails) => {
-    window.postMessage(
-      {
-        source: "requestly:client",
-        action: "onErrorOccurred",
-        requestDetails,
-      },
-      window.location.href
-    );
-
-    let onErrorOccurredAckHandler;
-
-    return Promise.race([
-      new Promise((resolve) => {
-        setTimeout(resolve, 2000);
-      }),
-      new Promise((resolve) => {
-        onErrorOccurredAckHandler = (event) => {
-          if (event.data.action === "onErrorOccurred:processed") {
-            resolve();
-          }
-        };
-        window.addEventListener("message", onErrorOccurredAckHandler);
-      }),
-    ]).finally(() => {
-      window.removeEventListener("message", onErrorOccurredAckHandler);
-    });
+    return postMessageAndWaitForAck({ requestDetails }, "onErrorOccurred");
   };
 
   /**
