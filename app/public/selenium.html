@@ -8,83 +8,148 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            background-color: #e6f7ff;
-            color: #2d3748;
+            background-color: #f0f4f8;
+            color: #333;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
         .container {
             background-color: #ffffff;
             padding: 2rem;
             border-radius: 0.5rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
         .step {
             transition: all 0.3s ease-in-out;
             position: relative;
-            padding-left: 3rem;
+            padding-left: 4rem; /* Increased padding to accommodate larger icon space */
             display: flex;
             align-items: center;
             margin-bottom: 1rem;
+            border-left: 4px solid #d1e7dd;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 0.25rem;
         }
         .step.completed {
-            opacity: 0.5;
+            border-color: #38a169;
+            background-color: #e6fffa;
+            opacity: 0.7;
+        }
+        .step.error {
+            border-color: #e53e3e;
+            background-color: #fff5f5;
         }
         .step-icon {
             font-size: 1.5rem;
-            margin-right: 0.5rem;
+            margin-right: 1rem; /* Adjusted space between icon and text */
+            margin-left: 2rem; /* Added left margin to ensure enough space between icons */
         }
         .step-icon-placeholder {
+            font-size: 1.5rem;
             position: absolute;
-            left: 0.5rem;
+            left: 1rem; /* Adjusted position to match increased padding */
             top: 50%;
             transform: translateY(-50%);
         }
         .in-progress .step-icon-placeholder {
             animation: spin 1s linear infinite;
         }
-        .completed {
-            background-color: #e0f7fa;
-            color: #38b2ac;
-        }
-        .error {
-            background-color: #fff5f5;
-            color: #e53e3e;
-        }
         @keyframes spin {
             0% { transform: translateY(-50%) rotate(0deg); }
             100% { transform: translateY(-50%) rotate(360deg); }
         }
+        #load-rules-btn {
+            background-image: linear-gradient(to right, #667eea, #764ba2);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+            margin-bottom: 2rem;
+        }
+        #load-rules-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+        #load-rules-btn:disabled {
+            background-image: none;
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            width: 100%;
+        }
+        footer {
+            width: 100%;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #666;
+            padding: 1rem 0;
+            background-color: #f0f4f8;
+            position: absolute;
+            bottom: 0;
+        }
+        footer a {
+            color: #667eea;
+            transition: color 0.3s;
+        }
+        footer a:hover {
+            color: #764ba2;
+        }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen">
-    <div id="container" class="container text-center max-w-xl">
-        <h1 id="page-title" class="text-3xl font-bold mb-8">Requestly for Selenium</h1>
-        <button id="load-rules-btn" class="bg-blue-500 text-white px-4 py-2 rounded mb-8 hover:bg-blue-700">Load Requestly Rules</button>
-        <div id="step1" class="step p-4 bg-blue-50 rounded-lg shadow">
-            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
-            <span class="icon step-icon"><i class="fas fa-plug"></i></span>
-            <span class="text-lg">Step 1: Checking if Requestly Extension is Installed</span>
-        </div>
-        <div id="step2" class="step p-4 bg-blue-50 rounded-lg shadow">
-            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
-            <span class="icon step-icon"><i class="fas fa-search"></i></span>
-            <span class="text-lg">Step 2: Fetching your Requestly Rules</span>
-        </div>
-        <div id="step3" class="step p-4 bg-blue-50 rounded-lg shadow">
-            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
-            <span class="icon step-icon"><i class="fas fa-save"></i></span>
-            <span class="text-lg">Step 3: Saving Rules to Extension Storage</span>
-        </div>
-        <div id="all-done" class="hidden text-lg text-green-600 font-bold mt-4">
-            <i class="fas fa-check-circle"></i> All done!
+<body>
+    <div class="main-content">
+        <div id="container" class="container">
+            <h1 id="page-title" class="text-3xl font-bold mb-8">Requestly for Selenium</h1>
+            <button id="load-rules-btn">Load Requestly Rules</button>
+            <div id="step1" class="step">
+                <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+                <span class="icon step-icon"><i class="fas fa-plug"></i></span>
+                <span class="text-lg">Step 1: Checking if Requestly Extension is Installed</span>
+            </div>
+            <div id="step2" class="step">
+                <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+                <span class="icon step-icon"><i class="fas fa-search"></i></span>
+                <span class="text-lg">Step 2: Fetching your Requestly Rules</span>
+            </div>
+            <div id="step3" class="step">
+                <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+                <span class="icon step-icon"><i class="fas fa-save"></i></span>
+                <span class="text-lg">Step 3: Saving Rules to Extension Storage</span>
+            </div>
+            <div id="all-done" class="hidden text-lg text-green-600 font-bold mt-4">
+                <i class="fas fa-check-circle"></i> All done!
+            </div>
         </div>
     </div>
-    <footer id="footer" class="text-center mt-4">
-        <p id="footer-text" class="text-sm text-gray-600">© 2024 RQ Labs, Inc.</p>
-        <div id="footer-links" class="mt-2">
-            <a id="main-app-link" href="https://app.requestly.io" class="text-blue-600 hover:underline">Go to Main App</a> |
-            <a id="privacy-policy-link" href="/privacy-policy" class="text-blue-600 hover:underline">Privacy Policy</a> |
-            <a id="disclaimer-link" href="/disclaimer" class="text-blue-600 hover:underline">Disclaimer</a>
+    <footer id="footer">
+        <p id="footer-text">© 2024 RQ Labs, Inc.</p>
+        <div id="footer-links">
+            <a id="main-app-link" href="https://app.requestly.io">Go to Main App</a> |
+            <a id="privacy-policy-link" href="/privacy-policy">Privacy Policy</a> |
+            <a id="disclaimer-link" href="/disclaimer">Disclaimer</a>
         </div>
     </footer>
     <script type="module" src="/selenium.bundle.js"></script>
