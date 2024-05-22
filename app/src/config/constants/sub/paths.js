@@ -600,11 +600,6 @@ PATHS.AUTH.EMAIL_LINK_SIGNIN.ABSOLUTE = joinPaths(PATHS.DASHBOARD, PATHS.AUTH.EM
 
 /******************* LEGACY *************************/
 PATHS.LEGACY = {};
-PATHS.HASH = {};
-
-// Routes on root
-PATHS.HASH.SHARED_LISTS = "#sharedList";
-PATHS.HASH.RULE_EDITOR = "#edit";
 
 // Files Library
 PATHS.LEGACY.FILES_LIBRARY = {};
