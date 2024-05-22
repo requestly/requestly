@@ -27,7 +27,7 @@ class RequestProcessor {
     // console.log("!!!debug", "headers", requestDetails, requestDetails.requestHeaders);
   };
 
-  onCSPError = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
+  onErrorOccuered = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
     const enabledRules = await rulesStorageService.getEnabledRules();
 
     if (enabledRules.length === 0) {
@@ -35,8 +35,6 @@ class RequestProcessor {
     }
 
     await handleCSPError(tabId, requestDetails);
-
-    // console.log("!!!debug", "headers", requestDetails, requestDetails.requestHeaders);
   };
 }
 
