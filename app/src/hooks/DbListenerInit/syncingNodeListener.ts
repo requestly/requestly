@@ -372,7 +372,6 @@ const syncingNodeListener = (
   try {
     // Check for individual sync target
     if (syncTarget === "sync") {
-      console.log("DBG syncingNodeListener - sync");
       // Listen to only records
       return [
         onValue(syncNodeRef, async (snap: Snapshot) => {
@@ -389,7 +388,6 @@ const syncingNodeListener = (
     }
     // Check for team sync target
     else if (syncTarget === "teamSync") {
-      console.log("DBG syncingNodeListener - teamSync");
       // Listen to records node & rulesConfig node
       const listeners: Function[] = [
         onValue(syncNodeRef, async (snap: Snapshot) => {
