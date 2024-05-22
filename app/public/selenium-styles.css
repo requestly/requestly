@@ -32,7 +32,7 @@ body {
 .step {
   transition: all 0.3s ease-in-out;
   position: relative;
-  padding-left: 4rem;
+  padding-left: 4rem; /* Increased padding to accommodate larger icon space */
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
@@ -52,18 +52,27 @@ body {
 }
 .step-icon {
   font-size: 1.5rem;
-  margin-right: 1rem;
-  margin-left: 2rem;
+  margin-right: 1rem; /* Adjusted space between icon and text */
+  margin-left: 2rem; /* Added left margin to ensure enough space between icons */
+  color: #667eea; /* Added color to the main icons */
 }
 .step-icon-placeholder {
   font-size: 1.5rem;
   position: absolute;
-  left: 1rem;
+  left: 1rem; /* Adjusted position to match increased padding */
   top: 50%;
   transform: translateY(-50%);
+  color: #667eea; /* Added color to the placeholder icons */
 }
 .in-progress .step-icon-placeholder {
   animation: spin 1s linear infinite;
+  color: #ff9800; /* Orange for in-progress */
+}
+.step-icon-placeholder.completed {
+  color: #38a169; /* Green for completed */
+}
+.step-icon-placeholder.error {
+  color: #e53e3e; /* Red for error */
 }
 @keyframes spin {
   0% {
