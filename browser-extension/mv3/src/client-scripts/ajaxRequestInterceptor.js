@@ -185,7 +185,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const getFunctionFromCode = (() => {
-    let dialogShown = false;
+    let logShown = false;
 
     return (code, ruleType) => {
       try {
@@ -195,15 +195,13 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           initiatorDomain: location.origin,
           url: location.href,
         }).then(() => {
-          if (!dialogShown) {
-            dialogShown = true;
-            if (
-              window.top.confirm(
-                `[Requestly]: You need to reload the page for ${ruleType} rule to work. Click OK to reload the page.`
-              )
-            ) {
-              window.top.location.reload();
-            }
+          if (!logShown) {
+            logShown = true;
+            console.log(
+              `%cRequestly%c Please reload the page for ${ruleType} rule to take effect`,
+              "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
+              "color: red; font-style: italic"
+            );
           }
         });
         return () => {};
