@@ -205,11 +205,6 @@ import { PUBLIC_NAMESPACE } from "common/constants";
               window.top.location.reload();
             }
           }
-          // console.log(
-          //   `%cRequestly%c Please reload the page for this rule to work`,
-          //   "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
-          //   "color: red; font-style: italic"
-          // );
         });
         return () => {};
       }
@@ -560,6 +555,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
             timeStamp: Date.now(),
           },
         });
+      } else {
+        this.requestData = data;
       }
     }
 
@@ -609,18 +606,17 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     if (requestRuleData) {
       const originalRequestBody = await request.text();
-      const requestBody =
-        getCustomRequestBody(requestRuleData, {
-          method,
-          url,
-          body: originalRequestBody,
-          bodyAsJson: jsonifyValidJSONString(originalRequestBody),
-        }) || {};
+      const requestBody = getCustomRequestBody(requestRuleData, {
+        method,
+        url,
+        body: originalRequestBody,
+        bodyAsJson: jsonifyValidJSONString(originalRequestBody),
+      });
 
       if (typeof requestBody !== undefined) {
         request = new Request(request.url, {
           method,
-          body: requestBody,
+          body: requestBody ?? {},
           headers: request.headers,
           referrer: request.referrer,
           referrerPolicy: request.referrerPolicy,
