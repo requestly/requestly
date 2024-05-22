@@ -7,6 +7,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { getThemeVariables } from "antd/dist/theme";
 import { theme } from "./src/lib/design-system/theme";
 import monacoEditorPlugin from "vite-plugin-monaco-editor";
+import path from "path";
 
 const config = ({ mode }) =>
   defineConfig({
@@ -38,9 +39,6 @@ const config = ({ mode }) =>
       svgr(),
     ],
     resolve: {
-      // { find: '@', replacement: path.resolve(__dirname, 'src') },
-      // fix less import by: @import ~
-      // https://github.com/vitejs/vite/issues/2185#issuecomment-784637827
       alias: [
         {
           find: /^~/,
@@ -67,6 +65,17 @@ const config = ({ mode }) =>
     },
     build: {
       outDir: "build",
+      rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, "index.html"),
+          selenium: path.resolve(__dirname, "public/selenium.html"),
+        },
+        output: {
+          entryFileNames: (assetInfo) => {
+            return assetInfo.name === "selenium" ? "selenium.bundle.js" : "assets/[name].[hash].js";
+          },
+        },
+      },
     },
     server: {
       open: true,

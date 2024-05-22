@@ -1,3 +1,5 @@
+import { getCurrentTimeStamp } from "./utils/DateTimeUtils";
+
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
   const apiKey = urlParams.get("apiKey");
@@ -8,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((rules) => saveRulesToExtension(rules))
     .then(() => {
       displayAllDone();
-      notifySelenium("All done!");
+      notifySelenium("All done!" + getCurrentTimeStamp());
     })
     .catch((error) => {
       displayError(error.step, error.message);
