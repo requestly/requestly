@@ -9,38 +9,43 @@
     <link rel="stylesheet" href="/selenium-styles.css" />
   </head>
   <body>
-    <div class="main-content">
-      <div id="container" class="container">
-        <h1 id="page-title" class="text-3xl font-bold mb-8">Requestly for Selenium</h1>
-        <button id="load-rules-btn">Load Requestly Rules</button>
-        <div id="step1" class="step">
-          <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
-          <span class="icon step-icon"><i class="fas fa-plug"></i></span>
-          <span class="text-lg">Step 1: Checking if Requestly Extension is Installed</span>
-        </div>
-        <div id="step2" class="step">
-          <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
-          <span class="icon step-icon"><i class="fas fa-search"></i></span>
-          <span class="text-lg">Step 2: Fetching your Requestly Rules</span>
-        </div>
-        <div id="step3" class="step">
-          <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
-          <span class="icon step-icon"><i class="fas fa-save"></i></span>
-          <span class="text-lg">Step 3: Saving Rules to Extension Storage</span>
-        </div>
-        <div id="all-done" class="hidden text-lg text-green-600 font-bold mt-4">
-          <i class="fas fa-check-circle"></i> All done!
+    <script>
+      window.global = window;
+    </script>
+    <div id="root">
+      <div class="main-content">
+        <div id="container" class="container">
+          <h1 id="page-title" class="text-3xl font-bold mb-8">Requestly for Selenium</h1>
+          <button id="load-rules-btn">Load Requestly Rules</button>
+          <div id="step1" class="step">
+            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+            <span class="icon step-icon"><i class="fas fa-plug"></i></span>
+            <span class="text-lg">Step 1: Checking if Requestly Extension is Installed</span>
+          </div>
+          <div id="step2" class="step">
+            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+            <span class="icon step-icon"><i class="fas fa-search"></i></span>
+            <span class="text-lg">Step 2: Fetching your Requestly Rules</span>
+          </div>
+          <div id="step3" class="step">
+            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+            <span class="icon step-icon"><i class="fas fa-save"></i></span>
+            <span class="text-lg">Step 3: Saving Rules to Extension Storage</span>
+          </div>
+          <div id="all-done" class="hidden text-lg text-green-600 font-bold mt-4">
+            <i class="fas fa-check-circle"></i> All done!
+          </div>
         </div>
       </div>
+      <footer id="footer">
+        <p id="footer-text">© 2024 RQ Labs, Inc.</p>
+        <div id="footer-links">
+          <a id="main-app-link" href="https://app.requestly.io">Go to Main App</a> |
+          <a id="privacy-policy-link" href="/privacy-policy">Privacy Policy</a> |
+          <a id="disclaimer-link" href="/disclaimer">Disclaimer</a>
+        </div>
+      </footer>
     </div>
-    <footer id="footer">
-      <p id="footer-text">© 2024 RQ Labs, Inc.</p>
-      <div id="footer-links">
-        <a id="main-app-link" href="https://app.requestly.io">Go to Main App</a> |
-        <a id="privacy-policy-link" href="/privacy-policy">Privacy Policy</a> |
-        <a id="disclaimer-link" href="/disclaimer">Disclaimer</a>
-      </div>
-    </footer>
     <script type="module" src="/selenium.bundle.js"></script>
   </body>
 </html>

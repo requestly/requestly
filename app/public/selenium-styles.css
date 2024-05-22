@@ -9,6 +9,14 @@ body {
   height: 100vh;
   margin: 0;
 }
+#root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
 .container {
   background-color: #ffffff;
   padding: 2rem;

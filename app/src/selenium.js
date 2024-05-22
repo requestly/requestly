@@ -1,3 +1,5 @@
+import { isExtensionInstalled } from "actions/ExtensionActions";
+
 document.addEventListener("DOMContentLoaded", () => {
   const loadRulesButton = document.getElementById("load-rules-btn");
 
@@ -43,15 +45,13 @@ document.addEventListener("DOMContentLoaded", () => {
     notifySelenium("Checking if Requestly Extension is Installed");
 
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const success = true; // Change to false to simulate error
-        if (success) {
-          resolve();
-          markStepCompleted(1);
-        } else {
-          reject({ step: 1, message: "Requestly Extension is not installed" });
-        }
-      }, 1000);
+      const success = isExtensionInstalled();
+      if (success) {
+        resolve();
+        markStepCompleted(1);
+      } else {
+        reject({ step: 1, message: "Requestly Extension is not installed" });
+      }
     });
   };
 
