@@ -298,7 +298,3 @@ export const getToastForEditor = (state, id) => {
 export const getIsAppBannerVisible = (state) => {
   return getGlobalState(state).misc.nonPersist?.isAppBannerVisible;
 };
-
-export const getIsAuthHandlerBeenSet = (state) => {
-  return getGlobalState(state).misc.nonPersist?.hasAuthHandlerBeenSet;
-};
