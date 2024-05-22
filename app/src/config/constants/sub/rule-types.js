@@ -28,7 +28,7 @@ const modifyRequestDefaultCode = () => {
   let value =
     "function modifyRequestBody(args) {\n  const { method, url, body, bodyAsJson } = args;\n  // Change request body below depending upon request attributes received in args\n  \n  return body;\n}";
 
-  if (isFeatureCompatible(FEATURES.ASYNC_MODIFY_RESPONSE_BODY)) {
+  if (isFeatureCompatible(FEATURES.ASYNC_MODIFY_REQUEST_BODY)) {
     value = "async " + value;
   }
 
