@@ -103,7 +103,9 @@ const MenuHeader = () => {
                 {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
                 user?.details?.planDetails?.status === "canceled" &&
                 isPlanExpiredBannerClosed ? (
-                  <PlanExpiredBadge />
+                  <div className="hidden-on-small-screen">
+                    <PlanExpiredBadge />
+                  </div>
                 ) : null}
                 <RQButton
                   type="default"
@@ -142,8 +144,10 @@ const MenuHeader = () => {
                   }}
                   data-tour-id={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
                 >
-                  <img src={BotIcon} alt="bot" />
-                  Ask AI
+                  <div className="ask-ai-btn-content">
+                    <img src={BotIcon} alt="bot" />
+                    Ask AI
+                  </div>
                 </RQButton>
 
                 <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
