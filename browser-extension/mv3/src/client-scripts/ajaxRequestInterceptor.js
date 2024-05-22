@@ -316,7 +316,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       new Promise((resolve) => setTimeout(resolve, 2000)),
       new Promise((resolve) => {
         ackHandler = (event) => {
-          if (event.data.action === action) {
+          if (event.data.action === ackAction) {
             resolve();
           }
         };
@@ -328,7 +328,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   };
 
   const notifyOnBeforeRequest = async (requestDetails) => {
-    return postMessageAndWaitForAck({ requestDetails }, "onBeforeRequest");
+    return postMessageAndWaitForAck({ requestDetails }, "onBeforeAjaxRequest");
   };
 
   const notifyOnErrorOccurred = async (requestDetails) => {

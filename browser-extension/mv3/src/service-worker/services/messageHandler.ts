@@ -123,7 +123,7 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.ON_ERROR_OCCURRED:
-        requestProcessor.onErrorOccuered(sender.tab.id, message.requestDetails).then(sendResponse);
+        requestProcessor.onErrorOccurred(sender.tab.id, message.requestDetails).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
