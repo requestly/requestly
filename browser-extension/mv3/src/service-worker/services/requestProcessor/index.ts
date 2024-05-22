@@ -24,7 +24,7 @@ class RequestProcessor {
     await handleInitiatorDomainFunction(tabId, requestDetails, headerRules);
   };
 
-  onErrorOccuered = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
+  onErrorOccurred = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
     const enabledRules = await rulesStorageService.getEnabledRules();
 
     if (enabledRules.length === 0) {
