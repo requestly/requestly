@@ -1,3 +1,5 @@
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+// import { StorageService } from "init";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,10 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const apiKey = urlParams.get("apiKey");
-    const workspaceId = urlParams.get("workspaceId");
 
     checkRequestlyExtension()
-      .then(() => fetchRules(apiKey, workspaceId))
+      .then(() => fetchRules(apiKey))
       .then((rules) => saveRulesToExtension(rules))
       .then(() => {
         displayAllDone();
@@ -45,7 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
     notifySelenium("Checking if Requestly Extension is Installed");
 
     return new Promise((resolve, reject) => {
-      const success = isExtensionInstalled();
+      // const success = isExtensionInstalled();
+      const success = true;
       if (success) {
         resolve();
         markStepCompleted(1);
@@ -58,28 +60,34 @@ document.addEventListener("DOMContentLoaded", () => {
   /**
    * Fetches Requestly rules using the provided API key and workspace ID.
    * @param {string} apiKey - The API key for accessing Requestly rules.
-   * @param {string} workspaceId - The workspace ID for accessing Requestly rules.
    * @returns {Promise} - Resolves with the fetched rules, rejects with an error otherwise.
    */
-  const fetchRules = (apiKey, workspaceId) => {
+  const fetchRules = (apiKey) => {
     markStepInProgress(2);
     notifySelenium("Fetching your Requestly Rules");
 
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Simulate API call
-        const success = true; // Change to false to simulate error
-        if (success) {
-          resolve([
-            // Example rules
-            { id: 1, name: "Rule 1" },
-            { id: 2, name: "Rule 2" },
-          ]);
-          markStepCompleted(2);
-        } else {
+      const myHeaders = new Headers();
+      myHeaders.append("x-api-key", apiKey);
+
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+
+      fetch("https://api2.requestly.io/v1/rules", requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          if (result?.success) {
+            resolve(result.data);
+            markStepCompleted(2);
+          } else throw new Error("Failed");
+        })
+        .catch((error) => {
+          console.error(error);
           reject({ step: 2, message: "Failed to fetch rules" });
-        }
-      }, 1000);
+        });
     });
   };
 
@@ -93,16 +101,15 @@ document.addEventListener("DOMContentLoaded", () => {
     notifySelenium("Saving Rules to Extension Storage");
 
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Simulate saving rules
-        const success = true; // Change to false to simulate error
-        if (success) {
+      StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
+        .saveMultipleRulesOrGroups(rules)
+        .then(() => {
           resolve();
           markStepCompleted(3);
-        } else {
+        })
+        .catch((error) => {
           reject({ step: 3, message: "Failed to save rules to extension storage" });
-        }
-      }, 1000);
+        });
     });
   };
 
