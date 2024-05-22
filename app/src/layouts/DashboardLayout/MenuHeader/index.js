@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
-import { getAppMode, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsMiscTourCompleted, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
@@ -23,6 +23,8 @@ import APP_CONSTANTS from "config/constants";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
 import { RequestBot } from "features/requestBot";
 import BotIcon from "./assets/bot.svg";
+import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
+import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -40,6 +42,7 @@ const MenuHeader = () => {
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
+  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
 
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
 
@@ -48,6 +51,20 @@ const MenuHeader = () => {
 
   return showMenuHeader() ? (
     <>
+      <ProductWalkthrough
+        completeTourOnUnmount={false}
+        tourFor={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
+        startWalkthrough={!isMiscTourCompleted.askAI}
+        onTourComplete={() =>
+          dispatch(
+            actions.updateProductTourCompleted({
+              tour: TOUR_TYPES.MISCELLANEOUS,
+              // TODO: FIX THIS, SUBTOUR SHOULD BE PASSED AS A CONSTANT
+              subTour: "askAI",
+            })
+          )
+        }
+      />
       <Header className="layout-header">
         <Row wrap={false} align="middle" className="w-full">
           {!isPricingOrGoodbyePage ? (
@@ -112,7 +129,19 @@ const MenuHeader = () => {
                   />
                 </span>
               </Col> */}
-                <RQButton className="ask-ai-btn" onClick={() => setIsRequestBotVisible(true)}>
+                <RQButton
+                  className="ask-ai-btn"
+                  onClick={() => {
+                    setIsRequestBotVisible(true);
+                    dispatch(
+                      actions.updateProductTourCompleted({
+                        tour: TOUR_TYPES.MISCELLANEOUS,
+                        subTour: "askAI",
+                      })
+                    );
+                  }}
+                  data-tour-id={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
+                >
                   <img src={BotIcon} alt="bot" />
                   Ask AI
                 </RQButton>
