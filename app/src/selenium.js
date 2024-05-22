@@ -1,6 +1,7 @@
+import PSMH from "config/PageScriptMessageHandler";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-// import { StorageService } from "init";
 import { isExtensionInstalled } from "actions/ExtensionActions";
+import { clearStorage, saveStorageObject } from "actions/ExtensionActions";
 
 document.addEventListener("DOMContentLoaded", () => {
   const loadRulesButton = document.getElementById("load-rules-btn");
@@ -101,15 +102,27 @@ document.addEventListener("DOMContentLoaded", () => {
     notifySelenium("Saving Rules to Extension Storage");
 
     return new Promise((resolve, reject) => {
-      StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
-        .saveMultipleRulesOrGroups(rules)
-        .then(() => {
+      (async () => {
+        try {
+          PSMH.init();
+
+          // Clean up
+          await clearStorage();
+
+          // Saving
+          const formattedObject = {};
+          rules.forEach((object) => {
+            if (object && object.id) formattedObject[object.id] = object;
+          });
+          await saveStorageObject(formattedObject);
+
           resolve();
           markStepCompleted(3);
-        })
-        .catch((error) => {
+        } catch (error) {
+          console.error(error);
           reject({ step: 3, message: "Failed to save rules to extension storage" });
-        });
+        }
+      })();
     });
   };
 
