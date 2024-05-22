@@ -21,10 +21,7 @@ class RequestProcessor {
     const headerRules = enabledRules.filter((rule) => rule.ruleType === RuleType.HEADERS);
 
     await forwardHeadersOnRedirect(tabId, requestDetails, redirectReplaceRules);
-
     await handleInitiatorDomainFunction(tabId, requestDetails, headerRules);
-
-    // console.log("!!!debug", "headers", requestDetails, requestDetails.requestHeaders);
   };
 
   onErrorOccuered = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
