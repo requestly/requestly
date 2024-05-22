@@ -66,10 +66,6 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
 const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails) => {
   let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
-  if (details.type === "main_frame") {
-    console.log("!!!debug", "main_frame", details);
-  }
-
   rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
