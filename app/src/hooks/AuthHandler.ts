@@ -172,7 +172,6 @@ const AuthHandler: React.FC<{}> = () => {
   );
 
   useEffect(() => {
-    console.log("DBG-1 AuthHandler useEffect triggered", JSON.stringify({ hasAuthInitialized }));
     if (hasAuthInitialized) return;
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
