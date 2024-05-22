@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const loadRulesButton = document.getElementById("load-rules-btn");
-  loadRulesButton.addEventListener("click", startProcess);
 
-  function startProcess() {
-    loadRulesButton.disabled = true;
-    loadRulesButton.classList.add("bg-gray-500", "hover:bg-gray-500");
-    loadRulesButton.classList.remove("bg-blue-500", "hover:bg-blue-700");
+  /**
+   * Starts the process of loading Requestly rules.
+   * Disables the button and initiates the step-by-step process.
+   */
+  const startProcess = () => {
+    disableButton(loadRulesButton);
 
     const urlParams = new URLSearchParams(window.location.search);
     const apiKey = urlParams.get("apiKey");
@@ -21,13 +22,26 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch((error) => {
         displayError(error.step, error.message);
       });
-  }
+  };
 
-  function checkRequestlyExtension() {
+  /**
+   * Disables a given button element.
+   * @param {HTMLElement} button - The button element to disable.
+   */
+  const disableButton = (button) => {
+    button.disabled = true;
+    button.classList.add("bg-gray-500", "hover:bg-gray-500");
+    button.classList.remove("bg-blue-500", "hover:bg-blue-700");
+  };
+
+  /**
+   * Checks if the Requestly extension is installed.
+   * @returns {Promise} - Resolves if the extension is installed, rejects with an error otherwise.
+   */
+  const checkRequestlyExtension = () => {
     markStepInProgress(1);
     notifySelenium("Checking if Requestly Extension is Installed");
 
-    // Placeholder for checking if Requestly extension is installed
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const success = true; // Change to false to simulate error
@@ -39,13 +53,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }, 1000);
     });
-  }
+  };
 
-  function fetchRules(apiKey, workspaceId) {
+  /**
+   * Fetches Requestly rules using the provided API key and workspace ID.
+   * @param {string} apiKey - The API key for accessing Requestly rules.
+   * @param {string} workspaceId - The workspace ID for accessing Requestly rules.
+   * @returns {Promise} - Resolves with the fetched rules, rejects with an error otherwise.
+   */
+  const fetchRules = (apiKey, workspaceId) => {
     markStepInProgress(2);
     notifySelenium("Fetching your Requestly Rules");
 
-    // Placeholder for API call
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // Simulate API call
@@ -62,13 +81,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }, 1000);
     });
-  }
+  };
 
-  function saveRulesToExtension(rules) {
+  /**
+   * Saves the fetched Requestly rules to the extension storage.
+   * @param {Array} rules - The rules to be saved.
+   * @returns {Promise} - Resolves if the rules are saved successfully, rejects with an error otherwise.
+   */
+  const saveRulesToExtension = (rules) => {
     markStepInProgress(3);
     notifySelenium("Saving Rules to Extension Storage");
 
-    // Placeholder for saving rules to Requestly extension storage
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // Simulate saving rules
@@ -81,36 +104,58 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }, 1000);
     });
-  }
+  };
 
-  function markStepInProgress(stepNumber) {
+  /**
+   * Marks a step as in-progress.
+   * @param {number} stepNumber - The number of the step to mark as in-progress.
+   */
+  const markStepInProgress = (stepNumber) => {
     const stepElement = document.getElementById(`step${stepNumber}`);
     stepElement.classList.add("in-progress");
     stepElement.querySelector(".step-icon-placeholder").innerHTML = '<i class="fas fa-spinner"></i>';
-  }
+  };
 
-  function markStepCompleted(stepNumber) {
+  /**
+   * Marks a step as completed.
+   * @param {number} stepNumber - The number of the step to mark as completed.
+   */
+  const markStepCompleted = (stepNumber) => {
     const stepElement = document.getElementById(`step${stepNumber}`);
     stepElement.classList.remove("in-progress");
     stepElement.classList.add("completed");
     stepElement.querySelector(".step-icon-placeholder").innerHTML = '<i class="fas fa-check"></i>';
-  }
+  };
 
-  function displayError(stepNumber, message) {
+  /**
+   * Displays an error message for a specific step.
+   * @param {number} stepNumber - The number of the step to display the error for.
+   * @param {string} message - The error message to display.
+   */
+  const displayError = (stepNumber, message) => {
     const stepElement = document.getElementById(`step${stepNumber}`);
     stepElement.classList.remove("in-progress");
     stepElement.classList.add("error");
     stepElement.querySelector(".step-icon-placeholder").innerHTML = '<i class="fas fa-exclamation-circle"></i>';
     stepElement.innerHTML += `<p class="mt-2 text-sm">${message}</p>`;
     notifySelenium(`Error: ${message}`);
-  }
+  };
 
-  function displayAllDone() {
+  /**
+   * Displays the "All done!" message.
+   */
+  const displayAllDone = () => {
     const allDoneElement = document.getElementById("all-done");
     allDoneElement.classList.remove("hidden");
-  }
+  };
 
-  function notifySelenium(message) {
+  /**
+   * Sends a notification to Selenium with a given message.
+   * @param {string} message - The message to send to Selenium.
+   */
+  const notifySelenium = (message) => {
     window.postMessage({ type: "TASK_COMPLETE", message: message }, "*");
-  }
+  };
+
+  loadRulesButton.addEventListener("click", startProcess);
 });
