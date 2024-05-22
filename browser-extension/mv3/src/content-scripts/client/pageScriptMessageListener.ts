@@ -27,12 +27,12 @@ export const initPageScriptMessageListener = () => {
           );
         });
         break;
-      case EXTENSION_MESSAGES.ON_CSP_ERROR:
+      case EXTENSION_MESSAGES.ON_ERROR_OCCURRED:
         chrome.runtime.sendMessage(event.data, () => {
           window.postMessage(
             {
               source: "requestly:client",
-              action: CLIENT_MESSAGES.ON_CSP_ERROR_PROCESSED,
+              action: CLIENT_MESSAGES.ON_ERROR_OCCURRED_PROCESSED,
             },
             window.location.href
           );

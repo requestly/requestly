@@ -122,8 +122,8 @@ export const initMessageHandler = () => {
         requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
         return true;
 
-      case EXTENSION_MESSAGES.ON_CSP_ERROR:
-        requestProcessor.onCSPError(sender.tab.id, message.requestDetails).then(sendResponse);
+      case EXTENSION_MESSAGES.ON_ERROR_OCCURRED:
+        requestProcessor.onErrorOccuered(sender.tab.id, message.requestDetails).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:

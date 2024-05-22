@@ -184,31 +184,44 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return responseModification.type === "static" && responseModification.serveWithoutRequest;
   };
 
-  const getFunctionFromCode = (code) => {
-    try {
-      return new Function("args", `return (${code})(args);`);
-    } catch (e) {
-      console.log("!!!debug", "", e);
-      notifyOnCSPError({
-        initiatorDomain: location.origin,
-        url: location.href,
-      }).then(() => {
-        console.log(
-          `%cRequestly%c Please reload the page for this rule to work`,
-          "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
-          "color: red; font-style: italic"
-        );
-      });
-      return () => {};
-    }
-  };
+  const getFunctionFromCode = (() => {
+    let dialogShown = false;
+
+    return (code, ruleType) => {
+      try {
+        return new Function("args", `return (${code})(args);`);
+      } catch (e) {
+        notifyOnErrorOccurred({
+          initiatorDomain: location.origin,
+          url: location.href,
+        }).then(() => {
+          if (!dialogShown) {
+            dialogShown = true;
+            if (
+              window.top.confirm(
+                `[Requestly]: You need to reload the page for ${ruleType} rule to work. Click OK to reload the page.`
+              )
+            ) {
+              window.top.location.reload();
+            }
+          }
+          // console.log(
+          //   `%cRequestly%c Please reload the page for this rule to work`,
+          //   "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
+          //   "color: red; font-style: italic"
+          // );
+        });
+        return () => {};
+      }
+    };
+  })();
 
   const getCustomRequestBody = (requestRuleData, args) => {
     let requestBody;
     if (requestRuleData.request.type === "static") {
       requestBody = requestRuleData.request.value;
     } else {
-      requestBody = getFunctionFromCode(requestRuleData.request.value)(args);
+      requestBody = getFunctionFromCode(requestRuleData.request.value, "request")(args);
     }
 
     if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {
@@ -321,32 +334,32 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     });
   };
 
-  const notifyOnCSPError = async (requestDetails) => {
+  const notifyOnErrorOccurred = async (requestDetails) => {
     window.postMessage(
       {
         source: "requestly:client",
-        action: "onCSPError",
+        action: "onErrorOccurred",
         requestDetails,
       },
       window.location.href
     );
 
-    let onCSPErrorAckHandler;
+    let onErrorOccurredAckHandler;
 
     return Promise.race([
       new Promise((resolve) => {
         setTimeout(resolve, 2000);
       }),
       new Promise((resolve) => {
-        onCSPErrorAckHandler = (event) => {
-          if (event.data.action === "onCSPError:processed") {
+        onErrorOccurredAckHandler = (event) => {
+          if (event.data.action === "onErrorOccurred:processed") {
             resolve();
           }
         };
-        window.addEventListener("message", onCSPErrorAckHandler);
+        window.addEventListener("message", onErrorOccurredAckHandler);
       }),
     ]).finally(() => {
-      window.removeEventListener("message", onCSPErrorAckHandler);
+      window.removeEventListener("message", onErrorOccurredAckHandler);
     });
   };
 
@@ -404,7 +417,10 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       if (this.readyState === this.DONE) {
         let customResponse =
           responseModification.type === "code"
-            ? getFunctionFromCode(responseRuleData.response.value)({
+            ? getFunctionFromCode(
+                responseRuleData.response.value,
+                "response"
+              )({
                 method: this.method,
                 url,
                 requestHeaders: this.requestHeaders,
@@ -735,7 +751,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         };
       }
 
-      customResponse = getFunctionFromCode(responseRuleData.response.value)(evaluatorArgs);
+      customResponse = getFunctionFromCode(responseRuleData.response.value, "response")(evaluatorArgs);
 
       if (typeof customResponse === "undefined") {
         return fetchedResponse;
