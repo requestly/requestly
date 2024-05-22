@@ -57,8 +57,9 @@
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen">
-    <div class="container text-center max-w-xl">
-        <h1 class="text-3xl font-bold mb-8">Requestly for Selenium</h1>
+    <div id="container" class="container text-center max-w-xl">
+        <h1 id="page-title" class="text-3xl font-bold mb-8">Requestly for Selenium</h1>
+        <button id="load-rules-btn" class="bg-blue-500 text-white px-4 py-2 rounded mb-8 hover:bg-blue-700">Load Requestly Rules</button>
         <div id="step1" class="step p-4 bg-blue-50 rounded-lg shadow">
             <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
             <span class="icon step-icon"><i class="fas fa-plug"></i></span>
@@ -78,14 +79,14 @@
             <i class="fas fa-check-circle"></i> All done!
         </div>
     </div>
-    <footer class="text-center mt-4">
-        <p class="text-sm text-gray-600">© 2024 RQ Labs, Inc.</p>
-        <div class="mt-2">
-            <a href="https://app.requestly.io" class="text-blue-600 hover:underline">Go to Main App</a> |
-            <a href="/privacy-policy" class="text-blue-600 hover:underline">Privacy Policy</a> |
-            <a href="/disclaimer" class="text-blue-600 hover:underline">Disclaimer</a>
+    <footer id="footer" class="text-center mt-4">
+        <p id="footer-text" class="text-sm text-gray-600">© 2024 RQ Labs, Inc.</p>
+        <div id="footer-links" class="mt-2">
+            <a id="main-app-link" href="https://app.requestly.io" class="text-blue-600 hover:underline">Go to Main App</a> |
+            <a id="privacy-policy-link" href="/privacy-policy" class="text-blue-600 hover:underline">Privacy Policy</a> |
+            <a id="disclaimer-link" href="/disclaimer" class="text-blue-600 hover:underline">Disclaimer</a>
         </div>
     </footer>
-    <script type="module" src="/src/selenium.js"></script>
+    <script type="module" src="/selenium.bundle.js"></script>
 </body>
 </html>
