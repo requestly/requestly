@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requestly for Selenium</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #e6f7ff;
+            color: #2d3748;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .step {
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            padding-left: 3rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .step.completed {
+            opacity: 0.5;
+        }
+        .step-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        .step-icon-placeholder {
+            position: absolute;
+            left: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .in-progress .step-icon-placeholder {
+            animation: spin 1s linear infinite;
+        }
+        .completed {
+            background-color: #e0f7fa;
+            color: #38b2ac;
+        }
+        .error {
+            background-color: #fff5f5;
+            color: #e53e3e;
+        }
+        @keyframes spin {
+            0% { transform: translateY(-50%) rotate(0deg); }
+            100% { transform: translateY(-50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen">
+    <div class="container text-center max-w-xl">
+        <h1 class="text-3xl font-bold mb-8">Requestly for Selenium</h1>
+        <div id="step1" class="step p-4 bg-blue-50 rounded-lg shadow">
+            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+            <span class="icon step-icon"><i class="fas fa-plug"></i></span>
+            <span class="text-lg">Step 1: Checking if Requestly Extension is Installed</span>
+        </div>
+        <div id="step2" class="step p-4 bg-blue-50 rounded-lg shadow">
+            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+            <span class="icon step-icon"><i class="fas fa-search"></i></span>
+            <span class="text-lg">Step 2: Fetching your Requestly Rules</span>
+        </div>
+        <div id="step3" class="step p-4 bg-blue-50 rounded-lg shadow">
+            <div class="step-icon-placeholder"><i class="fas fa-clock"></i></div>
+            <span class="icon step-icon"><i class="fas fa-save"></i></span>
+            <span class="text-lg">Step 3: Saving Rules to Extension Storage</span>
+        </div>
+        <div id="all-done" class="hidden text-lg text-green-600 font-bold mt-4">
+            <i class="fas fa-check-circle"></i> All done!
+        </div>
+    </div>
+    <footer class="text-center mt-4">
+        <p class="text-sm text-gray-600">© 2024 RQ Labs, Inc.</p>
+        <div class="mt-2">
+            <a href="https://app.requestly.io" class="text-blue-600 hover:underline">Go to Main App</a> |
+            <a href="/privacy-policy" class="text-blue-600 hover:underline">Privacy Policy</a> |
+            <a href="/disclaimer" class="text-blue-600 hover:underline">Disclaimer</a>
+        </div>
+    </footer>
+    <script src="selenium.js"></script>
+</body>
+</html>
