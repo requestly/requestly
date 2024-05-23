@@ -7,21 +7,22 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { getThemeVariables } from "antd/dist/theme";
 import { theme } from "./src/lib/design-system/theme";
 import monacoEditorPlugin from "vite-plugin-monaco-editor";
-import path from "path";
 
-export default ({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "");
-  return defineConfig({
+const config = ({ mode }) =>
+  defineConfig({
     define: {
       global: "window",
-      "process.env": env,
+      "process.env": loadEnv(mode, process.cwd(), ""),
     },
     plugins: [
       nodePolyfills(),
+
+      // For files which has JSX elements in .js files
       {
         name: "treat-js-files-as-jsx",
         async transform(code, id) {
-          if (!id.match(/src\/.*\.js$/)) return null;
+          if (!id.match(/src\/.*\.js$/)) return null; // include ts or tsx for TypeScript support
+          // checks for .js files containing jsx code
           return transformWithEsbuild(code, id, {
             loader: "jsx",
             jsx: "automatic",
@@ -29,24 +30,17 @@ export default ({ mode }) => {
         },
       },
       react(),
+
+      // For setting home for relative imports to `src/`
       viteTsconfigPaths(),
       monacoEditorPlugin({}),
       commonjs(),
       svgr(),
-      // Custom plugin to serve selenium.bundle.js in dev mode
-      {
-        name: "serve-selenium-bundle",
-        configureServer(server) {
-          server.middlewares.use((req, res, next) => {
-            if (req.url === "/selenium.bundle.js") {
-              req.url = "/src/selenium.js";
-            }
-            next();
-          });
-        },
-      },
     ],
     resolve: {
+      // { find: '@', replacement: path.resolve(__dirname, 'src') },
+      // fix less import by: @import ~
+      // https://github.com/vitejs/vite/issues/2185#issuecomment-784637827
       alias: [
         {
           find: /^~/,
@@ -73,17 +67,6 @@ export default ({ mode }) => {
     },
     build: {
       outDir: "build",
-      rollupOptions: {
-        input: {
-          main: path.resolve(__dirname, "index.html"),
-          selenium: path.resolve(__dirname, "public/selenium.html"),
-        },
-        output: {
-          entryFileNames: (assetInfo) => {
-            return assetInfo.name === "selenium" ? "selenium.bundle.js" : "assets/[name].[hash].js";
-          },
-        },
-      },
     },
     server: {
       open: true,
@@ -93,4 +76,5 @@ export default ({ mode }) => {
       },
     },
   });
-};
+
+export default config;
