@@ -15,7 +15,6 @@ import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
-import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import PATHS from "config/constants/sub/paths";
@@ -28,6 +27,7 @@ import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleTypesDropdownWrapper } from "../../RuleTypesDropdownWrapper/RuleTypesDropdownWrapper";
+import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -62,7 +62,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             <Button
               type="text"
               className={`pin-record-btn ${isPinned ? "pin-record-btn-pinned" : ""}`}
-              icon={<RiPushpin2Line className={`${record.isFavourite ? "record-pinned" : "record-unpinned"}`} />}
+              icon={<MdOutlinePushPin className={`${record.isFavourite ? "record-pinned" : "record-unpinned"}`} />}
               onClick={(e) => {
                 e.stopPropagation();
                 if (isEditingEnabled) {
@@ -275,7 +275,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
-            <span>
+            <span className="rule-updated-on-cell">
               {beautifiedDate} <UserIcon uid={record.lastModifiedBy} />
             </span>
           );
