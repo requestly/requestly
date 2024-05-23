@@ -144,7 +144,7 @@ export const trackMockCollectionCreated = (
   workspaceId: string,
   workspaceName: string,
   workspaceMembersCount: number,
-  containsPath: boolean
+  containsPath: boolean = false
 ) => {
   const params = { source, workspaceId, workspaceName, workspaceMembersCount, containsPath };
   trackEvent(MOCKSV2.MOCK_COLLECTION_CREATED, params);
