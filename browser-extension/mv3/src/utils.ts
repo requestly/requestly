@@ -46,7 +46,7 @@ export const isBlacklistedURL = (url: string): boolean => {
 export const generateUrlPattern = (urlString: string) => {
   try {
     const webUrlObj = new URL(urlString);
-    return `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
+    return `${webUrlObj.protocol}//${webUrlObj.host}/*`;
   } catch (error) {
     console.error(`Invalid URL: ${urlString}`, error);
     return null;
