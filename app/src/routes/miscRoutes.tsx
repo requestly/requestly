@@ -12,7 +12,7 @@ import AppSumoModal from "components/landing/Appsumo/Appsumo";
 import { ImportFromCharlesWrapperView } from "components/features/rules/ImportFromCharlesModal";
 import { Home } from "components/Home";
 import { PricingIndexPage } from "features/pricing/components/PricingPage";
-import { IncentiveTasksListScreen } from "features/Incentives";
+import { IncentiveTasksListScreen } from "features/Incentivization";
 
 export const miscRoutes: RouteObject[] = [
   {
