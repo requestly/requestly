@@ -9,6 +9,7 @@ import { redirectToMocks, redirectToSessionRecordingHome } from "utils/Redirecti
 import { actions } from "store";
 
 // TODO: ADD HELP LINKS
+//TODO: GET THE TASK IDS AND THEIR CREDITS FROM THE BACKEND AND CREATE THE LIST UI ACCORDINGLY
 export const incentiveTasksList: IncentiveTaskListItem[] = [
   {
     id: IncentiveTask.CREATE_FIRST_RULE,
@@ -61,7 +62,7 @@ export const incentiveTasksList: IncentiveTaskListItem[] = [
   },
 
   {
-    id: IncentiveTask.CREATE_API_MOCK,
+    id: IncentiveTask.CREATE_MOCK_API,
     title: "Create an API Mock",
     description: "Create mocks for your APIs with different status codes, delay, response headers or body",
     icon: <MdOutlineDns />,
