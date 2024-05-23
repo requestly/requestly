@@ -1,4 +1,4 @@
-import { Dispatch } from "@reduxjs/toolkit";
+import { Dispatch } from "redux";
 import { ReactNode } from "react";
 
 export enum IncentiveTask {
