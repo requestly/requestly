@@ -188,14 +188,61 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 150px;
+  width: 115px;
   border: none;
-  background: var(--input-background);
+  background: var(--requestly-color-surface-1);
   color: var(--text-gray);
   font-weight: 500;
   opacity: 0.8;
   margin-right: 4px;
+  padding: 8px 6px;
 }
+
+.search-shortcut-annotation {
+  border-radius: 4px;
+  border: 1px solid var(--requestly-color-white-t-10);
+  background: var(--requestly-color-white-t-10);
+  padding: 1px 4px;
+  font-size: var(--requestly-font-size-xs);
+}
+
+.ask-ai-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+
+.ask-ai-btn.ant-btn.ant-btn-default {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 24px;
+  box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  background: radial-gradient(rgba(255, 199, 0, 0) 30%, var(--requestly-color-white) 100%);
+  background-size: 240% 260%;
+  animation: gradient-rotate 3s linear infinite;
+  color: var(--requestly-color-text-default);
+}
+
+.ask-ai-btn.ant-btn.ant-btn-default[ant-click-animating-without-extra-node="true"]::after {
+  opacity: 1;
+  animation: none;
+}
+
+.ask-ai-btn.ant-btn.ant-btn-default::after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: calc(100% - 1px);
+  height: calc(100% - 1px);
+  border-radius: 24px;
+  background: var(--requestly-color-surface-1);
+}
+
 .header-right-section .header-search-btn.ant-btn:hover,
 .header-right-section .header-search-btn.ant-btn:focus {
   border: none !important;
@@ -230,5 +277,23 @@
 @media screen and (max-width: 600px) {
   .extension .header-left-section > a {
     display: none;
+  }
+}
+
+@keyframes gradient-rotate {
+  0% {
+    background-position: center top;
+  }
+  25% {
+    background-position: right center;
+  }
+  50% {
+    background-position: center bottom;
+  }
+  75% {
+    background-position: left center;
+  }
+  100% {
+    background-position: center top;
   }
 }
