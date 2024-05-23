@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
+import { RQButton } from "lib/design-system/components";
 import { actions } from "store";
 import { getPlanNameFromId } from "utils/PremiumUtils";
 import { capitalize } from "lodash";
@@ -13,27 +14,13 @@ export const PlanExpiredBadge = () => {
 
   return (
     <div className="header-plan-expired-badge-container">
-      <div
-        className="header-plan-expired-badge"
-        onClick={() => {
-          trackRenewNowClicked("header");
-          dispatch(
-            // @ts-ignore
-            actions.toggleActiveModal({
-              modalName: "pricingModal",
-              newValue: true,
-              newProps: { selectedPlan: null, source: "header_renew_button" },
-            })
-          );
-        }}
-      >
+      <div className="header-plan-expired-badge">
         <span>
           <Badge status="error" />
         </span>
         <span>{capitalize(getPlanNameFromId(user?.details?.planDetails?.planId))} plan expired</span>
       </div>
-      {/* TEMPORARILY HIDDEN AS HEADER IS OVERPOPULATED WITH MANY BUTTONS  */}
-      {/* <RQButton
+      <RQButton
         type="primary"
         onClick={() => {
           trackRenewNowClicked("header");
@@ -47,7 +34,7 @@ export const PlanExpiredBadge = () => {
         }}
       >
         Renew now
-      </RQButton> */}
+      </RQButton>
     </div>
   );
 };
