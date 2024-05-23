@@ -8,10 +8,14 @@
 
       .ant-collapse-item {
         border-bottom: none;
-        padding: 1rem;
+        padding: 0 1rem 0 1rem;
         background: var(--requestly-color-surface-1);
         border-radius: 8px;
         border: 1px solid var(--requestly-color-white-t-10);
+
+        .ant-collapse-header {
+          padding: 1rem 0 1rem 0;
+        }
 
         .ant-collapse-arrow {
           right: 0;
@@ -28,8 +32,11 @@
 
       .ant-collapse-content {
         border-top: none;
-        margin-top: 10px;
         border-radius: 4px;
+
+        &.ant-collapse-content-active {
+          margin-bottom: 10px;
+        }
       }
     }
 
@@ -47,58 +54,6 @@
 
     .collapse-arrow-down.rotate {
       transform: rotate(180deg);
-    }
-
-    .incentive-task-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 95%;
-
-      .incentive-task-title-container {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        svg {
-          color: var(--requestly-color-text-subtle);
-          width: 1rem;
-          height: 1rem;
-        }
-        .incentive-task-title {
-          font-size: var(--requestly-font-size-sm);
-          color: var(--requestly-color-text-default);
-          font-weight: 500;
-        }
-      }
-
-      .task-credit-value {
-        font-size: var(--requestly-font-size-xs);
-        color: var(--requestly-color-text-subtle);
-        span {
-          color: var(--requestly-color-text-default);
-          font-weight: 500;
-        }
-      }
-
-      svg.task-checked-icon {
-        color: var(--requestly-color-success);
-      }
-    }
-
-    .incentive-task-header.completed-task {
-      .incentive-task-title-container {
-        .incentive-task-title {
-          text-decoration: line-through;
-          color: var(--requestly-color-text-subtle);
-        }
-      }
-
-      .task-credit-value {
-        span {
-          color: var(--requestly-color-success);
-        }
-      }
     }
 
     .incentive-task-content {

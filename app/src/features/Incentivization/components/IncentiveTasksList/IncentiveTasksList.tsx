@@ -3,31 +3,14 @@ import { CreditsProgressBar } from "../CreditsProgressbar/CreditsProgessbar";
 import { IncentiveSectionHeader } from "../IncentiveSectionHeader";
 import { incentiveTasksList } from "./constants/incentiveTasks";
 import { PiCaretDownBold } from "@react-icons/all-files/pi/PiCaretDownBold";
-import { MdCheckCircle } from "@react-icons/all-files/md/MdCheckCircle";
-import { IncentiveTaskListItem } from "./types";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { TaskHeader } from "./components/TaskHeader/TaskHeader";
 import "./incentiveTasksList.scss";
 
 export const IncentiveTasksList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const renderTaskHeader = (task: IncentiveTaskListItem) => {
-    // TODO: HANDLE COMPLETE TASKS
-    const isTaskCompleted = false;
-    return (
-      <div className={`incentive-task-header ${isTaskCompleted ? "completed-task" : ""}`}>
-        <div className="incentive-task-title-container">
-          {isTaskCompleted ? <MdCheckCircle className="task-checked-icon" /> : task.icon}
-          <span className="incentive-task-title">{task.title}</span>
-        </div>
-        <div className="task-credit-value">
-          {/* TODO: GET CREDIT VALUE FROM MAP */}
-          <span>$10</span> {isTaskCompleted ? "Credits earned" : "Credits"}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="incentive-tasks-list-container">
@@ -46,7 +29,7 @@ export const IncentiveTasksList = () => {
           )}
         >
           {incentiveTasksList.map((task, index) => (
-            <Collapse.Panel header={renderTaskHeader(task)} key={index}>
+            <Collapse.Panel header={<TaskHeader task={task} />} key={index}>
               <div className="incentive-task-content">
                 <div className="incentive-task-description">{task.description}</div>
                 <div className="incentive-task-actions">

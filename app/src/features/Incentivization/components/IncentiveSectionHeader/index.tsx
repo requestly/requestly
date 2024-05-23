@@ -10,7 +10,7 @@ interface IncentiveSectionHeaderProps {
 export const IncentiveSectionHeader: React.FC<IncentiveSectionHeaderProps> = ({ title }) => {
   return (
     <div className="incentive-section-header-container">
-      <div className="incentive-section-header-container_title-container">
+      <div className="title-container">
         <span className="incentive-section-title">{title}</span>
         <span className="incentive-section-duration-badge">
           <TbClockExclamation /> <span>14 days left</span>
