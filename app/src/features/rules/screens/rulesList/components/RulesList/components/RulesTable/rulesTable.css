@@ -23,7 +23,7 @@
 }
 
 .rq-content-list-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-unpinned {
-  color: var(--requestly-color-text-default);
+  color: var(--requestly-color-text-subtle);
 }
 
 .rq-content-list-table-row .ant-table-cell-with-append:nth-child(2) {
@@ -154,6 +154,12 @@
   gap: 4px;
   padding: 4px 8px;
   height: 24px;
+}
+
+.rule-updated-on-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 tr.rq-content-list-table-row.ant-table-row:hover .group-name-container .add-rule-btn {

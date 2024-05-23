@@ -31,7 +31,7 @@
         .ant-table-column-sorters {
           .ant-table-column-sorter-inner {
             .anticon svg {
-              --sorter-icon-size: 12px;
+              --sorter-icon-size: 10px;
               width: var(--sorter-icon-size);
               height: var(--sorter-icon-size);
             }
@@ -84,7 +84,7 @@
         }
 
         .ant-table-cell {
-          background: var(--requestly-color-black);
+          background: var(--requestly-color-black-t-70);
 
           .ant-table-row-expand-icon {
             display: none;
@@ -114,10 +114,6 @@
         background: inherit;
         color: var(--requestly-color-text-default);
         border-bottom: 1px solid var(--requestly-color-white-t-10);
-
-        // &:hover {
-        // background: inherit;
-        // }
       }
 
       .ant-table-selection-column {
@@ -140,6 +136,29 @@
 
       button.ant-btn.ant-btn-icon-only:hover svg {
         color: var(--requestly-color-text-default);
+      }
+    }
+  }
+
+  th {
+    &::before {
+      display: none;
+    }
+  }
+
+  .rq-content-list-expand-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .rq-content-list-expand-icon {
+      color: var(--requestly-color-text-placeholder);
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+
+      &.expanded {
+        transform: rotate(90deg);
       }
     }
   }
