@@ -1,21 +1,17 @@
-.request-bot-container {
-  position: fixed;
-  bottom: 30px;
-  right: 20px;
-  z-index: 3;
-}
-
 .request-bot-iframe {
   border: none;
 }
 
 .request-bot {
+  position: fixed;
+  bottom: 30px;
+  right: 20px;
+  z-index: 3;
   width: 424px;
   height: 640px;
   background-color: var(--requestly-color-surface-2);
   padding: 8px;
   border-radius: 1rem;
-  position: relative;
 }
 
 .request-bot iframe {
