@@ -184,30 +184,27 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return responseModification.type === "static" && responseModification.serveWithoutRequest;
   };
 
-  const getFunctionFromCode = (() => {
-    let logShown = false;
-
-    return (code, ruleType) => {
-      try {
-        return new Function("args", `return (${code})(args);`);
-      } catch (e) {
-        notifyOnErrorOccurred({
-          initiatorDomain: location.origin,
-          url: location.href,
-        }).then(() => {
-          if (!logShown) {
-            logShown = true;
-            console.log(
-              `%cRequestly%c Please reload the page for ${ruleType} rule to take effect`,
-              "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
-              "color: red; font-style: italic"
-            );
-          }
-        });
-        return () => {};
-      }
-    };
-  })();
+  let logShown = false;
+  const getFunctionFromCode = (code, ruleType) => {
+    try {
+      return new Function("args", `return (${code})(args);`);
+    } catch (e) {
+      notifyOnErrorOccurred({
+        initiatorDomain: location.origin,
+        url: location.href,
+      }).then(() => {
+        if (!logShown) {
+          logShown = true;
+          console.log(
+            `%cRequestly%c Please reload the page for ${ruleType} rule to take effect`,
+            "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
+            "color: red; font-style: italic"
+          );
+        }
+      });
+      return () => {};
+    }
+  };
 
   const getCustomRequestBody = (requestRuleData, args) => {
     let requestBody;
