@@ -131,7 +131,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
       </div>
       <div className="collection-modal-actions">
         <Button onClick={handleCancel}>Cancel</Button>
-        <Button loading={isLoading} onClick={handleSaveClick} disabled={!collectionName}>
+        <Button type="primary" loading={isLoading} onClick={handleSaveClick} disabled={!collectionName}>
           Save
         </Button>
       </div>

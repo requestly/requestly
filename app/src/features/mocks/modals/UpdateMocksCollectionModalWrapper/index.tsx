@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { useMocksModalsContext } from "features/mocks/contexts/modals";
 import { UpdateMocksCollectionModal } from "./UpdateMocksCollectionModal";
 import {
@@ -10,7 +10,8 @@ import {
 export const UpdateMocksCollectionModalWrapper: React.FC<{
   forceRender: () => void;
   mocks: RQMockMetadataSchema[];
-}> = ({ mocks, forceRender }) => {
+  mockType: MockType;
+}> = ({ mocks, forceRender, mockType }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [mocksToBeUpdated, setMocksToBeUpdated] = useState<RQMockMetadataSchema[]>([]);
   const [onSuccess, setOnSuccess] = useState(() => () => {});
@@ -41,6 +42,7 @@ export const UpdateMocksCollectionModalWrapper: React.FC<{
       collections={collections}
       visible={isVisible}
       toggleModalVisibility={onClose}
+      mockType={mockType}
       onSuccess={() => {
         forceRender();
         onSuccess?.();
