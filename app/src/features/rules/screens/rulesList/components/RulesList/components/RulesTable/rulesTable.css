@@ -128,13 +128,11 @@
 .group-name-container .group-rules-count-details {
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: var(--requestly-color-text-placeholder);
+  gap: 6px;
+  color: var(--requestly-color-text-subtle);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.4px;
   border-radius: 32px;
-  border: 1px solid var(--requestly-color-surface-2);
   flex-shrink: 0;
   padding: 2px 4px;
   cursor: default;
@@ -146,6 +144,12 @@
   background: var(--requestly-color-success);
   flex-shrink: 0;
   border-radius: 100%;
+}
+
+.group-rules-count-details .ant-progress .ant-progress-inner {
+  /* Adding important because antd adds height and width as inline style */
+  height: unset !important;
+  width: 1rem !important;
 }
 
 .group-name-container .add-rule-btn {
