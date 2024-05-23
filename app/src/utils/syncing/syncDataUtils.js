@@ -65,6 +65,14 @@ export const getTeamUserRuleConfigPath = (ruleOrGroupId) => {
   return teamUserRuleAllConfigsPath;
 };
 
+export const getSyncRuleStatus = () => {
+  if (growthbook.isOn(FEATURES.OVERRIDE_TEAM_SYNC_STATUS)) {
+    return growthbook.getFeatureValue(FEATURES.OVERRIDEN_SYNC_STATUS_VALUE, true);
+  } else {
+    return localStorage.getItem("syncRuleStatus") === "true" || false;
+  }
+};
+
 // The intent of this function is to somehow prevent writing of user's personal rule config into teams's rule config
 // It works by modifying the original param received: latestRules
 const preventWorkspaceSyncWrite = async (key, latestRules, objectId, uid, remoteRecords, myLocalRecords, appMode) => {
@@ -103,7 +111,7 @@ export const updateUserSyncRecords = async (uid, records, appMode, options) => {
 
   // Check if it's team syncing. We might not want to write some props like "isFavourite" to this node. Instead, we can write it to userConfig node
   if (isSameWorkspaceOperation && window.currentlyActiveWorkspaceTeamId) {
-    const syncRuleStatus = localStorage.getItem("syncRuleStatus") === "true" || false;
+    const syncRuleStatus = getSyncRuleStatus();
     // Get current values from db and use them xD // @sagar, what's so funny?
     const allRemoteRecords = (await getValueAsPromise(getRecordsSyncPath())) || {};
     const remoteRecords = {};
@@ -220,7 +228,7 @@ export const parseRemoteRecords = async (appMode, allRemoteRecords = {}) => {
     // Todo - @sagar - Fix duplicate code - src/hooks/DbListenerInit/syncingNodeListener.js
     // Check if it's team syncing. We might not want to read some props like "isFavourite" from this not. Instead we an read from userConfig node
     if (window.currentlyActiveWorkspaceTeamId) {
-      const syncRuleStatus = localStorage.getItem("syncRuleStatus") === "true" || false;
+      const syncRuleStatus = getSyncRuleStatus();
       // Get current values from local storage and use them
       const teamUserRuleAllConfigsPath = getTeamUserRuleAllConfigsPath();
       if (!teamUserRuleAllConfigsPath) return [];
@@ -312,7 +320,7 @@ export const syncToLocalFromFirebase = async (allSyncedRecords, appMode, uid) =>
   // START - Handle prevention of syncing of isFavourite and syncRuleStatus in Team Workspaces
   if (window.currentlyActiveWorkspaceTeamId) {
     allSyncedRecords = processRecordsArrayIntoObject(allSyncedRecords);
-    const syncRuleStatus = localStorage.getItem("syncRuleStatus") === "true" || false;
+    const syncRuleStatus = getSyncRuleStatus();
     const personalRuleConfigs = await getValueAsPromise(getTeamUserRuleAllConfigsPath(null, uid));
     // Get current values from local storage and use them xD
     for (const objectId in allSyncedRecords) {

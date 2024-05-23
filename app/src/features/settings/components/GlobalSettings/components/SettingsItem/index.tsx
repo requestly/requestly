@@ -9,6 +9,7 @@ interface SettingsItemProps extends SwitchProps {
   toolTipTitle?: ReactNode;
   settingsBody?: ReactNode;
   onChange: (status: boolean, event?: React.MouseEvent<HTMLButtonElement>) => void;
+  isChangeAble?: boolean;
 }
 
 const SettingsItem: React.FC<SettingsItemProps> = ({
@@ -18,6 +19,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
   onChange,
   settingsBody,
   toolTipTitle = "",
+  isChangeAble = true,
   ...props
 }) => {
   return (
@@ -28,9 +30,15 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
         {settingsBody}
       </Col>
       <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
-        <Tooltip title={toolTipTitle}>
-          <Switch checked={isActive} onChange={onChange} {...props} />
-        </Tooltip>
+        {isChangeAble ? (
+          <Tooltip title={toolTipTitle}>
+            <Switch checked={isActive} onChange={onChange} {...props} />
+          </Tooltip>
+        ) : (
+          <Tooltip title="Enforced organisation wide. Please contact support to change.">
+            <Switch defaultChecked={isActive} disabled {...props} />
+          </Tooltip>
+        )}
       </Col>
     </Row>
   );

@@ -1,7 +1,5 @@
 import { EXTENSION_MESSAGES } from "common/constants";
 import { initSessionRecording } from "./sessionRecorder";
-import { initResponseRuleHandler } from "./responseRuleHandler";
-import { initRequestRuleHandler } from "./requestRuleHandler";
 import { Variable, getVariable } from "../../service-worker/variable";
 import { initPageScriptMessageListener } from "./pageScriptMessageListener";
 import { initTestRuleHandler } from "./testRuleHandler";
@@ -13,8 +11,6 @@ if (document.doctype?.name === "html" || document.contentType?.includes("html"))
       initSessionRecording();
       initPageScriptMessageListener();
       initTestRuleHandler();
-      initResponseRuleHandler();
-      initRequestRuleHandler();
     }
   });
 }

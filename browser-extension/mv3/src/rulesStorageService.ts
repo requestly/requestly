@@ -5,6 +5,7 @@ class RulesStorageService {
   private rules: Rule[] = [];
   private groups: Group[] = [];
   private isInitialized = false;
+  private listeners: any = {};
 
   private updateCachedRules = async (): Promise<void> => {
     this.rules = await getRules();
@@ -14,8 +15,23 @@ class RulesStorageService {
 
   constructor() {
     this.updateCachedRules();
-    onRuleOrGroupChange(this.updateCachedRules.bind(this));
+    onRuleOrGroupChange(() => {
+      this.updateCachedRules().then(() => {
+        if (this.listeners) {
+          Object.values(this.listeners).forEach((listener: () => void) => listener?.());
+        }
+      });
+    });
   }
+
+  onRuleOrGroupChange = (listener: () => void) => {
+    const listenerId = Date.now();
+    this.listeners[listenerId] = listener;
+
+    return () => {
+      this.listeners[listenerId] && delete this.listeners[listenerId];
+    };
+  };
 
   getAllRules = async (): Promise<Rule[]> => {
     if (!this.isInitialized) {
@@ -65,8 +81,6 @@ class RulesStorageService {
       return false;
     });
   };
-
-  //TODO: add onRuleOrGroupChange listener here then only it can be used wherever onRuleOrGroupChange listener on storage is being used
 }
 
 const rulesStorageService = new RulesStorageService();
