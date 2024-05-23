@@ -1,14 +1,18 @@
 .request-bot-container {
   position: fixed;
   bottom: 30px;
-  right: 1rem;
+  right: 20px;
   z-index: 3;
+}
+
+.request-bot-iframe {
+  border: none;
 }
 
 .request-bot {
   width: 424px;
   height: 640px;
-  background-color: #383838;
+  background-color: var(--requestly-color-surface-2);
   padding: 8px;
   border-radius: 1rem;
   position: relative;

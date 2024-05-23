@@ -21,7 +21,7 @@ import ProductsDropDown from "./ProductsDropDown";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 import APP_CONSTANTS from "config/constants";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
-import { RequestBot } from "features/requestBot";
+import { RequestBot, trackAskAIClicked } from "features/requestBot";
 import BotIcon from "./assets/bot.svg";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
@@ -134,6 +134,7 @@ const MenuHeader = () => {
                 <RQButton
                   className="ask-ai-btn"
                   onClick={() => {
+                    trackAskAIClicked();
                     setIsRequestBotVisible(true);
                     dispatch(
                       actions.updateProductTourCompleted({
