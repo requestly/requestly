@@ -4,7 +4,6 @@ import { isExtensionEnabled } from "./utils";
 import { Variable, onVariableChange } from "../variable";
 import { RequestRulePair, ResponseRulePair, RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
-import { PUBLIC_NAMESPACE } from "common/constants";
 
 const CLIENT_SCRIPT_ID = "client-script";
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
