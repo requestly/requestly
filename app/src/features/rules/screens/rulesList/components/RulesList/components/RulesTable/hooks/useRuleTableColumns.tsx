@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
+import { Button, Dropdown, MenuProps, Progress, Row, Switch, Table, Tooltip } from "antd";
 import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "../types";
@@ -28,6 +28,7 @@ import { useRulesActionContext } from "features/rules/context/actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleTypesDropdownWrapper } from "../../RuleTypesDropdownWrapper/RuleTypesDropdownWrapper";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
+import { useTheme } from "styled-components";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -44,6 +45,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordsPinAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
+
+  const theme = useTheme();
 
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
@@ -124,7 +127,15 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                   }
                 >
                   <div className="group-rules-count-details">
-                    <div className="active-status" /> {activeRulesCount} / {totalRules}
+                    <Progress
+                      strokeWidth={16}
+                      strokeColor={theme?.colors?.success}
+                      showInfo={false}
+                      type="circle"
+                      percent={(activeRulesCount / totalRules) * 100}
+                      size="small"
+                    />
+                    {activeRulesCount} / {totalRules}
                   </div>
                 </Tooltip>
               ) : null}
