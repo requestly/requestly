@@ -12,7 +12,7 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import AppSumoModal from "components/landing/Appsumo/Appsumo";
 import { ImportFromCharlesWrapperView } from "components/features/rules/ImportFromCharlesModal";
 import { Home } from "components/Home";
-import { IncentiveTasksListScreen } from "features/i";
+import { IncentiveTasksListScreen } from "features/incentivization";
 
 export const miscRoutes: RouteObject[] = [
   {
