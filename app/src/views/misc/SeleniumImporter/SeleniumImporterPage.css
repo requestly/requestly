@@ -4,19 +4,9 @@ body {
   font-family: "Inter", sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   height: 100vh;
   margin: 0;
-}
-
-#root2 {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
 }
 
 .container {
@@ -27,24 +17,24 @@ body {
   width: 100%;
   max-width: 600px;
   text-align: center;
-  animation: fadeIn 1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
 }
 
 .step {
   transition: all 0.3s ease-in-out;
   position: relative;
-  padding-left: 4rem; /* Increased padding to accommodate larger icon space */
+  padding-left: 4rem;
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
@@ -67,31 +57,31 @@ body {
 
 .step-icon {
   font-size: 1.5rem;
-  margin-right: 1rem; /* Adjusted space between icon and text */
-  margin-left: 2rem; /* Added left margin to ensure enough space between icons */
-  color: #667eea; /* Added color to the main icons */
+  margin-right: 1rem;
+  margin-left: 2rem;
+  color: #667eea;
 }
 
 .step-icon-placeholder {
   font-size: 1.5rem;
   position: absolute;
-  left: 1rem; /* Adjusted position to match increased padding */
+  left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #667eea; /* Added color to the placeholder icons */
+  color: #667eea;
 }
 
 .in-progress .step-icon-placeholder {
   animation: spin 1s linear infinite;
-  color: #ff9800; /* Orange for in-progress */
+  color: #ff9800;
 }
 
 .step-icon-placeholder.completed {
-  color: #38a169; /* Green for completed */
+  color: #38a169;
 }
 
 .step-icon-placeholder.error {
-  color: #e53e3e; /* Red for error */
+  color: #e53e3e;
 }
 
 @keyframes spin {
@@ -103,7 +93,7 @@ body {
   }
 }
 
-#load-rules-btn {
+button {
   background-image: linear-gradient(to right, #667eea, #764ba2);
   color: #fff;
   padding: 0.75rem 1.5rem;
@@ -112,27 +102,18 @@ body {
   font-weight: 600;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease-in-out;
-  margin-bottom: 1rem; /* Reduced margin bottom */
+  margin-bottom: 1rem;
 }
 
-#load-rules-btn:hover {
+button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
-#load-rules-btn:disabled {
+button:disabled {
   background-image: none;
   background-color: #cccccc;
   cursor: not-allowed;
-}
-
-.main-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  width: 100%;
 }
 
 .toast {
@@ -164,22 +145,21 @@ body {
   }
 }
 
-footer {
+.footer {
   width: 100%;
   text-align: center;
   font-size: 0.875rem;
   color: #666;
   padding: 1rem 0;
-  background-color: #f0f4f8;
-  position: absolute;
-  bottom: 0;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
 }
 
-footer a {
+.footer-links a {
   color: #667eea;
   transition: color 0.3s;
 }
 
-footer a:hover {
+.footer-links a:hover {
   color: #764ba2;
 }
