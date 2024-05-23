@@ -1,9 +1,8 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
 
 ((namespace) => {
+  // console.log("AJAX interceptor injected");
   window[namespace] = window[namespace] || {};
-  window[namespace].responseRules = [];
-  window[namespace].requestRules = [];
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage

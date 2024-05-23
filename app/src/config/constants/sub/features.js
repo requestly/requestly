@@ -78,4 +78,7 @@ FEATURES.DESKTOP_SESSIONS = "all_desktop_session_features";
 
 FEATURES.COMPRESS_RULE_PAIRS = "compress_rule_pairs";
 
+FEATURES.OVERRIDE_TEAM_SYNC_STATUS = "override_team_sync_status";
+FEATURES.OVERRIDEN_SYNC_STATUS_VALUE = "overriden_sync_status_value";
+
 export default FEATURES;
