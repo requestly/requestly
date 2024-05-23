@@ -4,6 +4,7 @@ import { isExtensionEnabled } from "./utils";
 import { Variable, onVariableChange } from "../variable";
 import { RequestRulePair, ResponseRulePair, RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
+import { PUBLIC_NAMESPACE } from "common/constants";
 
 const CLIENT_SCRIPT_ID = "client-script";
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
@@ -76,8 +77,9 @@ export const initClientHandler = async () => {
 
 const updateCache = async (obj: Record<string, any>) => {
   // console.log("[updateCache]", { obj });
+  window[PUBLIC_NAMESPACE] = window[PUBLIC_NAMESPACE] || {};
   Object.keys(obj).map((key) => {
-    window[key] = obj[key];
+    window[PUBLIC_NAMESPACE][key] = obj[key];
   });
 };
 
