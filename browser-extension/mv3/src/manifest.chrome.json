@@ -37,7 +37,7 @@
     "128": "resources/images/128x128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; script-src-elem 'self' https://firebasestorage.googleapis.com; object-src 'self'"
+    "extension_pages": "script-src 'self'; script-src-elem 'self' object-src 'self'"
   },
   "declarative_net_request": {
     "rule_resources": [
