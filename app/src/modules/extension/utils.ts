@@ -64,24 +64,35 @@ export const migrateAllRulesToMV3 = (rules: Rule[], currentWorkspaceId: string):
 
   if (migratedRules.length > 0) {
     Logger.log("[Debug][MV3.migrateAllRulesToMV3] Saving Migrated Rules", { migratedRules, currentWorkspaceId });
-    StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION)
-      .saveMultipleRulesOrGroups(migratedRules, { workspaceId: workspaceId })
-      .then(() => {
-        saveMV3MigrationData({
-          ...migrationData,
-          [workspaceId ? workspaceId : "private"]: {
-            rulesMigrationLogs: { ...currentWorkspaceMigrationData?.rulesMigrationLogs, ...rulesMigrationLogs },
-          },
-        });
-        Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migrated Successfully", { migratedRules });
-        trackMv3MigrationRulesMigrated(
-          rules.length,
-          migratedRules.length,
-          rulesMigrationLogs ? Object.keys(rulesMigrationLogs).length : 0,
-          pathImpactedRulesCount,
-          pageUrlImpactedRulesCount
-        );
+
+    // NOTE: Batching retriggers the syncing everytime time. So refrain from making this smaller.
+    const MIGRATION_BATCH = 100;
+    const migrationPromises = [];
+    for (let i = 0; i < migratedRules.length; i += MIGRATION_BATCH) {
+      migrationPromises.push(
+        StorageService(GLOBAL_CONSTANTS.APP_MODES.EXTENSION).saveMultipleRulesOrGroups(
+          migratedRules.slice(i, i + MIGRATION_BATCH),
+          { workspaceId: workspaceId }
+        )
+      );
+    }
+
+    Promise.all(migrationPromises).then((results) => {
+      saveMV3MigrationData({
+        ...migrationData,
+        [workspaceId ? workspaceId : "private"]: {
+          rulesMigrationLogs: { ...currentWorkspaceMigrationData?.rulesMigrationLogs, ...rulesMigrationLogs },
+        },
       });
+      Logger.log("[Debug][MV3.migrateAllRulesToMV3] Rules Migrated Successfully", { migratedRules, results });
+      trackMv3MigrationRulesMigrated(
+        rules.length,
+        migratedRules.length,
+        rulesMigrationLogs ? Object.keys(rulesMigrationLogs).length : 0,
+        pathImpactedRulesCount,
+        pageUrlImpactedRulesCount
+      );
+    });
   }
 
   trackMv3MigrationCompleted(rules.length, migratedRules.length);
