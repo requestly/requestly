@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { RQModal } from "lib/design-system/components";
-import { Button, Select, SelectProps } from "antd";
+import { Button, Select, SelectProps, message } from "antd";
 import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
 import { toast } from "utils/Toast";
+import { createCollection } from "backend/mocks/createCollection";
+import { trackMockCollectionCreated } from "modules/analytics/events/features/mocksV2";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./updateMocksCollectionModal.scss";
 
 interface Props {
@@ -14,6 +17,7 @@ interface Props {
   collections?: RQMockCollection[];
   toggleModalVisibility: (visible: boolean) => void;
   onSuccess?: () => void;
+  mockType: MockType;
 }
 
 type SelectOption = { label: string; value: string };
@@ -24,13 +28,17 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
   collections,
   toggleModalVisibility,
   onSuccess,
+  mockType,
 }) => {
   const user = useSelector(getUserAuthDetails);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const uid = user?.details?.profile?.uid;
+  const teamId = workspace?.id;
 
   const [isLoading, setIsLoading] = useState(false);
   const [collectionId, setCollectionId] = useState("");
   const [collectionName, setCollectionName] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     if (mocks.length === 1) {
@@ -38,11 +46,11 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
     }
   }, [mocks]);
 
-  const handleMoveMocks = () => {
+  const handleMoveMocks = async (collectionId: string, collectionName: string) => {
     setIsLoading(true);
     const mockIds = mocks?.map((mock) => mock.id);
 
-    updateMocksCollectionId(uid, mockIds, collectionId)
+    return updateMocksCollectionId(uid, mockIds, collectionId)
       .then(() => {
         // TODO: add analytic event
         onSuccess?.();
@@ -65,6 +73,29 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
 
   const handleSearchCollection: SelectProps<string, SelectOption>["filterOption"] = (searchValue, option) => {
     return (option?.label ?? "").toLowerCase().includes(searchValue.toLowerCase());
+  };
+
+  const handleCreateNewCollectionClick = async () => {
+    if (searchValue.length === 0) {
+      message.error("Collection name cannot be empty!");
+      return;
+    }
+
+    const collectionData = {
+      desc: "",
+      name: searchValue,
+      type: mockType,
+    };
+
+    setIsLoading(true);
+    createCollection(uid, collectionData, teamId)
+      .then((collection) => {
+        trackMockCollectionCreated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
+        return handleMoveMocks(collection.id, collection.name);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const options = collections?.map(({ id, name }) => ({ label: name, value: id }));
@@ -90,6 +121,23 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
           onChange={handleChangeCollection}
           filterOption={handleSearchCollection}
           className="collection-select"
+          onSearch={(value) => setSearchValue(value)}
+          notFoundContent={
+            <div className="collection-not-found-container">
+              {searchValue ? (
+                <Button
+                  type="text"
+                  loading={isLoading}
+                  onClick={handleCreateNewCollectionClick}
+                  className="create-new-collection-btn"
+                >
+                  Create "{searchValue}"
+                </Button>
+              ) : (
+                <span>Search to create new collection</span>
+              )}
+            </div>
+          }
         />
       </label>
 
@@ -100,7 +148,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
         <Button
           type="primary"
           loading={isLoading}
-          onClick={handleMoveMocks}
+          onClick={() => handleMoveMocks(collectionId, collectionName)}
           disabled={mocks?.length === 1 && mocks?.[0]?.collectionId === collectionId}
         >
           Move
