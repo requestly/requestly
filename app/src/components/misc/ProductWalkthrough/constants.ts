@@ -9,7 +9,6 @@ export const TOUR_TYPES = {
 export const MISC_TOURS = {
   APP_ENGAGEMENT: {
     FIRST_DRAFT_SESSION: "first_draft_session",
-    ASK_AI: "ask_ai",
   },
   PRICING: {
     UPGRADE_WORKSPACE_MENU: "upgrade_workspace_menu",

@@ -376,15 +376,4 @@ export const productTours: Record<string, CustomSteps[]> = {
       disableOverlay: true,
     },
   ],
-  [MISC_TOURS.APP_ENGAGEMENT.ASK_AI]: [
-    {
-      ...tourTooltipPresets,
-      title: "Ask AI for instant support!",
-      target: getTourTarget(MISC_TOURS.APP_ENGAGEMENT.ASK_AI),
-      content: "Interact with RequestBot to get answers to anything about Requestly.",
-      pointerPlacement: PointerPlacement.TOP_75,
-      customNextButtonText: "Got it!",
-      disableOverlay: true,
-    },
-  ],
 };
