@@ -40,3 +40,12 @@
     }
   }
 }
+
+.collection-not-found-container {
+  color: var(--requestly-color-white);
+
+  .create-new-collection-btn.ant-btn {
+    padding: 0;
+    background: transparent;
+  }
+}
