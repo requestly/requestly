@@ -21,6 +21,10 @@ export const isEnvDevWithBeta = () => {
   return process.env.NODE_ENV === "development" && !isEnvEmulator();
 };
 
-export const isAutomationEnabled = () => {
-  return window.navigator.webdriver === true;
+const detectHeadless = () => {
+  return /HeadlessChrome/.test(window.navigator.userAgent) === true;
+};
+
+export const isEnvAutomation = () => {
+  return window.navigator.webdriver === true || detectHeadless();
 };
