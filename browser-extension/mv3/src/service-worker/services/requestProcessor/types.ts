@@ -9,4 +9,5 @@ export interface AJAXRequestDetails {
 export enum SessionRuleType {
   FORWARD_IGNORED_HEADERS = "forwardIgnoredHeaders",
   INITIATOR_DOMAIN = "initiatorDomain",
+  CSP_ERROR = "cspError",
 }
