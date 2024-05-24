@@ -1,9 +1,9 @@
 import PATHS from "config/constants/sub/paths";
-import { isAutomationEnabled } from "utils/EnvUtils";
+import { isEnvAutomation } from "utils/EnvUtils";
 
 export const shouldShowOnboarding = () => {
   if (
-    isAutomationEnabled() ||
+    isEnvAutomation() ||
     window.location.href.includes(PATHS.AUTH.SIGN_IN.RELATIVE) ||
     window.location.href.includes(PATHS.AUTH.SIGN_UP.RELATIVE) ||
     window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||
