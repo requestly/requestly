@@ -86,10 +86,20 @@ const updateCache = (obj: Record<string, any>) => {
   });
 };
 
-const updateTabCache = async (tabId: number, obj: Record<string, any>) => {
+const updateTabCache = async (tabId: number, obj: Record<string, any>, frameId?: number) => {
+  const target: chrome.scripting.InjectionTarget = {
+    tabId: tabId,
+  };
+
+  if (frameId !== undefined) {
+    target["frameIds"] = [frameId];
+  } else {
+    target["allFrames"] = true;
+  }
+
   chrome.scripting.executeScript(
     {
-      target: { tabId },
+      target,
       func: updateCache,
       args: [obj],
       injectImmediately: true,
@@ -101,7 +111,7 @@ const updateTabCache = async (tabId: number, obj: Record<string, any>) => {
   );
 };
 
-const updateTabRuleCache = async (tabId: number) => {
+const updateTabRuleCache = async (tabId: number, frameId?: number) => {
   const requestRules = await rulesStorageService.getEnabledRules(RuleType.REQUEST);
   const responseRules = await rulesStorageService.getEnabledRules(RuleType.RESPONSE);
   const delayRules = await rulesStorageService.getEnabledRules(RuleType.DELAY);
@@ -131,11 +141,15 @@ const updateTabRuleCache = async (tabId: number) => {
     };
   });
 
-  updateTabCache(tabId, {
-    responseRules: clientResponseRules,
-    requestRules: clientRequestRules,
-    delayRules: clientDelayRules,
-  });
+  updateTabCache(
+    tabId,
+    {
+      responseRules: clientResponseRules,
+      requestRules: clientRequestRules,
+      delayRules: clientDelayRules,
+    },
+    frameId
+  );
 };
 
 export const initClientRuleCaching = async () => {
@@ -147,7 +161,7 @@ export const initClientRuleCaching = async () => {
 
   chrome.webNavigation.onCommitted.addListener(async (navigatedTabData) => {
     if (isExtensionStatusEnabled) {
-      updateTabRuleCache(navigatedTabData.tabId);
+      updateTabRuleCache(navigatedTabData.tabId, navigatedTabData.frameId);
     }
   });
 
@@ -155,7 +169,7 @@ export const initClientRuleCaching = async () => {
     if (isExtensionStatusEnabled) {
       chrome.tabs.query({}, (tabs) => {
         tabs.forEach((tab) => {
-          updateTabRuleCache(tab.id);
+          updateTabRuleCache(tab.id, undefined);
         });
       });
     }
