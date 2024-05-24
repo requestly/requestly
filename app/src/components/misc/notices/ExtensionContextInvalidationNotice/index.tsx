@@ -28,7 +28,7 @@ const ExtensionContextInvalidationNotice: React.FC = () => {
   }, []);
 
   return visible ? (
-    <div className="extension-context-invalidation-notice">
+    <div className="top-banner-notice">
       <Typography.Text>
         The browser extension was updated in the background. Please save your work and&nbsp;
       </Typography.Text>
