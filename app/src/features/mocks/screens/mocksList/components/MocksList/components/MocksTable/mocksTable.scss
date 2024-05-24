@@ -50,6 +50,12 @@
         }
       }
 
+      &.collection-row.starred {
+        .ant-table-cell:first-child {
+          border-left: 4px solid var(--requestly-color-warning);
+        }
+      }
+
       &.ant-table-row-level-1 {
         .mock-name-details-container {
           padding-left: 6px;
