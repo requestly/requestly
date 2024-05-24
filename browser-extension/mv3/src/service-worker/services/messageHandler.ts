@@ -116,6 +116,10 @@ export const initMessageHandler = () => {
         requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
         return true;
 
+      case EXTENSION_MESSAGES.ON_ERROR_OCCURRED:
+        requestProcessor.onErrorOccurred(sender.tab.id, message.requestDetails).then(sendResponse);
+        return true;
+
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
         launchUrlAndStartRuleTesting(message, sender.tab.id);
         break;

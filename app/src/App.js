@@ -21,7 +21,8 @@ import DBListeners from "hooks/DbListenerInit/DBListeners";
 import FeatureUsageEvent from "hooks/FeatureUsageEvent";
 import ActiveWorkspace from "hooks/ActiveWorkspace";
 import AuthHandler from "hooks/AuthHandler";
-import ExtensionContextInvalidationNotice from "components/misc/ExtensionContextInvalidationNotice";
+import ExtensionContextInvalidationNotice from "components/misc/notices/ExtensionContextInvalidationNotice";
+import AutomationNotAllowedNotice from "components/misc/notices/AutomationNotAllowedNotice";
 import { useIsExtensionEnabled } from "hooks";
 import { LazyMotion, domMax } from "framer-motion";
 import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsListener";
@@ -68,6 +69,7 @@ const App = () => {
   return (
     <>
       <ExtensionContextInvalidationNotice />
+      <AutomationNotAllowedNotice />
       <AuthHandler />
       <PreLoadRemover />
       <AppModeInitializer />
