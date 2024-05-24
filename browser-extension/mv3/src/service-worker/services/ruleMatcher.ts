@@ -115,7 +115,10 @@ const matchRequestWithRuleSourceFilters = function (
   return Object.entries(sourceObject).every(([key, values]) => {
     switch (key) {
       case SourceFilterTypes.PAGE_DOMAINS:
-        return values.includes(requestDetails.initiatorDomain);
+        return values.some((value: string) => {
+          // page domains filter should match all subdomains as well
+          return requestDetails.initiatorDomain.endsWith(value);
+        });
       case SourceFilterTypes.REQUEST_METHOD:
         return values.includes(requestDetails.method);
       case SourceFilterTypes.RESOURCE_TYPE:

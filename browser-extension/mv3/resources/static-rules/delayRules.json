@@ -18,8 +18,7 @@
         "sub_frame",
         "webbundle",
         "websocket",
-        "webtransport",
-        "xmlhttprequest"
+        "webtransport"
       ]
     },
     "action": {
@@ -48,8 +47,7 @@
         "sub_frame",
         "webbundle",
         "websocket",
-        "webtransport",
-        "xmlhttprequest"
+        "webtransport"
       ]
     },
     "action": {
