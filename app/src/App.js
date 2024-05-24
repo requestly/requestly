@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import isEmpty from "is-empty";
 import APP_CONSTANTS from "./config/constants";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
 import { ConfigProvider } from "antd";
@@ -45,6 +46,25 @@ const App = () => {
 
   submitAppDetailAttributes();
   useAppUpdateChecker();
+
+  if (!isEmpty(window.location.hash)) {
+    //Support legacy URL formats
+    const hashURL = window.location.hash.split("/");
+    const hashType = hashURL[0];
+    const hashPath = hashURL[1];
+
+    switch (hashType) {
+      case PATHS.HASH.SHARED_LISTS:
+        window.location.assign(PATHS.SHARED_LISTS.VIEWER.ABSOLUTE + "/" + hashPath);
+        break;
+      case PATHS.HASH.RULE_EDITOR:
+        window.location.replace(PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE + "/" + hashPath);
+        break;
+
+      default:
+        break;
+    }
+  }
 
   return (
     <>
