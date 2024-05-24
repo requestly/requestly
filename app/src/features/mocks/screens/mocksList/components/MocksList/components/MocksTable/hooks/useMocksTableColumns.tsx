@@ -53,7 +53,7 @@ export const useMocksTableColumns = ({
     {
       key: "isFavourite",
       dataIndex: "isFavourite",
-      width: isWorkspaceMode ? 25 : isRuleEditor ? 40 : 25,
+      width: isWorkspaceMode ? 40 : isRuleEditor ? 40 : 35,
       render: (_: any, record: RQMockSchema) => {
         return isRuleEditor ? null : (
           <Button
@@ -75,7 +75,7 @@ export const useMocksTableColumns = ({
       title: <div className="rq-col-title">Name</div>,
       dataIndex: "name",
       ellipsis: true,
-      width: isWorkspaceMode ? (isRuleEditor ? 110 : 310) : isRuleEditor ? 290 : 410,
+      width: isWorkspaceMode ? (isRuleEditor ? 110 : 290) : isRuleEditor ? 290 : 360,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
 

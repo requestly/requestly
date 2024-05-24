@@ -35,10 +35,6 @@
       }
 
       &.mock-row {
-        .ant-table-row-indent + .ant-table-row-expand-icon {
-          display: none;
-        }
-
         td.ant-table-cell.ant-table-cell-with-append:nth-child(2) {
           padding: 18px 0;
         }
@@ -72,7 +68,7 @@
         align-items: center;
         gap: 6px;
         font-size: 14px;
-        margin-right: 5px;
+        margin-right: 8px;
         flex-shrink: 0;
 
         .unstarred {
