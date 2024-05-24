@@ -52,12 +52,12 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
       {
         priority: 2,
         condition: {
-          regexFilter: `(.*)${rulePair.from}(.*)(${MARKER_QUERY_PARAM}=${markerValue})(.*)`,
+          regexFilter: `(.*)${rulePair.from}(.*)${MARKER_QUERY_PARAM}=${markerValue}(.*)`,
         },
         action: {
           type: RuleActionType.REDIRECT,
           redirect: {
-            regexSubstitution: `\\1${rulePair.to}\\2${REPLACED_QUERY_PARAM}=${markerValue}\\4`,
+            regexSubstitution: `\\1${rulePair.to}\\2${REPLACED_QUERY_PARAM}=${markerValue}\\3`,
           },
         },
       },
