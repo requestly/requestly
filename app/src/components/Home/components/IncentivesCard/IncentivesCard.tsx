@@ -1,7 +1,7 @@
 import { useState } from "react";
 import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import giftAnimation from "./assets/gift.json";
-import { CreditsProgressBar, IncentiveSectionHeader, IncentiveTasksListModal } from "features/Incentives";
+import { CreditsProgressBar, IncentiveSectionHeader, IncentiveTasksListModal } from "features/incentivization";
 import { RQButton } from "lib/design-system/components";
 import "./incentivesCard.scss";
 
