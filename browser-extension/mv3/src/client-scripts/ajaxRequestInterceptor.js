@@ -358,7 +358,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         return;
       }
 
-      const url = this.requestURL;
+      const url = this._rq_requestURL;
 
       const responseRuleData = getMatchedResponseRule(url);
       const { response: responseModification, source } = responseRuleData;
@@ -376,7 +376,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         !isRequestPayloadFilterApplicable(
           {
             requestData: jsonifyValidJSONString(this.requestData),
-            method: this.method,
+            method: this._rq_method,
           },
           source?.filters
         )
@@ -405,9 +405,9 @@ import { PUBLIC_NAMESPACE } from "common/constants";
                 responseRuleData.response.value,
                 "response"
               )({
-                method: this.method,
+                method: this._rq_method,
                 url,
-                requestHeaders: this.requestHeaders,
+                requestHeaders: this._rq_requestHeaders,
                 requestData: jsonifyValidJSONString(this.requestData),
                 responseType: contentType,
                 response: this.response,
@@ -465,7 +465,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
         const requestDetails = {
           url,
-          method: this.method,
+          method: this._rq_method,
           type: "xmlhttprequest",
           timeStamp: Date.now(),
         };
@@ -516,8 +516,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   const open = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method, url) {
-    this.method = method;
-    this.requestURL = getAbsoluteUrl(url);
+    this._rq_method = method;
+    this._rq_requestURL = getAbsoluteUrl(url);
     open.apply(this, arguments);
   };
 
@@ -525,16 +525,16 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   XMLHttpRequest.prototype.send = async function (data) {
     this.requestData = data;
 
-    const matchedDelayRule = getMatchedDelayRule(this.requestURL);
+    const matchedDelayRule = getMatchedDelayRule(this._rq_requestURL);
     if (matchedDelayRule) {
       await applyDelay(matchedDelayRule.delay);
     }
 
-    const requestRule = getMatchedRequestRule(this.requestURL);
+    const requestRule = getMatchedRequestRule(this._rq_requestURL);
     if (requestRule) {
       this.requestData = getCustomRequestBody(requestRule, {
-        method: this.method,
-        url: this.requestURL,
+        method: this._rq_method,
+        url: this._rq_requestURL,
         body: data,
         bodyAsJson: jsonifyValidJSONString(data),
       });
@@ -543,8 +543,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         notifyRequestRuleApplied({
           ruleDetails: requestRule,
           requestDetails: {
-            url: this.requestURL,
-            method: this.method,
+            url: this._rq_requestURL,
+            method: this._rq_method,
             type: "xmlhttprequest",
             timeStamp: Date.now(),
           },
@@ -554,17 +554,17 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       }
     }
 
-    this.responseRule = getMatchedResponseRule(this.requestURL);
+    this.responseRule = getMatchedResponseRule(this._rq_requestURL);
 
     if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule.response)) {
       resolveXHR(this, this.responseRule.response.value);
     } else {
       await notifyOnBeforeRequest({
-        url: this.requestURL,
-        method: this.method,
+        url: this._rq_requestURL,
+        method: this._rq_method,
         type: "xmlhttprequest",
         initiatorDomain: location.origin,
-        requestHeaders: this.requestHeaders ?? {},
+        requestHeaders: this._rq_requestHeaders ?? {},
       });
       send.apply(this, arguments);
     }
@@ -572,8 +572,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
   XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-    this.requestHeaders = this.requestHeaders ?? {};
-    this.requestHeaders[header] = value;
+    this._rq_requestHeaders = this._rq_requestHeaders ?? {};
+    this._rq_requestHeaders[header] = value;
     setRequestHeader.apply(this, arguments);
   };
 
