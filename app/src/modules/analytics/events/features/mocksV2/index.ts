@@ -1,6 +1,6 @@
 import { trackEvent } from "modules/analytics";
 import { MOCKSV2 } from "../constants";
-import { MockType } from "components/features/mocksV2/types";
+import { MockRecordType, MockType } from "components/features/mocksV2/types";
 
 export const trackCreateMockEvent = (
   id: string,
@@ -41,13 +41,20 @@ export const trackDeleteMockEvent = (id: string, type: string, file_type: string
   trackEvent(MOCKSV2.DELETED, params);
 };
 
-export const trackMockStarToggledEvent = (id: string, type: string, file_type: string, starred: boolean = false) => {
+export const trackMockStarToggledEvent = (
+  id: string,
+  type: string,
+  file_type: string,
+  starred: boolean = false,
+  recordType: MockRecordType
+) => {
   const params = {
     version: 2,
     id,
     type,
     file_type,
     starred,
+    recordType,
   };
   trackEvent(MOCKSV2.STAR_TOGGLED, params);
 };

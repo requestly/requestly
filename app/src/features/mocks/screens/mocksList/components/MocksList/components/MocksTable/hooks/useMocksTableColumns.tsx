@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table } from "antd";
-import { MockType, RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { EditOutlined } from "@ant-design/icons";
@@ -25,7 +25,6 @@ import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
 
-// TODO: move all actions in a hook and use that
 export const useMocksTableColumns = ({
   mockType,
   handleNameClick,
@@ -56,9 +55,7 @@ export const useMocksTableColumns = ({
       dataIndex: "isFavourite",
       width: isWorkspaceMode ? 25 : isRuleEditor ? 40 : 25,
       render: (_: any, record: RQMockSchema) => {
-        const isCollection = isRecordMockCollection(record);
-
-        return isCollection || isRuleEditor ? null : (
+        return isRuleEditor ? null : (
           <Button
             type="text"
             onClick={(e) => {
@@ -194,7 +191,7 @@ export const useMocksTableColumns = ({
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              updateCollectionNameAction(mockType, (record as unknown) as RQMockCollection);
+              updateCollectionNameAction(mockType, record);
             },
             label: (
               <Row>

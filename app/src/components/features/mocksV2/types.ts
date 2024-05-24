@@ -36,6 +36,7 @@ export interface RQMockCollection {
   name: string;
   desc?: string;
   type: MockType;
+  isFavourite?: boolean;
   recordType: MockRecordType.COLLECTION;
   ownerId: string;
   children?: RQMockMetadataSchema[];
