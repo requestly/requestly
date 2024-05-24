@@ -7,7 +7,7 @@ import {
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import "./extensionContextInvalidationNotice.scss";
+import "../common.scss";
 
 const ExtensionContextInvalidationNotice: React.FC = () => {
   const [visible, setVisible] = useState(false);
