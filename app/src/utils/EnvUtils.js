@@ -21,6 +21,6 @@ export const isEnvDevWithBeta = () => {
   return process.env.NODE_ENV === "development" && !isEnvEmulator();
 };
 
-export const isAutomationEnabled = () => {
+export const isEnvAutomation = () => {
   return window.navigator.webdriver === true;
 };
