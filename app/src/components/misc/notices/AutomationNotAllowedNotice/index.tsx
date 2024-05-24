@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Typography } from "antd";
-
-// @ts-ignore
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "../common.scss";
 import { isEnvAutomation } from "utils/EnvUtils";
 
