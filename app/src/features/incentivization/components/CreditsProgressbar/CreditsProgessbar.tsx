@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Progress } from "antd";
 import { MdRedeem } from "@react-icons/all-files/md/MdRedeem";
-import { RedeemCreditsModal } from "features/Incentives";
+import { RedeemCreditsModal } from "features/incentivization";
 import "./creditsProgessbar.scss";
 
 export const CreditsProgressBar = () => {
