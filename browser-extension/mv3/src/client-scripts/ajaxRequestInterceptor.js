@@ -179,6 +179,18 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return window[namespace].requestRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
+  const getMatchedDelayRule = (url) => {
+    if (!window[namespace]?.delayRules) return null;
+
+    for (const rule of window[namespace]?.delayRules) {
+      const matchedPair = rule.pairs.find((pair) => matchSourceUrl(pair.source, url));
+      if (matchedPair) {
+        return matchedPair;
+      }
+    }
+    return null;
+  };
+
   const shouldServeResponseWithoutRequest = (responseModification) => {
     return responseModification.type === "static" && responseModification.serveWithoutRequest;
   };
@@ -203,6 +215,10 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       });
       return () => {};
     }
+  };
+
+  const applyDelay = (delay) => {
+    return new Promise((resolve) => setTimeout(resolve, delay));
   };
 
   const getCustomRequestBody = (requestRuleData, args) => {
@@ -509,6 +525,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
   XMLHttpRequest.prototype.send = async function (data) {
     this.requestData = data;
 
+    const matchedDelayRule = getMatchedDelayRule(this.requestURL);
+    if (matchedDelayRule) {
+      await applyDelay(matchedDelayRule.delay);
+    }
+
     const requestRule = getMatchedRequestRule(this.requestURL);
     if (requestRule) {
       this.requestData = getCustomRequestBody(requestRule, {
@@ -571,6 +592,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     let url = getAbsoluteUrl(request.url);
     const method = request.method;
+
+    const matchedDelayRule = getMatchedDelayRule(url);
+    if (matchedDelayRule) {
+      await applyDelay(matchedDelayRule.delay);
+    }
 
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);

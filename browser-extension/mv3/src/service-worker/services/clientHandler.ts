@@ -104,6 +104,7 @@ const updateTabCache = async (tabId: number, obj: Record<string, any>) => {
 const updateTabRuleCache = async (tabId: number) => {
   const requestRules = await rulesStorageService.getEnabledRules(RuleType.REQUEST);
   const responseRules = await rulesStorageService.getEnabledRules(RuleType.RESPONSE);
+  const delayRules = await rulesStorageService.getEnabledRules(RuleType.DELAY);
 
   const clientRequestRules = requestRules.map((rule) => {
     const responseRulePair = rule.pairs[0] as RequestRulePair;
@@ -123,9 +124,17 @@ const updateTabRuleCache = async (tabId: number) => {
     };
   });
 
+  const clientDelayRules = delayRules.map((rule) => {
+    return {
+      id: rule.id,
+      pairs: rule.pairs,
+    };
+  });
+
   updateTabCache(tabId, {
     responseRules: clientResponseRules,
     requestRules: clientRequestRules,
+    delayRules: clientDelayRules,
   });
 };
 
