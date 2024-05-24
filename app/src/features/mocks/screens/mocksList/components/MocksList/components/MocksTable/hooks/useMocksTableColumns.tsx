@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table } from "antd";
-import { MockType, RQMockSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { EditOutlined } from "@ant-design/icons";
@@ -194,7 +194,7 @@ export const useMocksTableColumns = ({
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              updateCollectionNameAction(mockType, record);
+              updateCollectionNameAction(mockType, (record as unknown) as RQMockCollection);
             },
             label: (
               <Row>
