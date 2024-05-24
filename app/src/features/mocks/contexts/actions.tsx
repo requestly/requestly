@@ -1,7 +1,13 @@
 import React, { createContext, useCallback, useContext } from "react";
 import Logger from "../../../../../common/logger";
 import { useMocksModalsContext } from "./modals";
-import { MockListSource, MockType, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
+import {
+  MockListSource,
+  MockRecordType,
+  MockType,
+  RQMockMetadataSchema,
+  RQMockSchema,
+} from "components/features/mocksV2/types";
 import { updateMock } from "backend/mocks/updateMock";
 import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
@@ -98,11 +104,14 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       const isStarred = record.isFavourite;
       const updatedValue = !isStarred;
 
-      toast.loading(isStarred ? "Unstarring Mock..." : "Starring Mock...", 3);
+      const recordType =
+        record.recordType === MockRecordType.COLLECTION ? "Collection" : record.type === MockType.API ? "Mock" : "File";
+
+      toast.loading(isStarred ? `Unstarring ${recordType}...` : `Starring ${recordType}...`, 3);
 
       updateMock(uid, record.id, { ...record, isFavourite: updatedValue }, teamId).then(() => {
-        trackMockStarToggledEvent(record.id, record.type, record?.fileType, updatedValue);
-        toast.success(isStarred ? "Mock unstarred!" : "Mock starred!");
+        trackMockStarToggledEvent(record.id, record.type, record?.fileType, updatedValue, record.recordType);
+        toast.success(isStarred ? `${recordType} unstarred!` : `${recordType} starred!`);
         onSuccess?.();
       });
     },
