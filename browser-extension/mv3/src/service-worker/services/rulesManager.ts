@@ -43,6 +43,11 @@ const addExtensionRules = async (): Promise<void> => {
       extensionRules.forEach((extensionRule) => {
         if (!extensionRule.condition.resourceTypes?.length) {
           extensionRule.condition.resourceTypes = ALL_RESOURCE_TYPES;
+          if (extensionRule.condition.excludedResourceTypes?.length) {
+            extensionRule.condition.resourceTypes = extensionRule.condition.resourceTypes.filter(
+              (resourceType) => !extensionRule.condition.excludedResourceTypes.includes(resourceType)
+            );
+          }
         }
 
         const ruleId = parsedExtensionRules.length + 1;
