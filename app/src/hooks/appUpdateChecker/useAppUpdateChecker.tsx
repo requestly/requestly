@@ -33,7 +33,7 @@ const useAppUpdateChecker = () => {
                 </Col>
                 <Col>A new version of app is available</Col>
                 <Col>
-                  <Button type="link" onClick={() => window.location.reload()}>
+                  <Button type="link" onClick={() => window.location.replace(window.location.href)}>
                     Refresh
                   </Button>
                 </Col>
