@@ -12,7 +12,7 @@ const isProductionBuildMode = process.env.BUILD_MODE === "production";
 const generateUrlPattern = (urlString) => {
   try {
     const webUrlObj = new URL(urlString);
-    return `${webUrlObj.protocol}//${webUrlObj.hostname}/*`;
+    return `${webUrlObj.protocol}//${webUrlObj.host}/*`;
   } catch (error) {
     console.error(`Invalid URL: ${urlString}`, error);
     return null;

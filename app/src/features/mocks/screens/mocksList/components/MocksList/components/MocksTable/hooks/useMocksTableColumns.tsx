@@ -3,13 +3,12 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table } from "antd";
-import { MockType, RQMockSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { CalendarOutlined, EditOutlined } from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import { UserIcon } from "components/common/UserIcon";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
-import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
@@ -76,12 +75,7 @@ export const useMocksTableColumns = ({
     Table.EXPAND_COLUMN,
     {
       key: "id",
-      title: (
-        <div className="rq-col-title">
-          <HiOutlineBookOpen />
-          Name
-        </div>
-      ),
+      title: <div className="rq-col-title">Name</div>,
       dataIndex: "name",
       ellipsis: true,
       width: isWorkspaceMode ? (isRuleEditor ? 110 : 310) : isRuleEditor ? 290 : 410,
@@ -174,12 +168,7 @@ export const useMocksTableColumns = ({
     },
     {
       key: "lastUpdatedBy",
-      title: (
-        <div className="rq-col-title">
-          <CalendarOutlined />
-          Last Modified
-        </div>
-      ),
+      title: <div className="rq-col-title">Last Modified</div>,
       width: 110,
       className: "text-gray",
       render: (_: any, record: RQMockSchema) => {
@@ -205,7 +194,7 @@ export const useMocksTableColumns = ({
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              updateCollectionNameAction(mockType, record);
+              updateCollectionNameAction(mockType, (record as unknown) as RQMockCollection);
             },
             label: (
               <Row>
