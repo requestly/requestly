@@ -36,7 +36,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
         return {
-          regexFilter: pattern,
+          regexFilter: `.*${pattern}.*`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
@@ -60,7 +60,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
         return {
-          regexFilter: `^https?://${pattern}(/|$)(.*)`,
+          regexFilter: `^https?://${pattern}[/?#$]?(.*)`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
@@ -68,7 +68,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(createRegexForWildcardString(source.value));
         return {
-          regexFilter: `^https?://${pattern}(/|$)(.*)`,
+          regexFilter: `^https?://${pattern}[/?#$]?(.*)`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
