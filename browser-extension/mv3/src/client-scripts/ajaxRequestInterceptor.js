@@ -375,7 +375,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       if (
         !isRequestPayloadFilterApplicable(
           {
-            requestData: jsonifyValidJSONString(this.requestData),
+            requestData: jsonifyValidJSONString(this._rq_requestData),
             method: this._rq_method,
           },
           source?.filters
@@ -408,7 +408,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
                 method: this._rq_method,
                 url,
                 requestHeaders: this._rq_requestHeaders,
-                requestData: jsonifyValidJSONString(this.requestData),
+                requestData: jsonifyValidJSONString(this._rq_requestData),
                 responseType: contentType,
                 response: this.response,
                 responseJSON: jsonifyValidJSONString(this.response),
@@ -523,7 +523,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = async function (data) {
-    this.requestData = data;
+    this._rq_requestData = data;
 
     const matchedDelayRule = getMatchedDelayRule(this._rq_requestURL);
     if (matchedDelayRule) {
@@ -532,14 +532,14 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     const requestRule = getMatchedRequestRule(this._rq_requestURL);
     if (requestRule) {
-      this.requestData = getCustomRequestBody(requestRule, {
+      this._rq_requestData = getCustomRequestBody(requestRule, {
         method: this._rq_method,
         url: this._rq_requestURL,
         body: data,
         bodyAsJson: jsonifyValidJSONString(data),
       });
 
-      if (typeof this.requestData !== "undefined") {
+      if (typeof this._rq_requestData !== "undefined") {
         notifyRequestRuleApplied({
           ruleDetails: requestRule,
           requestDetails: {
@@ -550,7 +550,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           },
         });
       } else {
-        this.requestData = data;
+        this._rq_requestData = data;
       }
     }
 
