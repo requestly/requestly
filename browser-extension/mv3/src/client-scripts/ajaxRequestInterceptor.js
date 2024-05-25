@@ -183,6 +183,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     if (!window[namespace]?.delayRules) return null;
 
     for (const rule of window[namespace]?.delayRules) {
+      // TODO: Use ruleMatcher here as this doesn't handle the filters
       const matchedPair = rule.pairs.find((pair) => matchSourceUrl(pair.source, url));
       if (matchedPair) {
         return matchedPair;
@@ -201,7 +202,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       return new Function("args", `return (${code})(args);`);
     } catch (e) {
       notifyOnErrorOccurred({
-        initiatorDomain: location.origin,
+        initiator: location.origin,
         url: location.href,
       }).then(() => {
         if (!logShown) {
@@ -563,7 +564,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         url: this.requestURL,
         method: this.method,
         type: "xmlhttprequest",
-        initiatorDomain: location.origin,
+        initiator: location.origin,
         requestHeaders: this.requestHeaders ?? {},
       });
       send.apply(this, arguments);
@@ -662,7 +663,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           url,
           method,
           type: "xmlhttprequest",
-          initiatorDomain: location.origin,
+          initiator: location.origin,
           requestHeaders: headersObject,
         });
 
