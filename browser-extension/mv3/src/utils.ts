@@ -52,3 +52,13 @@ export const generateUrlPattern = (urlString: string) => {
     return null;
   }
 };
+
+export const getUrlObject = (url: string): URL | undefined => {
+  // Url obj fails to construct when chrome:// or similar urls are passed
+  try {
+    const urlObj = new URL(url);
+    return urlObj;
+  } catch (error) {
+    return null;
+  }
+};
