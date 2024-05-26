@@ -39,7 +39,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
           // To handle case for regexSubsitution as replaces inplace instead of replace whole. So we match the whole url instead
           // https://linear.app/requestly/issue/ENGG-1831
           // https://arc.net/l/quote/erozzfqb
-          regexFilter: `.*${pattern}.*`,
+          regexFilter: `.*?${pattern}.*`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
@@ -63,7 +63,8 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
         return {
-          regexFilter: `^https?://${pattern}[/?#$]?(.*)`,
+          regexFilter: `^https?://[a-z0-9.-]*?${pattern}[a-z0-9:.-]*.*`,
+          // `^https?://[^/?#]*${pattern}[^/?#]*.*`
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
@@ -71,7 +72,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(createRegexForWildcardString(source.value));
         return {
-          regexFilter: `^https?://${pattern}[/?#$]?(.*)`,
+          regexFilter: `^https?://[a-z0-9.-]*?${pattern}[a-z0-9:.-]*.*`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
