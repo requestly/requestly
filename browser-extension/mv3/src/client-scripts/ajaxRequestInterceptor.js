@@ -567,7 +567,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         initiator: location.origin,
         requestHeaders: this._rq_requestHeaders ?? {},
       });
-      send.apply(this, arguments);
+      send.call(this, this._rq_requestData);
     }
   };
 
