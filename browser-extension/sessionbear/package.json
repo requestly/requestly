@@ -1,7 +1,7 @@
 {
-  "name": "@requestly/browser-extension-mv3",
+  "name": "@requestly/session-bear",
   "version": "24.5.27",
-  "description": "Browser extension acting as Web Debugging Proxy to Intercept & Modify HTTP(s) Requests",
+  "description": "Capture HTTP Sessions and kill bugs in seconds",
   "homepage": "https://requestly.com",
   "private": true,
   "repository": {
@@ -19,21 +19,23 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
-    "config": "cd ../config && npm run build && cd ../mv3",
+    "config": "cd ../config && npm run build && cd ../sessionbear",
     "build": "npm run build:common && npm run build:current",
     "build:current": "rm -rf dist && rollup -c",
-    "build:common": "cd ../common && npm run build && cd ../mv3",
+    "build:common": "cd ../common && npm run build && cd ../sessionbear",
     "watch": "rm -rf dist && rollup -cw",
     "release": "BUILD_MODE='production' npm run build && node scripts/createZip"
   },
   "devDependencies": {
     "@requestly/web-sdk": "0.14.2",
+    "@rollup/plugin-commonjs": "^25.0.8",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/chrome": "^0.0.266",
     "archiver": "^5.3.1",
     "node-sass": "^8.0.0",
+    "patch-package": "^8.0.0",
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-terser": "^7.0.2",
