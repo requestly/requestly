@@ -1,6 +1,9 @@
-import { SourceKey, SourceOperator, UrlSource } from "common/types";
-import config from "common/config";
+import { SourceKey, SourceOperator, UrlSource } from "./types";
+import config from "./config";
 import { matchSourceUrl } from "./service-worker/services/ruleMatcher";
+import { v4 as uuid } from "uuid";
+import { STORAGE_KEYS } from "./constants";
+import { saveRecord } from "./storage";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
   if (dateInMillis && format === "yyyy-mm-dd") {
@@ -61,4 +64,12 @@ export const getUrlObject = (url: string): URL | undefined => {
   } catch (error) {
     return null;
   }
+};
+
+export function generateUUID() {
+  return uuid();
+}
+
+export const updateLastUpdatedTS = () => {
+  return saveRecord(STORAGE_KEYS.LAST_UPDATED_TS, Date.now());
 };

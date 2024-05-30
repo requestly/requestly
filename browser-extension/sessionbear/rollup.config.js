@@ -1,8 +1,12 @@
+import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
 import { terser } from "rollup-plugin-terser";
 import nodeResolve from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
+import postcss from "rollup-plugin-postcss";
+import svgr from "@svgr/rollup";
 import { version } from "./package.json";
 import { browser, WEB_URL, OTHER_WEB_URLS } from "../config/dist/config.build.json";
 
@@ -78,10 +82,39 @@ export default [
             dest: `${OUTPUT_DIR}/libs`,
           },
           { src: "../common/dist/devtools", dest: OUTPUT_DIR },
-          { src: "../common/dist/popup", dest: OUTPUT_DIR },
           { src: "../common/dist/lib/customElements.js", dest: `${OUTPUT_DIR}/libs` },
         ],
       }),
+    ],
+  },
+  {
+    input: "src/popup/index.tsx",
+    output: {
+      file: `${OUTPUT_DIR}/popup/popup.js`,
+      format: "iife",
+    },
+    context: "window",
+    plugins: [
+      copy({
+        targets: [
+          {
+            src: "src/popup/index.html",
+            dest: `${OUTPUT_DIR}/popup`,
+            rename: "popup.html",
+          },
+        ],
+      }),
+      nodeResolve(),
+      replace({
+        preventAssignment: true,
+        "process.env.NODE_ENV": JSON.stringify("production"),
+      }),
+      ...commonPlugins,
+      commonjs(),
+      postcss({
+        extract: true,
+      }),
+      svgr(),
     ],
   },
   {

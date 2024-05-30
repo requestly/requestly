@@ -1,0 +1,5 @@
+.tab-content-section > h5 {
+  font-size: 12px;
+  margin: 8px 0 0 10px;
+  color: var(--text-light);
+}

@@ -1,0 +1,37 @@
+.child-record .record-name-container.link {
+  padding: 4px 0;
+  max-width: 392px;
+  margin-right: 6px;
+}
+
+.child-record .record-name-container.link:last-child {
+  margin-bottom: 12px;
+}
+
+.rule-name-container .rule-type-icons.icon-wrapper svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-right: 2px;
+  color: var(--text-light);
+}
+
+.child-record .rule-name-container .rule-type-icons svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
+}
+
+.rule-name-container .rule-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 39ch;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
+
+.child-record .rule-name {
+  max-width: 40ch;
+}
