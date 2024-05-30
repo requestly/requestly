@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import PopupTabs from "../PopupTabs";
 import { EXTENSION_MESSAGES } from "../../../constants";
 import PopupHeader from "./PopupHeader";
-import { HttpsRuleOptions } from "../HttpsRuleOptions";
 import { EVENT, sendEvent } from "../../events";
 import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import "./popup.css";
@@ -41,7 +39,6 @@ const Popup: React.FC = () => {
         <div className="popup-body">
           {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
           <div className="popup-content">
-            {ifNoRulesPresent ? <HttpsRuleOptions /> : <PopupTabs />}
             <SessionRecordingView />
           </div>
         </div>
