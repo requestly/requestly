@@ -1,14 +1,14 @@
 {
   "extName": {
-    "message": "Requestly - Intercept, Modify & Mock HTTP Requests",
-    "description": "Requestly browser extension name which is visible in Web Stores"
+    "message": "SessionBear - Capture & Kill bugs in seconds!!",
+    "description": "SessionBear browser extension name which is visible in Web Stores"
   },
   "extDesc": {
-    "message": "The easiest way to Redirect URLs, Modify HTTP Headers, Mock APIs, Inject custom JS, Modify GraphQL Requests",
+    "message": "The easiest way to capture and share complete bugs information to developers",
     "description": "Requestly browser extension description visible in Web Stores"
   },
   "extIconTitle": {
-    "message": "Requestly - Intercept, Modify & Mock HTTP Requests",
+    "message": "SessionBear - Create developer friendly bug reports",
     "description": "Tooltip text shown on hovering Requestly browser extension icon"
   }
 }

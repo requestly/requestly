@@ -34,7 +34,7 @@
   "icons": {
     "16": "resources/images/16x16.png",
     "48": "resources/images/48x48.png",
-    "128": "resources/images/128x128.png"
+    "256": "resources/images/256x256.png"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; script-src-elem 'self'; object-src 'self'"
