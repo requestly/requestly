@@ -4,7 +4,7 @@ import { updateRequestSpecificRules } from "../rulesManager";
 export const handleCSPError = async (tabId: number, requestDetails: AJAXRequestDetails): Promise<void> => {
   await updateRequestSpecificRules(
     tabId,
-    requestDetails.initiatorDomain,
+    requestDetails.initiator,
     {
       action: {
         type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
@@ -16,7 +16,7 @@ export const handleCSPError = async (tabId: number, requestDetails: AJAXRequestD
         ],
       },
       condition: {
-        urlFilter: requestDetails.initiatorDomain,
+        urlFilter: requestDetails.initiator,
         resourceTypes: [
           chrome.declarativeNetRequest.ResourceType.SUB_FRAME,
           chrome.declarativeNetRequest.ResourceType.MAIN_FRAME,

@@ -2,7 +2,7 @@ export interface AJAXRequestDetails {
   url: string;
   method: string;
   type: "xmlhttprequest";
-  initiatorDomain: string;
+  initiator?: string; // initiator=origin. Should now contain port and protocol
   requestHeaders?: Record<string, string>;
 }
 
