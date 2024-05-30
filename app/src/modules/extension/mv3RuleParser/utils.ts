@@ -63,7 +63,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
         // Allows only accepted characters in the source incase of open rule (.*, .+, .?)
-        const cleanedPattern = pattern.replace(/.([+*?])/g, "[a-z0-9:.-]$1");
+        const cleanedPattern = pattern.replace(/\.([+*?])/g, "[a-z0-9:.-]$1");
         return {
           regexFilter: `^https?://[a-z0-9:.-]*?${cleanedPattern}[a-z0-9:.-]*.*`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
@@ -73,7 +73,7 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
       case SourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(createRegexForWildcardString(source.value));
         // Allows only accepted characters in the source incase of open rule (.*, .+, .?)
-        const cleanedPattern = pattern.replace(/.([+*?])/g, "[a-z0-9:.-]$1");
+        const cleanedPattern = pattern.replace(/\.([+*?])/g, "[a-z0-9:.-]$1");
         return {
           regexFilter: `^https?://[a-z0-9:.-]*?${cleanedPattern}[a-z0-9:.-]*.*`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
