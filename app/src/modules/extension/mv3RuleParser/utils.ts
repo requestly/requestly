@@ -2,9 +2,20 @@ import { RulePairSource, SourceFilter, SourceKey, SourceOperator } from "../../.
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
-export const createRegexForWildcardString = (value: string): string => {
+export const escapeForwardSlashes = (value: string): string => {
+  return value.replace(/\//g, "\\/");
+};
+
+export const createRegexForWildcardString = (
+  value: string,
+  isWildcardCapturingGroupsEnabled: boolean = true
+): string => {
   // TODO: convert all * to .* and escape all special chars for regex
-  return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(.*)");
+  if (isWildcardCapturingGroupsEnabled) {
+    return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(.*)");
+  } else {
+    return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(?:.*)");
+  }
 };
 
 // regex: /pattern/flags
@@ -96,6 +107,92 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
 
       case SourceOperator.WILDCARD_MATCHES:
         return { regexFilter: createRegexForWildcardString(source.value) }; // TODO: fix
+    }
+  }
+
+  return null;
+};
+
+export const parseSourceConditionV2 = (
+  source: RulePairSource,
+  isWildcardCapturingGroupsEnabled: boolean = true
+): ExtensionRuleCondition => {
+  // rules like query, headers, script, delay can be applied on all URLs
+  if (source.value === "") {
+    return {
+      regexFilter: ".*",
+      isUrlFilterCaseSensitive: false,
+    };
+  }
+
+  if (source.key === SourceKey.URL) {
+    switch (source.operator) {
+      case SourceOperator.EQUALS:
+        return {
+          regexFilter: `^${escapeForwardSlashes(source.value)}$`,
+          isUrlFilterCaseSensitive: true,
+        };
+
+      case SourceOperator.CONTAINS:
+        return {
+          regexFilter: `.*${escapeForwardSlashes(source.value)}.*`,
+          isUrlFilterCaseSensitive: true,
+        };
+
+      case SourceOperator.MATCHES: {
+        const { pattern, flags } = parseRegex(source.value);
+        return {
+          regexFilter: `.*?${pattern}.*`,
+          isUrlFilterCaseSensitive: !flags?.includes("i"),
+        };
+      }
+
+      case SourceOperator.WILDCARD_MATCHES:
+        const { pattern, flags } = parseRegex(
+          createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
+        );
+        return {
+          regexFilter: `.*?${pattern}.*`,
+          isUrlFilterCaseSensitive: !flags?.includes("i"),
+        };
+    }
+  }
+
+  if (source.key === SourceKey.HOST) {
+    switch (source.operator) {
+      case SourceOperator.EQUALS:
+        return {
+          regexFilter: `^https?://${source.value}(?:[/?#].*)?$`,
+          isUrlFilterCaseSensitive: true,
+        };
+
+      case SourceOperator.CONTAINS:
+        return {
+          regexFilter: `^https?://[a-z0-9:.-]*${source.value}[a-z0-9:.-]*(?:[/?#].*)?$`,
+          isUrlFilterCaseSensitive: true,
+        };
+
+      case SourceOperator.MATCHES: {
+        const { pattern, flags } = parseRegex(source.value);
+
+        // Allows only accepted characters in the source incase of open rule (.*, .+, .?)
+        const cleanedPattern = pattern.replace(/\.([+*?])/g, "[a-z0-9:.-]$1");
+        return {
+          regexFilter: `^https?://[a-z0-9:.-]*?${cleanedPattern}[a-z0-9:.-]*.*$`,
+          isUrlFilterCaseSensitive: !flags?.includes("i"),
+        };
+      }
+
+      case SourceOperator.WILDCARD_MATCHES: {
+        const { pattern, flags } = parseRegex(createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled));
+
+        // Allows only accepted characters in the source incase of open rule (.*, .+, .?)
+        const cleanedPattern = pattern.replace(/\.([+*?])/g, "[a-z0-9:.-]$1");
+        return {
+          regexFilter: `^https?://[a-z0-9:.-]*?${cleanedPattern}[a-z0-9:.-]*.*$`,
+          isUrlFilterCaseSensitive: !flags?.includes("i"),
+        };
+      }
     }
   }
 
