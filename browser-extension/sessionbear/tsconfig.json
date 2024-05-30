@@ -3,6 +3,7 @@
     "outDir": "dist",
     "target": "ESNext",
     "module": "ESNext",
+    "jsx": "react",
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
@@ -16,11 +17,8 @@
     "strict": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "rootDir": "..",
-    "paths": {
-      "common/*": ["../common/src/*"]
-    }
+    "rootDir": "./src"
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["./src/**/*", "../common/src/*"]
+  "include": ["./src/**/*"]
 }

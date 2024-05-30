@@ -1,0 +1,37 @@
+.group-expand-icon {
+  font-size: 14px;
+  cursor: pointer;
+  margin: 0 12px 0 3px;
+  color: var(--text-light);
+}
+
+.record-name-container {
+  cursor: pointer;
+}
+
+.record-name-container .record-name {
+  max-width: 36ch;
+}
+
+.record-name-container .group-icon-wrapper {
+  margin-top: 5px;
+}
+
+.record-name-container .group-icon-wrapper svg {
+  width: 20px;
+  height: 20px;
+  color: var(--text-light);
+}
+
+.record-name-container .group-expand-icon.group-expanded svg,
+.record-name-container .group-icon-wrapper.group-expanded svg {
+  color: var(--text-default);
+}
+
+.group-rules {
+  margin-left: 24px;
+}
+
+.empty-group-message {
+  margin-left: 68px;
+}
