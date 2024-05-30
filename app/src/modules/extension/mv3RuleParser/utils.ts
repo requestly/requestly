@@ -2,13 +2,13 @@ import { RulePairSource, SourceFilter, SourceKey, SourceOperator } from "../../.
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
-const createRegexForWildcardString = (value: string): string => {
+export const createRegexForWildcardString = (value: string): string => {
   // TODO: convert all * to .* and escape all special chars for regex
   return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(.*)");
 };
 
 // regex: /pattern/flags
-const parseRegex = (regex: string): { pattern: string; flags?: string } => {
+export const parseRegex = (regex: string): { pattern: string; flags?: string } => {
   const matchesRegexPattern = regex.match(/^\/(.*)\/([dgimsuy]*)$/);
   if (matchesRegexPattern) {
     const [, pattern, flags] = matchesRegexPattern;
