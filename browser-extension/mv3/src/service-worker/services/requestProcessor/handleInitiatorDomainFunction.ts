@@ -24,7 +24,7 @@ export const handleInitiatorDomainFunction = async (
   if (matchedPair.modifications?.Request?.length) {
     matchedPair.modifications.Request.forEach((header: { header: string; type: string; value: string }) => {
       if (header.value === INITIATOR_DOMAIN_FUNCTION) {
-        headerKeyValueMap.Request[header.header] = requestDetails.initiatorDomain;
+        headerKeyValueMap.Request[header.header] = requestDetails.initiator;
       }
     });
   }
@@ -32,7 +32,7 @@ export const handleInitiatorDomainFunction = async (
   if (matchedPair.modifications?.Response?.length) {
     matchedPair.modifications.Response.forEach((header: { header: string; type: string; value: string }) => {
       if (header.value === INITIATOR_DOMAIN_FUNCTION) {
-        headerKeyValueMap.Response[header.header] = requestDetails.initiatorDomain;
+        headerKeyValueMap.Response[header.header] = requestDetails.initiator;
       }
     });
   }

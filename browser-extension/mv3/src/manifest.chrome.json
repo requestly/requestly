@@ -52,7 +52,6 @@
     "storage",
     "contextMenus",
     "declarativeNetRequest",
-    "declarativeNetRequestFeedback",
     "scripting",
     "tabs",
     "webRequest",

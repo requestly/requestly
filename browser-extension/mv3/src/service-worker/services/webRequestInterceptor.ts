@@ -23,7 +23,7 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
             url: details.url,
             method: details.method,
             type: details.type as any,
-            initiatorDomain: details.initiator,
+            initiator: details.initiator,
           });
           if (isApplied) {
             ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
@@ -49,7 +49,7 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
             url: details.url,
             method: details.method,
             type: details.type as any,
-            initiatorDomain: details.initiator,
+            initiator: details.initiator,
           });
           if (isApplied && matchedPair.modifications?.Request && matchedPair.modifications?.Request?.length > 0) {
             ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);
@@ -75,7 +75,7 @@ const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails)
             url: details.url,
             method: details.method,
             type: details.type as any,
-            initiatorDomain: details.initiator,
+            initiator: details.initiator,
           });
           if (isApplied && matchedPair.modifications?.Response && matchedPair.modifications?.Response?.length > 0) {
             ruleExecutionHandler.onRuleExecuted(rule, details, isMainFrameRequest);

@@ -9,7 +9,7 @@ import {
   RulePair,
 } from "common/types";
 import { AJAXRequestDetails } from "./requestProcessor/types";
-import { isBlacklistedURL } from "../../utils";
+import { getUrlObject, isBlacklistedURL } from "../../utils";
 
 const toRegex = (regexStr: string): RegExp => {
   const matchRegExp = regexStr.match(new RegExp("^/(.+)/(|i|g|ig|gi)$"));
@@ -117,7 +117,9 @@ const matchRequestWithRuleSourceFilters = function (
       case SourceFilterTypes.PAGE_DOMAINS:
         return values.some((value: string) => {
           // page domains filter should match all subdomains as well
-          return requestDetails.initiatorDomain.endsWith(value);
+          const url = getUrlObject(requestDetails.initiator);
+          const requestInitiatorDomain = url?.hostname || "";
+          return requestInitiatorDomain.endsWith(value);
         });
       case SourceFilterTypes.REQUEST_METHOD:
         return values.includes(requestDetails.method);
@@ -130,7 +132,7 @@ const matchRequestWithRuleSourceFilters = function (
 };
 
 export const matchRuleWithRequest = function (rule: Rule, requestDetails: AJAXRequestDetails) {
-  if (isBlacklistedURL(requestDetails.initiatorDomain)) {
+  if (isBlacklistedURL(requestDetails.initiator) || isBlacklistedURL(requestDetails.url)) {
     return {};
   }
 
