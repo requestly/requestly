@@ -7,31 +7,31 @@ var Logger = {
   ns: "Requestly: ",
 
   log(...args) {
-    if (this.enabled) {
+    if (this?.enabled) {
       console.log(this.ns, ...args);
     }
   },
 
   error(...args) {
-    if (this.enabled) {
+    if (this?.enabled) {
       console.error(this.ns, ...args);
     }
   },
 
   time(...args) {
-    if (this.enabled) {
+    if (this?.enabled) {
       console.time(...args);
     }
   },
 
   timeEnd(...args) {
-    if (this.enabled) {
+    if (this?.enabled) {
       console.timeEnd(...args);
     }
   },
 
   timeLog(...args) {
-    if (this.enabled) {
+    if (this?.enabled) {
       console.timeLog(...args);
     }
   },
