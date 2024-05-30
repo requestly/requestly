@@ -471,7 +471,7 @@ const WorkspaceSelector = () => {
                 <Tooltip
                   placement="right"
                   overlayInnerStyle={{ width: "178px" }}
-                  title={team.archived ? "This workspace has been scheduled for deletion in next 48 hours." : ""}
+                  title={team.archived ? "This workspace has been archived." : ""}
                 >
                   <div className="workspace-item-wrapper">
                     <div
