@@ -1,0 +1,134 @@
+{
+  "Redirect_1": {
+    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "creationDate": 1715153713647,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "url": "https://example1.com"
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "urlFilter": "example.com"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Redirect_1",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1715153799963,
+    "name": "1. main_frame request",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "https://example1.com",
+        "destinationType": "url",
+        "id": "2lbqx",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example.com"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Redirect_2": {
+    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "creationDate": 1715153855725,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "url": "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz"
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "urlFilter": "https://testheaders.com/files/sample.js"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Redirect_2",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1715927670813,
+    "name": "2. Internal Request Redirect",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz",
+        "destinationType": "mock_or_file_picker",
+        "id": "nii1d",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://testheaders.com/files/sample.js"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  },
+  "Redirect_3": {
+    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "creationDate": 1715154027355,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "redirect": {
+            "url": "https://requestly.tech/api/mockv2/testAuthorization?teamId=9sBQkTnxaMlBY6kWHpoz"
+          },
+          "type": "redirect"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "urlFilter": "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Redirect_3",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1716785647119,
+    "name": "3. Redirect XHR request with Authorization Header",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "destination": "https://requestly.tech/api/mockv2/testAuthorization?teamId=9sBQkTnxaMlBY6kWHpoz",
+        "destinationType": "url",
+        "id": "yyvmw",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "preserveCookie": false,
+    "ruleType": "Redirect",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
+  }
+}

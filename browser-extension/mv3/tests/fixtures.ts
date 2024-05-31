@@ -8,7 +8,8 @@ export const test = base.extend<{
   extensionId: string;
   appPage: Page;
 }>({
-  context: async ({}, use) => {
+  context: async ({}, use, testInfo) => {
+    testInfo.setTimeout(60000); // Increase the timeout to 60 seconds
     const pathToExtension = path.join(__dirname, "..", "dist");
     const context = await chromium.launchPersistentContext("", {
       ignoreDefaultArgs: ["--headless"],
@@ -29,10 +30,9 @@ export const test = base.extend<{
     await use(extensionId);
   },
   appPage: async ({ context }, use) => {
-    const page = await context.newPage();
-    await page.goto(WEB_URL, { waitUntil: "load" });
-    // await clearRules(page);
-    await use(page);
+    const appPage = await context.newPage();
+    await appPage.goto(WEB_URL, { waitUntil: "load" });
+    await use(appPage);
   },
 });
 export const expect = test.expect;

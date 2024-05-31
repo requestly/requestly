@@ -124,7 +124,7 @@ test.describe("Modify Header Rule", () => {
     expect(CORSError).toBeTruthy();
   });
 
-  test("4. Fix CORS error", async ({ appPage, context }) => {
+  test("4. Fix CORS error (FETCH)", async ({ appPage, context }) => {
     await loadRules(appPage, { Headers_3: headerRules.Headers_3 });
     const page = await context.newPage();
 
@@ -146,6 +146,39 @@ test.describe("Modify Header Rule", () => {
     await page.goto("https://example.com");
     await page.evaluate(() => {
       fetch("https://testHeaders.com/exampleAPI");
+    });
+
+    await waitForPromiseToSettle(loadingFailedPromise, 2000).catch(() => {
+      // Do nothing
+    });
+
+    expect(CORSError).not.toBeTruthy();
+  });
+
+  test("5. Fix CORS error (XHR)", async ({ appPage, context }) => {
+    await loadRules(appPage, { Headers_3: headerRules.Headers_3 });
+    const page = await context.newPage();
+
+    const client = await page.context().newCDPSession(page);
+
+    await client.send("Network.enable");
+
+    let CORSError = false;
+
+    const loadingFailedPromise = new Promise<void>((resolve) => {
+      client.on("Network.loadingFailed", (params) => {
+        if (params.corsErrorStatus) {
+          CORSError = true;
+          resolve();
+        }
+      });
+    });
+
+    await page.goto("https://example.com");
+    await page.evaluate(() => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "https://testHeaders.com/exampleAPI");
+      xhr.send();
     });
 
     await waitForPromiseToSettle(loadingFailedPromise, 2000).catch(() => {
