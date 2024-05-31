@@ -17,7 +17,8 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
   return (
     <div className="popup-header">
       <div className="popup-header-workspace-section">
-        <img className="product-logo" src="/resources/images/extended_logo.png" />
+        <img className="product-logo" src="/resources/images/128x128.png" />
+        <span className="product-name">SessionBear</span>
       </div>
 
       <Row align="middle" gutter={16}>
@@ -25,7 +26,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
           <Row align="middle">
             <Tooltip
               open={!isExtensionEnabled}
-              title="Please switch on the Requestly extension. When paused, rules won't be applied and sessions won't be recorded."
+              title="When OFF, sessions won't be recorded."
               overlayClassName="enable-extension-tooltip"
               color="var(--neutrals-black)"
               overlayInnerStyle={{ fontSize: "14px" }}
@@ -37,7 +38,7 @@ const PopupHeader: React.FC<PopupHeaderProps> = ({ isExtensionEnabled, handleTog
                 className="pause-switch"
               />
             </Tooltip>
-            <Typography.Text>{`Requestly ${isExtensionEnabled ? "running" : "paused"}`}</Typography.Text>
+            <Typography.Text>{`SessionBear ${isExtensionEnabled ? "ON" : "OFF"}`}</Typography.Text>
           </Row>
         </Col>
         <Col>
