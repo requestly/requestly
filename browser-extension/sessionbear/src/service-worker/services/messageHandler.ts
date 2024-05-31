@@ -15,11 +15,6 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
-import {
-  handleTestRuleOnClientPageLoad,
-  launchUrlAndStartRuleTesting,
-  saveTestRuleResult,
-} from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
@@ -44,7 +39,6 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
         ruleExecutionHandler.processTabCachedRulesExecutions(sender.tab.id);
-        handleTestRuleOnClientPageLoad(sender.tab);
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
 
@@ -106,14 +100,6 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
-        break;
-
-      case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
-        launchUrlAndStartRuleTesting(message, sender.tab.id);
-        break;
-
-      case EXTENSION_MESSAGES.SAVE_TEST_RULE_RESULT:
-        saveTestRuleResult(message, sender.tab);
         break;
 
       case EXTENSION_MESSAGES.RULE_EXECUTED:
