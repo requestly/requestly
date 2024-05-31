@@ -5,7 +5,7 @@
   "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": ["*://*.requestly.in/*", "*://*.requestly.io/*"],
+      "matches": ["*://*.sessionbear.io/*", "*://*.sessionbear.com/*", "*://*.requestly.io/*"],
       "js": ["app.cs.js"],
       "run_at": "document_start"
     },
@@ -30,24 +30,17 @@
     "default_title": "__MSG_extIconTitle__",
     "default_popup": "popup/popup.html"
   },
-  "devtools_page": "devtools/devtools.html",
+  
   "icons": {
     "16": "resources/images/16x16.png",
     "48": "resources/images/48x48.png",
     "256": "resources/images/256x256.png"
   },
+
   "content_security_policy": {
     "extension_pages": "script-src 'self'; script-src-elem 'self'; object-src 'self'"
   },
-  "declarative_net_request": {
-    "rule_resources": [
-      {
-        "id": "delay_rules",
-        "enabled": true,
-        "path": "resources/static-rules/delayRules.json"
-      }
-    ]
-  },
+
   "permissions": [
     "storage",
     "contextMenus",
@@ -58,6 +51,8 @@
     "webNavigation",
     "unlimitedStorage"
   ],
+
   "host_permissions": ["<all_urls>"],
+  
   "commands": {}
 }
