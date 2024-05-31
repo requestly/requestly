@@ -1,4 +1,4 @@
-import { ChangeType, getRecord, onRecordChange, saveRecord } from "common/storage";
+import { ChangeType, getRecord, onRecordChange, saveRecord } from "../storage";
 
 export enum Variable {
   IS_EXTENSION_ENABLED = "isExtensionEnabled",

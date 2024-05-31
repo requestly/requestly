@@ -1,5 +1,5 @@
-import { getGroups, getRules, onRuleOrGroupChange } from "common/rulesStore";
-import { Group, Rule, RuleType, Status } from "common/types";
+import { getGroups, getRules, onRuleOrGroupChange } from "./rulesStore";
+import { Group, Rule, RuleType, Status } from "./types";
 
 class RulesStorageService {
   private rules: Rule[] = [];

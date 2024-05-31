@@ -1,8 +1,8 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "../../constants";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
-import { getRecord, saveRecord } from "common/storage";
-import { generateUUID } from "common/utils";
-import config from "common/config";
+import { getRecord, saveRecord } from "../../storage";
+import { generateUUID } from "../../utils";
+import config from "../../config";
 
 interface TestReport {
   timestamp: number;

@@ -1,7 +1,7 @@
 import { AJAXRequestDetails, SessionRuleType } from "./types";
 import { findMatchingRule } from "../ruleMatcher";
 import { updateRequestSpecificRules } from "../rulesManager";
-import { Rule } from "common/types";
+import { Rule } from "../../../types";
 
 export const IGNORED_HEADERS_ON_REDIRECT = ["Authorization"];
 

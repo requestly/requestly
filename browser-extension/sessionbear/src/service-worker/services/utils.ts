@@ -1,4 +1,4 @@
-import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
+import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "../../types";
 import { getVariable, setVariable, Variable } from "../variable";
 import { getAllSupportedWebURLs } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";

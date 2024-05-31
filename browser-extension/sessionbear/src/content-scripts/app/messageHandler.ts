@@ -1,6 +1,6 @@
-import config from "common/config";
-import { APP_MESSAGES, EXTENSION_MESSAGES, STORAGE_TYPE } from "common/constants";
-import { clearAllRecords, getAllRecords, getRecord, getSuperObject, removeRecord, saveObject } from "common/storage";
+import config from "../../config";
+import { APP_MESSAGES, EXTENSION_MESSAGES, STORAGE_TYPE } from "../../constants";
+import { clearAllRecords, getAllRecords, getRecord, getSuperObject, removeRecord, saveObject } from "../../storage";
 import { isAppURL } from "../../utils";
 
 interface ContentScriptMessage {

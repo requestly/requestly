@@ -1,4 +1,4 @@
-import config from "common/config";
+import config from "../../config";
 
 const handleExtensionInstalledOrUpdated = (details: chrome.runtime.InstalledDetails) => {
   if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {

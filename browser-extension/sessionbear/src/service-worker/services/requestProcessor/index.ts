@@ -2,7 +2,7 @@ import { AJAXRequestDetails } from "./types";
 import { forwardHeadersOnRedirect } from "./handleHeadersOnRedirect";
 import { handleInitiatorDomainFunction } from "./handleInitiatorDomainFunction";
 import rulesStorageService from "../../../rulesStorageService";
-import { RuleType } from "common/types";
+import { RuleType } from "../../../types";
 import { handleCSPError } from "./handleCSPError";
 
 class RequestProcessor {

@@ -7,7 +7,7 @@ import {
   RuleType,
   SourceFilterTypes,
   RulePair,
-} from "common/types";
+} from "../../types";
 import { AJAXRequestDetails } from "./requestProcessor/types";
 import { getUrlObject, isBlacklistedURL } from "../../utils";
 

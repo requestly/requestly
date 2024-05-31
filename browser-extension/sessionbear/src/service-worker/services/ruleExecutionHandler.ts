@@ -1,8 +1,8 @@
-import { Rule } from "common/types";
+import { Rule } from "../../types";
 import extensionIconManager from "./extensionIconManager";
 import { DataScope, TAB_SERVICE_DATA, tabService } from "./tabService";
 import rulesStorageService from "../../rulesStorageService";
-import { CLIENT_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES } from "../../constants";
 
 interface RulesExecutionLog {
   ruleId: string;
