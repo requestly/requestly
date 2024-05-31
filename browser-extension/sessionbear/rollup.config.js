@@ -81,7 +81,6 @@ export default [
             src: "node_modules/@requestly/web-sdk/dist/requestly-web-sdk.js",
             dest: `${OUTPUT_DIR}/libs`,
           },
-          { src: "../common/dist/devtools", dest: OUTPUT_DIR },
           { src: "../common/dist/lib/customElements.js", dest: `${OUTPUT_DIR}/libs` },
         ],
       }),
