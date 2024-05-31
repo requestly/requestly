@@ -7,13 +7,14 @@ import { actions } from "store";
 import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
 //Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import CodeEditor from "components/misc/CodeEditor";
+// import CodeEditor from "components/misc/CodeEditor";
 import "./CustomScriptRow.css";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getDefaultScriptRender, createRenderedScript } from "./utils";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { MockPickerModal } from "features/mocks/modals";
+import CodeEditor from "componentsV2/CodeEditor";
 
 const { Text } = Typography;
 

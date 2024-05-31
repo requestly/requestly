@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import * as Sentry from "@sentry/react";
 import lazyWithRetry from "utils/lazyWithRetry";
-import PageLoader from "../PageLoader";
+import PageLoader from "components/misc/PageLoader";
 
 function FallbackToTrackInfiniteLoading() {
   useEffect(() => {
@@ -21,7 +21,7 @@ function FallbackToTrackInfiniteLoading() {
 }
 
 export default lazyWithRetry(
-  () => import(/* webpackChunkName: "CodeEditor" */ "./CodeEditor"),
+  () => import(/* webpackChunkName: "CodeEditor" */ "./components/Editor/Editor"),
   <FallbackToTrackInfiniteLoading />
 );
 

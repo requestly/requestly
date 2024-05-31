@@ -5,7 +5,6 @@
 import { AutoComplete, Col, InputNumber, Row, Select } from "antd";
 import { RQEditorTitle } from "../../../../../lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
-import CodeEditor from "components/misc/CodeEditor";
 import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
@@ -25,6 +24,7 @@ import { APIClient, APIClientRequest } from "components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
+import CodeEditor from "componentsV2/CodeEditor";
 
 interface Props {
   isNew?: boolean;
@@ -320,13 +320,13 @@ const MockEditor: React.FC<Props> = ({
       <Row className="editor-row">
         <Col span={24}>
           {/* @ts-ignore */}
-          <CodeEditor
+          {/* <CodeEditor
             height={220}
             language="json"
             value={headersString}
             readOnly={false}
             handleChange={setHeadersString}
-          />
+          /> */}
         </Col>
       </Row>
     );
@@ -339,6 +339,7 @@ const MockEditor: React.FC<Props> = ({
           {mockType === MockType.FILE && <h4>File Content</h4>}
           {/* @ts-ignore */}
           <CodeEditor
+            defaultValue={""}
             language={getEditorLanguage(fileType)}
             value={body}
             height={220}
