@@ -3,24 +3,29 @@ import { useDispatch } from "react-redux";
 import { Row, Col, Input } from "antd";
 import { actions } from "store";
 
-const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+const ReplacePartRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
 
-  const handleInputChange = useCallback(
-    (e, path) => {
-      e?.preventDefault?.();
+  const handleInputChange = (e, path) => {
+    e?.preventDefault?.();
 
-      dispatch(
-        actions.updateRulePairAtGivenPath({
-          pairIndex,
-          updates: {
-            [path]: e?.target?.value,
-          },
-        })
-      );
-    },
-    [dispatch, pairIndex]
-  );
+    dispatch(
+      actions.updateRulePairAtGivenPath({
+        pairIndex,
+        updates: isSuperRule
+          ? {
+              [ruleId]: {
+                ...pair,
+                [path]: e?.target?.value,
+              },
+            }
+          : {
+              ...pair,
+              [path]: e?.target?.value,
+            },
+      })
+    );
+  };
 
   return (
     <Row align="middle" key={rowIndex} span={24} gutter={16} className="margin-top-one">
