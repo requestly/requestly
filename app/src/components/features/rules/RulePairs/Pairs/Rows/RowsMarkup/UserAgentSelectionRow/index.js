@@ -8,17 +8,24 @@ import { DownOutlined } from "@ant-design/icons";
 const { Text } = Typography;
 const { Option, OptGroup } = Select;
 
-const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+const UserAgentSelectionRow = ({ ruleId, isSuperRule, rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
 
   const userAgentSelectorOnChangeHandler = (itemSet) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: {
-          env: itemSet.value.env,
-          userAgent: itemSet.value.userAgent,
-        },
+        updates: isSuperRule
+          ? {
+              [ruleId]: {
+                env: itemSet.value.env,
+                userAgent: itemSet.value.userAgent,
+              },
+            }
+          : {
+              env: itemSet.value.env,
+              userAgent: itemSet.value.userAgent,
+            },
       })
     );
   };
@@ -34,10 +41,17 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          updates: {
-            envType: newValue,
-            ...extraModifications,
-          },
+          updates: isSuperRule
+            ? {
+                [ruleId]: {
+                  envType: newValue,
+                  ...extraModifications,
+                },
+              }
+            : {
+                envType: newValue,
+                ...extraModifications,
+              },
         })
       );
     },
@@ -119,9 +133,15 @@ const UserAgentSelectionRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
               dispatch(
                 actions.updateRulePairAtGivenPath({
                   pairIndex,
-                  updates: {
-                    userAgent: event?.target?.value,
-                  },
+                  updates: isSuperRule
+                    ? {
+                        [ruleId]: {
+                          userAgent: event?.target?.value,
+                        },
+                      }
+                    : {
+                        userAgent: event?.target?.value,
+                      },
                 })
               )
             }
