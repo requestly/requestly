@@ -9,6 +9,8 @@ import HEADER_SUGGESTIONS from "../../../../../../../config/constants/sub/header
 import { actions } from "store";
 
 const HeadersPairModificationRowV2 = ({
+  ruleId,
+  isSuperRule,
   modification,
   modificationIndex,
   pairIndex,
@@ -40,9 +42,13 @@ const HeadersPairModificationRowV2 = ({
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          updates: {
-            [`modifications[${modificationType}][${modificationIndex}].type`]: type,
-          },
+          updates: isSuperRule
+            ? {
+                [`${ruleId}.modifications[${modificationType}][${modificationIndex}].type`]: type,
+              }
+            : {
+                [`modifications[${modificationType}][${modificationIndex}].type`]: type,
+              },
         })
       );
     },
@@ -81,9 +87,13 @@ const HeadersPairModificationRowV2 = ({
                 dispatch(
                   actions.updateRulePairAtGivenPath({
                     pairIndex,
-                    updates: {
-                      [`modifications[${modificationType}][${modificationIndex}].header`]: value,
-                    },
+                    updates: isSuperRule
+                      ? {
+                          [`${ruleId}.modifications[${modificationType}][${modificationIndex}].header`]: value,
+                        }
+                      : {
+                          [`modifications[${modificationType}][${modificationIndex}].header`]: value,
+                        },
                   })
                 )
               }
@@ -113,9 +123,14 @@ const HeadersPairModificationRowV2 = ({
                   dispatch(
                     actions.updateRulePairAtGivenPath({
                       pairIndex,
-                      updates: {
-                        [`modifications[${modificationType}][${modificationIndex}].value`]: event?.target?.value,
-                      },
+                      updates: isSuperRule
+                        ? {
+                            [`${ruleId}.modifications[${modificationType}][${modificationIndex}].value`]: event?.target
+                              ?.value,
+                          }
+                        : {
+                            [`modifications[${modificationType}][${modificationIndex}].value`]: event?.target?.value,
+                          },
                     })
                   )
                 }
@@ -134,7 +149,9 @@ const HeadersPairModificationRowV2 = ({
                     dispatch(
                       actions.removeValueInRulePairByIndex({
                         pairIndex,
-                        arrayPath: ["modifications", modificationType],
+                        arrayPath: isSuperRule
+                          ? [ruleId, "modifications", modificationType]
+                          : ["modifications", modificationType],
                         index: modificationIndex,
                       })
                     );
