@@ -10,8 +10,8 @@ enum MenuItem {
 }
 
 enum ToggleActivationStatusLabel {
-  ACTIVATE = "Activate Requestly",
-  DEACTIVATE = "Deactivate Requestly",
+  ACTIVATE = "Activate SessionBear",
+  DEACTIVATE = "Deactivate SessionBear",
 }
 
 export const updateActivationStatus = (isExtensionEnabled: boolean) => {
