@@ -1,6 +1,7 @@
 import { BrowserContext, Page, test as base, chromium } from "@playwright/test";
 import path from "path";
 import { WEB_URL } from "../../config/dist/config.build.json";
+import { clearRules } from "./utils";
 
 export const test = base.extend<{
   context: BrowserContext;
@@ -10,7 +11,7 @@ export const test = base.extend<{
   context: async ({}, use) => {
     const pathToExtension = path.join(__dirname, "..", "dist");
     const context = await chromium.launchPersistentContext("", {
-      headless: false,
+      ignoreDefaultArgs: ["--headless"],
       args: [`--headless=new`, `--disable-extensions-except=${pathToExtension}`, `--load-extension=${pathToExtension}`],
     });
     await use(context);
@@ -30,8 +31,8 @@ export const test = base.extend<{
   appPage: async ({ context }, use) => {
     const page = await context.newPage();
     await page.goto(WEB_URL, { waitUntil: "load" });
+    // await clearRules(page);
     await use(page);
-    page.close();
   },
 });
 export const expect = test.expect;
