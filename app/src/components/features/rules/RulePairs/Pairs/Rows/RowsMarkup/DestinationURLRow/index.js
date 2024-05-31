@@ -30,8 +30,6 @@ import { MockPickerModal } from "features/mocks/modals";
 import "./index.css";
 
 const DestinationURLRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isInputDisabled }) => {
-  console.log({ "from destination": pair });
-
   const dispatch = useDispatch();
   const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [destinationTypePopupVisible, setDestinationTypePopupVisible] = useState(false);
@@ -53,7 +51,7 @@ const DestinationURLRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isI
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: isSuperRule ? { [ruleId]: { destination: url } } : { destination: url },
+        updates: isSuperRule ? { [ruleId]: { destination: url, ...pair } } : { destination: url },
       })
     );
   };
@@ -66,6 +64,7 @@ const DestinationURLRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isI
         updates: isSuperRule
           ? {
               [ruleId]: {
+                ...pair,
                 destination: `file://${filePath}`,
               },
             }
@@ -93,6 +92,7 @@ const DestinationURLRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isI
             updates: isSuperRule
               ? {
                   [ruleId]: {
+                    ...pair,
                     destination: "http://" + currentDestinationURL,
                   },
                 }
@@ -144,6 +144,7 @@ const DestinationURLRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isI
         updates: isSuperRule
           ? {
               [ruleId]: {
+                ...pair,
                 destination: "",
                 destinationType: destinationPopupSelection,
               },
@@ -173,6 +174,7 @@ const DestinationURLRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isI
               updates: isSuperRule
                 ? {
                     [ruleId]: {
+                      ...pair,
                       destination: event?.target?.value,
                     },
                   }
