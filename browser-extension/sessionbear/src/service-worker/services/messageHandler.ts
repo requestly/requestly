@@ -1,8 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "../../rulesStore";
 import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
-// import { handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
-import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
   getTabSession,
@@ -17,7 +15,6 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
-import { requestProcessor } from "./requestProcessor";
 import {
   handleTestRuleOnClientPageLoad,
   launchUrlAndStartRuleTesting,
@@ -42,7 +39,6 @@ export const initMessageHandler = () => {
         isExtensionEnabled().then((isExtensionStatusEnabled) => {
           if (!isExtensionStatusEnabled) return;
           initCustomWidgets(sender.tab?.id, sender.frameId);
-          applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         });
         break;
 
@@ -111,14 +107,6 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
         break;
-
-      case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
-        requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
-        return true;
-
-      case EXTENSION_MESSAGES.ON_ERROR_OCCURRED:
-        requestProcessor.onErrorOccurred(sender.tab.id, message.requestDetails).then(sendResponse);
-        return true;
 
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
         launchUrlAndStartRuleTesting(message, sender.tab.id);

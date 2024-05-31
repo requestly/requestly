@@ -61,24 +61,10 @@ export const STORAGE_TYPE = "local";
 
 export const PUBLIC_NAMESPACE = "__REQUESTLY__";
 
-export const RULE_TITLES = {
-  REDIRECT: "Redirect request",
-  CANCEL: "Cancel request",
-  REPLACE: "Replace string",
-  HEADERS: "Modify headers",
-  USERAGENT: "User-agent",
-  SCRIPT: "Insert scripts",
-  QUERYPARAM: "Query param",
-  RESPONSE: "Modify API response",
-  REQUEST: "Modify request body",
-  DELAY: "Delay network requests",
-};
-
 export const STORAGE_KEYS = {
   LAST_SYNCED_TS: "last-synced-ts",
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
-  IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
 };
 
 export const LINKS = {
