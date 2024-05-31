@@ -3,8 +3,23 @@ import DestinationURLRow from "../Rows/RowsMarkup/DestinationURLRow";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import { Row, Col } from "antd";
 
-const RedirectRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
-  return (
+const RedirectRulePair = ({ isSuperRule, ruleId, pair, pairIndex, ruleDetails, isInputDisabled }) => {
+  return isSuperRule ? (
+    <>
+      <Row>
+        <Col span={24}>
+          <DestinationURLRow
+            isSuperRule
+            ruleId={ruleId}
+            rowIndex={2}
+            pair={pair}
+            pairIndex={pairIndex}
+            isInputDisabled={isInputDisabled}
+          />
+        </Col>
+      </Row>
+    </>
+  ) : (
     <>
       <Row>
         <Col span={24}>

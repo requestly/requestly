@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Radio, Popconfirm } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
-import { getCurrentlySelectedRuleConfig } from "store/selectors";
+import { getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { InfoTag } from "components/misc/InfoTag";
 import { MoreInfo } from "components/misc/MoreInfo";
@@ -29,7 +29,9 @@ import { generatePlaceholderText } from "components/features/rules/RulePairs/uti
 import { MockPickerModal } from "features/mocks/modals";
 import "./index.css";
 
-const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+const DestinationURLRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isInputDisabled }) => {
+  console.log({ "from destination": pair });
+
   const dispatch = useDispatch();
   const [destinationType, setDestinationType] = useState(pair.destinationType);
   const [destinationTypePopupVisible, setDestinationTypePopupVisible] = useState(false);
@@ -38,6 +40,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
 
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
 
   const handleMockPickerVisibilityChange = (visible) => {
     // seems like an unnecessary abstraction
@@ -50,7 +53,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: { destination: url },
+        updates: isSuperRule ? { [ruleId]: { destination: url } } : { destination: url },
       })
     );
   };
@@ -60,9 +63,15 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: {
-          destination: `file://${filePath}`,
-        },
+        updates: isSuperRule
+          ? {
+              [ruleId]: {
+                destination: `file://${filePath}`,
+              },
+            }
+          : {
+              destination: `file://${filePath}`,
+            },
       })
     );
   };
@@ -81,9 +90,15 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
-            updates: {
-              destination: "http://" + currentDestinationURL,
-            },
+            updates: isSuperRule
+              ? {
+                  [ruleId]: {
+                    destination: "http://" + currentDestinationURL,
+                  },
+                }
+              : {
+                  destination: "http://" + currentDestinationURL,
+                },
           })
         );
       }
@@ -126,10 +141,17 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: {
-          destination: "",
-          destinationType: destinationPopupSelection,
-        },
+        updates: isSuperRule
+          ? {
+              [ruleId]: {
+                destination: "",
+                destinationType: destinationPopupSelection,
+              },
+            }
+          : {
+              destination: "",
+              destinationType: destinationPopupSelection,
+            },
       })
     );
 
@@ -142,15 +164,21 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
         data-tour-id="rule-editor-destination-url"
         data-selectionid="destination-url"
         className="display-inline-block"
-        placeholder={generatePlaceholderText(pair.source.operator, "destination")}
+        placeholder={generatePlaceholderText(pair.source?.operator, "destination")}
         type="text"
         onChange={(event) =>
           dispatch(
             actions.updateRulePairAtGivenPath({
               pairIndex,
-              updates: {
-                destination: event?.target?.value,
-              },
+              updates: isSuperRule
+                ? {
+                    [ruleId]: {
+                      destination: event?.target?.value,
+                    },
+                  }
+                : {
+                    destination: event?.target?.value,
+                  },
             })
           )
         }

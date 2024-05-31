@@ -8,6 +8,7 @@ import Request from "assets/icons/rule-types/request.svg?react";
 import Response from "assets/icons/rule-types/response.svg?react";
 import Delay from "assets/icons/rule-types/delay.svg?react";
 import UserAgent from "assets/icons/rule-types/useragent.svg?react";
+import { ApartmentOutlined } from "@ant-design/icons";
 
 export const ruleIcons = {
   Redirect: <Redirect />,
@@ -20,4 +21,5 @@ export const ruleIcons = {
   Response: <Response />,
   Request: <Request />,
   Delay: <Delay />,
+  Super: <ApartmentOutlined />,
 };

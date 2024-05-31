@@ -22,6 +22,7 @@ export enum RuleType {
   RESPONSE = "Response",
   REQUEST = "Request",
   DELAY = "Delay",
+  SUPER = "Super",
 }
 
 export interface Rule extends Record<string, unknown> {

@@ -9,6 +9,7 @@ import ResponseRulePair from "./ResponseRulePair";
 import RequestRulePair from "./RequestRulePair";
 import UserAgentRulePair from "./UserAgentRulePair";
 import DelayRulePair from "./DelayRulePair";
+import SuperRulePair from "./SuperRulePair";
 
 export const rulePairComponents = {
   [RuleType.REDIRECT]: RedirectRulePair,
@@ -21,4 +22,5 @@ export const rulePairComponents = {
   [RuleType.REQUEST]: RequestRulePair,
   [RuleType.USERAGENT]: UserAgentRulePair,
   [RuleType.DELAY]: DelayRulePair,
+  [RuleType.SUPER]: SuperRulePair,
 };
