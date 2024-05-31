@@ -1,5 +1,5 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
-import { SessionRecordingConfig } from "common/types";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
+import { SessionRecordingConfig } from "../../types";
 
 type SendResponseCallback = (payload: unknown) => void;
 

@@ -1,4 +1,4 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
 
 export const initPageScriptMessageListener = () => {
   window.addEventListener("message", function (event) {

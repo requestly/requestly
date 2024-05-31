@@ -1,5 +1,5 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
-import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
+import { checkIfNoRulesPresent, getRulesAndGroups } from "../../rulesStore";
 import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
 // import { handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";

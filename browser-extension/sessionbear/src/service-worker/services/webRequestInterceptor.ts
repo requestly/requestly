@@ -1,4 +1,4 @@
-import { RuleType } from "common/types";
+import { RuleType } from "../../types";
 import { matchRuleWithRequest } from "./ruleMatcher";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";

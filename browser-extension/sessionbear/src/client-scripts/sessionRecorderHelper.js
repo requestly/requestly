@@ -1,4 +1,4 @@
-import { PUBLIC_NAMESPACE } from "common/constants";
+import { PUBLIC_NAMESPACE } from "../constants";
 
 ((namespace) => {
   window[namespace] = window[namespace] || {};

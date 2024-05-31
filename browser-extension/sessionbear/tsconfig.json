@@ -17,7 +17,7 @@
     "strict": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "rootDir": "./src"
+    "rootDir": "./src",
   },
   "exclude": ["node_modules", "dist"],
   "include": ["./src/**/*"]

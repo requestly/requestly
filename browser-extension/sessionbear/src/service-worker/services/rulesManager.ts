@@ -1,5 +1,5 @@
-import config from "common/config";
-import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
+import config from "../../config";
+import { getEnabledRules, onRuleOrGroupChange } from "../../rulesStore";
 import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
 import { isExtensionEnabled } from "./utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";

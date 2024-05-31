@@ -24,7 +24,7 @@ const getDate = () => {
 const SOURCE_DIR = "dist";
 const BUILD_DIR = ensureDir("builds");
 const OUTPUT_DIR = ensureDir(`${BUILD_DIR}/${browser}`);
-const ZIP_FILE = `${OUTPUT_DIR}/requestly_mv3_v${version}_${env}_${getDate()}.zip`;
+const ZIP_FILE = `${OUTPUT_DIR}/sessionbear_v${version}_${env}_${getDate()}.zip`;
 
 const output = fs.createWriteStream(ZIP_FILE);
 const archive = archiver("zip");

@@ -1,4 +1,4 @@
-import { RuleType, ScriptObject, ScriptRulePair } from "common/types";
+import { RuleType, ScriptObject, ScriptRulePair } from "../../types";
 import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectScript } from "./utils";

@@ -1,9 +1,9 @@
-import { CLIENT_MESSAGES } from "common/constants";
-import { getRecord } from "common/storage";
-import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } from "common/types";
+import { CLIENT_MESSAGES } from "../../constants";
+import { getRecord } from "../../storage";
+import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } from "../../types";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
-import config from "common/config";
+import config from "../../config";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import extensionIconManager from "./extensionIconManager";
 

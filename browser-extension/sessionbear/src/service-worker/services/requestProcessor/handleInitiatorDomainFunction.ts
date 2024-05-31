@@ -1,4 +1,4 @@
-import { Rule } from "common/types";
+import { Rule } from "../../../types";
 import { findMatchingRule } from "../ruleMatcher";
 import { updateRequestSpecificRules } from "../rulesManager";
 import { AJAXRequestDetails, SessionRuleType } from "./types";

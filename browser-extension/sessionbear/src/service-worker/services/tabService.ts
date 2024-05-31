@@ -1,4 +1,4 @@
-import { EXTENSION_MESSAGES } from "common/constants";
+import { EXTENSION_MESSAGES } from "../../constants";
 
 type TabId = chrome.tabs.Tab["id"];
 
