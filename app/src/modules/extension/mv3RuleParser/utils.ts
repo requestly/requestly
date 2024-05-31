@@ -54,6 +54,9 @@ export const parseUrlParametersFromSourceV2 = (
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
         return {
+          // To handle case for regexSubsitution as replaces inplace instead of replace whole. So we match the whole url instead
+          // https://linear.app/requestly/issue/ENGG-1831
+          // https://arc.net/l/quote/erozzfqb
           regexFilter: `.*?${pattern}.*`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
