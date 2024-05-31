@@ -573,15 +573,19 @@ RQ.RequestResponseRuleHandler.interceptAJAXRequests = function ({
 
     const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this), "timeout");
 
-    Object.defineProperty(actualXhr, "timeout", {
-      get: function () {
-        return descriptor.get.call(this);
-      },
-      set: function (value) {
-        xhr.timeout = value;
-        descriptor.set.call(this, value);
-      },
-    });
+    // FIXME: This is breaking for some websites.
+    // https://linear.app/requestly/issue/ENGG-1823
+    if (descriptor) {
+      Object.defineProperty(actualXhr, "timeout", {
+        get: function () {
+          return descriptor.get.call(this);
+        },
+        set: function (value) {
+          xhr.timeout = value;
+          descriptor.set.call(this, value);
+        },
+      });
+    }
 
     this.rqProxyXhr = xhr;
   };
