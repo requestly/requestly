@@ -15,7 +15,6 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
-import ruleExecutionHandler from "./ruleExecutionHandler";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
@@ -38,7 +37,6 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
-        ruleExecutionHandler.processTabCachedRulesExecutions(sender.tab.id);
         handleSessionRecordingOnClientPageLoad(sender.tab, sender.frameId);
         break;
 
@@ -78,10 +76,6 @@ export const initMessageHandler = () => {
         getAPIResponse(message.apiRequest).then(sendResponse);
         return true;
 
-      case EXTENSION_MESSAGES.GET_EXECUTED_RULES:
-        ruleExecutionHandler.getExecutedRules(message.tabId ?? sender.tab.id).then(sendResponse);
-        return true;
-
       case EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT:
         checkIfNoRulesPresent().then(sendResponse);
         return true;
@@ -100,11 +94,6 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.CACHE_RECORDED_SESSION_ON_PAGE_UNLOAD:
         cacheRecordedSessionOnClientPageUnload(sender.tab.id, message.payload);
-        break;
-
-      case EXTENSION_MESSAGES.RULE_EXECUTED:
-        const requestDetails = { ...message.requestDetails, tabId: message.requestDetails?.tabId || sender.tab?.id };
-        ruleExecutionHandler.onRuleExecuted(message.rule, requestDetails);
         break;
     }
 
