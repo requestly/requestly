@@ -94,7 +94,7 @@ const SessionRecordingView: React.FC = () => {
   return (
     <div className="session-view-content">
       <Row align="middle" justify="space-between">
-        <div className="title">Record session for sharing & debugging</div>
+        <div className="title">Create bug reports that developers love!</div>
         <div className="configure-btn" onClick={handleConfigureBtnClick}>
           <SettingIcon /> Configure
         </div>
@@ -103,26 +103,28 @@ const SessionRecordingView: React.FC = () => {
         <Tooltip
           placement="top"
           color="#000000"
-          title="Capture mouse movement, console, network and more."
+          title="Capture screen, console logs, network logs and more."
           overlayClassName="action-btn-tooltip"
         >
-          <PrimaryActionButton
-            block
-            className={isRecordingInManualMode ? "stop-btn" : ""}
-            icon={isRecordingInManualMode ? <StopRecordingIcon /> : <PlayRecordingIcon />}
-            onClick={isRecordingInManualMode ? viewRecordingOnClick : startRecordingOnClick}
-          >
-            {isRecordingInManualMode ? "Stop and watch" : " Record this tab"}
-          </PrimaryActionButton>
+          <span className="buttonWrapper">
+            <PrimaryActionButton
+              block
+              className={isRecordingInManualMode ? "stop-btn" : ""}
+              icon={isRecordingInManualMode ? <StopRecordingIcon /> : <PlayRecordingIcon />}
+              onClick={isRecordingInManualMode ? viewRecordingOnClick : startRecordingOnClick}
+            >
+              {isRecordingInManualMode ? "Stop Recording" : "Record this tab"}
+            </PrimaryActionButton>
+          </span>
         </Tooltip>
-
+    
         <Tooltip
           placement="top"
           color="#000000"
           title={watchReplayBtnTooltipContent}
           overlayClassName="action-btn-tooltip watch-replay-btn"
         >
-          <span>
+          <span className="buttonWrapper">
             <PrimaryActionButton
               block
               icon={<ReplayLastFiveMinuteIcon />}
