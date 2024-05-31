@@ -55,6 +55,7 @@ CONSTANTS.RULE_TYPES = {
   RESPONSE: "Response",
   REQUEST: "Request",
   DELAY: "Delay",
+  SUPER: "Super",
 };
 
 CONSTANTS.DELAY_REQUEST_CONSTANTS = {

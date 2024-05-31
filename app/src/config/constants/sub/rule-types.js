@@ -69,6 +69,29 @@ const RULE_METADATA_CONFIG = {
 };
 
 const RULE_TYPES_CONFIG = {
+  [GLOBAL_CONSTANTS.RULE_TYPES.SUPER]: {
+    ID: 0,
+    TYPE: GLOBAL_CONSTANTS.RULE_TYPES.SUPER,
+    NAME: "Super Rule",
+    DESCRIPTION: "Combine multiple rule types in one rule",
+    ICON: () => <RuleIcon ruleType={GLOBAL_CONSTANTS.RULE_TYPES.SUPER} />,
+    PRIMARY_COLOR: "#5b9027",
+    SECONDARY_COLOR: "#4E7C22",
+    TOOL_TIP_PLACEMENT: "top",
+    PAIR_CONFIG: {
+      TITLE: "Rule Conditions",
+    },
+    EMPTY_PAIR_FORMAT: {
+      destination: "",
+      destinationType: "url",
+      source: getSourceFormat(),
+    },
+    ALLOW_ADD_PAIR: false,
+    HIDE_IN_EXTENSION: false,
+    SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW: false,
+    ALLOW_APPLY_RULE_TO_ALL_URLS: false,
+    ALLOW_REQUEST_SOURCE_FILTERS: true,
+  },
   [GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT]: {
     ID: 1,
     TYPE: GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT,
