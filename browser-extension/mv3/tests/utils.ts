@@ -1,3 +1,4 @@
+import { Page } from "@playwright/test";
 import { WEB_URL } from "../../config/dist/config.build.json";
 
 export const waitForPromiseToSettle = async (promise: Promise<any>, timeoutMillis: number) => {
@@ -23,7 +24,7 @@ export const waitForPromiseToSettle = async (promise: Promise<any>, timeoutMilli
     });
 };
 
-export const loadRules = async (page: any, rules: Record<string, any>) => {
+export const loadRules = async (page: Page, rules: Record<string, any>) => {
   await page.evaluate(
     ({ rules, WEB_URL }) => {
       window.postMessage(
@@ -38,7 +39,7 @@ export const loadRules = async (page: any, rules: Record<string, any>) => {
     },
     { rules, WEB_URL }
   );
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(1000);
 };
 
 export const clearRules = async (page: any) => {

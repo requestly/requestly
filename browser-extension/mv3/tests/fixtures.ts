@@ -31,7 +31,7 @@ export const test = base.extend<{
   },
   appPage: async ({ context }, use) => {
     const appPage = await context.newPage();
-    await appPage.goto(WEB_URL, { waitUntil: "load" });
+    await appPage.goto(WEB_URL, { waitUntil: "commit" });
     await use(appPage);
   },
 });

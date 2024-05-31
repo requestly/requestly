@@ -4,8 +4,9 @@ import { loadRules, waitForPromiseToSettle } from "../utils";
 
 test.describe("Modify Header Rule", () => {
   test("1. main_frame request", async ({ appPage, context }) => {
-    const testPage = await context.newPage();
     await loadRules(appPage, { Headers_1: headerRules.Headers_1 });
+
+    const testPage = await context.newPage();
     const client = await testPage.context().newCDPSession(testPage);
     await client.send("Network.enable");
 
