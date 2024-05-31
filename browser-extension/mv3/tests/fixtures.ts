@@ -1,11 +1,11 @@
-import { BrowserContext, test as base, chromium } from "@playwright/test";
+import { BrowserContext, Page, test as base, chromium } from "@playwright/test";
 import path from "path";
 import { WEB_URL } from "../../config/dist/config.build.json";
-import headerRules from "./rules/header_rules.json";
 
 export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
+  appPage: Page;
 }>({
   context: async ({}, use) => {
     const pathToExtension = path.join(__dirname, "..", "dist");
@@ -14,7 +14,6 @@ export const test = base.extend<{
       args: [`--headless=new`, `--disable-extensions-except=${pathToExtension}`, `--load-extension=${pathToExtension}`],
     });
     await use(context);
-    await context.close();
   },
   extensionId: async ({ context }, use) => {
     // for manifest v2:
@@ -25,28 +24,14 @@ export const test = base.extend<{
     let [background] = context.serviceWorkers();
     if (!background) background = await context.waitForEvent("serviceworker");
 
-    console.log("!!!debug", "background", background);
-    // const extensionId = background.url().split('/')[2];
-    // await use(extensionId);
+    const extensionId = background.url().split("/")[2];
+    await use(extensionId);
   },
-  page: async ({ context }, use) => {
+  appPage: async ({ context }, use) => {
     const page = await context.newPage();
-    await page.goto(WEB_URL);
-    await page.waitForLoadState("load");
-    await page.evaluate(
-      ({ WEB_URL }) => {
-        window.postMessage(
-          {
-            action: "CLEAR_STORAGE",
-            requestId: 100,
-            source: "page_script",
-          },
-          WEB_URL
-        );
-      },
-      { WEB_URL }
-    );
+    await page.goto(WEB_URL, { waitUntil: "load" });
     await use(page);
+    page.close();
   },
 });
 export const expect = test.expect;
