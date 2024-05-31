@@ -6,7 +6,6 @@ import commonjs from "vite-plugin-commonjs";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { getThemeVariables } from "antd/dist/theme";
 import { theme } from "./src/lib/design-system/theme";
-import monacoEditorPlugin from "vite-plugin-monaco-editor";
 
 const config = ({ mode }) =>
   defineConfig({
@@ -33,7 +32,7 @@ const config = ({ mode }) =>
 
       // For setting home for relative imports to `src/`
       viteTsconfigPaths(),
-      monacoEditorPlugin({}),
+      // monacoEditorPlugin({}),
       commonjs(),
       svgr(),
     ],

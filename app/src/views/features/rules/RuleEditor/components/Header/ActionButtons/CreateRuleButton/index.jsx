@@ -40,7 +40,7 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import "../RuleEditorActionButtons.css";
 import { HTML_ERRORS } from "./actions/insertScriptValidators";
-import { toastType } from "components/misc/CodeEditor/EditorToast/types";
+import { toastType } from "componentsV2/CodeEditor/components/EditorToast/types";
 
 const getEventParams = (rule) => {
   const eventParams = {};

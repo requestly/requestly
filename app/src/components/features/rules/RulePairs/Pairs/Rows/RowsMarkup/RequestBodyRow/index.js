@@ -6,7 +6,7 @@ import { Row, Col, Radio, Button } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import { Popconfirm } from "antd";
-import CodeEditor from "components/misc/CodeEditor";
+// import CodeEditor from "components/misc/CodeEditor";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { actions } from "store";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
@@ -170,7 +170,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             }}
           >
             <Col xl="12" span={24}>
-              <CodeEditor
+              {/* <CodeEditor
                 key={pair.request.type}
                 language={pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE ? "javascript" : "json"}
                 value={
@@ -185,7 +185,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 unlockJsonPrettify={true}
                 isCodeMinified={isCodeMinified}
                 isCodeFormatted={isCodeFormatted}
-              />
+              /> */}
             </Col>
           </Row>
           <Row align="middle" justify="space-between" className="code-editor-character-count-row ">

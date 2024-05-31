@@ -1,5 +1,10 @@
 .code-editor {
   overflow: auto;
+  height: 100%;
+}
+
+.code-editor .cm-editor {
+  height: 100%;
 }
 
 .custom-handle {

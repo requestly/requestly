@@ -4,7 +4,7 @@ import { Row, Col, Radio, Popover, Button, Popconfirm, Space, Checkbox } from "a
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
-import CodeEditor from "components/misc/CodeEditor";
+// import CodeEditor from "components/misc/CodeEditor";
 import {
   displayFileSelector,
   handleOpenLocalFileInBrowser,
@@ -24,6 +24,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import "./ResponseBodyRow.css";
+import CodeEditor from "componentsV2/CodeEditor";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();

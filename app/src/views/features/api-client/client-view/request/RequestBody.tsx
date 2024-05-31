@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import CodeEditor from "components/misc/CodeEditor";
+// import CodeEditor from "components/misc/CodeEditor";
 import { formatJSONString } from "utils/CodeEditorUtils";
 import { Button, Input, Radio } from "antd";
 import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
@@ -24,13 +24,14 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentTy
       case RequestContentType.JSON:
         return (
           // @ts-ignore
-          <CodeEditor
-            language={"json"}
-            value={body}
-            handleChange={setBody}
-            isCodeFormatted={false}
-            isResizable={false}
-          />
+          // <CodeEditor
+          //   language={"json"}
+          //   value={body}
+          //   handleChange={setBody}
+          //   isCodeFormatted={false}
+          //   isResizable={false}
+          // />
+          <></>
         );
 
       case RequestContentType.FORM:
