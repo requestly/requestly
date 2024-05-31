@@ -86,6 +86,7 @@ const RULE_TYPES_CONFIG = {
       destinationType: "url",
       source: getSourceFormat(),
     },
+    VERSION: 2,
     ALLOW_ADD_PAIR: false,
     HIDE_IN_EXTENSION: false,
     SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW: false,

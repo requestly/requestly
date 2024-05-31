@@ -10,7 +10,7 @@ import { redirectToTraffic } from "../../../../../../../utils/RedirectionUtils";
 import { isDesktopMode } from "../../../../../../../utils/AppUtils";
 import { actions } from "store";
 
-const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) => {
+const HeadersRulePairV2 = ({ isSuperRule, ruleId, pair, pairIndex, isInputDisabled, ruleDetails }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const navigateToTraffic = () => {
@@ -31,7 +31,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
     dispatch(
       actions.addValueInRulePairArray({
         pairIndex,
-        arrayPath: ["modifications", modificationType],
+        arrayPath: isSuperRule ? [ruleId, "modifications", modificationType] : ["modifications", modificationType],
         value: stableGetEmptyModification(type),
       })
     );
@@ -73,6 +73,8 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
               <Card bordered={false} className="headers-rule-pair-card">
                 {pair.modifications[modificationType]?.map((modification, modificationIndex) => (
                   <HeadersPairModificationRowV2
+                    isSuperRule={isSuperRule}
+                    ruleId={ruleId}
                     modification={modification}
                     modificationIndex={modificationIndex}
                     pairIndex={pairIndex}
