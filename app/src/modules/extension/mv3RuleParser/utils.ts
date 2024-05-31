@@ -1,8 +1,9 @@
+import { escapeRegExp } from "lodash";
 import { RulePairSource, SourceFilter, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
-const escapeForwardSlashes = (value: string): string => {
+export const escapeForwardSlashes = (value: string): string => {
   return value.replace(/\//g, "\\/");
 };
 
@@ -16,7 +17,7 @@ const createRegexForWildcardString = (value: string, isWildcardCapturingGroupsEn
 };
 
 // regex: /pattern/flags
-const parseRegex = (regex: string): { pattern: string; flags?: string } => {
+export const parseRegex = (regex: string): { pattern: string; flags?: string } => {
   const matchesRegexPattern = regex.match(/^\/(.*)\/([dgimsuy]*)$/);
   if (matchesRegexPattern) {
     const [, pattern, flags] = matchesRegexPattern;
@@ -41,13 +42,13 @@ export const parseUrlParametersFromSourceV2 = (
     switch (source.operator) {
       case SourceOperator.EQUALS:
         return {
-          regexFilter: `^${source.value}$`,
+          regexFilter: `^${escapeRegExp(source.value)}$`,
           isUrlFilterCaseSensitive: true,
         };
 
       case SourceOperator.CONTAINS:
         return {
-          regexFilter: `.*${source.value}.*`,
+          regexFilter: `.*${escapeRegExp(source.value)}.*`,
           isUrlFilterCaseSensitive: true,
         };
 
@@ -77,13 +78,13 @@ export const parseUrlParametersFromSourceV2 = (
     switch (source.operator) {
       case SourceOperator.EQUALS:
         return {
-          regexFilter: `^https?://${source.value}(?:[/?#].*)?$`,
+          regexFilter: `^https?://${escapeRegExp(source.value)}(?:[/?#].*)?$`,
           isUrlFilterCaseSensitive: true,
         };
 
       case SourceOperator.CONTAINS:
         return {
-          regexFilter: `^https?://[a-z0-9:.-]*${source.value}[a-z0-9:.-]*(?:[/?#].*)?$`,
+          regexFilter: `^https?://[a-z0-9:.-]*${escapeRegExp(source.value)}[a-z0-9:.-]*(?:[/?#].*)?$`,
           isUrlFilterCaseSensitive: true,
         };
 
