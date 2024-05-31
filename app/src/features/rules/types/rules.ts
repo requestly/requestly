@@ -21,6 +21,7 @@ export enum RuleType {
   RESPONSE = "Response",
   REQUEST = "Request",
   DELAY = "Delay",
+  SUPER = "Super",
 }
 
 enum RuleSourceKey {

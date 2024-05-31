@@ -38,9 +38,10 @@ import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
-import "../RuleEditorActionButtons.css";
 import { HTML_ERRORS } from "./actions/insertScriptValidators";
 import { toastType } from "components/misc/CodeEditor/EditorToast/types";
+import { RuleType } from "features/rules";
+import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -111,6 +112,7 @@ const CreateRuleButton = ({
   // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const isSuperRule = currentlySelectedRuleData?.ruleType === RuleType.SUPER;
 
   const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {
@@ -272,6 +274,106 @@ const CreateRuleButton = ({
     }
   };
 
+  const handleSuperRuleBtnOnClick = async (saveType = "button_click") => {
+    if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
+      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+      return;
+    }
+
+    const createdBy = currentlySelectedRuleData?.createdBy || user?.details?.profile?.uid || null;
+    const currentOwner = user?.details?.profile?.uid || null;
+    const lastModifiedBy = user?.details?.profile?.uid || null;
+
+    const fixedSuperRuleData = runMinorFixesOnRule(dispatch, currentlySelectedRuleData);
+    const ruleValidation = validateRule(fixedSuperRuleData, dispatch, appMode);
+
+    const syntaxValidation = await transformAndValidateRuleFields(fixedSuperRuleData);
+
+    if (!syntaxValidation.success) {
+      const validationError = syntaxValidation.validationError;
+      if (validationError.error) {
+        toast.error(validationError.message || "Could Not Parse rule");
+      }
+    } else {
+      const parsedRuleData = syntaxValidation.ruleData || fixedSuperRuleData;
+      const ruleValidation = validateRule(parsedRuleData, dispatch, appMode);
+      // save super rule
+      if (ruleValidation.result) {
+        await saveRule(appMode, {
+          ...parsedRuleData,
+          createdBy,
+          currentOwner,
+          lastModifiedBy,
+        });
+      }
+
+      if (ruleValidation.result) {
+        Object.values(fixedSuperRuleData?.rules ?? {}).forEach(async (rule) => {
+          const fixedRuleData = runMinorFixesOnRule(dispatch, {
+            ...rule,
+            // super rule child rules will only have one pair
+            name: fixedSuperRuleData.name,
+            status: fixedSuperRuleData.status,
+            pairs: [
+              {
+                ...(fixedSuperRuleData?.pairs?.[0]?.[rule.id] ?? {}),
+                source: fixedSuperRuleData?.pairs?.[0].source,
+              },
+            ],
+          });
+
+          const syntaxValidation = await transformAndValidateRuleFields(fixedRuleData);
+
+          if (!syntaxValidation.success) {
+            const validationError = syntaxValidation.validationError;
+            switch (validationError.error) {
+              case HTML_ERRORS.COULD_NOT_PARSE:
+              case HTML_ERRORS.UNCLOSED_TAGS:
+              case HTML_ERRORS.UNCLOSED_ATTRIBUTES:
+              case HTML_ERRORS.UNSUPPORTED_TAGS:
+              case HTML_ERRORS.MULTIPLE_TAGS:
+              case HTML_ERRORS.NO_TAGS:
+                dispatch(
+                  actions.triggerToastForEditor({
+                    id: validationError.id,
+                    message: validationError.message,
+                    type: toastType.ERROR,
+                    autoClose: 4500,
+                  })
+                );
+                break;
+              default:
+                toast.error(validationError.message || "Could Not Parse rule");
+                break;
+            }
+          } else {
+            const parsedRuleData = syntaxValidation.ruleData || fixedRuleData;
+            //Validation
+            const ruleValidation = validateRule(parsedRuleData, dispatch, appMode);
+            if (ruleValidation.result) {
+              saveRule(
+                appMode,
+                {
+                  ...parsedRuleData,
+                  createdBy,
+                  currentOwner,
+                  lastModifiedBy,
+                },
+                () => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false)
+              );
+            } else {
+              toast.warn(ruleValidation.message);
+            }
+          }
+        });
+
+        toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
+      } else {
+        toast.warn(ruleValidation.message);
+      }
+    }
+  };
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const saveFn = (event) => {
     if ((navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey) && event.key.toLowerCase() === "s") {
@@ -293,7 +395,7 @@ const CreateRuleButton = ({
       <PremiumFeature
         popoverPlacement="bottomLeft"
         features={[FeatureLimitType.num_rules, premiumRuleLimitType]}
-        onContinue={handleBtnOnClick}
+        onContinue={isSuperRule ? handleSuperRuleBtnOnClick : handleBtnOnClick}
         featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[currentlySelectedRuleData.ruleType]?.NAME} rule`}
         disabled={checkIsUpgradePopoverDisabled()}
         source={currentlySelectedRuleData.ruleType}

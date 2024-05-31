@@ -51,7 +51,7 @@ const DestinationURLRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isI
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: isSuperRule ? { [ruleId]: { destination: url, ...pair } } : { destination: url },
+        updates: isSuperRule ? { [ruleId]: { ...pair, destination: url } } : { destination: url },
       })
     );
   };

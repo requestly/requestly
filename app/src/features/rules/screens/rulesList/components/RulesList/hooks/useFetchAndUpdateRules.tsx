@@ -58,7 +58,12 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         // FIXME: This can be removed/improved. Move this logic to src/features
         const isGroupsSanitizationPassedResult = await isGroupsSanitizationPassed({ rules, groups, appMode });
 
-        const finalRecords = [...isGroupsSanitizationPassedResult.updatedRules, ...groups];
+        // const finalRecords = [...isGroupsSanitizationPassedResult.updatedRules, ...groups];
+
+        const finalRecords = [...isGroupsSanitizationPassedResult.updatedRules, ...groups].filter(
+          // @ts-ignore
+          (record) => record.objectType === RecordType.RULE && !record.superRuleId
+        );
 
         dispatch(recordsActions.setAllRecords(finalRecords));
 
