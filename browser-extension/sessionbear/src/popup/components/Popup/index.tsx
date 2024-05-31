@@ -6,17 +6,9 @@ import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import "./popup.css";
 
 const Popup: React.FC = () => {
-  const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
   const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(true);
 
   useEffect(() => {
-    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT }, (noRulesPresent) => {
-      setIfNoRulesPresent(noRulesPresent);
-      sendEvent(EVENT.POPUP_OPENED, {
-        onboarding_screen_viewed: noRulesPresent,
-      });
-    });
-
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_EXTENSION_ENABLED }, setIsExtensionEnabled);
   }, []);
 
