@@ -137,6 +137,20 @@ export const validateRule = (rule, dispatch, appMode) => {
       message: `Opps! Rule must have atleast one pair`,
       error: "missing rule pair",
     };
+  } else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.SUPER) {
+    if (isEmpty(rule.pairs?.[0].source.value)) {
+      output = {
+        result: false,
+        message: `Please enter a source`,
+        error: "missing source",
+      };
+    } else if (Object.keys(rule.rules ?? {}).length === 0) {
+      output = {
+        result: false,
+        message: `Please enter atleast one rule condition!`,
+        error: "missing rule condition",
+      };
+    }
   }
 
   //Rule specific validations
