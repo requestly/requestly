@@ -12,6 +12,7 @@ import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytic
 import { deleteTestReportByRuleId } from "../TestThisRule/utils/testReports";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { RuleType } from "types";
 
 const DeleteRulesModal = ({
   toggle: toggleDeleteRulesModal,
@@ -32,7 +33,18 @@ const DeleteRulesModal = ({
   const [areRulesMovingToTrash, setAreRulesMovingToTrash] = useState(false);
   const [areRulesBeingDeleted, setAreRulesBeingDeleted] = useState(false);
 
-  const ruleIdsToDelete = useMemo(() => rulesToDelete.map((rule) => rule.id), [rulesToDelete]);
+  const ruleIdsToDelete = [];
+
+  rulesToDelete.forEach((rule) => {
+    ruleIdsToDelete.push(rule.id);
+    if (rule.ruleType === RuleType.SUPER) {
+      Object.values(rule.rules ?? {}).forEach((childRule) => {
+        ruleIdsToDelete.push(childRule.id);
+      });
+    }
+  });
+
+  // const ruleIdsToDelete = useMemo(() => rulesToDelete.map((rule) => rule.id), [rulesToDelete]);
 
   const handleDeleteRuleTestReports = useCallback(async () => {
     deleteTestReportByRuleId(appMode, ruleIdsToDelete);
