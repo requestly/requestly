@@ -1,6 +1,6 @@
-import { test, expect } from "../fixtures";
+import { test, expect } from "../../fixtures";
 import headerRules from "./header_rules.json";
-import { loadRules, waitForPromiseToSettle } from "../utils";
+import { loadRules, waitForPromiseToSettle } from "../../utils";
 
 test.describe("Modify Header Rule", () => {
   test("1. main_frame request", async ({ appPage, context }) => {

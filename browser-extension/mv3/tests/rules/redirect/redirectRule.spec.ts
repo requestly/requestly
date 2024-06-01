@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
-import { test } from "../fixtures";
-import { loadRules } from "../utils";
+import { test } from "../../fixtures";
+import { loadRules } from "../../utils";
 import redirectRules from "./redirect_rules.json";
 
 test.describe("Redirect Rule", () => {
