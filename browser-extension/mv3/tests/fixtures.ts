@@ -33,6 +33,7 @@ export const test = base.extend<{
     const appPage = await context.newPage();
     await appPage.goto(WEB_URL, { waitUntil: "commit" });
     await use(appPage);
+    await clearRules(appPage);
   },
 });
 export const expect = test.expect;
