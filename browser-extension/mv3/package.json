@@ -24,7 +24,7 @@
     "build:current": "rm -rf dist && rollup -c",
     "build:common": "cd ../common && npm run build && cd ../mv3",
     "watch": "rm -rf dist && rollup -cw",
-    "release": "BUILD_MODE='production' npm run build && node scripts/createZip"
+    "test": "playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.1",
