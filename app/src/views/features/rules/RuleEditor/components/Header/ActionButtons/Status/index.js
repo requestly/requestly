@@ -13,6 +13,8 @@ import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PREMIUM_RULE_TYPES } from "features/rules";
 import APP_CONSTANTS from "config/constants";
+import { RuleType } from "types";
+import { cloneDeep } from "lodash";
 
 const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   //Global State
@@ -30,28 +32,75 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   };
 
   const changeRuleStatus = (newValue) => {
-    if (newValue !== currentlySelectedRuleData.status)
-      setCurrentlySelectedRule(dispatch, {
-        ...currentlySelectedRuleData,
-        status: newValue,
-      });
+    if (currentlySelectedRuleData.ruleType === RuleType.SUPER) {
+      let copiedSuperRule = cloneDeep(currentlySelectedRuleData);
 
-    const isCreateMode = location.pathname.indexOf("create") !== -1;
+      if (newValue !== currentlySelectedRuleData.status) {
+        Object.values(copiedSuperRule?.rules ?? {}).forEach((rule) => {
+          // copiedSuperRule.rules[rule.id].status = newValue;
+          copiedSuperRule = {
+            ...copiedSuperRule,
+            rules: { ...copiedSuperRule.rules, [rule.id]: { ...copiedSuperRule.rules[rule.id], status: newValue } },
+          };
+        });
 
-    !isCreateMode &&
-      StorageService(appMode)
-        .saveRuleOrGroup(
-          {
-            ...currentlySelectedRuleData,
-            status: newValue,
-          },
-          false
-        )
-        .then(() =>
-          newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
-            ? toast.success("Rule saved and activated")
-            : toast.success("Rule saved and deactivated")
-        );
+        setCurrentlySelectedRule(dispatch, {
+          ...copiedSuperRule,
+          status: newValue,
+        });
+      }
+
+      console.log({ copiedSuperRule });
+
+      const isCreateMode = location.pathname.indexOf("create") !== -1;
+
+      if (!isCreateMode) {
+        Object.values(copiedSuperRule?.rules ?? {}).forEach((rule) => {
+          // copiedSuperRule.rules[rule.id].status = newValue;
+          copiedSuperRule = {
+            ...copiedSuperRule,
+            rules: { ...copiedSuperRule.rules, [rule.id]: { ...copiedSuperRule.rules[rule.id], status: newValue } },
+          };
+        });
+
+        StorageService(appMode)
+          .saveRuleOrGroup(
+            {
+              ...copiedSuperRule,
+              status: newValue,
+            },
+            false
+          )
+          .then(() =>
+            newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+              ? toast.success("Rule saved and activated")
+              : toast.success("Rule saved and deactivated")
+          );
+      }
+    } else {
+      if (newValue !== currentlySelectedRuleData.status)
+        setCurrentlySelectedRule(dispatch, {
+          ...currentlySelectedRuleData,
+          status: newValue,
+        });
+
+      const isCreateMode = location.pathname.indexOf("create") !== -1;
+
+      !isCreateMode &&
+        StorageService(appMode)
+          .saveRuleOrGroup(
+            {
+              ...currentlySelectedRuleData,
+              status: newValue,
+            },
+            false
+          )
+          .then(() =>
+            newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+              ? toast.success("Rule saved and activated")
+              : toast.success("Rule saved and deactivated")
+          );
+    }
   };
 
   const stableChangeRuleStatus = useCallback(changeRuleStatus, [
