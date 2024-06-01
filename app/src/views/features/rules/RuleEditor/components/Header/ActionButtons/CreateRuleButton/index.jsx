@@ -297,10 +297,38 @@ const CreateRuleButton = ({
     } else {
       const parsedRuleData = syntaxValidation.ruleData || fixedSuperRuleData;
       const ruleValidation = validateRule(parsedRuleData, dispatch, appMode);
+
       // save super rule
       if (ruleValidation.result) {
+        let updatedParsedRule = { ...parsedRuleData };
+
+        // update child rules
+        Object.values(fixedSuperRuleData?.rules ?? {}).forEach(async (rule) => {
+          const fixedRuleData = {
+            ...rule,
+            // super rule child rules will only have one pair
+            name: fixedSuperRuleData.name,
+            status: fixedSuperRuleData.status,
+            pairs: [
+              {
+                ...(fixedSuperRuleData?.pairs?.[0]?.[rule.id] ?? {}),
+                source: fixedSuperRuleData?.pairs?.[0].source,
+              },
+            ],
+          };
+
+          console.log({ fixedRuleData });
+
+          updatedParsedRule = {
+            ...parsedRuleData,
+            rules: { ...parsedRuleData.rules, [rule.id]: { ...fixedRuleData } },
+          };
+        });
+
+        console.log({ updatedParsedRule });
+
         await saveRule(appMode, {
-          ...parsedRuleData,
+          ...updatedParsedRule,
           createdBy,
           currentOwner,
           lastModifiedBy,
@@ -321,6 +349,8 @@ const CreateRuleButton = ({
               },
             ],
           });
+
+          console.log({ fixedRuleData });
 
           const syntaxValidation = await transformAndValidateRuleFields(fixedRuleData);
 
@@ -368,6 +398,7 @@ const CreateRuleButton = ({
         });
 
         toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
+        redirectToRuleEditor(navigate, currentlySelectedRuleData.id, MODE);
       } else {
         toast.warn(ruleValidation.message);
       }

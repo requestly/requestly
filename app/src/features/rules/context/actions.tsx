@@ -233,8 +233,18 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         });
       };
 
-      const allPromises = records.map((record) => {
-        return handleRecordStatusUpdate(record, value);
+      const allPromises: any = [];
+
+      records.forEach((record) => {
+        allPromises.push(handleRecordStatusUpdate(record, value));
+
+        // @ts-ignore
+        if (record.ruleType === RuleType.SUPER) {
+          // @ts-ignore
+          Object.values(record.rules ?? {}).forEach((rule: StorageRecord) => {
+            allPromises.push(handleRecordStatusUpdate(rule, value));
+          });
+        }
       });
 
       Promise.all(allPromises).then(() => {
