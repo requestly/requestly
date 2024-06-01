@@ -9,7 +9,7 @@ import "./ResponseStatusCodeRow.css";
 
 const { Option, OptGroup } = Select;
 
-const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
+const ResponseStatusCodeRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
   const [statusCode, setStatusCode] = useState(pair.response.statusCode);
 
@@ -29,10 +29,15 @@ const ResponseStatusCodeRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) =
             dispatch(
               actions.updateRulePairAtGivenPath({
                 pairIndex,
-                updates: {
-                  "response.statusCode": value,
-                  "response.statusText": statusCodes[value] || "",
-                },
+                updates: isSuperRule
+                  ? {
+                      [`${ruleId}.response.statusCode`]: value,
+                      [`${ruleId}.response.statusText`]: statusCodes[value] || "",
+                    }
+                  : {
+                      "response.statusCode": value,
+                      "response.statusText": statusCodes[value] || "",
+                    },
               })
             );
 

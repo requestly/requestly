@@ -69,7 +69,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
       return pair.request.value ? pair.request.value : "";
     }
     return null;
-  }, [pair.request.type, pair.request.value]);
+  }, [pair?.request.type, pair.request.value]);
 
   const requestBodyChangeHandler = (value) => {
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {

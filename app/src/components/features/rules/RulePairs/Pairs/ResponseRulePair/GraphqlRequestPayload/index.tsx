@@ -36,12 +36,16 @@ interface RequestPayload {
 }
 
 interface GraphqlRequestPayloadProps {
+  ruleId?: string;
+  isSuperRule?: boolean;
   pairIndex: number;
   gqlOperationFilter: RequestPayload;
   setGqlOperationFilter: React.Dispatch<React.SetStateAction<RequestPayload>>;
 }
 
 const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
+  ruleId,
+  isSuperRule,
   pairIndex,
   gqlOperationFilter,
   setGqlOperationFilter,
@@ -55,10 +59,17 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
         actions.updateRulePairAtGivenPath({
           pairIndex,
           triggerUnsavedChangesIndication: false,
-          updates: {
-            [SOURCE_REQUEST_PAYLOAD_KEY]: gqlOperationFilter.key,
-            "source.filters.requestPayload.value": gqlOperationFilter.value,
-          },
+          updates: isSuperRule
+            ? {
+                [ruleId]: {
+                  [SOURCE_REQUEST_PAYLOAD_KEY]: gqlOperationFilter.key,
+                  "source.filters.requestPayload.value": gqlOperationFilter.value,
+                },
+              }
+            : {
+                [SOURCE_REQUEST_PAYLOAD_KEY]: gqlOperationFilter.key,
+                "source.filters.requestPayload.value": gqlOperationFilter.value,
+              },
         })
       );
     }
@@ -81,7 +92,13 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: { [SOURCE_REQUEST_PAYLOAD_KEY]: newPayloadKey },
+        updates: isSuperRule
+          ? {
+              [ruleId]: {
+                [SOURCE_REQUEST_PAYLOAD_KEY]: newPayloadKey,
+              },
+            }
+          : { [SOURCE_REQUEST_PAYLOAD_KEY]: newPayloadKey },
       })
     );
 
@@ -96,7 +113,13 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: { [SOURCE_REQUEST_PAYLOAD_OPERATOR]: operator },
+        updates: isSuperRule
+          ? {
+              [ruleId]: {
+                [SOURCE_REQUEST_PAYLOAD_OPERATOR]: operator,
+              },
+            }
+          : { [SOURCE_REQUEST_PAYLOAD_OPERATOR]: operator },
       })
     );
 
@@ -113,7 +136,13 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: { [SOURCE_REQUEST_PAYLOAD_VALUE]: newPayloadValue },
+        updates: isSuperRule
+          ? {
+              [ruleId]: {
+                [SOURCE_REQUEST_PAYLOAD_VALUE]: newPayloadValue,
+              },
+            }
+          : { [SOURCE_REQUEST_PAYLOAD_VALUE]: newPayloadValue },
       })
     );
 

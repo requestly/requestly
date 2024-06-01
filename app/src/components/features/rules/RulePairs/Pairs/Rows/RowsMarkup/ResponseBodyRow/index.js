@@ -25,7 +25,7 @@ import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import "./ResponseBodyRow.css";
 
-const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
+const ResponseBodyRow = ({ isSuperRule, ruleId, rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
 
   const isServeWithoutRequestSupported = useMemo(
@@ -60,11 +60,17 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          updates: {
-            "response.type": responseBodyType,
-            "response.value": value,
-            "response.serveWithoutRequest": undefined,
-          },
+          updates: isSuperRule
+            ? {
+                [`${ruleId}.response.type`]: responseBodyType,
+                [`${ruleId}.response.value`]: value,
+                [`${ruleId}.response.serveWithoutRequest`]: undefined,
+              }
+            : {
+                "response.type": responseBodyType,
+                "response.value": value,
+                "response.serveWithoutRequest": undefined,
+              },
         })
       );
     }
@@ -74,12 +80,17 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: {
-          "response.type": GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
-          "response.value": selectedFile,
-          // Removing this as we are not stripping file:// in requestly-proxy. Add this once we do that.
-          // value: `file://${selectedFile}`,
-        },
+        updates: isSuperRule
+          ? {
+              [`${ruleId}.response.type`]: GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
+              [`${ruleId}.response.value`]: selectedFile,
+            }
+          : {
+              "response.type": GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE,
+              "response.value": selectedFile,
+              // Removing this as we are not stripping file:// in requestly-proxy. Add this once we do that.
+              // value: `file://${selectedFile}`,
+            },
       })
     );
   };
@@ -149,11 +160,17 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
-        updates: {
-          "response.type": pair.response.type,
-          "response.value":
-            pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
-        },
+        updates: isSuperRule
+          ? {
+              [`${ruleId}.response.type`]: pair.response.type,
+              [`${ruleId}.response.value`]:
+                pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+            }
+          : {
+              "response.type": pair.response.type,
+              "response.value":
+                pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? formatJSONString(value) : value,
+            },
         triggerUnsavedChangesIndication: !codeFormattedFlag.current,
       })
     );
@@ -187,9 +204,13 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       dispatch(
         actions.updateRulePairAtGivenPath({
           pairIndex,
-          updates: {
-            "response.serveWithoutRequest": flag,
-          },
+          updates: isSuperRule
+            ? {
+                [`${ruleId}.response.serveWithoutRequest`]: flag,
+              }
+            : {
+                "response.serveWithoutRequest": flag,
+              },
         })
       );
     }
@@ -212,7 +233,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
       setIsCodeMinified(false);
     }
-  }, [pair.response.type]);
+  }, [pair?.response?.type]);
 
   const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.dynamic_response_body);
 
