@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
+import { json } from "@codemirror/lang-json";
 import { abcdef } from "@uiw/codemirror-theme-abcdef";
 
 //utils
@@ -95,6 +96,16 @@ const Editor = ({
     [dispatch]
   );
 
+  useEffect(() => {
+    // TEMP
+    if (isCodeMinified && language === "json") {
+      console.log("value", value);
+      setEditorContent(value);
+    }
+  }, [value, isCodeMinified, language]);
+
+  console.log("editorContent", editorContent);
+
   return (
     <>
       <ResizableBox
@@ -122,11 +133,11 @@ const Editor = ({
           <CodeMirror
             className="code-editor"
             width="100%"
-            value={editorContent}
-            defaultValue={defaultValue}
+            value={editorContent ?? ""}
+            defaultValue={defaultValue ?? ""}
             onChange={handleChange}
             theme={abcdef}
-            extensions={[javascript({ jsx: false }), EditorView.lineWrapping]}
+            extensions={[language === "javascript" ? javascript({ jsx: false }) : json(), EditorView.lineWrapping]}
             basicSetup={{
               highlightActiveLine: false,
               lineNumbers: false,
@@ -135,6 +146,7 @@ const Editor = ({
               bracketMatching: true,
               closeBrackets: true,
               lineWrapping: true,
+              // searchKeymap:false
             }}
           />
           {/* <Editor
