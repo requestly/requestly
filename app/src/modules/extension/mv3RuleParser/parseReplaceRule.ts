@@ -11,8 +11,8 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
     if (!rulePair.source.value) {
       const ruleCondition = {
         condition: {
-          regexFilter: `(.*)${rulePair.from}(.*)`,
           ...parseConditionFromSource(rulePair.source),
+          regexFilter: `(.*)${rulePair.from}(.*)`,
         },
         action: {
           type: RuleActionType.REDIRECT,
@@ -21,7 +21,6 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
           },
         },
       };
-      delete ruleCondition.condition.urlFilter;
       extensionRules.push(ruleCondition);
       return;
     }
