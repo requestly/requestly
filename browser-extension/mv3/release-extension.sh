@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+BROWSER=chrome ENV=prod npm run config
 npm run test
 # Check if the tests failed
 if [ $? -ne 0 ]; then
@@ -15,7 +16,6 @@ VERSION=`date +'%-y.%-m.%d'`
 npm version $VERSION
 
 # Chrome
-BROWSER=chrome ENV=prod npm run config
 BUILD_MODE='production' npm run build && node scripts/createZip
 
 # Reset config
