@@ -50,8 +50,6 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
         });
       }
 
-      console.log({ copiedSuperRule });
-
       const isCreateMode = location.pathname.indexOf("create") !== -1;
 
       if (!isCreateMode) {
@@ -76,6 +74,16 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
               ? toast.success("Rule saved and activated")
               : toast.success("Rule saved and deactivated")
           );
+
+        Object.values(copiedSuperRule?.rules ?? {}).forEach((rule) => {
+          StorageService(appMode).saveRuleOrGroup(
+            {
+              ...rule,
+              status: newValue,
+            },
+            false
+          );
+        });
       }
     } else {
       if (newValue !== currentlySelectedRuleData.status)
