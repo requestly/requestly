@@ -21,4 +21,24 @@ test.describe("Redirect Rule", () => {
     expect(redirectedTo).not.toBeFalsy();
     expect(redirectedTo).toBe(redirectedUrl);
   });
+
+  test("2. internal request", async ({ appPage, context }) => {
+    const rule = redirectRules.Redirect_2;
+    await loadRules(appPage, { [rule.id]: rule });
+
+    const testPage = await context.newPage();
+    const testURL = "https://testheaders.com/";
+    const redirectedUrl = "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz";
+
+    await testPage.goto(testURL, { waitUntil: "commit" });
+    const testRequest = await testPage.waitForRequest((req) => req.url() === redirectedUrl);
+
+    const redirectedFrom = testRequest?.redirectedFrom()?.url();
+    const redirectedTo = testRequest?.url();
+
+    expect(redirectedFrom).not.toBeFalsy();
+    expect(redirectedFrom).toBe("https://testheaders.com/files/sample.js");
+    expect(redirectedTo).not.toBeFalsy();
+    expect(redirectedTo).toBe(redirectedUrl);
+  });
 });
