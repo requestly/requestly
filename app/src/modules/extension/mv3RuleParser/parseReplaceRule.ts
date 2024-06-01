@@ -1,17 +1,17 @@
 import { escapeRegExp } from "lodash";
 import { ReplaceRule, ReplaceRulePair } from "../../../types/rules";
 import { ExtensionRule, ExtensionRuleCondition, RuleActionType } from "../types";
-import { parseConditionFromSource, parseUrlParametersFromSourceV2 } from "./utils";
+import { parseConditionFromSource } from "./utils";
 
 const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondition => {
   if (!rulePair.source.value) {
-    const regexCondition = parseUrlParametersFromSourceV2(rulePair.source, false);
+    const regexCondition = parseConditionFromSource(rulePair.source, false);
     return {
       ...regexCondition,
       regexFilter: `.*`,
     };
   } else {
-    const regexCondition = parseUrlParametersFromSourceV2(rulePair.source, false);
+    const regexCondition = parseConditionFromSource(rulePair.source, false);
     let finalRegexFilter = regexCondition.regexFilter;
 
     // Remove ^ & $
@@ -33,28 +33,45 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
   const extensionRules: ExtensionRule[] = [];
 
   rule.pairs.forEach((rulePair, pairIndex) => {
-    const redirectWithMarkerRule: ExtensionRule = {
+    const sourceCondition = parseConditionFromSource(rulePair.source);
+
+    const redirectForSubstitutionRule: ExtensionRule = {
       priority: 1,
       condition: {
-        regexFilter: `(${parseConditionFromSource(rulePair.source)?.regexFilter})`,
+        // To prevent infinite loops. First condition consumes the marker and returns the same redirected url. So stopping further redirections as same url
+        // 1st alteration
+        // https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
+        // $1 = https://example.com/v1/users/1234/hello
+        // $2 = #__rq_marker=https://example.com/v1/users/1234/hello
+        // Final URL = https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
+
+        // 2nd alteration: Used for first time redirect
+        // https://example.com/v1/users/1234/hello
+        // $3 = https://example.com/v1/users/1234/hello
+        // Final URL = https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
+
+        regexFilter: `(${sourceCondition?.regexFilter})(#__rq_marker.*)|(${
+          parseConditionFromSource(rulePair.source)?.regexFilter
+        })`,
+        isUrlFilterCaseSensitive: sourceCondition?.isUrlFilterCaseSensitive,
       },
       action: {
         type: RuleActionType.REDIRECT,
         redirect: {
-          regexSubstitution: `\\1#__rq_marker=\\1`,
+          regexSubstitution: `\\1\\3#__rq_marker=\\1\\3`,
         },
       },
     };
 
     const subsitutionRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
-    const { regexFilter: matchingRegex, isUrlFilterCaseSensitive } = getReplaceMatchingRegex(rulePair);
-    const finalRegex = `^${subsitutionRegex}#__rq_marker=(?:${matchingRegex})$`;
+    const matchingCondition = getReplaceMatchingRegex(rulePair);
+    const finalRegex = `^${subsitutionRegex}#__rq_marker=(?:${matchingCondition.regexFilter})$`;
 
     let substitutionRule: ExtensionRule = {
       priority: 2,
       condition: {
+        ...matchingCondition,
         regexFilter: finalRegex,
-        isUrlFilterCaseSensitive,
       },
       action: {
         type: RuleActionType.REDIRECT,
@@ -64,7 +81,7 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
       },
     };
 
-    extensionRules.push(...[redirectWithMarkerRule, substitutionRule]);
+    extensionRules.push(...[redirectForSubstitutionRule, substitutionRule]);
   });
 
   return extensionRules;
