@@ -44,6 +44,7 @@
     "@ant-design/pro-card": "^1.20.6",
     "@ant-design/pro-table": "^2.75.1",
     "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
     "@devtools-ds/navigation": "^1.1.2",
     "@devtools-ds/object-inspector": "^1.2.1",
     "@devtools-ds/table": "^1.1.2",

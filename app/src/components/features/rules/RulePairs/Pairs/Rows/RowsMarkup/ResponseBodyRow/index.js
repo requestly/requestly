@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, Profiler } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Radio, Popover, Button, Popconfirm, Space, Checkbox } from "antd";
 import { actions } from "store";
@@ -163,6 +163,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const handleCodePrettifyToggle = () => {
     if (!isCodeMinified) {
       setEditorStaticValue(minifyCode(editorStaticValue));
+      console.log("minifyCode(editorStaticValue)", minifyCode(editorStaticValue));
     }
     setIsCodeMinified((isMinified) => !isMinified);
     handleCodeFormattedFlag();
@@ -208,6 +209,16 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }
     return null;
   }, [pair.response.type, pair.response.value]);
+
+  function onRender(id, phase, actualDuration, baseDuration, startTime, commitTime) {
+    console.log("OPP", {
+      id,
+      phase,
+      actualDuration,
+      commitTime,
+      startTime,
+    });
+  }
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
@@ -280,22 +291,24 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             }}
           >
             <Col xl="12" span={24}>
-              <CodeEditor
-                key={pair.response.type}
-                language={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE ? "javascript" : "json"}
-                value={
-                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-                    ? editorStaticValue
-                    : pair.response.value
-                }
-                defaultValue={getEditorDefaultValue()}
-                handleChange={responseBodyChangeHandler}
-                readOnly={isInputDisabled}
-                validation={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? "off" : "editable"}
-                unlockJsonPrettify={true}
-                isCodeMinified={isCodeMinified}
-                isCodeFormatted={isCodeFormatted}
-              />
+              <Profiler id="code-editor" onRender={onRender}>
+                <CodeEditor
+                  key={pair.response.type}
+                  language={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE ? "javascript" : "json"}
+                  value={
+                    pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
+                      ? editorStaticValue
+                      : pair.response.value
+                  }
+                  defaultValue={getEditorDefaultValue()}
+                  handleChange={responseBodyChangeHandler}
+                  readOnly={isInputDisabled}
+                  validation={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? "off" : "editable"}
+                  unlockJsonPrettify={true}
+                  isCodeMinified={isCodeMinified}
+                  isCodeFormatted={isCodeFormatted}
+                />
+              </Profiler>
             </Col>
           </Row>
           <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
