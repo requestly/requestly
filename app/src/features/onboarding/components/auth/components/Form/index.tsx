@@ -24,12 +24,14 @@ import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils"
 import { SSOSignInForm } from "./components/SSOSignInForm";
 import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
 import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analytics";
+import { AuthWarningBanner } from "./components/AuthWarningBanner";
 import "./index.scss";
 
 interface AuthFormProps {
   authMode: string;
   email?: string;
   isOnboarding: boolean;
+  warningMessage?: string;
   source: string;
   setEmail?: (email: string) => void;
   setAuthMode: (mode: string) => void;
@@ -44,6 +46,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   email,
   setAuthMode,
   isOnboarding,
+  warningMessage,
   setIsVerifyEmailPopupVisible,
   setEmail,
   source,
@@ -57,6 +60,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(null);
+  const [isAuthWarningBannerVisible, setIsAuthWarningBannerVisible] = useState(!!warningMessage?.length);
 
   const handleSignupSigninSwitch = useCallback(() => {
     const finalState = authMode === AUTH.ACTION_LABELS.SIGN_UP ? AUTH.ACTION_LABELS.LOG_IN : AUTH.ACTION_LABELS.SIGN_UP;
@@ -192,9 +196,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <RequestPasswordResetForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} toggleModal={toggleModal} />
     );
   }
-
   return (
     <div className="w-full">
+      {authMode === AUTH.ACTION_LABELS.LOG_IN && warningMessage && isAuthWarningBannerVisible && (
+        <AuthWarningBanner warningMessage={warningMessage} onBannerClose={() => setIsAuthWarningBannerVisible(false)} />
+      )}
       <h2 className="onboarding-auth-form-header">
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your Requestly account"}
       </h2>
