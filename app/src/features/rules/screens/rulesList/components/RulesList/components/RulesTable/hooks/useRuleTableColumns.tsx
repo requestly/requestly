@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip } from "antd";
+import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip, Progress } from "antd";
 import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "../types";
@@ -15,7 +15,6 @@ import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
-import { RiPushpin2Line } from "@react-icons/all-files/ri/RiPushpin2Line";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import PATHS from "config/constants/sub/paths";
@@ -28,6 +27,8 @@ import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleTypesDropdownWrapper } from "../../RuleTypesDropdownWrapper/RuleTypesDropdownWrapper";
+import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
+import { useTheme } from "styled-components";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -44,6 +45,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordsPinAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
+  const theme = useTheme();
 
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
@@ -62,7 +64,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             <Button
               type="text"
               className={`pin-record-btn ${isPinned ? "pin-record-btn-pinned" : ""}`}
-              icon={<RiPushpin2Line className={`${record.isFavourite ? "record-pinned" : "record-unpinned"}`} />}
+              icon={<MdOutlinePushPin className={`${record.isFavourite ? "record-pinned" : "record-unpinned"}`} />}
               onClick={(e) => {
                 e.stopPropagation();
                 if (isEditingEnabled) {
@@ -124,7 +126,15 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                   }
                 >
                   <div className="group-rules-count-details">
-                    <div className="active-status" /> {activeRulesCount} / {totalRules}
+                    <Progress
+                      strokeWidth={16}
+                      strokeColor={theme?.colors?.success}
+                      showInfo={false}
+                      type="circle"
+                      percent={(activeRulesCount / totalRules) * 100}
+                      size="small"
+                    />
+                    {activeRulesCount} / {totalRules}
                   </div>
                 </Tooltip>
               ) : null}
@@ -275,7 +285,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
         const beautifiedDate = moment(dateToDisplay).format("MMM DD, YYYY");
         if (currentlyActiveWorkspace?.id && !options?.hideLastModifiedBy) {
           return (
-            <span>
+            <span className="rule-updated-on-cell">
               {beautifiedDate} <UserIcon uid={record.lastModifiedBy} />
             </span>
           );
