@@ -1,2 +1,1 @@
-import "./ajaxRequestInterceptor";
 import "./sessionRecorderHelper";
