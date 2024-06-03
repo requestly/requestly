@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { PrimarySidebarItem } from "../type";
+import { PrimarySidebarItem } from "../../../type";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 import { snakeCase } from "lodash";
 
