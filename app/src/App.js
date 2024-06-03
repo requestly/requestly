@@ -77,7 +77,6 @@ const App = () => {
       {/* <RuleExecutionsSyncer /> */}
       <ActiveWorkspace />
       <ThirdPartyIntegrationsHandler />
-
       <ThemeProvider>
         <ConfigProvider locale={enUS}>
           <GrowthBookProvider growthbook={growthbook}>
