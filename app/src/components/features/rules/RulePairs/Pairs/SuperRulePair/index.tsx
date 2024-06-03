@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import RequestSourceRow from "../Rows/RowsMarkup/RequestSourceRow";
 import { Row, Col, Space, Button } from "antd";
 import { Rule, RuleType } from "types";
@@ -8,54 +8,54 @@ import {
   setCurrentlySelectedRule,
 } from "components/features/rules/RuleBuilder/actions";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleData } from "store/selectors";
 import { rulePairComponents } from "..";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { RQDropdown } from "lib/design-system/components";
 import { CloseOutlined } from "@ant-design/icons";
 import { omit } from "lodash";
+import { deleteRulesFromStorage } from "components/features/rules/DeleteRulesModal/actions";
 
 /**
- * - Make the index route and render an empty page [DONE]
- * - Put request source row component, check the states [DONE]
- * - render delay rules values and show an edit icon
- * - render modify response rule
- * - Can add drag and drop too for priority
- * - Can add audit logs too on how the rules have executed
- * - An option to add more rules to a super rule
  *
  *
- * - Create a new rule type called superRule
- *    - If its a super rule type then the changes will be: superRule.children[index_of_individual_rule]
- * - This will openin editor with some different UI
- * - This can also show the rules on listing page
- * - The above will make possible to create mutiple super rules
- * - update the currentlySelected rule data and config whenever this page loads
  *
- *
- * - before saving the super rule add the foreign key ie superRuleId,
- *    - in all its child rules
- *    - hide all the superRules child rules in rules table
+ * - before saving the super rule add the foreign key ie superRuleId, [DONE]
+ *    - in all its child rules [DONE]
+ *    - hide all the superRules child rules in rules table [DONE]
  *
  * HERE
  * - have a dropdown, on select push the new rule into the super rule [DONE]
  * - render the superRule rules [DONE]
- * - test the modification done in each of rule
+ * - test the modification done in each of rule [DONE]
  *    - It will fail, fix state updates
- *    - Fix style
+ *    - Fix style [DONE]
  *
- * - if working then:
- *    - fix save super rule click
- *    - hide the source URL row from the rule pairs
- *    - test
- *    - add drag and drop for rearrangement of rules
- *      - then work on priority of rules
- * - if not working: debug,
+ * - render super rule in rules table [DONE]
+ * - fix save super rule click [DONE]
+ * - "Test this rule" testing [DONE]
+ * - Bugs:
+ *     - headers rule not working
+ * - sync status of each rule with the super rule [DONE]
+ *    - bug from editor action
+ * - fix delete rules [DONE]
+ * - hide the source URL row from the rule pairs [DONE]
+ * - test working of rule
+ * - add drag and drop for rearrangement of rules
+ * - then work on priority of rules
+
+ * - for pair add the rule pair in super rule pair only [DONE]
  *
- * - for pair add the rule pair in super rule pair only
- *
- * Bugs:
- * - deletion of rule paire will break
+ *  - RedirectRulePair [DONE]
+ *  - CancelRulePair [DONE]
+ *  - ReplaceRulePair [DONE]
+ *  - HeadersRulePair [DONE]
+ *  - ResponseRulePair [DONE]
+ *  - UserAgentRulePair [DONE]
+ *  - QueryParamRulePair
+ *  - ScriptRulePair
+ *  - RequestRulePair
+ *  - DelayRulePair
  */
 
 const SuperRulePair: React.FC<{
@@ -68,9 +68,7 @@ const SuperRulePair: React.FC<{
 
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const [ruleType, setRuleType] = useState<RuleType>();
 
   const ruleTypes = Object.entries(RuleType)
     .filter(([key, label]) => label !== RuleType.SUPER)
@@ -79,8 +77,6 @@ const SuperRulePair: React.FC<{
       label,
       onClick: () => {
         const newRule = getNewRule(label);
-
-        setRuleType(label);
 
         setCurrentlySelectedRule(
           dispatch,
@@ -100,9 +96,7 @@ const SuperRulePair: React.FC<{
     }));
 
   const removeRule = async (ruleId: string) => {
-    // await deleteRulesFromStorage(appMode, [ruleId], () => {
-    //   toast.info(`Rules deleted permanently!`);
-    // });
+    await deleteRulesFromStorage(appMode, [ruleId]);
 
     setCurrentlySelectedRule(
       dispatch,
@@ -115,10 +109,21 @@ const SuperRulePair: React.FC<{
     );
   };
 
-  console.log({ pairs: currentlySelectedRuleData.pairs });
+  console.log({ superRule: currentlySelectedRuleData });
 
   const getRulesMarkup = () => {
     const markup = Object.values(currentlySelectedRuleData?.rules ?? {})?.map((rule: Rule) => {
+      // const updatedRule = {
+      //   ...rule,
+      //   name: currentlySelectedRuleData.name,
+      //   status: currentlySelectedRuleData.status,
+      //   pairs: [
+      //     {
+      //       ...currentlySelectedRuleData.pairs?.[0]?.[rule.id],
+      //     },
+      //   ],
+      // };
+
       const commonProps = {
         // pair: currentlySelectedRuleData?.rules?.[rule.id]?.pairs?.[0],
         pair: currentlySelectedRuleData.pairs?.[0]?.[rule.id],
@@ -132,16 +137,25 @@ const SuperRulePair: React.FC<{
       const Component = rulePairComponents[rule.ruleType];
 
       return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-          <Button
-            title="Remove"
-            icon={<CloseOutlined width={12} height={12} />}
-            danger
-            onClick={() => removeRule(rule.id)}
-            style={{ alignSelf: "flex-end", marginRight: "21px", fontSize: "12px", padding: "4px" }}
-          />
+        <div key={rule?.id} style={{ display: "flex", gap: "4px", flexWrap: "nowrap" }}>
           {/* @ts-ignore */}
-          <Component key={rule?.id} {...commonProps} />
+          <div style={{ flexGrow: "1" }}>
+            <Component {...commonProps} />
+          </div>
+          <Button
+            size="small"
+            type="text"
+            title={`Remove ${rule.ruleType.toLowerCase()} rule`}
+            icon={<CloseOutlined width={12} height={12} />}
+            onClick={() => removeRule(rule.id)}
+            style={{
+              alignSelf: "flex-start",
+              flexShrink: "0",
+              fontSize: "12px",
+              padding: "4px",
+              marginTop: [RuleType.CANCEL].includes(rule.ruleType) ? "0" : "1rem",
+            }}
+          />
         </div>
       );
     });
@@ -164,7 +178,7 @@ const SuperRulePair: React.FC<{
       </Row>
 
       <Row>
-        <Space direction="vertical" size="middle" style={{ display: "flex", marginTop: "1rem", width: "100%" }}>
+        <Space direction="vertical" size={0} style={{ display: "flex", marginTop: "1rem", width: "100%" }}>
           <div style={{ marginLeft: "auto", marginRight: "21px", maxWidth: "150px" }}>
             <RQDropdown trigger={["click"]} menu={{ items: ruleTypes }}>
               <div
@@ -180,7 +194,7 @@ const SuperRulePair: React.FC<{
             </RQDropdown>
           </div>
 
-          <Space direction="vertical" size={[24, 24]} style={{ display: "flex", marginTop: "1rem", width: "100%" }}>
+          <Space direction="vertical" size={16} style={{ display: "flex", marginTop: "1rem", width: "100%" }}>
             {getRulesMarkup()}
           </Space>
         </Space>
