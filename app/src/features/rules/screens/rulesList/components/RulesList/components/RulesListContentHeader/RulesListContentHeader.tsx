@@ -147,7 +147,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           <div className="label">
             All{" "}
             {records.length ? (
-              <Badge count={records.filter((record) => isRule(record)).length} overflowCount={20} />
+              <Badge count={records.filter((record) => isRule(record)).length} overflowCount={10_000} />
             ) : null}
           </div>
         ),
