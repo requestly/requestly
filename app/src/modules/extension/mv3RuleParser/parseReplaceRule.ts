@@ -33,7 +33,7 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
   const extensionRules: ExtensionRule[] = [];
 
   rule.pairs.forEach((rulePair, pairIndex) => {
-    const sourceCondition = parseConditionFromSource(rulePair.source);
+    const matchingCondition = getReplaceMatchingRegex(rulePair);
 
     const redirectForSubstitutionRule: ExtensionRule = {
       priority: 1,
@@ -50,10 +50,10 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
         // $3 = https://example.com/v1/users/1234/hello
         // Final URL = https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
 
-        regexFilter: `(${sourceCondition?.regexFilter})(#__rq_marker.*)|(${
+        regexFilter: `^(${matchingCondition?.regexFilter})(#__rq_marker.*)$|(${
           parseConditionFromSource(rulePair.source)?.regexFilter
         })`,
-        isUrlFilterCaseSensitive: sourceCondition?.isUrlFilterCaseSensitive,
+        isUrlFilterCaseSensitive: matchingCondition?.isUrlFilterCaseSensitive,
       },
       action: {
         type: RuleActionType.REDIRECT,
@@ -64,7 +64,6 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
     };
 
     const subsitutionRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
-    const matchingCondition = getReplaceMatchingRegex(rulePair);
     const finalRegex = `^${subsitutionRegex}#__rq_marker=(?:${matchingCondition.regexFilter})$`;
 
     let substitutionRule: ExtensionRule = {
