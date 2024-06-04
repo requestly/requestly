@@ -17,3 +17,9 @@
   transition: 0.3s all;
   cursor: row-resize;
 }
+
+.code-editor-character-count {
+  text-align: right;
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-xs);
+}

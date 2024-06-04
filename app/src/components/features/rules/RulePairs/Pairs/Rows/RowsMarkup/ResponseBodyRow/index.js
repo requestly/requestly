@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { Row, Col, Radio, Popover, Button, Popconfirm, Space, Checkbox } from "antd";
+import { Row, Col, Radio, Popover, Popconfirm, Space, Checkbox } from "antd";
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import {
   displayFileSelector,
   handleOpenLocalFileInBrowser,
 } from "components/mode-specific/desktop/misc/FileDialogButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
+import { formatJSONString } from "utils/CodeEditorUtils";
 import { getAppDetails } from "utils/AppUtils";
 import InfoIcon from "components/misc/InfoIcon";
 import { trackServeResponseWithoutRequestEnabled } from "modules/analytics/events/features/ruleEditor";
@@ -40,8 +39,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
   const [editorStaticValue, setEditorStaticValue] = useState(
     pair?.response?.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC && pair.response.value
   );
-  const [isCodeMinified, setIsCodeMinified] = useState(true);
-  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
 
   const codeFormattedFlag = useRef(null);
   const { getFeatureLimitValue } = useFeatureLimiter();
@@ -54,7 +51,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
       } else if (responseBodyType === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.LOCAL_FILE) {
         value = "";
       } else {
-        setIsCodeMinified(true);
         setEditorStaticValue(value);
       }
       dispatch(
@@ -159,23 +155,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     );
   };
 
-  const handleCodePrettifyToggle = () => {
-    if (!isCodeMinified) {
-      setEditorStaticValue(minifyCode(editorStaticValue));
-    }
-    setIsCodeMinified((isMinified) => !isMinified);
-    handleCodeFormattedFlag();
-  };
-
-  const handleCodeFormattedFlag = () => {
-    setIsCodeFormatted(true);
-    codeFormattedFlag.current = true;
-    setTimeout(() => {
-      setIsCodeFormatted(false);
-      codeFormattedFlag.current = false;
-    }, 2000);
-  };
-
   const handleServeWithoutRequestFlagChange = (event) => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
       const flag = event.target.checked;
@@ -207,12 +186,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }
     return null;
   }, [pair.response.type, pair.response.value]);
-
-  useEffect(() => {
-    if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
-      setIsCodeMinified(false);
-    }
-  }, [pair.response.type]);
 
   const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.dynamic_response_body);
 
@@ -296,26 +269,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 handleChange={responseBodyChangeHandler}
                 isResizable
               />
-            </Col>
-          </Row>
-          <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
-            <Col align="left">
-              {pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
-                <>
-                  <Button type="link" onClick={handleCodePrettifyToggle}>
-                    {isCodeMinified ? <span>Pretty Print {"{ }"}</span> : <span>View Raw</span>}
-                  </Button>
-                </>
-              ) : (
-                <Button type="link" onClick={handleCodeFormattedFlag}>
-                  Pretty Print {"{ }"}
-                </Button>
-              )}
-            </Col>
-            <Col span={6} align="right">
-              <span className="codemirror-character-count text-gray">
-                {getByteSize(pair.response.value)} characters
-              </span>
             </Col>
           </Row>
           {isServeWithoutRequestSupported && pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (

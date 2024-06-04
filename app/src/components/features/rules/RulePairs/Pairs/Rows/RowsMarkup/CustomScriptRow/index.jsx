@@ -1,7 +1,7 @@
 /* eslint-disable default-case */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm, Button } from "antd";
+import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm } from "antd";
 import { actions } from "store";
 //Icons
 import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
@@ -35,7 +35,6 @@ const CustomScriptRow = ({
   const [codeTypeSelection, setCodeTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS);
   const [sourceTypeSelection, setSourceTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
-  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
   const [initialCodeEditorValue, setInitialCodeEditorValue] = useState(null);
 
   const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
@@ -203,7 +202,7 @@ const CustomScriptRow = ({
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
-            triggerUnsavedChangesIndication: !isCodeFormatted && triggerUnsavedChanges,
+            triggerUnsavedChangesIndication: triggerUnsavedChanges,
             updates: {
               [`scripts[${scriptIndex}].value`]: value,
             },
@@ -211,7 +210,7 @@ const CustomScriptRow = ({
         );
       }
     },
-    [dispatch, isCodeFormatted, pairIndex, script.type, scriptIndex]
+    [dispatch, pairIndex, script.type, scriptIndex]
   );
 
   useEffect(() => {
@@ -226,13 +225,6 @@ const CustomScriptRow = ({
   }, [initialCodeEditorValue, handleEditorUpdate]);
 
   const renderCodeEditor = () => {
-    const handleCodeFormattedFlag = () => {
-      setIsCodeFormatted(true);
-      setTimeout(() => {
-        setIsCodeFormatted(false);
-      }, 2000);
-    };
-
     return (
       <Col span={24} data-tour-id="code-editor">
         <Row
@@ -252,19 +244,8 @@ const CustomScriptRow = ({
               value={initialCodeEditorValue}
               handleChange={handleEditorUpdate}
               isReadOnly={isInputDisabled}
+              isResizable
             />
-          </Col>
-        </Row>
-        <Row span={24} align="middle" justify="space-between" className="code-editor-character-count-row ">
-          <Col align="left">
-            {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
-              <Button type="link" onClick={handleCodeFormattedFlag}>
-                Pretty Print {"{ }"}
-              </Button>
-            ) : null}
-          </Col>
-          <Col span={6} align="right">
-            <span className="codemirror-character-count text-gray">{script.value?.length ?? 0} characters</span>
           </Col>
         </Row>
       </Col>

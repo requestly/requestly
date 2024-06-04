@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
-import { Row, Col, Radio, Button } from "antd";
+import { Row, Col, Radio } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
+import {} from "../../../../../../../../utils/FormattingHelper";
 import { Popconfirm } from "antd";
-import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
+import { formatJSONString } from "utils/CodeEditorUtils";
 import { actions } from "store";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
@@ -21,8 +21,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
   const [requestTypePopupSelection, setRequestTypePopupSelection] = useState(
     pair?.request?.type ?? GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
   );
-  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
-  const [isCodeMinified, setIsCodeMinified] = useState(true);
   const [editorStaticValue, setEditorStaticValue] = useState(
     pair?.request?.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC && pair.request.value
   );
@@ -36,7 +34,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
       if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
         value = ruleDetails["REQUEST_BODY_JAVASCRIPT_DEFAULT_VALUE"];
       } else if (requestType === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-        setIsCodeMinified(true);
         setEditorStaticValue(value);
       }
 
@@ -88,29 +85,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
       })
     );
   };
-
-  const handleCodeFormattedFlag = () => {
-    setIsCodeFormatted(true);
-    codeFormattedFlag.current = true;
-    setTimeout(() => {
-      setIsCodeFormatted(false);
-      codeFormattedFlag.current = false;
-    }, 2000);
-  };
-
-  const handleCodePrettifyToggle = () => {
-    if (!isCodeMinified) {
-      setEditorStaticValue(minifyCode(editorStaticValue));
-    }
-    setIsCodeMinified((isMinified) => !isMinified);
-    handleCodeFormattedFlag();
-  };
-
-  useEffect(() => {
-    if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
-      setIsCodeMinified(false);
-    }
-  }, [pair.request.type]);
 
   const isPremiumFeature = !getFeatureLimitValue(FeatureLimitType.dynamic_request_body);
 
@@ -186,24 +160,6 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 handleChange={requestBodyChangeHandler}
                 isReadOnly={isInputDisabled}
               />
-            </Col>
-          </Row>
-          <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
-            <Col align="left">
-              {pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE ? (
-                <Button type="link" onClick={handleCodeFormattedFlag}>
-                  Pretty Print {"{ }"}
-                </Button>
-              ) : (
-                <>
-                  <Button type="link" onClick={handleCodePrettifyToggle}>
-                    {isCodeMinified ? <span>Pretty Print {"{ }"}</span> : <span>View Raw</span>}
-                  </Button>
-                </>
-              )}
-            </Col>
-            <Col span={6} align="right" className="text-gray code-editor-character-count-row">
-              <span>{getByteSize(pair.request.value)} characters</span>
             </Col>
           </Row>
         </>
