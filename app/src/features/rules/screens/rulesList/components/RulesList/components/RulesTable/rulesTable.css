@@ -49,9 +49,12 @@
   margin-top: 0px;
 }
 
-.rq-content-list-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
-  margin-left: 8px;
-  margin-right: 7px;
+.rq-content-list-table-row td.ant-table-cell:nth-child(2) .indent-level-1 {
+  padding-left: 0px !important;
+}
+
+.rq-content-list-table-row:not(.rq-content-list-table-row-group) td.ant-table-cell:nth-child(2) .indent-level-0 {
+  padding-left: 18px !important;
 }
 
 .rule-more-actions-dropdown .ant-dropdown-menu {
