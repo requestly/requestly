@@ -92,6 +92,7 @@ const Editor: React.FC<EditorProps> = ({
             bracketMatching: true,
             closeBrackets: true,
             allowMultipleSelections: true,
+            foldGutter: false,
           }}
         />
       </ResizableBox>
