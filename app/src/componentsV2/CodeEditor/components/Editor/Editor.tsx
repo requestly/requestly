@@ -7,6 +7,8 @@ import { css } from "@codemirror/lang-css";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { EditorLanguage } from "componentsV2/CodeEditor/types";
 import { ResizableBox } from "react-resizable";
+import CodeEditorToolbar from "./components/Toolbar/Toolbar";
+import { getByteSize } from "utils/FormattingHelper";
 import "./editor.scss";
 
 interface EditorProps {
@@ -29,7 +31,7 @@ const Editor: React.FC<EditorProps> = ({
   handleChange,
 }) => {
   const [editorHeight, setEditorHeight] = useState(height);
-  const [editorContent] = useState(value);
+  const [editorContent, setEditorContent] = useState(value);
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
@@ -50,38 +52,52 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [language]);
 
-  console.log("EditorProps", editorContent, value);
+  const handleEditorBodyChange = (value: string) => {
+    setEditorContent(value);
+    handleChange(value);
+  };
 
   return (
-    <ResizableBox
-      height={editorHeight}
-      width={Infinity}
-      onResize={handleResize}
-      handle={isResizable ? <div className="custom-handle" /> : null}
-      axis="y"
-      style={{
-        minHeight: `${height}px`,
-        marginBottom: isResizable ? "25px" : 0,
-      }}
-    >
-      <CodeMirror
-        className="code-editor"
-        width="100%"
-        readOnly={isReadOnly}
-        //   height="calc(100vh - 48px - 95px - 174px - 74px - 150px )"
-        value={editorContent ?? ""}
-        defaultValue={defaultValue ?? ""}
-        onChange={handleChange}
-        theme={vscodeDark}
-        extensions={[editorLanguage, EditorView.lineWrapping]}
-        basicSetup={{
-          highlightActiveLine: false,
-          bracketMatching: true,
-          closeBrackets: true,
-          allowMultipleSelections: true,
+    <>
+      <CodeEditorToolbar
+        language={language}
+        code={editorContent}
+        onCodeFormat={(formattedCode: string) => {
+          setEditorContent(formattedCode);
         }}
       />
-    </ResizableBox>
+      <ResizableBox
+        height={editorHeight}
+        width={Infinity}
+        onResize={handleResize}
+        handle={isResizable ? <div className="custom-handle" /> : null}
+        axis="y"
+        style={{
+          minHeight: `${height}px`,
+          marginBottom: isResizable ? "25px" : 0,
+        }}
+      >
+        <CodeMirror
+          className="code-editor"
+          width="100%"
+          readOnly={isReadOnly}
+          //   height="calc(100vh - 48px - 95px - 174px - 74px - 150px )"
+          value={editorContent ?? ""}
+          defaultValue={defaultValue ?? ""}
+          onChange={handleEditorBodyChange}
+          theme={vscodeDark}
+          extensions={[editorLanguage, EditorView.lineWrapping]}
+          basicSetup={{
+            highlightActiveLine: false,
+            bracketMatching: true,
+            closeBrackets: true,
+            allowMultipleSelections: true,
+          }}
+        />
+      </ResizableBox>
+
+      <div className="code-editor-character-count">{getByteSize(value)} characters</div>
+    </>
   );
 };
 
