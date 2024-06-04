@@ -76,14 +76,17 @@ class TabService {
         const tab = this.getTab(navigatedTabData.tabId);
 
         if (tab) {
-          this.sendMessage(navigatedTabData.tabId, { action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
+          this.sendMessage(navigatedTabData.tabId, { action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED }, () => {
+            // Way to catch the error in sendMessage callback
+            chrome.runtime.lastError; // catch the error and do nothing
+          });
         }
       }
     });
   }
 
   private sendMessage(tabId: TabId, ...args: [any, any?, ((response: any) => void)?]) {
-    chrome.tabs.sendMessage(tabId, ...args);
+    return chrome.tabs.sendMessage(tabId, ...args);
   }
 
   addOrUpdateTab(tab: TabData) {
