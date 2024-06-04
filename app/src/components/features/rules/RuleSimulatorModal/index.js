@@ -1,8 +1,6 @@
 import React from "react";
 import { Modal } from "antd";
 
-import CodeEditor from "components/misc/CodeEditor";
-
 const RuleSimulatorModal = ({ isOpen, toggle, body, mode, title }) => {
   return (
     <>
@@ -18,9 +16,7 @@ const RuleSimulatorModal = ({ isOpen, toggle, body, mode, title }) => {
           borderRadius: "4px",
         }}
         width="700px"
-      >
-        <CodeEditor height={300} language={mode} defaultValue={body} value={body} readOnly={true} />
-      </Modal>
+      ></Modal>
     </>
   );
 };
