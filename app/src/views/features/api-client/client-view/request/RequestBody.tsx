@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo } from "react";
-import CodeEditor from "components/misc/CodeEditor";
 import { formatJSONString } from "utils/CodeEditorUtils";
 import { Button, Input, Radio } from "antd";
 import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
 import KeyValueForm from "./KeyValueForm";
 import { trackBeautifyRequestJSONClicked } from "modules/analytics/events/features/apiClient";
+import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 
 interface Props {
   body: RQAPI.RequestBody;
@@ -23,12 +23,11 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentTy
     switch (contentType) {
       case RequestContentType.JSON:
         return (
-          // @ts-ignore
           <CodeEditor
-            language={"json"}
-            value={body}
+            defaultValue=""
+            language={EditorLanguage.JSON}
+            value={body as string}
             handleChange={setBody}
-            isCodeFormatted={false}
             isResizable={false}
           />
         );

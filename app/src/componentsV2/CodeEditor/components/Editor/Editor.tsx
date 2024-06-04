@@ -29,7 +29,7 @@ const Editor: React.FC<EditorProps> = ({
   handleChange,
 }) => {
   const [editorHeight, setEditorHeight] = useState(height);
-  const [editorContent, setEditorContent] = useState(value);
+  const [editorContent] = useState(value);
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
