@@ -13,6 +13,7 @@ import {
   onSessionRecordingStoppedNotification,
   startRecordingExplicitly,
   stopRecording,
+  stopRecordingOnAllTabs,
   watchRecording,
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
@@ -101,7 +102,12 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
-        toggleExtensionStatus().then(sendResponse);
+        toggleExtensionStatus().then((updatedStatus) => {
+          sendResponse(updatedStatus);
+          if (!updatedStatus) {
+            stopRecordingOnAllTabs();
+          }
+        });
         return true;
 
       case EXTENSION_MESSAGES.WATCH_RECORDING:

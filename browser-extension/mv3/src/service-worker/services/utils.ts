@@ -1,7 +1,6 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
 import { getVariable, setVariable, Variable } from "../variable";
 import { getAllSupportedWebURLs } from "../../utils";
-import { stopRecordingOnAllTabs } from "./sessionRecording";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -168,13 +167,6 @@ export const toggleExtensionStatus = async () => {
 
   const updatedStatus = !extensionEnabledStatus;
   setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
-  // updateActivationStatus(updatedStatus);
-  // FIXME: Memory leak here. onVariableChange sets up a listener on every toggle
-  // onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, () => null);
-
-  if (!updatedStatus) {
-    stopRecordingOnAllTabs();
-  }
 
   return updatedStatus;
 };
