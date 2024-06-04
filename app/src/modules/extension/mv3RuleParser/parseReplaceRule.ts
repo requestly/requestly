@@ -38,6 +38,7 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
     const redirectForSubstitutionRule: ExtensionRule = {
       priority: 1,
       condition: {
+        ...matchingCondition,
         // To prevent infinite loops. First condition consumes the marker and returns the same redirected url. So stopping further redirections as same url
         // 1st alteration
         // https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
