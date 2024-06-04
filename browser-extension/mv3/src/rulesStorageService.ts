@@ -74,7 +74,7 @@ class RulesStorageService {
 
       const group = groups.find((group) => group.id === rule.groupId);
 
-      if (group.status === Status.ACTIVE) {
+      if (group?.status === Status.ACTIVE) {
         return true;
       }
 

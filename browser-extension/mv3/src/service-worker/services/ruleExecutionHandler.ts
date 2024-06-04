@@ -3,6 +3,8 @@ import extensionIconManager from "./extensionIconManager";
 import { DataScope, TAB_SERVICE_DATA, tabService } from "./tabService";
 import rulesStorageService from "../../rulesStorageService";
 import { CLIENT_MESSAGES } from "common/constants";
+import { Variable, onVariableChange } from "../variable";
+import { isExtensionEnabled } from "./utils";
 
 interface RulesExecutionLog {
   ruleId: string;
@@ -10,7 +12,14 @@ interface RulesExecutionLog {
 }
 
 class RuleExecutionHandler {
-  constructor() {}
+  private isExtensionEnabled = true;
+
+  constructor() {
+    isExtensionEnabled().then((status) => (this.isExtensionEnabled = status));
+    onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (currentStatus) => {
+      this.isExtensionEnabled = currentStatus;
+    });
+  }
 
   getExecutedRules = async (tabId: number) => {
     const rulesExecutionLogs: RulesExecutionLog[] =
@@ -39,6 +48,10 @@ class RuleExecutionHandler {
     requestDetails: chrome.webRequest.WebRequestDetails | chrome.webRequest.WebResponseDetails,
     isMainFrameRequest?: boolean
   ) => {
+    if (!this.isExtensionEnabled) {
+      return;
+    }
+
     const tabDataScope = isMainFrameRequest ? DataScope.TAB : DataScope.PAGE;
 
     extensionIconManager.markRuleExecuted(requestDetails.tabId);
