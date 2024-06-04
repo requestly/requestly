@@ -7,13 +7,13 @@ import { actions } from "store";
 import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
 //Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import CodeEditor from "components/misc/CodeEditor";
 import "./CustomScriptRow.css";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getDefaultScriptRender, createRenderedScript } from "./utils";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { MockPickerModal } from "features/mocks/modals";
+import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 
 const { Text } = Typography;
 
@@ -46,10 +46,10 @@ const CustomScriptRow = ({
 
   const codeEditorLanguage = useMemo(() => {
     return isCompatibleWithAttributes
-      ? "html"
+      ? EditorLanguage.HTML
       : script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS
-      ? "javascript"
-      : "css";
+      ? EditorLanguage.JAVASCRIPT
+      : EditorLanguage.CSS;
   }, [script.codeType, isCompatibleWithAttributes]);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
@@ -251,8 +251,7 @@ const CustomScriptRow = ({
               defaultValue={scriptEditorBoilerCode}
               value={initialCodeEditorValue}
               handleChange={handleEditorUpdate}
-              readOnly={isInputDisabled}
-              isCodeFormatted={isCodeFormatted}
+              isReadOnly={isInputDisabled}
             />
           </Col>
         </Row>
