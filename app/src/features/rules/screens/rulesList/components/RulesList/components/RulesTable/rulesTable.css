@@ -49,10 +49,6 @@
   margin-top: 0px;
 }
 
-.rq-content-list-table-row td.ant-table-cell:nth-child(2) .indent-level-1 {
-  padding-left: 0px !important;
-}
-
 .rq-content-list-table-row:not(.rq-content-list-table-row-group) td.ant-table-cell:nth-child(2) .indent-level-0 {
   padding-left: 18px !important;
 }
@@ -180,5 +176,5 @@ tr.rq-content-list-table-row.ant-table-row:hover .group-name-container .add-rule
   tr.ant-table-row-level-1
   td
   .rule-name-container {
-  padding-left: 6px;
+  padding-left: 14px;
 }

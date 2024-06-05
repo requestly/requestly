@@ -58,7 +58,11 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
 
         return (
           <Tooltip
-            title={isPinned ? `Unpin ${isRule(record) ? "rule" : "group"}` : `Pin ${isRule(record) ? "rule" : "group"}`}
+            title={
+              isPinned
+                ? `Unpin ${isRule(record) ? "rule from extension popup" : "group from extension popup"}`
+                : `Pin ${isRule(record) ? "rule to extension popup" : "group to extension popup"}`
+            }
             color="var(--black)"
           >
             <Button
@@ -274,7 +278,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     {
       title: "Updated on",
       key: "modificationDate",
-      align: "center",
       width: 152,
       responsive: ["lg"],
       render: (record: RuleTableRecord) => {
