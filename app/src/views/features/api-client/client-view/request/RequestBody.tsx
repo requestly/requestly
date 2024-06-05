@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { formatJSONString } from "utils/CodeEditorUtils";
 import { Button, Input, Radio } from "antd";
 import { KeyValuePair, RQAPI, RequestContentType } from "../../types";
@@ -14,20 +14,29 @@ interface Props {
 }
 
 const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentType }) => {
+  const [isJsonBodyFormatted, setIsJsonBodyFormatted] = useState(false);
   const onClickBeautifyCode = useCallback(() => {
     setBody(formatJSONString(body, 2));
+    setIsJsonBodyFormatted(true);
     trackBeautifyRequestJSONClicked();
+
+    setTimeout(() => {
+      setIsJsonBodyFormatted(false);
+    }, 1000);
   }, [body, setBody]);
 
   const bodyEditor = useMemo(() => {
     switch (contentType) {
       case RequestContentType.JSON:
         return (
+          // @ts-ignore
           <CodeEditor
             defaultValue=""
             language={EditorLanguage.JSON}
             value={body as string}
             handleChange={setBody}
+            unlockJsonPrettify={true}
+            isCodeFormatted={isJsonBodyFormatted}
             isResizable={false}
           />
         );
