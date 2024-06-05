@@ -207,7 +207,6 @@ const INITIAL_STATE = {
       timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
       isAppBannerVisible: false,
-      hasAuthHandlerBeenSet: false,
     },
   },
 };

@@ -23,7 +23,3 @@ export const updateHasConnectedApp = (prevState, action) => {
 export const updateIsExtensionEnabled = (prevState, action) => {
   prevState.isExtensionEnabled = action.payload;
 };
-
-export const updateHasAuthHandlerBeenSet = (prevState, action) => {
-  prevState.misc.nonPersist.hasAuthHandlerBeenSet = action.payload;
-};
