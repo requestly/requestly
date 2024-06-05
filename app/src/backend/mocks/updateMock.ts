@@ -18,7 +18,7 @@ export const updateMock = async (
   const ownerId = getOwnerId(uid, teamId);
 
   let responsesWithBody: any[] = [];
-  if (BODY_IN_BUCKET_ENABLED) {
+  if (BODY_IN_BUCKET_ENABLED && mockData?.recordType !== MockRecordType.COLLECTION) {
     responsesWithBody = [];
     // Update body to null and filePath
     mockData.responses.map((response) => {
@@ -32,6 +32,10 @@ export const updateMock = async (
   const success = await updateMockFromFirebase(uid, mockId, mockData).catch(() => false);
 
   if (success) {
+    if (mockData?.recordType === MockRecordType.COLLECTION) {
+      return true;
+    }
+
     await updateUserMockSelectorsMap(ownerId, mockId, mockData);
     if (BODY_IN_BUCKET_ENABLED) {
       await uploadResponseBodyFiles(responsesWithBody, uid, mockId, teamId);
@@ -51,9 +55,9 @@ export const updateMockFromFirebase = async (
   const docRef = doc(db, "mocks", mockId);
 
   const success = await updateDoc(docRef, {
-    lastUpdatedBy: updaterId,
-    ...mockData,
     recordType: MockRecordType.MOCK,
+    ...mockData,
+    lastUpdatedBy: updaterId,
     updatedTs: Timestamp.now().toMillis(),
   })
     .then(() => {

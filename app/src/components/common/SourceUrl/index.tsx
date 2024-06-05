@@ -30,11 +30,13 @@ export const SourceConditionInput: React.FC<SourceProps> = ({
             onSourceChange({ ...source, key: value });
           }}
         >
-          {Object.entries(SourceKey).map(([key, value]) => (
-            <Select.Option key={value} value={value}>
-              {capitalize(value)}
-            </Select.Option>
-          ))}
+          {Object.entries(SourceKey).map(([key, value]) =>
+            value === SourceKey.PATH ? null : (
+              <Select.Option key={value} value={value}>
+                {capitalize(value)}
+              </Select.Option>
+            )
+          )}
         </Select>
       </Col>
       <Col className="shrink-0 source-condition-input-select">

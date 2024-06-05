@@ -12,6 +12,7 @@ const OldSurveyPageMap = {
   2: SurveyPage.RECOMMENDATIONS,
 };
 
+// duplicate of the function in app/src/features/onboarding/utils.ts
 export const shouldShowOnboarding = async (appMode: string) => {
   if (
     window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||

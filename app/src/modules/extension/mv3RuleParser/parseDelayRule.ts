@@ -1,5 +1,5 @@
 import { DelayRule } from "../../../types/rules";
-import { ExtensionRule, RuleActionType } from "../types";
+import { ExtensionResourceType, ExtensionRule, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
 const parseDelayRule = (rule: DelayRule): ExtensionRule[] => {
@@ -9,6 +9,7 @@ const parseDelayRule = (rule: DelayRule): ExtensionRule[] => {
         priority: 1,
         condition: {
           ...parseConditionFromSource(rulePair.source),
+          excludedResourceTypes: ["xmlhttprequest" as ExtensionResourceType],
         },
         action: {
           type: RuleActionType.REDIRECT,

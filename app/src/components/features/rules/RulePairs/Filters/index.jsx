@@ -309,14 +309,27 @@ const Filters = (props) => {
               )}
               onChange={(e) => {
                 e?.preventDefault?.();
-                dispatch(
-                  actions.updateRulePairAtGivenPath({
+                if (e.target.value === "") {
+                  deleteObjectAtPath(
+                    currentlySelectedRuleData,
+                    setCurrentlySelectedRule,
+                    [
+                      `source.filters.${GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_DOMAINS}`,
+                      `source.filters.${GLOBAL_CONSTANTS.RULE_SOURCE_FILTER_TYPES.PAGE_URL}`,
+                    ],
                     pairIndex,
-                    updates: {
-                      [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_DOMAINS]: [e.target.value],
-                    },
-                  })
-                );
+                    dispatch
+                  );
+                } else {
+                  dispatch(
+                    actions.updateRulePairAtGivenPath({
+                      pairIndex,
+                      updates: {
+                        [APP_CONSTANTS.PATH_FROM_PAIR.SOURCE_PAGE_DOMAINS]: [e.target.value],
+                      },
+                    })
+                  );
+                }
                 LOG_ANALYTICS.PAGE_DOMAINS_MODIFIED();
               }}
               disabled={props.isInputDisabled}

@@ -133,7 +133,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
       {/* keep this at top level, below modals will be used at multiple places */}
       <DeleteRecordsModalWrapper forceRender={_forceRender} />
-      <UpdateMocksCollectionModalWrapper forceRender={_forceRender} mocks={mockRecords} />
+      <UpdateMocksCollectionModalWrapper mockType={type} forceRender={_forceRender} mocks={mockRecords} />
     </>
   ) : (
     <GettingStarted mockType={type} source={source} />
