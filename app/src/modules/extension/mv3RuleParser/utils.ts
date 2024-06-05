@@ -28,7 +28,7 @@ export const parseRegex = (regex: string): { pattern: string; flags?: string } =
 
 export const parseUrlParametersFromSourceV2 = (
   source: RulePairSource,
-  isWildcardCapturingGroupsEnabled: boolean = true
+  isWildcardCapturingGroupsEnabled?: boolean
 ): ExtensionRuleCondition => {
   // rules like query, headers, script, delay can be applied on all URLs
   if (source.value === "") {
@@ -156,9 +156,12 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
   return condition;
 };
 
-export const parseConditionFromSource = (source: RulePairSource): ExtensionRuleCondition => {
+export const parseConditionFromSource = (
+  source: RulePairSource,
+  isWildcardCapturingGroupsEnabled?: boolean,
+): ExtensionRuleCondition => {
   return {
-    ...parseUrlParametersFromSourceV2(source),
+    ...parseUrlParametersFromSourceV2(source, isWildcardCapturingGroupsEnabled),
     ...parseFiltersFromSource(source),
     excludedInitiatorDomains: BLACKLISTED_DOMAINS,
     excludedRequestDomains: BLACKLISTED_DOMAINS,
