@@ -32,6 +32,7 @@
 
         &.active {
           &.ant-btn {
+            color: var(--requestly-color-text-default);
             background-color: var(--requestly-color-white-t-10);
             .label .ant-badge .ant-badge-count {
               background: var(--requestly-color-white-t-10);

@@ -3,9 +3,10 @@ import type { ColumnsType } from "antd/es/table";
 import { Table, TableProps } from "antd";
 import { BulkActionBarConfig } from "./types";
 import BulkActionBar from "./components/BulkActionBar/BulkActionBar";
-import "./contentListTable.scss";
 import { useContentListTableContext } from "./context";
+import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevronRight";
 import Logger from "lib/logger";
+import "./contentListTable.scss";
 
 export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   id: string;
@@ -107,6 +108,18 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
           defaultExpandedRowKeys: expandedRowKeys,
           onExpand: handleOnExpandClick,
           expandedRowKeys,
+          expandIcon: ({ expanded, expandable, onExpand, record }) =>
+            expandable ? (
+              <span
+                className="rq-content-list-expand-icon-container"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onExpand?.(record, event);
+                }}
+              >
+                <MdOutlineChevronRight className={`rq-content-list-expand-icon ${expanded ? "expanded" : ""}`} />
+              </span>
+            ) : null,
         }}
       />
     </div>
