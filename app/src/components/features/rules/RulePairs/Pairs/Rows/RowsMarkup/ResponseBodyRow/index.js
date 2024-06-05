@@ -294,6 +294,9 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 defaultValue={getEditorDefaultValue()}
                 isReadOnly={isInputDisabled}
                 handleChange={responseBodyChangeHandler}
+                unlockJsonPrettify={true}
+                isCodeMinified={isCodeMinified}
+                isCodeFormatted={isCodeFormatted}
                 isResizable
               />
             </Col>

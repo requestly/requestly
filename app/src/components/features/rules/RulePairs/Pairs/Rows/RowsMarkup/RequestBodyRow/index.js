@@ -185,6 +185,10 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 defaultValue={getEditorDefaultValue()}
                 handleChange={requestBodyChangeHandler}
                 isReadOnly={isInputDisabled}
+                unlockJsonPrettify={true}
+                isCodeMinified={isCodeMinified}
+                isCodeFormatted={isCodeFormatted}
+                isResizable
               />
             </Col>
           </Row>

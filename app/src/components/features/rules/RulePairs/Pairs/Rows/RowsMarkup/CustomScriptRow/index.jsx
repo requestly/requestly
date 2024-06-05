@@ -257,11 +257,12 @@ const CustomScriptRow = ({
         </Row>
         <Row span={24} align="middle" justify="space-between" className="code-editor-character-count-row ">
           <Col align="left">
-            {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
+            {/* TEMPORARILY HIDING THIS AS WE CURRENTLY DO NOT SUPPORT HTML PRETTIFY */}
+            {/* {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
               <Button type="link" onClick={handleCodeFormattedFlag}>
                 Pretty Print {"{ }"}
               </Button>
-            ) : null}
+            ) : null} */}
           </Col>
           <Col span={6} align="right">
             <span className="codemirror-character-count text-gray">{script.value?.length ?? 0} characters</span>

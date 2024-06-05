@@ -320,10 +320,13 @@ const MockEditor: React.FC<Props> = ({
       <Row className="editor-row">
         <Col span={24}>
           <CodeEditor
+            height={220}
             value={headersString}
             defaultValue={headersString}
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
+            // HACK TO PREVENT AUTO FORMAT
+            isCodeMinified={true}
           />
         </Col>
       </Row>
@@ -335,7 +338,9 @@ const MockEditor: React.FC<Props> = ({
       <Row className="editor-row">
         <Col span={24}>
           {mockType === MockType.FILE && <h4>File Content</h4>}
+          {/* @ts-ignore */}
           <CodeEditor
+            height={220}
             value={body}
             defaultValue={body}
             handleChange={setBody}
