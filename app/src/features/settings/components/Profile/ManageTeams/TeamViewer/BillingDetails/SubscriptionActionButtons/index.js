@@ -7,6 +7,7 @@ import CancelPlanModal from "./CancelPlanModal";
 import { actions } from "store";
 import { trackViewPricingPlansClicked } from "modules/analytics/events/common/pricing";
 
+// DEAD CODE
 const SubscriptionActionButtons = ({ isSubscriptionActive = false }) => {
   const dispatch = useDispatch();
   const [isContactUsModalActive, setIsContactUsModalActive] = useState(false);
