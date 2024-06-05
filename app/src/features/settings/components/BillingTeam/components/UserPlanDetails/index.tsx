@@ -91,7 +91,7 @@ export const UserPlanDetails = () => {
     }
   }, [user?.details?.planDetails?.subscription?.endDate]);
 
-  const cancelPlanClicked = useCallback(() => {
+  const handleCancelPlanClick = useCallback(() => {
     setIsConfirmationModalOpen(true);
     setIsConfirmationModalLoading(true);
     const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
@@ -137,7 +137,7 @@ export const UserPlanDetails = () => {
                     cancelText="No"
                     okText="Yes"
                     title="Are you sure you want to cancel your plan?"
-                    onConfirm={cancelPlanClicked}
+                    onConfirm={handleCancelPlanClick}
                   >
                     <RQButton size="small" type="text" className="cancel-plan-btn">
                       Cancel plan
