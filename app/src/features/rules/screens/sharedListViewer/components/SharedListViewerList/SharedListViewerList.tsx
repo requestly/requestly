@@ -35,10 +35,10 @@ export const SharedListViewerList: React.FC<Props> = ({ records, recordsMap, isL
     const enhancedRecords = enhanceRecords(records, recordsMap);
     const contentTableAdaptedRecords = recordsToContentTableDataAdapter(enhancedRecords);
     setContentListTableData(contentTableAdaptedRecords);
-  }, [records, recordsMap, setContentListTableData, enhanceRecords, recordsToContentTableDataAdapter]);
+  }, [records, recordsMap, setContentListTableData]);
 
   return (
-    <>
+    <div className="shared-list-viewer-table-container">
       <ContentListTable
         columns={columns}
         data={contentListTableData}
@@ -61,6 +61,6 @@ export const SharedListViewerList: React.FC<Props> = ({ records, recordsMap, isL
           }}
         />
       )}
-    </>
+    </div>
   );
 };
