@@ -168,13 +168,3 @@
 tr.rq-content-list-table-row.ant-table-row:hover .group-name-container .add-rule-btn {
   display: flex;
 }
-
-.rq-rules-table
-  .rq-content-list-table-container
-  .rules-list-table.rq-content-list-table
-  tbody
-  tr.ant-table-row-level-1
-  td
-  .rule-name-container {
-  padding-left: 14px;
-}

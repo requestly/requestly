@@ -1,6 +1,8 @@
 .rq-content-list-table-container {
   background-color: var(--requestly-color-background);
   margin: 16px 16px;
+  width: 100%;
+  max-width: 1920px;
 
   .rq-content-list-table {
     background-color: inherit;

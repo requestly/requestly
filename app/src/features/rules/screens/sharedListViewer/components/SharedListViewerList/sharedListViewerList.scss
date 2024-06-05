@@ -1,3 +1,10 @@
+.shared-list-viewer-table-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 1rem;
+}
+
 .shared-list-viewer-record-name {
   text-overflow: ellipsis;
   overflow: hidden;
@@ -31,6 +38,13 @@
 
     &:hover {
       opacity: 1;
+    }
+  }
+
+  .rq-content-list-table-row.ant-table-row-level-0 {
+    .ant-table-cell-with-append {
+      display: flex;
+      gap: 8px;
     }
   }
 }
