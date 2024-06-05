@@ -1,67 +1,87 @@
-import { ReplaceRule } from "../../../types/rules";
-import { ExtensionRule, RuleActionType } from "../types";
+import { escapeRegExp } from "lodash";
+import { ReplaceRule, ReplaceRulePair } from "../../../types/rules";
+import { ExtensionRule, ExtensionRuleCondition, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
-const MARKER_QUERY_PARAM = "__rq_marker__";
+const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondition => {
+  if (!rulePair.source.value) {
+    const regexCondition = parseConditionFromSource(rulePair.source, false);
+    return {
+      ...regexCondition,
+      regexFilter: `.*`,
+    };
+  } else {
+    const regexCondition = parseConditionFromSource(rulePair.source, false);
+    let finalRegexFilter = regexCondition.regexFilter;
+
+    // Remove ^ & $
+    if (finalRegexFilter?.[0] === "^") {
+      finalRegexFilter = finalRegexFilter.slice(1);
+    }
+    if (finalRegexFilter?.[finalRegexFilter.length - 1] === "$") {
+      finalRegexFilter = finalRegexFilter.slice(0, -1);
+    }
+
+    return {
+      ...regexCondition,
+      regexFilter: finalRegexFilter,
+    };
+  }
+};
 
 const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
   const extensionRules: ExtensionRule[] = [];
 
   rule.pairs.forEach((rulePair, pairIndex) => {
-    if (!rulePair.source.value) {
-      const ruleCondition = {
-        condition: {
-          ...parseConditionFromSource(rulePair.source),
-          regexFilter: `(.*)${rulePair.from}(.*)`,
-        },
-        action: {
-          type: RuleActionType.REDIRECT,
-          redirect: {
-            regexSubstitution: `\\1${rulePair.to}\\2`,
-          },
-        },
-      };
-      extensionRules.push(ruleCondition);
-      return;
-    }
+    const matchingCondition = getReplaceMatchingRegex(rulePair);
 
-    const markerValue = `${rule.id}_${pairIndex}`;
+    const redirectForSubstitutionRule: ExtensionRule = {
+      priority: 1,
+      condition: {
+        ...matchingCondition,
+        // To prevent infinite loops. First condition consumes the marker and returns the same redirected url. So stopping further redirections as same url
+        // 1st alteration
+        // https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
+        // $1 = https://example.com/v1/users/1234/hello
+        // $2 = #__rq_marker=https://example.com/v1/users/1234/hello
+        // Final URL = https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
 
-    const rulePairExtensionRules: ExtensionRule[] = [
-      {
-        priority: 1,
-        condition: parseConditionFromSource(rulePair.source),
-        action: {
-          type: RuleActionType.REDIRECT,
-          redirect: {
-            transform: {
-              queryTransform: {
-                addOrReplaceParams: [
-                  {
-                    key: MARKER_QUERY_PARAM,
-                    value: markerValue,
-                  },
-                ],
-              },
-            },
-          },
+        // 2nd alteration: Used for first time redirect
+        // https://example.com/v1/users/1234/hello
+        // $3 = https://example.com/v1/users/1234/hello
+        // Final URL = https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
+
+        regexFilter: `^(${matchingCondition?.regexFilter})(#__rq_marker.*)$|(${
+          parseConditionFromSource(rulePair.source)?.regexFilter
+        })`,
+        isUrlFilterCaseSensitive: matchingCondition?.isUrlFilterCaseSensitive,
+      },
+      action: {
+        type: RuleActionType.REDIRECT,
+        redirect: {
+          regexSubstitution: `\\1\\3#__rq_marker=\\1\\3`,
         },
       },
-      {
-        priority: 2,
-        condition: {
-          regexFilter: `(.*)${rulePair.from}(.*${MARKER_QUERY_PARAM}=${markerValue}.*)`,
-        },
-        action: {
-          type: RuleActionType.REDIRECT,
-          redirect: {
-            regexSubstitution: `\\1${rulePair.to}\\2`,
-          },
+    };
+
+    const subsitutionRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
+    const finalRegex = `^${subsitutionRegex}#__rq_marker=(?:${matchingCondition.regexFilter})$`;
+
+    let substitutionRule: ExtensionRule = {
+      priority: 2,
+      condition: {
+        ...matchingCondition,
+        regexFilter: finalRegex,
+      },
+      action: {
+        type: RuleActionType.REDIRECT,
+        redirect: {
+          regexSubstitution: `\\1${rulePair.to}\\2`,
         },
       },
-    ];
+    };
 
-    extensionRules.push(...rulePairExtensionRules);
+    extensionRules.push(...[redirectForSubstitutionRule, substitutionRule]);
   });
 
   return extensionRules;
