@@ -80,5 +80,19 @@
         }
       }
     }
+
+    .loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 350px;
+      overflow: hidden;
+
+      .anticon svg {
+        width: 24px;
+        height: 24px;
+        color: var(--requestly-color-text-subtle);
+      }
+    }
   }
 }

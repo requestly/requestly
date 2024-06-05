@@ -8,19 +8,16 @@ interface TaskHeaderProps {
 }
 
 export const TaskHeader: React.FC<TaskHeaderProps> = ({ task }) => {
-  // TODO: HANDLE COMPLETE TASKS
-
-  const isTaskCompleted = false;
+  // TODO: handle complete task state
 
   return (
-    <div className={`incentive-task-header ${isTaskCompleted ? "completed-task" : ""}`}>
+    <div className={`incentive-task-header ${task.isCompleted ? "completed-task" : ""}`}>
       <div className="incentive-task-title-container">
-        {isTaskCompleted ? <MdCheckCircle className="task-checked-icon" /> : task.icon}
+        {task.isCompleted ? <MdCheckCircle className="task-checked-icon" /> : task.icon}
         <span className="incentive-task-title">{task.title}</span>
       </div>
       <div className="task-credit-value">
-        {/* TODO: GET CREDIT VALUE FROM MAP */}
-        <span>$10</span> {isTaskCompleted ? "Credits earned" : "Credits"}
+        <span>${task.milestone?.value as number}</span> {task.isCompleted ? "Credits earned" : "Credits"}
       </div>
     </div>
   );
