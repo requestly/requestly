@@ -77,7 +77,8 @@ const AuthForm = ({
   const currentTestimonialIndex = useMemo(() => Math.floor(Math.random() * 3), []);
 
   const showPasswordSignInOptionInstead =
-    appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || AUTH_METHOD === AUTH_METHODS.PASSWORD;
+    appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
+    (AUTH_METHOD && AUTH_METHOD.toUpperCase() === AUTH_METHODS.PASSWORD.toUpperCase());
 
   useEffect(() => {
     // Updating reference code from query parameters

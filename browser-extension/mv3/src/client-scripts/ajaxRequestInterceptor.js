@@ -1,9 +1,8 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
 
 ((namespace) => {
+  // console.log("AJAX interceptor injected");
   window[namespace] = window[namespace] || {};
-  window[namespace].responseRules = [];
-  window[namespace].requestRules = [];
   let isDebugMode = false;
 
   // Some frames are sandboxes and throw DOMException when accessing localStorage
@@ -180,12 +179,47 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     return window[namespace].requestRules?.findLast((rule) => matchSourceUrl(rule.source, url));
   };
 
+  const getMatchedDelayRule = (url) => {
+    if (!window[namespace]?.delayRules) return null;
+
+    for (const rule of window[namespace]?.delayRules) {
+      // TODO: Use ruleMatcher here as this doesn't handle the filters
+      const matchedPair = rule.pairs.find((pair) => matchSourceUrl(pair.source, url));
+      if (matchedPair) {
+        return matchedPair;
+      }
+    }
+    return null;
+  };
+
   const shouldServeResponseWithoutRequest = (responseModification) => {
     return responseModification.type === "static" && responseModification.serveWithoutRequest;
   };
 
-  const getFunctionFromCode = (code) => {
-    return new Function("args", `return (${code})(args);`);
+  let logShown = false;
+  const getFunctionFromCode = (code, ruleType) => {
+    try {
+      return new Function("args", `return (${code})(args);`);
+    } catch (e) {
+      notifyOnErrorOccurred({
+        initiator: location.origin,
+        url: location.href,
+      }).then(() => {
+        if (!logShown) {
+          logShown = true;
+          console.log(
+            `%cRequestly%c Please reload the page for ${ruleType} rule to take effect`,
+            "color: #3c89e8; padding: 1px 5px; border-radius: 4px; border: 1px solid #91caff;",
+            "color: red; font-style: italic"
+          );
+        }
+      });
+      return () => {};
+    }
+  };
+
+  const applyDelay = (delay) => {
+    return new Promise((resolve) => setTimeout(resolve, delay));
   };
 
   const getCustomRequestBody = (requestRuleData, args) => {
@@ -193,7 +227,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     if (requestRuleData.request.type === "static") {
       requestBody = requestRuleData.request.value;
     } else {
-      requestBody = getFunctionFromCode(requestRuleData.request.value)(args);
+      requestBody = getFunctionFromCode(requestRuleData.request.value, "request")(args);
     }
 
     if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {
@@ -277,33 +311,41 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
 
-  const notifyOnBeforeRequest = async (requestDetails) => {
+  const postMessageAndWaitForAck = async (message, action) => {
     window.postMessage(
       {
+        ...message,
+        action,
         source: "requestly:client",
-        action: "onBeforeAjaxRequest",
-        requestDetails,
       },
       window.location.href
     );
 
-    let onBeforeAjaxRequestAckHandler;
+    let ackHandler;
+
+    const ackAction = `${action}:processed`;
 
     return Promise.race([
+      new Promise((resolve) => setTimeout(resolve, 2000)),
       new Promise((resolve) => {
-        setTimeout(resolve, 2000);
-      }),
-      new Promise((resolve) => {
-        onBeforeAjaxRequestAckHandler = (event) => {
-          if (event.data.action === "onBeforeAjaxRequest:processed") {
+        ackHandler = (event) => {
+          if (event.data.action === ackAction) {
             resolve();
           }
         };
-        window.addEventListener("message", onBeforeAjaxRequestAckHandler);
+        window.addEventListener("message", ackHandler);
       }),
     ]).finally(() => {
-      window.removeEventListener("message", onBeforeAjaxRequestAckHandler);
+      window.removeEventListener("message", ackHandler);
     });
+  };
+
+  const notifyOnBeforeRequest = async (requestDetails) => {
+    return postMessageAndWaitForAck({ requestDetails }, "onBeforeAjaxRequest");
+  };
+
+  const notifyOnErrorOccurred = async (requestDetails) => {
+    return postMessageAndWaitForAck({ requestDetails }, "onErrorOccurred");
   };
 
   /**
@@ -317,7 +359,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         return;
       }
 
-      const url = this.requestURL;
+      const url = this._rq_requestURL;
 
       const responseRuleData = getMatchedResponseRule(url);
       const { response: responseModification, source } = responseRuleData;
@@ -334,8 +376,8 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       if (
         !isRequestPayloadFilterApplicable(
           {
-            requestData: jsonifyValidJSONString(this.requestData),
-            method: this.method,
+            requestData: jsonifyValidJSONString(this._rq_requestData),
+            method: this._rq_method,
           },
           source?.filters
         )
@@ -360,16 +402,23 @@ import { PUBLIC_NAMESPACE } from "common/constants";
       if (this.readyState === this.DONE) {
         let customResponse =
           responseModification.type === "code"
-            ? getFunctionFromCode(responseRuleData.response.value)({
-                method: this.method,
+            ? getFunctionFromCode(
+                responseRuleData.response.value,
+                "response"
+              )({
+                method: this._rq_method,
                 url,
-                requestHeaders: this.requestHeaders,
-                requestData: jsonifyValidJSONString(this.requestData),
+                requestHeaders: this._rq_requestHeaders,
+                requestData: jsonifyValidJSONString(this._rq_requestData),
                 responseType: contentType,
                 response: this.response,
                 responseJSON: jsonifyValidJSONString(this.response),
               })
             : responseModification.value;
+
+        if (typeof customResponse === "undefined") {
+          return;
+        }
 
         // Convert customResponse back to rawText
         // response.value is String and evaluator method might return string/object
@@ -417,7 +466,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
         const requestDetails = {
           url,
-          method: this.method,
+          method: this._rq_method,
           type: "xmlhttprequest",
           timeStamp: Date.now(),
         };
@@ -468,55 +517,64 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
   const open = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method, url) {
-    this.method = method;
-    this.requestURL = getAbsoluteUrl(url);
+    this._rq_method = method;
+    this._rq_requestURL = getAbsoluteUrl(url);
     open.apply(this, arguments);
   };
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = async function (data) {
-    this.requestData = data;
+    this._rq_requestData = data;
 
-    const requestRule = getMatchedRequestRule(this.requestURL);
+    const matchedDelayRule = getMatchedDelayRule(this._rq_requestURL);
+    if (matchedDelayRule) {
+      await applyDelay(matchedDelayRule.delay);
+    }
+
+    const requestRule = getMatchedRequestRule(this._rq_requestURL);
     if (requestRule) {
-      this.requestData = getCustomRequestBody(requestRule, {
-        method: this.method,
-        url: this.requestURL,
+      this._rq_requestData = getCustomRequestBody(requestRule, {
+        method: this._rq_method,
+        url: this._rq_requestURL,
         body: data,
         bodyAsJson: jsonifyValidJSONString(data),
       });
 
-      notifyRequestRuleApplied({
-        ruleDetails: requestRule,
-        requestDetails: {
-          url: this.requestURL,
-          method: this.method,
-          type: "xmlhttprequest",
-          timeStamp: Date.now(),
-        },
-      });
+      if (typeof this._rq_requestData !== "undefined") {
+        notifyRequestRuleApplied({
+          ruleDetails: requestRule,
+          requestDetails: {
+            url: this._rq_requestURL,
+            method: this._rq_method,
+            type: "xmlhttprequest",
+            timeStamp: Date.now(),
+          },
+        });
+      } else {
+        this._rq_requestData = data;
+      }
     }
 
-    this.responseRule = getMatchedResponseRule(this.requestURL);
+    this.responseRule = getMatchedResponseRule(this._rq_requestURL);
 
     if (this.responseRule && shouldServeResponseWithoutRequest(this.responseRule.response)) {
       resolveXHR(this, this.responseRule.response.value);
     } else {
       await notifyOnBeforeRequest({
-        url: this.requestURL,
-        method: this.method,
+        url: this._rq_requestURL,
+        method: this._rq_method,
         type: "xmlhttprequest",
-        initiatorDomain: location.origin,
-        requestHeaders: this.requestHeaders ?? {},
+        initiator: location.origin,
+        requestHeaders: this._rq_requestHeaders ?? {},
       });
-      send.apply(this, arguments);
+      send.call(this, this._rq_requestData);
     }
   };
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
   XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-    this.requestHeaders = this.requestHeaders ?? {};
-    this.requestHeaders[header] = value;
+    this._rq_requestHeaders = this._rq_requestHeaders ?? {};
+    this._rq_requestHeaders[header] = value;
     setRequestHeader.apply(this, arguments);
   };
 
@@ -536,6 +594,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
     let url = getAbsoluteUrl(request.url);
     const method = request.method;
 
+    const matchedDelayRule = getMatchedDelayRule(url);
+    if (matchedDelayRule) {
+      await applyDelay(matchedDelayRule.delay);
+    }
+
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
 
@@ -543,36 +606,37 @@ import { PUBLIC_NAMESPACE } from "common/constants";
 
     if (requestRuleData) {
       const originalRequestBody = await request.text();
-      const requestBody =
-        getCustomRequestBody(requestRuleData, {
-          method,
-          url,
-          body: originalRequestBody,
-          bodyAsJson: jsonifyValidJSONString(originalRequestBody),
-        }) || {};
-
-      request = new Request(request.url, {
+      const requestBody = getCustomRequestBody(requestRuleData, {
         method,
-        body: requestBody,
-        headers: request.headers,
-        referrer: request.referrer,
-        referrerPolicy: request.referrerPolicy,
-        mode: request.mode,
-        credentials: request.credentials,
-        cache: request.cache,
-        redirect: request.redirect,
-        integrity: request.integrity,
+        url,
+        body: originalRequestBody,
+        bodyAsJson: jsonifyValidJSONString(originalRequestBody),
       });
 
-      notifyRequestRuleApplied({
-        ruleDetails: requestRuleData,
-        requestDetails: {
-          url,
+      if (typeof requestBody !== undefined) {
+        request = new Request(request.url, {
           method,
-          type: "fetch",
-          timeStamp: Date.now(),
-        },
-      });
+          body: requestBody ?? {},
+          headers: request.headers,
+          referrer: request.referrer,
+          referrerPolicy: request.referrerPolicy,
+          mode: request.mode,
+          credentials: request.credentials,
+          cache: request.cache,
+          redirect: request.redirect,
+          integrity: request.integrity,
+        });
+
+        notifyRequestRuleApplied({
+          ruleDetails: requestRuleData,
+          requestDetails: {
+            url,
+            method,
+            type: "fetch",
+            timeStamp: Date.now(),
+          },
+        });
+      }
     }
 
     let requestData;
@@ -599,7 +663,7 @@ import { PUBLIC_NAMESPACE } from "common/constants";
           url,
           method,
           type: "xmlhttprequest",
-          initiatorDomain: location.origin,
+          initiator: location.origin,
           requestHeaders: headersObject,
         });
 
@@ -683,7 +747,11 @@ import { PUBLIC_NAMESPACE } from "common/constants";
         };
       }
 
-      customResponse = getFunctionFromCode(responseRuleData.response.value)(evaluatorArgs);
+      customResponse = getFunctionFromCode(responseRuleData.response.value, "response")(evaluatorArgs);
+
+      if (typeof customResponse === "undefined") {
+        return fetchedResponse;
+      }
 
       // evaluator might return us Object but response.value is string
       // So make the response consistent by converting to JSON String and then create the Response object

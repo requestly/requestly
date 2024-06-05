@@ -42,3 +42,23 @@ export const isBlacklistedURL = (url: string): boolean => {
 
   return blacklistedSources.some((source) => matchSourceUrl(source, url));
 };
+
+export const generateUrlPattern = (urlString: string) => {
+  try {
+    const webUrlObj = new URL(urlString);
+    return `${webUrlObj.protocol}//${webUrlObj.host}/*`;
+  } catch (error) {
+    console.error(`Invalid URL: ${urlString}`, error);
+    return null;
+  }
+};
+
+export const getUrlObject = (url: string): URL | undefined => {
+  // Url obj fails to construct when chrome:// or similar urls are passed
+  try {
+    const urlObj = new URL(url);
+    return urlObj;
+  } catch (error) {
+    return null;
+  }
+};

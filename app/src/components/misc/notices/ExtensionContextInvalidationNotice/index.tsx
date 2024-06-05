@@ -7,7 +7,7 @@ import {
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import "./extensionContextInvalidationNotice.scss";
+import "../common.scss";
 
 const ExtensionContextInvalidationNotice: React.FC = () => {
   const [visible, setVisible] = useState(false);
@@ -28,7 +28,7 @@ const ExtensionContextInvalidationNotice: React.FC = () => {
   }, []);
 
   return visible ? (
-    <div id="extension-context-invalidation-notice">
+    <div className="top-banner-notice">
       <Typography.Text>
         The browser extension was updated in the background. Please save your work and&nbsp;
       </Typography.Text>

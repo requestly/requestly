@@ -1,6 +1,5 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { initClientHandler } from "./clientHandler";
 import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
 // import { handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
@@ -42,11 +41,6 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.HANDSHAKE_CLIENT:
         isExtensionEnabled().then((isExtensionStatusEnabled) => {
           if (!isExtensionStatusEnabled) return;
-
-          initClientHandler({
-            tabId: sender.tab?.id,
-            frameIds: [sender.frameId],
-          });
           initCustomWidgets(sender.tab?.id, sender.frameId);
           applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
         });
@@ -120,6 +114,10 @@ export const initMessageHandler = () => {
 
       case EXTENSION_MESSAGES.ON_BEFORE_AJAX_REQUEST:
         requestProcessor.onBeforeAJAXRequest(sender.tab.id, message.requestDetails).then(sendResponse);
+        return true;
+
+      case EXTENSION_MESSAGES.ON_ERROR_OCCURRED:
+        requestProcessor.onErrorOccurred(sender.tab.id, message.requestDetails).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.TEST_RULE_ON_URL:

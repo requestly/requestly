@@ -6,10 +6,9 @@ import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table }
 import { MockType, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { CalendarOutlined, EditOutlined } from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import { UserIcon } from "components/common/UserIcon";
 import { fileTypeColorMap, generateFinalUrl } from "components/features/mocksV2/utils";
-import { HiOutlineBookOpen } from "@react-icons/all-files/hi/HiOutlineBookOpen";
 import { MdOutlineFolder } from "@react-icons/all-files/md/MdOutlineFolder";
 import { MdOutlineStarOutline } from "@react-icons/all-files/md/MdOutlineStarOutline";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
@@ -26,7 +25,6 @@ import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
 
-// TODO: move all actions in a hook and use that
 export const useMocksTableColumns = ({
   mockType,
   handleNameClick,
@@ -55,11 +53,9 @@ export const useMocksTableColumns = ({
     {
       key: "isFavourite",
       dataIndex: "isFavourite",
-      width: isWorkspaceMode ? 25 : isRuleEditor ? 40 : 25,
+      width: isWorkspaceMode ? 40 : isRuleEditor ? 40 : 35,
       render: (_: any, record: RQMockSchema) => {
-        const isCollection = isRecordMockCollection(record);
-
-        return isCollection || isRuleEditor ? null : (
+        return isRuleEditor ? null : (
           <Button
             type="text"
             onClick={(e) => {
@@ -76,15 +72,10 @@ export const useMocksTableColumns = ({
     Table.EXPAND_COLUMN,
     {
       key: "id",
-      title: (
-        <div className="rq-col-title">
-          <HiOutlineBookOpen />
-          Name
-        </div>
-      ),
+      title: <div className="rq-col-title">Name</div>,
       dataIndex: "name",
       ellipsis: true,
-      width: isWorkspaceMode ? (isRuleEditor ? 110 : 310) : isRuleEditor ? 290 : 410,
+      width: isWorkspaceMode ? (isRuleEditor ? 110 : 290) : isRuleEditor ? 290 : 360,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
 
@@ -174,12 +165,7 @@ export const useMocksTableColumns = ({
     },
     {
       key: "lastUpdatedBy",
-      title: (
-        <div className="rq-col-title">
-          <CalendarOutlined />
-          Last Modified
-        </div>
-      ),
+      title: <div className="rq-col-title">Last Modified</div>,
       width: 110,
       className: "text-gray",
       render: (_: any, record: RQMockSchema) => {
