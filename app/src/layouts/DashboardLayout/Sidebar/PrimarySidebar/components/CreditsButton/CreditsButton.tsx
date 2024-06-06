@@ -3,7 +3,6 @@ import { getIsMiscTourCompleted, getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { FiGift } from "@react-icons/all-files/fi/FiGift";
 import { Badge } from "antd";
-import { IncentiveTasksListModal } from "features/incentivization";
 import { RQButton } from "lib/design-system/components";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
@@ -15,15 +14,17 @@ export const CreditsButton = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const [isTaskListModalVisible, setIsTaskListModalVisible] = useState(false);
   const [isCreditsTourVisible, setIsCreditsTourVisible] = useState(false);
 
   const handleButtonClick = () => {
     if (user.loggedIn) {
-      setIsTaskListModalVisible(true);
+      // @ts-ignore
+      dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+
       if (!isMiscTourCompleted.earnCredits) {
         setIsCreditsTourVisible(false);
         dispatch(
+          // @ts-ignore
           actions.updateProductTourCompleted({
             tour: TOUR_TYPES.MISCELLANEOUS,
             subTour: "earnCredits",
@@ -61,6 +62,7 @@ export const CreditsButton = () => {
         onTourComplete={() => {
           setIsCreditsTourVisible(false);
           dispatch(
+            // @ts-ignore
             actions.updateProductTourCompleted({
               tour: TOUR_TYPES.MISCELLANEOUS,
               // TODO: IMPROVE WALKTHROUGH COMPONENT, SUBTOUR SHOULD BE PASSED AS A CONSTANT
@@ -98,7 +100,6 @@ export const CreditsButton = () => {
         </div>
         <div className="link-title">Credits</div>
       </RQButton>
-      <IncentiveTasksListModal isOpen={isTaskListModalVisible} onClose={() => setIsTaskListModalVisible(false)} />
     </>
   );
 };

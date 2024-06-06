@@ -142,6 +142,10 @@ const INITIAL_STATE = {
       isActive: false,
       props: {},
     },
+    incentiveTasksListModal: {
+      isActive: false,
+      props: {},
+    },
   },
 
   desktopSpecificDetails: {
