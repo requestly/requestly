@@ -64,8 +64,6 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const remainingTasksCount =
     Object.keys(milestones ?? {}).length - (userMilestoneDetails?.claimedMilestoneLogs?.length ?? 0);
 
-  console.log("IncentiveTaskCompletedModal", { event, isOpen, totalCredits, remainingCredits, remainingTasksCount });
-
   return (
     <Modal
       width={368}
