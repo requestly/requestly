@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Collapse } from "antd";
 import { CreditsProgressBar } from "../CreditsProgressbar/CreditsProgessbar";
 import { IncentiveSectionHeader } from "../IncentiveSectionHeader";
@@ -6,8 +6,7 @@ import { PiCaretDownBold } from "@react-icons/all-files/pi/PiCaretDownBold";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TaskHeader } from "./components/TaskHeader/TaskHeader";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { Milestones, UserMilestoneDetails } from "features/incentivization/types";
+import { UserMilestoneDetails } from "features/incentivization/types";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import { MdPlaylistAdd } from "@react-icons/all-files/md/MdPlaylistAdd";
 import { MdOutlineDiversity1 } from "@react-icons/all-files/md/MdOutlineDiversity1";
@@ -20,15 +19,16 @@ import { redirectToMocks, redirectToSessionRecordingHome } from "utils/Redirecti
 import { actions } from "store";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { IncentiveTaskListItem } from "./types";
-import { incentivizationActions } from "store/features/incentivization/slice";
 import {
   getIncentivizationMilestones,
   getIncentivizationUserMilestoneDetails,
+  getIsIncentivizationDetailsLoading,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits, isTaskCompleted } from "features/incentivization/utils";
 import "./incentiveTasksList.scss";
 
 /**
+ *3:30 - 4, 4 - 4:30
  * - fetch userMilestone details and update the progress bar [DONE]
  * - fix complete state of the tasks [DONE]
  * - dissble actions for completed task [DONE]
@@ -48,30 +48,12 @@ import "./incentiveTasksList.scss";
 export const IncentiveTasksList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneDetails: UserMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
-  useEffect(() => {
-    const getMilestones = httpsCallable(getFunctions(), "incentivization-getMilestones");
-
-    setIsLoading(true);
-    getMilestones()
-      .then((res) => {
-        const milestones = (res?.data as { milestones: Milestones })?.milestones;
-        dispatch(incentivizationActions.setMilestones({ milestones }));
-      })
-      .catch(() => {
-        // do nothing
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [dispatch]);
-
-  // TODO: handle disable actions
   const incentiveTasksList: IncentiveTaskListItem[] = useMemo(
     () => [
       {
