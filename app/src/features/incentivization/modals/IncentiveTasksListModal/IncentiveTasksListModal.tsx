@@ -17,7 +17,6 @@ export const IncentiveTasksListModal: React.FC<IncentiveTasksListModalProps> = (
       className="custom-rq-modal incentive-tasks-modal"
       footer={null}
       centered
-      zIndex={3000}
     >
       <IncentiveTasksList />
     </Modal>
