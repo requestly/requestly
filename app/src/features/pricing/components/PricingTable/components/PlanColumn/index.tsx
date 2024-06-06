@@ -56,7 +56,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
               : planName === PRICING.PLAN_NAMES.PROFESSIONAL
               ? capitalize(PRICING.PLAN_NAMES.BASIC)
               : capitalize(PRICING.PLAN_NAMES.PROFESSIONAL)}{" "}
-            plan, and
+            plan +
           </Col>
         )}
       </Row>
@@ -84,7 +84,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     >
       <Space size={8}>
         <Typography.Text className="plan-name">{capitalize(planDetails.planTitle)}</Typography.Text>
-        {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">RECOMMENDED</span>}
+        {planName === PRICING.PLAN_NAMES.PROFESSIONAL && <span className="recommended-tag">MOST VALE</span>}
       </Space>
       {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
         <Row align="middle" className="items-center plan-price-row mt-8">
