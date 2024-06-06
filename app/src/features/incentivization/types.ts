@@ -15,7 +15,7 @@ export type Milestone = { id: IncentivizeEvent; type: IncentivizeEvent; value: R
 
 export type Milestones = Record<IncentivizeEvent, Milestone>;
 
-export interface UserMilestone {
+export interface UserMilestoneDetails {
   uid: string;
   creditsToBeRedeemed: number;
   totalCreditsClaimed: number;
