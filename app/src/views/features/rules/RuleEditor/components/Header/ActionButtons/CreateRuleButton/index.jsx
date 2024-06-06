@@ -222,6 +222,16 @@ const CreateRuleButton = ({
                   dispatch(
                     incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
                   );
+
+                  dispatch(
+                    actions.toggleActiveModal({
+                      modalName: "incentiveTaskCompletedModal",
+                      newValue: true,
+                      newProps: {
+                        event: IncentivizeEvent.FIRST_RULE_CREATED,
+                      },
+                    })
+                  );
                 }
               } else {
                 const premiumRules = [RuleType.REQUEST, RuleType.RESPONSE, RuleType.SCRIPT];
@@ -234,6 +244,16 @@ const CreateRuleButton = ({
                   if (response.data?.success) {
                     dispatch(
                       incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
+                    );
+
+                    dispatch(
+                      actions.toggleActiveModal({
+                        modalName: "incentiveTaskCompletedModal",
+                        newValue: true,
+                        newProps: {
+                          event: IncentivizeEvent.PREMIUM_RULE_CREATED,
+                        },
+                      })
                     );
                   }
                 }
