@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
+import { IncentiveTasksListModal } from "features/incentivization";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
@@ -42,16 +43,36 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const billingTeams = useSelector(getAvailableBillingTeams);
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
-
-  const trialDuration = useFeatureValue("trial_days_duration", 30);
+  const [isIncentiveTasksListModalVisible, setIsTaskListModalVisible] = useState(false);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
+
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
     [features, getFeatureLimitValue, checkIfFeatureLimitReached]
   );
   const isBreachingLimit = features.some((feat) => checkIfFeatureLimitReached(feat, "reached"));
 
-  const hasCrossedDeadline = new Date() > new Date("2023-11-30");
+  const hasCrossedDeadline = useMemo(() => new Date() > new Date("2023-11-30"), []);
+
+  const handlePopoverSecondaryAction = useCallback(() => {
+    if (!hasCrossedDeadline) {
+      trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
+      onContinue();
+    } else {
+      trackUpgradeOptionClicked("upgrade_for_free");
+      if (!user.loggedIn) {
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "authModal",
+            newValue: true,
+            newProps: { eventSource: source },
+          })
+        );
+      } else {
+        setIsTaskListModalVisible(true);
+      }
+    }
+  }, [dispatch, hasCrossedDeadline, onContinue, source, user.loggedIn]);
 
   useEffect(() => {
     return () => {
@@ -76,6 +97,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             isDeadlineCrossed={hasCrossedDeadline}
             source={source}
             featureName={featureName}
+            openIncentiveTaskListModal={() => setIsTaskListModalVisible(true)}
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
@@ -95,11 +117,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           showArrow={false}
           placement={popoverPlacement}
           okText="See upgrade plans"
-          cancelText={
-            !hasCrossedDeadline
-              ? "Use free till 30 November"
-              : !user.loggedIn && `Sign up for ${trialDuration}-day free trial`
-          }
+          cancelText={!hasCrossedDeadline ? "Use free till 30 November" : `Upgrade for free`}
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
@@ -110,18 +128,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
               })
             );
           }}
-          onCancel={() => {
-            if (!hasCrossedDeadline) {
-              trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
-              onContinue();
-            } else if (!user.loggedIn) {
-              trackUpgradeOptionClicked("sign_up_for_trial");
-              dispatch(
-                actions.toggleActiveModal({ modalName: "authModal", newValue: true, newProps: { eventSource: source } })
-              );
-            }
-          }}
-          cancelButtonProps={{ style: { display: hasCrossedDeadline && user.loggedIn ? "none" : "inline-flex" } }}
+          onCancel={handlePopoverSecondaryAction}
           title={
             <>
               <Typography.Title level={4}>
@@ -156,7 +163,14 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             });
           })}
         </Popconfirm>
-      )}{" "}
+      )}
+
+      {isIncentiveTasksListModalVisible && (
+        <IncentiveTasksListModal
+          isOpen={isIncentiveTasksListModalVisible}
+          onClose={() => setIsTaskListModalVisible(false)}
+        />
+      )}
     </>
   );
 };
