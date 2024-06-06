@@ -26,15 +26,27 @@ import {
 } from "store/features/incentivization/selectors";
 import { getTotalCredits, isTaskCompleted } from "features/incentivization/utils";
 import "./incentiveTasksList.scss";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import LINKS from "config/constants/sub/links";
 
 /**
  *3:30 - 4, 4 - 4:30
  * - fetch userMilestone details and update the progress bar [DONE]
  * - fix complete state of the tasks [DONE]
  * - dissble actions for completed task [DONE]
- * - trigger rule creation action
- *    - when success, show congratulation modal with proper message else error message
+ * - trigger rule creation action [DONE]
+ *    - when success, show congratulation modal with proper message else error message [DONE]
  * - trigger rest of the events from their corresponding actions and show the congrats modal
+ *      FIRST_RULE_CREATED = "FIRST_RULE_CREATED", [DONE]
+ *      PREMIUM_RULE_CREATED = "PREMIUM_RULE_CREATED", [DONE]
+ *      FIRST_TEAM_WORKSPACE_CREATED = "FIRST_TEAM_WORKSPACE_CREATED" [DONE]
+ *      FIRST_MOCK_CREATED = "FIRST_MOCK_CREATED" [DONE]
+ *      FIRST_SESSION_RECORDED = "FIRST_SESSION_RECORDED" [DONE]
+ *      RATE_ON_CHROME_STORE = "RATE_ON_CHROME_STORE" [DONE]
+ *
+ * - handle auth
+ * - fix complete now click in congrats modal
  * - fix rate us on chrome store link
  * - fix task list copies
  * - fix navigations
@@ -63,12 +75,12 @@ export const IncentiveTasksList = () => {
         description:
           "Use rules to intercept & modify network requests, headers, API requests, inject scripts & much more. Upon creating your first rule you will earn $25 Free credits for professional plan.",
         icon: <MdPlaylistAdd />,
+        helpLink: <a href="#">Learn how to create Rules</a>,
+        milestone: milestones?.[IncentivizeEvent.FIRST_RULE_CREATED],
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_RULE_CREATED, userMilestoneDetails);
           return <NewRuleButtonWithDropdown disable={isCompleted} />;
         },
-        helpLink: <a href="#">Learn how to create Rules</a>,
-        milestone: milestones?.[IncentivizeEvent.FIRST_RULE_CREATED],
       },
       {
         id: IncentivizeEvent.PREMIUM_RULE_CREATED,
@@ -77,12 +89,12 @@ export const IncentiveTasksList = () => {
         description:
           "Use rules to intercept & modify network requests, headers, API requests, inject scripts & much more. Upon creating your first rule you will earn $25 Free credits for professional plan.",
         icon: <MdPlaylistAdd />,
+        helpLink: <a href="#">Learn how to create Rules</a>,
+        milestone: milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED],
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.PREMIUM_RULE_CREATED, userMilestoneDetails);
           return <NewRuleButtonWithDropdown disable={isCompleted} />;
         },
-        helpLink: <a href="#">Learn how to create Rules</a>,
-        milestone: milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED],
       },
       {
         id: IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED,
@@ -91,6 +103,8 @@ export const IncentiveTasksList = () => {
         description:
           "Team Workspaces let you share your debugging workflows with your teammates in real time. Everyone can collaborate on things like Rules, Mock APIs and Session replays.",
         icon: <MdOutlineDiversity1 />,
+        helpLink: <a href="#">Learn how to create Team Workspace</a>,
+        milestone: milestones?.[IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED],
         action: ({ dispatch }) => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED, userMilestoneDetails);
 
@@ -109,7 +123,7 @@ export const IncentiveTasksList = () => {
                         // @ts-ignore
                         dispatch(actions.updateJoinWorkspaceCardVisible(false));
                       },
-                      source: "join_workspace_card",
+                      source: "incentivization_task_list",
                     },
                   })
                 )
@@ -119,8 +133,6 @@ export const IncentiveTasksList = () => {
             </Button>
           );
         },
-        helpLink: <a href="#">Learn how to create Team Workspace</a>,
-        milestone: milestones?.[IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED],
       },
       {
         id: IncentivizeEvent.FIRST_MOCK_CREATED,
@@ -148,6 +160,8 @@ export const IncentiveTasksList = () => {
         description:
           "Session replays allows you to capture, report, and debug errors with the power of session replay and network & console logs.",
         icon: <PiRecordFill />,
+        helpLink: <a href="#">Learn how to record a session</a>,
+        milestone: milestones?.[IncentivizeEvent.FIRST_SESSION_RECORDED],
         action: ({ navigate }) => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_SESSION_RECORDED, userMilestoneDetails);
 
@@ -157,8 +171,6 @@ export const IncentiveTasksList = () => {
             </Button>
           );
         },
-        helpLink: <a href="#">Learn how to record a session</a>,
-        milestone: milestones?.[IncentivizeEvent.FIRST_SESSION_RECORDED],
       },
       {
         id: IncentivizeEvent.RATE_ON_CHROME_STORE,
@@ -166,6 +178,7 @@ export const IncentiveTasksList = () => {
         isCompleted: isTaskCompleted(IncentivizeEvent.RATE_ON_CHROME_STORE, userMilestoneDetails),
         description: "Give a rating on chrome store.",
         icon: <MdOutlineStarBorder />,
+        milestone: milestones?.[IncentivizeEvent.RATE_ON_CHROME_STORE],
         action: ({ navigate }) => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.RATE_ON_CHROME_STORE, userMilestoneDetails);
 
@@ -174,15 +187,35 @@ export const IncentiveTasksList = () => {
               disabled={isCompleted}
               type="primary"
               onClick={() => {
-                // navigate to chrome store page
-                // just call claim rewards after 30 sec
+                setTimeout(() => {
+                  const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+                  claimIncentiveRewards({ event: IncentivizeEvent.RATE_ON_CHROME_STORE }).then(
+                    (response: { data: { success: boolean; data: UserMilestoneDetails } }) => {
+                      if (response.data?.success) {
+                        dispatch(
+                          incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
+                        );
+
+                        dispatch(
+                          // @ts-ignore
+                          actions.toggleActiveModal({
+                            modalName: "incentiveTaskCompletedModal",
+                            newValue: true,
+                            newProps: { event: IncentivizeEvent.RATE_ON_CHROME_STORE },
+                          })
+                        );
+                      }
+                    }
+                  );
+                }, 1000 * 20);
+
+                window.open(LINKS.CHROME_STORE_REVIEWS, "blank");
               }}
             >
               Rate now
             </Button>
           );
         },
-        milestone: milestones?.[IncentivizeEvent.RATE_ON_CHROME_STORE],
       },
     ],
     [milestones, userMilestoneDetails]
