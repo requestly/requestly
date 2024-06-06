@@ -174,6 +174,7 @@ const AuthHandler: React.FC<{}> = () => {
   useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
     hasAuthHandlerBeenSet = true;
+
     const auth = getAuth(firebaseApp);
     onAuthStateChanged(auth, async (user) => {
       Logger.time("AuthHandler");
