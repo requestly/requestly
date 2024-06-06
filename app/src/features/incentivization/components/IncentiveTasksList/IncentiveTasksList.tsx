@@ -30,35 +30,6 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import LINKS from "config/constants/sub/links";
 import "./incentiveTasksList.scss";
 
-/**
- *3:30 - 4, 4 - 4:30
- * - fetch userMilestone details and update the progress bar [DONE]
- * - fix complete state of the tasks [DONE]
- * - dissble actions for completed task [DONE]
- * - trigger rule creation action [DONE]
- *    - when success, show congratulation modal with proper message else error message [DONE]
- * - trigger rest of the events from their corresponding actions and show the congrats modal
- *      FIRST_RULE_CREATED = "FIRST_RULE_CREATED", [DONE]
- *      PREMIUM_RULE_CREATED = "PREMIUM_RULE_CREATED", [DONE]
- *      FIRST_TEAM_WORKSPACE_CREATED = "FIRST_TEAM_WORKSPACE_CREATED" [DONE]
- *      FIRST_MOCK_CREATED = "FIRST_MOCK_CREATED" [DONE]
- *      FIRST_SESSION_RECORDED = "FIRST_SESSION_RECORDED" [DONE]
- *      RATE_ON_CHROME_STORE = "RATE_ON_CHROME_STORE" [DONE]
- *
- * TODO: now
- * - handle auth
- *
- * - fix credits count badge insidebar [DONE]
- * - fix complete now click in congrats modal [DONE]
- * - fix rate us on chrome store link [DONE]
- * - fix task list copies [DONE]
- * - fix navigations [DONE]
- *
- * - deploy it on beta
- * - give it for review
- *
- */
-
 export const IncentiveTasksList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
