@@ -17,6 +17,7 @@ export type Milestones = Record<IncentivizeEvent, Milestone>;
 
 export interface UserMilestoneDetails {
   uid: string;
+  recentCreditsClaimed: number;
   creditsToBeRedeemed: number;
   totalCreditsClaimed: number;
   creditsRedeemedCount: number;
