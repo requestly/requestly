@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal } from "antd";
+// DEAD CODE
 
 const RuleSimulatorModal = ({ isOpen, toggle, body, mode, title }) => {
   return (

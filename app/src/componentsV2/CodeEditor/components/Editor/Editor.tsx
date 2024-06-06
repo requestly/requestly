@@ -33,6 +33,12 @@ const Editor: React.FC<EditorProps> = ({
   value,
   defaultValue,
   language,
+  /* TODO: REMOVE THESE PROPS:
+   unlockJsonPrettify
+   isCodeMinified,
+   isCodeFormatted,
+    ANY STATE RELATED TO CODE FORMATTING SHOULD BE HANDLED IN EDITOR COMPONENT
+  */
   unlockJsonPrettify = false,
   isCodeMinified,
   isCodeFormatted,
@@ -85,16 +91,16 @@ const Editor: React.FC<EditorProps> = ({
 
   useEffect(() => {
     if (isCodeFormatted) {
-      if (language === "javascript") {
+      if (language === EditorLanguage.JAVASCRIPT) {
         handleCodePrettify("babel");
-      } else if (unlockJsonPrettify && language === "json") {
+      } else if (unlockJsonPrettify && language === EditorLanguage.JSON) {
         !isCodeMinified && handleCodePrettify(EditorLanguage.JSON);
       }
     }
   }, [isCodeMinified, isCodeFormatted, language, unlockJsonPrettify, handleCodePrettify]);
 
   useEffect(() => {
-    if (isCodeMinified && language === "json") {
+    if (isCodeMinified && language === EditorLanguage.JSON) {
       setEditorContent(value);
     }
   }, [isCodeMinified, language, value]);
