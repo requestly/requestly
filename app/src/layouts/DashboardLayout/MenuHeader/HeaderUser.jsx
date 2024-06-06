@@ -20,6 +20,7 @@ import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/h
 import { RQButton } from "lib/design-system/components";
 import { PRICING } from "features/pricing";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
+import { incentivizationActions } from "store/features/incentivization/slice";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -81,13 +82,15 @@ export default function HeaderUser() {
         onClick: () => {
           setLoading(true);
           handleLogoutButtonOnClick(appMode, isWorkspaceMode, dispatch)
-            .then(() =>
+            .then(() => {
               dispatch(
                 actions.updateHardRefreshPendingStatus({
                   type: "rules",
                 })
-              )
-            )
+              );
+
+              dispatch(incentivizationActions.resetState());
+            })
             .finally(() => setLoading(false));
         },
       },
