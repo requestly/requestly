@@ -5,18 +5,19 @@ import "./incentiveTasksListModal.scss";
 
 interface IncentiveTasksListModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  toggle: () => void;
 }
 
-export const IncentiveTasksListModal: React.FC<IncentiveTasksListModalProps> = ({ isOpen, onClose }) => {
+export const IncentiveTasksListModal: React.FC<IncentiveTasksListModalProps> = ({ isOpen, toggle }) => {
   return (
     <Modal
       width={760}
       open={isOpen}
-      onCancel={onClose}
+      onCancel={toggle}
       className="custom-rq-modal incentive-tasks-modal"
       footer={null}
       centered
+      zIndex={3000}
     >
       <IncentiveTasksList />
     </Modal>
