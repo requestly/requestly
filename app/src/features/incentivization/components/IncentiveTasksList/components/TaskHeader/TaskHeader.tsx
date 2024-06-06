@@ -8,8 +8,6 @@ interface TaskHeaderProps {
 }
 
 export const TaskHeader: React.FC<TaskHeaderProps> = ({ task }) => {
-  // TODO: handle complete task state
-
   return (
     <div className={`incentive-task-header ${task.isCompleted ? "completed-task" : ""}`}>
       <div className="incentive-task-title-container">

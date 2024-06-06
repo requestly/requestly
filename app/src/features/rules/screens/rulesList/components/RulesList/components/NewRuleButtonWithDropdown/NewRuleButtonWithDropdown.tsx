@@ -1,3 +1,4 @@
+import React, { useCallback, useMemo } from "react";
 import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, Menu } from "antd";
 import { PremiumIcon } from "components/common/PremiumIcon";
@@ -11,16 +12,15 @@ import {
   trackNewRuleButtonClicked,
   trackRuleCreationWorkflowStartedEvent,
 } from "modules/analytics/events/common/rules";
-import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { RuleType } from "types";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 
-/* TODO: REFACTOR THIS COMPONENT 
+/* TODO: REFACTOR THIS COMPONENT
   Currently created a separate component for create new rule button with rule types dropdown
 */
 
-export const NewRuleButtonWithDropdown = () => {
+export const NewRuleButtonWithDropdown: React.FC<{ disable?: boolean }> = ({ disable = false }) => {
   const navigate = useNavigate();
   const { getFeatureLimitValue } = useFeatureLimiter();
 
@@ -73,6 +73,7 @@ export const NewRuleButtonWithDropdown = () => {
 
   return (
     <Dropdown.Button
+      disabled={disable}
       icon={<DownOutlined />}
       type="primary"
       trigger={["click"]}
