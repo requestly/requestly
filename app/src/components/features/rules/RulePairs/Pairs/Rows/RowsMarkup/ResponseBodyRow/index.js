@@ -203,7 +203,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }, 2000);
 
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      return "{}";
+      return pair.response.value ? pair.response.value : "{}";
     }
     return pair.response.value ? pair.response.value : "";
   }, [pair.response.type, pair.response.value]);
@@ -286,7 +286,13 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                value={getEditorDefaultValue()}
+                defaultValue={getEditorDefaultValue()}
+                // value={pair.response.value ? pair.response.value : getEditorDefaultValue()}
+                value={
+                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
+                    ? editorStaticValue
+                    : pair.response.value
+                }
                 isReadOnly={isInputDisabled}
                 handleChange={responseBodyChangeHandler}
                 unlockJsonPrettify={true}

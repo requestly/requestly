@@ -111,11 +111,12 @@ const Editor: React.FC<EditorProps> = ({
     } else {
       setEditorContent(value);
     }
-  }, [value, defaultValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultValue]);
 
   const handleEditorClose = useCallback(
     (id: string) => {
-      // @ts-ignore
+      // @ts-expect-error
       dispatch(actions.removeToastForEditor({ id }));
     },
     [dispatch]
@@ -156,7 +157,7 @@ const Editor: React.FC<EditorProps> = ({
           width="100%"
           readOnly={isReadOnly}
           value={editorContent ?? ""}
-          defaultValue={defaultValue ?? ""}
+          defaultValue={defaultValue}
           onChange={handleEditorBodyChange}
           theme={vscodeDark}
           extensions={[editorLanguage, EditorView.lineWrapping]}
