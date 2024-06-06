@@ -3,6 +3,20 @@
   align-items: center;
   gap: 8px;
 
+  .loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    overflow: hidden;
+    width: 100%;
+
+    .anticon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--requestly-color-text-subtle);
+    }
+  }
   .credits-earned-counter {
     font-size: var(--requestly-font-size-xs);
     color: var(--requestly-color-text-subtle);
