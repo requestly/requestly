@@ -152,6 +152,53 @@ const CreateRuleButton = ({
     }
   }, [isDisabled, MODE, premiumRuleLimitType, user.details?.isPremium]);
 
+  const claimRuleCreationRewards = () => {
+    const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+
+    if (userAttributes?.num_rules === 0 || !user?.loggedIn) {
+      claimIncentiveRewards({
+        event: IncentivizeEvent.FIRST_RULE_CREATED,
+        options: { ruleType: currentlySelectedRuleData.ruleType },
+      }).then((response) => {
+        if (response.data?.success) {
+          dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+
+          dispatch(
+            actions.toggleActiveModal({
+              modalName: "incentiveTaskCompletedModal",
+              newValue: true,
+              newProps: {
+                event: IncentivizeEvent.FIRST_RULE_CREATED,
+              },
+            })
+          );
+        }
+      });
+    } else {
+      const premiumRules = [RuleType.REQUEST, RuleType.RESPONSE, RuleType.SCRIPT];
+      if (premiumRules.includes(currentlySelectedRuleData.ruleType)) {
+        claimIncentiveRewards({
+          event: IncentivizeEvent.PREMIUM_RULE_CREATED,
+          options: { ruleType: currentlySelectedRuleData.ruleType },
+        }).then((response) => {
+          if (response.data?.success) {
+            dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "incentiveTaskCompletedModal",
+                newValue: true,
+                newProps: {
+                  event: IncentivizeEvent.PREMIUM_RULE_CREATED,
+                },
+              })
+            );
+          }
+        });
+      }
+    }
+  };
+
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
     if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
@@ -210,53 +257,20 @@ const CreateRuleButton = ({
         )
           .then(async () => {
             if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
-              const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-
-              if (userAttributes?.num_rules === 0) {
-                claimIncentiveRewards({
-                  event: IncentivizeEvent.FIRST_RULE_CREATED,
-                  options: { ruleType: currentlySelectedRuleData.ruleType },
-                }).then((response) => {
-                  if (response.data?.success) {
-                    dispatch(
-                      incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
-                    );
-
-                    dispatch(
-                      actions.toggleActiveModal({
-                        modalName: "incentiveTaskCompletedModal",
-                        newValue: true,
-                        newProps: {
-                          event: IncentivizeEvent.FIRST_RULE_CREATED,
-                        },
-                      })
-                    );
-                  }
-                });
+              if (user?.loggedIn) {
+                claimRuleCreationRewards();
               } else {
-                const premiumRules = [RuleType.REQUEST, RuleType.RESPONSE, RuleType.SCRIPT];
-                if (premiumRules.includes(currentlySelectedRuleData.ruleType)) {
-                  claimIncentiveRewards({
-                    event: IncentivizeEvent.PREMIUM_RULE_CREATED,
-                    options: { ruleType: currentlySelectedRuleData.ruleType },
-                  }).then((response) => {
-                    if (response.data?.success) {
-                      dispatch(
-                        incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
-                      );
-
-                      dispatch(
-                        actions.toggleActiveModal({
-                          modalName: "incentiveTaskCompletedModal",
-                          newValue: true,
-                          newProps: {
-                            event: IncentivizeEvent.PREMIUM_RULE_CREATED,
-                          },
-                        })
-                      );
-                    }
-                  });
-                }
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newValue: true,
+                    newProps: {
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                      warningMessage: "You must sign in to earn credits.",
+                      callback: () => claimRuleCreationRewards(),
+                    },
+                  })
+                );
               }
             }
 
