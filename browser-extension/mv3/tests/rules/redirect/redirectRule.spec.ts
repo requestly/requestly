@@ -56,7 +56,7 @@ const testRedirection = async ({ appPage, context, ruleIds, testPageURL, expecte
 
 test.describe("Redirect Rule", () => {
   scenarios.forEach(({ ruleIds, testPageURL, expectedRedirections, pageActions }, i) => {
-    test.skip(`${i}. Redirect rule`, async ({ appPage, context }) => {
+    test(`${i + 1}. Redirect rule`, async ({ appPage, context }) => {
       await testRedirection({ appPage, context, ruleIds, testPageURL, expectedRedirections, pageActions });
     });
   });
