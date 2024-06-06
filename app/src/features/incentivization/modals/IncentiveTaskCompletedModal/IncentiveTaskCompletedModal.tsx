@@ -28,7 +28,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const congratulationMesssages: Record<IncentivizeEvent, { message: string }> = {
     [IncentivizeEvent.FIRST_RULE_CREATED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.FIRST_RULE_CREATED]?.value ?? 0) as number
+        (userMilestoneDetails?.recentCreditsClaimed ?? 0) as number
       } on creating your first rule.`,
     },
     [IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED]: {
@@ -39,7 +39,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
     [IncentivizeEvent.PREMIUM_RULE_CREATED]: {
       message: `You earned $${
         (milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED]?.value ?? 0) as number
-      } on a premium rule.`,
+      } on creating your first premium rule.`,
     },
     [IncentivizeEvent.FIRST_MOCK_CREATED]: {
       message: `You earned $${
@@ -49,7 +49,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
     [IncentivizeEvent.FIRST_SESSION_RECORDED]: {
       message: `You earned $${
         (milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED]?.value ?? 0) as number
-      } on recording your session.`,
+      } on recording your first session.`,
     },
     [IncentivizeEvent.RATE_ON_CHROME_STORE]: {
       message: `You earned $${
@@ -66,7 +66,14 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   console.log("IncentiveTaskCompletedModal", { event, isOpen, totalCredits, remainingCredits, remainingTasksCount });
 
   return (
-    <Modal width={368} open={isOpen} onCancel={toggle} className="custom-rq-modal task-completed-modal" footer={null}>
+    <Modal
+      width={368}
+      open={isOpen}
+      onCancel={toggle}
+      maskClosable={false}
+      footer={null}
+      className="custom-rq-modal task-completed-modal"
+    >
       <div className="task-completed-modal-body">
         {/* TODO: REPLACE WITH DIFFERENT ASSEST */}
         <img src={giftIcon} alt="gift" />

@@ -5,7 +5,7 @@ import { ReducerKeys } from "store/constants";
 const initialState = {
   milestones: {} as Milestones,
   userMilestoneDetails: {} as UserMilestoneDetails,
-  isIncentivizationDetailsLoading: true,
+  isIncentivizationDetailsLoading: false,
 };
 
 const slice = createSlice({
