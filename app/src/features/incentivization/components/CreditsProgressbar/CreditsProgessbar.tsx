@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Progress } from "antd";
 import { MdRedeem } from "@react-icons/all-files/md/MdRedeem";
@@ -14,7 +14,8 @@ import {
 import { getTotalCredits } from "features/incentivization/utils";
 import "./creditsProgessbar.scss";
 
-export const CreditsProgressBar = () => {
+// TODO: fix isInModal in redeem flow
+export const CreditsProgressBar: React.FC<{ isInModal?: boolean }> = ({ isInModal = true }) => {
   const dispatch = useDispatch();
   const [isRedeemModalVisible, setIsRedeemModalVisible] = useState(false);
 
@@ -57,15 +58,17 @@ export const CreditsProgressBar = () => {
             <Progress percent={progressPrecentage} showInfo={false} className="incentive-credits-progessbar" />
             {/* TODO: HANDLE CREDITS EARNED COUNTER HERE */}
             <div className="credits-earned-counter">No credits earned</div>
-            <Button
-              type="text"
-              className="redeem-credits-btn"
-              icon={<MdRedeem />}
-              size="small"
-              onClick={() => setIsRedeemModalVisible(true)}
-            >
-              Redeem
-            </Button>
+            {isInModal ? (
+              <Button
+                type="text"
+                className="redeem-credits-btn"
+                icon={<MdRedeem />}
+                size="small"
+                onClick={() => setIsRedeemModalVisible(true)}
+              >
+                Redeem
+              </Button>
+            ) : null}
           </>
         )}
       </div>
