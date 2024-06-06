@@ -99,6 +99,14 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [isCodeMinified, language, value]);
 
+  useEffect(() => {
+    if (!value?.length) {
+      setEditorContent(defaultValue ?? "");
+    } else {
+      setEditorContent(value);
+    }
+  }, [value, defaultValue]);
+
   const handleEditorClose = useCallback(
     (id: string) => {
       // @ts-ignore
