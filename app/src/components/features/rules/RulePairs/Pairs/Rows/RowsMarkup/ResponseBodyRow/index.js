@@ -203,9 +203,9 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }, 2000);
 
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      return pair.response.value ? pair.response.value : "{}";
+      return "{}";
     }
-    return null;
+    return pair.response.value ? pair.response.value : "";
   }, [pair.response.type, pair.response.value]);
 
   useEffect(() => {
@@ -286,12 +286,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
-                value={
-                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
-                    ? editorStaticValue
-                    : pair.response.value
-                }
-                defaultValue={getEditorDefaultValue()}
+                value={getEditorDefaultValue()}
                 isReadOnly={isInputDisabled}
                 handleChange={responseBodyChangeHandler}
                 unlockJsonPrettify={true}
