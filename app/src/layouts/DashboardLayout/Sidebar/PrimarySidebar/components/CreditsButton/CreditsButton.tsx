@@ -19,7 +19,7 @@ export const CreditsButton = () => {
   const [isCreditsTourVisible, setIsCreditsTourVisible] = useState(false);
 
   const handleButtonClick = () => {
-    if (user.loggedIn) {
+    if (user?.loggedIn) {
       // @ts-ignore
       dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
 
