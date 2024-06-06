@@ -212,7 +212,7 @@ const CreateRuleButton = ({
             if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
               const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
 
-              if (userAttributes.num_rules === 0) {
+              if (userAttributes?.num_rules === 0) {
                 const response = await claimIncentiveRewards({
                   event: IncentivizeEvent.FIRST_RULE_CREATED,
                   options: { ruleType: currentlySelectedRuleData.ruleType },
