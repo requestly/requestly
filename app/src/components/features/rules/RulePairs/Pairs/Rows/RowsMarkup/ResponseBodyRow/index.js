@@ -203,10 +203,10 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }, 2000);
 
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      return pair.response.value ? pair.response.value : "{}";
+      return "{}";
     }
-    return pair.response.value ? pair.response.value : "";
-  }, [pair.response.type, pair.response.value]);
+    return null;
+  }, [pair.response.type]);
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
