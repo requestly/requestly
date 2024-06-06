@@ -213,34 +213,10 @@ const CreateRuleButton = ({
               const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
 
               if (userAttributes?.num_rules === 0) {
-                const response = await claimIncentiveRewards({
+                claimIncentiveRewards({
                   event: IncentivizeEvent.FIRST_RULE_CREATED,
                   options: { ruleType: currentlySelectedRuleData.ruleType },
-                });
-
-                if (response.data?.success) {
-                  dispatch(
-                    incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
-                  );
-
-                  dispatch(
-                    actions.toggleActiveModal({
-                      modalName: "incentiveTaskCompletedModal",
-                      newValue: true,
-                      newProps: {
-                        event: IncentivizeEvent.FIRST_RULE_CREATED,
-                      },
-                    })
-                  );
-                }
-              } else {
-                const premiumRules = [RuleType.REQUEST, RuleType.RESPONSE, RuleType.SCRIPT];
-                if (premiumRules.includes(currentlySelectedRuleData.ruleType)) {
-                  const response = await claimIncentiveRewards({
-                    event: IncentivizeEvent.PREMIUM_RULE_CREATED,
-                    options: { ruleType: currentlySelectedRuleData.ruleType },
-                  });
-
+                }).then((response) => {
                   if (response.data?.success) {
                     dispatch(
                       incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
@@ -251,11 +227,35 @@ const CreateRuleButton = ({
                         modalName: "incentiveTaskCompletedModal",
                         newValue: true,
                         newProps: {
-                          event: IncentivizeEvent.PREMIUM_RULE_CREATED,
+                          event: IncentivizeEvent.FIRST_RULE_CREATED,
                         },
                       })
                     );
                   }
+                });
+              } else {
+                const premiumRules = [RuleType.REQUEST, RuleType.RESPONSE, RuleType.SCRIPT];
+                if (premiumRules.includes(currentlySelectedRuleData.ruleType)) {
+                  claimIncentiveRewards({
+                    event: IncentivizeEvent.PREMIUM_RULE_CREATED,
+                    options: { ruleType: currentlySelectedRuleData.ruleType },
+                  }).then((response) => {
+                    if (response.data?.success) {
+                      dispatch(
+                        incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
+                      );
+
+                      dispatch(
+                        actions.toggleActiveModal({
+                          modalName: "incentiveTaskCompletedModal",
+                          newValue: true,
+                          newProps: {
+                            event: IncentivizeEvent.PREMIUM_RULE_CREATED,
+                          },
+                        })
+                      );
+                    }
+                  });
                 }
               }
             }
