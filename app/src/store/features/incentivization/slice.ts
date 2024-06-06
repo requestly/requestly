@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Milestones, UserMilestone } from "features/incentivization/types";
+import { Milestones, UserMilestoneDetails } from "features/incentivization/types";
 import { ReducerKeys } from "store/constants";
 
 const initialState = {
   milestones: {} as Milestones,
-  userMilestoneDetails: {} as UserMilestone,
+  userMilestoneDetails: {} as UserMilestoneDetails,
   isIncentivizationDetailsLoading: true,
 };
 
