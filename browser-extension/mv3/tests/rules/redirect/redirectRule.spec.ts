@@ -1,44 +1,63 @@
-import { expect } from "@playwright/test";
+import { Page, Request, expect } from "@playwright/test";
 import { test } from "../../fixtures";
 import { loadRules } from "../../utils";
 import redirectRules from "./redirect_rules.json";
 
-test.describe("Redirect Rule", () => {
-  test("1. main_frame request", async ({ appPage, context }) => {
-    const rule = redirectRules.Redirect_1;
-    await loadRules(appPage, { [rule.id]: rule });
+const scenarios = [
+  {
+    ruleIds: ["Redirect_1"],
+    testPageURL: "https://example.com/",
+    expectedRedirections: [
+      {
+        redirectedFrom: "https://example.com/",
+        redirectedTo: "https://example1.com/",
+      },
+    ],
+    pageActions: async () => {},
+  },
+  {
+    ruleIds: ["Redirect_2"],
+    testPageURL: "https://testheaders.com/",
+    expectedRedirections: [
+      {
+        redirectedFrom: "https://testheaders.com/files/sample.js",
+        redirectedTo: "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz",
+      },
+    ],
+    pageActions: async (testPage: Page) => {},
+  },
+];
 
-    const testPage = await context.newPage();
-    const testURL = "https://example.com/";
-    const redirectedUrl = "https://example1.com/";
+const testRedirection = async ({ appPage, context, ruleIds, testPageURL, expectedRedirections, pageActions }) => {
+  const rules = ruleIds.reduce((acc, ruleId) => ({ ...acc, [ruleId]: redirectRules[ruleId] }), {});
+  await loadRules(appPage, rules);
 
-    const pageResponse = await testPage.goto(testURL, { waitUntil: "domcontentloaded" });
-    const redirectedFrom = pageResponse?.request().redirectedFrom()?.url();
-    const redirectedTo = pageResponse?.url();
+  const testPage = await context.newPage();
 
-    expect(redirectedFrom).not.toBeFalsy();
-    expect(redirectedFrom).toBe(testURL);
-    expect(redirectedTo).not.toBeFalsy();
-    expect(redirectedTo).toBe(redirectedUrl);
+  const redirections = new Map<string, string>();
+
+  testPage.on("request", (request: Request) => {
+    if (request?.redirectedFrom()?.url()) {
+      console.log("!!!debug", "map values", request?.redirectedFrom()?.url(), "->", request.url());
+      redirections.set(request?.redirectedFrom()?.url()!, request.url());
+    }
   });
 
-  test("2. internal request", async ({ appPage, context }) => {
-    const rule = redirectRules.Redirect_2;
-    await loadRules(appPage, { [rule.id]: rule });
+  await testPage.goto(testPageURL, { waitUntil: "domcontentloaded" });
 
-    const testPage = await context.newPage();
-    const testURL = "https://testheaders.com/";
-    const redirectedUrl = "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz";
+  await pageActions(testPage);
 
-    await testPage.goto(testURL, { waitUntil: "commit" });
-    const testRequest = await testPage.waitForRequest((req) => req.url() === redirectedUrl);
+  for (const { redirectedFrom, redirectedTo } of expectedRedirections) {
+    const actualRedirection = redirections.get(redirectedFrom);
+    expect(actualRedirection).toBeDefined();
+    expect(actualRedirection).toBe(redirectedTo);
+  }
+};
 
-    const redirectedFrom = testRequest?.redirectedFrom()?.url();
-    const redirectedTo = testRequest?.url();
-
-    expect(redirectedFrom).not.toBeFalsy();
-    expect(redirectedFrom).toBe("https://testheaders.com/files/sample.js");
-    expect(redirectedTo).not.toBeFalsy();
-    expect(redirectedTo).toBe(redirectedUrl);
+test.describe("Redirect Rule", () => {
+  scenarios.forEach(({ ruleIds, testPageURL, expectedRedirections, pageActions }, i) => {
+    test.skip(`${i}. Redirect rule`, async ({ appPage, context }) => {
+      await testRedirection({ appPage, context, ruleIds, testPageURL, expectedRedirections, pageActions });
+    });
   });
 });

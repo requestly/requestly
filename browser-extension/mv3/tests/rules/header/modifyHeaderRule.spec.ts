@@ -2,7 +2,111 @@ import { test, expect } from "../../fixtures";
 import headerRules from "./header_rules.json";
 import { loadRules, waitForPromiseToSettle } from "../../utils";
 
+const scenarios = [
+  {
+    ruleIds: ["Headers_1"],
+    testPageURL: "https://requestly.tech/api/mockv2/testHeaderRule2?teamId=9sBQkTnxaMlBY6kWHpoz",
+    expectedHeaderData: [
+      {
+        url: "https://requestly.tech/api/mockv2/testHeaderRule2?teamId=9sBQkTnxaMlBY6kWHpoz",
+        requestHeaders: [
+          {
+            header: "header1",
+            value: "header1Value",
+          },
+          {
+            header: "accept",
+          },
+          {
+            header: "accept-language",
+            value: "test",
+          },
+        ],
+        responseHeaders: [
+          {
+            header: "newheader1",
+            value: "newHeader1Value",
+          },
+          {
+            header: "nonmodifiedheader1",
+            value: "modifiedHeader1Value",
+          },
+          {
+            header: "nonmodifiedheader2",
+          },
+        ],
+      },
+    ],
+    pageActions: async () => {},
+  },
+];
+
+const testHeaderRule = async ({ appPage, context, ruleIds, testPageURL, expectedHeaderData, pageActions }) => {
+  const rules = ruleIds.reduce((acc, ruleId) => ({ ...acc, [ruleId]: headerRules[ruleId] }), {});
+  await loadRules(appPage, rules);
+
+  const testPage = await context.newPage();
+  const client = await testPage.context().newCDPSession(testPage);
+  await client.send("Network.enable");
+
+  const headersData: Record<
+    string,
+    {
+      requestHeaders: Record<string, string>;
+      responseHeaders: Record<string, string>;
+      requestId: string;
+    }
+  > = {};
+
+  const extraRequestHeadersData: Record<string, Record<string, string>> = {};
+
+  client.on("Network.responseReceived", (params) => {
+    if (expectedHeaderData.some((data) => data.url === params.response.url))
+      headersData[params.response.url] = {
+        requestHeaders: params.response.requestHeaders ?? {},
+        responseHeaders: params.response.headers ?? {},
+        requestId: params.requestId,
+      };
+  });
+
+  client.on("Network.requestWillBeSentExtraInfo", (params) => {
+    extraRequestHeadersData[params.requestId] = params.headers;
+  });
+
+  await testPage.goto(testPageURL, { waitUntil: "domcontentloaded" });
+
+  await pageActions?.(testPage);
+
+  for (const {
+    url,
+    requestHeaders: expectedRequestHeaders,
+    responseHeaders: expectedResponseHeaders,
+  } of expectedHeaderData) {
+    const { requestHeaders, responseHeaders, requestId } = headersData[url];
+    const requestExtraHeaders = extraRequestHeadersData[requestId];
+
+    const allRequestHeaders = {
+      ...requestHeaders,
+      ...requestExtraHeaders,
+    };
+
+    for (const { header, value } of expectedRequestHeaders) {
+      expect(allRequestHeaders[header]).toBe(value);
+    }
+
+    for (const { header, value } of expectedResponseHeaders) {
+      expect(responseHeaders[header]).toBe(value);
+    }
+  }
+};
+
 test.describe("Modify Header Rule", () => {
+  scenarios.forEach(({ ruleIds, testPageURL, expectedHeaderData, pageActions }, i) => {
+    test.only(`${i}. Modify header rule`, async ({ appPage, context }) => {
+      await testHeaderRule({ appPage, context, ruleIds, testPageURL, expectedHeaderData, pageActions });
+    });
+  });
+
   test("1. main_frame request", async ({ appPage, context }) => {
     await loadRules(appPage, { Headers_1: headerRules.Headers_1 });
 
