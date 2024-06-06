@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getIsMiscTourCompleted, getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { FiGift } from "@react-icons/all-files/fi/FiGift";
@@ -16,11 +16,13 @@ export const CreditsButton = () => {
   const user = useSelector(getUserAuthDetails);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const [isTaskListModalVisible, setIsTaskListModalVisible] = useState(false);
+  const [isCreditsTourVisible, setIsCreditsTourVisible] = useState(false);
 
   const handleButtonClick = () => {
     if (user.loggedIn) {
       setIsTaskListModalVisible(true);
       if (!isMiscTourCompleted.earnCredits) {
+        setIsCreditsTourVisible(false);
         dispatch(
           actions.updateProductTourCompleted({
             tour: TOUR_TYPES.MISCELLANEOUS,
@@ -42,22 +44,30 @@ export const CreditsButton = () => {
       );
     }
   };
+
+  useEffect(() => {
+    // TODO: ADD CONDITION TO ONLY START WALKTHROUGH FOR NEW USERS ONLY
+    if (!isMiscTourCompleted.earnCredits) {
+      setIsCreditsTourVisible(true);
+    }
+  }, [isMiscTourCompleted.earnCredits]);
+
   return (
     <>
       <ProductWalkthrough
         completeTourOnUnmount={false}
         tourFor={MISC_TOURS.APP_ENGAGEMENT.EARN_CREDITS}
-        // TODO: ADD CONDITION TO ONLY START WALKTHROUGH FOR NEW USERS ONLY
-        startWalkthrough={!isMiscTourCompleted.earnCredits}
-        onTourComplete={() =>
+        startWalkthrough={isCreditsTourVisible}
+        onTourComplete={() => {
+          setIsCreditsTourVisible(false);
           dispatch(
             actions.updateProductTourCompleted({
               tour: TOUR_TYPES.MISCELLANEOUS,
               // TODO: IMPROVE WALKTHROUGH COMPONENT, SUBTOUR SHOULD BE PASSED AS A CONSTANT
               subTour: "earnCredits",
             })
-          )
-        }
+          );
+        }}
       />
       <RQButton
         className="primary-sidebar-link w-full"
@@ -65,7 +75,7 @@ export const CreditsButton = () => {
         data-tour-id={MISC_TOURS.APP_ENGAGEMENT.EARN_CREDITS}
       >
         <div className="icon__wrapper">
-          {!isMiscTourCompleted.earnCredits ? (
+          {isCreditsTourVisible ? (
             <Badge
               className="credits-earned-badge"
               size="small"
