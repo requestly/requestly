@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { IncentivizeEvent } from "features/incentivization/types";
@@ -10,6 +10,7 @@ import {
 import { getTotalCredits } from "features/incentivization/utils";
 import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import creditsEarnedAnimation from "./assets/creditsEarned.json";
+import { actions } from "store";
 import "./incentiveTaskCompletedModal.scss";
 
 interface IncentiveTaskCompletedModalProps {
@@ -19,10 +20,9 @@ interface IncentiveTaskCompletedModalProps {
 }
 
 export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalProps> = ({ isOpen, toggle, event }) => {
+  const dispatch = useDispatch();
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
-
-  console.log("IncentiveTaskCompletedModal", { isOpen, event });
 
   if (!milestones || !event) {
     return null;
@@ -95,7 +95,16 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
           )}
         </div>
         <div className="task-completed-actions-container">
-          <RQButton type="primary">Complete now</RQButton>
+          <RQButton
+            type="primary"
+            onClick={() => {
+              // @ts-ignore
+              dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+              toggle();
+            }}
+          >
+            Complete now
+          </RQButton>
           <RQButton type="default" onClick={toggle}>
             Remind me later
           </RQButton>
