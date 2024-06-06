@@ -14,12 +14,16 @@ import { editorDataToMockDataConverter, generateFinalUrl, mockDataToEditorDataAd
 import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, defaultJsEditorMock } from "./constants";
 import { FileType, MockType } from "../types";
 import { getMock } from "backend/mocks/getMock";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
 import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { IncentivizeEvent } from "features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import { actions } from "store";
 
 interface Props {
   isNew?: boolean;
@@ -40,6 +44,7 @@ const MockEditorIndex: React.FC<Props> = ({
   isEditorOpenInModal = false,
 }) => {
   const { mockId } = useParams();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -77,6 +82,26 @@ const MockEditorIndex: React.FC<Props> = ({
         if (mockId) {
           toast.success("Mock Created Successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
+
+          const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+
+          claimIncentiveRewards({ event: IncentivizeEvent.FIRST_MOCK_CREATED }).then((response) => {
+            // @ts-ignore
+            if (response.data?.success) {
+              // @ts-ignore
+              dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+
+              dispatch(
+                // @ts-ignore
+                actions.toggleActiveModal({
+                  modalName: "incentiveTaskCompletedModal",
+                  newValue: true,
+                  newProps: { event: IncentivizeEvent.FIRST_MOCK_CREATED },
+                })
+              );
+            }
+          });
+
           if (selectOnSave) {
             const url = generateFinalUrl(
               finalMockData.endpoint,
