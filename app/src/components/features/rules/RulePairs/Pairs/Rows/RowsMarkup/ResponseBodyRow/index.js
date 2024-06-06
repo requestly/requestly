@@ -287,7 +287,6 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                     : EditorLanguage.JSON
                 }
                 defaultValue={getEditorDefaultValue()}
-                // value={pair.response.value ? pair.response.value : getEditorDefaultValue()}
                 value={
                   pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
                     ? editorStaticValue

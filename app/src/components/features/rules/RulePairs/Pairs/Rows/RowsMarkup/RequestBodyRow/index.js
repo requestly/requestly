@@ -66,10 +66,10 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     }, 2000);
 
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-      return pair.request.value ? pair.request.value : "";
+      return "{}";
     }
     return null;
-  }, [pair.request.type, pair.request.value]);
+  }, [pair.request.type]);
 
   const requestBodyChangeHandler = (value) => {
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
@@ -177,12 +177,12 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                     ? EditorLanguage.JAVASCRIPT
                     : EditorLanguage.JSON
                 }
+                defaultValue={getEditorDefaultValue()}
                 value={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
                     ? editorStaticValue
                     : pair.request.value
                 }
-                defaultValue={getEditorDefaultValue()}
                 handleChange={requestBodyChangeHandler}
                 isReadOnly={isInputDisabled}
                 unlockJsonPrettify={true}
