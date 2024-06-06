@@ -167,6 +167,9 @@ const Editor: React.FC<EditorProps> = ({
             closeBrackets: true,
             allowMultipleSelections: true,
           }}
+          data-enable-grammarly="false"
+          data-gramm_editor="false"
+          data-gramm="false"
         />
       </>
     </ResizableBox>
