@@ -74,6 +74,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
       maskClosable={false}
       footer={null}
       className="custom-rq-modal task-completed-modal"
+      zIndex={2000}
     >
       <div className="task-completed-modal-body">
         <LottieAnimation
