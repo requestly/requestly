@@ -1,2 +1,2 @@
-export { default } from "./components/Editor/Editor";
+export { default } from "./CodeEditorWithLazyRetry";
 export * from "./types";
