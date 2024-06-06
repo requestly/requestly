@@ -22,6 +22,8 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
 
+  console.log("IncentiveTaskCompletedModal", { isOpen, event });
+
   if (!milestones || !event) {
     return null;
   }
@@ -44,17 +46,17 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
     },
     [IncentivizeEvent.FIRST_MOCK_CREATED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.FIRST_MOCK_CREATED]?.value ?? 0) as number
       } on creating your first mock.`,
     },
     [IncentivizeEvent.FIRST_SESSION_RECORDED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.FIRST_SESSION_RECORDED]?.value ?? 0) as number
       } on recording your first session.`,
     },
     [IncentivizeEvent.RATE_ON_CHROME_STORE]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.RATE_ON_CHROME_STORE]?.value ?? 0) as number
       } for rating us.`,
     },
   };
