@@ -28,9 +28,17 @@
     margin-top: 8px;
     color: var(--neutrals-gray-300);
     font-size: 13px;
+    flex-wrap: nowrap;
 
     & svg {
+      align-self: start;
       color: var(--white);
+      width: 14px;
+      margin-top: 2px;
+    }
+
+    & span {
+      max-width: 320px;
     }
   }
 }
