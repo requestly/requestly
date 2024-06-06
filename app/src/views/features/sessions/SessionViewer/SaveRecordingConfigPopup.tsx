@@ -33,6 +33,9 @@ import { getTestReportById, saveTestReport } from "components/features/rules/Tes
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { IncentivizeEvent } from "features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -146,6 +149,29 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
             source,
             recording_mode: sessionRecordingMetadata?.recordingMode,
           });
+
+          if (isDraftSession) {
+            const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+            claimIncentiveRewards({ event: IncentivizeEvent.FIRST_SESSION_RECORDED }).then((response) => {
+              // @ts-ignore
+              if (response.data?.success) {
+                dispatch(
+                  // @ts-ignore
+                  incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
+                );
+
+                dispatch(
+                  // @ts-ignore
+                  actions.toggleActiveModal({
+                    modalName: "incentiveTaskCompletedModal",
+                    newValue: true,
+                    newProps: { event: IncentivizeEvent.FIRST_SESSION_RECORDED },
+                  })
+                );
+              }
+            });
+          }
+
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
           trackSessionsCreatedCount();
           if (testRuleDraftSession) {
@@ -189,6 +215,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       appMode,
       navigate,
       source,
+      isDraftSession,
     ]
   );
 
