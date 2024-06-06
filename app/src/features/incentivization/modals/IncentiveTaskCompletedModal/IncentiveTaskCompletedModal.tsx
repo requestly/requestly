@@ -2,14 +2,15 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
-import giftIcon from "./assets/gift.svg";
-import "./incentiveTaskCompletedModal.scss";
 import { IncentivizeEvent } from "features/incentivization/types";
 import {
   getIncentivizationMilestones,
   getIncentivizationUserMilestoneDetails,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits } from "features/incentivization/utils";
+import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
+import creditsEarnedAnimation from "./assets/creditsEarned.json";
+import "./incentiveTaskCompletedModal.scss";
 
 interface IncentiveTaskCompletedModalProps {
   isOpen: boolean;
@@ -75,8 +76,11 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
       className="custom-rq-modal task-completed-modal"
     >
       <div className="task-completed-modal-body">
-        {/* TODO: REPLACE WITH DIFFERENT ASSEST */}
-        <img src={giftIcon} alt="gift" />
+        <LottieAnimation
+          animationData={creditsEarnedAnimation}
+          animationName="credits earned"
+          className="credits-earned-animation"
+        />
         <div className="task-completed-modal-title">Congratulations!</div>
         <div className="task-completed-modal-subtitle">{congratulationMesssages[event]?.message}</div>
         <div className="task-completed-modal-description">
