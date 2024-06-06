@@ -39,6 +39,11 @@ export const IncentiveTasksList = () => {
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
+  const postActionClickCallback = () => {
+    // @ts-ignore
+    dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+  };
+
   const incentiveTasksList: IncentiveTaskListItem[] = useMemo(
     () => [
       {
@@ -56,7 +61,7 @@ export const IncentiveTasksList = () => {
         milestone: milestones?.[IncentivizeEvent.FIRST_RULE_CREATED],
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_RULE_CREATED, userMilestoneDetails);
-          return <NewRuleButtonWithDropdown disable={isCompleted} />;
+          return <NewRuleButtonWithDropdown disable={isCompleted} callback={postActionClickCallback} />;
         },
       },
       {
@@ -74,7 +79,7 @@ export const IncentiveTasksList = () => {
         milestone: milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED],
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.PREMIUM_RULE_CREATED, userMilestoneDetails);
-          return <NewRuleButtonWithDropdown disable={isCompleted} />;
+          return <NewRuleButtonWithDropdown disable={isCompleted} callback={postActionClickCallback} />;
         },
       },
       {
@@ -97,7 +102,8 @@ export const IncentiveTasksList = () => {
             <Button
               disabled={isCompleted}
               type="primary"
-              onClick={() =>
+              onClick={() => {
+                postActionClickCallback();
                 dispatch(
                   // @ts-ignore
                   actions.toggleActiveModal({
@@ -111,8 +117,8 @@ export const IncentiveTasksList = () => {
                       source: "incentivization_task_list",
                     },
                   })
-                )
-              }
+                );
+              }}
             >
               Create a new workspace
             </Button>
@@ -135,7 +141,14 @@ export const IncentiveTasksList = () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_MOCK_CREATED, userMilestoneDetails);
 
           return (
-            <Button disabled={isCompleted} type="primary" onClick={() => redirectToMocks(navigate)}>
+            <Button
+              disabled={isCompleted}
+              type="primary"
+              onClick={() => {
+                postActionClickCallback();
+                redirectToMocks(navigate);
+              }}
+            >
               Create a mock API
             </Button>
           );
@@ -158,7 +171,14 @@ export const IncentiveTasksList = () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_SESSION_RECORDED, userMilestoneDetails);
 
           return (
-            <Button disabled={isCompleted} type="primary" onClick={() => redirectToSessionRecordingHome(navigate)}>
+            <Button
+              disabled={isCompleted}
+              type="primary"
+              onClick={() => {
+                postActionClickCallback();
+                redirectToSessionRecordingHome(navigate);
+              }}
+            >
               Record a session
             </Button>
           );
@@ -200,6 +220,8 @@ export const IncentiveTasksList = () => {
                     }
                   );
                 }, 1000 * 20);
+
+                postActionClickCallback();
 
                 window.open(LINKS.CHROME_STORE_REVIEWS, "blank");
               }}

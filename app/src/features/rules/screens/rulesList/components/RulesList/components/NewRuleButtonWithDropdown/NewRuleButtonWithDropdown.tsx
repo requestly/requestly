@@ -20,7 +20,10 @@ import { redirectToCreateNewRule } from "utils/RedirectionUtils";
   Currently created a separate component for create new rule button with rule types dropdown
 */
 
-export const NewRuleButtonWithDropdown: React.FC<{ disable?: boolean }> = ({ disable = false }) => {
+export const NewRuleButtonWithDropdown: React.FC<{ disable?: boolean; callback?: () => void }> = ({
+  disable = false,
+  callback = () => {},
+}) => {
   const navigate = useNavigate();
   const { getFeatureLimitValue } = useFeatureLimiter();
 
@@ -31,9 +34,11 @@ export const NewRuleButtonWithDropdown: React.FC<{ disable?: boolean }> = ({ dis
       } else {
         trackNewRuleButtonClicked("in_app");
       }
+
+      callback();
       redirectToCreateNewRule(navigate, ruleType, source || "my_rules");
     },
-    [navigate]
+    [navigate, callback]
   );
 
   const dropdownOverlay = useMemo(() => {
