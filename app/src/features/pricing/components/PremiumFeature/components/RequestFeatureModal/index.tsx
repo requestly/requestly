@@ -31,6 +31,7 @@ interface RequestFeatureModalProps {
   featureName?: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
+  openIncentiveTaskListModal: () => void;
 }
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
@@ -42,6 +43,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   setOpenPopup,
   onContinue,
   featureName,
+  openIncentiveTaskListModal,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -138,6 +140,17 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               className="request-modal-default-btn"
               disabled={isLoading}
               onClick={() => {
+                trackUpgradeOptionClicked("upgrade_for_free");
+                openIncentiveTaskListModal();
+              }}
+            >
+              Upgrade for free
+            </RQButton>
+            <RQButton
+              type="default"
+              className="request-modal-default-btn"
+              disabled={isLoading}
+              onClick={() => {
                 trackUpgradeOptionClicked("upgrade_yourself");
                 dispatch(
                   actions.toggleActiveModal({
@@ -174,7 +187,17 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       </Row>
     );
-  }, [billingTeams, dispatch, handleSendRequest, isLoading, isDeadlineCrossed, navigate, onContinue, setOpenPopup]);
+  }, [
+    billingTeams,
+    dispatch,
+    handleSendRequest,
+    isLoading,
+    isDeadlineCrossed,
+    navigate,
+    onContinue,
+    setOpenPopup,
+    openIncentiveTaskListModal,
+  ]);
 
   useEffect(() => {
     if (isOpen) {
