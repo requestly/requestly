@@ -94,7 +94,7 @@ export const CreditsButton = () => {
               size="small"
               status="default"
               count={
-                (userMilestoneDetails?.totalCreditsClaimed ?? 0) > 0 ? (
+                (userMilestoneDetails?.totalCreditsClaimed ?? 0) > 0 && user?.loggedIn ? (
                   <span className="credits-earned-count">${userMilestoneDetails?.totalCreditsClaimed ?? 0}</span>
                 ) : (
                   0
