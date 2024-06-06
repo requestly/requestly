@@ -8,12 +8,14 @@ import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
+import { getIncentivizationUserMilestoneDetails } from "store/features/incentivization/selectors";
 import "./creditsButton.scss";
 
 export const CreditsButton = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
+  const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
   const [isCreditsTourVisible, setIsCreditsTourVisible] = useState(false);
 
   const handleButtonClick = () => {
@@ -90,9 +92,14 @@ export const CreditsButton = () => {
             <Badge
               className="credits-earned-badge"
               size="small"
-              // TODO: Replace with actual credits earned
               status="default"
-              count={<span className="credits-earned-count">$100</span>}
+              count={
+                (userMilestoneDetails?.totalCreditsClaimed ?? 0) > 0 ? (
+                  <span className="credits-earned-count">${userMilestoneDetails?.totalCreditsClaimed ?? 0}</span>
+                ) : (
+                  0
+                )
+              }
             >
               <FiGift />
             </Badge>
