@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -22,8 +22,11 @@ import {
 import { trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
 import APP_CONSTANTS from "config/constants";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
-import "./CreateWorkspaceModal.css";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
+import { IncentivizeEvent } from "features/incentivization/types";
+import { actions } from "store";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import "./CreateWorkspaceModal.css";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -34,6 +37,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const billingTeams = useSelector(getAvailableBillingTeams);
+  const userAttributes = useSelector(getUserAttributes);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -72,8 +76,34 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           isNewTeam: !isNotifyAllSelected || !hasMembersInSameDomain,
         },
       });
+
+      if (userAttributes?.num_workspaces === 1) {
+        const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+
+        claimIncentiveRewards({ event: IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED }).then((response) => {
+          if (response.data?.success) {
+            dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "incentiveTaskCompletedModal",
+                newValue: true,
+                newProps: { event: IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED },
+              })
+            );
+          }
+        });
+      }
     },
-    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled]
+    [
+      dispatch,
+      appMode,
+      isNotifyAllSelected,
+      isWorkspaceMode,
+      navigate,
+      user?.details?.isSyncEnabled,
+      userAttributes?.num_workspaces,
+    ]
   );
 
   const handleFinishClick = useCallback(
