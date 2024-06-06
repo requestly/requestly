@@ -25,10 +25,10 @@ import {
   getIsIncentivizationDetailsLoading,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits, isTaskCompleted } from "features/incentivization/utils";
-import "./incentiveTasksList.scss";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import LINKS from "config/constants/sub/links";
+import "./incentiveTasksList.scss";
 
 /**
  *3:30 - 4, 4 - 4:30
@@ -45,16 +45,18 @@ import LINKS from "config/constants/sub/links";
  *      FIRST_SESSION_RECORDED = "FIRST_SESSION_RECORDED" [DONE]
  *      RATE_ON_CHROME_STORE = "RATE_ON_CHROME_STORE" [DONE]
  *
+ * TODO: now
  * - handle auth
- * - fix complete now click in congrats modal
- * - fix rate us on chrome store link
- * - fix task list copies
- * - fix navigations
+ *
+ * - fix credits count badge insidebar [DONE]
+ * - fix complete now click in congrats modal [DONE]
+ * - fix rate us on chrome store link [DONE]
+ * - fix task list copies [DONE]
+ * - fix navigations [DONE]
+ *
  * - deploy it on beta
  * - give it for review
- * - find out all the touch points for incentiviation checklist [VVVVV.IMP]
- *   - put them behind feature flag
- *   - also put them behind new user check
+ *
  */
 
 export const IncentiveTasksList = () => {
@@ -62,7 +64,7 @@ export const IncentiveTasksList = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
-  const userMilestoneDetails: UserMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
+  const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
@@ -73,9 +75,13 @@ export const IncentiveTasksList = () => {
         title: "Create your first rule",
         isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_RULE_CREATED, userMilestoneDetails),
         description:
-          "Use rules to intercept & modify network requests, headers, API requests, inject scripts & much more. Upon creating your first rule you will earn $25 Free credits for professional plan.",
+          "Use rules to intercept & modify network requests, headers, API requests, inject scripts & much more. Upon creating your first rule you will earn $25 free credits for professional plan.",
         icon: <MdPlaylistAdd />,
-        helpLink: <a href="#">Learn how to create Rules</a>,
+        helpLink: (
+          <a href="https://developers.requestly.com/create-first-rule/" target="_blank" rel="noreferrer">
+            Learn how to create Rules
+          </a>
+        ),
         milestone: milestones?.[IncentivizeEvent.FIRST_RULE_CREATED],
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_RULE_CREATED, userMilestoneDetails);
@@ -87,9 +93,13 @@ export const IncentiveTasksList = () => {
         title: "Create other rules",
         isCompleted: isTaskCompleted(IncentivizeEvent.PREMIUM_RULE_CREATED, userMilestoneDetails),
         description:
-          "Use rules to intercept & modify network requests, headers, API requests, inject scripts & much more. Upon creating your first rule you will earn $25 Free credits for professional plan.",
+          "Use premium rules to modify requests, response, & inject scripts. Upon creating your first premium rule you will earn $15 free credits for professional plan.",
         icon: <MdPlaylistAdd />,
-        helpLink: <a href="#">Learn how to create Rules</a>,
+        helpLink: (
+          <a href="https://developers.requestly.com/http-rules/overview/" target="_blank" rel="noreferrer">
+            Learn how to create Rules
+          </a>
+        ),
         milestone: milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED],
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.PREMIUM_RULE_CREATED, userMilestoneDetails);
@@ -103,7 +113,11 @@ export const IncentiveTasksList = () => {
         description:
           "Team Workspaces let you share your debugging workflows with your teammates in real time. Everyone can collaborate on things like Rules, Mock APIs and Session replays.",
         icon: <MdOutlineDiversity1 />,
-        helpLink: <a href="#">Learn how to create Team Workspace</a>,
+        helpLink: (
+          <a href="https://developers.requestly.com/workspace/using-workspace/" target="_blank" rel="noreferrer">
+            Learn how to create Team Workspace
+          </a>
+        ),
         milestone: milestones?.[IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED],
         action: ({ dispatch }) => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED, userMilestoneDetails);
@@ -140,6 +154,12 @@ export const IncentiveTasksList = () => {
         isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_MOCK_CREATED, userMilestoneDetails),
         description: "Create mocks for your APIs with different status codes, delay, response headers or body",
         icon: <MdOutlineDns />,
+        helpLink: (
+          <a href="https://developers.requestly.com/mock-server/create-new-mock-api/" target="_blank" rel="noreferrer">
+            Learn how to create API Mock
+          </a>
+        ),
+        milestone: milestones?.[IncentivizeEvent.FIRST_MOCK_CREATED],
         action: ({ navigate }) => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_MOCK_CREATED, userMilestoneDetails);
 
@@ -149,9 +169,6 @@ export const IncentiveTasksList = () => {
             </Button>
           );
         },
-
-        helpLink: <a href="#">Learn how to create API Mock</a>,
-        milestone: milestones?.[IncentivizeEvent.FIRST_MOCK_CREATED],
       },
       {
         id: IncentivizeEvent.FIRST_SESSION_RECORDED,
@@ -160,7 +177,11 @@ export const IncentiveTasksList = () => {
         description:
           "Session replays allows you to capture, report, and debug errors with the power of session replay and network & console logs.",
         icon: <PiRecordFill />,
-        helpLink: <a href="#">Learn how to record a session</a>,
+        helpLink: (
+          <a href="https://developers.requestly.com/sessions/record-session/" target="_blank" rel="noreferrer">
+            Learn how to record a session
+          </a>
+        ),
         milestone: milestones?.[IncentivizeEvent.FIRST_SESSION_RECORDED],
         action: ({ navigate }) => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_SESSION_RECORDED, userMilestoneDetails);
