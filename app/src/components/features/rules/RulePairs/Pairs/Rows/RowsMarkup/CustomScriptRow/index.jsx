@@ -240,7 +240,7 @@ const CustomScriptRow = ({
               id={script.id}
               height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}
               language={codeEditorLanguage}
-              defaultValue={scriptEditorBoilerCode}
+              defaultValue={initialCodeEditorValue ?? scriptEditorBoilerCode}
               value={initialCodeEditorValue}
               handleChange={handleEditorUpdate}
               isReadOnly={isInputDisabled}

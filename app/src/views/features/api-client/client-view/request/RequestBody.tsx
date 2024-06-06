@@ -31,7 +31,6 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentTy
         return (
           // @ts-ignore
           <CodeEditor
-            defaultValue=""
             language={EditorLanguage.JSON}
             value={body as string}
             handleChange={setBody}
