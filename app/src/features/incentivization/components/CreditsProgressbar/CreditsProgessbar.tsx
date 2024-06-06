@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Progress } from "antd";
 import { MdRedeem } from "@react-icons/all-files/md/MdRedeem";
 import { RedeemCreditsModal } from "features/incentivization";
-import { Milestones, UserMilestoneDetails } from "features/incentivization/types";
+import { UserMilestoneDetails } from "features/incentivization/types";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
@@ -19,8 +19,8 @@ export const CreditsProgressBar = () => {
   const [isRedeemModalVisible, setIsRedeemModalVisible] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
-  const milestones: Milestones = useSelector(getIncentivizationMilestones);
-  const userMilestoneDetails: UserMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
+  const milestones = useSelector(getIncentivizationMilestones);
+  const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
   const progressPrecentage = parseInt(
