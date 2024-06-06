@@ -1,12 +1,16 @@
-import { useState } from "react";
 import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import giftAnimation from "./assets/gift.json";
-import { CreditsProgressBar, IncentiveSectionHeader, IncentiveTasksListModal } from "features/incentivization";
+import { CreditsProgressBar, IncentiveSectionHeader } from "features/incentivization";
 import { RQButton } from "lib/design-system/components";
+import { getUserAuthDetails } from "store/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
+import APP_CONSTANTS from "config/constants";
 import "./incentivesCard.scss";
 
 export const IncentivesCard = () => {
-  const [isTaskListModalVisible, setIsTaskListModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
 
   return (
     <>
@@ -21,12 +25,31 @@ export const IncentivesCard = () => {
           </div>
         </div>
         <div className="align-self-center display-row-center flex-1">
-          <RQButton type="primary" onClick={() => setIsTaskListModalVisible(true)}>
+          <RQButton
+            type="primary"
+            onClick={() => {
+              if (user?.loggedIn) {
+                // @ts-ignore
+                dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+              } else {
+                dispatch(
+                  // @ts-ignore
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newValue: true,
+                    newProps: {
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                      warningMessage: "You must sign in to earn credits.",
+                    },
+                  })
+                );
+              }
+            }}
+          >
             Complete onboarding
           </RQButton>
         </div>
       </div>
-      <IncentiveTasksListModal isOpen={isTaskListModalVisible} onClose={() => setIsTaskListModalVisible(false)} />
     </>
   );
 };
