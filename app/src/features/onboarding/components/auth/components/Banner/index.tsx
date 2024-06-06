@@ -29,7 +29,7 @@ export const OnboardingAuthBanner = () => {
         {features.map((feature) => (
           <Row className="banner-premium-feature-list-item">
             <MdCheck />
-            <span>{feature}</span>
+            <span className="feature-text">{feature}</span>
           </Row>
         ))}
       </div>
