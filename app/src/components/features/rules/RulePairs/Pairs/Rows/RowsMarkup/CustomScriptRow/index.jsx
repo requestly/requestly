@@ -35,7 +35,6 @@ const CustomScriptRow = ({
   const [codeTypeSelection, setCodeTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS);
   const [sourceTypeSelection, setSourceTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
-  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
   const [initialCodeEditorValue, setInitialCodeEditorValue] = useState(null);
 
   const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
@@ -203,7 +202,7 @@ const CustomScriptRow = ({
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
-            triggerUnsavedChangesIndication: !isCodeFormatted && triggerUnsavedChanges,
+            triggerUnsavedChangesIndication: triggerUnsavedChanges,
             updates: {
               [`scripts[${scriptIndex}].value`]: value,
             },
@@ -211,7 +210,7 @@ const CustomScriptRow = ({
         );
       }
     },
-    [dispatch, isCodeFormatted, pairIndex, script.type, scriptIndex]
+    [dispatch, pairIndex, script.type, scriptIndex]
   );
 
   useEffect(() => {
@@ -226,13 +225,6 @@ const CustomScriptRow = ({
   }, [initialCodeEditorValue, handleEditorUpdate]);
 
   const renderCodeEditor = () => {
-    const handleCodeFormattedFlag = () => {
-      setIsCodeFormatted(true);
-      setTimeout(() => {
-        setIsCodeFormatted(false);
-      }, 2000);
-    };
-
     return (
       <Col span={24} data-tour-id="code-editor">
         <Row
