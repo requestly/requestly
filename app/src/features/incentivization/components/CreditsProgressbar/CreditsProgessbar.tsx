@@ -34,7 +34,11 @@ export const CreditsProgressBar: React.FC<{ isInModal?: boolean }> = ({ isInModa
           </div>
         ) : (
           <>
-            <Progress percent={progressPrecentage} showInfo={false} className="incentive-credits-progessbar" />
+            <Progress
+              percent={progressPrecentage === 0 ? 2 : progressPrecentage}
+              showInfo={false}
+              className="incentive-credits-progessbar"
+            />
             {/* TODO: HANDLE CREDITS EARNED COUNTER HERE */}
             <div className="credits-earned-counter">No credits earned</div>
             {isInModal ? (
