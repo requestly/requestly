@@ -23,7 +23,7 @@
 }
 
 .rq-content-list-table-row button.ant-btn.ant-btn-icon-only.pin-record-btn svg.record-unpinned {
-  color: var(--requestly-color-text-default);
+  color: var(--requestly-color-text-subtle);
 }
 
 .rq-content-list-table-row .ant-table-cell-with-append:nth-child(2) {
@@ -49,9 +49,8 @@
   margin-top: 0px;
 }
 
-.rq-content-list-table-row td.ant-table-cell:nth-child(2) > button.pin-record-btn {
-  margin-left: 8px;
-  margin-right: 7px;
+.rq-content-list-table-row:not(.rq-content-list-table-row-group) td.ant-table-cell:nth-child(2) .indent-level-0 {
+  padding-left: 18px !important;
 }
 
 .rule-more-actions-dropdown .ant-dropdown-menu {
@@ -128,13 +127,11 @@
 .group-name-container .group-rules-count-details {
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: var(--requestly-color-text-placeholder);
+  gap: 6px;
+  color: var(--requestly-color-text-subtle);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.4px;
-  border-radius: 32px;
-  border: 1px solid var(--requestly-color-surface-2);
   flex-shrink: 0;
   padding: 2px 4px;
   cursor: default;
@@ -148,12 +145,24 @@
   border-radius: 100%;
 }
 
+.group-rules-count-details .ant-progress .ant-progress-inner {
+  /* Adding important because antd adds height and width as inline style */
+  height: unset !important;
+  width: 1rem !important;
+}
+
 .group-name-container .add-rule-btn {
   display: none;
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
   height: 24px;
+}
+
+.rule-updated-on-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 tr.rq-content-list-table-row.ant-table-row:hover .group-name-container .add-rule-btn {
