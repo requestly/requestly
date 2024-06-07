@@ -12,7 +12,7 @@ const RequestQuoteModal = ({ isOpen, handleToggleModal }) => {
   const handleSubmit = async (values) => {
     trackRequestQuoteFormSubmitted();
     setFormState("loading");
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       await salesInboundNotification({
         notificationText: `${EVENTS.REQUEST_QUOTE_FORM_SUBMITTED} triggered with document type ${values.documentType}, purchase type ${values.purchaseType}, number of licenses ${values.numberOfLicenses}, subscription period ${values.subscriptionPeriod}, company name ${values.companyName}, and email ${values.email}`,

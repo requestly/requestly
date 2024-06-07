@@ -27,7 +27,7 @@ const PricingPageFooter = () => {
 
   const handleDocRequiredOnClick = () => {
     trackRequestDocumentClicked();
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       salesInboundNotification({
         notificationText: EVENTS.REQUEST_DOCUEMNT_CLICKED,
