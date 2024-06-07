@@ -47,7 +47,7 @@ const OtherWaysToMakePurchase = () => {
 
   const handleRequestQuoteOnClick = () => {
     trackRequestQuoteButtonClicked();
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       salesInboundNotification({
         notificationText: EVENTS.REQUEST_QUOTE_BUTTON_CLICKED,
@@ -60,7 +60,7 @@ const OtherWaysToMakePurchase = () => {
 
   const handleSendPurchaseOrderButtonOnClick = () => {
     trackSendPurhcaseOrderButtonClicked();
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       salesInboundNotification({
         notificationText: EVENTS.SEND_PURCHASE_ORDER_BUTTON_CLICKED,

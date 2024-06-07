@@ -14,7 +14,7 @@ const enterprisePlan = PricingFeatures[PRICING.PRODUCTS.HTTP_RULES].enterprise;
 const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openContactUsModal }) => {
   const handleScheduleCallButtonClick = () => {
     trackEnterprisePlanScheduleMeetButtonClicked();
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       salesInboundNotification({
         notificationText: EVENTS.ENTERPRISE_PLAN_SCHEDULE_MEET_BUTTON_CLICKED,

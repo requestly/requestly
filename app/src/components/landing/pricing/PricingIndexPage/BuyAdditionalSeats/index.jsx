@@ -61,7 +61,7 @@ const BuyAdditionalSeats = () => {
 
   const handleBuyAdditionalUsersButtonOnClick = () => {
     trackBuyAdditionalUsersButtonClicked();
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       salesInboundNotification({
         notificationText: EVENTS.BUY_ADDITIONAL_USERS_BUTTON_CLICKED,
