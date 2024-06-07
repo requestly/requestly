@@ -31,7 +31,6 @@ interface RequestFeatureModalProps {
   featureName?: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
-  openIncentiveTaskListModal: () => void;
 }
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
@@ -43,7 +42,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   setOpenPopup,
   onContinue,
   featureName,
-  openIncentiveTaskListModal,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -118,34 +116,25 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
     return (
       <Row className="mt-16" justify="space-between" align="middle">
         <Col>
-          {!isDeadlineCrossed && (
-            <RQButton
-              type="link"
-              className="request-modal-link-btn"
-              disabled={isLoading}
-              onClick={() => {
-                trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
-                setOpenPopup(false);
-                onContinue();
-              }}
-            >
-              Use free till 30 November
-            </RQButton>
-          )}
+          <RQButton
+            type="text"
+            className="request-modal-text-btn"
+            disabled={isLoading}
+            onClick={() => {
+              trackUpgradeOptionClicked("upgrade_for_free");
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "incentiveTasksListModal",
+                  newValue: true,
+                })
+              );
+            }}
+          >
+            Upgrade for free
+          </RQButton>
         </Col>
         <Col>
           <Space direction="horizontal" size={8}>
-            <RQButton
-              type="default"
-              className="request-modal-default-btn"
-              disabled={isLoading}
-              onClick={() => {
-                trackUpgradeOptionClicked("upgrade_for_free");
-                openIncentiveTaskListModal();
-              }}
-            >
-              Upgrade for free
-            </RQButton>
             <RQButton
               type="default"
               className="request-modal-default-btn"
@@ -187,17 +176,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       </Row>
     );
-  }, [
-    billingTeams,
-    dispatch,
-    handleSendRequest,
-    isLoading,
-    isDeadlineCrossed,
-    navigate,
-    onContinue,
-    setOpenPopup,
-    openIncentiveTaskListModal,
-  ]);
+  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate]);
 
   useEffect(() => {
     if (isOpen) {
