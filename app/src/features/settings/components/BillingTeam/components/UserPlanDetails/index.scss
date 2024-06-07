@@ -3,6 +3,8 @@
     padding: 8px 1rem;
     border-bottom: 1px solid var(--surface-2);
     margin: 0 !important;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .user-plan-card-grid {
@@ -83,4 +85,12 @@
     background: var(--surface-2);
     color: var(--white);
   }
+}
+
+.cancel-plan-btn {
+  @extend .user-download-invoice-btn;
+}
+
+.ant-btn.cancel-plan-btn {
+  margin-top: 0px;
 }
