@@ -20,7 +20,7 @@ export const IncentivesCard = () => {
         </div>
         <div className="align-self-center">
           <IncentiveSectionHeader title="Earn $65 Free credits — Complete your Requestly setup!" />
-          <div className="mt-24">
+          <div className="mt-16">
             <CreditsProgressBar />
           </div>
         </div>

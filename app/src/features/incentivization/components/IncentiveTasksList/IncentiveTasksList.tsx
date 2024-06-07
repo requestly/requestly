@@ -238,7 +238,7 @@ export const IncentiveTasksList = () => {
   return (
     <div className="incentive-tasks-list-container">
       <IncentiveSectionHeader title={`Complete onboarding and earn $${totalCredits} Free credits`} />
-      <div className="mt-24">
+      <div className="mt-16">
         <CreditsProgressBar />
       </div>
       <div className="incentive-tasks-list">

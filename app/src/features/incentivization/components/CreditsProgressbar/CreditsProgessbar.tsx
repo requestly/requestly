@@ -14,7 +14,7 @@ import "./creditsProgessbar.scss";
 
 // TODO: fix isInModal in redeem flow
 /**
- * - show earned credits / total credits
+ * - show earned credits / total credits [DONE]
  * - handle all credits earned state
  * - add redeem cta in app header
  * - add redeem in checklist modal
@@ -51,6 +51,21 @@ export const CreditsProgressBar = () => {
 
   return (
     <>
+      <div className="credits-redeem-container">
+        <div className="description">
+          You currently have <span className="highlight">${totalCreditsEarned}</span> credits, which can be redeemed for{" "}
+          <span className="highlight">{totalCreditsEarned}</span> days of the Requestly Professional plan.
+        </div>
+
+        <Button
+          size="small"
+          icon={<MdRedeem className="anticon" />}
+          className="redeem-credits-btn"
+          onClick={() => setIsRedeemModalVisible(true)}
+        >
+          Redeem now
+        </Button>
+      </div>
       <div className="credits-progressbar-container">
         {isLoading ? (
           <div className="loader">
@@ -72,16 +87,6 @@ export const CreditsProgressBar = () => {
                 "No credits earned"
               )}
             </div>
-
-            <Button
-              type="text"
-              className="redeem-credits-btn"
-              icon={<MdRedeem />}
-              size="small"
-              onClick={() => setIsRedeemModalVisible(true)}
-            >
-              Redeem
-            </Button>
           </>
         )}
       </div>
