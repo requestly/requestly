@@ -168,7 +168,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       {isIncentiveTasksListModalVisible && (
         <IncentiveTasksListModal
           isOpen={isIncentiveTasksListModalVisible}
-          onClose={() => setIsTaskListModalVisible(false)}
+          toggle={() => setIsTaskListModalVisible(!isIncentiveTasksListModalVisible)}
         />
       )}
     </>

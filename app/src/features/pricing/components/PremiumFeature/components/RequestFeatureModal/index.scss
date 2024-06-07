@@ -25,6 +25,15 @@
     .request-modal-default-btn {
       background: none;
     }
+
+    .request-modal-text-btn.ant-btn {
+      color: var(--requestly-color-text-default);
+
+      &:hover {
+        background: var(--requestly-color-surface-1);
+      }
+    }
+
     .request-modal-link-btn {
       color: var(--text-light);
       text-decoration: underline;
