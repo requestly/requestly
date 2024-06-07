@@ -9,7 +9,7 @@ import "./index.scss";
 
 const features = [
   "Work from anywhere - Sync Requestly rules & other configurations across devices",
-  "Access your organisation's centralized resources and access controls. Utilize team workspaces, shared rules, mocks, and sessions.",
+  "Access your organization's resources, including team workspaces, shared rules and mocks.",
   "Use All features like HTTP Sessions, API Mocks, Overriding API Responses, etc.",
   "Join a Community trusted by over 200,000 customers worldwide from over 10,000",
   "It's Free!",
@@ -25,7 +25,7 @@ export const OnboardingAuthBanner = () => {
           Why Sign Up ? <img src={underlineIcon} alt="highlight" />
         </span>
       </Typography.Title>
-      <div className="mt-24">
+      <div className="mt-20">
         {features.map((feature) => (
           <Row className="banner-premium-feature-list-item">
             <MdCheck />
