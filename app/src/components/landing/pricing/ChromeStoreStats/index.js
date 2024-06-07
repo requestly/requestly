@@ -10,19 +10,19 @@ const ChromeStoreStats = () => {
       <div className="stat-wrapper">
         <img src={starIcon} alt="stars" />
         <div className="text-gray">
-          <span className="stat">4.7</span>/5 Star ratings
+          <span className="stat">4.8</span>/5 Star ratings
         </div>
       </div>
       <div className="stat-wrapper">
         <img src={reviewIcon} alt="reviews" />
         <div className="text-gray">
-          <span className="stat">1000+</span> Chrome web store review
+          <span className="stat">1000+</span> Chrome store reviews
         </div>
       </div>
       <div className="stat-wrapper">
         <div className="text-gray">
           <img src={usersIcon} alt="users" />
-          <span className="stat">200,000+</span> Happy users
+          <span className="stat">200,000+</span> Developers
         </div>
       </div>
     </div>

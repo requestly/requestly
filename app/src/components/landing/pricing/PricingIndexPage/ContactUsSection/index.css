@@ -1,0 +1,11 @@
+.more-questions-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  margin-top: 40px;
+}
+.more-questions-container .header {
+  font-size: 18px;
+  font-weight: 400;
+}

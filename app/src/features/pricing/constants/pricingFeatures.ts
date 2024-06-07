@@ -79,7 +79,7 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Daily backups(Encrypted)",
+          title: "Daily backups (Encrypted)",
           enabled: true,
         },
         {

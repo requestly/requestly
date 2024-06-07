@@ -46,7 +46,7 @@ export const OnboardingAuthBanner = () => {
       ))}
       <Row style={{ marginTop: "60px" }}>
         <Typography.Text className="banner-text-small" style={{ fontWeight: "500", color: "var(--white)" }}>
-          Trusted by developers & QA teams from 5000+ organizations
+          Trusted by developers & QA teams from 50,000+ organizations
         </Typography.Text>
       </Row>
       <Row align="middle" gutter={16} className="mt-16">
