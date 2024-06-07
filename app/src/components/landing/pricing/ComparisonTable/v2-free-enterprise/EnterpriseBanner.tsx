@@ -8,6 +8,7 @@ import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
 import { trackEnterprisePlanScheduleMeetButtonClicked } from "./analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { EVENTS } from "./analytics";
+import "./index.css";
 
 const enterprisePlan = PricingFeatures[PRICING.PRODUCTS.HTTP_RULES].enterprise;
 
@@ -26,12 +27,12 @@ const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openCo
   };
 
   return (
-    <Row className="enterprise-banner" style={{ marginBottom: "-15%" }}>
-      <Col lg={19} sm={20}>
+    <Row className="enterprise-banner" gutter={[16, 16]}>
+      <Col lg={14} sm={24}>
         <Typography.Title level={2}>Enterprise Plan</Typography.Title>
         <Typography.Title level={5}>
           <span className="enterprise-banner-underline">
-            Recommened for larger teams <img src={underlineIcon} alt="highlight" />
+            Recommended for larger teams <img src={underlineIcon} alt="highlight" />
           </span>{" "}
           and organizations that need additional control
         </Typography.Title>
@@ -57,7 +58,7 @@ const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openCo
           </Col>
         </Row>
       </Col>
-      <Col className="align-self-center">
+      <Col lg={10} sm={24} className="align-self-center text-center enterprise-image">
         <img src={enterpriseImage} height={190} width={200} alt="enterprise-plan" />
       </Col>
     </Row>
