@@ -19,7 +19,7 @@ export const CompaniesSection = () => {
     <Row justify="center" align="middle" className="w-full" style={{ margin: "30px 0" }}>
       <Space direction="vertical" className="companies-wrapper">
         <Typography.Text className="companies-section-header">
-          Trusted by developer & QA teams from 5000+ organizations
+          Trusted by developer & QA teams from 50,000+ organizations
         </Typography.Text>
         <Col>
           <Space direction="horizontal" size={24}>

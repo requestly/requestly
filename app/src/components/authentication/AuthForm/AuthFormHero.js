@@ -85,7 +85,7 @@ export const AuthFormHero = ({ currentTestimonialIndex, isOnboarding = false }) 
         ))}
       </div>
       <Typography.Text className="signup-modal-secondary-text">
-        Trusted by developers from 5000+ Organizations
+        Trusted by developers from 50,000+ Organizations
       </Typography.Text>
       <CompanyMarquee />
       <TestimonialSection />

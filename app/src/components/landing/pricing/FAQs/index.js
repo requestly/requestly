@@ -1,11 +1,7 @@
-import React, { useState } from "react";
-import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
-import { RQButton } from "lib/design-system/components";
+import React from "react";
 import "./index.css";
 
 const PricingFAQs = () => {
-  const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);
-
   const FAQs = [
     {
       ques: <React.Fragment>Do individual developers need to pay for Requestly?</React.Fragment>,
@@ -49,11 +45,8 @@ const PricingFAQs = () => {
       ques: <>I want to modify only HTTP Headers, Is there a discounted plan for me?</>,
       answer: (
         <>
-          We provide a custom plan for users seeking unlimited header modifications at $5/month.{" "}
-          <span onClick={() => setIsContactUsModalOpen(true)} className="link-button">
-            Contact us
-          </span>{" "}
-          to get this plan activated for you.
+          We provide a custom plan for users seeking unlimited header modifications. Contact us to get this plan
+          activated for you.
         </>
       ),
     },
@@ -78,19 +71,6 @@ const PricingFAQs = () => {
           </div>
         ))}
       </>
-      <div className="more-questions-container">
-        <div className="header text-gray">Still have more questions?</div>
-        <RQButton type="primary" className="faq-contact-btn" onClick={() => setIsContactUsModalOpen(true)}>
-          Contact us
-        </RQButton>
-      </div>
-      <ContactUsModal
-        isOpen={isContactUsModalOpen}
-        onCancel={() => setIsContactUsModalOpen(false)}
-        heading="Get In Touch"
-        subHeading="Learn about Requestly"
-        source="pricing_page"
-      />
     </>
   );
 };
