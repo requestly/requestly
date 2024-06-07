@@ -4,7 +4,6 @@ import { Row, Col, Radio, Popover, Button, Popconfirm, Space, Checkbox } from "a
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
-import CodeEditor from "components/misc/CodeEditor";
 import {
   displayFileSelector,
   handleOpenLocalFileInBrowser,
@@ -23,6 +22,7 @@ import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
+import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import "./ResponseBodyRow.css";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
@@ -203,10 +203,10 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
     }, 2000);
 
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC) {
-      return pair.response.value ? pair.response.value : "{}";
+      return "{}";
     }
     return null;
-  }, [pair.response.type, pair.response.value]);
+  }, [pair.response.type]);
 
   useEffect(() => {
     if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
@@ -281,19 +281,23 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
             <Col xl="12" span={24}>
               <CodeEditor
                 key={pair.response.type}
-                language={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE ? "javascript" : "json"}
+                language={
+                  pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
+                    ? EditorLanguage.JAVASCRIPT
+                    : EditorLanguage.JSON
+                }
+                defaultValue={getEditorDefaultValue()}
                 value={
                   pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC
                     ? editorStaticValue
                     : pair.response.value
                 }
-                defaultValue={getEditorDefaultValue()}
+                isReadOnly={isInputDisabled}
                 handleChange={responseBodyChangeHandler}
-                readOnly={isInputDisabled}
-                validation={pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? "off" : "editable"}
                 unlockJsonPrettify={true}
                 isCodeMinified={isCodeMinified}
                 isCodeFormatted={isCodeFormatted}
+                isResizable
               />
             </Col>
           </Row>

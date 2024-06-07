@@ -7,13 +7,13 @@ import { actions } from "store";
 import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
 //Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import CodeEditor from "components/misc/CodeEditor";
 import "./CustomScriptRow.css";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { getDefaultScriptRender, createRenderedScript } from "./utils";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { MockPickerModal } from "features/mocks/modals";
+import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 
 const { Text } = Typography;
 
@@ -35,7 +35,6 @@ const CustomScriptRow = ({
   const [codeTypeSelection, setCodeTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS);
   const [sourceTypeSelection, setSourceTypeSelection] = useState(GLOBAL_CONSTANTS.SCRIPT_TYPES.CODE);
   const [isScriptDeletePopupVisible, setIsScriptDeletePopupVisible] = useState(false);
-  const [isCodeFormatted, setIsCodeFormatted] = useState(false);
   const [initialCodeEditorValue, setInitialCodeEditorValue] = useState(null);
 
   const isCompatibleWithAttributes = isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT);
@@ -46,10 +45,10 @@ const CustomScriptRow = ({
 
   const codeEditorLanguage = useMemo(() => {
     return isCompatibleWithAttributes
-      ? "html"
+      ? EditorLanguage.HTML
       : script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS
-      ? "javascript"
-      : "css";
+      ? EditorLanguage.JAVASCRIPT
+      : EditorLanguage.CSS;
   }, [script.codeType, isCompatibleWithAttributes]);
 
   const [isMockPickerVisible, setIsMockPickerVisible] = useState(false);
@@ -203,7 +202,7 @@ const CustomScriptRow = ({
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
-            triggerUnsavedChangesIndication: !isCodeFormatted && triggerUnsavedChanges,
+            triggerUnsavedChangesIndication: triggerUnsavedChanges,
             updates: {
               [`scripts[${scriptIndex}].value`]: value,
             },
@@ -211,7 +210,7 @@ const CustomScriptRow = ({
         );
       }
     },
-    [dispatch, isCodeFormatted, pairIndex, script.type, scriptIndex]
+    [dispatch, pairIndex, script.type, scriptIndex]
   );
 
   useEffect(() => {
@@ -226,13 +225,6 @@ const CustomScriptRow = ({
   }, [initialCodeEditorValue, handleEditorUpdate]);
 
   const renderCodeEditor = () => {
-    const handleCodeFormattedFlag = () => {
-      setIsCodeFormatted(true);
-      setTimeout(() => {
-        setIsCodeFormatted(false);
-      }, 2000);
-    };
-
     return (
       <Col span={24} data-tour-id="code-editor">
         <Row
@@ -248,21 +240,21 @@ const CustomScriptRow = ({
               id={script.id}
               height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}
               language={codeEditorLanguage}
-              defaultValue={scriptEditorBoilerCode}
+              defaultValue={initialCodeEditorValue ?? scriptEditorBoilerCode}
               value={initialCodeEditorValue}
               handleChange={handleEditorUpdate}
-              readOnly={isInputDisabled}
-              isCodeFormatted={isCodeFormatted}
+              isReadOnly={isInputDisabled}
             />
           </Col>
         </Row>
         <Row span={24} align="middle" justify="space-between" className="code-editor-character-count-row ">
           <Col align="left">
-            {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
+            {/* TEMPORARILY HIDING THIS AS WE CURRENTLY DO NOT SUPPORT HTML PRETTIFY */}
+            {/* {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
               <Button type="link" onClick={handleCodeFormattedFlag}>
                 Pretty Print {"{ }"}
               </Button>
-            ) : null}
+            ) : null} */}
           </Col>
           <Col span={6} align="right">
             <span className="codemirror-character-count text-gray">{script.value?.length ?? 0} characters</span>
