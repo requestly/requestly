@@ -16,6 +16,10 @@ export const generateUUID = () => {
   return Math.random().toString(36).substr(2, 5);
 };
 
+export const generateSupportTicketNumber = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
 export const copyToClipBoard = (textToCopy, prompt) => {
   prompt = prompt || "Copied to clipboard!";
   navigator.clipboard.writeText(textToCopy).then(
