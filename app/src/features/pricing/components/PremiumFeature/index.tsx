@@ -4,7 +4,6 @@ import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
-import { IncentiveTasksListModal } from "features/incentivization";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { actions } from "store";
@@ -43,7 +42,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const billingTeams = useSelector(getAvailableBillingTeams);
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
-  const [isIncentiveTasksListModalVisible, setIsTaskListModalVisible] = useState(false);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
 
   const isExceedingLimits = useMemo(
@@ -69,7 +67,12 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           })
         );
       } else {
-        setIsTaskListModalVisible(true);
+        dispatch(
+          actions.toggleActiveModal({
+            modalName: "incentiveTasksListModal",
+            newValue: true,
+          })
+        );
       }
     }
   }, [dispatch, hasCrossedDeadline, onContinue, source, user.loggedIn]);
@@ -97,7 +100,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             isDeadlineCrossed={hasCrossedDeadline}
             source={source}
             featureName={featureName}
-            openIncentiveTaskListModal={() => setIsTaskListModalVisible(true)}
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
@@ -163,13 +165,6 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             });
           })}
         </Popconfirm>
-      )}
-
-      {isIncentiveTasksListModalVisible && (
-        <IncentiveTasksListModal
-          isOpen={isIncentiveTasksListModalVisible}
-          toggle={() => setIsTaskListModalVisible(!isIncentiveTasksListModalVisible)}
-        />
       )}
     </>
   );

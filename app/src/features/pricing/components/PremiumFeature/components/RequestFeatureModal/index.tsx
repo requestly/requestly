@@ -31,7 +31,6 @@ interface RequestFeatureModalProps {
   featureName?: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
-  openIncentiveTaskListModal: () => void;
 }
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
@@ -43,7 +42,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   setOpenPopup,
   onContinue,
   featureName,
-  openIncentiveTaskListModal,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -124,7 +122,12 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
             disabled={isLoading}
             onClick={() => {
               trackUpgradeOptionClicked("upgrade_for_free");
-              openIncentiveTaskListModal();
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "incentiveTasksListModal",
+                  newValue: true,
+                })
+              );
             }}
           >
             Upgrade for free
@@ -173,7 +176,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       </Row>
     );
-  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate, openIncentiveTaskListModal]);
+  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate]);
 
   useEffect(() => {
     if (isOpen) {
