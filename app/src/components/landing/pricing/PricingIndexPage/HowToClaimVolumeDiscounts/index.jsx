@@ -57,7 +57,7 @@ const HowToClaimVolumeDiscounts = () => {
 
   const handleCTAOnClick = () => {
     trackClaimVolumeDiscountsCTAClicked();
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       salesInboundNotification({
         notificationText: EVENTS.CLAIM_VOLUME_DISCOUNTS_CTA_CLICKED,
