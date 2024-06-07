@@ -18,8 +18,13 @@
     }
   }
   .credits-earned-counter {
+    flex-shrink: 0;
     font-size: var(--requestly-font-size-xs);
     color: var(--requestly-color-text-subtle);
+
+    .success {
+      color: var(--requestly-color-success);
+    }
   }
 
   .redeem-credits-btn.ant-btn {
