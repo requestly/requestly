@@ -33,7 +33,7 @@ const RequestDocsModal = ({ isOpen, handleToggleModal }) => {
   const handleSubmit = async (values) => {
     trackRequestDocumentClicked();
     setFormState("loading");
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       await salesInboundNotification({
         notificationText: `${EVENTS.REQUEST_DOCUEMNT_FORM_SUBMMITTED} triggered with email ${

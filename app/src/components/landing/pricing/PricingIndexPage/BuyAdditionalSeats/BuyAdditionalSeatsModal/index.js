@@ -11,7 +11,7 @@ const BuyAdditionalSeatsModal = ({ isOpen, handleToggleModal }) => {
   const handleSubmit = async (values) => {
     trackBuyAdditionalUsersFormSubmitted();
     setFormState("loading");
-    const salesInboundNotification = httpsCallable(getFunctions(), "salesInboundNotification");
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       await salesInboundNotification({
         notificationText: `${EVENTS.BUY_ADDITIONAL_USERS_FORM_SUBMITTED} trigged with company name ${
