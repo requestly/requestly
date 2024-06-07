@@ -20,7 +20,7 @@ export const miscRoutes: RouteObject[] = [
   },
   {
     path: PATHS.EXTENSION_UPDATED.RELATIVE,
-    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE + "?updatedToMV3"} />,
+    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE + "?updatedToMv3"} />,
   },
   {
     path: PATHS.INSTALL_EXTENSION.RELATIVE,
