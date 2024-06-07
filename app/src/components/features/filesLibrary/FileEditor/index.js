@@ -1,3 +1,4 @@
+// DEAD CODE
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Input, Tooltip, Spin, AutoComplete, Tabs } from "antd";
@@ -10,7 +11,6 @@ import { redirectToFiles, redirectToMocks } from "../../../../utils/RedirectionU
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
 //TEXT EDITOR
-import CodeEditor from "components/misc/CodeEditor";
 
 import ImageViewer from "./ImageViewer";
 import { getByteSize } from "../../../../utils/FormattingHelper";
@@ -160,13 +160,7 @@ const FileEditor = (props) => {
     return (
       <Col span={24} className={`${mockType === RESOURCE_TYPE_LIST.MOCK ? null : "mt-1"}`}>
         {isContentLoading === false ? (
-          <CodeEditor
-            language={codeEditorLanguage}
-            defaultValue={codeEditorDefaultValue}
-            value={body || ""}
-            readOnly={isEditorReadOnly}
-            handleChange={onBodyChange}
-          />
+          <></>
         ) : (
           <Col offset={10}>
             <Spin tip="Loading... File Content"></Spin>
@@ -344,15 +338,7 @@ const FileEditor = (props) => {
     return (
       <>
         <Row>
-          <Col span={24}>
-            <CodeEditor
-              language="json"
-              value={headers || ""}
-              defaultValue='"{Header": "Value}"'
-              readOnly={false}
-              handleChange={onHeadersChange}
-            />
-          </Col>
+          <Col span={24}></Col>
         </Row>
       </>
     );
