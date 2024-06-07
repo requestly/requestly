@@ -6,13 +6,13 @@ import { Row, Col, Radio, Button } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getByteSize } from "../../../../../../../../utils/FormattingHelper";
 import { Popconfirm } from "antd";
-import CodeEditor from "components/misc/CodeEditor";
 import { minifyCode, formatJSONString } from "utils/CodeEditorUtils";
 import { actions } from "store";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
+import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -66,10 +66,10 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
     }, 2000);
 
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
-      return pair.request.value ? pair.request.value : "";
+      return "{}";
     }
     return null;
-  }, [pair.request.type, pair.request.value]);
+  }, [pair.request.type]);
 
   const requestBodyChangeHandler = (value) => {
     if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC) {
@@ -172,19 +172,23 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             <Col xl="12" span={24}>
               <CodeEditor
                 key={pair.request.type}
-                language={pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE ? "javascript" : "json"}
+                language={
+                  pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
+                    ? EditorLanguage.JAVASCRIPT
+                    : EditorLanguage.JSON
+                }
+                defaultValue={getEditorDefaultValue()}
                 value={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC
                     ? editorStaticValue
                     : pair.request.value
                 }
-                defaultValue={getEditorDefaultValue()}
                 handleChange={requestBodyChangeHandler}
-                readOnly={isInputDisabled}
-                validation={pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.STATIC ? "off" : "editable"}
+                isReadOnly={isInputDisabled}
                 unlockJsonPrettify={true}
                 isCodeMinified={isCodeMinified}
                 isCodeFormatted={isCodeFormatted}
+                isResizable
               />
             </Col>
           </Row>
