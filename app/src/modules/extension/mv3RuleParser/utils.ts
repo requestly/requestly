@@ -1,14 +1,23 @@
+import { escapeRegExp } from "lodash";
 import { RulePairSource, SourceFilter, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
 
-const createRegexForWildcardString = (value: string): string => {
+export const escapeForwardSlashes = (value: string): string => {
+  return value.replace(/\//g, "\\/");
+};
+
+const createRegexForWildcardString = (value: string, isWildcardCapturingGroupsEnabled: boolean = true): string => {
   // TODO: convert all * to .* and escape all special chars for regex
-  return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(.*)");
+  if (isWildcardCapturingGroupsEnabled) {
+    return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(.*)");
+  } else {
+    return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(?:.*)");
+  }
 };
 
 // regex: /pattern/flags
-const parseRegex = (regex: string): { pattern: string; flags?: string } => {
+export const parseRegex = (regex: string): { pattern: string; flags?: string } => {
   const matchesRegexPattern = regex.match(/^\/(.*)\/([dgimsuy]*)$/);
   if (matchesRegexPattern) {
     const [, pattern, flags] = matchesRegexPattern;
@@ -17,32 +26,51 @@ const parseRegex = (regex: string): { pattern: string; flags?: string } => {
   return { pattern: regex };
 };
 
-const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCondition => {
+export const parseUrlParametersFromSourceV2 = (
+  source: RulePairSource,
+  isWildcardCapturingGroupsEnabled?: boolean
+): ExtensionRuleCondition => {
   // rules like query, headers, script, delay can be applied on all URLs
   if (source.value === "") {
     return {
-      urlFilter: "*",
+      regexFilter: ".*",
+      isUrlFilterCaseSensitive: true,
     };
   }
 
   if (source.key === SourceKey.URL) {
     switch (source.operator) {
       case SourceOperator.EQUALS:
-        return { urlFilter: `|${source.value}|` };
+        return {
+          regexFilter: `^${escapeRegExp(source.value)}$`,
+          isUrlFilterCaseSensitive: true,
+        };
 
       case SourceOperator.CONTAINS:
-        return { urlFilter: source.value };
+        return {
+          regexFilter: `.*${escapeRegExp(source.value)}.*`,
+          isUrlFilterCaseSensitive: true,
+        };
 
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
         return {
-          regexFilter: pattern,
+          // To handle case for regexSubsitution as replaces inplace instead of replace whole. So we match the whole url instead
+          // https://linear.app/requestly/issue/ENGG-1831
+          // https://arc.net/l/quote/erozzfqb
+          regexFilter: `.*?${pattern}.*`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
 
       case SourceOperator.WILDCARD_MATCHES:
-        return { regexFilter: createRegexForWildcardString(source.value) };
+        const { pattern, flags } = parseRegex(
+          createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
+        );
+        return {
+          regexFilter: `^${pattern}$`,
+          isUrlFilterCaseSensitive: !flags?.includes("i"),
+        };
     }
   }
 
@@ -50,54 +78,43 @@ const parseUrlParametersFromSource = (source: RulePairSource): ExtensionRuleCond
     switch (source.operator) {
       case SourceOperator.EQUALS:
         return {
-          regexFilter: `^(https?://)?(www.)?${source.value}([/:?#].*)?$`,
-          // source.value=host.com should match only the domain (host.com) and not match with the subdomain (a.host.com)
+          regexFilter: `^https?://${escapeRegExp(source.value)}(?:[/?#].*)?$`,
+          isUrlFilterCaseSensitive: true,
         };
 
       case SourceOperator.CONTAINS:
-        return { urlFilter: `||${source.value}*^` }; // host.c matches a.host.com but not ahost.com
+        return {
+          regexFilter: `^https?://[a-z0-9:.-]*${escapeRegExp(source.value)}[a-z0-9:.-]*(?:[/?#].*)?$`,
+          isUrlFilterCaseSensitive: true,
+        };
 
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
+
+        // Allows only accepted characters in the source incase of open rule (.*, .+, .?)
+        const cleanedPattern = pattern.replace(/\.([+*?])/g, "[a-z0-9:.-]$1");
         return {
-          regexFilter: `^https?://${pattern}(/|$)(.*)`,
+          regexFilter: `^https?://[a-z0-9:.-]*?${cleanedPattern}[a-z0-9:.-]*(?:[/?#].*)?$`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
 
       case SourceOperator.WILDCARD_MATCHES: {
-        const { pattern, flags } = parseRegex(createRegexForWildcardString(source.value));
+        const { pattern, flags } = parseRegex(
+          createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
+        );
+
+        // Allows only accepted characters in the source incase of open rule (.*, .+, .?)
+        const cleanedPattern = pattern.replace(/\.([+*?])/g, "[a-z0-9:.-]$1");
         return {
-          regexFilter: `^https?://${pattern}(/|$)(.*)`,
+          regexFilter: `^https?://${cleanedPattern}(?:[/?#].*)?$`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
       }
     }
   }
 
-  // deprecated
-  // TODO: to be removed
-  if (source.key === SourceKey.PATH) {
-    switch (source.operator) {
-      case SourceOperator.EQUALS: {
-        const path = source.value.startsWith("/") ? source.value : "/" + source.value;
-        return { urlFilter: `${path}^` }; // both "/path/to/resource" and "/to/" match https://example.com/path/to/resource. TODO: fix
-      }
-
-      case SourceOperator.CONTAINS: {
-        if (source.value.startsWith("/")) {
-          return { urlFilter: source.value };
-        }
-        return { urlFilter: `/*${source.value}` }; // TODO: fix
-      }
-
-      case SourceOperator.MATCHES:
-        return { regexFilter: source.value }; // TODO: fix
-
-      case SourceOperator.WILDCARD_MATCHES:
-        return { regexFilter: createRegexForWildcardString(source.value) }; // TODO: fix
-    }
-  }
+  // TODO: Support path in future
 
   return null;
 };
@@ -139,9 +156,12 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
   return condition;
 };
 
-export const parseConditionFromSource = (source: RulePairSource): ExtensionRuleCondition => {
+export const parseConditionFromSource = (
+  source: RulePairSource,
+  isWildcardCapturingGroupsEnabled?: boolean,
+): ExtensionRuleCondition => {
   return {
-    ...parseUrlParametersFromSource(source),
+    ...parseUrlParametersFromSourceV2(source, isWildcardCapturingGroupsEnabled),
     ...parseFiltersFromSource(source),
     excludedInitiatorDomains: BLACKLISTED_DOMAINS,
     excludedRequestDomains: BLACKLISTED_DOMAINS,

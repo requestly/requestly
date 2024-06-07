@@ -1,4 +1,9 @@
 .rq-templates-table {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 1rem;
+
   .template-name {
     color: var(--link-color);
     cursor: pointer;
