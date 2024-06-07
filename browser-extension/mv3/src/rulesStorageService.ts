@@ -4,18 +4,19 @@ import { Group, Rule, RuleType, Status } from "common/types";
 class RulesStorageService {
   private rules: Rule[] = [];
   private groups: Group[] = [];
-  private isInitialized = false;
+  private areRecordsCached = false;
   private listeners: any = {};
 
   private updateCachedRules = async (): Promise<void> => {
     this.rules = await getRules();
     this.groups = await getGroups();
-    this.isInitialized = true;
+    this.areRecordsCached = true;
   };
 
   constructor() {
     this.updateCachedRules();
     onRuleOrGroupChange(() => {
+      this.areRecordsCached = false;
       this.updateCachedRules().then(() => {
         if (this.listeners) {
           Object.values(this.listeners).forEach((listener: () => void) => listener?.());
@@ -34,14 +35,14 @@ class RulesStorageService {
   };
 
   getAllRules = async (): Promise<Rule[]> => {
-    if (!this.isInitialized) {
+    if (!this.areRecordsCached) {
       return getRules();
     }
     return this.rules;
   };
 
   getAllGroups = async (): Promise<Group[]> => {
-    if (!this.isInitialized) {
+    if (!this.areRecordsCached) {
       return getGroups();
     }
     return this.groups;
