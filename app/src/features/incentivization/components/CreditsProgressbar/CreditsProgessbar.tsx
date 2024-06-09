@@ -15,10 +15,13 @@ import "./creditsProgessbar.scss";
 // TODO: fix isInModal in redeem flow
 /**
  * - show earned credits / total credits [DONE]
- * - handle all credits earned state
- * - add redeem cta in app header
- * - add redeem in checklist modal
+ * - fix redeem button container [DONE]
+ * - handle all credits earned state [DONE]
+ * - add redeem in checklist modal [DONE]
  * - integrate backend with the UI
+ *    - feed user data in redeem modal
+ *    - empty state - disable action and show empty message
+ *
  * - test UI, subscription and DB states
  *  subs cases:
  *  - new subs
@@ -48,23 +51,33 @@ export const CreditsProgressBar = () => {
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
   const totalCreditsEarned = userMilestoneDetails?.totalCreditsClaimed ?? 0;
   const progressPrecentage = parseInt(`${(totalCreditsEarned / Math.max(1, totalCredits)) * 100}`);
+  const isAllCreditsRedeemed =
+    Object.keys(milestones ?? {}).length === (userMilestoneDetails?.claimedMilestoneLogs?.length ?? 0);
 
   return (
     <>
       <div className="credits-redeem-container">
-        <div className="description">
-          You currently have <span className="highlight">${totalCreditsEarned}</span> credits, which can be redeemed for{" "}
-          <span className="highlight">{totalCreditsEarned}</span> days of the Requestly Professional plan.
-        </div>
+        {isAllCreditsRedeemed ? (
+          <div className="all-credits-redeemed description">
+            You have redeemed all available credits. No credits remain for redemption.
+          </div>
+        ) : (
+          <>
+            <div className="description">
+              You currently have <span className="highlight">${totalCreditsEarned}</span> credits, which can be redeemed
+              for <span className="highlight">{totalCreditsEarned}</span> days of the Requestly Professional plan.
+            </div>
 
-        <Button
-          size="small"
-          icon={<MdRedeem className="anticon" />}
-          className="redeem-credits-btn"
-          onClick={() => setIsRedeemModalVisible(true)}
-        >
-          Redeem now
-        </Button>
+            <Button
+              size="small"
+              icon={<MdRedeem className="anticon" />}
+              className="redeem-credits-btn"
+              onClick={() => setIsRedeemModalVisible(true)}
+            >
+              Redeem now
+            </Button>
+          </>
+        )}
       </div>
       <div className="credits-progressbar-container">
         {isLoading ? (
@@ -91,7 +104,11 @@ export const CreditsProgressBar = () => {
         )}
       </div>
       {isRedeemModalVisible && (
-        <RedeemCreditsModal isOpen={isRedeemModalVisible} onClose={() => setIsRedeemModalVisible(false)} />
+        <RedeemCreditsModal
+          isOpen={isRedeemModalVisible}
+          onClose={() => setIsRedeemModalVisible(false)}
+          userMilestoneDetails={userMilestoneDetails}
+        />
       )}
     </>
   );
