@@ -38,7 +38,7 @@ export const CreditsProgressBar = () => {
 
   return (
     <>
-      {creditsToBeRedeemed > 0 ? (
+      {
         <div className="credits-redeem-container">
           {isAllCreditsRedeemed ? (
             <div className="all-credits-redeemed description">
@@ -46,11 +46,18 @@ export const CreditsProgressBar = () => {
             </div>
           ) : (
             <>
-              <div className="description">
-                You currently have <span className="highlight">${creditsToBeRedeemed}</span> credits, which can be
-                redeemed for <span className="highlight">{creditsToBeRedeemed}</span> days of the Requestly Professional
-                plan.
-              </div>
+              {creditsToBeRedeemed > 0 ? (
+                <div className="description">
+                  You currently have <span className="highlight">${creditsToBeRedeemed}</span> credits, which can be
+                  redeemed for <span className="highlight">{creditsToBeRedeemed}</span> days of the Requestly
+                  Professional plan.
+                </div>
+              ) : (
+                <div className="description">
+                  You currently have <span className="highlight">$0</span> credits, perform below tasks to earn credits,
+                  and redeemed it for Requestly Pro plan.
+                </div>
+              )}
 
               <Tooltip
                 overlayClassName="redeem-disable-tooltip"
@@ -69,7 +76,7 @@ export const CreditsProgressBar = () => {
             </>
           )}
         </div>
-      ) : null}
+      }
 
       <div className="credits-progressbar-container">
         {isLoading ? (

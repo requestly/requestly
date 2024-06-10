@@ -208,7 +208,14 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
             >
               Setup & earn credits
             </RQButton>
-            <RQButton type="text" onClick={onClose}>
+            <RQButton
+              type="text"
+              onClick={() => {
+                // @ts-ignore
+                dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+                onClose();
+              }}
+            >
               I'll do it later
             </RQButton>
           </div>
