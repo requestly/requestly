@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import emptyWallet from "./assets/empty_wallet.svg";
@@ -27,16 +27,30 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
   const milestones = useSelector(getIncentivizationMilestones);
   const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(false);
+
+  const userPlanDetails = user?.details?.planDetails;
+
   const creditsToBeRedeemed = userMilestoneDetails?.creditsToBeRedeemed ?? 0;
   const totalCredits = getTotalCredits(milestones);
 
-  console.log({ user });
+  const getSubscriptionDatePreview = useCallback(() => {
+    // Extend subscription
+    if (userPlanDetails?.status === "trailing") {
+      const subscriptionStartDate = userPlanDetails?.subscription?.startDate;
+      const subscriptionEndDate = userPlanDetails?.subscription?.endDate;
+      const startDate = moment(subscriptionStartDate);
+      const endDate = moment(subscriptionEndDate).add(creditsToBeRedeemed, "days");
 
-  const getEndDate = () => {
-    const start = moment();
-    const endDate = start.add(creditsToBeRedeemed, "days");
-    return endDate.format("MMM DD, YYYY");
-  };
+      return { startDate: startDate.format("MMM DD, YYYY"), endDate: endDate.format("MMM DD, YYYY") };
+    } else {
+      // New or restart subscription
+      const startDate = moment();
+      const endDate = moment().add(creditsToBeRedeemed, "days");
+      return { startDate: startDate.format("MMM DD, YYYY"), endDate: endDate.format("MMM DD, YYYY") };
+    }
+  }, [isOpen, userPlanDetails, creditsToBeRedeemed]);
+
+  const { startDate, endDate } = getSubscriptionDatePreview();
 
   const planSummary = [
     {
@@ -49,11 +63,11 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
     },
     {
       label: "Start date",
-      value: moment().format("MMM DD, YYYY"),
+      value: startDate,
     },
     {
       label: "Renewal date",
-      value: getEndDate(),
+      value: endDate,
     },
   ];
 
@@ -91,6 +105,9 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
 
     setIsLoading(true);
 
+    // @ts-ignore
+    dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+
     const redeemStatusToast = "redeemStatusToast";
     toast.loading({ content: "Please wait", key: redeemStatusToast });
 
@@ -101,6 +118,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
         if (response.data?.success) {
           // @ts-ignore
           dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+          onClose();
           toast.success({
             duration: 0,
             key: redeemStatusToast,
@@ -118,13 +136,16 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
                     <MdClose />
                   </div>
                 </div>
-                <div className="description">You are upgraded to Requestly Pro plan till {getEndDate()}.</div>
+                <div className="description">You are upgraded to Requestly Pro plan till {endDate}.</div>
               </div>
             ),
           });
+        } else {
+          throw new Error("Failed to redeem!");
         }
       })
       .catch(() => {
+        onClose();
         toast.error({
           duration: 0,
           key: redeemStatusToast,
