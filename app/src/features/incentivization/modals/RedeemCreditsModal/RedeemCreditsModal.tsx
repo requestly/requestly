@@ -35,23 +35,23 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
 
   const getSubscriptionDatePreview = useCallback(() => {
     // Extend subscription
-    if (userPlanDetails?.status === "trailing") {
+    if (userPlanDetails?.status === "trialing") {
       const subscriptionStartDate = userPlanDetails?.subscription?.startDate;
       const subscriptionEndDate = userPlanDetails?.subscription?.endDate;
-      const startDate = moment(subscriptionStartDate);
-      const endDate = moment(subscriptionEndDate).add(creditsToBeRedeemed, "days");
+      const startDate = moment(subscriptionStartDate).format("MMM DD, YYYY");
+      const endDate = moment(subscriptionEndDate).add(creditsToBeRedeemed, "days").format("MMM DD, YYYY");
 
-      return { startDate: startDate.format("MMM DD, YYYY"), endDate: endDate.format("MMM DD, YYYY") };
+      return { startDate, endDate };
     } else {
       // New or restart subscription
-      const startDate = moment();
-      const endDate = moment().add(creditsToBeRedeemed, "days");
-      return { startDate: startDate.format("MMM DD, YYYY"), endDate: endDate.format("MMM DD, YYYY") };
+      const startDate = moment().format("MMM DD, YYYY");
+      const endDate = moment().add(creditsToBeRedeemed, "days").format("MMM DD, YYYY");
+
+      return { startDate, endDate };
     }
   }, [isOpen, userPlanDetails, creditsToBeRedeemed]);
 
   const { startDate, endDate } = getSubscriptionDatePreview();
-
   const planSummary = [
     {
       label: "Plan name",
