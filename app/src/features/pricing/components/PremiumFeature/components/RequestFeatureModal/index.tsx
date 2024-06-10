@@ -127,6 +127,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               onClick={() => {
                 trackUpgradeOptionClicked("upgrade_for_free");
                 dispatch(
+                  // @ts-ignore
                   actions.toggleActiveModal({
                     modalName: "incentiveTasksListModal",
                     newValue: true,
@@ -151,6 +152,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               onClick={() => {
                 trackUpgradeOptionClicked("upgrade_yourself");
                 dispatch(
+                  // @ts-ignore
                   actions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,

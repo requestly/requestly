@@ -23,8 +23,8 @@ export const CreditsButton = () => {
   const handleButtonClick = () => {
     trackSidebarClicked("credits");
     if (user?.loggedIn) {
-      // @ts-ignore
       dispatch(
+        // @ts-ignore
         actions.toggleActiveModal({
           modalName: "incentiveTasksListModal",
           newValue: true,
