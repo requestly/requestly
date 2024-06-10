@@ -1,6 +1,6 @@
 import React from "react";
 import { TbClockExclamation } from "@react-icons/all-files/tb/TbClockExclamation";
-import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
+// import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import "./index.scss";
 
 interface IncentiveSectionHeaderProps {
@@ -19,10 +19,10 @@ export const IncentiveSectionHeader: React.FC<IncentiveSectionHeaderProps> = ({ 
       <div className="incentive-section-description">
         <span>Get the most out of your Requestly account and earn free credits by completing these steps.</span>
         {/* TODO: ADD LINK */}
-        <a href="#">
+        {/* <a href="#">
           <MdOutlineInfo />
           Know more
-        </a>
+        </a> */}
       </div>
     </div>
   );
