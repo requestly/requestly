@@ -26,6 +26,7 @@ export const PrimarySidebar: React.FC = () => {
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
@@ -122,7 +123,7 @@ export const PrimarySidebar: React.FC = () => {
           ))}
       </ul>
       <div className="primary-sidebar-bottom-btns">
-        <CreditsButton />
+        {isIncentivizationEnabled && <CreditsButton />}
         <InviteButton />
       </div>
     </div>
