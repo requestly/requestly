@@ -19,9 +19,10 @@ import { BillingTeamDetails } from "features/settings/components/BillingTeam/typ
 import APP_CONSTANTS from "config/constants";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
-import "./index.scss";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import "./index.scss";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   const requestEnterprisePlanFromAdmin = useMemo(
     () =>
@@ -116,27 +118,30 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const ModalActionButtons = useMemo(() => {
     return (
       <Row className="mt-16" justify="space-between" align="middle">
-        <Col>
-          <RQButton
-            type="text"
-            className="request-modal-text-btn"
-            disabled={isLoading}
-            onClick={() => {
-              trackUpgradeOptionClicked("upgrade_for_free");
-              dispatch(
-                actions.toggleActiveModal({
-                  modalName: "incentiveTasksListModal",
-                  newValue: true,
-                  newProps: {
-                    source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
-                  },
-                })
-              );
-            }}
-          >
-            Upgrade for free
-          </RQButton>
-        </Col>
+        {isIncentivizationEnabled && (
+          <Col>
+            <RQButton
+              type="text"
+              className="request-modal-text-btn"
+              disabled={isLoading}
+              onClick={() => {
+                trackUpgradeOptionClicked("upgrade_for_free");
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "incentiveTasksListModal",
+                    newValue: true,
+                    newProps: {
+                      source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
+                    },
+                  })
+                );
+              }}
+            >
+              Upgrade for free
+            </RQButton>
+          </Col>
+        )}
+
         <Col>
           <Space direction="horizontal" size={8}>
             <RQButton

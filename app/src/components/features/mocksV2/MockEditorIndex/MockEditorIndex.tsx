@@ -24,6 +24,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { actions } from "store";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface Props {
   isNew?: boolean;
@@ -55,6 +56,8 @@ const MockEditorIndex: React.FC<Props> = ({
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
 
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+
   useEffect(() => {
     if (mockId) {
       setIsMockLoading(true);
@@ -83,24 +86,26 @@ const MockEditorIndex: React.FC<Props> = ({
           toast.success("Mock Created Successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
 
-          const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+          if (isIncentivizationEnabled) {
+            const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
 
-          claimIncentiveRewards({ event: IncentivizeEvent.FIRST_MOCK_CREATED }).then((response) => {
-            // @ts-ignore
-            if (response.data?.success) {
+            claimIncentiveRewards({ event: IncentivizeEvent.FIRST_MOCK_CREATED }).then((response) => {
               // @ts-ignore
-              dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
-
-              dispatch(
+              if (response.data?.success) {
                 // @ts-ignore
-                actions.toggleActiveModal({
-                  modalName: "incentiveTaskCompletedModal",
-                  newValue: true,
-                  newProps: { event: IncentivizeEvent.FIRST_MOCK_CREATED },
-                })
-              );
-            }
-          });
+                dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+
+                dispatch(
+                  // @ts-ignore
+                  actions.toggleActiveModal({
+                    modalName: "incentiveTaskCompletedModal",
+                    newValue: true,
+                    newProps: { event: IncentivizeEvent.FIRST_MOCK_CREATED },
+                  })
+                );
+              }
+            });
+          }
 
           if (selectOnSave) {
             const url = generateFinalUrl(

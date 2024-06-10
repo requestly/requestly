@@ -36,6 +36,7 @@ import { DraftSessionViewerProps } from "./DraftSessionViewer";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -75,6 +76,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecordingMetadata?.options), [
     sessionRecordingMetadata?.options,
   ]);
+
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   const isIncludeNetworkLogsDisabled =
     isSessionLogOptionsAlreadySaved && !savedSessionRecordingOptions.includes(DebugInfo.INCLUDE_NETWORK_LOGS);
@@ -151,25 +154,27 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
           });
 
           if (isDraftSession) {
-            const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-            claimIncentiveRewards({ event: IncentivizeEvent.FIRST_SESSION_RECORDED }).then((response) => {
-              // @ts-ignore
-              if (response.data?.success) {
-                dispatch(
-                  // @ts-ignore
-                  incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
-                );
+            if (isIncentivizationEnabled) {
+              const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+              claimIncentiveRewards({ event: IncentivizeEvent.FIRST_SESSION_RECORDED }).then((response) => {
+                // @ts-ignore
+                if (response.data?.success) {
+                  dispatch(
+                    // @ts-ignore
+                    incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
+                  );
 
-                dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
-                    modalName: "incentiveTaskCompletedModal",
-                    newValue: true,
-                    newProps: { event: IncentivizeEvent.FIRST_SESSION_RECORDED },
-                  })
-                );
-              }
-            });
+                  dispatch(
+                    // @ts-ignore
+                    actions.toggleActiveModal({
+                      modalName: "incentiveTaskCompletedModal",
+                      newValue: true,
+                      newProps: { event: IncentivizeEvent.FIRST_SESSION_RECORDED },
+                    })
+                  );
+                }
+              });
+            }
           }
 
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
@@ -216,6 +221,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       navigate,
       source,
       isDraftSession,
+      isIncentivizationEnabled,
     ]
   );
 
