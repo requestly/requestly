@@ -10,6 +10,8 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { getIncentivizationUserMilestoneDetails } from "store/features/incentivization/selectors";
 import "./creditsButton.scss";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization";
+import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
 
 export const CreditsButton = () => {
   const dispatch = useDispatch();
@@ -19,9 +21,18 @@ export const CreditsButton = () => {
   const [isCreditsTourVisible, setIsCreditsTourVisible] = useState(false);
 
   const handleButtonClick = () => {
+    trackSidebarClicked("credits");
     if (user?.loggedIn) {
       // @ts-ignore
-      dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+      dispatch(
+        actions.toggleActiveModal({
+          modalName: "incentiveTasksListModal",
+          newValue: true,
+          newProps: {
+            source: INCENTIVIZATION_SOURCE.SIDEBAR,
+          },
+        })
+      );
 
       if (!isMiscTourCompleted.earnCredits) {
         setIsCreditsTourVisible(false);
@@ -42,6 +53,7 @@ export const CreditsButton = () => {
           newProps: {
             authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
             warningMessage: "You must sign in to earn or redeem free credits.",
+            eventSource: "incentivization",
           },
         })
       );

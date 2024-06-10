@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button, Progress, Tooltip } from "antd";
 import { MdRedeem } from "@react-icons/all-files/md/MdRedeem";
@@ -14,7 +14,11 @@ import { getUserAuthDetails } from "store/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import "./creditsProgessbar.scss";
 
-export const CreditsProgressBar = () => {
+interface CreditsProgressBarProps {
+  source: string;
+}
+
+export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }) => {
   const [isRedeemModalVisible, setIsRedeemModalVisible] = useState(false);
 
   const user = useSelector(getUserAuthDetails);
@@ -107,6 +111,7 @@ export const CreditsProgressBar = () => {
           isOpen={isRedeemModalVisible}
           onClose={() => setIsRedeemModalVisible(false)}
           userMilestoneDetails={userMilestoneDetails}
+          source={source}
         />
       )}
     </>

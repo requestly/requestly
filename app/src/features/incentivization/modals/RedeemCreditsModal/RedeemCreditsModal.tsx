@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import emptyWallet from "./assets/empty_wallet.svg";
@@ -15,14 +15,28 @@ import { toast } from "utils/Toast";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import "./redeemCreditsModal.scss";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
+import {
+  trackCreditsRedeemed,
+  trackNoCreditsAvailableModalViewed,
+  trackRedeemCreditsClicked,
+  trackRedeemCreditsFailed,
+  trackRedeemCreditsModalViewed,
+} from "features/incentivization/analytics";
 
 interface RedeemCreditsModalProps {
   isOpen: boolean;
   onClose: () => void;
   userMilestoneDetails: UserMilestoneDetails;
+  source: string;
 }
 
-export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, onClose, userMilestoneDetails }) => {
+export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
+  isOpen,
+  onClose,
+  userMilestoneDetails,
+  source,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
@@ -98,6 +112,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
   };
 
   const handleRedeemCreditsClick = () => {
+    trackRedeemCreditsClicked(userMilestoneDetails?.creditsToBeRedeemed);
     const redeemCredits = httpsCallable(getFunctions(), "incentivization-redeemCredits");
 
     if (!user?.loggedIn) {
@@ -119,7 +134,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
         if (response.data?.success) {
           // @ts-ignore
           dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
-          onClose();
+          trackCreditsRedeemed(userMilestoneDetails?.creditsToBeRedeemed);
           toast.success({
             duration: 0,
             key: redeemStatusToast,
@@ -141,12 +156,13 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
               </div>
             ),
           });
+          onClose();
         } else {
           throw new Error("Failed to redeem!");
         }
       })
-      .catch(() => {
-        onClose();
+      .catch((error) => {
+        trackRedeemCreditsFailed(error?.message);
         toast.error({
           duration: 0,
           key: redeemStatusToast,
@@ -171,11 +187,23 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
             </div>
           ),
         });
+
+        onClose();
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      if (!creditsToBeRedeemed) {
+        trackNoCreditsAvailableModalViewed(source);
+      } else {
+        trackRedeemCreditsModalViewed(creditsToBeRedeemed, source);
+      }
+    }
+  }, [creditsToBeRedeemed, isOpen, source]);
 
   return (
     <Modal
@@ -201,8 +229,16 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
             <RQButton
               type="primary"
               onClick={() => {
-                // @ts-ignore
-                dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+                dispatch(
+                  // @ts-ignore
+                  actions.toggleActiveModal({
+                    modalName: "incentiveTasksListModal",
+                    newValue: true,
+                    newProps: {
+                      source: INCENTIVIZATION_SOURCE.REDEEM_CREDITS_MODAL,
+                    },
+                  })
+                );
                 onClose();
               }}
             >

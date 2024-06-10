@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -12,6 +12,8 @@ import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import creditsEarnedAnimation from "./assets/creditsEarned.json";
 import { actions } from "store";
 import "./incentiveTaskCompletedModal.scss";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
+import { trackCreditsAssignedModalClicked, trackCreditsAssignedModalViewed } from "features/incentivization/analytics";
 
 interface IncentiveTaskCompletedModalProps {
   isOpen: boolean;
@@ -23,6 +25,12 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const dispatch = useDispatch();
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
+
+  useEffect(() => {
+    if (isOpen) {
+      trackCreditsAssignedModalViewed(userMilestoneDetails?.recentCreditsClaimed ?? 0, event);
+    }
+  }, [userMilestoneDetails?.recentCreditsClaimed, event, isOpen]);
 
   if (!milestones || !event) {
     return null;
@@ -98,14 +106,29 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
           <RQButton
             type="primary"
             onClick={() => {
+              trackCreditsAssignedModalClicked("complete_now");
               // @ts-ignore
-              dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+              dispatch(
+                actions.toggleActiveModal({
+                  modalName: "incentiveTasksListModal",
+                  newValue: true,
+                  newProps: {
+                    source: INCENTIVIZATION_SOURCE.TASK_COMPLETED_MODAL,
+                  },
+                })
+              );
               toggle();
             }}
           >
             Complete now
           </RQButton>
-          <RQButton type="default" onClick={toggle}>
+          <RQButton
+            type="default"
+            onClick={() => {
+              trackCreditsAssignedModalClicked("remind_me_later");
+              toggle();
+            }}
+          >
             Remind me later
           </RQButton>
         </div>

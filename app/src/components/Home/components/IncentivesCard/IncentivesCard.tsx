@@ -1,12 +1,13 @@
 import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import giftAnimation from "./assets/gift.json";
-import { CreditsProgressBar, IncentiveSectionHeader } from "features/incentivization";
+import { CreditsProgressBar, INCENTIVIZATION_SOURCE, IncentiveSectionHeader } from "features/incentivization";
 import { RQButton } from "lib/design-system/components";
 import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import "./incentivesCard.scss";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 export const IncentivesCard = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ export const IncentivesCard = () => {
         <div className="align-self-center">
           <IncentiveSectionHeader title="Earn $65 Free credits — Complete your Requestly setup!" />
           <div className="mt-16">
-            <CreditsProgressBar />
+            <CreditsProgressBar source={SOURCE.HOME_SCREEN} />
           </div>
         </div>
         <div className="align-self-center display-row-center flex-1">
@@ -30,7 +31,15 @@ export const IncentivesCard = () => {
             onClick={() => {
               if (user?.loggedIn) {
                 // @ts-ignore
-                dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "incentiveTasksListModal",
+                    newValue: true,
+                    newProps: {
+                      source: INCENTIVIZATION_SOURCE.HOME_SCREEN,
+                    },
+                  })
+                );
               } else {
                 dispatch(
                   // @ts-ignore
