@@ -30,13 +30,13 @@
     "@requestly/web-sdk": "0.14.2",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/chrome": "^0.0.266",
     "archiver": "^5.3.1",
     "node-sass": "^8.0.0",
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-terser": "^7.0.2",
     "tslib": "^2.4.0",
     "typescript": "^4.9.5"
   }
