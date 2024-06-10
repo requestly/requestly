@@ -23,13 +23,13 @@ interface RedeemCreditsModalProps {
 }
 
 export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, onClose, userMilestoneDetails }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useDispatch();
   const milestones = useSelector(getIncentivizationMilestones);
   const user = useSelector(getUserAuthDetails);
-  const [isLoading, setIsLoading] = useState(false);
 
   const userPlanDetails = user?.details?.planDetails;
-
   const creditsToBeRedeemed = userMilestoneDetails?.creditsToBeRedeemed ?? 0;
   const totalCredits = getTotalCredits(milestones);
 
