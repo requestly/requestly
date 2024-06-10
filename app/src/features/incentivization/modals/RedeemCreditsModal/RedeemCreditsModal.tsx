@@ -72,6 +72,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
   ];
 
   // FIXME: currently breaks for few test cases eg 91
+  // @ts-ignore
   const daysToMonthsAndDays = (days: number) => {
     const duration = moment.duration(days, "days");
     const months = Math.floor(duration.asMonths());
