@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { Button, Progress } from "antd";
+import { Button, Progress, Tooltip } from "antd";
 import { MdRedeem } from "@react-icons/all-files/md/MdRedeem";
 import { RedeemCreditsModal } from "features/incentivization";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
@@ -10,43 +10,28 @@ import {
   getIsIncentivizationDetailsLoading,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits } from "features/incentivization/utils";
+import { getUserAuthDetails } from "store/selectors";
+import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import "./creditsProgessbar.scss";
 
-// TODO: fix isInModal in redeem flow
-/**
- * - show earned credits / total credits [DONE]
- * - fix redeem button container [DONE]
- * - handle all credits earned state [DONE]
- * - add redeem in checklist modal [DONE]
- * - integrate backend with the UI
- *    - feed user data in redeem modal
- *    - empty state - disable action and show empty message
- *
- * - test UI, subscription and DB states
- *  subs cases:
- *  - new subs
- *  - extend subs
- *  - restart subs
- *
- * credits cases:
- *  - if user node not exist in DB
- *  - if credits == 0
- *  - if credits > 0
- *
- *
- * backend [DONE]
- * - create backend function for redeeming the credits
- *    - update userMilestone node
- * - give strip subscription [IMP] (its trial only which we are giving to user)
- * - handle for active subscription extend it if again redeemed [IMP]
- */
+interface CreditsProgressBarProps {
+  source: string;
+}
 
-export const CreditsProgressBar = () => {
+export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }) => {
   const [isRedeemModalVisible, setIsRedeemModalVisible] = useState(false);
 
+  const user = useSelector(getUserAuthDetails);
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
+  const billingTeams = useSelector(getAvailableBillingTeams);
+
+  const isUserHasActiveSubscription = user?.details?.planDetails?.status === "active";
+  const isUserInBillingTeam =
+    billingTeams?.length && billingTeams?.some((team) => user?.details?.profile?.uid in team.members);
+
+  const disableRedeem = isUserHasActiveSubscription || isUserInBillingTeam;
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
   const totalCreditsEarned = userMilestoneDetails?.totalCreditsClaimed ?? 0;
@@ -57,7 +42,7 @@ export const CreditsProgressBar = () => {
 
   return (
     <>
-      {creditsToBeRedeemed > 0 ? (
+      {
         <div className="credits-redeem-container">
           {isAllCreditsRedeemed ? (
             <div className="all-credits-redeemed description">
@@ -65,24 +50,37 @@ export const CreditsProgressBar = () => {
             </div>
           ) : (
             <>
-              <div className="description">
-                You currently have <span className="highlight">${creditsToBeRedeemed}</span> credits, which can be
-                redeemed for <span className="highlight">{creditsToBeRedeemed}</span> days of the Requestly Professional
-                plan.
-              </div>
+              {creditsToBeRedeemed > 0 ? (
+                <div className="description">
+                  You currently have <span className="highlight">${creditsToBeRedeemed}</span> credits, which can be
+                  redeemed for <span className="highlight">{creditsToBeRedeemed}</span> days of the Requestly
+                  Professional plan.
+                </div>
+              ) : (
+                <div className="description">
+                  You currently have <span className="highlight">$0</span> credits, perform below tasks to earn credits,
+                  and redeemed it for Requestly Pro plan.
+                </div>
+              )}
 
-              <Button
-                size="small"
-                icon={<MdRedeem className="anticon" />}
-                className="redeem-credits-btn"
-                onClick={() => setIsRedeemModalVisible(true)}
+              <Tooltip
+                overlayClassName="redeem-disable-tooltip"
+                title={disableRedeem ? "You already have an active subscription!" : null}
               >
-                Redeem now
-              </Button>
+                <Button
+                  size="small"
+                  disabled={disableRedeem}
+                  icon={<MdRedeem className="anticon" />}
+                  className="redeem-credits-btn"
+                  onClick={() => setIsRedeemModalVisible(true)}
+                >
+                  Redeem now
+                </Button>
+              </Tooltip>
             </>
           )}
         </div>
-      ) : null}
+      }
 
       <div className="credits-progressbar-container">
         {isLoading ? (
@@ -113,6 +111,7 @@ export const CreditsProgressBar = () => {
           isOpen={isRedeemModalVisible}
           onClose={() => setIsRedeemModalVisible(false)}
           userMilestoneDetails={userMilestoneDetails}
+          source={source}
         />
       )}
     </>

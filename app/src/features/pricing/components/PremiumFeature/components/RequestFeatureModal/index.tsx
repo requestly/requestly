@@ -21,6 +21,7 @@ import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import "./index.scss";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -126,6 +127,9 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                 actions.toggleActiveModal({
                   modalName: "incentiveTasksListModal",
                   newValue: true,
+                  newProps: {
+                    source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
+                  },
                 })
               );
             }}

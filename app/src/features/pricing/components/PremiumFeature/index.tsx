@@ -13,6 +13,7 @@ import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.scss";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -71,6 +72,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           actions.toggleActiveModal({
             modalName: "incentiveTasksListModal",
             newValue: true,
+            newProps: {
+              source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
+            },
           })
         );
       }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import emptyWallet from "./assets/empty_wallet.svg";
@@ -15,29 +15,57 @@ import { toast } from "utils/Toast";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import "./redeemCreditsModal.scss";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
+import {
+  trackCreditsRedeemed,
+  trackNoCreditsAvailableModalViewed,
+  trackRedeemCreditsClicked,
+  trackRedeemCreditsFailed,
+  trackRedeemCreditsModalViewed,
+} from "features/incentivization/analytics";
 
 interface RedeemCreditsModalProps {
   isOpen: boolean;
   onClose: () => void;
   userMilestoneDetails: UserMilestoneDetails;
+  source: string;
 }
 
-export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, onClose, userMilestoneDetails }) => {
+export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
+  isOpen,
+  onClose,
+  userMilestoneDetails,
+  source,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useDispatch();
   const milestones = useSelector(getIncentivizationMilestones);
   const user = useSelector(getUserAuthDetails);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const userPlanDetails = user?.details?.planDetails;
   const creditsToBeRedeemed = userMilestoneDetails?.creditsToBeRedeemed ?? 0;
   const totalCredits = getTotalCredits(milestones);
 
-  console.log({ user });
+  const getSubscriptionDatePreview = useCallback(() => {
+    // Extend subscription
+    if (userPlanDetails?.status === "trialing") {
+      const subscriptionStartDate = userPlanDetails?.subscription?.startDate;
+      const subscriptionEndDate = userPlanDetails?.subscription?.endDate;
+      const startDate = moment(subscriptionStartDate).format("MMM DD, YYYY");
+      const endDate = moment(subscriptionEndDate).add(creditsToBeRedeemed, "days").format("MMM DD, YYYY");
 
-  const getEndDate = () => {
-    const start = moment();
-    const endDate = start.add(creditsToBeRedeemed, "days");
-    return endDate.format("MMM DD, YYYY");
-  };
+      return { startDate, endDate };
+    } else {
+      // New or restart subscription
+      const startDate = moment().format("MMM DD, YYYY");
+      const endDate = moment().add(creditsToBeRedeemed, "days").format("MMM DD, YYYY");
 
+      return { startDate, endDate };
+    }
+  }, [isOpen, userPlanDetails, creditsToBeRedeemed]);
+
+  const { startDate, endDate } = getSubscriptionDatePreview();
   const planSummary = [
     {
       label: "Plan name",
@@ -49,15 +77,16 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
     },
     {
       label: "Start date",
-      value: moment().format("MMM DD, YYYY"),
+      value: startDate,
     },
     {
       label: "Renewal date",
-      value: getEndDate(),
+      value: endDate,
     },
   ];
 
   // FIXME: currently breaks for few test cases eg 91
+  // @ts-ignore
   const daysToMonthsAndDays = (days: number) => {
     const duration = moment.duration(days, "days");
     const months = Math.floor(duration.asMonths());
@@ -83,6 +112,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
   };
 
   const handleRedeemCreditsClick = () => {
+    trackRedeemCreditsClicked(userMilestoneDetails?.creditsToBeRedeemed);
     const redeemCredits = httpsCallable(getFunctions(), "incentivization-redeemCredits");
 
     if (!user?.loggedIn) {
@@ -90,6 +120,9 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
     }
 
     setIsLoading(true);
+
+    // @ts-ignore
+    dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
 
     const redeemStatusToast = "redeemStatusToast";
     toast.loading({ content: "Please wait", key: redeemStatusToast });
@@ -101,6 +134,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
         if (response.data?.success) {
           // @ts-ignore
           dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+          trackCreditsRedeemed(userMilestoneDetails?.creditsToBeRedeemed);
           toast.success({
             duration: 0,
             key: redeemStatusToast,
@@ -118,13 +152,17 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
                     <MdClose />
                   </div>
                 </div>
-                <div className="description">You are upgraded to Requestly Pro plan till {getEndDate()}.</div>
+                <div className="description">You are upgraded to Requestly Pro plan till {endDate}.</div>
               </div>
             ),
           });
+          onClose();
+        } else {
+          throw new Error("Failed to redeem!");
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        trackRedeemCreditsFailed(error?.message);
         toast.error({
           duration: 0,
           key: redeemStatusToast,
@@ -149,11 +187,23 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
             </div>
           ),
         });
+
+        onClose();
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      if (!creditsToBeRedeemed) {
+        trackNoCreditsAvailableModalViewed(source);
+      } else {
+        trackRedeemCreditsModalViewed(creditsToBeRedeemed, source);
+      }
+    }
+  }, [creditsToBeRedeemed, isOpen, source]);
 
   return (
     <Modal
@@ -179,14 +229,29 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({ isOpen, 
             <RQButton
               type="primary"
               onClick={() => {
-                // @ts-ignore
-                dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+                dispatch(
+                  // @ts-ignore
+                  actions.toggleActiveModal({
+                    modalName: "incentiveTasksListModal",
+                    newValue: true,
+                    newProps: {
+                      source: INCENTIVIZATION_SOURCE.REDEEM_CREDITS_MODAL,
+                    },
+                  })
+                );
                 onClose();
               }}
             >
               Setup & earn credits
             </RQButton>
-            <RQButton type="text" onClick={onClose}>
+            <RQButton
+              type="text"
+              onClick={() => {
+                // @ts-ignore
+                dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+                onClose();
+              }}
+            >
               I'll do it later
             </RQButton>
           </div>
