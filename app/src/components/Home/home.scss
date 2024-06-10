@@ -25,7 +25,6 @@
     background: var(--surface-0_5);
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.6);
     padding: 1rem;
-    padding-bottom: 0;
 
     & .primary-card-header {
       font-weight: 700;
@@ -35,6 +34,7 @@
   }
 
   & .homepage-bottom-section {
+    padding-bottom: 1rem;
     gap: 1rem;
 
     & .homepage-teams-card {
@@ -131,9 +131,10 @@
   height: 100%;
 }
 
-.homepage-incentives-card {
+.homepage-incentives-card.ant-col {
   margin-bottom: 20px;
   margin-right: 8px;
+  padding-bottom: 0;
 }
 
 .homepage-empty-card-secondary-btn.ant-btn:focus {
