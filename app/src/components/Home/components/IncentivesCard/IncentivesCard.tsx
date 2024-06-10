@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import "./incentivesCard.scss";
-import { SOURCE } from "modules/analytics/events/common/constants";
 
 export const IncentivesCard = () => {
   const dispatch = useDispatch();
@@ -22,7 +21,7 @@ export const IncentivesCard = () => {
         <div className="align-self-center">
           <IncentiveSectionHeader title="Earn $65 Free credits — Complete your Requestly setup!" />
           <div className="mt-16">
-            <CreditsProgressBar source={SOURCE.HOME_SCREEN} />
+            <CreditsProgressBar source={INCENTIVIZATION_SOURCE.HOME_SCREEN} />
           </div>
         </div>
         <div className="align-self-center display-row-center flex-1">
