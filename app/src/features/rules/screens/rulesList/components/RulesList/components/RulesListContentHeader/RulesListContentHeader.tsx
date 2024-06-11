@@ -16,13 +16,13 @@ import React, { useMemo } from "react";
 import { RuleType } from "types";
 import { isRule } from "features/rules/utils";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
-import { RiCheckLine } from "@react-icons/all-files/ri/RiCheckLine";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
 import { useDebounce } from "hooks/useDebounce";
 import { trackRulesListFilterApplied, trackRulesListSearched } from "features/rules/analytics";
 import { useRulesActionContext } from "features/rules/context/actions";
+import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 
 interface Props {
   searchValue: string;
@@ -147,7 +147,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           <div className="label">
             All{" "}
             {records.length ? (
-              <Badge count={records.filter((record) => isRule(record)).length} overflowCount={20} />
+              <Badge count={records.filter((record) => isRule(record)).length} overflowCount={10_000} />
             ) : null}
           </div>
         ),
@@ -181,7 +181,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
         key: "active",
         label: (
           <div className="label">
-            <RiCheckLine className="icon" />
+            <MdOutlineToggleOn className="icon" />
             Active {/* FIXME: Performance Improvements and logic */}
             {records.length ? (
               <Badge

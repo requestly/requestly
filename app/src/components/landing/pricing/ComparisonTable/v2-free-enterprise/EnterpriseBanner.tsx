@@ -5,21 +5,38 @@ import { RQButton } from "lib/design-system/components";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { PRICING, PricingFeatures } from "features/pricing";
 import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
+import { trackEnterprisePlanScheduleMeetButtonClicked } from "./analytics";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { EVENTS } from "./analytics";
+import "./index.css";
 
 const enterprisePlan = PricingFeatures[PRICING.PRODUCTS.HTTP_RULES].enterprise;
 
 const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openContactUsModal }) => {
+  const handleScheduleCallButtonClick = () => {
+    trackEnterprisePlanScheduleMeetButtonClicked();
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
+    try {
+      salesInboundNotification({
+        notificationText: EVENTS.ENTERPRISE_PLAN_SCHEDULE_MEET_BUTTON_CLICKED,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    openContactUsModal();
+  };
+
   return (
-    <Row className="enterprise-banner">
-      <Col lg={19} sm={20}>
+    <Row className="enterprise-banner" gutter={[16, 16]}>
+      <Col lg={14} sm={24}>
         <Typography.Title level={2}>Enterprise Plan</Typography.Title>
         <Typography.Title level={5}>
           <span className="enterprise-banner-underline">
-            For larger teams <img src={underlineIcon} alt="highlight" />
+            Recommended for larger teams <img src={underlineIcon} alt="highlight" />
           </span>{" "}
           and organizations that need additional control
         </Typography.Title>
-        {/* <Typography.Text>{enterprisePlan.planDescription}</Typography.Text> */}
+
         <br />
         <div className="enterprise-features-grid">
           {enterprisePlan.features.map((feature, index) => (
@@ -35,13 +52,13 @@ const EnterpriseBanner: React.FC<{ openContactUsModal: () => void }> = ({ openCo
             <span className="text-bold title">Starts at $59</span>
           </Col>
           <Col>
-            <RQButton type="primary" onClick={openContactUsModal}>
-              Schedule a call
+            <RQButton type="primary" onClick={handleScheduleCallButtonClick}>
+              Schedule a call for today
             </RQButton>
           </Col>
         </Row>
       </Col>
-      <Col className="align-self-center">
+      <Col lg={10} sm={24} className="align-self-center text-center enterprise-image">
         <img src={enterpriseImage} height={190} width={200} alt="enterprise-plan" />
       </Col>
     </Row>

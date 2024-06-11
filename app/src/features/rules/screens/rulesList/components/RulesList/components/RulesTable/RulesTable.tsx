@@ -141,6 +141,17 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     })`;
   };
 
+  const getRowClassNames = (record: RuleTableRecord) => {
+    let classNames = "";
+    if (isGroup(record)) {
+      classNames += "rq-content-list-table-row-group";
+    }
+    if (record.isFavourite) {
+      classNames += " record-pinned";
+    }
+    return classNames;
+  };
+
   return (
     <>
       {/* Add Modals Required in Rules List here */}
@@ -154,7 +165,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
         data={contentTableData}
         rowKey="id"
         loading={loading}
-        customRowClassName={(record) => (record.isFavourite ? "record-pinned" : "")}
+        customRowClassName={(record) => getRowClassNames(record)}
         locale={{
           emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No rule found" />,
         }}
