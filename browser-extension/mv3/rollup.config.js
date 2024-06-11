@@ -101,9 +101,17 @@ export default [
     plugins: commonPlugins,
   },
   {
-    input: "src/client-scripts/index.ts",
+    input: "src/page-scripts/sessionRecorderHelper.js",
     output: {
-      file: `${OUTPUT_DIR}/client.js`,
+      file: `${OUTPUT_DIR}/page-scripts/sessionRecorderHelper.ps.js`,
+      format: "iife",
+    },
+    plugins: commonPlugins,
+  },
+  {
+    input: "src/page-scripts/ajaxRequestInterceptor.js",
+    output: {
+      file: `${OUTPUT_DIR}/page-scripts/ajaxRequestInterceptor.ps.js`,
       format: "iife",
     },
     plugins: commonPlugins,
