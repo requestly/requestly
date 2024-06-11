@@ -4,3 +4,4 @@ export { CreditsProgressBar } from "./components/CreditsProgressbar/CreditsProge
 export { IncentiveTasksListModal } from "./modals/IncentiveTasksListModal/IncentiveTasksListModal";
 export { RedeemCreditsModal } from "./modals/RedeemCreditsModal/RedeemCreditsModal";
 export { IncentiveTaskCompletedModal } from "./modals/IncentiveTaskCompletedModal/IncentiveTaskCompletedModal";
+export { INCENTIVIZATION_SOURCE } from "./analytics/constants";

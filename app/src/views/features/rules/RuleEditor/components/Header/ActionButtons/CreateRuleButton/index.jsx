@@ -8,6 +8,7 @@ import {
   getAppMode,
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
+  getUserAttributes,
   getUserAuthDetails,
 } from "../../../../../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
@@ -38,9 +39,14 @@ import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
-import "../RuleEditorActionButtons.css";
 import { HTML_ERRORS } from "./actions/insertScriptValidators";
 import { toastType } from "components/misc/CodeEditor/EditorToast/types";
+import { IncentivizeEvent } from "features/incentivization/types";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { RuleType } from "features/rules";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -100,6 +106,7 @@ const CreateRuleButton = ({
   //Constants
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
   const ruleCreatedEventSource =
     searchParams.get("source") ?? location?.state?.source ?? analyticEventRuleCreatedSource;
   const MODE = isRuleEditorModal ? ruleEditorModalMode : getModeData(location).MODE;
@@ -108,9 +115,9 @@ const CreateRuleButton = ({
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-  // const rules = getAllRules(state);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
+  const userAttributes = useSelector(getUserAttributes);
 
   const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {
@@ -146,6 +153,55 @@ const CreateRuleButton = ({
       }
     }
   }, [isDisabled, MODE, premiumRuleLimitType, user.details?.isPremium]);
+
+  const claimRuleCreationRewards = () => {
+    if (!isIncentivizationEnabled) return;
+
+    const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+
+    if (userAttributes?.num_rules === 0 || !user?.loggedIn) {
+      claimIncentiveRewards({
+        event: IncentivizeEvent.FIRST_RULE_CREATED,
+        options: { ruleType: currentlySelectedRuleData.ruleType },
+      }).then((response) => {
+        if (response.data?.success) {
+          dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+
+          dispatch(
+            actions.toggleActiveModal({
+              modalName: "incentiveTaskCompletedModal",
+              newValue: true,
+              newProps: {
+                event: IncentivizeEvent.FIRST_RULE_CREATED,
+              },
+            })
+          );
+        }
+      });
+    } else {
+      const premiumRules = [RuleType.REQUEST, RuleType.RESPONSE, RuleType.SCRIPT];
+      if (premiumRules.includes(currentlySelectedRuleData.ruleType)) {
+        claimIncentiveRewards({
+          event: IncentivizeEvent.PREMIUM_RULE_CREATED,
+          options: { ruleType: currentlySelectedRuleData.ruleType },
+        }).then((response) => {
+          if (response.data?.success) {
+            dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+
+            dispatch(
+              actions.toggleActiveModal({
+                modalName: "incentiveTaskCompletedModal",
+                newValue: true,
+                newProps: {
+                  event: IncentivizeEvent.PREMIUM_RULE_CREATED,
+                },
+              })
+            );
+          }
+        });
+      }
+    }
+  };
 
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
@@ -204,6 +260,24 @@ const CreateRuleButton = ({
           () => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false)
         )
           .then(async () => {
+            if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
+              if (user?.loggedIn) {
+                claimRuleCreationRewards();
+              } else {
+                dispatch(
+                  actions.toggleActiveModal({
+                    modalName: "authModal",
+                    newValue: true,
+                    newProps: {
+                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+                      warningMessage: "You must sign in to earn credits.",
+                      callback: () => claimRuleCreationRewards(),
+                    },
+                  })
+                );
+              }
+            }
+
             if (isRuleEditorModal) {
               ruleCreatedFromEditorModalCallback(currentlySelectedRuleData.id);
             } else {

@@ -1,11 +1,70 @@
+.credits-redeem-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--requestly-color-white-t-10);
+  background: var(--requestly-color-surface-1);
+  margin-bottom: 24px;
+  gap: 16px;
+
+  .description {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-xs);
+    font-weight: 400;
+    line-height: 130%;
+
+    &.all-credits-redeemed {
+      text-align: center;
+      width: 100%;
+    }
+
+    .highlight {
+      color: var(--requestly-color-text-default);
+      font-size: var(--requestly-font-size-xs);
+      font-weight: 500;
+      line-height: 130%;
+    }
+  }
+
+  .redeem-credits-btn {
+    color: var(--requestly-color-text-default);
+    text-align: center;
+    font-size: var(--requestly-font-size-xs);
+    font-weight: 500;
+    line-height: 130%;
+  }
+}
+
 .credits-progressbar-container {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 16px;
 
+  .loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    overflow: hidden;
+    width: 100%;
+
+    .anticon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--requestly-color-text-subtle);
+    }
+  }
   .credits-earned-counter {
+    flex-shrink: 0;
     font-size: var(--requestly-font-size-xs);
     color: var(--requestly-color-text-subtle);
+
+    .success {
+      color: var(--requestly-color-success);
+    }
   }
 
   .redeem-credits-btn.ant-btn {
@@ -29,4 +88,8 @@
       height: 8px;
     }
   }
+}
+
+.redeem-disable-tooltip {
+  min-width: 34ch;
 }

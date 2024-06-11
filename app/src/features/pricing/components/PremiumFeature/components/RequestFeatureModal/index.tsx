@@ -19,8 +19,10 @@ import { BillingTeamDetails } from "features/settings/components/BillingTeam/typ
 import APP_CONSTANTS from "config/constants";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
-import "./index.scss";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import "./index.scss";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -31,7 +33,6 @@ interface RequestFeatureModalProps {
   featureName?: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
-  openIncentiveTaskListModal: () => void;
 }
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
@@ -43,7 +44,6 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   setOpenPopup,
   onContinue,
   featureName,
-  openIncentiveTaskListModal,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -51,6 +51,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   const requestEnterprisePlanFromAdmin = useMemo(
     () =>
@@ -117,22 +118,31 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const ModalActionButtons = useMemo(() => {
     return (
       <Row className="mt-16" justify="space-between" align="middle">
-        <Col>
-          {!isDeadlineCrossed && (
+        {isIncentivizationEnabled && (
+          <Col>
             <RQButton
-              type="link"
-              className="request-modal-link-btn"
+              type="text"
+              className="request-modal-text-btn"
               disabled={isLoading}
               onClick={() => {
-                trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
-                setOpenPopup(false);
-                onContinue();
+                trackUpgradeOptionClicked("upgrade_for_free");
+                dispatch(
+                  // @ts-ignore
+                  actions.toggleActiveModal({
+                    modalName: "incentiveTasksListModal",
+                    newValue: true,
+                    newProps: {
+                      source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
+                    },
+                  })
+                );
               }}
             >
-              Use free till 30 November
+              Upgrade for free
             </RQButton>
-          )}
-        </Col>
+          </Col>
+        )}
+
         <Col>
           <Space direction="horizontal" size={8}>
             <RQButton
@@ -140,19 +150,9 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               className="request-modal-default-btn"
               disabled={isLoading}
               onClick={() => {
-                trackUpgradeOptionClicked("upgrade_for_free");
-                openIncentiveTaskListModal();
-              }}
-            >
-              Upgrade for free
-            </RQButton>
-            <RQButton
-              type="default"
-              className="request-modal-default-btn"
-              disabled={isLoading}
-              onClick={() => {
                 trackUpgradeOptionClicked("upgrade_yourself");
                 dispatch(
+                  // @ts-ignore
                   actions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,
@@ -187,17 +187,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       </Row>
     );
-  }, [
-    billingTeams,
-    dispatch,
-    handleSendRequest,
-    isLoading,
-    isDeadlineCrossed,
-    navigate,
-    onContinue,
-    setOpenPopup,
-    openIncentiveTaskListModal,
-  ]);
+  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate]);
 
   useEffect(() => {
     if (isOpen) {

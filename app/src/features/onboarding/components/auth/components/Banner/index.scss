@@ -7,7 +7,6 @@
   & h3.ant-typography {
     font-weight: 500;
     line-height: 36px;
-    margin-top: 8px !important;
   }
 
   .banner-title-highlight {
@@ -25,9 +24,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 8px;
+    margin-top: 1rem;
     color: var(--neutrals-gray-300);
-    font-size: 13px;
+    font-size: 14px;
     flex-wrap: nowrap;
 
     & svg {
