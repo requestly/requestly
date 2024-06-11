@@ -42,6 +42,7 @@ import { trackWorkspaceInviteAnimationViewed } from "modules/analytics/events/co
 import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/header";
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -123,6 +124,8 @@ const WorkspaceSelector = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
+
+  const isLimitToPrivateWorkspaceActive = useFeatureIsOn("limit_to_private_workspace");
 
   // GLOBAL STATE
   const user = useSelector(getUserAuthDetails);
@@ -417,8 +420,21 @@ const WorkspaceSelector = () => {
     joinWorkspaceDropdownItems[key]?.onClick?.();
   };
 
+  useEffect(() => {
+    if (isLimitToPrivateWorkspaceActive) {
+      if (currentlyActiveWorkspace?.id) {
+        confirmWorkspaceSwitch(handleSwitchToPrivateWorkspace);
+      }
+    }
+  }, [
+    isLimitToPrivateWorkspaceActive,
+    currentlyActiveWorkspace?.id,
+    confirmWorkspaceSwitch,
+    handleSwitchToPrivateWorkspace,
+  ]);
+
   const menu = (
-    <Menu className="workspaces-menu">
+    <Menu className="workspaces-menu" disabled={isLimitToPrivateWorkspaceActive}>
       <Menu.ItemGroup key="Workspaces" title="Your workspaces">
         <Menu.Item
           key="1"
