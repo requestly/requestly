@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { Collapse } from "antd";
 import { CreditsProgressBar } from "../CreditsProgressbar/CreditsProgessbar";
 import { IncentiveSectionHeader } from "../IncentiveSectionHeader";
@@ -29,8 +29,12 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import LINKS from "config/constants/sub/links";
 import "./incentiveTasksList.scss";
+import { trackIncentivizationTaskClicked } from "features/incentivization/analytics";
 
-export const IncentiveTasksList = () => {
+interface IncentiveTasksListProps {
+  source: string;
+}
+export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
@@ -39,9 +43,10 @@ export const IncentiveTasksList = () => {
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
-  const postActionClickCallback = () => {
+  const postActionClickCallback = (task: IncentivizeEvent) => {
     // @ts-ignore
     dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+    trackIncentivizationTaskClicked(task);
   };
 
   const incentiveTasksList: IncentiveTaskListItem[] = useMemo(
@@ -61,7 +66,12 @@ export const IncentiveTasksList = () => {
         milestone: milestones?.[IncentivizeEvent.FIRST_RULE_CREATED],
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_RULE_CREATED, userMilestoneDetails);
-          return <NewRuleButtonWithDropdown disable={isCompleted} callback={postActionClickCallback} />;
+          return (
+            <NewRuleButtonWithDropdown
+              disable={isCompleted}
+              callback={() => postActionClickCallback(IncentivizeEvent.FIRST_RULE_CREATED)}
+            />
+          );
         },
       },
       {
@@ -79,7 +89,12 @@ export const IncentiveTasksList = () => {
         milestone: milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED],
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.PREMIUM_RULE_CREATED, userMilestoneDetails);
-          return <NewRuleButtonWithDropdown disable={isCompleted} callback={postActionClickCallback} />;
+          return (
+            <NewRuleButtonWithDropdown
+              disable={isCompleted}
+              callback={() => postActionClickCallback(IncentivizeEvent.PREMIUM_RULE_CREATED)}
+            />
+          );
         },
       },
       {
@@ -103,7 +118,7 @@ export const IncentiveTasksList = () => {
               disabled={isCompleted}
               type="primary"
               onClick={() => {
-                postActionClickCallback();
+                postActionClickCallback(IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED);
                 dispatch(
                   // @ts-ignore
                   actions.toggleActiveModal({
@@ -145,7 +160,7 @@ export const IncentiveTasksList = () => {
               disabled={isCompleted}
               type="primary"
               onClick={() => {
-                postActionClickCallback();
+                postActionClickCallback(IncentivizeEvent.FIRST_MOCK_CREATED);
                 redirectToMocks(navigate);
               }}
             >
@@ -175,7 +190,7 @@ export const IncentiveTasksList = () => {
               disabled={isCompleted}
               type="primary"
               onClick={() => {
-                postActionClickCallback();
+                postActionClickCallback(IncentivizeEvent.FIRST_SESSION_RECORDED);
                 redirectToSessionRecordingHome(navigate);
               }}
             >
@@ -221,7 +236,7 @@ export const IncentiveTasksList = () => {
                   );
                 }, 1000 * 20);
 
-                postActionClickCallback();
+                postActionClickCallback(IncentivizeEvent.RATE_ON_CHROME_STORE);
 
                 window.open(LINKS.CHROME_STORE_REVIEWS, "blank");
               }}
@@ -238,8 +253,8 @@ export const IncentiveTasksList = () => {
   return (
     <div className="incentive-tasks-list-container">
       <IncentiveSectionHeader title={`Complete onboarding and earn $${totalCredits} Free credits`} />
-      <div className="mt-24">
-        <CreditsProgressBar />
+      <div className="mt-16">
+        <CreditsProgressBar source={source} />
       </div>
       <div className="incentive-tasks-list">
         {isLoading ? (

@@ -26,6 +26,7 @@ import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./CreateWorkspaceModal.css";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
@@ -46,6 +47,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
     description: "",
   });
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
+
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
@@ -77,7 +80,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
 
-      if (userAttributes?.num_workspaces === 1) {
+      if (userAttributes?.num_workspaces === 1 && isIncentivizationEnabled) {
         const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
 
         claimIncentiveRewards({ event: IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED }).then((response) => {
@@ -103,6 +106,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       navigate,
       user?.details?.isSyncEnabled,
       userAttributes?.num_workspaces,
+      isIncentivizationEnabled,
     ]
   );
 

@@ -13,6 +13,7 @@ import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.scss";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -43,6 +44,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
@@ -71,6 +73,9 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           actions.toggleActiveModal({
             modalName: "incentiveTasksListModal",
             newValue: true,
+            newProps: {
+              source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
+            },
           })
         );
       }
@@ -119,7 +124,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           showArrow={false}
           placement={popoverPlacement}
           okText="See upgrade plans"
-          cancelText={!hasCrossedDeadline ? "Use free till 30 November" : `Upgrade for free`}
+          cancelText={isIncentivizationEnabled ? "upgrade for free" : null}
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
@@ -153,6 +158,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           onOpenChange={(open) => {
             if (open) trackUpgradePopoverViewed("default", source);
           }}
+          cancelButtonProps={{ style: { display: isIncentivizationEnabled ? "inline-flex" : "none" } }}
         >
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {

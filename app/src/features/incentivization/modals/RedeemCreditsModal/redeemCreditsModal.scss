@@ -9,7 +9,10 @@
 .redeem-credits-modal.ant-modal {
   .ant-modal-header {
     border-bottom: none;
+    padding: 16px;
+    padding-bottom: 0;
   }
+
   .ant-modal-body {
     padding: 0;
   }
@@ -152,6 +155,53 @@
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+  }
+}
+
+.redeem-status-toast-container {
+  .ant-message-custom-content.ant-message-success,
+  .ant-message-custom-content.ant-message-error {
+    display: flex;
+    align-items: flex-start;
+
+    .anticon-check-circle,
+    .anticon-close-circle {
+      margin-top: 6px;
+    }
+  }
+
+  .redeem-status-toast {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .title-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+
+      .close-icon {
+        text-align: center;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--requestly-color-text-subtle);
+      }
+    }
+
+    .description {
+      margin-top: 4px;
+      text-align: left;
+      font-weight: 400;
+      line-height: 150%;
+      max-width: 28ch;
+    }
+  }
+
+  .ant-message-custom-content.ant-message-error {
+    .description {
+      max-width: 30ch;
     }
   }
 }
