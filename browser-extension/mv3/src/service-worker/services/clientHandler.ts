@@ -9,8 +9,8 @@ const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPatte
 
 const CLIENT_SCRIPTS: chrome.scripting.RegisteredContentScript[] = [
   {
-    id: "client-script-ajaxInterceptor",
-    js: ["client-scripts/ajaxRequestInterceptor.js"],
+    id: "page-script-ajaxInterceptor",
+    js: ["page-scripts/ajaxRequestInterceptor.ps.js"],
     world: "MAIN",
     allFrames: true,
     persistAcrossSessions: false,
@@ -19,8 +19,8 @@ const CLIENT_SCRIPTS: chrome.scripting.RegisteredContentScript[] = [
     excludeMatches: excludeMatchesPatterns,
   },
   {
-    id: "client-script-sessionRecorder",
-    js: ["client-scripts/sessionRecorderHelper.js"],
+    id: "page-script-sessionRecorder",
+    js: ["page-scripts/sessionRecorderHelper.ps.js"],
     world: "MAIN",
     persistAcrossSessions: false,
     matches: ["http://*/*", "https://*/*"],
