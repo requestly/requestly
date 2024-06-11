@@ -47,10 +47,20 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
         (milestones?.[IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED]?.value ?? 0) as number
       } on creating your first team workspace.`,
     },
-    [IncentivizeEvent.PREMIUM_RULE_CREATED]: {
+    [IncentivizeEvent.RULE_TESTED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED]?.value ?? 0) as number
-      } on creating your first premium rule.`,
+        (milestones?.[IncentivizeEvent.RULE_TESTED]?.value ?? 0) as number
+      } on testing your first rule.`,
+    },
+    [IncentivizeEvent.RESPONSE_RULE_CREATED]: {
+      message: `You earned $${
+        (milestones?.[IncentivizeEvent.RESPONSE_RULE_CREATED]?.value ?? 0) as number
+      } on creating your first response rule.`,
+    },
+    [IncentivizeEvent.REDIRECT_RULE_CREATED]: {
+      message: `You earned $${
+        (milestones?.[IncentivizeEvent.REDIRECT_RULE_CREATED]?.value ?? 0) as number
+      } on creating your first redirect rule.`,
     },
     [IncentivizeEvent.FIRST_MOCK_CREATED]: {
       message: `You earned $${

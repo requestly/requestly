@@ -22,4 +22,5 @@ export const INCENTIVIZATION_SOURCE = {
   REDEEM_CREDITS_MODAL: "redeem_credits_modal",
   UPGRADE_POPOVER: "upgrade_popover",
   SIDEBAR: "sidebar",
+  INCENTIVES_TASK_LIST: "incentives_task_list",
 };
