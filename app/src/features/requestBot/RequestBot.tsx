@@ -27,7 +27,7 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose }) => {
         className="get-human-support"
         onClick={() => {
           onClose();
-          window.$saturn?.open();
+          window.$crisp.push(["do", "overlay:open"]);
           trackGetHumanSupportClicked();
         }}
       >
