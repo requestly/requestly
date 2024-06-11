@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Checkbox, Col, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
 import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
@@ -15,9 +15,15 @@ import { testRuleOnUrl } from "actions/ExtensionActions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./index.scss";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { IncentivizeEvent } from "features/incentivization/types";
+import { actions } from "store";
+import { incentivizationActions } from "store/features/incentivization/slice";
 
 export const TestRuleHeader = () => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
@@ -25,6 +31,7 @@ export const TestRuleHeader = () => {
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(true);
   const { sheetPlacement } = useBottomSheetContext();
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -58,8 +65,30 @@ export const TestRuleHeader = () => {
     if (error) {
       setError(null);
     }
+
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
+
+    if (isIncentivizationEnabled) {
+      const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
+
+      claimIncentiveRewards({ event: IncentivizeEvent.RULE_TESTED }).then((response) => {
+        // @ts-ignore
+        if (response.data?.success) {
+          // @ts-ignore
+          dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+
+          dispatch(
+            // @ts-ignore
+            actions.toggleActiveModal({
+              modalName: "incentiveTaskCompletedModal",
+              newValue: true,
+              newProps: { event: IncentivizeEvent.RULE_TESTED },
+            })
+          );
+        }
+      });
+    }
   }, [
     pageUrl,
     error,
@@ -69,6 +98,8 @@ export const TestRuleHeader = () => {
     currentlySelectedRuleData.status,
     user.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
+    dispatch,
+    isIncentivizationEnabled,
   ]);
 
   return (
