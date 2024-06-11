@@ -97,18 +97,13 @@ const updateTabCache = async (tabId: number, obj: Record<string, any>, frameId?:
     target["allFrames"] = true;
   }
 
-  chrome.scripting.executeScript(
-    {
-      target,
-      func: updateCache,
-      args: [obj],
-      injectImmediately: true,
-      world: "MAIN",
-    },
-    () => {
-      // NOOP
-    }
-  );
+  return chrome.scripting.executeScript({
+    target,
+    func: updateCache,
+    args: [obj],
+    injectImmediately: true,
+    world: "MAIN",
+  });
 };
 
 const updateTabRuleCache = async (tabId: number, frameId?: number) => {
@@ -149,7 +144,9 @@ const updateTabRuleCache = async (tabId: number, frameId?: number) => {
       delayRules: clientDelayRules,
     },
     frameId
-  );
+  ).catch(() => {
+    //do nothing
+  });
 };
 
 export const initClientRuleCaching = async () => {

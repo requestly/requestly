@@ -9,7 +9,7 @@ import {
   RulePair,
 } from "common/types";
 import { AJAXRequestDetails } from "./requestProcessor/types";
-import { getUrlObject, isBlacklistedURL } from "../../utils";
+import { getAllSupportedWebURLs, getUrlObject } from "../../utils";
 
 const toRegex = (regexStr: string): RegExp => {
   const matchRegExp = regexStr.match(new RegExp("^/(.+)/(|i|g|ig|gi)$"));
@@ -229,4 +229,21 @@ export const findMatchingRule = (rules: Rule[], requestDetails: AJAXRequestDetai
     }
   }
   return null;
+};
+
+export const isBlacklistedURL = (url: string): boolean => {
+  const blacklistedSources: UrlSource[] = [
+    ...getAllSupportedWebURLs().map((webUrl) => ({
+      key: SourceKey.URL,
+      operator: SourceOperator.CONTAINS,
+      value: webUrl,
+    })),
+    {
+      key: SourceKey.URL,
+      operator: SourceOperator.CONTAINS,
+      value: "__rq", // you can use __rq in the url to blacklist it
+    },
+  ];
+
+  return blacklistedSources.some((source) => matchSourceUrl(source, url));
 };

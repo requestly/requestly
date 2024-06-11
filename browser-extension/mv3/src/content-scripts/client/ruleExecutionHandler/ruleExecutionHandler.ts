@@ -1,6 +1,6 @@
 import { Rule } from "common/types";
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
-import { handleAppliedRuleNotification } from "./testRuleHandler";
+import { CLIENT_MESSAGES } from "common/constants";
+import { handleAppliedRuleNotification } from "../testRuleHandler";
 
 class RuleExecutionHandler {
   constructor() {
@@ -14,12 +14,6 @@ class RuleExecutionHandler {
           this.onRuleExecuted(message.rule, message.requestDetails);
           break;
       }
-    });
-  };
-
-  getExecutedRules = async () => {
-    return chrome.runtime.sendMessage({
-      action: EXTENSION_MESSAGES.GET_EXECUTED_RULES,
     });
   };
 

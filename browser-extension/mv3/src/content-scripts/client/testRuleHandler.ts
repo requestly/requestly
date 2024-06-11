@@ -3,7 +3,7 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/consta
 import rulesStorageService from "../../rulesStorageService";
 import { getRecord } from "common/storage";
 import { Rule } from "common/types";
-import RuleExecutionHandler from "./ruleExecutionHandler";
+import { getExecutedRules } from "./ruleExecutionHandler/utils";
 
 let implicitTestRuleFlowEnabled = false;
 let explicitTestRuleFlowEnabled = false;
@@ -63,7 +63,7 @@ const showExplicitTestRuleWidget = async (ruleId: string) => {
     });
   });
 
-  const appliedRules = await RuleExecutionHandler.getExecutedRules();
+  const appliedRules = await getExecutedRules();
 
   if (appliedRules) {
     appliedRules?.forEach((rule: Rule) => {
@@ -145,7 +145,7 @@ export const showImplicitTestRuleWidget = async () => {
 
   document.documentElement.appendChild(testRuleWidget);
 
-  const appliedRules = await RuleExecutionHandler.getExecutedRules();
+  const appliedRules = await getExecutedRules();
 
   if (appliedRules) {
     appliedRules?.forEach((rule: Rule) => {
