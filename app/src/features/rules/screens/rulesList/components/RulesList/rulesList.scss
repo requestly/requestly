@@ -1,6 +1,7 @@
 .rq-rules-list-container {
   .rq-rules-table-breadcrumb {
-    padding: 8px 16px 4px 16px;
+    margin-bottom: 8px;
+    padding: 8px 16px 0px 16px;
     font-size: 11px;
     font-weight: 400;
 
@@ -11,4 +12,10 @@
       color: var(--text-subtle);
     }
   }
+}
+
+.rq-rules-table {
+  display: flex;
+  justify-content: center;
+  padding: 0 1rem;
 }

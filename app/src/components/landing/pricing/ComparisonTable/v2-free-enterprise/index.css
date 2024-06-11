@@ -48,6 +48,7 @@
 }
 .pricing-table-wrapper {
   display: flex;
+  justify-content: space-evenly;
   flex-direction: column;
   align-items: center;
 }
@@ -143,7 +144,7 @@
   padding: 48px;
   margin: 20px 24px;
   justify-content: center;
-  min-width: 80%;
+  min-width: 70%;
 }
 
 .enterprise-banner .enterprise-banner-underline {

@@ -1,0 +1,330 @@
+{
+  "Headers_1": {
+    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "creationDate": 1715932470157,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "requestHeaders": [
+            {
+              "header": "header1",
+              "operation": "set",
+              "value": "header1Value"
+            },
+            {
+              "header": "Accept",
+              "operation": "remove"
+            },
+            {
+              "header": "Accept-Language",
+              "operation": "set",
+              "value": "test"
+            }
+          ],
+          "responseHeaders": [
+            {
+              "header": "newHeader1",
+              "operation": "set",
+              "value": "newHeader1Value"
+            },
+            {
+              "header": "nonModifiedHeader1",
+              "operation": "set",
+              "value": "modifiedHeader1Value"
+            },
+            {
+              "header": "nonModifiedHeader2",
+              "operation": "remove"
+            }
+          ],
+          "type": "modifyHeaders"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "urlFilter": "https://requestly.tech/api/mockv2/testHeaderRule2"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Headers_1",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1716786119754,
+    "name": "1. Main Frame Header",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "46me7",
+        "modifications": {
+          "Request": [
+            {
+              "header": "header1",
+              "id": "xnz3c",
+              "type": "Add",
+              "value": "header1Value"
+            },
+            {
+              "header": "Accept",
+              "id": "tylw8",
+              "type": "Remove",
+              "value": ""
+            },
+            {
+              "header": "Accept-Language",
+              "id": "16p0v",
+              "type": "Add",
+              "value": "test"
+            }
+          ],
+          "Response": [
+            {
+              "header": "newHeader1",
+              "id": "ex7vw",
+              "type": "Add",
+              "value": "newHeader1Value"
+            },
+            {
+              "header": "nonModifiedHeader1",
+              "id": "q2w8v",
+              "type": "Add",
+              "value": "modifiedHeader1Value"
+            },
+            {
+              "header": "nonModifiedHeader2",
+              "id": "qwdiz",
+              "type": "Remove",
+              "value": ""
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/testHeaderRule2"
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "schemaVersion": "3.0.0",
+    "status": "Active",
+    "version": 2
+  },
+  "Headers_2": {
+    "createdBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "creationDate": 1715933433543,
+    "currentOwner": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "requestHeaders": [
+            {
+              "header": "newRequestHeader2",
+              "operation": "set",
+              "value": "newRequestHeader2Value"
+            },
+            {
+              "header": "nonModifiedRequestHeader1",
+              "operation": "set",
+              "value": "modifiedRequestHeader1Value"
+            },
+            {
+              "header": "nonModifiedRequestHeader2",
+              "operation": "remove"
+            },
+            {
+              "header": "nonModifiedRequestHeader3",
+              "operation": "set",
+              "value": "modifiedRequestHeader3Value"
+            }
+          ],
+          "responseHeaders": [
+            {
+              "header": "newResponseHeader1",
+              "operation": "set",
+              "value": "newResponseHeader1Value"
+            },
+            {
+              "header": "nonModifiedHeader1",
+              "operation": "set",
+              "value": "modifiedHeader1Value"
+            },
+            {
+              "header": "nonModifiedHeader2",
+              "operation": "remove"
+            },
+            {
+              "header": "nonModifiedHeader3",
+              "operation": "set",
+              "value": "modifiedHeader3Value"
+            }
+          ],
+          "type": "modifyHeaders"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "urlFilter": "https://requestly.tech/api/mockv2/testHeaderRule2"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Headers_2",
+    "isSample": false,
+    "lastModifiedBy": "oVzEimT53QYBSBokU6xokra2Tc13",
+    "modificationDate": 1716786287411,
+    "name": "2. Internal Request",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "day6e",
+        "modifications": {
+          "Request": [
+            {
+              "header": "newRequestHeader2",
+              "id": "45buv",
+              "type": "Add",
+              "value": "newRequestHeader2Value"
+            },
+            {
+              "header": "nonModifiedRequestHeader1",
+              "id": "ppjir",
+              "type": "Modify",
+              "value": "modifiedRequestHeader1Value"
+            },
+            {
+              "header": "nonModifiedRequestHeader2",
+              "id": "i05p0",
+              "type": "Remove",
+              "value": ""
+            },
+            {
+              "header": "nonModifiedRequestHeader3",
+              "id": "671w0",
+              "type": "Add",
+              "value": "modifiedRequestHeader3Value"
+            }
+          ],
+          "Response": [
+            {
+              "header": "newResponseHeader1",
+              "id": "bc4b5",
+              "type": "Add",
+              "value": "newResponseHeader1Value"
+            },
+            {
+              "header": "nonModifiedHeader1",
+              "id": "wodis",
+              "type": "Modify",
+              "value": "modifiedHeader1Value"
+            },
+            {
+              "header": "nonModifiedHeader2",
+              "id": "dqaw2",
+              "type": "Remove",
+              "value": ""
+            },
+            {
+              "header": "nonModifiedHeader3",
+              "id": "leqn8",
+              "type": "Add",
+              "value": "modifiedHeader3Value"
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/testHeaderRule2"
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "schemaVersion": "3.0.0",
+    "status": "Active",
+    "version": 2
+  },
+  "Headers_3": {
+    "createdBy": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "creationDate": 1643755328278,
+    "currentOwner": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "responseHeaders": [
+            {
+              "header": "Access-Control-Allow-Methods",
+              "operation": "set",
+              "value": "*"
+            },
+            {
+              "header": "Access-Control-Allow-Headers",
+              "operation": "set",
+              "value": "*"
+            },
+            {
+              "header": "Access-Control-Allow-Credentials",
+              "operation": "set",
+              "value": "true"
+            }
+          ],
+          "type": "modifyHeaders"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "urlFilter": "testheaders.com/exampleAPI"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Headers_3",
+    "isSample": false,
+    "lastModifiedBy": "p30CNkC5OgRe36ALZ8vHopDnlRX2",
+    "modificationDate": 1717096999705,
+    "name": "3. rq_request_initiator_origin()",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "z3v66",
+        "modifications": {
+          "Response": [
+            {
+              "header": "Access-Control-Allow-Origin",
+              "type": "Add",
+              "value": "rq_request_initiator_origin()"
+            },
+            {
+              "header": "Access-Control-Allow-Methods",
+              "type": "Add",
+              "value": "*"
+            },
+            {
+              "header": "Access-Control-Allow-Headers",
+              "type": "Add",
+              "value": "*"
+            },
+            {
+              "header": "Access-Control-Allow-Credentials",
+              "type": "Add",
+              "value": "true"
+            }
+          ]
+        },
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "testheaders.com/exampleAPI"
+        }
+      }
+    ],
+    "ruleType": "Headers",
+    "schemaVersion": "3.0.0",
+    "status": "Active",
+    "version": 2
+  }
+}
