@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 BROWSER=chrome ENV=prod npm run config
+
+echo **Playwright test Started**
 npm run test
 # Check if the tests failed
 if [ $? -ne 0 ]; then
