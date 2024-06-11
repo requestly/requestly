@@ -23,7 +23,7 @@
       }
 
       .ant-collapse-item:first-child {
-        margin-top: 24px;
+        margin-top: 8px;
       }
 
       .ant-collapse-item:not(:first-child) {
@@ -78,6 +78,20 @@
         .incentive-task-help-link {
           font-size: var(--requestly-font-size-xs);
         }
+      }
+    }
+
+    .loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 350px;
+      overflow: hidden;
+
+      .anticon svg {
+        width: 20px;
+        height: 20px;
+        color: var(--requestly-color-text-subtle);
       }
     }
   }
