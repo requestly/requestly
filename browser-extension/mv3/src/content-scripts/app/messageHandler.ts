@@ -131,13 +131,3 @@ export const initMessageHandler = () => {
     }
   );
 };
-
-export const initExtensionMessageListener = () => {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    switch (message.action) {
-      case EXTENSION_MESSAGES.NOTIFY_TEST_RULE_REPORT_UPDATED:
-        sendExtensionMessage(message);
-        break;
-    }
-  });
-};
