@@ -4,6 +4,7 @@ import { matchSourceUrl } from "./service-worker/services/ruleMatcher";
 import { v4 as uuid } from "uuid";
 import { STORAGE_KEYS } from "./constants";
 import { saveRecord } from "./storage";
+import { Variable, getVariable } from "./service-worker/variable";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
   if (dateInMillis && format === "yyyy-mm-dd") {
@@ -72,4 +73,8 @@ export function generateUUID() {
 
 export const updateLastUpdatedTS = () => {
   return saveRecord(STORAGE_KEYS.LAST_UPDATED_TS, Date.now());
+};
+
+export const isExtensionEnabled = async (): Promise<boolean> => {
+  return await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
 };

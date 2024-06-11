@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
+import { getAppTabs, toggleExtensionStatus } from "./utils";
 // import { handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
@@ -24,6 +24,7 @@ import {
   saveTestRuleResult,
 } from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
+import { isExtensionEnabled } from "../../utils";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {

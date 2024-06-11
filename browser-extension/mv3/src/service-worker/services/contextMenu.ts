@@ -1,6 +1,6 @@
 import { onVariableChange, setVariable, Variable } from "../variable";
 import extensionIconManager from "./extensionIconManager";
-import { isExtensionEnabled } from "./utils";
+import { isExtensionEnabled } from "../../utils";
 
 // TODO: fix circular dependency
 // import { sendMessageToApp } from "./messageHandler";

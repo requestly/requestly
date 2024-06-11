@@ -2,10 +2,11 @@ import { CLIENT_MESSAGES } from "common/constants";
 import { getRecord } from "common/storage";
 import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } from "common/types";
 import { matchSourceUrl } from "./ruleMatcher";
-import { injectWebAccessibleScript, isExtensionEnabled } from "./utils";
+import { injectWebAccessibleScript } from "./utils";
 import config from "common/config";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import extensionIconManager from "./extensionIconManager";
+import { isExtensionEnabled } from "../../utils";
 
 const CONFIG_STORAGE_KEY = "sessionRecordingConfig";
 
