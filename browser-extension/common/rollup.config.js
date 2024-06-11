@@ -6,7 +6,7 @@ import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
 import postcss from "rollup-plugin-postcss";
 import svgr from "@svgr/rollup";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import svg from "rollup-plugin-svg";
 
 const OUTPUT_DIR = "dist";
