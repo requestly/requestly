@@ -28,6 +28,7 @@
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^9.0.1",
     "@svgr/rollup": "^6.5.1",
     "@types/chrome": "^0.0.200",
@@ -40,7 +41,6 @@
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-svg": "^2.0.0",
-    "rollup-plugin-terser": "^7.0.2",
     "sass": "^1.72.0",
     "tslib": "^2.4.0",
     "typescript": "^4.8.4"
