@@ -1,7 +1,7 @@
 import json from "@rollup/plugin-json";
 import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import { version } from "./package.json";
 import { browser, WEB_URL, OTHER_WEB_URLS } from "../config/dist/config.build.json";
