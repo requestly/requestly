@@ -18,7 +18,6 @@ import { parseGravatarImage } from "utils/Misc";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { RQButton } from "lib/design-system/components";
-import { PRICING } from "features/pricing";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import { incentivizationActions } from "store/features/incentivization/slice";
 
@@ -127,10 +126,7 @@ export default function HeaderUser() {
           >
             <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
           </Dropdown>
-          {!planDetails?.planId ||
-          planDetails?.status === "trialing" ||
-          (["active", "past_due"].includes(planDetails?.status) &&
-            planDetails?.planName !== PRICING.PLAN_NAMES.PROFESSIONAL) ? (
+          {!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status) ? (
             <RQButton
               type="primary"
               className="header-upgrade-btn"
