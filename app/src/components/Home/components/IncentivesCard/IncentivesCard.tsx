@@ -1,16 +1,20 @@
 import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import giftAnimation from "./assets/gift.json";
-import { CreditsProgressBar, IncentiveSectionHeader } from "features/incentivization";
+import { CreditsProgressBar, INCENTIVIZATION_SOURCE, IncentiveSectionHeader } from "features/incentivization";
 import { RQButton } from "lib/design-system/components";
 import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
+import { getIncentivizationMilestones } from "store/features/incentivization/selectors";
+import { getTotalCredits } from "features/incentivization/utils";
 import "./incentivesCard.scss";
 
 export const IncentivesCard = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const milestones = useSelector(getIncentivizationMilestones);
+  const totalCredits = getTotalCredits(milestones);
 
   return (
     <>
@@ -19,9 +23,9 @@ export const IncentivesCard = () => {
           <LottieAnimation animationData={giftAnimation} animationName="member added successfully" />
         </div>
         <div className="align-self-center">
-          <IncentiveSectionHeader title="Earn $65 Free credits — Complete your Requestly setup!" />
-          <div className="mt-24">
-            <CreditsProgressBar />
+          <IncentiveSectionHeader title={`Earn $${totalCredits} Free credits — Complete your Requestly setup!`} />
+          <div className="mt-16">
+            <CreditsProgressBar source={INCENTIVIZATION_SOURCE.HOME_SCREEN} />
           </div>
         </div>
         <div className="align-self-center display-row-center flex-1">
@@ -29,8 +33,16 @@ export const IncentivesCard = () => {
             type="primary"
             onClick={() => {
               if (user?.loggedIn) {
-                // @ts-ignore
-                dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: true }));
+                dispatch(
+                  // @ts-ignore
+                  actions.toggleActiveModal({
+                    modalName: "incentiveTasksListModal",
+                    newValue: true,
+                    newProps: {
+                      source: INCENTIVIZATION_SOURCE.HOME_SCREEN,
+                    },
+                  })
+                );
               } else {
                 dispatch(
                   // @ts-ignore
