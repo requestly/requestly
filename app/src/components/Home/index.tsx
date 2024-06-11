@@ -9,15 +9,17 @@ import { MocksCard } from "./components/MocksCard";
 import { IncentivesCard } from "./components/IncentivesCard/IncentivesCard";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./home.scss";
 
 export const Home: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
+  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   return (
     <Col className="homepage-wrapper">
       <Col className="homepage-content">
-        {user.loggedIn && (
+        {user.loggedIn && isIncentivizationEnabled && (
           <Col className="homepage-primary-card homepage-incentives-card">
             <IncentivesCard />
           </Col>

@@ -34,6 +34,7 @@ import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { IncentiveTaskCompletedModal, IncentiveTasksListModal } from "features/incentivization";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -49,6 +50,14 @@ const DashboardContent = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingVariation = useFeatureValue("activation_without_onboarding", "variant");
+
+  const toggleIncentiveTasksListModal = () => {
+    dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal" }));
+  };
+
+  const toggleIncentiveTaskCompletedModal = () => {
+    dispatch(actions.toggleActiveModal({ modalName: "incentiveTaskCompletedModal" }));
+  };
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -97,6 +106,20 @@ const DashboardContent = () => {
       {isInsideIframe ? null : (
         <>
           {/* MODALS */}
+          {activeModals.incentiveTasksListModal.isActive ? (
+            <IncentiveTasksListModal
+              isOpen={activeModals.incentiveTasksListModal.isActive}
+              toggle={() => toggleIncentiveTasksListModal()}
+              {...activeModals.incentiveTasksListModal.props}
+            />
+          ) : null}
+          {activeModals.incentiveTaskCompletedModal.isActive ? (
+            <IncentiveTaskCompletedModal
+              isOpen={activeModals.incentiveTaskCompletedModal.isActive}
+              toggle={() => toggleIncentiveTaskCompletedModal()}
+              {...activeModals.incentiveTaskCompletedModal.props}
+            />
+          ) : null}
           {activeModals.loadingModal.isActive ? (
             <SpinnerModal isOpen={activeModals.loadingModal.isActive} toggle={() => toggleSpinnerModal()} />
           ) : null}
