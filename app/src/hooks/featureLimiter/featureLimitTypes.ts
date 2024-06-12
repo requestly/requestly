@@ -14,6 +14,18 @@ export const featureLimits: PlanFeatureLimits = {
     [FeatureLimitType.dynamic_request_body]: false,
     [FeatureLimitType.share_rules]: false,
   },
+  [PRICING.PLAN_NAMES.LITE]: {
+    [FeatureLimitType.num_rules]: 5,
+    [FeatureLimitType.num_active_rules]: 3,
+    [FeatureLimitType.response_rule]: true,
+    [FeatureLimitType.request_rule]: true,
+    [FeatureLimitType.script_rule]: true,
+    [FeatureLimitType.add_new_rule_pair]: true,
+    [FeatureLimitType.graphql_resource_type]: true,
+    [FeatureLimitType.dynamic_response_body]: true,
+    [FeatureLimitType.dynamic_request_body]: true,
+    [FeatureLimitType.share_rules]: true,
+  },
   [PRICING.PLAN_NAMES.BASIC]: {
     [FeatureLimitType.num_rules]: 25,
     [FeatureLimitType.num_active_rules]: 10,

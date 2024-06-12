@@ -13,15 +13,17 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "You can create upto 5 rules where 3 rules can be active at a time.",
         },
         {
-          title: "Mock Server",
+          title: "Standard HTTP Modifications",
+          enabled: true,
+          tooltip:
+            "Redirect requests, Replace Strings, Modify headers, Cancel requests, Modify Query Params, Delay Network Requests",
+        },
+        {
+          title: "5 API Mocks",
           enabled: true,
         },
         {
           title: "API Client",
-          enabled: true,
-        },
-        {
-          title: "Community Support",
           enabled: true,
         },
         {
@@ -30,9 +32,38 @@ export const PricingFeatures: PlanFeatures = {
         },
       ],
     },
+    lite: {
+      planTitle: "Lite",
+      heading: "For individuals",
+      features: [
+        {
+          title: "5 rules (3 active)",
+          enabled: true,
+          tooltip: "You can create upto 5 rules where 3 rules can be active at a time.",
+        },
+        {
+          title: "All HTTP Modifications",
+          enabled: true,
+          tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts",
+        },
+        {
+          title: "Unlimited Header Rules",
+          enabled: true,
+          tooltip: "There is no limit on header modification rules; they only count as one towards your total rule",
+        },
+        {
+          title: "5 API Mocks",
+          enabled: true,
+        },
+        {
+          title: "For individual users",
+          enabled: true,
+        },
+      ],
+    },
     basic: {
       planTitle: "Basic",
-      heading: "For individuals",
+      heading: "For small teams",
       features: [
         {
           title: "10 rules (5 active)",
@@ -40,20 +71,20 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "You can create upto 10 rules where 5 rules can be active at a time.",
         },
         {
-          title: "Modify API request and response",
+          title: "All HTTP Modifications",
           enabled: true,
-          tooltip: "Statically override the payload with content of up to 1500 characters",
+          tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts",
         },
         {
-          title: "GraphQL API Modifications",
-          enabled: true,
-        },
-        {
-          title: "Script injection",
+          title: "10 API Mocks",
           enabled: true,
         },
         {
           title: "Email + Chat Support",
+          enabled: true,
+        },
+        {
+          title: "For small teams",
           enabled: true,
         },
       ],
@@ -67,7 +98,7 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Unlimited active rules",
+          title: "Unlimited mocks",
           enabled: true,
         },
         {
@@ -75,15 +106,11 @@ export const PricingFeatures: PlanFeatures = {
           enabled: true,
         },
         {
-          title: "Unlimited mocks",
-          enabled: true,
-        },
-        {
           title: "Daily backups (Encrypted)",
           enabled: true,
         },
         {
-          title: "Email + Chat Support",
+          title: "Email + Chat Priority Support",
           enabled: true,
         },
       ],
