@@ -24,6 +24,7 @@ export const SharedListViewerScreen = () => {
     sharedListRules,
     isSharedListPresent,
     sharedListRecordsMap,
+    isDeleted,
   } = useFetchSharedListData({
     sharedListId,
   });
@@ -54,7 +55,7 @@ export const SharedListViewerScreen = () => {
     return <PageLoader message="Loading shared list..." />;
   }
 
-  if (isSharedListPresent && !isEmpty(sharedListRules)) {
+  if (isSharedListPresent && !isEmpty(sharedListRules) && !isDeleted) {
     return (
       <>
         <SharedListsContentHeader
