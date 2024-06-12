@@ -13,13 +13,13 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "You can create upto 5 rules where 3 rules can be active at a time.",
         },
         {
-          title: "Access to standard rule types",
+          title: "Standard HTTP Modifications",
           enabled: true,
           tooltip:
             "Redirect requests, Replace Strings, Modify headers, Cancel requests, Modify Query Params, Delay Network Requests",
         },
         {
-          title: "5 Mock endpoints",
+          title: "5 API Mocks",
           enabled: true,
         },
         {
@@ -42,21 +42,21 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "You can create upto 5 rules where 3 rules can be active at a time.",
         },
         {
-          title: "Access to all premium rule types",
+          title: "All HTTP Modifications",
           enabled: true,
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts",
         },
         {
-          title: "5 Mock endpoints",
-          enabled: true,
-        },
-        {
-          title: "Unlimited header modifications",
+          title: "Unlimited Header Rules",
           enabled: true,
           tooltip: "There is no limit on header modification rules; they only count as one towards your total rule",
         },
         {
-          title: "For individual users only",
+          title: "5 API Mocks",
+          enabled: true,
+        },
+        {
+          title: "For individual users",
           enabled: true,
         },
       ],
@@ -71,21 +71,20 @@ export const PricingFeatures: PlanFeatures = {
           tooltip: "You can create upto 10 rules where 5 rules can be active at a time.",
         },
         {
-          title: "Access to all premium rule types",
+          title: "All HTTP Modifications",
           enabled: true,
           tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts",
         },
         {
-          title: "10 Mock endpoints",
+          title: "10 API Mocks",
           enabled: true,
-        },
-        {
-          title: "Unlimited header modifications",
-          enabled: true,
-          tooltip: "There is no limit on header modification rules; they only count as one towards your total rule",
         },
         {
           title: "Email + Chat Support",
+          enabled: true,
+        },
+        {
+          title: "For small teams",
           enabled: true,
         },
       ],
