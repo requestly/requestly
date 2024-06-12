@@ -12,6 +12,7 @@ export const useFetchSharedListData = ({ sharedListId }: Props) => {
   const [sharedListGroups, setSharedListGroups] = useState<Group[]>([]);
   const [sharedListRules, setSharedListRules] = useState<Rule[]>([]);
   const [isSharedListPresent, setIsSharedListPresent] = useState(true);
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const sharedListRecordsMap = useMemo(() => {
     const records = [...sharedListGroups, ...sharedListRules];
@@ -28,6 +29,10 @@ export const useFetchSharedListData = ({ sharedListId }: Props) => {
         if (data) {
           setSharedListGroups(data.groups || []);
           setSharedListRules(data.rules || []);
+
+          if (data?.deleted) {
+            setIsDeleted(true);
+          }
         }
       })
       .catch((e) => {
@@ -45,5 +50,6 @@ export const useFetchSharedListData = ({ sharedListId }: Props) => {
     sharedListRules,
     sharedListRecordsMap,
     isSharedListPresent,
+    isDeleted,
   };
 };
