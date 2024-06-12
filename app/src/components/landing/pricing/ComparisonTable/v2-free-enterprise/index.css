@@ -144,7 +144,8 @@
   padding: 48px;
   margin: 20px 24px;
   justify-content: center;
-  min-width: 70%;
+  width: 100%;
+  max-width: 1250px;
 }
 
 .enterprise-banner .enterprise-banner-underline {
@@ -169,10 +170,12 @@
 .pricing-table-wrapper .pricing-table {
   gap: 1rem;
   flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
 }
 
 .pricing-table-wrapper .pricing-table .plan-card {
-  width: 300px;
+  width: 280px;
   background: var(--surface-2);
 }
 
@@ -184,5 +187,19 @@
   .pricing-table-row {
     max-width: 50%;
     flex: 0 0 50%;
+  }
+}
+
+/* TEMP MEDIA QUERIES */
+/* TODO: REMOVE THESE AFTER PRICING PAGE DESIGN CHANGES */
+@media (max-width: 1336px) {
+  .pricing-table-wrapper .pricing-table .plan-card {
+    width: 420px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-table-wrapper .pricing-table .plan-card {
+    width: 100%;
   }
 }
