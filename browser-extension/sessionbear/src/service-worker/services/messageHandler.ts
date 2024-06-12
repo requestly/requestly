@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "../../rulesStore";
-import { getAppTabs, isExtensionEnabled, toggleExtensionStatus } from "./utils";
+import { getAppTabs, toggleExtensionStatus } from "./utils";
 import {
   cacheRecordedSessionOnClientPageUnload,
   getTabSession,
@@ -15,6 +15,7 @@ import {
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
 import { getAPIResponse } from "./apiClient";
+import { isExtensionEnabled } from "../../utils";
 
 // TODO: relay this message from content script to app, so UI could be updated immediately
 export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
