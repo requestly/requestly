@@ -165,11 +165,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             : getPricingPlanAnnualBillingSubtitle(planName) || ""}
         </Typography.Text>
       </Row>
-      <Row
-        style={{
-          marginTop: planName === PRICING.PLAN_NAMES.FREE ? "3rem" : "1rem",
-        }}
-      >
+      <Row className={planName === PRICING.PLAN_NAMES.FREE ? "mt-48" : "mt-16"}>
         <PricingTableButtons
           key={planName + duration}
           columnPlanName={planName}

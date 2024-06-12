@@ -84,6 +84,8 @@
   }
 
   .checkout-screen-wrapper {
+    overflow: hidden;
+
     & .ant-divider-horizontal {
       margin: 1rem 0;
       margin-bottom: 0;
