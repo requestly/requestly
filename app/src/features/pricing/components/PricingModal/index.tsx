@@ -146,7 +146,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
                   }}
                 />{" "}
                 <span className={`${duration === PRICING.DURATION.ANNUALLY ? "text-bold text-white" : "text-gray"}`}>
-                  Annually<span className="success">(save 20%)</span>
+                  Annually<span className="success"> (save 20%)</span>
                 </span>
               </Col>
             </Row>

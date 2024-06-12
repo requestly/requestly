@@ -33,6 +33,27 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
 
+  const getHeaderPlanName = () => {
+    const pricingPlansOrder = [
+      PRICING.PLAN_NAMES.FREE,
+      PRICING.PLAN_NAMES.LITE,
+      PRICING.PLAN_NAMES.BASIC,
+      PRICING.PLAN_NAMES.PROFESSIONAL,
+      PRICING.PLAN_NAMES.ENTERPRISE,
+    ];
+
+    if (planName === PRICING.PLAN_NAMES.FREE) {
+      return null;
+    }
+
+    if (product === PRICING.PRODUCTS.SESSION_REPLAY) {
+      return capitalize(PRICING.PLAN_NAMES.FREE);
+    }
+
+    const index = pricingPlansOrder.indexOf(planName);
+    return capitalize(pricingPlansOrder[index - 1]);
+  };
+
   const renderFeaturesListHeader = (planName: string) => {
     return (
       <Row className="pro-basic-feature-title text-left">
@@ -50,13 +71,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             <span>
               Everything <img src={underlineIcon} alt="highlight" />
             </span>{" "}
-            in{" "}
-            {planName === PRICING.PLAN_NAMES.BASIC || product === PRICING.PRODUCTS.SESSION_REPLAY
-              ? capitalize(PRICING.PLAN_NAMES.FREE)
-              : planName === PRICING.PLAN_NAMES.PROFESSIONAL
-              ? capitalize(PRICING.PLAN_NAMES.BASIC)
-              : capitalize(PRICING.PLAN_NAMES.PROFESSIONAL)}{" "}
-            plan +
+            in {getHeaderPlanName()} plan +
           </Col>
         )}
       </Row>
@@ -64,7 +79,11 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   };
 
   const getPricingPlanAnnualBillingSubtitle = (planName: string) => {
-    if (planName === PRICING.PLAN_NAMES.BASIC || planName === PRICING.PLAN_NAMES.PROFESSIONAL)
+    if (
+      planName === PRICING.PLAN_NAMES.BASIC ||
+      planName === PRICING.PLAN_NAMES.PROFESSIONAL ||
+      planName === PRICING.PLAN_NAMES.LITE
+    )
       return `Billed $${PricingPlans[planName]?.plans[duration]?.usd?.price * quantity} annually`;
     return null;
   };
@@ -89,7 +108,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
         <Row align="middle" className="items-center plan-price-row mt-8">
           <Space size={0}>
-            <Typography.Text strong className="plan-price">
+            <Typography.Text strong className="plan-price enterprice-plan-price">
               $59
             </Typography.Text>
             <div className="caption">
@@ -106,7 +125,8 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             </Typography.Text>
             {product === PRICING.PRODUCTS.HTTP_RULES &&
               planName !== PRICING.PLAN_NAMES.FREE &&
-              planName !== PRICING.PLAN_NAMES.ENTERPRISE && (
+              planName !== PRICING.PLAN_NAMES.ENTERPRISE &&
+              planName !== PRICING.PLAN_NAMES.LITE && (
                 <Space>
                   <InputNumber
                     style={{ width: "65px", height: "30px", display: "flex", alignItems: "center" }}
@@ -124,7 +144,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                 </Space>
               )}
             <div className="caption">
-              {planName !== PRICING.PLAN_NAMES.FREE && <Typography.Text>member / month</Typography.Text>}
+              {planName !== PRICING.PLAN_NAMES.FREE && (
+                <Typography.Text>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</Typography.Text>
+              )}
             </div>
           </Space>
         </Row>
@@ -143,7 +165,11 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             : getPricingPlanAnnualBillingSubtitle(planName) || ""}
         </Typography.Text>
       </Row>
-      <Row className="mt-16">
+      <Row
+        style={{
+          marginTop: planName === PRICING.PLAN_NAMES.FREE ? "3rem" : "1rem",
+        }}
+      >
         <PricingTableButtons
           key={planName + duration}
           columnPlanName={planName}

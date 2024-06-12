@@ -32,7 +32,7 @@ const FreeAndEnterprisePlanTable = () => {
             Annually (save 20%)
           </span>
         </div>
-        <Row>
+        <Row className="w-full" justify="space-evenly">
           <Col>
             <PricingTable product={product} duration={duration} source={"pricing_page"} />
           </Col>
