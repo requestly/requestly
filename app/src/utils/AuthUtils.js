@@ -35,7 +35,7 @@ export const isEmailVerified = (userId) => {
 };
 
 export const isDisposableEmail = (email) => {
-  const domain = email.split("@").reverse()[0];
+  const domain = email.split("@")[1];
   return freeEmailDomains.includes(domain);
 };
 

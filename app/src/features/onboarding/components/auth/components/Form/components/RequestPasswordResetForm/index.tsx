@@ -32,6 +32,7 @@ export const RequestPasswordResetForm: React.FC<Props> = ({ setAuthMode, email, 
 
       if (isDisposableEmail(email)) {
         toast.error("Please enter a valid email address. Temporary or disposable email addresses are not allowed.");
+        return;
       }
       handleForgotPasswordButtonOnClick(event, email, setIsLoading, toggleModal);
     },

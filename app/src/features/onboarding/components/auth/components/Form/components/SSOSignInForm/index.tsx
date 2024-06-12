@@ -40,6 +40,7 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
 
     if (isDisposableEmail(email)) {
       toast.error("Please enter a valid email address. Temporary or disposable email addresses are not allowed.");
+      return;
     }
 
     trackLoginAttemptedEvent({
