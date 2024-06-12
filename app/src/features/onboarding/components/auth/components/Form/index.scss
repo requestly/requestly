@@ -119,3 +119,14 @@
     text-decoration: underline;
   }
 }
+
+.auth-email-disposable-error {
+  color: var(--requestly-color-error-300, #ff8080);
+
+  /* small/default */
+  font-family: var(--text-default);
+  font-size: var(--requestly-font-size-xs, 11px);
+  font-style: normal;
+  font-weight: var(--requestly-font-weight-normal);
+  line-height: var(--requestly-font-line-height-xs);
+}

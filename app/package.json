@@ -77,6 +77,7 @@
     "file-saver": "^2.0.5",
     "firebase": "^10.8.1",
     "framer-motion": "^10.16.16",
+    "free-email-domains": "^1.2.14",
     "fuzzysort": "^2.0.4",
     "html-validate": "^8.9.1",
     "is-empty": "^1.2.0",
