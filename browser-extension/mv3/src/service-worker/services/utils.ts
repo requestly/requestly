@@ -1,6 +1,6 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
-import { getVariable, setVariable, Variable } from "../variable";
-import { getAllSupportedWebURLs } from "../../utils";
+import { setVariable, Variable } from "../variable";
+import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 
 /* Do not refer any external variable in below function other than arguments */
@@ -157,10 +157,6 @@ export const injectJSAtRequestSource = (code: string, requestDetails: chrome.web
 export const isNonBrowserTab = (tabId: number): boolean => {
   // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
   return tabId === chrome.tabs.TAB_ID_NONE;
-};
-
-export const isExtensionEnabled = async (): Promise<boolean> => {
-  return await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
 };
 
 export const toggleExtensionStatus = async () => {

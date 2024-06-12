@@ -1,6 +1,7 @@
 import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
 import { matchSourceUrl } from "./service-worker/services/ruleMatcher";
+import { Variable, getVariable } from "./service-worker/variable";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
   if (dateInMillis && format === "yyyy-mm-dd") {
@@ -61,4 +62,8 @@ export const getUrlObject = (url: string): URL | undefined => {
   } catch (error) {
     return null;
   }
+};
+
+export const isExtensionEnabled = async (): Promise<boolean> => {
+  return await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
 };
