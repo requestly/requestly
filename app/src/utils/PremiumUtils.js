@@ -13,7 +13,7 @@ export const getPlanNameFromId = (planId) => {
     case PRICING.PLAN_NAMES.GOLD:
       return PRICING.PLAN_NAMES.PROFESSIONAL;
     case PRICING.PLAN_NAMES.LITE:
-      return PRICING.PLAN_NAMES.BASIC;
+      return PRICING.PLAN_NAMES.LITE;
     case PRICING.PLAN_NAMES.BASIC_V2:
       return PRICING.PLAN_NAMES.BASIC_V2;
     default:
