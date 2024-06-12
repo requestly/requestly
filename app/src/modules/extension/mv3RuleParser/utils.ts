@@ -7,6 +7,39 @@ export const escapeForwardSlashes = (value: string): string => {
   return value.replace(/\//g, "\\/");
 };
 
+export const getRegexSubstitutionStringWithIncrementedIndex = (regexSubstitutionString: string, increment = 0) => {
+  return regexSubstitutionString.replace(/\$(\d)+/g, (match: string) => {
+    
+    const matchedNumber = match.slice(1);
+    // The 'match' parameter is the current number found by the regex as a string
+    // Convert it to a number, increment it by 1, and return it as a string
+    return `$` + (parseInt(matchedNumber, 10) + increment).toString();
+  });
+};
+
+
+export const convertRegexSubstitutionStringToDNRSubstitutionString = (regexSubstitutionString: string) => {
+  return regexSubstitutionString.replace(/\$(\d)+/g, (match: string) => {
+    
+    const matchedNumber = match.slice(1);
+    // The 'match' parameter is the current number found by the regex as a string
+    // Convert it to a number, increment it by 1, and return it as a string
+    return `\\` + (parseInt(matchedNumber, 10)).toString();
+  });
+};
+
+export const countCapturingGroups = (regex: string) => {
+  const updatedRegexString = `.*|${regex}`;
+  const updatedRegex = new RegExp(updatedRegexString);
+
+  // Match the regex against an empty string and get the results
+  const match = updatedRegex.exec("");
+  console.log("[Debug] countCapturingGroup ", regex, match ? match.length - 1 : 0);
+  // The number of capturing groups is the length of the result array minus one
+  // (subtracting 1 because the first element is the full match)
+  return match ? match.length - 1 : 0;
+};
+
 const createRegexForWildcardString = (value: string, isWildcardCapturingGroupsEnabled: boolean = true): string => {
   // TODO: convert all * to .* and escape all special chars for regex
   if (isWildcardCapturingGroupsEnabled) {
@@ -23,6 +56,8 @@ export const parseRegex = (regex: string): { pattern: string; flags?: string } =
     const [, pattern, flags] = matchesRegexPattern;
     return { pattern, flags };
   }
+
+  return null;
   return { pattern: regex };
 };
 
@@ -158,7 +193,7 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
 
 export const parseConditionFromSource = (
   source: RulePairSource,
-  isWildcardCapturingGroupsEnabled?: boolean,
+  isWildcardCapturingGroupsEnabled?: boolean
 ): ExtensionRuleCondition => {
   return {
     ...parseUrlParametersFromSourceV2(source, isWildcardCapturingGroupsEnabled),
