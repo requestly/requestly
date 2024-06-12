@@ -15,6 +15,20 @@ export const PricingPlans: PricingPlansType = {
       },
     },
   },
+  lite: {
+    plans: {
+      monthly: {
+        usd: {
+          price: 9,
+        },
+      },
+      annually: {
+        usd: {
+          price: 90,
+        },
+      },
+    },
+  },
   basic: {
     plans: {
       monthly: {

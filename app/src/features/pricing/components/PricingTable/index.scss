@@ -26,7 +26,11 @@
 }
 
 .plan-price-row .ant-space-item:first-child {
-  min-width: 50px;
+  min-width: 25px;
+}
+
+.plan-price.enterprice-plan-price {
+  margin-right: 8px;
 }
 
 .plan-card {
@@ -38,7 +42,7 @@
   background: var(--background, #212121);
 }
 
-.plan-name {
+.plan-name.ant-typography {
   font-size: 1rem;
   font-weight: 500;
   letter-spacing: 0.5px;
