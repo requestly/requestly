@@ -1,23 +1,14 @@
 import React, { useState } from "react";
-import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
-import { Button, Card, Col, Row, Typography } from "antd";
-import enterpriseImage from "assets/images/illustrations/enterprise-banner.png";
-import { RQButton } from "lib/design-system/components";
+import { Button, Card } from "antd";
 import { FaUserPlus } from "@react-icons/all-files/fa6/FaUserPlus";
 import { EVENTS, trackBuyAdditionalUsersButtonClicked } from "./analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import BuyAdditionalSeatsModal from "./BuyAdditionalSeatsModal";
 
 const styles = {
-  bannerContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "20px",
-    margin: "20px 0",
-  },
   card: {
     width: "100%",
+    height: "100%",
     maxWidth: "60vw",
     textAlign: "center",
     padding: "20px",
@@ -26,8 +17,7 @@ const styles = {
   },
   content: {
     display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "column",
     justifyContent: "space-between",
   },
   icon: {
@@ -48,6 +38,7 @@ const styles = {
     color: "var(--neutrals-gray-300)",
   },
   button: {
+    marginTop: "1rem",
     padding: "0 20px",
   },
 };

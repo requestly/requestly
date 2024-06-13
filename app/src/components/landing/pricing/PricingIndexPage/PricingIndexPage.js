@@ -4,20 +4,20 @@ import { redirectToRules } from "utils/RedirectionUtils";
 //SUB COMPONENTS
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
 import PricingTable from "../PricingTable";
-import PricingFAQs from "../FAQs";
+import PricingFAQs from "../../../../features/pricing/components/PricingPage/components/FAQs";
 import EnterpriseRequestBanner from "../EnterpriseRequestBanner";
 import ChromeStoreStats from "../ChromeStoreStats/index";
 import { CompanyMarquee } from "components/misc/Marquee";
 import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import "./index.css";
 import ContactUsSection from "./ContactUsSection";
-import BuyAdditionalSeats from "./BuyAdditionalSeats";
+import BuyAdditionalSeats from "../../../../features/pricing/components/PricingPage/components/BuyAdditionalSeats";
 import CustomerStorySection from "./CustomerStorySection";
 import TrustedByOrgsSection from "./TrustedByOrgsSection";
-import OtherWaysToMakePurchase from "./OtherWaysToMakePurchase";
-import LicensingAndSavings from "./LicensingAndSavings";
-import HowToClaimVolumeDiscounts from "./HowToClaimVolumeDiscounts";
-import PricingPageFooter from "./PricingPageFooter";
+import OtherWaysToMakePurchase from "../../../../features/pricing/components/PricingPage/components/OtherWaysToMakePurchase";
+import LicensingAndSavings from "../../../../features/pricing/components/PricingPage/components/LicensingAndSavings";
+import HowToClaimVolumeDiscounts from "../../../../features/pricing/components/PricingPage/components/HowToClaimVolumeDiscounts";
+import PricingPageFooter from "../../../../features/pricing/components/PricingPage/components/PricingPageFooter";
 
 const PricingIndexPage = () => {
   const navigate = useNavigate();

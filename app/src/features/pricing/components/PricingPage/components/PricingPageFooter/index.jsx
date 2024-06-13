@@ -9,9 +9,11 @@ const { Title, Text, Link } = Typography;
 const styles = {
   footer: {
     padding: "40px 20px",
+    background: "var(--requestly-color-surface-0)",
+    width: "100%",
   },
   container: {
-    maxWidth: "70vw",
+    maxWidth: "90vw",
     margin: "0 auto",
   },
   title: {},
