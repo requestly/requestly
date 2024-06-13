@@ -7,8 +7,10 @@ import { PRICING } from "features/pricing/constants/pricing";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { redirectToRules } from "utils/RedirectionUtils";
 import RQLogo from "assets/img/brand/rq_logo_full.svg";
-import "./pricingIndexPage.scss";
 import { EnterprisePlanCard } from "./components/EnterperisePlanCard/EnterprisePlanCard";
+import { CompaniesSection } from "./components/CompaniesSection/CompaniesSection";
+import { StatsCard } from "./components/StatsCard/StatsCard";
+import "./pricingIndexPage.scss";
 
 export const PricingIndexPage = () => {
   const navigate = useNavigate();
@@ -49,6 +51,8 @@ export const PricingIndexPage = () => {
             <PricingTable duration={duration} source={SOURCE.PRICING_PAGE} />
           </div>
           <EnterprisePlanCard />
+          <CompaniesSection />
+          <StatsCard />
         </div>
       </div>
     </div>

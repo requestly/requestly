@@ -1,0 +1,28 @@
+.companies-section-container {
+  margin-top: 56px;
+}
+
+.companies-section-title {
+  color: var(--requestly-color-text-default);
+  font-weight: 500;
+  text-align: center;
+}
+
+.companies-section-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  gap: 24px;
+
+  img {
+    width: 100px;
+    height: 28px;
+    filter: invert(1);
+
+    &:nth-child(2) {
+      position: relative;
+      top: 5px;
+    }
+  }
+}
