@@ -1,9 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Collapse } from "antd";
 import { CreditsProgressBar } from "../CreditsProgressbar/CreditsProgessbar";
 import { IncentiveSectionHeader } from "../IncentiveSectionHeader";
 import { PiCaretDownBold } from "@react-icons/all-files/pi/PiCaretDownBold";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TaskHeader } from "./components/TaskHeader/TaskHeader";
 import { UserMilestoneDetails } from "features/incentivization/types";
@@ -15,7 +15,12 @@ import { PiRecordFill } from "@react-icons/all-files/pi/PiRecordFill";
 import { MdOutlineStarBorder } from "@react-icons/all-files/md/MdOutlineStarBorder";
 import { NewRuleButtonWithDropdown } from "features/rules/screens/rulesList/components/RulesList/components";
 import { Button } from "antd";
-import { redirectToMocks, redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import {
+  redirectToCreateNewRule,
+  redirectToMocks,
+  redirectToRules,
+  redirectToSessionRecordingHome,
+} from "utils/RedirectionUtils";
 import { actions } from "store";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { IncentiveTaskListItem } from "./types";
@@ -28,14 +33,21 @@ import { getTotalCredits, isTaskCompleted } from "features/incentivization/utils
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import LINKS from "config/constants/sub/links";
-import "./incentiveTasksList.scss";
 import { trackIncentivizationTaskClicked } from "features/incentivization/analytics";
+import { RQButton } from "lib/design-system/components";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
+import { RuleType } from "types";
+import { isExtensionInstalled } from "actions/ExtensionActions";
+import PATHS from "config/constants/sub/paths";
+import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
+import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
   source: string;
 }
 export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
@@ -43,11 +55,14 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
-  const postActionClickCallback = (task: IncentivizeEvent) => {
-    // @ts-ignore
-    dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
-    trackIncentivizationTaskClicked(task);
-  };
+  const postActionClickCallback = useCallback(
+    (task: IncentivizeEvent) => {
+      // @ts-ignore
+      dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+      trackIncentivizationTaskClicked(task);
+    },
+    [dispatch]
+  );
 
   const incentiveTasksList: IncentiveTaskListItem[] = useMemo(
     () => [
@@ -56,7 +71,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         title: "Create your first rule",
         isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_RULE_CREATED, userMilestoneDetails),
         description:
-          "Use rules to intercept & modify network requests, headers, API requests, inject scripts & much more. Upon creating your first rule you will earn $25 free credits for professional plan.",
+          "Rules enable you to set conditions that trigger specific actions when met. To apply desired network modifications",
         icon: <MdPlaylistAdd />,
         helpLink: (
           <a href="https://developers.requestly.com/create-first-rule/" target="_blank" rel="noreferrer">
@@ -75,25 +90,120 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         },
       },
       {
-        id: IncentivizeEvent.PREMIUM_RULE_CREATED,
-        title: "Create other rules",
-        isCompleted: isTaskCompleted(IncentivizeEvent.PREMIUM_RULE_CREATED, userMilestoneDetails),
+        id: IncentivizeEvent.RULE_TESTED,
+        title: location.pathname.includes(PATHS.RULE_EDITOR.EDIT_RULE.RELATIVE) ? "Test this rule" : "Test a rule",
+        isCompleted: isTaskCompleted(IncentivizeEvent.RULE_TESTED, userMilestoneDetails),
         description:
-          "Use premium rules to modify requests, response, & inject scripts. Upon creating your first premium rule you will earn $15 free credits for professional plan.",
-        icon: <MdPlaylistAdd />,
+          "Test your rule on a specific URL to see if it works as expected. You can test your rule on any website.",
+        icon: <MdOutlineScience />,
         helpLink: (
-          <a href="https://developers.requestly.com/http-rules/overview/" target="_blank" rel="noreferrer">
-            Learn how to create Rules
+          <a href="https://developers.requestly.com/http-rules/test-this-rule/" target="_blank" rel="noreferrer">
+            Learn how to test a rule
           </a>
         ),
-        milestone: milestones?.[IncentivizeEvent.PREMIUM_RULE_CREATED],
+        milestone: milestones?.[IncentivizeEvent.RULE_TESTED],
         action: () => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.PREMIUM_RULE_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_TESTED, userMilestoneDetails);
+          const isRuleEditorOpened = location.pathname.includes(PATHS.RULE_EDITOR.EDIT_RULE.RELATIVE);
           return (
-            <NewRuleButtonWithDropdown
-              disable={isCompleted}
-              callback={() => postActionClickCallback(IncentivizeEvent.PREMIUM_RULE_CREATED)}
-            />
+            <RQButton
+              disabled={isCompleted}
+              type="primary"
+              onClick={() => {
+                if (!isRuleEditorOpened) {
+                  redirectToRules(navigate);
+                }
+                postActionClickCallback(IncentivizeEvent.RULE_TESTED);
+              }}
+            >
+              {isRuleEditorOpened ? "Test this rule" : "Test a rule"}
+            </RQButton>
+          );
+        },
+      },
+      {
+        id: IncentivizeEvent.RESPONSE_RULE_CREATED,
+        title: "Create a Response Rule",
+        isCompleted: isTaskCompleted(IncentivizeEvent.RESPONSE_RULE_CREATED, userMilestoneDetails),
+        description: "Modify Response Rule allows you to debug & modify API responses on the fly",
+        icon: <MdPlaylistAdd />,
+        helpLink: (
+          <a href="https://developers.requestly.com/http-rules/modify-response-body/" target="_blank" rel="noreferrer">
+            Learn how to a create Response Rule
+          </a>
+        ),
+        milestone: milestones?.[IncentivizeEvent.RESPONSE_RULE_CREATED],
+        action: () => {
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RESPONSE_RULE_CREATED, userMilestoneDetails);
+          return (
+            <RQButton
+              disabled={isCompleted}
+              type="primary"
+              onClick={() => {
+                if (isExtensionInstalled()) {
+                  redirectToCreateNewRule(navigate, RuleType.RESPONSE, INCENTIVIZATION_SOURCE.INCENTIVES_TASK_LIST);
+                  postActionClickCallback(IncentivizeEvent.RESPONSE_RULE_CREATED);
+                } else {
+                  dispatch(
+                    // @ts-ignore
+                    actions.toggleActiveModal({
+                      modalName: "extensionModal",
+                      newValue: true,
+                      newProps: {
+                        eventPage: INCENTIVIZATION_SOURCE.INCENTIVES_TASK_LIST,
+                      },
+                    })
+                  );
+                }
+              }}
+            >
+              Create a Response Rule
+            </RQButton>
+          );
+        },
+      },
+      {
+        id: IncentivizeEvent.REDIRECT_RULE_CREATED,
+        title: "Create a Redirect Rule",
+        isCompleted: isTaskCompleted(IncentivizeEvent.REDIRECT_RULE_CREATED, userMilestoneDetails),
+        description: "Redirect Rule allows you to redirect a network request to a different URL.",
+        icon: <MdPlaylistAdd />,
+        helpLink: (
+          <a
+            href="https://developers.requestly.com/http-rules/map-local-url-redirect/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Learn how to create a Redirect Rule
+          </a>
+        ),
+        milestone: milestones?.[IncentivizeEvent.REDIRECT_RULE_CREATED],
+        action: () => {
+          const isCompleted = isTaskCompleted(IncentivizeEvent.REDIRECT_RULE_CREATED, userMilestoneDetails);
+          return (
+            <RQButton
+              disabled={isCompleted}
+              type="primary"
+              onClick={() => {
+                if (isExtensionInstalled()) {
+                  redirectToCreateNewRule(navigate, RuleType.REDIRECT, INCENTIVIZATION_SOURCE.INCENTIVES_TASK_LIST);
+                  postActionClickCallback(IncentivizeEvent.REDIRECT_RULE_CREATED);
+                } else {
+                  dispatch(
+                    // @ts-ignore
+                    actions.toggleActiveModal({
+                      modalName: "extensionModal",
+                      newValue: true,
+                      newProps: {
+                        eventPage: INCENTIVIZATION_SOURCE.INCENTIVES_TASK_LIST,
+                      },
+                    })
+                  );
+                }
+              }}
+            >
+              Create a Redirect Rule
+            </RQButton>
           );
         },
       },
@@ -102,7 +212,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         title: "Create a Team Workspace",
         isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED, userMilestoneDetails),
         description:
-          "Team Workspaces let you share your debugging workflows with your teammates in real time. Everyone can collaborate on things like Rules, Mock APIs and Session replays.",
+          "A Team Workspace lets you collaborate with your team and work together in real-time on your rules, mocks and sessions.",
         icon: <MdOutlineDiversity1 />,
         helpLink: (
           <a href="https://developers.requestly.com/workspace/using-workspace/" target="_blank" rel="noreferrer">
@@ -144,7 +254,8 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         id: IncentivizeEvent.FIRST_MOCK_CREATED,
         title: "Create an API Mock",
         isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_MOCK_CREATED, userMilestoneDetails),
-        description: "Create mocks for your APIs with different status codes, delay, response headers or body",
+        description:
+          "Generate a mock API endpoint to simulate your API without needing to configure a real API server.",
         icon: <MdOutlineDns />,
         helpLink: (
           <a href="https://developers.requestly.com/mock-server/create-new-mock-api/" target="_blank" rel="noreferrer">
@@ -174,7 +285,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         title: "Record a session",
         isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_SESSION_RECORDED, userMilestoneDetails),
         description:
-          "Session replays allows you to capture, report, and debug errors with the power of session replay and network & console logs.",
+          "SessionBook allows you to capture, report, and debug errors. Easily capture mouse movements and screen recording along with network & console logs.",
         icon: <PiRecordFill />,
         helpLink: (
           <a href="https://developers.requestly.com/sessions/record-session/" target="_blank" rel="noreferrer">
@@ -247,7 +358,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         },
       },
     ],
-    [milestones, userMilestoneDetails]
+    [milestones, userMilestoneDetails, dispatch, navigate, location.pathname, postActionClickCallback]
   );
 
   return (
