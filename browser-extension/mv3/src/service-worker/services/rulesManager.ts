@@ -12,9 +12,32 @@ interface RuleIdsMap {
 }
 
 const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
-  return new Promise((resolve) => {
-    chrome.declarativeNetRequest.updateDynamicRules(options, resolve);
-  });
+  const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
+  const badRQRuleIds: string[] = [];
+
+  while (true) {
+    if (!options.addRules && !options.removeRuleIds) {
+      break;
+    }
+
+    const addRules = options.addRules?.filter((rule) => !badRQRuleIds.includes(ruleIdsMap[rule.id])) ?? [];
+    const removeRuleIds = options.removeRuleIds?.filter((ruleId) => !badRQRuleIds.includes(ruleIdsMap[ruleId])) ?? [];
+
+    try {
+      await chrome.declarativeNetRequest.updateDynamicRules({
+        addRules,
+        removeRuleIds,
+      });
+      break;
+    } catch (err) {
+      const match = err.message.match(/Rule with id (\d+)/);
+      if (match) {
+        const ruleId = parseInt(match[1]);
+        badRQRuleIds.push(ruleIdsMap[ruleId]);
+      }
+    }
+  }
+  return;
 };
 
 const deleteAllDynamicRules = async (): Promise<void> => {
