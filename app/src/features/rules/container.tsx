@@ -22,7 +22,7 @@ import { trackErrorInSavingDNR } from "modules/analytics/events/common/rules";
 const RulesFeatureContainer = () => {
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("ruleSaveError", (message: any) => {
-      notification.error({
+      notification.warn({
         message: <span className="text-bold">{"Error saving rule"}</span>,
         description: (
           <div>
