@@ -22,7 +22,7 @@
     align-items: center;
     padding: 8px 1rem;
     background: var(--requestly-color-background);
-    border-bottom: 1px solid var(--requestly-color-surface-1);
+    border-bottom: 1px solid var(--requestly-color-surface-2);
     z-index: 5;
 
     &-content {
@@ -95,6 +95,14 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+
+  .pricing-table {
+    flex-wrap: wrap;
+
+    .plan-card {
+      flex: 1;
+    }
+  }
 }
 
 .pricing-page-other-actions-container {
