@@ -50,7 +50,7 @@ export const EnterprisePlanCard = () => {
               </div>
             </div>
           </div>
-          <div className="enterprise-contact-use-container">
+          <div className="enterprise-contact-us-container">
             <div className="enterprise-plan-price">Starts at $59</div>
             <RQButton type="primary" size="large" className="mt-16" onClick={() => setIsContactUsModalOpen(true)}>
               Contact sales
