@@ -15,7 +15,7 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({ task }) => {
         <span className="incentive-task-title">{task.title}</span>
       </div>
       <div className="task-credit-value">
-        <span>${task.milestone?.value as number}</span> {task.isCompleted ? "Credits earned" : "Credits"}
+        <span>${task.milestone?.reward.value as number}</span> {task.isCompleted ? "Credits earned" : "Credits"}
       </div>
     </div>
   );

@@ -194,7 +194,7 @@ const CreateRuleButton = ({
     const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
 
     claimIncentiveRewards({
-      event: IncentivizeEvent.FIRST_RULE_CREATED,
+      event: IncentivizeEvent.RULE_CREATED,
       options: { ruleType: currentlySelectedRuleData.ruleType },
     }).then((response) => {
       if (response.data?.success) {
@@ -205,7 +205,7 @@ const CreateRuleButton = ({
             modalName: "incentiveTaskCompletedModal",
             newValue: true,
             newProps: {
-              event: IncentivizeEvent.FIRST_RULE_CREATED,
+              event: IncentivizeEvent.RULE_CREATED,
             },
           })
         );

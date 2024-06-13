@@ -67,9 +67,9 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const incentiveTasksList: IncentiveTaskListItem[] = useMemo(
     () => [
       {
-        id: IncentivizeEvent.FIRST_RULE_CREATED,
+        id: IncentivizeEvent.RULE_CREATED,
         title: "Create your first rule",
-        isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_RULE_CREATED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.RULE_CREATED, userMilestoneDetails),
         description:
           "Rules enable you to set conditions that trigger specific actions when met. To apply desired network modifications",
         icon: <MdPlaylistAdd />,
@@ -78,13 +78,13 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
             Learn how to create Rules
           </a>
         ),
-        milestone: milestones?.[IncentivizeEvent.FIRST_RULE_CREATED],
+        milestone: milestones?.[IncentivizeEvent.RULE_CREATED],
         action: () => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_RULE_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_CREATED, userMilestoneDetails);
           return (
             <NewRuleButtonWithDropdown
               disable={isCompleted}
-              callback={() => postActionClickCallback(IncentivizeEvent.FIRST_RULE_CREATED)}
+              callback={() => postActionClickCallback(IncentivizeEvent.RULE_CREATED)}
             />
           );
         },
@@ -208,9 +208,9 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         },
       },
       {
-        id: IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED,
+        id: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
         title: "Create a Team Workspace",
-        isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.TEAM_WORKSPACE_CREATED, userMilestoneDetails),
         description:
           "A Team Workspace lets you collaborate with your team and work together in real-time on your rules, mocks and sessions.",
         icon: <MdOutlineDiversity1 />,
@@ -219,16 +219,16 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
             Learn how to create Team Workspace
           </a>
         ),
-        milestone: milestones?.[IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED],
+        milestone: milestones?.[IncentivizeEvent.TEAM_WORKSPACE_CREATED],
         action: ({ dispatch }) => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.TEAM_WORKSPACE_CREATED, userMilestoneDetails);
 
           return (
             <Button
               disabled={isCompleted}
               type="primary"
               onClick={() => {
-                postActionClickCallback(IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED);
+                postActionClickCallback(IncentivizeEvent.TEAM_WORKSPACE_CREATED);
                 dispatch(
                   // @ts-ignore
                   actions.toggleActiveModal({
@@ -251,9 +251,9 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         },
       },
       {
-        id: IncentivizeEvent.FIRST_MOCK_CREATED,
+        id: IncentivizeEvent.MOCK_CREATED,
         title: "Create an API Mock",
-        isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_MOCK_CREATED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.MOCK_CREATED, userMilestoneDetails),
         description:
           "Generate a mock API endpoint to simulate your API without needing to configure a real API server.",
         icon: <MdOutlineDns />,
@@ -262,16 +262,16 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
             Learn how to create API Mock
           </a>
         ),
-        milestone: milestones?.[IncentivizeEvent.FIRST_MOCK_CREATED],
+        milestone: milestones?.[IncentivizeEvent.MOCK_CREATED],
         action: ({ navigate }) => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_MOCK_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.MOCK_CREATED, userMilestoneDetails);
 
           return (
             <Button
               disabled={isCompleted}
               type="primary"
               onClick={() => {
-                postActionClickCallback(IncentivizeEvent.FIRST_MOCK_CREATED);
+                postActionClickCallback(IncentivizeEvent.MOCK_CREATED);
                 redirectToMocks(navigate);
               }}
             >
@@ -281,9 +281,9 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         },
       },
       {
-        id: IncentivizeEvent.FIRST_SESSION_RECORDED,
+        id: IncentivizeEvent.SESSION_RECORDED,
         title: "Record a session",
-        isCompleted: isTaskCompleted(IncentivizeEvent.FIRST_SESSION_RECORDED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.SESSION_RECORDED, userMilestoneDetails),
         description:
           "SessionBook allows you to capture, report, and debug errors. Easily capture mouse movements and screen recording along with network & console logs.",
         icon: <PiRecordFill />,
@@ -292,16 +292,16 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
             Learn how to record a session
           </a>
         ),
-        milestone: milestones?.[IncentivizeEvent.FIRST_SESSION_RECORDED],
+        milestone: milestones?.[IncentivizeEvent.SESSION_RECORDED],
         action: ({ navigate }) => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.FIRST_SESSION_RECORDED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.SESSION_RECORDED, userMilestoneDetails);
 
           return (
             <Button
               disabled={isCompleted}
               type="primary"
               onClick={() => {
-                postActionClickCallback(IncentivizeEvent.FIRST_SESSION_RECORDED);
+                postActionClickCallback(IncentivizeEvent.SESSION_RECORDED);
                 redirectToSessionRecordingHome(navigate);
               }}
             >

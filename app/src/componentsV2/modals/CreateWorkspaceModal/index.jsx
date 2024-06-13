@@ -83,7 +83,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       if (userAttributes?.num_workspaces === 1 && isIncentivizationEnabled) {
         const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
 
-        claimIncentiveRewards({ event: IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED }).then((response) => {
+        claimIncentiveRewards({ event: IncentivizeEvent.TEAM_WORKSPACE_CREATED }).then((response) => {
           if (response.data?.success) {
             dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
 
@@ -91,7 +91,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
               actions.toggleActiveModal({
                 modalName: "incentiveTaskCompletedModal",
                 newValue: true,
-                newProps: { event: IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED },
+                newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
               })
             );
           }

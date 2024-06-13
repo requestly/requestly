@@ -108,6 +108,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
         dispatch(
+          // @ts-ignore
           actions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
@@ -156,7 +157,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
           if (isDraftSession) {
             if (isIncentivizationEnabled) {
               const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-              claimIncentiveRewards({ event: IncentivizeEvent.FIRST_SESSION_RECORDED }).then((response) => {
+              claimIncentiveRewards({ event: IncentivizeEvent.SESSION_RECORDED }).then((response) => {
                 // @ts-ignore
                 if (response.data?.success) {
                   dispatch(
@@ -169,7 +170,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
                     actions.toggleActiveModal({
                       modalName: "incentiveTaskCompletedModal",
                       newValue: true,
-                      newProps: { event: IncentivizeEvent.FIRST_SESSION_RECORDED },
+                      newProps: { event: IncentivizeEvent.SESSION_RECORDED },
                     })
                   );
                 }

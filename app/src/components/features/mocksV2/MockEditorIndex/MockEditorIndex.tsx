@@ -89,7 +89,7 @@ const MockEditorIndex: React.FC<Props> = ({
           if (isIncentivizationEnabled) {
             const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
 
-            claimIncentiveRewards({ event: IncentivizeEvent.FIRST_MOCK_CREATED }).then((response) => {
+            claimIncentiveRewards({ event: IncentivizeEvent.MOCK_CREATED }).then((response) => {
               // @ts-ignore
               if (response.data?.success) {
                 // @ts-ignore
@@ -100,7 +100,7 @@ const MockEditorIndex: React.FC<Props> = ({
                   actions.toggleActiveModal({
                     modalName: "incentiveTaskCompletedModal",
                     newValue: true,
-                    newProps: { event: IncentivizeEvent.FIRST_MOCK_CREATED },
+                    newProps: { event: IncentivizeEvent.MOCK_CREATED },
                   })
                 );
               }

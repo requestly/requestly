@@ -1,19 +1,34 @@
 export enum IncentivizeEvent {
-  FIRST_RULE_CREATED = "FIRST_RULE_CREATED",
+  RULE_CREATED = "RULE_CREATED",
   RULE_TESTED = "RULE_TESTED",
   REDIRECT_RULE_CREATED = "REDIRECT_RULE_CREATED",
   RESPONSE_RULE_CREATED = "RESPONSE_RULE_CREATED",
-  FIRST_TEAM_WORKSPACE_CREATED = "FIRST_TEAM_WORKSPACE_CREATED",
-  FIRST_MOCK_CREATED = "FIRST_MOCK_CREATED",
-  FIRST_SESSION_RECORDED = "FIRST_SESSION_RECORDED",
+  TEAM_WORKSPACE_CREATED = "TEAM_WORKSPACE_CREATED",
+  MOCK_CREATED = "MOCK_CREATED",
+  SESSION_RECORDED = "SESSION_RECORDED",
   RATE_ON_CHROME_STORE = "RATE_ON_CHROME_STORE",
 }
+export enum RewardType {
+  CREDIT = "CREDIT",
+  OTHER = "OTHER",
+}
 
-export type Credit = number;
+export type Reward =
+  | {
+      type: RewardType.CREDIT;
+      value: number;
+    }
+  | {
+      type: RewardType.OTHER;
+      value: unknown;
+    };
 
-export type Reward = Credit | unknown;
-
-export type Milestone = { id: IncentivizeEvent; type: IncentivizeEvent; value: Reward };
+export interface Milestone {
+  id?: string;
+  type: IncentivizeEvent;
+  reward: Reward;
+  metadata?: Record<string, unknown>;
+}
 
 export type Milestones = Record<IncentivizeEvent, Milestone>;
 
