@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
 import APP_CONSTANTS from "./config/constants";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
-import { ConfigProvider, notification } from "antd";
+import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
 import useGeoLocation from "hooks/useGeoLocation";
 import DashboardLayout from "layouts/DashboardLayout";
@@ -29,7 +29,6 @@ import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsLi
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
 import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
-import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -38,18 +37,6 @@ const App = () => {
   useEffect(() => {
     // Load features asynchronously when the app renders
     growthbook.loadFeatures({ autoRefresh: true });
-    PageScriptMessageHandler.addMessageListener("ruleSaveError", (message) => {
-      notification.error({
-        // message: "Error saving rule",
-        message: (
-          <>
-            {message.error.errorMessage}
-            <p>Footer</p>
-          </>
-        ),
-        placement: "bottomLeft",
-      });
-    });
   }, []);
 
   useGeoLocation();

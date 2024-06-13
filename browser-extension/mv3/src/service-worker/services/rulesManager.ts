@@ -35,16 +35,12 @@ const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRu
       const match = e.message.match(/Rule with id (\d+)/);
       const ruleId = parseInt(match[1]);
       const rqRuleId = ruleIdsMap[ruleId];
-      console.log("!!!debug", "erros", e.code, e.reason);
       if (match && rqRuleId) {
         badRQRuleIds.add(ruleIdsMap[ruleId]);
         sendMessageToApp({
           action: EXTENSION_MESSAGES.RULE_SAVE_ERROR,
-          error: {
-            reason: e.message,
-            errorMessage: `Error while saving rule: ${rqRuleId}`,
-            rqRuleId,
-          },
+          error: e.message,
+          rqRuleId,
         });
       }
     }
