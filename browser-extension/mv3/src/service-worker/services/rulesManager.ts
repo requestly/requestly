@@ -4,6 +4,8 @@ import { getVariable, onVariableChange, setVariable, Variable } from "../variabl
 import { isExtensionEnabled } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
+import { sendMessageToApp } from "./messageHandler";
+import { EXTENSION_MESSAGES } from "common/constants";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
@@ -13,15 +15,15 @@ interface RuleIdsMap {
 
 const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
   const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
-  const badRQRuleIds: string[] = [];
+  const badRQRuleIds = new Set<string>();
 
   while (true) {
     if (!options.addRules && !options.removeRuleIds) {
       break;
     }
 
-    const addRules = options.addRules?.filter((rule) => !badRQRuleIds.includes(ruleIdsMap[rule.id])) ?? [];
-    const removeRuleIds = options.removeRuleIds?.filter((ruleId) => !badRQRuleIds.includes(ruleIdsMap[ruleId])) ?? [];
+    const addRules = options.addRules?.filter((rule) => !badRQRuleIds.has(ruleIdsMap[rule.id])) ?? [];
+    const removeRuleIds = options.removeRuleIds?.filter((ruleId) => !badRQRuleIds.has(ruleIdsMap[ruleId])) ?? [];
 
     try {
       await chrome.declarativeNetRequest.updateDynamicRules({
@@ -29,11 +31,21 @@ const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRu
         removeRuleIds,
       });
       break;
-    } catch (err) {
-      const match = err.message.match(/Rule with id (\d+)/);
-      if (match) {
-        const ruleId = parseInt(match[1]);
-        badRQRuleIds.push(ruleIdsMap[ruleId]);
+    } catch (e) {
+      const match = e.message.match(/Rule with id (\d+)/);
+      const ruleId = parseInt(match[1]);
+      const rqRuleId = ruleIdsMap[ruleId];
+      console.log("!!!debug", "erros", e.code, e.reason);
+      if (match && rqRuleId) {
+        badRQRuleIds.add(ruleIdsMap[ruleId]);
+        sendMessageToApp({
+          action: EXTENSION_MESSAGES.RULE_SAVE_ERROR,
+          error: {
+            reason: e.message,
+            errorMessage: `Error while saving rule: ${rqRuleId}`,
+            rqRuleId,
+          },
+        });
       }
     }
   }
