@@ -1,0 +1,1 @@
+export { PricingIndexPage } from "./PricingIndexPage";
