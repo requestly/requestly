@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { Row, notification } from "antd";
 import PATHS from "config/constants/sub/paths";
-import { trackErrorInRuleCreation } from "modules/analytics/events/common/rules";
+import { trackErrorInSavingDNR } from "modules/analytics/events/common/rules";
 
 const RulesFeatureContainer = () => {
   useEffect(() => {
@@ -37,7 +37,7 @@ const RulesFeatureContainer = () => {
         duration: 0,
       });
       console.log(`[Requestly]: Error saving rule - ${message.error}`);
-      trackErrorInRuleCreation(message.error, message.rqRuleId.split("_")[0]);
+      trackErrorInSavingDNR(message.error, message.rqRuleId.split("_")[0], message.rqRuleId);
     });
   }, []);
 
