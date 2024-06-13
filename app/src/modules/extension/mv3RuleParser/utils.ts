@@ -27,16 +27,8 @@ export const convertRegexSubstitutionStringToDNRSubstitutionString = (regexSubst
 };
 
 export const countCapturingGroups = (regexPattern: string) => {
-  const updatedRegexString = `.*|${regexPattern}`;
-  const updatedRegex = new RegExp(updatedRegexString);
-  console.log({ updatedRegexString, updatedRegex });
-
-  // Match the regex against an empty string and get the results
-  const match = updatedRegex.exec("");
-  console.log("[Debug] countCapturingGroup ", regexPattern, match ? match.length - 1 : 0);
-  // The number of capturing groups is the length of the result array minus one
-  // (subtracting 1 because the first element is the full match)
-  return match ? match.length - 1 : 0;
+  var num_groups = new RegExp(regexPattern.toString() + "|").exec("").length - 1;
+  return num_groups
 };
 
 const createRegexForWildcardString = (value: string, isWildcardCapturingGroupsEnabled: boolean = true): string => {

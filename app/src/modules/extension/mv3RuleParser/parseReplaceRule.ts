@@ -71,38 +71,30 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
     };
 
     const fromRegex = parseRegex(rulePair.from);
-    let replacementRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
-    let regexSubstitution = `\\1${rulePair.to}\\2`;
+    let replacementRegex = "";
+    let regexSubstitution = "";
 
-    if (fromRegex) {
-      console.log("[Debug] is a regex", { from: rulePair.from });
+    if (fromRegex?.pattern) {
       const num_capturing_groups = countCapturingGroups(fromRegex.pattern);
 
       if (num_capturing_groups === 0) {
-        console.log("[Debug]", { num_capturing_groups });
         replacementRegex = `(.*?)${fromRegex.pattern}(.*)`;
         regexSubstitution = `\\1${rulePair.to}\\2`;
       } else {
-        console.log("[Debug]", { num_capturing_groups });
-        
         replacementRegex = `(.*?)${fromRegex.pattern}(.*)`;
         const s1 = getRegexSubstitutionStringWithIncrementedIndex(rulePair.to, 1);
         const s2 = convertRegexSubstitutionStringToDNRSubstitutionString(s1);
-        console.log({ s1, s2 });
 
         regexSubstitution = `\\1${s2}\\${num_capturing_groups + 2}`;
       }
     } else {
-      console.log("[Debug] is not a regex", { from: rulePair.from });
       replacementRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
       regexSubstitution = `\\1${rulePair.to}\\2`;
     }
 
-    console.log("[Debug]", {replacementRegex, regexSubstitution})
-
     const finalRegex = `^${replacementRegex}#__rq_marker=(?:${matchingCondition.regexFilter})$`;
 
-    let substitutionRule: ExtensionRule = {
+    let replacementRule: ExtensionRule = {
       priority: 2,
       condition: {
         ...matchingCondition,
@@ -116,7 +108,7 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
       },
     };
 
-    extensionRules.push(...[redirectForSubstitutionRule, substitutionRule]);
+    extensionRules.push(...[redirectForSubstitutionRule, replacementRule]);
   });
 
   return extensionRules;
