@@ -11,6 +11,8 @@ import {
   trackEmailVerificationSendSuccess,
 } from "modules/analytics/events/common/auth/emailVerification";
 import Logger from "lib/logger";
+import disposableEmailDomains from "disposable-email-domains/index.json";
+import disposableEmailDomainsWildcard from "disposable-email-domains/wildcard.json";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 
@@ -31,6 +33,11 @@ export const isEmailVerified = (userId) => {
       } else return data.emailVerified;
     })
     .catch((err) => Logger.log(err));
+};
+
+export const isDisposableEmail = (email) => {
+  const domain = email.split("@")[1];
+  return disposableEmailDomains.includes(domain) || disposableEmailDomainsWildcard.includes(domain);
 };
 
 export const setEmailVerified = async (userId, value) => {
