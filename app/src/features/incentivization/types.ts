@@ -8,6 +8,12 @@ export enum IncentivizeEvent {
   SESSION_RECORDED = "SESSION_RECORDED",
   RATE_ON_CHROME_STORE = "RATE_ON_CHROME_STORE",
 }
+
+export interface UserIncentiveEvent {
+  type: IncentivizeEvent;
+  metadata: Record<string, unknown>;
+}
+
 export enum RewardType {
   CREDIT = "CREDIT",
   OTHER = "OTHER",

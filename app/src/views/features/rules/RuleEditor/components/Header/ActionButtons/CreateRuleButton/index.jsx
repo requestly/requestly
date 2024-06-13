@@ -42,12 +42,12 @@ import { actions } from "store";
 import { HTML_ERRORS } from "./actions/insertScriptValidators";
 import { toastType } from "componentsV2/CodeEditor/components/EditorToast/types";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { RuleType } from "features/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import "../RuleEditorActionButtons.css";
 import Logger from "../../../../../../../../../../common/logger";
+import { claimIncentiveRewards } from "backend/incentivization";
+import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -157,17 +157,17 @@ const CreateRuleButton = ({
 
   const handleOtherRuleEvents = useCallback(
     async (disableTaskCompletedModal = false) => {
-      const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-
       const otherRules = [RuleType.RESPONSE, RuleType.REDIRECT];
+
       if (otherRules.includes(currentlySelectedRuleData.ruleType)) {
         const incentiveEvent =
           currentlySelectedRuleData.ruleType === RuleType.RESPONSE
             ? IncentivizeEvent.RESPONSE_RULE_CREATED
             : IncentivizeEvent.REDIRECT_RULE_CREATED;
+
         claimIncentiveRewards({
-          event: incentiveEvent,
-          options: { ruleType: currentlySelectedRuleData.ruleType },
+          type: incentiveEvent,
+          metadata: { rule_type: currentlySelectedRuleData.ruleType },
         }).then((response) => {
           if (response.data?.success) {
             dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
@@ -191,11 +191,9 @@ const CreateRuleButton = ({
   );
 
   const handleFirstRuleCreationEvent = useCallback(async () => {
-    const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-
     claimIncentiveRewards({
-      event: IncentivizeEvent.RULE_CREATED,
-      options: { ruleType: currentlySelectedRuleData.ruleType },
+      type: IncentivizeEvent.RULE_CREATED,
+      metadata: { num_rules: 1 },
     }).then((response) => {
       if (response.data?.success) {
         dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
