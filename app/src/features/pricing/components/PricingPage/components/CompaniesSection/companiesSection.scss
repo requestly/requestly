@@ -14,6 +14,7 @@
   justify-content: center;
   margin-top: 1rem;
   gap: 24px;
+  flex-wrap: wrap;
 
   img {
     width: 100px;
@@ -23,6 +24,15 @@
     &:nth-child(2) {
       position: relative;
       top: 5px;
+    }
+  }
+}
+
+@media (max-width: 320px) {
+  .companies-section-logos {
+    img {
+      width: 80px;
+      height: 20px;
     }
   }
 }
