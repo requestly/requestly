@@ -1,9 +1,8 @@
 import { Card } from "antd";
 import "./index.css";
 
-const CustomerStory = ({ name, title, mugshot, testimonial, companyLogo, companyName }) => {
+const CustomerReviewCard = ({ name, title, mugshot, testimonial, companyName }) => {
   const mugshotAlt = `${name}, ${title}`;
-  const companyLogoAlt = `${companyName} logo`;
 
   return (
     <Card className="shadow testimonial-card">
@@ -15,9 +14,8 @@ const CustomerStory = ({ name, title, mugshot, testimonial, companyLogo, company
         </span>
       </div>
       <p className="mb-0 text-left text-gray mt-1 testimonial-content">{testimonial}</p>
-      {companyLogo && <img className="testimonial-company-logo" src={companyLogo} alt={companyLogoAlt} />}
     </Card>
   );
 };
 
-export default CustomerStory;
+export default CustomerReviewCard;

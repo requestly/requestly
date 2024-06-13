@@ -1,13 +1,17 @@
 .pricing-page-wrapper {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   background: var(--requestly-color-background);
   width: 100%;
+  overflow: hidden;
 }
 
 .pricing-page-container {
-  max-width: 1300px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   .pricing-navbar {
     position: fixed;
@@ -34,12 +38,24 @@
     }
   }
 
-  .pricing-page-body {
+  .pricing-page-body-wrapper {
+    width: 100%;
     height: calc(100vh - 26px); // height of navbar
     overflow-y: auto;
-    padding: 0 12px;
     padding-top: 56px;
-    padding-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .pricing-page-body {
+    max-width: 1300px;
+    width: 100%;
+    padding: 0 12px;
 
     &::-webkit-scrollbar {
       display: none;
@@ -79,4 +95,11 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+}
+
+.pricing-page-other-actions-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 56px;
 }

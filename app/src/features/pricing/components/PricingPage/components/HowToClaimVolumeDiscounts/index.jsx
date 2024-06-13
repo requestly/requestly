@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Button, Card, Col, Row, Typography } from "antd";
+import { Button, Card, Typography } from "antd";
 import { MailOutlined } from "@ant-design/icons";
-import { FaPercentage } from "@react-icons/all-files/fa/FaPercentage";
 import { FaUsers } from "@react-icons/all-files/fa/FaUsers";
 import { EVENTS, trackClaimVolumeDiscountsCTAClicked } from "./analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -9,13 +8,6 @@ import ContactUsModal from "components/landing/contactUsModal";
 
 const { Title, Text } = Typography;
 const styles = {
-  bannerContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: "20px",
-    margin: "20px 0",
-  },
   card: {
     width: "100%",
     maxWidth: "60vw",
@@ -26,8 +18,7 @@ const styles = {
   },
   content: {
     display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "column",
     justifyContent: "space-between",
   },
   icon: {
@@ -48,6 +39,7 @@ const styles = {
     color: "var(--neutrals-gray-300)",
   },
   button: {
+    marginTop: "1rem",
     padding: "0 20px",
   },
 };
