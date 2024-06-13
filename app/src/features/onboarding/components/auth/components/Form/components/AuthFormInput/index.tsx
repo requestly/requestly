@@ -9,6 +9,7 @@ interface InputProps {
   type?: string;
   onValueChange: (value: string) => void;
   onPressEnter?: () => void;
+  status?: "error" | "warning";
 }
 
 export const AuthFormInput: React.FC<InputProps> = ({
@@ -19,6 +20,7 @@ export const AuthFormInput: React.FC<InputProps> = ({
   onValueChange,
   onPressEnter,
   type,
+  status,
 }) => {
   return (
     <div className="onboarding-form-input">
@@ -30,6 +32,7 @@ export const AuthFormInput: React.FC<InputProps> = ({
         id={id}
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
+        status={status ?? ""}
       />
     </div>
   );
