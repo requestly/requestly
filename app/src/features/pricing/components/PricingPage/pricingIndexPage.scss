@@ -1,0 +1,82 @@
+.pricing-page-wrapper {
+  display: flex;
+  justify-content: center;
+  background: var(--requestly-color-background);
+  width: 100%;
+}
+
+.pricing-page-container {
+  max-width: 1300px;
+  width: 100%;
+
+  .pricing-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding: 8px 1rem;
+    background: var(--requestly-color-background);
+    border-bottom: 1px solid var(--requestly-color-surface-1);
+    z-index: 5;
+
+    &-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .logo {
+      width: 100px;
+      cursor: pointer;
+    }
+  }
+
+  .pricing-page-body {
+    height: calc(100vh - 26px); // height of navbar
+    overflow-y: auto;
+    padding: 0 12px;
+    padding-top: 56px;
+    padding-bottom: 2rem;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.page-yellow-text {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--requestly-color-warning);
+  font-size: var(--requestly-font-size-sm);
+}
+
+.pricing-page-title {
+  color: var(--requestly-color-text-default);
+  font-size: 24px;
+  font-weight: 500;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pricing-page-description {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-sm);
+  margin-top: 8px;
+  text-align: center;
+}
+
+.pricing-page-duartion-label {
+  color: var(--requestly-color-text-default);
+  margin-left: 8px;
+}
+
+.pricing-page-table-wrapper {
+  margin-top: 32px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}

@@ -1,0 +1,75 @@
+.enterprise-plan-card {
+  background: var(--requestly-color-surface-0);
+  border-radius: 8px;
+  border: 1px solid var(--requestly-color-white-t-20);
+  margin-top: 32px;
+}
+
+.enterprise-plan-name {
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-xl);
+  font-weight: 500;
+}
+
+.enterprise-plan-description {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-sm);
+  margin-top: 8px;
+}
+
+.enterprise-plan-details-container {
+  border-right: 1px solid var(--requestly-color-white-t-20);
+  padding-right: 48px;
+}
+
+.enterprise-plan-card-body {
+  display: flex;
+  padding: 30px 32px;
+}
+
+.enterprise-plan-features-list-container {
+  display: flex;
+  gap: 60px;
+  margin-top: 1rem;
+
+  .enterprise-plan-feature {
+    color: var(--requestly-color-text-subtle);
+
+    img {
+      width: 14px;
+      margin-right: 8px;
+    }
+
+    &:not(:first-child) {
+      margin-top: 8px;
+    }
+  }
+}
+
+.enterprise-contact-use-container {
+  padding: 64px 0;
+  padding-left: 48px;
+
+  .enterprise-plan-price {
+    color: var(--requestly-color-text-default);
+    font-size: var(--requestly-font-size-sm);
+  }
+}
+
+.enterprise-plan-img-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.enterprise-plan-card-footer {
+  text-align: center;
+  background: var(--requestly-color-surface-2);
+  padding: 1rem;
+  color: var(--requestly-color-text-subtle);
+  border-top: 1px solid var(--requestly-color-white-t-20);
+
+  span {
+    color: var(--requestly-color-text-default);
+  }
+}
