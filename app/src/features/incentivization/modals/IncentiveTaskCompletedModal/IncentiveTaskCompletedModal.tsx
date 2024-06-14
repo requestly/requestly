@@ -39,7 +39,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const congratulationMesssages: Record<IncentivizeEvent, { message: string }> = {
     [IncentivizeEvent.RULE_CREATED]: {
       message: `You earned $${
-        (userMilestoneDetails?.recentCreditsClaimed ?? 0) as number
+        (milestones?.[IncentivizeEvent.RULE_CREATED]?.reward.value ?? 0) as number
       } on creating your first rule.`,
     },
     [IncentivizeEvent.TEAM_WORKSPACE_CREATED]: {
@@ -108,7 +108,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
           ) : (
             <>
               Unlock an additional ${remainingCredits} worth of free credits by completing these {remainingTasksCount}{" "}
-              steps.
+              {remainingTasksCount > 1 ? "steps" : "step"}.
             </>
           )}
         </div>
@@ -116,7 +116,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
           <RQButton
             type="primary"
             onClick={() => {
-              trackCreditsAssignedModalClicked("complete_now");
+              trackCreditsAssignedModalClicked(remainingTasksCount === 0 ? "redeem_now" : "complete_now");
               dispatch(
                 // @ts-ignore
                 actions.toggleActiveModal({
@@ -130,7 +130,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
               toggle();
             }}
           >
-            Complete now
+            {remainingTasksCount === 0 ? "Redeem now" : "Complete now"}
           </RQButton>
           <RQButton
             type="default"
