@@ -32,7 +32,8 @@ const styles = {
   },
   title: {
     fontWeight: "bold",
-    marginBottom: "0px",
+    marginBottom: "8px",
+    fontSize: "var(--requestly-font-size-lg)",
   },
   subtitle: {
     marginBottom: "0px",

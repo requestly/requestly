@@ -14,6 +14,8 @@ const styles = {
   title: {
     textAlign: "center",
     marginBottom: "20px",
+    fontSize: "var(--requestly-font-size-xl)",
+    fontWeight: 500,
     color: "var(--requestly-color-text-default)",
   },
   col: {
