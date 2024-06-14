@@ -9,11 +9,11 @@ const styles = {
   card: {
     width: "100%",
     height: "100%",
-    maxWidth: "60vw",
     textAlign: "center",
     padding: "20px",
-    background: "var(--surface-2)",
-    borderRadius: "var(--border-radius-md)",
+    background: "var(--requestly-color-surface-0)",
+    borderRadius: "8px",
+    border: "1px solid var(--requestly-color-white-t-20)",
   },
   content: {
     display: "flex",
@@ -72,7 +72,8 @@ const BuyAdditionalSeats = () => {
             <div style={styles.textContainer}>
               <h2 style={styles.title}>Want to Add Seats to Your Existing Subscription?</h2>
               <p style={styles.subtitle}>
-                Purchase new seats at a prorated price up until the end of the subscription.
+                You can purchase additional seats at a prorated cost, which will be calculated based on the remaining
+                duration of your current subscription.
               </p>
             </div>
             <Button type="primary" style={styles.button} onClick={handleBuyAdditionalUsersButtonOnClick}>

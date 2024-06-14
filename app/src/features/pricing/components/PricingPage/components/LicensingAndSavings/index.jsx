@@ -1,20 +1,20 @@
 import React from "react";
 import { Card, Col, Row, Typography } from "antd";
-import { FileTextOutlined, UserSwitchOutlined, CreditCardOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { FileTextOutlined, UserSwitchOutlined, CreditCardOutlined } from "@ant-design/icons";
 
-const { Title, Text, Link } = Typography;
+const { Title, Text } = Typography;
 
 const styles = {
   section: {
-    padding: "40px 20px",
+    marginTop: "56px",
   },
   container: {
-    maxWidth: "65vw",
     margin: "0 auto",
   },
   title: {
     textAlign: "center",
-    marginBottom: "40px",
+    marginBottom: "20px",
+    color: "var(--requestly-color-text-default)",
   },
   col: {
     display: "flex",
@@ -24,14 +24,16 @@ const styles = {
     width: "100%",
     maxWidth: "400px",
     textAlign: "center",
-    background: "var(--component-background)",
+    background: "var(--requestly-color-surface-0)",
+    borderRadius: "8px",
+    border: "1px solid var(--requestly-color-white-t-20)",
   },
   icon: {
     fontSize: "2.2em",
     marginBottom: "20px",
   },
   text: {
-    color: "var(--neutrals-gray-300)",
+    color: "var(--requestly-color-text-subtle)",
   },
 };
 
