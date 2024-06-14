@@ -7,6 +7,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import ContactUsModal from "components/landing/contactUsModal";
 
 const { Title, Text } = Typography;
+// TODO: REFACTOR THIS COMPONENT WHEN PICKED UP FOR REDESIGN
 const styles = {
   card: {
     width: "100%",

@@ -5,6 +5,7 @@ import { EVENTS, trackBuyAdditionalUsersButtonClicked } from "./analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import BuyAdditionalSeatsModal from "./BuyAdditionalSeatsModal";
 
+// TODO: REFACTOR THIS COMPONENT WHEN PICKED UP FOR REDESIGN
 const styles = {
   card: {
     width: "100%",
