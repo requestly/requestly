@@ -331,7 +331,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
                     (response: { data: { success: boolean; data: UserMilestoneAndRewardDetails } }) => {
                       if (response.data?.success) {
                         dispatch(
-                          incentivizationActions.setUserMilestoneDetails({
+                          incentivizationActions.setUserMilestoneAndRewardDetails({
                             userMilestoneAndRewardDetails: response.data?.data,
                           })
                         );

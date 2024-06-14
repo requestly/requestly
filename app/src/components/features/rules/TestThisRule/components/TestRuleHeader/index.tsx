@@ -74,8 +74,10 @@ export const TestRuleHeader = () => {
         // @ts-ignore
         if (response.data?.success) {
           dispatch(
-            // @ts-ignore
-            incentivizationActions.setUserMilestoneDetails({ userMilestoneAndRewardDetails: response.data?.data })
+            incentivizationActions.setUserMilestoneAndRewardDetails({
+              // @ts-ignore
+              userMilestoneAndRewardDetails: response.data?.data,
+            })
           );
 
           dispatch(

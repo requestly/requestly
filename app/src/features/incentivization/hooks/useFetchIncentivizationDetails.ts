@@ -35,7 +35,7 @@ export const useFetchIncentivizationDetails = () => {
 
           if (userMilestoneAndRewardDetails.data?.success) {
             dispatch(
-              incentivizationActions.setUserMilestoneDetails({
+              incentivizationActions.setUserMilestoneAndRewardDetails({
                 userMilestoneAndRewardDetails: userMilestoneAndRewardDetails.data?.data,
               })
             );

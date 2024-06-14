@@ -18,7 +18,7 @@ const slice = createSlice({
       const { milestones } = action.payload;
       state.milestones = milestones;
     },
-    setUserMilestoneDetails: (state, action) => {
+    setUserMilestoneAndRewardDetails: (state, action) => {
       const { userMilestoneAndRewardDetails } = action.payload;
       state.userMilestoneAndRewardDetails = {
         ...state.userMilestoneAndRewardDetails,

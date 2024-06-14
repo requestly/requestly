@@ -132,8 +132,10 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
         // @ts-ignore
         if (response.data?.success) {
           dispatch(
-            // @ts-ignore
-            incentivizationActions.setUserMilestoneDetails({ userMilestoneAndRewardDetails: response.data?.data })
+            incentivizationActions.setUserMilestoneAndRewardDetails({
+              // @ts-ignore
+              userMilestoneAndRewardDetails: response.data?.data,
+            })
           );
           trackCreditsRedeemed(userMilestoneAndRewardDetails?.creditsToBeRedeemed);
           toast.success({
