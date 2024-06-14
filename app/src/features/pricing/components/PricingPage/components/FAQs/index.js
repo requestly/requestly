@@ -65,7 +65,7 @@ const PricingFAQs = () => {
     <>
       <div className="faq-heading">Frequently Asked Questions</div>
       <div className="faq-collapse-container">
-        <Collapse defaultActiveKey={["0"]} expandIconPosition="right" ghost className="faq-collapse">
+        <Collapse expandIconPosition="right" ghost className="faq-collapse">
           {FAQs.map((faq, index) => (
             <Collapse.Panel key={index} header={<div className="faq-question">{faq.question}</div>}>
               <div className="faq-answer">{faq.answer}</div>
