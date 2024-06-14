@@ -10,7 +10,7 @@ export const CompaniesSection = () => {
 
   return (
     <div className="companies-section-container">
-      <div className="companies-section-title">Trusted by developer & QA teams from 5000+ global organizations</div>
+      <div className="companies-section-title">Trusted by developer & QA teams from 50,000+ global organizations</div>
       <div className="companies-section-logos">
         {companyLogos.map((logo, index) => (
           <img key={index} src={logo} alt={`company-logo-${index}`} />
