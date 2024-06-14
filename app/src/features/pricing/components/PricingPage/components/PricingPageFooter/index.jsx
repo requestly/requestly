@@ -5,7 +5,7 @@ import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 const { Title, Text, Link } = Typography;
-
+// TODO: REFACTOR THIS COMPONENT WHEN PICKED UP FOR REDESIGN
 const styles = {
   footer: {
     marginTop: "40px",

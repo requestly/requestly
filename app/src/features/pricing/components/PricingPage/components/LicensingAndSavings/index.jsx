@@ -4,6 +4,8 @@ import { FileTextOutlined, UserSwitchOutlined, CreditCardOutlined } from "@ant-d
 
 const { Title, Text } = Typography;
 
+// TODO: REFACTOR THIS COMPONENT WHEN PICKED UP FOR REDESIGN
+
 const styles = {
   section: {
     marginTop: "56px",

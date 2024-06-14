@@ -9,6 +9,8 @@ import { RQButton } from "lib/design-system/components";
 
 const { Title, Text } = Typography;
 
+// TODO: REFACTOR THIS COMPONENT WHEN PICKED UP FOR REDESIGN
+
 const styles = {
   container: {
     marginTop: "56px",

@@ -39,7 +39,6 @@ export const PricingIndexPage = () => {
               With Requestly, developers save at least 2 hrs of their time a week, i.e. savings of over $200 a month per
               developer
             </div>
-            {/* TODO: CREATE A COMMON COMPONENT FOR THIS */}
             <Row justify="center" className="display-row-center w-full mt-24" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
                 <Switch
@@ -62,7 +61,7 @@ export const PricingIndexPage = () => {
             <CompaniesSection />
             <StatsCard />
             <div className="pricing-page-other-actions-container">
-              {/* TODO: A COMMON COMPONENT CAN BE CREATED FOR BELOW 2 COMPONENTS */}
+              {/* TODO: A COMMON COMPONENT TO BE CREATED FOR BELOW 2 COMPONENTS */}
               <BuyAdditionalSeats />
               <HowToClaimVolumeDiscounts />
             </div>
