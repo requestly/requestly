@@ -10,11 +10,11 @@ const { Title, Text } = Typography;
 const styles = {
   card: {
     width: "100%",
-    maxWidth: "60vw",
     textAlign: "center",
     padding: "20px",
-    background: "var(--surface-2)",
-    borderRadius: "var(--border-radius-md)",
+    background: "var(--requestly-color-surface-0)",
+    borderRadius: "8px",
+    border: "1px solid var(--requestly-color-white-t-20)",
   },
   content: {
     display: "flex",

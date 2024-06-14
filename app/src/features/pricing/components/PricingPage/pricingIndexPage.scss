@@ -22,7 +22,7 @@
     align-items: center;
     padding: 8px 1rem;
     background: var(--requestly-color-background);
-    border-bottom: 1px solid var(--requestly-color-surface-2);
+    border-bottom: 1px solid var(--requestly-color-surface-1);
     z-index: 5;
 
     &-content {
@@ -107,7 +107,7 @@
 
 .pricing-page-other-actions-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
   gap: 16px;
   margin-top: 56px;
 }

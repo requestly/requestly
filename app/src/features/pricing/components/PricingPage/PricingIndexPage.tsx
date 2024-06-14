@@ -66,8 +66,8 @@ export const PricingIndexPage = () => {
               <BuyAdditionalSeats />
               <HowToClaimVolumeDiscounts />
             </div>
-            <OtherWaysToMakePurchase />
             <LicensingAndSavings />
+            <OtherWaysToMakePurchase />
             <CustomerReviews />
             <PricingFAQs />
           </div>

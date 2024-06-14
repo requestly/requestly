@@ -8,8 +8,10 @@ const { Title, Text, Link } = Typography;
 
 const styles = {
   footer: {
+    marginTop: "40px",
     padding: "40px 20px",
     background: "var(--requestly-color-surface-0)",
+    borderTop: "1px solid var(--requestly-color-white-t-20)",
     width: "100%",
   },
   container: {

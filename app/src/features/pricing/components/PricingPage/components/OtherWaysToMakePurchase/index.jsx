@@ -5,22 +5,24 @@ import { EVENTS, trackRequestQuoteButtonClicked, trackSendPurhcaseOrderButtonCli
 import RequestQuoteModal from "./RequestQuoteModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import SendPurchaseOrderModal from "./SendPurchaseOrderModal";
+import { RQButton } from "lib/design-system/components";
 
 const { Title, Text, Link } = Typography;
 
 const styles = {
   container: {
-    padding: "40px 10px",
-    maxWidth: "70vw",
-    margin: "0 auto",
+    marginTop: "56px",
   },
   heading: {
     textAlign: "center",
-    marginBottom: "40px",
+    marginBottom: "20px",
+    color: "var(--requestly-color-text-default)",
   },
   card: {
     height: "100%",
-    background: "var(--component-background)",
+    background: "var(--requestly-color-surface-0)",
+    borderRadius: "8px",
+    border: "1px solid var(--requestly-color-white-t-20)",
   },
   link: {
     fontSize: "20px",
@@ -35,6 +37,7 @@ const styles = {
   },
   text: {
     color: "var(--neutrals-gray-300)",
+    display: "block",
   },
   divider: {
     height: "100%",
@@ -80,29 +83,33 @@ const OtherWaysToMakePurchase = () => {
         <Row justify="center" align="middle" gutter={[16, 16]}>
           <Col xs={24} md={10}>
             <Card style={styles.card}>
-              <Link style={styles.link} onClick={handleRequestQuoteOnClick}>
+              <div style={styles.link}>
                 <FileTextOutlined style={styles.icon} />
                 Request a Quote &nbsp; <ArrowRightOutlined />
-              </Link>
+              </div>
               <Text style={styles.text}>
                 Fill in your details and you’ll be sent a quote/estimate to sign. Once it’s signed and returned, we’ll
                 activate your licenses and send you an invoice with NET 30 payment terms.
               </Text>
+              <RQButton type="primary" className="mt-24" onClick={handleRequestQuoteOnClick}>
+                Request a Quote
+              </RQButton>
             </Card>
           </Col>
-          <Col xs={0} md={1}>
-            <Divider type="vertical" style={styles.divider} />
-          </Col>
+
           <Col xs={24} md={10}>
             <Card style={styles.card}>
-              <Link style={styles.link} onClick={handleSendPurchaseOrderButtonOnClick}>
+              <div style={styles.link}>
                 <FileAddOutlined style={styles.icon} />
                 Send a Purchase Order &nbsp; <ArrowRightOutlined />
-              </Link>
+              </div>
               <Text style={styles.text}>
                 Please review our PO Requirements to ensure streamlined processing of your PO. Once received and
                 processed, we’ll activate your licenses and send you an invoice with NET 30 payment terms.
               </Text>
+              <RQButton type="primary" className="mt-24" onClick={handleSendPurchaseOrderButtonOnClick}>
+                Send Purchase Order
+              </RQButton>
             </Card>
           </Col>
         </Row>
