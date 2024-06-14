@@ -17,6 +17,7 @@ import LicensingAndSavings from "./components/LicensingAndSavings";
 import { CustomerReviews } from "./components/CustomerReviews/CustomerReviews";
 import PricingFAQs from "./components/FAQs";
 import PricingPageFooter from "./components/PricingPageFooter";
+import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
 import "./pricingIndexPage.scss";
 
 export const PricingIndexPage = () => {
@@ -32,6 +33,7 @@ export const PricingIndexPage = () => {
           </div>
         </Layout.Header>
         <div className="pricing-page-body-wrapper">
+          <EnterpriseRequestBanner />
           <div className="pricing-page-body">
             <div className="page-yellow-text">Plans & pricing</div>
             <div className="pricing-page-title">Developer time is expensive</div>
