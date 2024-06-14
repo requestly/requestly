@@ -94,8 +94,10 @@ const MockEditorIndex: React.FC<Props> = ({
             }).then((response) => {
               // @ts-ignore
               if (response.data?.success) {
-                // @ts-ignore
-                dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+                dispatch(
+                  // @ts-ignore
+                  incentivizationActions.setUserMilestoneDetails({ userMilestoneAndRewardDetails: response.data?.data })
+                );
 
                 dispatch(
                   // @ts-ignore

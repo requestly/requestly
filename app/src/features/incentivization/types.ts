@@ -38,7 +38,7 @@ export interface Milestone {
 
 export type Milestones = Record<IncentivizeEvent, Milestone>;
 
-export interface UserMilestoneDetails {
+export interface UserMilestoneAndRewardDetails {
   uid: string;
   recentCreditsClaimed: number;
   creditsToBeRedeemed: number;

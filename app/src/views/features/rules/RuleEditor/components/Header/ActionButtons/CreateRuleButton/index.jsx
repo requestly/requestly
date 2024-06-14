@@ -170,7 +170,9 @@ const CreateRuleButton = ({
           metadata: { rule_type: currentlySelectedRuleData.ruleType },
         }).then((response) => {
           if (response.data?.success) {
-            dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+            dispatch(
+              incentivizationActions.setUserMilestoneDetails({ userMilestoneAndRewardDetails: response.data?.data })
+            );
 
             if (!disableTaskCompletedModal) {
               dispatch(
@@ -196,7 +198,9 @@ const CreateRuleButton = ({
       metadata: { num_rules: 1 },
     }).then((response) => {
       if (response.data?.success) {
-        dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+        dispatch(
+          incentivizationActions.setUserMilestoneDetails({ userMilestoneAndRewardDetails: response.data?.data })
+        );
 
         dispatch(
           actions.toggleActiveModal({

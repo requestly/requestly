@@ -6,7 +6,7 @@ import { RedeemCreditsModal } from "features/incentivization";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import {
   getIncentivizationMilestones,
-  getIncentivizationUserMilestoneDetails,
+  getUserIncentivizationDetails,
   getIsIncentivizationDetailsLoading,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits } from "features/incentivization/utils";
@@ -24,7 +24,7 @@ export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }
   const user = useSelector(getUserAuthDetails);
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
-  const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
+  const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
   const billingTeams = useSelector(getAvailableBillingTeams);
 
   const isUserHasActiveSubscription = user?.details?.planDetails?.status === "active";
@@ -34,11 +34,11 @@ export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }
   const disableRedeem = isUserHasActiveSubscription || isUserInBillingTeam;
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
-  const totalCreditsEarned = userMilestoneDetails?.totalCreditsClaimed ?? 0;
+  const totalCreditsEarned = userMilestoneAndRewardDetails?.totalCreditsClaimed ?? 0;
   const progressPrecentage = parseInt(`${(totalCreditsEarned / Math.max(1, totalCredits)) * 100}`);
-  const creditsToBeRedeemed = userMilestoneDetails?.creditsToBeRedeemed ?? 0;
+  const creditsToBeRedeemed = userMilestoneAndRewardDetails?.creditsToBeRedeemed ?? 0;
   const isAllCreditsRedeemed =
-    Object.keys(milestones ?? {}).length === (userMilestoneDetails?.claimedMilestoneLogs?.length ?? 0);
+    Object.keys(milestones ?? {}).length === (userMilestoneAndRewardDetails?.claimedMilestoneLogs?.length ?? 0);
 
   return (
     <>
@@ -110,7 +110,7 @@ export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }
         <RedeemCreditsModal
           isOpen={isRedeemModalVisible}
           onClose={() => setIsRedeemModalVisible(false)}
-          userMilestoneDetails={userMilestoneDetails}
+          userMilestoneAndRewardDetails={userMilestoneAndRewardDetails}
           source={source}
         />
       )}

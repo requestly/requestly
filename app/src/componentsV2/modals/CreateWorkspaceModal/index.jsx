@@ -87,7 +87,9 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           metadata: { num_workspaces: userAttributes?.num_workspaces },
         }).then((response) => {
           if (response.data?.success) {
-            dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+            dispatch(
+              incentivizationActions.setUserMilestoneDetails({ userMilestoneAndRewardDetails: response.data?.data })
+            );
 
             dispatch(
               actions.toggleActiveModal({

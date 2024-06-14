@@ -3,10 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import { IncentivizeEvent } from "features/incentivization/types";
-import {
-  getIncentivizationMilestones,
-  getIncentivizationUserMilestoneDetails,
-} from "store/features/incentivization/selectors";
+import { getIncentivizationMilestones, getUserIncentivizationDetails } from "store/features/incentivization/selectors";
 import { getTotalCredits } from "features/incentivization/utils";
 import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import creditsEarnedAnimation from "./assets/creditsEarned.json";
@@ -24,13 +21,13 @@ interface IncentiveTaskCompletedModalProps {
 export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalProps> = ({ isOpen, toggle, event }) => {
   const dispatch = useDispatch();
   const milestones = useSelector(getIncentivizationMilestones);
-  const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
+  const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
 
   useEffect(() => {
     if (isOpen) {
-      trackCreditsAssignedModalViewed(userMilestoneDetails?.recentCreditsClaimed ?? 0, event);
+      trackCreditsAssignedModalViewed(userMilestoneAndRewardDetails?.recentCreditsClaimed ?? 0, event);
     }
-  }, [userMilestoneDetails?.recentCreditsClaimed, event, isOpen]);
+  }, [userMilestoneAndRewardDetails?.recentCreditsClaimed, event, isOpen]);
 
   if (!milestones || !event) {
     return null;
@@ -80,9 +77,9 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   };
 
   const totalCredits = getTotalCredits(milestones);
-  const remainingCredits = totalCredits - (userMilestoneDetails?.totalCreditsClaimed ?? 0);
+  const remainingCredits = totalCredits - (userMilestoneAndRewardDetails?.totalCreditsClaimed ?? 0);
   const remainingTasksCount =
-    Object.keys(milestones ?? {}).length - (userMilestoneDetails?.claimedMilestoneLogs?.length ?? 0);
+    Object.keys(milestones ?? {}).length - (userMilestoneAndRewardDetails?.claimedMilestoneLogs?.length ?? 0);
 
   return (
     <Modal

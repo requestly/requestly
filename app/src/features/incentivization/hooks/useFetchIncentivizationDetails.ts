@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { Milestones, UserMilestoneDetails } from "../types";
+import { Milestones, UserMilestoneAndRewardDetails } from "../types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getUserAuthDetails } from "store/selectors";
 
@@ -9,6 +9,8 @@ export const useFetchIncentivizationDetails = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
+
+  console.log({ user });
 
   useEffect(() => {
     const getIncentivizationDetails = async () => {
@@ -27,15 +29,19 @@ export const useFetchIncentivizationDetails = () => {
             "incentivization-getUserIncentivizationDetails"
           );
 
-          const userMilestoneDetails = (await getUserIncentivizationDetails()) as {
-            data: { success: boolean; data: UserMilestoneDetails | null };
+          const userMilestoneAndRewardDetails = (await getUserIncentivizationDetails()) as {
+            data: { success: boolean; data: UserMilestoneAndRewardDetails | null };
           };
 
-          if (userMilestoneDetails.data?.success) {
+          if (userMilestoneAndRewardDetails.data?.success) {
             dispatch(
-              incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: userMilestoneDetails.data?.data })
+              incentivizationActions.setUserMilestoneDetails({
+                userMilestoneAndRewardDetails: userMilestoneAndRewardDetails.data?.data,
+              })
             );
           }
+        } else {
+          // load from localstorage
         }
       } catch (error) {
         // do nothing
@@ -44,6 +50,7 @@ export const useFetchIncentivizationDetails = () => {
       }
     };
 
+    // TODO: add a new user check
     getIncentivizationDetails();
   }, [dispatch, uid]);
 };

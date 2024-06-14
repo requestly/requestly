@@ -3,7 +3,7 @@ import { Modal } from "antd";
 import { RQButton } from "lib/design-system/components";
 import emptyWallet from "./assets/empty_wallet.svg";
 // import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
-import { UserMilestoneDetails } from "features/incentivization/types";
+import { UserMilestoneAndRewardDetails } from "features/incentivization/types";
 import { getTotalCredits } from "features/incentivization/utils";
 import { getIncentivizationMilestones } from "store/features/incentivization/selectors";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,14 +27,14 @@ import {
 interface RedeemCreditsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userMilestoneDetails: UserMilestoneDetails;
+  userMilestoneAndRewardDetails: UserMilestoneAndRewardDetails;
   source: string;
 }
 
 export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
   isOpen,
   onClose,
-  userMilestoneDetails,
+  userMilestoneAndRewardDetails,
   source,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +44,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
   const user = useSelector(getUserAuthDetails);
 
   const userPlanDetails = user?.details?.planDetails;
-  const creditsToBeRedeemed = userMilestoneDetails?.creditsToBeRedeemed ?? 0;
+  const creditsToBeRedeemed = userMilestoneAndRewardDetails?.creditsToBeRedeemed ?? 0;
   const totalCredits = getTotalCredits(milestones);
 
   const getSubscriptionDatePreview = useCallback(() => {
@@ -112,7 +112,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
   };
 
   const handleRedeemCreditsClick = () => {
-    trackRedeemCreditsClicked(userMilestoneDetails?.creditsToBeRedeemed);
+    trackRedeemCreditsClicked(userMilestoneAndRewardDetails?.creditsToBeRedeemed);
     const redeemCredits = httpsCallable(getFunctions(), "incentivization-redeemCredits");
 
     if (!user?.loggedIn) {
@@ -131,9 +131,11 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
       .then((response) => {
         // @ts-ignore
         if (response.data?.success) {
-          // @ts-ignore
-          dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
-          trackCreditsRedeemed(userMilestoneDetails?.creditsToBeRedeemed);
+          dispatch(
+            // @ts-ignore
+            incentivizationActions.setUserMilestoneDetails({ userMilestoneAndRewardDetails: response.data?.data })
+          );
+          trackCreditsRedeemed(userMilestoneAndRewardDetails?.creditsToBeRedeemed);
           toast.success({
             duration: 0,
             key: redeemStatusToast,

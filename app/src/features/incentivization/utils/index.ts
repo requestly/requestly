@@ -1,4 +1,4 @@
-import { IncentivizeEvent, Milestones, UserMilestoneDetails } from "../types";
+import { IncentivizeEvent, Milestones, UserMilestoneAndRewardDetails } from "../types";
 
 export const getTotalCredits = (milestones: Milestones) => {
   const total = Object.values(milestones ?? {}).reduce(
@@ -9,6 +9,9 @@ export const getTotalCredits = (milestones: Milestones) => {
   return total;
 };
 
-export const isTaskCompleted = (event: IncentivizeEvent, userMilestoneDetails: UserMilestoneDetails) => {
-  return userMilestoneDetails?.claimedMilestoneLogs?.includes(event);
+export const isTaskCompleted = (
+  event: IncentivizeEvent,
+  userMilestoneAndRewardDetails: UserMilestoneAndRewardDetails
+) => {
+  return userMilestoneAndRewardDetails?.claimedMilestoneLogs?.includes(event);
 };

@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Milestones, UserMilestoneDetails } from "features/incentivization/types";
+import { IncentivizeEvent, Milestones, UserMilestoneAndRewardDetails } from "features/incentivization/types";
 import { ReducerKeys } from "store/constants";
 
 const initialState = {
   milestones: {} as Milestones,
-  userMilestoneDetails: {} as UserMilestoneDetails,
+  userMilestoneAndRewardDetails: {} as UserMilestoneAndRewardDetails,
   isIncentivizationDetailsLoading: false,
+  localIncentivizationEventsState: [] as IncentivizeEvent[],
 };
 
 const slice = createSlice({
@@ -18,12 +19,26 @@ const slice = createSlice({
       state.milestones = milestones;
     },
     setUserMilestoneDetails: (state, action) => {
-      const { userMilestoneDetails } = action.payload;
-      state.userMilestoneDetails = { ...state.userMilestoneDetails, ...userMilestoneDetails };
+      const { userMilestoneAndRewardDetails } = action.payload;
+      state.userMilestoneAndRewardDetails = {
+        ...state.userMilestoneAndRewardDetails,
+        ...userMilestoneAndRewardDetails,
+      };
     },
     setIsIncentivizationDetailsLoading: (state, action) => {
       const { isLoading } = action.payload;
       state.isIncentivizationDetailsLoading = isLoading;
+    },
+    setLocalIncentivizationEventsState: (state, action) => {
+      const { type } = action.payload;
+
+      if (!state.localIncentivizationEventsState.includes(type)) {
+        state.localIncentivizationEventsState.push(type);
+      }
+
+      /**
+       * - any event added in this should also update the userIncentivization details nodes
+       */
     },
   },
 });

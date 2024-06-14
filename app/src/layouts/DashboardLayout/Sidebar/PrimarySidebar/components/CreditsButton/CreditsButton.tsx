@@ -8,7 +8,7 @@ import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { getIncentivizationUserMilestoneDetails } from "store/features/incentivization/selectors";
+import { getUserIncentivizationDetails } from "store/features/incentivization/selectors";
 import "./creditsButton.scss";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
@@ -17,7 +17,7 @@ export const CreditsButton = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
+  const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
   const [isCreditsTourVisible, setIsCreditsTourVisible] = useState(false);
 
   const handleButtonClick = () => {
@@ -106,8 +106,10 @@ export const CreditsButton = () => {
               size="small"
               status="default"
               count={
-                (userMilestoneDetails?.totalCreditsClaimed ?? 0) > 0 && user?.loggedIn ? (
-                  <span className="credits-earned-count">${userMilestoneDetails?.totalCreditsClaimed ?? 0}</span>
+                (userMilestoneAndRewardDetails?.totalCreditsClaimed ?? 0) > 0 && user?.loggedIn ? (
+                  <span className="credits-earned-count">
+                    ${userMilestoneAndRewardDetails?.totalCreditsClaimed ?? 0}
+                  </span>
                 ) : (
                   0
                 )

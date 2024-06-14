@@ -163,8 +163,10 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
                 // @ts-ignore
                 if (response.data?.success) {
                   dispatch(
-                    // @ts-ignore
-                    incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
+                    incentivizationActions.setUserMilestoneDetails({
+                      // @ts-ignore
+                      userMilestoneAndRewardDetails: response.data?.data,
+                    })
                   );
 
                   dispatch(
