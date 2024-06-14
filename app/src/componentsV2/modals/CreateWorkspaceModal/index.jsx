@@ -83,8 +83,12 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
 
       if (isIncentivizationEnabled) {
         claimIncentiveRewards({
-          type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-          metadata: { num_workspaces: userAttributes?.num_workspaces },
+          dispatch,
+          isUserloggedIn: user?.loggedIn,
+          event: {
+            type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
+            metadata: { num_workspaces: userAttributes?.num_workspaces },
+          },
         }).then((response) => {
           if (response.data?.success) {
             dispatch(
@@ -110,6 +114,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       isNotifyAllSelected,
       isWorkspaceMode,
       navigate,
+      user?.loggedIn,
       user?.details?.isSyncEnabled,
       userAttributes?.num_workspaces,
       isIncentivizationEnabled,

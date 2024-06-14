@@ -41,6 +41,7 @@ import PATHS from "config/constants/sub/paths";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { claimIncentiveRewards } from "backend/incentivization";
 import "./incentiveTasksList.scss";
+import { getUserAuthDetails } from "store/selectors";
 
 interface IncentiveTasksListProps {
   source: string;
@@ -50,6 +51,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
@@ -327,26 +329,28 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
               type="primary"
               onClick={() => {
                 setTimeout(() => {
-                  claimIncentiveRewards({ type: IncentivizeEvent.RATE_ON_CHROME_STORE }).then(
-                    (response: { data: { success: boolean; data: UserMilestoneAndRewardDetails } }) => {
-                      if (response.data?.success) {
-                        dispatch(
-                          incentivizationActions.setUserMilestoneAndRewardDetails({
-                            userMilestoneAndRewardDetails: response.data?.data,
-                          })
-                        );
+                  claimIncentiveRewards({
+                    dispatch,
+                    isUserloggedIn: user?.loggedIn,
+                    event: { type: IncentivizeEvent.RATE_ON_CHROME_STORE },
+                  }).then((response: { data: { success: boolean; data: UserMilestoneAndRewardDetails } }) => {
+                    if (response.data?.success) {
+                      dispatch(
+                        incentivizationActions.setUserMilestoneAndRewardDetails({
+                          userMilestoneAndRewardDetails: response.data?.data,
+                        })
+                      );
 
-                        dispatch(
-                          // @ts-ignore
-                          actions.toggleActiveModal({
-                            modalName: "incentiveTaskCompletedModal",
-                            newValue: true,
-                            newProps: { event: IncentivizeEvent.RATE_ON_CHROME_STORE },
-                          })
-                        );
-                      }
+                      dispatch(
+                        // @ts-ignore
+                        actions.toggleActiveModal({
+                          modalName: "incentiveTaskCompletedModal",
+                          newValue: true,
+                          newProps: { event: IncentivizeEvent.RATE_ON_CHROME_STORE },
+                        })
+                      );
                     }
-                  );
+                  });
                 }, 1000 * 20);
 
                 postActionClickCallback(IncentivizeEvent.RATE_ON_CHROME_STORE);
@@ -360,7 +364,15 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         },
       },
     ],
-    [milestones, userMilestoneAndRewardDetails, dispatch, navigate, location.pathname, postActionClickCallback]
+    [
+      user?.loggedIn,
+      milestones,
+      userMilestoneAndRewardDetails,
+      dispatch,
+      navigate,
+      location.pathname,
+      postActionClickCallback,
+    ]
   );
 
   return (

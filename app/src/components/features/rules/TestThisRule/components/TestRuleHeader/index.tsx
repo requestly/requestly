@@ -70,7 +70,11 @@ export const TestRuleHeader = () => {
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
 
     if (isIncentivizationEnabled) {
-      claimIncentiveRewards({ type: IncentivizeEvent.RULE_TESTED }).then((response) => {
+      claimIncentiveRewards({
+        dispatch,
+        isUserloggedIn: user?.loggedIn,
+        event: { type: IncentivizeEvent.RULE_TESTED },
+      }).then((response) => {
         // @ts-ignore
         if (response.data?.success) {
           dispatch(
@@ -98,7 +102,7 @@ export const TestRuleHeader = () => {
     currentlySelectedRuleData.id,
     currentlySelectedRuleData.ruleType,
     currentlySelectedRuleData.status,
-    user.loggedIn,
+    user?.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
     isIncentivizationEnabled,

@@ -157,8 +157,12 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
           if (isDraftSession) {
             if (isIncentivizationEnabled) {
               claimIncentiveRewards({
-                type: IncentivizeEvent.SESSION_RECORDED,
-                metadata: { num_sessions: userAttributes?.num_sessions === 0 ? 1 : 0 },
+                dispatch,
+                isUserloggedIn: user?.loggedIn,
+                event: {
+                  type: IncentivizeEvent.SESSION_RECORDED,
+                  metadata: { num_sessions: userAttributes?.num_sessions === 0 ? 1 : 0 },
+                },
               }).then((response) => {
                 // @ts-ignore
                 if (response.data?.success) {
@@ -227,6 +231,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       source,
       isDraftSession,
       isIncentivizationEnabled,
+      userAttributes?.num_sessions,
     ]
   );
 

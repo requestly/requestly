@@ -166,8 +166,9 @@ const CreateRuleButton = ({
             : IncentivizeEvent.REDIRECT_RULE_CREATED;
 
         claimIncentiveRewards({
-          type: incentiveEvent,
-          metadata: { rule_type: currentlySelectedRuleData.ruleType },
+          dispatch,
+          isUserloggedIn: user?.loggedIn,
+          event: { type: incentiveEvent, metadata: { rule_type: currentlySelectedRuleData.ruleType } },
         }).then((response) => {
           if (response.data?.success) {
             dispatch(
@@ -191,13 +192,14 @@ const CreateRuleButton = ({
         });
       }
     },
-    [currentlySelectedRuleData.ruleType, dispatch]
+    [currentlySelectedRuleData.ruleType, user?.loggedIn, dispatch]
   );
 
   const handleFirstRuleCreationEvent = useCallback(async () => {
     claimIncentiveRewards({
-      type: IncentivizeEvent.RULE_CREATED,
-      metadata: { num_rules: 1 },
+      dispatch,
+      isUserloggedIn: user?.loggedIn,
+      event: { type: IncentivizeEvent.RULE_CREATED, metadata: { num_rules: 1 } },
     }).then((response) => {
       if (response.data?.success) {
         dispatch(
@@ -217,7 +219,7 @@ const CreateRuleButton = ({
         );
       }
     });
-  }, [currentlySelectedRuleData.ruleType, dispatch]);
+  }, [user?.loggedIn, dispatch]);
 
   const claimRuleCreationRewards = useCallback(async () => {
     if (!isIncentivizationEnabled) return;
