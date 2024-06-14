@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
-import { Col, Popconfirm, Row, Space } from "antd";
+import { Col, Modal, Popconfirm, Row, Space } from "antd";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../TeamPlanStatus";
 import { RQButton } from "lib/design-system/components";
@@ -110,6 +110,45 @@ export const UserPlanDetails = () => {
 
   if (isLoading) return null;
 
+  const renderPopConfirmation = () => {
+    const showFreeTrailCancelMessage = () => {
+      Modal.info({
+        title: "You are on a free trial plan.",
+        content: (
+          <div>
+            <p>
+              This plan will cancel automatically in a few days.
+              <br />
+              No action is required.
+            </p>
+          </div>
+        ),
+        onOk() {},
+      });
+    };
+
+    if (user?.details?.planDetails?.status === "trialing") {
+      return (
+        <RQButton size="small" type="text" className="cancel-plan-btn" onClick={showFreeTrailCancelMessage}>
+          Cancel plan
+        </RQButton>
+      );
+    }
+    return (
+      <Popconfirm
+        icon={null}
+        cancelText="No"
+        okText="Yes"
+        title="Are you sure you want to cancel your plan?"
+        onConfirm={handleCancelPlanClick}
+      >
+        <RQButton size="small" type="text" className="cancel-plan-btn">
+          Cancel plan
+        </RQButton>
+      </Popconfirm>
+    );
+  };
+
   return (
     <>
       <Col
@@ -130,21 +169,7 @@ export const UserPlanDetails = () => {
                   </Col>
                 </Row>
               </Col>
-              <Col>
-                {user?.details?.planDetails?.status !== PlanStatus.EXPIRED && (
-                  <Popconfirm
-                    icon={null}
-                    cancelText="No"
-                    okText="Yes"
-                    title="Are you sure you want to cancel your plan?"
-                    onConfirm={handleCancelPlanClick}
-                  >
-                    <RQButton size="small" type="text" className="cancel-plan-btn">
-                      Cancel plan
-                    </RQButton>
-                  </Popconfirm>
-                )}
-              </Col>
+              <Col>{user?.details?.planDetails?.status !== PlanStatus.EXPIRED && renderPopConfirmation()}</Col>
             </Row>
             <Col className="user-plan-card-grid">
               <div className="user-plan-card-grid-item">
