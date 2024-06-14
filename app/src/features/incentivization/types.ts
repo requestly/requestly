@@ -40,13 +40,9 @@ export type Milestones = Record<IncentivizeEvent, Milestone>;
 
 export interface UserMilestoneAndRewardDetails {
   uid: string;
-  recentCreditsClaimed: number;
   creditsToBeRedeemed: number;
   totalCreditsClaimed: number;
   creditsRedeemedCount: number;
   claimedMilestoneLogs: Milestone["type"][];
-  updatedTs: number;
-  metadata: {
-    milestonesVersion: number;
-  };
+  updatedTs?: number;
 }
