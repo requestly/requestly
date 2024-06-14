@@ -44,7 +44,7 @@ export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }
     <>
       {
         <div className="credits-redeem-container">
-          {isAllCreditsRedeemed ? (
+          {isAllCreditsRedeemed && creditsToBeRedeemed === 0 ? (
             <div className="all-credits-redeemed description">
               You have redeemed all available credits. No credits remain for redemption.
             </div>

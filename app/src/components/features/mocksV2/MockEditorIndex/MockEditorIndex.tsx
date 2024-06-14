@@ -15,16 +15,16 @@ import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, default
 import { FileType, MockType } from "../types";
 import { getMock } from "backend/mocks/getMock";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { updateMock } from "backend/mocks/updateMock";
 import { createMock } from "backend/mocks/createMock";
 import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/events/features/mocksV2";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { actions } from "store";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { claimIncentiveRewards } from "backend/incentivization";
 
 interface Props {
   isNew?: boolean;
@@ -47,6 +47,7 @@ const MockEditorIndex: React.FC<Props> = ({
   const { mockId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -87,9 +88,10 @@ const MockEditorIndex: React.FC<Props> = ({
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
 
           if (isIncentivizationEnabled) {
-            const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-
-            claimIncentiveRewards({ event: IncentivizeEvent.FIRST_MOCK_CREATED }).then((response) => {
+            claimIncentiveRewards({
+              type: IncentivizeEvent.MOCK_CREATED,
+              metadata: { num_mocks: userAttributes?.num_mocks },
+            }).then((response) => {
               // @ts-ignore
               if (response.data?.success) {
                 // @ts-ignore
@@ -100,7 +102,7 @@ const MockEditorIndex: React.FC<Props> = ({
                   actions.toggleActiveModal({
                     modalName: "incentiveTaskCompletedModal",
                     newValue: true,
-                    newProps: { event: IncentivizeEvent.FIRST_MOCK_CREATED },
+                    newProps: { event: IncentivizeEvent.MOCK_CREATED },
                   })
                 );
               }

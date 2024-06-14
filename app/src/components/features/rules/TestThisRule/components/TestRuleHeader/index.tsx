@@ -16,11 +16,11 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import "./index.scss";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
+import { claimIncentiveRewards } from "backend/incentivization";
+import "./index.scss";
 
 export const TestRuleHeader = () => {
   const dispatch = useDispatch();
@@ -70,9 +70,7 @@ export const TestRuleHeader = () => {
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
 
     if (isIncentivizationEnabled) {
-      const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-
-      claimIncentiveRewards({ event: IncentivizeEvent.RULE_TESTED }).then((response) => {
+      claimIncentiveRewards({ type: IncentivizeEvent.RULE_TESTED }).then((response) => {
         // @ts-ignore
         if (response.data?.success) {
           // @ts-ignore

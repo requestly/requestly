@@ -129,7 +129,6 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
 
     redeemCredits()
       .then((response) => {
-        console.log({ response });
         // @ts-ignore
         if (response.data?.success) {
           // @ts-ignore
