@@ -1,10 +1,11 @@
 import React from "react";
+import { Collapse } from "antd";
 import "./index.css";
 
 const PricingFAQs = () => {
   const FAQs = [
     {
-      ques: <React.Fragment>Do individual developers need to pay for Requestly?</React.Fragment>,
+      question: <React.Fragment>Do individual developers need to pay for Requestly?</React.Fragment>,
       answer: (
         <React.Fragment>
           No, developers working individually without a team are not required to pay for Requestly. The Free plan
@@ -14,7 +15,7 @@ const PricingFAQs = () => {
       ),
     },
     {
-      ques: <React.Fragment>How can I remove limits from the Free plan?</React.Fragment>,
+      question: <React.Fragment>How can I remove limits from the Free plan?</React.Fragment>,
       answer: (
         <React.Fragment>
           Requestly is an open-source platform. Downloading the source code from GitHub allows you to use the Free plan
@@ -23,7 +24,7 @@ const PricingFAQs = () => {
       ),
     },
     {
-      ques: <React.Fragment>When should I switch to the Pro plan?</React.Fragment>,
+      question: <React.Fragment>When should I switch to the Pro plan?</React.Fragment>,
       answer: (
         <React.Fragment>
           Users should look forward to creating teams when there is a need for collaboration, as team workspaces provide
@@ -33,7 +34,7 @@ const PricingFAQs = () => {
       ),
     },
     {
-      ques: <React.Fragment>Does unlimited really mean unlimited in the case of Pro plan?</React.Fragment>,
+      question: <React.Fragment>Does unlimited really mean unlimited in the case of Pro plan?</React.Fragment>,
       answer: (
         <React.Fragment>
           Yes. Rarely some things might get restricted due to storage or performance reasons. Please contact us in case
@@ -42,7 +43,7 @@ const PricingFAQs = () => {
       ),
     },
     {
-      ques: <>I want to modify only HTTP Headers, Is there a discounted plan for me?</>,
+      question: <>I want to modify only HTTP Headers, Is there a discounted plan for me?</>,
       answer: (
         <>
           We provide a custom plan for users seeking unlimited header modifications. Contact us to get this plan
@@ -51,7 +52,7 @@ const PricingFAQs = () => {
       ),
     },
     {
-      ques: <React.Fragment>Which payment methods do you accept?</React.Fragment>,
+      question: <React.Fragment>Which payment methods do you accept?</React.Fragment>,
       answer: (
         <React.Fragment>
           We are using Stripe as our payment processor. Stripe supports the majority of credit and debit card networks,
@@ -62,15 +63,16 @@ const PricingFAQs = () => {
   ];
   return (
     <>
-      <div className="text-center faq-heading">Frequently Asked Questions</div>
-      <>
-        {FAQs.map((faq, index) => (
-          <div key={index} className="faq-item">
-            <div className="faq-question">{faq.ques}</div>
-            <div className="faq-answer">{faq.answer}</div>
-          </div>
-        ))}
-      </>
+      <div className="faq-heading">Frequently Asked Questions</div>
+      <div className="faq-collapse-container">
+        <Collapse defaultActiveKey={["0"]} expandIconPosition="right" ghost className="faq-collapse">
+          {FAQs.map((faq, index) => (
+            <Collapse.Panel key={index} header={<div className="faq-question">{faq.question}</div>}>
+              <div className="faq-answer">{faq.answer}</div>
+            </Collapse.Panel>
+          ))}
+        </Collapse>
+      </div>
     </>
   );
 };
