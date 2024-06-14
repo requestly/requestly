@@ -87,7 +87,7 @@ export default function EnterpriseRequestBanner(): React.ReactNode {
           </>
         ) : (
           <>
-            <Row className="pricing-alert-row display-row-center">
+            <Row className="pricing-alert-row display-row-center mt-16">
               <Col className="display-row-center">
                 {enterpriseRequestedState === 2 ? (
                   <Alert
