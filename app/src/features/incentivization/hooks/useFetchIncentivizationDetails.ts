@@ -18,12 +18,16 @@ export const useFetchIncentivizationDetails = () => {
         const getMilestones = httpsCallable(getFunctions(), "incentivization-getMilestones");
 
         const milestones = (await getMilestones()) as { data: { milestones: Milestones } };
+
         dispatch(incentivizationActions.setMilestones({ milestones: milestones.data.milestones }));
 
         if (uid) {
-          const getUserMilestoneDetails = httpsCallable(getFunctions(), "incentivization-getUserMilestoneDetails");
+          const getUserIncentivizationDetails = httpsCallable(
+            getFunctions(),
+            "incentivization-getUserIncentivizationDetails"
+          );
 
-          const userMilestoneDetails = (await getUserMilestoneDetails()) as {
+          const userMilestoneDetails = (await getUserIncentivizationDetails()) as {
             data: { success: boolean; data: UserMilestoneDetails | null };
           };
 

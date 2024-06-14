@@ -11,9 +11,9 @@ import { getTotalCredits } from "features/incentivization/utils";
 import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import creditsEarnedAnimation from "./assets/creditsEarned.json";
 import { actions } from "store";
-import "./incentiveTaskCompletedModal.scss";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
 import { trackCreditsAssignedModalClicked, trackCreditsAssignedModalViewed } from "features/incentivization/analytics";
+import "./incentiveTaskCompletedModal.scss";
 
 interface IncentiveTaskCompletedModalProps {
   isOpen: boolean;
@@ -37,44 +37,44 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   }
 
   const congratulationMesssages: Record<IncentivizeEvent, { message: string }> = {
-    [IncentivizeEvent.FIRST_RULE_CREATED]: {
+    [IncentivizeEvent.RULE_CREATED]: {
       message: `You earned $${
-        (userMilestoneDetails?.recentCreditsClaimed ?? 0) as number
+        (milestones?.[IncentivizeEvent.RULE_CREATED]?.reward.value ?? 0) as number
       } on creating your first rule.`,
     },
-    [IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED]: {
+    [IncentivizeEvent.TEAM_WORKSPACE_CREATED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.FIRST_TEAM_WORKSPACE_CREATED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.TEAM_WORKSPACE_CREATED]?.reward.value ?? 0) as number
       } on creating your first team workspace.`,
     },
     [IncentivizeEvent.RULE_TESTED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.RULE_TESTED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.RULE_TESTED]?.reward.value ?? 0) as number
       } on testing your first rule.`,
     },
     [IncentivizeEvent.RESPONSE_RULE_CREATED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.RESPONSE_RULE_CREATED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.RESPONSE_RULE_CREATED]?.reward.value ?? 0) as number
       } on creating your first response rule.`,
     },
     [IncentivizeEvent.REDIRECT_RULE_CREATED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.REDIRECT_RULE_CREATED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.REDIRECT_RULE_CREATED]?.reward.value ?? 0) as number
       } on creating your first redirect rule.`,
     },
-    [IncentivizeEvent.FIRST_MOCK_CREATED]: {
+    [IncentivizeEvent.MOCK_CREATED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.FIRST_MOCK_CREATED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.MOCK_CREATED]?.reward.value ?? 0) as number
       } on creating your first mock.`,
     },
-    [IncentivizeEvent.FIRST_SESSION_RECORDED]: {
+    [IncentivizeEvent.SESSION_RECORDED]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.FIRST_SESSION_RECORDED]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.SESSION_RECORDED]?.reward.value ?? 0) as number
       } on recording your first session.`,
     },
     [IncentivizeEvent.RATE_ON_CHROME_STORE]: {
       message: `You earned $${
-        (milestones?.[IncentivizeEvent.RATE_ON_CHROME_STORE]?.value ?? 0) as number
+        (milestones?.[IncentivizeEvent.RATE_ON_CHROME_STORE]?.reward.value ?? 0) as number
       } for rating us.`,
     },
   };
@@ -108,7 +108,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
           ) : (
             <>
               Unlock an additional ${remainingCredits} worth of free credits by completing these {remainingTasksCount}{" "}
-              steps.
+              {remainingTasksCount > 1 ? "steps" : "step"}.
             </>
           )}
         </div>
@@ -116,9 +116,9 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
           <RQButton
             type="primary"
             onClick={() => {
-              trackCreditsAssignedModalClicked("complete_now");
-              // @ts-ignore
+              trackCreditsAssignedModalClicked(remainingTasksCount === 0 ? "redeem_now" : "complete_now");
               dispatch(
+                // @ts-ignore
                 actions.toggleActiveModal({
                   modalName: "incentiveTasksListModal",
                   newValue: true,
@@ -130,7 +130,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
               toggle();
             }}
           >
-            Complete now
+            {remainingTasksCount === 0 ? "Redeem now" : "Complete now"}
           </RQButton>
           <RQButton
             type="default"

@@ -33,10 +33,10 @@ import { getTestReportById, saveTestReport } from "components/features/rules/Tes
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { claimIncentiveRewards } from "backend/incentivization";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -108,6 +108,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
         dispatch(
+          // @ts-ignore
           actions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
@@ -155,8 +156,10 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
 
           if (isDraftSession) {
             if (isIncentivizationEnabled) {
-              const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-              claimIncentiveRewards({ event: IncentivizeEvent.FIRST_SESSION_RECORDED }).then((response) => {
+              claimIncentiveRewards({
+                type: IncentivizeEvent.SESSION_RECORDED,
+                metadata: { num_sessions: userAttributes?.num_sessions === 0 ? 1 : 0 },
+              }).then((response) => {
                 // @ts-ignore
                 if (response.data?.success) {
                   dispatch(
@@ -169,7 +172,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
                     actions.toggleActiveModal({
                       modalName: "incentiveTaskCompletedModal",
                       newValue: true,
-                      newProps: { event: IncentivizeEvent.FIRST_SESSION_RECORDED },
+                      newProps: { event: IncentivizeEvent.SESSION_RECORDED },
                     })
                   );
                 }
