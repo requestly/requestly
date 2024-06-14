@@ -7,7 +7,7 @@ import { PRICING } from "features/pricing/constants/pricing";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { redirectToRules } from "utils/RedirectionUtils";
 import RQLogo from "assets/img/brand/rq_logo_full.svg";
-import { EnterprisePlanCard } from "./components/EnterperisePlanCard/EnterprisePlanCard";
+import { EnterprisePlanCard } from "./components/EnterprisePlanCard/EnterprisePlanCard";
 import { CompaniesSection } from "./components/CompaniesSection/CompaniesSection";
 import { StatsCard } from "./components/StatsCard/StatsCard";
 import BuyAdditionalSeats from "./components/BuyAdditionalSeats";

@@ -3,8 +3,8 @@ import { RQButton } from "lib/design-system/components";
 import securityIllustration from "./assets/security.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { ContactUsModal } from "componentsV2/modals/ContactUsModal";
-import "./enterprisePlanCard.scss";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import "./enterprisePlanCard.scss";
 
 export const EnterprisePlanCard = () => {
   const [isContactUsModalOpen, setIsContactUsModalOpen] = useState(false);

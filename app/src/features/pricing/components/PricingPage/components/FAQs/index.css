@@ -16,10 +16,6 @@
   color: var(--requestly-color-text-subtle);
   line-height: 26px;
   margin-top: 4px;
-  background: var(--requestly-color-background);
-  padding: 1rem;
-  border-radius: 4px;
-  border: 1px solid var(--requestly-color-surface-1);
 }
 
 .faq-collapse-container {
