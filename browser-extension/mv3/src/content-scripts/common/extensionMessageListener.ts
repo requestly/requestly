@@ -1,4 +1,4 @@
-import { EXTENSION_MESSAGES } from "common/constants";
+import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { sendExtensionMessage } from "../app/messageHandler";
 
 export const initExtensionMessageListener = () => {
@@ -10,6 +10,10 @@ export const initExtensionMessageListener = () => {
 
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
         chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
+        break;
+
+      case CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED:
+        sendExtensionMessage(message);
         break;
     }
   });
