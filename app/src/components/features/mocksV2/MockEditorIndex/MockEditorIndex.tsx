@@ -90,7 +90,7 @@ const MockEditorIndex: React.FC<Props> = ({
           if (isIncentivizationEnabled) {
             claimIncentiveRewards({
               type: IncentivizeEvent.MOCK_CREATED,
-              metadata: { num_mocks: userAttributes?.num_mocks === 0 ? 1 : 0 },
+              metadata: { num_mocks: userAttributes?.num_mocks },
             }).then((response) => {
               // @ts-ignore
               if (response.data?.success) {
