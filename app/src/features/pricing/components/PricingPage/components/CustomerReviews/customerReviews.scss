@@ -1,14 +1,24 @@
 .testimonials-container {
   display: flex;
   justify-content: center;
-  flex-flow: "1 1 auto";
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 60px;
+  margin-top: 24px;
+  width: 100%;
 }
+
 .testimonials-container .testimonial-card {
-  background: var(--component-background);
-  border: 1px solid var(--border-dark);
+  background: var(--requestly-color-surface-0);
+  border-radius: 8px;
+  border: 1px solid var(--requestly-color-white-t-20);
   flex: 1;
-  min-width: 320px;
+  min-width: 300px;
+}
+
+.testimonials-section-title {
+  color: var(--requestly-color-text-default);
+  font-size: var(--requestly-font-size-xl);
+  font-weight: 500;
+  margin-top: 56px;
+  text-align: center;
 }

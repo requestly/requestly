@@ -1,4 +1,3 @@
-import { Row, Col } from "antd";
 import leaImg from "assets/images/pages/pricing-page/lea.jpeg";
 import piersImg from "assets/images/pages/pricing-page/piers.jpeg";
 import CustomerReviewCard from "./components/CustomerReviewCard";
@@ -25,23 +24,22 @@ export const CustomerReviews = () => {
   ];
 
   return (
-    <Row>
-      <Col span={12} offset={6}>
-        <div>
-          <div className="testimonials-container">
-            {customerStoryData.map((data) => (
-              <CustomerReviewCard
-                key={data.name}
-                name={data.name}
-                title={data.title}
-                mugshot={data.mugshot}
-                testimonial={data.testimonial}
-                companyName={data.companyName}
-              />
-            ))}
-          </div>
-        </div>
-      </Col>
-    </Row>
+    <>
+      <div className="testimonials-section-title">
+        Discover what top developers worldwide are saying about Requestly
+      </div>
+      <div className="testimonials-container">
+        {customerStoryData.map((data) => (
+          <CustomerReviewCard
+            key={data.name}
+            name={data.name}
+            title={data.title}
+            mugshot={data.mugshot}
+            testimonial={data.testimonial}
+            companyName={data.companyName}
+          />
+        ))}
+      </div>
+    </>
   );
 };

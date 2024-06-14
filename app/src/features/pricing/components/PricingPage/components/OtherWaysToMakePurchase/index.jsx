@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Card, Col, Row, Typography, Divider } from "antd";
-import { ArrowRightOutlined, FileTextOutlined, FileAddOutlined } from "@ant-design/icons";
+import { Card, Col, Row, Typography } from "antd";
+import { FileTextOutlined, FileAddOutlined } from "@ant-design/icons";
 import { EVENTS, trackRequestQuoteButtonClicked, trackSendPurhcaseOrderButtonClicked } from "./analytics";
 import RequestQuoteModal from "./RequestQuoteModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import SendPurchaseOrderModal from "./SendPurchaseOrderModal";
 import { RQButton } from "lib/design-system/components";
 
-const { Title, Text, Link } = Typography;
+const { Title, Text } = Typography;
 
 const styles = {
   container: {
@@ -16,6 +16,8 @@ const styles = {
   heading: {
     textAlign: "center",
     marginBottom: "20px",
+    fontSize: "var(--requestly-font-size-xl)",
+    fontWeight: 500,
     color: "var(--requestly-color-text-default)",
   },
   card: {
@@ -38,6 +40,7 @@ const styles = {
   text: {
     color: "var(--neutrals-gray-300)",
     display: "block",
+    minHeight: "66px",
   },
   divider: {
     height: "100%",
@@ -81,11 +84,11 @@ const OtherWaysToMakePurchase = () => {
           Other Ways to Make a Purchase
         </Title>
         <Row justify="center" align="middle" gutter={[16, 16]}>
-          <Col xs={24} md={10}>
+          <Col lg={12} sm={24}>
             <Card style={styles.card}>
               <div style={styles.link}>
                 <FileTextOutlined style={styles.icon} />
-                Request a Quote &nbsp; <ArrowRightOutlined />
+                Request a Quote
               </div>
               <Text style={styles.text}>
                 Fill in your details and you’ll be sent a quote/estimate to sign. Once it’s signed and returned, we’ll
@@ -97,11 +100,11 @@ const OtherWaysToMakePurchase = () => {
             </Card>
           </Col>
 
-          <Col xs={24} md={10}>
+          <Col lg={12} sm={24}>
             <Card style={styles.card}>
               <div style={styles.link}>
                 <FileAddOutlined style={styles.icon} />
-                Send a Purchase Order &nbsp; <ArrowRightOutlined />
+                Send a Purchase Order
               </div>
               <Text style={styles.text}>
                 Please review our PO Requirements to ensure streamlined processing of your PO. Once received and
