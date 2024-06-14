@@ -60,9 +60,9 @@ export const EnterprisePlanCard = () => {
             <img src={securityIllustration} alt="security" />
           </div>
         </div>
-        <div className="enterprise-plan-card-footer">
+        {/* <div className="enterprise-plan-card-footer">
           Requestly is trusted by <span>50,000+</span> companies globally.
-        </div>
+        </div> */}
       </div>
 
       <ContactUsModal
