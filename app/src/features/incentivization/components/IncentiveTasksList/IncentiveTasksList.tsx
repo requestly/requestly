@@ -30,7 +30,6 @@ import {
   getIsIncentivizationDetailsLoading,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits, isTaskCompleted } from "features/incentivization/utils";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import LINKS from "config/constants/sub/links";
 import { trackIncentivizationTaskClicked } from "features/incentivization/analytics";
@@ -40,11 +39,13 @@ import { RuleType } from "types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import PATHS from "config/constants/sub/paths";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
+import { claimIncentiveRewards } from "backend/incentivization";
 import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
   source: string;
 }
+
 export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -326,8 +327,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
               type="primary"
               onClick={() => {
                 setTimeout(() => {
-                  const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-                  claimIncentiveRewards({ event: IncentivizeEvent.RATE_ON_CHROME_STORE }).then(
+                  claimIncentiveRewards({ type: IncentivizeEvent.RATE_ON_CHROME_STORE }).then(
                     (response: { data: { success: boolean; data: UserMilestoneDetails } }) => {
                       if (response.data?.success) {
                         dispatch(
