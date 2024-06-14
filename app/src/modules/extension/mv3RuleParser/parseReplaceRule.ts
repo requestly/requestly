@@ -1,7 +1,13 @@
 import { escapeRegExp } from "lodash";
 import { ReplaceRule, ReplaceRulePair } from "../../../types/rules";
 import { ExtensionRule, ExtensionRuleCondition, RuleActionType } from "../types";
-import { parseConditionFromSource } from "./utils";
+import {
+  convertRegexSubstitutionStringToDNRSubstitutionString,
+  countCapturingGroups,
+  getRegexSubstitutionStringWithIncrementedIndex,
+  parseConditionFromSource,
+  parseRegex,
+} from "./utils";
 
 const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondition => {
   if (!rulePair.source.value) {
@@ -64,10 +70,31 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
       },
     };
 
-    const subsitutionRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
-    const finalRegex = `^${subsitutionRegex}#__rq_marker=(?:${matchingCondition.regexFilter})$`;
+    const fromRegex = parseRegex(rulePair.from);
+    let replacementRegex = "";
+    let regexSubstitution = "";
 
-    let substitutionRule: ExtensionRule = {
+    if (fromRegex?.pattern) {
+      const num_capturing_groups = countCapturingGroups(fromRegex.pattern);
+
+      if (num_capturing_groups === 0) {
+        replacementRegex = `(.*?)${fromRegex.pattern}(.*)`;
+        regexSubstitution = `\\1${rulePair.to}\\2`;
+      } else {
+        replacementRegex = `(.*?)${fromRegex.pattern}(.*)`;
+        const s1 = getRegexSubstitutionStringWithIncrementedIndex(rulePair.to, 1);
+        const s2 = convertRegexSubstitutionStringToDNRSubstitutionString(s1);
+
+        regexSubstitution = `\\1${s2}\\${num_capturing_groups + 2}`;
+      }
+    } else {
+      replacementRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
+      regexSubstitution = `\\1${rulePair.to}\\2`;
+    }
+
+    const finalRegex = `^${replacementRegex}#__rq_marker=(?:${matchingCondition.regexFilter})$`;
+
+    let replacementRule: ExtensionRule = {
       priority: 2,
       condition: {
         ...matchingCondition,
@@ -76,12 +103,12 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
       action: {
         type: RuleActionType.REDIRECT,
         redirect: {
-          regexSubstitution: `\\1${rulePair.to}\\2`,
+          regexSubstitution: regexSubstitution,
         },
       },
     };
 
-    extensionRules.push(...[redirectForSubstitutionRule, substitutionRule]);
+    extensionRules.push(...[redirectForSubstitutionRule, replacementRule]);
   });
 
   return extensionRules;
