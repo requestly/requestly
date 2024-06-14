@@ -11,7 +11,7 @@ export enum IncentivizeEvent {
 
 export interface UserIncentiveEvent {
   type: IncentivizeEvent;
-  metadata: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 export enum RewardType {
