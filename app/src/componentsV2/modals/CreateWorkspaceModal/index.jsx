@@ -27,6 +27,7 @@ import { IncentivizeEvent } from "features/incentivization/types";
 import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { claimIncentiveRewards } from "backend/incentivization";
 import "./CreateWorkspaceModal.css";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
@@ -80,10 +81,11 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
 
-      if (userAttributes?.num_workspaces === 1 && isIncentivizationEnabled) {
-        const claimIncentiveRewards = httpsCallable(getFunctions(), "incentivization-claimIncentiveRewards");
-
-        claimIncentiveRewards({ event: IncentivizeEvent.TEAM_WORKSPACE_CREATED }).then((response) => {
+      if (isIncentivizationEnabled) {
+        claimIncentiveRewards({
+          type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
+          metadata: { num_workspaces: userAttributes?.num_workspaces },
+        }).then((response) => {
           if (response.data?.success) {
             dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
 
