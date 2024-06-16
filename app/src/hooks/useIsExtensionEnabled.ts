@@ -5,7 +5,6 @@ import { getAppMode } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import Logger from "lib/logger";
 import { StorageService } from "init";
-import APP_CONSTANTS from "config/constants";
 import { actions } from "store";
 
 export const useIsExtensionEnabled = () => {
@@ -16,10 +15,10 @@ export const useIsExtensionEnabled = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       Logger.log(`Reading storage in App`);
       StorageService(appMode)
-        .getRecord(APP_CONSTANTS.RQ_SETTINGS)
+        .getRecord("rq_var_isExtensionEnabled")
         .then((value) => {
-          if (value) {
-            dispatch(actions.updateIsExtensionEnabled(value.isExtensionEnabled));
+          if (value !== undefined) {
+            dispatch(actions.updateIsExtensionEnabled(value));
           } else {
             dispatch(actions.updateIsExtensionEnabled(true));
           }
