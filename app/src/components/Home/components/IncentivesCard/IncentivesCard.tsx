@@ -14,7 +14,7 @@ export const IncentivesCard = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const milestones = useSelector(getIncentivizationMilestones);
-  const totalCredits = getTotalCredits(milestones) ?? 0;
+  const totalCredits = getTotalCredits(milestones);
 
   return (
     <>
