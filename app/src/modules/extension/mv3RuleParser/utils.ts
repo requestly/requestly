@@ -63,7 +63,7 @@ export const parseUrlParametersFromSourceV2 = (
         };
       }
 
-      case SourceOperator.WILDCARD_MATCHES:
+      case SourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(
           createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
         );
@@ -71,6 +71,7 @@ export const parseUrlParametersFromSourceV2 = (
           regexFilter: `^${pattern}$`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
+      }
     }
   }
 
@@ -158,7 +159,7 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
 
 export const parseConditionFromSource = (
   source: RulePairSource,
-  isWildcardCapturingGroupsEnabled?: boolean,
+  isWildcardCapturingGroupsEnabled?: boolean
 ): ExtensionRuleCondition => {
   return {
     ...parseUrlParametersFromSourceV2(source, isWildcardCapturingGroupsEnabled),
