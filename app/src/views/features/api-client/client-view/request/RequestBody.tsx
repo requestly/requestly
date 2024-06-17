@@ -34,8 +34,6 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentTy
             language={EditorLanguage.JSON}
             value={body as string}
             handleChange={setBody}
-            unlockJsonPrettify={true}
-            isCodeFormatted={isJsonBodyFormatted}
             isResizable={false}
           />
         );

@@ -325,8 +325,6 @@ const MockEditor: React.FC<Props> = ({
             defaultValue={headersString}
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
-            // HACK TO PREVENT AUTO FORMAT
-            isCodeMinified={true}
           />
         </Col>
       </Row>

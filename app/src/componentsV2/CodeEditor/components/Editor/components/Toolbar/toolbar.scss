@@ -1,0 +1,19 @@
+.code-editor-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+
+  .code-editor-actions {
+    .ant-btn {
+      color: var(--requestly-color-text-default);
+
+      &:hover,
+      &:focus,
+      &:active {
+        background: var(--requestly-color-surface-2);
+      }
+    }
+  }
+}

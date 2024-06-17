@@ -294,14 +294,11 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 }
                 isReadOnly={isInputDisabled}
                 handleChange={responseBodyChangeHandler}
-                unlockJsonPrettify={true}
-                isCodeMinified={isCodeMinified}
-                isCodeFormatted={isCodeFormatted}
                 isResizable
               />
             </Col>
           </Row>
-          <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
+          {/* <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
             <Col align="left">
               {pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
                 <>
@@ -320,7 +317,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 {getByteSize(pair.response.value)} characters
               </span>
             </Col>
-          </Row>
+          </Row> */}
           {isServeWithoutRequestSupported && pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC ? (
             <Row className="serve-without-request-setting">
               <Col xl="12" span={24}>
