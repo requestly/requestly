@@ -23,12 +23,11 @@ export const Home: React.FC = () => {
   return (
     <Col className="homepage-wrapper">
       <Col className="homepage-content">
-        {user.loggedIn &&
-          checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents) && (
-            <Col className="homepage-primary-card homepage-incentives-card">
-              <IncentivesCard />
-            </Col>
-          )}
+        {checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents) && (
+          <Col className="homepage-primary-card homepage-incentives-card">
+            <IncentivesCard />
+          </Col>
+        )}
 
         <Row className="homepage-primary-cards-wrapper">
           <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
