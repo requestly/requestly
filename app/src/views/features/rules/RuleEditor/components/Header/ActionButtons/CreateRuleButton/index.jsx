@@ -156,45 +156,40 @@ const CreateRuleButton = ({
     }
   }, [isDisabled, MODE, premiumRuleLimitType, user.details?.isPremium]);
 
-  const handleOtherRuleEvents = useCallback(
-    async (disableTaskCompletedModal = false) => {
-      const otherRules = [RuleType.RESPONSE, RuleType.REDIRECT];
+  const handleOtherRuleEvents = useCallback(async () => {
+    const otherRules = [RuleType.RESPONSE, RuleType.REDIRECT];
 
-      if (otherRules.includes(currentlySelectedRuleData.ruleType)) {
-        const incentiveEvent =
-          currentlySelectedRuleData.ruleType === RuleType.RESPONSE
-            ? IncentivizeEvent.RESPONSE_RULE_CREATED
-            : IncentivizeEvent.REDIRECT_RULE_CREATED;
+    if (otherRules.includes(currentlySelectedRuleData.ruleType)) {
+      const incentiveEvent =
+        currentlySelectedRuleData.ruleType === RuleType.RESPONSE
+          ? IncentivizeEvent.RESPONSE_RULE_CREATED
+          : IncentivizeEvent.REDIRECT_RULE_CREATED;
 
-        claimIncentiveRewards({
-          dispatch,
-          isUserloggedIn: user?.loggedIn,
-          event: { type: incentiveEvent, metadata: { rule_type: currentlySelectedRuleData.ruleType } },
-        })?.then((response) => {
-          if (response.data?.success) {
-            dispatch(
-              incentivizationActions.setUserMilestoneAndRewardDetails({
-                userMilestoneAndRewardDetails: response.data?.data,
-              })
-            );
+      claimIncentiveRewards({
+        dispatch,
+        isUserloggedIn: user?.loggedIn,
+        event: { type: incentiveEvent, metadata: { rule_type: currentlySelectedRuleData.ruleType } },
+      })?.then((response) => {
+        if (response.data?.success) {
+          dispatch(
+            incentivizationActions.setUserMilestoneAndRewardDetails({
+              userMilestoneAndRewardDetails: response.data?.data,
+            })
+          );
 
-            if (!disableTaskCompletedModal) {
-              dispatch(
-                incentivizationActions.toggleActiveModal({
-                  modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                  newValue: true,
-                  newProps: {
-                    event: incentiveEvent,
-                  },
-                })
-              );
-            }
-          }
-        });
-      }
-    },
-    [currentlySelectedRuleData.ruleType, user?.loggedIn, dispatch]
-  );
+          dispatch(
+            incentivizationActions.toggleActiveModal({
+              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+              newValue: true,
+              newProps: {
+                event: incentiveEvent,
+              },
+            })
+          );
+        }
+      });
+    }
+  }, [currentlySelectedRuleData.ruleType, user?.loggedIn, dispatch]);
 
   const handleFirstRuleCreationEvent = useCallback(async () => {
     claimIncentiveRewards({
@@ -209,36 +204,32 @@ const CreateRuleButton = ({
           })
         );
 
-        dispatch(
-          incentivizationActions.toggleActiveModal({
-            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-            newValue: true,
-            newProps: {
-              event: IncentivizeEvent.RULE_CREATED,
-            },
-          })
-        );
+        const incentiveRuleTypes = [RuleType.RESPONSE, RuleType.REDIRECT];
+        if (!incentiveRuleTypes.includes(currentlySelectedRuleData.ruleType))
+          dispatch(
+            incentivizationActions.toggleActiveModal({
+              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+              newValue: true,
+              newProps: {
+                event: IncentivizeEvent.RULE_CREATED,
+              },
+            })
+          );
       }
     });
-  }, [user?.loggedIn, dispatch]);
+  }, [user?.loggedIn, dispatch, currentlySelectedRuleData.ruleType]);
 
   const claimRuleCreationRewards = useCallback(async () => {
     if (!isIncentivizationEnabled) return;
 
-    if (userAttributes?.num_rules === 0 || !user?.loggedIn) {
+    if (userAttributes?.num_rules === 0) {
       return Promise.allSettled([handleFirstRuleCreationEvent(), handleOtherRuleEvents()]).catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
       });
     } else {
-      handleOtherRuleEvents(true);
+      handleOtherRuleEvents();
     }
-  }, [
-    handleFirstRuleCreationEvent,
-    handleOtherRuleEvents,
-    isIncentivizationEnabled,
-    user?.loggedIn,
-    userAttributes?.num_rules,
-  ]);
+  }, [handleFirstRuleCreationEvent, handleOtherRuleEvents, isIncentivizationEnabled, userAttributes?.num_rules]);
 
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
