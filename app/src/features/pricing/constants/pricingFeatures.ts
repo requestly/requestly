@@ -44,7 +44,7 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "All HTTP Modifications",
           enabled: true,
-          tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts",
+          tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
         },
         {
           title: "Unlimited Header Rules",
@@ -73,7 +73,7 @@ export const PricingFeatures: PlanFeatures = {
         {
           title: "All HTTP Modifications",
           enabled: true,
-          tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts",
+          tooltip: "Override API responses, Modify Request Body, Insert Custom Scripts + Standard HTTP Modifications",
         },
         {
           title: "10 API Mocks",
