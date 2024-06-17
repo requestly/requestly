@@ -226,9 +226,7 @@ const CreateRuleButton = ({
     if (!isIncentivizationEnabled) return;
 
     if (userAttributes?.num_rules === 0 || !user?.loggedIn) {
-      const t = [handleFirstRuleCreationEvent(), handleOtherRuleEvents()];
-      console.log("claimRuleCreationRewards", userAttributes?.num_rules, { t });
-      return Promise.allSettled(toastType).catch((err) => {
+      return Promise.allSettled([handleFirstRuleCreationEvent(), handleOtherRuleEvents()]).catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
       });
     } else {
