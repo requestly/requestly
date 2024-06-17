@@ -185,14 +185,11 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 }
                 handleChange={requestBodyChangeHandler}
                 isReadOnly={isInputDisabled}
-                unlockJsonPrettify={true}
-                isCodeMinified={isCodeMinified}
-                isCodeFormatted={isCodeFormatted}
                 isResizable
               />
             </Col>
           </Row>
-          <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
+          {/* <Row align="middle" justify="space-between" className="code-editor-character-count-row ">
             <Col align="left">
               {pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE ? (
                 <Button type="link" onClick={handleCodeFormattedFlag}>
@@ -209,7 +206,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
             <Col span={6} align="right" className="text-gray code-editor-character-count-row">
               <span>{getByteSize(pair.request.value)} characters</span>
             </Col>
-          </Row>
+          </Row> */}
         </>
       ) : null}
     </Col>
