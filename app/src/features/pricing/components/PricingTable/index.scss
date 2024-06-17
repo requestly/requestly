@@ -23,6 +23,24 @@
   & .ant-input-number-handler-wrap {
     opacity: 1;
   }
+
+  .ant-input-number:hover,
+  .ant-input-number:focus,
+  .ant-input-number:active {
+    border-color: var(--surface-3);
+  }
+
+  .ant-input-number-sm {
+    background: transparent;
+
+    .anticon {
+      color: var(--requestly-color-text-default);
+    }
+
+    .ant-input-number-handler:hover .anticon {
+      color: var(--requestly-color-text-default);
+    }
+  }
 }
 
 .plan-price-row .ant-space-item:first-child {
@@ -38,8 +56,8 @@
   height: auto;
   padding: 20px;
   border-radius: var(--border-radius-sm);
-  border: 1px solid var(--surface-2, #383838);
-  background: var(--background, #212121);
+  border: 1px solid var(--requestly-color-white-t-20);
+  background: var(--requestly-color-surface-0);
 }
 
 .plan-name.ant-typography {
@@ -50,7 +68,8 @@
 }
 
 .plan-price.ant-typography {
-  font-size: 1.4rem;
+  font-size: 28px;
+  font-weight: 700;
 }
 
 .plan-description {
@@ -82,7 +101,7 @@
 }
 
 .plan-features-list {
-  margin-top: 24px;
+  margin-top: 40px;
 }
 
 .plan-feature-item {
