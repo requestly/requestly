@@ -80,11 +80,11 @@ const postMessageAndWaitForAck = async (message, action) => {
   });
 };
 
-const notifyOnBeforeRequest = async (requestDetails) => {
+export const notifyOnBeforeRequest = async (requestDetails) => {
   return postMessageAndWaitForAck({ requestDetails }, "onBeforeAjaxRequest");
 };
 
-const notifyOnErrorOccurred = async (requestDetails) => {
+export const notifyOnErrorOccurred = async (requestDetails) => {
   return postMessageAndWaitForAck({ requestDetails }, "onErrorOccurred");
 };
 
@@ -165,9 +165,45 @@ export const getMatchedResponseRule = (requestDetails) => {
   );
 };
 
+export const getMatchedDelayRule = (requestDetails) => {
+  console.log("getMatchedDelayRule", { requestDetails });
+  return window[PUBLIC_NAMESPACE].delayRules?.findLast(
+    (rule) =>
+      // TODO: Move ruleMatcher outside of service worker
+      // TODO: Add graphql requestData matching in matchRuleWithRequest too
+      matchRuleWithRequest(rule, requestDetails)?.isApplied === true
+  );
+};
+
 export const shouldServeResponseWithoutRequest = (responseRule) => {
   const responseModification = responseRule.pairs[0].response;
   return responseModification.type === "static" && responseModification.serveWithoutRequest;
 };
 
 export const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
+
+export const applyDelay = async (delay) => {
+  return new Promise((resolve) => setTimeout(resolve, delay));
+};
+
+/**
+ * @param {Object} json
+ * @param {String} path -> "a", "a.b", "a.0.b (If a is an array containing list of objects"
+ * Also copied in shared/utils.js for the sake of testing
+ */
+export const traverseJsonByPath = (jsonObject, path) => {
+  if (!path) return;
+
+  const pathParts = path.split(".");
+
+  try {
+    // Reach the last node but not the leaf node.
+    for (i = 0; i < pathParts.length - 1; i++) {
+      jsonObject = jsonObject[pathParts[i]];
+    }
+
+    return jsonObject[pathParts[pathParts.length - 1]];
+  } catch (e) {
+    /* Do nothing */
+  }
+};

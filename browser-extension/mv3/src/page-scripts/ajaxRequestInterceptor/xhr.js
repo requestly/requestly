@@ -1,13 +1,16 @@
 import {
+  applyDelay,
   getAbsoluteUrl,
   getCustomRequestBody,
   getFunctionFromCode,
+  getMatchedDelayRule,
   getMatchedRequestRule,
   getMatchedResponseRule,
   isContentTypeJSON,
   isJSON,
   isPromise,
   jsonifyValidJSONString,
+  notifyOnBeforeRequest,
   notifyRequestRuleApplied,
   notifyResponseRuleApplied,
   shouldServeResponseWithoutRequest,
@@ -270,8 +273,18 @@ export const initXhrInterceptor = (debug) => {
   };
 
   const send = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.send = function (data) {
+  XMLHttpRequest.prototype.send = async function (data) {
     this.rqProxyXhr._requestData = data;
+
+    const matchedDelayRule = getMatchedDelayRule({
+      url: this.rqProxyXhr._requestURL,
+      method: this.rqProxyXhr._method,
+      type: "xmlhttprequest",
+      initiator: location.origin, // initiator=origin. Should now contain port and protocol
+    });
+    if (matchedDelayRule) {
+      await applyDelay(matchedDelayRule.delay);
+    }
 
     const requestRule = getMatchedRequestRule({
       url: this.rqProxyXhr._requestURL,
@@ -328,6 +341,13 @@ export const initXhrInterceptor = (debug) => {
         debug && console.log("[RQ]", "send and response rule matched and serveWithoutRequest is true");
         resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
       } else {
+        await notifyOnBeforeRequest({
+          url: this._rq_requestURL,
+          method: this._rq_method,
+          type: "xmlhttprequest",
+          initiator: location.origin,
+          requestHeaders: this._rq_requestHeaders ?? {},
+        });
         send.call(this.rqProxyXhr, this.rqProxyXhr._requestData);
       }
       return;

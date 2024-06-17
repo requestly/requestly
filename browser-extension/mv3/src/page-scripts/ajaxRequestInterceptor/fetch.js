@@ -1,12 +1,15 @@
 import {
+  applyDelay,
   getAbsoluteUrl,
   getCustomRequestBody,
   getFunctionFromCode,
+  getMatchedDelayRule,
   getMatchedRequestRule,
   getMatchedResponseRule,
   isContentTypeJSON,
   isJSON,
   jsonifyValidJSONString,
+  notifyOnBeforeRequest,
   notifyRequestRuleApplied,
   notifyResponseRuleApplied,
   shouldServeResponseWithoutRequest,
@@ -28,10 +31,19 @@ export const initFetchInterceptor = (debug) => {
       request = new Request(resource.toString(), initOptions);
     }
 
-    let hasModifiedHeaders = false;
-
     const url = getAbsoluteUrl(request.url);
     const method = request.method;
+
+    const matchedDelayRule = getMatchedDelayRule({
+      url: url,
+      method: method,
+      type: "fetch",
+      initiator: location.origin, // initiator=origin. Should now contain port and protocol
+    });
+
+    if (matchedDelayRule) {
+      await applyDelay(matchedDelayRule.delay);
+    }
 
     // Ported to handleHeadersOnRedirect.ts
     // const redirectRuleThatMatchesURL = getMatchingRedirectRule(url);
@@ -114,7 +126,19 @@ export const initFetchInterceptor = (debug) => {
       responseHeaders = new Headers({ "content-type": contentType });
     } else {
       try {
-        if (requestRule || hasModifiedHeaders) {
+        const headersObject = {};
+        request?.headers?.forEach((value, key) => {
+          headersObject[key] = value;
+        });
+        await notifyOnBeforeRequest({
+          url,
+          method,
+          type: "xmlhttprequest",
+          initiator: location.origin,
+          requestHeaders: headersObject,
+        });
+
+        if (requestRule) {
           // use modified request to fetch response
           fetchedResponse = await _fetch(request);
         } else {
