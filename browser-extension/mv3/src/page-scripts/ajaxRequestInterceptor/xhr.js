@@ -276,14 +276,15 @@ export const initXhrInterceptor = (debug) => {
   XMLHttpRequest.prototype.send = async function (data) {
     this.rqProxyXhr._requestData = data;
 
-    const matchedDelayRule = getMatchedDelayRule({
+    const matchedDelayRulePair = getMatchedDelayRule({
       url: this.rqProxyXhr._requestURL,
       method: this.rqProxyXhr._method,
       type: "xmlhttprequest",
       initiator: location.origin, // initiator=origin. Should now contain port and protocol
     });
-    if (matchedDelayRule) {
-      await applyDelay(matchedDelayRule.delay);
+    if (matchedDelayRulePair) {
+      console.log({ matchedDelayRulePair });
+      await applyDelay(matchedDelayRulePair.delay);
     }
 
     const requestRule = getMatchedRequestRule({

@@ -167,12 +167,18 @@ export const getMatchedResponseRule = (requestDetails) => {
 
 export const getMatchedDelayRule = (requestDetails) => {
   console.log("getMatchedDelayRule", { requestDetails });
-  return window[PUBLIC_NAMESPACE].delayRules?.findLast(
-    (rule) =>
-      // TODO: Move ruleMatcher outside of service worker
-      // TODO: Add graphql requestData matching in matchRuleWithRequest too
-      matchRuleWithRequest(rule, requestDetails)?.isApplied === true
-  );
+
+  if (!window[PUBLIC_NAMESPACE].delayRules) {
+    return null;
+  }
+
+  for (const rule of window[PUBLIC_NAMESPACE]?.delayRules) {
+    const { isApplied, matchedPair } = matchRuleWithRequest(rule, requestDetails);
+
+    return matchedPair;
+  }
+
+  return null;
 };
 
 export const shouldServeResponseWithoutRequest = (responseRule) => {

@@ -34,15 +34,15 @@ export const initFetchInterceptor = (debug) => {
     const url = getAbsoluteUrl(request.url);
     const method = request.method;
 
-    const matchedDelayRule = getMatchedDelayRule({
+    const matchedDelayRulePair = getMatchedDelayRule({
       url: url,
       method: method,
       type: "fetch",
       initiator: location.origin, // initiator=origin. Should now contain port and protocol
     });
 
-    if (matchedDelayRule) {
-      await applyDelay(matchedDelayRule.delay);
+    if (matchedDelayRulePair) {
+      await applyDelay(matchedDelayRulePair.delay);
     }
 
     // Request body can be sent only for request methods other than GET and HEAD.
