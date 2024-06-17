@@ -9,13 +9,13 @@ export const claimIncentiveRewards = ({
   isUserloggedIn,
 }: {
   event: UserIncentiveEvent;
-  dispatch: Dispatch;
+  dispatch?: Dispatch;
   isUserloggedIn: boolean;
 }) => {
   const claimRewards = httpsCallable<UserIncentiveEvent>(getFunctions(), "incentivization-claimIncentiveRewards");
   if (isUserloggedIn) {
     return claimRewards(event);
   } else {
-    dispatch(incentivizationActions.setLocalIncentivizationEventsState({ type: event.type }));
+    dispatch(incentivizationActions.setLocalIncentivizationEventsState({ event }));
   }
 };

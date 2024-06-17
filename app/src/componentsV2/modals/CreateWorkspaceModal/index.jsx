@@ -90,7 +90,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
             type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
             metadata: { num_workspaces: userAttributes?.num_workspaces },
           },
-        }).then((response) => {
+        })?.then((response) => {
           if (response.data?.success) {
             dispatch(
               incentivizationActions.setUserMilestoneAndRewardDetails({

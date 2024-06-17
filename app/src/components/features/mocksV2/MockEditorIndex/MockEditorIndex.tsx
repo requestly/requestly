@@ -95,7 +95,7 @@ const MockEditorIndex: React.FC<Props> = ({
                 type: IncentivizeEvent.MOCK_CREATED,
                 metadata: { num_mocks: userAttributes?.num_mocks },
               },
-            }).then((response) => {
+            })?.then((response) => {
               // @ts-ignore
               if (response.data?.success) {
                 dispatch(

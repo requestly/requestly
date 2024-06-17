@@ -170,7 +170,7 @@ const CreateRuleButton = ({
           dispatch,
           isUserloggedIn: user?.loggedIn,
           event: { type: incentiveEvent, metadata: { rule_type: currentlySelectedRuleData.ruleType } },
-        }).then((response) => {
+        })?.then((response) => {
           if (response.data?.success) {
             dispatch(
               incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -201,7 +201,7 @@ const CreateRuleButton = ({
       dispatch,
       isUserloggedIn: user?.loggedIn,
       event: { type: IncentivizeEvent.RULE_CREATED, metadata: { num_rules: 1 } },
-    }).then((response) => {
+    })?.then((response) => {
       if (response.data?.success) {
         dispatch(
           incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -226,7 +226,9 @@ const CreateRuleButton = ({
     if (!isIncentivizationEnabled) return;
 
     if (userAttributes?.num_rules === 0 || !user?.loggedIn) {
-      return Promise.allSettled([handleFirstRuleCreationEvent(), handleOtherRuleEvents()]).catch((err) => {
+      const t = [handleFirstRuleCreationEvent(), handleOtherRuleEvents()];
+      console.log("claimRuleCreationRewards", userAttributes?.num_rules, { t });
+      return Promise.allSettled(toastType).catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
       });
     } else {

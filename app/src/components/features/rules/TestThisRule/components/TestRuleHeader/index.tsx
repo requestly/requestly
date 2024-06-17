@@ -74,7 +74,7 @@ export const TestRuleHeader = () => {
         dispatch,
         isUserloggedIn: user?.loggedIn,
         event: { type: IncentivizeEvent.RULE_TESTED },
-      }).then((response) => {
+      })?.then((response) => {
         // @ts-ignore
         if (response.data?.success) {
           dispatch(
