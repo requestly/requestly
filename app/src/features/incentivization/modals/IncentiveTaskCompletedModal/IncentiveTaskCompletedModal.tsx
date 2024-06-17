@@ -22,12 +22,13 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const dispatch = useDispatch();
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
+  const taskValue = (milestones?.[event]?.reward?.value as number) ?? 0;
 
   useEffect(() => {
     if (isOpen) {
-      trackCreditsAssignedModalViewed(userMilestoneAndRewardDetails?.recentCreditsClaimed ?? 0, event);
+      trackCreditsAssignedModalViewed(taskValue, event);
     }
-  }, [userMilestoneAndRewardDetails?.recentCreditsClaimed, event, isOpen]);
+  }, [taskValue, event, isOpen]);
 
   if (!milestones || !event) {
     return null;
