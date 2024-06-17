@@ -13,6 +13,8 @@ import { trackCreditsAssignedModalClicked, trackCreditsAssignedModalViewed } fro
 import "./incentiveTaskCompletedModal.scss";
 import { getUserAuthDetails } from "store/selectors";
 import APP_CONSTANTS from "config/constants";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
 
 interface IncentiveTaskCompletedModalProps {
   isOpen: boolean;
@@ -142,9 +144,8 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
                 onClick={() => {
                   trackCreditsAssignedModalClicked(remainingTasksCount === 0 ? "redeem_now" : "complete_now");
                   dispatch(
-                    // @ts-ignore
-                    actions.toggleActiveModal({
-                      modalName: "incentiveTasksListModal",
+                    incentivizationActions.toggleActiveModal({
+                      modalName: IncentivizationModal.TASKS_LIST_MODAL,
                       newValue: true,
                       newProps: {
                         source: INCENTIVIZATION_SOURCE.TASK_COMPLETED_MODAL,

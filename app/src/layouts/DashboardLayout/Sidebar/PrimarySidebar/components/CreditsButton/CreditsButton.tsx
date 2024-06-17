@@ -10,6 +10,8 @@ import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/const
 import { getUserIncentivizationDetails } from "store/features/incentivization/selectors";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 import { trackSidebarClicked } from "modules/analytics/events/common/onboarding/sidebar";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
 import "./creditsButton.scss";
 
 export const CreditsButton = () => {
@@ -22,9 +24,8 @@ export const CreditsButton = () => {
     trackSidebarClicked("credits");
 
     dispatch(
-      // @ts-ignore
-      actions.toggleActiveModal({
-        modalName: "incentiveTasksListModal",
+      incentivizationActions.toggleActiveModal({
+        modalName: IncentivizationModal.TASKS_LIST_MODAL,
         newValue: true,
         newProps: {
           source: INCENTIVIZATION_SOURCE.SIDEBAR,

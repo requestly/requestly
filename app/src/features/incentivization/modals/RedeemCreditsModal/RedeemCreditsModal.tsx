@@ -8,7 +8,6 @@ import { getTotalCredits } from "features/incentivization/utils";
 import { getIncentivizationMilestones } from "store/features/incentivization/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { actions } from "store";
 import { getUserAuthDetails } from "store/selectors";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { toast } from "utils/Toast";
@@ -23,6 +22,7 @@ import {
   trackRedeemCreditsFailed,
   trackRedeemCreditsModalViewed,
 } from "features/incentivization/analytics";
+import { IncentivizationModal } from "store/features/incentivization/types";
 
 interface RedeemCreditsModalProps {
   isOpen: boolean;
@@ -121,8 +121,9 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
 
     setIsLoading(true);
 
-    // @ts-ignore
-    dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+    dispatch(
+      incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASKS_LIST_MODAL, newValue: false })
+    );
 
     const redeemStatusToast = "redeemStatusToast";
     toast.loading({ content: "Please wait", key: redeemStatusToast });
@@ -233,9 +234,8 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
               type="primary"
               onClick={() => {
                 dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
-                    modalName: "incentiveTasksListModal",
+                  incentivizationActions.toggleActiveModal({
+                    modalName: IncentivizationModal.TASKS_LIST_MODAL,
                     newValue: true,
                     newProps: {
                       source: INCENTIVIZATION_SOURCE.REDEEM_CREDITS_MODAL,
@@ -250,8 +250,12 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
             <RQButton
               type="text"
               onClick={() => {
-                // @ts-ignore
-                dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+                dispatch(
+                  incentivizationActions.toggleActiveModal({
+                    modalName: IncentivizationModal.TASKS_LIST_MODAL,
+                    newValue: false,
+                  })
+                );
                 onClose();
               }}
             >

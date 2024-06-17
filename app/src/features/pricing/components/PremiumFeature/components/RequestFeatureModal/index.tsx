@@ -23,6 +23,8 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./index.scss";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -127,9 +129,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               onClick={() => {
                 trackUpgradeOptionClicked("upgrade_for_free");
                 dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
-                    modalName: "incentiveTasksListModal",
+                  incentivizationActions.toggleActiveModal({
+                    modalName: IncentivizationModal.TASKS_LIST_MODAL,
                     newValue: true,
                     newProps: {
                       source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
