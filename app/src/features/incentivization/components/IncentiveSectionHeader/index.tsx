@@ -11,7 +11,7 @@ interface IncentiveSectionHeaderProps {
 
 export const IncentiveSectionHeader: React.FC<IncentiveSectionHeaderProps> = ({ title }) => {
   const userAttributes = useSelector(getUserAttributes);
-  const daysLeft = 14 - userAttributes?.days_since_signup ?? 0;
+  const daysLeft = 14 - (userAttributes?.days_since_signup ?? 0);
 
   return (
     <div className="incentive-section-header-container">
