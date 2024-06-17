@@ -93,7 +93,7 @@ const MockEditorIndex: React.FC<Props> = ({
               isUserloggedIn: user?.loggedIn,
               event: {
                 type: IncentivizeEvent.MOCK_CREATED,
-                metadata: { num_mocks: userAttributes?.num_mocks },
+                metadata: { num_mocks: userAttributes?.num_mocks ?? 1 },
               },
             })?.then((response) => {
               // @ts-ignore
