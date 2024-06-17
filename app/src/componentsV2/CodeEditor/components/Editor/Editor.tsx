@@ -24,6 +24,7 @@ interface EditorProps {
   isResizable?: boolean;
   id?: string;
   toolbarOptions?: EditorCustomToolbar;
+  hideCharacterCount?: boolean;
   handleChange: (value: string) => void;
 }
 
@@ -34,6 +35,7 @@ const Editor: React.FC<EditorProps> = ({
   isReadOnly = false,
   height = 225,
   isResizable = false,
+  hideCharacterCount = false,
   handleChange,
   toolbarOptions,
   id = "",
@@ -173,7 +175,7 @@ const Editor: React.FC<EditorProps> = ({
           />
         </>
       </ResizableBox>
-      <div className="code-editor-character-count">{getByteSize(value)} characters</div>
+      {!hideCharacterCount ? <div className="code-editor-character-count">{getByteSize(value)} characters</div> : null}
     </>
   );
 };
