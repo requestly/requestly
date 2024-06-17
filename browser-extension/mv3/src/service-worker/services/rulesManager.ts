@@ -1,20 +1,16 @@
 import config from "common/config";
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
-import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
+import { onVariableChange, Variable } from "../variable";
 import { isExtensionEnabled } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
 import { sendMessageToApp } from "./messageHandler";
 import { EXTENSION_MESSAGES } from "common/constants";
+import { UpdateDynamicRuleOptions } from "common/types";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
-interface RuleIdsMap {
-  [id: string]: string;
-}
-
-const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
-  const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
+const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<void> => {
   const badRQRuleIds = new Set<string>();
 
   while (true) {
@@ -22,21 +18,26 @@ const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRu
       break;
     }
 
-    const addRules = options.addRules?.filter((rule) => !badRQRuleIds.has(ruleIdsMap[rule.id])) ?? [];
-    const removeRuleIds = options.removeRuleIds?.filter((ruleId) => !badRQRuleIds.has(ruleIdsMap[ruleId])) ?? [];
+    const addRules = options.addRules?.filter((rule) => !badRQRuleIds.has(rule?.rqRuleId)) ?? [];
+    const removeRuleIds = options.removeRuleIds ?? [];
 
     try {
       await chrome.declarativeNetRequest.updateDynamicRules({
-        addRules,
+        addRules: addRules.map((rule) => {
+          const dnrRule = { ...rule };
+          delete dnrRule.rqRuleId;
+          return dnrRule as chrome.declarativeNetRequest.Rule;
+        }),
         removeRuleIds,
       });
       break;
     } catch (e) {
       const match = e.message.match(/Rule with id (\d+)/);
       const ruleId = parseInt(match[1]);
-      const rqRuleId = ruleIdsMap[ruleId];
+      const rqRuleId = addRules.find((rule) => rule.id === ruleId)?.rqRuleId;
+
       if (match && rqRuleId) {
-        badRQRuleIds.add(ruleIdsMap[ruleId]);
+        badRQRuleIds.add(rqRuleId);
         sendMessageToApp({
           action: EXTENSION_MESSAGES.RULE_SAVE_ERROR,
           error: e.message,
@@ -66,9 +67,7 @@ const deleteAllSessionRules = async (): Promise<void> => {
 
 const addExtensionRules = async (): Promise<void> => {
   const enabledRules = await getEnabledRules();
-  const parsedExtensionRules: chrome.declarativeNetRequest.Rule[] = [];
-
-  const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
+  const parsedExtensionRules: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[] = [];
 
   enabledRules.forEach((rule) => {
     const extensionRules = rule.extensionRules;
@@ -89,11 +88,8 @@ const addExtensionRules = async (): Promise<void> => {
         parsedExtensionRules.push({
           ...extensionRule,
           id: ruleId,
+          rqRuleId: rule.id,
         });
-
-        ruleIdsMap[ruleId] = rule.id;
-
-        setVariable(Variable.ENABLED_RULE_IDS_MAP, ruleIdsMap);
       });
     }
   });
