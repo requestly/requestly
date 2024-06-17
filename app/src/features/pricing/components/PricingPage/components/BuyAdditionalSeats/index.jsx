@@ -4,6 +4,7 @@ import { FaUserPlus } from "@react-icons/all-files/fa6/FaUserPlus";
 import { EVENTS, trackBuyAdditionalUsersButtonClicked } from "./analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import BuyAdditionalSeatsModal from "./BuyAdditionalSeatsModal";
+import Logger from "../../../../../../../../common/logger";
 
 // TODO: REFACTOR THIS COMPONENT WHEN PICKED UP FOR REDESIGN
 const styles = {
@@ -60,7 +61,7 @@ const BuyAdditionalSeats = () => {
         notificationText: EVENTS.BUY_ADDITIONAL_USERS_BUTTON_CLICKED,
       });
     } catch (error) {
-      console.error(error);
+      Logger.logError("Failed to send sales inbound notification", error);
     }
     setIsModalOpen(true);
   };
