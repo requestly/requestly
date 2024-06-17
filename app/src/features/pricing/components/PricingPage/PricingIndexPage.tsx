@@ -36,10 +36,9 @@ export const PricingIndexPage = () => {
           <EnterpriseRequestBanner />
           <div className="pricing-page-body">
             <div className="page-yellow-text">Plans & pricing</div>
-            <div className="pricing-page-title">Developer time is expensive</div>
+            <div className="pricing-page-title">50,000+ Companies Are Using Requestly Today</div>
             <div className="pricing-page-description">
-              With Requestly, developers save at least 2 hrs of their time a week, i.e. savings of over $200 a month per
-              developer
+              More than half of Fortune 500 companies already use Requestly
             </div>
             <Row justify="center" className="display-row-center w-full mt-24" gutter={24}>
               <Col className="display-row-center plan-duration-switch-container">
