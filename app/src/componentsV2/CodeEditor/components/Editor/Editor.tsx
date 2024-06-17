@@ -5,15 +5,15 @@ import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import { EditorLanguage } from "componentsV2/CodeEditor/types";
+import { EditorLanguage, EditorCustomToolbar } from "componentsV2/CodeEditor/types";
 import { ResizableBox } from "react-resizable";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getAllEditorToast } from "store/selectors";
 import { EditorToastContainer } from "../EditorToast/EditorToastContainer";
-import "./editor.scss";
 import { getByteSize } from "utils/FormattingHelper";
 import CodeEditorToolbar from "./components/Toolbar/Toolbar";
+import "./editor.scss";
 
 interface EditorProps {
   value: string;
@@ -23,6 +23,7 @@ interface EditorProps {
   height?: number;
   isResizable?: boolean;
   id?: string;
+  toolbarOptions?: EditorCustomToolbar;
   handleChange: (value: string) => void;
 }
 
@@ -34,6 +35,7 @@ const Editor: React.FC<EditorProps> = ({
   height = 225,
   isResizable = false,
   handleChange,
+  toolbarOptions,
   id = "",
 }) => {
   const dispatch = useDispatch();
@@ -126,6 +128,7 @@ const Editor: React.FC<EditorProps> = ({
         onCodeFormat={(formattedCode: string) => {
           setEditorContent(formattedCode);
         }}
+        customOptions={toolbarOptions}
       />
       <ResizableBox
         height={editorHeight}
