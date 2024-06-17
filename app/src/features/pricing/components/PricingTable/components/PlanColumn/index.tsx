@@ -8,6 +8,9 @@ import { PricingPlans } from "features/pricing/constants/pricingPlans";
 import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 
 interface PlanColumnProps {
   planName: string;
@@ -32,6 +35,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
+  const user = useSelector(getUserAuthDetails);
 
   const getHeaderPlanName = () => {
     const pricingPlansOrder = [
@@ -88,12 +92,29 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     return null;
   };
 
+  const EVENTS = {
+    PRICING_QUANTITY_CHANGED: "pricing_quantity_changed",
+  };
+
   const handleQuantityChange = (value: number) => {
     if (value < 1 || value > 1000) {
       setDisbaleUpgradeButton(true);
     } else setDisbaleUpgradeButton(false);
     setQuantity(value);
     trackPricingPlansQuantityChanged(value, planName, source);
+
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
+    try {
+      salesInboundNotification({
+        notificationText: `${
+          EVENTS.PRICING_QUANTITY_CHANGED
+        } trigged with quantity ${value} for plan ${planName} and source ${source} by user ${
+          user?.details?.profile?.email ?? "NOT LOGGED IN"
+        }`,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
