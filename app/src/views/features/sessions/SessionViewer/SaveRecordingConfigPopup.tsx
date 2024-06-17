@@ -162,7 +162,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
                 isUserloggedIn: user?.loggedIn,
                 event: {
                   type: IncentivizeEvent.SESSION_RECORDED,
-                  metadata: { num_sessions: userAttributes?.num_sessions === 0 ? 1 : 0 },
+                  metadata: { num_sessions: userAttributes?.num_sessions || 1 },
                 },
               })?.then((response) => {
                 // @ts-ignore

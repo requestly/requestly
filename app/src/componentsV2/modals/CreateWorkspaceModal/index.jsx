@@ -88,7 +88,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           isUserloggedIn: user?.loggedIn,
           event: {
             type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-            metadata: { num_workspaces: userAttributes?.num_workspaces },
+            metadata: { num_workspaces: userAttributes?.num_workspaces || 1 },
           },
         })?.then((response) => {
           if (response.data?.success) {
