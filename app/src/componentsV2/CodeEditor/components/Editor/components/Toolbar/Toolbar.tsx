@@ -5,7 +5,7 @@ import { RQButton } from "lib/design-system/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
 import { PiBracketsCurlyBold } from "@react-icons/all-files/pi/PiBracketsCurlyBold";
 import { BsFiletypeRaw } from "@react-icons/all-files/bs/BsFiletypeRaw";
-import { EditorLanguage } from "componentsV2/CodeEditor/types";
+import { EditorLanguage, EditorCustomToolbar } from "componentsV2/CodeEditor/types";
 import Logger from "../../../../../../../../common/logger";
 import { Tooltip } from "antd";
 import { useTheme } from "styled-components";
@@ -14,10 +14,11 @@ import "./toolbar.scss";
 interface CodeEditorToolbarProps {
   language: EditorLanguage;
   code: string;
+  customOptions?: EditorCustomToolbar;
   onCodeFormat: (formattedCode: string) => void;
 }
 
-const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({ language, code, onCodeFormat }) => {
+const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({ language, code, onCodeFormat, customOptions }) => {
   const theme = useTheme();
   const [isCodePrettified, setIsCodePrettified] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -65,7 +66,23 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({ language, code, o
 
   return (
     <div className="code-editor-toolbar">
-      <div>CUSTOM TOOL BAR HERE</div>
+      <div className="code-editor-custom-options-row">
+        {customOptions ? (
+          <>
+            {customOptions.title ? <div className="code-editor-custom-options-title">{customOptions.title}</div> : null}
+            {customOptions.options ? (
+              <div className="code-editor-custom-options-block">
+                {customOptions.options.map((option, index) => (
+                  <div key={index} className="code-editor-custom-option">
+                    {option}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+
       <div className="code-editor-actions">
         <Tooltip title={isCopied ? "Copied" : "Copy code"} color={theme.colors.black} mouseEnterDelay={0.6}>
           <RQButton type="text" icon={<IoMdCopy />} onClick={handleCopyCode} />
