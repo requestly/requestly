@@ -17,9 +17,9 @@ import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { claimIncentiveRewards } from "backend/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
@@ -85,9 +85,8 @@ export const TestRuleHeader = () => {
           );
 
           dispatch(
-            // @ts-ignore
-            actions.toggleActiveModal({
-              modalName: "incentiveTaskCompletedModal",
+            incentivizationActions.toggleActiveModal({
+              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
               newValue: true,
               newProps: { event: IncentivizeEvent.RULE_TESTED },
             })

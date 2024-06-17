@@ -47,6 +47,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "../../../../../../../../../../common/logger";
 import { claimIncentiveRewards } from "backend/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -179,8 +180,8 @@ const CreateRuleButton = ({
 
             if (!disableTaskCompletedModal) {
               dispatch(
-                actions.toggleActiveModal({
-                  modalName: "incentiveTaskCompletedModal",
+                incentivizationActions.toggleActiveModal({
+                  modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
                   newValue: true,
                   newProps: {
                     event: incentiveEvent,
@@ -209,8 +210,8 @@ const CreateRuleButton = ({
         );
 
         dispatch(
-          actions.toggleActiveModal({
-            modalName: "incentiveTaskCompletedModal",
+          incentivizationActions.toggleActiveModal({
+            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
             newValue: true,
             newProps: {
               event: IncentivizeEvent.RULE_CREATED,
@@ -297,21 +298,7 @@ const CreateRuleButton = ({
         )
           .then(async () => {
             if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
-              if (user?.loggedIn) {
-                claimRuleCreationRewards();
-              } else {
-                dispatch(
-                  actions.toggleActiveModal({
-                    modalName: "authModal",
-                    newValue: true,
-                    newProps: {
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                      warningMessage: "You must sign in to redeem credits.",
-                      callback: () => claimRuleCreationRewards(),
-                    },
-                  })
-                );
-              }
+              claimRuleCreationRewards();
             }
 
             if (isRuleEditorModal) {

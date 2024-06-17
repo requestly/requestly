@@ -28,6 +28,7 @@ import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { claimIncentiveRewards } from "backend/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
 import "./CreateWorkspaceModal.css";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
@@ -98,8 +99,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
             );
 
             dispatch(
-              actions.toggleActiveModal({
-                modalName: "incentiveTaskCompletedModal",
+              incentivizationActions.toggleActiveModal({
+                modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
                 newValue: true,
                 newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
               })
