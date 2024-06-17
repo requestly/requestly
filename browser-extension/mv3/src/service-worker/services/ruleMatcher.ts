@@ -7,6 +7,7 @@ import {
   RuleType,
   SourceFilterTypes,
   RulePair,
+  RequestPayloadFilter,
 } from "common/types";
 import { AJAXRequestDetails } from "./requestProcessor/types";
 import { getUrlObject, isBlacklistedURL } from "../../utils";
@@ -125,10 +126,42 @@ const matchRequestWithRuleSourceFilters = function (
         return values.includes(requestDetails.method);
       case SourceFilterTypes.RESOURCE_TYPE:
         return values.includes(requestDetails.type);
+      case SourceFilterTypes.REQUEST_PAYLOAD:
+        return matchRequestPayload(values, requestDetails.requestData);
       default:
         return true;
     }
   });
+};
+
+const matchRequestPayload = (requestPayloadFilter: RequestPayloadFilter, requestData: any) => {
+  if (!requestPayloadFilter) return true;
+  if (typeof requestPayloadFilter === "object" && Object.keys(requestPayloadFilter).length === 0) return true;
+
+  // We only allow request payload targeting when requestData is JSON
+  if (!requestData || typeof requestData !== "object") return false;
+  if (Object.keys(requestData).length === 0) return false;
+
+  const targetedKey = requestPayloadFilter?.key;
+  const targetedValue = requestPayloadFilter?.value;
+
+  // tagetedKey is the json path e.g. a.b.0.c
+  if (targetedKey && typeof targetedValue !== undefined) {
+    const valueInRequestData = traverseJsonByPath(requestData, targetedKey);
+
+    console.log({ targetedKey, targetedValue, valueInRequestData });
+    const operator = requestPayloadFilter?.operator;
+
+    if (!operator || operator === "Equals") {
+      return valueInRequestData === targetedValue;
+    }
+
+    if (operator === "Contains") {
+      return valueInRequestData.includes(targetedValue);
+    }
+  }
+
+  return false;
 };
 
 export const matchRuleWithRequest = function (rule: Rule, requestDetails: AJAXRequestDetails) {
@@ -229,4 +262,26 @@ export const findMatchingRule = (rules: Rule[], requestDetails: AJAXRequestDetai
     }
   }
   return null;
+};
+
+/**
+ * @param {Object} json
+ * @param {String} path -> "a", "a.b", "a.0.b (If a is an array containing list of objects"
+ * Also copied in shared/utils.js for the sake of testing
+ */
+export const traverseJsonByPath = (jsonObject: Record<any, any>, path: string) => {
+  if (!path) return;
+
+  const pathParts = path.split(".");
+
+  try {
+    // Reach the last node but not the leaf node.
+    for (let i = 0; i < pathParts.length - 1; i++) {
+      jsonObject = jsonObject[pathParts[i]];
+    }
+
+    return jsonObject[pathParts[pathParts.length - 1]];
+  } catch (e) {
+    /* Do nothing */
+  }
 };

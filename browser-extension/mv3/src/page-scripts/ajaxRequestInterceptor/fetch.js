@@ -116,7 +116,10 @@ export const initFetchInterceptor = (debug) => {
       requestData,
       method,
     });
-    console.log("[Debug] fetch matchedResponseRule", { responseRule });
+
+    if (responseRule) {
+      console.log("[Debug] fetch matchedResponseRule", { responseRule });
+    }
 
     let responseHeaders;
     let fetchedResponse;

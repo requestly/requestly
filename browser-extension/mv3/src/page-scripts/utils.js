@@ -185,25 +185,3 @@ export const isContentTypeJSON = (contentType) => !!contentType?.includes("appli
 export const applyDelay = async (delay) => {
   return new Promise((resolve) => setTimeout(resolve, delay));
 };
-
-/**
- * @param {Object} json
- * @param {String} path -> "a", "a.b", "a.0.b (If a is an array containing list of objects"
- * Also copied in shared/utils.js for the sake of testing
- */
-export const traverseJsonByPath = (jsonObject, path) => {
-  if (!path) return;
-
-  const pathParts = path.split(".");
-
-  try {
-    // Reach the last node but not the leaf node.
-    for (i = 0; i < pathParts.length - 1; i++) {
-      jsonObject = jsonObject[pathParts[i]];
-    }
-
-    return jsonObject[pathParts[pathParts.length - 1]];
-  } catch (e) {
-    /* Do nothing */
-  }
-};
