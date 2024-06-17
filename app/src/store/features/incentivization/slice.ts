@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { IncentivizeEvent, Milestones, UserMilestoneAndRewardDetails } from "features/incentivization/types";
+import {
+  IncentivizeEvent,
+  Milestones,
+  UserIncentiveEvent,
+  UserMilestoneAndRewardDetails,
+} from "features/incentivization/types";
 import { ReducerKeys } from "store/constants";
 import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 import { IncentivizationModal, IncentivizationModals } from "./types";
@@ -8,7 +13,7 @@ const initialState = {
   milestones: {} as Milestones,
   userMilestoneAndRewardDetails: {} as UserMilestoneAndRewardDetails,
   isIncentivizationDetailsLoading: false,
-  localIncentivizationEventsState: [] as IncentivizeEvent[],
+  localIncentivizationEventsState: [] as UserIncentiveEvent[],
   activeModals: {
     [IncentivizationModal.TASKS_LIST_MODAL]: {
       isActive: false,
@@ -41,22 +46,25 @@ const slice = createSlice({
       const { isLoading } = action.payload;
       state.isIncentivizationDetailsLoading = isLoading;
     },
+    resetLocalIncentivizationEventsState: (state) => {
+      state.localIncentivizationEventsState = [];
+    },
     setLocalIncentivizationEventsState: (state, action) => {
-      const { type } = action.payload;
+      const { event } = action.payload as { event: UserIncentiveEvent };
 
-      if (
-        !state.localIncentivizationEventsState.includes(type) &&
-        !state.userMilestoneAndRewardDetails?.claimedMilestoneLogs?.includes(type)
-      ) {
+      if (!state.userMilestoneAndRewardDetails?.claimedMilestoneLogs?.includes(event.type)) {
         const milestones = state.milestones;
-        const localEventsState = [...state.localIncentivizationEventsState, type];
+        const localEventsState = [...state.localIncentivizationEventsState, event];
 
-        const credits = (milestones?.[(type as unknown) as IncentivizeEvent]?.reward?.value as number) ?? 0;
+        const credits = (milestones?.[(event.type as unknown) as IncentivizeEvent]?.reward?.value as number) ?? 0;
 
         const creditsRedeemedCount = state.userMilestoneAndRewardDetails?.creditsRedeemedCount ?? 0;
         const creditsToBeRedeemed = (state.userMilestoneAndRewardDetails?.creditsToBeRedeemed ?? 0) + credits;
         const totalCreditsClaimed = (state.userMilestoneAndRewardDetails?.totalCreditsClaimed ?? 0) + credits;
-        const claimedMilestoneLogs: IncentivizeEvent[] = [...localEventsState];
+        const claimedMilestoneLogs: IncentivizeEvent[] = [
+          ...(state.userMilestoneAndRewardDetails?.claimedMilestoneLogs ?? []),
+          event.type,
+        ];
 
         const updatedUserMilestoneAndRewardDetails: UserMilestoneAndRewardDetails = {
           creditsRedeemedCount,
@@ -65,13 +73,16 @@ const slice = createSlice({
           claimedMilestoneLogs,
         };
 
-        console.log("updatedUserMilestoneAndRewardDetails", updatedUserMilestoneAndRewardDetails);
-
         state.localIncentivizationEventsState = localEventsState;
 
         state.userMilestoneAndRewardDetails = {
           ...state.userMilestoneAndRewardDetails,
           ...updatedUserMilestoneAndRewardDetails,
+        };
+
+        state.activeModals[IncentivizationModal.TASK_COMPLETED_MODAL] = {
+          isActive: true,
+          props: { event: event.type },
         };
       }
     },
