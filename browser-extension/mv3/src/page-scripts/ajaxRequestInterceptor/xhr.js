@@ -4,6 +4,7 @@ import {
   getFunctionFromCode,
   getMatchedRequestRule,
   getMatchedResponseRule,
+  isContentTypeJSON,
   isJSON,
   isPromise,
   jsonifyValidJSONString,

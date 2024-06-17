@@ -1,3 +1,4 @@
+import { initFetchInterceptor } from "./fetch";
 import { initXhrInterceptor } from "./xhr";
 
 export const initAjaxRequestInterceptor = () => {
@@ -9,6 +10,7 @@ export const initAjaxRequestInterceptor = () => {
   } catch (e) {}
 
   initXhrInterceptor(isDebugMode);
+  initFetchInterceptor(isDebugMode);
 };
 
 initAjaxRequestInterceptor();

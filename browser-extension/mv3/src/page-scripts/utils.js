@@ -169,3 +169,5 @@ export const shouldServeResponseWithoutRequest = (responseRule) => {
   const responseModification = responseRule.pairs[0].response;
   return responseModification.type === "static" && responseModification.serveWithoutRequest;
 };
+
+export const isContentTypeJSON = (contentType) => !!contentType?.includes("application/json");
