@@ -306,7 +306,7 @@ const CreateRuleButton = ({
                     newValue: true,
                     newProps: {
                       authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                      warningMessage: "You must sign in to earn credits.",
+                      warningMessage: "You must sign in to redeem credits.",
                       callback: () => claimRuleCreationRewards(),
                     },
                   })
