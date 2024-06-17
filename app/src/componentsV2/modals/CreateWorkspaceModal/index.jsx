@@ -26,9 +26,11 @@ import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { claimIncentiveRewards } from "backend/incentivization";
+import { checkIncentivesEligibility } from "features/incentivization";
 import "./CreateWorkspaceModal.css";
+import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -40,6 +42,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const userAttributes = useSelector(getUserAttributes);
+  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -49,7 +52,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   });
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
 
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
@@ -81,7 +84,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
 
-      if (isIncentivizationEnabled) {
+      if (checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)) {
         claimIncentiveRewards({
           dispatch,
           isUserloggedIn: user?.loggedIn,
@@ -116,8 +119,9 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       navigate,
       user?.loggedIn,
       user?.details?.isSyncEnabled,
-      userAttributes?.num_workspaces,
       isIncentivizationEnabled,
+      userAttributes,
+      localIncentiveEvents,
     ]
   );
 

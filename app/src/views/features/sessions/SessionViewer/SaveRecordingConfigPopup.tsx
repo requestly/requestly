@@ -35,8 +35,10 @@ import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/feature
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { claimIncentiveRewards } from "backend/incentivization";
+import { checkIncentivesEligibility } from "features/incentivization";
+import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -64,6 +66,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const appMode = useSelector(getAppMode);
+  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
 
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
@@ -77,7 +80,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
     sessionRecordingMetadata?.options,
   ]);
 
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
 
   const isIncludeNetworkLogsDisabled =
     isSessionLogOptionsAlreadySaved && !savedSessionRecordingOptions.includes(DebugInfo.INCLUDE_NETWORK_LOGS);
@@ -155,7 +158,9 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
           });
 
           if (isDraftSession) {
-            if (isIncentivizationEnabled) {
+            if (
+              checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)
+            ) {
               claimIncentiveRewards({
                 dispatch,
                 isUserloggedIn: user?.loggedIn,
@@ -231,7 +236,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       source,
       isDraftSession,
       isIncentivizationEnabled,
-      userAttributes?.num_sessions,
+      localIncentiveEvents,
+      userAttributes,
     ]
   );
 

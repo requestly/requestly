@@ -44,10 +44,12 @@ import { toastType } from "componentsV2/CodeEditor/components/EditorToast/types"
 import { IncentivizeEvent } from "features/incentivization/types";
 import { RuleType } from "features/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import Logger from "../../../../../../../../../../common/logger";
 import { claimIncentiveRewards } from "backend/incentivization";
 import "../RuleEditorActionButtons.css";
+import { checkIncentivesEligibility } from "features/incentivization";
+import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
 const getEventParams = (rule) => {
   const eventParams = {};
@@ -107,7 +109,7 @@ const CreateRuleButton = ({
   //Constants
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
   const ruleCreatedEventSource =
     searchParams.get("source") ?? location?.state?.source ?? analyticEventRuleCreatedSource;
   const MODE = isRuleEditorModal ? ruleEditorModalMode : getModeData(location).MODE;
@@ -119,6 +121,7 @@ const CreateRuleButton = ({
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
+  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
 
   const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {
@@ -222,7 +225,8 @@ const CreateRuleButton = ({
   }, [user?.loggedIn, dispatch]);
 
   const claimRuleCreationRewards = useCallback(async () => {
-    if (!isIncentivizationEnabled) return;
+    if (!checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents))
+      return;
 
     if (userAttributes?.num_rules === 0 || !user?.loggedIn) {
       return Promise.allSettled([handleFirstRuleCreationEvent(), handleOtherRuleEvents()]).catch((err) => {
@@ -236,7 +240,8 @@ const CreateRuleButton = ({
     handleOtherRuleEvents,
     isIncentivizationEnabled,
     user?.loggedIn,
-    userAttributes?.num_rules,
+    userAttributes,
+    localIncentiveEvents,
   ]);
 
   const handleBtnOnClick = async (saveType = "button_click") => {

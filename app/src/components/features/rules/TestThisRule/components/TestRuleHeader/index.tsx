@@ -7,6 +7,7 @@ import { trackTestRuleClicked } from "../../analytics";
 import {
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
+  getUserAttributes,
   getUserAuthDetails,
 } from "store/selectors";
 import { prefixUrlWithHttps } from "utils/URLUtils";
@@ -15,23 +16,27 @@ import { testRuleOnUrl } from "actions/ExtensionActions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { claimIncentiveRewards } from "backend/incentivization";
+import { checkIncentivesEligibility } from "features/incentivization";
+import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(true);
   const { sheetPlacement } = useBottomSheetContext();
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -69,7 +74,7 @@ export const TestRuleHeader = () => {
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
 
-    if (isIncentivizationEnabled) {
+    if (checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)) {
       claimIncentiveRewards({
         dispatch,
         isUserloggedIn: user?.loggedIn,
@@ -106,6 +111,8 @@ export const TestRuleHeader = () => {
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
     isIncentivizationEnabled,
+    localIncentiveEvents,
+    userAttributes,
   ]);
 
   return (

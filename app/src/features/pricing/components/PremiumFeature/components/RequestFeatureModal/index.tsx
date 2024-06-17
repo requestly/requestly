@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUserAuthDetails } from "store/selectors";
+import { getUserAttributes, getUserAuthDetails } from "store/selectors";
 import Modal from "antd/lib/modal/Modal";
 import { Col, Row, Space, Typography } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -20,9 +20,10 @@ import APP_CONSTANTS from "config/constants";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { INCENTIVIZATION_SOURCE } from "features/incentivization";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { INCENTIVIZATION_SOURCE, checkIncentivesEligibility } from "features/incentivization";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import "./index.scss";
+import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -48,10 +49,12 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
+  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
 
   const requestEnterprisePlanFromAdmin = useMemo(
     () =>
@@ -118,7 +121,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const ModalActionButtons = useMemo(() => {
     return (
       <Row className="mt-16" justify="space-between" align="middle">
-        {isIncentivizationEnabled && (
+        {checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents) && (
           <Col>
             <RQButton
               type="text"
@@ -187,7 +190,17 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       </Row>
     );
-  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate]);
+  }, [
+    billingTeams,
+    dispatch,
+    handleSendRequest,
+    isLoading,
+    navigate,
+    user,
+    userAttributes,
+    isIncentivizationEnabled,
+    localIncentiveEvents,
+  ]);
 
   useEffect(() => {
     if (isOpen) {

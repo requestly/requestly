@@ -23,8 +23,10 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { actions } from "store";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureValue } from "@growthbook/growthbook-react";
 import { claimIncentiveRewards } from "backend/incentivization";
+import { checkIncentivesEligibility } from "features/incentivization";
+import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
 interface Props {
   isNew?: boolean;
@@ -47,6 +49,7 @@ const MockEditorIndex: React.FC<Props> = ({
   const { mockId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
   const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -57,7 +60,7 @@ const MockEditorIndex: React.FC<Props> = ({
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
 
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
 
   useEffect(() => {
     if (mockId) {
@@ -87,7 +90,9 @@ const MockEditorIndex: React.FC<Props> = ({
           toast.success("Mock Created Successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
 
-          if (isIncentivizationEnabled) {
+          if (
+            checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)
+          ) {
             claimIncentiveRewards({
               dispatch,
               isUserloggedIn: user?.loggedIn,

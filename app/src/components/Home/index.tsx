@@ -8,22 +8,27 @@ import { RulesCard } from "./components/RulesCard";
 import { MocksCard } from "./components/MocksCard";
 import { IncentivesCard } from "./components/IncentivesCard/IncentivesCard";
 import { useSelector } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import { checkIncentivesEligibility } from "features/incentivization";
+import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 import "./home.scss";
 
 export const Home: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const userAttributes = useSelector(getUserAttributes);
+  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
+  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
 
   return (
     <Col className="homepage-wrapper">
       <Col className="homepage-content">
-        {user.loggedIn && isIncentivizationEnabled && (
-          <Col className="homepage-primary-card homepage-incentives-card">
-            <IncentivesCard />
-          </Col>
-        )}
+        {user.loggedIn &&
+          checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents) && (
+            <Col className="homepage-primary-card homepage-incentives-card">
+              <IncentivesCard />
+            </Col>
+          )}
 
         <Row className="homepage-primary-cards-wrapper">
           <Col className="homepage-primary-card" xs={24} md={24} lg={12}>

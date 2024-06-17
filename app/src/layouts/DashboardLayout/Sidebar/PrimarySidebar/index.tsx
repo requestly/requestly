@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
-import { getAppMode, getNetworkSessionSaveInProgress } from "store/selectors";
+import { getAppMode, getNetworkSessionSaveInProgress, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
@@ -17,16 +17,22 @@ import PATHS from "config/constants/sub/paths";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { CreditsButton } from "./components/CreditsButton/CreditsButton";
 import "./PrimarySidebar.css";
+import { checkIncentivesEligibility } from "features/incentivization";
+import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
+  const user = useSelector(getUserAuthDetails);
+  const userAttributes = useSelector(getUserAttributes);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
+  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
+
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
 
   const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
@@ -123,7 +129,9 @@ export const PrimarySidebar: React.FC = () => {
           ))}
       </ul>
       <div className="primary-sidebar-bottom-btns">
-        {isIncentivizationEnabled && <CreditsButton />}
+        {checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents) && (
+          <CreditsButton />
+        )}
         <InviteButton />
       </div>
     </div>
