@@ -45,21 +45,6 @@ export const initFetchInterceptor = (debug) => {
       await applyDelay(matchedDelayRule.delay);
     }
 
-    // Ported to handleHeadersOnRedirect.ts
-    // const redirectRuleThatMatchesURL = getMatchingRedirectRule(url);
-    // const replaceRuleThatMatchesURL = getMatchingReplaceRule(url);
-    // // redirect/replace rule specific code that is applied only when redirect/replace rule matches the URL
-    // if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
-    //   // Stores Auth header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
-    //   ignoredHeadersOnRedirect.forEach((header) => {
-    //     const originalHeaderValue = request.headers.get(header);
-    //     if (isExtensionEnabled() && originalHeaderValue) {
-    //       hasModifiedHeaders = true;
-    //       request.headers.set(customHeaderPrefix + header, originalHeaderValue);
-    //     }
-    //   });
-    // }
-
     // Request body can be sent only for request methods other than GET and HEAD.
     const canRequestBodyBeSent = !["GET", "HEAD"].includes(method);
 

@@ -321,20 +321,6 @@ export const initXhrInterceptor = (debug) => {
     this.rqProxyXhr.responseRule = this.responseRule;
     console.log("Matched response rule", this.responseRule);
 
-    // Ported to handleHeadersOnRedirect.ts
-    // const redirectRuleThatMatchesURL = getMatchingRedirectRule(this.rqProxyXhr._requestURL);
-    // const replaceRuleThatMatchesURL = getMatchingReplaceRule(this.rqProxyXhr._requestURL);
-    // if (redirectRuleThatMatchesURL || replaceRuleThatMatchesURL) {
-    //   ignoredHeadersOnRedirect.forEach((header) => {
-    //     // Stores ignored header to be set on redirected URL. Refer: https://github.com/requestly/requestly/issues/1208
-    //     const originalHeaderValue =
-    //       this.rqProxyXhr._requestHeaders?.[header] || this.rqProxyXhr._requestHeaders?.[header.toLowerCase()];
-    //     if (isExtensionEnabled() && originalHeaderValue) {
-    //       this.setRequestHeader(customHeaderPrefix + header, originalHeaderValue);
-    //     }
-    //   });
-    // }
-
     if (this.responseRule) {
       debug && console.log("[RQ]", "send and response rule matched", this.responseRule);
       if (shouldServeResponseWithoutRequest(this.responseRule)) {
