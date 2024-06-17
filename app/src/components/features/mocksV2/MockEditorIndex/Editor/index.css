@@ -57,6 +57,10 @@
   width: 100%;
 }
 
+.mock-editor-body .ant-tabs > .ant-tabs-nav {
+  margin-bottom: 0;
+}
+
 .mock-editor-body .ant-tabs-tab:hover {
   color: var(--text-gray);
 }

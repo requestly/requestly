@@ -335,15 +335,18 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          {mockType === MockType.FILE && <h4>File Content</h4>}
           {/* @ts-ignore */}
           <CodeEditor
+            isResizable
             height={220}
             value={body}
             defaultValue={body}
             handleChange={setBody}
             language={getEditorLanguage(fileType)}
             isReadOnly={isEditorReadOnly}
+            toolbarOptions={{
+              title: mockType === MockType.FILE ? "File content" : "",
+            }}
           />
         </Col>
       </Row>
