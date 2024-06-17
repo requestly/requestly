@@ -13,8 +13,10 @@ import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { INCENTIVIZATION_SOURCE, checkIncentivesEligibility } from "features/incentivization";
-import "./index.scss";
 import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import "./index.scss";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -63,27 +65,18 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       onContinue();
     } else {
       trackUpgradeOptionClicked("upgrade_for_free");
-      if (!user.loggedIn) {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "authModal",
-            newValue: true,
-            newProps: { eventSource: source },
-          })
-        );
-      } else {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "incentiveTasksListModal",
-            newValue: true,
-            newProps: {
-              source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
-            },
-          })
-        );
-      }
+
+      dispatch(
+        incentivizationActions.toggleActiveModal({
+          modalName: IncentivizationModal.TASKS_LIST_MODAL,
+          newValue: true,
+          newProps: {
+            source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
+          },
+        })
+      );
     }
-  }, [dispatch, hasCrossedDeadline, onContinue, source, user.loggedIn]);
+  }, [dispatch, hasCrossedDeadline, onContinue, source]);
 
   useEffect(() => {
     return () => {
@@ -135,6 +128,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
+              // @ts-ignore
               actions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,

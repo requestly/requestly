@@ -22,11 +22,11 @@ import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/ev
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { actions } from "store";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import { claimIncentiveRewards } from "backend/incentivization";
 import { checkIncentivesEligibility } from "features/incentivization";
 import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
+import { claimIncentiveRewards } from "backend/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
 
 interface Props {
   isNew?: boolean;
@@ -98,9 +98,9 @@ const MockEditorIndex: React.FC<Props> = ({
               isUserloggedIn: user?.loggedIn,
               event: {
                 type: IncentivizeEvent.MOCK_CREATED,
-                metadata: { num_mocks: userAttributes?.num_mocks },
+                metadata: { num_mocks: userAttributes?.num_mocks || 1 },
               },
-            }).then((response) => {
+            })?.then((response) => {
               // @ts-ignore
               if (response.data?.success) {
                 dispatch(
@@ -111,9 +111,8 @@ const MockEditorIndex: React.FC<Props> = ({
                 );
 
                 dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
-                    modalName: "incentiveTaskCompletedModal",
+                  incentivizationActions.toggleActiveModal({
+                    modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
                     newValue: true,
                     newProps: { event: IncentivizeEvent.MOCK_CREATED },
                   })

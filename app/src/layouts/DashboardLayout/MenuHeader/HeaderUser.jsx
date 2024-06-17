@@ -19,7 +19,6 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import { RQButton } from "lib/design-system/components";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
-import { incentivizationActions } from "store/features/incentivization/slice";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -87,8 +86,6 @@ export default function HeaderUser() {
                   type: "rules",
                 })
               );
-
-              dispatch(incentivizationActions.resetState());
             })
             .finally(() => setLoading(false));
         },

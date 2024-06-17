@@ -11,6 +11,10 @@ import { actions } from "store";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
 import { trackCreditsAssignedModalClicked, trackCreditsAssignedModalViewed } from "features/incentivization/analytics";
 import "./incentiveTaskCompletedModal.scss";
+import { getUserAuthDetails } from "store/selectors";
+import APP_CONSTANTS from "config/constants";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
 
 interface IncentiveTaskCompletedModalProps {
   isOpen: boolean;
@@ -20,14 +24,16 @@ interface IncentiveTaskCompletedModalProps {
 
 export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalProps> = ({ isOpen, toggle, event }) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
+  const taskValue = (milestones?.[event]?.reward?.value as number) ?? 0;
 
   useEffect(() => {
     if (isOpen) {
-      trackCreditsAssignedModalViewed(userMilestoneAndRewardDetails?.recentCreditsClaimed ?? 0, event);
+      trackCreditsAssignedModalViewed(taskValue, event);
     }
-  }, [userMilestoneAndRewardDetails?.recentCreditsClaimed, event, isOpen]);
+  }, [taskValue, event, isOpen]);
 
   if (!milestones || !event) {
     return null;
@@ -81,6 +87,23 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const remainingTasksCount =
     Object.keys(milestones ?? {}).length - (userMilestoneAndRewardDetails?.claimedMilestoneLogs?.length ?? 0);
 
+  const handleSignupClick = () => {
+    toggle();
+
+    dispatch(
+      // @ts-ignore
+      actions.toggleActiveModal({
+        modalName: "authModal",
+        newValue: true,
+        newProps: {
+          authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
+          warningMessage: "You must sign in to redeem credits.",
+          eventSource: "incentivization",
+        },
+      })
+    );
+  };
+
   return (
     <Modal
       width={368}
@@ -100,44 +123,57 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
         <div className="task-completed-modal-title">Congratulations!</div>
         <div className="task-completed-modal-subtitle">{congratulationMesssages[event]?.message}</div>
         <div className="task-completed-modal-description">
-          {remainingCredits === 0 ? (
-            <>You have unlocked all the free credits.</>
+          {user?.loggedIn ? (
+            remainingCredits === 0 ? (
+              <>You have unlocked all the free credits.</>
+            ) : (
+              <>
+                Unlock an additional ${remainingCredits} worth of free credits by completing these {remainingTasksCount}{" "}
+                {remainingTasksCount > 1 ? "steps" : "step"}.
+              </>
+            )
           ) : (
-            <>
-              Unlock an additional ${remainingCredits} worth of free credits by completing these {remainingTasksCount}{" "}
-              {remainingTasksCount > 1 ? "steps" : "step"}.
-            </>
+            <>Sign up to create an account and redeem these credits.</>
           )}
         </div>
         <div className="task-completed-actions-container">
-          <RQButton
-            type="primary"
-            onClick={() => {
-              trackCreditsAssignedModalClicked(remainingTasksCount === 0 ? "redeem_now" : "complete_now");
-              dispatch(
-                // @ts-ignore
-                actions.toggleActiveModal({
-                  modalName: "incentiveTasksListModal",
-                  newValue: true,
-                  newProps: {
-                    source: INCENTIVIZATION_SOURCE.TASK_COMPLETED_MODAL,
-                  },
-                })
-              );
-              toggle();
-            }}
-          >
-            {remainingTasksCount === 0 ? "Redeem now" : "Complete now"}
-          </RQButton>
-          <RQButton
-            type="default"
-            onClick={() => {
-              trackCreditsAssignedModalClicked("remind_me_later");
-              toggle();
-            }}
-          >
-            Remind me later
-          </RQButton>
+          {user?.loggedIn ? (
+            <>
+              <RQButton
+                type="primary"
+                onClick={() => {
+                  trackCreditsAssignedModalClicked(remainingTasksCount === 0 ? "redeem_now" : "complete_now");
+                  dispatch(
+                    incentivizationActions.toggleActiveModal({
+                      modalName: IncentivizationModal.TASKS_LIST_MODAL,
+                      newValue: true,
+                      newProps: {
+                        source: INCENTIVIZATION_SOURCE.TASK_COMPLETED_MODAL,
+                      },
+                    })
+                  );
+                  toggle();
+                }}
+              >
+                {remainingTasksCount === 0 ? "Redeem now" : "Complete now"}
+              </RQButton>
+              <RQButton
+                type="default"
+                onClick={() => {
+                  trackCreditsAssignedModalClicked("remind_me_later");
+                  toggle();
+                }}
+              >
+                Remind me later
+              </RQButton>
+            </>
+          ) : (
+            <>
+              <RQButton type="primary" onClick={handleSignupClick}>
+                Sign up
+              </RQButton>
+            </>
+          )}
         </div>
       </div>
     </Modal>

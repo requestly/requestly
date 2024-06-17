@@ -40,8 +40,9 @@ import { isExtensionInstalled } from "actions/ExtensionActions";
 import PATHS from "config/constants/sub/paths";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { claimIncentiveRewards } from "backend/incentivization";
-import "./incentiveTasksList.scss";
 import { getUserAuthDetails } from "store/selectors";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
   source: string;
@@ -60,8 +61,9 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
 
   const postActionClickCallback = useCallback(
     (task: IncentivizeEvent) => {
-      // @ts-ignore
-      dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+      dispatch(
+        incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASKS_LIST_MODAL, newValue: false })
+      );
       trackIncentivizationTaskClicked(task);
     },
     [dispatch]
@@ -333,7 +335,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
                     dispatch,
                     isUserloggedIn: user?.loggedIn,
                     event: { type: IncentivizeEvent.RATE_ON_CHROME_STORE },
-                  }).then((response: { data: { success: boolean; data: UserMilestoneAndRewardDetails } }) => {
+                  })?.then((response: { data: { success: boolean; data: UserMilestoneAndRewardDetails } }) => {
                     if (response.data?.success) {
                       dispatch(
                         incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -342,9 +344,8 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
                       );
 
                       dispatch(
-                        // @ts-ignore
-                        actions.toggleActiveModal({
-                          modalName: "incentiveTaskCompletedModal",
+                        incentivizationActions.toggleActiveModal({
+                          modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
                           newValue: true,
                           newProps: { event: IncentivizeEvent.RATE_ON_CHROME_STORE },
                         })

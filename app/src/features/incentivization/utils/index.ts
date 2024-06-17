@@ -1,4 +1,4 @@
-import { IncentivizeEvent, Milestones, UserMilestoneAndRewardDetails } from "../types";
+import { IncentivizeEvent, Milestones, UserIncentiveEvent, UserMilestoneAndRewardDetails } from "../types";
 
 export const getTotalCredits = (milestones: Milestones) => {
   const total = Object.values(milestones ?? {}).reduce(
@@ -20,7 +20,7 @@ export const checkIncentivesEligibility = (
   isUserLoggedIn: boolean,
   userAttributes: any,
   isFeatureFlagEnabled: boolean,
-  localIncentiveEvents: IncentivizeEvent[]
+  localIncentiveEvents: UserIncentiveEvent[]
 ): boolean => {
   const eligibilityDate = new Date("2024-06-17");
   const currentDate = new Date();

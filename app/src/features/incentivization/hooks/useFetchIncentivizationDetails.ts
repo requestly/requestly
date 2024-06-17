@@ -4,13 +4,14 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { Milestones, UserMilestoneAndRewardDetails } from "../types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getUserAuthDetails } from "store/selectors";
+import { useSyncLocalIncentivizationState } from "./useSyncLocalIncentivizationState";
 
 export const useFetchIncentivizationDetails = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
-  console.log({ user });
+  useSyncLocalIncentivizationState();
 
   useEffect(() => {
     const getIncentivizationDetails = async () => {
@@ -40,8 +41,6 @@ export const useFetchIncentivizationDetails = () => {
               })
             );
           }
-        } else {
-          // load from localstorage
         }
       } catch (error) {
         // do nothing

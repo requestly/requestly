@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Modal } from "antd";
 import { IncentiveTasksList } from "../../components/IncentiveTasksList/IncentiveTasksList";
-import "./incentiveTasksListModal.scss";
 import { trackIncentivizationChecklistModalViewed } from "features/incentivization/analytics";
+import "./incentiveTasksListModal.scss";
 
 interface IncentiveTasksListModalProps {
   isOpen: boolean;

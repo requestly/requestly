@@ -24,11 +24,11 @@ import APP_CONSTANTS from "config/constants";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import { claimIncentiveRewards } from "backend/incentivization";
 import { checkIncentivesEligibility } from "features/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
 import "./CreateWorkspaceModal.css";
 import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
@@ -90,9 +90,9 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           isUserloggedIn: user?.loggedIn,
           event: {
             type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-            metadata: { num_workspaces: userAttributes?.num_workspaces },
+            metadata: { num_workspaces: userAttributes?.num_workspaces || 1 },
           },
-        }).then((response) => {
+        })?.then((response) => {
           if (response.data?.success) {
             dispatch(
               incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -101,8 +101,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
             );
 
             dispatch(
-              actions.toggleActiveModal({
-                modalName: "incentiveTaskCompletedModal",
+              incentivizationActions.toggleActiveModal({
+                modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
                 newValue: true,
                 newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
               })

@@ -47,6 +47,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import Logger from "../../../../../../../../../../common/logger";
 import { claimIncentiveRewards } from "backend/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
 import "../RuleEditorActionButtons.css";
 import { checkIncentivesEligibility } from "features/incentivization";
 import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
@@ -158,52 +159,47 @@ const CreateRuleButton = ({
     }
   }, [isDisabled, MODE, premiumRuleLimitType, user.details?.isPremium]);
 
-  const handleOtherRuleEvents = useCallback(
-    async (disableTaskCompletedModal = false) => {
-      const otherRules = [RuleType.RESPONSE, RuleType.REDIRECT];
+  const handleOtherRuleEvents = useCallback(async () => {
+    const otherRules = [RuleType.RESPONSE, RuleType.REDIRECT];
 
-      if (otherRules.includes(currentlySelectedRuleData.ruleType)) {
-        const incentiveEvent =
-          currentlySelectedRuleData.ruleType === RuleType.RESPONSE
-            ? IncentivizeEvent.RESPONSE_RULE_CREATED
-            : IncentivizeEvent.REDIRECT_RULE_CREATED;
+    if (otherRules.includes(currentlySelectedRuleData.ruleType)) {
+      const incentiveEvent =
+        currentlySelectedRuleData.ruleType === RuleType.RESPONSE
+          ? IncentivizeEvent.RESPONSE_RULE_CREATED
+          : IncentivizeEvent.REDIRECT_RULE_CREATED;
 
-        claimIncentiveRewards({
-          dispatch,
-          isUserloggedIn: user?.loggedIn,
-          event: { type: incentiveEvent, metadata: { rule_type: currentlySelectedRuleData.ruleType } },
-        }).then((response) => {
-          if (response.data?.success) {
-            dispatch(
-              incentivizationActions.setUserMilestoneAndRewardDetails({
-                userMilestoneAndRewardDetails: response.data?.data,
-              })
-            );
+      claimIncentiveRewards({
+        dispatch,
+        isUserloggedIn: user?.loggedIn,
+        event: { type: incentiveEvent, metadata: { rule_type: currentlySelectedRuleData.ruleType } },
+      })?.then((response) => {
+        if (response.data?.success) {
+          dispatch(
+            incentivizationActions.setUserMilestoneAndRewardDetails({
+              userMilestoneAndRewardDetails: response.data?.data,
+            })
+          );
 
-            if (!disableTaskCompletedModal) {
-              dispatch(
-                actions.toggleActiveModal({
-                  modalName: "incentiveTaskCompletedModal",
-                  newValue: true,
-                  newProps: {
-                    event: incentiveEvent,
-                  },
-                })
-              );
-            }
-          }
-        });
-      }
-    },
-    [currentlySelectedRuleData.ruleType, user?.loggedIn, dispatch]
-  );
+          dispatch(
+            incentivizationActions.toggleActiveModal({
+              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+              newValue: true,
+              newProps: {
+                event: incentiveEvent,
+              },
+            })
+          );
+        }
+      });
+    }
+  }, [currentlySelectedRuleData.ruleType, user?.loggedIn, dispatch]);
 
   const handleFirstRuleCreationEvent = useCallback(async () => {
     claimIncentiveRewards({
       dispatch,
       isUserloggedIn: user?.loggedIn,
       event: { type: IncentivizeEvent.RULE_CREATED, metadata: { num_rules: 1 } },
-    }).then((response) => {
+    })?.then((response) => {
       if (response.data?.success) {
         dispatch(
           incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -211,29 +207,31 @@ const CreateRuleButton = ({
           })
         );
 
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "incentiveTaskCompletedModal",
-            newValue: true,
-            newProps: {
-              event: IncentivizeEvent.RULE_CREATED,
-            },
-          })
-        );
+        const incentiveRuleTypes = [RuleType.RESPONSE, RuleType.REDIRECT];
+        if (!incentiveRuleTypes.includes(currentlySelectedRuleData.ruleType))
+          dispatch(
+            incentivizationActions.toggleActiveModal({
+              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+              newValue: true,
+              newProps: {
+                event: IncentivizeEvent.RULE_CREATED,
+              },
+            })
+          );
       }
     });
-  }, [user?.loggedIn, dispatch]);
+  }, [user?.loggedIn, dispatch, currentlySelectedRuleData.ruleType]);
 
   const claimRuleCreationRewards = useCallback(async () => {
     if (!checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents))
       return;
 
-    if (userAttributes?.num_rules === 0 || !user?.loggedIn) {
+    if (userAttributes?.num_rules === 0) {
       return Promise.allSettled([handleFirstRuleCreationEvent(), handleOtherRuleEvents()]).catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
       });
     } else {
-      handleOtherRuleEvents(true);
+      handleOtherRuleEvents();
     }
   }, [
     handleFirstRuleCreationEvent,
@@ -302,21 +300,7 @@ const CreateRuleButton = ({
         )
           .then(async () => {
             if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
-              if (user?.loggedIn) {
-                claimRuleCreationRewards();
-              } else {
-                dispatch(
-                  actions.toggleActiveModal({
-                    modalName: "authModal",
-                    newValue: true,
-                    newProps: {
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                      warningMessage: "You must sign in to earn credits.",
-                      callback: () => claimRuleCreationRewards(),
-                    },
-                  })
-                );
-              }
+              claimRuleCreationRewards();
             }
 
             if (isRuleEditorModal) {

@@ -39,6 +39,7 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 import { claimIncentiveRewards } from "backend/incentivization";
 import { checkIncentivesEligibility } from "features/incentivization";
 import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
+import { IncentivizationModal } from "store/features/incentivization/types";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -166,9 +167,9 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
                 isUserloggedIn: user?.loggedIn,
                 event: {
                   type: IncentivizeEvent.SESSION_RECORDED,
-                  metadata: { num_sessions: userAttributes?.num_sessions === 0 ? 1 : 0 },
+                  metadata: { num_sessions: userAttributes?.num_sessions || 1 },
                 },
-              }).then((response) => {
+              })?.then((response) => {
                 // @ts-ignore
                 if (response.data?.success) {
                   dispatch(
@@ -179,9 +180,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
                   );
 
                   dispatch(
-                    // @ts-ignore
-                    actions.toggleActiveModal({
-                      modalName: "incentiveTaskCompletedModal",
+                    incentivizationActions.toggleActiveModal({
+                      modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
                       newValue: true,
                       newProps: { event: IncentivizeEvent.SESSION_RECORDED },
                     })

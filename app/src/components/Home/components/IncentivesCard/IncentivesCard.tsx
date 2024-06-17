@@ -2,17 +2,15 @@ import LottieAnimation from "componentsV2/LottieAnimation/LottieAnimation";
 import giftAnimation from "./assets/gift.json";
 import { CreditsProgressBar, INCENTIVIZATION_SOURCE, IncentiveSectionHeader } from "features/incentivization";
 import { RQButton } from "lib/design-system/components";
-import { getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "store";
-import APP_CONSTANTS from "config/constants";
 import { getIncentivizationMilestones } from "store/features/incentivization/selectors";
 import { getTotalCredits } from "features/incentivization/utils";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import { IncentivizationModal } from "store/features/incentivization/types";
 import "./incentivesCard.scss";
 
 export const IncentivesCard = () => {
   const dispatch = useDispatch();
-  const user = useSelector(getUserAuthDetails);
   const milestones = useSelector(getIncentivizationMilestones);
   const totalCredits = getTotalCredits(milestones);
 
@@ -32,30 +30,15 @@ export const IncentivesCard = () => {
           <RQButton
             type="primary"
             onClick={() => {
-              if (user?.loggedIn) {
-                dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
-                    modalName: "incentiveTasksListModal",
-                    newValue: true,
-                    newProps: {
-                      source: INCENTIVIZATION_SOURCE.HOME_SCREEN,
-                    },
-                  })
-                );
-              } else {
-                dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
-                    modalName: "authModal",
-                    newValue: true,
-                    newProps: {
-                      authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-                      warningMessage: "You must sign in to earn credits.",
-                    },
-                  })
-                );
-              }
+              dispatch(
+                incentivizationActions.toggleActiveModal({
+                  modalName: IncentivizationModal.TASKS_LIST_MODAL,
+                  newValue: true,
+                  newProps: {
+                    source: INCENTIVIZATION_SOURCE.HOME_SCREEN,
+                  },
+                })
+              );
             }}
           >
             Complete onboarding
