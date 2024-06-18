@@ -147,7 +147,7 @@ export const getAbsoluteUrl = (url) => {
 };
 
 export const getMatchedRequestRule = (requestDetails) => {
-  return window[PUBLIC_NAMESPACE].requestRules?.findLast(
+  return window[PUBLIC_NAMESPACE]?.requestRules?.findLast(
     (rule) =>
       // TODO: Move ruleMatcher outside of service worker
       matchRuleWithRequest(rule, requestDetails)?.isApplied === true
@@ -155,7 +155,7 @@ export const getMatchedRequestRule = (requestDetails) => {
 };
 
 export const getMatchedResponseRule = (requestDetails) => {
-  return window[PUBLIC_NAMESPACE].responseRules?.findLast(
+  return window[PUBLIC_NAMESPACE]?.responseRules?.findLast(
     (rule) =>
       // TODO: Move ruleMatcher outside of service worker
       // TODO: Add graphql requestData matching in matchRuleWithRequest too
