@@ -205,6 +205,10 @@ export const getExtensionSignupDate = (state) => {
   return getUserAttributes(state).signup_date;
 };
 
+export const getDaysSinceSignup = (state) => {
+  return getUserAttributes(state).days_since_signup;
+};
+
 export const getIsProductHuntLaunchedBannerClosed = (state) => {
   return getGlobalState(state).misc?.persist?.isProductHuntLaunchedBannerClosed;
 };
