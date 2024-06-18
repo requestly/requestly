@@ -72,7 +72,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
               <Input
                 ref={nameInputRef}
                 data-tour-id="rule-editor-title"
-                className={`${errors?.name && !name ? "error" : null}`}
+                className={`${errors?.name && !name ? "error" : null} editor-title-input`}
                 autoFocus={true}
                 onFocus={() => setIsNameEditable(true)}
                 onBlur={() => setIsNameEditable(false)}
