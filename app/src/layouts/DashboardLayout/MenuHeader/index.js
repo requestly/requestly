@@ -25,7 +25,6 @@ import { RequestBot, trackAskAIClicked } from "features/requestBot";
 import BotIcon from "./assets/bot.svg";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -44,7 +43,6 @@ const MenuHeader = () => {
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
 
@@ -157,8 +155,7 @@ const MenuHeader = () => {
 
                 {(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
                   (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-                    user?.details?.planDetails?.status !== "canceled" &&
-                    !isIncentivizationEnabled)) && (
+                    user?.details?.planDetails?.status !== "canceled")) && (
                   <Col>
                     <PremiumPlanBadge />
                   </Col>
