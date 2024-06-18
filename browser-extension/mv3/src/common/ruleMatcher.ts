@@ -148,8 +148,6 @@ const matchRequestPayload = (requestPayloadFilter: RequestPayloadFilter, request
   // tagetedKey is the json path e.g. a.b.0.c
   if (targetedKey && typeof targetedValue !== undefined) {
     const valueInRequestData = traverseJsonByPath(requestData, targetedKey);
-
-    console.log({ targetedKey, targetedValue, valueInRequestData });
     const operator = requestPayloadFilter?.operator;
 
     if (!operator || operator === "Equals") {

@@ -8,6 +8,7 @@ import {
   getMatchedResponseRule,
   isContentTypeJSON,
   isJSON,
+  isPromise,
   jsonifyValidJSONString,
   notifyOnBeforeRequest,
   notifyRequestRuleApplied,
@@ -103,7 +104,7 @@ export const initFetchInterceptor = (debug) => {
     });
 
     if (responseRule) {
-      console.log("[Debug] fetch matchedResponseRule", { responseRule });
+      console.log("[fetchInterceptor] matchedResponseRule", { responseRule });
     }
 
     let responseHeaders;

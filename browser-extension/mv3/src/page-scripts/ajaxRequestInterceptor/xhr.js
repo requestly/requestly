@@ -283,7 +283,7 @@ export const initXhrInterceptor = (debug) => {
       initiator: location.origin, // initiator=origin. Should now contain port and protocol
     });
     if (matchedDelayRulePair) {
-      console.log({ matchedDelayRulePair });
+      debug && console.log("[xhrInterceptor] matchedDelayRulePair", { matchedDelayRulePair });
       await applyDelay(matchedDelayRulePair.delay);
     }
 
@@ -293,9 +293,9 @@ export const initXhrInterceptor = (debug) => {
       type: "xmlhttprequest",
       initiator: location.origin, // initiator=origin. Should now contain port and protocol
     });
-    console.log("[Debug] Matched request rule", requestRule);
 
     if (requestRule) {
+      debug && console.log("[xhrInterceptor] matchedRequestRule", { requestRule });
       this.rqProxyXhr._requestData = getCustomRequestBody(requestRule, {
         method: this.rqProxyXhr._method,
         url: this.rqProxyXhr._requestURL,
@@ -320,12 +320,11 @@ export const initXhrInterceptor = (debug) => {
       method: this.rqProxyXhr._method,
     });
     this.rqProxyXhr.responseRule = this.responseRule;
-    console.log("Matched response rule", this.responseRule);
 
     if (this.responseRule) {
-      debug && console.log("[RQ]", "send and response rule matched", this.responseRule);
+      debug && console.log("[xhrInterceptor]", "send and response rule matched", this.responseRule);
       if (shouldServeResponseWithoutRequest(this.responseRule)) {
-        debug && console.log("[RQ]", "send and response rule matched and serveWithoutRequest is true");
+        debug && console.log("[xhrInterceptor]", "send and response rule matched and serveWithoutRequest is true");
         resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
       } else {
         await notifyOnBeforeRequest({

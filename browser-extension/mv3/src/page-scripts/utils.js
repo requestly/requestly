@@ -147,7 +147,6 @@ export const getAbsoluteUrl = (url) => {
 };
 
 export const getMatchedRequestRule = (requestDetails) => {
-  console.log("[Debug] getMatchedRequestRule", { requestDetails });
   return window[PUBLIC_NAMESPACE].requestRules?.findLast(
     (rule) =>
       // TODO: Move ruleMatcher outside of service worker
@@ -156,7 +155,6 @@ export const getMatchedRequestRule = (requestDetails) => {
 };
 
 export const getMatchedResponseRule = (requestDetails) => {
-  console.log("getMatchedResponseRule", { requestDetails });
   return window[PUBLIC_NAMESPACE].responseRules?.findLast(
     (rule) =>
       // TODO: Move ruleMatcher outside of service worker
@@ -166,9 +164,7 @@ export const getMatchedResponseRule = (requestDetails) => {
 };
 
 export const getMatchedDelayRule = (requestDetails) => {
-  console.log("getMatchedDelayRule", { requestDetails });
-
-  if (!window[PUBLIC_NAMESPACE].delayRules) {
+  if (!window[PUBLIC_NAMESPACE]?.delayRules) {
     return null;
   }
 
