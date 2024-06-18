@@ -7,7 +7,6 @@ import { trackTestRuleClicked } from "../../analytics";
 import {
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
-  getUserAttributes,
   getUserAuthDetails,
 } from "store/selectors";
 import { prefixUrlWithHttps } from "utils/URLUtils";
@@ -16,27 +15,23 @@ import { testRuleOnUrl } from "actions/ExtensionActions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { claimIncentiveRewards } from "backend/incentivization";
-import { checkIncentivesEligibility } from "features/incentivization";
-import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(true);
   const { sheetPlacement } = useBottomSheetContext();
-  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -74,31 +69,27 @@ export const TestRuleHeader = () => {
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
 
-    if (checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)) {
-      claimIncentiveRewards({
-        dispatch,
-        isUserloggedIn: user?.loggedIn,
-        event: { type: IncentivizeEvent.RULE_TESTED },
-      })?.then((response) => {
-        // @ts-ignore
-        if (response.data?.success) {
-          dispatch(
-            incentivizationActions.setUserMilestoneAndRewardDetails({
-              // @ts-ignore
-              userMilestoneAndRewardDetails: response.data?.data,
-            })
-          );
+    claimIncentiveRewards({
+      type: IncentivizeEvent.RULE_TESTED,
+    })?.then((response) => {
+      // @ts-ignore
+      if (response.data?.success) {
+        dispatch(
+          incentivizationActions.setUserMilestoneAndRewardDetails({
+            // @ts-ignore
+            userMilestoneAndRewardDetails: response.data?.data,
+          })
+        );
 
-          dispatch(
-            incentivizationActions.toggleActiveModal({
-              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-              newValue: true,
-              newProps: { event: IncentivizeEvent.RULE_TESTED },
-            })
-          );
-        }
-      });
-    }
+        dispatch(
+          incentivizationActions.toggleActiveModal({
+            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+            newValue: true,
+            newProps: { event: IncentivizeEvent.RULE_TESTED },
+          })
+        );
+      }
+    });
   }, [
     pageUrl,
     error,
@@ -109,9 +100,6 @@ export const TestRuleHeader = () => {
     user?.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
-    isIncentivizationEnabled,
-    localIncentiveEvents,
-    userAttributes,
   ]);
 
   return (
