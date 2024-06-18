@@ -5,4 +5,3 @@ export { IncentiveTasksListModal } from "./modals/IncentiveTasksListModal/Incent
 export { RedeemCreditsModal } from "./modals/RedeemCreditsModal/RedeemCreditsModal";
 export { IncentiveTaskCompletedModal } from "./modals/IncentiveTaskCompletedModal/IncentiveTaskCompletedModal";
 export { INCENTIVIZATION_SOURCE } from "./analytics/constants";
-export { checkIncentivesEligibility } from "./utils";

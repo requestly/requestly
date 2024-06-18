@@ -2,13 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
-import {
-  getAppMode,
-  getIsMiscTourCompleted,
-  getIsPlanExpiredBannerClosed,
-  getUserAttributes,
-  getUserAuthDetails,
-} from "store/selectors";
+import { getAppMode, getIsMiscTourCompleted, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
@@ -31,10 +25,8 @@ import { RequestBot, trackAskAIClicked } from "features/requestBot";
 import BotIcon from "./assets/bot.svg";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { useFeatureValue } from "@growthbook/growthbook-react";
-import { checkIncentivesEligibility } from "features/incentivization";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./MenuHeader.css";
-import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
 const { Header } = Layout;
 const { PATHS } = APP_CONSTANTS;
@@ -47,14 +39,12 @@ const MenuHeader = () => {
   const { pathname } = useLocation();
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
-  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
 
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
 
@@ -168,12 +158,7 @@ const MenuHeader = () => {
                 {(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
                   (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
                     user?.details?.planDetails?.status !== "canceled" &&
-                    !checkIncentivesEligibility(
-                      user.loggedIn,
-                      userAttributes,
-                      isIncentivizationEnabled,
-                      localIncentiveEvents
-                    ))) && (
+                    !isIncentivizationEnabled)) && (
                   <Col>
                     <PremiumPlanBadge />
                   </Col>

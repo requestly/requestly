@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
-import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
-import { getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { getUserAuthDetails } from "store/selectors";
 import { RequestFeatureModal } from "./components/RequestFeatureModal";
 import { Popconfirm, PopconfirmProps, Typography } from "antd";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
@@ -12,10 +12,10 @@ import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { INCENTIVIZATION_SOURCE, checkIncentivesEligibility } from "features/incentivization";
-import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./index.scss";
 
 interface PremiumFeatureProps {
@@ -43,13 +43,11 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
-  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
@@ -120,11 +118,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           showArrow={false}
           placement={popoverPlacement}
           okText="See upgrade plans"
-          cancelText={
-            checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)
-              ? "upgrade for free"
-              : null
-          }
+          cancelText={isIncentivizationEnabled ? "upgrade for free" : null}
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(

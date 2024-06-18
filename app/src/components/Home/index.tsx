@@ -7,23 +7,16 @@ import { Templates } from "./components/Templates";
 import { RulesCard } from "./components/RulesCard";
 import { MocksCard } from "./components/MocksCard";
 import { IncentivesCard } from "./components/IncentivesCard/IncentivesCard";
-import { useSelector } from "react-redux";
-import { getUserAttributes, getUserAuthDetails } from "store/selectors";
-import { useFeatureValue } from "@growthbook/growthbook-react";
-import { checkIncentivesEligibility } from "features/incentivization";
-import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./home.scss";
 
 export const Home: React.FC = () => {
-  const user = useSelector(getUserAuthDetails);
-  const userAttributes = useSelector(getUserAttributes);
-  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
-  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   return (
     <Col className="homepage-wrapper">
       <Col className="homepage-content">
-        {checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents) && (
+        {isIncentivizationEnabled && (
           <Col className="homepage-primary-card homepage-incentives-card">
             <IncentivesCard />
           </Col>
