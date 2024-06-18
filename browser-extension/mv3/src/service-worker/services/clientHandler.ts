@@ -2,7 +2,7 @@ import { generateUrlPattern } from "../../utils";
 import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.json";
 import { isExtensionEnabled } from "../../utils";
 import { Variable, onVariableChange } from "../variable";
-import { RequestRulePair, ResponseRulePair, RuleType } from "common/types";
+import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
 
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
