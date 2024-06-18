@@ -15,9 +15,9 @@ export const useIncentiveActions = () => {
 
   const claimIncentiveRewards = useCallback(
     (event: UserIncentiveEvent) => {
-      // if (!isIncentivizationEnabled) {
-      //   return;
-      // }
+      if (!isIncentivizationEnabled) {
+        return;
+      }
 
       if (isUserLoggedIn) {
         return rawClaimIncentiveRewards(event);
