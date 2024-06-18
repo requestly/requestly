@@ -25,12 +25,9 @@ import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { useFeatureValue } from "@growthbook/growthbook-react";
-import { claimIncentiveRewards } from "backend/incentivization";
-import { checkIncentivesEligibility } from "features/incentivization";
 import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 import "./CreateWorkspaceModal.css";
-import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -42,7 +39,6 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const billingTeams = useSelector(getAvailableBillingTeams);
   const userAttributes = useSelector(getUserAttributes);
-  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -52,7 +48,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   });
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
 
-  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
@@ -84,32 +80,26 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
 
-      if (checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)) {
-        claimIncentiveRewards({
-          dispatch,
-          isUserloggedIn: user?.loggedIn,
-          event: {
-            type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-            metadata: { num_workspaces: userAttributes?.num_workspaces || 1 },
-          },
-        })?.then((response) => {
-          if (response.data?.success) {
-            dispatch(
-              incentivizationActions.setUserMilestoneAndRewardDetails({
-                userMilestoneAndRewardDetails: response.data?.data,
-              })
-            );
+      claimIncentiveRewards({
+        type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
+        metadata: { num_workspaces: userAttributes?.num_workspaces || 1 },
+      })?.then((response) => {
+        if (response.data?.success) {
+          dispatch(
+            incentivizationActions.setUserMilestoneAndRewardDetails({
+              userMilestoneAndRewardDetails: response.data?.data,
+            })
+          );
 
-            dispatch(
-              incentivizationActions.toggleActiveModal({
-                modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                newValue: true,
-                newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
-              })
-            );
-          }
-        });
-      }
+          dispatch(
+            incentivizationActions.toggleActiveModal({
+              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+              newValue: true,
+              newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
+            })
+          );
+        }
+      });
     },
     [
       dispatch,
@@ -119,9 +109,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       navigate,
       user?.loggedIn,
       user?.details?.isSyncEnabled,
-      isIncentivizationEnabled,
       userAttributes,
-      localIncentiveEvents,
     ]
   );
 
