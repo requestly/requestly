@@ -314,6 +314,14 @@ export const initXhrInterceptor = (debug) => {
       });
     }
 
+    await notifyOnBeforeRequest({
+      url: this.rqProxyXhr._requestURL,
+      method: this.rqProxyXhr._method,
+      type: "xmlhttprequest",
+      initiator: location.origin,
+      requestHeaders: this.rqProxyXhr._requestHeaders ?? {},
+    });
+
     this.responseRule = getMatchedResponseRule({
       url: this.rqProxyXhr._requestURL,
       requestData: jsonifyValidJSONString(this.rqProxyXhr._requestData),
@@ -327,13 +335,6 @@ export const initXhrInterceptor = (debug) => {
         debug && console.log("[xhrInterceptor]", "send and response rule matched and serveWithoutRequest is true");
         resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
       } else {
-        await notifyOnBeforeRequest({
-          url: this._rq_requestURL,
-          method: this._rq_method,
-          type: "xmlhttprequest",
-          initiator: location.origin,
-          requestHeaders: this._rq_requestHeaders ?? {},
-        });
         send.call(this.rqProxyXhr, this.rqProxyXhr._requestData);
       }
       return;
