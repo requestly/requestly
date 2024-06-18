@@ -21,7 +21,9 @@ import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./index.scss";
 
 interface RequestFeatureModalProps {
@@ -51,7 +53,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const requestEnterprisePlanFromAdmin = useMemo(
     () =>
@@ -127,9 +129,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               onClick={() => {
                 trackUpgradeOptionClicked("upgrade_for_free");
                 dispatch(
-                  // @ts-ignore
-                  actions.toggleActiveModal({
-                    modalName: "incentiveTasksListModal",
+                  incentivizationActions.toggleActiveModal({
+                    modalName: IncentivizationModal.TASKS_LIST_MODAL,
                     newValue: true,
                     newProps: {
                       source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
@@ -187,7 +188,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       </Row>
     );
-  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate]);
+  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate, user, isIncentivizationEnabled]);
 
   useEffect(() => {
     if (isOpen) {

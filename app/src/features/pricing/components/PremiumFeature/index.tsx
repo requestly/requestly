@@ -12,8 +12,11 @@ import { capitalize } from "lodash";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import "./index.scss";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
+import "./index.scss";
 
 interface PremiumFeatureProps {
   onContinue?: () => void;
@@ -44,7 +47,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const { getFeatureLimitValue, checkIfFeatureLimitReached } = useFeatureLimiter();
   const [openPopup, setOpenPopup] = useState(false);
   const isUpgradePopoverEnabled = useFeatureIsOn("show_upgrade_popovers");
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const isExceedingLimits = useMemo(
     () => features.some((feat) => !(getFeatureLimitValue(feat) && !checkIfFeatureLimitReached(feat, "reached"))),
@@ -60,27 +63,18 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       onContinue();
     } else {
       trackUpgradeOptionClicked("upgrade_for_free");
-      if (!user.loggedIn) {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "authModal",
-            newValue: true,
-            newProps: { eventSource: source },
-          })
-        );
-      } else {
-        dispatch(
-          actions.toggleActiveModal({
-            modalName: "incentiveTasksListModal",
-            newValue: true,
-            newProps: {
-              source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
-            },
-          })
-        );
-      }
+
+      dispatch(
+        incentivizationActions.toggleActiveModal({
+          modalName: IncentivizationModal.TASKS_LIST_MODAL,
+          newValue: true,
+          newProps: {
+            source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
+          },
+        })
+      );
     }
-  }, [dispatch, hasCrossedDeadline, onContinue, source, user.loggedIn]);
+  }, [dispatch, hasCrossedDeadline, onContinue, source]);
 
   useEffect(() => {
     return () => {
@@ -128,6 +122,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
+              // @ts-ignore
               actions.toggleActiveModal({
                 modalName: "pricingModal",
                 newValue: true,

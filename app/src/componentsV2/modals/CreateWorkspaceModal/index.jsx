@@ -24,10 +24,9 @@ import APP_CONSTANTS from "config/constants";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
 import { IncentivizeEvent } from "features/incentivization/types";
-import { actions } from "store";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { claimIncentiveRewards } from "backend/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 import "./CreateWorkspaceModal.css";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
@@ -49,7 +48,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   });
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
 
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
@@ -81,24 +80,26 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
 
-      if (isIncentivizationEnabled) {
-        claimIncentiveRewards({
-          type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-          metadata: { num_workspaces: userAttributes?.num_workspaces },
-        }).then((response) => {
-          if (response.data?.success) {
-            dispatch(incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data }));
+      claimIncentiveRewards({
+        type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
+        metadata: { num_workspaces: userAttributes?.num_workspaces || 1 },
+      })?.then((response) => {
+        if (response.data?.success) {
+          dispatch(
+            incentivizationActions.setUserMilestoneAndRewardDetails({
+              userMilestoneAndRewardDetails: response.data?.data,
+            })
+          );
 
-            dispatch(
-              actions.toggleActiveModal({
-                modalName: "incentiveTaskCompletedModal",
-                newValue: true,
-                newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
-              })
-            );
-          }
-        });
-      }
+          dispatch(
+            incentivizationActions.toggleActiveModal({
+              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+              newValue: true,
+              newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
+            })
+          );
+        }
+      });
     },
     [
       dispatch,
@@ -106,9 +107,10 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       isNotifyAllSelected,
       isWorkspaceMode,
       navigate,
+      user?.loggedIn,
       user?.details?.isSyncEnabled,
-      userAttributes?.num_workspaces,
-      isIncentivizationEnabled,
+      userAttributes,
+      claimIncentiveRewards,
     ]
   );
 

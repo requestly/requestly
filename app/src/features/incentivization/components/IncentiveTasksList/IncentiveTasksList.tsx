@@ -6,7 +6,7 @@ import { PiCaretDownBold } from "@react-icons/all-files/pi/PiCaretDownBold";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TaskHeader } from "./components/TaskHeader/TaskHeader";
-import { UserMilestoneDetails } from "features/incentivization/types";
+import { UserMilestoneAndRewardDetails } from "features/incentivization/types";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import { MdPlaylistAdd } from "@react-icons/all-files/md/MdPlaylistAdd";
 import { MdOutlineDiversity1 } from "@react-icons/all-files/md/MdOutlineDiversity1";
@@ -26,7 +26,7 @@ import { IncentivizeEvent } from "features/incentivization/types";
 import { IncentiveTaskListItem } from "./types";
 import {
   getIncentivizationMilestones,
-  getIncentivizationUserMilestoneDetails,
+  getUserIncentivizationDetails,
   getIsIncentivizationDetailsLoading,
 } from "store/features/incentivization/selectors";
 import { getTotalCredits, isTaskCompleted } from "features/incentivization/utils";
@@ -39,7 +39,9 @@ import { RuleType } from "types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import PATHS from "config/constants/sub/paths";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { claimIncentiveRewards } from "backend/incentivization";
+import { getUserAuthDetails } from "store/selectors";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
@@ -50,16 +52,20 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const user = useSelector(getUserAuthDetails);
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
-  const userMilestoneDetails = useSelector(getIncentivizationUserMilestoneDetails);
+  const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
   const postActionClickCallback = useCallback(
     (task: IncentivizeEvent) => {
-      // @ts-ignore
-      dispatch(actions.toggleActiveModal({ modalName: "incentiveTasksListModal", newValue: false }));
+      dispatch(
+        incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASKS_LIST_MODAL, newValue: false })
+      );
       trackIncentivizationTaskClicked(task);
     },
     [dispatch]
@@ -70,7 +76,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       {
         id: IncentivizeEvent.RULE_CREATED,
         title: "Create your first rule",
-        isCompleted: isTaskCompleted(IncentivizeEvent.RULE_CREATED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.RULE_CREATED, userMilestoneAndRewardDetails),
         description:
           "Rules enable you to set conditions that trigger specific actions when met. To apply desired network modifications",
         icon: <MdPlaylistAdd />,
@@ -81,7 +87,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         ),
         milestone: milestones?.[IncentivizeEvent.RULE_CREATED],
         action: () => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_CREATED, userMilestoneAndRewardDetails);
           return (
             <NewRuleButtonWithDropdown
               disable={isCompleted}
@@ -93,7 +99,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       {
         id: IncentivizeEvent.RULE_TESTED,
         title: location.pathname.includes(PATHS.RULE_EDITOR.EDIT_RULE.RELATIVE) ? "Test this rule" : "Test a rule",
-        isCompleted: isTaskCompleted(IncentivizeEvent.RULE_TESTED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.RULE_TESTED, userMilestoneAndRewardDetails),
         description:
           "Test your rule on a specific URL to see if it works as expected. You can test your rule on any website.",
         icon: <MdOutlineScience />,
@@ -104,7 +110,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         ),
         milestone: milestones?.[IncentivizeEvent.RULE_TESTED],
         action: () => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_TESTED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_TESTED, userMilestoneAndRewardDetails);
           const isRuleEditorOpened = location.pathname.includes(PATHS.RULE_EDITOR.EDIT_RULE.RELATIVE);
           return (
             <RQButton
@@ -125,7 +131,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       {
         id: IncentivizeEvent.RESPONSE_RULE_CREATED,
         title: "Create a Response Rule",
-        isCompleted: isTaskCompleted(IncentivizeEvent.RESPONSE_RULE_CREATED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.RESPONSE_RULE_CREATED, userMilestoneAndRewardDetails),
         description: "Modify Response Rule allows you to debug & modify API responses on the fly",
         icon: <MdPlaylistAdd />,
         helpLink: (
@@ -135,7 +141,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         ),
         milestone: milestones?.[IncentivizeEvent.RESPONSE_RULE_CREATED],
         action: () => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.RESPONSE_RULE_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RESPONSE_RULE_CREATED, userMilestoneAndRewardDetails);
           return (
             <RQButton
               disabled={isCompleted}
@@ -166,7 +172,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       {
         id: IncentivizeEvent.REDIRECT_RULE_CREATED,
         title: "Create a Redirect Rule",
-        isCompleted: isTaskCompleted(IncentivizeEvent.REDIRECT_RULE_CREATED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.REDIRECT_RULE_CREATED, userMilestoneAndRewardDetails),
         description: "Redirect Rule allows you to redirect a network request to a different URL.",
         icon: <MdPlaylistAdd />,
         helpLink: (
@@ -180,7 +186,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         ),
         milestone: milestones?.[IncentivizeEvent.REDIRECT_RULE_CREATED],
         action: () => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.REDIRECT_RULE_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.REDIRECT_RULE_CREATED, userMilestoneAndRewardDetails);
           return (
             <RQButton
               disabled={isCompleted}
@@ -211,7 +217,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       {
         id: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
         title: "Create a Team Workspace",
-        isCompleted: isTaskCompleted(IncentivizeEvent.TEAM_WORKSPACE_CREATED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.TEAM_WORKSPACE_CREATED, userMilestoneAndRewardDetails),
         description:
           "A Team Workspace lets you collaborate with your team and work together in real-time on your rules, mocks and sessions.",
         icon: <MdOutlineDiversity1 />,
@@ -222,7 +228,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         ),
         milestone: milestones?.[IncentivizeEvent.TEAM_WORKSPACE_CREATED],
         action: ({ dispatch }) => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.TEAM_WORKSPACE_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.TEAM_WORKSPACE_CREATED, userMilestoneAndRewardDetails);
 
           return (
             <Button
@@ -254,7 +260,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       {
         id: IncentivizeEvent.MOCK_CREATED,
         title: "Create an API Mock",
-        isCompleted: isTaskCompleted(IncentivizeEvent.MOCK_CREATED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.MOCK_CREATED, userMilestoneAndRewardDetails),
         description:
           "Generate a mock API endpoint to simulate your API without needing to configure a real API server.",
         icon: <MdOutlineDns />,
@@ -265,7 +271,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         ),
         milestone: milestones?.[IncentivizeEvent.MOCK_CREATED],
         action: ({ navigate }) => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.MOCK_CREATED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.MOCK_CREATED, userMilestoneAndRewardDetails);
 
           return (
             <Button
@@ -284,7 +290,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       {
         id: IncentivizeEvent.SESSION_RECORDED,
         title: "Record a session",
-        isCompleted: isTaskCompleted(IncentivizeEvent.SESSION_RECORDED, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.SESSION_RECORDED, userMilestoneAndRewardDetails),
         description:
           "SessionBook allows you to capture, report, and debug errors. Easily capture mouse movements and screen recording along with network & console logs.",
         icon: <PiRecordFill />,
@@ -295,7 +301,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         ),
         milestone: milestones?.[IncentivizeEvent.SESSION_RECORDED],
         action: ({ navigate }) => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.SESSION_RECORDED, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.SESSION_RECORDED, userMilestoneAndRewardDetails);
 
           return (
             <Button
@@ -314,12 +320,12 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       {
         id: IncentivizeEvent.RATE_ON_CHROME_STORE,
         title: "Rate us on Chrome Store",
-        isCompleted: isTaskCompleted(IncentivizeEvent.RATE_ON_CHROME_STORE, userMilestoneDetails),
+        isCompleted: isTaskCompleted(IncentivizeEvent.RATE_ON_CHROME_STORE, userMilestoneAndRewardDetails),
         description: "Give a rating on chrome store.",
         icon: <MdOutlineStarBorder />,
         milestone: milestones?.[IncentivizeEvent.RATE_ON_CHROME_STORE],
         action: ({ navigate }) => {
-          const isCompleted = isTaskCompleted(IncentivizeEvent.RATE_ON_CHROME_STORE, userMilestoneDetails);
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RATE_ON_CHROME_STORE, userMilestoneAndRewardDetails);
 
           return (
             <Button
@@ -327,24 +333,25 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
               type="primary"
               onClick={() => {
                 setTimeout(() => {
-                  claimIncentiveRewards({ type: IncentivizeEvent.RATE_ON_CHROME_STORE }).then(
-                    (response: { data: { success: boolean; data: UserMilestoneDetails } }) => {
-                      if (response.data?.success) {
-                        dispatch(
-                          incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: response.data?.data })
-                        );
+                  claimIncentiveRewards({
+                    type: IncentivizeEvent.RATE_ON_CHROME_STORE,
+                  })?.then((response: { data: { success: boolean; data: UserMilestoneAndRewardDetails } }) => {
+                    if (response.data?.success) {
+                      dispatch(
+                        incentivizationActions.setUserMilestoneAndRewardDetails({
+                          userMilestoneAndRewardDetails: response.data?.data,
+                        })
+                      );
 
-                        dispatch(
-                          // @ts-ignore
-                          actions.toggleActiveModal({
-                            modalName: "incentiveTaskCompletedModal",
-                            newValue: true,
-                            newProps: { event: IncentivizeEvent.RATE_ON_CHROME_STORE },
-                          })
-                        );
-                      }
+                      dispatch(
+                        incentivizationActions.toggleActiveModal({
+                          modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+                          newValue: true,
+                          newProps: { event: IncentivizeEvent.RATE_ON_CHROME_STORE },
+                        })
+                      );
                     }
-                  );
+                  });
                 }, 1000 * 20);
 
                 postActionClickCallback(IncentivizeEvent.RATE_ON_CHROME_STORE);
@@ -358,7 +365,16 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         },
       },
     ],
-    [milestones, userMilestoneDetails, dispatch, navigate, location.pathname, postActionClickCallback]
+    [
+      user?.loggedIn,
+      milestones,
+      userMilestoneAndRewardDetails,
+      dispatch,
+      navigate,
+      location.pathname,
+      postActionClickCallback,
+      claimIncentiveRewards,
+    ]
   );
 
   return (

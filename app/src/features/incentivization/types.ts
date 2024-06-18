@@ -38,15 +38,10 @@ export interface Milestone {
 
 export type Milestones = Record<IncentivizeEvent, Milestone>;
 
-export interface UserMilestoneDetails {
-  uid: string;
-  recentCreditsClaimed: number;
+export interface UserMilestoneAndRewardDetails {
   creditsToBeRedeemed: number;
   totalCreditsClaimed: number;
   creditsRedeemedCount: number;
   claimedMilestoneLogs: Milestone["type"][];
-  updatedTs: number;
-  metadata: {
-    milestonesVersion: number;
-  };
+  updatedTs?: number;
 }

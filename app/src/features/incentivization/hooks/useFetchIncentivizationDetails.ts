@@ -1,16 +1,26 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { Milestones, UserMilestoneDetails } from "../types";
+import { Milestones, UserMilestoneAndRewardDetails } from "../types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getUserAuthDetails } from "store/selectors";
+import { useSyncLocalIncentivizationState } from "./useSyncLocalIncentivizationState";
+import { useIsIncentivizationEnabled } from "./useIsIncentivizationEnabled";
 
 export const useFetchIncentivizationDetails = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
+
+  useSyncLocalIncentivizationState();
+
   useEffect(() => {
+    if (!isIncentivizationEnabled) {
+      return;
+    }
+
     const getIncentivizationDetails = async () => {
       try {
         dispatch(incentivizationActions.setIsIncentivizationDetailsLoading({ isLoading: true }));
@@ -27,13 +37,15 @@ export const useFetchIncentivizationDetails = () => {
             "incentivization-getUserIncentivizationDetails"
           );
 
-          const userMilestoneDetails = (await getUserIncentivizationDetails()) as {
-            data: { success: boolean; data: UserMilestoneDetails | null };
+          const userMilestoneAndRewardDetails = (await getUserIncentivizationDetails()) as {
+            data: { success: boolean; data: UserMilestoneAndRewardDetails | null };
           };
 
-          if (userMilestoneDetails.data?.success) {
+          if (userMilestoneAndRewardDetails.data?.success) {
             dispatch(
-              incentivizationActions.setUserMilestoneDetails({ userMilestoneDetails: userMilestoneDetails.data?.data })
+              incentivizationActions.setUserMilestoneAndRewardDetails({
+                userMilestoneAndRewardDetails: userMilestoneAndRewardDetails.data?.data,
+              })
             );
           }
         }
@@ -44,6 +56,7 @@ export const useFetchIncentivizationDetails = () => {
       }
     };
 
+    // TODO: add a new user check
     getIncentivizationDetails();
-  }, [dispatch, uid]);
+  }, [dispatch, uid, isIncentivizationEnabled]);
 };
