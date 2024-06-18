@@ -9,8 +9,8 @@ import {
   RulePair,
   RequestPayloadFilter,
 } from "common/types";
-import { AJAXRequestDetails } from "./requestProcessor/types";
-import { getUrlObject, isBlacklistedURL } from "../../utils";
+import { AJAXRequestDetails } from "../service-worker/services/requestProcessor/types";
+import { getUrlObject, isBlacklistedURL } from "../utils";
 
 const toRegex = (regexStr: string): RegExp => {
   const matchRegExp = regexStr.match(new RegExp("^/(.+)/(|i|g|ig|gi)$"));

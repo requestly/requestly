@@ -1,5 +1,5 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
-import { matchRuleWithRequest } from "../service-worker/services/ruleMatcher";
+import { matchRuleWithRequest } from "../common/ruleMatcher";
 
 let logShown = false;
 
