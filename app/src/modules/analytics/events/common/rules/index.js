@@ -161,6 +161,11 @@ export const trackErrorInRuleCreation = (description, rule_type) => {
   trackEvent(RULES.ERROR_IN_RULE_CREATION, params);
 };
 
+export const trackErrorInSavingDNR = (description, rule_type, rule_id) => {
+  const params = { description, rule_type, rule_id };
+  trackEvent(RULES.ERROR_IN_RULE_CREATION, params);
+};
+
 export const trackRuleEditorViewed = (source, rule_type) => {
   const params = { source, rule_type };
   trackEvent(RULES.RULE_EDITOR_VIEWED, params);
