@@ -5,15 +5,22 @@ import { Milestones, UserMilestoneAndRewardDetails } from "../types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getUserAuthDetails } from "store/selectors";
 import { useSyncLocalIncentivizationState } from "./useSyncLocalIncentivizationState";
+import { useIsIncentivizationEnabled } from "./useIsIncentivizationEnabled";
 
 export const useFetchIncentivizationDetails = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
+
   useSyncLocalIncentivizationState();
 
   useEffect(() => {
+    if (!isIncentivizationEnabled) {
+      return;
+    }
+
     const getIncentivizationDetails = async () => {
       try {
         dispatch(incentivizationActions.setIsIncentivizationDetailsLoading({ isLoading: true }));
@@ -51,5 +58,5 @@ export const useFetchIncentivizationDetails = () => {
 
     // TODO: add a new user check
     getIncentivizationDetails();
-  }, [dispatch, uid]);
+  }, [dispatch, uid, isIncentivizationEnabled]);
 };

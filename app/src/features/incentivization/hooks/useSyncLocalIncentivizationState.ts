@@ -19,8 +19,6 @@ export const useSyncLocalIncentivizationState = () => {
   const { claimIncentiveRewards } = useIncentiveActions();
 
   useEffect(() => {
-    // TODO: add incentive check
-
     if (Object.keys(milestones).length === 0) {
       return;
     }
