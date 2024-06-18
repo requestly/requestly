@@ -66,37 +66,6 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [language]);
 
-  // const handleCodePrettify = useCallback(
-  //   (parser: string) => {
-  //     try {
-  //       let prettifiedCode = prettier.format(value, {
-  //         parser: parser,
-  //         plugins: [parserBabel],
-  //       });
-  //       setEditorContent(prettifiedCode);
-  //     } catch (error) {
-  //       console.error("Error while prettifying code", error);
-  //     }
-  //   },
-  //   [value]
-  // );
-
-  // useEffect(() => {
-  //   if (isCodeFormatted) {
-  //     if (language === EditorLanguage.JAVASCRIPT) {
-  //       handleCodePrettify("babel");
-  //     } else if (unlockJsonPrettify && language === EditorLanguage.JSON) {
-  //       !isCodeMinified && handleCodePrettify(EditorLanguage.JSON);
-  //     }
-  //   }
-  // }, [isCodeMinified, isCodeFormatted, language, unlockJsonPrettify, handleCodePrettify]);
-
-  // useEffect(() => {
-  //   if (isCodeMinified && language === EditorLanguage.JSON) {
-  //     setEditorContent(value);
-  //   }
-  // }, [isCodeMinified, language, value]);
-
   useEffect(() => {
     if (!value?.length) {
       setEditorContent(defaultValue ?? "");
