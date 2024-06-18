@@ -13,6 +13,7 @@ export const initExtensionMessageListener = () => {
         break;
 
       case CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED:
+      case EXTENSION_MESSAGES.RULE_SAVE_ERROR:
         sendExtensionMessage(message);
         break;
     }

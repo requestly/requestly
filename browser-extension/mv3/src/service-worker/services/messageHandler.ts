@@ -26,13 +26,9 @@ import {
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import { isExtensionEnabled } from "../../utils";
 
-// TODO: relay this message from content script to app, so UI could be updated immediately
-export const sendMessageToApp = (messageObject: unknown, callback?: () => void) => {
-  getAppTabs().then((tabs) => {
-    tabs.forEach(({ id }) => {
-      chrome.tabs.sendMessage(id, messageObject, callback);
-    });
-  });
+export const sendMessageToApp = async (messageObject: unknown) => {
+  const appTabs = await getAppTabs();
+  return Promise.all(appTabs.map(({ id }) => chrome.tabs.sendMessage(id, messageObject)));
 };
 
 export const initMessageHandler = () => {

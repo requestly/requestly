@@ -33,6 +33,7 @@ export const EXTENSION_MESSAGES = {
   TEST_RULE_ON_URL: "testRuleOnUrl",
   RULE_EXECUTED: "ruleExecuted",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
+  RULE_SAVE_ERROR: "ruleSaveError",
 };
 
 export const CLIENT_MESSAGES = {
