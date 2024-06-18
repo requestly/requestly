@@ -19,14 +19,16 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { CreditsButton } from "./components/CreditsButton/CreditsButton";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
+
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
 
   const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
@@ -123,7 +125,7 @@ export const PrimarySidebar: React.FC = () => {
           ))}
       </ul>
       <div className="primary-sidebar-bottom-btns">
-        {isIncentivizationEnabled && <CreditsButton />}
+        {isIncentivizationEnabled ? <CreditsButton /> : null}
         <InviteButton />
       </div>
     </div>

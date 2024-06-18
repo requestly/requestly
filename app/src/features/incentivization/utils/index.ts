@@ -2,7 +2,7 @@ import { IncentivizeEvent, Milestones, UserMilestoneAndRewardDetails } from "../
 
 export const getTotalCredits = (milestones: Milestones) => {
   const total = Object.values(milestones ?? {}).reduce(
-    (result, milestone) => result + (milestone.reward.value as number),
+    (result, milestone) => result + (milestone.reward?.value as number),
     0
   );
 

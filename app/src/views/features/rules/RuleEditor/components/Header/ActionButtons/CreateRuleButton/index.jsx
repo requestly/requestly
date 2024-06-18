@@ -44,10 +44,9 @@ import { toastType } from "componentsV2/CodeEditor/components/EditorToast/types"
 import { IncentivizeEvent } from "features/incentivization/types";
 import { RuleType } from "features/rules";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import Logger from "../../../../../../../../../../common/logger";
-import { claimIncentiveRewards } from "backend/incentivization";
 import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -108,7 +107,6 @@ const CreateRuleButton = ({
   //Constants
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
   const ruleCreatedEventSource =
     searchParams.get("source") ?? location?.state?.source ?? analyticEventRuleCreatedSource;
   const MODE = isRuleEditorModal ? ruleEditorModalMode : getModeData(location).MODE;
@@ -120,6 +118,8 @@ const CreateRuleButton = ({
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {
@@ -166,9 +166,8 @@ const CreateRuleButton = ({
           : IncentivizeEvent.REDIRECT_RULE_CREATED;
 
       claimIncentiveRewards({
-        dispatch,
-        isUserloggedIn: user?.loggedIn,
-        event: { type: incentiveEvent, metadata: { rule_type: currentlySelectedRuleData.ruleType } },
+        type: incentiveEvent,
+        metadata: { rule_type: currentlySelectedRuleData.ruleType },
       })?.then((response) => {
         if (response.data?.success) {
           dispatch(
@@ -189,13 +188,12 @@ const CreateRuleButton = ({
         }
       });
     }
-  }, [currentlySelectedRuleData.ruleType, user?.loggedIn, dispatch]);
+  }, [currentlySelectedRuleData.ruleType]);
 
   const handleFirstRuleCreationEvent = useCallback(async () => {
     claimIncentiveRewards({
-      dispatch,
-      isUserloggedIn: user?.loggedIn,
-      event: { type: IncentivizeEvent.RULE_CREATED, metadata: { num_rules: 1 } },
+      type: IncentivizeEvent.RULE_CREATED,
+      metadata: { num_rules: 1 },
     })?.then((response) => {
       if (response.data?.success) {
         dispatch(
@@ -217,11 +215,9 @@ const CreateRuleButton = ({
           );
       }
     });
-  }, [user?.loggedIn, dispatch, currentlySelectedRuleData.ruleType]);
+  }, [currentlySelectedRuleData.ruleType]);
 
   const claimRuleCreationRewards = useCallback(async () => {
-    if (!isIncentivizationEnabled) return;
-
     if (userAttributes?.num_rules === 0) {
       return Promise.allSettled([handleFirstRuleCreationEvent(), handleOtherRuleEvents()]).catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
@@ -229,7 +225,7 @@ const CreateRuleButton = ({
     } else {
       handleOtherRuleEvents();
     }
-  }, [handleFirstRuleCreationEvent, handleOtherRuleEvents, isIncentivizationEnabled, userAttributes?.num_rules]);
+  }, [handleFirstRuleCreationEvent, handleOtherRuleEvents, userAttributes]);
 
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);

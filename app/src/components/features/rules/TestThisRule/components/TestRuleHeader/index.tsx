@@ -15,11 +15,10 @@ import { testRuleOnUrl } from "actions/ExtensionActions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { claimIncentiveRewards } from "backend/incentivization";
 import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
@@ -31,7 +30,8 @@ export const TestRuleHeader = () => {
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(true);
   const { sheetPlacement } = useBottomSheetContext();
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -69,31 +69,27 @@ export const TestRuleHeader = () => {
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
 
-    if (isIncentivizationEnabled) {
-      claimIncentiveRewards({
-        dispatch,
-        isUserloggedIn: user?.loggedIn,
-        event: { type: IncentivizeEvent.RULE_TESTED },
-      })?.then((response) => {
-        // @ts-ignore
-        if (response.data?.success) {
-          dispatch(
-            incentivizationActions.setUserMilestoneAndRewardDetails({
-              // @ts-ignore
-              userMilestoneAndRewardDetails: response.data?.data,
-            })
-          );
+    claimIncentiveRewards({
+      type: IncentivizeEvent.RULE_TESTED,
+    })?.then((response) => {
+      // @ts-ignore
+      if (response.data?.success) {
+        dispatch(
+          incentivizationActions.setUserMilestoneAndRewardDetails({
+            // @ts-ignore
+            userMilestoneAndRewardDetails: response.data?.data,
+          })
+        );
 
-          dispatch(
-            incentivizationActions.toggleActiveModal({
-              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-              newValue: true,
-              newProps: { event: IncentivizeEvent.RULE_TESTED },
-            })
-          );
-        }
-      });
-    }
+        dispatch(
+          incentivizationActions.toggleActiveModal({
+            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+            newValue: true,
+            newProps: { event: IncentivizeEvent.RULE_TESTED },
+          })
+        );
+      }
+    });
   }, [
     pageUrl,
     error,
@@ -104,7 +100,6 @@ export const TestRuleHeader = () => {
     user?.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
-    isIncentivizationEnabled,
   ]);
 
   return (

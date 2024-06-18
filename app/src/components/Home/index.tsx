@@ -7,11 +7,11 @@ import { Templates } from "./components/Templates";
 import { RulesCard } from "./components/RulesCard";
 import { MocksCard } from "./components/MocksCard";
 import { IncentivesCard } from "./components/IncentivesCard/IncentivesCard";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./home.scss";
 
 export const Home: React.FC = () => {
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   return (
     <Col className="homepage-wrapper">

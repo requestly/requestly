@@ -25,7 +25,7 @@ import { RequestBot, trackAskAIClicked } from "features/requestBot";
 import BotIcon from "./assets/bot.svg";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -44,7 +44,7 @@ const MenuHeader = () => {
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
-  const isIncentivizationEnabled = useFeatureIsOn("incentivization_onboarding");
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
 

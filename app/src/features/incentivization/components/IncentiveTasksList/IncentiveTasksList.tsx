@@ -39,9 +39,9 @@ import { RuleType } from "types";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import PATHS from "config/constants/sub/paths";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
-import { claimIncentiveRewards } from "backend/incentivization";
 import { getUserAuthDetails } from "store/selectors";
 import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
@@ -56,6 +56,8 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
@@ -332,9 +334,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
               onClick={() => {
                 setTimeout(() => {
                   claimIncentiveRewards({
-                    dispatch,
-                    isUserloggedIn: user?.loggedIn,
-                    event: { type: IncentivizeEvent.RATE_ON_CHROME_STORE },
+                    type: IncentivizeEvent.RATE_ON_CHROME_STORE,
                   })?.then((response: { data: { success: boolean; data: UserMilestoneAndRewardDetails } }) => {
                     if (response.data?.success) {
                       dispatch(
