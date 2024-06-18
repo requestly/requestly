@@ -237,6 +237,7 @@ const CustomScriptRow = ({
         >
           <Col xl="12" span={24}>
             <CodeEditor
+              isResizable
               id={script.id}
               height={script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? 125 : 300}
               language={codeEditorLanguage}
@@ -409,66 +410,68 @@ const CustomScriptRow = ({
   };
   return (
     <div key={rowIndex} className={!isLastIndex ? "custom-script-row" : ""}>
-      <Row span={24} align="middle" className="code-editor-header-row mt-20">
-        <Col span={22}>
-          <Row align="middle" className="items-center" gutter={[20, 20]}>
-            <Col align="left" data-tour-id="rule-editor-script-language">
-              <Text className="text-gray">Language: </Text>
-              <CodeTypeOptions />
-            </Col>
-            <Col align="left">
-              <Text className="text-gray">Code Source: </Text>
-              <SourceTypeOptions />
-            </Col>
-            {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
-              <Col align="left">
-                <Text className="text-gray">Insert: </Text>
-                <Dropdown overlay={loadTimeMenu} disabled={isInputDisabled}>
-                  <Text
-                    strong
-                    className="cursor-pointer ant-dropdown-link"
-                    onClick={(e) => e.preventDefault()}
-                    style={{ textTransform: "capitalize" }}
-                  >
-                    {script.loadTime === GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
-                      ? "After Page Load"
-                      : isExtensionManifestVersion3()
-                      ? "As Soon As Possible"
-                      : "Before Page Load"}{" "}
-                    <DownOutlined />
-                  </Text>
-                </Dropdown>
+      <div className="code-editor-row">
+        <Row span={24} align="middle" className="code-editor-header-row">
+          <Col span={22}>
+            <Row align="middle" className="items-center" gutter={[20, 20]}>
+              <Col align="left" data-tour-id="rule-editor-script-language">
+                <Text className="text-gray">Language: </Text>
+                <CodeTypeOptions />
               </Col>
-            ) : null}
-          </Row>
-        </Col>
-        {!isInputDisabled && (
-          <Col align="right" className="flex-1">
-            <Popconfirm
-              title="This will clear the existing script"
-              onConfirm={(e) => {
-                handleScriptDelete(e);
-                setIsScriptDeletePopupVisible(false);
-              }}
-              onCancel={() => {
-                setIsScriptDeletePopupVisible(false);
-              }}
-              okText="Confirm"
-              cancelText="Cancel"
-              visible={isScriptDeletePopupVisible}
-            >
-              <Tooltip title="Remove">
-                <DeleteOutlined
-                  id="delete-pair"
-                  color="text-gray cursor-pointer"
-                  onClick={showScriptDeleteConfirmation}
-                />
-              </Tooltip>
-            </Popconfirm>
+              <Col align="left">
+                <Text className="text-gray">Code Source: </Text>
+                <SourceTypeOptions />
+              </Col>
+              {script.codeType === GLOBAL_CONSTANTS.SCRIPT_CODE_TYPES.JS ? (
+                <Col align="left">
+                  <Text className="text-gray">Insert: </Text>
+                  <Dropdown overlay={loadTimeMenu} disabled={isInputDisabled}>
+                    <Text
+                      strong
+                      className="cursor-pointer ant-dropdown-link"
+                      onClick={(e) => e.preventDefault()}
+                      style={{ textTransform: "capitalize" }}
+                    >
+                      {script.loadTime === GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD
+                        ? "After Page Load"
+                        : isExtensionManifestVersion3()
+                        ? "As Soon As Possible"
+                        : "Before Page Load"}{" "}
+                      <DownOutlined />
+                    </Text>
+                  </Dropdown>
+                </Col>
+              ) : null}
+            </Row>
           </Col>
-        )}
-      </Row>
-      {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? renderURLInput() : renderCodeEditor()}
+          {!isInputDisabled && (
+            <Col align="right" className="flex-1">
+              <Popconfirm
+                title="This will clear the existing script"
+                onConfirm={(e) => {
+                  handleScriptDelete(e);
+                  setIsScriptDeletePopupVisible(false);
+                }}
+                onCancel={() => {
+                  setIsScriptDeletePopupVisible(false);
+                }}
+                okText="Confirm"
+                cancelText="Cancel"
+                visible={isScriptDeletePopupVisible}
+              >
+                <Tooltip title="Remove">
+                  <DeleteOutlined
+                    id="delete-pair"
+                    color="text-gray cursor-pointer"
+                    onClick={showScriptDeleteConfirmation}
+                  />
+                </Tooltip>
+              </Popconfirm>
+            </Col>
+          )}
+        </Row>
+        {script.type === GLOBAL_CONSTANTS.SCRIPT_TYPES.URL ? renderURLInput() : renderCodeEditor()}
+      </div>
     </div>
   );
 };
