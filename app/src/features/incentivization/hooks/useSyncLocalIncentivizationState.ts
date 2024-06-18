@@ -5,16 +5,18 @@ import {
   getLocalIncentivizationEventsState,
 } from "store/features/incentivization/selectors";
 import { getUserAuthDetails } from "store/selectors";
-import { claimIncentiveRewards } from "backend/incentivization";
 import { UserMilestoneAndRewardDetails } from "../types";
 import { HttpsCallableResult } from "firebase/functions";
 import { incentivizationActions } from "store/features/incentivization/slice";
+import { useIncentiveActions } from "./useIncentiveActions";
 
 export const useSyncLocalIncentivizationState = () => {
   const dispatch = useDispatch();
   const milestones = useSelector(getIncentivizationMilestones);
   const localEventsState = useSelector(getLocalIncentivizationEventsState);
   const user = useSelector(getUserAuthDetails);
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   useEffect(() => {
     if (Object.keys(milestones).length === 0) {
@@ -30,7 +32,7 @@ export const useSyncLocalIncentivizationState = () => {
       const dedupedLocalEvents = localEventsState.filter((event) => localEventTypesSet.has(event.type));
 
       const allPromises = dedupedLocalEvents.map((event) => {
-        return claimIncentiveRewards({ dispatch, isUserloggedIn: true, event });
+        return claimIncentiveRewards(event);
       });
 
       Promise.all(allPromises).then(
