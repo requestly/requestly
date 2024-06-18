@@ -22,11 +22,8 @@ import { trackCreateMockEvent, trackUpdateMockEvent } from "modules/analytics/ev
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { useFeatureValue } from "@growthbook/growthbook-react";
-import { checkIncentivesEligibility } from "features/incentivization";
-import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
-import { claimIncentiveRewards } from "backend/incentivization";
 import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 
 interface Props {
   isNew?: boolean;
@@ -49,7 +46,6 @@ const MockEditorIndex: React.FC<Props> = ({
   const { mockId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
   const userAttributes = useSelector(getUserAttributes);
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
@@ -60,7 +56,7 @@ const MockEditorIndex: React.FC<Props> = ({
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
 
-  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   useEffect(() => {
     if (mockId) {
@@ -90,36 +86,28 @@ const MockEditorIndex: React.FC<Props> = ({
           toast.success("Mock Created Successfully");
           trackCreateMockEvent(mockId, mockType, fileType, "editor");
 
-          if (
-            checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)
-          ) {
-            claimIncentiveRewards({
-              dispatch,
-              isUserloggedIn: user?.loggedIn,
-              event: {
-                type: IncentivizeEvent.MOCK_CREATED,
-                metadata: { num_mocks: userAttributes?.num_mocks || 1 },
-              },
-            })?.then((response) => {
-              // @ts-ignore
-              if (response.data?.success) {
-                dispatch(
-                  incentivizationActions.setUserMilestoneAndRewardDetails({
-                    // @ts-ignore
-                    userMilestoneAndRewardDetails: response.data?.data,
-                  })
-                );
+          claimIncentiveRewards({
+            type: IncentivizeEvent.MOCK_CREATED,
+            metadata: { num_mocks: userAttributes?.num_mocks || 1 },
+          })?.then((response) => {
+            // @ts-ignore
+            if (response.data?.success) {
+              dispatch(
+                incentivizationActions.setUserMilestoneAndRewardDetails({
+                  // @ts-ignore
+                  userMilestoneAndRewardDetails: response.data?.data,
+                })
+              );
 
-                dispatch(
-                  incentivizationActions.toggleActiveModal({
-                    modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                    newValue: true,
-                    newProps: { event: IncentivizeEvent.MOCK_CREATED },
-                  })
-                );
-              }
-            });
-          }
+              dispatch(
+                incentivizationActions.toggleActiveModal({
+                  modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+                  newValue: true,
+                  newProps: { event: IncentivizeEvent.MOCK_CREATED },
+                })
+              );
+            }
+          });
 
           if (selectOnSave) {
             const url = generateFinalUrl(
