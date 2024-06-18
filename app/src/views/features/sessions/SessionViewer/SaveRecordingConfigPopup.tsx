@@ -35,11 +35,8 @@ import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/feature
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
 import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
-import { useFeatureValue } from "@growthbook/growthbook-react";
-import { claimIncentiveRewards } from "backend/incentivization";
-import { checkIncentivesEligibility } from "features/incentivization";
-import { getLocalIncentivizationEventsState } from "store/features/incentivization/selectors";
 import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -67,7 +64,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const appMode = useSelector(getAppMode);
-  const localIncentiveEvents = useSelector(getLocalIncentivizationEventsState);
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
@@ -80,8 +78,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
   const savedSessionRecordingOptions = useMemo(() => getSessionRecordingOptions(sessionRecordingMetadata?.options), [
     sessionRecordingMetadata?.options,
   ]);
-
-  const isIncentivizationEnabled = useFeatureValue("incentivization_onboarding", false);
 
   const isIncludeNetworkLogsDisabled =
     isSessionLogOptionsAlreadySaved && !savedSessionRecordingOptions.includes(DebugInfo.INCLUDE_NETWORK_LOGS);
@@ -159,36 +155,28 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
           });
 
           if (isDraftSession) {
-            if (
-              checkIncentivesEligibility(user.loggedIn, userAttributes, isIncentivizationEnabled, localIncentiveEvents)
-            ) {
-              claimIncentiveRewards({
-                dispatch,
-                isUserloggedIn: user?.loggedIn,
-                event: {
-                  type: IncentivizeEvent.SESSION_RECORDED,
-                  metadata: { num_sessions: userAttributes?.num_sessions || 1 },
-                },
-              })?.then((response) => {
-                // @ts-ignore
-                if (response.data?.success) {
-                  dispatch(
-                    incentivizationActions.setUserMilestoneAndRewardDetails({
-                      // @ts-ignore
-                      userMilestoneAndRewardDetails: response.data?.data,
-                    })
-                  );
+            claimIncentiveRewards({
+              type: IncentivizeEvent.SESSION_RECORDED,
+              metadata: { num_sessions: userAttributes?.num_sessions || 1 },
+            })?.then((response) => {
+              // @ts-ignore
+              if (response.data?.success) {
+                dispatch(
+                  incentivizationActions.setUserMilestoneAndRewardDetails({
+                    // @ts-ignore
+                    userMilestoneAndRewardDetails: response.data?.data,
+                  })
+                );
 
-                  dispatch(
-                    incentivizationActions.toggleActiveModal({
-                      modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                      newValue: true,
-                      newProps: { event: IncentivizeEvent.SESSION_RECORDED },
-                    })
-                  );
-                }
-              });
-            }
+                dispatch(
+                  incentivizationActions.toggleActiveModal({
+                    modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+                    newValue: true,
+                    newProps: { event: IncentivizeEvent.SESSION_RECORDED },
+                  })
+                );
+              }
+            });
           }
 
           testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
@@ -235,8 +223,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       navigate,
       source,
       isDraftSession,
-      isIncentivizationEnabled,
-      localIncentiveEvents,
       userAttributes,
     ]
   );
