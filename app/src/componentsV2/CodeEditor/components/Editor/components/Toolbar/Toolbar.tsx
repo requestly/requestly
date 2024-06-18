@@ -10,6 +10,11 @@ import Logger from "../../../../../../../../common/logger";
 import { Tooltip } from "antd";
 import { useTheme } from "styled-components";
 import "./toolbar.scss";
+import {
+  trackCodeEditorCodePrettified,
+  trackCodeEditorCodeMinified,
+  trackCodeEditorCodeCopied,
+} from "componentsV2/CodeEditor/components/analytics";
 
 interface CodeEditorToolbarProps {
   language: EditorLanguage;
@@ -39,6 +44,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({ language, code, o
         plugins: [parserBabel],
       });
       onCodeFormat(prettifiedCode);
+      trackCodeEditorCodePrettified();
     } catch (error) {
       Logger.log("Error in prettifying code", error);
     }
@@ -49,16 +55,19 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({ language, code, o
     if (isCodePrettified) {
       let minifiedCode = JSON.stringify(JSON.parse(code));
       onCodeFormat(minifiedCode);
+      trackCodeEditorCodeMinified();
       setIsCodePrettified(false);
     } else {
       handlePrettifyCode(EditorLanguage.JSON);
       setIsCodePrettified(true);
+      trackCodeEditorCodePrettified();
     }
   };
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(code);
     setIsCopied(true);
+    trackCodeEditorCodeCopied();
     setTimeout(() => {
       setIsCopied(false);
     }, 1000);
