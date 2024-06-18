@@ -136,7 +136,15 @@ const Editor: React.FC<EditorProps> = ({
         height={editorHeight}
         width={Infinity}
         onResize={handleResize}
-        handle={isResizable ? <div className="custom-handle" /> : null}
+        handle={
+          isResizable ? (
+            <div className="custom-handle">
+              {!hideCharacterCount ? (
+                <div className="code-editor-character-count">{getByteSize(value)} characters</div>
+              ) : null}
+            </div>
+          ) : null
+        }
         axis="y"
         style={{
           minHeight: `${height}px`,
@@ -175,7 +183,6 @@ const Editor: React.FC<EditorProps> = ({
           />
         </>
       </ResizableBox>
-      {!hideCharacterCount ? <div className="code-editor-character-count">{getByteSize(value)} characters</div> : null}
     </>
   );
 };
