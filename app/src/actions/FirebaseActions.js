@@ -464,6 +464,7 @@ export const signInWithEmailLink = async (email, callback) => {
 
     //  Analytics - Track event
     if (isNewUser) {
+      setSignupDate(authData.uid);
       trackSignupSuccessEvent({
         auth_provider: AUTH_PROVIDERS.EMAIL,
         email,
