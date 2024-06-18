@@ -159,7 +159,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
               type: IncentivizeEvent.SESSION_RECORDED,
               metadata: { num_sessions: userAttributes?.num_sessions || 1 },
             })?.then((response) => {
-              // @ts-ignore
               if (response.data?.success) {
                 dispatch(
                   incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -224,6 +223,7 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       source,
       isDraftSession,
       userAttributes,
+      claimIncentiveRewards,
     ]
   );
 

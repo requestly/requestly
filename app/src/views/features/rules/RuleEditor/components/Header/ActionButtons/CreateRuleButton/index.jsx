@@ -188,13 +188,14 @@ const CreateRuleButton = ({
         }
       });
     }
-  }, [currentlySelectedRuleData.ruleType]);
+  }, [currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
 
   const handleFirstRuleCreationEvent = useCallback(async () => {
     claimIncentiveRewards({
       type: IncentivizeEvent.RULE_CREATED,
       metadata: { num_rules: 1 },
     })?.then((response) => {
+      console.log("handleFirstRuleCreationEvent", response);
       if (response.data?.success) {
         dispatch(
           incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -215,7 +216,7 @@ const CreateRuleButton = ({
           );
       }
     });
-  }, [currentlySelectedRuleData.ruleType]);
+  }, [currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
 
   const claimRuleCreationRewards = useCallback(async () => {
     if (userAttributes?.num_rules === 0) {

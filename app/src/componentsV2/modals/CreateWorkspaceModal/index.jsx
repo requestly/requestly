@@ -110,6 +110,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       user?.loggedIn,
       user?.details?.isSyncEnabled,
       userAttributes,
+      claimIncentiveRewards,
     ]
   );
 

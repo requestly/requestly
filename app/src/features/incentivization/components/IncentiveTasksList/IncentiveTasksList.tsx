@@ -373,6 +373,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
       navigate,
       location.pathname,
       postActionClickCallback,
+      claimIncentiveRewards,
     ]
   );
 

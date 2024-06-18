@@ -100,6 +100,7 @@ export const TestRuleHeader = () => {
     user?.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
+    claimIncentiveRewards,
   ]);
 
   return (
