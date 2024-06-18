@@ -8,6 +8,9 @@ import { PricingPlans } from "features/pricing/constants/pricingPlans";
 import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { useSelector } from "react-redux";
+import { getUserAuthDetails } from "store/selectors";
 
 interface PlanColumnProps {
   planName: string;
@@ -32,6 +35,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
+  const user = useSelector(getUserAuthDetails);
 
   const getHeaderPlanName = () => {
     const pricingPlansOrder = [
@@ -88,12 +92,29 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     return null;
   };
 
+  const EVENTS = {
+    PRICING_QUANTITY_CHANGED: "pricing_quantity_changed",
+  };
+
   const handleQuantityChange = (value: number) => {
     if (value < 1 || value > 1000) {
       setDisbaleUpgradeButton(true);
     } else setDisbaleUpgradeButton(false);
     setQuantity(value);
     trackPricingPlansQuantityChanged(value, planName, source);
+
+    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
+    try {
+      salesInboundNotification({
+        notificationText: `${
+          EVENTS.PRICING_QUANTITY_CHANGED
+        } trigged with quantity ${value} for plan ${planName} and source ${source} by user ${
+          user?.details?.profile?.email ?? "NOT LOGGED IN"
+        }`,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -108,11 +129,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
         <Row align="middle" className="items-center plan-price-row mt-8">
           <Space size={0}>
-            <Typography.Text strong className="plan-price enterprice-plan-price">
-              $59
-            </Typography.Text>
+            <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
             <div className="caption">
-              <Typography.Text>member / month</Typography.Text>
+              <Typography.Text>member per month</Typography.Text>
             </div>
           </Space>
         </Row>
@@ -120,7 +139,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       {planPrice !== undefined && (
         <Row align="middle" className="items-center plan-price-row mt-8">
           <Space size="small">
-            <Typography.Text strong className="plan-price">
+            <Typography.Text className="plan-price">
               ${(duration === PRICING.DURATION.ANNUALLY ? Math.ceil(planPrice / 12) : planPrice) * quantity}
             </Typography.Text>
             {product === PRICING.PRODUCTS.HTTP_RULES &&
@@ -143,9 +162,9 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
                   />
                 </Space>
               )}
-            <div className="caption">
+            <div className="caption text-white">
               {planName !== PRICING.PLAN_NAMES.FREE && (
-                <Typography.Text>{planName === PRICING.PLAN_NAMES.LITE ? "/ month" : "member / month"}</Typography.Text>
+                <div>{planName === PRICING.PLAN_NAMES.LITE ? "per month" : "member per month"}</div>
               )}
             </div>
           </Space>
@@ -165,7 +184,11 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
             : getPricingPlanAnnualBillingSubtitle(planName) || ""}
         </Typography.Text>
       </Row>
-      <Row className={planName === PRICING.PLAN_NAMES.FREE ? "mt-48" : "mt-16"}>
+      <Row
+        style={{
+          marginTop: planName === PRICING.PLAN_NAMES.FREE ? "54px" : "24px",
+        }}
+      >
         <PricingTableButtons
           key={planName + duration}
           columnPlanName={planName}
