@@ -11,6 +11,10 @@ export const initExtensionMessageListener = () => {
       case EXTENSION_MESSAGES.CLIENT_PAGE_LOADED:
         chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CLIENT_PAGE_LOADED });
         break;
+
+      case EXTENSION_MESSAGES.RULE_SAVE_ERROR:
+        sendExtensionMessage(message);
+        break;
     }
   });
 };
