@@ -185,3 +185,8 @@ export interface ResponseRulePair extends RulePair {
 export interface RequestRulePair extends RulePair {
   request: ModifyRequestResponseObject;
 }
+
+export interface UpdateDynamicRuleOptions {
+  addRules?: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[];
+  removeRuleIds?: chrome.declarativeNetRequest.UpdateRuleOptions["removeRuleIds"];
+}
