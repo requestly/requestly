@@ -320,6 +320,7 @@ const MockEditor: React.FC<Props> = ({
       <Row className="editor-row">
         <Col span={24}>
           <CodeEditor
+            isResizable
             height={220}
             value={headersString}
             defaultValue={headersString}
@@ -382,7 +383,7 @@ const MockEditor: React.FC<Props> = ({
   };
 
   return (
-    <>
+    <div className="overflow-hidden">
       <MockEditorHeader
         isNewMock={isNew}
         mockType={mockType}
@@ -393,13 +394,7 @@ const MockEditor: React.FC<Props> = ({
         setPassword={setPassword}
         password={password}
       />
-      <Col
-        className="mock-editor-title-container"
-        span={22}
-        offset={1}
-        md={isEditorOpenInModal ? null : { offset: 2, span: 20 }}
-        lg={isEditorOpenInModal ? null : { offset: 4, span: 16 }}
-      >
+      <Col className="mock-editor-title-container">
         <RQEditorTitle
           name={name}
           mode={isNew ? "create" : "edit"}
@@ -412,20 +407,14 @@ const MockEditor: React.FC<Props> = ({
           errors={errors}
         />
       </Col>
-      <Row className="mock-editor-container">
-        <Col
-          className="mock-editor-container-col"
-          span={22}
-          offset={1}
-          md={{ offset: 2, span: 20 }}
-          lg={{ offset: 4, span: 16 }}
-        >
+      <div className="mock-editor-wrapper">
+        <div className="mock-editor-container">
           <Row className="mock-editor-body">
             {renderMetadataRow()}
             {renderMockCodeEditor()}
           </Row>
-        </Col>
-      </Row>
+        </div>
+      </div>
       {!isNew ? (
         <APIClient
           request={apiRequest}
@@ -435,7 +424,7 @@ const MockEditor: React.FC<Props> = ({
           onModalClose={() => setIsTestModalOpen(false)}
         />
       ) : null}
-    </>
+    </div>
   );
 };
 
