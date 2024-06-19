@@ -1,6 +1,8 @@
 .add-custom-script-btn.ant-btn-dashed {
   padding: 1rem;
   color: var(--text-gray);
+  display: flex;
+  gap: 4px;
 }
 
 .add-custom-script-btn.ant-btn-dashed:hover,
