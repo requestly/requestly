@@ -144,7 +144,6 @@ const Editor: React.FC<EditorProps> = ({
               bracketMatching: true,
               closeBrackets: true,
               allowMultipleSelections: true,
-              foldGutter: false,
             }}
             data-enable-grammarly="false"
             data-gramm_editor="false"
