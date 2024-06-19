@@ -16,11 +16,14 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { MdOutlineWarningAmber } from "@react-icons/all-files/md/MdOutlineWarningAmber";
 import "./index.scss";
+import { getAllRecordsMap } from "store/features/rules/selectors";
 
 export const TestRuleHeader = () => {
   const user = useSelector(getUserAuthDetails);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const allRecordsMap = useSelector(getAllRecordsMap);
+
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(true);
@@ -50,6 +53,14 @@ export const TestRuleHeader = () => {
       return;
     }
 
+    if (
+      currentlySelectedRuleData.groupId &&
+      allRecordsMap[currentlySelectedRuleData.groupId]?.status === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
+    ) {
+      setError("Rule group is inactive, please activate the rule group before testing the rule");
+      return;
+    }
+
     if (!user.loggedIn && doCaptureSession) {
       setError("You need to login to capture your test session");
       return;
@@ -69,6 +80,8 @@ export const TestRuleHeader = () => {
     currentlySelectedRuleData.status,
     user.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
+    allRecordsMap,
+    currentlySelectedRuleData.groupId,
   ]);
 
   return (
