@@ -393,7 +393,7 @@ export const productTours: Record<string, CustomSteps[]> = {
       // TODO: IMPROVE TITLE
       title: "Earn credits by completing tasks",
       target: getTourTarget(MISC_TOURS.APP_ENGAGEMENT.EARN_CREDITS),
-      content: "Complete your onboarding and earn $120 Free credits for Requestly Pro plan.",
+      content: "Complete your onboarding and earn $100 Free credits for Requestly Pro plan.",
       pointerPlacement: PointerPlacement.TOP_75,
       placement: "right",
       showNext: false,
