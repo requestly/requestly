@@ -169,7 +169,6 @@ const CreateRuleButton = ({
         type: incentiveEvent,
         metadata: { rule_type: currentlySelectedRuleData.ruleType },
       })?.then((response) => {
-        console.log("handleOtherRuleEvents", response);
         if (response.data?.success) {
           dispatch(
             incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -196,7 +195,6 @@ const CreateRuleButton = ({
       type: IncentivizeEvent.RULE_CREATED,
       metadata: { num_rules: 1, rule_type: currentlySelectedRuleData.ruleType },
     })?.then((response) => {
-      console.log("handleFirstRuleCreationEvent", response);
       if (response.data?.success) {
         dispatch(
           incentivizationActions.setUserMilestoneAndRewardDetails({
