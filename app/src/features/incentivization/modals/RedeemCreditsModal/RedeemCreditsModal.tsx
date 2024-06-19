@@ -69,7 +69,7 @@ export const RedeemCreditsModal: React.FC<RedeemCreditsModalProps> = ({
   const planSummary = [
     {
       label: "Plan name",
-      value: "Professional team plan",
+      value: "Professional plan",
     },
     {
       label: "Duration",
