@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Row, Col, Layout, Divider } from "antd";
+import React, { useEffect, useMemo } from "react";
+import { Row, Col, Layout, Divider, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getGroupwiseRulesToPopulate } from "store/selectors";
 import { actions } from "store";
@@ -13,16 +13,33 @@ import { TestRuleButton } from "./ActionButtons/TestRuleButton";
 import RuleOptions from "./RuleOptions";
 import { capitalize, replace } from "lodash";
 import "./RuleEditorHeader.css";
+import { WarningOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import {
+  checkIsRuleGroupDisabled,
+  normalizeRecord,
+} from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/utils/rules";
+import { getAllRecordsMap } from "store/features/rules/selectors";
+import { useRulesActionContext } from "features/rules/context/actions";
 
 const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
   const dispatch = useDispatch();
+
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
+  const allRecordsMap = useSelector(getAllRecordsMap);
+
+  const { recordStatusToggleAction } = useRulesActionContext();
 
   const getRuleTitle = (name, mode) => {
     return `${replace(capitalize(name), "api", "API")} / ${capitalize(mode)} ${
       mode === "create" ? "new rule" : "rule"
     }`;
   };
+
+  const isRuleGroupDisabled = useMemo(() => checkIsRuleGroupDisabled(allRecordsMap, currentlySelectedRuleData), [
+    allRecordsMap,
+    currentlySelectedRuleData,
+  ]);
 
   // If user directly lands on rule editor, it ensures that
   // groupwise rules object is created for the current rule shown in the
@@ -59,6 +76,21 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
             <Col>
               <Status location={location} />
             </Col>
+            {isRuleGroupDisabled && (
+              <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
+                <Col className="rule-editor-header-disabled-group-warning">
+                  <WarningOutlined className="icon__wrapper" />
+                  Group is disabled.{" "}
+                  <Link
+                    onClick={() =>
+                      recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
+                    }
+                  >
+                    Enable now
+                  </Link>
+                </Col>
+              </Tooltip>
+            )}
             <Col>
               <PinButton rule={currentlySelectedRuleData} />
             </Col>
