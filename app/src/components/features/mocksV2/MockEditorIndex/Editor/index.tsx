@@ -336,7 +336,6 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          {/* @ts-ignore */}
           <CodeEditor
             isResizable
             height={220}
