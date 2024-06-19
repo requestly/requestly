@@ -118,6 +118,7 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({ language, code, o
       </div>
 
       <div className="code-editor-actions">
+        {/* TODO: ADD toggle search button */}
         <Tooltip title={isCopied ? "Copied" : "Copy code"} color={theme.colors.black} mouseEnterDelay={0.6}>
           <RQButton type="text" icon={<IoMdCopy />} onClick={handleCopyCode} />
         </Tooltip>
