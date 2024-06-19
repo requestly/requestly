@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";
@@ -38,7 +38,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const billingTeams = useSelector(getAvailableBillingTeams);
-  const userAttributes = useSelector(getUserAttributes);
+  const availableTeams = useSelector(getAvailableTeams);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -79,39 +79,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
           isNewTeam: !isNotifyAllSelected || !hasMembersInSameDomain,
         },
       });
-
-      claimIncentiveRewards({
-        type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
-        metadata: { num_workspaces: userAttributes?.num_workspaces || 1 },
-      })?.then((response) => {
-        if (response.data?.success) {
-          dispatch(
-            incentivizationActions.setUserMilestoneAndRewardDetails({
-              userMilestoneAndRewardDetails: response.data?.data,
-            })
-          );
-
-          dispatch(
-            incentivizationActions.toggleActiveModal({
-              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-              newValue: true,
-              newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
-            })
-          );
-        }
-      });
     },
-    [
-      dispatch,
-      appMode,
-      isNotifyAllSelected,
-      isWorkspaceMode,
-      navigate,
-      user?.loggedIn,
-      user?.details?.isSyncEnabled,
-      userAttributes,
-      claimIncentiveRewards,
-    ]
+    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.loggedIn, user?.details?.isSyncEnabled]
   );
 
   const handleFinishClick = useCallback(
@@ -123,6 +92,27 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       try {
         const response = await createTeam({
           teamName: newTeamName,
+        });
+
+        claimIncentiveRewards({
+          type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
+          metadata: { num_workspaces: availableTeams?.length || 1 },
+        })?.then((response) => {
+          if (response.data?.success) {
+            dispatch(
+              incentivizationActions.setUserMilestoneAndRewardDetails({
+                userMilestoneAndRewardDetails: response.data?.data,
+              })
+            );
+
+            dispatch(
+              incentivizationActions.toggleActiveModal({
+                modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+                newValue: true,
+                newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
+              })
+            );
+          }
         });
 
         trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal");
@@ -182,6 +172,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       user?.details?.profile?.email,
       handlePostTeamCreation,
       billingTeams,
+      availableTeams?.length,
+      claimIncentiveRewards,
     ]
   );
 
