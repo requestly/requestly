@@ -97,7 +97,6 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
         newValue: true,
         newProps: {
           authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
-          warningMessage: "You must sign in to redeem credits.",
           eventSource: "incentivization",
         },
       })
