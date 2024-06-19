@@ -118,7 +118,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
           showArrow={false}
           placement={popoverPlacement}
           okText="See upgrade plans"
-          cancelText={isIncentivizationEnabled ? "upgrade for free" : null}
+          cancelText={isIncentivizationEnabled ? "Upgrade for free" : null}
           onConfirm={() => {
             trackUpgradeOptionClicked("see_upgrade_plans");
             dispatch(
