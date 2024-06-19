@@ -8,6 +8,7 @@ import {
 import { ReducerKeys } from "store/constants";
 import getReducerWithLocalStorageSync from "store/getReducerWithLocalStorageSync";
 import { IncentivizationModal, IncentivizationModals } from "./types";
+import { RuleType } from "types";
 
 const initialState = {
   milestones: {} as Milestones,
@@ -54,16 +55,30 @@ const slice = createSlice({
 
       if (!state.userMilestoneAndRewardDetails?.claimedMilestoneLogs?.includes(event.type)) {
         const milestones = state.milestones;
-        const localEventsState = [...state.localIncentivizationEventsState, event];
+        const newLocalEvents = [...state.localIncentivizationEventsState, event];
+        const achievedMilestoneTypes = [event.type];
 
-        const credits = (milestones?.[(event.type as unknown) as IncentivizeEvent]?.reward?.value as number) ?? 0;
+        if (event.type === IncentivizeEvent.RULE_CREATED) {
+          if (event.metadata?.rule_type === RuleType.REDIRECT) {
+            achievedMilestoneTypes.push(IncentivizeEvent.REDIRECT_RULE_CREATED);
+          } else if (event.metadata?.rule_type === RuleType.RESPONSE) {
+            achievedMilestoneTypes.push(IncentivizeEvent.RESPONSE_RULE_CREATED);
+          }
+        }
+
+        const achievedMilestones = achievedMilestoneTypes.map((milestoneType) => milestones?.[milestoneType]);
+
+        const credits = achievedMilestones.reduce(
+          (result, milestone) => result + ((milestone?.reward?.value as number) ?? 0),
+          0
+        );
 
         const creditsRedeemedCount = state.userMilestoneAndRewardDetails?.creditsRedeemedCount ?? 0;
         const creditsToBeRedeemed = (state.userMilestoneAndRewardDetails?.creditsToBeRedeemed ?? 0) + credits;
         const totalCreditsClaimed = (state.userMilestoneAndRewardDetails?.totalCreditsClaimed ?? 0) + credits;
         const claimedMilestoneLogs: IncentivizeEvent[] = [
           ...(state.userMilestoneAndRewardDetails?.claimedMilestoneLogs ?? []),
-          event.type,
+          ...(achievedMilestones.map((milestone) => milestone.type) ?? []),
         ];
 
         const updatedUserMilestoneAndRewardDetails: UserMilestoneAndRewardDetails = {
@@ -71,9 +86,10 @@ const slice = createSlice({
           creditsToBeRedeemed,
           totalCreditsClaimed,
           claimedMilestoneLogs,
+          recentAchievedMilestones: achievedMilestones,
         };
 
-        state.localIncentivizationEventsState = localEventsState;
+        state.localIncentivizationEventsState = newLocalEvents;
 
         state.userMilestoneAndRewardDetails = {
           ...state.userMilestoneAndRewardDetails,
