@@ -65,14 +65,14 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
 
   return (
     <Row className="editor-title-container">
-      <Col>
+      <Col className="flex-1">
         <Row className="editor-title-name">
           {name.length === 0 || isNameEditable ? (
             <div className="editor-title-name-wrapper">
               <Input
                 ref={nameInputRef}
                 data-tour-id="rule-editor-title"
-                className={`${errors?.name && !name ? "error" : null}`}
+                className={`${errors?.name && !name ? "error" : null} editor-title-input`}
                 autoFocus={true}
                 onFocus={() => setIsNameEditable(true)}
                 onBlur={() => setIsNameEditable(false)}
