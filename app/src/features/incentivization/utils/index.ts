@@ -1,6 +1,6 @@
 import { IncentivizeEvent, Milestones, UserMilestoneAndRewardDetails } from "../types";
 
-export const getTotalCredits = (milestones: Milestones) => {
+export const getTotalCredits = (milestones: Partial<Milestones>) => {
   const total = Object.values(milestones ?? {}).reduce(
     (result, milestone) => result + (milestone.reward?.value as number),
     0
