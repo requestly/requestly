@@ -1,6 +1,6 @@
 .editor-title-container.ant-row {
   width: 100%;
-  max-width: 840px;
+  max-width: 1200px;
   padding: 1.25rem 0;
   justify-content: space-between;
 }
@@ -17,16 +17,24 @@
   align-items: center;
   gap: 4px;
 }
+
 .editor-title-name .editor-title-name-wrapper {
   width: 100%;
 }
+
 .editor-title-container .editor-title-name {
   min-height: 33px;
 }
+
+.editor-title-container .editor-title-name .editor-title-input.ant-input {
+  padding: 0;
+}
+
 .editor-title-container .editor-title-description .ant-input {
   min-height: 30px !important;
   transition: 0.2s ease-in-out;
 }
+
 .editor-description .ant-typography {
   margin-bottom: 0;
   color: #86868b;
@@ -67,6 +75,7 @@
   gap: 4px;
   width: 360px;
 }
+
 .editor-title-name .editor-title svg {
   align-self: center;
   cursor: pointer;

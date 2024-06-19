@@ -1,15 +1,28 @@
-.mock-editor-container {
+.mock-editor-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
   overflow-y: auto;
-  height: 80vh;
+  height: calc(100vh - 225px); /* 225px is the height of the header, title and the footer */
+  padding: 1rem;
+}
+
+.mock-editor-container {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
 }
 
 .mock-editor-title-container {
   display: flex;
   justify-content: center;
+  width: 100%;
+  padding: 0 1rem;
 }
 
 .mock-editor-title-container .editor-title-container {
-  max-width: none;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .mock-editor-body {
@@ -55,6 +68,10 @@
 
 .mock-editor-body .ant-tabs {
   width: 100%;
+}
+
+.mock-editor-body .ant-tabs > .ant-tabs-nav {
+  margin-bottom: 0;
 }
 
 .mock-editor-body .ant-tabs-tab:hover {
