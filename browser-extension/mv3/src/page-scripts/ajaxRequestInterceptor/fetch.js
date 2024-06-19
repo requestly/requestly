@@ -14,7 +14,7 @@ import {
   notifyRequestRuleApplied,
   notifyResponseRuleApplied,
   shouldServeResponseWithoutRequest,
-} from "../utils";
+} from "./utils";
 
 export const initFetchInterceptor = (debug) => {
   console.log("initFetchInterceptor");

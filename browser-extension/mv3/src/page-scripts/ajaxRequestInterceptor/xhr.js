@@ -14,7 +14,7 @@ import {
   notifyRequestRuleApplied,
   notifyResponseRuleApplied,
   shouldServeResponseWithoutRequest,
-} from "../utils";
+} from "./utils";
 
 export const initXhrInterceptor = (debug) => {
   console.log("initXHRRequestInterceptor");
