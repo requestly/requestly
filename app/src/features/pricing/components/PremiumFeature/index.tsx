@@ -147,7 +147,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
                       featureName ?? "This feature"
                     } is a part of our paid offering. Consider upgrading for uninterrupted usage.`}
               </Typography.Text>
-              {!user.loggedIn && <div className="no-cc-text caption text-gray text-bold">No credit card required!</div>}
+              {/* {!user.loggedIn && <div className="no-cc-text caption text-gray text-bold">No credit card required!</div>} */}
             </>
           }
           onOpenChange={(open) => {
