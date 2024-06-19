@@ -48,7 +48,7 @@ const DashboardContent = () => {
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
-  const onboardingVariation = useFeatureValue("activation_without_onboarding", "variant");
+  const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -190,7 +190,7 @@ const DashboardContent = () => {
             />
           ) : null}
 
-          {onboardingVariation === "control" &&
+          {onboardingVariation !== "variant1" &&
             shouldShowOnboarding() &&
             appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
             !appOnboardingDetails.isOnboardingCompleted && (
