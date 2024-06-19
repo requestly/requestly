@@ -41,7 +41,7 @@ export const getCustomRequestBody = (requestRule, args) => {
   if (modification.type === "static") {
     requestBody = modification.value;
   } else {
-    requestBody = getFunctionFromCode(modification.value)(args);
+    requestBody = getFunctionFromCode(modification.value, "request")(args);
   }
 
   if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {

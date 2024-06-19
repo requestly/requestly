@@ -106,7 +106,10 @@ export const initXhrInterceptor = (debug) => {
 
         let customResponse =
           responseModification.type === "code"
-            ? getFunctionFromCode(responseModification.value)({
+            ? getFunctionFromCode(
+                responseModification.value,
+                "response"
+              )({
                 method: this._method,
                 url: this._requestURL,
                 requestHeaders: this._requestHeaders,
@@ -116,6 +119,10 @@ export const initXhrInterceptor = (debug) => {
                 responseJSON: jsonifyValidJSONString(this.response, true),
               })
             : responseModification.value;
+
+        if (typeof customResponse === "undefined") {
+          return;
+        }
 
         // Convert customResponse back to rawText
         // response.value is String and evaluator method might return string/object

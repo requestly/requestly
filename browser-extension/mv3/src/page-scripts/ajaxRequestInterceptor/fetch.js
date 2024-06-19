@@ -185,7 +185,11 @@ export const initFetchInterceptor = (debug) => {
         };
       }
 
-      customResponse = getFunctionFromCode(responseModification.value)(evaluatorArgs);
+      customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
+
+      if (typeof customResponse === "undefined") {
+        return fetchedResponse;
+      }
 
       // evaluator might return us Object but response.value is string
       // So make the response consistent by converting to JSON String and then create the Response object

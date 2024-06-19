@@ -1,7 +1,7 @@
 import { initFetchInterceptor } from "./fetch";
 import { initXhrInterceptor } from "./xhr";
 
-export const initAjaxRequestInterceptor = () => {
+const initAjaxRequestInterceptor = () => {
   console.log("initAjaxRequestInterceptor");
 
   let isDebugMode;
