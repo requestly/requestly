@@ -43,5 +43,6 @@ export interface UserMilestoneAndRewardDetails {
   totalCreditsClaimed: number;
   creditsRedeemedCount: number;
   claimedMilestoneLogs: Milestone["type"][];
+  recentAchievedMilestones?: Milestone[];
   updatedTs?: number;
 }
