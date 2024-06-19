@@ -45,5 +45,6 @@ export const useIsIncentivizationEnabled = () => {
     return false;
   }, [isFeatureFlagEnabled, user?.loggedIn, extensionInstallDate, extensionSignupDate, daysSinceSignup]);
 
-  return isEnabled;
+  // TODO: remove below before deployment
+  return true || isEnabled;
 };
