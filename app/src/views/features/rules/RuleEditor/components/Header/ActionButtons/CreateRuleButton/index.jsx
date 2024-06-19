@@ -169,6 +169,7 @@ const CreateRuleButton = ({
         type: incentiveEvent,
         metadata: { rule_type: currentlySelectedRuleData.ruleType },
       })?.then((response) => {
+        console.log("handleOtherRuleEvents", response);
         if (response.data?.success) {
           dispatch(
             incentivizationActions.setUserMilestoneAndRewardDetails({
@@ -193,7 +194,7 @@ const CreateRuleButton = ({
   const handleFirstRuleCreationEvent = useCallback(async () => {
     claimIncentiveRewards({
       type: IncentivizeEvent.RULE_CREATED,
-      metadata: { num_rules: 1 },
+      metadata: { num_rules: 1, rule_type: currentlySelectedRuleData.ruleType },
     })?.then((response) => {
       console.log("handleFirstRuleCreationEvent", response);
       if (response.data?.success) {
@@ -203,30 +204,28 @@ const CreateRuleButton = ({
           })
         );
 
-        const incentiveRuleTypes = [RuleType.RESPONSE, RuleType.REDIRECT];
-        if (!incentiveRuleTypes.includes(currentlySelectedRuleData.ruleType))
-          dispatch(
-            incentivizationActions.toggleActiveModal({
-              modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-              newValue: true,
-              newProps: {
-                event: IncentivizeEvent.RULE_CREATED,
-              },
-            })
-          );
+        dispatch(
+          incentivizationActions.toggleActiveModal({
+            modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+            newValue: true,
+            newProps: {
+              event: IncentivizeEvent.RULE_CREATED,
+            },
+          })
+        );
       }
     });
   }, [currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
 
   const claimRuleCreationRewards = useCallback(async () => {
     if (userAttributes?.num_rules === 0) {
-      return Promise.allSettled([handleFirstRuleCreationEvent(), handleOtherRuleEvents()]).catch((err) => {
+      return handleFirstRuleCreationEvent().catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
       });
     } else {
       handleOtherRuleEvents();
     }
-  }, [handleFirstRuleCreationEvent, handleOtherRuleEvents, userAttributes]);
+  }, [handleFirstRuleCreationEvent, userAttributes]);
 
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
