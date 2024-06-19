@@ -25,11 +25,6 @@ export const IncentiveSectionHeader: React.FC<IncentiveSectionHeaderProps> = ({ 
       </div>
       <div className="incentive-section-description">
         <span>Get the most out of your Requestly account and earn free credits by completing these steps.</span>
-        {/* TODO: ADD LINK */}
-        {/* <a href="#">
-          <MdOutlineInfo />
-          Know more
-        </a> */}
       </div>
     </div>
   );

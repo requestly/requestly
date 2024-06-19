@@ -85,20 +85,22 @@ export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }
                 </div>
               )}
 
-              <Tooltip
-                overlayClassName="redeem-disable-tooltip"
-                title={disableRedeem ? "You already have an active subscription!" : null}
-              >
-                <Button
-                  size="small"
-                  disabled={disableRedeem}
-                  icon={<MdRedeem className="anticon" />}
-                  className="redeem-credits-btn"
-                  onClick={handleRedeemClick}
+              {creditsToBeRedeemed > 0 ? (
+                <Tooltip
+                  overlayClassName="redeem-disable-tooltip"
+                  title={disableRedeem ? "You already have an active subscription!" : null}
                 >
-                  Redeem now
-                </Button>
-              </Tooltip>
+                  <Button
+                    size="small"
+                    disabled={disableRedeem}
+                    icon={<MdRedeem className="anticon" />}
+                    className="redeem-credits-btn"
+                    onClick={handleRedeemClick}
+                  >
+                    Redeem now
+                  </Button>
+                </Tooltip>
+              ) : null}
             </>
           )}
         </div>
