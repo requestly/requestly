@@ -27,13 +27,18 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const user = useSelector(getUserAuthDetails);
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
-  const taskValue = (milestones?.[event]?.reward?.value as number) ?? 0;
+
+  const recentAchievedMilestones = userMilestoneAndRewardDetails?.recentAchievedMilestones?.reduce(
+    (result, milestone) => ({ ...result, [milestone.type]: milestone }),
+    {}
+  );
+  const earnedCredits = getTotalCredits(recentAchievedMilestones);
 
   useEffect(() => {
     if (isOpen) {
-      trackCreditsAssignedModalViewed(taskValue, event);
+      trackCreditsAssignedModalViewed(earnedCredits, event);
     }
-  }, [taskValue, event, isOpen]);
+  }, [earnedCredits, event, isOpen]);
 
   if (!milestones || !event) {
     return null;
@@ -41,44 +46,28 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
 
   const congratulationMesssages: Record<IncentivizeEvent, { message: string }> = {
     [IncentivizeEvent.RULE_CREATED]: {
-      message: `You earned $${
-        (milestones?.[IncentivizeEvent.RULE_CREATED]?.reward.value ?? 0) as number
-      } on creating your first rule.`,
+      message: `You earned $${earnedCredits} on creating your first rule.`,
     },
     [IncentivizeEvent.TEAM_WORKSPACE_CREATED]: {
-      message: `You earned $${
-        (milestones?.[IncentivizeEvent.TEAM_WORKSPACE_CREATED]?.reward.value ?? 0) as number
-      } on creating your first team workspace.`,
+      message: `You earned $${earnedCredits} on creating your first team workspace.`,
     },
     [IncentivizeEvent.RULE_TESTED]: {
-      message: `You earned $${
-        (milestones?.[IncentivizeEvent.RULE_TESTED]?.reward.value ?? 0) as number
-      } on testing your first rule.`,
+      message: `You earned $${earnedCredits} on testing your first rule.`,
     },
     [IncentivizeEvent.RESPONSE_RULE_CREATED]: {
-      message: `You earned $${
-        (milestones?.[IncentivizeEvent.RESPONSE_RULE_CREATED]?.reward.value ?? 0) as number
-      } on creating your first response rule.`,
+      message: `You earned $${earnedCredits} on creating your first response rule.`,
     },
     [IncentivizeEvent.REDIRECT_RULE_CREATED]: {
-      message: `You earned $${
-        (milestones?.[IncentivizeEvent.REDIRECT_RULE_CREATED]?.reward.value ?? 0) as number
-      } on creating your first redirect rule.`,
+      message: `You earned $${earnedCredits} on creating your first redirect rule.`,
     },
     [IncentivizeEvent.MOCK_CREATED]: {
-      message: `You earned $${
-        (milestones?.[IncentivizeEvent.MOCK_CREATED]?.reward.value ?? 0) as number
-      } on creating your first mock.`,
+      message: `You earned $${earnedCredits} on creating your first mock.`,
     },
     [IncentivizeEvent.SESSION_RECORDED]: {
-      message: `You earned $${
-        (milestones?.[IncentivizeEvent.SESSION_RECORDED]?.reward.value ?? 0) as number
-      } on recording your first session.`,
+      message: `You earned $${earnedCredits} on recording your first session.`,
     },
     [IncentivizeEvent.RATE_ON_CHROME_STORE]: {
-      message: `You earned $${
-        (milestones?.[IncentivizeEvent.RATE_ON_CHROME_STORE]?.reward.value ?? 0) as number
-      } for rating us.`,
+      message: `You earned $${earnedCredits} for rating us.`,
     },
   };
 
