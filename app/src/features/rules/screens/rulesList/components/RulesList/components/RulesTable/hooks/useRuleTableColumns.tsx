@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip, Progress } from "antd";
+import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip, Progress, Popconfirm } from "antd";
 import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "../types";
@@ -29,6 +29,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { RuleTypesDropdownWrapper } from "../../RuleTypesDropdownWrapper/RuleTypesDropdownWrapper";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { useTheme } from "styled-components";
+import { WarningOutlined } from "@ant-design/icons";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -226,16 +227,32 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           const isRuleGroupDisabled = checkIsRuleGroupDisabled(allRecordsMap, record);
           if (isRuleGroupDisabled) {
             return (
-              <Tooltip
-                title={isRuleGroupDisabled ? "Please enable the group to enable/disable the rules inside them." : null}
+              <Popconfirm
+                title={
+                  <>
+                    <Row className="group-disabled-popover-title">{"Enable parent group"}</Row>
+                    <Row className="group-disabled-popover-content">
+                      {
+                        "This rule won't execute because its parent group is disabled. Enable the group to activate this rule."
+                      }
+                    </Row>
+                  </>
+                }
+                overlayClassName="group-disabled-popover"
+                trigger={["hover", "focus"]}
+                okText="Enable"
+                cancelText="Cancel"
+                icon={<WarningOutlined />}
+                onConfirm={() => recordStatusToggleAction(normalizeRecord(allRecordsMap[record.groupId]))}
               >
                 <Switch
-                  disabled
                   size="small"
                   checked={record.status === RecordStatus.ACTIVE}
                   data-tour-id={index === 0 ? "rule-table-switch-status" : null}
+                  onChange={() => recordStatusToggleAction(normalizeRecord(record))}
                 />
-              </Tooltip>
+                {record.status === RecordStatus.ACTIVE && <WarningOutlined className="group-disabled-warning" />}
+              </Popconfirm>
             );
           } else {
             return (
