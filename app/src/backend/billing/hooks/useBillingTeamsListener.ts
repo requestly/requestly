@@ -52,15 +52,20 @@ export const useBillingTeamsListener = () => {
 
       if (isCompanyEmail(user?.details?.profile?.email)) {
         const domainBillingTeamsQuery = query(collection(db, "billing"), where("ownerDomain", "==", domain));
-        const querySnapshot = await getDocs(domainBillingTeamsQuery);
-        querySnapshot.forEach((doc) => {
-          if (!userBillingTeamIds.has(doc.id)) {
-            billingTeamDetails.push({
-              ...(doc.data() as BillingTeamDetails),
-              id: doc.id,
+        await getDocs(domainBillingTeamsQuery)
+          .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              if (!userBillingTeamIds.has(doc.id)) {
+                billingTeamDetails.push({
+                  ...(doc.data() as BillingTeamDetails),
+                  id: doc.id,
+                });
+              }
             });
-          }
-        });
+          })
+          .catch((error) => {
+            Logger.error("Error getting domain billing teams: ", error);
+          });
       }
 
       dispatch(billingActions.setAvailableBillingTeams(billingTeamDetails));
