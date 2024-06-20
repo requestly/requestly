@@ -8,13 +8,15 @@ import { useFeatureValue } from "@growthbook/growthbook-react";
 
 const ExtensionInstalled: React.FC = () => {
   const installSourcePage = useSelector(getExtensionInsallSource);
-  const onboardingVariation = useFeatureValue("activation_without_onboarding", "variant");
+  const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
 
   useEffect(() => {
     trackExtensionInstalled();
   }, []);
 
-  return <Navigate to={onboardingVariation === "control" ? installSourcePage ?? "/" : PATHS.RULES.MY_RULES.ABSOLUTE} />;
+  return (
+    <Navigate to={onboardingVariation === "variant1" ? PATHS.RULES.MY_RULES.ABSOLUTE : installSourcePage ?? "/"} />
+  );
 };
 
 export default ExtensionInstalled;
