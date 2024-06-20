@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { getUserAuthDetails } from "store/selectors";
 import { Button, Dropdown, MenuProps, Row, Tooltip, Typography, message, Table } from "antd";
-import { MockType, RQMockSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection, RQMockMetadataSchema, RQMockSchema } from "components/features/mocksV2/types";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { EditOutlined } from "@ant-design/icons";
@@ -20,7 +20,7 @@ import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
 import { RQButton } from "lib/design-system/components";
 import { MocksTableProps } from "../MocksTable";
-import { isRecordMockCollection } from "../utils";
+import { isRecordMock, isRecordMockCollection } from "../utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requestMethodColors";
 import PATHS from "config/constants/sub/paths";
@@ -31,7 +31,8 @@ export const useMocksTableColumns = ({
   handleEditAction,
   handleSelectAction,
   forceRender,
-}: Partial<MocksTableProps>) => {
+  allRecordsMap,
+}: Partial<MocksTableProps> & { allRecordsMap: { [id: string]: RQMockMetadataSchema } }) => {
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -78,6 +79,7 @@ export const useMocksTableColumns = ({
       width: isWorkspaceMode ? (isRuleEditor ? 110 : 290) : isRuleEditor ? 290 : 360,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
+        const collectionPath = ((record as unknown) as RQMockCollection)?.path ?? "";
 
         return isCollection ? (
           <div className="mock-collection-details-container">
@@ -87,6 +89,12 @@ export const useMocksTableColumns = ({
             <Typography.Text ellipsis={true} className="mock-collection-name">
               {record.name}
             </Typography.Text>
+
+            {collectionPath ? (
+              <Typography.Text className="collection-path" ellipsis={true}>
+                {"/" + collectionPath}
+              </Typography.Text>
+            ) : null}
 
             {record?.desc ? (
               <Tooltip
@@ -186,16 +194,21 @@ export const useMocksTableColumns = ({
       align: "right",
       width: isWorkspaceMode ? (isRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
+        const collectionPath =
+          isRecordMock(record) && record.collectionId
+            ? ((allRecordsMap[record.collectionId] as unknown) as RQMockCollection).path
+            : "";
+
         const collectionActions: MenuProps["items"] = [
           {
             key: 0,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              updateCollectionNameAction(mockType, record);
+              updateCollectionNameAction(mockType, (record as unknown) as RQMockCollection);
             },
             label: (
               <Row>
-                <RiEdit2Line /> Rename
+                <RiEdit2Line /> Edit
               </Row>
             ),
           },
@@ -224,13 +237,14 @@ export const useMocksTableColumns = ({
               // TODO: Refactor this into separate action and use that
               const copyText = record.isOldMock
                 ? record.url
-                : generateFinalUrl(
-                    record.endpoint,
-                    user?.details?.profile?.uid,
-                    user?.details?.username,
+                : generateFinalUrl({
+                    endpoint: record.endpoint,
+                    uid: user?.details?.profile?.uid,
+                    username: user?.details?.username,
                     teamId,
-                    record?.password
-                  );
+                    password: record?.password,
+                    collectionPath,
+                  });
 
               navigator.clipboard.writeText(copyText).then(() => {
                 message.success("Link copied!");
@@ -311,7 +325,14 @@ export const useMocksTableColumns = ({
                   url = record.url;
                 } else {
                   // Not sending username as it might change
-                  url = generateFinalUrl(record.endpoint, user?.details?.profile?.uid, null, teamId, record?.password);
+                  url = generateFinalUrl({
+                    endpoint: record.endpoint,
+                    uid: user?.details?.profile?.uid,
+                    username: null,
+                    teamId,
+                    password: record?.password,
+                    collectionPath,
+                  });
                 }
                 handleSelectAction(url);
               }}

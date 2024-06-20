@@ -12,7 +12,7 @@ import MockEditor from "./Editor/index";
 import { MockEditorDataSchema } from "./types";
 import { editorDataToMockDataConverter, generateFinalUrl, mockDataToEditorDataAdapter } from "../utils";
 import { defaultCssEditorMock, defaultEditorMock, defaultHtmlEditorMock, defaultJsEditorMock } from "./constants";
-import { FileType, MockType } from "../types";
+import { FileType, MockType, RQMockCollection } from "../types";
 import { getMock } from "backend/mocks/getMock";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAttributes, getUserAuthDetails } from "store/selectors";
@@ -55,25 +55,47 @@ const MockEditorIndex: React.FC<Props> = ({
   const [mockEditorData, setMockEditorData] = useState<MockEditorDataSchema>(null);
   const [isMockLoading, setIsMockLoading] = useState<boolean>(true);
   const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
+  const [mockCollectionData, setMockCollectionData] = useState<RQMockCollection>(null);
+  const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(false);
 
   const { claimIncentiveRewards } = useIncentiveActions();
 
   useEffect(() => {
-    if (mockId) {
-      setIsMockLoading(true);
-      getMock(uid, mockId, teamId).then((data: any) => {
-        if (data) {
-          const editorData = mockDataToEditorDataAdapter(data);
-          setMockEditorData(editorData);
-        } else {
-          // TODO: Handle case when No mock is found. Show a message that mock now found
-          // Right now the UI will break
-          setMockEditorData(null);
-        }
-        setIsMockLoading(false);
-      });
+    if (!mockId) {
+      return;
     }
+
+    setIsMockLoading(true);
+    getMock(uid, mockId, teamId).then((data: any) => {
+      if (data) {
+        const editorData = mockDataToEditorDataAdapter(data);
+        setMockEditorData(editorData);
+      } else {
+        // TODO: Handle case when No mock is found. Show a message that mock now found
+        // Right now the UI will break
+        setMockEditorData(null);
+      }
+
+      setIsMockLoading(false);
+    });
   }, [mockId, uid, teamId]);
+
+  useEffect(() => {
+    if (!mockEditorData?.collectionId) {
+      return;
+    }
+
+    setIsMockCollectionLoading(true);
+    getMock(uid, mockEditorData.collectionId, teamId)
+      .then((data: any) => {
+        if (data) {
+          setMockCollectionData(data);
+        }
+      })
+      .finally(() => {
+        setIsMockCollectionLoading(false);
+      });
+  }, [mockEditorData?.collectionId]);
 
   const onMockSave = (data: MockEditorDataSchema) => {
     setSavingInProgress(true);
@@ -110,13 +132,13 @@ const MockEditorIndex: React.FC<Props> = ({
           });
 
           if (selectOnSave) {
-            const url = generateFinalUrl(
-              finalMockData.endpoint,
-              user?.details?.profile?.uid,
-              null,
-              teamId,
-              data?.password
-            );
+            const url = generateFinalUrl({
+              endpoint: finalMockData.endpoint,
+              uid: user?.details?.profile?.uid,
+              username: null,
+              teamId: teamId,
+              password: data?.password,
+            });
             selectOnSave(url);
             return;
           }
@@ -193,9 +215,11 @@ const MockEditorIndex: React.FC<Props> = ({
         mockType={mockType}
         onSave={onMockSave}
         mockData={mockEditorData}
+        mockCollectionData={mockCollectionData}
         onClose={handleCloseEditorFromPicker ?? handleOnClose}
         savingInProgress={savingInProgress}
         isEditorOpenInModal={isEditorOpenInModal}
+        isMockCollectionLoading={isMockCollectionLoading}
       />
     );
   }

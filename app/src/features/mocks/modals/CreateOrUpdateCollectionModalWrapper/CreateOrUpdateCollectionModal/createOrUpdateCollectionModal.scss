@@ -24,6 +24,17 @@
       flex-direction: column;
       gap: 4px;
 
+      .know-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        svg {
+          width: 12px;
+          height: 12px;
+        }
+      }
+
       span {
         color: var(--white);
         font-size: 13px;

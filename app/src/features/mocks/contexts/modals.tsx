@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
-import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 
 type MocksModalsContextType = {
-  openCollectionModalAction: (mockType: MockType, record?: RQMockMetadataSchema) => void;
+  openCollectionModalAction: (mockType: MockType, record?: RQMockCollection) => void;
   setOpenCollectionModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
   openDeleteCollectionModalAction: (record: RQMockMetadataSchema) => void;
