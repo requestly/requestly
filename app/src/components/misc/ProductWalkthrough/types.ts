@@ -20,6 +20,7 @@ export interface CustomSteps extends Step {
   autoMoveToNext?: boolean;
   pointerPlacement?: PointerPlacement;
   customNextButtonText?: string;
+  hidePointer?: boolean;
 }
 
 export interface CustomTooltipProps extends Omit<TooltipRenderProps, "step"> {

@@ -6,12 +6,22 @@ import { TeamsCard } from "./components/WorkspaceCard";
 import { Templates } from "./components/Templates";
 import { RulesCard } from "./components/RulesCard";
 import { MocksCard } from "./components/MocksCard";
+import { IncentivesCard } from "./components/IncentivesCard/IncentivesCard";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./home.scss";
 
 export const Home: React.FC = () => {
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
+
   return (
     <Col className="homepage-wrapper">
       <Col className="homepage-content">
+        {isIncentivizationEnabled && (
+          <Col className="homepage-primary-card homepage-incentives-card">
+            <IncentivesCard />
+          </Col>
+        )}
+
         <Row className="homepage-primary-cards-wrapper">
           <Col className="homepage-primary-card" xs={24} md={24} lg={12}>
             <RulesCard />

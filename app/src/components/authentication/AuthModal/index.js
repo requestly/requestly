@@ -3,10 +3,10 @@ import { useSelector } from "react-redux";
 import { Modal } from "antd";
 import { getUserAuthDetails } from "../../../store/selectors";
 import { AuthScreen } from "features/onboarding";
-import "./AuthModal.css";
 import closeIcon from "../../../assets/images/modal/close.svg";
 import APP_CONSTANTS from "../../../config/constants";
 import { trackAuthModalShownEvent } from "modules/analytics/events/common/auth/authModal";
+import "./AuthModal.css";
 
 const AuthModal = ({
   isOpen,
@@ -14,6 +14,7 @@ const AuthModal = ({
   authMode = APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
   eventSource,
   callback,
+  warningMessage,
   closable = true,
 }) => {
   const user = useSelector(getUserAuthDetails);
@@ -52,6 +53,7 @@ const AuthModal = ({
           source={eventSource}
           callback={callback}
           toggleAuthModal={toggle}
+          warningMessage={warningMessage}
         />
       </Modal>
     </>

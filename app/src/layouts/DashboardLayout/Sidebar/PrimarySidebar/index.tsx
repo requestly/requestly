@@ -8,21 +8,25 @@ import HttpRulesIcon from "assets/icons/http-rules.svg?react";
 import SessionIcon from "assets/icons/session.svg?react";
 import MockServerIcon from "assets/icons/mock-server.svg?react";
 import { TbDeviceDesktopSearch } from "@react-icons/all-files/tb/TbDeviceDesktopSearch";
-import { PrimarySidebarLink } from "./PrimarySidebarLink";
+import { PrimarySidebarLink } from "./components/PrimarySidebarLink/PrimarySidebarLink";
 import { RQBadge } from "lib/design-system/components/RQBadge";
 import { PrimarySidebarItem } from "../type";
-import InviteButton from "./InviteButton";
+import InviteButton from "./components/InviteButton/InviteButton";
 import PATHS from "config/constants/sub/paths";
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import "./PrimarySidebar.css";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { CreditsButton } from "./components/CreditsButton/CreditsButton";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
+import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
+
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
@@ -120,8 +124,10 @@ export const PrimarySidebar: React.FC = () => {
             </li>
           ))}
       </ul>
-
-      <InviteButton />
+      <div className="primary-sidebar-bottom-btns">
+        {isIncentivizationEnabled ? <CreditsButton /> : null}
+        <InviteButton />
+      </div>
     </div>
   );
 };

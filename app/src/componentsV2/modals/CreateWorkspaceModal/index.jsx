@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAppMode, getUserAuthDetails } from "store/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";
@@ -22,8 +22,12 @@ import {
 import { trackAddWorkspaceNameModalViewed } from "modules/analytics/events/common/teams";
 import APP_CONSTANTS from "config/constants";
 import { isWorkspaceMappedToBillingTeam } from "features/settings";
-import "./CreateWorkspaceModal.css";
 import TEAM_WORKSPACES from "config/constants/sub/team-workspaces";
+import { IncentivizeEvent } from "features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { useIncentiveActions } from "features/incentivization/hooks";
+import "./CreateWorkspaceModal.css";
 
 const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const navigate = useNavigate();
@@ -34,6 +38,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
   const appMode = useSelector(getAppMode);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const billingTeams = useSelector(getAvailableBillingTeams);
+  const availableTeams = useSelector(getAvailableTeams);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isNotifyAllSelected, setIsNotifyAllSelected] = useState(false);
@@ -42,6 +47,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
     description: "",
   });
   const [isVerifiedBusinessUser, setIsVerifiedBusinessUser] = useState(false);
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const createOrgTeamInvite = useMemo(() => httpsCallable(getFunctions(), "invites-createOrganizationTeamInvite"), []);
   const upsertTeamCommonInvite = useMemo(() => httpsCallable(getFunctions(), "invites-upsertTeamCommonInvite"), []);
@@ -73,7 +80,7 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
         },
       });
     },
-    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.details?.isSyncEnabled]
+    [dispatch, appMode, isNotifyAllSelected, isWorkspaceMode, navigate, user?.loggedIn, user?.details?.isSyncEnabled]
   );
 
   const handleFinishClick = useCallback(
@@ -85,6 +92,27 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       try {
         const response = await createTeam({
           teamName: newTeamName,
+        });
+
+        claimIncentiveRewards({
+          type: IncentivizeEvent.TEAM_WORKSPACE_CREATED,
+          metadata: { num_workspaces: availableTeams?.length || 1 },
+        })?.then((response) => {
+          if (response.data?.success) {
+            dispatch(
+              incentivizationActions.setUserMilestoneAndRewardDetails({
+                userMilestoneAndRewardDetails: response.data?.data,
+              })
+            );
+
+            dispatch(
+              incentivizationActions.toggleActiveModal({
+                modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
+                newValue: true,
+                newProps: { event: IncentivizeEvent.TEAM_WORKSPACE_CREATED },
+              })
+            );
+          }
         });
 
         trackNewTeamCreateSuccess(response.data.teamId, newTeamName, "create_workspace_modal");
@@ -144,6 +172,8 @@ const CreateWorkspaceModal = ({ isOpen, toggleModal, callback, source }) => {
       user?.details?.profile?.email,
       handlePostTeamCreation,
       billingTeams,
+      availableTeams?.length,
+      claimIncentiveRewards,
     ]
   );
 

@@ -11,6 +11,7 @@ import firebaseApp from "../../../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./premiumPlanBadge.scss";
 
 const PremiumPlanBadge = () => {
@@ -22,10 +23,13 @@ const PremiumPlanBadge = () => {
   const planStatus = userPlanDetails?.status;
   const planEndDateString = userPlanDetails?.subscription?.endDate;
   const [isAppSumoDeal, setIsAppSumoDeal] = useState(false);
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
+
   let daysLeft = 0;
 
   const handleBadgeClick = useCallback(() => {
     dispatch(
+      // @ts-ignore
       actions.toggleActiveModal({
         modalName: "pricingModal",
         newValue: true,
@@ -86,7 +90,7 @@ const PremiumPlanBadge = () => {
           <div className="premium-plan-name">{getPrettyPlanName(getPlanNameFromId(planId))}</div>
           <div className="premium-plan-days-left">
             {planStatus === APP_CONSTANTS.SUBSCRIPTION_STATUS.TRIALING
-              ? `${daysLeft} days left in trial`
+              ? `${daysLeft} days left in  ${isIncentivizationEnabled ? "plan" : "trial"}`
               : "Plan Expired"}
           </div>
         </div>

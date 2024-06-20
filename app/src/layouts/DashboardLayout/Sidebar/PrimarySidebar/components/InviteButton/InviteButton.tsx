@@ -57,7 +57,7 @@ const InviteButton: React.FC = () => {
           handleInviteClick();
           trackSidebarClicked("invite");
         }}
-        className={`primary-sidebar-link`}
+        className="primary-sidebar-link w-full"
       >
         <span className="icon__wrapper">{<InviteIcon />}</span>
         <span className="link-title">{"Invite"}</span>
