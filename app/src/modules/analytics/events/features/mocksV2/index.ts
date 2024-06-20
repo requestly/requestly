@@ -143,9 +143,10 @@ export const trackMockCollectionCreated = (
   source: string,
   workspaceId: string,
   workspaceName: string,
-  workspaceMembersCount: number
+  workspaceMembersCount: number,
+  containsPath: boolean = false
 ) => {
-  const params = { source, workspaceId, workspaceName, workspaceMembersCount };
+  const params = { source, workspaceId, workspaceName, workspaceMembersCount, containsPath };
   trackEvent(MOCKSV2.MOCK_COLLECTION_CREATED, params);
 };
 
@@ -153,9 +154,10 @@ export const trackMockCollectionUpdated = (
   source: string,
   workspaceId: string,
   workspaceName: string,
-  workspaceMembersCount: number
+  workspaceMembersCount: number,
+  containsPath: boolean
 ) => {
-  const params = { source, workspaceId, workspaceName, workspaceMembersCount };
+  const params = { source, workspaceId, workspaceName, workspaceMembersCount, containsPath };
   trackEvent(MOCKSV2.MOCK_COLLECTION_UPDATED, params);
 };
 

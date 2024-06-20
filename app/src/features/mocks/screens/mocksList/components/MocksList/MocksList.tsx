@@ -29,7 +29,6 @@ interface Props {
 
 const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
   const navigate = useNavigate();
-
   const [searchValue, setSearchValue] = useState<string>("");
   const [filter, setFilter] = useState<MockTableHeaderFilter>("all");
   const [forceRender, setForceRender] = useState(false);

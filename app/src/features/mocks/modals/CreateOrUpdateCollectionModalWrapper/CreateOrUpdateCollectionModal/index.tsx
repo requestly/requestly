@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Button, Input, message } from "antd";
-import { MockType } from "components/features/mocksV2/types";
+import { Button, Input, Row, Tooltip } from "antd";
+import { MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { RQModal } from "lib/design-system/components";
 import { createCollection } from "backend/mocks/createCollection";
 import { getUserAuthDetails } from "store/selectors";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { updateCollections } from "backend/mocks/updateCollections";
+import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { trackMockCollectionCreated, trackMockCollectionUpdated } from "modules/analytics/events/features/mocksV2";
+import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
+import { cleanupEndpoint, validateEndpoint } from "components/features/mocksV2/MockEditorIndex/utils";
+import { toast } from "utils/Toast";
 import "./createOrUpdateCollectionModal.scss";
 
 interface Props {
   id?: string;
   name?: string;
   description?: string;
+  mocks?: RQMockMetadataSchema[];
+  path?: string;
   mockType: MockType;
   visible: boolean;
   toggleModalVisibility: (visible: boolean) => void;
@@ -24,6 +30,8 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
   id,
   name = "",
   description = "",
+  path: oldPath = "",
+  mocks = [],
   mockType,
   visible,
   toggleModalVisibility,
@@ -37,61 +45,99 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [collectionName, setCollectionName] = useState("");
   const [collectionDescription, setCollectionDescription] = useState("");
+  const [collectionPath, setCollectionPath] = useState("");
+  const [isCollectionPathValid, setIsCollectionPathValid] = useState(true);
 
   useEffect(() => {
     setCollectionName(name ?? "");
     setCollectionDescription(description ?? "");
+    setCollectionPath(oldPath ?? "");
 
     return () => {
       setCollectionName("");
       setCollectionDescription("");
+      setCollectionPath("");
     };
-  }, [name, description, visible]);
+  }, [name, description, oldPath, visible]);
 
   const handleSaveClick = async () => {
-    if (collectionName.length === 0) {
-      message.error("Collection name cannot be empty!");
-      return;
-    }
+    try {
+      setIsCollectionPathValid(true);
+      setIsLoading(true);
 
-    if (id) {
-      const collectionData = [
-        {
-          id,
+      if (collectionName.length === 0) {
+        toast.error("Collection name cannot be empty!");
+        return;
+      }
+
+      if (collectionPath) {
+        const error = validateEndpoint(collectionPath, "Collection path");
+
+        if (error) {
+          toast.error(error);
+          setIsCollectionPathValid(false);
+          return;
+        }
+      }
+
+      const cleanedUpPath = cleanupEndpoint(collectionPath);
+
+      if (id) {
+        const collectionsData = [
+          {
+            id,
+            name: collectionName,
+            desc: collectionDescription,
+            path: cleanedUpPath,
+          },
+        ];
+
+        const isPathUpdated = oldPath !== cleanedUpPath;
+
+        if (isPathUpdated) {
+          const mockIds = mocks?.map((mock) => mock.id);
+
+          // TODO: Improve this as it will make one more call to update the collection id
+          await updateMocksCollection(uid, mockIds, id, collectionPath, teamId);
+        }
+
+        await updateCollections(uid, collectionsData);
+
+        trackMockCollectionUpdated(
+          "mocksTable",
+          workspace?.id,
+          workspace?.name,
+          workspace?.membersCount,
+          !!cleanedUpPath
+        );
+        toast.success("Collection updated!");
+        toggleModalVisibility(false);
+        onSuccess?.();
+      } else {
+        const collectionsData = {
+          type: mockType,
           name: collectionName,
           desc: collectionDescription,
-        },
-      ];
+          path: cleanedUpPath,
+        };
 
-      setIsLoading(true);
-      updateCollections(uid, collectionData)
-        .then(() => {
-          trackMockCollectionUpdated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
-          message.success("Collection updated!");
-          toggleModalVisibility(false);
-          onSuccess?.();
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      const collectionData = {
-        name: collectionName,
-        desc: collectionDescription,
-        type: mockType,
-      };
+        await createCollection(uid, collectionsData, teamId);
 
-      setIsLoading(true);
-      createCollection(uid, collectionData, teamId)
-        .then((mockCollection) => {
-          trackMockCollectionCreated("mocksTable", workspace?.id, workspace?.name, workspace?.membersCount);
-          message.success("Collection created!");
-          toggleModalVisibility(false);
-          onSuccess?.();
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+        trackMockCollectionCreated(
+          "mocksTable",
+          workspace?.id,
+          workspace?.name,
+          workspace?.membersCount,
+          !!cleanedUpPath
+        );
+        toast.success("Collection created!");
+        toggleModalVisibility(false);
+        onSuccess?.();
+      }
+    } catch (error) {
+      // do nothing
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,11 +152,46 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
         <label className="collection-name-label">
           <span>Collection name</span>
           <Input
+            required
             autoFocus
             value={collectionName}
             placeholder="E.g. APIs V1"
             onChange={(e) => {
               setCollectionName(e.target.value);
+            }}
+          />
+        </label>
+
+        <label className="collection-name-label">
+          <Row justify="space-between">
+            <div>
+              <span>Collection path</span>
+              <span className="optional">(Optional)</span>
+            </div>
+
+            <Tooltip
+              showArrow={false}
+              title={
+                <div>
+                  Add prefix path for all your mocks in this collection.
+                  <br />
+                  e.g: api/v1 + /your-mock-endpoint
+                </div>
+              }
+            >
+              <div className="know-more">
+                <RiInformationLine /> Know more
+              </div>
+            </Tooltip>
+          </Row>
+          <Input
+            autoFocus
+            status={!isCollectionPathValid ? "error" : ""}
+            value={collectionPath}
+            placeholder="e.g. apis/v1"
+            onChange={(e) => {
+              setIsCollectionPathValid(true);
+              setCollectionPath(e.target.value);
             }}
           />
         </label>
