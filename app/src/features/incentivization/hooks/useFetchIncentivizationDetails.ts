@@ -17,10 +17,6 @@ export const useFetchIncentivizationDetails = () => {
   useSyncLocalIncentivizationState();
 
   useEffect(() => {
-    if (!isIncentivizationEnabled) {
-      return;
-    }
-
     const getIncentivizationDetails = async () => {
       try {
         dispatch(incentivizationActions.setIsIncentivizationDetailsLoading({ isLoading: true }));
@@ -31,7 +27,7 @@ export const useFetchIncentivizationDetails = () => {
 
         dispatch(incentivizationActions.setMilestones({ milestones: milestones.data.milestones }));
 
-        if (uid) {
+        if (isIncentivizationEnabled && uid) {
           const getUserIncentivizationDetails = httpsCallable(
             getFunctions(),
             "incentivization-getUserIncentivizationDetails"
