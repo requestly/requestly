@@ -134,7 +134,8 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         sessionRecordingMetadata,
         compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
         recordingOptionsToSave,
-        source
+        source,
+        null
       ).then((response) => {
         if (response?.success) {
           onClose();
