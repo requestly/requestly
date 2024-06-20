@@ -5,14 +5,14 @@ import { Milestones, UserMilestoneAndRewardDetails } from "../types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { getUserAuthDetails } from "store/selectors";
 import { useSyncLocalIncentivizationState } from "./useSyncLocalIncentivizationState";
-import { useIsIncentivizationEnabled } from "./useIsIncentivizationEnabled";
+// import { useIsIncentivizationEnabled } from "./useIsIncentivizationEnabled";
 
 export const useFetchIncentivizationDetails = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
 
-  const isIncentivizationEnabled = useIsIncentivizationEnabled();
+  // const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   useSyncLocalIncentivizationState();
 
@@ -27,7 +27,7 @@ export const useFetchIncentivizationDetails = () => {
 
         dispatch(incentivizationActions.setMilestones({ milestones: milestones.data.milestones }));
 
-        if (isIncentivizationEnabled && uid) {
+        if (uid) {
           const getUserIncentivizationDetails = httpsCallable(
             getFunctions(),
             "incentivization-getUserIncentivizationDetails"
@@ -54,5 +54,5 @@ export const useFetchIncentivizationDetails = () => {
 
     // TODO: add a new user check
     getIncentivizationDetails();
-  }, [dispatch, uid, isIncentivizationEnabled]);
+  }, [dispatch, uid]);
 };
