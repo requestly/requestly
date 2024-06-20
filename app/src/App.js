@@ -29,6 +29,7 @@ import { useBillingTeamsListener } from "backend/billing/hooks/useBillingTeamsLi
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
 import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
+import { useFetchIncentivizationDetails } from "features/incentivization/hooks";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -46,6 +47,7 @@ const App = () => {
 
   submitAppDetailAttributes();
   useAppUpdateChecker();
+  useFetchIncentivizationDetails();
 
   if (!isEmpty(window.location.hash)) {
     //Support legacy URL formats
@@ -77,7 +79,6 @@ const App = () => {
       {/* <RuleExecutionsSyncer /> */}
       <ActiveWorkspace />
       <ThirdPartyIntegrationsHandler />
-
       <ThemeProvider>
         <ConfigProvider locale={enUS}>
           <GrowthBookProvider growthbook={growthbook}>
