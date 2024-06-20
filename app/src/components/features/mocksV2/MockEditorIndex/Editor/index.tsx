@@ -351,6 +351,7 @@ const MockEditor: React.FC<Props> = ({
             isReadOnly={isEditorReadOnly}
             toolbarOptions={{
               title: mockType === MockType.FILE ? "File content" : "",
+              options: null,
             }}
           />
         </Col>
