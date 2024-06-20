@@ -13,7 +13,7 @@ import { getGreeting, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
-import { isNull } from "lodash";
+import { isNull, set } from "lodash";
 import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm/MagicAuthLinkModal/actions";
 import Logger from "lib/logger";
@@ -24,12 +24,15 @@ import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils"
 import { SSOSignInForm } from "./components/SSOSignInForm";
 import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
 import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analytics";
+import { AuthWarningBanner } from "./components/AuthWarningBanner";
 import "./index.scss";
+import { isDisposableEmail } from "utils/AuthUtils";
 
 interface AuthFormProps {
   authMode: string;
   email?: string;
   isOnboarding: boolean;
+  warningMessage?: string;
   source: string;
   setEmail?: (email: string) => void;
   setAuthMode: (mode: string) => void;
@@ -44,6 +47,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   email,
   setAuthMode,
   isOnboarding,
+  warningMessage,
   setIsVerifyEmailPopupVisible,
   setEmail,
   source,
@@ -57,6 +61,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(null);
+  const [isAuthWarningBannerVisible, setIsAuthWarningBannerVisible] = useState(!!warningMessage?.length);
+
+  const [isInputEmailDisposable, setIsInputEmailDisposable] = useState(false);
 
   const handleSignupSigninSwitch = useCallback(() => {
     const finalState = authMode === AUTH.ACTION_LABELS.SIGN_UP ? AUTH.ACTION_LABELS.LOG_IN : AUTH.ACTION_LABELS.SIGN_UP;
@@ -106,6 +113,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
       if (!isEmailValid(email)) {
         toast.error("Please enter a valid email address");
+        return;
+      }
+
+      if (isDisposableEmail(email)) {
+        setIsInputEmailDisposable(true);
         return;
       }
     }
@@ -192,9 +204,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <RequestPasswordResetForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} toggleModal={toggleModal} />
     );
   }
-
   return (
     <div className="w-full">
+      {authMode === AUTH.ACTION_LABELS.LOG_IN && warningMessage && isAuthWarningBannerVisible && (
+        <AuthWarningBanner warningMessage={warningMessage} onBannerClose={() => setIsAuthWarningBannerVisible(false)} />
+      )}
       <h2 className="onboarding-auth-form-header">
         {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your Requestly account"}
       </h2>
@@ -222,8 +236,13 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
       <AuthFormInput
         id="work-email"
+        type="email"
         value={email}
-        onValueChange={(email) => setEmail(email)}
+        onValueChange={(email) => {
+          setIsInputEmailDisposable(false);
+          setEmail(email);
+        }}
+        status={isInputEmailDisposable ? "error" : null}
         placeholder="E.g., you@company.com"
         label={
           <label>
@@ -243,6 +262,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         }
         onPressEnter={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? handleMagicLinkAuthClick : null}
       />
+      {isInputEmailDisposable && (
+        <div className="auth-email-disposable-error ">
+          Please enter a valid email address. Temporary or disposable email addresses are not allowed.
+        </div>
+      )}
       {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
         <div className="mt-16">
           <AuthFormInput

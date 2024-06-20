@@ -1,5 +1,4 @@
 import { Col, Row, Space, Typography } from "antd";
-import adobeLogo from "../../assets/adobe.svg";
 import atlassianLogo from "../../assets/atlassian.svg";
 import indeedLogo from "../../assets/indeed.svg";
 import verizonLogo from "../../assets/verizon.svg";
@@ -8,7 +7,6 @@ import "./index.scss";
 
 export const CompaniesSection = () => {
   const companies = [
-    { src: adobeLogo, alt: "adobe" },
     { src: atlassianLogo, alt: "atlassian" },
     { src: indeedLogo, alt: "indeed" },
     { src: verizonLogo, alt: "verizon" },
@@ -16,10 +14,10 @@ export const CompaniesSection = () => {
   ];
 
   return (
-    <Row justify="center" align="middle" className="w-full" style={{ margin: "30px 0" }}>
+    <Row justify="center" align="middle" className="w-full companies-row">
       <Space direction="vertical" className="companies-wrapper">
         <Typography.Text className="companies-section-header">
-          Trusted by developer & QA teams from 5000+ organizations
+          Trusted by developer & QA teams from 50,000+ organizations
         </Typography.Text>
         <Col>
           <Space direction="horizontal" size={24}>

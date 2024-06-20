@@ -5,7 +5,6 @@
 import { AutoComplete, Col, InputNumber, Row, Select } from "antd";
 import { RQEditorTitle } from "../../../../../lib/design-system/components/RQEditorTitle";
 import { MockEditorHeader } from "./Header";
-import CodeEditor from "components/misc/CodeEditor";
 import { Tabs } from "antd";
 import APP_CONSTANTS from "config/constants";
 import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } from "react";
@@ -25,6 +24,7 @@ import { APIClient, APIClientRequest } from "components/common/APIClient";
 import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
+import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 
 interface Props {
   isNew?: boolean;
@@ -324,13 +324,13 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          {/* @ts-ignore */}
           <CodeEditor
+            isResizable
             height={220}
-            language="json"
             value={headersString}
-            readOnly={false}
+            defaultValue={headersString}
             handleChange={setHeadersString}
+            language={EditorLanguage.JSON}
           />
         </Col>
       </Row>
@@ -341,16 +341,17 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          {mockType === MockType.FILE && <h4>File Content</h4>}
-          {/* @ts-ignore */}
           <CodeEditor
-            language={getEditorLanguage(fileType)}
-            value={body}
+            isResizable
             height={220}
-            readOnly={isEditorReadOnly}
+            value={body}
+            defaultValue={body}
             handleChange={setBody}
-            // HACK TO PREVENT AUTO FORMAT
-            isCodeMinified={true}
+            language={getEditorLanguage(fileType)}
+            isReadOnly={isEditorReadOnly}
+            toolbarOptions={{
+              title: mockType === MockType.FILE ? "File content" : "",
+            }}
           />
         </Col>
       </Row>
@@ -386,7 +387,7 @@ const MockEditor: React.FC<Props> = ({
   };
 
   return (
-    <>
+    <div className="overflow-hidden">
       <MockEditorHeader
         isNewMock={isNew}
         mockType={mockType}
@@ -397,13 +398,7 @@ const MockEditor: React.FC<Props> = ({
         setPassword={setPassword}
         password={password}
       />
-      <Col
-        className="mock-editor-title-container"
-        span={22}
-        offset={1}
-        md={isEditorOpenInModal ? null : { offset: 2, span: 20 }}
-        lg={isEditorOpenInModal ? null : { offset: 4, span: 16 }}
-      >
+      <Col className="mock-editor-title-container">
         <RQEditorTitle
           name={name}
           mode={isNew ? "create" : "edit"}
@@ -416,20 +411,14 @@ const MockEditor: React.FC<Props> = ({
           errors={errors}
         />
       </Col>
-      <Row className="mock-editor-container">
-        <Col
-          className="mock-editor-container-col"
-          span={22}
-          offset={1}
-          md={{ offset: 2, span: 20 }}
-          lg={{ offset: 4, span: 16 }}
-        >
+      <div className="mock-editor-wrapper">
+        <div className="mock-editor-container">
           <Row className="mock-editor-body">
             {renderMetadataRow()}
             {renderMockCodeEditor()}
           </Row>
-        </Col>
-      </Row>
+        </div>
+      </div>
       {!isNew ? (
         <APIClient
           request={apiRequest}
@@ -439,7 +428,7 @@ const MockEditor: React.FC<Props> = ({
           onModalClose={() => setIsTestModalOpen(false)}
         />
       ) : null}
-    </>
+    </div>
   );
 };
 

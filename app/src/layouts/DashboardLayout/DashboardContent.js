@@ -34,6 +34,10 @@ import { isPricingPage } from "utils/PathUtils";
 import { Onboarding, shouldShowOnboarding } from "features/onboarding";
 import { RequestBillingTeamAccessReminder } from "features/settings";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { IncentiveTaskCompletedModal, IncentiveTasksListModal } from "features/incentivization";
+import { getIncentivizationActiveModals } from "store/features/incentivization/selectors";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import { IncentivizationModal } from "store/features/incentivization/types";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -43,12 +47,21 @@ const DashboardContent = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const activeModals = useSelector(getActiveModals);
+  const incentiveActiveModals = useSelector(getIncentivizationActiveModals);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
   const appOnboardingDetails = useSelector(getAppOnboardingDetails);
   const isWorkspaceOnboardingCompleted = useSelector(getIsWorkspaceOnboardingCompleted);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
-  const onboardingVariation = useFeatureValue("activation_without_onboarding", "variant");
+  const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
+
+  const toggleIncentiveTasksListModal = () => {
+    dispatch(incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASKS_LIST_MODAL }));
+  };
+
+  const toggleIncentiveTaskCompletedModal = () => {
+    dispatch(incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASK_COMPLETED_MODAL }));
+  };
 
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
@@ -97,6 +110,20 @@ const DashboardContent = () => {
       {isInsideIframe ? null : (
         <>
           {/* MODALS */}
+          {incentiveActiveModals[IncentivizationModal.TASKS_LIST_MODAL]?.isActive ? (
+            <IncentiveTasksListModal
+              isOpen={incentiveActiveModals[IncentivizationModal.TASKS_LIST_MODAL]?.isActive}
+              toggle={() => toggleIncentiveTasksListModal()}
+              {...incentiveActiveModals[IncentivizationModal.TASKS_LIST_MODAL].props}
+            />
+          ) : null}
+          {incentiveActiveModals[IncentivizationModal.TASK_COMPLETED_MODAL].isActive ? (
+            <IncentiveTaskCompletedModal
+              isOpen={incentiveActiveModals[IncentivizationModal.TASK_COMPLETED_MODAL]?.isActive}
+              toggle={() => toggleIncentiveTaskCompletedModal()}
+              {...incentiveActiveModals[IncentivizationModal.TASK_COMPLETED_MODAL].props}
+            />
+          ) : null}
           {activeModals.loadingModal.isActive ? (
             <SpinnerModal isOpen={activeModals.loadingModal.isActive} toggle={() => toggleSpinnerModal()} />
           ) : null}
@@ -190,7 +217,7 @@ const DashboardContent = () => {
             />
           ) : null}
 
-          {onboardingVariation === "control" &&
+          {onboardingVariation !== "variant1" &&
             shouldShowOnboarding() &&
             appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
             !appOnboardingDetails.isOnboardingCompleted && (

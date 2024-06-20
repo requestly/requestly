@@ -1,7 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import Updates from "views/features/Updates";
-import PricingIndexPage from "components/landing/pricing/PricingIndexPage";
 import Goodbye from "components/misc/Goodbye";
 import ExtensionInstalled from "components/misc/ExtensionInstalled";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
@@ -12,6 +11,8 @@ import ProtectedRoute from "components/authentication/ProtectedRoute";
 import AppSumoModal from "components/landing/Appsumo/Appsumo";
 import { ImportFromCharlesWrapperView } from "components/features/rules/ImportFromCharlesModal";
 import { Home } from "components/Home";
+import { PricingIndexPage } from "features/pricing/components/PricingPage";
+import { IncentiveTasksListScreen } from "features/incentivization";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -66,6 +67,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.APPSUMO.RELATIVE,
     element: <ProtectedRoute component={AppSumoModal} />,
+  },
+  {
+    path: PATHS.CREDITS.RELATIVE,
+    element: <IncentiveTasksListScreen />,
   },
   {
     path: PATHS.ANY,

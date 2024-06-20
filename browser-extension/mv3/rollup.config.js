@@ -1,7 +1,7 @@
 import json from "@rollup/plugin-json";
 import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import { version } from "./package.json";
 import { browser, WEB_URL, OTHER_WEB_URLS } from "../config/dist/config.build.json";
@@ -101,9 +101,17 @@ export default [
     plugins: commonPlugins,
   },
   {
-    input: "src/client-scripts/index.ts",
+    input: "src/page-scripts/sessionRecorderHelper.js",
     output: {
-      file: `${OUTPUT_DIR}/client.js`,
+      file: `${OUTPUT_DIR}/page-scripts/sessionRecorderHelper.ps.js`,
+      format: "iife",
+    },
+    plugins: commonPlugins,
+  },
+  {
+    input: "src/page-scripts/ajaxRequestInterceptor/index.js",
+    output: {
+      file: `${OUTPUT_DIR}/page-scripts/ajaxRequestInterceptor.ps.js`,
       format: "iife",
     },
     plugins: commonPlugins,

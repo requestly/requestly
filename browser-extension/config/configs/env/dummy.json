@@ -1,5 +1,6 @@
 {
   "WEB_URL": "https://app.requestly.io",
+  "SESSIONS_URL": "https://app.requestly.io/sessions",
   "OTHER_WEB_URLS": ["https://app.requestly.com"],
   "logLevel": "debug"
 }

@@ -13,6 +13,7 @@ import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import "./index.scss";
 import { getSSOProviderId } from "backend/auth/sso";
 import { loginWithSSO } from "actions/FirebaseActions";
+import { isDisposableEmail } from "utils/AuthUtils";
 
 interface Props {
   email: string;
@@ -34,6 +35,11 @@ export const SSOSignInForm: React.FC<Props> = ({ setAuthMode, email, setEmail, s
 
     if (!isEmailValid(email)) {
       toast.error("Please enter a valid email");
+      return;
+    }
+
+    if (isDisposableEmail(email)) {
+      toast.error("Please enter a valid email address. Temporary or disposable email addresses are not allowed.");
       return;
     }
 

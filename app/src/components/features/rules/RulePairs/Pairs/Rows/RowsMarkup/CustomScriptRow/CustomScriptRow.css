@@ -4,11 +4,17 @@
   border-bottom: 1px dashed var(--border);
 }
 
-.code-editor-header-row {
-  padding: 1rem 0.5rem;
+.code-editor-row {
   background: var(--component-header-background);
-  border-top-left-radius: var(--border-radius-sm);
-  border-top-right-radius: var(--border-radius-sm);
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--requestly-color-surface-2);
+}
+
+.code-editor-header-row {
+  padding-right: 6px;
+  padding-bottom: 4px;
 }
 
 .code-editor-character-count-row {

@@ -19,3 +19,9 @@ cd mv3
 rm -rf node_modules
 npm install
 cd ..
+
+echo -e "\n***** Installing SessionBear dependencies *****"
+cd sessionbear
+rm -rf node_modules
+npm install
+cd ..

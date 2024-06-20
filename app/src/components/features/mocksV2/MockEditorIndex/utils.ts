@@ -1,3 +1,4 @@
+import { EditorLanguage } from "componentsV2/CodeEditor";
 import { FileType } from "../types";
 
 // Remove leading & trailing slash
@@ -39,12 +40,12 @@ export const validateStatusCode = (statusCode: string) => {
 export const getEditorLanguage = (fileType?: FileType) => {
   switch (fileType) {
     case FileType.JS:
-      return "javascript";
+      return EditorLanguage.JAVASCRIPT;
     case FileType.CSS:
-      return "css";
+      return EditorLanguage.CSS;
     case FileType.HTML:
-      return "html";
+      return EditorLanguage.HTML;
     default:
-      return "json";
+      return EditorLanguage.JSON;
   }
 };

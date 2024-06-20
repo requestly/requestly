@@ -1,0 +1,115 @@
+.pricing-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--requestly-color-background);
+  width: 100%;
+  overflow: hidden;
+}
+
+.pricing-page-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .pricing-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding: 8px 1rem;
+    background: var(--requestly-color-background);
+    border-bottom: 1px solid var(--requestly-color-surface-1);
+    z-index: 5;
+
+    &-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .logo {
+      width: 100px;
+      cursor: pointer;
+    }
+  }
+
+  .pricing-page-body-wrapper {
+    width: 100%;
+    height: calc(100vh - 26px); // height of navbar
+    overflow-y: auto;
+    padding-top: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .pricing-page-body {
+    max-width: 1280px;
+    width: 100%;
+    padding: 0 12px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.page-yellow-text {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--requestly-color-warning);
+  font-size: var(--requestly-font-size-sm);
+}
+
+.pricing-page-title {
+  color: var(--requestly-color-text-default);
+  font-size: 24px;
+  font-weight: 500;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pricing-page-description {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-sm);
+  margin-top: 8px;
+  text-align: center;
+}
+
+.pricing-page-duartion-label {
+  color: var(--requestly-color-text-default);
+  margin-left: 8px;
+}
+
+.pricing-page-table-wrapper {
+  margin-top: 32px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .pricing-table {
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0 4px;
+
+    .plan-card {
+      flex: 1;
+    }
+  }
+}
+
+.pricing-page-other-actions-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 16px;
+  margin-top: 56px;
+}

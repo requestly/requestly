@@ -338,7 +338,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
-              groupDeleteAction(normalizeRecord(record) as Group);
+              groupDeleteAction(record as Group);
             },
             label: (
               <Row>

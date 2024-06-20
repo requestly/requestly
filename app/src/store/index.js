@@ -10,6 +10,7 @@ import * as sharedListActions from "./features/sharedListActions";
 import * as rulesActions from "./features/rulesActions";
 import * as appModeSpecificActions from "./features/appModeSpecificActions";
 import * as editorToastActions from "./features/editorToastActions";
+import { incentivizationReducer } from "./features/incentivization/slice";
 import { sessionRecordingReducer } from "./features/session-recording/slice";
 import { teamsReducer } from "./features/teams/slice";
 
@@ -63,6 +64,7 @@ export const reduxStore = configureStore({
     [ReducerKeys.DESKTOP_TRAFFIC_TABLE]: desktopTrafficTableReducer,
     [ReducerKeys.RULES]: recordsReducer, // SLICE ALSO CONTAINS GROUP RECORDS
     [ReducerKeys.BILLING]: billingReducer,
+    [ReducerKeys.INCENTIVIZATION]: incentivizationReducer,
   },
   middleware: (getDefaultMiddleware) => {
     // In development mode redux-toolkit will

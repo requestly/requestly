@@ -1,0 +1,61 @@
+{
+  "name": "@requestly/session-bear",
+  "version": "24.5.27",
+  "description": "Capture HTTP Sessions and kill bugs in seconds",
+  "homepage": "https://requestly.com",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/requestly/requestly.git",
+    "directory": "browser-extension/mv3"
+  },
+  "bugs": {
+    "url": "https://github.com/requestly/requestly/issues"
+  },
+  "author": {
+    "name": "Requestly",
+    "email": "contact@requestly.io",
+    "url": "https://requestly.com/"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "config": "cd ../config && npm run build && cd ../sessionbear",
+    "build": "npm run build:common && npm run build:current",
+    "build:current": "rm -rf dist && rollup -c",
+    "build:common": "cd ../common && npm run build && cd ../sessionbear",
+    "watch": "rm -rf dist && rollup -cw",
+    "release": "BUILD_MODE='production' npm run build && node scripts/createZip"
+  },
+  "devDependencies": {
+    "@requestly/web-sdk": "0.14.3",
+    "@rollup/plugin-commonjs": "^25.0.8",
+    "@rollup/plugin-json": "^5.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.5",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@svgr/rollup": "^8.1.0",
+    "@types/chrome": "^0.0.266",
+    "@types/uuid": "^9.0.8",
+    "archiver": "^5.3.1",
+    "node-sass": "^8.0.0",
+    "rollup": "^2.79.1",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "tslib": "^2.4.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.8.0",
+    "@devtools-ds/navigation": "^1.2.1",
+    "@devtools-ds/object-inspector": "^1.2.1",
+    "@devtools-ds/table": "^1.2.1",
+    "@devtools-ds/themes": "^1.2.1",
+    "@monaco-editor/react": "^4.5.2",
+    "antd": "^5.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-split": "^2.0.14",
+    "uuid": "^9.0.1"
+  }
+}

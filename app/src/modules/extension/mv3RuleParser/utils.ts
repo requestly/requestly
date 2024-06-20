@@ -2,33 +2,58 @@ import { escapeRegExp } from "lodash";
 import { RulePairSource, SourceFilter, SourceKey, SourceOperator } from "../../../types/rules";
 import { BLACKLISTED_DOMAINS } from "../constants";
 import { ExtensionRequestMethod, ExtensionResourceType, ExtensionRuleCondition } from "../types";
+import Logger from "../../../../../common/logger";
 
 export const escapeForwardSlashes = (value: string): string => {
   return value.replace(/\//g, "\\/");
 };
 
+export const getRegexSubstitutionStringWithIncrementedIndex = (regexSubstitutionString: string, increment = 0) => {
+  return regexSubstitutionString.replace(/\$(\d)+/g, (match: string) => {
+    const matchedNumber = match.slice(1);
+    // The 'match' parameter is the current number found by the regex as a string
+    // Convert it to a number, increment it by 1, and return it as a string
+    return `$` + (parseInt(matchedNumber, 10) + increment).toString();
+  });
+};
+
+export const convertRegexSubstitutionStringToDNRSubstitutionString = (regexSubstitutionString: string) => {
+  return regexSubstitutionString.replace(/\$(\d)+/g, (match: string) => {
+    const matchedNumber = match.slice(1);
+    // The 'match' parameter is the current number found by the regex as a string
+    // Convert it to a number, increment it by 1, and return it as a string
+    return `\\` + parseInt(matchedNumber, 10).toString();
+  });
+};
+
+export const countCapturingGroups = (regexPattern: string) => {
+  var num_groups = new RegExp(regexPattern.toString() + "|").exec("").length - 1;
+  return num_groups;
+};
+
 const createRegexForWildcardString = (value: string, isWildcardCapturingGroupsEnabled: boolean = true): string => {
   // TODO: convert all * to .* and escape all special chars for regex
   if (isWildcardCapturingGroupsEnabled) {
-    return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(.*)");
+    return "/" + value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(.*)") + "/";
   } else {
-    return value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(?:.*)");
+    return "/" + value.replace(/([?.-])/g, "\\$1").replace(/(\*)/g, "(?:.*)") + "/";
   }
 };
 
 // regex: /pattern/flags
-export const parseRegex = (regex: string): { pattern: string; flags?: string } => {
+export const parseRegex = (regex: string): { pattern?: string; flags?: string } => {
   const matchesRegexPattern = regex.match(/^\/(.*)\/([dgimsuy]*)$/);
   if (matchesRegexPattern) {
     const [, pattern, flags] = matchesRegexPattern;
     return { pattern, flags };
   }
-  return { pattern: regex };
+
+  return {};
 };
 
 export const parseUrlParametersFromSourceV2 = (
   source: RulePairSource,
-  isWildcardCapturingGroupsEnabled: boolean = true
+  isWildcardCapturingGroupsEnabled?: boolean
 ): ExtensionRuleCondition => {
   // rules like query, headers, script, delay can be applied on all URLs
   if (source.value === "") {
@@ -54,6 +79,12 @@ export const parseUrlParametersFromSourceV2 = (
 
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
+
+        if (!pattern) {
+          Logger.log("Invalid regex");
+          throw new Error("Invalid Regex");
+        }
+
         return {
           // To handle case for regexSubsitution as replaces inplace instead of replace whole. So we match the whole url instead
           // https://linear.app/requestly/issue/ENGG-1831
@@ -63,14 +94,21 @@ export const parseUrlParametersFromSourceV2 = (
         };
       }
 
-      case SourceOperator.WILDCARD_MATCHES:
+      case SourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(
           createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
         );
+
+        if (!pattern) {
+          Logger.log("Invalid regex");
+          throw new Error("Invalid Regex");
+        }
+
         return {
           regexFilter: `^${pattern}$`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
+      }
     }
   }
 
@@ -91,6 +129,11 @@ export const parseUrlParametersFromSourceV2 = (
       case SourceOperator.MATCHES: {
         const { pattern, flags } = parseRegex(source.value);
 
+        if (!pattern) {
+          Logger.log("Invalid regex");
+          throw new Error("Invalid Regex");
+        }
+
         // Allows only accepted characters in the source incase of open rule (.*, .+, .?)
         const cleanedPattern = pattern.replace(/\.([+*?])/g, "[a-z0-9:.-]$1");
         return {
@@ -103,6 +146,11 @@ export const parseUrlParametersFromSourceV2 = (
         const { pattern, flags } = parseRegex(
           createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
         );
+
+        if (!pattern) {
+          Logger.log("Invalid regex");
+          throw new Error("Invalid Regex");
+        }
 
         // Allows only accepted characters in the source incase of open rule (.*, .+, .?)
         const cleanedPattern = pattern.replace(/\.([+*?])/g, "[a-z0-9:.-]$1");
@@ -156,9 +204,12 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
   return condition;
 };
 
-export const parseConditionFromSource = (source: RulePairSource): ExtensionRuleCondition => {
+export const parseConditionFromSource = (
+  source: RulePairSource,
+  isWildcardCapturingGroupsEnabled?: boolean
+): ExtensionRuleCondition => {
   return {
-    ...parseUrlParametersFromSourceV2(source),
+    ...parseUrlParametersFromSourceV2(source, isWildcardCapturingGroupsEnabled),
     ...parseFiltersFromSource(source),
     excludedInitiatorDomains: BLACKLISTED_DOMAINS,
     excludedRequestDomains: BLACKLISTED_DOMAINS,

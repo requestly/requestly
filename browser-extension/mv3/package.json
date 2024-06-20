@@ -24,19 +24,20 @@
     "build:current": "rm -rf dist && rollup -c",
     "build:common": "cd ../common && npm run build && cd ../mv3",
     "watch": "rm -rf dist && rollup -cw",
-    "release": "BUILD_MODE='production' npm run build && node scripts/createZip"
+    "test": "playwright test"
   },
   "devDependencies": {
-    "@requestly/web-sdk": "0.14.2",
+    "@playwright/test": "^1.44.1",
+    "@requestly/web-sdk": "0.14.3",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/chrome": "^0.0.266",
     "archiver": "^5.3.1",
     "node-sass": "^8.0.0",
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-terser": "^7.0.2",
     "tslib": "^2.4.0",
     "typescript": "^4.9.5"
   }

@@ -1,41 +1,73 @@
 import config from "common/config";
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
-import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
-import { isExtensionEnabled } from "./utils";
+import { onVariableChange, Variable } from "../variable";
+import { isExtensionEnabled } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
+import { sendMessageToApp } from "./messageHandler";
+import { EXTENSION_MESSAGES } from "common/constants";
+import { UpdateDynamicRuleOptions } from "common/types";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
-interface RuleIdsMap {
-  [id: string]: string;
-}
+const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<void> => {
+  const badRQRuleIds = new Set<string>();
 
-const updateDynamicRules = async (options: chrome.declarativeNetRequest.UpdateRuleOptions): Promise<void> => {
-  return new Promise((resolve) => {
-    chrome.declarativeNetRequest.updateDynamicRules(options, resolve);
+  while (true) {
+    if (!options.addRules && !options.removeRuleIds) {
+      break;
+    }
+
+    const addRules = options.addRules?.filter((rule) => !badRQRuleIds.has(rule?.rqRuleId)) ?? [];
+    const removeRuleIds = options.removeRuleIds ?? [];
+
+    try {
+      await chrome.declarativeNetRequest.updateDynamicRules({
+        addRules: addRules.map((rule) => {
+          const dnrRule = { ...rule };
+          delete dnrRule.rqRuleId;
+          return dnrRule as chrome.declarativeNetRequest.Rule;
+        }),
+        removeRuleIds,
+      });
+      break;
+    } catch (e) {
+      const match = e.message.match(/Rule with id (\d+)/);
+      const ruleId = parseInt(match[1]);
+      const rqRuleId = addRules.find((rule) => rule.id === ruleId)?.rqRuleId;
+
+      if (match && rqRuleId) {
+        badRQRuleIds.add(rqRuleId);
+        sendMessageToApp({
+          action: EXTENSION_MESSAGES.RULE_SAVE_ERROR,
+          error: e.message,
+          rqRuleId,
+        });
+      }
+    }
+  }
+  return;
+};
+
+const deleteAllDynamicRules = async (): Promise<void> => {
+  const dynamicRules = await chrome.declarativeNetRequest.getDynamicRules();
+
+  return updateDynamicRules({
+    removeRuleIds: dynamicRules.map((extensionRule) => extensionRule.id),
   });
 };
 
-const deleteExtensionRules = async (): Promise<void> => {
-  const dynamicRules = await chrome.declarativeNetRequest.getDynamicRules();
+const deleteAllSessionRules = async (): Promise<void> => {
   const sessionRules = await chrome.declarativeNetRequest.getSessionRules();
 
-  await Promise.all([
-    updateDynamicRules({
-      removeRuleIds: dynamicRules.map((extensionRule) => extensionRule.id),
-    }),
-    chrome.declarativeNetRequest.updateSessionRules({
-      removeRuleIds: sessionRules.map((extensionRule) => extensionRule.id),
-    }),
-  ]);
+  return chrome.declarativeNetRequest.updateSessionRules({
+    removeRuleIds: sessionRules.map((extensionRule) => extensionRule.id),
+  });
 };
 
 const addExtensionRules = async (): Promise<void> => {
   const enabledRules = await getEnabledRules();
-  const parsedExtensionRules: chrome.declarativeNetRequest.Rule[] = [];
-
-  const ruleIdsMap = await getVariable<RuleIdsMap>(Variable.ENABLED_RULE_IDS_MAP, {});
+  const parsedExtensionRules: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[] = [];
 
   enabledRules.forEach((rule) => {
     const extensionRules = rule.extensionRules;
@@ -56,11 +88,8 @@ const addExtensionRules = async (): Promise<void> => {
         parsedExtensionRules.push({
           ...extensionRule,
           id: ruleId,
+          rqRuleId: rule.id,
         });
-
-        ruleIdsMap[ruleId] = rule.id;
-
-        setVariable(Variable.ENABLED_RULE_IDS_MAP, ruleIdsMap);
       });
     }
   });
@@ -75,7 +104,7 @@ const addExtensionRules = async (): Promise<void> => {
 };
 
 const applyExtensionRules = async (): Promise<void> => {
-  await deleteExtensionRules();
+  await deleteAllDynamicRules();
 
   const isExtensionStatusEnabled = await isExtensionEnabled();
   if (isExtensionStatusEnabled) {
@@ -85,7 +114,10 @@ const applyExtensionRules = async (): Promise<void> => {
 
 export const initRulesManager = async (): Promise<void> => {
   onRuleOrGroupChange(applyExtensionRules);
-  onVariableChange(Variable.IS_EXTENSION_ENABLED, applyExtensionRules);
+  onVariableChange(Variable.IS_EXTENSION_ENABLED, () => {
+    applyExtensionRules();
+    deleteAllSessionRules();
+  });
   applyExtensionRules();
 };
 
