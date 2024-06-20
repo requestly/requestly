@@ -2,7 +2,7 @@ import { generateUrlPattern } from "../../utils";
 import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.json";
 import { isExtensionEnabled } from "../../utils";
 import { Variable, onVariableChange } from "../variable";
-import { RequestRulePair, ResponseRulePair, RuleType } from "common/types";
+import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
 
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
@@ -125,37 +125,12 @@ const updateTabRuleCache = async (tabId: number, frameId?: number) => {
   const responseRules = await rulesStorageService.getEnabledRules(RuleType.RESPONSE);
   const delayRules = await rulesStorageService.getEnabledRules(RuleType.DELAY);
 
-  const clientRequestRules = requestRules.map((rule) => {
-    const responseRulePair = rule.pairs[0] as RequestRulePair;
-    return {
-      id: rule.id,
-      source: responseRulePair.source,
-      request: responseRulePair.request,
-    };
-  });
-
-  const clientResponseRules = responseRules.map((rule) => {
-    const responseRulePair = rule.pairs[0] as ResponseRulePair;
-    return {
-      id: rule.id,
-      source: responseRulePair.source,
-      response: responseRulePair.response,
-    };
-  });
-
-  const clientDelayRules = delayRules.map((rule) => {
-    return {
-      id: rule.id,
-      pairs: rule.pairs,
-    };
-  });
-
   updateTabCache(
     tabId,
     {
-      responseRules: clientResponseRules,
-      requestRules: clientRequestRules,
-      delayRules: clientDelayRules,
+      responseRules: responseRules,
+      requestRules: requestRules,
+      delayRules: delayRules,
     },
     frameId
   );
