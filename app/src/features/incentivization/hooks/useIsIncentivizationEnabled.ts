@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 import {
@@ -44,6 +44,10 @@ export const useIsIncentivizationEnabled = () => {
 
     return false;
   }, [isFeatureFlagEnabled, user?.loggedIn, extensionInstallDate, extensionSignupDate, daysSinceSignup]);
+
+  useEffect(() => {
+    window.incentivization = isEnabled;
+  }, [isEnabled]);
 
   return isEnabled;
 };
