@@ -88,7 +88,11 @@ export const CreditsProgressBar: React.FC<CreditsProgressBarProps> = ({ source }
               {creditsToBeRedeemed > 0 ? (
                 <Tooltip
                   overlayClassName="redeem-disable-tooltip"
-                  title={disableRedeem ? "You already have an active subscription!" : null}
+                  title={
+                    disableRedeem
+                      ? "You are either part of any billing team or already have an active subscription. For any queries, please contact us."
+                      : null
+                  }
                 >
                   <Button
                     size="small"
