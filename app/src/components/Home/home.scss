@@ -34,6 +34,7 @@
   }
 
   & .homepage-bottom-section {
+    padding-bottom: 1rem;
     gap: 1rem;
 
     & .homepage-teams-card {
@@ -128,6 +129,12 @@
 
 .homepage-teams-card > div {
   height: 100%;
+}
+
+.homepage-incentives-card.ant-col {
+  margin-bottom: 20px;
+  margin-right: 8px;
+  padding-bottom: 0;
 }
 
 .homepage-empty-card-secondary-btn.ant-btn:focus {

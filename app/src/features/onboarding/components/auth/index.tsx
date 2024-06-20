@@ -17,6 +17,7 @@ interface Props {
   isOpen: boolean;
   toggleAuthModal?: () => void;
   defaultAuthMode: string;
+  warningMessage?: string;
   isOnboarding?: boolean;
   source: string;
   callback?: () => void;
@@ -26,6 +27,7 @@ export const AuthScreen: React.FC<Props> = ({
   isOpen,
   toggleAuthModal = () => {},
   defaultAuthMode = APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+  warningMessage,
   isOnboarding = false,
   source,
   callback = () => {},
@@ -82,6 +84,7 @@ export const AuthScreen: React.FC<Props> = ({
               callback={callback}
               setIsVerifyEmailPopupVisible={setIsVerifyEmailPopupVisible}
               toggleModal={toggleAuthModal}
+              warningMessage={warningMessage}
             />
           </m.div>
           {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
