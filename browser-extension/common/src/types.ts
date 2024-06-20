@@ -46,6 +46,7 @@ export enum SourceFilterTypes {
   PAGE_DOMAINS = "pageDomains",
   REQUEST_METHOD = "requestMethod",
   RESOURCE_TYPE = "resourceType",
+  REQUEST_PAYLOAD = "requestPayload",
 }
 
 export interface UrlSource {
@@ -61,6 +62,13 @@ export interface RuleSourceFilter {
   pageDomains: string[];
   requestMethod: HttpRequestMethod[];
   resourceType: ResourceType[];
+  requestPayload?: RequestPayloadFilter;
+}
+
+export interface RequestPayloadFilter {
+  key: string;
+  operator?: "Contains" | "Equals";
+  value: string;
 }
 
 enum ResourceType {
