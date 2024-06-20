@@ -15,6 +15,7 @@ export interface MockEditorDataSchema {
   body: string;
   responseId?: string; // Keeping it separate as we only support 1 response
   password?: string;
+  collectionId?: string;
   // TODO: Response should ideally be an array
 }
 
