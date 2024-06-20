@@ -61,10 +61,20 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     }
   }, [mockType, filteredRecords?.length, isWorkspaceMode]);
 
+  const allRecordsMap = useMemo(() => {
+    const recordsMap: { [id: string]: RQMockMetadataSchema } = {};
+
+    records.forEach((record) => {
+      recordsMap[record.id] = record;
+    });
+
+    return recordsMap;
+  }, [records]);
+
   const contentTableAdaptedRecords = useMemo(() => {
-    const enhancedRecords = enhanceRecords(filteredRecords, records);
+    const enhancedRecords = enhanceRecords(filteredRecords, allRecordsMap);
     return recordsToContentTableDataAdapter(enhancedRecords);
-  }, [filteredRecords]);
+  }, [filteredRecords, allRecordsMap]);
 
   // TODO: move all actions in a hook and use that
   const columns = useMocksTableColumns({
@@ -73,6 +83,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     handleEditAction,
     handleSelectAction,
     forceRender,
+    allRecordsMap,
   });
 
   const { deleteRecordsAction, updateMocksCollectionAction, removeMocksFromCollectionAction } =
@@ -125,7 +136,9 @@ export const MocksTable: React.FC<MocksTableProps> = ({
               return;
             }
 
-            const url = record.isOldMock ? record.url : generateFinalUrl(record.endpoint, user?.details?.profile?.uid);
+            const url = record.isOldMock
+              ? record.url
+              : generateFinalUrl({ endpoint: record.endpoint, uid: user?.details?.profile?.uid });
             handleItemSelect(record.id, url, record.isOldMock);
           },
         };

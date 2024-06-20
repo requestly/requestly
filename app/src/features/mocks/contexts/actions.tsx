@@ -5,6 +5,7 @@ import {
   MockListSource,
   MockRecordType,
   MockType,
+  RQMockCollection,
   RQMockMetadataSchema,
   RQMockSchema,
 } from "components/features/mocksV2/types";
@@ -21,12 +22,12 @@ import { useNavigate } from "react-router-dom";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { isRecordMock } from "../screens/mocksList/components/MocksList/components/MocksTable/utils";
-import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
-import { DEFAULT_COLLECTION_ID } from "../constants";
+import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
+import { DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH } from "../constants";
 
 type MocksActionContextType = {
   createNewCollectionAction: (mockType: MockType) => void;
-  updateCollectionNameAction: (mockType: MockType, record: RQMockMetadataSchema) => void;
+  updateCollectionNameAction: (mockType: MockType, record: RQMockCollection) => void;
   deleteCollectionAction: (record: RQMockMetadataSchema) => void;
   deleteRecordsAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
   updateMocksCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
@@ -68,7 +69,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   );
 
   const updateCollectionNameAction = useCallback(
-    (mockType: MockType, record: RQMockMetadataSchema) => {
+    (mockType: MockType, record: RQMockCollection) => {
       Logger.log("[DEBUG]", "updateCollectionNameAction", { record, mockType });
       openCollectionModalAction(mockType, record);
     },
@@ -154,12 +155,12 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
       Logger.log("[DEBUG]", "removeMocksFromCollectionAction", { records });
       const mockIds = records.filter(isRecordMock).map((mock) => mock.id);
 
-      updateMocksCollectionId(uid, mockIds, DEFAULT_COLLECTION_ID).then(() => {
+      updateMocksCollection(uid, mockIds, DEFAULT_COLLECTION_ID, DEFAULT_COLLECTION_PATH, teamId).then(() => {
         toast.success(`${mockIds.length > 1 ? "Mocks" : "Mock"} removed from collection!`);
         onSuccess?.();
       });
     },
-    [uid]
+    [uid, teamId]
   );
 
   const value = {

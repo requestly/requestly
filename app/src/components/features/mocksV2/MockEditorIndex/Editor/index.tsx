@@ -11,7 +11,7 @@ import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } f
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
-import { FileType, MockType } from "../../types";
+import { FileType, MockType, RQMockCollection } from "../../types";
 import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
@@ -31,18 +31,22 @@ interface Props {
   isEditorReadOnly?: boolean;
   savingInProgress?: boolean;
   mockData?: MockEditorDataSchema;
+  mockCollectionData?: RQMockCollection;
   onSave: Function;
   onClose: Function;
   mockType?: MockType;
   isEditorOpenInModal?: boolean;
+  isMockCollectionLoading?: boolean;
 }
 
 const MockEditor: React.FC<Props> = ({
   isNew = false,
   isEditorReadOnly = false,
   isEditorOpenInModal = false,
+  isMockCollectionLoading = false,
   savingInProgress = false,
   mockData,
+  mockCollectionData,
   onSave = () => {},
   onClose = () => {},
   mockType,
@@ -75,13 +79,12 @@ const MockEditor: React.FC<Props> = ({
 
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
-  const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId, password), [
-    endpoint,
-    teamId,
-    user?.details?.profile?.uid,
-    username,
-    password,
-  ]);
+  const collectionPath = mockCollectionData?.path ?? "";
+
+  const finalUrl = useMemo(
+    () => generateFinalUrl({ endpoint, uid: user?.details?.profile?.uid, username, teamId, password }),
+    [endpoint, teamId, user?.details?.profile?.uid, username, password]
+  );
 
   const apiRequest = useMemo<APIClientRequest>(() => {
     return {
@@ -286,11 +289,13 @@ const MockEditor: React.FC<Props> = ({
       <MockEditorEndpoint
         isNew={isNew}
         errors={errors}
+        collectionPath={collectionPath}
         endpoint={endpoint}
         setEndpoint={setEndpoint}
         mockType={mockType}
         ref={endpointRef}
         password={password}
+        isMockCollectionLoading={isMockCollectionLoading}
       />
     );
   };

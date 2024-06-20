@@ -35,6 +35,7 @@ export interface RQMockCollection {
   id?: string;
   name: string;
   desc?: string;
+  path?: string;
   type: MockType;
   isFavourite?: boolean;
   recordType: MockRecordType.COLLECTION;

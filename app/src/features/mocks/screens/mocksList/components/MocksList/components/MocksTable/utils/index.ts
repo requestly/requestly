@@ -15,14 +15,9 @@ export const isMockInCollection = (mock: RQMockMetadataSchema) => {
 
 export const enhanceRecords = (
   filteredRecords: RQMockMetadataSchema[],
-  allRecords: RQMockMetadataSchema[]
+  allRecordsMap: { [id: string]: RQMockMetadataSchema }
 ): RQMockMetadataSchema[] => {
-  const allRecordsMap: { [id: string]: RQMockMetadataSchema } = {};
   const enhancedRecordsMap: { [id: string]: RQMockMetadataSchema } = {};
-
-  allRecords.forEach((record) => {
-    allRecordsMap[record.id] = record;
-  });
 
   filteredRecords.forEach((record) => {
     enhancedRecordsMap[record.id] = record;
@@ -32,7 +27,7 @@ export const enhanceRecords = (
       enhancedRecordsMap[record.collectionId] = allRecordsMap[record.collectionId];
     } // Add all the child mocks if collection
     else if (isRecordMockCollection(record)) {
-      allRecords
+      Object.values(allRecordsMap)
         .filter((mockRecord) => isRecordMock(mockRecord) && record.id === mockRecord.collectionId)
         .forEach((record) => {
           enhancedRecordsMap[record.id] = record;

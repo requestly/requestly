@@ -1,6 +1,6 @@
 import firebaseApp from "../../firebase";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import { RQMockSchema } from "components/features/mocksV2/types";
+import { MockRecordType, RQMockSchema } from "components/features/mocksV2/types";
 import { BODY_IN_BUCKET_ENABLED } from "./constants";
 import { createResponseBodyFilepath } from "./utils";
 import { getFile } from "services/firebaseStorageService";
@@ -13,7 +13,7 @@ export const getMock = async (uid: string, mockId: string, teamId?: string): Pro
   const mock = await getMockFromFirebase(mockId).catch(() => null);
 
   // TODO: We can lazy load this in another call and show a loader
-  if (BODY_IN_BUCKET_ENABLED && mock) {
+  if (BODY_IN_BUCKET_ENABLED && mock && mock?.recordType !== MockRecordType.COLLECTION) {
     await fetchResponsesBodyFromBucket(uid, mockId, mock.responses, teamId);
   }
   return mock;

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import CopyButton from "components/misc/CopyButton";
-import { MockMetadata } from "@requestly/mock-server/build/types/mock";
+import { RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { redirectToMockEditorEditMock } from "utils/RedirectionUtils";
 import { generateFinalUrlParts } from "components/features/mocksV2/utils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -12,22 +12,24 @@ import { trackHomeMockActionClicked } from "components/Home/analytics";
 import "./mocksListItem.scss";
 
 interface Props {
-  mock: MockMetadata;
+  mock: RQMockMetadataSchema;
+  collectionData?: RQMockCollection | undefined;
 }
 
-export const MocksListItem: React.FC<Props> = ({ mock }) => {
+export const MocksListItem: React.FC<Props> = ({ mock, collectionData }) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const { url } = useMemo(
     () =>
-      generateFinalUrlParts(
-        mock.endpoint,
-        user?.details?.profile?.uid,
-        user?.details?.username,
-        workspace?.id,
-        mock.password
-      ),
+      generateFinalUrlParts({
+        endpoint: mock.endpoint,
+        uid: user?.details?.profile?.uid,
+        username: user?.details?.username,
+        teamId: workspace?.id,
+        password: mock.password,
+        collectionPath: collectionData?.path ?? "",
+      }),
     [mock.endpoint, user?.details?.profile?.uid, user?.details?.username, workspace?.id, mock.password]
   );
 
