@@ -6,6 +6,7 @@ import { COLLECTION_NAME } from "./constants";
 import { createFile } from "services/firebaseStorageService";
 import { RecordingOptions, SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/utils";
+import { RuleType } from "types";
 
 export const saveRecording = async (
   uid: string,
@@ -14,7 +15,10 @@ export const saveRecording = async (
   events: any,
   options: RecordingOptions,
   source: string,
-  isInternal: boolean = false
+  testThisRuleMetadata: {
+    appliedStatus: boolean;
+    ruleType: RuleType;
+  }
 ): Promise<any> => {
   const db = getFirestore(firebaseApp);
   const ownerId = getOwnerId(uid, workspaceId);
@@ -39,7 +43,7 @@ export const saveRecording = async (
     updatedTs: Date.now(),
     createdTs: Date.now(),
     source,
-    isInternal,
+    testThisRuleMetadata,
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)
