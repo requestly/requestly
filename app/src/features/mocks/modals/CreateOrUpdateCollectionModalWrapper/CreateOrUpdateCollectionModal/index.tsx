@@ -175,7 +175,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
                 <div>
                   Add prefix path for all your mocks in this collection.
                   <br />
-                  e.g: /api/v1 + /your-mock-endpoint
+                  e.g: api/v1 + /your-mock-endpoint
                 </div>
               }
             >
@@ -188,7 +188,7 @@ export const CreateOrUpdateCollectionModal: React.FC<Props> = ({
             autoFocus
             status={!isCollectionPathValid ? "error" : ""}
             value={collectionPath}
-            placeholder="e.g. /apis/v1"
+            placeholder="e.g. apis/v1"
             onChange={(e) => {
               setIsCollectionPathValid(true);
               setCollectionPath(e.target.value);
