@@ -1,5 +1,5 @@
 import { RuleType } from "common/types";
-import { matchRuleWithRequest } from "./ruleMatcher";
+import { matchRuleWithRequest } from "../../common/ruleMatcher";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
 

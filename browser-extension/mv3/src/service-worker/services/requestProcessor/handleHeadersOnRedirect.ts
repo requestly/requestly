@@ -1,5 +1,5 @@
 import { AJAXRequestDetails, SessionRuleType } from "./types";
-import { findMatchingRule } from "../ruleMatcher";
+import { findMatchingRule } from "../../../common/ruleMatcher";
 import { updateRequestSpecificRules } from "../rulesManager";
 import { Rule } from "common/types";
 

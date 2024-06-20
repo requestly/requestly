@@ -1,6 +1,6 @@
 import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
-import { matchSourceUrl } from "./service-worker/services/ruleMatcher";
+import { matchSourceUrl } from "./common/ruleMatcher";
 import { Variable, getVariable } from "./service-worker/variable";
 
 export const formatDate = (dateInMillis: number, format: string): string => {

@@ -109,7 +109,7 @@ export default [
     plugins: commonPlugins,
   },
   {
-    input: "src/page-scripts/ajaxRequestInterceptor.js",
+    input: "src/page-scripts/ajaxRequestInterceptor/index.js",
     output: {
       file: `${OUTPUT_DIR}/page-scripts/ajaxRequestInterceptor.ps.js`,
       format: "iife",

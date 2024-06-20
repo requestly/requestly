@@ -1,6 +1,6 @@
 import { RuleType, ScriptObject, ScriptRulePair } from "common/types";
 import { isBlacklistedURL } from "../../utils";
-import { matchSourceUrl } from "./ruleMatcher";
+import { matchSourceUrl } from "../../common/ruleMatcher";
 import { injectScript } from "./utils";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
