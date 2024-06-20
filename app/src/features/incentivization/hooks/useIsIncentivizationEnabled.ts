@@ -18,7 +18,7 @@ export const useIsIncentivizationEnabled = () => {
   const isFeatureFlagEnabled = useFeatureValue("incentivization_onboarding", false);
 
   const isEnabled = useMemo(() => {
-    const releaseDate = new Date("2024-06-18").getTime();
+    const releaseDate = new Date("2024-06-20").getTime();
     const currentDate = new Date().getTime();
 
     if (currentDate < releaseDate) {
@@ -36,8 +36,8 @@ export const useIsIncentivizationEnabled = () => {
         } else {
           // TODO: add sentry log for this case
           const momentDate = moment(currentDate);
-          const updatedDate = momentDate.subtract(daysSinceSignup, "days");
-          return releaseDate <= updatedDate.toDate().getTime();
+          const signupDate = momentDate.subtract(daysSinceSignup, "days");
+          return signupDate.toDate().getTime() >= releaseDate;
         }
       }
     }
@@ -45,6 +45,5 @@ export const useIsIncentivizationEnabled = () => {
     return false;
   }, [isFeatureFlagEnabled, user?.loggedIn, extensionInstallDate, extensionSignupDate, daysSinceSignup]);
 
-  // TODO: remove below before deployment
-  return true || isEnabled;
+  return isEnabled;
 };
