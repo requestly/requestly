@@ -82,7 +82,7 @@ const LINKS = {
   CHROME_EXTENSION: "https://chrome.google.com/webstore/detail/requestly/mdnleldcmiljblolnjhpnblkcekpdkpa",
 
   CHROME_STORE_REVIEWS:
-    "https://chrome.google.com/webstore/detail/redirect-url-modify-heade/mdnleldcmiljblolnjhpnblkcekpdkpa/reviews",
+    "https://chromewebstore.google.com/detail/requestly-intercept-modif/mdnleldcmiljblolnjhpnblkcekpdkpa/reviews",
   //Firefox
   FIREFOX_EXTENSION: "https://app.requestly.in/firefox/builds/requestly-latest.xpi",
   //Edge
