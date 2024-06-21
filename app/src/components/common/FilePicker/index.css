@@ -6,8 +6,8 @@
   justify-content: center;
   align-items: center;
   gap: 12px;
-  border: 1px dashed var(--border);
-  border-radius: var(--border-radius-sm);
+  border: 1px dashed var(--requestly-color-white-t-20);
+  border-radius: 8px;
   padding: 40px 0;
   cursor: pointer;
   transition: 0.2s ease-in-out;
@@ -24,5 +24,11 @@
 
 .file-picker-wrapper .file-picker-icon-title,
 .file-picker-wrapper-active .file-picker-icon-title {
-  font-size: 1rem;
+  font-size: var(--requestly-font-size-lg);
+}
+
+.file-picker-wrapper .file-picker-icon-subtitle,
+.file-picker-wrapper-active .file-picker-icon-subtitle {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-xs);
 }
