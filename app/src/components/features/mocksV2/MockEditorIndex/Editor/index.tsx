@@ -11,7 +11,7 @@ import React, { ReactNode, useState, useMemo, useCallback, useEffect, useRef } f
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { toast } from "utils/Toast";
-import { FileType, MockType } from "../../types";
+import { FileType, MockType, RQMockCollection } from "../../types";
 import type { TabsProps } from "antd";
 import { generateFinalUrl } from "../../utils";
 import { requestMethodDropdownOptions } from "../constants";
@@ -31,18 +31,22 @@ interface Props {
   isEditorReadOnly?: boolean;
   savingInProgress?: boolean;
   mockData?: MockEditorDataSchema;
+  mockCollectionData?: RQMockCollection;
   onSave: Function;
   onClose: Function;
   mockType?: MockType;
   isEditorOpenInModal?: boolean;
+  isMockCollectionLoading?: boolean;
 }
 
 const MockEditor: React.FC<Props> = ({
   isNew = false,
   isEditorReadOnly = false,
   isEditorOpenInModal = false,
+  isMockCollectionLoading = false,
   savingInProgress = false,
   mockData,
+  mockCollectionData,
   onSave = () => {},
   onClose = () => {},
   mockType,
@@ -75,13 +79,12 @@ const MockEditor: React.FC<Props> = ({
 
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
 
-  const finalUrl = useMemo(() => generateFinalUrl(endpoint, user?.details?.profile?.uid, username, teamId, password), [
-    endpoint,
-    teamId,
-    user?.details?.profile?.uid,
-    username,
-    password,
-  ]);
+  const collectionPath = mockCollectionData?.path ?? "";
+
+  const finalUrl = useMemo(
+    () => generateFinalUrl({ endpoint, uid: user?.details?.profile?.uid, username, teamId, password }),
+    [endpoint, teamId, user?.details?.profile?.uid, username, password]
+  );
 
   const apiRequest = useMemo<APIClientRequest>(() => {
     return {
@@ -286,11 +289,13 @@ const MockEditor: React.FC<Props> = ({
       <MockEditorEndpoint
         isNew={isNew}
         errors={errors}
+        collectionPath={collectionPath}
         endpoint={endpoint}
         setEndpoint={setEndpoint}
         mockType={mockType}
         ref={endpointRef}
         password={password}
+        isMockCollectionLoading={isMockCollectionLoading}
       />
     );
   };
@@ -320,13 +325,12 @@ const MockEditor: React.FC<Props> = ({
       <Row className="editor-row">
         <Col span={24}>
           <CodeEditor
+            isResizable
             height={220}
             value={headersString}
             defaultValue={headersString}
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
-            // HACK TO PREVENT AUTO FORMAT
-            isCodeMinified={true}
           />
         </Col>
       </Row>
@@ -337,15 +341,18 @@ const MockEditor: React.FC<Props> = ({
     return (
       <Row className="editor-row">
         <Col span={24}>
-          {mockType === MockType.FILE && <h4>File Content</h4>}
-          {/* @ts-ignore */}
           <CodeEditor
+            isResizable
             height={220}
             value={body}
             defaultValue={body}
             handleChange={setBody}
             language={getEditorLanguage(fileType)}
             isReadOnly={isEditorReadOnly}
+            toolbarOptions={{
+              title: mockType === MockType.FILE ? "File content" : "",
+              options: null,
+            }}
           />
         </Col>
       </Row>
@@ -381,7 +388,7 @@ const MockEditor: React.FC<Props> = ({
   };
 
   return (
-    <>
+    <div className="overflow-hidden">
       <MockEditorHeader
         isNewMock={isNew}
         mockType={mockType}
@@ -392,13 +399,7 @@ const MockEditor: React.FC<Props> = ({
         setPassword={setPassword}
         password={password}
       />
-      <Col
-        className="mock-editor-title-container"
-        span={22}
-        offset={1}
-        md={isEditorOpenInModal ? null : { offset: 2, span: 20 }}
-        lg={isEditorOpenInModal ? null : { offset: 4, span: 16 }}
-      >
+      <Col className="mock-editor-title-container">
         <RQEditorTitle
           name={name}
           mode={isNew ? "create" : "edit"}
@@ -411,20 +412,14 @@ const MockEditor: React.FC<Props> = ({
           errors={errors}
         />
       </Col>
-      <Row className="mock-editor-container">
-        <Col
-          className="mock-editor-container-col"
-          span={22}
-          offset={1}
-          md={{ offset: 2, span: 20 }}
-          lg={{ offset: 4, span: 16 }}
-        >
+      <div className="mock-editor-wrapper">
+        <div className="mock-editor-container">
           <Row className="mock-editor-body">
             {renderMetadataRow()}
             {renderMockCodeEditor()}
           </Row>
-        </Col>
-      </Row>
+        </div>
+      </div>
       {!isNew ? (
         <APIClient
           request={apiRequest}
@@ -434,7 +429,7 @@ const MockEditor: React.FC<Props> = ({
           onModalClose={() => setIsTestModalOpen(false)}
         />
       ) : null}
-    </>
+    </div>
   );
 };
 

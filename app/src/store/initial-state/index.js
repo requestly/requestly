@@ -196,6 +196,7 @@ const INITIAL_STATE = {
       isMiscTourCompleted: {
         firstDraftSession: false,
         askAI: false,
+        earnCredits: false,
         upgradeWorkspaceMenu: false,
       },
 

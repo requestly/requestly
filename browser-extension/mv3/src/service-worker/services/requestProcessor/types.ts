@@ -4,6 +4,7 @@ export interface AJAXRequestDetails {
   type: "xmlhttprequest";
   initiator?: string; // initiator=origin. Should now contain port and protocol
   requestHeaders?: Record<string, string>;
+  requestData?: any;
 }
 
 export enum SessionRuleType {

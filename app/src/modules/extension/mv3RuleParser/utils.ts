@@ -28,7 +28,7 @@ export const convertRegexSubstitutionStringToDNRSubstitutionString = (regexSubst
 
 export const countCapturingGroups = (regexPattern: string) => {
   var num_groups = new RegExp(regexPattern.toString() + "|").exec("").length - 1;
-  return num_groups
+  return num_groups;
 };
 
 const createRegexForWildcardString = (value: string, isWildcardCapturingGroupsEnabled: boolean = true): string => {
@@ -94,7 +94,7 @@ export const parseUrlParametersFromSourceV2 = (
         };
       }
 
-      case SourceOperator.WILDCARD_MATCHES:
+      case SourceOperator.WILDCARD_MATCHES: {
         const { pattern, flags } = parseRegex(
           createRegexForWildcardString(source.value, isWildcardCapturingGroupsEnabled)
         );
@@ -108,6 +108,7 @@ export const parseUrlParametersFromSourceV2 = (
           regexFilter: `^${pattern}$`,
           isUrlFilterCaseSensitive: !flags?.includes("i"),
         };
+      }
     }
   }
 

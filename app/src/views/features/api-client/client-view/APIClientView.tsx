@@ -293,7 +293,7 @@ const APIClientView: React.FC<Props> = ({ apiEntry, notifyApiRequestFinished }) 
           className="api-client-body"
           direction="vertical"
           cursor="row-resize"
-          sizes={[40, 60]}
+          sizes={entry.request.contentType === RequestContentType.JSON ? [60, 40] : [40, 60]}
           minSize={200}
           gutterSize={6}
           gutterAlign="center"

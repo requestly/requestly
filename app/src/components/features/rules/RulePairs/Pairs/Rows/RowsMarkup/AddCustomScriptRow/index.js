@@ -9,7 +9,7 @@ const AddCustomScriptRow = ({ rowIndex, addEmptyScript }) => {
       <Col span={24}>
         <Button block type="dashed" onClick={addEmptyScript} icon={<PlusOutlined />} className="add-custom-script-btn">
           <span className="text-white">Insert Custom Script</span>
-          (scripts are executed serially)
+          <span>(scripts are executed serially)</span>
         </Button>
       </Col>
     </Row>
