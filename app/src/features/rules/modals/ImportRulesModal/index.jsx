@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
@@ -12,7 +12,7 @@ import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { actions } from "store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
+import { ImportFromCharlesModal } from "features/rules/screens/rulesList/components/RulesList/components";
 import { RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
