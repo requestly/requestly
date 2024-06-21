@@ -131,12 +131,13 @@ export const TestThisRule = () => {
         if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
           toggleBottomSheet(true);
         }
-        if (message.record) {
+        if (message.record && user.loggedIn) {
           handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId, message.appliedStatus);
         }
       }
     );
   }, [
+    user.loggedIn,
     currentlySelectedRuleData.ruleType,
     handleSaveTestSession,
     fetchAndUpdateTestReports,
