@@ -232,9 +232,8 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                   <>
                     <Row className="group-disabled-popover-title">{"Enable parent group"}</Row>
                     <Row className="group-disabled-popover-content">
-                      {
-                        "This rule won't execute because its parent group is disabled. Enable the group to activate this rule."
-                      }
+                      This rule won't execute because its parent group is disabled. Enable the group to activate this
+                      rule.
                     </Row>
                   </>
                 }
