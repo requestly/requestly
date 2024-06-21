@@ -17,8 +17,6 @@ import {
 } from "./utils";
 
 export const initXhrInterceptor = (debug) => {
-  console.log("initXHRRequestInterceptor");
-
   // XHR Implementation
   const updateXhrReadyState = (xhr, readyState) => {
     Object.defineProperty(xhr, "readyState", { writable: true });
