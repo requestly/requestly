@@ -18,4 +18,24 @@
   display: flex;
   justify-content: center;
   padding: 0 1rem;
+
+  .group-disabled-warning {
+    color: var(--requestly-color-warning-300);
+    margin-left: 8px;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+}
+
+.group-disabled-popover {
+  max-width: 360px;
+
+  .group-disabled-popover-title {
+    font-weight: var(--requestly-font-weight-medium);
+  }
+
+  .group-disabled-popover-content {
+    margin-left: -24px;
+    padding: 4px 0;
+  }
 }

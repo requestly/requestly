@@ -30,6 +30,7 @@ export const HelpButton = () => {
         className="header-rule-help-btn"
         type="text"
         onClick={() => setIsHelpDrawerOpen((isOpen) => !isOpen)}
+        size="small"
       >
         Help
       </RQButton>
