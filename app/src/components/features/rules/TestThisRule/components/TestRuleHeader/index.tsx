@@ -139,7 +139,11 @@ export const TestRuleHeader = () => {
           </RQButton>
         </Col>
       </Row>
-      <AuthConfirmationPopover title="You need to signup to capture your test session" source={SOURCE.TEST_THIS_RULE}>
+      <AuthConfirmationPopover
+        placement="topRight"
+        title="You need to signup to capture your test session"
+        source={SOURCE.TEST_THIS_RULE}
+      >
         <Checkbox
           checked={doCaptureSession}
           onClick={() => {
