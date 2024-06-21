@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import ImportRulesModal from "../ImportRulesModal";
-import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
+import { ImportFromCharlesModal } from "features/rules/screens/rulesList/components/RulesList/components";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "../../../../config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
