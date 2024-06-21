@@ -32,7 +32,17 @@
   visibility: hidden;
 }
 
-@media only screen and (max-width: 1200px) {
+.rule-editor-header-disabled-group-warning.ant-col {
+  color: var(--requestly-color-warning-300);
+  font-size: var(--requestly-font-size-xs);
+  padding-top: 2px;
+}
+
+.rule-editor-header-disabled-group-warning.ant-col .rq-btn {
+  padding: 0;
+}
+
+.rule-editor-header-disabled-group-warning.ant-col @media only screen and (max-width: 1200px) {
   .rule-editor-back-btn {
     visibility: visible;
   }

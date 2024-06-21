@@ -22,12 +22,15 @@ import { useIncentiveActions } from "features/incentivization/hooks";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.scss";
+import { getAllRecordsMap } from "store/features/rules/selectors";
 
 export const TestRuleHeader = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
+  const allRecordsMap = useSelector(getAllRecordsMap);
+
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
   const [doCaptureSession, setDoCaptureSession] = useState(user.loggedIn);
@@ -56,6 +59,14 @@ export const TestRuleHeader = () => {
 
     if (currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE) {
       setError("Rule is inactive, please activate the rule before testing it");
+      return;
+    }
+
+    if (
+      currentlySelectedRuleData.groupId &&
+      allRecordsMap[currentlySelectedRuleData.groupId]?.status === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
+    ) {
+      setError("Rule group is inactive, please activate the rule group before testing the rule");
       return;
     }
 
@@ -97,6 +108,8 @@ export const TestRuleHeader = () => {
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
     claimIncentiveRewards,
+    allRecordsMap,
+    currentlySelectedRuleData.groupId,
   ]);
 
   return (
