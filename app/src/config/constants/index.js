@@ -123,6 +123,7 @@ APP_CONSTANTS.SUBSCRIPTION_STATUS = {
   ACTIVE: "active",
   CANCELLED: "canceled",
   TRIALING: "trialing",
+  PAST_DUE: "past_due",
 };
 
 APP_CONSTANTS.PATH_FROM_PAIR = {
