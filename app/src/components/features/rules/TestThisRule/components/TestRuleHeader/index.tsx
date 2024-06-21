@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Checkbox, Col, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
@@ -19,8 +19,10 @@ import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
-import "./index.scss";
+import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllRecordsMap } from "store/features/rules/selectors";
+import "./index.scss";
 
 export const TestRuleHeader = () => {
   const dispatch = useDispatch();
@@ -31,7 +33,7 @@ export const TestRuleHeader = () => {
 
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
-  const [doCaptureSession, setDoCaptureSession] = useState(true);
+  const [doCaptureSession, setDoCaptureSession] = useState(user.loggedIn);
   const { sheetPlacement } = useBottomSheetContext();
 
   const { claimIncentiveRewards } = useIncentiveActions();
@@ -65,11 +67,6 @@ export const TestRuleHeader = () => {
       allRecordsMap[currentlySelectedRuleData.groupId]?.status === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
     ) {
       setError("Rule group is inactive, please activate the rule group before testing the rule");
-      return;
-    }
-
-    if (!user.loggedIn && doCaptureSession) {
-      setError("You need to login to capture your test session");
       return;
     }
 
@@ -108,13 +105,18 @@ export const TestRuleHeader = () => {
     currentlySelectedRuleData.id,
     currentlySelectedRuleData.ruleType,
     currentlySelectedRuleData.status,
-    user?.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
     claimIncentiveRewards,
     allRecordsMap,
     currentlySelectedRuleData.groupId,
   ]);
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      setDoCaptureSession(false);
+    }
+  }, [user.loggedIn]);
 
   return (
     <>
@@ -143,13 +145,21 @@ export const TestRuleHeader = () => {
           </RQButton>
         </Col>
       </Row>
-      <Checkbox
-        checked={doCaptureSession}
-        onChange={(event) => setDoCaptureSession(event.target.checked)}
-        className="test-rule-checkbox"
+      <AuthConfirmationPopover
+        placement="topRight"
+        title="You need to signup to capture your test session"
+        source={SOURCE.TEST_THIS_RULE}
       >
-        Save the test session with video, console & network logs
-      </Checkbox>
+        <Checkbox
+          checked={doCaptureSession}
+          onClick={() => {
+            if (user.loggedIn) setDoCaptureSession(!doCaptureSession);
+          }}
+          className="test-rule-checkbox"
+        >
+          Save the test session with video, console & network logs
+        </Checkbox>
+      </AuthConfirmationPopover>
     </>
   );
 };
