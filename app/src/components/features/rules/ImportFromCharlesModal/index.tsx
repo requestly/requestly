@@ -309,15 +309,11 @@ const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, 
             target="_blank"
             rel="noreferrer"
             to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
+            // !!!TODO fix to common method with the analytics
             // onClick={() => trackCharlesSettingsImportDocsClicked(linkClickSrc, importTriggerSrc)}
           >
             Follow these steps
-            <div
-              className="icon__wrapper"
-              style={{
-                marginTop: "2px",
-              }}
-            >
+            <div className="icon__wrapper">
               <HiOutlineExternalLink />
             </div>
           </Link>
