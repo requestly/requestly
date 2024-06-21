@@ -4,7 +4,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { useSelector } from "react-redux";
 import { RQModal } from "lib/design-system/components";
 import { Button, Select, SelectProps, message } from "antd";
-import { updateMocksCollectionId } from "backend/mocks/updateMocksCollectionId";
+import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 import { toast } from "utils/Toast";
 import { createCollection } from "backend/mocks/createCollection";
 import { trackMockCollectionCreated } from "modules/analytics/events/features/mocksV2";
@@ -38,6 +38,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [collectionId, setCollectionId] = useState("");
   const [collectionName, setCollectionName] = useState("");
+  const [collectionPath, setCollectionPath] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
     setIsLoading(true);
     const mockIds = mocks?.map((mock) => mock.id);
 
-    return updateMocksCollectionId(uid, mockIds, collectionId)
+    return updateMocksCollection(uid, mockIds, collectionId, collectionPath, teamId)
       .then(() => {
         // TODO: add analytic event
         onSuccess?.();
@@ -69,6 +70,8 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
   const handleChangeCollection: SelectProps<string, SelectOption>["onChange"] = (collectionId, option) => {
     setCollectionId(collectionId);
     setCollectionName((option as SelectOption).label);
+    // @ts-ignore
+    setCollectionPath(option.path ?? "");
   };
 
   const handleSearchCollection: SelectProps<string, SelectOption>["filterOption"] = (searchValue, option) => {
@@ -83,6 +86,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
 
     const collectionData = {
       desc: "",
+      path: "",
       name: searchValue,
       type: mockType,
     };
@@ -98,7 +102,7 @@ export const UpdateMocksCollectionModal: React.FC<Props> = ({
       });
   };
 
-  const options = collections?.map(({ id, name }) => ({ label: name, value: id }));
+  const options = collections?.map(({ id, name, path }) => ({ label: name, value: id, path }));
 
   return (
     <RQModal

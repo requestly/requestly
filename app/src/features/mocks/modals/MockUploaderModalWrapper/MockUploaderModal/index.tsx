@@ -51,7 +51,9 @@ export const MockUploaderModal: React.FC<Props> = ({
           redirectToFileMockEditorEditMock(navigate, mock.id);
         } else {
           selectMockOnUpload &&
-            selectMockOnUpload(generateFinalUrl(mock.endpoint, user?.details?.profile?.uid, null, teamId));
+            selectMockOnUpload(
+              generateFinalUrl({ endpoint: mock.endpoint, uid: user?.details?.profile?.uid, username: null, teamId })
+            );
         }
       })
       .catch((err) => {

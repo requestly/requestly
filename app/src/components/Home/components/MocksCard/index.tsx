@@ -6,13 +6,12 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { RQButton } from "lib/design-system/components";
 import { getMocks } from "backend/mocks/getMocks";
 import { getUserAuthDetails } from "store/selectors";
-import { MockType } from "components/features/mocksV2/types";
+import { MockRecordType, MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { MocksListItem } from "./components/MocksListItem";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
 import { MdOutlineCloud } from "@react-icons/all-files/md/MdOutlineCloud";
-import { MockMetadata } from "@requestly/mock-server/build/types/mock";
 import { redirectToMockEditorCreateMock } from "utils/RedirectionUtils";
 import Logger from "lib/logger";
 import PATHS from "config/constants/sub/paths";
@@ -26,6 +25,7 @@ export const MocksCard: React.FC = () => {
   const user = useSelector(getUserAuthDetails);
   const [isLoading, setIsLoading] = useState(true);
   const [mocks, setMocks] = useState(null);
+  const [mockCollections, setMockCollections] = useState<{ [id: string]: RQMockCollection }>({});
 
   useEffect(() => {
     if (!user.loggedIn) {
@@ -35,7 +35,22 @@ export const MocksCard: React.FC = () => {
     setIsLoading(true);
     getMocks(user?.details?.profile?.uid, MockType.API, workspace?.id)
       .then((data) => {
-        const sortedMocks = data.sort((a: MockMetadata, b: MockMetadata) => Number(b.createdTs) - Number(a.createdTs));
+        const mocks: RQMockMetadataSchema[] = [];
+        const collections: { [id: string]: RQMockCollection } = {};
+
+        data.forEach((record) => {
+          if (record.recordType === MockRecordType.COLLECTION) {
+            collections[record.id] = (record as unknown) as RQMockCollection;
+          } else {
+            mocks.push(record);
+          }
+        });
+
+        setMockCollections(collections);
+
+        const sortedMocks = mocks.sort(
+          (a: RQMockMetadataSchema, b: RQMockMetadataSchema) => Number(b.createdTs) - Number(a.createdTs)
+        );
         setMocks(sortedMocks.slice(0, MAX_MOCKS_TO_SHOW));
       })
       .catch((err) => {
@@ -83,8 +98,8 @@ export const MocksCard: React.FC = () => {
             </Col>
           </Row>
           <div className="mocks-card-list">
-            {mocks.map((mock: MockMetadata, index: number) => (
-              <MocksListItem key={index} mock={mock} />
+            {mocks.map((mock: RQMockMetadataSchema, index: number) => (
+              <MocksListItem key={index} mock={mock} collectionData={mockCollections[mock.collectionId]} />
             ))}
           </div>
           {mocks.length > MAX_MOCKS_TO_SHOW && (
