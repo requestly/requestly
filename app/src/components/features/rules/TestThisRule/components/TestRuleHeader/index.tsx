@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Checkbox, Col, Row } from "antd";
 import { RQButton, RQInput } from "lib/design-system/components";
@@ -21,8 +21,8 @@ import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import "./index.scss";
 import { getAllRecordsMap } from "store/features/rules/selectors";
+import "./index.scss";
 
 export const TestRuleHeader = () => {
   const dispatch = useDispatch();
@@ -111,6 +111,12 @@ export const TestRuleHeader = () => {
     allRecordsMap,
     currentlySelectedRuleData.groupId,
   ]);
+
+  useEffect(() => {
+    if (!user.loggedIn) {
+      setDoCaptureSession(false);
+    }
+  }, [user.loggedIn]);
 
   return (
     <>
