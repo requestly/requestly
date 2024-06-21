@@ -23,7 +23,6 @@ import { redirectToPersonalSubscription } from "utils/RedirectionUtils";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import "./index.scss";
 import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
-import { useFeatureValue } from "@growthbook/growthbook-react";
 import { PlanStatus } from "../../types";
 import { ChangePlanRequestConfirmationModal } from "features/pricing/components/ChangePlanRequestConfirmationModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -39,7 +38,6 @@ export const UserPlanDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
-  const trialDuration = useFeatureValue("trial_days_duration", 30);
   const { type } = user.details?.planDetails ?? {};
 
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -80,6 +78,17 @@ export const UserPlanDetails = () => {
         .finally(() => setIsLoading(false));
     }
   }, [getSubscriptionEndDateForAppsumo, teamId]);
+
+  let trialDuration = 0;
+  try {
+    const startDate = user?.details?.planDetails?.subscription?.startDate;
+    const endDate = user?.details?.planDetails?.subscription?.endDate;
+    const diffTime = new Date(endDate).getTime() - new Date(startDate).getTime();
+
+    trialDuration = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  } catch (err) {
+    Logger.log(err);
+  }
 
   useEffect(() => {
     try {
