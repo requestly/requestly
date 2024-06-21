@@ -17,8 +17,6 @@ import {
 } from "./utils";
 
 export const initFetchInterceptor = (debug) => {
-  console.log("initFetchInterceptor");
-
   const _fetch = fetch;
   fetch = async (...args) => {
     const [resource, initOptions = {}] = args;
@@ -102,10 +100,6 @@ export const initFetchInterceptor = (debug) => {
       requestData,
       method,
     });
-
-    if (responseRule) {
-      console.log("[fetchInterceptor] matchedResponseRule", { responseRule });
-    }
 
     let responseHeaders;
     let fetchedResponse;
