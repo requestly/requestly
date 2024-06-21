@@ -19,6 +19,8 @@ import { IncentivizeEvent } from "features/incentivization/types";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
+import { SOURCE } from "modules/analytics/events/common/constants";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
@@ -28,7 +30,7 @@ export const TestRuleHeader = () => {
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const [pageUrl, setPageUrl] = useState("");
   const [error, setError] = useState(null);
-  const [doCaptureSession, setDoCaptureSession] = useState(true);
+  const [doCaptureSession, setDoCaptureSession] = useState(user.loggedIn);
   const { sheetPlacement } = useBottomSheetContext();
 
   const { claimIncentiveRewards } = useIncentiveActions();
@@ -54,11 +56,6 @@ export const TestRuleHeader = () => {
 
     if (currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE) {
       setError("Rule is inactive, please activate the rule before testing it");
-      return;
-    }
-
-    if (!user.loggedIn && doCaptureSession) {
-      setError("You need to login to capture your test session");
       return;
     }
 
@@ -97,7 +94,6 @@ export const TestRuleHeader = () => {
     currentlySelectedRuleData.id,
     currentlySelectedRuleData.ruleType,
     currentlySelectedRuleData.status,
-    user?.loggedIn,
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
     claimIncentiveRewards,
@@ -130,13 +126,17 @@ export const TestRuleHeader = () => {
           </RQButton>
         </Col>
       </Row>
-      <Checkbox
-        checked={doCaptureSession}
-        onChange={(event) => setDoCaptureSession(event.target.checked)}
-        className="test-rule-checkbox"
-      >
-        Save the test session with video, console & network logs
-      </Checkbox>
+      <AuthConfirmationPopover title="You need to signup to capture your test session" source={SOURCE.TEST_THIS_RULE}>
+        <Checkbox
+          checked={doCaptureSession}
+          onClick={() => {
+            if (user.loggedIn) setDoCaptureSession(!doCaptureSession);
+          }}
+          className="test-rule-checkbox"
+        >
+          Save the test session with video, console & network logs
+        </Checkbox>
+      </AuthConfirmationPopover>
     </>
   );
 };
