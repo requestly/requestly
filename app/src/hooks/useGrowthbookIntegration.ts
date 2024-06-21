@@ -55,7 +55,7 @@ export const GrowthbookExperimentHelperComponent = (): any => {
   // Fire experiment_assigned as soon as ui loads
   // console.log("gb: GrowthbookExperimentHelperComponent");
   useFeatureValue("backgates_restriction", false);
-  useFeatureValue("trial_days_duration", 30);
+  useFeatureValue("trial_days_duration", 7);
   return null;
 };
 
