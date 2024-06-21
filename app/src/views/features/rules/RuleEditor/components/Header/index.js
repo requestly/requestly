@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Row, Col, Layout, Divider, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getGroupwiseRulesToPopulate } from "store/selectors";
@@ -14,13 +14,13 @@ import RuleOptions from "./RuleOptions";
 import { capitalize, replace } from "lodash";
 import "./RuleEditorHeader.css";
 import { WarningOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
 import {
   checkIsRuleGroupDisabled,
   normalizeRecord,
 } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/utils/rules";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useRulesActionContext } from "features/rules/context/actions";
+import { RQButton } from "lib/design-system/components";
 
 const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
   const dispatch = useDispatch();
@@ -60,7 +60,7 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
   return (
     <Layout.Header className="rule-editor-header" key={currentlySelectedRuleData.id}>
       <Row wrap={false} align="middle" className="rule-editor-row">
-        <Col span={8}>
+        <Col span={6}>
           <Row wrap={false} align="middle">
             <CloseButton mode={mode} ruleType={currentlySelectedRuleData?.ruleType} />
             <div className="text-gray rule-editor-header-title">
@@ -68,7 +68,7 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
             </div>
           </Row>
         </Col>
-        <Col span={16} align="right" className="ml-auto rule-editor-header-actions-container">
+        <Col span={18} align="right" className="ml-auto rule-editor-header-actions-container">
           <Row gutter={8} wrap={false} justify="end" align="middle">
             <Col>
               <HelpButton />
@@ -77,19 +77,21 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
               <Status location={location} />
             </Col>
             {isRuleGroupDisabled && (
-              <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
-                <Col className="rule-editor-header-disabled-group-warning">
+              <Col className="rule-editor-header-disabled-group-warning">
+                <Tooltip title="This rule won't execute because its parent group is disabled. Enable the group to run this rule.">
                   <WarningOutlined className="icon__wrapper" />
                   Group is disabled.{" "}
-                  <Link
+                  <RQButton
+                    type="link"
+                    size="small"
                     onClick={() =>
                       recordStatusToggleAction(normalizeRecord(allRecordsMap[currentlySelectedRuleData.groupId]))
                     }
                   >
                     Enable now
-                  </Link>
-                </Col>
-              </Tooltip>
+                  </RQButton>
+                </Tooltip>
+              </Col>
             )}
             <Col>
               <PinButton rule={currentlySelectedRuleData} />

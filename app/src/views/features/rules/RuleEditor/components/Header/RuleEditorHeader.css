@@ -38,6 +38,10 @@
   padding-top: 2px;
 }
 
+.rule-editor-header-disabled-group-warning.ant-col .rq-btn {
+  padding: 0;
+}
+
 .rule-editor-header-disabled-group-warning.ant-col @media only screen and (max-width: 1200px) {
   .rule-editor-back-btn {
     visibility: visible;
