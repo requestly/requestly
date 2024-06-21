@@ -3,18 +3,51 @@
   border-bottom-right-radius: inherit;
 }
 
-.root-wrapper {
-  width: 80%;
+.charles-import-wrapper {
+  width: 55%;
   margin: 0 auto;
-  margin-top: 16px;
   max-width: 900px;
-  background-color: var(--surface-2);
+  background-color: transparent;
+  height: 100%;
   padding: 24px;
+}
+
+.charles-import-container {
+  margin: auto;
+}
+
+.charles-import-body {
+  /* max-height: 50%; */
+  /* margin: 8px 0; */
+  border: 1px dashed var(--requestly-color-white-t-20);
   border-radius: 8px;
+  padding: 40px 0;
+}
+
+.charles-import-footer {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-xs);
+  text-align: center;
+  margin: 16px 0;
+}
+
+.charles-import-heading {
+  font-size: var(--requestly-font-size-base);
+  font-weight: var(--requestly-font-weight-medium);
+  padding: 0 4px;
+}
+
+.charles-import-share-container {
+  font-size: var(--requestly-font-size-xs);
+  font-weight: var(--requestly-font-weight-medium);
+  padding: 8px;
 }
 
 .parsed-rules-info {
-  margin-top: 1.5rem;
+  /* padding: 20px 24px 4px 24px; */
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .parsed-rules-info ul {
@@ -33,7 +66,7 @@
 }
 
 .parsed-rules-error-info {
-  margin-top: 1.5rem;
+  /* margin-top: 1.5rem; */
 }
 
 .parsed-rules-error-info ol {

@@ -10,6 +10,7 @@ interface FilePickerProps {
   maxFiles?: number;
   isProcessing: boolean;
   loaderMessage?: string;
+  subtitle?: string;
 }
 
 export const FilePicker: React.FC<FilePickerProps> = ({
@@ -18,6 +19,7 @@ export const FilePicker: React.FC<FilePickerProps> = ({
   isProcessing,
   maxFiles = 0, // no limitations
   loaderMessage = "Processing...",
+  subtitle,
 }) => {
   const [isFilePickerActive, setIsFilePickerActive] = useState<boolean>(false);
 
@@ -65,11 +67,11 @@ export const FilePicker: React.FC<FilePickerProps> = ({
 
             <Space direction="vertical" align="center">
               <Typography.Text className="file-picker-icon-title">{title}</Typography.Text>
-              <div>or</div>
+              <Typography.Text className="file-picker-icon-subtitle">{subtitle}</Typography.Text>
             </Space>
 
-            <Button type="primary" size="large" onClick={open}>
-              Browse
+            <Button type="primary" size="middle" onClick={open}>
+              Select file
             </Button>
           </>
         )}
