@@ -21,6 +21,7 @@ import {
 } from "modules/analytics/events/features/rules";
 import "./charlesImporter.css";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
+import { copyToClipBoard } from "utils/Misc";
 
 interface ModalProps {
   isOpen: boolean;
@@ -212,7 +213,12 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
             )}
             Import Charles Proxy settings
           </Col>
-          <Col className="charles-import-share-container">
+          <Col
+            className="charles-import-share-container"
+            onClick={() =>
+              copyToClipBoard(window.origin + PATHS.IMPORT_FROM_CHARLES.ABSOLUTE, "URL copied to clipboard")
+            }
+          >
             <LinkOutlined className="icon__wrapper" />
             Share
           </Col>

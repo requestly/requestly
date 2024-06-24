@@ -46,6 +46,7 @@
   font-size: var(--requestly-font-size-xs);
   font-weight: var(--requestly-font-weight-medium);
   padding: 8px;
+  cursor: pointer;
 }
 
 .parsed-rules-info {
