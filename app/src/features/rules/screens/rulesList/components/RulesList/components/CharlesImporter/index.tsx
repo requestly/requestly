@@ -112,10 +112,8 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
-  const [isParseComplete, setIsParseComplete] = useState<boolean>(true);
-  const [rulesToImport, setRulesToImport] = useState<ParsedRulesFromChalres>({
-    otherRuleTypesCount: 1,
-  });
+  const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
+  const [rulesToImport, setRulesToImport] = useState<ParsedRulesFromChalres>({});
   const [validationError, setValidationError] = useState<CharlesRuleImportErrorMessage | string | null>(null);
 
   const appMode = useSelector(getAppMode);
