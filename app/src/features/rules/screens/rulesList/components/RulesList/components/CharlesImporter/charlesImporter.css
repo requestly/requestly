@@ -70,15 +70,22 @@
   color: var(--success);
 }
 
+.parsed-rules-error-info {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-base);
+  font-weight: var(--requestly-font-weight-medium);
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  flex-wrap: wrap;
+}
+
 .parsed-rules-error-info ol {
   margin-top: 14px;
-  padding-left: 16px;
+  font-weight: var(--requestly-font-weight-normal);
+  font-size: var(--requestly-font-size-sm);
 }
 
 .parsed-rules-error-info li {
   list-style: unset;
-}
-
-.parsed-rules-error-info .additional-import-steps-list {
-  padding-left: 1rem;
 }
