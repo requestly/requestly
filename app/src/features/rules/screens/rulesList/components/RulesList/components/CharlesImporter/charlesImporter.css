@@ -32,7 +32,14 @@
 .charles-import-heading {
   font-size: var(--requestly-font-size-base);
   font-weight: var(--requestly-font-weight-medium);
-  padding: 0 4px;
+  /* padding: 0 4px; */
+  gap: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.charles-import-heading .charles-import-back-icon {
+  cursor: pointer;
 }
 
 .charles-import-share-container {
