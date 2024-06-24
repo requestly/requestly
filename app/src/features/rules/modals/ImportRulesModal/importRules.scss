@@ -11,5 +11,9 @@
     font-size: var(--requestly-font-size-xs);
     text-align: center;
     margin-top: 16px;
+
+    .rq-btn {
+      padding: 0;
+    }
   }
 }

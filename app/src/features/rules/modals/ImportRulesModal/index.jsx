@@ -310,6 +310,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                       trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
                     }}
                   >
+                    {" "}
                     Click here to upload
                   </RQButton>
                 </div>

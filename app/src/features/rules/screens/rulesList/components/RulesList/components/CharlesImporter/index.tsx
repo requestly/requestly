@@ -112,8 +112,10 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
-  const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
-  const [rulesToImport, setRulesToImport] = useState<ParsedRulesFromChalres>({});
+  const [isParseComplete, setIsParseComplete] = useState<boolean>(true);
+  const [rulesToImport, setRulesToImport] = useState<ParsedRulesFromChalres>({
+    otherRuleTypesCount: 1,
+  });
   const [validationError, setValidationError] = useState<CharlesRuleImportErrorMessage | string | null>(null);
 
   const appMode = useSelector(getAppMode);
@@ -252,38 +254,32 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                 )}
                 {rulesToImport?.otherRuleTypesCount > 0 &&
                   (isParsedRulesExist ? (
-                    <Space direction="vertical" align="center">
-                      <div className="text-sm text-dark-gray">
-                        Other settings are not supported.{" "}
-                        <CharlesDocsLink
-                          title="Learn more"
-                          linkClickSrc="some_settings_unsupported_screen"
-                          importTriggerSrc={modalSrc}
-                        />
-                      </div>
-                    </Space>
+                    <div className="text-center">
+                      Other settings are not supported.{" "}
+                      <CharlesDocsLink
+                        title="Learn more"
+                        linkClickSrc="some_settings_unsupported_screen"
+                        importTriggerSrc={modalSrc}
+                      />
+                    </div>
                   ) : (
-                    <Space direction="vertical" align="center">
-                      <div>
-                        Uploaded settings are not supported. <br />
-                        Learn more about supported setting types{" "}
-                        <CharlesDocsLink
-                          title="here"
-                          linkClickSrc="all_settings_unsupported_screen"
-                          importTriggerSrc={modalSrc}
-                        />
-                        .
-                      </div>
-                    </Space>
+                    <div className="text-center">
+                      Uploaded settings are not supported. <br />
+                      Learn more about supported setting types{" "}
+                      <CharlesDocsLink
+                        title="here"
+                        linkClickSrc="all_settings_unsupported_screen"
+                        importTriggerSrc={modalSrc}
+                      />
+                      .
+                    </div>
                   ))}
               </div>
             ) : validationError ? (
               <>
                 {validationError === CharlesRuleImportErrorMessage.INVALID_EXPORT ? (
                   <div className="parsed-rules-error-info">
-                    <div className="subtitle mt-16">
-                      Invalid settings file. Follow below steps to export settings from Charles:
-                    </div>
+                    Invalid settings file. Follow below steps to export settings from Charles:
                     <ol>
                       {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
                         <>
@@ -322,15 +318,8 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
         )}
 
         <div className="charles-import-footer">
-          {" "}
           To export your rules from Charles,{" "}
-          <Link
-            target="_blank"
-            rel="noreferrer"
-            to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
-            // !!!TODO fix to common method with the analytics
-            // onClick={() => trackCharlesSettingsImportDocsClicked(linkClickSrc, importTriggerSrc)}
-          >
+          <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
             Follow these steps
             <div className="icon__wrapper">
               <HiOutlineExternalLink />
