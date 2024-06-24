@@ -20,10 +20,12 @@ import {
   trackRulesJsonParsed,
   trackRulesImportFailed,
   trackRulesImportCompleted,
+  trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import "./importRules.scss";
 import { ImportFromCharles } from "features/rules/screens/rulesList/components/RulesList/components/CharlesImporter";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
@@ -300,7 +302,14 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
               {isCharlesImportFeatureFlagOn ? (
                 <div className="rules-importer-footer">
                   Have Charles export file?
-                  <RQButton type="link" size="small" onClick={() => setIsImportFromCharlesModalOpen(true)}>
+                  <RQButton
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setIsImportFromCharlesModalOpen(true);
+                      trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
+                    }}
+                  >
                     Click here to upload
                   </RQButton>
                 </div>
