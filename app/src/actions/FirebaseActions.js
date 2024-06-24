@@ -456,6 +456,8 @@ export const signInWithEmailLink = async (email, callback) => {
     const additionalUserInfo = getAdditionalUserInfo(result); // get this info
     const isNewUser = additionalUserInfo?.isNewUser || false;
 
+    Logger.log("[signInWithEmailLink]", { result, email });
+
     // Update details in db
     const authData = getAuthData(result.user);
     const database = getDatabase();
@@ -487,6 +489,8 @@ export const signInWithEmailLink = async (email, callback) => {
     callback && callback.call(null, true);
     return { authData, isNewUser };
   } catch (error) {
+    Logger.log("[signInWithEmailLink] catch", { error });
+
     if (error?.code === "auth/email-already-in-use") {
       /* user already exists with another auth provider */
       const userEmail = error?.email;
@@ -508,6 +512,7 @@ export const signInWithEmailLink = async (email, callback) => {
           isNewUser: false,
         };
       } catch (e) {
+        Logger.log("[signInWithEmailLink] auth/email-already-in-use catch", { e });
         /* wait for sign in to be triggered again, once userAuth is ready */
         return {
           authData: { email: userEmail },
