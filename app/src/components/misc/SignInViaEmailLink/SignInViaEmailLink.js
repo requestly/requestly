@@ -19,6 +19,7 @@ import {
 import "./index.css";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
+import Logger from "../../../../../common/logger";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -89,7 +90,8 @@ const SignInViaEmailLink = () => {
             } else throw new Error("Failed");
           }
         })
-        .catch(() => {
+        .catch((e) => {
+          Logger.log("[SignInViaEmailLink] handleLogin.catch", { e });
           setIsProcessing(false);
           setUserEmailfromLocalStorage(null);
         });
