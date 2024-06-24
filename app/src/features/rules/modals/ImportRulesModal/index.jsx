@@ -292,7 +292,11 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
       <RQModal open={isOpen} onCancel={toggleModal}>
         <div className="rq-modal-content">
           {isImportFromCharlesModalOpen ? (
-            <ImportFromCharles showBackBtn={true} onClickBackButton={() => setIsImportFromCharlesModalOpen(false)} />
+            <ImportFromCharles
+              showBackBtn={true}
+              onClickBackButton={() => setIsImportFromCharlesModalOpen(false)}
+              callBack={toggleModal}
+            />
           ) : (
             <>
               <Row align="middle" justify="space-between" className="rules-importer-heading">
@@ -315,10 +319,10 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                   </RQButton>
                 </div>
               ) : null}
-              {renderImportRulesBtn()}
             </>
           )}
         </div>
+        {renderImportRulesBtn()}
       </RQModal>
     </>
   );
