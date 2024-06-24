@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Col, Row, Space, Typography } from "antd";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
-import { CheckCircleOutlined, LinkOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, CheckCircleOutlined, LinkOutlined } from "@ant-design/icons";
 import { RQButton, RQModal } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
@@ -19,7 +19,7 @@ import {
   trackCharlesSettingsImportDocsClicked,
   trackCharlesSettingsImportViewed,
 } from "modules/analytics/events/features/rules";
-import "./ImportFromCharlesModal.css";
+import "./charlesImporter.css";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 
 interface ModalProps {
@@ -83,11 +83,6 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
   );
 };
 
-interface ImportFromCharlesProps {
-  modalSrc?: string | null; // null indicates this is not mounted inside modal
-  callBack?: () => void;
-}
-
 export const ImportFromCharlesWrapperView: React.FC = () => {
   useEffect(() => {
     trackCharlesSettingsImportViewed("TOP_LEVEL_ROUTE");
@@ -98,7 +93,20 @@ export const ImportFromCharlesWrapperView: React.FC = () => {
     </div>
   );
 };
-const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, callBack }) => {
+
+interface ImportFromCharlesProps {
+  modalSrc?: string | null; // null indicates this is not mounted inside modal
+  callBack?: () => void;
+  showBackBtn?: boolean;
+  onClickBackButton?: () => void;
+}
+
+export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
+  modalSrc = null,
+  callBack,
+  showBackBtn,
+  onClickBackButton,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -198,7 +206,12 @@ const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, 
     <>
       <div className="charles-import-container">
         <Row justify={"space-between"}>
-          <Col className="charles-import-heading">Import Charles Proxy settings</Col>
+          <Col className="charles-import-heading">
+            {showBackBtn && (
+              <ArrowLeftOutlined size={16} className="charles-import-back-icon" onClick={onClickBackButton} />
+            )}
+            Import Charles Proxy settings
+          </Col>
           <Col className="charles-import-share-container">
             <LinkOutlined className="icon__wrapper" />
             Share
@@ -210,7 +223,7 @@ const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, 
             maxFiles={1}
             onFilesDrop={onFilesDrop}
             isProcessing={isDataProcessing}
-            title="Drag and drop your Charles export file"
+            title="Drag and drop your Charles export file to upload"
             subtitle="Accepted file formats: CSV, Trace test file, and XML"
           />
         )}
