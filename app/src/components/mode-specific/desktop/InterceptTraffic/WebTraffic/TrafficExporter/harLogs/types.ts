@@ -70,10 +70,10 @@ interface HarResponseContent {
   encoding?: string;
 }
 
-type HarRequestQueryString = HarMapEntry;
+export type HarRequestQueryString = HarMapEntry;
 export type HarHeaderEntry = HarMapEntry;
 
-interface HarMapEntry {
+export interface HarMapEntry {
   name: string;
   value: string;
   comment?: string;
@@ -102,6 +102,13 @@ interface LogRequest {
   headers: HeaderMap;
   body: any;
   queryParams: HarMapEntry[];
+  GQLDetails: GQLDetails | null;
+}
+
+interface GQLDetails {
+  query: string;
+  variables: any; // TBD @nsr
+  operationName: string;
 }
 
 interface LogResponse {
