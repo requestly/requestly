@@ -72,6 +72,23 @@ import { toast } from "utils/Toast";
 const { getUserProfilePath } = DB_UTILS;
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+
+const getUserDisplayName = (email, displayName) => {
+  const DEFAULT_DISPLAY_NAME = "User";
+
+  if (!email) {
+    return DEFAULT_DISPLAY_NAME;
+  }
+
+  const updatedDisplayName = email?.split("@")?.[0]?.trim();
+
+  if (!displayName || displayName === DEFAULT_DISPLAY_NAME) {
+    return updatedDisplayName;
+  }
+
+  return displayName;
+};
+
 /**
  * SignIn with Google in popup window and create profile node
  * @returns Promise Object which can be chained with then and catch to handle success and error respectively
@@ -597,7 +614,7 @@ export function getAuthData(user) {
 
   // Add default name in case actual name isnt provided
   if (!userProfile.displayName) {
-    userProfile.displayName = "User";
+    userProfile.displayName = getUserDisplayName(userProfile.email, userProfile.displayName);
   }
 
   return userProfile;
