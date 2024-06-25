@@ -210,11 +210,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         <AuthWarningBanner warningMessage={warningMessage} onBannerClose={() => setIsAuthWarningBannerVisible(false)} />
       )}
       <h2 className="onboarding-auth-form-header">
-        {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your Requestly account"}
+        {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your account"}
       </h2>
       <Row align="middle" className="text-bold onboarding-auth-mode-switch-wrapper">
         <span>
-          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Already using Requestly?" : "Don't have an account yet?"}{" "}
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Already have an account?" : "Don't have an account yet?"}{" "}
         </span>
         <span onClick={handleSignupSigninSwitch} className="text-white onboarding-auth-mode-switcher">
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign in" : "Sign up now"}
@@ -327,7 +327,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
       {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <div className="onboarding-terms-text">
-          I agree to the Requestly{" "}
+          I agree to the{" "}
           <a href="https://requestly.com/terms/" target="_blank" rel="noreferrer">
             terms
           </a>
