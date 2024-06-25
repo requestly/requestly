@@ -12,18 +12,13 @@
   padding: 24px;
 }
 
-.charles-import-modal-content {
-  padding: 16px;
-  background-color: var(--requestly-color-surface-0);
-  border-radius: 8px;
-}
-
 .charles-import-container {
   margin: auto;
 }
 
 .charles-import-header {
   margin-bottom: 8px;
+  margin-top: -18px;
 }
 
 .charles-import-body {
@@ -57,6 +52,7 @@
   padding: 8px;
   cursor: pointer;
   margin-top: 4px;
+  margin-right: 20px;
 }
 
 .parsed-rules-info {
