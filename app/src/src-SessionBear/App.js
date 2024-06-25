@@ -20,6 +20,7 @@ import { useIsExtensionEnabled } from "hooks";
 import { LazyMotion, domMax } from "framer-motion";
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import DashboardLayout from "./layouts/DashboardLayout";
+import { useInitializeNewUserSessionRecordingConfig } from "features/settings/components/SessionsBookSettings/hooks";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
 
   useIsExtensionEnabled();
   submitAppDetailAttributes();
+  useInitializeNewUserSessionRecordingConfig();
 
   return (
     <>
