@@ -268,6 +268,24 @@ const CurrentTrafficTable = ({
         } catch (err) {
           Logger.log(err);
         }
+
+        if (!includeLog && log?.request?.GQLDetails) {
+          // search also on GraphQL properties
+          const operationName = log?.request?.GQLDetails?.operationName?.toLowerCase() || "";
+          const query = log?.request?.GQLDetails?.query?.toLowerCase() || "";
+          try {
+            // TODO: @wrongsahil fix this. Special Characters are breaking the UI
+            let reg = null;
+            if (searchFilter.regex) {
+              reg = new RegExp(searchTerm);
+              includeLog = operationName.match(reg) || query.match(reg);
+            } else {
+              includeLog = operationName.includes(searchTerm) || query.includes(searchTerm);
+            }
+          } catch (err) {
+            Logger.log(err);
+          }
+        }
       }
 
       if (!includeLog) {
