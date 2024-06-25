@@ -1,13 +1,14 @@
 .url-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  gap: 4px;
+  justify-content: start;
   .url {
     white-space: nowrap;
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex-grow: 1;
+    flex-grow: auto;
   }
 
   .graphql-operation-name {
