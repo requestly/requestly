@@ -77,7 +77,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
   }, [triggeredBy]);
   return (
     <RQModal open={isOpen} centered onCancel={toggle} className="import-from-charles-modal">
-      <div className="rq-modal-content">
+      <div className="charles-import-modal-content">
         <ImportFromCharles modalSrc={triggeredBy} callBack={() => toggle()} />
       </div>
     </RQModal>
@@ -206,7 +206,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
   return (
     <>
       <div className="charles-import-container">
-        <Row justify={"space-between"}>
+        <Row justify={"space-between"} className="charles-import-header">
           <Col className="charles-import-heading">
             {showBackBtn && (
               <ArrowLeftOutlined size={16} className="charles-import-back-icon" onClick={onClickBackButton} />
@@ -303,11 +303,11 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
 
             <Row justify="center" className="mt-8">
               {isParsedRulesExist ? (
-                <RQButton size="small" type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
+                <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
                   Import
                 </RQButton>
               ) : (
-                <RQButton size="small" type="primary" onClick={handleResetImport}>
+                <RQButton type="primary" onClick={handleResetImport}>
                   Try another file
                 </RQButton>
               )}
