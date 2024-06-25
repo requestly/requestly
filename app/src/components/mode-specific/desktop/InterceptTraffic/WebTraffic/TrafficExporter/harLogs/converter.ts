@@ -110,7 +110,7 @@ export const convertHarJsonToRQLogs = (har: Har): RQNetworkLog[] => {
         headers: requestHeaders,
         body: entry.request.postData?.text,
         queryParams: entry.request.queryString,
-        GQLDetails: getGraphQLDetails(entry), // can be behind a feature flag for now to avoid performance impact for everyone
+        GQLDetails: getGraphQLDetails(entry),
       },
       response: {
         statusCode: entry.response.status,

@@ -1,0 +1,18 @@
+.url-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  .url {
+    white-space: nowrap;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+  }
+
+  .graphql-operation-name {
+    font-style: italic;
+    color: var(--map-tokens-secondary-secondary-400, #b568f9);
+    font-weight: 400;
+  }
+}

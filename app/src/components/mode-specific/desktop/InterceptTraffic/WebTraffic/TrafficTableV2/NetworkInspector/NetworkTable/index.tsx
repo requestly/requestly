@@ -15,6 +15,8 @@ import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 import { Checkbox } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
+import "./index.scss";
+
 export const ITEM_SIZE = 30;
 
 interface Props {
@@ -145,7 +147,13 @@ const NetworkTable: React.FC<Props> = ({
         render: (url: string, log: RQNetworkLog) => {
           if (log.request.GQLDetails) {
             const { operationName } = log.request.GQLDetails;
-            return operationName ? `[${operationName}] ${url}` : url;
+            console.log("operationName", operationName);
+            return (
+              <div className="url-wrapper">
+                <span className="url">{url}</span>
+                <span className="graphql-operation-name">{`(${operationName})`}</span>
+              </div>
+            );
           }
 
           return url;
