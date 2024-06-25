@@ -25,7 +25,7 @@ import AddMemberModal from "features/settings/components/Profile/ManageTeams/Tea
 import SwitchWorkspaceModal from "componentsV2/modals/SwitchWorkspaceModal/SwitchWorkspaceModal";
 import { usePrevious } from "hooks";
 import JoinWorkspaceModal from "componentsV2/modals/JoinWorkspaceModal";
-import { isAppOpenedInIframe } from "utils/AppUtils";
+import { isAppOpenedInIframe, isAppTypeSessionBear } from "utils/AppUtils";
 import { SharingModal } from "components/common/SharingModal";
 import { PricingModal } from "features/pricing";
 import MailLoginLinkPopup from "components/authentication/AuthForm/MagicAuthLinkModal";
@@ -220,9 +220,8 @@ const DashboardContent = () => {
           {onboardingVariation !== "variant1" &&
             shouldShowOnboarding() &&
             appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-            !appOnboardingDetails.isOnboardingCompleted && (
-              <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />
-            )}
+            !appOnboardingDetails.isOnboardingCompleted &&
+            !isAppTypeSessionBear() && <Onboarding isOpen={activeModals.appOnboardingModal.isActive} />}
 
           {/* {isJoinWorkspaceCardVisible && user.loggedIn ? <JoinWorkspaceCard /> : null} */}
           {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||

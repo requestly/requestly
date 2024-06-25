@@ -157,4 +157,9 @@ APP_CONSTANTS.mock_base_url = {
   local: "http://localhost:5001/requestly-dev/us-central1/handleMockRequest/api/mockv2", // Change port depending upon you firebase functions emulator port
 };
 
+APP_CONSTANTS.APP_TYPE = {
+  REQUESTLY: "requestly",
+  SESSIONBEAR: "sessionbear",
+};
+
 export default APP_CONSTANTS;

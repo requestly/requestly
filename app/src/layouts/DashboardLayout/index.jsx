@@ -9,7 +9,7 @@ import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
-import { isAppOpenedInIframe } from "utils/AppUtils";
+import { isAppOpenedInIframe, isAppTypeSessionBear } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { actions } from "store";
@@ -74,10 +74,11 @@ const DashboardLayout = () => {
         <div className="app-main-content">
           <DashboardContent />
         </div>
-
-        <div className="app-footer">
-          <Footer />
-        </div>
+        {!isAppTypeSessionBear() ? (
+          <div className="app-footer">
+            <Footer />
+          </div>
+        ) : null}
       </div>
     </>
   );
