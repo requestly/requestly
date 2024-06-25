@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserAuthDetails } from "store/selectors";
+import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { useLocation } from "react-router-dom";
 import { isPricingPage, isGoodbyePage, isInvitePage, isSettingsPage } from "utils/PathUtils.js";
 import Footer from "../../components/sections/Footer";
@@ -9,16 +9,18 @@ import { Sidebar } from "./Sidebar";
 import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
-import { isAppOpenedInIframe, isAppTypeSessionBear } from "utils/AppUtils";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import { AppNotificationBanner } from "../../componentsV2/AppNotificationBanner";
 import { httpsCallable, getFunctions } from "firebase/functions";
 import { actions } from "store";
 import "./DashboardLayout.css";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
   const location = useLocation();
   const { pathname } = location;
   const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
@@ -31,9 +33,18 @@ const DashboardLayout = () => {
   }
 
   const isSidebarVisible = useMemo(
-    () => !(isPricingPage(pathname) || isGoodbyePage(pathname) || isInvitePage(pathname) || isSettingsPage(pathname)),
-    [pathname]
+    () =>
+      !(
+        isPricingPage(pathname) ||
+        isGoodbyePage(pathname) ||
+        isInvitePage(pathname) ||
+        isSettingsPage(pathname) ||
+        appMode === GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR
+      ),
+    [pathname, appMode]
   );
+
+  const isFooterVisible = appMode !== GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR;
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
 
@@ -74,7 +85,7 @@ const DashboardLayout = () => {
         <div className="app-main-content">
           <DashboardContent />
         </div>
-        {!isAppTypeSessionBear() ? (
+        {isFooterVisible ? (
           <div className="app-footer">
             <Footer />
           </div>

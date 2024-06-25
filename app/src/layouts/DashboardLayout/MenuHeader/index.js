@@ -25,7 +25,6 @@ import { RequestBot, trackAskAIClicked } from "features/requestBot";
 import BotIcon from "./assets/bot.svg";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
-import { isAppTypeSessionBear } from "utils/AppUtils";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -45,7 +44,6 @@ const MenuHeader = () => {
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
-  const isAppTypeRequestly = !isAppTypeSessionBear();
 
   //don't show general app header component for editor screens
   const showMenuHeader = () => !PATHS_WITHOUT_HEADER.some((path) => pathname.includes(path));
@@ -76,7 +74,7 @@ const MenuHeader = () => {
             >
               <div className="header-left-section">
                 <WorkspaceSelector />
-                {isAppTypeRequestly && (
+                {appMode !== GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR && (
                   <>
                     <a
                       target="_blank"
@@ -93,7 +91,7 @@ const MenuHeader = () => {
             </Col>
           ) : null}
 
-          {appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isAppTypeRequestly && (
+          {appMode !== GLOBAL_CONSTANTS.APP_MODES.EXTENSION && appMode !== GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR && (
             <Col xs={0} sm={0} md={0} lg={!isPricingOrGoodbyePage ? (isTabletView ? 10 : 8) : 10}>
               <div className="header-middle-section">
                 <HeaderText />
@@ -104,28 +102,27 @@ const MenuHeader = () => {
           <Col className="ml-auto">
             <div className="header-right-section">
               <Row align="middle" gutter={8} wrap={false}>
-                <>
-                  {isAppTypeRequestly && (
-                    <>
-                      {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-                      user?.details?.planDetails?.status === "canceled" &&
-                      isPlanExpiredBannerClosed ? (
-                        <div className="hidden-on-small-screen">
-                          <PlanExpiredBadge />
-                        </div>
-                      ) : null}
-                      <RQButton
-                        type="default"
-                        className="header-search-btn"
-                        onClick={() => dispatch(actions.updateIsCommandBarOpen(true))}
-                      >
-                        <div>
-                          <SearchOutlined /> Search
-                        </div>
-                        <div className="search-shortcut-annotation">⌘+K</div>
-                      </RQButton>
-                      {/* TEMPORARILY HIDDEN  */}
-                      {/* <Col className="hidden-on-small-screen">
+                {appMode !== GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR && (
+                  <>
+                    {appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+                    user?.details?.planDetails?.status === "canceled" &&
+                    isPlanExpiredBannerClosed ? (
+                      <div className="hidden-on-small-screen">
+                        <PlanExpiredBadge />
+                      </div>
+                    ) : null}
+                    <RQButton
+                      type="default"
+                      className="header-search-btn"
+                      onClick={() => dispatch(actions.updateIsCommandBarOpen(true))}
+                    >
+                      <div>
+                        <SearchOutlined /> Search
+                      </div>
+                      <div className="search-shortcut-annotation">⌘+K</div>
+                    </RQButton>
+                    {/* TEMPORARILY HIDDEN  */}
+                    {/* <Col className="hidden-on-small-screen">
                 <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
                   <GitHubButton
                     style={{ display: "flex" }}
@@ -138,37 +135,37 @@ const MenuHeader = () => {
                   />
                 </span>
               </Col> */}
-                      <RQButton
-                        className="ask-ai-btn"
-                        onClick={() => {
-                          trackAskAIClicked();
-                          setIsRequestBotVisible(true);
-                          dispatch(
-                            actions.updateProductTourCompleted({
-                              tour: TOUR_TYPES.MISCELLANEOUS,
-                              subTour: "askAI",
-                            })
-                          );
-                        }}
-                        data-tour-id={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
-                      >
-                        <div className="ask-ai-btn-content">
-                          <img src={BotIcon} alt="bot" />
-                          Ask AI
-                        </div>
-                      </RQButton>
-                    </>
+                    <RQButton
+                      className="ask-ai-btn"
+                      onClick={() => {
+                        trackAskAIClicked();
+                        setIsRequestBotVisible(true);
+                        dispatch(
+                          actions.updateProductTourCompleted({
+                            tour: TOUR_TYPES.MISCELLANEOUS,
+                            subTour: "askAI",
+                          })
+                        );
+                      }}
+                      data-tour-id={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
+                    >
+                      <div className="ask-ai-btn-content">
+                        <img src={BotIcon} alt="bot" />
+                        Ask AI
+                      </div>
+                    </RQButton>
+                  </>
+                )}
+
+                <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
+                {(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
+                  (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
+                    user?.details?.planDetails?.status !== "canceled")) &&
+                  appMode !== GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR && (
+                    <Col>
+                      <PremiumPlanBadge />
+                    </Col>
                   )}
-                  <Divider type="vertical" className="header-vertical-divider hidden-on-small-screen" />
-                  {(appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ||
-                    (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP &&
-                      user?.details?.planDetails?.status !== "canceled")) &&
-                    isAppTypeRequestly && (
-                      <Col>
-                        <PremiumPlanBadge />
-                      </Col>
-                    )}
-                </>
 
                 {/* settings */}
                 <Col>

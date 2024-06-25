@@ -43,6 +43,7 @@ import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { trackHarFileOpened } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { trackLocalSessionRecordingOpened } from "modules/analytics/events/features/sessionRecording";
+import { isSessionBearApp } from "utils/AppUtils";
 
 let hasAppModeBeenSet = false;
 
@@ -233,6 +234,16 @@ const AppModeInitializer = () => {
     const asyncUseEffect = async () => {
       if (!hasAppModeBeenSet || hasAuthChanged) {
         hasAppModeBeenSet = true;
+
+        if (isSessionBearApp()) {
+          dispatch(
+            actions.updateAppMode({
+              appMode: GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR,
+            })
+          );
+          return;
+        }
+
         if (!isExtensionInstalled()) {
           if (isDesktopMode()) {
             dispatch(
