@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useTransition } from "react";
 import "./SeleniumImporterPage.css";
-import "./vendor/tailwind.min.css";
 import { clearStorage, isExtensionInstalled, saveStorageObject } from "actions/ExtensionActions";
 import removePreloader from "actions/UI/removePreloader";
 
@@ -158,13 +157,11 @@ const SeleniumImporterPage = () => {
   return (
     <div className="container">
       <div className="main-content">
-        <h1 className="text-3xl font-bold mb-4">Requestly for Selenium</h1>
+        <h1 className="heading">Requestly for Selenium</h1>
         <button
           onClick={startProcess}
           disabled={isButtonDisabled}
-          className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
-            isButtonDisabled ? "bg-gray-500 hover:bg-gray-500" : ""
-          }`}
+          className={`action-button ${isButtonDisabled ? "disabled" : ""}`}
         >
           Load Requestly Rules
         </button>
@@ -189,11 +186,11 @@ const SeleniumImporterPage = () => {
                   {index === 0 ? "🔌" : index === 1 ? "🔍" : index === 2 ? "🗑️" : "💾"}
                 </span>
                 <span className="text-lg">{stepText}</span>
-                {stepState.error && <p className="mt-2 text-sm">{stepState.error.message}</p>}
+                {stepState.error && <p className="error-message">{stepState.error.message}</p>}
               </div>
             );
           })}
-          {isAllDone && <div className="text-lg text-green-600 font-bold mt-4">✅ All done!</div>}
+          {isAllDone && <div className="all-done-message">✅ All done!</div>}
         </div>
         {toastMessage && <div className="toast">{toastMessage}</div>}
       </div>
