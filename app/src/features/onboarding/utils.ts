@@ -8,7 +8,7 @@ export const shouldShowOnboarding = () => {
 
   if (
     isEnvAutomation() ||
-    appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ||
+    appFlavour !== GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ||
     window.location.href.includes(PATHS.AUTH.SIGN_IN.RELATIVE) ||
     window.location.href.includes(PATHS.AUTH.SIGN_UP.RELATIVE) ||
     window.location.href.includes(PATHS.AUTH.DEKSTOP_SIGN_IN.RELATIVE) ||
