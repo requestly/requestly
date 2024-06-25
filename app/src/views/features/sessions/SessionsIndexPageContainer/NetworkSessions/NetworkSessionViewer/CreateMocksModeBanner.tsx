@@ -118,7 +118,7 @@ const CreateMocksModeBanner: React.FC<Props> = ({
 
     const newRules = Object.values(selectedMockRequests).map((log) => {
       return createResponseMock({
-        response: log.response.body,
+        responseDetails: log.response,
         urlMatcher: mockMatcher,
         requestUrl: log.url,
         operationKeys: graphQLKeys,
