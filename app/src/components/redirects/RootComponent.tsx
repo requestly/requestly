@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 import { getAppMode } from "store/selectors";
 import PATHS from "config/constants/sub/paths";
-import { isAppTypeSessionBear } from "utils/AppUtils";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
@@ -20,10 +19,10 @@ const RootComponent: React.FC = () => {
   return (
     <Navigate
       to={
-        isOpenedInDesktopMode
-          ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE
-          : isAppTypeSessionBear()
+        appMode === GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR
           ? PATHS.SESSIONS.ABSOLUTE
+          : isOpenedInDesktopMode
+          ? PATHS.DESKTOP.INTERCEPT_TRAFFIC.ABSOLUTE
           : PATHS.HOME.ABSOLUTE
       }
     />

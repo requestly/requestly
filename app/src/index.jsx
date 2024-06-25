@@ -1,7 +1,7 @@
 import React from "react";
 import * as Sentry from "@sentry/react";
 import { createRoot } from "react-dom/client";
-import { RouterProvider, createBrowserRouter, Route, Routes } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { persistStore } from "redux-persist";
 import { reduxStore } from "./store";
@@ -13,10 +13,10 @@ import "./assets/less/index.less";
 import "./styles/custom/custom.scss";
 
 import PageError from "components/misc/PageError";
-import { routes } from "routes";
-import { fullScreenRoutes } from "routes/fullScreenRoutes";
+import { requestlyRoutes, sessionBearRoutes } from "routes";
 import SeleniumImporter from "views/misc/SeleniumImporter";
 import PATHS from "config/constants/sub/paths";
+import { isSessionBearApp } from "utils/AppUtils";
 
 const persistor = persistStore(reduxStore);
 const container = document.getElementById("root");
@@ -39,7 +39,7 @@ const router = createBrowserRouter([
         <App />
       </Sentry.ErrorBoundary>
     ),
-    children: [...routes, ...fullScreenRoutes],
+    children: isSessionBearApp() ? sessionBearRoutes : requestlyRoutes,
   },
 ]);
 

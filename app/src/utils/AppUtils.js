@@ -1,6 +1,5 @@
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isExtensionInstalled } from "actions/ExtensionActions";
-import APP_CONSTANTS from "config/constants";
 
 export const getAppDetails = () => {
   let app_mode = null;
@@ -42,12 +41,12 @@ export const isAppOpenedInIframe = () => {
   }
 };
 
-export const isAppTypeSessionBear = () => {
+export const isSessionBearApp = () => {
   // TEMP: ADDED PARAMS FOR SESSIONBEAR, FOR TESTING ON LOCAL ENV. TO BE REMOVED BEFORE RELEAE
   const queryParams = new URLSearchParams(window.location.search);
 
   return (
     window.location.host.includes("app.sessionbear.com") ||
-    queryParams.get("appType") === APP_CONSTANTS.APP_TYPE.SESSIONBEAR
+    queryParams.get("mode") === GLOBAL_CONSTANTS.APP_MODES.SESSIONBEAR
   );
 };
