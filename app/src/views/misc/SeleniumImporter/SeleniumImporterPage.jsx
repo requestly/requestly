@@ -5,6 +5,7 @@ import removePreloader from "actions/UI/removePreloader";
 
 const SeleniumImporterPage = () => {
   const [isPending, startTransition] = useTransition();
+  const [apiKey, setApiKey] = useState("");
   const [step1, setStep1] = useState({ inProgress: false, success: false, error: null });
   const [step2, setStep2] = useState({ inProgress: false, success: false, error: null });
   const [step3, setStep3] = useState({ inProgress: false, success: false, error: null });
@@ -12,6 +13,22 @@ const SeleniumImporterPage = () => {
   const [isAllDone, setIsAllDone] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const apiKeyFromQuery = urlParams.get("apiKey");
+    if (apiKeyFromQuery) {
+      setApiKey(apiKeyFromQuery);
+    }
+
+    startTransition(() => {
+      try {
+        removePreloader();
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }, []);
 
   const steps = [
     "Checking if Requestly Extension is Installed",
@@ -127,9 +144,12 @@ const SeleniumImporterPage = () => {
   };
 
   const startProcess = () => {
+    if (!apiKey) {
+      setToastMessage("API key is required");
+      return;
+    }
+
     disableButton();
-    const urlParams = new URLSearchParams(window.location.search);
-    const apiKey = urlParams.get("apiKey");
 
     checkRequestlyExtension()
       .then(() => fetchRules(apiKey))
@@ -144,20 +164,23 @@ const SeleniumImporterPage = () => {
       });
   };
 
-  useEffect(() => {
-    startTransition(() => {
-      try {
-        removePreloader();
-      } catch (error) {
-        console.error(error);
-      }
-    });
-  }, []);
-
   return (
     <div className="container">
       <div className="main-content">
         <h1 className="heading">Requestly for Selenium</h1>
+        <div className="api-key-input-container">
+          <label htmlFor="apiKey" className="api-key-label">
+            API Key
+          </label>
+          <input
+            type="password"
+            id="apiKey"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            placeholder="Enter your API Key"
+            className="api-key-input"
+          />
+        </div>
         <button
           onClick={startProcess}
           disabled={isButtonDisabled}
