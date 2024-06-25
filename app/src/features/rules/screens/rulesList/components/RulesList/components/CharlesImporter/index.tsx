@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Col, Row, Space, Typography } from "antd";
+import { Col, Modal, Row, Space, Typography } from "antd";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { ArrowLeftOutlined, CheckCircleOutlined, LinkOutlined } from "@ant-design/icons";
-import { RQButton, RQModal } from "lib/design-system/components";
+import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
@@ -76,11 +76,9 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
     trackCharlesSettingsImportViewed(triggeredBy);
   }, [triggeredBy]);
   return (
-    <RQModal open={isOpen} centered onCancel={toggle} className="import-from-charles-modal">
-      <div className="charles-import-modal-content">
-        <ImportFromCharles modalSrc={triggeredBy} callBack={() => toggle()} />
-      </div>
-    </RQModal>
+    <Modal open={isOpen} centered onCancel={toggle} footer={null} className="import-from-charles-modal custom-rq-modal">
+      <ImportFromCharles modalSrc={triggeredBy} callBack={() => toggle()} />
+    </Modal>
   );
 };
 

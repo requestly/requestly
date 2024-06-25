@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
-import { Button, Col, List, Row, Space } from "antd";
+import { Button, Col, List, Modal, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
@@ -11,7 +11,7 @@ import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { actions } from "store";
 import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
-import { RQButton, RQModal } from "lib/design-system/components";
+import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { RULE_IMPORT_TYPE } from "features/rules";
@@ -289,7 +289,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
 
   return (
     <>
-      <RQModal open={isOpen} onCancel={toggleModal} width={480}>
+      <Modal open={isOpen} onCancel={toggleModal} width={480} className="custom-rq-modal" footer={null}>
         <div className="rule-importer-content">
           {isImportFromCharlesModalOpen ? (
             <ImportFromCharles
@@ -323,7 +323,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
           )}
         </div>
         {renderImportRulesBtn()}
-      </RQModal>
+      </Modal>
     </>
   );
 };

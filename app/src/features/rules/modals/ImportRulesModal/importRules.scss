@@ -1,13 +1,9 @@
-.rq-modal .rule-importer-content {
-  padding: 16px;
-  background-color: var(--requestly-color-surface-0);
-  border-radius: 8px;
-
+.custom-rq-modal .rule-importer-content {
   .ant-row.rules-importer-heading {
     font-size: var(--requestly-font-size-base);
     font-weight: var(--requestly-font-weight-medium);
-    padding: 0 4px;
     margin-bottom: 16px;
+    margin-top: -10px;
   }
 
   .rules-importer-footer {
