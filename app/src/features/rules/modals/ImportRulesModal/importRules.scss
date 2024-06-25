@@ -1,9 +1,13 @@
-.rq-modal .rq-modal-content {
+.rq-modal .rule-importer-content {
+  padding: 16px;
+  background-color: var(--requestly-color-surface-0);
+  border-radius: 8px;
+
   .ant-row.rules-importer-heading {
     font-size: var(--requestly-font-size-base);
     font-weight: var(--requestly-font-weight-medium);
     padding: 0 4px;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
   }
 
   .rules-importer-footer {
@@ -11,9 +15,11 @@
     font-size: var(--requestly-font-size-xs);
     text-align: center;
     margin-top: 16px;
+    margin-bottom: 8px;
 
     .rq-btn {
       padding: 0;
+      font-size: var(--requestly-font-size-xs);
     }
   }
 }

@@ -12,8 +12,18 @@
   padding: 24px;
 }
 
+.charles-import-modal-content {
+  padding: 16px;
+  background-color: var(--requestly-color-surface-0);
+  border-radius: 8px;
+}
+
 .charles-import-container {
   margin: auto;
+}
+
+.charles-import-header {
+  margin-bottom: 8px;
 }
 
 .charles-import-body {
@@ -32,7 +42,6 @@
 .charles-import-heading {
   font-size: var(--requestly-font-size-base);
   font-weight: var(--requestly-font-weight-medium);
-  /* padding: 0 4px; */
   gap: 8px;
   display: flex;
   align-items: center;
@@ -47,6 +56,7 @@
   font-weight: var(--requestly-font-weight-medium);
   padding: 8px;
   cursor: pointer;
+  margin-top: 4px;
 }
 
 .parsed-rules-info {
@@ -78,6 +88,7 @@
   flex-direction: column;
   align-content: center;
   flex-wrap: wrap;
+  padding: 0 16px;
 }
 
 .parsed-rules-error-info ol {
