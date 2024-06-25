@@ -4,7 +4,6 @@ import APP_CONSTANTS from "../config/constants";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
 import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
-import DashboardLayout from "layouts/DashboardLayout";
 import FullScreenLayout from "layouts/FullScreenLayout";
 import UpdateDialog from "components/mode-specific/desktop/UpdateDialog";
 import ThirdPartyIntegrationsHandler from "hooks/ThirdPartyIntegrationsHandler";
@@ -20,6 +19,7 @@ import AutomationNotAllowedNotice from "components/misc/notices/AutomationNotAll
 import { useIsExtensionEnabled } from "hooks";
 import { LazyMotion, domMax } from "framer-motion";
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
