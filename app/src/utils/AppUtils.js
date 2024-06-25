@@ -40,3 +40,16 @@ export const isAppOpenedInIframe = () => {
     return true;
   }
 };
+
+export const getAppFlavour = () => {
+  // TEMP: ADDED PARAMS FOR SESSIONBEAR, FOR TESTING ON LOCAL ENV. TO BE REMOVED BEFORE RELEASE
+  const queryParams = new URLSearchParams(window.location.search);
+  if (
+    window.location.host.includes("app.sessionbear.com") ||
+    queryParams.get("flavour") === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
+  ) {
+    return GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR;
+  }
+
+  return GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY;
+};
