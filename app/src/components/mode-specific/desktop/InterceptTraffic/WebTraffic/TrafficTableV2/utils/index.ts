@@ -94,7 +94,7 @@ export const getOrCreateSessionGroup = async (
 };
 
 export const createResponseMock = (ruleParams: {
-  response: string;
+  responseDetails: Record<string, any>;
   urlMatcher: string;
   requestUrl: string;
   requestDetails: Record<string, any>;
@@ -104,9 +104,10 @@ export const createResponseMock = (ruleParams: {
 }) => {
   const newResponseRule = getNewRule("Response");
   const responseRulePair = cloneDeep(newResponseRule.pairs[0]);
-  responseRulePair.response.value = ruleParams.response;
+  responseRulePair.response.value = ruleParams.responseDetails.body;
   responseRulePair.response.serveWithoutRequest = true;
   responseRulePair.response.resourceType = ruleParams.resourceType;
+  responseRulePair.response.statusCode = ruleParams.responseDetails.statusCode;
 
   if (ruleParams.urlMatcher === GLOBAL_CONSTANTS.RULE_KEYS.URL) {
     responseRulePair.source.value = ruleParams.requestUrl;
