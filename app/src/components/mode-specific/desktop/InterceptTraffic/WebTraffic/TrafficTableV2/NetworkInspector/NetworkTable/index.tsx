@@ -142,6 +142,14 @@ const NetworkTable: React.FC<Props> = ({
         title: "URL",
         dataIndex: "url",
         width: "48%",
+        render: (url: string, log: RQNetworkLog) => {
+          if (log.request.GQLDetails) {
+            const { operationName } = log.request.GQLDetails;
+            return operationName ? `[${operationName}] ${url}` : url;
+          }
+
+          return url;
+        },
       },
       {
         id: "method",
@@ -219,7 +227,6 @@ const NetworkTable: React.FC<Props> = ({
               return null;
             }
             const columnData = get(log, getColumnKey(column?.dataIndex));
-
             return (
               <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>
                 {column?.render ? column.render(columnData, log) : columnData}
