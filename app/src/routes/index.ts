@@ -10,17 +10,21 @@ import { ruleRoutes } from "features/rules/routes";
 import { desktopSessionsRoutes } from "./desktopSessionRoutes";
 import { settingRoutes } from "features/settings/routes";
 import { mockServerRoutes } from "features/mocks/routes";
+import { isAppTypeSessionBear } from "utils/AppUtils";
+import { sessionBearRoutes } from "./sessionBearRoutes";
 
-export const routes: RouteObject[] = [
-  ...ruleRoutes,
-  ...sessionRoutes,
-  ...apiClientRoutes,
-  ...accountRoutes,
-  ...authRoutes,
-  ...desktopRoutes,
-  ...mockServerRoutes,
-  ...onboardingRoutes,
-  ...settingRoutes,
-  ...miscRoutes,
-  ...desktopSessionsRoutes,
-];
+export const routes: RouteObject[] = isAppTypeSessionBear()
+  ? sessionBearRoutes
+  : [
+      ...ruleRoutes,
+      ...sessionRoutes,
+      ...apiClientRoutes,
+      ...accountRoutes,
+      ...authRoutes,
+      ...desktopRoutes,
+      ...mockServerRoutes,
+      ...onboardingRoutes,
+      ...settingRoutes,
+      ...miscRoutes,
+      ...desktopSessionsRoutes,
+    ];
