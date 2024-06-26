@@ -1,5 +1,6 @@
-import { getNewRule } from "components/features/rules/RuleBuilder/actions";
+import { getNewGroup, getNewRule } from "components/features/rules/RuleBuilder/actions";
 import {
+  Group,
   HeaderRuleActionType,
   HeadersRule,
   RedirectRule,
@@ -10,16 +11,43 @@ import {
   SourceOperator,
 } from "types";
 
-export const parseRulesFromModheader = (modheaderProfile) => {
-  //parse request headers
-  //parse response headers
-  //parse CSP rules
-  // parse source filters and create header rules - use only the enabled filters
-  // empty filters array means all requests
-  //parse redirect rules
-  //parse source filters
-  //create rules
-  //dump into groups
+export const parseRulesFromModheader = (modheaderProfiles): (Rule | Group)[] => {
+  const recordsToBeImported: (Rule | Group)[] = [];
+
+  modheaderProfiles.forEach((modheaderProfile) => {
+    const group = getNewGroup(modheaderProfile.title) as Group;
+    recordsToBeImported.push(group);
+
+    const headerRule = parseHeaders(modheaderProfile);
+    if (headerRule) {
+      headerRule.groupId = group.id;
+      recordsToBeImported.push(headerRule);
+    }
+
+    const cspHeaderRule = parseCSPHeaders(modheaderProfile);
+    if (cspHeaderRule) {
+      cspHeaderRule.groupId = group.id;
+      recordsToBeImported.push(cspHeaderRule);
+    }
+
+    const cookieHeaderRule = parseCookieHeaders(modheaderProfile);
+    if (cookieHeaderRule) {
+      cookieHeaderRule.groupId = group.id;
+      recordsToBeImported.push(cookieHeaderRule);
+    }
+
+    const redirectRules = parseRedirectRules(modheaderProfile)?.map((rule) => {
+      rule.groupId = group.id;
+      return rule;
+    });
+    if (redirectRules) {
+      recordsToBeImported.push(...redirectRules);
+    }
+  });
+
+  console.log("!!!debug", "recordsToBeImported", recordsToBeImported);
+
+  return recordsToBeImported;
 };
 
 const parseRedirectRules = (modheaderProfile): Rule[] => {
@@ -33,8 +61,13 @@ const parseRedirectRules = (modheaderProfile): Rule[] => {
       filters: parseFilters(modheaderProfile),
     };
     newRedirectRulePair.destination = redirect.value;
+    newRedirectRule.isModHeaderImport = true;
     return newRedirectRule;
   });
+
+  if (!redirectRules) {
+    return null;
+  }
 
   return redirectRules;
 };
@@ -55,7 +88,14 @@ const parseHeaders = (modheaderProfile): Rule => {
   }));
 
   const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  newHeaderRule.isModHeaderImport = true;
+
   const newHeaderRulePair = newHeaderRule.pairs[0];
+
+  if (!requestHeaders && !responseHeaders) {
+    return null;
+  }
+
   newHeaderRulePair.modifications.Request = requestHeaders ?? [];
   newHeaderRulePair.modifications.Response = responseHeaders ?? [];
   newHeaderRulePair.source = { ...parseSourceConditions(modheaderProfile), filters: parseFilters(modheaderProfile) };
@@ -66,9 +106,14 @@ const parseHeaders = (modheaderProfile): Rule => {
 const parseCSPHeaders = (modheaderProfile): Rule => {
   const enabledCSPDirectives = modheaderProfile.cspDirectives?.filter((directive) => directive.enabled);
 
-  const cspValueString = enabledCSPDirectives.map((directive) => `${directive.name} ${directive.value}`).join(";");
+  const cspValueString = enabledCSPDirectives?.map((directive) => `${directive.name} ${directive.value}`)?.join(";");
+
+  if (!cspValueString) {
+    return null;
+  }
 
   const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  newHeaderRule.isModHeaderImport = true;
 
   const newHeaderRulePair = newHeaderRule.pairs[0];
 
@@ -88,9 +133,15 @@ const parseCSPHeaders = (modheaderProfile): Rule => {
 const parseCookieHeaders = (modheaderProfile): Rule => {
   const enabledCookies = modheaderProfile.reqCookieAppend?.filter((cookie) => cookie.enabled);
 
-  const cookieString = enabledCookies.map((cookie) => `${cookie.name}=${cookie.value}`).join(";");
+  const cookieString = enabledCookies?.map((cookie) => `${cookie.name}=${cookie.value}`).join(";");
+
+  if (!cookieString) {
+    return null;
+  }
 
   const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  newHeaderRule.isModHeaderImport = true;
+
   const newHeaderRulePair = newHeaderRule.pairs[0];
   newHeaderRulePair.modifications.Request = [
     {

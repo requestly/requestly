@@ -220,6 +220,6 @@ export interface Group extends Record<string, unknown> {
   name: string;
   objectType: ObjectType.GROUP;
   status: Status;
-  children: Rule[];
+  children?: Rule[];
   isFavourite?: boolean;
 }
