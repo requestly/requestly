@@ -25,7 +25,10 @@ export const isDesktopMode = () => {
   return getAppDetails().app_mode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 };
 export const isProductionUI =
-  (window.location.host.includes("app.requestly.io") || window.location.host.includes("beta.requestly.io")) &&
+  (window.location.host.includes("app.requestly.io") ||
+    window.location.host.includes("beta.requestly.io") ||
+    window.location.host.includes("app.sessionbear.com") ||
+    window.location.host.includes("beta.sessionbear.com")) &&
   !window.testMode;
 
 export const isLocalStoragePresent = (appMode) => {
@@ -46,6 +49,7 @@ export const getAppFlavour = () => {
   const queryParams = new URLSearchParams(window.location.search);
   if (
     window.location.host.includes("app.sessionbear.com") ||
+    window.location.host.includes("beta.sessionbear.com") ||
     queryParams.get("flavour") === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
   ) {
     return GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR;
