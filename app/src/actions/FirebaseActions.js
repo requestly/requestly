@@ -68,6 +68,7 @@ import {
   trackLogoutSuccess,
 } from "modules/analytics/events/common/auth/logout";
 import { toast } from "utils/Toast";
+import { capitalize } from "lodash";
 
 const { getUserProfilePath } = DB_UTILS;
 
@@ -80,13 +81,22 @@ const getUserDisplayName = (email, displayName) => {
     return DEFAULT_DISPLAY_NAME;
   }
 
-  const updatedDisplayName = email?.split("@")?.[0]?.trim();
+  try {
+    const emailPrefix = email?.split("@")?.[0]?.trim();
+    const updatedDisplayName = emailPrefix
+      .split(".")
+      .map((word) => capitalize(word))
+      .join(" ");
 
-  if (!displayName || displayName === DEFAULT_DISPLAY_NAME) {
-    return updatedDisplayName;
+    if (!displayName || displayName === DEFAULT_DISPLAY_NAME) {
+      return updatedDisplayName;
+    }
+
+    return displayName;
+  } catch (error) {
+    Logger.log("Error while creating display name!");
+    return DEFAULT_DISPLAY_NAME;
   }
-
-  return displayName;
 };
 
 /**
