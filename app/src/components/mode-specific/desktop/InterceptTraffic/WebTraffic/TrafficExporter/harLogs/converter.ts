@@ -110,7 +110,6 @@ export const convertHarJsonToRQLogs = (har: Har): RQNetworkLog[] => {
         headers: requestHeaders,
         body: entry.request.postData?.text,
         queryParams: entry.request.queryString,
-        GQLDetails: getGraphQLDetails(entry),
       },
       response: {
         statusCode: entry.response.status,
@@ -123,6 +122,9 @@ export const convertHarJsonToRQLogs = (har: Har): RQNetworkLog[] => {
             : JSON.stringify(entry.response.content?.text),
       },
       requestShellCurl: entry?._RQDetails?.requestShellCurl || "",
+      metadata: {
+        GQLDetails: getGraphQLDetails(entry),
+      },
       actions: entry?._RQDetails?.actions || [],
       requestState: entry?._RQDetails?.requestState || "",
       consoleLogs: entry?._RQDetails?.consoleLogs || [],
