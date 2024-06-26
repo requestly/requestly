@@ -92,6 +92,7 @@ export interface RQNetworkLog {
   consoleLogs: any; // array of logs generated in script based rules
   domain?: string;
   app?: string;
+  metadata: Metadata;
 }
 
 interface LogRequest {
@@ -102,6 +103,9 @@ interface LogRequest {
   headers: HeaderMap;
   body: any;
   queryParams: HarMapEntry[];
+}
+
+interface Metadata {
   GQLDetails: GQLDetails | null;
 }
 

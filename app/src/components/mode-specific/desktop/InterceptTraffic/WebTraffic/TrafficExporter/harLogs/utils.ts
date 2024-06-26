@@ -15,7 +15,7 @@ export function downloadHar(har: Har, preferredName?: string) {
   saveAs(jsonBlob, preferredName ? `${preferredName}.har` : "requestly_logs.har");
 }
 
-export function getGraphQLDetails(harEntry: HarEntry): RQNetworkLog["request"]["GQLDetails"] {
+export function getGraphQLDetails(harEntry: HarEntry): RQNetworkLog["metadata"]["GQLDetails"] {
   const method = harEntry.request.method;
 
   let GQLQuery = null,

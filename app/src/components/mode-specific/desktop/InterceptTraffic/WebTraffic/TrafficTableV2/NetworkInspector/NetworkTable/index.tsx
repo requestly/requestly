@@ -145,9 +145,8 @@ const NetworkTable: React.FC<Props> = ({
         dataIndex: "url",
         width: "48%",
         render: (url: string, log: RQNetworkLog) => {
-          if (log.request.GQLDetails) {
-            const { operationName } = log.request.GQLDetails;
-            console.log("operationName", operationName);
+          if (log.metadata.GQLDetails) {
+            const { operationName } = log.metadata.GQLDetails;
             return (
               <div className="url-wrapper">
                 <span className="url">{url}</span>

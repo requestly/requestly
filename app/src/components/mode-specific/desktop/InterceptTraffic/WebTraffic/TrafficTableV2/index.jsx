@@ -271,8 +271,8 @@ const CurrentTrafficTable = ({
 
         if (!includeLog && log?.request?.GQLDetails) {
           // search also on GraphQL properties
-          const operationName = log?.request?.GQLDetails?.operationName?.toLowerCase() || "";
-          const query = log?.request?.GQLDetails?.query?.toLowerCase() || "";
+          const operationName = log?.metadata?.GQLDetails?.operationName?.toLowerCase() || "";
+          const query = log?.metadata?.GQLDetails?.query?.toLowerCase() || "";
           try {
             // TODO: @wrongsahil fix this. Special Characters are breaking the UI
             let reg = null;
