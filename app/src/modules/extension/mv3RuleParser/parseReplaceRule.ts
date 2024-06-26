@@ -11,13 +11,13 @@ import {
 
 const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondition => {
   if (!rulePair.source.value) {
-    const regexCondition = parseConditionFromSource(rulePair.source, false);
+    const regexCondition = parseConditionFromSource(rulePair.source, true, false);
     return {
       ...regexCondition,
       regexFilter: `.*`,
     };
   } else {
-    const regexCondition = parseConditionFromSource(rulePair.source, false);
+    const regexCondition = parseConditionFromSource(rulePair.source, true, false);
     let finalRegexFilter = regexCondition.regexFilter;
 
     // Remove ^ & $
@@ -58,7 +58,7 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
         // Final URL = https://example.com/v1/users/1234/hello#__rq_marker=https://example.com/v1/users/1234/hello
 
         regexFilter: `^(${matchingCondition?.regexFilter})(#__rq_marker.*)$|(${
-          parseConditionFromSource(rulePair.source)?.regexFilter
+          parseConditionFromSource(rulePair.source, true, false)?.regexFilter
         })`,
         isUrlFilterCaseSensitive: matchingCondition?.isUrlFilterCaseSensitive,
       },
