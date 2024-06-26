@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import MenuHeader from "./MenuHeader";
+import MenuHeader from "../../components/MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";

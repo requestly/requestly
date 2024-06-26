@@ -7,8 +7,8 @@ import { actions } from "store";
 import {
   redirectToAccountDetails,
   redirectToBillingTeamSettings,
-  redirectToGlobalSettings,
   redirectToProfileSettings,
+  redirectToSettings,
   redirectToWorkspaceSettings,
 } from "utils/RedirectionUtils";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
@@ -73,7 +73,7 @@ export default function HeaderUser() {
       },
       {
         label: "Settings",
-        onClick: () => redirectToGlobalSettings(navigate, window.location.pathname, "header"),
+        onClick: () => redirectToSettings(navigate, window.location.pathname, "header"),
       },
       { type: "divider" },
       {
