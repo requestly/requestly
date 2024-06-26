@@ -161,9 +161,27 @@ export const trackErrorInRuleCreation = (description, rule_type) => {
   trackEvent(RULES.ERROR_IN_RULE_CREATION, params);
 };
 
-export const trackErrorInSavingDNR = (description, rule_type, rule_id) => {
-  const params = { description, rule_type, rule_id };
-  trackEvent(RULES.ERROR_IN_RULE_CREATION, params);
+export const trackErrorInSavingDNR = ({
+  rule_type,
+  rule_id,
+  error,
+  is_migration_triggered,
+  source_key,
+  source_operator,
+  source_value,
+  page_path,
+}) => {
+  const params = {
+    rule_type,
+    rule_id,
+    error,
+    is_migration_triggered,
+    source_key,
+    source_operator,
+    source_value,
+    page_path,
+  };
+  trackEvent(RULES.ERROR_IN_SAVING_DNR, params);
 };
 
 export const trackRuleEditorViewed = (source, rule_type) => {
