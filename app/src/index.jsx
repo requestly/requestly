@@ -35,6 +35,13 @@ const router = createBrowserRouter([
         )}
         showDialog
       >
+        {/* 
+          CREATING SEPARATE APPS FOR SESSIONBEAR AND REQUESTLY IN ORDER TO KEEP THE EXISTING REQUESTLY CODE AS CLEAN AS POSSIBLE
+          - THIS FILE IS THE ENRTY POINT FOR THE APP
+          - DEPENDING ON THE APP FLAVOUR, WE RENDER THE RESPECTIVE APP's ROOT COMPONENT
+          - COMPONENTS CAN BE REUSED FROM REQUESTLY TO SESSIONBEAR IF ANY TWEAKS ARE REQUIRED
+        
+        */}
         {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? <SessionBearApp /> : <App />}
       </Sentry.ErrorBoundary>
     ),
