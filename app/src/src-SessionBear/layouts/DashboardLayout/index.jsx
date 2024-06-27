@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import MenuHeader from "../../components/MenuHeader";
+import MenuHeader from "./MenuHeader";
 import { useGoogleOneTapLogin } from "hooks/useGoogleOneTapLogin";
 import { removeElement } from "utils/domUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import "../../../layouts/DashboardLayout/DashboardLayout.css";
 import DashboardContent from "layouts/DashboardLayout/DashboardContent";
+import "../../../layouts/DashboardLayout/DashboardLayout.css";
 
 const DashboardLayout = () => {
   const { initializeOneTap, promptOneTap, shouldShowOneTapPrompt } = useGoogleOneTapLogin();
