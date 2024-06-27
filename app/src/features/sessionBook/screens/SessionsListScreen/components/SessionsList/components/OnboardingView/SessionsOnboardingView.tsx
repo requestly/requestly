@@ -1,0 +1,164 @@
+import React from "react";
+import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
+import { Button, Col, InputRef, Row, Space, Typography, Input } from "antd";
+import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/apiClient";
+import {
+  trackOnboardingPageViewed,
+  trackOnboardingSampleSessionViewed,
+  trackOnboardingToSettingsNavigate,
+  trackStartRecordingOnExternalTarget,
+  trackStartRecordingWithURLClicked,
+  trackTriedRecordingForInvalidURL,
+} from "modules/analytics/events/features/sessionRecording";
+import { useCallback, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { actions } from "store";
+import { isValidUrl } from "utils/FormattingHelper";
+import { redirectToSessionSettings } from "utils/RedirectionUtils";
+import { toast } from "utils/Toast";
+import { prefixUrlWithHttps } from "utils/URLUtils";
+import { SettingOutlined } from "@ant-design/icons";
+import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
+import StartSessionRecordingGif from "../../assets/sessions-banner.gif";
+import "./sessionsOnboardingView.scss";
+
+const { Text, Title } = Typography;
+
+interface SessionOnboardingViewProps {
+  isModalView?: boolean;
+}
+
+export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ isModalView = false }) => {
+  const inputRef = useRef<InputRef>();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    trackOnboardingPageViewed();
+  }, []);
+
+  const openInstallExtensionModal = useCallback(() => {
+    const modalProps = {
+      heading: "Install Browser extension to record sessions for faster debugging and bug reporting",
+      subHeading:
+        "Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser.",
+      eventPage: "session_recording_page",
+    };
+    // @ts-ignore
+    dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
+    trackInstallExtensionDialogShown({ src: "sessions_home_page" });
+  }, [dispatch]);
+
+  const handleStartRecordingBtnClicked = useCallback(() => {
+    trackStartRecordingWithURLClicked(isModalView ? "modal" : "onboarding");
+    if (isExtensionInstalled()) {
+      const urlToRecord = prefixUrlWithHttps(inputRef?.current.input.value);
+      inputRef.current.input.value = urlToRecord;
+      if (isValidUrl(urlToRecord)) {
+        trackStartRecordingOnExternalTarget(urlToRecord);
+        return startRecordingOnUrl(urlToRecord);
+      } else {
+        trackTriedRecordingForInvalidURL(urlToRecord);
+        toast.warn("Please enter a valid URL");
+      }
+    } else {
+      openInstallExtensionModal();
+    }
+  }, [openInstallExtensionModal, isModalView]);
+
+  const handleSettingsNavigation = useCallback(() => {
+    trackOnboardingToSettingsNavigate();
+    redirectToSessionSettings(navigate);
+  }, [navigate]);
+
+  return (
+    <div className="onboarding-content-container">
+      {!isModalView && (
+        <Row justify="end" align="middle" className="settings-row">
+          <Space size={20}>
+            {/* {openDownloadedSessionModalBtn} */}
+            <span onClick={handleSettingsNavigation} className="settings-btn">
+              <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+            </span>
+          </Space>
+        </Row>
+      )}
+
+      <Row justify="space-between" className="onboarding-banner">
+        <Col span={isModalView ? 24 : 12} className="banner-text-container">
+          <Row className="banner-header">
+            <Title className="banner-title">Debug issues faster with SessionBook</Title>
+          </Row>
+          <Row className="banner-description">
+            <Text type="secondary" className="banner-text w-full">
+              <div>
+                Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
+                <Text strong>network</Text> &
+              </div>
+              <div>
+                {" "}
+                <Text strong>environment data</Text> automatically on your device for sharing &{" "}
+              </div>
+              <div> debugging </div>
+            </Text>
+            {!isModalView && (
+              <Text type="secondary" className="banner-message banner-text">
+                <BsShieldCheck style={{ fill: "url(#green-gradient)" }} className="check-icon" />
+                {/* GREEN GRADIENT on svg */}
+                <svg width="0" height="0">
+                  <linearGradient id="green-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop stopColor="#eefccb" offset="0%" />
+                    <stop stopColor="#aefc31" offset="50%" />
+                    <stop stopColor="#0dbb48" offset="100%" />
+                  </linearGradient>
+                </svg>{" "}
+                session recordings are not automatically saved to the cloud; they require manual saving
+              </Text>
+            )}
+          </Row>
+          <Col span={24}>
+            <Row className="record-label">
+              <Text type="secondary" className="banner-text">
+                Record your {!isModalView && "first"} session
+              </Text>
+            </Row>
+            <Row>
+              <Col span={15} className="input-container">
+                <Input
+                  ref={inputRef}
+                  placeholder="Enter Page URL eg. https://ebay.com"
+                  onPressEnter={handleStartRecordingBtnClicked}
+                />
+              </Col>
+              <Col span={3} className="start-btn-container">
+                <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
+                  {" "}
+                  Start Recording
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Col>
+        {!isModalView && (
+          <Col span={12} className="banner-demo-video">
+            <Row justify="end">
+              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+            </Row>
+            <Row onClick={trackOnboardingSampleSessionViewed}>
+              <a
+                href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
+                target="__blank"
+                className="sample-link-container"
+              >
+                <Row justify="end" align="middle" className="sample-link">
+                  <Text underline>View sample replay</Text>
+                </Row>
+              </a>
+            </Row>
+          </Col>
+        )}
+      </Row>
+    </div>
+  );
+};
