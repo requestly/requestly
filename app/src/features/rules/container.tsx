@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-
 import { RulesSidebar } from "./components/RulesSidebar/RulesSidebar";
 import { RulesContextProvider } from "./context";
 import { CreateNewRuleGroupModalWrapper } from "./modals/CreateNewRuleGroupModalWrapper";
@@ -28,14 +27,30 @@ const RulesFeatureContainer = () => {
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("ruleSaveError", (message: any) => {
       notification.warn({
-        message: <span className="text-bold">{"Error saving rule"}</span>,
+        message: (
+          <span className="text-bold">
+            {"Error saving rule: "}
+            <a href={PATHS.RULE_EDITOR.ABSOLUTE + `/edit/${message.rqRuleId}`} target="_blank" rel="noreferrer">
+              {message.rqRuleId}
+            </a>
+          </span>
+        ),
         description: (
           <div>
-            <Row>
-              {`There was as an error while saving the rule:`}
-              <a href={PATHS.RULE_EDITOR.ABSOLUTE + `/edit/${message.rqRuleId}`}>{message.rqRuleId}</a>
+            <Row className="text-gray">
+              {message.error?.match(
+                /Rule with id \d+ was skipped as the "regexFilter" value exceeded the 2KB memory.*/
+              ) ? (
+                <span>
+                  We are facing some limitations due to chrome API changes. Please try the solution mentioned{" "}
+                  <a href="https://github.com/requestly/requestly/issues/1797" target="_blank" rel="noreferrer">
+                    here.
+                  </a>
+                </span>
+              ) : (
+                "Please contact support."
+              )}
             </Row>
-            <Row className="text-gray">Please contact support.</Row>
           </div>
         ),
         placement: "bottomLeft",
