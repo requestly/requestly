@@ -11,7 +11,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import "layouts/DashboardLayout/MenuHeader/MenuHeader.css";
 import SessionBearLogo from "../../assets/sessionBearLogoFull.svg";
-import SessionBearMiniLogo from "../../assets/sessionBearLogoMini.svg";
+import SessionBearSmallLogo from "../../assets/sessionBearLogoSmall.svg";
 import "./index.css";
 
 const { Header } = Layout;
@@ -36,7 +36,7 @@ const MenuHeader = () => {
                 <img onClick={() => redirectToRoot(navigate)} src={SessionBearLogo} alt="SessionBear logo" />
               </Col>
               <Col className="sessionbear-header-mini-logo">
-                <img onClick={() => redirectToRoot(navigate)} src={SessionBearMiniLogo} alt="SessionBear logo" />
+                <img onClick={() => redirectToRoot(navigate)} src={SessionBearSmallLogo} alt="SessionBear logo" />
               </Col>
               <Col className={appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? "extension" : "desktop"}>
                 <div className="header-left-section">
