@@ -70,10 +70,10 @@ interface HarResponseContent {
   encoding?: string;
 }
 
-type HarRequestQueryString = HarMapEntry;
+export type HarRequestQueryString = HarMapEntry;
 export type HarHeaderEntry = HarMapEntry;
 
-interface HarMapEntry {
+export interface HarMapEntry {
   name: string;
   value: string;
   comment?: string;
@@ -92,6 +92,7 @@ export interface RQNetworkLog {
   consoleLogs: any; // array of logs generated in script based rules
   domain?: string;
   app?: string;
+  metadata: Metadata;
 }
 
 interface LogRequest {
@@ -102,6 +103,16 @@ interface LogRequest {
   headers: HeaderMap;
   body: any;
   queryParams: HarMapEntry[];
+}
+
+interface Metadata {
+  GQLDetails: GQLDetails | null;
+}
+
+interface GQLDetails {
+  query: string;
+  variables: any; // TBD @nsr
+  operationName: string;
 }
 
 interface LogResponse {
