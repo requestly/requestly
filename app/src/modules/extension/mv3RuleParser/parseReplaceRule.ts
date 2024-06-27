@@ -54,30 +54,25 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
       regexSubstitution = `\\${currentSubstitutionIndex++}`;
     }
 
-    if (rulePair.source.value === rulePair.from) {
-      regexFilter = regexFilter + `${escapeRegExp(rulePair.from)}`;
-      regexSubstitution = regexSubstitution + `${rulePair.to}`;
-    } else {
-      const nonMatchingParts = rulePair.source.value.split(rulePair.from);
-      regexFilter = nonMatchingParts.reduce((acc: string, part: string, index: number) => {
-        // Means matches in the beginning or end of the string)
-        if (index === 0 && part === "") {
-          regexFilter = regexFilter + `${escapeRegExp(rulePair.from)}`;
-          regexSubstitution = regexSubstitution + `${rulePair.to}`;
-        } else if (index === nonMatchingParts.length - 1) {
-          if (part === "") {
-            // Already handled `from` in previous part iteration
-          } else {
-            regexFilter = regexFilter + `(${escapeRegExp(part)})`;
-            regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}`;
-          }
+    const nonMatchingParts = rulePair.source.value.split(rulePair.from);
+    regexFilter = nonMatchingParts.reduce((acc: string, part: string, index: number) => {
+      // Means matches in the beginning or end of the string)
+      if (index === 0 && part === "") {
+        regexFilter = regexFilter + `${escapeRegExp(rulePair.from)}`;
+        regexSubstitution = regexSubstitution + `${rulePair.to}`;
+      } else if (index === nonMatchingParts.length - 1) {
+        if (part === "") {
+          // Already handled `from` in previous part iteration
         } else {
-          regexFilter = regexFilter + `(${escapeRegExp(part)})${escapeRegExp(rulePair.from)}`;
-          regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}${rulePair.to}`;
+          regexFilter = regexFilter + `(${escapeRegExp(part)})`;
+          regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}`;
         }
-        return regexFilter;
-      }, regexFilter);
-    }
+      } else {
+        regexFilter = regexFilter + `(${escapeRegExp(part)})${escapeRegExp(rulePair.from)}`;
+        regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}${rulePair.to}`;
+      }
+      return regexFilter;
+    }, regexFilter);
 
     if (rulePair.source.operator === SourceOperator.CONTAINS) {
       regexFilter = regexFilter + `(.*)`;
@@ -91,6 +86,7 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
       {
         priority: 1,
         condition: {
+          ...parseConditionFromSource(rulePair.source, true, false),
           regexFilter: regexFilter,
         },
         action: {
