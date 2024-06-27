@@ -12,6 +12,8 @@ document.documentElement.setAttribute("rq-ext-mv", "3");
 // extension id
 document.documentElement.setAttribute("rq-ext-id", chrome.runtime.id);
 
+document.documentElement.setAttribute("rq-ext-name", "SESSIONBEAR");
+
 initMessageHandler();
 initExtensionMessageListener();
 isExtensionEnabled().then((isExtensionStatusEnabled) => {
