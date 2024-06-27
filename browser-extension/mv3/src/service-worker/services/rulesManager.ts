@@ -35,7 +35,6 @@ const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<vo
       });
       return;
     } catch (e) {
-      console.error(e);
       const match = e.message.match(/Rule with id (\d+)/);
       const ruleId = parseInt(match[1]);
       const rqRuleId = addRules.find((rule) => rule.id === ruleId)?.rqRuleId;
