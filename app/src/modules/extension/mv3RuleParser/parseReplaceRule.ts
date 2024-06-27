@@ -55,7 +55,7 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
     }
 
     const nonMatchingParts = rulePair.source.value.split(rulePair.from);
-    regexFilter = nonMatchingParts.reduce((acc: string, part: string, index: number) => {
+    nonMatchingParts.forEach((part, index) => {
       // Means matches in the beginning or end of the string)
       if (index === 0 && part === "") {
         regexFilter = regexFilter + `${escapeRegExp(rulePair.from)}`;
@@ -71,8 +71,7 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
         regexFilter = regexFilter + `(${escapeRegExp(part)})${escapeRegExp(rulePair.from)}`;
         regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}${rulePair.to}`;
       }
-      return regexFilter;
-    }, regexFilter);
+    });
 
     if (rulePair.source.operator === SourceOperator.CONTAINS) {
       regexFilter = regexFilter + `(.*)`;
