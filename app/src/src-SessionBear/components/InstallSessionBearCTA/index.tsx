@@ -3,11 +3,11 @@ import { useDispatch } from "react-redux";
 import { Row, Space, Typography } from "antd";
 import { Alert } from "antd";
 import UAParser from "ua-parser-js";
-import { actions } from "store";
+import { actions } from "../../../store";
 import { supportedBrowserExtensions } from "./constants/supportedBrowserExtensions";
 import APP_CONSTANTS from "../../../config/constants";
 import { InstallExtensionContent } from "./type";
-import { trackExtensionInstallationButtonClicked } from "modules/analytics/events/common/onboarding/index";
+import { trackExtensionInstallationButtonClicked } from "../../../modules/analytics/events/common/onboarding/index";
 import "./installExtensionCTA.css";
 
 const HEADING = "Install Browser extension to record sessions for faster debugging and bug reporting";
