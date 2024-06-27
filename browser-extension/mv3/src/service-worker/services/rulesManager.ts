@@ -10,13 +10,22 @@ import { UpdateDynamicRuleOptions } from "common/types";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
+let isApplyingRules = false;
+const ruleApplicationQueue: (() => Promise<void>)[] = [];
+
 const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<void> => {
+  console.log("!!!debug", "updateDynamicRules");
   const badRQRuleIds = new Set<string>();
 
   while (true) {
     if (!options.addRules && !options.removeRuleIds) {
       break;
     }
+    console.log("!!!debug", "inWhile updateDynamic", {
+      addRules: options.addRules,
+      removeRuleIds: options.removeRuleIds,
+      existingRules: await chrome.declarativeNetRequest.getDynamicRules(),
+    });
 
     const addRules = options.addRules?.filter((rule) => !badRQRuleIds.has(rule?.rqRuleId)) ?? [];
     const removeRuleIds = options.removeRuleIds ?? [];
@@ -30,8 +39,9 @@ const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<vo
         }),
         removeRuleIds,
       });
-      break;
+      return;
     } catch (e) {
+      console.error(e);
       const match = e.message.match(/Rule with id (\d+)/);
       const ruleId = parseInt(match[1]);
       const rqRuleId = addRules.find((rule) => rule.id === ruleId)?.rqRuleId;
@@ -50,6 +60,7 @@ const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<vo
 };
 
 const deleteAllDynamicRules = async (): Promise<void> => {
+  console.log("!!!debug", "deleteAllDynamicRules");
   const dynamicRules = await chrome.declarativeNetRequest.getDynamicRules();
 
   return updateDynamicRules({
@@ -104,11 +115,29 @@ const addExtensionRules = async (): Promise<void> => {
 };
 
 const applyExtensionRules = async (): Promise<void> => {
-  await deleteAllDynamicRules();
+  ruleApplicationQueue.push(async () => {
+    try {
+      await deleteAllDynamicRules();
+      const isExtensionStatusEnabled = await isExtensionEnabled();
+      if (isExtensionStatusEnabled) {
+        await addExtensionRules();
+      }
+    } finally {
+      isApplyingRules = false;
+      processQueue();
+    }
+  });
 
-  const isExtensionStatusEnabled = await isExtensionEnabled();
-  if (isExtensionStatusEnabled) {
-    await addExtensionRules();
+  if (!isApplyingRules) {
+    processQueue();
+  }
+};
+
+const processQueue = async () => {
+  if (ruleApplicationQueue.length && !isApplyingRules) {
+    isApplyingRules = true;
+    const ruleApplication = ruleApplicationQueue.shift();
+    ruleApplication && ruleApplication();
   }
 };
 
