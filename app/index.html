@@ -30,11 +30,34 @@
         navigator.sendBeacon("https://api2.amplitude.com/2/httpapi", b);
       }
     </script>
+    <script>
+      // Set favicon
+      const hostname = window.location.hostname;
+      let faviconPath = '/favicon.png'; 
+
+      if (hostname.includes("sessionbear.com")) {
+        faviconPath = '/sessionBearFavicon.png';
+      }
+
+      const link = document.createElement('link');
+      link.rel = 'icon';
+      link.href = faviconPath;
+      window.document.head.appendChild(link);
+
+       // Set the page title
+      let pageTitle = 'Requestly - Lightweight Proxy to Intercept & Modify HTTP(s) requests'; // default title
+      if (hostname.includes("sessionbear.com")) {
+        pageTitle = 'SessionBear - Capture & Kill bugs in seconds!';
+      }
+      
+      window.document.title = pageTitle;
+  </script>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#000000" />
     <link rel="manifest" href="/manifest.json" />
-    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <!-- <link rel="shortcut icon" type="image/png" href="/favicon.png" /> -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -237,7 +260,7 @@
       }
     </style>
 
-    <title>Requestly - Lightweight Proxy to Intercept & Modify HTTP(s) requests</title>
+    <title></title>
   </head>
 
   <body class="dark">
