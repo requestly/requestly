@@ -1,6 +1,7 @@
 import { Har, HarEntry, HarHeaderEntry, HarRequest, HarResponse, HeaderMap, RQNetworkLog } from "./types";
 
 import { v4 as uuidv4 } from "uuid";
+import { getGraphQLDetails } from "./utils";
 
 const createHarHeaders = (headersObject: HeaderMap) => {
   const headers: HarHeaderEntry[] = [];
@@ -121,6 +122,9 @@ export const convertHarJsonToRQLogs = (har: Har): RQNetworkLog[] => {
             : JSON.stringify(entry.response.content?.text),
       },
       requestShellCurl: entry?._RQDetails?.requestShellCurl || "",
+      metadata: {
+        GQLDetails: getGraphQLDetails(entry),
+      },
       actions: entry?._RQDetails?.actions || [],
       requestState: entry?._RQDetails?.requestState || "",
       consoleLogs: entry?._RQDetails?.consoleLogs || [],
