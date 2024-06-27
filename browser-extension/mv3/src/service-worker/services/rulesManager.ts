@@ -14,18 +14,12 @@ let isApplyingRules = false;
 const ruleApplicationQueue: (() => Promise<void>)[] = [];
 
 const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<void> => {
-  console.log("!!!debug", "updateDynamicRules");
   const badRQRuleIds = new Set<string>();
 
   while (true) {
     if (!options.addRules && !options.removeRuleIds) {
       break;
     }
-    console.log("!!!debug", "inWhile updateDynamic", {
-      addRules: options.addRules,
-      removeRuleIds: options.removeRuleIds,
-      existingRules: await chrome.declarativeNetRequest.getDynamicRules(),
-    });
 
     const addRules = options.addRules?.filter((rule) => !badRQRuleIds.has(rule?.rqRuleId)) ?? [];
     const removeRuleIds = options.removeRuleIds ?? [];
@@ -60,7 +54,6 @@ const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<vo
 };
 
 const deleteAllDynamicRules = async (): Promise<void> => {
-  console.log("!!!debug", "deleteAllDynamicRules");
   const dynamicRules = await chrome.declarativeNetRequest.getDynamicRules();
 
   return updateDynamicRules({
@@ -124,16 +117,16 @@ const applyExtensionRules = async (): Promise<void> => {
       }
     } finally {
       isApplyingRules = false;
-      processQueue();
+      processRuleApplicationQueue();
     }
   });
 
   if (!isApplyingRules) {
-    processQueue();
+    processRuleApplicationQueue();
   }
 };
 
-const processQueue = async () => {
+const processRuleApplicationQueue = async () => {
   if (ruleApplicationQueue.length && !isApplyingRules) {
     isApplyingRules = true;
     const ruleApplication = ruleApplicationQueue.shift();
