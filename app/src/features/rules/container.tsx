@@ -27,13 +27,16 @@ const RulesFeatureContainer = () => {
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("ruleSaveError", (message: any) => {
       notification.warn({
-        message: <span className="text-bold">{"Error saving rule"}</span>,
+        message: (
+          <span className="text-bold">
+            {"Error saving rule: "}
+            <a href={PATHS.RULE_EDITOR.ABSOLUTE + `/edit/${message.rqRuleId}`} target="_blank" rel="noreferrer">
+              {message.rqRuleId}
+            </a>
+          </span>
+        ),
         description: (
           <div>
-            <Row>
-              {`There was as an error while saving the rule:`}
-              <a href={PATHS.RULE_EDITOR.ABSOLUTE + `/edit/${message.rqRuleId}`}>{message.rqRuleId}</a>
-            </Row>
             <Row className="text-gray">
               {message.error.match(
                 /Rule with id \d+ was skipped as the "regexFilter" value exceeded the 2KB memory.*/
