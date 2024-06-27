@@ -4,8 +4,10 @@
     <script>
       if (
         window.location.hostname !== "app.requestly.io" &&
-        window.location.hostname !== "localhost" &&
         window.location.hostname !== "beta.requestly.io" &&
+        window.location.hostname !== "app.sessionbear.com" &&
+        window.location.hostname !== "beta.sessionbear.com" &&
+        window.location.hostname !== "localhost" &&
         isNaN(parseInt(window.location.hostname.replace(/\./g, ""))) // dumb check for an IP (or any number really)
       ) {
         window.location.href = "https://app.requestly.io";
