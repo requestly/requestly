@@ -38,7 +38,7 @@ const RulesFeatureContainer = () => {
         description: (
           <div>
             <Row className="text-gray">
-              {message.error.match(
+              {message.error?.match(
                 /Rule with id \d+ was skipped as the "regexFilter" value exceeded the 2KB memory.*/
               ) ? (
                 <span>
