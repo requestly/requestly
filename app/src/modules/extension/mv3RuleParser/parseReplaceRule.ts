@@ -1,5 +1,5 @@
 import { escapeRegExp } from "lodash";
-import { ReplaceRule, ReplaceRulePair } from "../../../types/rules";
+import { ReplaceRule, ReplaceRulePair, SourceKey, SourceOperator } from "../../../types/rules";
 import { ExtensionRule, ExtensionRuleCondition, RuleActionType } from "../types";
 import {
   convertRegexSubstitutionStringToDNRSubstitutionString,
@@ -8,6 +8,7 @@ import {
   parseConditionFromSource,
   parseRegex,
 } from "./utils";
+import Logger from "../../../../../common/logger";
 
 const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondition => {
   if (!rulePair.source.value) {
@@ -35,10 +36,70 @@ const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondit
   }
 };
 
-const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
-  const extensionRules: ExtensionRule[] = [];
+const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule[] => {
+  // Case 1 - Replace from in URL source condition
+  // Edgecase: Will not replace `from` if not present in the source condition url
+  if (
+    rulePair.source.key === SourceKey.URL &&
+    (rulePair.source.operator === SourceOperator.CONTAINS || rulePair.source.operator === SourceOperator.EQUALS) &&
+    rulePair.source.value.includes(rulePair.from)
+  ) {
+    Logger.log("Replace Rule: Case 1");
+    let regexFilter = "";
+    let regexSubstitution = "";
+    let currentSubstitutionIndex = 1;
 
-  rule.pairs.forEach((rulePair, pairIndex) => {
+    if (rulePair.source.operator === SourceOperator.CONTAINS) {
+      regexFilter = `(.*?)`;
+      regexSubstitution = `\\${currentSubstitutionIndex++}`;
+    }
+
+    const nonMatchingParts = rulePair.source.value.split(rulePair.from);
+    nonMatchingParts.forEach((part, index) => {
+      // Means matches in the beginning or end of the string)
+      if (index === 0 && part === "") {
+        regexFilter = regexFilter + `${escapeRegExp(rulePair.from)}`;
+        regexSubstitution = regexSubstitution + `${rulePair.to}`;
+      } else if (index === nonMatchingParts.length - 1) {
+        if (part === "") {
+          // Already handled `from` in previous part iteration
+        } else {
+          regexFilter = regexFilter + `(${escapeRegExp(part)})`;
+          regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}`;
+        }
+      } else {
+        regexFilter = regexFilter + `(${escapeRegExp(part)})${escapeRegExp(rulePair.from)}`;
+        regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}${rulePair.to}`;
+      }
+    });
+
+    if (rulePair.source.operator === SourceOperator.CONTAINS) {
+      regexFilter = regexFilter + `(.*)`;
+      regexSubstitution = regexSubstitution + `\\${currentSubstitutionIndex++}`;
+    } else if (rulePair.source.operator === SourceOperator.EQUALS) {
+      regexFilter = `^${regexFilter}$`;
+    }
+
+    Logger.log("Replace Rule: Case 1 - Regex Filter: ", { regexFilter, regexSubstitution });
+    return [
+      {
+        priority: 1,
+        condition: {
+          ...parseConditionFromSource(rulePair.source, true, false),
+          regexFilter: regexFilter,
+        },
+        action: {
+          type: RuleActionType.REDIRECT,
+          redirect: {
+            regexSubstitution: regexSubstitution,
+          },
+        },
+      },
+    ];
+  }
+  // REST of the Cases
+  else {
+    Logger.log("Replace Rule: Case 2");
     const matchingCondition = getReplaceMatchingRegex(rulePair);
 
     const redirectForSubstitutionRule: ExtensionRule = {
@@ -108,7 +169,16 @@ const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
       },
     };
 
-    extensionRules.push(...[redirectForSubstitutionRule, replacementRule]);
+    return [redirectForSubstitutionRule, replacementRule];
+  }
+};
+
+const parseReplaceRule = (rule: ReplaceRule): ExtensionRule[] => {
+  const extensionRules: ExtensionRule[] = [];
+
+  rule.pairs.forEach((rulePair, pairIndex) => {
+    const extensionRulesForPair = generateReplaceExtensionRules(rulePair);
+    extensionRules.push(...extensionRulesForPair);
   });
 
   return extensionRules;
