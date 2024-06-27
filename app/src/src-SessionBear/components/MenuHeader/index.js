@@ -4,12 +4,16 @@ import { useSelector } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
 import { getAppMode } from "store/selectors";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
-import { redirectToSettings } from "utils/RedirectionUtils";
+import { redirectToRoot, redirectToSettings } from "utils/RedirectionUtils";
 import Settings from "assets/icons/settings.svg?react";
 import WorkspaceSelector from "layouts/DashboardLayout/MenuHeader/WorkspaceSelector";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/header";
 import "layouts/DashboardLayout/MenuHeader/MenuHeader.css";
+import SessionBearLogo from "../../assets/sessionBearLogoFull.svg";
+import SessionBearMiniLogo from "../../assets/sessionBearLogoMini.svg";
+import "./index.css";
+
 const { Header } = Layout;
 
 const MenuHeader = () => {
@@ -19,17 +23,29 @@ const MenuHeader = () => {
   return (
     <>
       <Header className="layout-header">
-        <Row wrap={false} align="middle" className="w-full">
-          <Col
-            span={9}
-            flex="1 0 auto"
-            className={appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? "extension" : "desktop"}
-          >
-            <div className="header-left-section">
-              <WorkspaceSelector />
-            </div>
+        <Row wrap={false} align="middle" justify="space-between" className="w-full">
+          <Col flex="1">
+            <Row
+              align="middle"
+              gutter={20}
+              style={{
+                marginTop: "-8px",
+              }}
+            >
+              <Col className="sessionbear-header-logo">
+                <img onClick={() => redirectToRoot(navigate)} src={SessionBearLogo} alt="SessionBear logo" />
+              </Col>
+              <Col className="sessionbear-header-mini-logo">
+                <img onClick={() => redirectToRoot(navigate)} src={SessionBearMiniLogo} alt="SessionBear logo" />
+              </Col>
+              <Col className={appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION ? "extension" : "desktop"}>
+                <div className="header-left-section">
+                  <WorkspaceSelector />
+                </div>
+              </Col>
+            </Row>
           </Col>
-          <Col className="ml-auto">
+          <Col>
             <div className="header-right-section">
               <Row align="middle" gutter={8} wrap={false}>
                 {/* TEMPORARILY HIDDEN  */}
