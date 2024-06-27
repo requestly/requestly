@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
-import { Col, Modal, Popconfirm, Row, Space } from "antd";
+import { Col, Modal, Row, Space } from "antd";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../TeamPlanStatus";
 import { RQButton } from "lib/design-system/components";
@@ -24,9 +24,7 @@ import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDo
 import "./index.scss";
 import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
 import { PlanStatus } from "../../types";
-import { ChangePlanRequestConfirmationModal } from "features/pricing/components/ChangePlanRequestConfirmationModal";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { toast } from "utils/Toast";
+import { CancelPlanModal } from "../BillingDetails/modals/common/CancelPlanModal";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
@@ -38,10 +36,8 @@ export const UserPlanDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
+  const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
   const { type } = user.details?.planDetails ?? {};
-
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [isConfirmationModalLoading, setIsConfirmationModalLoading] = useState(false);
 
   const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
     const currentDate = date;
@@ -101,20 +97,17 @@ export const UserPlanDetails = () => {
   }, [user?.details?.planDetails?.subscription?.endDate]);
 
   const handleCancelPlanClick = useCallback(() => {
-    setIsConfirmationModalOpen(true);
-    setIsConfirmationModalLoading(true);
-    const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
-    requestPlanCancellation({
-      currentPlan: user?.details?.planDetails?.planId,
-    })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Error in cancelling plan. Please contact support");
-        setIsConfirmationModalOpen(false);
-      })
-      .finally(() => {
-        setIsConfirmationModalLoading(false);
-      });
+    setIsCancelPlanModalOpen(true);
+    // const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
+    // requestPlanCancellation({
+    //   currentPlan: user?.details?.planDetails?.planId,
+    // })
+    //   .catch((err) => {
+    //     console.error(err);
+    //     toast.error("Error in cancelling plan. Please contact support");
+    //   })
+    //   .finally(() => {
+    //   });
   }, [user?.details?.planDetails?.planId]);
 
   if (isLoading) return null;
@@ -144,22 +137,20 @@ export const UserPlanDetails = () => {
       );
     }
     return (
-      <Popconfirm
-        icon={null}
-        cancelText="No"
-        okText="Yes"
-        title="Are you sure you want to cancel your plan?"
-        onConfirm={handleCancelPlanClick}
-      >
-        <RQButton size="small" type="text" className="cancel-plan-btn">
-          Cancel plan
-        </RQButton>
-      </Popconfirm>
+      <RQButton onClick={handleCancelPlanClick} size="small" type="text" className="cancel-plan-btn">
+        Cancel plan
+      </RQButton>
     );
   };
 
   return (
     <>
+      <CancelPlanModal
+        isOpen={isCancelPlanModalOpen}
+        subscriptionDetails={user?.details?.planDetails}
+        closeModal={() => setIsCancelPlanModalOpen((prev) => !prev)}
+      />
+
       <Col
         className="billing-teams-primary-card user-plan-detail-card"
         style={{
@@ -323,11 +314,6 @@ export const UserPlanDetails = () => {
           </>
         )}
       </Col>
-      <ChangePlanRequestConfirmationModal
-        isOpen={isConfirmationModalOpen}
-        handleToggle={() => setIsConfirmationModalOpen(false)}
-        isLoading={isConfirmationModalLoading}
-      />
     </>
   );
 };
