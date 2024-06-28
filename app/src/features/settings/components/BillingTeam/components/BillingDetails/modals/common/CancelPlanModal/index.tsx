@@ -21,6 +21,8 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
   const [isLoading, setIsLoading] = useState(false);
 
   const isIndividualPlanType = PlanType.INDIVIDUAL === subscriptionDetails?.type;
+  const { subscription, type, planName } = subscriptionDetails ?? {};
+  const endDate = subscription?.endDate;
 
   const handleRequestCancellation = () => {
     if (isIndividualPlanType) {
@@ -42,9 +44,6 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
         .then((res) => {
           // @ts-ignore
           if (res?.data?.success) {
-            const { subscription, type, planName } = subscriptionDetails;
-            const endDate = subscription.endDate;
-
             trackPricingPlanCancelled({
               reason,
               type: type,
@@ -109,9 +108,8 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
         {isIndividualPlanType ? (
           <>
             Your <span className="text-white">{getPrettyPlanName(subscriptionDetails?.plan)} plan</span> will remain
-            active until
-            {getLongFormatDateString(new Date(subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000))}. You won't be
-            charged for the next billing cycle and will automatically be switched to the Free plan thereafter.
+            active until {getLongFormatDateString(new Date(endDate))}. You won't be charged for the next billing cycle
+            and will automatically be switched to the Free plan thereafter.
           </>
         ) : (
           <>
