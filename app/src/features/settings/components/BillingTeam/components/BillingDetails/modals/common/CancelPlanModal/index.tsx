@@ -7,6 +7,7 @@ import { toast } from "utils/Toast";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getLongFormatDateString } from "utils/DateTimeUtils";
 import { PlanType } from "features/settings/components/BillingTeam/types";
+import { trackPricingPlanCancelled } from "modules/analytics/events/misc/business";
 import "./index.scss";
 
 interface Props {
@@ -22,12 +23,46 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
   const isIndividualPlanType = PlanType.INDIVIDUAL === subscriptionDetails?.type;
 
   const handleRequestCancellation = () => {
-    setIsLoading(true);
-
     if (isIndividualPlanType) {
-      // do something
-      console.log("cancel individual subscription");
+      if (!reason) {
+        toast.success("Please let us know the reason for cancellation!");
+        return;
+      }
+
+      if (reason.length <= 3) {
+        toast.success("Please enter a valid reason for cancellation!");
+        return;
+      }
+
+      setIsLoading(true);
+
+      const cancelIndividualSubscription = httpsCallable(getFunctions(), "subscription-cancelIndividualSubscription");
+
+      cancelIndividualSubscription({ reason })
+        .then(() => {
+          const { subscription, type, planName } = subscriptionDetails;
+          const endDate = subscription.endDate;
+
+          trackPricingPlanCancelled({
+            reason,
+            type: type,
+            end_date: endDate,
+            current_plan: planName,
+          });
+
+          const formattedEndDate = getLongFormatDateString(new Date(endDate));
+          toast.success(`Plan will automatically get cancelled on ${formattedEndDate}.`);
+        })
+        .catch((e) => {
+          Logger.log(e);
+        })
+        .finally(() => {
+          setIsLoading(false);
+          closeModal();
+          setReason("");
+        });
     } else {
+      setIsLoading(true);
       const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
       requestPlanCancellation({
         currentPlan: getPrettyPlanName(subscriptionDetails?.plan),
