@@ -124,6 +124,7 @@
 
 .popup-content {
   padding: 16px;
+  padding-bottom: 8px;
 }
 
 .header-content-separator {
@@ -296,7 +297,7 @@
 
 .popup-footer {
   padding-inline: 1rem;
-  padding-bottom: 1rem;
+  padding-bottom: 8px;
 }
 
 .popup-footer .extension-version {
