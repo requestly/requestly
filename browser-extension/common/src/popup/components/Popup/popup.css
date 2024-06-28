@@ -293,3 +293,13 @@
 .ant-tabs.ant-tabs-top.popup-tabs .ant-tabs-nav {
   margin-bottom: 4px;
 }
+
+.popup-footer {
+  padding-inline: 1rem;
+  padding-bottom: 1rem;
+}
+
+.popup-footer .extension-version {
+  font-size: 11px;
+  color: var(--neutrals-gray-400);
+}
