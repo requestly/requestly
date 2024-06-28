@@ -1,6 +1,5 @@
-import { generateUrlPattern } from "../../utils";
+import { generateUrlPattern, isExtensionEnabled } from "../../utils";
 import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.json";
-import { isExtensionEnabled } from "../../utils";
 import { Variable, onVariableChange } from "../variable";
 import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
@@ -182,8 +181,8 @@ const updateTabBlockedDomainsCache = async (tabId: number, frameId?: number) => 
   );
 };
 
-export const initClientRuleCaching = async () => {
-  // TODO: Do not inject in Requestly Pages. No harm in injecting though
+export const initClientPageCaching = async () => {
+  // TODO: Do not inject in Requestly Pages and blocklisted domains. No harm in injecting though
   let isExtensionStatusEnabled = await isExtensionEnabled();
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
     isExtensionStatusEnabled = extensionStatus;
@@ -192,6 +191,7 @@ export const initClientRuleCaching = async () => {
   chrome.webNavigation.onCommitted.addListener(async (navigatedTabData) => {
     if (isExtensionStatusEnabled) {
       updateTabRuleCache(navigatedTabData.tabId, navigatedTabData.frameId);
+      updateTabBlockedDomainsCache(navigatedTabData.tabId, navigatedTabData.frameId);
     }
   });
 
