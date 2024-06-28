@@ -25,12 +25,12 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
   const handleRequestCancellation = () => {
     if (isIndividualPlanType) {
       if (!reason) {
-        toast.success("Please let us know the reason for cancellation!");
+        toast.warn("Please let us know the reason for cancellation!");
         return;
       }
 
       if (reason.length <= 3) {
-        toast.success("Please enter a valid reason for cancellation!");
+        toast.warn("Please enter a valid reason for cancellation!");
         return;
       }
 
