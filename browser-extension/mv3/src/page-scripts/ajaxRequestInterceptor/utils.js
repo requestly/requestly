@@ -1,5 +1,6 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
-import { matchRuleWithRequest } from "../../common/ruleMatcher";
+import { matchRuleWithRequest, matchSourceUrl } from "../../common/ruleMatcher";
+import { SourceKey, SourceOperator } from "common/types";
 
 let logShown = false;
 
@@ -186,4 +187,17 @@ export const isContentTypeJSON = (contentType) => !!contentType?.includes("appli
 
 export const applyDelay = async (delay) => {
   return new Promise((resolve) => setTimeout(resolve, delay));
+};
+
+export const isRequestDomainBlocked = (url) => {
+  return window[PUBLIC_NAMESPACE]?.blockedDomains?.some((domain) => {
+    return matchSourceUrl(
+      {
+        key: SourceKey.HOST,
+        value: domain,
+        operator: SourceOperator.CONTAINS,
+      },
+      url
+    );
+  });
 };

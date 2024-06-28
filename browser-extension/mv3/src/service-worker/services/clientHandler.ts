@@ -11,7 +11,7 @@ import { STORAGE_KEYS } from "common/constants";
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
 
 const generateBlockedDomainPattern = (hostname: string) => {
-  return `*://*.${hostname}/*`;
+  return `*://*${hostname}/*`;
 };
 
 const CLIENT_SCRIPTS: chrome.scripting.RegisteredContentScript[] = [
@@ -103,7 +103,14 @@ export const initClientHandler = async () => {
       changeTypes: [ChangeType.MODIFIED],
     },
     () => {
-      unregisterClientScripts().then(() => setupClientScript(isExtensionStatusEnabled));
+      unregisterClientScripts().then(() => {
+        setupClientScript(isExtensionStatusEnabled);
+        chrome.tabs.query({}, (tabs) => {
+          tabs.forEach((tab) => {
+            updateTabBlockedDomainsCache(tab.id, undefined);
+          });
+        });
+      });
     }
   );
 };
@@ -158,6 +165,18 @@ const updateTabRuleCache = async (tabId: number, frameId?: number) => {
       responseRules: responseRules,
       requestRules: requestRules,
       delayRules: delayRules,
+    },
+    frameId
+  );
+};
+
+const updateTabBlockedDomainsCache = async (tabId: number, frameId?: number) => {
+  const blockedDomains = await getBlockedDomains();
+
+  updateTabCache(
+    tabId,
+    {
+      blockedDomains: blockedDomains,
     },
     frameId
   );
