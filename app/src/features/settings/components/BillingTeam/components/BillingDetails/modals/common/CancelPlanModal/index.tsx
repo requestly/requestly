@@ -39,21 +39,27 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
       const cancelIndividualSubscription = httpsCallable(getFunctions(), "subscription-cancelIndividualSubscription");
 
       cancelIndividualSubscription({ reason })
-        .then(() => {
-          const { subscription, type, planName } = subscriptionDetails;
-          const endDate = subscription.endDate;
+        .then((res) => {
+          // @ts-ignore
+          if (res?.data?.success) {
+            const { subscription, type, planName } = subscriptionDetails;
+            const endDate = subscription.endDate;
 
-          trackPricingPlanCancelled({
-            reason,
-            type: type,
-            end_date: endDate,
-            current_plan: planName,
-          });
+            trackPricingPlanCancelled({
+              reason,
+              type: type,
+              end_date: endDate,
+              current_plan: planName,
+            });
 
-          const formattedEndDate = getLongFormatDateString(new Date(endDate));
-          toast.success(`Plan will automatically get cancelled on ${formattedEndDate}.`);
+            const formattedEndDate = getLongFormatDateString(new Date(endDate));
+            toast.success(`Plan will automatically get cancelled on ${formattedEndDate}.`);
+          } else {
+            toast.warn(`Plan cancellation failed, please contact support!`);
+          }
         })
         .catch((e) => {
+          toast.warn(`Plan cancellation failed, please contact support!`);
           Logger.log(e);
         })
         .finally(() => {
