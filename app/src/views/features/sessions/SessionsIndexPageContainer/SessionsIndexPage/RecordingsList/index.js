@@ -17,6 +17,8 @@ import Favicon from "components/misc/Favicon";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { getAppFlavour } from "utils/AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const confirmDeleteAction = (id, eventsFilePath, callback) => {
   Modal.confirm({
@@ -221,7 +223,7 @@ const RecordingsList = ({
         headerTitle={
           <>
             <Typography.Title level={4} style={{ marginBottom: 0 }}>
-              SessionBook
+              {getAppFlavour() === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? "Sessions" : "SessionBook"}
             </Typography.Title>
           </>
         }
