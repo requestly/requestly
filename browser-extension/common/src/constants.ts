@@ -80,6 +80,7 @@ export const STORAGE_KEYS = {
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
   IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
+  BLOCKED_DOMAINS: "blocked_domains",
 };
 
 export const LINKS = {
