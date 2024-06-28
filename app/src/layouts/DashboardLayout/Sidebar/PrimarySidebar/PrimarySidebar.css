@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border-right: 1px solid var(--border-dark);
   margin-bottom: 2rem; /*Bottom margin to prevent overlapping from Saturn widget */
 }
 
