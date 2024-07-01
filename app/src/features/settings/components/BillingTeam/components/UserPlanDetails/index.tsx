@@ -23,7 +23,7 @@ import { redirectToPersonalSubscription } from "utils/RedirectionUtils";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import "./index.scss";
 import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
-import { PlanStatus } from "../../types";
+import { PlanStatus, PlanType } from "../../types";
 import { CancelPlanModal } from "../BillingDetails/modals/common/CancelPlanModal";
 
 export const UserPlanDetails = () => {
@@ -38,6 +38,7 @@ export const UserPlanDetails = () => {
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
   const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
   const { type } = user.details?.planDetails ?? {};
+  const isIndividualPlanType = PlanType.INDIVIDUAL === type;
 
   const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
     const currentDate = date;
@@ -132,13 +133,19 @@ export const UserPlanDetails = () => {
     if (user?.details?.planDetails?.status === "trialing") {
       return (
         <RQButton size="small" type="text" className="cancel-plan-btn" onClick={showFreeTrailCancelMessage}>
-          Cancel plan
+          Cancel Plan
         </RQButton>
       );
     }
     return (
-      <RQButton onClick={handleCancelPlanClick} size="small" type="text" className="cancel-plan-btn">
-        Cancel plan
+      <RQButton
+        disabled={isIndividualPlanType ? user?.details?.planDetails?.subscription?.cancelAtPeriodEnd : false}
+        onClick={handleCancelPlanClick}
+        size="small"
+        type="text"
+        className="cancel-plan-btn"
+      >
+        Cancel Plan
       </RQButton>
     );
   };
