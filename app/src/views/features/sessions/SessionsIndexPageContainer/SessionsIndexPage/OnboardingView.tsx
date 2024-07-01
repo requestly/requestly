@@ -182,8 +182,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
             </Text>
             {!isModalView && (
               <Text type="secondary" className="banner-message banner-text">
-                <GreenVerifiedCheck /> session recordings are not automatically saved to the cloud; they require manual
-                saving
+                <GreenVerifiedCheck /> sessions are not automatically saved to the cloud; they require manual saving
               </Text>
             )}
           </Row>
@@ -222,7 +221,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
                 className="sample-link-container"
               >
                 <Row justify="end" align="middle" className="sample-link">
-                  <Text underline>View sample replay</Text>
+                  <Text underline>View sample session</Text>
                 </Row>
               </a>
             </Row>
