@@ -1,10 +1,18 @@
 import React, { useCallback, useState } from "react";
-import { Har } from "../harLogs/types";
+import { NetworkEventData, RQSessionEvents } from "@requestly/web-sdk";
+import {
+  Har,
+  HarRequest,
+  HarRequestQueryString,
+  HarResponse,
+  HarEntry,
+} from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/harLogs/types";
+
 import SessionSaveModal from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/SessionSaveModal";
 import {
-  trackHarImportButtonClicked,
-  trackHarImportCanceled,
-  trackHarImportCompleted,
+  trackWebSessionImportButtonClicked,
+  trackWebSessionImportCanceled,
+  trackWebSessionImportCompleted,
   trackNetworkSessionSaved,
 } from "modules/analytics/events/features/sessionRecording/networkSessions";
 import { RQButton, RQModal } from "lib/design-system/components";
@@ -13,13 +21,88 @@ import { saveNetworkSession } from "views/features/sessions/SessionsIndexPageCon
 import { toast } from "utils/Toast";
 import { trackRQDesktopLastActivity } from "utils/AnalyticsUtils";
 import { SESSION_RECORDING } from "modules/analytics/events/features/constants";
+import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
 
 interface Props {
   onSaved: (sessionId: string) => void;
   btnText?: string;
 }
 
-const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
+function webSessionEventsToHar(webSessionEvents: RQSessionEvents): Har {
+  const harEntries = webSessionEvents.network.map((event) => {
+    return createHarEntry(event as NetworkEventData);
+  });
+  const result: Har = {
+    log: {
+      version: "1.2",
+      creator: {},
+      browser: {},
+      pages: [],
+      entries: harEntries,
+    },
+  };
+
+  return result;
+
+  function createHarEntry(event: NetworkEventData): HarEntry {
+    const harRequest: HarRequest = {
+      bodySize: -1,
+      headersSize: -1,
+      httpVersion: "HTTP/1.1", // informed guess
+      cookies: [],
+      method: event.method,
+      queryString: createHarQueryString(event.url),
+      url: event.url,
+      postData: {
+        text: event.requestData ? (event.requestData as string) : "",
+      },
+      headers: [], // not recorded
+    };
+    const harResponse: HarResponse = {
+      status: event.status,
+      httpVersion: "HTTP/1.1", // informed guess
+      cookies: [],
+      content: {
+        size: 0,
+        compression: 0,
+        text: event.response ? (event.response as string) : "",
+        mimeType: event.contentType ?? "", // not always present
+      },
+      headers: [], // not recorded
+    };
+
+    const entry: HarEntry = {
+      startedDateTime: new Date(event.timestamp).toISOString(),
+      request: harRequest,
+      response: harResponse,
+      cache: {},
+      timings: {},
+
+      /* NOT PRESENT IN RRWEB SESSIONS */
+      // _RQDetails: {
+      //     id: log.id,
+      //     actions: log.actions,
+      //     requestShellCurl: log.requestShellCurl,
+      //     consoleLogs: log.consoleLogs,
+      //     requestState: log.requestState,
+      // },
+    };
+
+    return entry;
+
+    function createHarQueryString(url: string) {
+      const urlObj = new URL(url);
+      const queryString = urlObj.searchParams;
+      const queryStringArray: HarRequestQueryString[] = [];
+      queryString.forEach((value, key) => {
+        queryStringArray.push({ name: key, value });
+      });
+      return queryStringArray;
+    }
+  }
+}
+
+export const ImportFromWebSessionsButton: React.FC<Props> = ({ onSaved, btnText }) => {
   const [importedHar, setImportedHar] = useState<Har>();
   const [isDropZoneVisible, setIsDropZoneVisible] = useState(false);
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
@@ -46,8 +129,8 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
   const handleImportedData = useCallback(
     async (data: Har, name: string) => {
       setImportedHar(data);
-      trackHarImportCompleted();
-      trackRQDesktopLastActivity(SESSION_RECORDING.network.import.har.completed);
+      trackWebSessionImportCompleted();
+      trackRQDesktopLastActivity(SESSION_RECORDING.network.import.web_sessions.completed);
       if (name) {
         // just in case the file reader is unable to read the name
         const id = await saveNetworkSession(name, data);
@@ -76,11 +159,14 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
         //Render the loader
         setProcessingUploadedData(true);
         try {
-          const importedHar: Har = JSON.parse(reader.result as string);
-          handleImportedData(importedHar, name);
+          const parsedFileContents = JSON.parse(reader.result as string);
+          const webSessionEvents = decompressEvents(parsedFileContents.data.events);
+          const har = webSessionEventsToHar(webSessionEvents);
+
+          handleImportedData(har, name);
         } catch (error) {
           setProcessingUploadedData(false);
-          alert("Imported file doesn't match the HAR format. Please choose another file.");
+          alert("Imported RQLY file seems corrupted. Please choose another file or contact our support.");
           closeDropZone();
         }
       };
@@ -92,28 +178,27 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
   return (
     <React.Fragment>
       <RQButton
-        type="primary"
         onClick={() => {
-          trackHarImportButtonClicked();
-          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.har.btn_clicked);
+          trackWebSessionImportButtonClicked();
+          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.web_sessions.btn_clicked);
           openDropZone();
         }}
         className="mt-8"
       >
-        {btnText ? btnText : "Import HAR File"}
+        {btnText ? btnText : "Import Log File"}
       </RQButton>
       <RQModal
         width="50%"
         open={isDropZoneVisible}
         maskClosable={false}
         onCancel={() => {
-          trackHarImportCanceled();
-          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.har.canceled);
+          trackWebSessionImportCanceled();
+          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.web_sessions.canceled);
           closeDropZone();
         }}
       >
         <div className="rq-modal-content">
-          <div className="header text-center mb-16">Import Traffic Logs</div>
+          <div className="header text-center mb-16">Import Saved Session</div>
           <FilePicker
             onFilesDrop={onDrop}
             loaderMessage="Processing data..."
@@ -128,5 +213,3 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
     </React.Fragment>
   );
 };
-
-export default HarImportModal;
