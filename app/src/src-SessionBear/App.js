@@ -5,7 +5,6 @@ import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
 import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
 import FullScreenLayout from "layouts/FullScreenLayout";
-import UpdateDialog from "components/mode-specific/desktop/UpdateDialog";
 import ThirdPartyIntegrationsHandler from "hooks/ThirdPartyIntegrationsHandler";
 import { GrowthBookProvider } from "@growthbook/growthbook-react";
 import { growthbook } from "utils/feature-flag/growthbook";
@@ -21,6 +20,7 @@ import { LazyMotion, domMax } from "framer-motion";
 import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { useInitializeNewUserSessionRecordingConfig } from "features/settings/components/SessionsBookSettings/hooks";
+import DBListeners from "hooks/DbListenerInit/DBListeners";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -42,8 +42,7 @@ const App = () => {
       <AuthHandler />
       <PreLoadRemover />
       <AppModeInitializer />
-      {/* <DBListeners /> */}
-      {/* <RuleExecutionsSyncer /> */}
+      <DBListeners />
       <ActiveWorkspace />
       <ThirdPartyIntegrationsHandler />
       <ThemeProvider>
@@ -56,7 +55,6 @@ const App = () => {
                   <FullScreenLayout />
                 ) : (
                   <>
-                    <UpdateDialog />
                     <DashboardLayout />
                   </>
                 )}
