@@ -27,7 +27,7 @@ const processManifest = (content) => {
   const manifestJson = JSON.parse(content);
 
   manifestJson.version = version;
-  manifestJson.version_name = `${version} (MV3)`;
+  manifestJson.version_name = version;
 
   const { content_scripts: contentScripts } = manifestJson;
 
