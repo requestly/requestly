@@ -3,4 +3,5 @@
   display: flex;
   position: relative;
   background-color: var(--body-background);
+  border-right: 1px solid var(--border-dark);
 }

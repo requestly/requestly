@@ -15,6 +15,8 @@ import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
 import { Checkbox } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
+import "./index.scss";
+
 export const ITEM_SIZE = 30;
 
 interface Props {
@@ -142,6 +144,19 @@ const NetworkTable: React.FC<Props> = ({
         title: "URL",
         dataIndex: "url",
         width: "48%",
+        render: (url: string, log: RQNetworkLog) => {
+          if (log?.metadata?.GQLDetails) {
+            const { operationName } = log.metadata.GQLDetails;
+            return (
+              <div className="url-wrapper">
+                <span className="url">{url}</span>
+                <span className="graphql-operation-name">{`(${operationName})`}</span>
+              </div>
+            );
+          }
+
+          return url;
+        },
       },
       {
         id: "method",
@@ -219,7 +234,6 @@ const NetworkTable: React.FC<Props> = ({
               return null;
             }
             const columnData = get(log, getColumnKey(column?.dataIndex));
-
             return (
               <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>
                 {column?.render ? column.render(columnData, log) : columnData}
@@ -239,13 +253,15 @@ const NetworkTable: React.FC<Props> = ({
         startWalkthrough={!isTrafficTableTourCompleted && isConnectedAppsTourCompleted}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
       />
-      <VirtualTableV2
-        header={header}
-        renderLogRow={renderLogRow}
-        logs={logs}
-        selectedRowData={selectedRowData}
-        onReplayRequest={onReplayRequest}
-      />
+      <div className="web-traffic-table-container">
+        <VirtualTableV2
+          header={header}
+          renderLogRow={renderLogRow}
+          logs={logs}
+          selectedRowData={selectedRowData}
+          onReplayRequest={onReplayRequest}
+        />
+      </div>
       {isReplayRequestModalOpen ? (
         <APIClient
           request={apiClientRequestForSelectedRowRef.current}
