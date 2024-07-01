@@ -165,7 +165,11 @@ export const UserPlanDetails = () => {
                 <Row gutter={8} align="middle">
                   <Col className="text-white text-bold">Your plan</Col>
                   <Col>
-                    <TeamPlanStatus subscriptionStatus={user?.details?.planDetails?.status} />
+                    <TeamPlanStatus
+                      subscriptionEndDate={user?.details?.planDetails?.subscription?.endDate}
+                      subscriptionStatus={user?.details?.planDetails?.status}
+                      cancelAtPeriodEnd={user?.details?.planDetails?.subscription?.cancelAtPeriodEnd}
+                    />
                   </Col>
                 </Row>
               </Col>
