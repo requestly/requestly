@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUserAuthDetails } from "store/selectors";
-import { Col, Modal, Popconfirm, Row, Space } from "antd";
+import { Col, Modal, Row, Space } from "antd";
 import { getAvailableBillingTeams } from "store/features/billing/selectors";
 import { TeamPlanStatus } from "../TeamPlanStatus";
 import { RQButton } from "lib/design-system/components";
@@ -23,10 +23,8 @@ import { redirectToPersonalSubscription } from "utils/RedirectionUtils";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
 import "./index.scss";
 import { trackPersonalSubscriptionDownloadInvoicesClicked } from "features/settings/analytics";
-import { PlanStatus } from "../../types";
-import { ChangePlanRequestConfirmationModal } from "features/pricing/components/ChangePlanRequestConfirmationModal";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { toast } from "utils/Toast";
+import { PlanStatus, PlanType } from "../../types";
+import { CancelPlanModal } from "../BillingDetails/modals/common/CancelPlanModal";
 
 export const UserPlanDetails = () => {
   const navigate = useNavigate();
@@ -38,10 +36,9 @@ export const UserPlanDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAppSumoSubscription, setHasAppSumoSubscription] = useState(false);
   const [lifeTimeSubscriptionDetails, setLifeTimeSubscriptionDetails] = useState(null);
+  const [isCancelPlanModalOpen, setIsCancelPlanModalOpen] = useState(false);
   const { type } = user.details?.planDetails ?? {};
-
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [isConfirmationModalLoading, setIsConfirmationModalLoading] = useState(false);
+  const isIndividualPlanType = PlanType.INDIVIDUAL === type;
 
   const getSubscriptionEndDateForAppsumo = useCallback((date = new Date()) => {
     const currentDate = date;
@@ -100,22 +97,9 @@ export const UserPlanDetails = () => {
     }
   }, [user?.details?.planDetails?.subscription?.endDate]);
 
-  const handleCancelPlanClick = useCallback(() => {
-    setIsConfirmationModalOpen(true);
-    setIsConfirmationModalLoading(true);
-    const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
-    requestPlanCancellation({
-      currentPlan: user?.details?.planDetails?.planId,
-    })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Error in cancelling plan. Please contact support");
-        setIsConfirmationModalOpen(false);
-      })
-      .finally(() => {
-        setIsConfirmationModalLoading(false);
-      });
-  }, [user?.details?.planDetails?.planId]);
+  const handleCancelPlanClick = () => {
+    setIsCancelPlanModalOpen(true);
+  };
 
   if (isLoading) return null;
 
@@ -139,27 +123,31 @@ export const UserPlanDetails = () => {
     if (user?.details?.planDetails?.status === "trialing") {
       return (
         <RQButton size="small" type="text" className="cancel-plan-btn" onClick={showFreeTrailCancelMessage}>
-          Cancel plan
+          Cancel Plan
         </RQButton>
       );
     }
     return (
-      <Popconfirm
-        icon={null}
-        cancelText="No"
-        okText="Yes"
-        title="Are you sure you want to cancel your plan?"
-        onConfirm={handleCancelPlanClick}
+      <RQButton
+        disabled={isIndividualPlanType ? user?.details?.planDetails?.subscription?.cancelAtPeriodEnd : false}
+        onClick={handleCancelPlanClick}
+        size="small"
+        type="text"
+        className="cancel-plan-btn"
       >
-        <RQButton size="small" type="text" className="cancel-plan-btn">
-          Cancel plan
-        </RQButton>
-      </Popconfirm>
+        Cancel Plan
+      </RQButton>
     );
   };
 
   return (
     <>
+      <CancelPlanModal
+        isOpen={isCancelPlanModalOpen}
+        subscriptionDetails={user?.details?.planDetails}
+        closeModal={() => setIsCancelPlanModalOpen((prev) => !prev)}
+      />
+
       <Col
         className="billing-teams-primary-card user-plan-detail-card"
         style={{
@@ -174,7 +162,11 @@ export const UserPlanDetails = () => {
                 <Row gutter={8} align="middle">
                   <Col className="text-white text-bold">Your plan</Col>
                   <Col>
-                    <TeamPlanStatus subscriptionStatus={user?.details?.planDetails?.status} />
+                    <TeamPlanStatus
+                      subscriptionEndDate={user?.details?.planDetails?.subscription?.endDate}
+                      subscriptionStatus={user?.details?.planDetails?.status}
+                      cancelAtPeriodEnd={user?.details?.planDetails?.subscription?.cancelAtPeriodEnd}
+                    />
                   </Col>
                 </Row>
               </Col>
@@ -323,11 +315,6 @@ export const UserPlanDetails = () => {
           </>
         )}
       </Col>
-      <ChangePlanRequestConfirmationModal
-        isOpen={isConfirmationModalOpen}
-        handleToggle={() => setIsConfirmationModalOpen(false)}
-        isLoading={isConfirmationModalLoading}
-      />
     </>
   );
 };
