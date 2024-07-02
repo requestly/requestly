@@ -12,6 +12,7 @@ import { updateUserProfile } from "./actions";
 import { getUsername, updateUsername } from "backend/auth/username";
 import { actions } from "store";
 import { trackUsernameUpdated } from "modules/analytics/events/misc/username";
+import { getUserProfileFromFirestore } from "backend/auth/getUserProfileFromFirestore";
 
 const UserInfo = ({ customHeading, shadow }) => {
   //Global State
@@ -41,7 +42,11 @@ const UserInfo = ({ customHeading, shadow }) => {
     setSavingChanges(true);
     Promise.all([
       updateUserProfile(user.details.profile.uid, {
-        FullName: userFullName,
+        displayName: userFullName,
+      }).then(() => {
+        if (userFullName) {
+          dispatch(actions.updateUserDisplayName(userFullName));
+        }
       }),
       updateUsername(user?.details?.profile?.uid, username)
         .then(() => {
@@ -89,15 +94,12 @@ const UserInfo = ({ customHeading, shadow }) => {
 
   useEffect(() => {
     // Initial values. Fetch full profile
-    DataStoreUtils.getValue(["users", user.details.profile.uid]).then((userRef) => {
-      if (!userRef) return;
-      const { profile } = userRef;
-      if (profile) {
-        // Full Name
-        profile["displayName"] && setUserFullName(profile["displayName"]);
+    getUserProfileFromFirestore(user?.details?.profile?.uid).then((profile) => {
+      if (profile && profile["displayName"]) {
+        setUserFullName(profile["displayName"]);
       }
     });
-  }, [user]);
+  }, [user?.details?.profile?.uid]);
 
   return (
     <Card className={`profile-card ${shadow ? "profile-card-shadow" : ""}`}>
