@@ -189,6 +189,10 @@ export const updatePlanExpiredBannerClosed = (prevState, action) => {
   prevState.misc.persist.isPlanExpiredBannerClosed = action.payload;
 };
 
+export const updateIsManageBillingTeamAlertVisible = (prevState, action) => {
+  prevState.misc.persist.isManageBillingTeamAlertVisible = action.payload;
+};
+
 export const updateIsAppBannerVisible = (prevState, action) => {
   prevState.misc.nonPersist.isAppBannerVisible = action.payload;
 };
