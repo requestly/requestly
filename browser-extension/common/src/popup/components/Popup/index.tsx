@@ -11,6 +11,13 @@ const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
   const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(true);
   const [isBlockedOnTab, setIsBlockedOnTab] = useState<boolean>(false);
+  const [currentTabUrl, setCurrentTabUrl] = useState<string>("");
+
+  useEffect(() => {
+    chrome.tabs.query({ active: true, currentWindow: true }, ([activeTab]) => {
+      setCurrentTabUrl(activeTab.url);
+    });
+  });
 
   useEffect(() => {
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT }, (noRulesPresent) => {
@@ -26,10 +33,11 @@ const Popup: React.FC = () => {
   useEffect(() => {
     chrome.runtime
       .sendMessage({
-        action: EXTENSION_MESSAGES.IS_REQUESTLY_BLOCKED_ON_TAB,
+        action: EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB,
+        tabUrl: currentTabUrl,
       })
       .then(setIsBlockedOnTab);
-  }, []);
+  }, [currentTabUrl]);
 
   const handleToggleExtensionStatus = useCallback(() => {
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS }, (updatedStatus) => {
