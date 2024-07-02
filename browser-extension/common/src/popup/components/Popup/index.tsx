@@ -5,6 +5,7 @@ import PopupHeader from "./PopupHeader";
 import { HttpsRuleOptions } from "../HttpsRuleOptions";
 import { EVENT, sendEvent } from "../../events";
 import SessionRecordingView from "../SessionRecording/SessionRecordingView";
+import { getExtensionVersion } from "../../utils";
 import "./popup.css";
 
 const Popup: React.FC = () => {
@@ -61,6 +62,9 @@ const Popup: React.FC = () => {
               </div>
             </>
           )}
+        </div>
+        <div className="popup-footer">
+          <div className="extension-version">v{getExtensionVersion()}</div>
         </div>
       </div>
     </>

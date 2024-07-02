@@ -25,6 +25,7 @@ import { redirectToNetworkSession } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { ImportFromWebSessionsButton } from "./ImportFromWebSessionsButton";
 
 const { Text } = Typography;
 
@@ -171,7 +172,10 @@ const NetworkSessionsList = ({ networkSessionsMetadata }) => {
             {isDesktopSessionsCompatible ? (
               <ImportHarModalButton />
             ) : (
-              <HarImportModal onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
+              <div className="import-btn-group">
+                <ImportFromWebSessionsButton onSaved={stableOnSuccessfulHarImport} btnText="Import .RQLY File" />
+                <HarImportModal onSaved={stableOnSuccessfulHarImport} btnText="Import HAR" />
+              </div>
             )}
           </Space>
         }

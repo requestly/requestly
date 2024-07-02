@@ -10,6 +10,7 @@ import { redirectToUrl } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
 import { Footer } from "antd/lib/layout/layout";
 import { trackFooterClicked } from "modules/analytics/events/common/onboarding/footer";
+import { getExtensionVersion, isExtensionInstalled } from "actions/ExtensionActions";
 import "./Footer.css";
 
 const { Text } = Typography;
@@ -88,18 +89,21 @@ const AppFooter: React.FC = () => {
     <>
       <Footer className="app-layout-footer">
         <Row align="middle" justify="space-between" className="w-full">
-          {isSidebarToggleAllowed && (
-            <Col>
-              <Tooltip title={`${isSecondarySidebarCollapsed ? "Expand" : "Collapse"} sidebar`} placement="topRight">
-                <Button
-                  type="text"
-                  icon={<PicRightOutlined />}
-                  className="footer-sidebar-toggle-btn"
-                  onClick={handleSecondarySidebarToggle}
-                />
-              </Tooltip>
-            </Col>
-          )}
+          <div className="display-flex items-center">
+            {isSidebarToggleAllowed && (
+              <Col>
+                <Tooltip title={`${isSecondarySidebarCollapsed ? "Expand" : "Collapse"} sidebar`} placement="topRight">
+                  <Button
+                    type="text"
+                    icon={<PicRightOutlined />}
+                    className="footer-sidebar-toggle-btn"
+                    onClick={handleSecondarySidebarToggle}
+                  />
+                </Tooltip>
+              </Col>
+            )}
+            {isExtensionInstalled() && <span className="extension-version">v{getExtensionVersion()}</span>}
+          </div>
 
           <Col className="ml-auto">{SHOW_YC_BRANDING ? renderYCBranding() : renderFooterLinks()}</Col>
         </Row>
