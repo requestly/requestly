@@ -33,6 +33,7 @@ export const EXTENSION_MESSAGES = {
   TEST_RULE_ON_URL: "testRuleOnUrl",
   RULE_EXECUTED: "ruleExecuted",
   RULE_SAVE_ERROR: "ruleSaveError",
+  IS_REQUESTLY_BLOCKED_ON_TAB: "isRequestlyBlockedOnTab",
 };
 
 export const CLIENT_MESSAGES = {
