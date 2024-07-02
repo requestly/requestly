@@ -10,7 +10,7 @@ import DataCollection from "./components/DataCollection";
 import RulesSyncing from "./components/RulesSyncing";
 import { ImplicitRuleTesting } from "./components/ImplicitRuleTesting";
 import "./index.scss";
-import { BlockList } from "./components/BlockList";
+import { BlockList } from "./components/BlockListSettings/BlockListSettings";
 
 export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
