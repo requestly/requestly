@@ -1,0 +1,125 @@
+{
+  "Cancel_1": {
+    "createdBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "creationDate": 1719884565367,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "type": "block"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "urlFilter": "|https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz|"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Cancel_1",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719884698058,
+    "name": "cancel call to ping server",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "0cnht",
+        "source": {
+          "key": "Url",
+          "operator": "Equals",
+          "value": "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Cancel",
+    "schemaVersion": "3.0.0",
+    "status": "Inactive"
+  },
+  "Cancel_2": {
+    "createdBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "creationDate": 1719884526545,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "type": "block"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "isUrlFilterCaseSensitive": true,
+          "urlFilter": "example.com"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Cancel_2",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719884554659,
+    "name": "cancel example.com document",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "ago0o",
+        "source": {
+          "key": "Url",
+          "operator": "Contains",
+          "value": "example.com"
+        }
+      }
+    ],
+    "ruleType": "Cancel",
+    "schemaVersion": "3.0.0",
+    "status": "Inactive"
+  },
+  "Cancel_3": {
+    "createdBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "creationDate": 1719884719081,
+    "currentOwner": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "description": "",
+    "extensionRules": [
+      {
+        "action": {
+          "type": "block"
+        },
+        "condition": {
+          "excludedInitiatorDomains": ["requestly.io"],
+          "excludedRequestDomains": ["requestly.io"],
+          "initiatorDomains": ["example.com"],
+          "isUrlFilterCaseSensitive": true,
+          "urlFilter": "|https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz|"
+        }
+      }
+    ],
+    "groupId": "",
+    "id": "Cancel_3",
+    "isSample": false,
+    "lastModifiedBy": "AfhB1kqjeKYJD1P8Q9LawGJLkfT2",
+    "modificationDate": 1719884729646,
+    "name": "cancel ping to server on example",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "0cnht",
+        "source": {
+          "filters": [
+            {
+              "pageDomains": ["example.com"]
+            }
+          ],
+          "key": "Url",
+          "operator": "Equals",
+          "value": "https://requestly.tech/api/mockv2/ping?teamId=9sBQkTnxaMlBY6kWHpoz"
+        }
+      }
+    ],
+    "ruleType": "Cancel",
+    "schemaVersion": "3.0.0",
+    "status": "Inactive"
+  }
+}
