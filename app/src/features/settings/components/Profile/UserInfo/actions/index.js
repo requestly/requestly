@@ -1,13 +1,14 @@
 //UTILS
+import { updateUserProfileInFirestore } from "backend/auth/updateUserProfileInFirestore";
 import DataStoreUtils from "../../../../../../utils/DataStoreUtils";
 
 export const updateUserProfile = (uid, profile) => {
-  const { CompanyName, FullName, Address } = profile;
+  const { CompanyName, displayName, Address } = profile;
 
   // Build object to save
   const updatedProfile = {};
   if (CompanyName) updatedProfile["companyName"] = CompanyName;
-  if (FullName) updatedProfile["displayName"] = FullName;
+  if (displayName) updatedProfile["displayName"] = displayName;
   if (Address) {
     const { AddrLine1, AddrLine2, AddrCity, AddrState, AddrCountry, AddrZIP } = Address;
     updatedProfile["address"] = {};
@@ -20,5 +21,5 @@ export const updateUserProfile = (uid, profile) => {
   }
 
   // Save change to DB
-  return DataStoreUtils.updateValueAsPromise(["users", uid, "profile"], updatedProfile);
+  return updateUserProfileInFirestore(uid, updatedProfile);
 };
