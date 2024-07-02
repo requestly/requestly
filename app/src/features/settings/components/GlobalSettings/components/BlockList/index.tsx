@@ -47,9 +47,9 @@ export const BlockList = () => {
       title="Blocked Sites"
       caption="HTTP rules and SessionBook wont't work on these sites"
       settingsBody={
-        <>
-          <Row>
-            <Col>
+        <div className="blocklist-body">
+          <Row align={"middle"}>
+            <Col span={20}>
               <Input placeholder="Enter URL" onChange={(e) => setInputValue(e.target.value)} />
             </Col>
             <Col>
@@ -67,7 +67,7 @@ export const BlockList = () => {
               <Typography.Text>{blockedDomain}</Typography.Text>
             </Row>
           ))}
-        </>
+        </div>
       }
       isTogglable={false}
     />
