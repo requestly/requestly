@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import InstallExtensionCTA from "../../../../components/misc/InstallExtensionCTA";
@@ -10,6 +10,7 @@ import DataCollection from "./components/DataCollection";
 import RulesSyncing from "./components/RulesSyncing";
 import { ImplicitRuleTesting } from "./components/ImplicitRuleTesting";
 import "./index.scss";
+import { BlockList } from "./components/BlockList";
 
 export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
@@ -47,6 +48,7 @@ export const GlobalSettings = () => {
         {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && isImplicitTestThisRuleCompatible ? (
           <ImplicitRuleTesting />
         ) : null}
+        <BlockList />
       </div>
     </div>
   );
