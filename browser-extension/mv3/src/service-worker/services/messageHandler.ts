@@ -1,7 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { getAppTabs, getBlockedDomains, toggleExtensionStatus } from "./utils";
-// import { handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
+import { getAppTabs, isUrlInBlockList, toggleExtensionStatus } from "./utils";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -25,8 +24,6 @@ import {
 } from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import { isExtensionEnabled } from "../../utils";
-import { matchSourceUrl } from "../../common/ruleMatcher";
-import { SourceKey, SourceOperator } from "common/types";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -132,19 +129,14 @@ export const initMessageHandler = () => {
         ruleExecutionHandler.onRuleExecuted(message.rule, requestDetails);
         break;
 
-      case EXTENSION_MESSAGES.IS_REQUESTLY_BLOCKED_ON_TAB: {
+      case EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB: {
         try {
-          getBlockedDomains().then((blockedDomains) => {
-            const isBlocked = blockedDomains.some((domain) => {
-              return matchSourceUrl(
-                {
-                  key: SourceKey.HOST,
-                  value: domain,
-                  operator: SourceOperator.CONTAINS,
-                },
-                sender.url
-              );
-            });
+          if (!message.tabUrl) {
+            sendResponse(false);
+            return true;
+          }
+
+          isUrlInBlockList(message.tabUrl).then((isBlocked) => {
             sendResponse(isBlocked);
           });
         } catch (e) {

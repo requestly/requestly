@@ -7,16 +7,17 @@ import { EVENT, sendEvent } from "../../events";
 import SessionRecordingView from "../SessionRecording/SessionRecordingView";
 import { getExtensionVersion } from "../../utils";
 import "./popup.css";
+import { BlockedExtensionView } from "../BlockedExtensionView/BlockedExtensionView";
 
 const Popup: React.FC = () => {
   const [ifNoRulesPresent, setIfNoRulesPresent] = useState<boolean>(true);
   const [isExtensionEnabled, setIsExtensionEnabled] = useState<boolean>(true);
   const [isBlockedOnTab, setIsBlockedOnTab] = useState<boolean>(false);
-  const [currentTabUrl, setCurrentTabUrl] = useState<string>("");
+  const [currentTab, setCurrentTab] = useState<chrome.tabs.Tab>(null);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([activeTab]) => {
-      setCurrentTabUrl(activeTab.url);
+      setCurrentTab(activeTab);
     });
   });
 
@@ -35,10 +36,10 @@ const Popup: React.FC = () => {
     chrome.runtime
       .sendMessage({
         action: EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB,
-        tabUrl: currentTabUrl,
+        tabUrl: currentTab?.url,
       })
       .then(setIsBlockedOnTab);
-  }, [currentTabUrl]);
+  }, [currentTab]);
 
   const handleToggleExtensionStatus = useCallback(() => {
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS }, (updatedStatus) => {
@@ -58,9 +59,7 @@ const Popup: React.FC = () => {
         />
         <div className="popup-body">
           {isBlockedOnTab ? (
-            <>
-              <div>COOOOL</div>
-            </>
+            <BlockedExtensionView />
           ) : (
             <>
               {!isExtensionEnabled && <div className="extension-paused-overlay"></div>}
