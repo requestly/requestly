@@ -45,6 +45,7 @@ export const BUSINESS = {
   APPSUMO_CODE_REDEEMED: "appsumo_code_redeemed",
   PRICING_PLAN_CTA_CLICKED: "pricing_plan_cta_clicked",
   PRICING_PLAN_CANCELLATION_REQUESTED: "pricing_plan_cancellation_requested",
+  PRICING_PLAN_CANCELLED: "pricing_plan_cancelled",
 };
 
 export const INTEREST_CAPTURED = "interest_captured";
