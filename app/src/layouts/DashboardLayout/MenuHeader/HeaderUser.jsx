@@ -132,7 +132,8 @@ export default function HeaderUser() {
           >
             <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
           </Dropdown>
-          {!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status) ? (
+          {(!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
+          appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
             <RQButton
               type="primary"
               className="header-upgrade-btn"
