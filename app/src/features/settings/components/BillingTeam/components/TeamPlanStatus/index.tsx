@@ -9,7 +9,7 @@ import "./index.scss";
 export const TeamPlanStatus: React.FC<{
   subscriptionStatus: string;
   cancelAtPeriodEnd?: boolean;
-  subscriptionEndDate: string;
+  subscriptionEndDate?: string;
 }> = ({ subscriptionEndDate, subscriptionStatus, cancelAtPeriodEnd = false }) => {
   const [searchParams] = useSearchParams();
   const redirectedFromCheckout = searchParams.get("redirectedFromCheckout");
@@ -25,9 +25,9 @@ export const TeamPlanStatus: React.FC<{
     const daysLeft = endDate.diff(currentDate, "days") + 1;
 
     if (daysLeft > 15) {
-      const daysLeftToCancelPlan = moment(currentDate, "DD MMM YYYY");
-      daysLeftToCancelPlan.add(daysLeft, "days");
-      const formattedDate = daysLeftToCancelPlan.format("Do MMM YYYY");
+      const todaysDate = moment(currentDate);
+      todaysDate.add(daysLeft, "days");
+      const formattedDate = todaysDate.format("Do MMM YYYY");
       return `Cancelling on ${formattedDate}`;
     }
 

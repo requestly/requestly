@@ -97,19 +97,9 @@ export const UserPlanDetails = () => {
     }
   }, [user?.details?.planDetails?.subscription?.endDate]);
 
-  const handleCancelPlanClick = useCallback(() => {
+  const handleCancelPlanClick = () => {
     setIsCancelPlanModalOpen(true);
-    // const requestPlanCancellation = httpsCallable(getFunctions(), "premiumNotifications-requestPlanCancellation");
-    // requestPlanCancellation({
-    //   currentPlan: user?.details?.planDetails?.planId,
-    // })
-    //   .catch((err) => {
-    //     console.error(err);
-    //     toast.error("Error in cancelling plan. Please contact support");
-    //   })
-    //   .finally(() => {
-    //   });
-  }, [user?.details?.planDetails?.planId]);
+  };
 
   if (isLoading) return null;
 

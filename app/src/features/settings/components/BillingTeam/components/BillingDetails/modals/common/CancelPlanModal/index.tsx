@@ -127,7 +127,6 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             className="cancel-plan-modal-textarea"
-            style={{ height: 80, resize: "none" }}
             maxLength={400}
           />
         </Col>
