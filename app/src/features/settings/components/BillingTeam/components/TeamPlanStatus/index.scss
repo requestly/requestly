@@ -21,6 +21,7 @@
 }
 
 .plan-status-warning-badge {
+  color: var(--warning);
   border: 1px solid var(--warning);
 }
 
@@ -42,4 +43,8 @@
 
 .plan-status-active-dot {
   background: var(--success);
+}
+
+.team-plan-status-badge-text {
+  color: inherit;
 }
