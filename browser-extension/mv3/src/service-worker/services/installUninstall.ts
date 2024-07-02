@@ -5,9 +5,9 @@ const handleExtensionInstalledOrUpdated = (details: chrome.runtime.InstalledDeta
     chrome.tabs.create({ url: config.WEB_URL + "/extension-installed" });
   }
 
-  if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-    chrome.tabs.create({ url: config.WEB_URL + "/extension-updated" });
-  }
+  // if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
+  //   chrome.tabs.create({ url: config.WEB_URL + "/extension-updated" });
+  // }
 };
 
 export const handleInstallUninstall = () => {
