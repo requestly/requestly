@@ -1,7 +1,7 @@
 import config from "common/config";
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { onVariableChange, Variable } from "../variable";
-import { isExtensionEnabled } from "../../utils";
+import { debounce, isExtensionEnabled } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
 import { sendMessageToApp } from "./messageHandler";
@@ -34,16 +34,22 @@ const updateDynamicRules = async (options: UpdateDynamicRuleOptions): Promise<vo
       break;
     } catch (e) {
       const match = e.message.match(/Rule with id (\d+)/);
-      const ruleId = parseInt(match[1]);
+      const ruleId = match && parseInt(match[1]);
       const rqRuleId = addRules.find((rule) => rule.id === ruleId)?.rqRuleId;
 
       if (match && rqRuleId) {
         badRQRuleIds.add(rqRuleId);
-        sendMessageToApp({
-          action: EXTENSION_MESSAGES.RULE_SAVE_ERROR,
-          error: e.message,
-          rqRuleId,
-        });
+      }
+
+      sendMessageToApp({
+        action: EXTENSION_MESSAGES.RULE_SAVE_ERROR,
+        error: e.message,
+        rqRuleId,
+      });
+
+      if (!match) {
+        console.error(`Error updating dynamic rules: ${e.message}`);
+        break;
       }
     }
   }
@@ -119,7 +125,7 @@ const applyExtensionRules = async (): Promise<void> => {
 };
 
 export const initRulesManager = async (): Promise<void> => {
-  onRuleOrGroupChange(applyExtensionRules);
+  onRuleOrGroupChange(debounce(applyExtensionRules, 300));
   onVariableChange(Variable.IS_EXTENSION_ENABLED, () => {
     applyExtensionRules();
     deleteAllSessionRules();
