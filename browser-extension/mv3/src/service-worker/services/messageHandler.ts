@@ -132,9 +132,13 @@ export const initMessageHandler = () => {
         ruleExecutionHandler.onRuleExecuted(message.rule, requestDetails);
         break;
 
-      case EXTENSION_MESSAGES.IS_REQUESTLY_BLOCKED_ON_TAB: {
+      case EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB: {
         try {
           getBlockedDomains().then((blockedDomains) => {
+            if (!message.tabUrl) {
+              return sendResponse(false);
+            }
+
             const isBlocked = blockedDomains.some((domain) => {
               return matchSourceUrl(
                 {
@@ -142,7 +146,7 @@ export const initMessageHandler = () => {
                   value: domain,
                   operator: SourceOperator.CONTAINS,
                 },
-                sender.url
+                message.tabUrl
               );
             });
             sendResponse(isBlocked);
