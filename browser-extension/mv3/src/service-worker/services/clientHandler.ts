@@ -1,11 +1,17 @@
-import { generateUrlPattern } from "../../utils";
+import { generateUrlPattern, isExtensionEnabled } from "../../utils";
 import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.json";
-import { isExtensionEnabled } from "../../utils";
 import { Variable, onVariableChange } from "../variable";
 import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
+import { getBlockedDomains } from "./utils";
+import { ChangeType, onRecordChange } from "common/storage";
+import { STORAGE_KEYS } from "common/constants";
 
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
+
+const generateBlockedDomainPattern = (hostname: string) => {
+  return `*://*${hostname}/*`;
+};
 
 const CLIENT_SCRIPTS: chrome.scripting.RegisteredContentScript[] = [
   {
@@ -36,9 +42,19 @@ declare const window: {
 
 /** Loading Client scripts ASAP */
 const registerClientScripts = async () => {
-  console.log("[registerClientScript]");
+  const blockedDomains = await getBlockedDomains();
+  const blockedDomainPatterns = blockedDomains.map(generateBlockedDomainPattern).filter((pattern) => !!pattern);
+
+  console.log("[registerClientScript]", { blockedDomains });
+  const clientScripts = CLIENT_SCRIPTS.map((script) => {
+    return {
+      ...script,
+      excludeMatches: [...(script.excludeMatches ?? []), ...blockedDomainPatterns],
+    };
+  });
+
   chrome.scripting
-    .registerContentScripts(CLIENT_SCRIPTS)
+    .registerContentScripts(clientScripts)
     .then(() => {
       console.log("[registerClientScript]");
       chrome.scripting
@@ -62,7 +78,7 @@ const unregisterClientScripts = async () => {
 };
 
 const setupClientScript = async (isExtensionStatusEnabled: boolean) => {
-  console.log("[initClientHandler.setupClientScript]", { isExtensionEnabled });
+  console.log("[initClientHandler.setupClientScript]", { isExtensionStatusEnabled });
   if (isExtensionStatusEnabled) {
     registerClientScripts();
   } else {
@@ -79,6 +95,23 @@ export const initClientHandler = async () => {
     console.log("[initClientHandler]", "onVariableChange", { extensionStatus });
     setupClientScript(extensionStatus);
   });
+
+  onRecordChange<string[]>(
+    {
+      keyFilter: STORAGE_KEYS.BLOCKED_DOMAINS,
+      changeTypes: [ChangeType.MODIFIED],
+    },
+    () => {
+      unregisterClientScripts().then(() => {
+        setupClientScript(isExtensionStatusEnabled);
+        chrome.tabs.query({}, (tabs) => {
+          tabs.forEach((tab) => {
+            updateTabBlockedDomainsCache(tab.id, undefined);
+          });
+        });
+      });
+    }
+  );
 };
 
 /** Caching Rules for AjaxInterceptor */
@@ -136,8 +169,20 @@ const updateTabRuleCache = async (tabId: number, frameId?: number) => {
   );
 };
 
-export const initClientRuleCaching = async () => {
-  // TODO: Do not inject in Requestly Pages. No harm in injecting though
+const updateTabBlockedDomainsCache = async (tabId: number, frameId?: number) => {
+  const blockedDomains = await getBlockedDomains();
+
+  updateTabCache(
+    tabId,
+    {
+      blockedDomains: blockedDomains,
+    },
+    frameId
+  );
+};
+
+export const initClientPageCaching = async () => {
+  // TODO: Do not inject in Requestly Pages and blocklisted domains. No harm in injecting though
   let isExtensionStatusEnabled = await isExtensionEnabled();
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
     isExtensionStatusEnabled = extensionStatus;
@@ -146,6 +191,7 @@ export const initClientRuleCaching = async () => {
   chrome.webNavigation.onCommitted.addListener(async (navigatedTabData) => {
     if (isExtensionStatusEnabled) {
       updateTabRuleCache(navigatedTabData.tabId, navigatedTabData.frameId);
+      updateTabBlockedDomainsCache(navigatedTabData.tabId, navigatedTabData.frameId);
     }
   });
 

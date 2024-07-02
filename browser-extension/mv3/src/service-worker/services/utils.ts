@@ -2,6 +2,8 @@ import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "comm
 import { setVariable, Variable } from "../variable";
 import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
+import { getRecord } from "common/storage";
+import { STORAGE_KEYS } from "common/constants";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -185,4 +187,9 @@ export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
   }
 
   return appTabs;
+};
+
+export const getBlockedDomains = async (): Promise<string[]> => {
+  const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
+  return blockedDomains ?? [];
 };

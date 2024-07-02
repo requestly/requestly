@@ -7,6 +7,7 @@ import { SessionRuleType } from "./requestProcessor/types";
 import { sendMessageToApp } from "./messageHandler";
 import { EXTENSION_MESSAGES } from "common/constants";
 import { UpdateDynamicRuleOptions } from "common/types";
+import { getBlockedDomains } from "./utils";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 
@@ -75,6 +76,8 @@ const addExtensionRules = async (): Promise<void> => {
   const enabledRules = await getEnabledRules();
   const parsedExtensionRules: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[] = [];
 
+  const blockedDomains = await getBlockedDomains();
+
   enabledRules.forEach((rule) => {
     const extensionRules = rule.extensionRules;
     if (extensionRules?.length) {
@@ -88,6 +91,9 @@ const addExtensionRules = async (): Promise<void> => {
             (resourceType) => !extensionRule.condition.excludedResourceTypes.includes(resourceType)
           );
         }
+
+        extensionRule.condition.excludedRequestDomains.push(...blockedDomains);
+        extensionRule.condition.excludedInitiatorDomains.push(...blockedDomains);
 
         const ruleId = parsedExtensionRules.length + 1;
 
