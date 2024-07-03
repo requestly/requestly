@@ -3,10 +3,10 @@ import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast";
-import { decompressEvents } from "../../SessionViewer/sessionEventsUtils";
+import { decompressEvents } from "../../../../../../../../views/features/sessions/SessionViewer/sessionEventsUtils";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PATHS from "config/constants/sub/paths";
-import { SessionRecordingMetadata } from "../../SessionViewer/types";
+import { SessionRecordingMetadata } from "../../../../../../../../views/features/sessions/SessionViewer/types";
 
 export const ImportWebSessionModalButton: React.FC = () => {
   const dispatch = useDispatch();

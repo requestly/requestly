@@ -8,7 +8,7 @@ import { redirectToSessionSettings } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
 import { NewSessionModal } from "features/sessionBook/screens/SessionsListScreen/modals/NewSessionModal/NewSessionModal";
 import { trackNewSessionClicked } from "modules/analytics/events/features/sessionRecording";
-import { ImportWebSessionModalButton } from "views/features/sessions/SessionsIndexPageContainer/SessionsIndexPage/ImportWebSessionModalButton";
+import { ImportWebSessionModalButton } from "../ImportWebSessionModalButton/ImportWebSessionModalButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
