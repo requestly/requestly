@@ -188,16 +188,3 @@ export const isContentTypeJSON = (contentType) => !!contentType?.includes("appli
 export const applyDelay = async (delay) => {
   return new Promise((resolve) => setTimeout(resolve, delay));
 };
-
-export const isRequestDomainBlocked = (url) => {
-  return window[PUBLIC_NAMESPACE]?.blockedDomains?.some((domain) => {
-    return matchSourceUrl(
-      {
-        key: SourceKey.HOST,
-        value: domain,
-        operator: SourceOperator.CONTAINS,
-      },
-      url
-    );
-  });
-};

@@ -9,7 +9,6 @@ import {
   isContentTypeJSON,
   isJSON,
   isPromise,
-  isRequestDomainBlocked,
   jsonifyValidJSONString,
   notifyOnBeforeRequest,
   notifyRequestRuleApplied,
@@ -281,10 +280,6 @@ export const initXhrInterceptor = (debug) => {
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = async function (data) {
     this.rqProxyXhr._requestData = data;
-
-    if (isRequestDomainBlocked(this.rqProxyXhr._requestURL)) {
-      send.call(this, this.rqProxyXhr._requestData);
-    }
 
     const matchedDelayRulePair = getMatchedDelayRule({
       url: this.rqProxyXhr._requestURL,
