@@ -1,114 +1,38 @@
-import React, { useCallback, useRef, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
-import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
-import { Button, Divider, Input, Row, Col, Typography, InputRef, Space } from "antd";
-import { actions } from "store";
+import React from "react";
 import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
-import { isValidUrl } from "utils/FormattingHelper";
-import { toast } from "utils/Toast";
-import { prefixUrlWithHttps } from "utils/URLUtils";
-// import StartSessionRecordingGif from "./assets/sessions-banner.gif";
+import { Button, Col, InputRef, Row, Space, Typography, Input } from "antd";
+import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/apiClient";
 import {
-  trackInstallExtensionDialogShown,
-  trackOnboardingToSettingsNavigate,
-  trackOnboardingSampleSessionViewed,
   trackOnboardingPageViewed,
+  trackOnboardingSampleSessionViewed,
+  trackOnboardingToSettingsNavigate,
   trackStartRecordingOnExternalTarget,
   trackStartRecordingWithURLClicked,
   trackTriedRecordingForInvalidURL,
 } from "modules/analytics/events/features/sessionRecording";
-import "./index.scss";
-import { ImportHarModalButton } from "../NetworkSessions/ImportHarModalButton";
-import { getAppFlavour } from "utils/AppUtils";
-import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { useCallback, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { actions } from "store";
+import { isValidUrl } from "utils/FormattingHelper";
+import { redirectToSessionSettings } from "utils/RedirectionUtils";
+import { toast } from "utils/Toast";
+import { prefixUrlWithHttps } from "utils/URLUtils";
+import { SettingOutlined } from "@ant-design/icons";
+import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
+import StartSessionRecordingGif from "../../assets/sessions-banner.gif";
+import "./sessionsOnboardingView.scss";
 
 const { Text, Title } = Typography;
 
-const CheckItem: React.FC<{ label: string }> = ({ label }) => {
-  return (
-    <div>
-      <CheckOutlined style={{ marginRight: "8px", fontSize: "16px", color: "#228B22" }} />
-      <span>{label}</span>
-    </div>
-  );
-};
-
-const GreenVerifiedCheck: React.FC<{}> = () => {
-  return (
-    <>
-      <BsShieldCheck style={{ fill: "url(#green-gradient)" }} className="check-icon" />
-      {/* GREEN GRADIENT on svg */}
-      <svg width="0" height="0">
-        <linearGradient id="green-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
-          <stop stopColor="#eefccb" offset="0%" />
-          <stop stopColor="#aefc31" offset="50%" />
-          <stop stopColor="#0dbb48" offset="100%" />
-        </linearGradient>
-      </svg>
-    </>
-  );
-};
-
-interface SessionOnboardProps {
-  redirectToSettingsPage?: () => void;
-  openDownloadedSessionModalBtn?: React.ReactNode;
+interface SessionOnboardingViewProps {
   isModalView?: boolean;
 }
 
-export enum OnboardingTypes {
-  NETWORK,
-  SESSIONS,
-}
-interface OnboardingProps extends SessionOnboardProps {
-  type?: OnboardingTypes;
-}
-
-const NewtorkSessionsOnboarding: React.FC<{}> = () => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        textAlign: "center",
-        height: "100%",
-        margin: "30px",
-      }}
-    >
-      <Title level={1}>Record &amp; Replay your browsing sessions</Title>
-      <Text type="secondary">
-        <div>Record your network sessions and Share with others for offline review or debugging.</div>
-      </Text>
-      <div>
-        {/* <HarImportModal onSaved={stableNavigate} /> */}
-        <ImportHarModalButton />
-      </div>
-      <Divider />
-      <Text type="secondary">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-evenly",
-            fontWeight: "bold",
-          }}
-        >
-          <CheckItem label="Faster Debugging" />
-          <CheckItem label="No need to reproduce" />
-          <CheckItem label="Strict Privacy" />
-        </div>
-      </Text>
-    </div>
-  );
-};
-
-export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
-  redirectToSettingsPage,
-  openDownloadedSessionModalBtn,
-  isModalView = false,
-}) => {
+export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ isModalView = false }) => {
   const inputRef = useRef<InputRef>();
   const dispatch = useDispatch();
-  const appFlavour = getAppFlavour();
+  const navigate = useNavigate();
 
   useEffect(() => {
     trackOnboardingPageViewed();
@@ -121,6 +45,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
         "Safely capture mouse movement, console, network & environment data automatically on your device for sharing and debugging. Private and secure, works locally on your browser.",
       eventPage: "session_recording_page",
     };
+    // @ts-ignore
     dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newProps: modalProps }));
     trackInstallExtensionDialogShown({ src: "sessions_home_page" });
   }, [dispatch]);
@@ -144,15 +69,15 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
 
   const handleSettingsNavigation = useCallback(() => {
     trackOnboardingToSettingsNavigate();
-    redirectToSettingsPage();
-  }, [redirectToSettingsPage]);
+    redirectToSessionSettings(navigate);
+  }, [navigate]);
 
   return (
     <div className="onboarding-content-container">
       {!isModalView && (
         <Row justify="end" align="middle" className="settings-row">
           <Space size={20}>
-            {openDownloadedSessionModalBtn}
+            {/* {openDownloadedSessionModalBtn} */}
             <span onClick={handleSettingsNavigation} className="settings-btn">
               <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
             </span>
@@ -163,10 +88,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
       <Row justify="space-between" className="onboarding-banner">
         <Col span={isModalView ? 24 : 12} className="banner-text-container">
           <Row className="banner-header">
-            <Title className="banner-title">
-              Debug issues faster with{" "}
-              {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? "SessionBear" : "SessionBook"}
-            </Title>
+            <Title className="banner-title">Debug issues faster with SessionBook</Title>
           </Row>
           <Row className="banner-description">
             <Text type="secondary" className="banner-text w-full">
@@ -182,7 +104,16 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
             </Text>
             {!isModalView && (
               <Text type="secondary" className="banner-message banner-text">
-                <GreenVerifiedCheck /> sessions are not automatically saved to the cloud; they require manual saving
+                <BsShieldCheck style={{ fill: "url(#green-gradient)" }} className="check-icon" />
+                {/* GREEN GRADIENT on svg */}
+                <svg width="0" height="0">
+                  <linearGradient id="green-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop stopColor="#eefccb" offset="0%" />
+                    <stop stopColor="#aefc31" offset="50%" />
+                    <stop stopColor="#0dbb48" offset="100%" />
+                  </linearGradient>
+                </svg>{" "}
+                session recordings are not automatically saved to the cloud; they require manual saving
               </Text>
             )}
           </Row>
@@ -212,7 +143,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
         {!isModalView && (
           <Col span={12} className="banner-demo-video">
             <Row justify="end">
-              {/* <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" /> */}
+              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
             </Row>
             <Row onClick={trackOnboardingSampleSessionViewed}>
               <a
@@ -221,7 +152,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
                 className="sample-link-container"
               >
                 <Row justify="end" align="middle" className="sample-link">
-                  <Text underline>View sample session</Text>
+                  <Text underline>View sample replay</Text>
                 </Row>
               </a>
             </Row>
@@ -231,18 +162,3 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
     </div>
   );
 };
-
-const OnboardingView: React.FC<OnboardingProps> = ({ type, redirectToSettingsPage, openDownloadedSessionModalBtn }) => {
-  if (type === OnboardingTypes.NETWORK) {
-    return <NewtorkSessionsOnboarding />;
-  } else {
-    return (
-      <SessionOnboardingView
-        redirectToSettingsPage={redirectToSettingsPage}
-        openDownloadedSessionModalBtn={openDownloadedSessionModalBtn}
-      />
-    );
-  }
-};
-
-export default OnboardingView;
