@@ -196,6 +196,19 @@ export const validateRule = (rule, dispatch, appMode) => {
           error: "missing from field",
         };
       }
+
+      if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
+        const capturingGroupPattern = /\((?!\?:)/g;
+        const hasCapturingGroup = capturingGroupPattern.test(pair.source.value);
+
+        if (hasCapturingGroup) {
+          output = {
+            result: false,
+            message: `Capturing groups are not supported in the source regex`,
+            error: "capturing group present in source",
+          };
+        }
+      }
     });
   }
 
