@@ -22,7 +22,7 @@ export const NewtorkSessionsOnboardingView: React.FC<{}> = () => {
         flexDirection: "column",
         textAlign: "center",
         height: "100%",
-        margin: "30px",
+        padding: "30px",
       }}
     >
       <Title level={1}>Record &amp; Replay your browsing sessions</Title>
