@@ -22,6 +22,7 @@ import { useIncentiveActions } from "features/incentivization/hooks";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllRecordsMap } from "store/features/rules/selectors";
+import { useIsNewUserForIncentivization } from "features/incentivization/hooks";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
@@ -37,6 +38,7 @@ export const TestRuleHeader = () => {
   const { sheetPlacement } = useBottomSheetContext();
 
   const { claimIncentiveRewards } = useIncentiveActions();
+  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-03");
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
@@ -77,14 +79,17 @@ export const TestRuleHeader = () => {
     setPageUrl(urlToTest);
     testRuleOnUrl({ url: urlToTest, ruleId: currentlySelectedRuleData.id, record: doCaptureSession });
 
+    const incentiveEvent = isNewUserForIncentivization
+      ? IncentivizeEvent.RULE_CREATED_AND_TESTED
+      : IncentivizeEvent.RULE_TESTED;
+
     claimIncentiveRewards({
-      type: IncentivizeEvent.RULE_TESTED,
+      type: incentiveEvent,
+      metadata: { rule_type: currentlySelectedRuleData.ruleType },
     })?.then((response) => {
-      // @ts-ignore
       if (response.data?.success) {
         dispatch(
           incentivizationActions.setUserMilestoneAndRewardDetails({
-            // @ts-ignore
             userMilestoneAndRewardDetails: response.data?.data,
           })
         );
@@ -94,7 +99,7 @@ export const TestRuleHeader = () => {
             modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
             newValue: true,
             newProps: {
-              event: IncentivizeEvent.RULE_TESTED,
+              event: incentiveEvent,
               metadata: { rule_type: currentlySelectedRuleData.ruleType },
             },
           })
@@ -111,6 +116,7 @@ export const TestRuleHeader = () => {
     isCurrentlySelectedRuleHasUnsavedChanges,
     dispatch,
     claimIncentiveRewards,
+    isNewUserForIncentivization,
     allRecordsMap,
     currentlySelectedRuleData.groupId,
   ]);
