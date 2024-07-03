@@ -104,11 +104,6 @@ export const initClientHandler = async () => {
     () => {
       unregisterClientScripts().then(() => {
         setupClientScript(isExtensionStatusEnabled);
-        chrome.tabs.query({}, (tabs) => {
-          tabs.forEach((tab) => {
-            updateTabBlockedDomainsCache(tab.id, undefined);
-          });
-        });
       });
     }
   );
@@ -169,19 +164,7 @@ const updateTabRuleCache = async (tabId: number, frameId?: number) => {
   );
 };
 
-const updateTabBlockedDomainsCache = async (tabId: number, frameId?: number) => {
-  const blockedDomains = await getBlockedDomains();
-
-  updateTabCache(
-    tabId,
-    {
-      blockedDomains: blockedDomains,
-    },
-    frameId
-  );
-};
-
-export const initClientPageCaching = async () => {
+export const initClientRuleCaching = async () => {
   // TODO: Do not inject in Requestly Pages and blocklisted domains. No harm in injecting though
   let isExtensionStatusEnabled = await isExtensionEnabled();
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
@@ -191,7 +174,6 @@ export const initClientPageCaching = async () => {
   chrome.webNavigation.onCommitted.addListener(async (navigatedTabData) => {
     if (isExtensionStatusEnabled) {
       updateTabRuleCache(navigatedTabData.tabId, navigatedTabData.frameId);
-      updateTabBlockedDomainsCache(navigatedTabData.tabId, navigatedTabData.frameId);
     }
   });
 

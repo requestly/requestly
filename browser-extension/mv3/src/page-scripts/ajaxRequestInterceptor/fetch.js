@@ -9,7 +9,6 @@ import {
   isContentTypeJSON,
   isJSON,
   isPromise,
-  isRequestDomainBlocked,
   jsonifyValidJSONString,
   notifyOnBeforeRequest,
   notifyRequestRuleApplied,
@@ -33,10 +32,6 @@ export const initFetchInterceptor = (debug) => {
 
     const url = getAbsoluteUrl(request.url);
     const method = request.method;
-
-    if (isRequestDomainBlocked(url)) {
-      return getOriginalResponse();
-    }
 
     const matchedDelayRulePair = getMatchedDelayRule({
       url: url,
