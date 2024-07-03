@@ -51,6 +51,9 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   }
 
   const congratulationMesssages: Record<IncentivizeEvent, { message: string }> = {
+    [IncentivizeEvent.RULE_CREATED_AND_TESTED]: {
+      message: `You earned $${earnedCredits} on testing your rule.`,
+    },
     [IncentivizeEvent.RULE_CREATED]: {
       message: `You earned $${earnedCredits} on creating your first rule.`,
     },

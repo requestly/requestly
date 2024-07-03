@@ -47,6 +47,7 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import Logger from "../../../../../../../../../../common/logger";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -120,6 +121,7 @@ const CreateRuleButton = ({
   const userAttributes = useSelector(getUserAttributes);
 
   const { claimIncentiveRewards } = useIncentiveActions();
+  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-03");
 
   const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {
@@ -217,15 +219,19 @@ const CreateRuleButton = ({
     });
   }, [currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
 
-  const claimRuleCreationRewards = useCallback(async () => {
+  const claimRuleCreationRewards = async () => {
     if (userAttributes?.num_rules === 0) {
+      if (isNewUserForIncentivization) {
+        return;
+      }
+
       return handleFirstRuleCreationEvent().catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
       });
     } else {
       handleOtherRuleEvents();
     }
-  }, [handleFirstRuleCreationEvent, userAttributes]);
+  };
 
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);

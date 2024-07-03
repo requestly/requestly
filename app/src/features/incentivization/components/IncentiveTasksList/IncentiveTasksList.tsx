@@ -45,6 +45,7 @@ import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { getUserAuthDetails } from "store/selectors";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";
 import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
@@ -62,6 +63,9 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const [activePanels, setActivePanels] = useState([]);
 
   const { claimIncentiveRewards } = useIncentiveActions();
+  const isNewUser = useIsNewUserForIncentivization("2024-07-03");
+
+  console.log("isNewUser", isNewUser);
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
@@ -77,6 +81,29 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
 
   const incentiveTasksList: IncentiveTaskListItem[] = useMemo(
     () => [
+      {
+        id: IncentivizeEvent.RULE_CREATED_AND_TESTED,
+        title: "Create and test a rule",
+        isCompleted: isTaskCompleted(IncentivizeEvent.RULE_CREATED_AND_TESTED, userMilestoneAndRewardDetails),
+        description:
+          "Rules enable you to set conditions that trigger specific actions when met. Create a rule to apply desired network modifications. Use the testing widget to ensure it is correctly configured and functioning as expected.",
+        icon: <MdPlaylistAdd />,
+        helpLink: (
+          <a href="https://developers.requestly.com/create-first-rule/" target="_blank" rel="noreferrer">
+            Learn how to create Rules
+          </a>
+        ),
+        milestone: milestones?.[IncentivizeEvent.RULE_CREATED_AND_TESTED],
+        action: () => {
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_CREATED_AND_TESTED, userMilestoneAndRewardDetails);
+          return (
+            <NewRuleButtonWithDropdown
+              disable={isCompleted}
+              callback={() => postActionClickCallback(IncentivizeEvent.RULE_CREATED_AND_TESTED)}
+            />
+          );
+        },
+      },
       {
         id: IncentivizeEvent.RULE_CREATED,
         title: "Create your first rule",
