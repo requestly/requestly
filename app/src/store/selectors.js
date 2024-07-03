@@ -295,6 +295,10 @@ export const getIsPlanExpiredBannerClosed = (state) => {
   return getGlobalState(state).misc.persist?.isPlanExpiredBannerClosed;
 };
 
+export const getIsManageBillingTeamAlertVisible = (state) => {
+  return getGlobalState(state).misc.persist?.isManageBillingTeamAlertVisible;
+};
+
 export const getAllEditorToast = (state) => {
   return getGlobalState(state).editorToast;
 };
