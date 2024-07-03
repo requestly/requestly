@@ -40,7 +40,7 @@ export const BlockList = () => {
           setInputValue("");
         });
     } catch (e) {
-      toast.error("please enter a valid URL or domain");
+      toast.error("Please enter a valid URL or domain");
     }
   };
 
@@ -77,6 +77,7 @@ export const BlockList = () => {
                 placeholder="Enter URL"
                 onChange={(e) => setInputValue(e.target.value)}
                 onPressEnter={handleAddDomain}
+                value={inputValue}
               />
             </Col>
             <Col span={2}>
@@ -87,14 +88,12 @@ export const BlockList = () => {
           </Row>
           <Row className="blocklist-subheading">Adding a domain will include all its subdomains.</Row>
           {blockedDomains.map((blockedDomain, index) => (
-            <>
-              <Row className="blocklist-domains-container" align={"middle"} justify={"space-between"}>
-                <Col span={23}>{blockedDomain}</Col>
-                <Col className="blocklist-close-icon" onClick={debounce(() => handleRemoveDomain(index), 100)}>
-                  <CloseOutlined className="icon__wrapper" />
-                </Col>
-              </Row>
-            </>
+            <Row className="blocklist-domains-container" align={"middle"} justify={"space-between"} key={index}>
+              <Col span={23}>{blockedDomain}</Col>
+              <Col className="blocklist-close-icon" onClick={debounce(() => handleRemoveDomain(index), 100)}>
+                <CloseOutlined className="icon__wrapper" />
+              </Col>
+            </Row>
           ))}
         </div>
       }
