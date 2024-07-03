@@ -23,6 +23,8 @@
 
     .blocklist-close-icon {
       cursor: pointer;
+      display: flex;
+      align-self: center;
     }
   }
 }

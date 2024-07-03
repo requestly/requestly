@@ -9,7 +9,7 @@ import { getAppMode } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { prefixUrlWithHttps } from "utils/URLUtils";
 import "./blocklist.scss";
-import { CloseOutlined } from "@ant-design/icons";
+import { AiOutlineClose } from "@react-icons/all-files/ai/AiOutlineClose";
 import { debounce } from "lodash";
 
 export const BlockList = () => {
@@ -91,7 +91,7 @@ export const BlockList = () => {
             <Row className="blocklist-domains-container" align={"middle"} justify={"space-between"} key={index}>
               <Col span={23}>{blockedDomain}</Col>
               <Col className="blocklist-close-icon" onClick={debounce(() => handleRemoveDomain(index), 100)}>
-                <CloseOutlined className="icon__wrapper" />
+                <AiOutlineClose />
               </Col>
             </Row>
           ))}
