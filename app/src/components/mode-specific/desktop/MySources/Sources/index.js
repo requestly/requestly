@@ -76,15 +76,16 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           if (!desktopSpecificDetails.appsList[device.id]) {
             console.log("Adding Device", device.id);
             updatedAppsList[device.id] = {
-              id: "android",
-              type: "mobile-auto",
+              id: "android-adb",
+              type: "mobile",
               name: device.id,
-              description: device?.details?.model,
+              description: device?.product,
               icon: "android.png",
               isActive: false,
               isScanned: true,
               comingSoon: false,
               isAvailable: true,
+              metadata: { deviceId: device.id },
             };
           }
         });
@@ -135,7 +136,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           // Notify user and update state
           if (res.success) {
             toast.success(`Connected ${getAppName(appId)}`);
-            if (appId === "android") {
+            if (appId === "android-adb") {
               console.log(appId, options.deviceId, options.launchOptions);
               dispatch(
                 actions.updateDesktopSpecificAppProperty({
@@ -195,7 +196,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           if (res.success) {
             toast.info(`Disconnected ${getAppName(appId)}`);
 
-            if (appId === "android") {
+            if (appId === "android-adb") {
               console.log(appId, options.deviceId, options.launchOptions);
               dispatch(
                 actions.updateDesktopSpecificAppProperty({
@@ -271,7 +272,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           </Col>
           <Col className="source-description">{app.description}</Col>
           <>
-            {app.type !== "browser" && app.type !== "mobile-auto" ? (
+            {app.type !== "browser" && app.id !== "android-adb" ? (
               <RQButton type="default" onClick={() => renderInstructionsModal(app.id)}>
                 Setup Instructions
               </RQButton>
@@ -283,7 +284,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                   app.isActive,
                   app.isAvailable,
                   app.canLaunchWithCustomArgs,
-                  app.type === "mobile-auto" ? { deviceId: app.name } : {}
+                  app.metadata ?? {}
                 )}
               </>
             )}
@@ -294,63 +295,12 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     [renderChangeAppStatusBtn, renderInstructionsModal]
   );
 
-  // const renderMobileSources = useCallback(
-  //   (source) => {
-  //     fetchMobileDevices();
-  //     const manualSetupSources = [
-  //       {
-  //         id: "android",
-  //         type: "mobile",
-  //         name: "Android",
-  //         description: "External Device",
-  //         icon: "android.png",
-  //         isActive: false,
-  //         isScanned: false,
-  //         comingSoon: false,
-  //         isAvailable: true,
-  //       },
-  //       {
-  //         id: "ios",
-  //         type: "mobile",
-  //         name: "iOS",
-  //         description: "External Device",
-  //         icon: "ios.svg",
-  //         isActive: false,
-  //         isScanned: false,
-  //         comingSoon: false,
-  //         isAvailable: true,
-  //       },
-  //     ];
-
-  //     return (
-  //       <div className="source-grid">
-  //         {mobileDevices?.map((device) => {
-  //           return renderSourceCard({
-  //             id: "android",
-  //             type: "mobile-auto",
-  //             name: device.id,
-  //             description: device?.details?.model,
-  //             icon: "android.png",
-  //             isActive: false,
-  //             isScanned: true,
-  //             comingSoon: false,
-  //             isAvailable: true,
-  //           });
-  //         })}
-  //         {manualSetupSources.map((source) => renderSourceCard(source))}
-  //       </div>
-  //     );
-  //   },
-  //   [fetchMobileDevices, mobileDevices, renderSourceCard]
-  // );
-
   const renderSources = useCallback(
-    (types) => {
-      const sources = appsListArray.filter((app) => types.includes(app.type));
+    (type) => {
+      const sources = appsListArray.filter((app) => type === app.type);
       const renderSourceByType = {
         browser: (source) => (source.isAvailable ? renderSourceCard(source) : null),
         mobile: (source) => renderSourceCard(source),
-        "mobile-auto": (source) => renderSourceCard(source),
         terminal: (source) =>
           isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY) ? renderSourceCard(source) : null,
         other: (source) => renderSourceCard(source),
@@ -366,23 +316,23 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       {
         key: "browser",
         label: `Installed browsers`,
-        children: renderSources(["browser"]),
+        children: renderSources("browser"),
       },
       {
         key: "mobile",
         label: `Mobile apps & browsers`,
-        children: renderSources(["mobile", "mobile-auto"]),
+        children: renderSources("mobile"),
       },
       {
         key: "terminal",
         label: `Terminal processes`,
         disabled: !isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY),
-        children: renderSources(["terminal"]),
+        children: renderSources("terminal"),
       },
       {
         key: "other",
         label: `Others`,
-        children: renderSources(["other"]),
+        children: renderSources("other"),
       },
     ],
     [renderSources]
