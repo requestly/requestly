@@ -1,18 +1,17 @@
 import { DeleteOutlined, ShareAltOutlined } from "@ant-design/icons";
-import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { Space, Table, Tag, Tooltip, Typography } from "antd";
-import { UserIcon } from "components/common/UserIcon";
-import Favicon from "components/misc/Favicon";
-import { ContentListTableProps } from "componentsV2/ContentList";
-import FEATURES from "config/constants/sub/features";
-import PATHS from "config/constants/sub/paths";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { Space, Table, Tag, Tooltip, Typography } from "antd";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { UserIcon } from "components/common/UserIcon";
+import { ContentListTableProps } from "componentsV2/ContentList";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import Favicon from "components/misc/Favicon";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { getPrettyVisibilityName, renderHeroIcon } from "views/features/sessions/ShareRecordingModal";
-// import ReactHoverObserver from "react-hover-observer";
+import FEATURES from "config/constants/sub/features";
+import PATHS from "config/constants/sub/paths";
 
 export const useSessionsTableColumns = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -88,9 +87,7 @@ export const useSessionsTableColumns = () => {
       align: "center",
       width: "10%",
       render: (visibility) => (
-        <Tooltip title={getPrettyVisibilityName(visibility, isWorkspaceMode)}>
-          {renderHeroIcon(visibility, "1em")}
-        </Tooltip>
+        <Tooltip title={getPrettyVisibilityName(visibility, isWorkspaceMode)}>{renderHeroIcon(visibility)}</Tooltip>
       ),
     },
 
@@ -101,7 +98,7 @@ export const useSessionsTableColumns = () => {
       render: (id, record) => {
         return (
           <>
-            <div className="rule-action-buttons">
+            <div>
               <Space>
                 <Text
                   style={{
