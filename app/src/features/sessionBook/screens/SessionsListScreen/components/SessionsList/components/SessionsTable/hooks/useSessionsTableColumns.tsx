@@ -1,8 +1,8 @@
-import { DeleteOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { Space, Table, Tag, Tooltip, Typography } from "antd";
+import { Modal, Table, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { UserIcon } from "components/common/UserIcon";
 import { ContentListTableProps } from "componentsV2/ContentList";
@@ -12,10 +12,44 @@ import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/Date
 import { getPrettyVisibilityName, renderHeroIcon } from "views/features/sessions/ShareRecordingModal";
 import FEATURES from "config/constants/sub/features";
 import PATHS from "config/constants/sub/paths";
+import { deleteRecording } from "views/features/sessions/api";
+import { RQButton } from "lib/design-system/components";
+import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 
-export const useSessionsTableColumns = () => {
+interface SessionsTableColumnsProps {
+  setSharingRecordId: (id: string) => void;
+  setSelectedRowVisibility: (visibility: string) => void;
+  setIsShareModalVisible: (isVisible: boolean) => void;
+}
+
+export const useSessionsTableColumns = ({
+  setSharingRecordId,
+  setSelectedRowVisibility,
+  setIsShareModalVisible,
+}: SessionsTableColumnsProps) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-  const { Text } = Typography;
+
+  const confirmDeleteAction = (id: string, eventsFilePath: string) => {
+    Modal.confirm({
+      title: "Confirm",
+      icon: <ExclamationCircleOutlined />,
+      content: (
+        <div>
+          <p>
+            Are you sure to delete this recording?
+            <br />
+            <br />
+            Users having the shared link will not be able to access it anymore.
+          </p>
+        </div>
+      ),
+      okText: "Delete",
+      cancelText: "Cancel",
+      onOk: async () => {
+        await deleteRecording(id, eventsFilePath);
+      },
+    });
+  };
 
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
@@ -25,7 +59,8 @@ export const useSessionsTableColumns = () => {
     {
       title: "Name",
       dataIndex: "name",
-      width: "30%",
+      width: 340,
+      ellipsis: true,
       render: (name, record) => {
         return isDesktopSessionsCompatible ? (
           <Link
@@ -44,7 +79,8 @@ export const useSessionsTableColumns = () => {
     {
       title: "Host",
       dataIndex: "url",
-      width: "20%",
+      width: 250,
+      ellipsis: true,
       render: (url) => {
         return (
           <>
@@ -57,7 +93,7 @@ export const useSessionsTableColumns = () => {
     {
       title: "Recorded At",
       dataIndex: "startTime",
-      width: "15%",
+      width: 200,
       render: (ts) => {
         return epochToDateAndTimeString(ts);
       },
@@ -65,18 +101,16 @@ export const useSessionsTableColumns = () => {
     {
       title: "Duration",
       dataIndex: "duration",
-      width: "10%",
+      width: 100,
       render: (ms) => {
         return msToHoursMinutesAndSeconds(ms);
       },
     },
     {
       title: "Created by",
-      width: "10%",
       responsive: ["lg"],
       className: "text-gray mock-table-user-icon",
       dataIndex: "createdBy",
-      //  textAlign: "center",
       render: (creatorUserID) => {
         return <UserIcon uid={creatorUserID} />;
       },
@@ -84,8 +118,8 @@ export const useSessionsTableColumns = () => {
     {
       title: "Visibility",
       dataIndex: "visibility",
+      width: 120,
       align: "center",
-      width: "10%",
       render: (visibility) => (
         <Tooltip title={getPrettyVisibilityName(visibility, isWorkspaceMode)}>{renderHeroIcon(visibility)}</Tooltip>
       ),
@@ -93,49 +127,30 @@ export const useSessionsTableColumns = () => {
 
     {
       title: "",
-      width: "15%",
       dataIndex: "id",
       render: (id, record) => {
         return (
-          <>
-            <div>
-              <Space>
-                <Text
-                  style={{
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    // setSharingRecordId(id);
-                    // setSelectedRowVisibility(record.visibility);
-                    // setIsShareModalVisible(true);
-                  }}
-                >
-                  <Tooltip title="Share with your Teammates">
-                    <Tag>
-                      <ShareAltOutlined />
-                    </Tag>
-                  </Tooltip>
-                </Text>
+          <div className="sessions-table-actions">
+            <Tooltip title="Share with your Teammates">
+              <RQButton
+                icon={<ShareAltOutlined />}
+                iconOnly
+                onClick={() => {
+                  setSharingRecordId(id);
+                  setSelectedRowVisibility(record.visibility);
+                  setIsShareModalVisible(true);
+                }}
+              />
+            </Tooltip>
 
-                <Text style={{ cursor: "pointer" }}>
-                  <Tooltip title="Delete" placement="bottom">
-                    <Tag
-
-                    // onClick={() => confirmDeleteAction(id, record.eventsFilePath, callbackOnDeleteSuccess)}
-                    >
-                      <DeleteOutlined
-                        style={{
-                          padding: "5px 0px",
-                          fontSize: "12px",
-                          cursor: "pointer",
-                        }}
-                      />
-                    </Tag>
-                  </Tooltip>
-                </Text>
-              </Space>
-            </div>
-          </>
+            <Tooltip title="Delete">
+              <RQButton
+                icon={<RiDeleteBinLine />}
+                iconOnly
+                onClick={() => confirmDeleteAction(id, record.eventsFilePath)}
+              />
+            </Tooltip>
+          </div>
         );
       },
     },
