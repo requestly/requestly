@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { getAppTabs, getBlockedDomains, toggleExtensionStatus } from "./utils";
+import { getAppTabs, toggleExtensionStatus } from "./utils";
 // import { handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
@@ -27,6 +27,7 @@ import ruleExecutionHandler from "./ruleExecutionHandler";
 import { isExtensionEnabled } from "../../utils";
 import { matchSourceUrl } from "../../common/ruleMatcher";
 import { SourceKey, SourceOperator } from "common/types";
+import { getBlockedDomains } from "./clientHandler";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();

@@ -7,7 +7,7 @@ import { SessionRuleType } from "./requestProcessor/types";
 import { sendMessageToApp } from "./messageHandler";
 import { EXTENSION_MESSAGES } from "common/constants";
 import { UpdateDynamicRuleOptions } from "common/types";
-import { getBlockedDomains } from "./utils";
+import { getBlockedDomains } from "./clientHandler";
 
 const ALL_RESOURCE_TYPES = Object.values(chrome.declarativeNetRequest.ResourceType);
 

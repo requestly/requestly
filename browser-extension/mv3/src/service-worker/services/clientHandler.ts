@@ -3,11 +3,11 @@ import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.js
 import { Variable, onVariableChange } from "../variable";
 import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
-import { getBlockedDomains } from "./utils";
-import { ChangeType, onRecordChange } from "common/storage";
+import { ChangeType, getRecord, onRecordChange } from "common/storage";
 import { STORAGE_KEYS } from "common/constants";
 
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
+let cachedBlockedDomains: string[] = null;
 
 const generateBlockedHostMatchPattern = (host: string) => {
   return [`*://${host}/*`, `*://*.${host}/*`];
@@ -86,10 +86,25 @@ const setupClientScript = async (isExtensionStatusEnabled: boolean) => {
   }
 };
 
+const cacheBlockedDomains = async () => {
+  const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
+  cachedBlockedDomains = blockedDomains ?? [];
+};
+
+export const getBlockedDomains = async () => {
+  if (cachedBlockedDomains === null) {
+    const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
+    return blockedDomains ?? [];
+  }
+
+  return cachedBlockedDomains;
+};
+
 export const initClientHandler = async () => {
   console.log("[initClientHandler]");
   const isExtensionStatusEnabled = await isExtensionEnabled();
   setupClientScript(isExtensionStatusEnabled);
+  cacheBlockedDomains();
 
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
     console.log("[initClientHandler]", "onVariableChange", { extensionStatus });
@@ -102,6 +117,7 @@ export const initClientHandler = async () => {
       changeTypes: [ChangeType.MODIFIED],
     },
     () => {
+      cacheBlockedDomains();
       unregisterClientScripts().then(() => {
         setupClientScript(isExtensionStatusEnabled);
       });
