@@ -7,9 +7,9 @@ import NetworkSessionsIndexPage from "views/features/sessions/SessionsIndexPageC
 import DesktopAppError from "views/features/sessions/errors/DesktopAppError";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SessionsListScreen } from "./SessionListScreen";
-import "./sessionListScreenContainer.scss";
+import "./sessionsListScreenContainer.scss";
 
-export const SessionListScreenContainer = () => {
+export const SessionsListScreenContainer = () => {
   const appMode = useSelector(getAppMode);
   const isImportNetworkSessions = useFeatureIsOn("import_export_sessions");
 

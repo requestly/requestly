@@ -4,6 +4,7 @@ import { ImportHarModalButton } from "../ImportHarModalButton";
 import { CheckOutlined } from "@ant-design/icons";
 import { Typography } from "antd";
 
+// TODO: REFACTOR NETWORK SESSIONS COMPONENTS
 const CheckItem: React.FC<{ label: string }> = ({ label }) => {
   return (
     <div>

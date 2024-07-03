@@ -1,5 +1,5 @@
 import PATHS from "config/constants/sub/paths";
-import { SessionListScreenContainer } from "features/sessionBook/screens/SessionsListScreen/SessionListScreenContainer";
+import { SessionsListScreenContainer } from "features/sessionBook/screens/SessionsListScreen/SessionsListScreenContainer";
 import { Navigate, RouteObject } from "react-router-dom";
 import { DesktopSessionsContainer } from "views/containers/DesktopSessionsContainer";
 import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
@@ -26,7 +26,7 @@ export const desktopSessionsRoutes: RouteObject[] = [
       },
       {
         path: PATHS.SESSIONS.DESKTOP.WEB_SESSIONS_WRAPPER.RELATIVE,
-        element: <SessionListScreenContainer />,
+        element: <SessionsListScreenContainer />,
       },
       {
         path: PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + "/:id",
