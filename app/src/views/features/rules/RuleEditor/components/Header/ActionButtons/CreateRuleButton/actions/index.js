@@ -9,6 +9,7 @@ import { ResponseRuleResourceType } from "types/rules";
 import { parseHTMLString, getHTMLNodeName, validateHTMLTag, removeUrlAttribute } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { RE2JS } from "re2js";
 
 /**
  * In case of a few rules, input from the rule editor does not directly map to rule schema.
@@ -142,7 +143,7 @@ export const validateRule = (rule, dispatch, appMode) => {
   //Rule specific validations
 
   //Redirect Rule
-  else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
+  if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
     rule.pairs.forEach((pair) => {
       //Source shouldn't be empty
       if (isEmpty(pair.source.value)) {
@@ -530,6 +531,16 @@ export const validateRule = (rule, dispatch, appMode) => {
       }
       return true;
     });
+
+    for (const pair of rule.pairs) {
+      if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES && !isRE2Compatible(pair.source.value)) {
+        return {
+          result: false,
+          message: `Invalid regex. Only RE2 regex syntax is supported.`,
+          error: "not re2 compatible",
+        };
+      }
+    }
   }
 
   if (output && output.result === false) {
@@ -547,5 +558,14 @@ export const ruleModifiedAnalytics = (user) => {
     const usageMetrics = httpsCallable(functions, "usageMetrics");
     const data = new Date().getTime();
     usageMetrics(data);
+  }
+};
+
+const isRE2Compatible = (regexString) => {
+  try {
+    RE2JS.compile(regexString);
+    return true;
+  } catch (error) {
+    return false;
   }
 };
