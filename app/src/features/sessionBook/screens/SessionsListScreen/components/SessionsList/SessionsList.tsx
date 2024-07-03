@@ -1,7 +1,7 @@
-import { useState } from "react";
-import PageLoader from "components/misc/PageLoader";
-import { useFetchSessions } from "./hooks/useFetchSessions";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { useFetchSessions } from "./hooks/useFetchSessions";
+import PageLoader from "components/misc/PageLoader";
 import { getUserAuthDetails } from "store/selectors";
 import { SessionsOnboardingView } from "../OnboardingView/SessionsOnboardingView";
 import { SessionsListContentHeader } from "./components/SessionsListContentHeader/SessionsListContentHeader";
@@ -12,6 +12,11 @@ export const SessionsList = () => {
   const { sessions, isSessionsListLoading } = useFetchSessions();
   const [searchValue, setSearchValue] = useState("");
 
+  const searchedSessions = useMemo(() => sessions.filter((session) => session.name.includes(searchValue)), [
+    sessions,
+    searchValue,
+  ]);
+
   if (isSessionsListLoading) {
     return <PageLoader message="Loading sessions..." />;
   }
@@ -20,7 +25,7 @@ export const SessionsList = () => {
     return (
       <>
         <SessionsListContentHeader searchValue={searchValue} handleSearchValueUpdate={setSearchValue} />
-        <SessionsTable sessions={sessions} />
+        <SessionsTable sessions={searchedSessions} />
       </>
     );
   } else return <SessionsOnboardingView />;
