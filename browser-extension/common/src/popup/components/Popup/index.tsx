@@ -19,7 +19,7 @@ const Popup: React.FC = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([activeTab]) => {
       setCurrentTab(activeTab);
     });
-  });
+  }, []);
 
   useEffect(() => {
     chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.CHECK_IF_NO_RULES_PRESENT }, (noRulesPresent) => {
