@@ -92,7 +92,6 @@ const addExtensionRules = async (): Promise<void> => {
           );
         }
 
-        extensionRule.condition.excludedRequestDomains.push(...blockedDomains);
         extensionRule.condition.excludedInitiatorDomains.push(...blockedDomains);
 
         const ruleId = parsedExtensionRules.length + 1;
