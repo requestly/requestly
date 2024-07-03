@@ -87,14 +87,16 @@ export const BlockList = () => {
             </Col>
           </Row>
           <Row className="blocklist-subheading">Adding a domain will include all its subdomains.</Row>
-          {blockedDomains.map((blockedDomain, index) => (
-            <Row className="blocklist-domains-container" align={"middle"} justify={"space-between"} key={index}>
-              <Col span={23}>{blockedDomain}</Col>
-              <Col className="blocklist-close-icon" onClick={debounce(() => handleRemoveDomain(index), 100)}>
-                <AiOutlineClose />
-              </Col>
-            </Row>
-          ))}
+          <div className="blocklist-domains-container">
+            {blockedDomains.map((blockedDomain, index) => (
+              <Row className="blocklist-domains-container" align={"middle"} justify={"space-between"} key={index}>
+                <Col span={23}>{blockedDomain}</Col>
+                <Col className="blocklist-close-icon" onClick={debounce(() => handleRemoveDomain(index), 100)}>
+                  <AiOutlineClose />
+                </Col>
+              </Row>
+            ))}
+          </div>
         </div>
       }
       isTogglable={false}
