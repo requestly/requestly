@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Collapse } from "antd";
 import { CreditsProgressBar } from "../CreditsProgressbar/CreditsProgessbar";
 import { IncentiveSectionHeader } from "../IncentiveSectionHeader";
@@ -32,7 +32,10 @@ import {
 import { getTotalCredits, isTaskCompleted } from "features/incentivization/utils";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import LINKS from "config/constants/sub/links";
-import { trackIncentivizationTaskClicked } from "features/incentivization/analytics";
+import {
+  trackIncentivizationChecklistTaskViewed,
+  trackIncentivizationTaskClicked,
+} from "features/incentivization/analytics";
 import { RQButton } from "lib/design-system/components";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
 import { RuleType } from "types";
@@ -56,6 +59,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
+  const [activePanels, setActivePanels] = useState([]);
 
   const { claimIncentiveRewards } = useIncentiveActions();
 
@@ -392,6 +396,16 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           <Collapse
             className="incentive-tasks-list-collapse"
             expandIconPosition="end"
+            onChange={(keys) => {
+              setActivePanels(keys as string[]);
+
+              // some panel is opened
+              if (Array.isArray(keys) && keys?.length >= activePanels.length) {
+                const lastOpenedPanelKey = Number(keys[keys.length - 1]);
+                const taskId = incentiveTasksList[lastOpenedPanelKey].id;
+                trackIncentivizationChecklistTaskViewed(taskId);
+              }
+            }}
             expandIcon={({ isActive }) => (
               <div className="collapse-arrow-container">
                 <PiCaretDownBold className={`collapse-arrow-down ${isActive ? "rotate" : ""}`} />
