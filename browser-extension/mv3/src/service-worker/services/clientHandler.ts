@@ -9,8 +9,8 @@ import { STORAGE_KEYS } from "common/constants";
 
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
 
-const generateBlockedDomainPattern = (hostname: string) => {
-  return `*://*${hostname}/*`;
+const generateBlockedHostMatchPattern = (host: string) => {
+  return [`*://${host}/*`, `*://*.${host}/*`];
 };
 
 const CLIENT_SCRIPTS: chrome.scripting.RegisteredContentScript[] = [
@@ -43,7 +43,7 @@ declare const window: {
 /** Loading Client scripts ASAP */
 const registerClientScripts = async () => {
   const blockedDomains = await getBlockedDomains();
-  const blockedDomainPatterns = blockedDomains.map(generateBlockedDomainPattern).filter((pattern) => !!pattern);
+  const blockedDomainPatterns = blockedDomains.flatMap(generateBlockedHostMatchPattern).filter((pattern) => !!pattern);
 
   console.log("[registerClientScript]", { blockedDomains });
   const clientScripts = CLIENT_SCRIPTS.map((script) => {
