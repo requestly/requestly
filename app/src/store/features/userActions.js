@@ -36,6 +36,10 @@ export const updateUsername = (prevState, action) => {
   prevState.user.details.username = action.payload.username;
 };
 
+export const updateUserDisplayName = (prevState, action) => {
+  prevState.user.details.profile.displayName = action.payload;
+};
+
 export const updateUserLimitReached = (prevState, action) => {
   prevState.user.isLimitReached = action.payload;
 };
