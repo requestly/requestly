@@ -87,6 +87,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
         newProps: {
           authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
           eventSource: "incentivization",
+          warningMessage: "You must sign in to claim free credits.",
         },
       })
     );
@@ -120,9 +121,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
                 {remainingTasksCount > 1 ? "steps" : "step"}.
               </>
             )
-          ) : (
-            <>Sign up to create an account and redeem these credits.</>
-          )}
+          ) : null}
         </div>
         <div className="task-completed-actions-container">
           {user?.loggedIn ? (
@@ -158,7 +157,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
           ) : (
             <>
               <RQButton type="primary" onClick={handleSignupClick}>
-                Sign up
+                Claim credits
               </RQButton>
             </>
           )}
