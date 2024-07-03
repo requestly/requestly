@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { isExtensionInstalled, startRecordingOnUrl } from "actions/ExtensionActions";
 import { Button, Col, InputRef, Row, Space, Typography, Input } from "antd";
 import { trackInstallExtensionDialogShown } from "modules/analytics/events/features/apiClient";
@@ -21,6 +21,12 @@ import { prefixUrlWithHttps } from "utils/URLUtils";
 import { SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import StartSessionRecordingGif from "../../assets/sessions-banner.gif";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import FEATURES from "config/constants/sub/features";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { ImportWebSessionModalButton } from "../SessionsList/components/ImportWebSessionModalButton/ImportWebSessionModalButton";
+import { RQButton } from "lib/design-system/components";
+import { ImportSessionModal } from "../../modals/ImportSessionModal/ImportSessionModal";
 import "./sessionsOnboardingView.scss";
 
 const { Text, Title } = Typography;
@@ -33,10 +39,24 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
   const inputRef = useRef<InputRef>();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isImportSessionModalOpen, setIsImportSessionModalOpen] = useState(false);
 
   useEffect(() => {
     trackOnboardingPageViewed();
   }, []);
+
+  const isDesktopSessionsCompatible =
+    useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
+
+  const openDownloadedSessionModalBtn = useMemo(() => {
+    return isDesktopSessionsCompatible ? (
+      <ImportWebSessionModalButton />
+    ) : (
+      <RQButton type="default" onClick={() => setIsImportSessionModalOpen(true)}>
+        Upload & view downloaded sessions
+      </RQButton>
+    );
+  }, [isDesktopSessionsCompatible]);
 
   const openInstallExtensionModal = useCallback(() => {
     const modalProps = {
@@ -73,92 +93,95 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
   }, [navigate]);
 
   return (
-    <div className="onboarding-content-container">
-      {!isModalView && (
-        <Row justify="end" align="middle" className="settings-row">
-          <Space size={20}>
-            {/* {openDownloadedSessionModalBtn} */}
-            <span onClick={handleSettingsNavigation} className="settings-btn">
-              <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
-            </span>
-          </Space>
-        </Row>
-      )}
-
-      <Row justify="space-between" className="onboarding-banner">
-        <Col span={isModalView ? 24 : 12} className="banner-text-container">
-          <Row className="banner-header">
-            <Title className="banner-title">Debug issues faster with SessionBook</Title>
-          </Row>
-          <Row className="banner-description">
-            <Text type="secondary" className="banner-text w-full">
-              <div>
-                Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
-                <Text strong>network</Text> &
-              </div>
-              <div>
-                {" "}
-                <Text strong>environment data</Text> automatically on your device for sharing &{" "}
-              </div>
-              <div> debugging </div>
-            </Text>
-            {!isModalView && (
-              <Text type="secondary" className="banner-message banner-text">
-                <BsShieldCheck style={{ fill: "url(#green-gradient)" }} className="check-icon" />
-                {/* GREEN GRADIENT on svg */}
-                <svg width="0" height="0">
-                  <linearGradient id="green-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
-                    <stop stopColor="#eefccb" offset="0%" />
-                    <stop stopColor="#aefc31" offset="50%" />
-                    <stop stopColor="#0dbb48" offset="100%" />
-                  </linearGradient>
-                </svg>{" "}
-                session recordings are not automatically saved to the cloud; they require manual saving
-              </Text>
-            )}
-          </Row>
-          <Col span={24}>
-            <Row className="record-label">
-              <Text type="secondary" className="banner-text">
-                Record your {!isModalView && "first"} session
-              </Text>
-            </Row>
-            <Row>
-              <Col span={15} className="input-container">
-                <Input
-                  ref={inputRef}
-                  placeholder="Enter Page URL eg. https://ebay.com"
-                  onPressEnter={handleStartRecordingBtnClicked}
-                />
-              </Col>
-              <Col span={3} className="start-btn-container">
-                <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
-                  {" "}
-                  Start Recording
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-        </Col>
+    <>
+      <div className="onboarding-content-container">
         {!isModalView && (
-          <Col span={12} className="banner-demo-video">
-            <Row justify="end">
-              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
-            </Row>
-            <Row onClick={trackOnboardingSampleSessionViewed}>
-              <a
-                href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
-                target="__blank"
-                className="sample-link-container"
-              >
-                <Row justify="end" align="middle" className="sample-link">
-                  <Text underline>View sample replay</Text>
-                </Row>
-              </a>
-            </Row>
-          </Col>
+          <Row justify="end" align="middle" className="settings-row">
+            <Space size={20}>
+              {openDownloadedSessionModalBtn}
+              <span onClick={handleSettingsNavigation} className="settings-btn">
+                <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+              </span>
+            </Space>
+          </Row>
         )}
-      </Row>
-    </div>
+
+        <Row justify="space-between" className="onboarding-banner">
+          <Col span={isModalView ? 24 : 12} className="banner-text-container">
+            <Row className="banner-header">
+              <Title className="banner-title">Debug issues faster with SessionBook</Title>
+            </Row>
+            <Row className="banner-description">
+              <Text type="secondary" className="banner-text w-full">
+                <div>
+                  Safely capture <Text strong>mouse movement</Text>, <Text strong>console</Text>,{" "}
+                  <Text strong>network</Text> &
+                </div>
+                <div>
+                  {" "}
+                  <Text strong>environment data</Text> automatically on your device for sharing &{" "}
+                </div>
+                <div> debugging </div>
+              </Text>
+              {!isModalView && (
+                <Text type="secondary" className="banner-message banner-text">
+                  <BsShieldCheck style={{ fill: "url(#green-gradient)" }} className="check-icon" />
+                  {/* GREEN GRADIENT on svg */}
+                  <svg width="0" height="0">
+                    <linearGradient id="green-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
+                      <stop stopColor="#eefccb" offset="0%" />
+                      <stop stopColor="#aefc31" offset="50%" />
+                      <stop stopColor="#0dbb48" offset="100%" />
+                    </linearGradient>
+                  </svg>{" "}
+                  Sessions are not automatically saved to the cloud; they require manual saving
+                </Text>
+              )}
+            </Row>
+            <Col span={24}>
+              <Row className="record-label">
+                <Text type="secondary" className="banner-text">
+                  Record your {!isModalView && "first"} session
+                </Text>
+              </Row>
+              <Row>
+                <Col span={15} className="input-container">
+                  <Input
+                    ref={inputRef}
+                    placeholder="Enter Page URL eg. https://ebay.com"
+                    onPressEnter={handleStartRecordingBtnClicked}
+                  />
+                </Col>
+                <Col span={3} className="start-btn-container">
+                  <Button size="middle" type="primary" onClick={handleStartRecordingBtnClicked}>
+                    {" "}
+                    Start Recording
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          </Col>
+          {!isModalView && (
+            <Col span={12} className="banner-demo-video">
+              <Row justify="end">
+                <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+              </Row>
+              <Row onClick={trackOnboardingSampleSessionViewed}>
+                <a
+                  href="https://app.requestly.io/sessions/saved/24wBYgAaKlgqCOflTTJj"
+                  target="__blank"
+                  className="sample-link-container"
+                >
+                  <Row justify="end" align="middle" className="sample-link">
+                    <Text underline>View sample session</Text>
+                  </Row>
+                </a>
+              </Row>
+            </Col>
+          )}
+        </Row>
+      </div>
+      <ImportSessionModal isOpen={isImportSessionModalOpen} toggleModal={() => setIsImportSessionModalOpen(false)} />
+    </>
   );
 };

@@ -98,3 +98,8 @@ export type SessionRecording = {
   createdBy: string;
   updatedTs?: number;
 };
+
+export enum OnboardingTypes {
+  NETWORK,
+  SESSIONS,
+}
