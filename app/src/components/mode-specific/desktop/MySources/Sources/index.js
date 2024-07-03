@@ -32,6 +32,7 @@ import PATHS from "config/constants/sub/paths";
 import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
 import LaunchButtonDropdown from "./LaunchButtonDropDown";
+import { getAndroidDevices } from "./utils";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -65,6 +66,33 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     appsListRef.current = appsList;
     setAppsListArray(Object.values(appsList));
   }, [appsList]);
+
+  useEffect(() => {
+    getAndroidDevices().then((devices) => {
+      if (devices) {
+        console.log("Devices", devices, desktopSpecificDetails.appsList);
+        const updatedAppsList = { ...desktopSpecificDetails.appsList };
+        devices.forEach((device) => {
+          if (!desktopSpecificDetails.appsList[device.id]) {
+            console.log("Adding Device", device.id);
+            updatedAppsList[device.id] = {
+              id: "android",
+              type: "mobile-auto",
+              name: device.id,
+              description: device?.details?.model,
+              icon: "android.png",
+              isActive: false,
+              isScanned: true,
+              comingSoon: false,
+              isAvailable: true,
+            };
+          }
+        });
+        console.log("Updated Apps List", updatedAppsList);
+        dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
+      }
+    });
+  }, [dispatch]); // Don't add appsList as dependency
 
   const toggleCloseConfirmModal = () => {
     if (isCloseConfirmModalActive) {
@@ -107,13 +135,25 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           // Notify user and update state
           if (res.success) {
             toast.success(`Connected ${getAppName(appId)}`);
-            dispatch(
-              actions.updateDesktopSpecificAppProperty({
-                appId: appId,
-                property: "isActive",
-                value: true,
-              })
-            );
+            if (appId === "android") {
+              console.log(appId, options.deviceId, options.launchOptions);
+              dispatch(
+                actions.updateDesktopSpecificAppProperty({
+                  appId: options.deviceId,
+                  property: "isActive",
+                  value: true,
+                })
+              );
+            } else {
+              dispatch(
+                actions.updateDesktopSpecificAppProperty({
+                  appId: appId,
+                  property: "isActive",
+                  value: true,
+                })
+              );
+            }
+
             dispatch(actions.updateHasConnectedApp(true));
             trackAppConnectedEvent(getAppName(appId), getAppCount() + 1, getAppType(appId), options?.launchOptions);
             toggle();
@@ -139,13 +179,14 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   );
 
   const handleDisconnectAppOnClick = useCallback(
-    (appId) => {
+    (appId, options = {}) => {
       setProcessingApps({ ...processingApps, appId: true });
       // If URL is opened in browser instead of dekstop app
       if (!window.RQ || !window.RQ.DESKTOP) return;
 
       window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("deactivate-app", {
         id: appId,
+        options,
       })
         .then((res) => {
           setProcessingApps({ ...processingApps, appId: false });
@@ -154,13 +195,24 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           if (res.success) {
             toast.info(`Disconnected ${getAppName(appId)}`);
 
-            dispatch(
-              actions.updateDesktopSpecificAppProperty({
-                appId: appId,
-                property: "isActive",
-                value: false,
-              })
-            );
+            if (appId === "android") {
+              console.log(appId, options.deviceId, options.launchOptions);
+              dispatch(
+                actions.updateDesktopSpecificAppProperty({
+                  appId: options.deviceId,
+                  property: "isActive",
+                  value: false,
+                })
+              );
+            } else {
+              dispatch(
+                actions.updateDesktopSpecificAppProperty({
+                  appId: appId,
+                  property: "isActive",
+                  value: false,
+                })
+              );
+            }
             trackAppDisconnectedEvent(getAppName(appId));
           } else {
             toast.error(`Unable to deactivate ${getAppName(appId)}. Issue reported.`);
@@ -172,7 +224,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   );
 
   const renderChangeAppStatusBtn = useCallback(
-    (appId, isScanned, isActive, isAvailable, canLaunchWithCustomArgs) => {
+    (appId, isScanned, isActive, isAvailable, canLaunchWithCustomArgs, options = {}) => {
       if (!isAvailable) {
         return <span className="text-primary cursor-disabled">Couldn't find it on your system</span>;
       } else if (!isActive) {
@@ -186,7 +238,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         ) : (
           <RQButton
             type="default"
-            onClick={() => handleActivateAppOnClick(appId)}
+            onClick={() => handleActivateAppOnClick(appId, options)}
             loading={!isScanned || processingApps[appId]}
             className="launch-button"
           >
@@ -195,7 +247,12 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         );
       } else {
         return (
-          <RQButton danger type="default" className="danger-btn" onClick={() => handleDisconnectAppOnClick(appId)}>
+          <RQButton
+            danger
+            type="default"
+            className="danger-btn"
+            onClick={() => handleDisconnectAppOnClick(appId, options)}
+          >
             Disconnect
           </RQButton>
         );
@@ -214,7 +271,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
           </Col>
           <Col className="source-description">{app.description}</Col>
           <>
-            {app.type !== "browser" ? (
+            {app.type !== "browser" && app.type !== "mobile-auto" ? (
               <RQButton type="default" onClick={() => renderInstructionsModal(app.id)}>
                 Setup Instructions
               </RQButton>
@@ -225,7 +282,8 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                   app.isScanned,
                   app.isActive,
                   app.isAvailable,
-                  app.canLaunchWithCustomArgs
+                  app.canLaunchWithCustomArgs,
+                  app.type === "mobile-auto" ? { deviceId: app.name } : {}
                 )}
               </>
             )}
@@ -236,18 +294,69 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     [renderChangeAppStatusBtn, renderInstructionsModal]
   );
 
+  // const renderMobileSources = useCallback(
+  //   (source) => {
+  //     fetchMobileDevices();
+  //     const manualSetupSources = [
+  //       {
+  //         id: "android",
+  //         type: "mobile",
+  //         name: "Android",
+  //         description: "External Device",
+  //         icon: "android.png",
+  //         isActive: false,
+  //         isScanned: false,
+  //         comingSoon: false,
+  //         isAvailable: true,
+  //       },
+  //       {
+  //         id: "ios",
+  //         type: "mobile",
+  //         name: "iOS",
+  //         description: "External Device",
+  //         icon: "ios.svg",
+  //         isActive: false,
+  //         isScanned: false,
+  //         comingSoon: false,
+  //         isAvailable: true,
+  //       },
+  //     ];
+
+  //     return (
+  //       <div className="source-grid">
+  //         {mobileDevices?.map((device) => {
+  //           return renderSourceCard({
+  //             id: "android",
+  //             type: "mobile-auto",
+  //             name: device.id,
+  //             description: device?.details?.model,
+  //             icon: "android.png",
+  //             isActive: false,
+  //             isScanned: true,
+  //             comingSoon: false,
+  //             isAvailable: true,
+  //           });
+  //         })}
+  //         {manualSetupSources.map((source) => renderSourceCard(source))}
+  //       </div>
+  //     );
+  //   },
+  //   [fetchMobileDevices, mobileDevices, renderSourceCard]
+  // );
+
   const renderSources = useCallback(
-    (type) => {
-      const sources = appsListArray.filter((app) => app.type === type);
+    (types) => {
+      const sources = appsListArray.filter((app) => types.includes(app.type));
       const renderSourceByType = {
         browser: (source) => (source.isAvailable ? renderSourceCard(source) : null),
         mobile: (source) => renderSourceCard(source),
+        "mobile-auto": (source) => renderSourceCard(source),
         terminal: (source) =>
           isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY) ? renderSourceCard(source) : null,
         other: (source) => renderSourceCard(source),
       };
 
-      return <div className="source-grid">{sources.map((source) => renderSourceByType[type](source))}</div>;
+      return <div className="source-grid">{sources.map((source) => renderSourceByType[source.type](source))}</div>;
     },
     [appsListArray, renderSourceCard]
   );
@@ -257,23 +366,23 @@ const Sources = ({ isOpen, toggle, ...props }) => {
       {
         key: "browser",
         label: `Installed browsers`,
-        children: renderSources("browser"),
+        children: renderSources(["browser"]),
       },
       {
         key: "mobile",
         label: `Mobile apps & browsers`,
-        children: renderSources("mobile"),
+        children: renderSources(["mobile", "mobile-auto"]),
       },
       {
         key: "terminal",
         label: `Terminal processes`,
         disabled: !isFeatureCompatible(FEATURES.DESKTOP_APP_TERMINAL_PROXY),
-        children: renderSources("terminal"),
+        children: renderSources(["terminal"]),
       },
       {
         key: "other",
         label: `Others`,
-        children: renderSources("other"),
+        children: renderSources(["other"]),
       },
     ],
     [renderSources]
