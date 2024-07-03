@@ -12,7 +12,7 @@ import { updateUserProfile } from "./actions";
 import { getUsername, updateUsername } from "backend/auth/username";
 import { actions } from "store";
 import { trackUsernameUpdated } from "modules/analytics/events/misc/username";
-import { getUserProfileFromFirestore } from "backend/auth/getUserProfileFromFirestore";
+import { getUser } from "backend/user/getUser";
 
 const UserInfo = ({ customHeading, shadow }) => {
   //Global State
@@ -94,8 +94,8 @@ const UserInfo = ({ customHeading, shadow }) => {
 
   useEffect(() => {
     // Initial values. Fetch full profile
-    getUserProfileFromFirestore(user?.details?.profile?.uid).then((profile) => {
-      if (profile && profile["displayName"]) {
+    getUser(user?.details?.profile?.uid).then((profile) => {
+      if (profile && profile?.["displayName"]) {
         setUserFullName(profile["displayName"]);
       }
     });

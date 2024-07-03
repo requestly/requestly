@@ -2,7 +2,7 @@ import { onValue } from "firebase/database";
 import Logger from "lib/logger";
 import { getNodeRef } from "../../actions/FirebaseActions";
 import { actions } from "../../store";
-import { getUserProfileFromFirestore } from "backend/auth/getUserProfileFromFirestore";
+import { getUser } from "backend/user/getUser";
 
 const userNodeListener = (dispatch, uid) => {
   if (uid) {
@@ -11,7 +11,7 @@ const userNodeListener = (dispatch, uid) => {
       onValue(userNodeRef, async (snapshot) => {
         const userDetails = snapshot.val();
         if (userDetails) {
-          getUserProfileFromFirestore(uid).then((profile) => {
+          getUser(uid).then((profile) => {
             dispatch(
               actions.updateUserProfile({
                 userProfile: profile ? { ...(userDetails ?? {}), displayName: profile.displayName } : userDetails,
