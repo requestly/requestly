@@ -2,12 +2,12 @@ import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
-import { SessionListScreenContainer } from "./screens/SessionsListScreen/SessionListScreenContainer";
+import { SessionsListScreenContainer } from "./screens/SessionsListScreen/SessionsListScreenContainer";
 
 export const sessionRoutes: RouteObject[] = [
   {
     path: PATHS.SESSIONS.INDEX,
-    element: <SessionListScreenContainer />,
+    element: <SessionsListScreenContainer />,
   },
   {
     path: PATHS.SESSIONS.SETTINGS.RELATIVE,
