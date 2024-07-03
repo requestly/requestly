@@ -8,7 +8,6 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import { decompressEvents } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import { trackSessionRecordingUpload } from "modules/analytics/events/features/sessionRecording";
 import PATHS from "config/constants/sub/paths";
-import "./importSesssionModal.scss";
 
 interface ImportSessionModalProps {
   isOpen: boolean;

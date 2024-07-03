@@ -1,7 +1,6 @@
 import { useHasChanged } from "hooks";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-// import { useNavigate } from "react-router-dom";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import {
@@ -16,22 +15,19 @@ import {
 } from "firebase/firestore";
 import firebaseApp from "../../../../../../../firebase";
 import { getOwnerId } from "backend/utils";
-import { SessionRecording } from "views/features/sessions/types";
+import { SessionRecording } from "../../../../../types";
+
+// TODO: ADD PAGINATION
 
 const pageSize = 15;
 let unsubscribeListener: any;
 
 export const useFetchSessions = () => {
-  //   const dispatch = useDispatch();
-  //   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
-  //   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
   const [isSessionsListLoading, setIsSessionsListLoading] = useState(false);
   const [sessions, setSessions] = useState([]);
-  const [, setReachedEnd] = useState(false);
-  const [, setQs] = useState(null);
 
   const fetchRecordings = (lastDoc: unknown = null) => {
     if (unsubscribeListener) unsubscribeListener();
@@ -81,11 +77,11 @@ export const useFetchSessions = () => {
 
         setSessions(records);
         if (records.length > 0) {
-          setQs(documentSnapshots); // Handles pagination
+          //   setQs(documentSnapshots); // Handles pagination
         }
       } else {
         setSessions([]);
-        setReachedEnd(true);
+        // setReachedEnd(true);
       }
       setIsSessionsListLoading(false);
     });
@@ -97,15 +93,13 @@ export const useFetchSessions = () => {
     if (user?.details?.profile?.uid) {
       if (hasUserChanged) {
         setSessions([]);
-        setReachedEnd(false);
+        // setReachedEnd(false);
         stableFetchRecordings();
       } else {
         stableFetchRecordings();
       }
     }
   }, [hasUserChanged, workspace, stableFetchRecordings, user?.details?.profile?.uid]);
-
-  console.log("sessions", sessions);
 
   return {
     sessions,
