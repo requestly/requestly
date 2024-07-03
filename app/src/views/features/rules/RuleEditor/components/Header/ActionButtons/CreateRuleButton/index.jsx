@@ -182,6 +182,7 @@ const CreateRuleButton = ({
               newValue: true,
               newProps: {
                 event: incentiveEvent,
+                metadata: { rule_type: currentlySelectedRuleData.ruleType },
               },
             })
           );
@@ -208,6 +209,7 @@ const CreateRuleButton = ({
             newValue: true,
             newProps: {
               event: IncentivizeEvent.RULE_CREATED,
+              metadata: { rule_type: currentlySelectedRuleData.ruleType },
             },
           })
         );

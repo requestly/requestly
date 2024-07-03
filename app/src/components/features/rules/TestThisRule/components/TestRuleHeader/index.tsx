@@ -93,7 +93,10 @@ export const TestRuleHeader = () => {
           incentivizationActions.toggleActiveModal({
             modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
             newValue: true,
-            newProps: { event: IncentivizeEvent.RULE_TESTED },
+            newProps: {
+              event: IncentivizeEvent.RULE_TESTED,
+              metadata: { rule_type: currentlySelectedRuleData.ruleType },
+            },
           })
         );
       }

@@ -20,9 +20,15 @@ interface IncentiveTaskCompletedModalProps {
   isOpen: boolean;
   toggle: () => void;
   event: IncentivizeEvent;
+  metadata?: Record<string, unknown>;
 }
 
-export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalProps> = ({ isOpen, toggle, event }) => {
+export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalProps> = ({
+  isOpen,
+  toggle,
+  event,
+  metadata,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const milestones = useSelector(getIncentivizationMilestones);
@@ -36,7 +42,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
 
   useEffect(() => {
     if (isOpen) {
-      trackCreditsAssignedModalViewed(earnedCredits, event);
+      trackCreditsAssignedModalViewed(earnedCredits, event, metadata);
     }
   }, [earnedCredits, event, isOpen]);
 
