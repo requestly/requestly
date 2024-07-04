@@ -231,18 +231,28 @@ export const fixRegexStr = (regexStr) => {
 export function runMinorFixesOnRule(dispatch, rule) {
   const rulePairs = rule.pairs.map((pair) => {
     let fixedPair = pair;
+
     // fix regex
     if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
+      let fixedRegex = pair.source.value;
       if (!isValidRegex(pair.source.value)) {
-        fixedPair = {
-          ...pair,
-          source: {
-            ...pair.source,
-            value: fixRegexStr(pair.source.value),
-          },
-        };
+        fixedRegex = fixRegexStr(pair.source.value);
       }
+
+      // if replace rule, add non-capturing group to all capturing groups
+      if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REPLACE) {
+        fixedRegex = fixedRegex.replaceAll(/\((?!\?:)/g, "(?:");
+      }
+
+      fixedPair = {
+        ...pair,
+        source: {
+          ...pair.source,
+          value: fixedRegex,
+        },
+      };
     }
+
     // trim white space from source value
     fixedPair = {
       ...fixedPair,
