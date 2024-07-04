@@ -20,6 +20,7 @@ const RulesIndexView = () => {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) {
       return <RulesIndexPage />;
     }
+    console.log("!!!debug", "rulesIndex");
 
     /* User journey flowchart
     /* https://requestlyio.atlassian.net/wiki/spaces/RH/pages/1867777/RQLY-70+Removing+Extension+install+modal?focusedCommentId=5439489#comment-5439489

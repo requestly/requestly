@@ -22,9 +22,10 @@
 }
 
 .charles-import-body {
-  border: 1px dashed var(--requestly-color-white-t-20);
+  background: var(--requestly-color-surface-1);
+  margin-bottom: 16px;
   border-radius: 8px;
-  padding: 40px 0;
+  padding: 16px;
 }
 
 .charles-import-footer {
@@ -57,42 +58,55 @@
 
 .parsed-rules-info {
   display: flex;
-  justify-content: center;
+  /* justify-conxtent: center; */
   flex-direction: column;
+  padding: 16px;
 }
 
-.parsed-rules-info ul {
-  margin-top: 4px;
-  padding-left: 0;
+.parsed-success-row {
+  color: var(--requestly-color-success-300);
 }
 
 .parsed-rules-info li {
-  display: flex;
-  align-items: center;
-  column-gap: 5px;
+  /* display: flex; */
+  /* align-items: center; */
+  /* column-gap: 5px; */
+  list-style: disc;
 }
 
-.parsed-rules-info .check-outlined-icon {
-  color: var(--success);
+.external-icon-link {
+  vertical-align: text-top;
+}
+
+.info-link-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--requestly-color-error-300);
 }
 
 .parsed-rules-error-info {
-  color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-base);
-  font-weight: var(--requestly-font-weight-medium);
   display: flex;
   flex-direction: column;
-  align-content: center;
   flex-wrap: wrap;
   padding: 0 16px;
 }
 
 .parsed-rules-error-info ol {
-  margin-top: 14px;
   font-weight: var(--requestly-font-weight-normal);
   font-size: var(--requestly-font-size-sm);
 }
 
 .parsed-rules-error-info li {
   list-style: unset;
+}
+
+.validation-heading {
+  color: var(--requestly-color-error-300);
+}
+
+.validation-subheading {
+  margin-left: 22px;
+  font-weight: var(--requestly-font-weight-medium);
 }

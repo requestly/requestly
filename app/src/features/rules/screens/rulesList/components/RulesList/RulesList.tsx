@@ -49,6 +49,8 @@ const RulesList: React.FC<Props> = () => {
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
 
+  console.log("!!!debug", "rulesList");
+
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
       if (!isExtensionInstalled()) {
