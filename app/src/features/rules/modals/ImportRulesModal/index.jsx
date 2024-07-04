@@ -289,7 +289,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
 
   return (
     <>
-      <Modal open={isOpen} onCancel={toggleModal} width={480} className="custom-rq-modal" footer={null}>
+      <Modal open={isOpen} onCancel={toggleModal} width={550} className="custom-rq-modal" footer={null}>
         <div className="rule-importer-content">
           {isImportFromCharlesModalOpen ? (
             <ImportFromCharles

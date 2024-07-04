@@ -122,6 +122,8 @@ const RulesIndexPage = () => {
     return <GettingStarted />;
   };
 
+  console.log("!!!debug", "rulesIndexPage exact");
+
   return (
     <React.Fragment>
       {fetchRulesAndGroupsComplete && !isRulesListLoading ? (

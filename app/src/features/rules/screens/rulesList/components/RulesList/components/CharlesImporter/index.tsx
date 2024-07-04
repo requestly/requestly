@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Col, Modal, Row, Space, Typography } from "antd";
+import { Col, Modal, Row, Space } from "antd";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
-import { ArrowLeftOutlined, CheckCircleOutlined, LinkOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, CheckCircleOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
@@ -67,7 +67,7 @@ const CharlesDocsLink = ({
     href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
     onClick={() => trackCharlesSettingsImportDocsClicked(linkClickSrc, importTriggerSrc)}
   >
-    {title}
+    {title} <HiOutlineExternalLink className="external-icon-link" />
   </a>
 );
 
@@ -76,7 +76,14 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
     trackCharlesSettingsImportViewed(triggeredBy);
   }, [triggeredBy]);
   return (
-    <Modal open={isOpen} centered onCancel={toggle} footer={null} className="import-from-charles-modal custom-rq-modal">
+    <Modal
+      open={isOpen}
+      centered
+      onCancel={toggle}
+      footer={null}
+      className="import-from-charles-modal custom-rq-modal"
+      width={550}
+    >
       <ImportFromCharles modalSrc={triggeredBy} callBack={() => toggle()} />
     </Modal>
   );
@@ -222,96 +229,79 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
           </Col>
         </Row>
 
-        {!isParseComplete && !validationError && (
-          <FilePicker
-            maxFiles={1}
-            onFilesDrop={onFilesDrop}
-            isProcessing={isDataProcessing}
-            title="Drag and drop your Charles export file to upload"
-            subtitle="Accepted file formats: CSV, Trace test file, and XML"
-          />
-        )}
-
         {(isParseComplete || validationError) && (
           <div className="charles-import-body">
             {isParseComplete ? (
               <div className="parsed-rules-info">
                 {rulesToImport?.parsedRuleTypes?.length > 0 && (
-                  <Space direction="vertical" align="center">
-                    <div className="">Successfully parsed below settings:</div>
+                  <Space direction="vertical" align="start" size={8}>
+                    <div className="parsed-success-row">
+                      <CheckCircleOutlined className="check-outlined-icon" /> Successfully parsed below settings:
+                    </div>
                     <ul>
                       {rulesToImport.parsedRuleTypes.map((ruleType) => (
-                        <li key={ruleType}>
-                          <CheckCircleOutlined className="check-outlined-icon" /> {ruleType}
-                        </li>
+                        <li key={ruleType}>{ruleType}</li>
                       ))}
                     </ul>
                   </Space>
                 )}
-                {rulesToImport?.otherRuleTypesCount > 0 &&
-                  (isParsedRulesExist ? (
-                    <div className="text-center">
-                      Other settings are not supported.{" "}
-                      <CharlesDocsLink
-                        title="Learn more"
-                        linkClickSrc="some_settings_unsupported_screen"
-                        importTriggerSrc={modalSrc}
-                      />
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      Uploaded settings are not supported. <br />
-                      Learn more about supported setting types{" "}
-                      <CharlesDocsLink
-                        title="here"
-                        linkClickSrc="all_settings_unsupported_screen"
-                        importTriggerSrc={modalSrc}
-                      />
-                      .
-                    </div>
-                  ))}
-              </div>
-            ) : validationError ? (
-              <>
-                {validationError === CharlesRuleImportErrorMessage.INVALID_EXPORT ? (
-                  <div className="parsed-rules-error-info">
-                    Invalid settings file. Follow below steps to export settings from Charles:
-                    <ol>
-                      {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
-                        <>
-                          <li key={index}>{step}</li>
-                          {additionalSteps.length > 0 && (
-                            <ul className="additional-import-steps-list">
-                              {additionalSteps.map(({ step }, index) => (
-                                <li key={index}>{step}</li>
-                              ))}
-                            </ul>
-                          )}
-                        </>
-                      ))}
-                    </ol>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <Typography.Text type="danger">{validationError}</Typography.Text>
+                {rulesToImport?.otherRuleTypesCount > 0 && (
+                  <div className="info-link-container">
+                    <InfoCircleOutlined />
+                    {isParsedRulesExist ? "Other settings are not supported." : "Uploaded settings are not supported."}
+                    <CharlesDocsLink
+                      title="Learn more about it here"
+                      linkClickSrc="all_settings_unsupported_screen"
+                      importTriggerSrc={modalSrc}
+                    />
                   </div>
                 )}
-              </>
+              </div>
+            ) : validationError ? (
+              <div className="parsed-rules-error-info">
+                <Row className="validation-heading">
+                  <InfoCircleOutlined className="icon__wrapper" />
+                  Invalid settings file.
+                </Row>
+                <Row className="validation-subheading">Follow below steps to export settings from Charles:</Row>
+                <ol>
+                  {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
+                    <>
+                      <li key={index}>{step}</li>
+                      {additionalSteps.length > 0 && (
+                        <ul className="additional-import-steps-list">
+                          {additionalSteps.map(({ step }, index) => (
+                            <li key={index}>{step}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  ))}
+                </ol>
+              </div>
             ) : null}
 
-            <Row justify="center" className="mt-8">
-              {isParsedRulesExist ? (
+            {isParsedRulesExist && (
+              <Row justify="center" className="mt-8">
                 <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
                   Import
                 </RQButton>
-              ) : (
-                <RQButton type="primary" onClick={handleResetImport}>
-                  Try another file
-                </RQButton>
-              )}
-            </Row>
+              </Row>
+            )}
           </div>
         )}
+
+        <FilePicker
+          maxFiles={1}
+          onFilesDrop={(files) => {
+            handleResetImport();
+            onFilesDrop(files);
+          }}
+          isProcessing={isDataProcessing}
+          title="Drag and drop your Charles export file to upload"
+          subtitle="Accepted file formats: CSV, Trace test file, and XML"
+          selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
+        />
 
         <div className="charles-import-footer">
           To export your rules from Charles,{" "}
