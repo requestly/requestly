@@ -7,9 +7,12 @@ import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
 import { ArrowLeftOutlined, CheckCircleOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
-import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
-import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
-import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
+import { parseRulesFromCharlesXML } from "modules/rule-adapters/charles-rule-adapters/parseRulesFromCharlesXML";
+import { createNewGroupAndSave } from "modules/rule-adapters/utils";
+import {
+  CharlesRuleImportErrorMessage,
+  ParsedRulesFromChalres,
+} from "modules/rule-adapters/charles-rule-adapters/types";
 import PATHS from "config/constants/sub/paths";
 import LINKS from "config/constants/sub/links";
 import {
