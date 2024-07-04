@@ -201,6 +201,14 @@ export const getExtensionInstallDate = (state) => {
   return getUserAttributes(state).install_date;
 };
 
+export const getExtensionSignupDate = (state) => {
+  return getUserAttributes(state).signup_date;
+};
+
+export const getDaysSinceSignup = (state) => {
+  return getUserAttributes(state).days_since_signup;
+};
+
 export const getIsProductHuntLaunchedBannerClosed = (state) => {
   return getGlobalState(state).misc?.persist?.isProductHuntLaunchedBannerClosed;
 };
@@ -285,6 +293,10 @@ export const getIsOrgBannerDismissed = (state) => {
 
 export const getIsPlanExpiredBannerClosed = (state) => {
   return getGlobalState(state).misc.persist?.isPlanExpiredBannerClosed;
+};
+
+export const getIsManageBillingTeamAlertVisible = (state) => {
+  return getGlobalState(state).misc.persist?.isManageBillingTeamAlertVisible;
 };
 
 export const getAllEditorToast = (state) => {

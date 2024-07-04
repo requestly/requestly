@@ -196,12 +196,14 @@ const INITIAL_STATE = {
       isMiscTourCompleted: {
         firstDraftSession: false,
         askAI: false,
+        earnCredits: false,
         upgradeWorkspaceMenu: false,
       },
 
       hasConnectedApp: false,
       lastSeenInviteTs: 0,
       isJoinWorkspaceCardVisible: true,
+      isManageBillingTeamAlertVisible: true,
     },
     nonPersist: {
       networkSessionSaveInProgress: false, // todo: check if requried

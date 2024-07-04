@@ -100,7 +100,7 @@ const SessionsIndexPage = () => {
       if (!documentSnapshots.empty) {
         documentSnapshots.forEach((doc) => {
           const recordData = doc.data();
-          if (!recordData?.isInternal) {
+          if (!recordData?.isInternal && !recordData?.testThisRuleMetadata) {
             records.push({
               id: doc.id,
               name: recordData.name,
@@ -246,7 +246,7 @@ const SessionsIndexPage = () => {
       <ImportWebSessionModalButton />
     ) : (
       <RQButton type="default" onClick={toggleImportSessionModal}>
-        Upload & view downloaded session
+        Upload & view downloaded sessions
       </RQButton>
     );
   }, [toggleImportSessionModal, isDesktopSessionsCompatible]);

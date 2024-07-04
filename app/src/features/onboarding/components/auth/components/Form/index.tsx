@@ -24,6 +24,7 @@ import { AuthTypes, getAuthErrorMessage } from "components/authentication/utils"
 import { SSOSignInForm } from "./components/SSOSignInForm";
 import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
 import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analytics";
+import { AuthWarningBanner } from "./components/AuthWarningBanner";
 import "./index.scss";
 import { isDisposableEmail } from "utils/AuthUtils";
 
@@ -31,6 +32,7 @@ interface AuthFormProps {
   authMode: string;
   email?: string;
   isOnboarding: boolean;
+  warningMessage?: string;
   source: string;
   setEmail?: (email: string) => void;
   setAuthMode: (mode: string) => void;
@@ -45,6 +47,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   email,
   setAuthMode,
   isOnboarding,
+  warningMessage,
   setIsVerifyEmailPopupVisible,
   setEmail,
   source,
@@ -58,6 +61,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(null);
+  const [isAuthWarningBannerVisible, setIsAuthWarningBannerVisible] = useState(!!warningMessage?.length);
 
   const [isInputEmailDisposable, setIsInputEmailDisposable] = useState(false);
 
@@ -200,15 +204,17 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <RequestPasswordResetForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} toggleModal={toggleModal} />
     );
   }
-
   return (
     <div className="w-full">
+      {authMode === AUTH.ACTION_LABELS.LOG_IN && warningMessage && isAuthWarningBannerVisible && (
+        <AuthWarningBanner warningMessage={warningMessage} onBannerClose={() => setIsAuthWarningBannerVisible(false)} />
+      )}
       <h2 className="onboarding-auth-form-header">
-        {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your Requestly account"}
+        {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your account"}
       </h2>
       <Row align="middle" className="text-bold onboarding-auth-mode-switch-wrapper">
         <span>
-          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Already using Requestly?" : "Don't have an account yet?"}{" "}
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Already have an account?" : "Don't have an account yet?"}{" "}
         </span>
         <span onClick={handleSignupSigninSwitch} className="text-white onboarding-auth-mode-switcher">
           {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign in" : "Sign up now"}
@@ -321,7 +327,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
       {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
         <div className="onboarding-terms-text">
-          I agree to the Requestly{" "}
+          I agree to the{" "}
           <a href="https://requestly.com/terms/" target="_blank" rel="noreferrer">
             terms
           </a>

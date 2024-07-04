@@ -1,3 +1,7 @@
+.app-footer .app-layout-footer.ant-layout-footer {
+  padding: 0 14px;
+}
+
 .app-footer-links {
   display: flex;
   align-items: center;
@@ -8,6 +12,10 @@
   align-items: center;
   display: inline-flex;
   color: var(--gray-light);
+}
+
+.app-footer-links .ant-typography:last-child {
+  padding-right: 0;
 }
 
 .app-footer-links .ant-typography {
@@ -28,6 +36,8 @@
   cursor: pointer;
   height: inherit;
   color: var(--gray-light);
+  margin-right: 45px;
+  margin-left: -14px;
 }
 
 .app-layout-footer .footer-sidebar-toggle-btn.ant-btn:hover,
@@ -38,4 +48,8 @@
 
 .app-layout-footer .footer-sidebar-toggle-btn svg {
   font-size: 11px;
+}
+
+.app-layout-footer .extension-version {
+  color: var(--requestly-color-neutral-400);
 }

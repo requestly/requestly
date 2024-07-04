@@ -5,14 +5,14 @@ import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import { EditorLanguage } from "componentsV2/CodeEditor/types";
+import { EditorLanguage, EditorCustomToolbar } from "componentsV2/CodeEditor/types";
 import { ResizableBox } from "react-resizable";
-import prettier from "prettier";
-import parserBabel from "prettier/parser-babel";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getAllEditorToast } from "store/selectors";
 import { EditorToastContainer } from "../EditorToast/EditorToastContainer";
+import { getByteSize } from "utils/FormattingHelper";
+import CodeEditorToolbar from "./components/Toolbar/Toolbar";
 import "./editor.scss";
 
 interface EditorProps {
@@ -22,10 +22,9 @@ interface EditorProps {
   isReadOnly?: boolean;
   height?: number;
   isResizable?: boolean;
-  unlockJsonPrettify?: boolean;
-  isCodeMinified: boolean;
-  isCodeFormatted?: boolean;
   id?: string;
+  toolbarOptions?: EditorCustomToolbar;
+  hideCharacterCount?: boolean;
   handleChange: (value: string) => void;
 }
 
@@ -33,19 +32,12 @@ const Editor: React.FC<EditorProps> = ({
   value,
   defaultValue,
   language,
-  /* TODO: REMOVE THESE PROPS:
-   unlockJsonPrettify
-   isCodeMinified,
-   isCodeFormatted,
-    ANY STATE RELATED TO CODE FORMATTING SHOULD BE HANDLED IN EDITOR COMPONENT
-  */
-  unlockJsonPrettify = false,
-  isCodeMinified,
-  isCodeFormatted,
   isReadOnly = false,
   height = 225,
   isResizable = false,
+  hideCharacterCount = false,
   handleChange,
+  toolbarOptions,
   id = "",
 }) => {
   const dispatch = useDispatch();
@@ -74,37 +66,6 @@ const Editor: React.FC<EditorProps> = ({
     }
   }, [language]);
 
-  const handleCodePrettify = useCallback(
-    (parser: string) => {
-      try {
-        let prettifiedCode = prettier.format(value, {
-          parser: parser,
-          plugins: [parserBabel],
-        });
-        setEditorContent(prettifiedCode);
-      } catch (error) {
-        console.error("Error while prettifying code", error);
-      }
-    },
-    [value]
-  );
-
-  useEffect(() => {
-    if (isCodeFormatted) {
-      if (language === EditorLanguage.JAVASCRIPT) {
-        handleCodePrettify("babel");
-      } else if (unlockJsonPrettify && language === EditorLanguage.JSON) {
-        !isCodeMinified && handleCodePrettify(EditorLanguage.JSON);
-      }
-    }
-  }, [isCodeMinified, isCodeFormatted, language, unlockJsonPrettify, handleCodePrettify]);
-
-  useEffect(() => {
-    if (isCodeMinified && language === EditorLanguage.JSON) {
-      setEditorContent(value);
-    }
-  }, [isCodeMinified, language, value]);
-
   useEffect(() => {
     if (!value?.length) {
       setEditorContent(defaultValue ?? "");
@@ -131,48 +92,66 @@ const Editor: React.FC<EditorProps> = ({
   );
 
   return (
-    <ResizableBox
-      height={editorHeight}
-      width={Infinity}
-      onResize={handleResize}
-      handle={isResizable ? <div className="custom-handle" /> : null}
-      axis="y"
-      style={{
-        minHeight: `${height}px`,
-        marginBottom: isResizable ? "25px" : 0,
-      }}
-    >
-      <>
-        {toastOverlay && (
-          <EditorToastContainer
-            message={toastOverlay.message}
-            type={toastOverlay.type}
-            onClose={() => handleEditorClose(toastOverlay.id)}
-            isVisible={toastOverlay}
-            autoClose={toastOverlay.autoClose}
+    <>
+      <CodeEditorToolbar
+        language={language}
+        code={editorContent}
+        onCodeFormat={(formattedCode: string) => {
+          setEditorContent(formattedCode);
+        }}
+        customOptions={toolbarOptions}
+      />
+      <ResizableBox
+        height={editorHeight}
+        width={Infinity}
+        onResize={handleResize}
+        handle={
+          isResizable ? (
+            <div className="custom-handle">
+              {!hideCharacterCount ? (
+                <div className="code-editor-character-count">{getByteSize(value)} characters</div>
+              ) : null}
+            </div>
+          ) : null
+        }
+        axis="y"
+        style={{
+          minHeight: `${height}px`,
+          marginBottom: isResizable ? "25px" : 0,
+        }}
+      >
+        <>
+          {toastOverlay && (
+            <EditorToastContainer
+              message={toastOverlay.message}
+              type={toastOverlay.type}
+              onClose={() => handleEditorClose(toastOverlay.id)}
+              isVisible={toastOverlay}
+              autoClose={toastOverlay.autoClose}
+            />
+          )}
+          <CodeMirror
+            className="code-editor"
+            width="100%"
+            readOnly={isReadOnly}
+            value={editorContent ?? ""}
+            defaultValue={defaultValue}
+            onChange={handleEditorBodyChange}
+            theme={vscodeDark}
+            extensions={[editorLanguage, EditorView.lineWrapping]}
+            basicSetup={{
+              highlightActiveLine: false,
+              bracketMatching: true,
+              closeBrackets: true,
+              allowMultipleSelections: true,
+            }}
+            data-enable-grammarly="false"
+            data-gramm_editor="false"
+            data-gramm="false"
           />
-        )}
-        <CodeMirror
-          className="code-editor"
-          width="100%"
-          readOnly={isReadOnly}
-          value={editorContent ?? ""}
-          defaultValue={defaultValue}
-          onChange={handleEditorBodyChange}
-          theme={vscodeDark}
-          extensions={[editorLanguage, EditorView.lineWrapping]}
-          basicSetup={{
-            highlightActiveLine: false,
-            bracketMatching: true,
-            closeBrackets: true,
-            allowMultipleSelections: true,
-          }}
-          data-enable-grammarly="false"
-          data-gramm_editor="false"
-          data-gramm="false"
-        />
-      </>
-    </ResizableBox>
+        </>
+      </ResizableBox>
+    </>
   );
 };
 

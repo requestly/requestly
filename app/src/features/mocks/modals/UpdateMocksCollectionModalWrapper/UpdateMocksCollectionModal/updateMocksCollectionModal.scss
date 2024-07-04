@@ -47,5 +47,9 @@
   .create-new-collection-btn.ant-btn {
     padding: 0;
     background: transparent;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
   }
 }

@@ -11,9 +11,7 @@ class ExtensionIconManager {
   #icons = {
     DEFAULT: "/resources/images/48x48.png",
     DISABLED: "/resources/images/48x48_greyscale.png",
-    RULE_EXECUTED: "/resources/images/48x48_green.png",
     DEFAULT_WITH_REC: "/resources/images/48x48_rec.png",
-    RULE_EXECUTED_WITH_REC: "/resources/images/48x48_green_rec.png",
   };
 
   #CONSTANTS = {
@@ -37,14 +35,6 @@ class ExtensionIconManager {
   #getIcon(config: ExtensionIconConfig) {
     if (this.#isExtensionDisabled) {
       return this.#icons.DISABLED;
-    }
-
-    if (config.ruleExecuted) {
-      if (config.isRecording) {
-        return this.#icons.RULE_EXECUTED_WITH_REC;
-      }
-
-      return this.#icons.RULE_EXECUTED;
     }
 
     if (config.isRecording) {

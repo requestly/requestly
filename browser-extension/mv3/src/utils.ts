@@ -1,6 +1,6 @@
 import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
-import { matchSourceUrl } from "./service-worker/services/ruleMatcher";
+import { matchSourceUrl } from "./common/ruleMatcher";
 import { Variable, getVariable } from "./service-worker/variable";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
@@ -66,4 +66,13 @@ export const getUrlObject = (url: string): URL | undefined => {
 
 export const isExtensionEnabled = async (): Promise<boolean> => {
   return await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
+};
+
+export const debounce = (func: Function, wait: number) => {
+  let timeout: NodeJS.Timeout;
+
+  return function (...args: any[]) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 };

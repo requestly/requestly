@@ -106,11 +106,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       salesInboundNotification({
-        notificationText: `${
-          EVENTS.PRICING_QUANTITY_CHANGED
-        } trigged with quantity ${value} for plan ${planName} and source ${source} by user ${
-          user?.details?.profile?.email ?? "NOT LOGGED IN"
-        }`,
+        notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} trigged with quantity ${value} for plan ${planName} and source ${source}`,
       });
     } catch (error) {
       console.error(error);

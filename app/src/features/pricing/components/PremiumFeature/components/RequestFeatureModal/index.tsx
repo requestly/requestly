@@ -19,8 +19,12 @@ import { BillingTeamDetails } from "features/settings/components/BillingTeam/typ
 import APP_CONSTANTS from "config/constants";
 import { getBillingTeamMemberById } from "store/features/billing/selectors";
 import { getDomainFromEmail } from "utils/FormattingHelper";
-import "./index.scss";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { INCENTIVIZATION_SOURCE } from "features/incentivization";
+import { IncentivizationModal } from "store/features/incentivization/types";
+import { incentivizationActions } from "store/features/incentivization/slice";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
+import "./index.scss";
 
 interface RequestFeatureModalProps {
   isOpen: boolean;
@@ -49,6 +53,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [postRequestMessage, setPostRequestMessage] = useState(null);
   const teamOwnerDetails = useSelector(getBillingTeamMemberById(billingTeams[0]?.id, billingTeams[0]?.owner));
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
 
   const requestEnterprisePlanFromAdmin = useMemo(
     () =>
@@ -115,22 +120,30 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   const ModalActionButtons = useMemo(() => {
     return (
       <Row className="mt-16" justify="space-between" align="middle">
-        <Col>
-          {!isDeadlineCrossed && (
+        {isIncentivizationEnabled && (
+          <Col>
             <RQButton
-              type="link"
-              className="request-modal-link-btn"
+              type="text"
+              className="request-modal-text-btn"
               disabled={isLoading}
               onClick={() => {
-                trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
-                setOpenPopup(false);
-                onContinue();
+                trackUpgradeOptionClicked("upgrade_for_free");
+                dispatch(
+                  incentivizationActions.toggleActiveModal({
+                    modalName: IncentivizationModal.TASKS_LIST_MODAL,
+                    newValue: true,
+                    newProps: {
+                      source: INCENTIVIZATION_SOURCE.UPGRADE_POPOVER,
+                    },
+                  })
+                );
               }}
             >
-              Use free till 30 November
+              Upgrade for free
             </RQButton>
-          )}
-        </Col>
+          </Col>
+        )}
+
         <Col>
           <Space direction="horizontal" size={8}>
             <RQButton
@@ -140,6 +153,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               onClick={() => {
                 trackUpgradeOptionClicked("upgrade_yourself");
                 dispatch(
+                  // @ts-ignore
                   actions.toggleActiveModal({
                     modalName: "pricingModal",
                     newValue: true,
@@ -174,7 +188,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
         </Col>
       </Row>
     );
-  }, [billingTeams, dispatch, handleSendRequest, isLoading, isDeadlineCrossed, navigate, onContinue, setOpenPopup]);
+  }, [billingTeams, dispatch, handleSendRequest, isLoading, navigate, user, isIncentivizationEnabled]);
 
   useEffect(() => {
     if (isOpen) {

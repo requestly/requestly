@@ -8,6 +8,26 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.7.2",
+    logs: [
+      "[ENGG-1989] fix: DNR rules not getting unique ID while saving (#1879)",
+      "fix: extension on update (#1890)",
+      "ENGG-1939: Show extension version in app and extension popup footer (#1881)",
+    ],
+  },
+  {
+    version: "24.6.21",
+    logs: [
+      "[ENGG-1659] chore: MV3 async xhr support (#1829)",
+      "[ENGG-1856] propagate DNR errors to UI (#1816)",
+      "[ENGG-1883] chore: upgrade web-sdk (#1812)",
+      "[ENGG-1883] chore: upgrade rrweb and remove patch-package (#1805)",
+      "[ENGG-1880] MV3: support for session recording in webApp (#1795)",
+      "[ENGG-1834] fix: session rules being deleted on rules change listener (#1768)",
+      "fix: x.com not loading on Arc (#1753)",
+    ],
+  },
+  {
     version: "24.5.8",
     logs: [
       "[ENGG-1588] feat: async support in response rule - XHR requests (#1611)",

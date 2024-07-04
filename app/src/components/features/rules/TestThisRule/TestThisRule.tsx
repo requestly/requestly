@@ -58,7 +58,7 @@ export const TestThisRule = () => {
   );
 
   const handleSaveTestSession = useCallback(
-    (tabId: number, reportId: string) => {
+    (tabId: number, reportId: string, ruleAppliedStatus: boolean) => {
       getTabSession(tabId)
         .then((tabSession) => {
           if (!tabSession) return;
@@ -81,7 +81,10 @@ export const TestThisRule = () => {
             compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
             recordingOptionsToSave,
             SOURCE.TEST_THIS_RULE,
-            true
+            {
+              appliedStatus: ruleAppliedStatus,
+              ruleType: currentlySelectedRuleData?.ruleType,
+            }
           ).then((response) => {
             if (response.success) {
               trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
@@ -101,7 +104,7 @@ export const TestThisRule = () => {
           toast.error("Error saving test session");
         });
     },
-    [appMode, user.details?.profile?.uid, workspace?.id, fetchAndUpdateTestReports]
+    [appMode, user.details?.profile?.uid, workspace?.id, fetchAndUpdateTestReports, currentlySelectedRuleData?.ruleType]
   );
 
   const handleTestReportDelete = useCallback(
@@ -128,12 +131,13 @@ export const TestThisRule = () => {
         if (sheetPlacement === BottomSheetPlacement.BOTTOM) {
           toggleBottomSheet(true);
         }
-        if (message.record) {
-          handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId);
+        if (message.record && user.loggedIn) {
+          handleSaveTestSession(parseInt(message.testPageTabId), message.testReportId, message.appliedStatus);
         }
       }
     );
   }, [
+    user.loggedIn,
     currentlySelectedRuleData.ruleType,
     handleSaveTestSession,
     fetchAndUpdateTestReports,

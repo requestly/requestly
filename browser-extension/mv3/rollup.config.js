@@ -23,7 +23,7 @@ const processManifest = (content) => {
   const manifestJson = JSON.parse(content);
 
   manifestJson.version = version;
-  manifestJson.version_name = `${version} (MV3)`;
+  manifestJson.version_name = version;
 
   const { content_scripts: contentScripts } = manifestJson;
 
@@ -109,7 +109,7 @@ export default [
     plugins: commonPlugins,
   },
   {
-    input: "src/page-scripts/ajaxRequestInterceptor.js",
+    input: "src/page-scripts/ajaxRequestInterceptor/index.js",
     output: {
       file: `${OUTPUT_DIR}/page-scripts/ajaxRequestInterceptor.ps.js`,
       format: "iife",
