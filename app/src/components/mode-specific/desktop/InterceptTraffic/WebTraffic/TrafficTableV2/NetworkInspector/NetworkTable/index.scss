@@ -1,0 +1,37 @@
+.web-traffic-table-container {
+  height: 100%;
+  table {
+    tbody {
+      tr[aria-selected="true"] {
+        .graphql-operation-name {
+          color: var(--text-default);
+        }
+      }
+    }
+  }
+
+  .url-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    justify-content: start;
+
+    .url {
+      white-space: nowrap;
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-grow: auto;
+    }
+
+    .graphql-operation-name {
+      font-style: italic;
+      color: var(--map-tokens-secondary-secondary-400, #b568f9);
+      font-weight: 400;
+
+      &.selected {
+        color: var(--text-default);
+      }
+    }
+  }
+}
