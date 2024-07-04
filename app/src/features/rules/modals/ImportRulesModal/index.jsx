@@ -6,6 +6,8 @@ import { Button, Col, List, Modal, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
+import CharlesIcon from "assets/icons/charlesIcon.svg?react";
+import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
 import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
@@ -305,7 +307,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
               {dataToImport ? renderImportConfirmation() : renderFilePicker()}
               {isCharlesImportFeatureFlagOn ? (
                 <div className="rules-importer-footer">
-                  Have Charles export file?
+                  <div>Or import from other apps:</div>
                   <RQButton
                     type="link"
                     size="small"
@@ -314,8 +316,19 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                       trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
                     }}
                   >
-                    {" "}
-                    Click here to upload
+                    <CharlesIcon />
+                    &nbsp; Import from Charles
+                  </RQButton>
+                  <RQButton
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setIsImportFromCharlesModalOpen(true);
+                      trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
+                    }}
+                  >
+                    <ModheaderIcon />
+                    &nbsp; Import from ModHeader
                   </RQButton>
                 </div>
               ) : null}

@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import CharlesIcon from "assets/icons/charlesIcon.svg?react";
+import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
 import { ImportFromCharlesModal } from "../CharlesImporter";
 import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
@@ -158,15 +160,30 @@ export const GettingStarted: React.FC = () => {
 
                 {/* TODO: make desktop only */}
                 {isCharlesImportFeatureFlagOn ? (
-                  <RQButton
-                    type="default"
-                    onClick={() => {
-                      toggleImportCharlesRulesModal();
-                      trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
-                    }}
-                  >
-                    Import settings from Charles Proxy
-                  </RQButton>
+                  <div className="display-row-center">
+                    <RQButton
+                      type="link"
+                      size="small"
+                      onClick={() => {
+                        toggleImportCharlesRulesModal();
+                        trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
+                      }}
+                    >
+                      <CharlesIcon />
+                      &nbsp; Import from Charles
+                    </RQButton>
+                    <RQButton
+                      type="link"
+                      size="small"
+                      onClick={() => {
+                        toggleImportCharlesRulesModal();
+                        trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
+                      }}
+                    >
+                      <ModheaderIcon />
+                      &nbsp; Import from ModHeader
+                    </RQButton>
+                  </div>
                 ) : null}
               </div>
             </div>

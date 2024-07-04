@@ -307,7 +307,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
         />
 
         <div className="charles-import-footer">
-          To export your rules from Charles,{" "}
+          To export your rules from Charles,{"  "}
           <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
             Follow these steps
             <div className="icon__wrapper">
