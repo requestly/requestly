@@ -288,11 +288,11 @@ const hideAutoModeWidget = () => {
 const showToast = () => {
   const rqToast = document.createElement("rq-toast");
   rqToast.classList.add("rq-element");
-  rqToast.setAttribute("heading", "Requestly is recording session on this tab!");
+  rqToast.setAttribute("heading", "SessionBear is recording session on this tab!");
   rqToast.setAttribute("icon-path", chrome.runtime.getURL("resources/images/128x128.png"));
   const rqToastContent = `
   <div slot="content">
-    You can save up to last 5 minutes anytime by clicking on Requestly extension icon to save & upload activity for this tab.
+    You can save up to last 5 minutes anytime by clicking on SessionBear extension icon to save & upload activity for this tab.
   </div>
   `;
   try {
