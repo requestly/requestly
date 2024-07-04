@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useMediaQuery } from "react-responsive";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Modal, Space } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -83,6 +84,7 @@ const SavedSessionViewer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isMobileScreen = useMediaQuery({ query: "(max-width: 550px)" });
 
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -216,16 +218,19 @@ const SavedSessionViewer: React.FC = () => {
         {showOnboardingPrompt && <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />}
         <div className="session-viewer-header">
           <div className="display-row-center w-full">
-            <RQButton
-              iconOnly
-              type="default"
-              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
-              className="back-button"
-            />
+            {!isMobileScreen && (
+              <RQButton
+                iconOnly
+                type="default"
+                icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+                onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
+                className="back-button"
+              />
+            )}
+
             <SessionViewerTitle isReadOnly={!isRequestedByOwner} isInsideIframe={isInsideIframe} />
           </div>
-          {isRequestedByOwner && !isInsideIframe ? (
+          {isRequestedByOwner && !isInsideIframe && !isMobileScreen ? (
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
@@ -242,7 +247,7 @@ const SavedSessionViewer: React.FC = () => {
             </div>
           ) : null}
         </div>
-        <SessionDetails key={id} isInsideIframe={isInsideIframe} />
+        <SessionDetails key={id} isInsideIframe={isInsideIframe} isMobileView={isMobileScreen} />
       </div>
     </>
   );
