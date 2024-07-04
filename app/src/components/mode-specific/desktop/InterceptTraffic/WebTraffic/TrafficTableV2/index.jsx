@@ -268,6 +268,22 @@ const CurrentTrafficTable = ({
         } catch (err) {
           Logger.log(err);
         }
+
+        if (!includeLog && log?.request?.body) {
+          const body = log.request.body.toLowerCase();
+          try {
+            // TODO: @wrongsahil fix this. Special Characters are breaking the UI
+            let reg = null;
+            if (searchFilter.regex) {
+              reg = new RegExp(searchTerm);
+              includeLog = body.match(reg);
+            } else {
+              includeLog = body.includes(searchTerm);
+            }
+          } catch (err) {
+            Logger.log(err);
+          }
+        }
       }
 
       if (!includeLog) {

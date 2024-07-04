@@ -53,6 +53,7 @@ export const parseRegex = (regex: string): { pattern?: string; flags?: string } 
 
 export const parseUrlParametersFromSourceV2 = (
   source: RulePairSource,
+  useRegexOnlyFilter: boolean = false,
   isWildcardCapturingGroupsEnabled?: boolean
 ): ExtensionRuleCondition => {
   // rules like query, headers, script, delay can be applied on all URLs
@@ -66,14 +67,28 @@ export const parseUrlParametersFromSourceV2 = (
   if (source.key === SourceKey.URL) {
     switch (source.operator) {
       case SourceOperator.EQUALS:
+        if (useRegexOnlyFilter) {
+          return {
+            regexFilter: `^${escapeRegExp(source.value)}$`,
+            isUrlFilterCaseSensitive: true,
+          };
+        }
+
         return {
-          regexFilter: `^${escapeRegExp(source.value)}$`,
+          urlFilter: `|${source.value}|`,
           isUrlFilterCaseSensitive: true,
         };
 
       case SourceOperator.CONTAINS:
+        if (useRegexOnlyFilter) {
+          return {
+            regexFilter: `.*${escapeRegExp(source.value)}.*`,
+            isUrlFilterCaseSensitive: true,
+          };
+        }
+
         return {
-          regexFilter: `.*${escapeRegExp(source.value)}.*`,
+          urlFilter: `${source.value}`,
           isUrlFilterCaseSensitive: true,
         };
 
@@ -206,10 +221,11 @@ export const parseFiltersFromSource = (source: RulePairSource): ExtensionRuleCon
 
 export const parseConditionFromSource = (
   source: RulePairSource,
+  useRegexOnlyFilter: boolean = false,
   isWildcardCapturingGroupsEnabled?: boolean
 ): ExtensionRuleCondition => {
   return {
-    ...parseUrlParametersFromSourceV2(source, isWildcardCapturingGroupsEnabled),
+    ...parseUrlParametersFromSourceV2(source, useRegexOnlyFilter, isWildcardCapturingGroupsEnabled),
     ...parseFiltersFromSource(source),
     excludedInitiatorDomains: BLACKLISTED_DOMAINS,
     excludedRequestDomains: BLACKLISTED_DOMAINS,

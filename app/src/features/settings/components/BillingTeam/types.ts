@@ -4,6 +4,11 @@ export enum PlanStatus {
   EXPIRED = "expired",
 }
 
+export enum PlanType {
+  TEAM = "team",
+  INDIVIDUAL = "individual",
+}
+
 export interface BillingTeamDetails {
   id: string;
   name: string;
