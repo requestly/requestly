@@ -18,6 +18,10 @@ export function isExtensionInstalled() {
   return !!getExtensionVersion();
 }
 
+export function isSessionBearExtensionInstalled() {
+  return document.documentElement.getAttribute("rq-ext-name") === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR;
+}
+
 export function isExtensionVersionCompatible(compatibleVersion = "0.0.1") {
   let currentExtensionVersion = getExtensionVersion();
   currentExtensionVersion = currentExtensionVersion ? currentExtensionVersion : "0.0.1";
