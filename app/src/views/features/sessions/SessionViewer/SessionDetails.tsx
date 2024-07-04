@@ -34,9 +34,10 @@ import PlayerFrameOverlay from "./PlayerOverlay";
 
 interface SessionDetailsProps {
   isInsideIframe?: boolean;
+  isMobileView?: boolean;
 }
 
-const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false }) => {
+const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false, isMobileView = false }) => {
   const attributes = useSelector(getSessionRecordingAttributes);
   const events = useSelector(getSessionRecordingEvents);
   const startTimeOffset = useSelector(getSessionRecordingStartTimeOffset);
@@ -335,7 +336,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             className="session-duration-property"
           />
         )}
-        {attributes?.startTime && (
+        {attributes?.startTime && !isMobileView && (
           <Input
             readOnly
             addonBefore="Recorded at"
@@ -356,7 +357,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             RQControllerButtonContainer
           )}
         <PlayerFrameOverlay playerContainer={playerContainer.current} playerState={playerState} />
-        <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />
+        <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} isMobileView={isMobileView} />
       </div>
       <ProCard
         className={`primary-card session-panels-container ${
