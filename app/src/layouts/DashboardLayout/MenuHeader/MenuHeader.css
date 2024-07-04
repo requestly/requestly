@@ -256,6 +256,10 @@
   padding-top: 0;
 }
 
+.header-profile-dropdown .ant-dropdown-menu-item-disabled {
+  display: none;
+}
+
 @media screen and (max-width: 1300px) {
   .desktop .header-left-section > a {
     display: none;

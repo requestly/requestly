@@ -29,12 +29,13 @@ import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import { trackSavedSessionViewed } from "modules/analytics/events/features/sessionRecording";
-import { isAppOpenedInIframe } from "utils/AppUtils";
+import { getAppFlavour, isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionViewer.scss";
 import BadSessionError from "../errors/BadSessionError";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -45,6 +46,7 @@ interface SessionCreatedOnboardingPromptProps {
 }
 
 const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptProps> = ({ onClose }) => {
+  const appFlavour = getAppFlavour();
   return (
     <div className="session-onboarding-prompt">
       <div className="display-flex">
@@ -59,7 +61,14 @@ const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptPro
         </div>
       </div>
       <div className="session-onboarding-prompt-actions">
-        <Link to={PATHS.SESSIONS.SETTINGS.RELATIVE} className="session-onboarding-prompt-settings-link">
+        <Link
+          to={
+            appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
+              ? PATHS.SETTINGS.SESSIONS_SETTINGS.RELATIVE
+              : PATHS.SESSIONS.SETTINGS.RELATIVE
+          }
+          className="session-onboarding-prompt-settings-link"
+        >
           <SettingOutlined />
           <span>Open settings</span>
         </Link>

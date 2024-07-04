@@ -4,6 +4,9 @@ import { RQModal } from "lib/design-system/components";
 import ExtensionDeactivationMessage from "../../ExtensionDeactivationMessage";
 import InstallExtensionCTA from "../index";
 import { InstallExtensionContent } from "../type";
+import { getAppFlavour } from "utils/AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import InstallSessionBearExtensionCTA from "../../../../src-SessionBear/components/InstallSessionBearCTA";
 import "./installExtensionModal.css";
 
 interface Props extends ModalProps, InstallExtensionContent {
@@ -22,6 +25,8 @@ const InstallExtensionModal: React.FC<Props> = ({
   disabled = false,
   ...props
 }) => {
+  const appFlavour = getAppFlavour();
+
   return (
     <RQModal
       centered
@@ -34,7 +39,13 @@ const InstallExtensionModal: React.FC<Props> = ({
       {disabled ? (
         <ExtensionDeactivationMessage />
       ) : (
-        <InstallExtensionCTA heading={heading} subHeading={subHeading} eventPage={eventPage} />
+        <>
+          {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
+            <InstallSessionBearExtensionCTA heading={heading} subHeading={subHeading} eventPage={eventPage} />
+          ) : (
+            <InstallExtensionCTA heading={heading} subHeading={subHeading} eventPage={eventPage} />
+          )}
+        </>
       )}
     </RQModal>
   );
