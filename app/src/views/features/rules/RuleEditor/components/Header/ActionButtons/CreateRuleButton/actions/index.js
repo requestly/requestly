@@ -538,7 +538,7 @@ export const validateRule = (rule, dispatch, appMode) => {
 
         return {
           result: false,
-          message: "Invalid Regex. " + unsupportedFeatureMessage,
+          message: "Invalid regex. " + unsupportedFeatureMessage,
           error: "not re2 compatible",
         };
       }
