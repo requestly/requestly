@@ -9,6 +9,7 @@ import { ResponseRuleResourceType } from "types/rules";
 import { parseHTMLString, getHTMLNodeName, validateHTMLTag, removeUrlAttribute } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { RE2JS } from "re2js";
 
 /**
  * In case of a few rules, input from the rule editor does not directly map to rule schema.
@@ -530,6 +531,18 @@ export const validateRule = (rule, dispatch, appMode) => {
       }
       return true;
     });
+
+    for (const pair of rule.pairs) {
+      if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES && !isRE2Compatible(pair.source.value)) {
+        const unsupportedFeatureMessage = checkUnsupportedRE2Features(pair.source.value);
+
+        return {
+          result: false,
+          message: "Invalid regex. " + unsupportedFeatureMessage,
+          error: "not re2 compatible",
+        };
+      }
+    }
   }
 
   if (output && output.result === false) {
@@ -547,5 +560,45 @@ export const ruleModifiedAnalytics = (user) => {
     const usageMetrics = httpsCallable(functions, "usageMetrics");
     const data = new Date().getTime();
     usageMetrics(data);
+  }
+};
+
+const checkUnsupportedRE2Features = (regexString) => {
+  const unsupportedFeaturesRegex = {
+    positive_lookahead: /\(\?=/,
+    negative_lookahead: /\(\?!/,
+    positive_lookbehind: /\(\?<=/,
+    negative_lookbehind: /\(\?<!/,
+    backreferences: /\\\d+/,
+    named_capture_groups: /\(\?<\w+>/,
+  };
+
+  const unsupportedFeaturesMessages = {
+    positive_lookahead: "The positive lookahead assertion (?=...) is not supported.",
+    negative_lookahead: "The negative lookahead assertion (?!...) is not supported.",
+    positive_lookbehind: "The positive lookbehind assertion (?<=...) is not supported.",
+    negative_lookbehind: "The negative lookbehind assertion (?<!...) is not supported.",
+    backreferences: "Backreferences such as \\1 are not supported.",
+    named_capture_groups: "Named capture groups such as (?<name>...) are not supported.",
+  };
+
+  let message = "Only RE2 regex syntax is supported.";
+
+  for (const [feature, regex] of Object.entries(unsupportedFeaturesRegex)) {
+    if (regexString.match(regex)) {
+      message = unsupportedFeaturesMessages[feature];
+      break;
+    }
+  }
+
+  return message;
+};
+
+const isRE2Compatible = (regexString) => {
+  try {
+    RE2JS.compile(regexString);
+    return true;
+  } catch (error) {
+    return false;
   }
 };

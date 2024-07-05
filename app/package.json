@@ -91,6 +91,7 @@
     "pako": "^2.1.0",
     "posthog-js": "^1.71.0",
     "prettier": "^2.8.1",
+    "re2js": "^0.4.1",
     "react": "^18.2.0",
     "react-calendly": "^4.3.0",
     "react-copy-to-clipboard": "5.0.4",
