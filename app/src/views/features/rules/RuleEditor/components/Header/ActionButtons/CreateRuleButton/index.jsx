@@ -220,11 +220,10 @@ const CreateRuleButton = ({
   }, [currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
 
   const claimRuleCreationRewards = async () => {
-    if (userAttributes?.num_rules === 0) {
-      if (isNewUserForIncentivization) {
-        return;
-      }
-
+    if (isNewUserForIncentivization) {
+      handleOtherRuleEvents();
+      return;
+    } else if (userAttributes?.num_rules === 0) {
       return handleFirstRuleCreationEvent().catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
       });
