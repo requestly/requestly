@@ -2,6 +2,8 @@ import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
 import { matchSourceUrl } from "./common/ruleMatcher";
 import { Variable, getVariable } from "./service-worker/variable";
+import { getRecord } from "common/storage";
+import { STORAGE_KEYS } from "common/constants";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
   if (dateInMillis && format === "yyyy-mm-dd") {
@@ -75,4 +77,20 @@ export const debounce = (func: Function, wait: number) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
+};
+
+let cachedBlockedDomains: string[] | null = null;
+
+export const cacheBlockedDomains = async () => {
+  const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
+  cachedBlockedDomains = blockedDomains ?? [];
+};
+
+export const getBlockedDomains = async () => {
+  if (cachedBlockedDomains === null) {
+    const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
+    return blockedDomains ?? [];
+  }
+
+  return cachedBlockedDomains;
 };
