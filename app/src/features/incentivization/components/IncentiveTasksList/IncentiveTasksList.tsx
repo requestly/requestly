@@ -63,9 +63,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const [activePanels, setActivePanels] = useState([]);
 
   const { claimIncentiveRewards } = useIncentiveActions();
-  const isNewUser = useIsNewUserForIncentivization("2024-07-03");
-
-  console.log("isNewUser", isNewUser);
+  const isNewUser = useIsNewUserForIncentivization("2024-07-05");
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
@@ -79,8 +77,8 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
     [dispatch]
   );
 
-  const incentiveTasksList: IncentiveTaskListItem[] = useMemo(
-    () => [
+  const incentiveTasksList: IncentiveTaskListItem[] = useMemo(() => {
+    const newUserEvents = [
       {
         id: IncentivizeEvent.RULE_CREATED_AND_TESTED,
         title: "Create and test a rule",
@@ -104,6 +102,9 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           );
         },
       },
+    ];
+
+    const oldUserEvents = [
       {
         id: IncentivizeEvent.RULE_CREATED,
         title: "Create your first rule",
@@ -159,6 +160,10 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           );
         },
       },
+    ];
+
+    return [
+      ...(isNewUser ? newUserEvents : oldUserEvents),
       {
         id: IncentivizeEvent.RESPONSE_RULE_CREATED,
         title: "Create a Response Rule",
@@ -395,18 +400,18 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           );
         },
       },
-    ],
-    [
-      user?.loggedIn,
-      milestones,
-      userMilestoneAndRewardDetails,
-      dispatch,
-      navigate,
-      location.pathname,
-      postActionClickCallback,
-      claimIncentiveRewards,
-    ]
-  );
+    ];
+  }, [
+    isNewUser,
+    user?.loggedIn,
+    milestones,
+    userMilestoneAndRewardDetails,
+    dispatch,
+    navigate,
+    location.pathname,
+    postActionClickCallback,
+    claimIncentiveRewards,
+  ]);
 
   return (
     <div className="incentive-tasks-list-container">
