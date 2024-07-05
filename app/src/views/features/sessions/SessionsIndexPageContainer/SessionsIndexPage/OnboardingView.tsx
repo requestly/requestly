@@ -9,6 +9,7 @@ import { isValidUrl } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { prefixUrlWithHttps } from "utils/URLUtils";
 import StartSessionRecordingGif from "./assets/sessions-banner.gif";
+import SessionBearRecordingGif from "./assets/SessionBear.gif";
 import {
   trackInstallExtensionDialogShown,
   trackOnboardingToSettingsNavigate,
@@ -18,10 +19,10 @@ import {
   trackStartRecordingWithURLClicked,
   trackTriedRecordingForInvalidURL,
 } from "modules/analytics/events/features/sessionRecording";
-import "./index.scss";
 import { ImportHarModalButton } from "../NetworkSessions/ImportHarModalButton";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import "./index.scss";
 
 const { Text, Title } = Typography;
 
@@ -182,7 +183,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
             </Text>
             {!isModalView && (
               <Text type="secondary" className="banner-message banner-text">
-                <GreenVerifiedCheck /> sessions are not automatically saved to the cloud; they require manual saving
+                <GreenVerifiedCheck /> Sessions are not automatically saved to the cloud; they require manual saving
               </Text>
             )}
           </Row>
@@ -212,7 +213,15 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
         {!isModalView && (
           <Col span={12} className="banner-demo-video">
             <Row justify="end">
-              <img src={StartSessionRecordingGif} alt="How to start session recording" className="demo-video" />
+              <img
+                src={
+                  appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
+                    ? SessionBearRecordingGif
+                    : StartSessionRecordingGif
+                }
+                alt="How to start session recording"
+                className="demo-video"
+              />
             </Row>
             <Row onClick={trackOnboardingSampleSessionViewed}>
               <a
