@@ -75,7 +75,6 @@ export const saveDraftSession = async (
           if (response.data?.success) {
             dispatch(
               incentivizationActions.setUserMilestoneAndRewardDetails({
-                // @ts-ignore
                 userMilestoneAndRewardDetails: response.data?.data,
               })
             );
