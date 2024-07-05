@@ -38,7 +38,7 @@ export const TestRuleHeader = () => {
   const { sheetPlacement } = useBottomSheetContext();
 
   const { claimIncentiveRewards } = useIncentiveActions();
-  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-03");
+  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-05");
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);
