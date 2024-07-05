@@ -87,7 +87,7 @@ export const BlockList = () => {
             </Col>
           </Row>
           <Row className="blocklist-subheading">Adding a domain will include all its subdomains.</Row>
-          <div className="blocklist-domains-container">
+          <div className="blocklist-container">
             {blockedDomains.map((blockedDomain, index) => (
               <Row className="blocklist-domains-container" align={"middle"} justify={"space-between"} key={index}>
                 <Col span={23}>{blockedDomain}</Col>
