@@ -8,7 +8,7 @@ import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
 import { SearchOutlined } from "@ant-design/icons";
 import { redirectToSettings } from "utils/RedirectionUtils";
-// import GitHubButton from "react-github-btn";
+import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import Settings from "assets/icons/settings.svg?react";
 import LINKS from "config/constants/sub/links";
@@ -107,6 +107,19 @@ const MenuHeader = () => {
                     <PlanExpiredBadge />
                   </div>
                 ) : null}
+                <Col className="hidden-on-small-screen">
+                  <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
+                    <GitHubButton
+                      style={{ display: "flex" }}
+                      className="github-star-button"
+                      href="https://github.com/requestly/requestly"
+                      data-color-scheme="dark_dimmed"
+                      data-text="Star"
+                      data-show-count="true"
+                      aria-label="Star Requestly on GitHub"
+                    />
+                  </span>
+                </Col>
                 <RQButton
                   type="default"
                   className="header-search-btn"
@@ -117,20 +130,7 @@ const MenuHeader = () => {
                   </div>
                   <div className="search-shortcut-annotation">⌘+K</div>
                 </RQButton>
-                {/* TEMPORARILY HIDDEN  */}
-                {/* <Col className="hidden-on-small-screen">
-                <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
-                  <GitHubButton
-                    style={{ display: "flex" }}
-                    className="github-star-button"
-                    href="https://github.com/requestly/requestly"
-                    data-color-scheme="dark_dimmed"
-                    data-text="Star"
-                    data-show-count="true"
-                    aria-label="Star Requestly on GitHub"
-                  />
-                </span>
-              </Col> */}
+
                 <RQButton
                   className="ask-ai-btn"
                   onClick={() => {
