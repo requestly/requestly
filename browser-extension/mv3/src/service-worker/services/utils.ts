@@ -1,7 +1,8 @@
-import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "common/types";
+import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType, SourceKey, SourceOperator } from "common/types";
 import { setVariable, Variable } from "../variable";
-import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
+import { getAllSupportedWebURLs, getBlockedDomains, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
+import { matchSourceUrl } from "../../common/ruleMatcher";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -185,4 +186,18 @@ export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
   }
 
   return appTabs;
+};
+
+export const isUrlInBlockList = async (url: string): Promise<boolean> => {
+  const blockedDomains = await getBlockedDomains();
+  return blockedDomains?.some((domain) => {
+    return matchSourceUrl(
+      {
+        key: SourceKey.HOST,
+        value: domain,
+        operator: SourceOperator.CONTAINS,
+      },
+      url
+    );
+  });
 };
