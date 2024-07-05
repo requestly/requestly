@@ -486,6 +486,22 @@
   }
 }
 
+.save-session-btns-container {
+  display: flex;
+  align-items: center;
+
+  .session-viewer-save-action-btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 1px solid #ffffff55;
+  }
+
+  .save-popup-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
 body.dark {
   .session-viewer-page {
     .session-recording-name {
