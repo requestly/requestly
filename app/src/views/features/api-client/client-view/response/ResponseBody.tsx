@@ -1,8 +1,8 @@
-import React, { ReactElement, memo, useCallback, useEffect, useMemo, useState } from "react";
-import { ThemeProvider } from "@devtools-ds/themes";
-import { ObjectInspector } from "@devtools-ds/object-inspector";
+import React, { ReactElement, memo, useCallback, useMemo, useState } from "react";
 import { Radio, RadioChangeEvent } from "antd";
 import { trackRawResponseViewed } from "modules/analytics/events/features/apiClient";
+import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
+import { EditorLanguage } from "componentsV2/CodeEditor";
 
 interface Props {
   responseText: string;
@@ -13,28 +13,6 @@ enum ResponseMode {
   RAW,
   PREVIEW,
 }
-
-const JSONResponsePreview: React.FC<{ responseText: string }> = ({ responseText }) => {
-  const [responseJSON, setResponseJSON] = useState(null);
-
-  useEffect(() => {
-    if (responseText) {
-      try {
-        const sanitizedJsonString = /[[{][\s\S]*$/.exec(responseText)?.[0] || responseText; // removes padded characters before JSON
-        const json = JSON.parse(sanitizedJsonString);
-        setResponseJSON(json);
-      } catch (e) {
-        setResponseJSON(null);
-      }
-    }
-  }, [responseText]);
-
-  return (
-    <ThemeProvider theme={"chrome"} colorScheme={"dark"}>
-      <ObjectInspector data={responseJSON} expandLevel={1} includePrototypes={false} className="api-response-json" />
-    </ThemeProvider>
-  );
-};
 
 const HTMLResponsePreview: React.FC<{ responseText: string }> = ({ responseText }) => {
   return <iframe title="HTML Response Preview" className="html-response-preview" sandbox="" srcDoc={responseText} />;
@@ -49,11 +27,21 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
 
   const preview = useMemo<ReactElement>(() => {
     if (contentTypeHeader?.includes("application/json")) {
-      return <JSONResponsePreview responseText={responseText} />;
+      return <Editor value={responseText} defaultValue={responseText} language={EditorLanguage.JSON} isReadOnly />;
     }
 
     if (contentTypeHeader?.includes("text/html")) {
       return <HTMLResponsePreview responseText={responseText} />;
+    }
+
+    if (contentTypeHeader?.includes("application/javascript")) {
+      return (
+        <Editor value={responseText} defaultValue={responseText} language={EditorLanguage.JAVASCRIPT} isReadOnly />
+      );
+    }
+
+    if (contentTypeHeader?.includes("text/css")) {
+      return <Editor value={responseText} defaultValue={responseText} language={EditorLanguage.CSS} isReadOnly />;
     }
 
     if (contentTypeHeader?.includes("image/")) {
