@@ -5,7 +5,8 @@ import { useIsNewUserForIncentivization } from "./useIsNewUserForIncentivization
 export const useIsIncentivizationEnabled = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const isFeatureFlagEnabled = useFeatureValue("incentivization_onboarding", false);
-  const isNewUser = useIsNewUserForIncentivization("2024-06-20");
+  const RELEASE_DATE = "2024-06-20";
+  const isNewUser = useIsNewUserForIncentivization(RELEASE_DATE);
 
   useEffect(() => {
     const getIsIncentivizationEnabled = () => {
