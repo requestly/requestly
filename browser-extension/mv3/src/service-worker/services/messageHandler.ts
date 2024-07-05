@@ -1,6 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { getAppTabs, isUrlInBlockList, toggleExtensionStatus } from "./utils";
+import { getAppTabs, toggleExtensionStatus } from "./utils";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -23,7 +23,7 @@ import {
   saveTestRuleResult,
 } from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
-import { isExtensionEnabled } from "../../utils";
+import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -136,9 +136,8 @@ export const initMessageHandler = () => {
             return true;
           }
 
-          isUrlInBlockList(message.tabUrl).then((isBlocked) => {
-            sendResponse(isBlocked);
-          });
+          const isBlocked = isUrlInBlockList(message.tabUrl);
+          sendResponse(isBlocked);
         } catch (e) {
           sendResponse(false);
         }

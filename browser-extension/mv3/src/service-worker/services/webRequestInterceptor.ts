@@ -2,8 +2,13 @@ import { RuleType } from "common/types";
 import { matchRuleWithRequest } from "../../common/ruleMatcher";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
+import { isUrlInBlockList } from "../../utils";
 
 const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
+  if (isUrlInBlockList(details.url)) {
+    return;
+  }
+
   // @ts-ignore
   if (details?.documentLifecycle !== "active") {
     return;
@@ -37,6 +42,10 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
 };
 
 const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails) => {
+  if (isUrlInBlockList(details.url)) {
+    return;
+  }
+
   let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {
@@ -64,6 +73,10 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
 };
 
 const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails) => {
+  if (isUrlInBlockList(details.url)) {
+    return;
+  }
+
   let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {

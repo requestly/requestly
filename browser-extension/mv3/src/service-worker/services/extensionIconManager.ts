@@ -110,7 +110,6 @@ class ExtensionIconManager {
   }
 
   markExtensionBlocked(tabId: number) {
-    console.log("!!!debug", "markExtesnionBlocked", tabId);
     this.#updateIconState(tabId, "isBlocked", true);
   }
 }
