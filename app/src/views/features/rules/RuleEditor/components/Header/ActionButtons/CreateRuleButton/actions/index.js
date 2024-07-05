@@ -143,7 +143,7 @@ export const validateRule = (rule, dispatch, appMode) => {
   //Rule specific validations
 
   //Redirect Rule
-  if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
+  else if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT) {
     rule.pairs.forEach((pair) => {
       //Source shouldn't be empty
       if (isEmpty(pair.source.value)) {
