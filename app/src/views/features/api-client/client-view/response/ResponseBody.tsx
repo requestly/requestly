@@ -2,7 +2,7 @@ import React, { ReactElement, memo, useCallback, useMemo, useState } from "react
 import { Radio, RadioChangeEvent } from "antd";
 import { trackRawResponseViewed } from "modules/analytics/events/features/apiClient";
 import Editor from "componentsV2/CodeEditor/components/Editor/Editor";
-import { EditorLanguage } from "componentsV2/CodeEditor";
+import { getEditorLanguageFromContentType } from "componentsV2/CodeEditor";
 
 interface Props {
   responseText: string;
@@ -26,26 +26,18 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
   const [responseMode, setResponseMode] = useState(ResponseMode.PREVIEW);
 
   const preview = useMemo<ReactElement>(() => {
-    if (contentTypeHeader?.includes("application/json")) {
-      return <Editor value={responseText} defaultValue={responseText} language={EditorLanguage.JSON} isReadOnly />;
-    }
-
     if (contentTypeHeader?.includes("text/html")) {
       return <HTMLResponsePreview responseText={responseText} />;
     }
 
-    if (contentTypeHeader?.includes("application/javascript")) {
-      return (
-        <Editor value={responseText} defaultValue={responseText} language={EditorLanguage.JAVASCRIPT} isReadOnly />
-      );
-    }
-
-    if (contentTypeHeader?.includes("text/css")) {
-      return <Editor value={responseText} defaultValue={responseText} language={EditorLanguage.CSS} isReadOnly />;
-    }
-
     if (contentTypeHeader?.includes("image/")) {
       return <ImageResponsePreview responseText={responseText} mimeType={contentTypeHeader} />;
+    }
+
+    const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
+
+    if (editorLanguage) {
+      return <Editor value={responseText} defaultValue={responseText} language={editorLanguage} isReadOnly />;
     }
 
     return null;
