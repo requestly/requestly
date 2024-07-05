@@ -1,9 +1,8 @@
 import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType, SourceKey, SourceOperator } from "common/types";
 import { setVariable, Variable } from "../variable";
-import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
+import { getAllSupportedWebURLs, getBlockedDomains, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
 import { matchSourceUrl } from "../../common/ruleMatcher";
-import { getBlockedDomains } from "./clientHandler";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
