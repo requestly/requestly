@@ -25,7 +25,7 @@ interface EditorProps {
   id?: string;
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
-  handleChange: (value: string) => void;
+  handleChange?: (value: string) => void;
 }
 
 const Editor: React.FC<EditorProps> = ({
@@ -36,7 +36,7 @@ const Editor: React.FC<EditorProps> = ({
   height = 225,
   isResizable = false,
   hideCharacterCount = false,
-  handleChange,
+  handleChange = () => {},
   toolbarOptions,
   id = "",
 }) => {
