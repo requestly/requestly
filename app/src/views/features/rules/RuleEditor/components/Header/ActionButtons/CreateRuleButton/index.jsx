@@ -121,7 +121,7 @@ const CreateRuleButton = ({
   const userAttributes = useSelector(getUserAttributes);
 
   const { claimIncentiveRewards } = useIncentiveActions();
-  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-03");
+  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-05");
 
   const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {
