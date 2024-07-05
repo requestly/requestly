@@ -105,6 +105,7 @@ const SavedSessionViewer: React.FC = () => {
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
   const navigateToList = useCallback(() => navigate(PATHS.SESSIONS.ABSOLUTE), [navigate]);
+  const appFlavour = getAppFlavour();
 
   const confirmDeleteAction = useCallback(() => {
     Modal.confirm({
@@ -215,7 +216,9 @@ const SavedSessionViewer: React.FC = () => {
   ) : (
     <>
       <div className={`session-viewer-page ${isInsideIframe ? "inside-iframe" : ""}`}>
-        {showOnboardingPrompt && <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />}
+        {showOnboardingPrompt && appFlavour !== GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR && (
+          <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />
+        )}
         <div className="session-viewer-header">
           <div className="display-row-center w-full">
             {!isMobileScreen && (
