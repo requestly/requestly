@@ -1,4 +1,8 @@
+import { Request } from "@playwright/test";
+
 import { test, expect } from "../../fixtures";
+import queryRules from "./query_rules.json";
+import { loadRules } from "../../utils";
 
 import testScenarios, { QueryTestScenario } from "./testScenarios";
 import { IBaseTestData } from "../types";
@@ -22,21 +26,39 @@ const testQueryRule = async (testScenarioData: QueryTestScenario & IBaseTestData
     pageActions,
   } = testScenarioData;
 
+  const rules = ruleIds.reduce((acc, ruleId) => ({ ...acc, [ruleId]: queryRules[ruleId] }), {});
+  await loadRules(appPage, rules);
+
   const testPage = await context.newPage();
 
-  await appPage.bringToFront();
+  const redirections = new Map<string, string>();
+
+  testPage.on("request", (request: Request) => {
+    console.log("Request URL: ", request.url());
+    if (request?.redirectedFrom()?.url()) {
+      redirections.set(request?.redirectedFrom()?.url()!, request.url());
+    }
+  });
 
   await testPage.goto(testPageUrl, { waitUntil: "domcontentloaded" });
 
   await pageActions?.(testPage);
 
+  const redirectedUrl = redirections.get(testPageUrl);
+
+  console.log("Redirected URL: ", redirectedUrl);
+  console.log("REdirections: ", redirections);
+  // expect(redirectedUrl).toBeDefined();
+  // const newUrl = new URL(redirectedUrl!);
+
   const url = new URL(testPageUrl);
+
   const searchParams = url.searchParams;
 
-  // List all search parameters
-  searchParams.forEach((value, name) => {
-    console.log(`${name}: ${value}`);
-  });
+  // // List all search parameters
+  // searchParams.forEach((value, name) => {
+  //   console.log(`${name}: ${value}`);
+  // });
 
   for (const { name, value } of expectedQueryParams) {
     expect(searchParams.get(name)).toBe(value);
