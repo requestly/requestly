@@ -203,6 +203,7 @@ const INITIAL_STATE = {
       hasConnectedApp: false,
       lastSeenInviteTs: 0,
       isJoinWorkspaceCardVisible: true,
+      isManageBillingTeamAlertVisible: true,
     },
     nonPersist: {
       networkSessionSaveInProgress: false, // todo: check if requried

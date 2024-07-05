@@ -18,9 +18,10 @@ import debounce from "lodash/debounce";
 
 interface Props {
   getCurrentTimeOffset: () => number;
+  isMobileView?: boolean;
 }
 
-const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
+const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset, isMobileView = false }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const recordingId = useSelector(getSessionRecordingId);
@@ -74,9 +75,9 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
 
   return (
     <ProCard className="session-recording-properties primary-card">
-      {!isReadOnly && (
+      {!isReadOnly && !isMobileView && (
         <>
-          <p className="session-property-label text-gray">Start time offset</p>
+          <p className="session-property-label text-bold text-white">Start time offset</p>
           <div className="session-start-time-input-wrapper">
             <InputNumber
               addonAfter="seconds"
@@ -98,7 +99,7 @@ const SessionPropertiesPanel: React.FC<Props> = ({ getCurrentTimeOffset }) => {
         </>
       )}
 
-      <p className={`${!isReadOnly ? "mt-20" : null} session-property-label text-gray`}>Description</p>
+      <p className={`${!isReadOnly ? "mt-20" : null} session-property-label text-bold text-white`}>Description</p>
       {!isReadOnly ? (
         <Input.TextArea
           rows={7}

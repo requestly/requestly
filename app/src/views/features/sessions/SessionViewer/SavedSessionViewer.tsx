@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useMediaQuery } from "react-responsive";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Modal, Space } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -29,12 +30,13 @@ import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import PATHS from "config/constants/sub/paths";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
 import { trackSavedSessionViewed } from "modules/analytics/events/features/sessionRecording";
-import { isAppOpenedInIframe } from "utils/AppUtils";
+import { getAppFlavour, isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionViewer.scss";
 import BadSessionError from "../errors/BadSessionError";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -45,6 +47,7 @@ interface SessionCreatedOnboardingPromptProps {
 }
 
 const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptProps> = ({ onClose }) => {
+  const appFlavour = getAppFlavour();
   return (
     <div className="session-onboarding-prompt">
       <div className="display-flex">
@@ -59,7 +62,14 @@ const SessionCreatedOnboardingPrompt: React.FC<SessionCreatedOnboardingPromptPro
         </div>
       </div>
       <div className="session-onboarding-prompt-actions">
-        <Link to={PATHS.SESSIONS.SETTINGS.RELATIVE} className="session-onboarding-prompt-settings-link">
+        <Link
+          to={
+            appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR
+              ? PATHS.SETTINGS.SESSIONS_SETTINGS.RELATIVE
+              : PATHS.SESSIONS.SETTINGS.RELATIVE
+          }
+          className="session-onboarding-prompt-settings-link"
+        >
           <SettingOutlined />
           <span>Open settings</span>
         </Link>
@@ -74,6 +84,7 @@ const SavedSessionViewer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isMobileScreen = useMediaQuery({ query: "(max-width: 550px)" });
 
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
@@ -207,16 +218,19 @@ const SavedSessionViewer: React.FC = () => {
         {showOnboardingPrompt && <SessionCreatedOnboardingPrompt onClose={hideOnboardingPrompt} />}
         <div className="session-viewer-header">
           <div className="display-row-center w-full">
-            <RQButton
-              iconOnly
-              type="default"
-              icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
-              onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
-              className="back-button"
-            />
+            {!isMobileScreen && (
+              <RQButton
+                iconOnly
+                type="default"
+                icon={<img alt="back" width="14px" height="12px" src="/assets/icons/leftArrow.svg" />}
+                onClick={() => redirectToSessionRecordingHome(navigate, isDesktopSessionsCompatible)}
+                className="back-button"
+              />
+            )}
+
             <SessionViewerTitle isReadOnly={!isRequestedByOwner} isInsideIframe={isInsideIframe} />
           </div>
-          {isRequestedByOwner && !isInsideIframe ? (
+          {isRequestedByOwner && !isInsideIframe && !isMobileScreen ? (
             <div className="session-viewer-actions">
               <Space>
                 <ShareButton recordingId={id} showShareModal={(location.state as NavigationState)?.viewAfterSave} />
@@ -233,7 +247,7 @@ const SavedSessionViewer: React.FC = () => {
             </div>
           ) : null}
         </div>
-        <SessionDetails key={id} isInsideIframe={isInsideIframe} />
+        <SessionDetails key={id} isInsideIframe={isInsideIframe} isMobileView={isMobileScreen} />
       </div>
     </>
   );
