@@ -15,7 +15,7 @@ export const useIsIncentivizationEnabled = () => {
     const timerId = setTimeout(() => {
       const isEnabled = getIsIncentivizationEnabled();
       setIsEnabled(isEnabled);
-    }, 3 * 1000);
+    }, 1 * 1000);
 
     return () => {
       if (timerId) {
