@@ -282,7 +282,7 @@ export const initXhrInterceptor = (debug) => {
   XMLHttpRequest.prototype.send = async function (data) {
     if (!this.rqProxyXhr._async) {
       debug && console.log("Async disabled");
-      return send.call(this, this.rqProxyXhr._requestData);
+      return send.call(this, data);
     }
 
     this.rqProxyXhr._requestData = data;
