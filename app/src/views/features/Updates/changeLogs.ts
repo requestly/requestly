@@ -8,6 +8,10 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.7.7",
+    logs: ["fix: Non async XHR breaking websites (#1920)"],
+  },
+  {
     version: "24.7.2",
     logs: [
       "[ENGG-1989] fix: DNR rules not getting unique ID while saving (#1879)",
