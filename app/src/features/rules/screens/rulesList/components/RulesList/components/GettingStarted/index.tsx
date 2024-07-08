@@ -22,6 +22,7 @@ import {
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
+import { ImportFromModheaderModal } from "../ModheaderImporter/ImportFromModheaderModal";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -37,6 +38,7 @@ export const GettingStarted: React.FC = () => {
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
+  const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
@@ -52,9 +54,13 @@ export const GettingStarted: React.FC = () => {
   const toggleImportCharlesRulesModal = () => {
     setIsImportCharlesRulesModalActive((prev) => !prev);
   };
+  const toggleImportModheaderRulesModal = () => {
+    setIsImportModheaderRulesModalActive((prev) => !prev);
+  };
 
   const handleLoginOnClick = () => {
     dispatch(
+      //@ts-ignore
       actions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
@@ -176,7 +182,7 @@ export const GettingStarted: React.FC = () => {
                       type="link"
                       size="small"
                       onClick={() => {
-                        toggleImportCharlesRulesModal();
+                        toggleImportModheaderRulesModal();
                         trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
                       }}
                     >
@@ -203,6 +209,14 @@ export const GettingStarted: React.FC = () => {
       {isImportCharlesRulesModalActive ? (
         <ImportFromCharlesModal
           isOpen={isImportCharlesRulesModalActive}
+          toggle={toggleImportModheaderRulesModal}
+          triggeredBy={SOURCE.GETTING_STARTED}
+        />
+      ) : null}
+
+      {isImportModheaderRulesModalActive ? (
+        <ImportFromModheaderModal
+          isOpen={isImportModheaderRulesModalActive}
           toggle={toggleImportCharlesRulesModal}
           triggeredBy={SOURCE.GETTING_STARTED}
         />

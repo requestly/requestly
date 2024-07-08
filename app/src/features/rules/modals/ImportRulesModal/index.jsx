@@ -28,6 +28,7 @@ import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeat
 import "./importRules.scss";
 import { ImportFromCharles } from "features/rules/screens/rulesList/components/RulesList/components/CharlesImporter";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { ImportFromModheader } from "features/rules/screens/rulesList/components/RulesList/components/ModheaderImporter/ModheaderImporter";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
@@ -46,6 +47,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [groupsToImportCount, setGroupsToImportCount] = useState(false);
   const [conflictingRecords, setConflictingRecords] = useState([]);
   const [isImportFromCharlesModalOpen, setIsImportFromCharlesModalOpen] = useState(false);
+  const [isImportFromModheaderModalOpen, setIsImportFromModheaderModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
   const isImportLimitReached = useMemo(() => {
@@ -299,6 +301,12 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
               onBackButtonClick={() => setIsImportFromCharlesModalOpen(false)}
               callback={toggleModal}
             />
+          ) : isImportFromModheaderModalOpen ? (
+            <ImportFromModheader
+              isBackButtonVisible={true}
+              onBackButtonClick={() => setIsImportFromModheaderModalOpen(false)}
+              callback={toggleModal}
+            />
           ) : (
             <>
               <Row align="middle" justify="space-between" className="rules-importer-heading">
@@ -323,7 +331,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                     type="link"
                     size="small"
                     onClick={() => {
-                      setIsImportFromCharlesModalOpen(true);
+                      setIsImportFromModheaderModalOpen(true);
                       trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
                     }}
                   >
