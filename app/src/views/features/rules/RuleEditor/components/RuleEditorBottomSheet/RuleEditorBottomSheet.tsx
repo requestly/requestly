@@ -10,6 +10,7 @@ import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/const
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getIsMiscTourCompleted } from "store/selectors";
+import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 
 interface RuleEditorBottomSheetProps {
   mode: string;
@@ -18,6 +19,7 @@ interface RuleEditorBottomSheetProps {
 export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mode }) => {
   const dispatch = useDispatch();
   const miscTours = useSelector(getIsMiscTourCompleted);
+  const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const [startWalkthrough, setStartWalkthrough] = useState(false);
   const isTestThisRuleTourCompleted = miscTours?.testThisRule;
 
@@ -25,6 +27,7 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
     let timerId: NodeJS.Timeout;
 
     if (
+      isIncentivizationEnabled &&
       mode === RULE_EDITOR_CONFIG.MODES.EDIT &&
       isFeatureCompatible(FEATURES.TEST_THIS_RULE) &&
       !isTestThisRuleTourCompleted
@@ -39,7 +42,7 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
         clearTimeout(timerId);
       }
     };
-  }, [mode, isTestThisRuleTourCompleted]);
+  }, [mode, isTestThisRuleTourCompleted, isIncentivizationEnabled]);
 
   const BOTTOM_SHEET_TAB_KEYS = {
     TEST_RULE: "TEST_RULE",
