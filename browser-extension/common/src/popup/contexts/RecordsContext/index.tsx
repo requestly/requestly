@@ -1,6 +1,6 @@
 import React, { useMemo, useContext, createContext, useReducer, useEffect, useCallback } from "react";
 import { Group, Rule } from "../../../types";
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../../constants";
+import { EXTENSION_MESSAGES } from "../../../constants";
 import { recordsInitialState, recordsReducer } from "./recordsReducer";
 import { RecordsAction, RecordsActionType, RecordsObject } from "./types";
 import { saveRecord } from "../../../storage";
@@ -46,7 +46,7 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) =>
 
     updateLastUpdatedTS();
     chrome.runtime.sendMessage({
-      action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP,
+      action: EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP,
     });
   }, []);
 
@@ -62,7 +62,7 @@ export const RecordsProvider: React.FC<RecordsProviderProps> = ({ children }) =>
 
     updateLastUpdatedTS();
     chrome.runtime.sendMessage({
-      action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP,
+      action: EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP,
     });
   }, []);
 

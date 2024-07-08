@@ -129,6 +129,10 @@ export const initMessageHandler = () => {
         const requestDetails = { ...message.requestDetails, tabId: message.requestDetails?.tabId || sender.tab?.id };
         ruleExecutionHandler.onRuleExecuted(message.rule, requestDetails);
         break;
+
+      case EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
+        sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED });
+        break;
     }
 
     return false;
