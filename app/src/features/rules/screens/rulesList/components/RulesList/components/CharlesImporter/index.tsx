@@ -87,7 +87,7 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
       className="import-from-charles-modal custom-rq-modal"
       width={550}
     >
-      <ImportFromCharles modalSrc={triggeredBy} callBack={() => toggle()} />
+      <ImportFromCharles source={triggeredBy} callback={() => toggle()} />
     </Modal>
   );
 };
@@ -104,17 +104,17 @@ export const ImportFromCharlesWrapperView: React.FC = () => {
 };
 
 interface ImportFromCharlesProps {
-  modalSrc?: string | null; // null indicates this is not mounted inside modal
-  callBack?: () => void;
-  showBackBtn?: boolean;
-  onClickBackButton?: () => void;
+  source?: string | null; // null indicates this is not mounted inside modal
+  callback?: () => void;
+  isBackButtonVisible?: boolean;
+  onBackButtonClick?: () => void;
 }
 
 export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
-  modalSrc = null,
-  callBack,
-  showBackBtn,
-  onClickBackButton,
+  source = null,
+  callback,
+  isBackButtonVisible,
+  onBackButtonClick,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -196,7 +196,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
 
         trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
-        callBack?.();
+        callback?.();
       })
       .finally(() => setIsLoading(false));
   };
@@ -216,8 +216,8 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
       <div className="charles-import-container">
         <Row justify={"space-between"} className="charles-import-header">
           <Col className="charles-import-heading">
-            {showBackBtn && (
-              <ArrowLeftOutlined size={16} className="charles-import-back-icon" onClick={onClickBackButton} />
+            {isBackButtonVisible && (
+              <ArrowLeftOutlined size={16} className="charles-import-back-icon" onClick={onBackButtonClick} />
             )}
             Import Charles Proxy settings
           </Col>
@@ -255,7 +255,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                     <CharlesDocsLink
                       title="Learn more about it here"
                       linkClickSrc="all_settings_unsupported_screen"
-                      importTriggerSrc={modalSrc}
+                      importTriggerSrc={source}
                     />
                   </div>
                 )}
