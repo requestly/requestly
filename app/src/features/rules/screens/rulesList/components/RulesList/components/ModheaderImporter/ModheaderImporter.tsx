@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Col, Row, Space } from "antd";
-import { actions } from "store";
-import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
+import { getAppMode } from "store/selectors";
 import { ArrowLeftOutlined, CheckCircleOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
@@ -15,6 +14,7 @@ import { parseRulesFromModheader } from "modules/rule-adapters/modheader-rule-ad
 import { Group, Rule } from "types";
 import { addRulesAndGroupsToStorage } from "components/features/rules/ImportRulesModal/actions";
 import "./modheaderImporter.css";
+import { redirectToRules } from "utils/RedirectionUtils";
 
 const validExportSteps = [
   {
@@ -71,7 +71,6 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
   isBackButtonVisible,
   onBackButtonClick,
 }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
@@ -80,7 +79,6 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const appMode = useSelector(getAppMode);
-  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
 
   const onFilesDrop = async (files: File[]) => {
     const file = files[0];
@@ -107,7 +105,7 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
       try {
         modheaderProfilesJSON = JSON.parse(fileContent as string);
       } catch (e) {
-        setValidationError("Failed to parse Modheader proxy settings file.");
+        setValidationError("Failed to parse your Modheader file.");
         setIsDataProcessing(false);
         return;
       }
@@ -124,17 +122,26 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
   const handleModheaderRulesImport = () => {
     setIsLoading(true);
 
-    addRulesAndGroupsToStorage(appMode, rulesToImport).then(() => {
-      dispatch(
-        //@ts-ignore
-        actions.updateRefreshPendingStatus({
-          type: "rules",
-          newValue: !isRulesListRefreshPending,
-        })
-      );
-      navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
-      callback();
-    });
+    addRulesAndGroupsToStorage(appMode, rulesToImport)
+      // .then(() => {
+      //   dispatch(
+      //     actions.updateRefreshPendingStatus({
+      //       type: "rules",
+      //       newValue: !isRulesListRefreshPending,
+      //     })
+      //   );
+      // })
+      .then(() => {
+        callback?.();
+        redirectToRules(navigate, true);
+      })
+      .catch((e) => {
+        setValidationError("Failed to import your Modheader file.");
+        return;
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleResetImport = () => {

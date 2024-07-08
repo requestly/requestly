@@ -45,8 +45,6 @@ export const parseRulesFromModheader = (modheaderProfiles): (Rule | Group)[] => 
     }
   });
 
-  console.log("!!!debug", "recordsToBeImported", recordsToBeImported);
-
   return recordsToBeImported;
 };
 

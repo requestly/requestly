@@ -332,7 +332,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                     size="small"
                     onClick={() => {
                       setIsImportFromModheaderModalOpen(true);
-                      trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
+                      // trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
                     }}
                   >
                     <ModheaderIcon />

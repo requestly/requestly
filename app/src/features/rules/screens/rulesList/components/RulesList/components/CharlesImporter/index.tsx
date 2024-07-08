@@ -188,6 +188,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
     Promise.all(rulesImportPromises)
       .then(() => {
         dispatch(
+          //@ts-ignore
           actions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,

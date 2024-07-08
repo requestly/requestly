@@ -209,7 +209,7 @@ export const GettingStarted: React.FC = () => {
       {isImportCharlesRulesModalActive ? (
         <ImportFromCharlesModal
           isOpen={isImportCharlesRulesModalActive}
-          toggle={toggleImportModheaderRulesModal}
+          toggle={toggleImportCharlesRulesModal}
           triggeredBy={SOURCE.GETTING_STARTED}
         />
       ) : null}
@@ -217,7 +217,7 @@ export const GettingStarted: React.FC = () => {
       {isImportModheaderRulesModalActive ? (
         <ImportFromModheaderModal
           isOpen={isImportModheaderRulesModalActive}
-          toggle={toggleImportCharlesRulesModal}
+          toggle={toggleImportModheaderRulesModal}
           triggeredBy={SOURCE.GETTING_STARTED}
         />
       ) : null}
