@@ -376,4 +376,19 @@ export const productTours: Record<string, CustomSteps[]> = {
       disableOverlay: true,
     },
   ],
+  [MISC_TOURS.APP_ENGAGEMENT.TEST_THIS_RULE]: [
+    {
+      ...tourTooltipPresets,
+      title: "Test this Rule",
+      target: getTourTarget(MISC_TOURS.APP_ENGAGEMENT.TEST_THIS_RULE),
+      content:
+        "Check if the rule is configured correctly and is working as expected on the intended web page. Earn $35 in credit on completing this step.",
+      pointerPlacement: PointerPlacement.BOTTOM_100,
+      placement: "left",
+      showNext: false,
+      hidePointer: true,
+      disableOverlay: true,
+      offset: 0,
+    },
+  ],
 };

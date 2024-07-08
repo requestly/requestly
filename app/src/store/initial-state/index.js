@@ -195,6 +195,7 @@ const INITIAL_STATE = {
       extensionInstallSource: null,
       isMiscTourCompleted: {
         firstDraftSession: false,
+        testThisRule: false,
         upgradeWorkspaceMenu: false,
       },
 
