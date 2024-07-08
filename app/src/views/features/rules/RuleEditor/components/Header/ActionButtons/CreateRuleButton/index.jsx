@@ -48,6 +48,7 @@ import Logger from "../../../../../../../../../../common/logger";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";
+import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -121,7 +122,7 @@ const CreateRuleButton = ({
   const userAttributes = useSelector(getUserAttributes);
 
   const { claimIncentiveRewards } = useIncentiveActions();
-  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-05");
+  const isNewUserForIncentivization = useIsNewUserForIncentivization(INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE);
 
   const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {

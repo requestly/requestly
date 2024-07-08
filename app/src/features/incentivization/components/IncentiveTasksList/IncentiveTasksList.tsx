@@ -46,6 +46,7 @@ import { getUserAuthDetails } from "store/selectors";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";
+import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
 import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
@@ -63,7 +64,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const [activePanels, setActivePanels] = useState([]);
 
   const { claimIncentiveRewards } = useIncentiveActions();
-  const isNewUser = useIsNewUserForIncentivization("2024-07-05");
+  const isNewUser = useIsNewUserForIncentivization(INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE);
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 

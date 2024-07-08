@@ -23,6 +23,7 @@ import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPop
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useIsNewUserForIncentivization } from "features/incentivization/hooks";
+import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
 import "./index.scss";
 
 export const TestRuleHeader = () => {
@@ -38,7 +39,7 @@ export const TestRuleHeader = () => {
   const { sheetPlacement } = useBottomSheetContext();
 
   const { claimIncentiveRewards } = useIncentiveActions();
-  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-05");
+  const isNewUserForIncentivization = useIsNewUserForIncentivization(INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE);
 
   const handleStartTestRule = useCallback(() => {
     trackTestRuleClicked(currentlySelectedRuleData.ruleType, pageUrl);

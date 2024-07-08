@@ -6,12 +6,13 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import { getUserAuthDetails } from "store/selectors";
 import { useSyncLocalIncentivizationState } from "./useSyncLocalIncentivizationState";
 import { useIsNewUserForIncentivization } from "./useIsNewUserForIncentivization";
+import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "../constants";
 
 export const useFetchIncentivizationDetails = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const uid = user?.details?.profile?.uid;
-  const isNewUserForIncentivization = useIsNewUserForIncentivization("2024-07-05");
+  const isNewUserForIncentivization = useIsNewUserForIncentivization(INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE);
 
   useSyncLocalIncentivizationState();
 
