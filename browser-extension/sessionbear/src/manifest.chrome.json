@@ -5,7 +5,7 @@
   "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": ["*://*.sessionbear.io/*", "*://*.sessionbear.com/*", "*://*.requestly.io/*"],
+      "matches": ["*://*.sessionbear.io/*", "*://*.sessionbear.com/*"],
       "js": ["app.cs.js"],
       "run_at": "document_start"
     },
@@ -30,7 +30,7 @@
     "default_title": "__MSG_extIconTitle__",
     "default_popup": "popup/popup.html"
   },
-  
+
   "icons": {
     "16": "resources/images/16x16.png",
     "48": "resources/images/48x48.png",
@@ -53,6 +53,6 @@
   ],
 
   "host_permissions": ["<all_urls>"],
-  
+
   "commands": {}
 }
