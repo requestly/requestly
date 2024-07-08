@@ -9,6 +9,7 @@ import { ResponseRuleResourceType } from "types/rules";
 import { parseHTMLString, getHTMLNodeName, validateHTMLTag, removeUrlAttribute } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { countCapturingGroups } from "modules/extension/mv3RuleParser/utils";
 
 /**
  * In case of a few rules, input from the rule editor does not directly map to rule schema.
@@ -198,8 +199,7 @@ export const validateRule = (rule, dispatch, appMode) => {
       }
 
       if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
-        const capturingGroupPattern = /\((?!\?:)/g;
-        const hasCapturingGroup = capturingGroupPattern.test(pair.source.value);
+        const hasCapturingGroup = !!countCapturingGroups(pair.source.value);
 
         if (hasCapturingGroup) {
           output = {

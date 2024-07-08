@@ -6,6 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+import { countCapturingGroups } from "modules/extension/mv3RuleParser/utils";
 
 const { RULE_TYPES_CONFIG, RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
@@ -241,7 +242,9 @@ export function runMinorFixesOnRule(dispatch, rule) {
 
       // if replace rule, add non-capturing group to all capturing groups
       if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REPLACE) {
-        fixedRegex = fixedRegex.replaceAll(/\((?!\?:)/g, "(?:");
+        if (countCapturingGroups(fixedRegex) > 0) {
+          fixedRegex = fixedRegex.replaceAll(/\((?!\?:)/g, "(?:");
+        }
       }
 
       fixedPair = {
