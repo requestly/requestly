@@ -34,9 +34,10 @@ import PlayerFrameOverlay from "./PlayerOverlay";
 
 interface SessionDetailsProps {
   isInsideIframe?: boolean;
+  isMobileView?: boolean;
 }
 
-const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false }) => {
+const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false, isMobileView = false }) => {
   const attributes = useSelector(getSessionRecordingAttributes);
   const events = useSelector(getSessionRecordingEvents);
   const startTimeOffset = useSelector(getSessionRecordingStartTimeOffset);
@@ -212,8 +213,8 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
   useEffect(() => {
     if (!player) return;
 
-    player.addEventListener("ui-update-current-time", updateCurrentTimeHandler);
-    player.addEventListener("ui-update-player-state", playerStateChangeHandler);
+    player?.addEventListener("ui-update-current-time", updateCurrentTimeHandler);
+    player?.addEventListener("ui-update-player-state", playerStateChangeHandler);
   }, [player, playerStateChangeHandler, updateCurrentTimeHandler]);
 
   useEffect(() => {
@@ -223,7 +224,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
 
     // player should start playing from the start time offset only on the
     // first load and not when the user changes time offset.
-    player.goto(offsetTimeRef.current * 1000, true);
+    player?.goto(offsetTimeRef.current * 1000, true);
   }, [player]);
 
   useEffect(() => {
@@ -327,7 +328,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
     <>
       <div className="session-properties-wrapper">
         <PageURLInfo sessionUrl={attributes?.url} logs={pageNavigationLogs} playerTimeOffset={playerTimeOffset} />
-        {events?.rrweb?.length && attributes?.duration && (
+        {events?.rrweb?.length && attributes?.duration && !isMobileView && (
           <Input
             readOnly
             addonBefore="Duration"
@@ -335,7 +336,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             className="session-duration-property"
           />
         )}
-        {attributes?.startTime && (
+        {attributes?.startTime && !isMobileView && (
           <Input
             readOnly
             addonBefore="Recorded at"
@@ -356,7 +357,7 @@ const SessionDetails: React.FC<SessionDetailsProps> = ({ isInsideIframe = false 
             RQControllerButtonContainer
           )}
         <PlayerFrameOverlay playerContainer={playerContainer.current} playerState={playerState} />
-        <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} />
+        <SessionPropertiesPanel getCurrentTimeOffset={getCurrentTimeOffset} isMobileView={isMobileView} />
       </div>
       <ProCard
         className={`primary-card session-panels-container ${
