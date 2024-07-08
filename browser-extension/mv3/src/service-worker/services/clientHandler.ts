@@ -45,7 +45,7 @@ declare const window: {
 
 /** Loading Client scripts ASAP */
 const registerClientScripts = async () => {
-  const blockedDomains = await getBlockedDomains();
+  const blockedDomains = getBlockedDomains();
   const blockedDomainPatterns = blockedDomains.flatMap(generateBlockedHostMatchPattern).filter((pattern) => !!pattern);
 
   console.log("[registerClientScript]", { blockedDomains });
@@ -93,7 +93,7 @@ export const initClientHandler = async () => {
   console.log("[initClientHandler]");
   const isExtensionStatusEnabled = await isExtensionEnabled();
   setupClientScript(isExtensionStatusEnabled);
-  cacheBlockedDomains();
+  // cacheBlockedDomains();
 
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
     console.log("[initClientHandler]", "onVariableChange", { extensionStatus });

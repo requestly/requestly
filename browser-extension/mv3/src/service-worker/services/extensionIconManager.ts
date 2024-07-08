@@ -26,10 +26,11 @@ class ExtensionIconManager {
   constructor() {
     chrome.tabs.onUpdated.addListener((tabId, _, tab) => {
       // FIXME: Can be made better by only listening to url changes on tabs
-      this.#updateIconState(tabId);
       const isBlocked = isUrlInBlockList(tab.url);
       if (isBlocked) {
         extensionIconManager.markExtensionBlocked(tabId);
+      } else {
+        this.#updateIconState(tabId);
       }
     });
   }
@@ -107,6 +108,7 @@ class ExtensionIconManager {
   }
 
   markRecording(tabId: number) {
+    console.log("!!!debug", "markrecordig", Date.now());
     this.#updateIconState(tabId, "isRecording", true);
   }
 
@@ -115,6 +117,7 @@ class ExtensionIconManager {
   }
 
   markExtensionBlocked(tabId: number) {
+    console.log("!!!debug", "markBlocked", Date.now());
     this.#updateIconState(tabId, "isBlocked", true);
   }
 }
