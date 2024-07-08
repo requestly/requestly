@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Collapse } from "antd";
 import { CreditsProgressBar } from "../CreditsProgressbar/CreditsProgessbar";
 import { IncentiveSectionHeader } from "../IncentiveSectionHeader";
@@ -32,7 +32,10 @@ import {
 import { getTotalCredits, isTaskCompleted } from "features/incentivization/utils";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import LINKS from "config/constants/sub/links";
-import { trackIncentivizationTaskClicked } from "features/incentivization/analytics";
+import {
+  trackIncentivizationChecklistTaskViewed,
+  trackIncentivizationTaskClicked,
+} from "features/incentivization/analytics";
 import { RQButton } from "lib/design-system/components";
 import { INCENTIVIZATION_SOURCE } from "features/incentivization/analytics/constants";
 import { RuleType } from "types";
@@ -42,6 +45,8 @@ import { MdOutlineScience } from "@react-icons/all-files/md/MdOutlineScience";
 import { getUserAuthDetails } from "store/selectors";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";
+import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
 import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
@@ -56,8 +61,10 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
   const isLoading = useSelector(getIsIncentivizationDetailsLoading);
   const milestones = useSelector(getIncentivizationMilestones);
   const userMilestoneAndRewardDetails = useSelector(getUserIncentivizationDetails);
+  const [activePanels, setActivePanels] = useState([]);
 
   const { claimIncentiveRewards } = useIncentiveActions();
+  const isNewUser = useIsNewUserForIncentivization(INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE);
 
   const totalCredits = useMemo(() => getTotalCredits(milestones), [milestones]);
 
@@ -71,8 +78,34 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
     [dispatch]
   );
 
-  const incentiveTasksList: IncentiveTaskListItem[] = useMemo(
-    () => [
+  const incentiveTasksList: IncentiveTaskListItem[] = useMemo(() => {
+    const newUserEvents = [
+      {
+        id: IncentivizeEvent.RULE_CREATED_AND_TESTED,
+        title: "Create and test a rule",
+        isCompleted: isTaskCompleted(IncentivizeEvent.RULE_CREATED_AND_TESTED, userMilestoneAndRewardDetails),
+        description:
+          "Rules enable you to set conditions that trigger specific actions when met. Create a rule to apply desired network modifications. Use the testing widget to ensure it is correctly configured and functioning as expected.",
+        icon: <MdPlaylistAdd />,
+        helpLink: (
+          <a href="https://developers.requestly.com/create-first-rule/" target="_blank" rel="noreferrer">
+            Learn how to create Rules
+          </a>
+        ),
+        milestone: milestones?.[IncentivizeEvent.RULE_CREATED_AND_TESTED],
+        action: () => {
+          const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_CREATED_AND_TESTED, userMilestoneAndRewardDetails);
+          return (
+            <NewRuleButtonWithDropdown
+              disable={isCompleted}
+              callback={() => postActionClickCallback(IncentivizeEvent.RULE_CREATED_AND_TESTED)}
+            />
+          );
+        },
+      },
+    ];
+
+    const oldUserEvents = [
       {
         id: IncentivizeEvent.RULE_CREATED,
         title: "Create your first rule",
@@ -128,6 +161,10 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           );
         },
       },
+    ];
+
+    return [
+      ...(isNewUser ? newUserEvents : oldUserEvents),
       {
         id: IncentivizeEvent.RESPONSE_RULE_CREATED,
         title: "Create a Response Rule",
@@ -364,18 +401,18 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           );
         },
       },
-    ],
-    [
-      user?.loggedIn,
-      milestones,
-      userMilestoneAndRewardDetails,
-      dispatch,
-      navigate,
-      location.pathname,
-      postActionClickCallback,
-      claimIncentiveRewards,
-    ]
-  );
+    ];
+  }, [
+    isNewUser,
+    user?.loggedIn,
+    milestones,
+    userMilestoneAndRewardDetails,
+    dispatch,
+    navigate,
+    location.pathname,
+    postActionClickCallback,
+    claimIncentiveRewards,
+  ]);
 
   return (
     <div className="incentive-tasks-list-container">
@@ -392,6 +429,16 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
           <Collapse
             className="incentive-tasks-list-collapse"
             expandIconPosition="end"
+            onChange={(keys) => {
+              setActivePanels(keys as string[]);
+
+              // some panel is opened
+              if (Array.isArray(keys) && keys?.length >= activePanels.length) {
+                const lastOpenedPanelKey = Number(keys[keys.length - 1]);
+                const taskId = incentiveTasksList[lastOpenedPanelKey].id;
+                trackIncentivizationChecklistTaskViewed(taskId);
+              }
+            }}
             expandIcon={({ isActive }) => (
               <div className="collapse-arrow-container">
                 <PiCaretDownBold className={`collapse-arrow-down ${isActive ? "rotate" : ""}`} />

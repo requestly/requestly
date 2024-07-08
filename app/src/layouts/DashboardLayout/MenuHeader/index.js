@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
-import { getAppMode, getIsMiscTourCompleted, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
@@ -40,7 +40,6 @@ const MenuHeader = () => {
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
-  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
 
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
 

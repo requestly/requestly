@@ -38,8 +38,12 @@ export const trackNoCreditsAvailableModalViewed = (source: string) => {
   trackEvent(INCENTIVIZATION.INCENTIVIZATION_NO_CREDITS_AVAILABLE_MODAL_VIEWED, { source });
 };
 
-export const trackCreditsAssignedModalViewed = (num_credits: number, task: IncentivizeEvent) => {
-  trackEvent(INCENTIVIZATION.INCENTIVIZATION_CREDITS_ASSIGNED_MODAL_VIEWED, { num_credits, task });
+export const trackCreditsAssignedModalViewed = (
+  num_credits: number,
+  task: IncentivizeEvent,
+  metadata: Record<string, unknown> = {}
+) => {
+  trackEvent(INCENTIVIZATION.INCENTIVIZATION_CREDITS_ASSIGNED_MODAL_VIEWED, { num_credits, task, metadata });
 };
 
 export const trackCreditsAssignedModalClicked = (action: string) => {

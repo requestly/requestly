@@ -20,9 +20,15 @@ interface IncentiveTaskCompletedModalProps {
   isOpen: boolean;
   toggle: () => void;
   event: IncentivizeEvent;
+  metadata?: Record<string, unknown>;
 }
 
-export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalProps> = ({ isOpen, toggle, event }) => {
+export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalProps> = ({
+  isOpen,
+  toggle,
+  event,
+  metadata,
+}) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const milestones = useSelector(getIncentivizationMilestones);
@@ -36,7 +42,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
 
   useEffect(() => {
     if (isOpen) {
-      trackCreditsAssignedModalViewed(earnedCredits, event);
+      trackCreditsAssignedModalViewed(earnedCredits, event, metadata);
     }
   }, [earnedCredits, event, isOpen]);
 
@@ -45,6 +51,9 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   }
 
   const congratulationMesssages: Record<IncentivizeEvent, { message: string }> = {
+    [IncentivizeEvent.RULE_CREATED_AND_TESTED]: {
+      message: `You earned $${earnedCredits} on testing your rule.`,
+    },
     [IncentivizeEvent.RULE_CREATED]: {
       message: `You earned $${earnedCredits} on creating your first rule.`,
     },
@@ -87,6 +96,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
         newProps: {
           authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.LOG_IN,
           eventSource: "incentivization",
+          warningMessage: "You must sign in to claim free credits.",
         },
       })
     );
@@ -120,9 +130,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
                 {remainingTasksCount > 1 ? "steps" : "step"}.
               </>
             )
-          ) : (
-            <>Sign up to create an account and redeem these credits.</>
-          )}
+          ) : null}
         </div>
         <div className="task-completed-actions-container">
           {user?.loggedIn ? (
@@ -158,7 +166,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
           ) : (
             <>
               <RQButton type="primary" onClick={handleSignupClick}>
-                Sign up
+                Claim credits
               </RQButton>
             </>
           )}

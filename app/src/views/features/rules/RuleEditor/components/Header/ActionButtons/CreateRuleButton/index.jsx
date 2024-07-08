@@ -47,6 +47,8 @@ import { incentivizationActions } from "store/features/incentivization/slice";
 import Logger from "../../../../../../../../../../common/logger";
 import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";
+import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
 import "../RuleEditorActionButtons.css";
 
 const getEventParams = (rule) => {
@@ -120,6 +122,7 @@ const CreateRuleButton = ({
   const userAttributes = useSelector(getUserAttributes);
 
   const { claimIncentiveRewards } = useIncentiveActions();
+  const isNewUserForIncentivization = useIsNewUserForIncentivization(INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE);
 
   const premiumRuleLimitType = useMemo(() => {
     switch (currentlySelectedRuleData.ruleType) {
@@ -182,6 +185,7 @@ const CreateRuleButton = ({
               newValue: true,
               newProps: {
                 event: incentiveEvent,
+                metadata: { rule_type: currentlySelectedRuleData.ruleType },
               },
             })
           );
@@ -208,6 +212,7 @@ const CreateRuleButton = ({
             newValue: true,
             newProps: {
               event: IncentivizeEvent.RULE_CREATED,
+              metadata: { rule_type: currentlySelectedRuleData.ruleType },
             },
           })
         );
@@ -215,15 +220,18 @@ const CreateRuleButton = ({
     });
   }, [currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
 
-  const claimRuleCreationRewards = useCallback(async () => {
-    if (userAttributes?.num_rules === 0) {
+  const claimRuleCreationRewards = async () => {
+    if (isNewUserForIncentivization) {
+      handleOtherRuleEvents();
+      return;
+    } else if (userAttributes?.num_rules === 0) {
       return handleFirstRuleCreationEvent().catch((err) => {
         Logger.log("Error in claiming rule creation rewards", err);
       });
     } else {
       handleOtherRuleEvents();
     }
-  }, [handleFirstRuleCreationEvent, userAttributes]);
+  };
 
   const handleBtnOnClick = async (saveType = "button_click") => {
     trackRuleSaveClicked(MODE);
