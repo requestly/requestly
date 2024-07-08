@@ -23,8 +23,6 @@ import APP_CONSTANTS from "config/constants";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
 import { RequestBot, trackAskAIClicked } from "features/requestBot";
 import BotIcon from "./assets/bot.svg";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -51,20 +49,6 @@ const MenuHeader = () => {
 
   return showMenuHeader() ? (
     <>
-      <ProductWalkthrough
-        completeTourOnUnmount={false}
-        tourFor={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
-        startWalkthrough={!isMiscTourCompleted.askAI}
-        onTourComplete={() =>
-          dispatch(
-            actions.updateProductTourCompleted({
-              tour: TOUR_TYPES.MISCELLANEOUS,
-              // TODO: FIX WALKTHROUGH COMPONENT, SUBTOUR SHOULD BE PASSED AS A CONSTANT
-              subTour: "askAI",
-            })
-          )
-        }
-      />
       <Header className="layout-header">
         <Row wrap={false} align="middle" className="w-full">
           {!isPricingOrGoodbyePage ? (
@@ -136,14 +120,7 @@ const MenuHeader = () => {
                   onClick={() => {
                     trackAskAIClicked();
                     setIsRequestBotVisible(true);
-                    dispatch(
-                      actions.updateProductTourCompleted({
-                        tour: TOUR_TYPES.MISCELLANEOUS,
-                        subTour: "askAI",
-                      })
-                    );
                   }}
-                  data-tour-id={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
                 >
                   <div className="ask-ai-btn-content">
                     <img src={BotIcon} alt="bot" />
