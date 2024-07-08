@@ -1,10 +1,14 @@
-import { cacheBlockedDomains, generateUrlPattern, getBlockedDomains, isExtensionEnabled } from "../../utils";
+import {
+  cacheBlockedDomains,
+  generateUrlPattern,
+  getBlockedDomains,
+  isExtensionEnabled,
+  onBlockListChange,
+} from "../../utils";
 import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.json";
 import { Variable, onVariableChange } from "../variable";
 import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
-import { ChangeType, onRecordChange } from "common/storage";
-import { STORAGE_KEYS } from "common/constants";
 
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
 
@@ -96,18 +100,11 @@ export const initClientHandler = async () => {
     setupClientScript(extensionStatus);
   });
 
-  onRecordChange<string[]>(
-    {
-      keyFilter: STORAGE_KEYS.BLOCKED_DOMAINS,
-      changeTypes: [ChangeType.MODIFIED],
-    },
-    () => {
-      cacheBlockedDomains();
-      unregisterClientScripts().then(() => {
-        setupClientScript(isExtensionStatusEnabled);
-      });
-    }
-  );
+  onBlockListChange(() => {
+    unregisterClientScripts().then(() => {
+      setupClientScript(isExtensionStatusEnabled);
+    });
+  });
 };
 
 /** Caching Rules for AjaxInterceptor */

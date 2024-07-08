@@ -2,7 +2,7 @@ import { SourceKey, SourceOperator, UrlSource } from "common/types";
 import config from "common/config";
 import { matchSourceUrl } from "./common/ruleMatcher";
 import { Variable, getVariable } from "./service-worker/variable";
-import { getRecord } from "common/storage";
+import { ChangeType, getRecord, onRecordChange } from "common/storage";
 import { STORAGE_KEYS } from "common/constants";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
@@ -102,4 +102,17 @@ export const isUrlInBlockList = (url: string) => {
       url
     );
   });
+};
+
+export const onBlockListChange = (callback: () => void) => {
+  onRecordChange<string[]>(
+    {
+      keyFilter: STORAGE_KEYS.BLOCKED_DOMAINS,
+      changeTypes: [ChangeType.MODIFIED],
+    },
+    () => {
+      cacheBlockedDomains();
+      callback?.();
+    }
+  );
 };
