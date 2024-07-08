@@ -1,6 +1,4 @@
 import { EXTENSION_MESSAGES } from "common/constants";
-import extensionIconManager from "./extensionIconManager";
-import { isUrlInBlockList } from "../../utils";
 
 type TabId = chrome.tabs.Tab["id"];
 
@@ -70,10 +68,6 @@ class TabService {
     chrome.webNavigation.onCommitted.addListener((navigatedTabData) => {
       if (navigatedTabData.frameId === 0) {
         this.resetPageData(navigatedTabData.tabId);
-        const isBlocked = isUrlInBlockList(navigatedTabData.url);
-        if (isBlocked) {
-          extensionIconManager.markExtensionBlocked(navigatedTabData.tabId);
-        }
       }
     });
 

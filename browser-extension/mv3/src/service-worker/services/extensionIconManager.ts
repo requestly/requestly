@@ -1,3 +1,4 @@
+import { isUrlInBlockList } from "../../utils";
 import { tabService } from "./tabService";
 
 interface ExtensionIconConfig {
@@ -23,9 +24,13 @@ class ExtensionIconManager {
   };
 
   constructor() {
-    chrome.tabs.onUpdated.addListener((tabId) => {
+    chrome.tabs.onUpdated.addListener((tabId, _, tab) => {
       // FIXME: Can be made better by only listening to url changes on tabs
       this.#updateIconState(tabId);
+      const isBlocked = isUrlInBlockList(tab.url);
+      if (isBlocked) {
+        extensionIconManager.markExtensionBlocked(tabId);
+      }
     });
   }
 
