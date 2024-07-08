@@ -293,9 +293,9 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
         <div className="rule-importer-content">
           {isImportFromCharlesModalOpen ? (
             <ImportFromCharles
-              showBackBtn={true}
-              onClickBackButton={() => setIsImportFromCharlesModalOpen(false)}
-              callBack={toggleModal}
+              isBackButtonVisible={true}
+              onBackButtonClick={() => setIsImportFromCharlesModalOpen(false)}
+              callback={toggleModal}
             />
           ) : (
             <>
