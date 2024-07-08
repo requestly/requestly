@@ -82,7 +82,7 @@ const HeadersPairModificationRowV2 = ({
                   actions.updateRulePairAtGivenPath({
                     pairIndex,
                     updates: {
-                      [`modifications[${modificationType}][${modificationIndex}].header`]: value.trim(),
+                      [`modifications[${modificationType}][${modificationIndex}].header`]: value?.trim(),
                     },
                   })
                 )
