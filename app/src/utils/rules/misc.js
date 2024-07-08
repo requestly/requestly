@@ -242,6 +242,7 @@ export function runMinorFixesOnRule(dispatch, rule) {
 
       // if replace rule, add non-capturing group to all capturing groups
       if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REPLACE) {
+        console.log("!!!debug", "count cap", countCapturingGroups(fixedRegex));
         if (countCapturingGroups(fixedRegex) > 0) {
           fixedRegex = fixedRegex.replaceAll(/\((?!\?:)/g, "(?:");
         }
