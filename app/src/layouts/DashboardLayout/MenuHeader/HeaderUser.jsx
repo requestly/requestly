@@ -7,8 +7,8 @@ import { actions } from "store";
 import {
   redirectToAccountDetails,
   redirectToBillingTeamSettings,
-  redirectToGlobalSettings,
   redirectToProfileSettings,
+  redirectToSettings,
   redirectToWorkspaceSettings,
 } from "utils/RedirectionUtils";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
@@ -20,6 +20,8 @@ import { trackHeaderClicked } from "modules/analytics/events/common/onboarding/h
 import { RQButton } from "lib/design-system/components";
 import { trackUpgradeClicked } from "modules/analytics/events/misc/monetizationExperiment";
 import { incentivizationActions } from "store/features/incentivization/slice";
+import { getAppFlavour } from "utils/AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export default function HeaderUser() {
   const navigate = useNavigate();
@@ -39,6 +41,7 @@ export default function HeaderUser() {
   // Component State
   const [loading, setLoading] = useState(false);
   const [hideUserDropDown, setHideUserDropdown] = useState(false);
+  const appFlavour = useMemo(() => getAppFlavour(), []);
 
   useEffect(() => {
     setHideUserDropdown(
@@ -60,6 +63,7 @@ export default function HeaderUser() {
       },
       { type: "divider" },
       {
+        disabled: appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR,
         label: "Profile",
         onClick: () => redirectToProfileSettings(navigate, window.location.pathname, "header"),
       },
@@ -68,12 +72,13 @@ export default function HeaderUser() {
         onClick: () => redirectToWorkspaceSettings(navigate, window.location.pathname, "header"),
       },
       {
+        disabled: appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR,
         label: "Plans and Billing",
         onClick: () => redirectToBillingTeamSettings(navigate, window.location.pathname, "header"),
       },
       {
         label: "Settings",
-        onClick: () => redirectToGlobalSettings(navigate, window.location.pathname, "header"),
+        onClick: () => redirectToSettings(navigate, window.location.pathname, "header"),
       },
       { type: "divider" },
       {
@@ -94,7 +99,7 @@ export default function HeaderUser() {
         },
       },
     ],
-    [appMode, dispatch, isWorkspaceMode, navigate, userEmail, userPhoto, userName]
+    [appMode, dispatch, isWorkspaceMode, navigate, userEmail, userPhoto, userName, appFlavour]
   );
 
   if (loading) {
@@ -117,6 +122,7 @@ export default function HeaderUser() {
         <Col>
           <Dropdown
             trigger={["click"]}
+            overlayClassName="header-profile-dropdown"
             menu={{ items: menuPropItems }}
             placement="bottomLeft"
             className="header-profile-dropdown-trigger"
@@ -126,7 +132,8 @@ export default function HeaderUser() {
           >
             <Avatar size={28} src={userPhoto} shape="square" className="cursor-pointer" />
           </Dropdown>
-          {!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status) ? (
+          {(!planDetails?.planId || !["active", "past_due"].includes(planDetails?.status)) &&
+          appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
             <RQButton
               type="primary"
               className="header-upgrade-btn"

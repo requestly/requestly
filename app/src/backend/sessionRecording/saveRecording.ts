@@ -7,6 +7,7 @@ import { createFile } from "services/firebaseStorageService";
 import { RecordingOptions, SessionRecordingMetadata, Visibility } from "views/features/sessions/SessionViewer/types";
 import { getOwnerId } from "backend/utils";
 import { RuleType } from "types";
+import { getAppFlavour } from "utils/AppUtils";
 
 export const saveRecording = async (
   uid: string,
@@ -44,6 +45,7 @@ export const saveRecording = async (
     createdTs: Date.now(),
     source,
     testThisRuleMetadata,
+    appFlavour: getAppFlavour(),
   };
 
   const docId = await addDoc(collection(db, COLLECTION_NAME), data)

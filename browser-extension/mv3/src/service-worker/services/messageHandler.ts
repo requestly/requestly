@@ -130,18 +130,21 @@ export const initMessageHandler = () => {
         break;
 
       case EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB: {
-        try {
-          if (!message.tabUrl) {
-            sendResponse(false);
-            return true;
-          }
-
-          isUrlInBlockList(message.tabUrl).then((isBlocked) => sendResponse(isBlocked));
-        } catch (e) {
+        if (!message.tabUrl) {
           sendResponse(false);
+          break;
         }
+
+        isUrlInBlockList(message.tabUrl)
+          .then((isBlocked) => sendResponse(isBlocked))
+          .catch(() => sendResponse(false));
+
         return true;
       }
+
+      case EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
+        sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED });
+        break;
     }
 
     return false;
