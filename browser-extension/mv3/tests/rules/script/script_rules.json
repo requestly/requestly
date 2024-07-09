@@ -19,7 +19,7 @@
           "excludedInitiatorDomains": ["requestly.io"],
           "excludedRequestDomains": ["requestly.io"],
           "isUrlFilterCaseSensitive": true,
-          "regexFilter": ".*youtube\\.com.*",
+          "regexFilter": ".*example\\.com.*",
           "resourceTypes": ["main_frame", "sub_frame"]
         }
       }
@@ -69,7 +69,7 @@
         "source": {
           "key": "Url",
           "operator": "Contains",
-          "value": "youtube.com"
+          "value": "example.com"
         }
       }
     ],
