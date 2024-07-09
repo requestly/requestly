@@ -16,7 +16,7 @@ export const BlockedExtensionView = () => {
         type="primary"
         onClick={() => {
           chrome.tabs.create({
-            url: `${config.WEB_URL}/settings/global-settings`,
+            url: `${config.WEB_URL}/settings/global-settings?source=popup`,
           });
         }}
       >

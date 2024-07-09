@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Col, Row } from "antd";
 import SettingsItem from "../SettingsItem";
 import { RQButton, RQInput } from "lib/design-system/components";
@@ -11,11 +12,16 @@ import { prefixUrlWithHttps } from "utils/URLUtils";
 import "./blocklist.scss";
 import { AiOutlineClose } from "@react-icons/all-files/ai/AiOutlineClose";
 import { debounce } from "lodash";
+import { trackBlockListUpdated } from "modules/analytics/events/misc/settings";
 
 export const BlockList = () => {
+  const [searchParams] = useSearchParams();
+
   const [blockedDomains, setBlockedDomains] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const appMode = useSelector(getAppMode);
+
+  const source = searchParams.get("source") ?? "settings";
 
   const handleAddDomain = () => {
     try {
@@ -38,6 +44,12 @@ export const BlockList = () => {
         .then(() => {
           toast.success("Successfully added.");
           setInputValue("");
+          trackBlockListUpdated({
+            action: "add",
+            url: inputUrl.host,
+            block_list: newBlockedDomains,
+            source: source,
+          });
         });
     } catch (e) {
       toast.error("Please enter a valid URL or domain");
@@ -45,6 +57,7 @@ export const BlockList = () => {
   };
 
   const handleRemoveDomain = (index: number) => {
+    const domainToRemove = blockedDomains[index];
     const newBlockedDomains = blockedDomains.filter((_, i) => i !== index);
     setBlockedDomains(newBlockedDomains);
     StorageService(appMode)
@@ -52,6 +65,12 @@ export const BlockList = () => {
       .then(() => {
         toast.success("Successfully removed.");
         setInputValue("");
+        trackBlockListUpdated({
+          action: "remove",
+          url: domainToRemove,
+          block_list: newBlockedDomains,
+          source: source,
+        });
       });
   };
 
@@ -68,7 +87,7 @@ export const BlockList = () => {
       isActive={true}
       onChange={null}
       title="Blocked Sites"
-      caption="HTTP rules and SessionBook wont't work on these sites"
+      caption="HTTP rules and SessionBook won't work on these sites"
       settingsBody={
         <div className="blocklist-body">
           <Row align={"middle"} justify={"space-between"} className="header-row">
