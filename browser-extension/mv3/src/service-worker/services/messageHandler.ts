@@ -136,8 +136,7 @@ export const initMessageHandler = () => {
             return true;
           }
 
-          const isBlocked = isUrlInBlockList(message.tabUrl);
-          sendResponse(isBlocked);
+          isUrlInBlockList(message.tabUrl).then((isBlocked) => sendResponse(isBlocked));
         } catch (e) {
           sendResponse(false);
         }

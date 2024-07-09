@@ -75,7 +75,7 @@ const addExtensionRules = async (): Promise<void> => {
   const enabledRules = await getEnabledRules();
   const parsedExtensionRules: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[] = [];
 
-  const blockedDomains = getBlockedDomains();
+  const blockedDomains = await getBlockedDomains();
 
   enabledRules.forEach((rule) => {
     const extensionRules = rule.extensionRules;
@@ -92,6 +92,9 @@ const addExtensionRules = async (): Promise<void> => {
         }
 
         extensionRule.condition.excludedInitiatorDomains.push(...blockedDomains);
+
+        if (blockedDomains.length) {
+        }
 
         const ruleId = parsedExtensionRules.length + 1;
 

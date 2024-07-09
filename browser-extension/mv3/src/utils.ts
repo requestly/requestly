@@ -79,19 +79,24 @@ export const debounce = (func: Function, wait: number) => {
   };
 };
 
-let cachedBlockedDomains: string[] = [];
+let cachedBlockedDomains: string[] | null = null;
 
 export const cacheBlockedDomains = async () => {
   const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
   cachedBlockedDomains = blockedDomains ?? [];
 };
 
-export const getBlockedDomains = () => {
+export const getBlockedDomains = async () => {
+  if (cachedBlockedDomains) {
+    return cachedBlockedDomains;
+  }
+
+  await cacheBlockedDomains();
   return cachedBlockedDomains;
 };
 
-export const isUrlInBlockList = (url: string) => {
-  const blockedDomains = getBlockedDomains();
+export const isUrlInBlockList = async (url: string) => {
+  const blockedDomains = await getBlockedDomains();
   return blockedDomains?.some((domain) => {
     return matchSourceUrl(
       {

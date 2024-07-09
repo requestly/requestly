@@ -4,17 +4,17 @@ import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
 import { isUrlInBlockList } from "../../utils";
 
-const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
-  if (isUrlInBlockList(details.url)) {
-    return;
-  }
-
+const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
   // @ts-ignore
   if (details?.documentLifecycle !== "active") {
     return;
   }
 
   let isMainFrameRequest = details.type === "main_frame" ? true : false;
+
+  if (!isMainFrameRequest && (await isUrlInBlockList(details.url))) {
+    return;
+  }
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
@@ -41,12 +41,12 @@ const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
   });
 };
 
-const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails) => {
-  if (isUrlInBlockList(details.url)) {
+const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersDetails) => {
+  let isMainFrameRequest = details.type === "main_frame" ? true : false;
+
+  if (!isMainFrameRequest && (await isUrlInBlockList(details.url))) {
     return;
   }
-
-  let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
@@ -72,12 +72,12 @@ const onBeforeSendHeaders = (details: chrome.webRequest.WebRequestHeadersDetails
   });
 };
 
-const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails) => {
-  if (isUrlInBlockList(details.url)) {
+const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDetails) => {
+  let isMainFrameRequest = details.type === "main_frame" ? true : false;
+
+  if (!isMainFrameRequest && (await isUrlInBlockList(details.url))) {
     return;
   }
-
-  let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
@@ -102,24 +102,30 @@ const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails)
 };
 
 export const initWebRequestInterceptor = () => {
+  //@ts-ignore
   if (!chrome.webRequest.onBeforeRequest.hasListener(onBeforeRequest)) {
+    //@ts-ignore
     chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ["<all_urls>"] });
   }
 
+  //@ts-ignore
   if (!chrome.webRequest.onBeforeSendHeaders.hasListener(onBeforeSendHeaders)) {
     var onBeforeSendHeadersOptions = ["requestHeaders"];
 
     chrome.webRequest.onBeforeSendHeaders.addListener(
+      //@ts-ignore
       onBeforeSendHeaders,
       { urls: ["<all_urls>"] },
       onBeforeSendHeadersOptions
     );
   }
 
+  //@ts-ignore
   if (!chrome.webRequest.onHeadersReceived.hasListener(onHeadersReceived)) {
     var onHeadersReceivedOptions = ["responseHeaders"];
 
     chrome.webRequest.onHeadersReceived.addListener(
+      //@ts-ignore
       onHeadersReceived,
       { urls: ["<all_urls>"] },
       onHeadersReceivedOptions

@@ -39,7 +39,7 @@ declare const window: {
 
 /** Loading Client scripts ASAP */
 const registerClientScripts = async () => {
-  const blockedDomains = getBlockedDomains();
+  const blockedDomains = await getBlockedDomains();
   const blockedDomainPatterns = blockedDomains.flatMap(generateBlockedHostMatchPattern).filter((pattern) => !!pattern);
 
   console.log("[registerClientScript]", { blockedDomains });
