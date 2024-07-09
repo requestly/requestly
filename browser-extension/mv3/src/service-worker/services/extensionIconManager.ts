@@ -77,7 +77,6 @@ class ExtensionIconManager {
     tabService.setPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG, config);
 
     this.#setExtensionIcon(this.#getIcon(config), tabId);
-    // tabService.setExtensionIcon(this.#getIcon(config), tabId);
   }
 
   #updateIconStateForAllTabs() {

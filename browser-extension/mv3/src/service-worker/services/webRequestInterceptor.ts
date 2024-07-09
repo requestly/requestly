@@ -12,7 +12,7 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
 
   let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
-  if (!isMainFrameRequest && (await isUrlInBlockList(details.url))) {
+  if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
     return;
   }
 
@@ -44,7 +44,7 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
 const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersDetails) => {
   let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
-  if (!isMainFrameRequest && (await isUrlInBlockList(details.url))) {
+  if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
     return;
   }
 
@@ -75,7 +75,7 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
 const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDetails) => {
   let isMainFrameRequest = details.type === "main_frame" ? true : false;
 
-  if (!isMainFrameRequest && (await isUrlInBlockList(details.url))) {
+  if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
     return;
   }
 
