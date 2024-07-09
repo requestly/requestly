@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { Row, Typography } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { Col, Modal, Row, Space } from "antd";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
-import { CheckCircleOutlined } from "@ant-design/icons";
-import { RQButton, RQModal } from "lib/design-system/components";
+import { ArrowLeftOutlined, CheckCircleOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
+import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
 import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
@@ -19,7 +19,9 @@ import {
   trackCharlesSettingsImportDocsClicked,
   trackCharlesSettingsImportViewed,
 } from "modules/analytics/events/features/rules";
-import "./ImportFromCharlesModal.css";
+import "./charlesImporter.css";
+import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
+import { copyToClipBoard } from "utils/Misc";
 
 interface ModalProps {
   isOpen: boolean;
@@ -65,7 +67,7 @@ const CharlesDocsLink = ({
     href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
     onClick={() => trackCharlesSettingsImportDocsClicked(linkClickSrc, importTriggerSrc)}
   >
-    {title}
+    {title} <HiOutlineExternalLink className="external-icon-link" />
   </a>
 );
 
@@ -74,30 +76,43 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
     trackCharlesSettingsImportViewed(triggeredBy);
   }, [triggeredBy]);
   return (
-    <RQModal open={isOpen} centered onCancel={toggle} className="import-from-charles-modal">
-      <div className="rq-modal-content">
-        <ImportFromCharles modalSrc={triggeredBy} callBack={() => toggle()} />
-      </div>
-    </RQModal>
+    <Modal
+      open={isOpen}
+      centered
+      onCancel={toggle}
+      footer={null}
+      className="import-from-charles-modal custom-rq-modal"
+      width={550}
+    >
+      <ImportFromCharles source={triggeredBy} callback={() => toggle()} />
+    </Modal>
   );
 };
-
-interface ImportFromCharlesProps {
-  modalSrc?: string | null; // null indicates this is not mounted inside modal
-  callBack?: () => void;
-}
 
 export const ImportFromCharlesWrapperView: React.FC = () => {
   useEffect(() => {
     trackCharlesSettingsImportViewed("TOP_LEVEL_ROUTE");
   }, []);
   return (
-    <div className="root-wrapper">
+    <div className="charles-import-wrapper">
       <ImportFromCharles />
     </div>
   );
 };
-const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, callBack }) => {
+
+interface ImportFromCharlesProps {
+  source?: string | null; // null indicates this is not mounted inside modal
+  callback?: () => void;
+  isBackButtonVisible?: boolean;
+  onBackButtonClick?: () => void;
+}
+
+export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
+  source = null,
+  callback,
+  isBackButtonVisible,
+  onBackButtonClick,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -178,7 +193,7 @@ const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, 
 
         trackCharlesSettingsImportComplete(rulesToImport?.parsedRuleTypes?.length, rulesToImport?.parsedRuleTypes);
         navigate(PATHS.RULES.MY_RULES.ABSOLUTE);
-        callBack?.();
+        callback?.();
       })
       .finally(() => setIsLoading(false));
   };
@@ -195,110 +210,109 @@ const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({ modalSrc = null, 
 
   return (
     <>
-      <div>
-        <div className="header text-center">Import Charles Proxy settings</div>
-        <div className="mt-16">
-          {isParseComplete ? (
-            <div className="parsed-rules-info">
-              {rulesToImport?.parsedRuleTypes?.length > 0 && (
-                <>
-                  <div className="title mt-16">Successfully parsed below settings:</div>
-                  <ul>
-                    {rulesToImport.parsedRuleTypes.map((ruleType) => (
-                      <li key={ruleType}>
-                        <CheckCircleOutlined className="check-outlined-icon" /> {ruleType}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-              {rulesToImport?.otherRuleTypesCount > 0 &&
-                (isParsedRulesExist ? (
-                  <div className="text-sm text-dark-gray">
-                    Other settings are not supported.{" "}
-                    <CharlesDocsLink
-                      title="Learn more"
-                      linkClickSrc="some_settings_unsupported_screen"
-                      importTriggerSrc={modalSrc}
-                    />
-                  </div>
-                ) : (
-                  <div className="text-center title mt-16" style={{ fontWeight: "normal" }}>
-                    Uploaded settings are not supported. <br />
-                    Learn more about supported setting types{" "}
-                    <CharlesDocsLink
-                      title="here"
-                      linkClickSrc="all_settings_unsupported_screen"
-                      importTriggerSrc={modalSrc}
-                    />
-                    .
-                  </div>
-                ))}
-            </div>
-          ) : validationError ? (
-            <>
-              {validationError === CharlesRuleImportErrorMessage.INVALID_EXPORT ? (
-                <div className="parsed-rules-error-info">
-                  <div className="subtitle mt-16">
-                    Invalid settings file. Follow below steps to export settings from Charles:
-                  </div>
-                  <ol>
-                    {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
-                      <>
-                        <li key={index}>{step}</li>
-                        {additionalSteps.length > 0 && (
-                          <ul className="additional-import-steps-list">
-                            {additionalSteps.map(({ step }, index) => (
-                              <li key={index}>{step}</li>
-                            ))}
-                          </ul>
-                        )}
-                      </>
-                    ))}
-                  </ol>
-                </div>
-              ) : (
-                <div className="text-center title mt-16">
-                  <Typography.Text type="danger">{validationError}</Typography.Text>
-                </div>
-              )}
-            </>
-          ) : (
-            <FilePicker
-              maxFiles={1}
-              onFilesDrop={onFilesDrop}
-              isProcessing={isDataProcessing}
-              title="Drag and drop your Charles export file"
-            />
-          )}
-        </div>
+      <div className="charles-import-container">
+        <Row justify={"space-between"} className="charles-import-header">
+          <Col className="charles-import-heading">
+            {isBackButtonVisible && (
+              <ArrowLeftOutlined size={16} className="charles-import-back-icon" onClick={onBackButtonClick} />
+            )}
+            Import Charles Proxy settings
+          </Col>
+          <Col
+            className="charles-import-share-container"
+            onClick={() =>
+              copyToClipBoard(window.origin + PATHS.IMPORT_FROM_CHARLES.ABSOLUTE, "URL copied to clipboard")
+            }
+          >
+            <LinkOutlined className="icon__wrapper" />
+            Share
+          </Col>
+        </Row>
 
-        <div className="text-center title mt-16">
-          {" "}
+        {(isParseComplete || validationError) && (
+          <div className="charles-import-body">
+            {isParseComplete ? (
+              <div className="parsed-rules-info">
+                {rulesToImport?.parsedRuleTypes?.length > 0 && (
+                  <Space direction="vertical" align="start" size={8}>
+                    <div className="parsed-success-row">
+                      <CheckCircleOutlined className="check-outlined-icon" /> Successfully parsed below settings:
+                    </div>
+                    <ul>
+                      {rulesToImport.parsedRuleTypes.map((ruleType) => (
+                        <li key={ruleType}>{ruleType}</li>
+                      ))}
+                    </ul>
+                  </Space>
+                )}
+                {rulesToImport?.otherRuleTypesCount > 0 && (
+                  <div className="info-link-container">
+                    <InfoCircleOutlined />
+                    {isParsedRulesExist ? "Other settings are not supported." : "Uploaded settings are not supported."}
+                    <CharlesDocsLink
+                      title="Learn more about it here"
+                      linkClickSrc="all_settings_unsupported_screen"
+                      importTriggerSrc={source}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : validationError ? (
+              <div className="parsed-rules-error-info">
+                <Row className="validation-heading">
+                  <InfoCircleOutlined className="icon__wrapper" />
+                  Invalid settings file.
+                </Row>
+                <Row className="validation-subheading">Follow below steps to export settings from Charles:</Row>
+                <ol>
+                  {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
+                    <>
+                      <li key={index}>{step}</li>
+                      {additionalSteps.length > 0 && (
+                        <ul className="additional-import-steps-list">
+                          {additionalSteps.map(({ step }, index) => (
+                            <li key={index}>{step}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  ))}
+                </ol>
+              </div>
+            ) : null}
+
+            {isParsedRulesExist && (
+              <Row justify="center" className="mt-8">
+                <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
+                  Import
+                </RQButton>
+              </Row>
+            )}
+          </div>
+        )}
+
+        <FilePicker
+          maxFiles={1}
+          onFilesDrop={(files) => {
+            handleResetImport();
+            onFilesDrop(files);
+          }}
+          isProcessing={isDataProcessing}
+          title="Drag and drop your Charles export file to upload"
+          subtitle="Accepted file formats: CSV, Trace test file, and XML"
+          selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
+        />
+
+        <div className="charles-import-footer">
           To export your rules from Charles,{" "}
-          <CharlesDocsLink title="Follow these steps" linkClickSrc="upload_screen" importTriggerSrc={modalSrc} />
+          <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
+            Follow these steps
+            <div className="icon__wrapper">
+              <HiOutlineExternalLink />
+            </div>
+          </Link>
         </div>
       </div>
-
-      {isParseComplete || validationError ? (
-        isParsedRulesExist ? (
-          <div className="rq-modal-footer">
-            <Row justify="end">
-              <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
-                Import
-              </RQButton>
-            </Row>
-          </div>
-        ) : (
-          <div className="rq-modal-footer">
-            <Row justify="end">
-              <RQButton type="primary" onClick={handleResetImport}>
-                Try another file
-              </RQButton>
-            </Row>
-          </div>
-        )
-      ) : null}
     </>
   );
 };
