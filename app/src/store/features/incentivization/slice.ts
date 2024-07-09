@@ -66,7 +66,19 @@ const slice = createSlice({
           }
         }
 
-        const achievedMilestones = achievedMilestoneTypes.map((milestoneType) => milestones?.[milestoneType]);
+        if (event.type === IncentivizeEvent.RULE_CREATED_AND_TESTED) {
+          if (event.metadata?.rule_type === RuleType.REDIRECT) {
+            achievedMilestoneTypes.push(IncentivizeEvent.REDIRECT_RULE_CREATED);
+          } else if (event.metadata?.rule_type === RuleType.RESPONSE) {
+            achievedMilestoneTypes.push(IncentivizeEvent.RESPONSE_RULE_CREATED);
+          }
+        }
+
+        const dedupAchievedMilestones = achievedMilestoneTypes.filter(
+          (milestoneType) => !state.userMilestoneAndRewardDetails?.claimedMilestoneLogs?.includes(milestoneType)
+        );
+
+        const achievedMilestones = dedupAchievedMilestones.map((milestoneType) => milestones?.[milestoneType]);
 
         const credits = achievedMilestones.reduce(
           (result, milestone) => result + ((milestone?.reward?.value as number) ?? 0),
