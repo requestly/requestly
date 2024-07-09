@@ -246,7 +246,7 @@ const SessionsIndexPage = () => {
       <ImportWebSessionModalButton />
     ) : (
       <RQButton type="default" onClick={toggleImportSessionModal}>
-        Upload & view downloaded session
+        Upload & view downloaded sessions
       </RQButton>
     );
   }, [toggleImportSessionModal, isDesktopSessionsCompatible]);

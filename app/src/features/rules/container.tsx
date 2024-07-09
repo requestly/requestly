@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-
 import { RulesSidebar } from "./components/RulesSidebar/RulesSidebar";
 import { RulesContextProvider } from "./context";
 import { CreateNewRuleGroupModalWrapper } from "./modals/CreateNewRuleGroupModalWrapper";
@@ -18,28 +17,63 @@ import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { Row, notification } from "antd";
 import PATHS from "config/constants/sub/paths";
 import { trackErrorInSavingDNR } from "modules/analytics/events/common/rules";
+import { useSelector } from "react-redux";
+import { StorageService } from "init";
+import { getAppMode } from "store/selectors";
 
 const RulesFeatureContainer = () => {
+  const appMode = useSelector(getAppMode);
+
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("ruleSaveError", (message: any) => {
       notification.warn({
-        message: <span className="text-bold">{"Error saving rule"}</span>,
+        message: (
+          <span className="text-bold">
+            {"Error saving rule: "}
+            <a href={PATHS.RULE_EDITOR.ABSOLUTE + `/edit/${message.rqRuleId}`} target="_blank" rel="noreferrer">
+              {message.rqRuleId}
+            </a>
+          </span>
+        ),
         description: (
           <div>
-            <Row>
-              {`There was as an error while saving the rule:`}
-              <a href={PATHS.RULE_EDITOR.ABSOLUTE + `/edit/${message.rqRuleId}`}>{message.rqRuleId}</a>
+            <Row className="text-gray">
+              {message.error?.match(
+                /Rule with id \d+ was skipped as the "regexFilter" value exceeded the 2KB memory.*/
+              ) ? (
+                <span>
+                  We are facing some limitations due to chrome API changes. Please try the solution mentioned{" "}
+                  <a href="https://github.com/requestly/requestly/issues/1797" target="_blank" rel="noreferrer">
+                    here.
+                  </a>
+                </span>
+              ) : (
+                "Please contact support."
+              )}
             </Row>
-            <Row className="text-gray">Please contact support.</Row>
           </div>
         ),
         placement: "bottomLeft",
         duration: 0,
       });
       console.log(`[Requestly]: Error saving rule - ${message.error}`);
-      trackErrorInSavingDNR(message.error, message.rqRuleId.split("_")[0], message.rqRuleId);
+      StorageService(appMode)
+        .getRecord(message.rqRuleId)
+        .then((ruleDetails) => {
+          const sourceCondition = ruleDetails?.pairs?.[0]?.source;
+          trackErrorInSavingDNR({
+            rule_type: message.rqRuleId.split("_")[0],
+            rule_id: message.rqRuleId,
+            error: message.error.replace(/Rule with id \d+/g, "Rule with id"),
+            is_migration_triggered: window.location.search.includes("updatedToMv3"),
+            source_key: sourceCondition?.key,
+            source_operator: sourceCondition?.operator,
+            source_value: sourceCondition?.value,
+            page_path: window.location.pathname + window.location.search,
+          });
+        });
     });
-  }, []);
+  }, [appMode]);
 
   return (
     <SecondarySidebarLayout secondarySidebar={<RulesSidebar />}>

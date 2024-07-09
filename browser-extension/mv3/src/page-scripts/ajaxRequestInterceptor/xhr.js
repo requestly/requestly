@@ -17,8 +17,6 @@ import {
 } from "./utils";
 
 export const initXhrInterceptor = (debug) => {
-  console.log("initXHRRequestInterceptor");
-
   // XHR Implementation
   const updateXhrReadyState = (xhr, readyState) => {
     Object.defineProperty(xhr, "readyState", { writable: true });
@@ -256,9 +254,10 @@ export const initXhrInterceptor = (debug) => {
   });
 
   const open = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function (method, url) {
+  XMLHttpRequest.prototype.open = function (method, url, async = true) {
     this.rqProxyXhr._method = method;
     this.rqProxyXhr._requestURL = getAbsoluteUrl(url);
+    this.rqProxyXhr._async = async;
     open.apply(this.rqProxyXhr, arguments);
     open.apply(this, arguments);
   };
@@ -281,6 +280,11 @@ export const initXhrInterceptor = (debug) => {
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = async function (data) {
+    if (!this.rqProxyXhr._async) {
+      debug && console.log("Async disabled");
+      return send.call(this, data);
+    }
+
     this.rqProxyXhr._requestData = data;
 
     const matchedDelayRulePair = getMatchedDelayRule({
