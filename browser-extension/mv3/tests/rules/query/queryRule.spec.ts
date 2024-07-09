@@ -34,7 +34,6 @@ const testQueryRule = async (testScenarioData: QueryTestScenario & IBaseTestData
   const redirections = new Map<string, string>();
 
   testPage.on("request", (request: Request) => {
-    console.log("Request URL: ", request.url());
     if (request?.redirectedFrom()?.url()) {
       redirections.set(request?.redirectedFrom()?.url()!, request.url());
     }
