@@ -4,9 +4,10 @@ interface Props {
   label?: string;
   children: ReactNode;
   isCodeBlock?: boolean;
+  color?: string;
 }
 
-export const NetworkLogProperty: React.FC<Props> = ({ label, children, isCodeBlock }) => {
+export const NetworkLogProperty: React.FC<Props> = ({ label, children, isCodeBlock, color }) => {
   const updatedChildren = children === "" ? <span>&Prime;&Prime;</span> : children;
 
   return updatedChildren ? (
@@ -18,7 +19,11 @@ export const NetworkLogProperty: React.FC<Props> = ({ label, children, isCodeBlo
       }}
     >
       {label ? <span style={{ fontWeight: "bold", marginRight: 8 }}>{label}:</span> : null}
-      {isCodeBlock ? <pre style={{ fontSize: 11 }}>{updatedChildren}</pre> : updatedChildren}
+      {isCodeBlock ? (
+        <pre style={{ fontSize: 11 }}>{updatedChildren}</pre>
+      ) : (
+        <span style={{ color: color || "var(--text-color)" }}>{updatedChildren}</span>
+      )}
     </div>
   ) : null;
 };
