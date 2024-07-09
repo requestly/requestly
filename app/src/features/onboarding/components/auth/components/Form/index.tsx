@@ -13,7 +13,7 @@ import { getGreeting, isEmailValid } from "utils/FormattingHelper";
 import { toast } from "utils/Toast";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
-import { isNull, set } from "lodash";
+import { isNull } from "lodash";
 import { sendEmailLinkForSignin } from "actions/FirebaseActions";
 import { updateTimeToResendEmailLogin } from "components/authentication/AuthForm/MagicAuthLinkModal/actions";
 import Logger from "lib/logger";
