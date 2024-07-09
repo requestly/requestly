@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, List, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
@@ -12,7 +12,7 @@ import { processDataToImport, addRulesAndGroupsToStorage } from "./actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { ImportFromCharlesModal } from "../ImportFromCharlesModal";
+import { ImportFromCharlesModal } from "features/rules/screens/rulesList/components/RulesList/components";
 import { RQModal } from "lib/design-system/components";
 import Logger from "lib/logger";
 import {
