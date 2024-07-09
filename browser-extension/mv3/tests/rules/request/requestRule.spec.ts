@@ -22,6 +22,8 @@ const testRequestRule = async (testScenarioData: RequestRuleTestScenario & IBase
 
   const bodyMap = new Map<string, string[]>();
 
+  /* CURRENTLY THIS GIVES THE REQUEST BEFORE MODIFICATION */
+  // @nsr: couldn't find any way to get the request after modification
   testPage.on("request", (request: Request) => {
     if (request.method() === "POST") {
       const body = request.postData();
