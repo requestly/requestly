@@ -11,11 +11,23 @@ import {
   SourceOperator,
 } from "types";
 
-export const parseRulesFromModheader = (modheaderProfiles): (Rule | Group)[] => {
+interface ModheaderProfile {
+  title: string;
+  headers: any[];
+  respHeaders: any[];
+  urlReplacements: any[];
+  cspDirectives: any[];
+  reqCookieAppend: any[];
+  urlFilters: any[];
+  resourceFilters: any[];
+  requestMethodFilters: any[];
+}
+
+export const parseRulesFromModheader = (modheaderProfiles: ModheaderProfile[]): (Rule | Group)[] => {
   const recordsToBeImported: (Rule | Group)[] = [];
 
   modheaderProfiles.forEach((modheaderProfile) => {
-    const group = getNewGroup(modheaderProfile.title) as Group;
+    const group = getNewGroup(`[Modheader] ${modheaderProfile.title}`) as Group;
     recordsToBeImported.push(group);
 
     const headerRule = parseHeaders(modheaderProfile);
@@ -48,7 +60,7 @@ export const parseRulesFromModheader = (modheaderProfiles): (Rule | Group)[] => 
   return recordsToBeImported;
 };
 
-const parseRedirectRules = (modheaderProfile): Rule[] => {
+const parseRedirectRules = (modheaderProfile: ModheaderProfile): Rule[] => {
   const redirectRules = modheaderProfile.urlReplacements?.map((redirect: any) => {
     const newRedirectRule = getNewRule(RuleType.REDIRECT) as RedirectRule;
     const newRedirectRulePair = newRedirectRule.pairs[0];
@@ -59,6 +71,7 @@ const parseRedirectRules = (modheaderProfile): Rule[] => {
       filters: parseFilters(modheaderProfile),
     };
     newRedirectRulePair.destination = redirect.value;
+    newRedirectRule.name = `[Redirect] ${redirect.name}`;
     newRedirectRule.isModHeaderImport = true;
     return newRedirectRule;
   });
@@ -70,7 +83,7 @@ const parseRedirectRules = (modheaderProfile): Rule[] => {
   return redirectRules;
 };
 
-const parseHeaders = (modheaderProfile): Rule => {
+const parseHeaders = (modheaderProfile: ModheaderProfile): Rule => {
   const requestHeaders = modheaderProfile.headers?.map((header) => ({
     header: header.name,
     value: header.value,
@@ -86,6 +99,7 @@ const parseHeaders = (modheaderProfile): Rule => {
   }));
 
   const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  newHeaderRule.name = `[Headers]`;
   newHeaderRule.isModHeaderImport = true;
 
   const newHeaderRulePair = newHeaderRule.pairs[0];
@@ -101,7 +115,7 @@ const parseHeaders = (modheaderProfile): Rule => {
   return newHeaderRule;
 };
 
-const parseCSPHeaders = (modheaderProfile): Rule => {
+const parseCSPHeaders = (modheaderProfile: ModheaderProfile): Rule => {
   const enabledCSPDirectives = modheaderProfile.cspDirectives?.filter((directive) => directive.enabled);
 
   const cspValueString = enabledCSPDirectives?.map((directive) => `${directive.name} ${directive.value}`)?.join(";");
@@ -111,6 +125,7 @@ const parseCSPHeaders = (modheaderProfile): Rule => {
   }
 
   const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  newHeaderRule.name = `[CSP Header]`;
   newHeaderRule.isModHeaderImport = true;
 
   const newHeaderRulePair = newHeaderRule.pairs[0];
@@ -128,7 +143,7 @@ const parseCSPHeaders = (modheaderProfile): Rule => {
   return newHeaderRule;
 };
 
-const parseCookieHeaders = (modheaderProfile): Rule => {
+const parseCookieHeaders = (modheaderProfile: ModheaderProfile): Rule => {
   const enabledCookies = modheaderProfile.reqCookieAppend?.filter((cookie) => cookie.enabled);
 
   const cookieString = enabledCookies?.map((cookie) => `${cookie.name}=${cookie.value}`).join(";");
@@ -138,6 +153,7 @@ const parseCookieHeaders = (modheaderProfile): Rule => {
   }
 
   const newHeaderRule = getNewRule(RuleType.HEADERS) as HeadersRule;
+  newHeaderRule.name = `[Cookie Header]`;
   newHeaderRule.isModHeaderImport = true;
 
   const newHeaderRulePair = newHeaderRule.pairs[0];
@@ -154,7 +170,7 @@ const parseCookieHeaders = (modheaderProfile): Rule => {
   return newHeaderRule;
 };
 
-const parseSourceConditions = (modheaderProfile) => {
+const parseSourceConditions = (modheaderProfile: ModheaderProfile) => {
   const firstEnabledCondition = modheaderProfile.urlFilters?.find((filter) => filter.enabled);
 
   if (!firstEnabledCondition) {
@@ -168,11 +184,11 @@ const parseSourceConditions = (modheaderProfile) => {
   return {
     key: SourceKey.URL,
     operator: SourceOperator.MATCHES,
-    value: firstEnabledCondition.urlRegex,
+    value: `/${firstEnabledCondition.urlRegex}/`,
   };
 };
 
-const parseFilters = (modheaderProfile) => {
+const parseFilters = (modheaderProfile: ModheaderProfile) => {
   const resourceFilters = modheaderProfile.resourceFilters?.find((filter) => filter.enabled);
   const requestMethodFilters = modheaderProfile.requestMethodFilters?.find((filter) => filter.enabled);
 

@@ -14,7 +14,6 @@ import { parseRulesFromModheader } from "modules/rule-adapters/modheader-rule-ad
 import { Group, Rule } from "types";
 import { addRulesAndGroupsToStorage } from "components/features/rules/ImportRulesModal/actions";
 import "./modheaderImporter.css";
-import { redirectToRules } from "utils/RedirectionUtils";
 
 const validExportSteps = [
   {
@@ -72,6 +71,7 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
   onBackButtonClick,
 }) => {
   const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDataProcessing, setIsDataProcessing] = useState<boolean>(false);
   const [isParseComplete, setIsParseComplete] = useState<boolean>(false);
@@ -123,17 +123,9 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
     setIsLoading(true);
 
     addRulesAndGroupsToStorage(appMode, rulesToImport)
-      // .then(() => {
-      //   dispatch(
-      //     actions.updateRefreshPendingStatus({
-      //       type: "rules",
-      //       newValue: !isRulesListRefreshPending,
-      //     })
-      //   );
-      // })
       .then(() => {
         callback?.();
-        redirectToRules(navigate, true);
+        navigate(PATHS.RULES.ABSOLUTE);
       })
       .catch((e) => {
         setValidationError("Failed to import your Modheader file.");
