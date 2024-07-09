@@ -10,7 +10,7 @@ import { getAppMode, getUserAuthDetails } from "../../../store/selectors";
 import { isEmailValid } from "../../../utils/FormattingHelper";
 import { signInWithEmailLink } from "../../../actions/FirebaseActions";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
-import { redirectToWebAppHomePage } from "utils/RedirectionUtils";
+import { redirectToRoot } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import {
   trackSignInWithLinkCustomFormSeen,
@@ -19,6 +19,7 @@ import {
 import "./index.css";
 import { trackAppOnboardingStepCompleted } from "features/onboarding/analytics";
 import { ONBOARDING_STEPS } from "features/onboarding/types";
+import Logger from "../../../../../common/logger";
 
 const SignInViaEmailLink = () => {
   //Component State
@@ -68,7 +69,7 @@ const SignInViaEmailLink = () => {
         dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.PERSONA));
         trackAppOnboardingStepCompleted(ONBOARDING_STEPS.AUTH);
       }
-      redirectToWebAppHomePage(navigate);
+      redirectToRoot(navigate);
     }
   }, [dispatch, user.loggedIn, navigate, isLogin, user.displayName, user.email, user.details?.profile?.displayName]);
 
@@ -89,7 +90,8 @@ const SignInViaEmailLink = () => {
             } else throw new Error("Failed");
           }
         })
-        .catch(() => {
+        .catch((e) => {
+          Logger.log("[SignInViaEmailLink] handleLogin.catch", { e });
           setIsProcessing(false);
           setUserEmailfromLocalStorage(null);
         });

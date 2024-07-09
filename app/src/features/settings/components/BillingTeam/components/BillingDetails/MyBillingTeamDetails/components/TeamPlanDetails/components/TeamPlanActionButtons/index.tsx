@@ -14,7 +14,7 @@ import { useCallback, useState } from "react";
 import { getPrettyPlanName } from "utils/FormattingHelper";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "utils/Toast";
-import { CancelPlanModal } from "../../../CancelPlanModal";
+import { CancelPlanModal } from "../../../../../modals/common/CancelPlanModal";
 
 interface Props {
   subscriptionDetails: any;

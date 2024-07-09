@@ -32,3 +32,8 @@ export const trackPricingPlanCancellationRequested = ({ current_plan, end_date, 
   const params = { current_plan, end_date, type };
   trackEvent(BUSINESS.PRICING_PLAN_CANCELLATION_REQUESTED, params);
 };
+
+export const trackPricingPlanCancelled = ({ current_plan, end_date, type, reason }) => {
+  const params = { current_plan, end_date, type, reason };
+  trackEvent(BUSINESS.PRICING_PLAN_CANCELLED, params);
+};

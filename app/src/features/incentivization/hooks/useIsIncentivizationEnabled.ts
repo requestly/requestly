@@ -1,53 +1,34 @@
-import { useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { useFeatureValue } from "@growthbook/growthbook-react";
-import {
-  getDaysSinceSignup,
-  getExtensionInstallDate,
-  getExtensionSignupDate,
-  getUserAuthDetails,
-} from "store/selectors";
-import moment from "moment";
+import { useIsNewUserForIncentivization } from "./useIsNewUserForIncentivization";
 
 export const useIsIncentivizationEnabled = () => {
-  const user = useSelector(getUserAuthDetails);
-  const extensionInstallDate = useSelector(getExtensionInstallDate);
-  const extensionSignupDate = useSelector(getExtensionSignupDate);
-  const daysSinceSignup = useSelector(getDaysSinceSignup) ?? 0;
-
+  const [isEnabled, setIsEnabled] = useState(false);
   const isFeatureFlagEnabled = useFeatureValue("incentivization_onboarding", false);
+  const RELEASE_DATE = "2024-06-20";
+  const isNewUser = useIsNewUserForIncentivization(RELEASE_DATE);
 
-  const isEnabled = useMemo(() => {
-    const releaseDate = new Date("2024-06-20").getTime();
-    const currentDate = new Date().getTime();
+  useEffect(() => {
+    const getIsIncentivizationEnabled = () => {
+      return isFeatureFlagEnabled && isNewUser;
+    };
 
-    if (currentDate < releaseDate) {
-      return false;
-    }
+    const timerId = setTimeout(() => {
+      const isEnabled = getIsIncentivizationEnabled();
+      setIsEnabled(isEnabled);
+    }, 1 * 1000);
 
-    if (isFeatureFlagEnabled) {
-      if (!user?.loggedIn) {
-        return extensionInstallDate && new Date(extensionInstallDate).getTime() >= releaseDate;
-      } else {
-        if (extensionSignupDate) {
-          if (new Date(extensionSignupDate).getTime() >= releaseDate) {
-            return !extensionInstallDate || new Date(extensionInstallDate).getTime() >= releaseDate;
-          }
-        } else {
-          // TODO: add sentry log for this case
-          const momentDate = moment(currentDate);
-          const signupDate = momentDate.subtract(daysSinceSignup, "days");
-          return signupDate.toDate().getTime() >= releaseDate;
-        }
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
       }
-    }
-
-    return false;
-  }, [isFeatureFlagEnabled, user?.loggedIn, extensionInstallDate, extensionSignupDate, daysSinceSignup]);
+    };
+  }, [isFeatureFlagEnabled, isNewUser]);
 
   useEffect(() => {
     window.incentivization = isEnabled;
-  }, [isEnabled]);
+    window.incentivizationOnboarding = isFeatureFlagEnabled;
+  }, [isEnabled, isFeatureFlagEnabled]);
 
   return isEnabled;
 };

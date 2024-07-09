@@ -11,6 +11,7 @@ import { InstallExtensionContent } from "./type";
 import {
   trackViewAllPlatformsClicked,
   trackExtensionInstallationButtonClicked,
+  trackExtensionInstallCTAShown,
 } from "modules/analytics/events/common/onboarding/index";
 import "./installExtensionCTA.css";
 
@@ -49,6 +50,10 @@ const InstallExtensionCTA: React.FC<InstallExtensionContent> = ({
 
     setBrowser(currentBrowserData);
   }, [supportedBrowsers]);
+
+  useEffect(() => {
+    trackExtensionInstallCTAShown(eventPage);
+  }, [eventPage]);
 
   const handleDownloadExtensionClick = () => {
     dispatch(actions.updateExtensionInstallSource(window.location.pathname));

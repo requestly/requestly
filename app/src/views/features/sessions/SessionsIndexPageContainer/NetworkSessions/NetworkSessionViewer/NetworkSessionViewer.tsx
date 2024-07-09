@@ -43,7 +43,9 @@ import CreateMocksModeBanner from "./CreateMocksModeBanner";
 import "./networkSessions.scss";
 
 export const NetworkSessionViewer: React.FC = () => {
-  const { id } = useParams();
+  const params = useParams();
+  console.debug("params", params);
+  const id = params.id;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

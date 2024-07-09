@@ -13,6 +13,7 @@ import { Home } from "components/Home";
 import { PricingIndexPage } from "features/pricing/components/PricingPage";
 import { IncentiveTasksListScreen } from "features/incentivization";
 import { ImportFromCharlesWrapperView } from "features/rules/screens/rulesList/components/RulesList/components";
+import SeleniumImporter from "views/misc/SeleniumImporter";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -71,6 +72,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.CREDITS.RELATIVE,
     element: <IncentiveTasksListScreen />,
+  },
+  {
+    path: PATHS.SELENIUM_IMPORTER.RELATIVE,
+    element: <SeleniumImporter />,
   },
   {
     path: PATHS.ANY,
