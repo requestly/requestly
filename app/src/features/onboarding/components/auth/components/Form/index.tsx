@@ -25,8 +25,9 @@ import { SSOSignInForm } from "./components/SSOSignInForm";
 import { RequestPasswordResetForm } from "./components/RequestPasswordResetForm";
 import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analytics";
 import { AuthWarningBanner } from "./components/AuthWarningBanner";
-import "./index.scss";
 import { isDisposableEmail } from "utils/AuthUtils";
+import { useFeatureValue } from "@growthbook/growthbook-react";
+import "./index.scss";
 
 interface AuthFormProps {
   authMode: string;
@@ -64,6 +65,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   const [isAuthWarningBannerVisible, setIsAuthWarningBannerVisible] = useState(!!warningMessage?.length);
 
   const [isInputEmailDisposable, setIsInputEmailDisposable] = useState(false);
+  const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
 
   const handleSignupSigninSwitch = useCallback(() => {
     const finalState = authMode === AUTH.ACTION_LABELS.SIGN_UP ? AUTH.ACTION_LABELS.LOG_IN : AUTH.ACTION_LABELS.SIGN_UP;
@@ -204,7 +206,136 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <RequestPasswordResetForm email={email} setEmail={setEmail} setAuthMode={setAuthMode} toggleModal={toggleModal} />
     );
   }
-  return (
+  return onboardingVariation === "variant3" ? (
+    <>
+      <div className="w-full onboarding-auth-form-container">
+        {authMode === AUTH.ACTION_LABELS.LOG_IN && warningMessage && isAuthWarningBannerVisible && (
+          <AuthWarningBanner
+            warningMessage={warningMessage}
+            onBannerClose={() => setIsAuthWarningBannerVisible(false)}
+          />
+        )}
+        <div className="variant3">
+          <h2 className="onboarding-auth-form-header">
+            {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Create your account" : "Sign in to your account"}
+          </h2>
+        </div>
+        <RQButton
+          type="default"
+          className="onboarding-google-auth-button"
+          onClick={handleGoogleSignInButtonClick}
+          loading={isGoogleSignInLoading}
+          disabled={isLoading}
+        >
+          <img src={googleLogo} alt="google" />
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign up with Google" : "Sign in with Google"}
+        </RQButton>
+        <Divider plain className="onboarding-auth-form-divider">
+          Or
+        </Divider>
+
+        <AuthFormInput
+          id="work-email"
+          type="email"
+          value={email}
+          onValueChange={(email) => {
+            setIsInputEmailDisposable(false);
+            setEmail(email);
+          }}
+          status={isInputEmailDisposable ? "error" : null}
+          placeholder="E.g., you@company.com"
+          label={
+            <label>
+              <Row justify="space-between" align="middle">
+                <Col>Your work email</Col>{" "}
+                {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
+                  <Tooltip
+                    placement="right"
+                    title="Use your work email to use team workspaces, session replay and orgazniation-level access controls."
+                    color="var(--black)"
+                  >
+                    <Col className="why-work-email">Why work email?</Col>
+                  </Tooltip>
+                )}
+              </Row>
+            </label>
+          }
+          onPressEnter={appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? handleMagicLinkAuthClick : null}
+        />
+        {isInputEmailDisposable && (
+          <div className="auth-email-disposable-error ">
+            Please enter a valid email address. Temporary or disposable email addresses are not allowed.
+          </div>
+        )}
+        {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && (
+          <div className="mt-16">
+            <AuthFormInput
+              id="password"
+              type="password"
+              value={password}
+              onValueChange={(value) => setPassword(value)}
+              placeholder="Enter your password here"
+              label="Password"
+              onPressEnter={
+                authMode === AUTH.ACTION_LABELS.SIGN_UP ? handleEmailPasswordSignUp : handleEmailPasswordSignIn
+              }
+            />
+            {authMode === AUTH.ACTION_LABELS.LOG_IN && (
+              <Button
+                type="link"
+                className="auth-screen-forgot-password-btn"
+                onClick={() => setAuthMode(APP_CONSTANTS.AUTH.ACTION_LABELS.REQUEST_RESET_PASSWORD)}
+              >
+                Forgot password?
+              </Button>
+            )}
+          </div>
+        )}
+
+        <RQButton
+          type="primary"
+          size="large"
+          className="w-full mt-16 onboarding-continue-button"
+          onClick={
+            appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+              ? authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
+                ? handleEmailPasswordSignUp
+                : handleEmailPasswordSignIn
+              : handleMagicLinkAuthClick
+          }
+          loading={isLoading}
+          disabled={isGoogleSignInLoading}
+        >
+          {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP
+            ? authMode === APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP
+              ? "Create new account"
+              : "Sign in with email"
+            : "Continue"}
+        </RQButton>
+        <RQButton
+          block
+          type="default"
+          size="large"
+          className="auth-screen-sso-btn"
+          onClick={() => {
+            setAuthMode(AUTH.ACTION_LABELS.SSO);
+            trackLoginWithSSOClicked();
+          }}
+        >
+          Continue with Single Sign-on (SSO)
+        </RQButton>
+      </div>
+
+      <Row align="middle" className="text-bold onboarding-auth-mode-switch-wrapper variant3">
+        <span>
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Already have an account?" : "Don't have an account yet?"}{" "}
+        </span>
+        <span onClick={handleSignupSigninSwitch} className="text-white onboarding-auth-mode-switcher">
+          {authMode === AUTH.ACTION_LABELS.SIGN_UP ? "Sign in" : "Sign up now"}
+        </span>
+      </Row>
+    </>
+  ) : (
     <div className="w-full">
       {authMode === AUTH.ACTION_LABELS.LOG_IN && warningMessage && isAuthWarningBannerVisible && (
         <AuthWarningBanner warningMessage={warningMessage} onBannerClose={() => setIsAuthWarningBannerVisible(false)} />

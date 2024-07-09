@@ -5,9 +5,19 @@
   // height: 100%;
   margin-top: 120px;
 
+  &.variant3 {
+    margin-top: 40px;
+  }
+
   .onboarding-auth-screen {
     max-width: 912px;
     display: flex;
+
+    &.variant3 {
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
   }
 
   .onboarding-auth-form-wrapper {
