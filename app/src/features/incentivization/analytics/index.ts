@@ -3,7 +3,7 @@ import { INCENTIVIZATION } from "./constants";
 import { IncentivizeEvent } from "../types";
 
 export const trackIncentivizationChecklistModalViewed = (source: string) => {
-  trackEvent(INCENTIVIZATION.INCENTIVIZATION_CHECKLIST_MODAL_VIEWED, source);
+  trackEvent(INCENTIVIZATION.INCENTIVIZATION_CHECKLIST_MODAL_VIEWED, { source });
 };
 
 export const trackIncentivesScreenViewed = (source: string) => {
