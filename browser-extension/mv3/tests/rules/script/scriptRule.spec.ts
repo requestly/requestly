@@ -44,10 +44,12 @@ const testScriptRule = async (testScenarioData: ScriptTestScenario & IBaseTestDa
   );
 
   const testPage = await context.newPage();
+  testPage.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
-  await testPage.goto(testPageURL, { waitUntil: "domcontentloaded" });
+  await testPage.goto(testPageURL, { waitUntil: "networkidle" });
 
-  const RQElements = await testPage.$$(`.${RQ_CLASSNAME}`);
+  const RQElements = await testPage.locator(`.${RQ_CLASSNAME}`).all();
+  console.log("RQElements", RQElements);
   const insertedElementDataPromises = RQElements.map(async (element) => {
     const type = await element.evaluate((el) => el.tagName.toLowerCase());
     const attributes = await element.evaluate((el) => {
@@ -61,7 +63,9 @@ const testScriptRule = async (testScenarioData: ScriptTestScenario & IBaseTestDa
   const insertedElementData = await Promise.all(insertedElementDataPromises);
 
   for (const element of rulePairElementData) {
+    console.log("element", element);
     const matchingEntry = insertedElementData.find((entry) => {
+      console.log("entry", entry);
       if (entry.type === element.type) {
         if (element.sourceType === "code") {
           return entry.innerText === element.innerText;
