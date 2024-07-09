@@ -12,10 +12,11 @@ import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
-import { Checkbox } from "antd";
+import { Checkbox, Typography } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
 
 import "./index.scss";
+import { REQUEST_METHOD_COLORS } from "../../../../../../../../constants/requestMethodColors";
 
 export const ITEM_SIZE = 30;
 
@@ -163,6 +164,13 @@ const NetworkTable: React.FC<Props> = ({
         title: "Method",
         dataIndex: ["request", "method"], // corresponds to request.method
         width: "8%",
+        render(method: keyof typeof REQUEST_METHOD_COLORS) {
+          return (
+            <Typography.Text className="api-method" strong style={{ color: REQUEST_METHOD_COLORS[method] }}>
+              {method}
+            </Typography.Text>
+          );
+        },
       },
       {
         id: "contentType",
