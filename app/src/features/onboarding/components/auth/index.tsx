@@ -96,7 +96,7 @@ export const AuthScreen: React.FC<Props> = ({
               />
             </m.div>
             {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
-              <m.div transition={{ type: "linear" }} layout className="onboarding-auth-company-logobanner-wrapper">
+              <m.div transition={{ type: "linear" }} layout className="companies-logo-banner">
                 <CompaniesLogoBanner />
               </m.div>
             )}

@@ -10,8 +10,8 @@ const companyLogos = [indeedLogo, atntLogo, verizonLogo, intuitLogo];
 export const CompaniesLogoBanner: React.FC = () => {
   return (
     <>
-      <Row style={{ marginTop: "60px" }}>
-        <Typography.Text className="banner-text-small" style={{ fontWeight: "500", color: "var(--white)" }}>
+      <Row style={{ marginTop: "40px" }}>
+        <Typography.Text className="banner-text-small" style={{ fontWeight: "500" }}>
           Trusted by developers & QA teams from 50,000+ organizations
         </Typography.Text>
       </Row>
