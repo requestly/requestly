@@ -1,10 +1,4 @@
-import {
-  cacheBlockedDomains,
-  generateUrlPattern,
-  getBlockedDomains,
-  isExtensionEnabled,
-  onBlockListChange,
-} from "../../utils";
+import { generateUrlPattern, getBlockedDomains, isExtensionEnabled, onBlockListChange } from "../../utils";
 import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.json";
 import { Variable, onVariableChange } from "../variable";
 import { RuleType } from "common/types";
@@ -93,7 +87,6 @@ export const initClientHandler = async () => {
   console.log("[initClientHandler]");
   const isExtensionStatusEnabled = await isExtensionEnabled();
   setupClientScript(isExtensionStatusEnabled);
-  // cacheBlockedDomains();
 
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
     console.log("[initClientHandler]", "onVariableChange", { extensionStatus });

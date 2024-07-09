@@ -1,3 +1,4 @@
+import { cacheBlockedDomains } from "../utils";
 import { initClientHandler, initClientRuleCaching } from "./services/clientHandler";
 import { registerCommands } from "./services/commands";
 import { initContextMenu } from "./services/contextMenu";
@@ -8,6 +9,7 @@ import { initWebRequestInterceptor } from "./services/webRequestInterceptor";
 
 // initialize
 (async () => {
+  cacheBlockedDomains();
   initClientHandler();
   initClientRuleCaching();
   registerCommands();
