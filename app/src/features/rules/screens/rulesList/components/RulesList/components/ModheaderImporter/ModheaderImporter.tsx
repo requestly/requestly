@@ -220,7 +220,7 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
           }}
           isProcessing={isDataProcessing}
           title="Drag and drop your Modheader export file to upload"
-          subtitle="Accepted file formats: JSON"
+          subtitle="Accepted file formats: json"
           selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
         />
 
