@@ -1,29 +1,37 @@
-class Event {
-  private listeners: Function[] = [];
+class Event<CallbackType extends (...args: any[]) => void> {
+  private listeners: CallbackType[] = [];
 
   /**
-   * @param listener: Accepts a method which is listend
+   * Registers an event listener callback to an event.
+   * @param callback — Called when an event occurs. The parameters of this function depend on the type of event.
    * @returns: Returns unsub method which can be called to remove the listener
    */
-  addListener = (listener: Function): Function => {
-    const i = this.listeners.push(listener);
-    console.debug({ newLength: i, listeners: this.listeners });
+  addListener = (callback: CallbackType): Function => {
+    const i = this.listeners.push(callback);
+    console.debug("[Event.addListener]", { newLength: i, listeners: this.listeners });
 
     return () => {
-      this.removeListener(listener);
+      this.removeListener(callback);
     };
   };
 
-  removeListener = (listenerToRemove: Function) => {
+  removeListener = (listenerToRemove: CallbackType) => {
     if (!this.listeners) return;
 
     this.listeners = this.listeners.filter((listener) => {
       if (listener === listenerToRemove) {
-        console.debug("Listener Removed");
-        return true;
+        console.debug("[Event.removeListener] Listener Removed");
+        return false;
       }
-      return false;
+      return true;
     });
+  };
+
+  processListeners = (...args: Parameters<CallbackType>) => {
+    console.debug("[Event.processListeners]", { listeners: this.listeners, args });
+    if (this.listeners) {
+      this.listeners.forEach((listener) => listener?.(...args));
+    }
   };
 }
 

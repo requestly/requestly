@@ -24,7 +24,8 @@ class ExtensionIconManager {
   };
 
   constructor() {
-    chrome.tabs.onUpdated.addListener((tabId, _, tab) => {
+    tabService.tabs_onUpdated.addListener((tabId, tabChangeInfo, tab) => {
+      console.log("ExtensionIconManager addListener", { tab });
       // FIXME: Can be made better by only listening to url changes on tabs
       isUrlInBlockList(tab.url).then((isBlocked) => {
         if (isBlocked) {

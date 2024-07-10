@@ -1,4 +1,5 @@
 import { EXTENSION_MESSAGES } from "common/constants";
+import Event from "../../lib/event";
 
 type TabId = chrome.tabs.Tab["id"];
 
@@ -14,11 +15,36 @@ type TabData = chrome.tabs.Tab & {
 
 class TabService {
   private map: Record<number, TabData> = {};
+  tabs_onUpdated: Event<(tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: TabData) => void>;
 
   constructor() {
     this.initTabs();
+    this.initEvents();
     this.addEventListeners();
   }
+
+  private initEvents = () => {
+    this.tabs_onUpdated = new Event();
+    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      let updatedTab: TabData;
+      const existingTab = this.getTab(tabId);
+
+      if (!existingTab) {
+        updatedTab = tab;
+        this.addOrUpdateTab(tab);
+        return;
+      } else {
+        updatedTab = {
+          ...tab,
+          [DataScope.TAB]: existingTab[DataScope.TAB] || {},
+          [DataScope.PAGE]: existingTab[DataScope.PAGE] || {},
+        };
+        this.addOrUpdateTab(updatedTab);
+      }
+
+      this.tabs_onUpdated.processListeners(tabId, changeInfo, updatedTab);
+    });
+  };
 
   private initTabs() {
     chrome.tabs.query({}, (tabs) => {
@@ -37,22 +63,7 @@ class TabService {
       chrome.tabs.get(addedTabId, (tab) => this.addOrUpdateTab(tab));
     });
 
-    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      const existingTab = this.getTab(tabId);
-
-      if (!existingTab) {
-        this.addOrUpdateTab(tab);
-        return;
-      }
-
-      const newTabState = {
-        ...tab,
-        [DataScope.TAB]: existingTab[DataScope.TAB] || {},
-        [DataScope.PAGE]: existingTab[DataScope.PAGE] || {},
-      };
-
-      this.addOrUpdateTab(newTabState);
-    });
+    // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {});
 
     // Why?
     chrome.webRequest.onBeforeRequest.addListener(
@@ -85,6 +96,13 @@ class TabService {
   private sendMessage(tabId: TabId, ...args: [any, any?, ((response: any) => void)?]) {
     chrome.tabs.sendMessage(tabId, ...args);
   }
+
+  // Event Listeners
+  addOnUpdatedEventListener = (callback: Function) => {
+    chrome.tabs.onUpdated.addListener(() => {
+      callback && callback();
+    });
+  };
 
   addOrUpdateTab(tab: TabData) {
     // A special ID value given to tabs that are not browser tabs (for example, apps and devtools windows)
