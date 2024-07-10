@@ -35,8 +35,6 @@ export const redirectToCreateNewRule = (navigate, ruleType, source, groupId = ""
         : `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${ruleType}`,
       { state: { source } }
     );
-  } else {
-    navigate(PATHS.RULES.CREATE);
   }
 };
 
