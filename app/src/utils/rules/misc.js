@@ -6,7 +6,6 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
-import { countCapturingGroups } from "modules/extension/mv3RuleParser/utils";
 
 const { RULE_TYPES_CONFIG, RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
