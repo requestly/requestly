@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Col, Row, Avatar, Tabs, Alert, Button, Space } from "antd";
-import { QuestionCircleOutlined, CheckCircleOutlined, DesktopOutlined } from "@ant-design/icons";
+import { QuestionCircleOutlined, CheckCircleOutlined, DesktopOutlined, InfoCircleFilled } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 // SUB COMPONENTS
@@ -334,16 +334,21 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                   <Row justify={"space-between"}>
                     <Col style={{ paddingTop: "4px" }}>Not seeing your emulator/device!!</Col>
                     <Col>
-                      <Space>
-                        <Button
-                          icon={<IoMdRefresh />}
-                          disabled={fetchingDevices}
-                          onClick={fetchAndUpdateAndroidDevices}
-                        >
-                          &nbsp;Refresh Devices
-                        </Button>
-                        {/* <Button danger>Disconnect All</Button> */}
-                      </Space>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          window.RQ.DESKTOP.SERVICES.IPC.invokeEventInBG("open-external-link", {
+                            link: "https://developers.requestly.com/android-emulators/",
+                          });
+                        }}
+                        icon={<InfoCircleFilled />}
+                      >
+                        Need Help
+                      </Button>
+                      <Button icon={<IoMdRefresh />} disabled={fetchingDevices} onClick={fetchAndUpdateAndroidDevices}>
+                        &nbsp;Refresh Devices
+                      </Button>
+                      {/* <Button danger>Disconnect All</Button> */}
                     </Col>
                   </Row>
                 }
