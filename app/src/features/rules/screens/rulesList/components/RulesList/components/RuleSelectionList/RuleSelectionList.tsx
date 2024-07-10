@@ -13,6 +13,11 @@ import { TooltipPlacement } from "antd/lib/tooltip";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import { PaidFeatureNudgeViewedSource } from "modules/analytics/events/common/pricing";
 import "./RuleSelectionList.scss";
+import {
+  trackNewRuleButtonClicked,
+  trackRuleCreationWorkflowStartedEvent,
+} from "modules/analytics/events/common/rules";
+import { RuleType } from "types";
 
 export interface RuleSelectionListProps {
   /** Analytics event source */
