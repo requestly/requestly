@@ -171,7 +171,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             setIsCloseConfirmModalActive(true);
           } else {
             if (appId === "android-adb") {
-              toast.error(`Unable to activate ${options.deviceId}.\nError: ${res?.metadata?.message}`);
+              toast.error(`Unable to connect to ${options.deviceId}.\nError: ${res?.metadata?.message}`);
             } else {
               toast.error(`Unable to activate ${getAppName(appId)}. Issue reported.`);
             }
@@ -252,7 +252,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             loading={!isScanned || processingApps[appId]}
             className="launch-button"
           >
-            {appId.includes("existing") ? "Open" : "Launch"}
+            {appId === "android-adb" ? "Connect" : appId.includes("existing") ? "Open" : "Launch"}
           </RQButton>
         );
       } else {
@@ -279,7 +279,9 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             <Avatar src={window.location.origin + "/assets/img/thirdPartyAppIcons/" + app.icon} />
             <Row className="text-bold">{app.name}</Row>
           </Col>
-          <Col className="source-description">{app.description}</Col>
+          <Col span={20} className="source-description">
+            {app.description}
+          </Col>
           <>
             {app.type !== "browser" && app.id !== "android-adb" ? (
               <RQButton type="default" onClick={() => renderInstructionsModal(app.id)}>
