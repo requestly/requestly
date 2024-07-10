@@ -4,3 +4,4 @@ export { ImportFromCharlesModal, ImportFromCharlesWrapperView } from "./CharlesI
 export { ImportRulesModal } from "../../../../../modals/ImportRulesModal";
 export { RuleTypesDropdownWrapper } from "./RuleTypesDropdownWrapper/RuleTypesDropdownWrapper";
 export { NewRuleButtonWithDropdown } from "./NewRuleButtonWithDropdown/NewRuleButtonWithDropdown";
+export { RuleSelectionList } from "./RuleSelectionList/RuleSelectionList";
