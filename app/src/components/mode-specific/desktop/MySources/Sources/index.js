@@ -122,7 +122,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const handleActivateAppOnClick = useCallback(
     (appId, options = {}) => {
       // renderInstructionsModal(appId); // currently no event for this
-      setProcessingApps({ ...processingApps, appId: true });
+      setProcessingApps({ ...processingApps, [appId]: true });
       // If URL is opened in browser instead of desktop app
       if (!window.RQ || !window.RQ.DESKTOP) return;
 
@@ -131,12 +131,15 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         options: { ...options },
       })
         .then((res) => {
-          setProcessingApps({ ...processingApps, appId: false });
+          setProcessingApps({ ...processingApps, [appId]: false });
 
           // Notify user and update state
+          console.log("App Activated Successfully", { res });
           if (res.success) {
-            toast.success(`Connected ${getAppName(appId)}`);
             if (appId === "android-adb") {
+              res?.metadata?.message
+                ? toast.success(`Connected to ${options.deviceId}.\n${res?.metadata?.message}`, 10)
+                : toast.success(`Connected to ${options.deviceId}`, 10);
               console.log(appId, options.deviceId, options.launchOptions);
               dispatch(
                 actions.updateDesktopSpecificAppProperty({
@@ -146,6 +149,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                 })
               );
             } else {
+              toast.success(`Connected ${getAppName(appId)}`);
               dispatch(
                 actions.updateDesktopSpecificAppProperty({
                   appId: appId,
@@ -166,7 +170,12 @@ const Sources = ({ isOpen, toggle, ...props }) => {
             setAppIdToCloseConfirm(appId);
             setIsCloseConfirmModalActive(true);
           } else {
-            toast.error(`Unable to activate ${getAppName(appId)}. Issue reported.`);
+            if (appId === "android-adb") {
+              toast.error(`Unable to activate ${options.deviceId}.\nError: ${res?.metadata?.message}`);
+            } else {
+              toast.error(`Unable to activate ${getAppName(appId)}. Issue reported.`);
+            }
+
             trackAppConnectFailureEvent(getAppName(appId));
 
             if (appId === "system-wide") {
@@ -181,7 +190,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
 
   const handleDisconnectAppOnClick = useCallback(
     (appId, options = {}) => {
-      setProcessingApps({ ...processingApps, appId: true });
+      setProcessingApps({ ...processingApps, [appId]: true });
       // If URL is opened in browser instead of dekstop app
       if (!window.RQ || !window.RQ.DESKTOP) return;
 
@@ -190,13 +199,12 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         options,
       })
         .then((res) => {
-          setProcessingApps({ ...processingApps, appId: false });
+          setProcessingApps({ ...processingApps, [appId]: false });
 
           // Notify user and update state
           if (res.success) {
-            toast.info(`Disconnected ${getAppName(appId)}`);
-
             if (appId === "android-adb") {
+              toast.info(`Disconnected ${options.deviceId}`);
               console.log(appId, options.deviceId, options.launchOptions);
               dispatch(
                 actions.updateDesktopSpecificAppProperty({
@@ -206,6 +214,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
                 })
               );
             } else {
+              toast.info(`Disconnected ${getAppName(appId)}`);
               dispatch(
                 actions.updateDesktopSpecificAppProperty({
                   appId: appId,
