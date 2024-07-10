@@ -210,6 +210,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
       maskStyle={{ backdropFilter: "blur(4px)", background: "none" }}
       closeIcon={<RQButton type="default" iconOnly icon={<CloseOutlined />} />}
       maskClosable={false}
+      zIndex={10010}
     >
       {postRequestMessage ? (
         <Col className="post-request-message-container">

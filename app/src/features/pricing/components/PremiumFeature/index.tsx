@@ -112,6 +112,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         </>
       ) : (
         <Popconfirm
+          zIndex={10010}
           disabled={!isExceedingLimits || !features || disabled || !isUpgradePopoverEnabled}
           overlayClassName={`premium-feature-popover ${!user.loggedIn ? "premium-popover-bottom-padding" : ""}`}
           autoAdjustOverflow
