@@ -1,4 +1,4 @@
-import { REQUEST_METHOD_COLORS } from "../../../../../constants/requestMethodColors";
+import { REQUEST_METHOD_COLORS, RequestMethod } from "../../../../../constants/requestMethodColors";
 import { Column, NetworkEntry } from "./types";
 
 export const getDefaultColumns = <NetworkLog,>(networkEntrySelector: (log: NetworkLog) => NetworkEntry) => {
@@ -23,10 +23,8 @@ export const getDefaultColumns = <NetworkLog,>(networkEntrySelector: (log: Netwo
       width: 8,
       priority: 2,
       render: (log) => {
-        const method = networkEntrySelector(log).request.method;
-        return (
-          <div style={{ color: REQUEST_METHOD_COLORS[method as keyof typeof REQUEST_METHOD_COLORS] }}>{method}</div>
-        );
+        const method = networkEntrySelector(log).request.method as RequestMethod;
+        return <div style={{ color: REQUEST_METHOD_COLORS[method] }}>{method}</div>;
       },
     },
     {

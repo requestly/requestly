@@ -11,3 +11,5 @@ export const REQUEST_METHOD_COLORS = {
   HEAD: tokens["success-100"],
   OPTIONS: tokens["warning-100"],
 };
+
+export type RequestMethod = keyof typeof REQUEST_METHOD_COLORS;
