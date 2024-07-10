@@ -1,3 +1,12 @@
+.onboarding-auth-form-container {
+  .variant3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+}
+
 .onboarding-auth-form-header {
   font-size: 20px;
   font-weight: 500;
@@ -13,6 +22,13 @@
     text-decoration: underline;
     cursor: pointer;
     margin-left: 4px;
+  }
+
+  &.variant3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 24px;
   }
 }
 

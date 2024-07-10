@@ -1,0 +1,112 @@
+.import-from-charles-modal .ant-modal-body .rq-modal-content:last-child {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.charles-import-wrapper {
+  width: 55%;
+  margin: 0 auto;
+  max-width: 900px;
+  background-color: transparent;
+  height: 100%;
+  padding: 24px;
+}
+
+.charles-import-container {
+  margin: auto;
+}
+
+.charles-import-header {
+  margin-bottom: 8px;
+  margin-top: -18px;
+}
+
+.charles-import-body {
+  background: var(--requestly-color-surface-1);
+  margin-bottom: 16px;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.charles-import-footer {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-xs);
+  text-align: center;
+  margin: 16px 0;
+}
+
+.charles-import-heading {
+  font-size: var(--requestly-font-size-base);
+  font-weight: var(--requestly-font-weight-medium);
+  gap: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.charles-import-heading .charles-import-back-icon {
+  cursor: pointer;
+}
+
+.charles-import-share-container {
+  font-size: var(--requestly-font-size-xs);
+  font-weight: var(--requestly-font-weight-medium);
+  padding: 8px;
+  cursor: pointer;
+  margin-top: 4px;
+  margin-right: 20px;
+}
+
+.parsed-rules-info {
+  display: flex;
+  /* justify-conxtent: center; */
+  flex-direction: column;
+  padding: 16px;
+}
+
+.parsed-success-row {
+  color: var(--requestly-color-success-300);
+}
+
+.parsed-rules-info li {
+  /* display: flex; */
+  /* align-items: center; */
+  /* column-gap: 5px; */
+  list-style: disc;
+}
+
+.external-icon-link {
+  vertical-align: text-top;
+}
+
+.info-link-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--requestly-color-error-300);
+}
+
+.parsed-rules-error-info {
+  font-size: var(--requestly-font-size-base);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  padding: 0 16px;
+}
+
+.parsed-rules-error-info ol {
+  font-weight: var(--requestly-font-weight-normal);
+  font-size: var(--requestly-font-size-sm);
+}
+
+.parsed-rules-error-info li {
+  list-style: unset;
+}
+
+.validation-heading {
+  color: var(--requestly-color-error-300);
+}
+
+.validation-subheading {
+  margin-left: 22px;
+  font-weight: var(--requestly-font-weight-medium);
+}
