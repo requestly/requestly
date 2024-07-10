@@ -85,7 +85,8 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
   const remainingTasksCount =
     Object.keys(milestones ?? {}).length - (userMilestoneAndRewardDetails?.claimedMilestoneLogs?.length ?? 0);
 
-  const handleSignupClick = () => {
+  const handleClaimCreditsClick = () => {
+    trackCreditsAssignedModalClicked("claim_credits");
     toggle();
 
     dispatch(
@@ -165,7 +166,7 @@ export const IncentiveTaskCompletedModal: React.FC<IncentiveTaskCompletedModalPr
             </>
           ) : (
             <>
-              <RQButton type="primary" onClick={handleSignupClick}>
+              <RQButton type="primary" onClick={handleClaimCreditsClick}>
                 Claim credits
               </RQButton>
             </>
