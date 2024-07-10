@@ -15,9 +15,10 @@
 }
 
 .rules-dropdown-items-container {
-  display: flex;
   width: 360px;
-  height: 550px;
+  height: 100%;
+  max-height: calc(100vh - 220px);
+  display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 4px;
