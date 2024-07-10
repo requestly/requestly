@@ -2,12 +2,9 @@ import React, { createContext, useCallback, useContext } from "react";
 import { Group, RecordStatus, RuleType, StorageRecord } from "features/rules/types/rules";
 import {
   trackNewRuleButtonClicked,
-  trackRuleCreationWorkflowStartedEvent,
   trackRulePinToggled,
   trackRuleToggled,
 } from "modules/analytics/events/common/rules";
-import { redirectToCreateNewRule } from "utils/RedirectionUtils";
-import { useNavigate } from "react-router-dom";
 import { useRulesModalsContext } from "./modals";
 import { isGroup, isRule } from "../utils";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
@@ -50,7 +47,6 @@ const { UNGROUPED_GROUP_ID } = RULES_LIST_TABLE_CONSTANTS;
 
 export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ children }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
@@ -98,20 +94,10 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   );
   /*****/
 
-  // FIXME: Remove hard coded event source values and refactor this action
-  const createRuleAction = useCallback(
-    (ruleType?: RuleType, source = "", groupId = "") => {
-      Logger.log("[DEBUG]", "createRuleAction");
-      if (ruleType) {
-        trackRuleCreationWorkflowStartedEvent(ruleType, source);
-      } else {
-        trackNewRuleButtonClicked("in_app");
-      }
-      redirectToCreateNewRule(navigate, ruleType, source || "my_rules", groupId);
-      return;
-    },
-    [navigate]
-  );
+  const createRuleAction = useCallback(() => {
+    Logger.log("[DEBUG]", "createRuleAction");
+    trackNewRuleButtonClicked("in_app");
+  }, []);
 
   const createGroupAction = useCallback(() => {
     Logger.log("[DEBUG]", "createGroupAction");
