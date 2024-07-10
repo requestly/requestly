@@ -27,46 +27,10 @@ interface Props {
 }
 
 const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, filter, setFilter, records }) => {
-  // const { getFeatureLimitValue } = useFeatureLimiter();
   const user = useSelector(getUserAuthDetails);
   const debouncedTrackRulesListSearched = useDebounce(trackRulesListSearched, 500);
 
   const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
-
-  // const dropdownOverlay = useMemo(() => {
-  //   // FIXME: RuleType needed?
-  //   const checkIsPremiumRule = (ruleType: RuleType) => {
-  //     const featureName = `${ruleType.toLowerCase()}_rule`;
-  //     return !getFeatureLimitValue(featureName as FeatureLimitType);
-  //   };
-
-  //   return (
-  //     <Menu>
-  //       {Object.values(RULE_TYPES_CONFIG)
-  //         .filter((ruleConfig) => ruleConfig.ID !== 11)
-  //         .map(({ ID, TYPE, ICON, NAME }) => (
-  //           <PremiumFeature
-  //             popoverPlacement="topLeft"
-  //             onContinue={() => createRuleAction(TYPE as RuleType, SOURCE.DROPDOWN)}
-  //             features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
-  //             featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
-  //             source="rule_selection_dropdown"
-  //           >
-  //             <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
-  //               {NAME}
-  //               {checkIsPremiumRule(TYPE as RuleType) ? (
-  //                 <PremiumIcon
-  //                   placement="topLeft"
-  //                   source="rule_dropdown"
-  //                   featureType={`${TYPE.toLowerCase()}_rule` as FeatureLimitType}
-  //                 />
-  //               ) : null}
-  //             </Menu.Item>
-  //           </PremiumFeature>
-  //         ))}
-  //     </Menu>
-  //   );
-  // }, [createRuleAction, getFeatureLimitValue]);
 
   const buttonData = [
     {
@@ -93,11 +57,15 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       isTooltipShown: false,
       buttonText: "New Rule",
       icon: <MdAdd className="anticon" />,
-      onClickHandler: createRuleAction,
+      onClickHandler: () => createRuleAction("in_app"),
       isDropdown: true,
       overlay: (
         <div className="rules-dropdown-items-container">
-          <RuleSelectionList source="rule_dropdown" />
+          <RuleSelectionList
+            source="rule_dropdown"
+            premiumIconSource="rule_dropdown"
+            premiumPopoverPlacement="topLeft"
+          />
         </div>
       ),
     },

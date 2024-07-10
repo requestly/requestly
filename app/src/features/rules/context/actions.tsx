@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext } from "react";
-import { Group, RecordStatus, RuleType, StorageRecord } from "features/rules/types/rules";
+import { Group, RecordStatus, StorageRecord } from "features/rules/types/rules";
 import {
   trackNewRuleButtonClicked,
   trackRulePinToggled,
@@ -22,7 +22,7 @@ import APP_CONSTANTS from "config/constants";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
-  createRuleAction: (ruleType?: RuleType, source?: string, groupId?: string | undefined) => void;
+  createRuleAction: (source?: string) => void;
   createGroupAction: () => void;
   importRecordsAction: () => void;
   recordsUngroupAction: (records: StorageRecord[]) => Promise<any>; // TODO: add proper type
@@ -94,9 +94,10 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   );
   /*****/
 
-  const createRuleAction = useCallback(() => {
+  const createRuleAction = useCallback((source = "") => {
     Logger.log("[DEBUG]", "createRuleAction");
-    trackNewRuleButtonClicked("in_app");
+    trackNewRuleButtonClicked(source);
+    return;
   }, []);
 
   const createGroupAction = useCallback(() => {
@@ -150,6 +151,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         const ruleIds = rulesToShare.map((rule) => rule.id);
 
         dispatch(
+          // @ts-ignore
           actions.toggleActiveModal({
             modalName: "sharingModal",
             newValue: true,
@@ -161,6 +163,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
         );
       } else {
         dispatch(
+          // @ts-ignore
           actions.toggleActiveModal({
             modalName: "authModal",
             newValue: true,
