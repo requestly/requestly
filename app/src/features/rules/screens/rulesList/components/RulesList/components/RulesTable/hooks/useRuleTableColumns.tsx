@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip, Progress, Popconfirm } from "antd";
@@ -26,7 +27,7 @@ import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { RuleTypesDropdownWrapper } from "../../RuleTypesDropdownWrapper/RuleTypesDropdownWrapper";
+import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { useTheme } from "styled-components";
 import { WarningOutlined } from "@ant-design/icons";
@@ -47,6 +48,11 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
   const theme = useTheme();
+  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(false);
+
+  const onRulesListDrawerClose = () => {
+    setIsRulesListDrawerOpen(false);
+  };
 
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
@@ -144,17 +150,23 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 </Tooltip>
               ) : null}
 
-              <RuleTypesDropdownWrapper groupId={group.id} analyticEventSource={SOURCE.RULE_GROUP}>
+              <RuleSelectionListDrawer
+                groupId={group.id}
+                open={isRulesListDrawerOpen}
+                onClose={onRulesListDrawerClose}
+                analyticEventSource={SOURCE.RULE_GROUP}
+              >
                 <Button
                   className="add-rule-btn"
                   onClick={(e) => {
                     e.stopPropagation();
+                    setIsRulesListDrawerOpen(true);
                     trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
                   }}
                 >
                   <span>+</span> <span>Add rule</span>
                 </Button>
-              </RuleTypesDropdownWrapper>
+              </RuleSelectionListDrawer>
             </div>
           );
         }
