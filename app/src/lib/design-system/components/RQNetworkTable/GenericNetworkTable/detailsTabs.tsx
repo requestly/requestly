@@ -4,7 +4,6 @@ import { NetworkEntry } from "./types";
 import { NetworkLogProperty } from "./components/NetworkLogProperty";
 import { NetworkStatusField } from "./components/NetworkStatusField";
 import { NetworkPayload } from "./components/NetworkPayload";
-import { REQUEST_METHOD_COLORS } from "../../../../../constants/requestMethodColors";
 
 export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: NetworkLog) => NetworkEntry) => {
   const detailsTabs: DetailsTab<NetworkLog>[] = [
@@ -24,14 +23,7 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
                 </NetworkLogProperty>
               ) : null}
 
-              <NetworkLogProperty
-                label="Request Method"
-                color={
-                  REQUEST_METHOD_COLORS[
-                    (harEntry.request.method?.toUpperCase() as keyof typeof REQUEST_METHOD_COLORS) || "GET"
-                  ]
-                }
-              >
+              <NetworkLogProperty label="Request Method">
                 {harEntry.request.method?.toUpperCase() ?? "GET"}
               </NetworkLogProperty>
 
