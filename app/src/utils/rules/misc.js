@@ -240,13 +240,6 @@ export function runMinorFixesOnRule(dispatch, rule) {
         fixedRegex = fixRegexStr(pair.source.value);
       }
 
-      // if replace rule, add non-capturing group to all capturing groups
-      if (rule.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REPLACE) {
-        if (countCapturingGroups(fixedRegex) > 0) {
-          fixedRegex = fixedRegex.replaceAll(/\((?!\?:)/g, "(?:");
-        }
-      }
-
       fixedPair = {
         ...pair,
         source: {

@@ -206,7 +206,7 @@ export const validateRule = (rule, dispatch, appMode) => {
           output = {
             result: false,
             message: `Capturing groups are not supported in the source regex`,
-            error: "capturing group present in source",
+            error: "capturing group present in source of replace rule",
           };
         }
       }
