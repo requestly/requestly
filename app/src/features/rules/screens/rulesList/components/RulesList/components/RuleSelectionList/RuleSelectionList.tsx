@@ -3,12 +3,9 @@ import { RULE_DETAILS } from "./constants";
 import { Divider } from "antd";
 import { NavLink } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import "./RuleSelectionList.scss";
-import {
-  trackNewRuleButtonClicked,
-  trackRuleCreationWorkflowStartedEvent,
-} from "modules/analytics/events/common/rules";
+import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import { RuleType } from "types";
+import "./RuleSelectionList.scss";
 
 interface RuleSelectionListProps {
   source?: string;
@@ -16,12 +13,8 @@ interface RuleSelectionListProps {
 }
 
 export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({ source = "my_rules", groupId }) => {
-  const handleRuleTypeClick = async (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, ruleType: RuleType) => {
-    if (ruleType) {
-      trackRuleCreationWorkflowStartedEvent(ruleType, source);
-    } else {
-      trackNewRuleButtonClicked("in_app");
-    }
+  const handleRuleTypeClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, ruleType: RuleType) => {
+    trackRuleCreationWorkflowStartedEvent(ruleType, source);
   };
 
   return (
