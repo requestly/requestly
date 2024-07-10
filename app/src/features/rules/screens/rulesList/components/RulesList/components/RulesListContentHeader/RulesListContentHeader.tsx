@@ -1,7 +1,6 @@
-import { DownOutlined, DownloadOutlined } from "@ant-design/icons";
+import { DownloadOutlined } from "@ant-design/icons";
 import { RiFolderAddLine } from "@react-icons/all-files/ri/RiFolderAddLine";
-import { Badge, Dropdown, Menu, Tooltip } from "antd";
-import { DropdownButtonType } from "antd/lib/dropdown";
+import { Badge, Button, Dropdown, Menu, Tooltip } from "antd";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import AuthPopoverButton from "components/features/rules/RulesListContainer/RulesTable/AuthPopoverButtons";
 import { ContentListHeader, ContentListHeaderProps, FilterType } from "componentsV2/ContentList";
@@ -16,6 +15,7 @@ import React, { useMemo } from "react";
 import { RuleType } from "types";
 import { isRule } from "features/rules/utils";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
+import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 import { trackUploadRulesButtonClicked } from "modules/analytics/events/features/rules";
@@ -53,14 +53,14 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           .map(({ ID, TYPE, ICON, NAME }) => (
             <PremiumFeature
               popoverPlacement="topLeft"
-              onContinue={() => createRuleAction(TYPE, SOURCE.DROPDOWN)}
+              onContinue={() => createRuleAction(TYPE as RuleType, SOURCE.DROPDOWN)}
               features={[`${TYPE.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
               featureName={`${APP_CONSTANTS.RULE_TYPES_CONFIG[TYPE]?.NAME} rule`}
               source="rule_selection_dropdown"
             >
               <Menu.Item key={ID} icon={<ICON />} className="rule-selection-dropdown-btn-overlay-item">
                 {NAME}
-                {checkIsPremiumRule(TYPE) ? (
+                {checkIsPremiumRule(TYPE as RuleType) ? (
                   <PremiumIcon
                     placement="topLeft"
                     source="rule_dropdown"
@@ -98,7 +98,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       type: "primary",
       isTooltipShown: false,
       buttonText: "New Rule",
-      icon: <DownOutlined />,
+      icon: <MdAdd className="anticon" />,
       onClickHandler: createRuleAction,
       isDropdown: true,
       overlay: dropdownOverlay,
@@ -119,17 +119,16 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
         <>
           {isDropdown ? (
             // TODO: refactor this with common component RuleTypesDropdown
-            <Dropdown.Button
-              icon={icon}
-              type={type as DropdownButtonType}
+            <Dropdown
               trigger={["click"]}
-              onClick={() => onClickHandler()}
               overlay={overlay}
               data-tour-id={tourId}
               className="rule-selection-dropdown-btn"
             >
-              {buttonText}
-            </Dropdown.Button>
+              <Button type="primary" icon={icon} onClick={() => onClickHandler()}>
+                {buttonText}
+              </Button>
+            </Dropdown>
           ) : (
             // @ts-ignore
             <AuthPopoverButton isLoggedIn={user?.details?.isLoggedIn} {...buttonData[index]} />

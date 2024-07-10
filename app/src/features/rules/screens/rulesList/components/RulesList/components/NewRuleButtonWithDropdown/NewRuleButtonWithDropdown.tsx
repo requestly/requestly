@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { DownOutlined } from "@ant-design/icons";
-import { Dropdown, Menu } from "antd";
+import { Button, Dropdown, Menu } from "antd";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import APP_CONSTANTS from "config/constants";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
@@ -15,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { RuleType } from "types";
 import { redirectToCreateNewRule } from "utils/RedirectionUtils";
+import { MdAdd } from "@react-icons/all-files/md/MdAdd";
 
 /* TODO: REFACTOR THIS COMPONENT
   Currently created a separate component for create new rule button with rule types dropdown
@@ -77,16 +77,10 @@ export const NewRuleButtonWithDropdown: React.FC<{ disable?: boolean; callback?:
   }, [getFeatureLimitValue, handleCreateNewRule]);
 
   return (
-    <Dropdown.Button
-      disabled={disable}
-      icon={<DownOutlined />}
-      type="primary"
-      trigger={["click"]}
-      onClick={() => handleCreateNewRule(null, "")}
-      overlay={dropdownOverlay}
-      className="rule-selection-dropdown-btn"
-    >
-      Create new rule
-    </Dropdown.Button>
+    <Dropdown disabled={disable} trigger={["click"]} overlay={dropdownOverlay} className="rule-selection-dropdown-btn">
+      <Button icon={<MdAdd className="anticon" />} type="primary">
+        Create new rule
+      </Button>
+    </Dropdown>
   );
 };
