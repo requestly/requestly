@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Row, Avatar, Tabs } from "antd";
+import { Col, Row, Avatar, Tabs, Alert, Button, Space } from "antd";
 import { QuestionCircleOutlined, CheckCircleOutlined, DesktopOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "utils/Toast.js";
@@ -33,6 +33,7 @@ import { getConnectedAppsCount } from "utils/Misc";
 import { trackConnectAppsCategorySwitched } from "modules/analytics/events/desktopApp/apps";
 import LaunchButtonDropdown from "./LaunchButtonDropDown";
 import { getAndroidDevices } from "./utils";
+import { IoMdRefresh } from "@react-icons/all-files/io/IoMdRefresh";
 
 const Sources = ({ isOpen, toggle, ...props }) => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
   const [showInstructions, setShowInstructions] = useState(props.showInstructions ?? false);
   const [activeSourceTab, setActiveSourceTab] = useState("browser");
   const [currentApp, setCurrentApp] = useState(props.appId ?? null);
+  const [fetchingDevices, setFetchingDevices] = useState(false);
 
   const { appsList } = desktopSpecificDetails;
   const systemWideSource = appsList["system-wide"];
@@ -67,7 +69,8 @@ const Sources = ({ isOpen, toggle, ...props }) => {
     setAppsListArray(Object.values(appsList));
   }, [appsList]);
 
-  useEffect(() => {
+  const fetchAndUpdateAndroidDevices = useCallback(() => {
+    setFetchingDevices(true);
     getAndroidDevices().then((devices) => {
       if (devices) {
         console.log("Devices", devices, desktopSpecificDetails.appsList);
@@ -92,8 +95,13 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         console.log("Updated Apps List", updatedAppsList);
         dispatch(actions.updateDesktopAppsList({ appsList: updatedAppsList }));
       }
+      setFetchingDevices(false);
     });
   }, [dispatch]); // Don't add appsList as dependency
+
+  useEffect(() => {
+    fetchAndUpdateAndroidDevices();
+  }, [fetchAndUpdateAndroidDevices]);
 
   const toggleCloseConfirmModal = () => {
     if (isCloseConfirmModalActive) {
@@ -317,7 +325,41 @@ const Sources = ({ isOpen, toggle, ...props }) => {
         other: (source) => renderSourceCard(source),
       };
 
-      return <div className="source-grid">{sources.map((source) => renderSourceByType[source.type](source))}</div>;
+      return (
+        <>
+          {type === "mobile" ? (
+            <>
+              <Alert
+                message={
+                  <Row justify={"space-between"}>
+                    <Col style={{ paddingTop: "4px" }}>Not seeing your emulator/device!!</Col>
+                    <Col>
+                      <Space>
+                        <Button
+                          icon={<IoMdRefresh />}
+                          disabled={fetchingDevices}
+                          onClick={fetchAndUpdateAndroidDevices}
+                        >
+                          &nbsp;Refresh Devices
+                        </Button>
+                        {/* <Button danger>Disconnect All</Button> */}
+                      </Space>
+                    </Col>
+                  </Row>
+                }
+                type="info"
+                banner={true}
+                style={{ width: "100%" }}
+              />
+
+              <br />
+            </>
+          ) : null}
+          <Row>
+            <div className="source-grid">{sources.map((source) => renderSourceByType[source.type](source))}</div>
+          </Row>
+        </>
+      );
     },
     [appsListArray, renderSourceCard]
   );
