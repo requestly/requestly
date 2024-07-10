@@ -243,7 +243,6 @@ export function runMinorFixesOnRule(dispatch, rule) {
         };
       }
     }
-
     // trim white space from source value
     fixedPair = {
       ...fixedPair,
