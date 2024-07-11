@@ -13,7 +13,6 @@ import { MdOutlineDiversity1 } from "@react-icons/all-files/md/MdOutlineDiversit
 import { MdOutlineDns } from "@react-icons/all-files/md/MdOutlineDns";
 import { PiRecordFill } from "@react-icons/all-files/pi/PiRecordFill";
 import { MdOutlineStarBorder } from "@react-icons/all-files/md/MdOutlineStarBorder";
-import { NewRuleButtonWithDropdown } from "features/rules/screens/rulesList/components/RulesList/components";
 import { Button } from "antd";
 import {
   redirectToCreateNewRule,
@@ -47,6 +46,7 @@ import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
 import { useIsNewUserForIncentivization } from "features/incentivization/hooks/useIsNewUserForIncentivization";
 import { INCENTIVIZATION_ENHANCEMENTS_RELEASE_DATE } from "features/incentivization/constants";
+import { NewRuleButton } from "./components/NewRuleButton/NewRuleButton";
 import "./incentiveTasksList.scss";
 
 interface IncentiveTasksListProps {
@@ -96,7 +96,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_CREATED_AND_TESTED, userMilestoneAndRewardDetails);
           return (
-            <NewRuleButtonWithDropdown
+            <NewRuleButton
               disable={isCompleted}
               callback={() => postActionClickCallback(IncentivizeEvent.RULE_CREATED_AND_TESTED)}
             />
@@ -122,7 +122,7 @@ export const IncentiveTasksList: React.FC<IncentiveTasksListProps> = ({ source }
         action: () => {
           const isCompleted = isTaskCompleted(IncentivizeEvent.RULE_CREATED, userMilestoneAndRewardDetails);
           return (
-            <NewRuleButtonWithDropdown
+            <NewRuleButton
               disable={isCompleted}
               callback={() => postActionClickCallback(IncentivizeEvent.RULE_CREATED)}
             />
