@@ -1,7 +1,7 @@
 import React from "react";
 import * as Sentry from "@sentry/react";
 import { createRoot } from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Navigate, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { persistStore } from "redux-persist";
 import { reduxStore } from "./store";
@@ -19,6 +19,8 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAppFlavour } from "utils/AppUtils";
 import { sessionBearRoutes } from "src-SessionBear/routes";
 import SessionBearApp from "src-SessionBear/App";
+import PATHS from "config/constants/sub/paths";
+import SeleniumImporter from "views/misc/SeleniumImporter";
 
 const persistor = persistStore(reduxStore);
 const container = document.getElementById("root");
@@ -26,6 +28,15 @@ const root = createRoot(container);
 const appFlavour = getAppFlavour();
 
 const router = createBrowserRouter([
+  {
+    path: PATHS.SELENIUM_IMPORTER.RELATIVE,
+    element:
+      appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
+        <SeleniumImporter />
+      ) : (
+        <Navigate to={PATHS.PAGE404.RELATIVE} />
+      ),
+  },
   {
     path: "/",
     element: (
