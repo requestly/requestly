@@ -1,8 +1,9 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import SessionsHomeView from "views/features/sessions";
-import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
+import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
+import { SavedSessionViewer } from "features/sessionsV2";
 
 export const sessionRoutes: RouteObject[] = [
   {
