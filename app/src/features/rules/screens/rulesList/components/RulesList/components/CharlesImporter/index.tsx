@@ -4,7 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Col, Modal, Row, Space } from "antd";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
-import { ArrowLeftOutlined, CheckCircleOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  CheckCircleOutlined,
+  InfoCircleOutlined,
+  LinkOutlined,
+  WarningOutlined,
+} from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
 import { parseRulesFromCharlesXML } from "modules/rule-adapters/charles-rule-adapters/parseRulesFromCharlesXML";
@@ -260,6 +266,21 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
             subtitle="Accepted file formats: CSV, Trace test file, and XML"
             selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
           />
+        )}
+
+        {isParseComplete && isParsedRulesExist && rulesToImport?.otherRuleTypesCount > 0 && (
+          <div className="charles-import-warning-banner">
+            <div className="charles-import-warning-banner-text">
+              <WarningOutlined className="charles-importer-warning-icon" /> A few settings are not supported.
+            </div>
+            <div className="charles-importer-warning-docs-link">
+              <CharlesDocsLink
+                title="Learn more about it here"
+                linkClickSrc="all_settings_unsupported_screen"
+                importTriggerSrc={source}
+              />
+            </div>
+          </div>
         )}
 
         {(isParseComplete || validationError) && (
