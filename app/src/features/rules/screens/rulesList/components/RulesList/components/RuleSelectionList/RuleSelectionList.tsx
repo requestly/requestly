@@ -40,8 +40,6 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
   const handleRuleTypeClick = (ruleType: RuleType) => {
     trackRuleCreationWorkflowStartedEvent(ruleType, source);
 
-    onRuleItemClick(ruleType);
-
     callback();
 
     onRuleItemClick(ruleType);
@@ -76,6 +74,7 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
                     features={[`${rule.type.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
                     onClickCallback={(e) => {
                       e?.preventDefault?.();
+                      onRuleItemClick(rule.type);
                     }}
                   >
                     <NavLink
