@@ -1,0 +1,23 @@
+.saved-session-header {
+  padding: 12px 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-header-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &__parent-route {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-sm);
+    font-weight: 400;
+  }
+
+  &__arrow {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-xs);
+  }
+}
