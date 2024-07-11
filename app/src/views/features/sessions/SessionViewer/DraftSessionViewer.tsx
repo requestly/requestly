@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
+import { unstable_usePrompt, useNavigate } from "react-router-dom";
 import { getAppMode, getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
-import { getTabSession } from "actions/ExtensionActions";
+// import { getTabSession } from "actions/ExtensionActions";
 import { Input, Modal, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import SessionDetails from "./SessionDetails";
 import { SessionViewerTitle } from "./SessionViewerTitle";
 import { RQSession } from "@requestly/web-sdk";
-import mockSession from "./mockData/mockSession";
+// import mockSession from "./mockData/mockSession";
 import DownArrow from "assets/icons/down-arrow.svg?react";
 import PageLoader from "components/misc/PageLoader";
 import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
@@ -33,7 +33,7 @@ import {
   trackTestRuleSessionDraftViewed,
   trackTroubleshootClicked,
 } from "modules/analytics/events/features/ruleEditor";
-import { DebugInfo, SessionRecordingMode } from "./types";
+import { DebugInfo } from "./types";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import APP_CONSTANTS from "config/constants";
 import { toast } from "utils/Toast";
@@ -58,8 +58,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   source = DRAFT_SESSION_VIEWED_SOURCE.DEFAULT,
   desktopMode = false,
 }) => {
-  const tempTabId = useParams().tabId ?? testRuleDraftSession?.draftSessionTabId;
-  const tabId = useMemo(() => (desktopMode ? "imported" : tempTabId), [desktopMode, tempTabId]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
@@ -69,7 +67,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const isImportedSession = tabId === "imported";
+  // const isImportedSession = tabId === "imported";
 
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string>();
@@ -124,55 +122,90 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
     [dispatch]
   );
 
-  useEffect(() => {
-    if (isImportedSession && sessionRecordingMetadata === null && !desktopMode) {
-      navigate(PATHS.SESSIONS.ABSOLUTE);
-    }
-  }, [navigate, isImportedSession, sessionRecordingMetadata, desktopMode]);
+  // useEffect(() => {
+  //   if (isImportedSession && sessionRecordingMetadata === null && !desktopMode) {
+  //     navigate(PATHS.SESSIONS.ABSOLUTE);
+  //   }
+  // }, [navigate, isImportedSession, sessionRecordingMetadata, desktopMode]);
+
+  // useEffect(() => {
+  //   setIsLoading(true);
+
+  //   if (tabId === "imported") {
+  //     setIsLoading(false);
+  //   } else if (tabId === "mock") {
+  //     // TODO: remove mock flow
+  //     dispatch(
+  //       sessionRecordingActions.setSessionRecordingMetadata({
+  //         sessionAttributes: mockSession.attributes,
+  //         name: "Mock Session Recording",
+  //       })
+  //     );
+  //     dispatch(sessionRecordingActions.setEvents(mockSession.events));
+  //     setIsLoading(false);
+  //   } else {
+  //     getTabSession(parseInt(tabId)).then((payload: unknown) => {
+  //       if (typeof payload === "string") {
+  //         setLoadingError(payload);
+  //       } else {
+  //         const tabSession = payload as RQSession & { recordingMode?: SessionRecordingMode };
+  //         if (!tabSession) {
+  //           return;
+  //         }
+
+  //         if (tabSession.events.rrweb?.length < 2) {
+  //           setLoadingError("RRWeb events not captured");
+  //         } else {
+  //           dispatch(
+  //             sessionRecordingActions.setSessionRecordingMetadata({
+  //               sessionAttributes: tabSession.attributes,
+  //               name: generateDraftSessionTitle(tabSession.attributes?.url),
+  //               recordingMode: tabSession.recordingMode || null,
+  //             })
+  //           );
+
+  //           dispatch(sessionRecordingActions.setEvents(tabSession.events));
+  //         }
+  //       }
+  //       setIsLoading(false);
+  //     });
+  //   }
+  // }, [dispatch, tabId, user?.details?.profile?.email, testRuleDraftSession, source]);
 
   useEffect(() => {
-    setIsLoading(true);
+    const handleMessage = (event: any) => {
+      if (event.data.type === "DRAFT_SESSION") {
+        setIsLoading(true);
+        const tabSession = event.data.payload as RQSession;
 
-    if (tabId === "imported") {
-      setIsLoading(false);
-    } else if (tabId === "mock") {
-      // TODO: remove mock flow
-      dispatch(
-        sessionRecordingActions.setSessionRecordingMetadata({
-          sessionAttributes: mockSession.attributes,
-          name: "Mock Session Recording",
-        })
-      );
-      dispatch(sessionRecordingActions.setEvents(mockSession.events));
-      setIsLoading(false);
-    } else {
-      getTabSession(parseInt(tabId)).then((payload: unknown) => {
-        if (typeof payload === "string") {
-          setLoadingError(payload);
+        if (!tabSession) {
+          return;
+        }
+        if (tabSession.events.rrweb?.length < 2) {
+          setLoadingError("RRWeb events not captured");
         } else {
-          const tabSession = payload as RQSession & { recordingMode?: SessionRecordingMode };
-          if (!tabSession) {
-            return;
-          }
+          dispatch(
+            sessionRecordingActions.setSessionRecordingMetadata({
+              sessionAttributes: tabSession.attributes,
+              name: generateDraftSessionTitle(tabSession.attributes?.url),
+              recordingMode: null,
+            })
+          );
 
-          if (tabSession.events.rrweb?.length < 2) {
-            setLoadingError("RRWeb events not captured");
-          } else {
-            dispatch(
-              sessionRecordingActions.setSessionRecordingMetadata({
-                sessionAttributes: tabSession.attributes,
-                name: generateDraftSessionTitle(tabSession.attributes?.url),
-                recordingMode: tabSession.recordingMode || null,
-              })
-            );
-
-            dispatch(sessionRecordingActions.setEvents(tabSession.events));
-          }
+          dispatch(sessionRecordingActions.setEvents(tabSession.events));
         }
         setIsLoading(false);
-      });
-    }
-  }, [dispatch, tabId, user?.details?.profile?.email, testRuleDraftSession, source]);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener("message", handleMessage);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [dispatch, user?.details?.profile?.email, source]);
 
   useEffect(() => {
     trackDraftSessionViewed(source, sessionRecordingMetadata?.recordingMode);
@@ -351,12 +384,13 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
           </a>
         </Space>
       )}
-      <SessionDetails key={tabId} />
+      <SessionDetails />
       <ProductWalkthrough
         completeTourOnUnmount={false}
         startWalkthrough={!hasUserCreatedSessions && !isMiscTourCompleted?.firstDraftSession && !testRuleDraftSession}
         tourFor={MISC_TOURS.APP_ENGAGEMENT.FIRST_DRAFT_SESSION}
         onTourComplete={() =>
+          // @ts-ignore
           dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" }))
         }
       />

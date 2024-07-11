@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
 import firebaseApp from "firebase.js";
-import { User, getAuth, onAuthStateChanged } from "firebase/auth";
+import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 import { actions } from "store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
@@ -16,6 +16,8 @@ import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDo
 import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUser } from "backend/user/getUser";
+import { StorageService } from "init";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -172,6 +174,36 @@ const AuthHandler: React.FC<{}> = () => {
   );
 
   useEffect(() => {
+    const handleMessage = (event: any) => {
+      if (event.data.type === "AUTH") {
+        const token = event.data.payload;
+
+        if (!token) {
+          return;
+        }
+
+        const auth = getAuth(firebaseApp);
+        signInWithCustomToken(auth, token)
+          .then(() => {
+            // Signed in
+            alert("User signed in within iframe");
+          })
+          .catch((error) => {
+            console.error("Error signing in with custom token:", error);
+          });
+      }
+    };
+
+    // Add event listener
+    window.addEventListener("message", handleMessage);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
     hasAuthHandlerBeenSet = true;
 
@@ -182,7 +214,11 @@ const AuthHandler: React.FC<{}> = () => {
 
       if (user) {
         Logger.timeLog("AuthHandler-preloader", "User found");
-
+        user.getIdToken().then((token) => {
+          StorageService(appMode).saveRecord({
+            [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: token,
+          });
+        });
         blockingOperations(user).then((success: boolean) => {
           if (success) {
             nonBlockingOperations(user).then(() => {
@@ -197,6 +233,7 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
         localStorage.removeItem("__rq_uid");
+        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN);
 
         // set amplitude anon id to local storage:
 

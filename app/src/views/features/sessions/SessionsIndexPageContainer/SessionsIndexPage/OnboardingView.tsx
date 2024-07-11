@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect } from "react";
+import React, { useCallback, useRef, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { CheckOutlined, SettingOutlined } from "@ant-design/icons";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
@@ -110,9 +110,32 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
   const inputRef = useRef<InputRef>();
   const dispatch = useDispatch();
   const appFlavour = getAppFlavour();
+  const [temp, setIsTemp] = useState(false);
 
   useEffect(() => {
     trackOnboardingPageViewed();
+  }, []);
+
+  useEffect(() => {
+    const handleMessage = (event: any) => {
+      // // Check the origin of the message
+      // if (event.origin !== "https://parent-website.com") {
+      //   return;
+      // }
+
+      // Handle the message
+      if (event.data.type === "DRAFT_SESSION") {
+        setIsTemp(true);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener("message", handleMessage);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
   }, []);
 
   const openInstallExtensionModal = useCallback(() => {
@@ -164,6 +187,7 @@ export const SessionOnboardingView: React.FC<SessionOnboardProps> = ({
       <Row justify="space-between" className="onboarding-banner">
         <Col span={isModalView ? 24 : 12} className="banner-text-container">
           <Row className="banner-header">
+            {temp && <Text>SESSION DATA RECEIVED</Text>}
             <Title className="banner-title">
               Debug issues faster with{" "}
               {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? "SessionBear" : "SessionBook"}
