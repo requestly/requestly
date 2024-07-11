@@ -24,9 +24,10 @@ export const RuleSelectionListDrawer: React.FC<Props> = ({
     <>
       <Drawer
         title="Create new rule"
+        width={360}
         open={open}
-        placement={placement}
         onClose={onClose}
+        placement={placement}
         className="rule-selection-list-drawer"
       >
         <RuleSelectionList
