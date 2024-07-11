@@ -9,6 +9,7 @@ import { ResponseRuleResourceType } from "types/rules";
 import { parseHTMLString, getHTMLNodeName, validateHTMLTag, removeUrlAttribute } from "./insertScriptValidators";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
+import { countCapturingGroups } from "modules/extension/mv3RuleParser/utils";
 import { RE2JS } from "re2js";
 
 /**
@@ -196,6 +197,18 @@ export const validateRule = (rule, dispatch, appMode) => {
           message: `Please enter the part that needs to be replaced`,
           error: "missing from field",
         };
+      }
+
+      if (pair.source.operator === GLOBAL_CONSTANTS.RULE_OPERATORS.MATCHES) {
+        const hasCapturingGroup = !!countCapturingGroups(pair.source.value);
+
+        if (hasCapturingGroup) {
+          output = {
+            result: false,
+            message: `Capturing groups are not supported in the source regex`,
+            error: "capturing group present in source of replace rule",
+          };
+        }
       }
     });
   }
