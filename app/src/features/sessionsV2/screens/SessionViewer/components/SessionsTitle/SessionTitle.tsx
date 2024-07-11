@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { CustomInlineInput } from "componentsV2/CustomInlineInput/CustomInlineInput";
-import "./sessionsHeader.scss";
+import "./sessionsTitle.scss";
 
-export const SessionsHeader = () => {
+export const SessionTitle = () => {
   const [sessionTitle, setSessionTitle] = useState("Pookie");
 
   return (
