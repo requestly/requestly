@@ -1,3 +1,4 @@
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import React, { useEffect, useMemo, useState } from "react";
 import { TestThisRule } from "components/features/rules/TestThisRule";
 import { BottomSheet } from "componentsV2/BottomSheet";
@@ -9,7 +10,7 @@ import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
-import { getIsMiscTourCompleted } from "store/selectors";
+import { getAppMode, getIsMiscTourCompleted } from "store/selectors";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 
 interface RuleEditorBottomSheetProps {
@@ -18,6 +19,7 @@ interface RuleEditorBottomSheetProps {
 
 export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mode }) => {
   const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
   const miscTours = useSelector(getIsMiscTourCompleted);
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const [startWalkthrough, setStartWalkthrough] = useState(false);
@@ -50,6 +52,7 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
   const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
 
   const bottomSheetTabItems = useMemo(() => {
+    if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP) return [];
     return [
       {
         key: BOTTOM_SHEET_TAB_KEYS.TEST_RULE,
@@ -63,7 +66,7 @@ export const RuleEditorBottomSheet: React.FC<RuleEditorBottomSheetProps> = ({ mo
         forceRender: true,
       },
     ];
-  }, [BOTTOM_SHEET_TAB_KEYS.TEST_RULE]);
+  }, [BOTTOM_SHEET_TAB_KEYS.TEST_RULE, appMode]);
 
   return (
     <>
