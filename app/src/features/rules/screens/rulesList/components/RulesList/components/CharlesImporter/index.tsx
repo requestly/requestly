@@ -266,7 +266,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
           <div className="charles-import-body">
             {isParseComplete ? (
               <div className="parsed-rules-info">
-                {rulesToImport?.parsedRuleTypes?.length > 0 && (
+                {isParsedRulesExist && (
                   <Space direction="vertical" align="start" size={8}>
                     <div className="parsed-success-row">
                       <CheckCircleOutlined className="check-outlined-icon" /> Successfully parsed below settings:
@@ -278,16 +278,20 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                     </ul>
                   </Space>
                 )}
-                {rulesToImport?.otherRuleTypesCount > 0 && (
-                  <div className="info-link-container">
-                    <InfoCircleOutlined />
-                    {isParsedRulesExist ? "Other settings are not supported." : "Uploaded settings are not supported."}
-                    <CharlesDocsLink
-                      title="Learn more about it here"
-                      linkClickSrc="all_settings_unsupported_screen"
-                      importTriggerSrc={source}
-                    />
-                  </div>
+                {!isParsedRulesExist && rulesToImport?.otherRuleTypesCount > 0 && (
+                  <>
+                    <div className="info-link-container">
+                      <InfoCircleOutlined />
+                      {"Uploaded settings are not supported."}
+                    </div>
+                    <div className="doc-link-container">
+                      <CharlesDocsLink
+                        title="Learn more about it here"
+                        linkClickSrc="all_settings_unsupported_screen"
+                        importTriggerSrc={source}
+                      />
+                    </div>
+                  </>
                 )}
               </div>
             ) : validationError ? (
@@ -316,13 +320,20 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
           </div>
         )}
 
-        {(isParsedRulesExist || validationError) && (
+        {(isParseComplete || validationError) && (
           <Row justify="end" className="import-actions-row">
             <RQButton loading={isLoading} onClick={callback}>
               Close
             </RQButton>
-            <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
-              {"Import rules"}
+            <RQButton
+              type="primary"
+              loading={isLoading}
+              onClick={() => {
+                if (isParsedRulesExist) handleCharlesRulesImport();
+                else handleResetImport();
+              }}
+            >
+              {isParsedRulesExist ? "Import rules" : "Upload another file"}
             </RQButton>
           </Row>
         )}

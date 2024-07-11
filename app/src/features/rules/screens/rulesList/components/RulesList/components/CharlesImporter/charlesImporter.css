@@ -71,7 +71,11 @@
   display: flex;
   /* justify-conxtent: center; */
   flex-direction: column;
-  padding: 16px;
+  /* padding: 16px; */
+}
+
+.doc-link-container {
+  margin-left: 18px;
 }
 
 .parsed-success-row {
