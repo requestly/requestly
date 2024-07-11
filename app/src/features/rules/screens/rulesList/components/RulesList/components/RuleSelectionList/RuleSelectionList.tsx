@@ -40,6 +40,8 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
   const handleRuleTypeClick = (ruleType: RuleType) => {
     trackRuleCreationWorkflowStartedEvent(ruleType, source);
 
+    onRuleItemClick(ruleType);
+
     callback();
 
     onRuleItemClick(ruleType);
