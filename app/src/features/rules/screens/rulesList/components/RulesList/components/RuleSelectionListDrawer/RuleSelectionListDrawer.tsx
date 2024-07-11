@@ -1,24 +1,26 @@
 import React from "react";
 import { Drawer, DrawerProps } from "antd";
-import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
+import { RuleSelectionList, RuleSelectionListProps } from "../RuleSelectionList/RuleSelectionList";
 import "./RuleSelectionListDrawer.scss";
 
-interface Props {
+interface RuleSelectionListDrawerProps extends RuleSelectionListProps {
   open: boolean;
   onClose: () => void;
-  groupId?: string;
   children: React.ReactNode;
-  analyticEventSource: string;
-  placement?: DrawerProps["placement"];
+  drawerPlacement?: DrawerProps["placement"];
 }
 
-export const RuleSelectionListDrawer: React.FC<Props> = ({
+export const RuleSelectionListDrawer: React.FC<RuleSelectionListDrawerProps> = ({
   open,
   onClose,
   groupId,
   children,
-  placement = "right",
-  analyticEventSource,
+  drawerPlacement = "right",
+  source,
+  premiumIconSource,
+  premiumPopoverPlacement = "topLeft",
+  callback = () => {},
+  onRuleItemClick = () => {},
 }) => {
   return (
     <>
@@ -27,14 +29,16 @@ export const RuleSelectionListDrawer: React.FC<Props> = ({
         width={360}
         open={open}
         onClose={onClose}
-        placement={placement}
+        placement={drawerPlacement}
         className="rule-selection-list-drawer"
       >
         <RuleSelectionList
           groupId={groupId}
-          source={analyticEventSource}
-          premiumPopoverPlacement="topLeft"
-          premiumIconSource="rule_dropdown"
+          source={source}
+          premiumIconSource={premiumIconSource}
+          premiumPopoverPlacement={premiumPopoverPlacement}
+          onRuleItemClick={onRuleItemClick}
+          callback={callback}
         />
       </Drawer>
 

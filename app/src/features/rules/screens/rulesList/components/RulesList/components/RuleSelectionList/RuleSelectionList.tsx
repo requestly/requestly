@@ -14,7 +14,7 @@ import { redirectToCreateNewRule } from "utils/RedirectionUtils";
 import { PaidFeatureNudgeViewedSource } from "modules/analytics/events/common/pricing";
 import "./RuleSelectionList.scss";
 
-interface RuleSelectionListProps {
+export interface RuleSelectionListProps {
   /** Analytics event source */
   source?: string;
   groupId?: string;
@@ -23,6 +23,7 @@ interface RuleSelectionListProps {
 
   /** Premium icon analytics event source */
   premiumIconSource: PaidFeatureNudgeViewedSource;
+  onRuleItemClick?: (ruleType: RuleType) => void;
 }
 
 export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
@@ -31,12 +32,15 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
   premiumPopoverPlacement = "topLeft",
   callback = () => {},
   premiumIconSource,
+  onRuleItemClick = () => {},
 }) => {
   const navigate = useNavigate();
   const { getFeatureLimitValue } = useFeatureLimiter();
 
   const handleRuleTypeClick = (ruleType: RuleType) => {
     trackRuleCreationWorkflowStartedEvent(ruleType, source);
+
+    onRuleItemClick(ruleType);
 
     callback();
 
@@ -59,27 +63,29 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
             <div>
               {rules.map((rule) => {
                 return (
-                  <NavLink
-                    end
-                    key={rule.type}
-                    className="rule-item-container"
-                    state={{ source }}
-                    onClick={(e) => {
-                      // Continue after premium check
-                      e.preventDefault();
+                  <PremiumFeature
+                    source={source}
+                    featureName={`${rule.title} rule`}
+                    popoverPlacement={premiumPopoverPlacement}
+                    onContinue={() => handleRuleTypeClick(rule.type)}
+                    features={[`${rule.type.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
+                    onClickCallback={(e) => {
+                      e?.preventDefault?.();
                     }}
-                    to={
-                      groupId
-                        ? `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${rule.type}?groupId=${groupId}`
-                        : `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${rule.type}`
-                    }
                   >
-                    <PremiumFeature
-                      source={source}
-                      featureName={`${rule.title} rule`}
-                      popoverPlacement={premiumPopoverPlacement}
-                      onContinue={() => handleRuleTypeClick(rule.type)}
-                      features={[`${rule.type.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
+                    <NavLink
+                      end
+                      key={rule.type}
+                      className="rule-item-container"
+                      state={{ source }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                      }}
+                      to={
+                        groupId
+                          ? `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${rule.type}?groupId=${groupId}`
+                          : `${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${rule.type}`
+                      }
                     >
                       <div className="rule-item">
                         <div className="icon">{rule.icon()}</div>
@@ -98,8 +104,8 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
                           </div>
                         ) : null}
                       </div>
-                    </PremiumFeature>
-                  </NavLink>
+                    </NavLink>
+                  </PremiumFeature>
                 );
               })}
             </div>
