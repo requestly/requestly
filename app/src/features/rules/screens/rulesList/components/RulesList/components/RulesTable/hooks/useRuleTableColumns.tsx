@@ -155,7 +155,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
                 open={isRulesListDrawerOpen}
                 onClose={onRulesListDrawerClose}
                 source={SOURCE.RULE_GROUP}
-                premiumIconSource="rule_drawer"
               >
                 <Button
                   className="add-rule-btn"

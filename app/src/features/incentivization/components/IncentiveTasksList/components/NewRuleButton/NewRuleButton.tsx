@@ -21,7 +21,6 @@ export const NewRuleButton: React.FC<{ disable?: boolean; callback?: () => void 
         onClose={onRulesListDrawerClose}
         source="rule_selection_dropdown"
         premiumPopoverPlacement="topLeft"
-        premiumIconSource="rule_dropdown"
         callback={callback}
         onRuleItemClick={() => {
           onRulesListDrawerClose();
