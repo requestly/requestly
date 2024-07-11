@@ -102,18 +102,18 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
       }
 
       let modheaderProfilesJSON;
+      let parsedRules = [];
       try {
         modheaderProfilesJSON = JSON.parse(fileContent as string);
+        parsedRules = parseRulesFromModheader(modheaderProfilesJSON);
       } catch (e) {
         setValidationError("Failed to parse your Modheader file.");
         setIsDataProcessing(false);
         return;
       }
 
-      const importedRules = parseRulesFromModheader(modheaderProfilesJSON);
-
       setIsDataProcessing(false);
-      setRulesToImport(importedRules);
+      setRulesToImport(parsedRules);
       setIsParseComplete(true);
     };
     reader.readAsText(file);
@@ -165,6 +165,20 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
           </Col>
         </Row>
 
+        {!isParseComplete && !validationError && (
+          <FilePicker
+            maxFiles={1}
+            onFilesDrop={(files) => {
+              handleResetImport();
+              onFilesDrop(files);
+            }}
+            isProcessing={isDataProcessing}
+            title="Drag and drop your Modheader export file to upload"
+            subtitle="Accepted file formats: json"
+            selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
+          />
+        )}
+
         {(isParseComplete || validationError) && (
           <div className="modheader-import-body">
             {isParseComplete ? (
@@ -201,38 +215,24 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
                 </ol>
               </div>
             ) : null}
-
-            {isParsedRulesExist && (
-              <Row justify="center" className="mt-8">
-                <RQButton type="primary" loading={isLoading} onClick={handleModheaderRulesImport}>
-                  Import
-                </RQButton>
-              </Row>
-            )}
           </div>
         )}
 
-        <FilePicker
-          maxFiles={1}
-          onFilesDrop={(files) => {
-            handleResetImport();
-            onFilesDrop(files);
-          }}
-          isProcessing={isDataProcessing}
-          title="Drag and drop your Modheader export file to upload"
-          subtitle="Accepted file formats: json"
-          selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
-        />
-
-        {/* <div className="charles-import-footer">
-          To export your rules from Charles,{"  "}
-          <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
-            Follow these steps
-            <div className="icon__wrapper">
-              <HiOutlineExternalLink />
-            </div>
-          </Link>
-        </div> */}
+        {(isParseComplete || validationError) && (
+          <Row justify="end" className="modheader-import-actions-row">
+            <RQButton onClick={callback}>Close</RQButton>
+            <RQButton
+              type="primary"
+              loading={isLoading}
+              onClick={() => {
+                if (isParsedRulesExist) handleModheaderRulesImport();
+                else handleResetImport();
+              }}
+            >
+              {isParsedRulesExist ? "Import rules" : "Upload another file"}
+            </RQButton>
+          </Row>
+        )}
       </div>
     </>
   );

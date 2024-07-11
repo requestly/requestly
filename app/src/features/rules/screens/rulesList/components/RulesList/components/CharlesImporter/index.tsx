@@ -342,10 +342,8 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
         )}
 
         {(isParseComplete || validationError) && (
-          <Row justify="end" className="import-actions-row">
-            <RQButton loading={isLoading} onClick={callback}>
-              Close
-            </RQButton>
+          <Row justify="end" className="charles-import-actions-row">
+            <RQButton onClick={callback}>Close</RQButton>
             <RQButton
               type="primary"
               loading={isLoading}

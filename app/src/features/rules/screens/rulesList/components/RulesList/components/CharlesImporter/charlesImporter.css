@@ -16,7 +16,7 @@
   margin: auto;
 }
 
-.charles-import-container .import-actions-row {
+.charles-import-container .charles-import-actions-row {
   display: flex;
   justify-content: flex-end;
   margin: 16px 0;
@@ -35,7 +35,7 @@
   padding: 16px;
 }
 
-.charles-import-footer {
+.import-from-charles-modal .charles-import-footer {
   color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-xs);
   text-align: center;
@@ -44,6 +44,13 @@
   margin-top: 16px;
   width: 550px;
   margin-left: -24px;
+}
+
+.charles-import-footer {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-xs);
+  text-align: center;
+  margin: 16px 0;
 }
 
 .charles-import-heading {

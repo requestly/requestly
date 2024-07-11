@@ -16,6 +16,13 @@
   margin: auto;
 }
 
+.modheader-import-container .modheader-import-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: 16px 0;
+  gap: 8px;
+}
+
 .modheader-import-header {
   margin-bottom: 8px;
   margin-top: -18px;
