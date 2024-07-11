@@ -327,7 +327,7 @@ const Sources = ({ isOpen, toggle, ...props }) => {
 
       return (
         <>
-          {type === "mobile" ? (
+          {type === "mobile" && isFeatureCompatible(FEATURES.DESKTOP_ANDROID_EMULATOR_SUPPORT) ? (
             <>
               <Alert
                 message={
