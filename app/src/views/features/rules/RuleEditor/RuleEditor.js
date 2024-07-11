@@ -87,11 +87,17 @@ const RuleEditor = (props) => {
             currentlySelectedRuleConfig={currentlySelectedRuleConfig}
           />
         ) : null}
-        <BottomSheetLayout bottomSheet={<RuleEditorBottomSheet mode={MODE} />}>
+        {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <ProCard className="rule-editor-procard">
             <RuleBuilder />
           </ProCard>
-        </BottomSheetLayout>
+        ) : (
+          <BottomSheetLayout bottomSheet={<RuleEditorBottomSheet mode={MODE} />}>
+            <ProCard className="rule-editor-procard">
+              <RuleBuilder />
+            </ProCard>
+          </BottomSheetLayout>
+        )}
       </Col>
     );
   };
