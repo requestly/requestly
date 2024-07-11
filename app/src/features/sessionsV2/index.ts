@@ -1,1 +1,1 @@
-export { SavedSessionViewer } from "./screens/SessionViewer/SavedSessionViewer/SavedSessionScreen";
+export { SavedSessionViewer } from "./screens/SessionViewer/SavedSessionViewer/SavedSessionViewer";
