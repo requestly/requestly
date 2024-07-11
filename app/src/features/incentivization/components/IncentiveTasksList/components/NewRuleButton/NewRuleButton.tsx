@@ -24,7 +24,7 @@ export const NewRuleButton: React.FC<{ disable?: boolean; callback?: () => void 
         premiumIconSource="rule_dropdown"
         callback={callback}
         onRuleItemClick={() => {
-          setIsRulesListDrawerOpen(false);
+          onRulesListDrawerClose();
         }}
       >
         <Button
