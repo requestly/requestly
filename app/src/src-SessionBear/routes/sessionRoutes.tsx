@@ -14,7 +14,7 @@ export const sessionRoutes: RouteObject[] = [
     element: <Navigate to={PATHS.SETTINGS.SESSION_BOOK.RELATIVE} replace />,
   },
   {
-    path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
+    path: PATHS.SESSIONS.DRAFT.RELATIVE,
     element: <DraftSessionViewer />,
   },
   {

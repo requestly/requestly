@@ -15,10 +15,10 @@ const DashboardLayout = () => {
     promptOneTap();
   }
 
-  useEffect(() => {
-    if (!isAppOpenedInIframe()) return;
-    removeElement(".app-header");
-  }, []);
+  // useEffect(() => {
+  //   if (!isAppOpenedInIframe()) return;
+  //   removeElement(".app-header");
+  // }, []);
 
   return (
     <>

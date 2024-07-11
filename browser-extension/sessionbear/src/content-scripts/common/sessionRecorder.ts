@@ -1,5 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
 import { SessionRecordingConfig } from "../../types";
+import { getRecord } from "../../storage";
 
 type SendResponseCallback = (payload: unknown) => void;
 
@@ -29,6 +30,7 @@ export const initSessionRecording = () => {
     switch (message.action) {
       case CLIENT_MESSAGES.START_RECORDING:
         sendStartRecordingEvent(message.payload);
+        injectSessionDraftViewer();
         break;
     }
   });
@@ -215,12 +217,14 @@ const showManualModeRecordingWidget = () => {
         action: EXTENSION_MESSAGES.STOP_RECORDING,
         openRecording: true,
       });
+      openSessionDraftViewer();
     });
 
     widget.addEventListener("discard", () => {
       chrome.runtime.sendMessage({
         action: EXTENSION_MESSAGES.STOP_RECORDING,
       });
+      openSessionDraftViewer();
     });
 
     widget.addEventListener("moved", (evt: CustomEvent) => {
@@ -306,4 +310,58 @@ const showToast = () => {
   }
 
   document.documentElement.appendChild(rqToast);
+};
+
+const injectSessionDraftViewer = () => {
+  const sessionDraftViewer = document.createElement("rq-session-draft-viewer");
+  sessionDraftViewer.classList.add("rq-draft-session");
+  sessionDraftViewer.style.position = "fixed";
+  sessionDraftViewer.style.inset = "0";
+  sessionDraftViewer.style.zIndex = "999999";
+  sessionDraftViewer.style.display = "none";
+  sessionDraftViewer.style.justifyContent = "center";
+  sessionDraftViewer.style.alignItems = "center";
+
+  // const container = document.createElement("div");
+  // container.style.position = "relative";
+  // container.style.height = "100vh";
+  // container.style.width = "100vw";
+
+  const iframe = document.createElement("iframe");
+  iframe.src = "http://localhost:3000/sessions/draft";
+  // iframe.style.position = "absolute";
+  // iframe.style.top = "50%";
+  // iframe.style.left = "50%";
+  // iframe.style.transform = "translate(-50%, -50%)";
+  iframe.style.height = "90vh";
+  iframe.style.width = "85vw";
+  iframe.id = "rq-session-draft-viewer-iframe";
+
+  // container.appendChild(iframe);
+  sessionDraftViewer.appendChild(iframe);
+  document.documentElement.appendChild(sessionDraftViewer);
+  getRecord("user_token")
+    .then((token) => {
+      iframe.contentWindow.postMessage(
+        { source: "pookie", action: "authenticate_user", type: "AUTH", payload: token },
+        "*"
+      );
+    })
+    .catch(() => {
+      console.log("User token not found");
+    });
+};
+
+const openSessionDraftViewer = () => {
+  const sessionDraftViewer = document.querySelector(".rq-draft-session") as HTMLElement;
+  sessionDraftViewer.style.display = "flex";
+
+  // get session from tab and send message to iframe
+  sendMessageToClient("getSessionData", null, (session) => {
+    const iframe = sessionDraftViewer.querySelector("#rq-session-draft-viewer-iframe") as HTMLIFrameElement;
+    iframe.contentWindow.postMessage(
+      { source: "pookie", action: "load_draft_session", type: "DRAFT_SESSION", payload: session },
+      "*"
+    );
+  });
 };

@@ -85,9 +85,9 @@ export const stopRecording = (tabId: number, openRecording: boolean) => {
     tabService.removeData(tabId, TAB_SERVICE_DATA.SESSION_RECORDING);
   });
 
-  if (openRecording) {
-    watchRecording(tabId);
-  }
+  // if (openRecording) {
+  //   watchRecording(tabId);
+  // }
 };
 
 export const startRecordingExplicitly = async (tab: chrome.tabs.Tab, showWidget: boolean = true) => {
