@@ -90,6 +90,7 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
               overlay={overlay}
               data-tour-id={tourId}
               className="rule-selection-dropdown-btn"
+              overlayStyle={{ zIndex: "1000" }}
             >
               <Button type="primary" icon={icon} onClick={() => onClickHandler()}>
                 {buttonText}
