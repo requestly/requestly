@@ -3,11 +3,12 @@ import { Drawer, DrawerProps } from "antd";
 import { RuleSelectionList, RuleSelectionListProps } from "../RuleSelectionList/RuleSelectionList";
 import "./RuleSelectionListDrawer.scss";
 
-interface RuleSelectionListDrawerProps extends RuleSelectionListProps {
+interface RuleSelectionListDrawerProps extends Omit<RuleSelectionListProps, "premiumIconSource"> {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
   drawerPlacement?: DrawerProps["placement"];
+  premiumIconSource?: RuleSelectionListProps["premiumIconSource"];
 }
 
 export const RuleSelectionListDrawer: React.FC<RuleSelectionListDrawerProps> = ({
@@ -17,7 +18,7 @@ export const RuleSelectionListDrawer: React.FC<RuleSelectionListDrawerProps> = (
   children,
   drawerPlacement = "right",
   source,
-  premiumIconSource,
+  premiumIconSource = "rule_drawer",
   premiumPopoverPlacement = "topLeft",
   callback = () => {},
   onRuleItemClick = () => {},
