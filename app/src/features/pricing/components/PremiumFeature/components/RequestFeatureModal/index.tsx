@@ -137,6 +137,9 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     },
                   })
                 );
+
+                setOpenPopup(false);
+                setPostRequestMessage(null);
               }}
             >
               Upgrade for free
@@ -160,6 +163,9 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     newProps: { selectedPlan: null, source: SOURCE.REQUEST_FEATURE_MODAL },
                   })
                 );
+
+                setOpenPopup(false);
+                setPostRequestMessage(null);
               }}
             >
               Upgrade yourself
