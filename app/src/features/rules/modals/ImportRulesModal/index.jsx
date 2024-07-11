@@ -294,21 +294,21 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   return (
     <>
       <Modal open={isOpen} onCancel={toggleModal} width={550} className="custom-rq-modal" footer={null}>
-        <div className="rule-importer-content">
-          {isImportFromCharlesModalOpen ? (
-            <ImportFromCharles
-              isBackButtonVisible={true}
-              onBackButtonClick={() => setIsImportFromCharlesModalOpen(false)}
-              callback={toggleModal}
-            />
-          ) : isImportFromModheaderModalOpen ? (
-            <ImportFromModheader
-              isBackButtonVisible={true}
-              onBackButtonClick={() => setIsImportFromModheaderModalOpen(false)}
-              callback={toggleModal}
-            />
-          ) : (
-            <>
+        {isImportFromCharlesModalOpen ? (
+          <ImportFromCharles
+            isBackButtonVisible={true}
+            onBackButtonClick={() => setIsImportFromCharlesModalOpen(false)}
+            callback={toggleModal}
+          />
+        ) : isImportFromModheaderModalOpen ? (
+          <ImportFromModheader
+            isBackButtonVisible={true}
+            onBackButtonClick={() => setIsImportFromModheaderModalOpen(false)}
+            callback={toggleModal}
+          />
+        ) : (
+          <>
+            <div className="rule-importer-content">
               <Row align="middle" justify="space-between" className="rules-importer-heading">
                 Import Rules
               </Row>
@@ -340,9 +340,9 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                   </RQButton>
                 </div>
               ) : null}
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
         {renderImportRulesBtn()}
       </Modal>
     </>

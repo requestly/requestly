@@ -16,6 +16,13 @@
   margin: auto;
 }
 
+.charles-import-container .import-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: 16px 0;
+  gap: 8px;
+}
+
 .charles-import-header {
   margin-bottom: 8px;
   margin-top: -18px;
@@ -32,7 +39,11 @@
   color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-xs);
   text-align: center;
-  margin: 16px 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--requestly-color-white-t-20);
+  margin-top: 16px;
+  width: 550px;
+  margin-left: -24px;
 }
 
 .charles-import-heading {

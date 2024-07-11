@@ -26,12 +26,6 @@ import "./charlesImporter.css";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { copyToClipBoard } from "utils/Misc";
 
-interface ModalProps {
-  isOpen: boolean;
-  toggle: () => void;
-  triggeredBy: string;
-}
-
 const validExportSteps = [
   {
     step: `Click on "Tools" in the top Menu bar in Charles Proxy`,
@@ -74,10 +68,25 @@ const CharlesDocsLink = ({
   </a>
 );
 
-export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, triggeredBy }) => {
+interface ModalProps {
+  isOpen: boolean;
+  toggle: () => void;
+  triggeredBy: string;
+  isBackButtonVisible?: boolean;
+  onBackButtonClick?: () => void;
+}
+
+export const ImportFromCharlesModal: React.FC<ModalProps> = ({
+  isOpen,
+  toggle,
+  triggeredBy,
+  isBackButtonVisible,
+  onBackButtonClick,
+}) => {
   useEffect(() => {
     trackCharlesSettingsImportViewed(triggeredBy);
   }, [triggeredBy]);
+
   return (
     <Modal
       open={isOpen}
@@ -87,7 +96,12 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
       className="import-from-charles-modal custom-rq-modal"
       width={550}
     >
-      <ImportFromCharles source={triggeredBy} callback={() => toggle()} />
+      <ImportFromCharles
+        source={triggeredBy}
+        callback={() => toggle()}
+        isBackButtonVisible={isBackButtonVisible}
+        onBackButtonClick={onBackButtonClick}
+      />
     </Modal>
   );
 };
@@ -96,6 +110,7 @@ export const ImportFromCharlesWrapperView: React.FC = () => {
   useEffect(() => {
     trackCharlesSettingsImportViewed("TOP_LEVEL_ROUTE");
   }, []);
+
   return (
     <div className="charles-import-wrapper">
       <ImportFromCharles />
@@ -233,6 +248,20 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
           </Col>
         </Row>
 
+        {!isParseComplete && !validationError && (
+          <FilePicker
+            maxFiles={1}
+            onFilesDrop={(files) => {
+              handleResetImport();
+              onFilesDrop(files);
+            }}
+            isProcessing={isDataProcessing}
+            title="Drag and drop your Charles export file to upload"
+            subtitle="Accepted file formats: CSV, Trace test file, and XML"
+            selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
+          />
+        )}
+
         {(isParseComplete || validationError) && (
           <div className="charles-import-body">
             {isParseComplete ? (
@@ -284,38 +313,29 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                 </ol>
               </div>
             ) : null}
-
-            {isParsedRulesExist && (
-              <Row justify="center" className="mt-8">
-                <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
-                  Import
-                </RQButton>
-              </Row>
-            )}
           </div>
         )}
 
-        <FilePicker
-          maxFiles={1}
-          onFilesDrop={(files) => {
-            handleResetImport();
-            onFilesDrop(files);
-          }}
-          isProcessing={isDataProcessing}
-          title="Drag and drop your Charles export file to upload"
-          subtitle="Accepted file formats: CSV, Trace test file, and XML"
-          selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
-        />
+        {(isParsedRulesExist || validationError) && (
+          <Row justify="end" className="import-actions-row">
+            <RQButton loading={isLoading} onClick={callback}>
+              Close
+            </RQButton>
+            <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
+              {"Import rules"}
+            </RQButton>
+          </Row>
+        )}
+      </div>
 
-        <div className="charles-import-footer">
-          To export your rules from Charles,{"  "}
-          <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
-            Follow these steps
-            <div className="icon__wrapper">
-              <HiOutlineExternalLink />
-            </div>
-          </Link>
-        </div>
+      <div className="charles-import-footer">
+        To export your rules from Charles,{"  "}
+        <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
+          Follow these steps
+          <div className="icon__wrapper">
+            <HiOutlineExternalLink />
+          </div>
+        </Link>
       </div>
     </>
   );
