@@ -18,7 +18,7 @@ export const NetworkLogProperty: React.FC<Props> = ({ label, children, isCodeBlo
       }}
     >
       {label ? <span style={{ fontWeight: "bold", marginRight: 8 }}>{label}:</span> : null}
-      {isCodeBlock ? <pre style={{ fontSize: 11 }}>{updatedChildren}</pre> : updatedChildren};
+      {isCodeBlock ? <pre style={{ fontSize: 11 }}>{updatedChildren}</pre> : updatedChildren}
     </div>
   ) : null;
 };
