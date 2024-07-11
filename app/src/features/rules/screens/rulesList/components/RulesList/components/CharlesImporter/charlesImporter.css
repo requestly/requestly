@@ -156,9 +156,13 @@
 
 .validation-heading {
   color: var(--requestly-color-error-300);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .validation-subheading {
   margin-left: 22px;
   font-weight: var(--requestly-font-weight-medium);
+  margin-bottom: 8px;
 }

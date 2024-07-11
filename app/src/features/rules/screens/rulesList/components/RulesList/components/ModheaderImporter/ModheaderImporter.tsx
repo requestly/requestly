@@ -204,11 +204,11 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
                     <>
                       <li key={index}>{step}</li>
                       {additionalSteps.length > 0 && (
-                        <ul className="additional-import-steps-list">
+                        <ol className="additional-import-steps-list">
                           {additionalSteps.map(({ step }, index) => (
                             <li key={index}>{step}</li>
                           ))}
-                        </ul>
+                        </ol>
                       )}
                     </>
                   ))}

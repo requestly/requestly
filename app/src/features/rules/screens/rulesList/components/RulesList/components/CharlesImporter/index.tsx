@@ -318,7 +318,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
             ) : validationError ? (
               <div className="parsed-rules-error-info">
                 <Row className="validation-heading">
-                  <InfoCircleOutlined className="icon__wrapper" />
+                  <InfoCircleOutlined />
                   Invalid settings file.
                 </Row>
                 <Row className="validation-subheading">Follow below steps to export settings from Charles:</Row>
@@ -327,11 +327,11 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                     <>
                       <li key={index}>{step}</li>
                       {additionalSteps.length > 0 && (
-                        <ul className="additional-import-steps-list">
+                        <ol className="additional-import-steps-list">
                           {additionalSteps.map(({ step }, index) => (
                             <li key={index}>{step}</li>
                           ))}
-                        </ul>
+                        </ol>
                       )}
                     </>
                   ))}
