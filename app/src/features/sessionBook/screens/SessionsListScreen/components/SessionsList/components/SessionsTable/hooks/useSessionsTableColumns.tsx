@@ -1,8 +1,8 @@
-import { ExclamationCircleOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { ShareAltOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { Modal, Table, Tooltip } from "antd";
+import { Table, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { UserIcon } from "components/common/UserIcon";
 import { ContentListTableProps } from "componentsV2/ContentList";
@@ -12,47 +12,25 @@ import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/Date
 import { getPrettyVisibilityName, renderHeroIcon } from "views/features/sessions/ShareRecordingModal";
 import FEATURES from "config/constants/sub/features";
 import PATHS from "config/constants/sub/paths";
-import { deleteRecording } from "views/features/sessions/api";
 import { RQButton } from "lib/design-system/components";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
+import { useSessionsActionContext } from "features/sessionBook/context/actions";
 
 interface SessionsTableColumnsProps {
-  setSharingRecordId: (id: string) => void;
-  setSelectedRowVisibility: (visibility: string) => void;
-  setIsShareModalVisible: (isVisible: boolean) => void;
+  handleUpdateSharingRecordId: (id: string) => void;
+  handleUpdateSelectedRowVisibility: (visibility: string) => void;
+  handleShareModalVisibiliity: (isVisible: boolean) => void;
   handleForceRender: () => void;
 }
 
 export const useSessionsTableColumns = ({
-  setSharingRecordId,
-  setSelectedRowVisibility,
-  setIsShareModalVisible,
+  handleUpdateSharingRecordId,
+  handleUpdateSelectedRowVisibility,
+  handleShareModalVisibiliity,
   handleForceRender,
 }: SessionsTableColumnsProps) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
-
-  const confirmDeleteAction = (id: string, eventsFilePath: string) => {
-    Modal.confirm({
-      title: "Confirm",
-      icon: <ExclamationCircleOutlined />,
-      content: (
-        <div>
-          <p>
-            Are you sure to delete this recording?
-            <br />
-            <br />
-            Users having the shared link will not be able to access it anymore.
-          </p>
-        </div>
-      ),
-      okText: "Delete",
-      cancelText: "Cancel",
-      onOk: async () => {
-        await deleteRecording(id, eventsFilePath);
-        handleForceRender();
-      },
-    });
-  };
+  const { handleDeleteSessionAction } = useSessionsActionContext();
 
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
@@ -139,9 +117,9 @@ export const useSessionsTableColumns = ({
                 icon={<ShareAltOutlined />}
                 iconOnly
                 onClick={() => {
-                  setSharingRecordId(id);
-                  setSelectedRowVisibility(record.visibility);
-                  setIsShareModalVisible(true);
+                  handleUpdateSharingRecordId(id);
+                  handleUpdateSelectedRowVisibility(record.visibility);
+                  handleShareModalVisibiliity(true);
                 }}
               />
             </Tooltip>
@@ -150,7 +128,7 @@ export const useSessionsTableColumns = ({
               <RQButton
                 icon={<RiDeleteBinLine />}
                 iconOnly
-                onClick={() => confirmDeleteAction(id, record.eventsFilePath)}
+                onClick={() => handleDeleteSessionAction(id, record.eventsFilePath, handleForceRender)}
               />
             </Tooltip>
           </div>
@@ -160,9 +138,8 @@ export const useSessionsTableColumns = ({
   ];
 
   if (!isWorkspaceMode) {
-    columns = columns.filter((colObj) => {
-      return colObj.title !== "Created by";
-    });
+    // remove createdBy column
+    columns.splice(5, 1);
   }
 
   return columns;

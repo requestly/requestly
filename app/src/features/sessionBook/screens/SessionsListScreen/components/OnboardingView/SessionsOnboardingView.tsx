@@ -18,7 +18,7 @@ import { isValidUrl } from "utils/FormattingHelper";
 import { redirectToSessionSettings } from "utils/RedirectionUtils";
 import { toast } from "utils/Toast";
 import { prefixUrlWithHttps } from "utils/URLUtils";
-import { SettingOutlined } from "@ant-design/icons";
+import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import { BsShieldCheck } from "@react-icons/all-files/bs/BsShieldCheck";
 import StartSessionRecordingGif from "../../assets/sessions-banner.gif";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
@@ -26,7 +26,7 @@ import FEATURES from "config/constants/sub/features";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { ImportWebSessionModalButton } from "../SessionsList/components/ImportWebSessionModalButton/ImportWebSessionModalButton";
 import { RQButton } from "lib/design-system/components";
-import { ImportSessionModal } from "../../modals/ImportSessionModal/ImportSessionModal";
+import { ImportSessionModal } from "features/sessionBook/modals/ImportSessionModal/ImportSessionModal";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./sessionsOnboardingView.scss";
@@ -104,7 +104,7 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
               {openDownloadedSessionModalBtn}
               {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY && (
                 <span onClick={handleSettingsNavigation} className="settings-btn">
-                  <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+                  <MdOutlineSettings /> &nbsp; <Text underline>Settings</Text>
                 </span>
               )}
             </Space>

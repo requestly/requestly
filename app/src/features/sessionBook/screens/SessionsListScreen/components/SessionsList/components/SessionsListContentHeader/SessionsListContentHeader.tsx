@@ -1,18 +1,18 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ContentListHeader } from "componentsV2/ContentList";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { SettingOutlined } from "@ant-design/icons";
 import { redirectToSessionSettings } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
-import { NewSessionModal } from "features/sessionBook/screens/SessionsListScreen/modals/NewSessionModal/NewSessionModal";
+import { NewSessionModal } from "features/sessionBook/modals/NewSessionModal/NewSessionModal";
 import { trackNewSessionClicked } from "modules/analytics/events/features/sessionRecording";
 import { ImportWebSessionModalButton } from "../ImportWebSessionModalButton/ImportWebSessionModalButton";
 import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
-import { ImportSessionModal } from "features/sessionBook/screens/SessionsListScreen/modals/ImportSessionModal/ImportSessionModal";
+import { ImportSessionModal } from "features/sessionBook/modals/ImportSessionModal/ImportSessionModal";
 import "./sessionsListContentHeader.scss";
 
 interface SessionsListContentHeaderProps {
@@ -24,6 +24,7 @@ export const SessionsListContentHeader: React.FC<SessionsListContentHeaderProps>
   searchValue,
   handleSearchValueUpdate,
 }) => {
+  const location = useLocation();
   const navigate = useNavigate();
   const [isNewSessionModalOpen, setIsNewSessionModalOpen] = useState(false);
   const [isImportSessionModalOpen, setIsImportSessionModalOpen] = useState(false);
@@ -54,7 +55,7 @@ export const SessionsListContentHeader: React.FC<SessionsListContentHeaderProps>
           actions={[
             <RQButton
               type="default"
-              onClick={() => redirectToSessionSettings(navigate, window.location.pathname)}
+              onClick={() => redirectToSessionSettings(navigate, location.pathname)}
               icon={<SettingOutlined />}
             >
               Settings

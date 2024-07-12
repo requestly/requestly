@@ -3,24 +3,32 @@ import PATHS from "config/constants/sub/paths";
 import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
 import { SessionsListScreenContainer } from "./screens/SessionsListScreen/SessionsListScreenContainer";
+import SessionsFeatureContainer from "./container";
 
 export const sessionRoutes: RouteObject[] = [
   {
     path: PATHS.SESSIONS.INDEX,
-    element: <SessionsListScreenContainer />,
+    element: <SessionsFeatureContainer />,
+    children: [
+      {
+        path: PATHS.SESSIONS.RELATIVE,
+        element: <SessionsListScreenContainer />,
+      },
+      {
+        path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
+        element: <DraftSessionViewer />,
+      },
+      {
+        path: PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
+        element: <SavedSessionViewer />,
+      },
+    ],
   },
   {
     path: PATHS.SESSIONS.SETTINGS.RELATIVE,
     element: <Navigate to={PATHS.SETTINGS.SESSION_BOOK.RELATIVE} replace />,
   },
-  {
-    path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
-    element: <DraftSessionViewer />,
-  },
-  {
-    path: PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
-    element: <SavedSessionViewer />,
-  },
+
   {
     // path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",
     path: PATHS.NETWORK_LOGS.VIEWER.RELATIVE + "/:id",
