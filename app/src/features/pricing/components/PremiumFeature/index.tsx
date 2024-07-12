@@ -28,6 +28,8 @@ interface PremiumFeatureProps {
   source: string;
   featureName?: string;
   onClickCallback?: (e: any) => void;
+  onUpgradeYourselfCallback?: () => void;
+  onUpgradeForFreeCallback?: () => void;
 }
 
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
@@ -40,6 +42,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   source,
   onClickCallback,
   featureName,
+  onUpgradeYourselfCallback,
+  onUpgradeForFreeCallback,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -99,6 +103,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             isDeadlineCrossed={hasCrossedDeadline}
             source={source}
             featureName={featureName}
+            onUpgradeForFreeCallback={onUpgradeForFreeCallback}
+            onUpgradeYourselfCallback={onUpgradeYourselfCallback}
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
