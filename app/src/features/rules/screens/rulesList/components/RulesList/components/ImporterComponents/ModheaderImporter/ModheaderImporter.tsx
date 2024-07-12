@@ -20,10 +20,10 @@ const validExportSteps = [
     step: `Click on the ModHeader icon in the Chrome toolbar to open the extension.`,
   },
   {
-    step: `Click to opent the menu from top right corner and select "Export"`,
+    step: `Click to open the menu from top right corner and select "Export"`,
   },
   {
-    step: `Click on "Export/ share" profile.`,
+    step: `Click on "Export/Share" profile.`,
   },
   {
     step: `Select the JSON tab`,
