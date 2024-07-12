@@ -7,6 +7,7 @@ import { RQButton } from "lib/design-system/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOutlinePublic } from "@react-icons/all-files/md/MdOutlinePublic";
 import { MdOutlineLink } from "@react-icons/all-files/md/MdOutlineLink";
+import { SessionViewerBottomSheet } from "features/sessionsV2/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import "./savedSessionViewer.scss";
 
 export const SavedSessionViewer = () => {
@@ -28,7 +29,7 @@ export const SavedSessionViewer = () => {
             <DownloadSessionButton />
           </div>
         </div>
-        <BottomSheetLayout bottomSheet={<>SESSION DETAILS HERE</>}>
+        <BottomSheetLayout bottomSheet={<SessionViewerBottomSheet />}>
           <div className="saved-session-viewer-body">
             <SessionPlayer />
           </div>
