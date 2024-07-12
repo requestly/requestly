@@ -26,9 +26,9 @@ import {
 } from "modules/analytics/events/features/rules";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import "./importRules.scss";
-import { ImportFromCharles } from "features/rules/screens/rulesList/components/RulesList/components/CharlesImporter";
+import { ImportFromCharles } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/CharlesImporter";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { ImportFromModheader } from "features/rules/screens/rulesList/components/RulesList/components/ModheaderImporter/ModheaderImporter";
+import { ImportFromModheader } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ModheaderImporter";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State

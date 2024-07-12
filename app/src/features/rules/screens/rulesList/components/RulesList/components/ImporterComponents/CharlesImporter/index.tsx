@@ -28,9 +28,9 @@ import {
   trackCharlesSettingsImportDocsClicked,
   trackCharlesSettingsImportViewed,
 } from "modules/analytics/events/features/rules";
-import "./charlesImporter.css";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { copyToClipBoard } from "utils/Misc";
+import "../importer-components.css";
 
 const validExportSteps = [
   {
@@ -118,7 +118,7 @@ export const ImportFromCharlesWrapperView: React.FC = () => {
   }, []);
 
   return (
-    <div className="charles-import-wrapper">
+    <div className="importer-wrapper">
       <ImportFromCharles />
     </div>
   );
@@ -235,16 +235,16 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
 
   return (
     <>
-      <div className="charles-import-container">
-        <Row justify={"space-between"} className="charles-import-header">
-          <Col className="charles-import-heading">
+      <div className="importer-container">
+        <Row justify={"space-between"} className="importer-header">
+          <Col className="importer-heading">
             {isBackButtonVisible && (
               <ArrowLeftOutlined size={16} className="charles-import-back-icon" onClick={onBackButtonClick} />
             )}
             Import Charles Proxy settings
           </Col>
           <Col
-            className="charles-import-share-container"
+            className="importer-share-container"
             onClick={() =>
               copyToClipBoard(window.origin + PATHS.IMPORT_FROM_CHARLES.ABSOLUTE, "URL copied to clipboard")
             }
@@ -269,11 +269,11 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
         )}
 
         {isParseComplete && isParsedRulesExist && rulesToImport?.otherRuleTypesCount > 0 && (
-          <div className="charles-import-warning-banner">
-            <div className="charles-import-warning-banner-text">
-              <WarningOutlined className="charles-importer-warning-icon" /> A few settings are not supported.
+          <div className="importer-warning-banner">
+            <div className="importer-warning-banner-text">
+              <WarningOutlined className="importer-warning-icon" /> A few settings are not supported.
             </div>
-            <div className="charles-importer-warning-docs-link">
+            <div className="importer-warning-docs-link">
               <CharlesDocsLink
                 title="Learn more about it here"
                 linkClickSrc="all_settings_unsupported_screen"
@@ -284,9 +284,9 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
         )}
 
         {(isParseComplete || validationError) && (
-          <div className="charles-import-body">
+          <div className="importer-body">
             {isParseComplete ? (
-              <div className="parsed-rules-info">
+              <div className="importer-parsed-rules-info">
                 {isParsedRulesExist && (
                   <Space direction="vertical" align="start" size={8}>
                     <div className="parsed-success-row">
@@ -342,7 +342,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
         )}
 
         {(isParseComplete || validationError) && (
-          <Row justify="end" className="charles-import-actions-row">
+          <Row justify="end" className="importer-actions-row">
             <RQButton onClick={callback}>Close</RQButton>
             <RQButton
               type="primary"
@@ -358,7 +358,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
         )}
       </div>
 
-      <div className="charles-import-footer">
+      <div className="importer-footer">
         To export your rules from Charles,{"  "}
         <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
           Follow these steps

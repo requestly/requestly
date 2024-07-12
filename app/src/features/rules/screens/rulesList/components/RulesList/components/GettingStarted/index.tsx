@@ -5,7 +5,7 @@ import { Row, Col, Button } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
-import { ImportFromCharlesModal } from "../CharlesImporter";
+import { ImportFromCharlesModal } from "../ImporterComponents/CharlesImporter";
 import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "config/constants";
@@ -22,7 +22,7 @@ import {
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
-import { ImportFromModheaderModal } from "../ModheaderImporter/ImportFromModheaderModal";
+import { ImportFromModheaderModal } from "../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
 
 const { PATHS } = APP_CONSTANTS;
 

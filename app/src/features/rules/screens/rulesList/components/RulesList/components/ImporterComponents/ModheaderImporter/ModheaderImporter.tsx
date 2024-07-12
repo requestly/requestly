@@ -13,7 +13,7 @@ import { copyToClipBoard } from "utils/Misc";
 import { parseRulesFromModheader } from "modules/rule-adapters/modheader-rule-adapters/parseRulesFromModheader";
 import { Group, Rule } from "types";
 import { addRulesAndGroupsToStorage } from "components/features/rules/ImportRulesModal/actions";
-import "./modheaderImporter.css";
+import "../importer-components.css";
 
 const validExportSteps = [
   {
@@ -37,25 +37,6 @@ const validExportSteps = [
     step: `Click on the "Download JSON" button`,
   },
 ];
-
-// const CharlesDocsLink = ({
-//   title,
-//   linkClickSrc,
-//   importTriggerSrc,
-// }: {
-//   title: string;
-//   linkClickSrc: string;
-//   importTriggerSrc: string;
-// }) => (
-//   <a
-//     target="_blank"
-//     rel="noreferrer"
-//     href={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}
-//     onClick={() => trackCharlesSettingsImportDocsClicked(linkClickSrc, importTriggerSrc)}
-//   >
-//     {title} <HiOutlineExternalLink className="external-icon-link" />
-//   </a>
-// );
 
 interface ImportFromModheaderProps {
   source?: string | null; // null indicates this is not mounted inside modal
@@ -146,16 +127,16 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
 
   return (
     <>
-      <div className="modheader-import-container">
-        <Row justify={"space-between"} className="modheader-import-header">
-          <Col className="modheader-import-heading">
+      <div className="importer-container">
+        <Row justify={"space-between"} className="importer-header">
+          <Col className="importer-heading">
             {isBackButtonVisible && (
-              <ArrowLeftOutlined size={16} className="modheader-import-back-icon" onClick={onBackButtonClick} />
+              <ArrowLeftOutlined size={16} className="importer-back-icon" onClick={onBackButtonClick} />
             )}
             Import Modheader profiles
           </Col>
           <Col
-            className="modheader-import-share-container"
+            className="importer-share-container"
             onClick={() =>
               copyToClipBoard(window.origin + PATHS.IMPORT_FROM_MODHEADER.ABSOLUTE, "URL copied to clipboard")
             }
@@ -180,58 +161,57 @@ export const ImportFromModheader: React.FC<ImportFromModheaderProps> = ({
         )}
 
         {(isParseComplete || validationError) && (
-          <div className="modheader-import-body">
-            {isParseComplete ? (
-              <div className="parsed-rules-info">
-                {isParsedRulesExist && (
-                  <Space direction="vertical" align="start" size={8}>
-                    <div className="parsed-success-row">
-                      <CheckCircleOutlined className="check-outlined-icon" /> Successfully parsed your modheader
-                      profile.
-                    </div>
-                  </Space>
-                )}
-              </div>
-            ) : validationError ? (
-              <div className="parsed-rules-error-info">
-                <Row className="validation-heading">
-                  <InfoCircleOutlined className="icon__wrapper" />
-                  Invalid export file.
-                </Row>
-                <Row className="validation-subheading">Follow below steps to export Profiles from Modheader:</Row>
-                <ol>
-                  {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
-                    <>
-                      <li key={index}>{step}</li>
-                      {additionalSteps.length > 0 && (
-                        <ol className="additional-import-steps-list">
-                          {additionalSteps.map(({ step }, index) => (
-                            <li key={index}>{step}</li>
-                          ))}
-                        </ol>
-                      )}
-                    </>
-                  ))}
-                </ol>
-              </div>
-            ) : null}
-          </div>
-        )}
-
-        {(isParseComplete || validationError) && (
-          <Row justify="end" className="modheader-import-actions-row">
-            <RQButton onClick={callback}>Close</RQButton>
-            <RQButton
-              type="primary"
-              loading={isLoading}
-              onClick={() => {
-                if (isParsedRulesExist) handleModheaderRulesImport();
-                else handleResetImport();
-              }}
-            >
-              {isParsedRulesExist ? "Import rules" : "Upload another file"}
-            </RQButton>
-          </Row>
+          <>
+            <div className="importer-body">
+              {isParseComplete ? (
+                <div className="parsed-rules-info">
+                  {isParsedRulesExist && (
+                    <Space direction="vertical" align="start" size={8}>
+                      <div className="parsed-success-row">
+                        <CheckCircleOutlined className="check-outlined-icon" /> Successfully parsed your modheader
+                        profile.
+                      </div>
+                    </Space>
+                  )}
+                </div>
+              ) : validationError ? (
+                <div className="parsed-rules-error-info">
+                  <Row className="validation-heading">
+                    <InfoCircleOutlined className="icon__wrapper" />
+                    Invalid export file.
+                  </Row>
+                  <Row className="validation-subheading">Follow below steps to export Profiles from Modheader:</Row>
+                  <ol>
+                    {validExportSteps.map(({ step, additionalSteps = [] }, index) => (
+                      <>
+                        <li key={index}>{step}</li>
+                        {additionalSteps.length > 0 && (
+                          <ol className="additional-import-steps-list">
+                            {additionalSteps.map(({ step }, index) => (
+                              <li key={index}>{step}</li>
+                            ))}
+                          </ol>
+                        )}
+                      </>
+                    ))}
+                  </ol>
+                </div>
+              ) : null}
+            </div>
+            <Row justify="end" className="importer-actions-row">
+              <RQButton onClick={callback}>Close</RQButton>
+              <RQButton
+                type="primary"
+                loading={isLoading}
+                onClick={() => {
+                  if (isParsedRulesExist) handleModheaderRulesImport();
+                  else handleResetImport();
+                }}
+              >
+                {isParsedRulesExist ? "Import rules" : "Upload another file"}
+              </RQButton>
+            </Row>
+          </>
         )}
       </div>
     </>

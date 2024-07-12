@@ -13,7 +13,7 @@ import { Home } from "components/Home";
 import { PricingIndexPage } from "features/pricing/components/PricingPage";
 import { IncentiveTasksListScreen } from "features/incentivization";
 import { ImportFromCharlesWrapperView } from "features/rules/screens/rulesList/components/RulesList/components";
-import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ModheaderImporter/ImportFromModheaderScreen";
+import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ImportFromModheaderScreen";
 import SeleniumImporter from "views/misc/SeleniumImporter";
 
 export const miscRoutes: RouteObject[] = [

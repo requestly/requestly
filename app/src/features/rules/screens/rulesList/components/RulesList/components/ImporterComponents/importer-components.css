@@ -3,7 +3,12 @@
   border-bottom-right-radius: inherit;
 }
 
-.modheader-import-wrapper {
+.import-from-modheader-modal .ant-modal-body .rq-modal-content:last-child {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.importer-wrapper {
   width: 55%;
   margin: 0 auto;
   max-width: 900px;
@@ -12,37 +17,37 @@
   padding: 24px;
 }
 
-.modheader-import-container {
+.importer-container {
   margin: auto;
 }
 
-.modheader-import-container .modheader-import-actions-row {
+.importer-container .importer-actions-row {
   display: flex;
   justify-content: flex-end;
   margin: 16px 0;
   gap: 8px;
 }
 
-.modheader-import-header {
+.importer-header {
   margin-bottom: 8px;
   margin-top: -18px;
 }
 
-.modheader-import-body {
+.importer-body {
   background: var(--requestly-color-surface-1);
   margin-bottom: 16px;
   border-radius: 8px;
   padding: 16px;
 }
 
-.modheader-import-footer {
+.importer-footer {
   color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-xs);
   text-align: center;
   margin: 16px 0;
 }
 
-.modheader-import-heading {
+.importer-heading {
   font-size: var(--requestly-font-size-base);
   font-weight: var(--requestly-font-weight-medium);
   gap: 8px;
@@ -50,11 +55,11 @@
   align-items: center;
 }
 
-.modheader-import-heading .modheader-import-back-icon {
+.importer-heading .importer-back-icon {
   cursor: pointer;
 }
 
-.modheader-import-share-container {
+.importer-share-container {
   font-size: var(--requestly-font-size-xs);
   font-weight: var(--requestly-font-weight-medium);
   padding: 8px;
@@ -63,17 +68,17 @@
   margin-right: 20px;
 }
 
-.modheader-rules-info {
+.importer-parsed-rules-info {
   display: flex;
   flex-direction: column;
   padding: 16px;
 }
 
-.modheader-success-row {
+.importer-success-row {
   color: var(--requestly-color-success-300);
 }
 
-.modheader-rules-info li {
+.importer-rules-info li {
   list-style: disc;
 }
 
@@ -112,4 +117,64 @@
 .validation-subheading {
   margin-left: 22px;
   font-weight: var(--requestly-font-weight-medium);
+}
+
+.import-from-charles-modal .importer-footer {
+  color: var(--requestly-color-text-subtle);
+  font-size: var(--requestly-font-size-xs);
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--requestly-color-white-t-20);
+  margin-top: 16px;
+  width: 550px;
+  margin-left: -24px;
+}
+
+.doc-link-container {
+  margin-left: 18px;
+}
+
+.importer-warning-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--requestly-color-warning-600);
+  border: 1px var(--requestly-color-white-t-20) solid;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  color: var(--requestly-color-black);
+}
+
+.importer-warning-banner-text {
+  font-size: var(--requestly-font-size-sm);
+  gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.importer-warning-icon {
+  margin-top: -2px;
+}
+
+.importer-warning-docs-link a {
+  color: var(--requestly-color-black);
+  text-decoration: underline;
+}
+
+.parsed-success-row {
+  color: var(--requestly-color-success-300);
+  gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parsed-rules-info li {
+  list-style: disc;
+}
+
+.external-icon-link {
+  vertical-align: text-top;
 }
