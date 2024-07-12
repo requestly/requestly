@@ -10,16 +10,19 @@ import "./sessionsTable.scss";
 
 interface SessionsTableProps {
   sessions: SessionRecordingMetadata[];
+  handleForceRender: () => void;
 }
 
-export const SessionsTable: React.FC<SessionsTableProps> = ({ sessions }) => {
+export const SessionsTable: React.FC<SessionsTableProps> = ({ sessions, handleForceRender }) => {
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sharingRecordId, setSharingRecordId] = useState("");
   const [selectedRowVisibility, setSelectedRowVisibility] = useState("");
+
   const columns = useSessionsTableColumns({
     setIsShareModalVisible,
     setSharingRecordId,
     setSelectedRowVisibility,
+    handleForceRender,
   });
   const isAppBannerVisible = useSelector(getIsAppBannerVisible);
 
@@ -44,6 +47,7 @@ export const SessionsTable: React.FC<SessionsTableProps> = ({ sessions }) => {
           setVisible={setIsShareModalVisible}
           recordingId={sharingRecordId}
           currentVisibility={selectedRowVisibility}
+          onVisibilityChange={handleForceRender}
         />
       ) : null}
     </>

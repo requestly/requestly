@@ -1,7 +1,10 @@
+import React, { useEffect, useState, useRef } from "react";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getUserAuthDetails } from "store/selectors";
 import { Button, Col, Row, Radio, Tag, Typography, Modal } from "antd";
+import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
 import { BsBuilding } from "@react-icons/all-files/bs/BsBuilding";
 import { AiOutlineLink } from "@react-icons/all-files/ai/AiOutlineLink";
-import React, { useEffect, useState, useRef } from "react";
 import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { ShareAltOutlined } from "@ant-design/icons";
 import { IoEarthOutline } from "@react-icons/all-files/io5/IoEarthOutline";
@@ -16,11 +19,8 @@ import {
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { fetchCurrentEmails, updateVisibility } from "../api";
 import { Visibility } from "../SessionViewer/types";
-import "./shareRecordingModal.scss";
 import { useSelector } from "react-redux";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { getUserAuthDetails } from "store/selectors";
-import EmailInputWithDomainBasedSuggestions from "components/common/EmailInputWithDomainBasedSuggestions";
+import "./shareRecordingModal.scss";
 
 const _ = require("lodash");
 

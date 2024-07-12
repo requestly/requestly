@@ -10,7 +10,6 @@ import {
   query as firebaseQuery,
   limit,
   where,
-  startAfter,
   onSnapshot,
 } from "firebase/firestore";
 import firebaseApp from "../../../../../../../firebase";
@@ -20,9 +19,9 @@ import { SessionRecording } from "../../../../../types";
 // TODO: ADD PAGINATION
 
 const pageSize = 15;
-let unsubscribeListener: any;
+// let unsubscribeListener: any;
 
-export const useFetchSessions = () => {
+export const useFetchSessions = (forceRender: boolean) => {
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
@@ -30,9 +29,8 @@ export const useFetchSessions = () => {
   const [sessions, setSessions] = useState([]);
 
   const fetchRecordings = (lastDoc: unknown = null) => {
-    if (unsubscribeListener) unsubscribeListener();
-
     setIsSessionsListLoading(true);
+    setSessions([]);
     const records: SessionRecording[] = [];
     const db = getFirestore(firebaseApp);
     const collectionRef = collection(db, "session-recordings");
@@ -40,24 +38,24 @@ export const useFetchSessions = () => {
 
     let query = null;
 
-    if (lastDoc) {
-      query = firebaseQuery(
-        collectionRef,
-        where("ownerId", "==", ownerId),
-        orderBy("sessionAttributes.startTime", "desc"),
-        startAfter(lastDoc),
-        limit(pageSize)
-      );
-    } else {
-      query = firebaseQuery(
-        collectionRef,
-        where("ownerId", "==", ownerId),
-        orderBy("sessionAttributes.startTime", "desc"),
-        limit(pageSize)
-      );
-    }
+    // if (lastDoc) {
+    //   query = firebaseQuery(
+    //     collectionRef,
+    //     where("ownerId", "==", ownerId),
+    //     orderBy("sessionAttributes.startTime", "desc"),
+    //     startAfter(lastDoc),
+    //     limit(pageSize)
+    //   );
+    // } else {
+    query = firebaseQuery(
+      collectionRef,
+      where("ownerId", "==", ownerId),
+      orderBy("sessionAttributes.startTime", "desc"),
+      limit(pageSize)
+    );
+    // }
 
-    unsubscribeListener = onSnapshot(query, (documentSnapshots) => {
+    onSnapshot(query, (documentSnapshots) => {
       if (!documentSnapshots.empty) {
         documentSnapshots.forEach((doc) => {
           const recordData = doc.data();
@@ -75,7 +73,9 @@ export const useFetchSessions = () => {
           }
         });
 
+        console.log("records", records);
         setSessions(records);
+
         if (records.length > 0) {
           //   setQs(documentSnapshots); // Handles pagination
         }
@@ -87,22 +87,28 @@ export const useFetchSessions = () => {
     });
   };
 
-  const stableFetchRecordings = useCallback(fetchRecordings, [user?.details?.profile?.uid, workspace]);
+  const resetAndFetchSessions = () => {
+    setSessions([]);
+    stableFetchSessions();
+  };
+
+  const stableFetchSessions = useCallback(fetchRecordings, [user?.details?.profile?.uid, workspace]);
 
   useEffect(() => {
     if (user?.details?.profile?.uid) {
-      if (hasUserChanged) {
-        setSessions([]);
-        // setReachedEnd(false);
-        stableFetchRecordings();
-      } else {
-        stableFetchRecordings();
-      }
+      // if (hasUserChanged) {
+      //   setSessions([]);
+      //   // setReachedEnd(false);
+      //   stableFetchSessions();
+      // } else {
+      stableFetchSessions();
+      // }
     }
-  }, [hasUserChanged, workspace, stableFetchRecordings, user?.details?.profile?.uid]);
+  }, [hasUserChanged, workspace, stableFetchSessions, user?.details?.profile?.uid, forceRender]);
 
   return {
     sessions,
     isSessionsListLoading,
+    resetAndFetchSessions,
   };
 };

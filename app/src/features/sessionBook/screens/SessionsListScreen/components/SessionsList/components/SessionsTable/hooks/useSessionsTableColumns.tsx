@@ -20,12 +20,14 @@ interface SessionsTableColumnsProps {
   setSharingRecordId: (id: string) => void;
   setSelectedRowVisibility: (visibility: string) => void;
   setIsShareModalVisible: (isVisible: boolean) => void;
+  handleForceRender: () => void;
 }
 
 export const useSessionsTableColumns = ({
   setSharingRecordId,
   setSelectedRowVisibility,
   setIsShareModalVisible,
+  handleForceRender,
 }: SessionsTableColumnsProps) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
 
@@ -47,6 +49,7 @@ export const useSessionsTableColumns = ({
       cancelText: "Cancel",
       onOk: async () => {
         await deleteRecording(id, eventsFilePath);
+        handleForceRender();
       },
     });
   };
