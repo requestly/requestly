@@ -32,6 +32,7 @@ export const RuleSelectionListDrawer: React.FC<RuleSelectionListDrawerProps> = (
         onClose={onClose}
         placement={drawerPlacement}
         className="rule-selection-list-drawer"
+        destroyOnClose
       >
         <RuleSelectionList
           groupId={groupId}
