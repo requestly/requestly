@@ -10,6 +10,7 @@ interface SettingsItemProps extends SwitchProps {
   settingsBody?: ReactNode;
   onChange: (status: boolean, event?: React.MouseEvent<HTMLButtonElement>) => void;
   isChangeAble?: boolean;
+  isTogglable?: boolean;
 }
 
 const SettingsItem: React.FC<SettingsItemProps> = ({
@@ -20,6 +21,7 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
   settingsBody,
   toolTipTitle = "",
   isChangeAble = true,
+  isTogglable = true,
   ...props
 }) => {
   return (
@@ -29,17 +31,19 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
         {!!caption && <p className="setting-item-caption">{caption}</p>}
         {settingsBody}
       </Col>
-      <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
-        {isChangeAble ? (
-          <Tooltip title={toolTipTitle}>
-            <Switch checked={isActive} onChange={onChange} {...props} />
-          </Tooltip>
-        ) : (
-          <Tooltip title="Enforced organisation wide. Please contact support to change.">
-            <Switch defaultChecked={isActive} disabled {...props} />
-          </Tooltip>
-        )}
-      </Col>
+      {isTogglable && (
+        <Col span={2} style={{ alignSelf: "self-start", marginTop: "8px" }}>
+          {isChangeAble ? (
+            <Tooltip title={toolTipTitle}>
+              <Switch checked={isActive} onChange={onChange} {...props} />
+            </Tooltip>
+          ) : (
+            <Tooltip title="Enforced organisation wide. Please contact support to change.">
+              <Switch defaultChecked={isActive} disabled {...props} />
+            </Tooltip>
+          )}
+        </Col>
+      )}
     </Row>
   );
 };

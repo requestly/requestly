@@ -1,5 +1,6 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
-import { matchRuleWithRequest } from "../../common/ruleMatcher";
+import { matchRuleWithRequest, matchSourceUrl } from "../../common/ruleMatcher";
+import { SourceKey, SourceOperator } from "common/types";
 
 let logShown = false;
 
