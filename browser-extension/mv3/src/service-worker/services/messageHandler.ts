@@ -1,7 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
 import { getAppTabs, toggleExtensionStatus } from "./utils";
-// import { handleRuleExecutionsOnClientPageLoad } from "./rulesManager";
 import { applyScriptRules } from "./scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
@@ -24,7 +23,7 @@ import {
   saveTestRuleResult,
 } from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
-import { isExtensionEnabled } from "../../utils";
+import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -129,6 +128,19 @@ export const initMessageHandler = () => {
         const requestDetails = { ...message.requestDetails, tabId: message.requestDetails?.tabId || sender.tab?.id };
         ruleExecutionHandler.onRuleExecuted(message.rule, requestDetails);
         break;
+
+      case EXTENSION_MESSAGES.IS_EXTENSION_BLOCKED_ON_TAB: {
+        if (!message.tabUrl) {
+          sendResponse(false);
+          break;
+        }
+
+        isUrlInBlockList(message.tabUrl)
+          .then((isBlocked) => sendResponse(isBlocked))
+          .catch(() => sendResponse(false));
+
+        return true;
+      }
 
       case EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
         sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED });
