@@ -2,46 +2,45 @@ import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { RuleType, Status, RedirectRule, RedirectDestinationType } from "types";
-import { CharlesRuleType, MapRemoteRule, MapRemoteRuleMappings, ParsedRule } from "../types";
-import { getGroupName, getLocation } from "../utils";
+import { getGroupName, getLocation } from "../../utils";
+import { CharlesRuleType, MapLocalRule, MapLocalRuleMappings, ParsedRule } from "../types";
 
-export const mapRemoteAdapter = (rules: MapRemoteRule): ParsedRule => {
-  const mappings = get(rules, "map.mappings.mapMapping") as MapRemoteRuleMappings;
+export const mapLocalRuleAdapter = (rules: MapLocalRule): ParsedRule => {
+  const mappings = get(rules, "mapLocal.mappings.mapLocalMapping") as MapLocalRuleMappings;
   const updatedMappings = Array.isArray(mappings) ? mappings : [mappings];
 
   if (!rules || !mappings) {
     return;
   }
 
-  const exportedRules = updatedMappings.map(({ sourceLocation, destLocation, enabled }) => {
+  const exportedRules = updatedMappings.map(({ dest: destination, sourceLocation, enabled }) => {
     const source = getLocation(sourceLocation);
-    const destination = getLocation(destLocation);
     const rule = getNewRule(RuleType.REDIRECT) as RedirectRule;
     return {
       ...rule,
       isCharlesImport: true,
-      name: `${source.value} to ${destination.value}`,
+      name: `${source.value} to ${destination}`,
       status: enabled ? Status.ACTIVE : Status.INACTIVE,
       pairs: [
         {
           ...rule.pairs[0],
           id: generateObjectId(),
-          destination: destination.value,
-          destinationType: RedirectDestinationType.URL,
+          destination: `file://${destination}`,
+          destinationType: RedirectDestinationType.MAP_LOCAL,
           source: { ...rule.pairs[0].source, value: source.value, operator: source.operator },
         },
       ],
     };
   });
 
-  const isToolEnabled = get(rules, "map.toolEnabled");
+  const isToolEnabled = get(rules, "mapLocal.toolEnabled");
   return {
-    type: CharlesRuleType.MAP_REMOTE,
+    type: CharlesRuleType.MAP_LOCAL,
     groups: [
       {
         rules: exportedRules,
         status: isToolEnabled,
-        name: getGroupName(CharlesRuleType.MAP_REMOTE),
+        name: getGroupName(CharlesRuleType.MAP_LOCAL),
       },
     ],
   };

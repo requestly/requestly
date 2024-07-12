@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { ImportFromCharlesModal } from "../CharlesImporter";
+import CharlesIcon from "assets/icons/charlesIcon.svg?react";
+import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
+import { ImportFromCharlesModal } from "../ImporterComponents/CharlesImporter";
 import { ImportRulesModal } from "../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
 import APP_CONSTANTS from "config/constants";
@@ -20,6 +22,7 @@ import {
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
 import "./gettingStarted.css";
+import { ImportFromModheaderModal } from "../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -35,6 +38,7 @@ export const GettingStarted: React.FC = () => {
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
+  const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
@@ -50,9 +54,13 @@ export const GettingStarted: React.FC = () => {
   const toggleImportCharlesRulesModal = () => {
     setIsImportCharlesRulesModalActive((prev) => !prev);
   };
+  const toggleImportModheaderRulesModal = () => {
+    setIsImportModheaderRulesModalActive((prev) => !prev);
+  };
 
   const handleLoginOnClick = () => {
     dispatch(
+      //@ts-ignore
       actions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
@@ -158,15 +166,30 @@ export const GettingStarted: React.FC = () => {
 
                 {/* TODO: make desktop only */}
                 {isCharlesImportFeatureFlagOn ? (
-                  <RQButton
-                    type="default"
-                    onClick={() => {
-                      toggleImportCharlesRulesModal();
-                      trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
-                    }}
-                  >
-                    Import settings from Charles Proxy
-                  </RQButton>
+                  <div className="display-row-center">
+                    <RQButton
+                      type="link"
+                      size="small"
+                      onClick={() => {
+                        toggleImportCharlesRulesModal();
+                        trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
+                      }}
+                    >
+                      <CharlesIcon />
+                      &nbsp; Import from Charles
+                    </RQButton>
+                    <RQButton
+                      type="link"
+                      size="small"
+                      onClick={() => {
+                        toggleImportModheaderRulesModal();
+                        trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
+                      }}
+                    >
+                      <ModheaderIcon />
+                      &nbsp; Import from ModHeader
+                    </RQButton>
+                  </div>
                 ) : null}
               </div>
             </div>
@@ -187,6 +210,14 @@ export const GettingStarted: React.FC = () => {
         <ImportFromCharlesModal
           isOpen={isImportCharlesRulesModalActive}
           toggle={toggleImportCharlesRulesModal}
+          triggeredBy={SOURCE.GETTING_STARTED}
+        />
+      ) : null}
+
+      {isImportModheaderRulesModalActive ? (
+        <ImportFromModheaderModal
+          isOpen={isImportModheaderRulesModalActive}
+          toggle={toggleImportModheaderRulesModal}
           triggeredBy={SOURCE.GETTING_STARTED}
         />
       ) : null}
