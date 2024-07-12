@@ -48,8 +48,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   setOpenPopup,
   onContinue,
   featureName,
-  onUpgradeYourselfCallback = () => {},
-  onUpgradeForFreeCallback = () => {},
+  onUpgradeYourselfCallback,
+  onUpgradeForFreeCallback,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();

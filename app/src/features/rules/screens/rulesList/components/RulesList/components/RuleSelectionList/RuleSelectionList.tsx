@@ -42,6 +42,8 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
 
     callback();
 
+    onRuleItemClick(ruleType);
+
     redirectToCreateNewRule(navigate, ruleType, source, groupId);
   };
 
@@ -66,10 +68,11 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
                     featureName={`${rule.title} rule`}
                     popoverPlacement={premiumPopoverPlacement}
                     onContinue={() => handleRuleTypeClick(rule.type)}
+                    onUpgradeYourselfCallback={() => onRuleItemClick(rule.type)}
+                    onUpgradeForFreeCallback={() => onRuleItemClick(rule.type)}
                     features={[`${rule.type.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
                     onClickCallback={(e) => {
                       e?.preventDefault?.();
-                      onRuleItemClick(rule.type);
                     }}
                   >
                     <NavLink

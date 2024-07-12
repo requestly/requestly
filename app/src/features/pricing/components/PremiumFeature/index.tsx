@@ -42,8 +42,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   source,
   onClickCallback,
   featureName,
-  onUpgradeYourselfCallback,
-  onUpgradeForFreeCallback,
+  onUpgradeYourselfCallback = () => {},
+  onUpgradeForFreeCallback = () => {},
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -62,6 +62,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const hasCrossedDeadline = useMemo(() => new Date() > new Date("2023-11-30"), []);
 
   const handlePopoverSecondaryAction = useCallback(() => {
+    onUpgradeForFreeCallback();
+
     if (!hasCrossedDeadline) {
       trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
       onContinue();
