@@ -35,6 +35,8 @@ interface RequestFeatureModalProps {
   featureName?: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
+  onUpgradeYourselfClickCallback?: () => void;
+  onUpgradeForFreeClickCallback?: () => void;
 }
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
@@ -46,6 +48,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   setOpenPopup,
   onContinue,
   featureName,
+  onUpgradeYourselfClickCallback,
+  onUpgradeForFreeClickCallback,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -127,6 +131,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               className="request-modal-text-btn"
               disabled={isLoading}
               onClick={() => {
+                onUpgradeForFreeClickCallback();
                 trackUpgradeOptionClicked("upgrade_for_free");
                 dispatch(
                   incentivizationActions.toggleActiveModal({
@@ -137,6 +142,9 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     },
                   })
                 );
+
+                setOpenPopup(false);
+                setPostRequestMessage(null);
               }}
             >
               Upgrade for free
@@ -151,6 +159,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               className="request-modal-default-btn"
               disabled={isLoading}
               onClick={() => {
+                onUpgradeYourselfClickCallback();
                 trackUpgradeOptionClicked("upgrade_yourself");
                 dispatch(
                   // @ts-ignore
@@ -160,6 +169,9 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
                     newProps: { selectedPlan: null, source: SOURCE.REQUEST_FEATURE_MODAL },
                   })
                 );
+
+                setOpenPopup(false);
+                setPostRequestMessage(null);
               }}
             >
               Upgrade yourself
@@ -210,6 +222,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
       maskStyle={{ backdropFilter: "blur(4px)", background: "none" }}
       closeIcon={<RQButton type="default" iconOnly icon={<CloseOutlined />} />}
       maskClosable={false}
+      zIndex={10010}
     >
       {postRequestMessage ? (
         <Col className="post-request-message-container">

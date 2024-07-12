@@ -28,6 +28,8 @@ interface PremiumFeatureProps {
   source: string;
   featureName?: string;
   onClickCallback?: (e: any) => void;
+  onUpgradeYourselfClickCallback?: () => void;
+  onUpgradeForFreeClickCallback?: () => void;
 }
 
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
@@ -40,6 +42,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   source,
   onClickCallback,
   featureName,
+  onUpgradeYourselfClickCallback = () => {},
+  onUpgradeForFreeClickCallback = () => {},
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -58,6 +62,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const hasCrossedDeadline = useMemo(() => new Date() > new Date("2023-11-30"), []);
 
   const handlePopoverSecondaryAction = useCallback(() => {
+    onUpgradeForFreeClickCallback();
+
     if (!hasCrossedDeadline) {
       trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
       onContinue();
@@ -99,6 +105,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             isDeadlineCrossed={hasCrossedDeadline}
             source={source}
             featureName={featureName}
+            onUpgradeForFreeClickCallback={onUpgradeForFreeClickCallback}
+            onUpgradeYourselfClickCallback={onUpgradeYourselfClickCallback}
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
@@ -112,6 +120,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
         </>
       ) : (
         <Popconfirm
+          zIndex={10010}
           disabled={!isExceedingLimits || !features || disabled || !isUpgradePopoverEnabled}
           overlayClassName={`premium-feature-popover ${!user.loggedIn ? "premium-popover-bottom-padding" : ""}`}
           autoAdjustOverflow
