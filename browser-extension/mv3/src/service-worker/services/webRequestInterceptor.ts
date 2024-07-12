@@ -2,6 +2,8 @@ import { RuleType } from "common/types";
 import { matchRuleWithRequest } from "../../common/ruleMatcher";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
+import { isExtensionEnabled } from "../../utils";
+import { Variable, onVariableChange } from "../variable";
 
 const onBeforeRequest = (details: chrome.webRequest.WebRequestBodyDetails) => {
   // @ts-ignore
@@ -88,7 +90,7 @@ const onHeadersReceived = (details: chrome.webRequest.WebResponseHeadersDetails)
   });
 };
 
-export const initWebRequestInterceptor = () => {
+export const addListeners = () => {
   if (!chrome.webRequest.onBeforeRequest.hasListener(onBeforeRequest)) {
     chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ["<all_urls>"] });
   }
@@ -112,4 +114,26 @@ export const initWebRequestInterceptor = () => {
       onHeadersReceivedOptions
     );
   }
+};
+
+const removeListeners = () => {
+  chrome.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
+  chrome.webRequest.onBeforeSendHeaders.removeListener(onBeforeSendHeaders);
+  chrome.webRequest.onHeadersReceived.removeListener(onHeadersReceived);
+};
+
+export const initWebRequestInterceptor = () => {
+  isExtensionEnabled().then((extensionStatus) => {
+    if (extensionStatus) {
+      addListeners();
+    }
+  });
+
+  onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
+    if (extensionStatus) {
+      addListeners();
+    } else {
+      removeListeners();
+    }
+  });
 };

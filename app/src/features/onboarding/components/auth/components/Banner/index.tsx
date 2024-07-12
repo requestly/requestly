@@ -2,11 +2,8 @@ import { Col, Row, Typography } from "antd";
 import { getAppFlavour } from "utils/AppUtils";
 import underlineIcon from "assets/images/illustrations/yellow-highlight.svg";
 import { MdCheck } from "@react-icons/all-files/md/MdCheck";
-import indeedLogo from "assets/img/icons/common/indeed.svg";
-import atntLogo from "assets/img/icons/common/atnt.svg";
-import verizonLogo from "assets/img/icons/common/verizon.svg";
-import intuitLogo from "assets/img/icons/common/intuit.svg";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { CompaniesLogoBanner } from "../CompaniesLogoBanner";
 import "./index.scss";
 
 const requestlyFeatures = [
@@ -24,8 +21,6 @@ const sessionBearFeatures = [
   "Join a Community trusted by over 200,000 customers worldwide from over 10,000",
   "It's Free!",
 ];
-
-const companyLogos = [indeedLogo, atntLogo, verizonLogo, intuitLogo];
 
 export const OnboardingAuthBanner = () => {
   const appFlavour = getAppFlavour();
@@ -62,18 +57,7 @@ export const OnboardingAuthBanner = () => {
               </Row>
             ))}
       </div>
-      <Row style={{ marginTop: "60px" }}>
-        <Typography.Text className="banner-text-small" style={{ fontWeight: "500", color: "var(--white)" }}>
-          Trusted by developers & QA teams from 50,000+ organizations
-        </Typography.Text>
-      </Row>
-      <Row align="middle" gutter={16} className="mt-16">
-        {companyLogos.map((logo) => (
-          <Col>
-            <img src={logo} className="banner-company-logo" alt="company logo" />
-          </Col>
-        ))}
-      </Row>
+      <CompaniesLogoBanner />
     </Col>
   );
 };
