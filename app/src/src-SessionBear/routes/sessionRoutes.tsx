@@ -3,7 +3,7 @@ import PATHS from "config/constants/sub/paths";
 import SessionsHomeView from "views/features/sessions";
 import { DraftSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
-import { SavedSessionViewer } from "features/sessionsV2";
+import { SavedSessionScreen } from "features/sessionsV2";
 
 export const sessionRoutes: RouteObject[] = [
   {
@@ -20,7 +20,7 @@ export const sessionRoutes: RouteObject[] = [
   },
   {
     path: PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
-    element: <SavedSessionViewer />,
+    element: <SavedSessionScreen />,
   },
   {
     // path: PATHS.SESSIONS.NETWORK.RELATIVE + "/:id",

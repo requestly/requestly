@@ -1,25 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Tooltip } from "antd";
 import { getAuthInitialization, getUserAuthDetails } from "store/selectors";
-import { SessionTitle } from "../components/SessionsTitle/SessionTitle";
-import { RQButton } from "lib/design-system/components";
-import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
-import { MdOutlinePublic } from "@react-icons/all-files/md/MdOutlinePublic";
-import { MdOutlineLink } from "@react-icons/all-files/md/MdOutlineLink";
-import { DownloadSessionButton } from "../components/DownloadSessionButton/DownloadSessionButton";
-import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import { SessionPlayer } from "../components/SessionPlayer/SessionPlayer";
 import { getRecording } from "backend/sessionRecording/getRecording";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { RQSessionEvents } from "@requestly/web-sdk";
 import { decompressEvents } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-import "./savedSessionViewer.scss";
 import PageLoader from "components/misc/PageLoader";
+import "./savedSessionScreen.scss";
+import { SavedSessionViewer } from "./components/SavedSessionViewer/SavedSessionViewer";
 
-export const SavedSessionViewer: React.FC = () => {
+export const SavedSessionScreen: React.FC = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -67,30 +59,5 @@ export const SavedSessionViewer: React.FC = () => {
     return <PageLoader message="Fetching session details..." />;
   }
 
-  return (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
-      <div className="saved-session-viewer-container">
-        <div className="saved-session-header">
-          <SessionTitle />
-          <div className="saved-session-actions">
-            <Tooltip title="Delete session">
-              <RQButton className="delete-session-btn" iconOnly icon={<RiDeleteBin6Line />} />
-            </Tooltip>
-            <RQButton className="share-session-btn" icon={<MdOutlinePublic />}>
-              Share session
-            </RQButton>
-            <RQButton className="share-session-btn" icon={<MdOutlineLink />}>
-              Copy link
-            </RQButton>
-            <DownloadSessionButton />
-          </div>
-        </div>
-        <BottomSheetLayout bottomSheet={<>SHEET</>}>
-          <div className="saved-session-viewer-body">
-            <SessionPlayer />
-          </div>
-        </BottomSheetLayout>
-      </div>
-    </BottomSheetProvider>
-  );
+  return <SavedSessionViewer />;
 };
