@@ -47,6 +47,7 @@ FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR = "graphql-payload-filter-operator";
 FEATURES.CUSTOM_LAUNCH_OPTIONS = "custom-launch-options";
 FEATURES.RELAY_AUTH_HEADER = "relay-auth-header";
 FEATURES.BLOCK_LIST = "block_list";
+FEATURES.DESKTOP_ANDROID_EMULATOR_SUPPORT = "desktop-android-emulator-support";
 
 FEATURES.SCRIPT_RULE = {};
 FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT = "script-rule-html-block";

@@ -1,7 +1,7 @@
 import { get } from "lodash";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { RuleType, HeadersRule, Status } from "types";
-import { getSourcesData, getHeaders, getGroupName } from "../utils";
+import { getSourcesData, getHeaders, getGroupName } from "../../utils";
 import { CharlesRuleType, NoCachingRule, ParsedRule, SourceUrl } from "../types";
 import { headersConfig } from "./headers-config";
 
