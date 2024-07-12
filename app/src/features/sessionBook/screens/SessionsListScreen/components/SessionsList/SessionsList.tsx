@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFetchSessions } from "./hooks/useFetchSessions";
 import PageLoader from "components/misc/PageLoader";
@@ -13,13 +13,19 @@ import { getIsWorkspaceMode } from "store/features/teams/selectors";
 export const SessionsList = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const user = useSelector(getUserAuthDetails);
-  const { sessions, isSessionsListLoading } = useFetchSessions();
   const [searchValue, setSearchValue] = useState("");
+  const [forceRender, setForceRender] = useState(false);
 
-  const searchedSessions = useMemo(() => sessions.filter((session) => session.name.includes(searchValue)), [
-    sessions,
-    searchValue,
-  ]);
+  const _forceRender = useCallback(() => {
+    setForceRender((prev) => !prev);
+  }, []);
+
+  const { sessions, isSessionsListLoading } = useFetchSessions(forceRender);
+
+  const searchedSessions = useMemo(
+    () => sessions.filter((session) => session.name.toLowerCase().includes(searchValue.toLowerCase())),
+    [sessions, searchValue]
+  );
 
   useEffect(() => {
     if (searchedSessions?.length >= 0 && !isWorkspaceMode) {
@@ -35,7 +41,7 @@ export const SessionsList = () => {
     return (
       <>
         <SessionsListContentHeader searchValue={searchValue} handleSearchValueUpdate={setSearchValue} />
-        <SessionsTable sessions={searchedSessions} />
+        <SessionsTable sessions={searchedSessions} handleForceRender={_forceRender} />
       </>
     );
   } else return <SessionsOnboardingView />;
