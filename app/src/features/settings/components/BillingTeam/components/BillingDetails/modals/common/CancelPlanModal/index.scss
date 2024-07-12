@@ -15,9 +15,11 @@
     letter-spacing: 0.4px;
   }
 
-  .cancel-plan-modal-textarea {
-    background: var(--background);
+  .cancel-plan-modal-textarea.ant-input {
+    height: 80px;
+    resize: none;
     margin-top: 4px;
+    background: var(--background);
   }
 
   .cancel-plan-modal-footer {

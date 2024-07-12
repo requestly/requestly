@@ -12,8 +12,11 @@ import { TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import VirtualTableV2 from "./VirtualTableV2";
 import { APIClient, APIClientRequest } from "components/common/APIClient";
 import { RQNetworkLog } from "../../../TrafficExporter/harLogs/types";
-import { Checkbox } from "antd";
+import { Checkbox, Typography } from "antd";
 import { trackMockResponsesRequestsSelected } from "modules/analytics/events/features/sessionRecording/mockResponseFromSession";
+
+import "./index.scss";
+import { REQUEST_METHOD_COLORS, RequestMethod } from "../../../../../../../../constants/requestMethodColors";
 
 export const ITEM_SIZE = 30;
 
@@ -142,12 +145,32 @@ const NetworkTable: React.FC<Props> = ({
         title: "URL",
         dataIndex: "url",
         width: "48%",
+        render: (url: string, log: RQNetworkLog) => {
+          if (log?.metadata?.GQLDetails) {
+            const { operationName } = log.metadata.GQLDetails;
+            return (
+              <div className="url-wrapper">
+                <span className="url">{url}</span>
+                <span className="graphql-operation-name">{`(${operationName})`}</span>
+              </div>
+            );
+          }
+
+          return url;
+        },
       },
       {
         id: "method",
         title: "Method",
         dataIndex: ["request", "method"], // corresponds to request.method
         width: "8%",
+        render(method: RequestMethod) {
+          return (
+            <Typography.Text className="api-method" strong style={{ color: REQUEST_METHOD_COLORS[method] }}>
+              {method}
+            </Typography.Text>
+          );
+        },
       },
       {
         id: "contentType",
@@ -219,7 +242,6 @@ const NetworkTable: React.FC<Props> = ({
               return null;
             }
             const columnData = get(log, getColumnKey(column?.dataIndex));
-
             return (
               <Table.Cell key={column.id} title={!column?.render ? columnData : ""}>
                 {column?.render ? column.render(columnData, log) : columnData}
@@ -239,13 +261,15 @@ const NetworkTable: React.FC<Props> = ({
         startWalkthrough={!isTrafficTableTourCompleted && isConnectedAppsTourCompleted}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.TRAFFIC_TABLE }))}
       />
-      <VirtualTableV2
-        header={header}
-        renderLogRow={renderLogRow}
-        logs={logs}
-        selectedRowData={selectedRowData}
-        onReplayRequest={onReplayRequest}
-      />
+      <div className="web-traffic-table-container">
+        <VirtualTableV2
+          header={header}
+          renderLogRow={renderLogRow}
+          logs={logs}
+          selectedRowData={selectedRowData}
+          onReplayRequest={onReplayRequest}
+        />
+      </div>
       {isReplayRequestModalOpen ? (
         <APIClient
           request={apiClientRequestForSelectedRowRef.current}

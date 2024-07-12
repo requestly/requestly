@@ -50,8 +50,7 @@ export const TestURLModal: React.FC<ModalProps> = ({ isOpen, source, analyticsCo
             (group, index) =>
               index !== 0 && (
                 <span key={index}>
-                  <span className="text-bold">${index}</span> ={" "}
-                  <Typography.Text code>{group.length ? group : '""'}</Typography.Text>
+                  <span className="text-bold">${index}</span> = <Typography.Text code>{group || '""'}</Typography.Text>
                 </span>
               )
           )}

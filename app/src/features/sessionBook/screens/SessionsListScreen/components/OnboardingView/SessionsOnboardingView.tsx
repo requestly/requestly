@@ -27,6 +27,8 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { ImportWebSessionModalButton } from "../SessionsList/components/ImportWebSessionModalButton/ImportWebSessionModalButton";
 import { RQButton } from "lib/design-system/components";
 import { ImportSessionModal } from "../../modals/ImportSessionModal/ImportSessionModal";
+import { getAppFlavour } from "utils/AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./sessionsOnboardingView.scss";
 
 const { Text, Title } = Typography;
@@ -40,6 +42,7 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isImportSessionModalOpen, setIsImportSessionModalOpen] = useState(false);
+  const appFlavour = getAppFlavour();
 
   useEffect(() => {
     trackOnboardingPageViewed();
@@ -99,9 +102,11 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
           <Row justify="end" align="middle" className="settings-row">
             <Space size={20}>
               {openDownloadedSessionModalBtn}
-              <span onClick={handleSettingsNavigation} className="settings-btn">
-                <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
-              </span>
+              {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY && (
+                <span onClick={handleSettingsNavigation} className="settings-btn">
+                  <SettingOutlined /> &nbsp; <Text underline>Settings</Text>
+                </span>
+              )}
             </Space>
           </Row>
         )}
