@@ -1,7 +1,7 @@
 import config from "common/config";
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { onVariableChange, Variable } from "../variable";
-import { debounce, isExtensionEnabled } from "../../utils";
+import { debounce, getBlockedDomains, isExtensionEnabled } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
 import { sendMessageToApp } from "./messageHandler";
@@ -75,6 +75,8 @@ const addExtensionRules = async (): Promise<void> => {
   const enabledRules = await getEnabledRules();
   const parsedExtensionRules: (chrome.declarativeNetRequest.Rule & { rqRuleId?: string })[] = [];
 
+  const blockedDomains = await getBlockedDomains();
+
   enabledRules.forEach((rule) => {
     const extensionRules = rule.extensionRules;
     if (extensionRules?.length) {
@@ -88,6 +90,9 @@ const addExtensionRules = async (): Promise<void> => {
             (resourceType) => !extensionRule.condition.excludedResourceTypes.includes(resourceType)
           );
         }
+
+        extensionRule.condition.excludedInitiatorDomains.push(...blockedDomains);
+        extensionRule.condition.excludedRequestDomains.push(...blockedDomains);
 
         const ruleId = parsedExtensionRules.length + 1;
 

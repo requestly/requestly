@@ -1,8 +1,10 @@
+import { isUrlInBlockList } from "../../utils";
 import { tabService } from "./tabService";
 
 interface ExtensionIconConfig {
   ruleExecuted?: boolean;
   isRecording?: boolean;
+  isBlocked?: boolean;
 }
 
 class ExtensionIconManager {
@@ -11,6 +13,7 @@ class ExtensionIconManager {
   #icons = {
     DEFAULT: "/resources/images/48x48.png",
     DISABLED: "/resources/images/48x48_greyscale.png",
+    BLOCKED: "/resources/images/48x48_blocked.png",
     RULE_EXECUTED: "/resources/images/48x48_green.png",
     DEFAULT_WITH_REC: "/resources/images/48x48_rec.png",
     RULE_EXECUTED_WITH_REC: "/resources/images/48x48_green_rec.png",
@@ -21,9 +24,15 @@ class ExtensionIconManager {
   };
 
   constructor() {
-    chrome.tabs.onUpdated.addListener((tabId) => {
+    chrome.tabs.onUpdated.addListener((tabId, _, tab) => {
       // FIXME: Can be made better by only listening to url changes on tabs
-      this.#updateIconState(tabId);
+      isUrlInBlockList(tab.url).then((isBlocked) => {
+        if (isBlocked) {
+          this.markExtensionBlocked(tabId);
+        } else {
+          this.#updateIconState(tabId);
+        }
+      });
     });
   }
 
@@ -51,6 +60,10 @@ class ExtensionIconManager {
       return this.#icons.DEFAULT_WITH_REC;
     }
 
+    if (config.isBlocked) {
+      return this.#icons.BLOCKED;
+    }
+
     return this.#icons.DEFAULT;
   }
 
@@ -63,7 +76,6 @@ class ExtensionIconManager {
     tabService.setPageData(tabId, this.#CONSTANTS.PAGE_DATA_ICON_CONFIG, config);
 
     this.#setExtensionIcon(this.#getIcon(config), tabId);
-    // tabService.setExtensionIcon(this.#getIcon(config), tabId);
   }
 
   #updateIconStateForAllTabs() {
@@ -101,6 +113,10 @@ class ExtensionIconManager {
 
   markNotRecording(tabId: number) {
     this.#updateIconState(tabId, "isRecording", false);
+  }
+
+  markExtensionBlocked(tabId: number) {
+    this.#updateIconState(tabId, "isBlocked", true);
   }
 }
 
