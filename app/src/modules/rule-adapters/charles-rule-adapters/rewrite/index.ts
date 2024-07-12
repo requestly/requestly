@@ -1,6 +1,6 @@
 import { get } from "lodash";
 import { CharlesRuleType, ParsedRule, RewriteRule, RewriteRulePair, RewriteSet, SourceData } from "../types";
-import { convertToArray, getGroupName, getSourcesData } from "../utils";
+import { convertToArray, getGroupName, getSourcesData } from "../../utils";
 import { rewriteRuleActionTypes } from "./constants";
 import {
   createModifyBodyRule,
