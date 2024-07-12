@@ -4,12 +4,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { Col, Modal, Row, Space } from "antd";
 import { actions } from "store";
 import { getAppMode, getIsRefreshRulesPending } from "store/selectors";
-import { ArrowLeftOutlined, CheckCircleOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  CheckCircleOutlined,
+  InfoCircleOutlined,
+  LinkOutlined,
+  WarningOutlined,
+} from "@ant-design/icons";
 import { RQButton } from "lib/design-system/components";
 import { FilePicker } from "components/common/FilePicker";
-import { parseRulesFromCharlesXML } from "modules/charles-rule-adapters/parseRulesFromCharlesXML";
-import { createNewGroupAndSave } from "modules/charles-rule-adapters/utils";
-import { CharlesRuleImportErrorMessage, ParsedRulesFromChalres } from "modules/charles-rule-adapters/types";
+import { parseRulesFromCharlesXML } from "modules/rule-adapters/charles-rule-adapters/parseRulesFromCharlesXML";
+import { createNewGroupAndSave } from "modules/rule-adapters/utils";
+import {
+  CharlesRuleImportErrorMessage,
+  ParsedRulesFromChalres,
+} from "modules/rule-adapters/charles-rule-adapters/types";
 import PATHS from "config/constants/sub/paths";
 import LINKS from "config/constants/sub/links";
 import {
@@ -19,15 +28,9 @@ import {
   trackCharlesSettingsImportDocsClicked,
   trackCharlesSettingsImportViewed,
 } from "modules/analytics/events/features/rules";
-import "./charlesImporter.css";
 import { HiOutlineExternalLink } from "@react-icons/all-files/hi/HiOutlineExternalLink";
 import { copyToClipBoard } from "utils/Misc";
-
-interface ModalProps {
-  isOpen: boolean;
-  toggle: () => void;
-  triggeredBy: string;
-}
+import "../importer-components.css";
 
 const validExportSteps = [
   {
@@ -71,10 +74,25 @@ const CharlesDocsLink = ({
   </a>
 );
 
-export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, triggeredBy }) => {
+interface ModalProps {
+  isOpen: boolean;
+  toggle: () => void;
+  triggeredBy: string;
+  isBackButtonVisible?: boolean;
+  onBackButtonClick?: () => void;
+}
+
+export const ImportFromCharlesModal: React.FC<ModalProps> = ({
+  isOpen,
+  toggle,
+  triggeredBy,
+  isBackButtonVisible,
+  onBackButtonClick,
+}) => {
   useEffect(() => {
     trackCharlesSettingsImportViewed(triggeredBy);
   }, [triggeredBy]);
+
   return (
     <Modal
       open={isOpen}
@@ -84,7 +102,12 @@ export const ImportFromCharlesModal: React.FC<ModalProps> = ({ isOpen, toggle, t
       className="import-from-charles-modal custom-rq-modal"
       width={550}
     >
-      <ImportFromCharles source={triggeredBy} callback={() => toggle()} />
+      <ImportFromCharles
+        source={triggeredBy}
+        callback={() => toggle()}
+        isBackButtonVisible={isBackButtonVisible}
+        onBackButtonClick={onBackButtonClick}
+      />
     </Modal>
   );
 };
@@ -93,8 +116,9 @@ export const ImportFromCharlesWrapperView: React.FC = () => {
   useEffect(() => {
     trackCharlesSettingsImportViewed("TOP_LEVEL_ROUTE");
   }, []);
+
   return (
-    <div className="charles-import-wrapper">
+    <div className="importer-wrapper">
       <ImportFromCharles />
     </div>
   );
@@ -185,6 +209,7 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
     Promise.all(rulesImportPromises)
       .then(() => {
         dispatch(
+          //@ts-ignore
           actions.updateRefreshPendingStatus({
             type: "rules",
             newValue: !isRulesListRefreshPending,
@@ -210,16 +235,16 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
 
   return (
     <>
-      <div className="charles-import-container">
-        <Row justify={"space-between"} className="charles-import-header">
-          <Col className="charles-import-heading">
+      <div className="importer-container">
+        <Row justify={"space-between"} className="importer-header">
+          <Col className="importer-heading">
             {isBackButtonVisible && (
               <ArrowLeftOutlined size={16} className="charles-import-back-icon" onClick={onBackButtonClick} />
             )}
             Import Charles Proxy settings
           </Col>
           <Col
-            className="charles-import-share-container"
+            className="importer-share-container"
             onClick={() =>
               copyToClipBoard(window.origin + PATHS.IMPORT_FROM_CHARLES.ABSOLUTE, "URL copied to clipboard")
             }
@@ -229,11 +254,40 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
           </Col>
         </Row>
 
+        {!isParseComplete && !validationError && (
+          <FilePicker
+            maxFiles={1}
+            onFilesDrop={(files) => {
+              handleResetImport();
+              onFilesDrop(files);
+            }}
+            isProcessing={isDataProcessing}
+            title="Drag and drop your Charles export file to upload"
+            subtitle="Accepted file formats: CSV, Trace test file, and XML"
+            selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
+          />
+        )}
+
+        {isParseComplete && isParsedRulesExist && rulesToImport?.otherRuleTypesCount > 0 && (
+          <div className="importer-warning-banner">
+            <div className="importer-warning-banner-text">
+              <WarningOutlined className="importer-warning-icon" /> A few settings are not supported.
+            </div>
+            <div className="importer-warning-docs-link">
+              <CharlesDocsLink
+                title="Learn more about it here"
+                linkClickSrc="all_settings_unsupported_screen"
+                importTriggerSrc={source}
+              />
+            </div>
+          </div>
+        )}
+
         {(isParseComplete || validationError) && (
-          <div className="charles-import-body">
+          <div className="importer-body">
             {isParseComplete ? (
-              <div className="parsed-rules-info">
-                {rulesToImport?.parsedRuleTypes?.length > 0 && (
+              <div className="importer-parsed-rules-info">
+                {isParsedRulesExist && (
                   <Space direction="vertical" align="start" size={8}>
                     <div className="parsed-success-row">
                       <CheckCircleOutlined className="check-outlined-icon" /> Successfully parsed below settings:
@@ -245,22 +299,26 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                     </ul>
                   </Space>
                 )}
-                {rulesToImport?.otherRuleTypesCount > 0 && (
-                  <div className="info-link-container">
-                    <InfoCircleOutlined />
-                    {isParsedRulesExist ? "Other settings are not supported." : "Uploaded settings are not supported."}
-                    <CharlesDocsLink
-                      title="Learn more about it here"
-                      linkClickSrc="all_settings_unsupported_screen"
-                      importTriggerSrc={source}
-                    />
-                  </div>
+                {!isParsedRulesExist && rulesToImport?.otherRuleTypesCount > 0 && (
+                  <>
+                    <div className="info-link-container">
+                      <InfoCircleOutlined />
+                      {"Uploaded settings are not supported."}
+                    </div>
+                    <div className="doc-link-container">
+                      <CharlesDocsLink
+                        title="Learn more about it here"
+                        linkClickSrc="all_settings_unsupported_screen"
+                        importTriggerSrc={source}
+                      />
+                    </div>
+                  </>
                 )}
               </div>
             ) : validationError ? (
               <div className="parsed-rules-error-info">
                 <Row className="validation-heading">
-                  <InfoCircleOutlined className="icon__wrapper" />
+                  <InfoCircleOutlined />
                   Invalid settings file.
                 </Row>
                 <Row className="validation-subheading">Follow below steps to export settings from Charles:</Row>
@@ -269,49 +327,45 @@ export const ImportFromCharles: React.FC<ImportFromCharlesProps> = ({
                     <>
                       <li key={index}>{step}</li>
                       {additionalSteps.length > 0 && (
-                        <ul className="additional-import-steps-list">
+                        <ol className="additional-import-steps-list">
                           {additionalSteps.map(({ step }, index) => (
                             <li key={index}>{step}</li>
                           ))}
-                        </ul>
+                        </ol>
                       )}
                     </>
                   ))}
                 </ol>
               </div>
             ) : null}
-
-            {isParsedRulesExist && (
-              <Row justify="center" className="mt-8">
-                <RQButton type="primary" loading={isLoading} onClick={handleCharlesRulesImport}>
-                  Import
-                </RQButton>
-              </Row>
-            )}
           </div>
         )}
 
-        <FilePicker
-          maxFiles={1}
-          onFilesDrop={(files) => {
-            handleResetImport();
-            onFilesDrop(files);
-          }}
-          isProcessing={isDataProcessing}
-          title="Drag and drop your Charles export file to upload"
-          subtitle="Accepted file formats: CSV, Trace test file, and XML"
-          selectorButtonTitle={isParseComplete || validationError ? "Try another file" : "Select file"}
-        />
+        {(isParseComplete || validationError) && (
+          <Row justify="end" className="importer-actions-row">
+            <RQButton onClick={callback}>Close</RQButton>
+            <RQButton
+              type="primary"
+              loading={isLoading}
+              onClick={() => {
+                if (isParsedRulesExist) handleCharlesRulesImport();
+                else handleResetImport();
+              }}
+            >
+              {isParsedRulesExist ? "Import rules" : "Upload another file"}
+            </RQButton>
+          </Row>
+        )}
+      </div>
 
-        <div className="charles-import-footer">
-          To export your rules from Charles,{" "}
-          <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
-            Follow these steps
-            <div className="icon__wrapper">
-              <HiOutlineExternalLink />
-            </div>
-          </Link>
-        </div>
+      <div className="importer-footer">
+        To export your rules from Charles,{"  "}
+        <Link target="_blank" rel="noreferrer" to={LINKS.REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES}>
+          Follow these steps
+          <div className="icon__wrapper">
+            <HiOutlineExternalLink />
+          </div>
+        </Link>
       </div>
     </>
   );
