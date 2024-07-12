@@ -27,6 +27,10 @@ export const parseRulesFromModheader = (modheaderProfiles: ModheaderProfile[]): 
   const recordsToBeImported: (Rule | Group)[] = [];
 
   modheaderProfiles.forEach((modheaderProfile) => {
+    if (!modheaderProfile.title) {
+      throw new Error("Modheader profile title is missing");
+    }
+
     const group = getNewGroup(`[Modheader] ${modheaderProfile.title}`) as Group;
     recordsToBeImported.push(group);
 
