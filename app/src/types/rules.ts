@@ -82,8 +82,8 @@ export interface SourceFilter {
   requestMethod?: string[];
   resourceType?: string[];
   requestPayload?: { key: string; value: string };
-  pageUrl: Record<string, string>;
-  pageDomains: string[];
+  pageUrl?: Record<string, string>;
+  pageDomains?: string[];
 }
 
 export interface RulePairSource {
@@ -220,6 +220,6 @@ export interface Group extends Record<string, unknown> {
   name: string;
   objectType: ObjectType.GROUP;
   status: Status;
-  children: Rule[];
+  children?: Rule[];
   isFavourite?: boolean;
 }

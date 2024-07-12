@@ -34,6 +34,7 @@ export const EXTENSION_MESSAGES = {
   RULE_EXECUTED: "ruleExecuted",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   RULE_SAVE_ERROR: "ruleSaveError",
+  IS_EXTENSION_BLOCKED_ON_TAB: "isExtensionBlockedOnTab",
 };
 
 export const CLIENT_MESSAGES = {
@@ -81,6 +82,7 @@ export const STORAGE_KEYS = {
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
   IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
+  BLOCKED_DOMAINS: "blocked_domains",
 };
 
 export const LINKS = {
