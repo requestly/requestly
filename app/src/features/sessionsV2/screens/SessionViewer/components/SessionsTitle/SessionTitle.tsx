@@ -6,7 +6,7 @@ export const SessionTitle = () => {
   const [sessionTitle, setSessionTitle] = useState("Pookie");
 
   return (
-    <div className="saved-session-header">
+    <div className="session-title-container">
       <div className="session-header-breadcrumb">
         <span className="session-header-breadcrumb__parent-route">All sessions</span>
         <span className="session-header-breadcrumb__arrow">&gt;</span>

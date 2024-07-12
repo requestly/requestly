@@ -1,0 +1,128 @@
+.firebase-emulator-warning {
+  display: none;
+}
+
+.session-player-container {
+  width: 100%;
+  background: #000;
+  border-radius: 8px;
+  padding: 10px;
+
+  .session-player {
+    width: 100%;
+    position: relative;
+
+    .rr-player {
+      width: 100% !important;
+      height: calc(100% - 63px) !important;
+    }
+
+    .rr-controller {
+      height: auto;
+
+      .rr-timeline {
+        width: 100%;
+      }
+
+      .rr-controller__btns {
+        display: none;
+      }
+
+      .rr-timeline__time {
+        display: none;
+      }
+
+      .rr-progress {
+        margin-top: -8px;
+        background: var(--requestly-color-text-placeholder);
+        border: none;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 6px;
+        height: 8px;
+
+        .rr-progress__step {
+          background: var(--requestly-color-primary);
+        }
+
+        .rr-progress__handler {
+          background: var(--requestly-color-primary);
+          width: 1rem;
+          height: 1rem;
+          top: 4px;
+        }
+      }
+    }
+
+    .rr-player__frame {
+      width: 100% !important;
+      .replayer-wrapper {
+        iframe {
+          border-radius: 12px;
+        }
+      }
+    }
+  }
+
+  .session-player-controller {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 15px 8px;
+    position: relative;
+    top: 6px;
+
+    &__btn.ant-btn {
+      color: var(--requestly-color-text-default);
+      background: none;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background: none;
+      }
+
+      svg {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    .session-status-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .session-player-jump-controllers {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .session-player-controller__speed-selector {
+      .ant-select-selector {
+        border: none;
+        background: none;
+
+        .ant-select-selection-item {
+          color: var(--requestly-color-text-default);
+        }
+      }
+      .ant-select-arrow {
+        color: var(--requestly-color-text-default);
+      }
+    }
+
+    .session-player-skip-controller {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--requestly-color-text-default);
+    }
+
+    .session-player-fullscreen-controller-container {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
