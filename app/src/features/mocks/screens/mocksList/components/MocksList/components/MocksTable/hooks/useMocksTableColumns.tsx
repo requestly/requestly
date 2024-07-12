@@ -54,7 +54,7 @@ export const useMocksTableColumns = ({
     {
       key: "isFavourite",
       dataIndex: "isFavourite",
-      width: isWorkspaceMode ? 40 : isRuleEditor ? 40 : 35,
+      width: 30,
       render: (_: any, record: RQMockSchema) => {
         return isRuleEditor ? null : (
           <Button

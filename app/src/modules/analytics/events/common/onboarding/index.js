@@ -15,3 +15,8 @@ export const trackDesktopAppPromoClicked = (source, action) => {
   const params = { source, action };
   trackEvent(ONBOARDING.DESKTOP_APP_PROMO_CLICKED, params);
 };
+
+export const trackExtensionInstallCTAShown = (eventPage) => {
+  const params = { eventPage };
+  trackEvent(ONBOARDING.EXTENSION_INSTALL_CTA_SHOWN, params);
+};

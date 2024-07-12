@@ -38,9 +38,17 @@ export const SESSION_RECORDING = {
   },
   network: {
     import: {
-      btn_clicked: "import_external_har_button_clicked",
-      completed: "import_external_har_completed",
-      canceled: "import_external_har_canceled",
+      har: {
+        btn_clicked: "import_external_har_button_clicked",
+        completed: "import_external_har_completed",
+        canceled: "import_external_har_canceled",
+      },
+
+      web_sessions: {
+        btn_clicked: "import_web_session_button_clicked",
+        completed: "import_web_session_completed",
+        canceled: "import_web_session_canceled",
+      },
     },
     delete: {
       btn_clicked: "delete_network_session_clicked_from_list",

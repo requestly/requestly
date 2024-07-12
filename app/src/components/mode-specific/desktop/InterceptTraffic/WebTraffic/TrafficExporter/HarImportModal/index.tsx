@@ -19,7 +19,6 @@ interface Props {
   btnText?: string;
 }
 
-/* NO LONGER USED */
 const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
   const [importedHar, setImportedHar] = useState<Har>();
   const [isDropZoneVisible, setIsDropZoneVisible] = useState(false);
@@ -48,7 +47,7 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
     async (data: Har, name: string) => {
       setImportedHar(data);
       trackHarImportCompleted();
-      trackRQDesktopLastActivity(SESSION_RECORDING.network.import.completed);
+      trackRQDesktopLastActivity(SESSION_RECORDING.network.import.har.completed);
       if (name) {
         // just in case the file reader is unable to read the name
         const id = await saveNetworkSession(name, data);
@@ -96,7 +95,7 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
         type="primary"
         onClick={() => {
           trackHarImportButtonClicked();
-          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.btn_clicked);
+          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.har.btn_clicked);
           openDropZone();
         }}
         className="mt-8"
@@ -109,7 +108,7 @@ const HarImportModal: React.FC<Props> = ({ onSaved, btnText }) => {
         maskClosable={false}
         onCancel={() => {
           trackHarImportCanceled();
-          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.canceled);
+          trackRQDesktopLastActivity(SESSION_RECORDING.network.import.har.canceled);
           closeDropZone();
         }}
       >

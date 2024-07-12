@@ -1,6 +1,7 @@
 .session-viewer-page {
   width: 100%;
   height: 100%;
+  overflow: auto;
   display: flex;
   flex-direction: column;
   padding: 24px;
@@ -485,6 +486,22 @@
   }
 }
 
+.save-session-btns-container {
+  display: flex;
+  align-items: center;
+
+  .session-viewer-save-action-btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 1px solid #ffffff55;
+  }
+
+  .save-popup-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
 body.dark {
   .session-viewer-page {
     .session-recording-name {
@@ -494,12 +511,19 @@ body.dark {
     .rr-controller {
       color: white !important;
 
+      .rr-timeline {
+        width: 100% !important;
+      }
       .rr-timeline__time {
         color: white !important;
       }
 
       svg {
         fill: white !important;
+      }
+
+      .rr-controller__btns {
+        gap: 8px;
       }
     }
 
@@ -571,6 +595,39 @@ body.dark {
     }
     .right-info {
       display: none;
+    }
+  }
+}
+
+@media (max-width: 680px) {
+  .session-viewer-page {
+    .session-properties-wrapper {
+      .ant-input-group-wrapper.session-page-url-property {
+        .ant-input {
+          width: 100% !important;
+        }
+      }
+      .ant-input-group-wrapper {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 550px) {
+  .app-header,
+  .app-sidebar {
+    display: none;
+  }
+
+  .session-viewer-page {
+    padding-inline: 10px;
+    overflow-x: hidden;
+
+    .rr-controller {
+      .rr-controller__btns {
+        gap: 0px !important;
+      }
     }
   }
 }

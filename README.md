@@ -1,6 +1,10 @@
 <p align="center">
-  <a target="_blank" href="https://requestly.com/">
-    <img src="https://github.com/requestly/requestly/blob/master/app/src/assets/img/brand/rq_logo_full.svg?raw=true" alt="Requestly Logo" width="40%"/>
+  <a rel="noreferrer noopener" href="https://requestly.com/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/requestly/requestly/blob/master/app/src/assets/img/brand/rq_logo_full.svg?raw=true">
+      <source media="(prefers-color-scheme: light)" srcset="https://github.com/requestly/requestly/blob/master/app/src/assets/img/brand/rq_logo_full_light_mode.svg?raw=true">
+        <img alt="Requestly Logo" src="https://github.com/requestly/requestly/blob/master/app/src/assets/img/brand/rq_logo_full.svg?raw=true" width="40%">
+      </picture>
   </a>
 </p>
 

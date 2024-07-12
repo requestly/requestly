@@ -1,0 +1,21 @@
+.custom-rq-modal .rule-importer-content {
+  .ant-row.rules-importer-heading {
+    font-size: var(--requestly-font-size-base);
+    font-weight: var(--requestly-font-weight-medium);
+    margin-bottom: 16px;
+    margin-top: -10px;
+  }
+
+  .rules-importer-footer {
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-xs);
+    text-align: center;
+    margin-top: 16px;
+    margin-bottom: 8px;
+
+    .rq-btn {
+      padding: 0;
+      font-size: var(--requestly-font-size-xs);
+    }
+  }
+}

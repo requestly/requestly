@@ -48,6 +48,12 @@
     .network-session-list-heading {
       margin-bottom: 0;
     }
+
+    .import-btn-group {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+    }
   }
 }
 

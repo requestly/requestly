@@ -59,6 +59,7 @@ export const newSchemaToOldSchemaAdapter = (firestoreData) => {
     planId: firestoreData?.plan,
     status: firestoreData?.subscriptionStatus,
     subscription: {
+      cancelAtPeriodEnd: firestoreData?.cancel_at_period_end || false,
       endDate:
         firestoreData?.subscriptionCurrentPeriodEnd &&
         new Date(firestoreData?.subscriptionCurrentPeriodEnd * 1000).toISOString().split("T")[0],

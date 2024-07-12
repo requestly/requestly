@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Layout, Button, Row, Col, Tooltip, Divider } from "antd";
-import { getAppMode, getIsMiscTourCompleted, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsPlanExpiredBannerClosed, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
 import HeaderUser from "./HeaderUser";
 import HeaderText from "./HeaderText";
 import { SearchOutlined } from "@ant-design/icons";
 import { redirectToSettings } from "utils/RedirectionUtils";
-// import GitHubButton from "react-github-btn";
+import GitHubButton from "react-github-btn";
 import { useMediaQuery } from "react-responsive";
 import Settings from "assets/icons/settings.svg?react";
 import LINKS from "config/constants/sub/links";
@@ -23,8 +23,6 @@ import APP_CONSTANTS from "config/constants";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
 import { RequestBot, trackAskAIClicked } from "features/requestBot";
 import BotIcon from "./assets/bot.svg";
-import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
-import { MISC_TOURS, TOUR_TYPES } from "components/misc/ProductWalkthrough/constants";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -42,7 +40,6 @@ const MenuHeader = () => {
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
-  const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
 
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
 
@@ -51,20 +48,6 @@ const MenuHeader = () => {
 
   return showMenuHeader() ? (
     <>
-      <ProductWalkthrough
-        completeTourOnUnmount={false}
-        tourFor={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
-        startWalkthrough={!isMiscTourCompleted.askAI}
-        onTourComplete={() =>
-          dispatch(
-            actions.updateProductTourCompleted({
-              tour: TOUR_TYPES.MISCELLANEOUS,
-              // TODO: FIX WALKTHROUGH COMPONENT, SUBTOUR SHOULD BE PASSED AS A CONSTANT
-              subTour: "askAI",
-            })
-          )
-        }
-      />
       <Header className="layout-header">
         <Row wrap={false} align="middle" className="w-full">
           {!isPricingOrGoodbyePage ? (
@@ -107,6 +90,19 @@ const MenuHeader = () => {
                     <PlanExpiredBadge />
                   </div>
                 ) : null}
+                <Col className="hidden-on-small-screen">
+                  <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
+                    <GitHubButton
+                      style={{ display: "flex" }}
+                      className="github-star-button"
+                      href="https://github.com/requestly/requestly"
+                      data-color-scheme="dark_dimmed"
+                      data-text="Star"
+                      data-show-count="true"
+                      aria-label="Star Requestly on GitHub"
+                    />
+                  </span>
+                </Col>
                 <RQButton
                   type="default"
                   className="header-search-btn"
@@ -117,33 +113,13 @@ const MenuHeader = () => {
                   </div>
                   <div className="search-shortcut-annotation">⌘+K</div>
                 </RQButton>
-                {/* TEMPORARILY HIDDEN  */}
-                {/* <Col className="hidden-on-small-screen">
-                <span className="github-star-button" onClick={() => trackHeaderClicked("github_star_button")}>
-                  <GitHubButton
-                    style={{ display: "flex" }}
-                    className="github-star-button"
-                    href="https://github.com/requestly/requestly"
-                    data-color-scheme="dark_dimmed"
-                    data-text="Star"
-                    data-show-count="true"
-                    aria-label="Star Requestly on GitHub"
-                  />
-                </span>
-              </Col> */}
+
                 <RQButton
                   className="ask-ai-btn"
                   onClick={() => {
                     trackAskAIClicked();
                     setIsRequestBotVisible(true);
-                    dispatch(
-                      actions.updateProductTourCompleted({
-                        tour: TOUR_TYPES.MISCELLANEOUS,
-                        subTour: "askAI",
-                      })
-                    );
                   }}
-                  data-tour-id={MISC_TOURS.APP_ENGAGEMENT.ASK_AI}
                 >
                   <div className="ask-ai-btn-content">
                     <img src={BotIcon} alt="bot" />

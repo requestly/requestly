@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate, useParams } from "react-router-dom";
-import { getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsMiscTourCompleted, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { getTabSession } from "actions/ExtensionActions";
 import { Input, Modal, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
@@ -12,11 +12,11 @@ import { RQSession } from "@requestly/web-sdk";
 import mockSession from "./mockData/mockSession";
 import DownArrow from "assets/icons/down-arrow.svg?react";
 import PageLoader from "components/misc/PageLoader";
-import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
+import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
-import { generateDraftSessionTitle } from "./utils";
+import { generateDraftSessionTitle, saveDraftSession } from "./utils";
 import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
@@ -33,8 +33,13 @@ import {
   trackTestRuleSessionDraftViewed,
   trackTroubleshootClicked,
 } from "modules/analytics/events/features/ruleEditor";
-import { SessionRecordingMode } from "./types";
-
+import { DebugInfo, SessionRecordingMode } from "./types";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import APP_CONSTANTS from "config/constants";
+import { toast } from "utils/Toast";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import Logger from "../../../../../../common/logger";
+import { useIncentiveActions } from "features/incentivization/hooks";
 export interface DraftSessionViewerProps {
   testRuleDraftSession?: {
     draftSessionTabId: string;
@@ -46,6 +51,8 @@ export interface DraftSessionViewerProps {
   desktopMode?: boolean;
 }
 
+const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
+
 const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   testRuleDraftSession,
   source = DRAFT_SESSION_VIEWED_SOURCE.DEFAULT,
@@ -55,10 +62,13 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const tabId = useMemo(() => (desktopMode ? "imported" : tempTabId), [desktopMode, tempTabId]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
+  const sessionEvents = useSelector(getSessionRecordingEvents);
   const isMiscTourCompleted = useSelector(getIsMiscTourCompleted);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const isImportedSession = tabId === "imported";
 
   const [isLoading, setIsLoading] = useState(true);
@@ -66,6 +76,9 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   const [isSavePopupVisible, setIsSavePopupVisible] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const [isDiscardSessionClicked, setIsDiscardSessionClicked] = useState(false);
+  const [isSessionSaving, setIsSessionSaving] = useState(false);
+
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const hasUserCreatedSessions = useMemo(
     () =>
@@ -191,6 +204,72 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
     });
   }, [navigate, testRuleDraftSession]);
 
+  // CURRENTLY THIS FUNCTION IS REDUNDANT, USED BY DRAFT SESSION VIEWER AND SAVE POPUP
+  // TODO: REFACTOR THIS WHEN REVAMP TASK IS PICKED
+  const handleSaveDraftSession = useCallback(() => {
+    if (!user?.loggedIn) {
+      dispatch(
+        // @ts-ignore
+        actions.toggleActiveModal({
+          modalName: "authModal",
+          newValue: true,
+          newProps: {
+            authMode: AUTH_ACTION_LABELS.SIGN_UP,
+            src: window.location.href,
+            eventSource: SOURCE.SAVE_DRAFT_SESSION,
+          },
+        })
+      );
+      return;
+    }
+
+    if (isSessionSaving) {
+      return;
+    }
+
+    if (!sessionRecordingMetadata?.name) {
+      toast.error("Name is required to save the recording.");
+      return;
+    }
+
+    setIsSessionSaving(true);
+    setIsSaveSessionClicked(true);
+    saveDraftSession(
+      user,
+      userAttributes,
+      appMode,
+      dispatch,
+      navigate,
+      workspace?.id,
+      sessionRecordingMetadata,
+      sessionEvents,
+      [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS],
+      source,
+      testRuleDraftSession,
+      claimIncentiveRewards
+    )
+      .catch((err) => {
+        setIsSessionSaving(false);
+        Logger.log("Error while saving draft session", err);
+      })
+      .finally(() => {
+        setIsSessionSaving(false);
+      });
+  }, [
+    appMode,
+    dispatch,
+    navigate,
+    sessionEvents,
+    sessionRecordingMetadata,
+    source,
+    testRuleDraftSession,
+    user,
+    userAttributes,
+    workspace?.id,
+    isSessionSaving,
+    claimIncentiveRewards,
+  ]);
+
   useEffect(() => {
     if (loadingError) {
       trackSessionRecordingFailed(loadingError);
@@ -211,20 +290,35 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
               Discard
             </RQButton>
           )}
-
-          <RQButton
-            data-tour-id="save-draft-session-btn"
-            type="primary"
-            className="text-bold session-viewer-save-action-btn"
-            onClick={() => {
-              setIsSavePopupVisible((prev) => !prev);
-              dispatch(
-                actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" })
-              );
-            }}
-          >
-            Save <DownArrow />
-          </RQButton>
+          <div className="save-session-btns-container" data-tour-id="save-draft-session-btn">
+            <RQButton
+              type="primary"
+              className="text-bold session-viewer-save-action-btn"
+              loading={isSessionSaving}
+              onClick={() => {
+                handleSaveDraftSession();
+                // @ts-ignore
+                actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" });
+              }}
+            >
+              Save
+            </RQButton>
+            <RQButton
+              disabled={isSessionSaving}
+              size="small"
+              type="primary"
+              className="save-popup-button"
+              onClick={() => {
+                setIsSavePopupVisible((prev) => !prev);
+                dispatch(
+                  // @ts-ignore
+                  actions.updateProductTourCompleted({ tour: TOUR_TYPES.MISCELLANEOUS, subTour: "firstDraftSession" })
+                );
+              }}
+            >
+              <DownArrow />
+            </RQButton>
+          </div>
 
           {isSavePopupVisible && (
             <SaveRecordingConfigPopup

@@ -178,6 +178,7 @@
 .github-star-button span {
   display: flex;
   align-items: center;
+  margin-right: 0.3rem;
 }
 
 .header-profile-dropdown-trigger.ant-avatar {

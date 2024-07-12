@@ -106,11 +106,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
     try {
       salesInboundNotification({
-        notificationText: `${
-          EVENTS.PRICING_QUANTITY_CHANGED
-        } trigged with quantity ${value} for plan ${planName} and source ${source} by user ${
-          user?.details?.profile?.email ?? "NOT LOGGED IN"
-        }`,
+        notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} trigged with quantity ${value} for plan ${planName} and source ${source}`,
       });
     } catch (error) {
       console.error(error);
@@ -129,6 +125,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       {planName === PRICING.PLAN_NAMES.ENTERPRISE && (
         <Row align="middle" className="items-center plan-price-row mt-8">
           <Space size={0}>
+            <span className="text-bold">Starts at</span>
             <Typography.Text className="plan-price enterprice-plan-price">$59</Typography.Text>
             <div className="caption">
               <Typography.Text>member per month</Typography.Text>

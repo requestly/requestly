@@ -376,26 +376,15 @@ export const productTours: Record<string, CustomSteps[]> = {
       disableOverlay: true,
     },
   ],
-  [MISC_TOURS.APP_ENGAGEMENT.ASK_AI]: [
+  [MISC_TOURS.APP_ENGAGEMENT.TEST_THIS_RULE]: [
     {
       ...tourTooltipPresets,
-      title: "Ask AI for instant support!",
-      target: getTourTarget(MISC_TOURS.APP_ENGAGEMENT.ASK_AI),
-      content: "Interact with RequestBot to get answers to anything about Requestly.",
-      pointerPlacement: PointerPlacement.TOP_75,
-      customNextButtonText: "Got it!",
-      disableOverlay: true,
-    },
-  ],
-  [MISC_TOURS.APP_ENGAGEMENT.EARN_CREDITS]: [
-    {
-      ...tourTooltipPresets,
-      // TODO: IMPROVE TITLE
-      title: "Earn credits by completing tasks",
-      target: getTourTarget(MISC_TOURS.APP_ENGAGEMENT.EARN_CREDITS),
-      content: "Complete your onboarding and earn $100 Free credits for Requestly Pro plan.",
-      pointerPlacement: PointerPlacement.TOP_75,
-      placement: "right",
+      title: "Test this Rule",
+      target: getTourTarget(MISC_TOURS.APP_ENGAGEMENT.TEST_THIS_RULE),
+      content:
+        "Check if the rule is configured correctly and is working as expected on the intended web page. Earn $35 in credit on completing this step.",
+      pointerPlacement: PointerPlacement.BOTTOM_100,
+      placement: "left",
       showNext: false,
       hidePointer: true,
       disableOverlay: true,

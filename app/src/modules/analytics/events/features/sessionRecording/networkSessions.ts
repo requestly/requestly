@@ -8,13 +8,23 @@ export enum ActionSource {
 }
 
 export function trackHarImportButtonClicked() {
-  trackEvent(SESSION_RECORDING.network.import.btn_clicked);
+  trackEvent(SESSION_RECORDING.network.import.har.btn_clicked);
 }
 export function trackHarImportCanceled() {
-  trackEvent(SESSION_RECORDING.network.import.canceled);
+  trackEvent(SESSION_RECORDING.network.import.har.canceled);
 }
 export function trackHarImportCompleted() {
-  trackEvent(SESSION_RECORDING.network.import.completed);
+  trackEvent(SESSION_RECORDING.network.import.har.completed);
+}
+
+export function trackWebSessionImportButtonClicked() {
+  trackEvent(SESSION_RECORDING.network.import.web_sessions.btn_clicked);
+}
+export function trackWebSessionImportCanceled() {
+  trackEvent(SESSION_RECORDING.network.import.web_sessions.canceled);
+}
+export function trackWebSessionImportCompleted() {
+  trackEvent(SESSION_RECORDING.network.import.web_sessions.completed);
 }
 
 export function trackDeleteNetworkSessionClicked(source: ActionSource) {

@@ -22,21 +22,13 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { saveRecording } from "backend/sessionRecording/saveRecording";
-import PATHS from "config/constants/sub/paths";
-import {
-  trackDraftSessionSaveFailed,
-  trackDraftSessionSaved,
-} from "modules/analytics/events/features/sessionRecording";
+import { trackDraftSessionSaved } from "modules/analytics/events/features/sessionRecording";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getTestReportById, saveTestReport } from "components/features/rules/TestThisRule/utils/testReports";
-import { getSessionRecordingSharedLink } from "utils/PathUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
-import { IncentivizeEvent } from "features/incentivization/types";
-import { incentivizationActions } from "store/features/incentivization/slice";
-import { IncentivizationModal } from "store/features/incentivization/types";
 import { useIncentiveActions } from "features/incentivization/hooks";
+import { saveDraftSession } from "./utils";
+import Logger from "../../../../../../common/logger";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -104,7 +96,9 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
     [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
   );
 
-  const saveDraftSession = useCallback(
+  // CURRENTLY THIS FUNCTION IS REDUNDANT, USED BY DRAFT SESSION VIEWER AND SAVE POPUP
+  // TODO: REFACTOR THIS WHEN REVAMP TASK IS PICKED
+  const handleSaveDraftSession = useCallback(
     (e: React.MouseEvent) => {
       if (!user?.loggedIn) {
         dispatch(
@@ -131,84 +125,34 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         return;
       }
 
-      const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
-
       setIsSaving(true);
       setIsSaveSessionClicked?.(true);
-      saveRecording(
-        user?.details?.profile?.uid,
+      saveDraftSession(
+        user,
+        userAttributes,
+        appMode,
+        dispatch,
+        navigate,
         workspace?.id,
         sessionRecordingMetadata,
-        compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
-        recordingOptionsToSave,
+        sessionEvents,
+        includedDebugInfo,
         source,
-        null
-      ).then((response) => {
-        if (response?.success) {
-          onClose();
-          toast.success("Recording saved successfully");
-          trackDraftSessionSaved({
-            session_length: sessionRecordingMetadata?.sessionAttributes?.duration,
-            options: recordingOptionsToSave,
-            type: SessionSaveMode.ONLINE,
-            source,
-            recording_mode: sessionRecordingMetadata?.recordingMode,
-          });
-
-          if (isDraftSession) {
-            claimIncentiveRewards({
-              type: IncentivizeEvent.SESSION_RECORDED,
-              metadata: { num_sessions: userAttributes?.num_sessions || 1 },
-            })?.then((response) => {
-              if (response.data?.success) {
-                dispatch(
-                  incentivizationActions.setUserMilestoneAndRewardDetails({
-                    // @ts-ignore
-                    userMilestoneAndRewardDetails: response.data?.data,
-                  })
-                );
-
-                dispatch(
-                  incentivizationActions.toggleActiveModal({
-                    modalName: IncentivizationModal.TASK_COMPLETED_MODAL,
-                    newValue: true,
-                    newProps: { event: IncentivizeEvent.SESSION_RECORDED },
-                  })
-                );
-              }
-            });
-          }
-
-          testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.ONLINE);
-          trackSessionsCreatedCount();
-          if (testRuleDraftSession) {
-            getTestReportById(appMode, testRuleDraftSession.testReportId).then((testReport) => {
-              if (testReport) {
-                testReport.sessionLink = getSessionRecordingSharedLink(response?.firestoreId);
-                saveTestReport(appMode, testRuleDraftSession.testReportId, testReport).then(
-                  testRuleDraftSession.closeModal
-                );
-              }
-            });
-          } else {
-            let path = PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId;
-            if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
-              path = PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + `/${response?.firestoreId}`;
-            navigate(path, {
-              replace: true,
-              state: { fromApp: true, viewAfterSave: true },
-            });
-          }
-        } else {
-          toast.error(response?.message);
-          trackDraftSessionSaveFailed(response?.message);
+        testRuleDraftSession,
+        claimIncentiveRewards
+      )
+        .then(() => {
+          onClose?.();
+        })
+        .catch((err) => {
+          Logger.log("Failed to save draft session", err);
+        })
+        .finally(() => {
           setIsSaving(false);
-        }
-      });
+        });
     },
     [
-      user?.loggedIn,
-      user?.details?.profile?.uid,
+      user,
       isSaving,
       sessionRecordingMetadata,
       includedDebugInfo,
@@ -216,14 +160,12 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       workspace?.id,
       sessionEvents,
       dispatch,
-      onClose,
-      trackSessionsCreatedCount,
       testRuleDraftSession,
       appMode,
       navigate,
       source,
-      isDraftSession,
       userAttributes,
+      onClose,
       claimIncentiveRewards,
     ]
   );
@@ -317,7 +259,9 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
           className="ml-auto"
           loading={isSaving}
           onClick={
-            isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? saveDraftSession : handleDownloadFileClick
+            isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE
+              ? handleSaveDraftSession
+              : handleDownloadFileClick
           }
         >
           {isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? "Save" : "Download"}
