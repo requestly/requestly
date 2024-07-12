@@ -35,8 +35,8 @@ interface RequestFeatureModalProps {
   featureName?: string;
   setOpenPopup: (open: boolean) => void;
   onContinue?: () => void;
-  onUpgradeYourselfCallback?: () => void;
-  onUpgradeForFreeCallback?: () => void;
+  onUpgradeYourselfClickCallback?: () => void;
+  onUpgradeForFreeClickCallback?: () => void;
 }
 
 export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
@@ -48,8 +48,8 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
   setOpenPopup,
   onContinue,
   featureName,
-  onUpgradeYourselfCallback,
-  onUpgradeForFreeCallback,
+  onUpgradeYourselfClickCallback,
+  onUpgradeForFreeClickCallback,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -131,7 +131,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               className="request-modal-text-btn"
               disabled={isLoading}
               onClick={() => {
-                onUpgradeForFreeCallback();
+                onUpgradeForFreeClickCallback();
                 trackUpgradeOptionClicked("upgrade_for_free");
                 dispatch(
                   incentivizationActions.toggleActiveModal({
@@ -159,7 +159,7 @@ export const RequestFeatureModal: React.FC<RequestFeatureModalProps> = ({
               className="request-modal-default-btn"
               disabled={isLoading}
               onClick={() => {
-                onUpgradeYourselfCallback();
+                onUpgradeYourselfClickCallback();
                 trackUpgradeOptionClicked("upgrade_yourself");
                 dispatch(
                   // @ts-ignore

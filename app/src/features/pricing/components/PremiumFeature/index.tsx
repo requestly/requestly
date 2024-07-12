@@ -28,8 +28,8 @@ interface PremiumFeatureProps {
   source: string;
   featureName?: string;
   onClickCallback?: (e: any) => void;
-  onUpgradeYourselfCallback?: () => void;
-  onUpgradeForFreeCallback?: () => void;
+  onUpgradeYourselfClickCallback?: () => void;
+  onUpgradeForFreeClickCallback?: () => void;
 }
 
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
@@ -42,8 +42,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   source,
   onClickCallback,
   featureName,
-  onUpgradeYourselfCallback = () => {},
-  onUpgradeForFreeCallback = () => {},
+  onUpgradeYourselfClickCallback = () => {},
+  onUpgradeForFreeClickCallback = () => {},
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -62,7 +62,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   const hasCrossedDeadline = useMemo(() => new Date() > new Date("2023-11-30"), []);
 
   const handlePopoverSecondaryAction = useCallback(() => {
-    onUpgradeForFreeCallback();
+    onUpgradeForFreeClickCallback();
 
     if (!hasCrossedDeadline) {
       trackUpgradeOptionClicked(SOURCE.USE_FOR_FREE_NOW);
@@ -105,8 +105,8 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
             isDeadlineCrossed={hasCrossedDeadline}
             source={source}
             featureName={featureName}
-            onUpgradeForFreeCallback={onUpgradeForFreeCallback}
-            onUpgradeYourselfCallback={onUpgradeYourselfCallback}
+            onUpgradeForFreeClickCallback={onUpgradeForFreeClickCallback}
+            onUpgradeYourselfClickCallback={onUpgradeYourselfClickCallback}
           />
           {React.Children.map(children, (child) => {
             return React.cloneElement(child as React.ReactElement, {
