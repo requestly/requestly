@@ -1,6 +1,6 @@
 import React from "react";
 import { RQModal } from "lib/design-system/components";
-import { SessionsOnboardingView } from "../../components/OnboardingView/SessionsOnboardingView";
+import { SessionsOnboardingView } from "features/sessionBook/screens/SessionsListScreen/components/OnboardingView/SessionsOnboardingView";
 import "./newSessionModal.scss";
 
 interface NewSessionModalProps {

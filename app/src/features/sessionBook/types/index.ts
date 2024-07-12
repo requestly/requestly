@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { NetworkEventData, RQSessionAttributes } from "@requestly/web-sdk";
 import { LogData } from "rrweb";
 import { SessionRecordingPageSource } from "types/sessionRecording";

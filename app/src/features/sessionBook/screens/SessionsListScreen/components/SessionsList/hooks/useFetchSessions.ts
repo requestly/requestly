@@ -73,7 +73,6 @@ export const useFetchSessions = (forceRender: boolean) => {
           }
         });
 
-        console.log("records", records);
         setSessions(records);
 
         if (records.length > 0) {
