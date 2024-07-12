@@ -26,6 +26,7 @@ import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOut
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
+import { RuleSelectionListDrawer } from "../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import "./gettingStarted.scss";
 
 const { PATHS } = APP_CONSTANTS;
@@ -40,6 +41,12 @@ export const GettingStarted: React.FC = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
+  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(false);
+
+  const onRulesListDrawerClose = () => {
+    setIsRulesListDrawerOpen(false);
+  };
+
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
   const isRecommendationScreenVisible = useMemo(
@@ -58,8 +65,9 @@ export const GettingStarted: React.FC = () => {
   };
 
   const handleCreateMyFirstRuleClick = () => {
+    // TODO: update analytics
     trackNewRuleButtonClicked(SOURCE.GETTING_STARTED);
-    navigate(PATHS.RULES.CREATE);
+    setIsRulesListDrawerOpen(true);
   };
 
   const handleUploadRulesClick = () => {
@@ -84,9 +92,8 @@ export const GettingStarted: React.FC = () => {
    * - add link [DONE]
    * - fix below content [DONE]
    * - fix analytics
-   * - add drawer
+   * - add drawer [DONE]
    * - raise PR
-   * - review PR [IMPP]
    */
 
   const suggestedRules = [
@@ -123,18 +130,27 @@ export const GettingStarted: React.FC = () => {
               <div className="no-rules">
                 <div className="empty-rules-image-container">
                   <img width={72} height={72} src={emptyInbox} alt="empty-rules" className="empty-rules" />
-                  <div className="caption">No rules created yet.</div>
+                  <div className="caption">No rules created yet</div>
                 </div>
 
-                <Button
-                  block
-                  type="primary"
-                  onClick={handleCreateMyFirstRuleClick}
-                  className="getting-started-create-rule-btn"
-                  icon={<MdOutlineAddCircleOutline className="anticon" />}
+                <RuleSelectionListDrawer
+                  open={isRulesListDrawerOpen}
+                  onClose={onRulesListDrawerClose}
+                  source={SOURCE.GETTING_STARTED}
+                  onRuleItemClick={() => {
+                    onRulesListDrawerClose();
+                  }}
                 >
-                  New rule
-                </Button>
+                  <Button
+                    block
+                    type="primary"
+                    onClick={handleCreateMyFirstRuleClick}
+                    className="getting-started-create-rule-btn"
+                    icon={<MdOutlineAddCircleOutline className="anticon" />}
+                  >
+                    New rule
+                  </Button>
+                </RuleSelectionListDrawer>
               </div>
               <div className="rule-suggestions">
                 {suggestedRules.map(({ type, title, icon, link, help }) => {
@@ -151,9 +167,18 @@ export const GettingStarted: React.FC = () => {
                   );
                 })}
 
-                <Button type="link" className="link-btn" onClick={handleCreateMyFirstRuleClick}>
-                  View all rules
-                </Button>
+                <RuleSelectionListDrawer
+                  open={isRulesListDrawerOpen}
+                  onClose={onRulesListDrawerClose}
+                  source={SOURCE.GETTING_STARTED}
+                  onRuleItemClick={() => {
+                    onRulesListDrawerClose();
+                  }}
+                >
+                  <Button type="link" className="link-btn" onClick={handleCreateMyFirstRuleClick}>
+                    View all rules
+                  </Button>
+                </RuleSelectionListDrawer>
               </div>
             </div>
           </div>
@@ -198,7 +223,7 @@ export const GettingStarted: React.FC = () => {
               type="link"
               className="link-btn templates-btn"
               onClick={() => {
-                // navigate
+                navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
               }}
             >
               Start with templates
