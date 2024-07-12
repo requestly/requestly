@@ -73,7 +73,6 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
                     features={[`${rule.type.toLowerCase()}_rule` as FeatureLimitType, FeatureLimitType.num_rules]}
                     onClickCallback={(e) => {
                       e?.preventDefault?.();
-                      onRuleItemClick(rule.type);
                     }}
                   >
                     <NavLink
