@@ -88,15 +88,6 @@ export const GettingStarted: React.FC = () => {
     return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
   }
 
-  /**
-   * - TODO:
-   * - add link [DONE]
-   * - fix below content [DONE]
-   * - fix analytics
-   * - add drawer [DONE]
-   * - raise PR
-   */
-
   const suggestedRules = [
     {
       type: RuleType.REDIRECT,
