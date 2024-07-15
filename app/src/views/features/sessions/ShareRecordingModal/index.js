@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import { Button, Col, Row, Radio, Tag, Typography, Modal } from "antd";
@@ -108,6 +108,7 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
   const handleVisibilityChange = async (newVisibility) => {
     await updateVisibility(user?.details?.profile?.uid, recordingId, newVisibility);
     onVisibilityChange && onVisibilityChange(newVisibility);
+    fetchUserEmails();
   };
 
   const getPrettyDescription = (visibility) => {
@@ -207,9 +208,7 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
     );
   };
 
-  useEffect(() => {
-    if (currentVisibility !== Visibility.CUSTOM) return;
-
+  const fetchUserEmails = useCallback(async () => {
     fetchCurrentEmails(recordingId)
       .then((emails) => {
         setCurrentEmails(emails);
@@ -220,7 +219,12 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
         alert("An unexpected error has occurred!");
         return;
       });
-  }, [currentVisibility, recordingId]);
+  }, [recordingId]);
+
+  useEffect(() => {
+    if (currentVisibility !== Visibility.CUSTOM) return;
+    fetchUserEmails();
+  }, [currentVisibility, fetchUserEmails]);
 
   if (_.isEmpty(recordingId)) return null;
 
@@ -234,6 +238,7 @@ const ShareRecordingModal = ({ currentVisibility, isVisible, setVisible, recordi
       open={isVisible}
       onCancel={handleCloseModal}
       width={640}
+      maskClosable={false}
       footer={[
         <Row justify="space-between">
           <div>

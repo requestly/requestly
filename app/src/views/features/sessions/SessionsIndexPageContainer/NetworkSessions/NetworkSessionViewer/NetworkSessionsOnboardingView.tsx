@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { Divider } from "antd";
-import React from "react";
-import { ImportHarModalButton } from "../ImportHarModalButton";
+import React, { useCallback } from "react";
 import { CheckOutlined } from "@ant-design/icons";
 import { Typography } from "antd";
+import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
 
 // TODO: REFACTOR NETWORK SESSIONS COMPONENTS
 const CheckItem: React.FC<{ label: string }> = ({ label }) => {
@@ -15,7 +17,16 @@ const CheckItem: React.FC<{ label: string }> = ({ label }) => {
 };
 
 export const NewtorkSessionsOnboardingView: React.FC<{}> = () => {
+  const navigate = useNavigate();
+
   const { Title, Text } = Typography;
+  const stableNavigate = useCallback(
+    (sessionId: string) => {
+      redirectToNetworkSession(navigate, sessionId);
+    },
+    [navigate]
+  );
+
   return (
     <div
       style={{
@@ -31,8 +42,7 @@ export const NewtorkSessionsOnboardingView: React.FC<{}> = () => {
         <div>Record your network sessions and Share with others for offline review or debugging.</div>
       </Text>
       <div>
-        {/* <HarImportModal onSaved={stableNavigate} /> */}
-        <ImportHarModalButton />
+        <HarImportModal onSaved={stableNavigate} />
       </div>
       <Divider />
       <Text type="secondary">
