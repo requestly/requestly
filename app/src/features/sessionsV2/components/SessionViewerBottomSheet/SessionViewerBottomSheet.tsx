@@ -4,6 +4,7 @@ import { MdNetworkCheck } from "@react-icons/all-files/md/MdNetworkCheck";
 import { MdConnectedTv } from "@react-icons/all-files/md/MdConnectedTv";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { BottomSheet } from "componentsV2/BottomSheet";
+import { SessionInfo } from "./components/SessionInfo/SessionInfo";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
@@ -22,7 +23,7 @@ export const SessionViewerBottomSheet = () => {
             <span>Info</span>
           </div>
         ),
-        children: <>SESSION INFO HERE</>,
+        children: <SessionInfo />,
         forceRender: true,
       },
       {
