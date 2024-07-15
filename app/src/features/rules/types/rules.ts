@@ -1,5 +1,10 @@
 import { HttpRequestMethod, ResourceType } from "types/network";
 
+export enum RuleEditorMode {
+  EDIT = "edit",
+  CREATE = "create",
+}
+
 export enum RecordType {
   RULE = "rule",
   GROUP = "group",

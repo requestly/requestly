@@ -78,7 +78,7 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
                     <NavLink
                       end
                       key={rule.type}
-                      className="rule-item-container"
+                      className={({ isActive }) => `rule-item-container ${isActive ? "active" : ""}`}
                       state={{ source }}
                       onClick={(e) => {
                         e.preventDefault();

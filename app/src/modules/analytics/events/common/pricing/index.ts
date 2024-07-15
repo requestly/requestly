@@ -14,6 +14,7 @@ export type FeatureType = Lowercase<keyof typeof FeatureLimitType>;
 
 export type PaidFeatureNudgeViewedSource =
   | "rule_dropdown"
+  | "rule_sidebar"
   | "rule_drawer"
   | "rule_selection_screen"
   | "share_button"
