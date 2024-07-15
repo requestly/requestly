@@ -6,6 +6,8 @@ import { Button, Col, List, Modal, Row, Space } from "antd";
 import { toast } from "utils/Toast.js";
 import { AiOutlineWarning } from "@react-icons/all-files/ai/AiOutlineWarning";
 import { BsFileEarmarkCheck } from "@react-icons/all-files/bs/BsFileEarmarkCheck";
+import CharlesIcon from "assets/icons/charlesIcon.svg?react";
+import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
 import { getAppMode, getIsRefreshRulesPending, getUserAuthDetails } from "store/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
@@ -24,8 +26,9 @@ import {
 } from "modules/analytics/events/features/rules";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import "./importRules.scss";
-import { ImportFromCharles } from "features/rules/screens/rulesList/components/RulesList/components/CharlesImporter";
+import { ImportFromCharles } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/CharlesImporter";
 import { SOURCE } from "modules/analytics/events/common/constants";
+import { ImportFromModheader } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ModheaderImporter";
 
 export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   //Global State
@@ -44,6 +47,7 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   const [groupsToImportCount, setGroupsToImportCount] = useState(false);
   const [conflictingRecords, setConflictingRecords] = useState([]);
   const [isImportFromCharlesModalOpen, setIsImportFromCharlesModalOpen] = useState(false);
+  const [isImportFromModheaderModalOpen, setIsImportFromModheaderModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
   const isImportLimitReached = useMemo(() => {
@@ -290,22 +294,28 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
   return (
     <>
       <Modal open={isOpen} onCancel={toggleModal} width={550} className="custom-rq-modal" footer={null}>
-        <div className="rule-importer-content">
-          {isImportFromCharlesModalOpen ? (
-            <ImportFromCharles
-              isBackButtonVisible={true}
-              onBackButtonClick={() => setIsImportFromCharlesModalOpen(false)}
-              callback={toggleModal}
-            />
-          ) : (
-            <>
+        {isImportFromCharlesModalOpen ? (
+          <ImportFromCharles
+            isBackButtonVisible={true}
+            onBackButtonClick={() => setIsImportFromCharlesModalOpen(false)}
+            callback={toggleModal}
+          />
+        ) : isImportFromModheaderModalOpen ? (
+          <ImportFromModheader
+            isBackButtonVisible={true}
+            onBackButtonClick={() => setIsImportFromModheaderModalOpen(false)}
+            callback={toggleModal}
+          />
+        ) : (
+          <>
+            <div className="rule-importer-content">
               <Row align="middle" justify="space-between" className="rules-importer-heading">
                 Import Rules
               </Row>
               {dataToImport ? renderImportConfirmation() : renderFilePicker()}
               {isCharlesImportFeatureFlagOn ? (
                 <div className="rules-importer-footer">
-                  Have Charles export file?
+                  <div>Or import from other apps:</div>
                   <RQButton
                     type="link"
                     size="small"
@@ -314,14 +324,25 @@ export const ImportRulesModal = ({ toggle: toggleModal, isOpen }) => {
                       trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
                     }}
                   >
-                    {" "}
-                    Click here to upload
+                    <CharlesIcon />
+                    &nbsp; Import from Charles
+                  </RQButton>
+                  <RQButton
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      setIsImportFromModheaderModalOpen(true);
+                      // trackCharlesSettingsImportStarted(SOURCE.UPLOAD_RULES);
+                    }}
+                  >
+                    <ModheaderIcon />
+                    &nbsp; Import from ModHeader
                   </RQButton>
                 </div>
               ) : null}
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
         {renderImportRulesBtn()}
       </Modal>
     </>
