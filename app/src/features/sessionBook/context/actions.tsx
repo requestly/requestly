@@ -17,6 +17,9 @@ export const SessionsActionContextProvider: React.FC<RulesProviderProps> = ({ ch
   const handleDeleteSessionAction = useCallback((id: string, eventsFilePath: string, handleForceRender: () => void) => {
     Modal.confirm({
       title: "Confirm",
+      /* antD modal by default applied warining and size styles to antd icons
+      TODO: use react-icons instead of antd icons when revamping sessions UI
+      */
       icon: <ExclamationCircleOutlined />,
       content: (
         <div>
