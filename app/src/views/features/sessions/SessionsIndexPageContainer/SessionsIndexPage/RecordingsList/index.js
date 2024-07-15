@@ -43,6 +43,7 @@ const confirmDeleteAction = (id, eventsFilePath, callback) => {
   });
 };
 
+// not renedered
 const RecordingsList = ({
   isTableLoading,
   filteredRecordings,
