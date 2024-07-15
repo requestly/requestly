@@ -13,6 +13,7 @@ import { Home } from "components/Home";
 import { PricingIndexPage } from "features/pricing/components/PricingPage";
 import { IncentiveTasksListScreen } from "features/incentivization";
 import { ImportFromCharlesWrapperView } from "features/rules/screens/rulesList/components/RulesList/components";
+import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ImportFromModheaderScreen";
 import SeleniumImporter from "views/misc/SeleniumImporter";
 
 export const miscRoutes: RouteObject[] = [
@@ -60,6 +61,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.IMPORT_FROM_CHARLES.RELATIVE,
     element: <ImportFromCharlesWrapperView />,
+  },
+  {
+    path: PATHS.IMPORT_FROM_MODHEADER.RELATIVE,
+    element: <ImportFromModheaderWrapperView />,
   },
   {
     path: PATHS.HOME.RELATIVE,

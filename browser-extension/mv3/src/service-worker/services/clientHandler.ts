@@ -1,11 +1,14 @@
-import { generateUrlPattern } from "../../utils";
+import { generateUrlPattern, getBlockedDomains, isExtensionEnabled, onBlockListChange } from "../../utils";
 import { WEB_URL, OTHER_WEB_URLS } from "../../../../config/dist/config.build.json";
-import { isExtensionEnabled } from "../../utils";
 import { Variable, onVariableChange } from "../variable";
 import { RuleType } from "common/types";
 import rulesStorageService from "../../rulesStorageService";
 
 const excludeMatchesPatterns = [WEB_URL, ...OTHER_WEB_URLS].map(generateUrlPattern).filter((pattern) => !!pattern);
+
+const generateBlockedHostMatchPattern = (host: string) => {
+  return [`*://${host}/*`, `*://*.${host}/*`];
+};
 
 const CLIENT_SCRIPTS: chrome.scripting.RegisteredContentScript[] = [
   {
@@ -36,9 +39,19 @@ declare const window: {
 
 /** Loading Client scripts ASAP */
 const registerClientScripts = async () => {
-  console.log("[registerClientScript]");
+  const blockedDomains = await getBlockedDomains();
+  const blockedDomainPatterns = blockedDomains.flatMap(generateBlockedHostMatchPattern).filter((pattern) => !!pattern);
+
+  console.log("[registerClientScript]", { blockedDomains });
+  const clientScripts = CLIENT_SCRIPTS.map((script) => {
+    return {
+      ...script,
+      excludeMatches: [...(script.excludeMatches ?? []), ...blockedDomainPatterns],
+    };
+  });
+
   chrome.scripting
-    .registerContentScripts(CLIENT_SCRIPTS)
+    .registerContentScripts(clientScripts)
     .then(() => {
       console.log("[registerClientScript]");
       chrome.scripting
@@ -62,7 +75,7 @@ const unregisterClientScripts = async () => {
 };
 
 const setupClientScript = async (isExtensionStatusEnabled: boolean) => {
-  console.log("[initClientHandler.setupClientScript]", { isExtensionEnabled });
+  console.log("[initClientHandler.setupClientScript]", { isExtensionStatusEnabled });
   if (isExtensionStatusEnabled) {
     registerClientScripts();
   } else {
@@ -78,6 +91,12 @@ export const initClientHandler = async () => {
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
     console.log("[initClientHandler]", "onVariableChange", { extensionStatus });
     setupClientScript(extensionStatus);
+  });
+
+  onBlockListChange(() => {
+    unregisterClientScripts().then(() => {
+      setupClientScript(isExtensionStatusEnabled);
+    });
   });
 };
 
@@ -137,7 +156,7 @@ const updateTabRuleCache = async (tabId: number, frameId?: number) => {
 };
 
 export const initClientRuleCaching = async () => {
-  // TODO: Do not inject in Requestly Pages. No harm in injecting though
+  // TODO: Do not inject in Requestly Pages and blocklisted domains. No harm in injecting though
   let isExtensionStatusEnabled = await isExtensionEnabled();
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, (extensionStatus) => {
     isExtensionStatusEnabled = extensionStatus;

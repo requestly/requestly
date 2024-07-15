@@ -19,7 +19,7 @@ import {
 import { mapRemoteAdapter } from "./map-remote";
 import { mapLocalRuleAdapter } from "./map-local";
 import { rewriteRuleAdapter } from "./rewrite";
-import { convertToArray } from "./utils";
+import { convertToArray } from "../utils";
 
 type CharlesExport = {
   "charles-export": Record<string, unknown>;
