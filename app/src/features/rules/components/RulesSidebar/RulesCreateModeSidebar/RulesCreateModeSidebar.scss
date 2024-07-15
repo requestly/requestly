@@ -48,6 +48,16 @@
         .description {
           display: none;
         }
+
+        .premium-icon-container {
+          display: flex;
+          align-items: center;
+
+          .premium-icon {
+            width: 14px;
+            height: 14px;
+          }
+        }
       }
     }
   }
