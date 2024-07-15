@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { CustomInlineInput } from "componentsV2/CustomInlineInput/CustomInlineInput";
 import "./sessionsTitle.scss";
 
 export const SessionTitle = () => {
-  const [sessionTitle, setSessionTitle] = useState("Pookie");
+  const sessionMetadata = useSelector(getSessionRecordingMetaData);
+  const [sessionTitle, setSessionTitle] = useState(sessionMetadata?.name || "");
 
   return (
     <div className="session-title-container">

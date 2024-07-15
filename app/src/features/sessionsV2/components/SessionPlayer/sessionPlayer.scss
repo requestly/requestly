@@ -4,17 +4,16 @@
 
 .session-player-container {
   width: 100%;
-  background: #000;
+  background: var(--requestly-color-black);
   border-radius: 8px;
   padding: 10px;
 
   .session-player {
     width: 100%;
-    position: relative;
 
     .rr-player {
       width: 100% !important;
-      height: calc(100% - 63px) !important;
+      height: calc(100% - 13px) !important;
     }
 
     .rr-controller {
@@ -55,9 +54,14 @@
 
     .rr-player__frame {
       width: 100% !important;
+      height: 530px !important;
+      background: var(--requestly-color-black);
+
       .replayer-wrapper {
+        transform: scale(0.65) translate(-50%, -50%) !important;
+
         iframe {
-          border-radius: 12px;
+          border-radius: 8px;
         }
       }
     }
@@ -67,7 +71,7 @@
     display: flex;
     align-items: center;
     gap: 32px;
-    padding: 15px 8px;
+    padding: 10px 8px;
     position: relative;
     top: 6px;
 

@@ -29,8 +29,8 @@ import { convertSessionRecordingNetworkLogsToRQNetworkLogs } from "./NetworkLogs
 import { trackSessionRecordingPanelTabClicked } from "modules/analytics/events/features/sessionRecording";
 import { MdOutlineReplay10 } from "@react-icons/all-files/md/MdOutlineReplay10";
 import { MdOutlineForward10 } from "@react-icons/all-files/md/MdOutlineForward10";
-import "./sessionViewer.scss";
 import PlayerFrameOverlay from "./PlayerOverlay";
+import "./sessionViewer.scss";
 
 interface SessionDetailsProps {
   isInsideIframe?: boolean;
