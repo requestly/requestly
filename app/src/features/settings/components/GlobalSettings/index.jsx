@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import InstallExtensionCTA from "../../../../components/misc/InstallExtensionCTA";
-import * as ExtensionActions from "../../../../actions/ExtensionActions";
+import { isExtensionInstalled } from "actions/ExtensionActions";
 import APP_CONSTANTS from "../../../../config/constants";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { isFeatureCompatible } from "../../../../utils/CompatibilityUtils";
@@ -15,22 +15,13 @@ import { BlockList } from "./components/BlockListSettings/BlockListSettings";
 export const GlobalSettings = () => {
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
-  const [storageType, setStorageType] = useState("");
-
-  useEffect(() => {
-    if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
-      ExtensionActions.getStorageInfo().then((response) => {
-        setStorageType(response.storageType);
-      });
-    }
-  }, [appMode, setStorageType]);
 
   const isImplicitTestThisRuleCompatible = useMemo(
     () => isFeatureCompatible(APP_CONSTANTS.FEATURES.IMPLICIT_TEST_THIS_RULE),
     []
   );
 
-  if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && !storageType) {
+  if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP && !isExtensionInstalled()) {
     return <InstallExtensionCTA heading="Requestly Extension Settings" eventPage="settings_page" />;
   }
 
