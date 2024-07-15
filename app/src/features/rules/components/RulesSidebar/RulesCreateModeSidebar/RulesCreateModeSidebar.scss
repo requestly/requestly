@@ -1,10 +1,45 @@
 .rules-create-mode-sidebar-container {
   min-width: 208px;
   max-width: 208px;
+  height: max-content;
+  padding: 16px 8px 16px 16px;
   border-right: 1px solid var(--requestly-color-surface-1, #282828);
 
+  .ask-ai-btn.ant-btn.ant-btn-default {
+    margin-bottom: 4px;
+    border-radius: 4px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(12px);
+    background: radial-gradient(rgba(255, 199, 0, 0) 30%, var(--requestly-color-white) 100%);
+    background-size: 240% 260%;
+
+    .ask-ai-btn-content {
+      color: var(--requestly-color-text-placeholder, #8f8f8f);
+      font-size: 11px;
+      font-style: normal;
+      line-height: 130%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+
+      svg {
+        width: 14px;
+        height: 14px;
+        color: inherit;
+      }
+    }
+
+    &::after {
+      border-radius: 4px;
+    }
+  }
+
   .rule-selection-list-container {
-    padding: 16px 8px 16px 16px;
+    padding: 0;
 
     .rule-category-title {
       margin: 12px 0 8px 0;
