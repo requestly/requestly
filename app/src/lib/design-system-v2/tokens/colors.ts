@@ -1,4 +1,4 @@
-type SeedTokenKeys = "primary" | "neutral" | "success" | "error" | "warning";
+type SeedTokenKeys = "primary" | "secondary" | "neutral" | "success" | "error" | "warning";
 type MapTokenVariations = 0 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000;
 type MapTokenKeys = `${SeedTokenKeys}-${MapTokenVariations}`;
 type AliasTokenKeys =
@@ -48,6 +48,17 @@ const DEFAULT_MAP_TOKENS: MapTokens = {
   "primary-800": "#001F88",
   "primary-900": "#001670",
   "primary-1000": "#111A2C",
+  "secondary-0": "#EEDCFA",
+  "secondary-100": "#E2COFA",
+  "secondary-200": "#D5A3FB",
+  "secondary-300": "#C686FA",
+  "secondary-400": "#B568F9",
+  "secondary-500": "#A447F8",
+  "secondary-600": "#750FCD",
+  "secondary-700": "#680CB7",
+  "secondary-800": "#2B084B",
+  "secondary-900": "#420975",
+  "secondary-1000": "#240342",
   "neutral-0": "#E9E9E9",
   "neutral-100": "#E9E9E9",
   "neutral-200": "#D1D1D1",
@@ -96,12 +107,13 @@ const DEFAULT_MAP_TOKENS: MapTokens = {
 
 export const generateColorTokens = (
   primary = "#004EEB",
+  secondary = "#A447F8",
   neutral = "#787878",
   success = "#0BAA60",
   error = "#E43434",
   warning = "#E09400"
 ) => {
-  const seedTokens = { primary, neutral, success, error, warning };
+  const seedTokens = { primary, secondary, neutral, success, error, warning };
   const mapTokens = generateMapTokens(seedTokens);
   const aliasTokens = generateAliasTokens(mapTokens);
 

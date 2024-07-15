@@ -12,6 +12,11 @@
     text-align: center;
     margin-top: 16px;
     margin-bottom: 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
 
     .rq-btn {
       padding: 0;

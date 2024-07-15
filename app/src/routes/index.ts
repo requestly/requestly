@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom";
-import { sessionRoutes } from "./sessionRoutes";
+import { sessionRoutes } from "features/sessionBook";
 import { apiClientRoutes } from "./apiClientRoutes";
 import { accountRoutes } from "./accountRoutes";
 import { authRoutes } from "./authRoutes";
