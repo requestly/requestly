@@ -11,8 +11,9 @@ import { RiForward10Fill } from "@react-icons/all-files/ri/RiForward10Fill";
 import { MdFullscreen } from "@react-icons/all-files/md/MdFullscreen";
 import { RQButton } from "lib/design-system/components";
 import { Select, Switch } from "antd";
-import { PlayerState } from "features/sessionsV2/types";
+import { PlayerState } from "features/sessionBook/types";
 import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessionEventsUtils";
+import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 import "./sessionPlayer.scss";
 
 export const SessionPlayer = () => {
@@ -175,7 +176,9 @@ export const SessionPlayer = () => {
             iconOnly
             icon={playerState === PlayerState.PAUSED ? <MdOutlinePlayCircle /> : <MdPauseCircleOutline />}
           />
-          <div className="session-player-duration-tracker">00:2/ 00:49</div>
+          <div className="session-player-duration-tracker">
+            00:2/ {msToMinutesAndSeconds(attributes?.duration || 0)}
+          </div>
         </div>
         <div className="session-player-jump-controllers">
           <RQButton

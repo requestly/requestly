@@ -1,13 +1,13 @@
 import { Tooltip } from "antd";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import { DownloadSessionButton } from "features/sessionsV2/components/DownloadSessionButton/DownloadSessionButton";
-import { SessionPlayer } from "features/sessionsV2/components/SessionPlayer/SessionPlayer";
-import { SessionTitle } from "features/sessionsV2/components/SessionsTitle/SessionTitle";
+import { DownloadSessionButton } from "features/sessionBook/components/DownloadSessionButton/DownloadSessionButton";
+import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
+import { SessionTitle } from "features/sessionBook/components/SessionsTitle/SessionTitle";
 import { RQButton } from "lib/design-system/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOutlinePublic } from "@react-icons/all-files/md/MdOutlinePublic";
 import { MdOutlineLink } from "@react-icons/all-files/md/MdOutlineLink";
-import { SessionViewerBottomSheet } from "features/sessionsV2/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
+import { SessionViewerBottomSheet } from "features/sessionBook/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import "./savedSessionViewer.scss";
 
 export const SavedSessionViewer = () => {

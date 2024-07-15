@@ -8,8 +8,8 @@ import { RQSessionEvents } from "@requestly/web-sdk";
 import { decompressEvents } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import PageLoader from "components/misc/PageLoader";
-import "./savedSessionScreen.scss";
 import { SavedSessionViewer } from "./components/SavedSessionViewer/SavedSessionViewer";
+import "./savedSessionScreen.scss";
 
 export const SavedSessionScreen: React.FC = () => {
   const { id } = useParams();
