@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext } from "react";
 import { Modal } from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { RiErrorWarningLine } from "@react-icons/all-files/ri/RiErrorWarningLine";
 import { deleteRecording } from "views/features/sessions/api";
 
 type SessionsActionContextType = {
@@ -20,7 +20,7 @@ export const SessionsActionContextProvider: React.FC<RulesProviderProps> = ({ ch
       /* antD modal by default applied warining and size styles to antd icons
       TODO: use react-icons instead of antd icons when revamping sessions UI
       */
-      icon: <ExclamationCircleOutlined />,
+      icon: <RiErrorWarningLine className="anticon" />,
       content: (
         <div>
           <p>
