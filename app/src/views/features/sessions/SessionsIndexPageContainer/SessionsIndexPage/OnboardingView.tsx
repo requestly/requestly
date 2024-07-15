@@ -19,10 +19,13 @@ import {
   trackStartRecordingWithURLClicked,
   trackTriedRecordingForInvalidURL,
 } from "modules/analytics/events/features/sessionRecording";
-import { ImportHarModalButton } from "../NetworkSessions/ImportHarModalButton";
+// import { ImportHarModalButton } from "../NetworkSessions/ImportHarModalButton";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.scss";
+import { useNavigate } from "react-router-dom";
+import { redirectToNetworkSession } from "utils/RedirectionUtils";
+import HarImportModal from "components/mode-specific/desktop/InterceptTraffic/WebTraffic/TrafficExporter/HarImportModal";
 
 const { Text, Title } = Typography;
 
@@ -66,6 +69,13 @@ interface OnboardingProps extends SessionOnboardProps {
 }
 
 const NewtorkSessionsOnboarding: React.FC<{}> = () => {
+  const navigate = useNavigate();
+  const stableNavigate = useCallback(
+    (sessionId: string) => {
+      redirectToNetworkSession(navigate, sessionId);
+    },
+    [navigate]
+  );
   return (
     <div
       style={{
@@ -81,8 +91,8 @@ const NewtorkSessionsOnboarding: React.FC<{}> = () => {
         <div>Record your network sessions and Share with others for offline review or debugging.</div>
       </Text>
       <div>
-        {/* <HarImportModal onSaved={stableNavigate} /> */}
-        <ImportHarModalButton />
+        <HarImportModal onSaved={stableNavigate} />
+        {/* <ImportHarModalButton /> */}
       </div>
       <Divider />
       <Text type="secondary">
