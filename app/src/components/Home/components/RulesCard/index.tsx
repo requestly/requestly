@@ -8,7 +8,7 @@ import { useHasChanged } from "hooks";
 import { HomepageEmptyCard } from "../EmptyCard";
 import { m, AnimatePresence } from "framer-motion";
 import { RQButton } from "lib/design-system/components";
-import { redirectToCreateNewRule, redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
+import { redirectToRuleEditor, redirectToTemplates } from "utils/RedirectionUtils";
 import { Rule, RuleType } from "types";
 import rulesIcon from "../../assets/rules.svg";
 import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
@@ -23,6 +23,7 @@ import { trackHomeRulesActionClicked } from "components/Home/analytics";
 import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
+import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
 import "./rulesCard.scss";
 
 export const RulesCard: React.FC = () => {
@@ -36,6 +37,11 @@ export const RulesCard: React.FC = () => {
   const hasUserChanged = useHasChanged(user?.details?.profile?.uid);
   const [rules, setRules] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRulesDrawerOpen, setIsRulesDrawerOpen] = useState(false);
+
+  const onRulesDrawerClose = () => {
+    setIsRulesDrawerOpen(false);
+  };
 
   useEffect(() => {
     if (isExtensionInstalled() && !isRulesLoading) {
@@ -82,16 +88,25 @@ export const RulesCard: React.FC = () => {
               </Row>
             </Col>
             <Col span={8} className="homepage-rules-card-header-action">
-              <Button
-                type="default"
-                className="rules-card-create-btn"
-                onClick={() => {
-                  trackHomeRulesActionClicked("new_rule_dropdown");
-                  redirectToCreateNewRule(navigate, null, SOURCE.HOME_SCREEN);
+              <RuleSelectionListDrawer
+                open={isRulesDrawerOpen}
+                onClose={onRulesDrawerClose}
+                source={SOURCE.HOME_SCREEN}
+                onRuleItemClick={() => {
+                  onRulesDrawerClose();
                 }}
               >
-                <IoMdAdd /> New rule
-              </Button>
+                <Button
+                  type="default"
+                  className="rules-card-create-btn"
+                  onClick={() => {
+                    trackHomeRulesActionClicked("new_rule_drawer");
+                    setIsRulesDrawerOpen(true);
+                  }}
+                >
+                  <IoMdAdd /> New rule
+                </Button>
+              </RuleSelectionListDrawer>
             </Col>
           </Row>
           <div className="homepage-rules-list">
@@ -130,19 +145,30 @@ export const RulesCard: React.FC = () => {
             title="HTTP Rules"
             description="Create rules to modify HTTP requests and responses."
             primaryButton={
-              <RQButton
-                type="primary"
-                onClick={() => {
-                  trackHomeRulesActionClicked("create_new_rule");
-                  if (isExtensionInstalled()) {
-                    redirectToCreateNewRule(navigate, null, SOURCE.HOME_SCREEN);
-                  } else {
-                    dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
-                  }
+              <RuleSelectionListDrawer
+                open={isRulesDrawerOpen}
+                onClose={onRulesDrawerClose}
+                source={SOURCE.HOME_SCREEN}
+                onRuleItemClick={() => {
+                  onRulesDrawerClose();
                 }}
               >
-                Create new Rule
-              </RQButton>
+                <RQButton
+                  type="primary"
+                  onClick={() => {
+                    trackHomeRulesActionClicked("create_new_rule");
+
+                    if (isExtensionInstalled()) {
+                      setIsRulesDrawerOpen(true);
+                    } else {
+                      // @ts-ignore
+                      dispatch(actions.toggleActiveModal({ modalName: "extensionModal", newValue: true }));
+                    }
+                  }}
+                >
+                  Create new Rule
+                </RQButton>
+              </RuleSelectionListDrawer>
             }
             secondaryButton={
               <RQButton

@@ -1,6 +1,6 @@
 import { get } from "lodash";
 import { BlockCookiesRule, CharlesRuleType, ParsedRule } from "../types";
-import { getGroupName, getHeaders, getSourcesData } from "../utils";
+import { getGroupName, getHeaders, getSourcesData } from "../../utils";
 import { headersConfig } from "./header-config";
 import { getNewRule } from "components/features/rules/RuleBuilder/actions";
 import { HeadersRule, RuleType, Status } from "types";
