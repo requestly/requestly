@@ -24,6 +24,7 @@ import emptyInbox from "./empty-inbox.svg";
 import { MdOutlineAddCircleOutline } from "@react-icons/all-files/md/MdOutlineAddCircleOutline";
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
+import { HiOutlineTemplate } from "@react-icons/all-files/hi/HiOutlineTemplate";
 import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { RuleSelectionListDrawer } from "../RuleSelectionListDrawer/RuleSelectionListDrawer";
@@ -237,6 +238,7 @@ export const GettingStarted: React.FC = () => {
             <Button
               type="link"
               className="link-btn templates-btn"
+              icon={<HiOutlineTemplate className="anticon" />}
               onClick={() => {
                 navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
               }}
