@@ -207,16 +207,31 @@ export const GettingStarted: React.FC = () => {
 
             {/* TODO: make desktop only */}
             {isCharlesImportFeatureFlagOn ? (
-              <Button
-                type="link"
-                className="link-btn"
-                onClick={() => {
-                  toggleImportCharlesRulesModal();
-                  trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
-                }}
-              >
-                Import from Charles proxy
-              </Button>
+              <>
+                <Button
+                  type="link"
+                  className="link-btn"
+                  icon={<CharlesIcon className="anticon" />}
+                  onClick={() => {
+                    toggleImportCharlesRulesModal();
+                    trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
+                  }}
+                >
+                  Import from Charles
+                </Button>
+
+                <Button
+                  type="link"
+                  className="link-btn"
+                  icon={<ModheaderIcon className="anticon" />}
+                  onClick={() => {
+                    toggleImportModheaderRulesModal();
+                    trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
+                  }}
+                >
+                  Import from ModHeader
+                </Button>
+              </>
             ) : null}
 
             <Button
