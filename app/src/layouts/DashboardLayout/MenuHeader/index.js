@@ -22,7 +22,7 @@ import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 import APP_CONSTANTS from "config/constants";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
 import { RequestBot, trackAskAIClicked } from "features/requestBot";
-import BotIcon from "./assets/bot.svg";
+import BotIcon from "assets/icons/bot.svg?react";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -122,7 +122,7 @@ const MenuHeader = () => {
                   }}
                 >
                   <div className="ask-ai-btn-content">
-                    <img src={BotIcon} alt="bot" />
+                    <BotIcon />
                     Ask AI
                   </div>
                 </RQButton>
