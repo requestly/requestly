@@ -8,14 +8,7 @@
   .ask-ai-btn.ant-btn.ant-btn-default {
     margin-bottom: 4px;
     border-radius: 4px;
-    position: relative;
-    display: flex;
-    align-items: center;
     gap: 6px;
-    box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(12px);
-    background: radial-gradient(rgba(255, 199, 0, 0) 30%, var(--requestly-color-white) 100%);
-    background-size: 240% 260%;
 
     .ask-ai-btn-content {
       color: var(--requestly-color-text-placeholder, #8f8f8f);

@@ -150,24 +150,32 @@
         color: var(--requestly-color-text-default, #fff);
       }
 
-      .ask-ai {
+      .ask-ai-btn.ant-btn.ant-btn-default {
         height: 48px;
         padding: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        align-self: stretch;
-        font-size: 13px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 150%;
         border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        color: var(--requestly-color-text-placeholder, #8f8f8f);
+        gap: 8px;
 
-        backdrop-filter: blur(12px);
-        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.15);
-        background: var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+        .ask-ai-btn-content {
+          font-size: 13px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 150%;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          width: 100%;
+
+          svg {
+            width: 16px;
+            height: 16px;
+            color: inherit;
+          }
+        }
+
+        &::after {
+          border-radius: 8px;
+        }
       }
 
       .caption {
