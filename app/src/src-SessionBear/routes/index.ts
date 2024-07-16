@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom";
-import { sessionRoutes } from "./sessionRoutes";
+import { sessionRoutes } from "features/sessionBook";
 import { miscRoutes } from "./miscRoutes";
 import { authRoutes } from "routes/authRoutes";
 import { settingsRoutes } from "./settingsRoutes";

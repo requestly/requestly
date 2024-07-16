@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getAppMode } from "store/selectors";
-import { AutoRecordingMode, SessionRecordingConfig } from "../../../../../views/features/sessions/types";
+import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook";
 import { defaultSessionRecordingConfig } from "..";
 import { StorageService } from "init";
 // @ts-ignore
