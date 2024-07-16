@@ -13,7 +13,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import PersonaRecommendation from "./PersonaRecommendation";
 import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
-import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
+import { trackGettingStartedVideoPlayed, trackRulesEmptyStateClicked } from "modules/analytics/events/common/rules";
 import {
   trackRulesImportStarted,
   trackUploadRulesButtonClicked,
@@ -65,9 +65,8 @@ export const GettingStarted: React.FC = () => {
     setIsImportModheaderRulesModalActive((prev) => !prev);
   };
 
-  const handleCreateMyFirstRuleClick = () => {
-    // TODO: update analytics
-    trackNewRuleButtonClicked(SOURCE.GETTING_STARTED);
+  const handleNewRuleClick = (source: string) => {
+    trackRulesEmptyStateClicked(source);
     setIsRulesListDrawerOpen(true);
   };
 
@@ -136,7 +135,7 @@ export const GettingStarted: React.FC = () => {
                   <Button
                     block
                     type="primary"
-                    onClick={handleCreateMyFirstRuleClick}
+                    onClick={() => handleNewRuleClick("new_rule")}
                     className="getting-started-create-rule-btn"
                     icon={<MdOutlineAddCircleOutline className="anticon" />}
                   >
@@ -147,7 +146,15 @@ export const GettingStarted: React.FC = () => {
               <div className="rule-suggestions">
                 {suggestedRules.map(({ type, title, icon, link, help }) => {
                   return (
-                    <Link to={link} key={type} className="suggested-rule-link">
+                    <Link
+                      to={link}
+                      key={type}
+                      className="suggested-rule-link"
+                      state={{ source: "rules_empty_state" }}
+                      onClick={() => {
+                        trackRulesEmptyStateClicked(type);
+                      }}
+                    >
                       <span className="icon">{icon()}</span>
                       <span className="title">{title}</span>
                       {help ? (
@@ -169,7 +176,7 @@ export const GettingStarted: React.FC = () => {
                     onRulesListDrawerClose();
                   }}
                 >
-                  <Button type="link" className="link-btn" onClick={handleCreateMyFirstRuleClick}>
+                  <Button type="link" className="link-btn" onClick={() => handleNewRuleClick("view_all_rule_types")}>
                     View all rules
                   </Button>
                 </RuleSelectionListDrawer>
@@ -191,6 +198,7 @@ export const GettingStarted: React.FC = () => {
                 className="link-btn"
                 icon={<MdOutlineFileUpload className="anticon" />}
                 onClick={() => {
+                  trackRulesEmptyStateClicked("import_json");
                   trackUploadRulesButtonClicked(SOURCE.GETTING_STARTED);
                   user?.details?.isLoggedIn && handleUploadRulesClick();
                 }}
@@ -208,6 +216,7 @@ export const GettingStarted: React.FC = () => {
                   icon={<CharlesIcon className="anticon" />}
                   onClick={() => {
                     toggleImportCharlesRulesModal();
+                    trackRulesEmptyStateClicked("import_charles");
                     trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
                   }}
                 >
@@ -220,6 +229,7 @@ export const GettingStarted: React.FC = () => {
                   icon={<ModheaderIcon className="anticon" />}
                   onClick={() => {
                     toggleImportModheaderRulesModal();
+                    trackRulesEmptyStateClicked("import_modheader");
                     trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
                   }}
                 >
@@ -233,6 +243,7 @@ export const GettingStarted: React.FC = () => {
               className="link-btn templates-btn"
               icon={<HiOutlineTemplate className="anticon" />}
               onClick={() => {
+                trackRulesEmptyStateClicked("templates");
                 navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
               }}
             >
@@ -244,7 +255,12 @@ export const GettingStarted: React.FC = () => {
             <div className="title">Ask AI for any help with using Requestly</div>
 
             <div>
-              <div className="ask-ai">
+              <div
+                className="ask-ai"
+                onClick={() => {
+                  trackRulesEmptyStateClicked("ai_bot");
+                }}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <g clip-path="url(#clip0_2119_2251)">
                     <path

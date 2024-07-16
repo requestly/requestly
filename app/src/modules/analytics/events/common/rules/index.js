@@ -267,3 +267,8 @@ export const trackDocsSidebarContactUsClicked = (rule_type) => {
 export const trackRuleSaveClicked = (mode) => {
   trackEvent(RULES.RULE_SAVE_CLICKED, { mode });
 };
+
+export const trackRulesEmptyStateClicked = (action) => {
+  const params = { action };
+  trackEvent(RULES.RULES_EMPTY_STATE_CLICKED, params);
+};

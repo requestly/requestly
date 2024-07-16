@@ -117,7 +117,7 @@ const MenuHeader = () => {
                 <RQButton
                   className="ask-ai-btn"
                   onClick={() => {
-                    trackAskAIClicked();
+                    trackAskAIClicked("app_header");
                     setIsRequestBotVisible(true);
                   }}
                 >
