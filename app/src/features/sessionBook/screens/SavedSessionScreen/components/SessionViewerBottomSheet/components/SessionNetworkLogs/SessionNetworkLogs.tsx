@@ -5,6 +5,7 @@ import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/
 import { NetworkLog } from "features/sessionBook/types";
 import { convertSessionRecordingNetworkLogsToRQNetworkLogs } from "views/features/sessions/SessionViewer/NetworkLogs/helpers";
 import NetworkLogsPanel from "views/features/sessions/SessionViewer/NetworkLogs/NetworkLogsPanel";
+import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import "./sessionNetworkLogs.scss";
 
 interface SessionNetworkLogsProps {
@@ -14,6 +15,7 @@ interface SessionNetworkLogsProps {
 const SessionNetworkLogs: React.FC<SessionNetworkLogsProps> = ({ playerTimeOffset }) => {
   const events = useSelector(getSessionRecordingEvents);
   const attributes = useSelector(getSessionRecordingAttributes);
+  const { sheetPlacement } = useBottomSheetContext();
 
   const networkLogs = useMemo<NetworkLog[]>(() => {
     const networkEvents = events?.[RQSessionEventType.NETWORK] || [];
@@ -27,7 +29,13 @@ const SessionNetworkLogs: React.FC<SessionNetworkLogsProps> = ({ playerTimeOffse
 
   if (rqNetworkLogs) {
     return (
-      <div className="session-network-logs-container">
+      <div
+        className={`session-network-logs-container ${
+          sheetPlacement === BottomSheetPlacement.BOTTOM
+            ? "network-logs-container-bottom"
+            : "network-logs-container-right"
+        }`}
+      >
         <NetworkLogsPanel
           startTime={attributes?.startTime}
           networkLogs={rqNetworkLogs}

@@ -1,6 +1,13 @@
 .session-console-logs-container {
-  height: calc(100% - 60px);
   overflow-y: auto;
   border-radius: 4px;
   border: 1px solid var(--requestly-color-white-t-10);
+
+  &.console-logs-container-bottom {
+    height: 320px;
+  }
+
+  &.console-logs-container-right {
+    height: calc(100% - 60px);
+  }
 }
