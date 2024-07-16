@@ -4,16 +4,20 @@ import BotIcon from "assets/icons/bot.svg?react";
 import { RQButton } from "lib/design-system/components";
 import { trackRuleTypeSwitched } from "modules/analytics/events/common/rules";
 import { trackAskAIClicked } from "features/requestBot";
+import { useDispatch } from "react-redux";
+import { actions } from "store";
 import "./RulesCreateModeSidebar.scss";
 
 export const RulesCreateModeSidebar: React.FC = () => {
+  const dispatch = useDispatch();
+
   return (
     <div className="rules-create-mode-sidebar-container">
       <RQButton
         className="ask-ai-btn"
         onClick={() => {
           trackAskAIClicked("rule_sidebar");
-          // setIsRequestBotVisible(true);
+          dispatch(actions.updateRequestBot({ isActive: true, modelType: "ruleTypes" }));
         }}
       >
         <div className="ask-ai-btn-content">
