@@ -11,6 +11,12 @@
   .session-player {
     width: 100%;
 
+    &.session-player-fullscreen {
+      .rr-player__frame {
+        height: 92vh !important;
+      }
+    }
+
     .rr-player {
       width: 100% !important;
       height: calc(100% - 13px) !important;
