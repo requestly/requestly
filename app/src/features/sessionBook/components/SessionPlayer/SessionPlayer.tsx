@@ -9,6 +9,7 @@ import { MdPauseCircleOutline } from "@react-icons/all-files/md/MdPauseCircleOut
 import { RiReplay10Fill } from "@react-icons/all-files/ri/RiReplay10Fill";
 import { RiForward10Fill } from "@react-icons/all-files/ri/RiForward10Fill";
 import { MdFullscreen } from "@react-icons/all-files/md/MdFullscreen";
+import { TbMinimize } from "@react-icons/all-files/tb/TbMinimize";
 import { RQButton } from "lib/design-system/components";
 import { Select, Switch } from "antd";
 import { PlayerState } from "features/sessionBook/types";
@@ -29,8 +30,10 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
   const [playerTimeOffset, setPlayerTimeOffset] = useState(0);
   const [isSkipInactiveEnabled, setIsSkipInactiveEnabled] = useState(true);
+  const [isFullScreenMode, setIsFullScreenMode] = useState(false);
 
-  const playerContainer = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
   const currentTimeRef = useRef<number>(0);
   const isPlayerSkippingInactivity = useRef(false);
   const skipInactiveSegments = useRef(true);
@@ -95,7 +98,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
 
       setPlayer(
         new Replayer({
-          target: playerContainer.current,
+          target: playerRef.current,
           props: {
             events: rrwebEvents,
             // width: playerContainer.current.clientWidth,
@@ -113,19 +116,19 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   }, [events, player]);
 
   useEffect(() => {
-    const pauseVideo = () => {
-      player?.pause();
-    };
+    // const pauseVideo = () => {
+    //   player?.pause();
+    // };
 
     // no rrweb listener on the player works when focus is shifted from the tab
     // The player keeps playing even when the tab is not in focus.
     // so we add a listener on the window to pause the player when the tab is blurred
-    window.addEventListener("blur", pauseVideo);
+    // window.addEventListener("blur", pauseVideo);
 
     return () => {
       // @ts-ignore
       player?.$destroy(); // destroy player on unmount
-      window.removeEventListener("blur", pauseVideo);
+      // window.removeEventListener("blur", pauseVideo);
     };
   }, [player]);
 
@@ -170,9 +173,25 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     player?.toggleSkipInactive();
   };
 
+  // NOTE: effect is not working as expected when in fullscreen mode
+  // useEffect(() => {
+  //   // listen for esc key press to exit fullscreen mode
+  //   const handleEscKey = (event: KeyboardEvent) => {
+  //     if (event.key === "Escape" || event.key === "Esc") {
+  //       document.exitFullscreen();
+  //       setIsFullScreenMode(false);
+  //     }
+  //   };
+  //   document.addEventListener("keydown", handleEscKey);
+
+  //   return () => {
+  //     document.removeEventListener("keydown", handleEscKey);
+  //   };
+  // }, []);
+
   return (
-    <div className="session-player-container">
-      <div ref={playerContainer} className="session-player"></div>
+    <div ref={playerContainerRef} className="session-player-container">
+      <div ref={playerRef} className={`session-player ${isFullScreenMode ? "session-player-fullscreen" : ""}`}></div>
       <div className="session-player-controller">
         <div className="session-status-container">
           <RQButton
@@ -182,7 +201,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
             icon={playerState === PlayerState.PAUSED ? <MdOutlinePlayCircle /> : <MdPauseCircleOutline />}
           />
           <div className="session-player-duration-tracker">
-            00:2/ {msToMinutesAndSeconds(attributes?.duration || 0)}
+            {msToMinutesAndSeconds(playerTimeOffset * 1000 || 0)}/ {msToMinutesAndSeconds(attributes?.duration || 0)}
           </div>
         </div>
         <div className="session-player-jump-controllers">
@@ -211,6 +230,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
               { value: 8, label: "8x" },
             ]}
             onChange={handlePlayerSpeedChange}
+            placement="topRight"
           />
         </div>
         <div className="session-player-skip-controller">
@@ -218,7 +238,28 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
           <span>Skip inactive</span>
         </div>
         <div className="flex-1 session-player-fullscreen-controller-container">
-          <RQButton className="session-player-controller__btn " iconOnly icon={<MdFullscreen />} />
+          {isFullScreenMode ? (
+            <RQButton
+              className="session-player-controller__btn "
+              iconOnly
+              icon={<TbMinimize />}
+              onClick={() => {
+                // playerContainerRef.current.requestFullscreen();
+                document.exitFullscreen();
+                setIsFullScreenMode(false);
+              }}
+            />
+          ) : (
+            <RQButton
+              className="session-player-controller__btn "
+              iconOnly
+              icon={<MdFullscreen />}
+              onClick={() => {
+                playerContainerRef.current.requestFullscreen();
+                setIsFullScreenMode(true);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
