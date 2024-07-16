@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Divider, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
@@ -31,6 +31,7 @@ import { RuleSelectionListDrawer } from "../RuleSelectionListDrawer/RuleSelectio
 import { trackAskAIClicked } from "features/requestBot";
 import { RQButton } from "lib/design-system/components";
 import BotIcon from "assets/icons/bot.svg?react";
+import { actions } from "store";
 import "./gettingStarted.scss";
 
 const { PATHS } = APP_CONSTANTS;
@@ -38,6 +39,7 @@ const { PATHS } = APP_CONSTANTS;
 export const GettingStarted: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
@@ -263,7 +265,7 @@ export const GettingStarted: React.FC = () => {
                 onClick={() => {
                   trackAskAIClicked("rules_empty_state");
                   trackRulesEmptyStateClicked("ai_bot");
-                  // setIsRequestBotVisible(true);
+                  dispatch(actions.updateRequestBot({ isActive: true, modelType: "app" }));
                 }}
               >
                 <div className="ask-ai-btn-content">
