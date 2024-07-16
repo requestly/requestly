@@ -2,11 +2,11 @@ import React, { useMemo, useState } from "react";
 import { ConsoleLog } from "../types";
 import LogIcon from "./LogIcon";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
-import { Col, Collapse, Row, Space, Typography } from "antd";
+import { Col, Collapse, Row, Space } from "antd";
 import { RQButton } from "lib/design-system/components";
-import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
-import { ClockCircleOutlined } from "@ant-design/icons";
-import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
+// import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
+// import { ClockCircleOutlined } from "@ant-design/icons";
+// import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./console.scss";
 interface LogRowProps extends ConsoleLog {
@@ -112,15 +112,7 @@ const ConsoleLogRow: React.FC<LogRowProps> = ({
       data-resource-id={id}
     >
       <Col span={24} className="display-flex">
-        <Col>
-          <Row align="middle" className="log-offset-row">
-            {isRecentLog ? <AiFillCaretRight className="recent-log-pointer" /> : <div></div>}
-            <Typography.Text type="secondary" className="log-offset">
-              <ClockCircleOutlined /> {timeOffset < 0 ? "00:00" : secToMinutesAndSeconds(Math.floor(timeOffset))}
-            </Typography.Text>
-          </Row>
-        </Col>
-        <Col span={17} sm={14} lg={16} xxl={17}>
+        <Col span={logSource ? 17 : 24}>
           {parsedLevel === "error" || parsedLevel === "warn" ? (
             <Collapse ghost className="console-log-collapse">
               <Collapse.Panel
@@ -181,7 +173,7 @@ const ConsoleLogRow: React.FC<LogRowProps> = ({
             </div>
           )}
         </Col>
-        {!isInsideIframe && (
+        {!isInsideIframe && logSource && (
           <Col span={6} className="right-info">
             {logSource}
           </Col>

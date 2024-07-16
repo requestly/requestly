@@ -1,10 +1,12 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { MdNetworkCheck } from "@react-icons/all-files/md/MdNetworkCheck";
 import { MdConnectedTv } from "@react-icons/all-files/md/MdConnectedTv";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
 import { BottomSheet } from "componentsV2/BottomSheet";
 import { SessionInfo } from "./components/SessionInfo/SessionInfo";
+import SessionNetworkLogs from "./components/SessionNetworkLogs/SessionNetworkLogs";
+import SessionConsoleLogs from "./components/SessionConsoleLogs/SessionConsoleLogs";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
@@ -12,7 +14,12 @@ const BOTTOM_SHEET_TAB_KEYS = {
   NETWORK: "network",
   ENVIRONMENT: "environment",
 };
-export const SessionViewerBottomSheet = () => {
+
+interface SessionViewerBottomSheetProps {
+  playerTimeOffset: number;
+}
+
+const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({ playerTimeOffset }) => {
   const bottomSheetTabItems = useMemo(() => {
     return [
       {
@@ -34,7 +41,7 @@ export const SessionViewerBottomSheet = () => {
             <span>Console</span>
           </div>
         ),
-        children: <>CONSOLE LOGS HERE</>,
+        children: <SessionConsoleLogs playerTimeOffset={playerTimeOffset} />,
         forceRender: true,
       },
       {
@@ -45,7 +52,7 @@ export const SessionViewerBottomSheet = () => {
             <span>Network</span>
           </div>
         ),
-        children: <>NETOWRK LOGS HERE</>,
+        children: <SessionNetworkLogs playerTimeOffset={playerTimeOffset} />,
         // forceRender: true,
       },
       {
@@ -60,7 +67,9 @@ export const SessionViewerBottomSheet = () => {
         // forceRender: true,
       },
     ];
-  }, []);
+  }, [playerTimeOffset]);
 
   return <BottomSheet items={bottomSheetTabItems} defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.INFO} />;
 };
+
+export default React.memo(SessionViewerBottomSheet);

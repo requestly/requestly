@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
@@ -16,7 +16,11 @@ import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessi
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 import "./sessionPlayer.scss";
 
-export const SessionPlayer = () => {
+interface SessionPlayerProps {
+  onPlayerTimeOffsetChange: (timeOffset: number) => void;
+}
+
+export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffsetChange }) => {
   const events = useSelector(getSessionRecordingEvents);
   const attributes = useSelector(getSessionRecordingAttributes);
   const startTime = attributes?.startTime;
@@ -58,6 +62,7 @@ export const SessionPlayer = () => {
       const currentTime = startTime + currentPlayerTime;
       currentTimeRef.current = currentTime;
       setPlayerTimeOffset(currentPlayerTime / 1000); // millis -> secs
+      onPlayerTimeOffsetChange(currentPlayerTime / 1000);
 
       if (!skipInactiveSegments.current) return;
 
@@ -80,7 +85,7 @@ export const SessionPlayer = () => {
         }
       }
     },
-    [startTime, inactiveSegments, player, resetPlayerSkippingState, skipInactiveSegments]
+    [startTime, inactiveSegments, player, resetPlayerSkippingState, skipInactiveSegments, onPlayerTimeOffsetChange]
   );
 
   useEffect(() => {

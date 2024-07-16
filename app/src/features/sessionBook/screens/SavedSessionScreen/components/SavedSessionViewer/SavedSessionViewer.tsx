@@ -10,7 +10,7 @@ import { RQButton } from "lib/design-system/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOutlinePublic } from "@react-icons/all-files/md/MdOutlinePublic";
 import { MdOutlineLink } from "@react-icons/all-files/md/MdOutlineLink";
-import { SessionViewerBottomSheet } from "features/sessionBook/screens/SavedSessionScreen/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
+import SessionViewerBottomSheet from "features/sessionBook/screens/SavedSessionScreen/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import { useSessionsActionContext } from "features/sessionBook/context/actions";
 import { getSessionRecordingMetaData, getSessionRecordingVisibility } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
@@ -27,6 +27,7 @@ export const SavedSessionViewer = () => {
 
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
+  const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
 
   const handleCopySessionLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -39,6 +40,10 @@ export const SavedSessionViewer = () => {
   const handleShareModalVisibiliity = () => {
     // TODO: ADD ANALYTICS
     setIsShareModalVisible((prev) => !prev);
+  };
+
+  const handleSessionPlayerTimeOffsetChange = (offset: number) => {
+    setSessionPlayerOffset(offset);
   };
 
   return (
@@ -68,9 +73,9 @@ export const SavedSessionViewer = () => {
             <DownloadSessionButton />
           </div>
         </div>
-        <BottomSheetLayout bottomSheet={<SessionViewerBottomSheet />}>
+        <BottomSheetLayout bottomSheet={<SessionViewerBottomSheet playerTimeOffset={sessionPlayerOffset} />}>
           <div className="saved-session-viewer-body">
-            <SessionPlayer />
+            <SessionPlayer onPlayerTimeOffsetChange={handleSessionPlayerTimeOffsetChange} />
           </div>
         </BottomSheetLayout>
       </div>
