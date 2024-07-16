@@ -9,9 +9,10 @@ import "./filtersToolbar.scss";
 interface Props {
   filters: NetworkFilters;
   setFilters: (filters: NetworkFilters) => void;
+  disabled?: boolean;
 }
 
-const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
+const FiltersToolbar: React.FC<Props> = ({ filters, setFilters, disabled = false }) => {
   const [searchValue, setSearchValue] = useState(filters?.search ?? "");
   const [statusCodeFilters, setStatusCodeFilters] = useState(filters?.statusCode ?? []);
   const [methodFilters, setMethodFilters] = useState(filters?.method ?? []);
@@ -34,6 +35,8 @@ const FiltersToolbar: React.FC<Props> = ({ filters, setFilters }) => {
   );
 
   const debouncedSearchFilter = useDebounce((value: string) => onSearchFilterChange(value));
+
+  if (disabled) return null;
 
   return (
     <div className="filters-toolbar">
