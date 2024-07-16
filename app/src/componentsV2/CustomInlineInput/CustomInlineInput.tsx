@@ -6,25 +6,29 @@ import "./customInlineInput.scss";
 interface Props {
   value: string;
   placeholder: string;
-  valueChangeCallback: (value: String) => void;
+  onChange: (value: String) => void;
+  onBlur?: () => void;
 }
 
-export const CustomInlineInput: React.FC<Props> = ({ value, placeholder, valueChangeCallback }) => {
+export const CustomInlineInput: React.FC<Props> = ({ value, placeholder, onChange, onBlur }) => {
   const [isEditable, setIsEditable] = useState<boolean>(false);
 
   return (
     <div className="inline-input-container">
       <Row className="inline-input-row">
-        {value.length === 0 || isEditable ? (
+        {value?.length === 0 || isEditable ? (
           <Input
             className="active-inline-input"
             onFocus={() => setIsEditable(true)}
-            onBlur={() => setIsEditable(false)}
+            onBlur={() => {
+              setIsEditable(false);
+              onBlur?.();
+            }}
             bordered={false}
             autoFocus={true}
             spellCheck={false}
             value={value}
-            onChange={(e) => valueChangeCallback(e.target.value)}
+            onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             onPressEnter={() => setIsEditable(false)}
           />
