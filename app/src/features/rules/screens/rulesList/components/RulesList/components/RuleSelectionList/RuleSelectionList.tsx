@@ -64,6 +64,7 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
               {rules.map((rule) => {
                 return (
                   <PremiumFeature
+                    key={rule.type}
                     source={source}
                     featureName={`${rule.title} rule`}
                     popoverPlacement={premiumPopoverPlacement}
@@ -77,7 +78,6 @@ export const RuleSelectionList: React.FC<RuleSelectionListProps> = ({
                   >
                     <NavLink
                       end
-                      key={rule.type}
                       className={({ isActive }) => `rule-item-container ${isActive ? "active" : ""}`}
                       state={{ source }}
                       onClick={(e) => {
