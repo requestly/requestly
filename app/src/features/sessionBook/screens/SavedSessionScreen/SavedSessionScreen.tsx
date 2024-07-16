@@ -16,9 +16,8 @@ export const SavedSessionScreen: React.FC = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const workspace = useSelector(getCurrentlyActiveWorkspace);
-  const [isFetching, setIsFetching] = useState(false);
-
   const hasAuthInitialized = useSelector(getAuthInitialization);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     if (!hasAuthInitialized) return;

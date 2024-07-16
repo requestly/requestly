@@ -1,5 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getSessionRecordingId, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
+import {
+  getIsRequestedByOwner,
+  getSessionRecordingId,
+  getSessionRecordingMetaData,
+} from "store/features/session-recording/selectors";
 import { CustomInlineInput } from "componentsV2/CustomInlineInput/CustomInlineInput";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { updateSessionName } from "../utils";
@@ -11,6 +15,7 @@ export const SessionTitle = () => {
   const user = useSelector(getUserAuthDetails);
   const recordingId = useSelector(getSessionRecordingId);
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
+  const isRequestedByOwner = useSelector(getIsRequestedByOwner);
 
   const handleSessionNameUpdate = () => {
     if (recordingId && sessionMetadata?.name) {
@@ -30,6 +35,7 @@ export const SessionTitle = () => {
             dispatch(sessionRecordingActions.setName(value));
           }}
           onBlur={handleSessionNameUpdate}
+          disabled={!isRequestedByOwner}
         />
       </div>
     </div>
