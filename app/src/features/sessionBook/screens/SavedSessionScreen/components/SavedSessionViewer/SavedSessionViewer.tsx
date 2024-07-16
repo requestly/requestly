@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tooltip } from "antd";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import { DownloadSessionButton } from "features/sessionBook/components/DownloadSessionButton/DownloadSessionButton";
+import { SaveSessionButton } from "features/sessionBook/components/SaveSessionButton/SaveSessionButton";
 import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
 import { SessionTitle } from "features/sessionBook/screens/SavedSessionScreen/components/SessionsTitle/SessionTitle";
 import { RQButton } from "lib/design-system/components";
@@ -76,7 +76,7 @@ export const SavedSessionViewer = () => {
               <RQButton className="share-session-btn" icon={<MdOutlineLink />} onClick={handleCopySessionLink}>
                 {isLinkCopied ? "Copied!" : "Copy Link"}
               </RQButton>
-              <DownloadSessionButton />
+              <SaveSessionButton />
             </div>
           ) : null}
         </div>
