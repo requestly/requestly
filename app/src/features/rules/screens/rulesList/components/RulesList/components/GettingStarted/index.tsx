@@ -251,7 +251,7 @@ export const GettingStarted: React.FC = () => {
             </Button>
           </div>
 
-          <div className="ask-ai-container">
+          {/* <div className="ask-ai-container">
             <div className="title">Ask AI for any help with using Requestly</div>
 
             <div>
@@ -278,7 +278,7 @@ export const GettingStarted: React.FC = () => {
               </div>
               <div className="caption">Interact with our AI bot to get instant answers to your questions.</div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
