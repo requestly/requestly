@@ -256,7 +256,6 @@ export const GettingStarted: React.FC = () => {
 
           <div className="ask-ai-container">
             <div className="title">Ask AI for any help with using Requestly</div>
-
             <div>
               <RQButton
                 block
