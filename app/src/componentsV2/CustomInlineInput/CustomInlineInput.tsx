@@ -6,11 +6,12 @@ import "./customInlineInput.scss";
 interface Props {
   value: string;
   placeholder: string;
+  disabled?: boolean;
   onChange: (value: String) => void;
   onBlur?: () => void;
 }
 
-export const CustomInlineInput: React.FC<Props> = ({ value, placeholder, onChange, onBlur }) => {
+export const CustomInlineInput: React.FC<Props> = ({ value, placeholder, onChange, onBlur, disabled = false }) => {
   const [isEditable, setIsEditable] = useState<boolean>(false);
 
   return (
@@ -37,12 +38,12 @@ export const CustomInlineInput: React.FC<Props> = ({ value, placeholder, onChang
             <Typography.Text
               ellipsis={true}
               onClick={() => {
-                setIsEditable(true);
+                if (!disabled) setIsEditable(true);
               }}
             >
               {value ?? placeholder}
             </Typography.Text>
-            <BiPencil onClick={() => setIsEditable(true)} />
+            {!disabled && <BiPencil onClick={() => setIsEditable(true)} />}
           </div>
         )}
       </Row>
