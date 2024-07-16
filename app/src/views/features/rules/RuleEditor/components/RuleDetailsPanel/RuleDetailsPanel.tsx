@@ -5,9 +5,9 @@ import { Button } from "antd";
 import { MdMenuBook } from "@react-icons/all-files/md/MdMenuBook";
 import { MdOutlineFactCheck } from "@react-icons/all-files/md/MdOutlineFactCheck";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
-import "./RuleDetailsPanel.scss";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
+import "./RuleDetailsPanel.scss";
 
 interface RuleDetailsPanelProps {
   ruleType: RuleType | undefined;

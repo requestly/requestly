@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Button, Col, Row, Skeleton, Collapse } from "antd";
+import { Button, Col, Row, Skeleton, Collapse, DrawerProps } from "antd";
 import { CompassOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { YouTubePlayer } from "components/misc/YoutubeIframe";
 import { NotionRenderer } from "react-notion";
@@ -19,6 +19,7 @@ import {
   trackDocsSidebarDemovideoWatched,
   trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./Help.css";
 import "react-notion/src/styles.css";
 import "prismjs/themes/prism-tomorrow.css";
@@ -78,9 +79,10 @@ const defaultMockUrls = {
 
 interface HelpProps {
   ruleType: RuleType;
+  onClose: DrawerProps["onClose"];
 }
 
-const Help: React.FC<HelpProps> = ({ ruleType }) => {
+const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
   const [isDocsVisible, setIsDocsVisible] = useState<boolean>(false);
   const [notionPageData, setNotionPageData] = useState(null);
   const [tableOfContents, setTableOfContents] = useState(null);
@@ -153,7 +155,10 @@ const Help: React.FC<HelpProps> = ({ ruleType }) => {
             {isDocsVisible && (
               <Button onClick={toggleDocs} icon={<LeftArrow />} className="rule-editor-help-back-btn" />
             )}
-            Help
+            Help and guide
+          </Col>
+          <Col>
+            <Button onClick={onClose} icon={<MdClose className="anticon" />} className="rule-editor-help-close-btn" />
           </Col>
         </Row>
 

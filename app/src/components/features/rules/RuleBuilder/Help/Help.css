@@ -5,7 +5,7 @@
 }
 
 .rule-editor-help-header {
-  padding: 0 1.25rem 8px 0;
+  padding: 0 4px 8px 0;
 }
 
 .rule-editor-help-back-btn.ant-btn {
@@ -17,6 +17,7 @@
 }
 
 .rule-editor-help-back-btn.ant-btn,
+.rule-editor-help-close-btn.ant-btn,
 .rule-editor-docs-close-btn.ant-btn {
   padding: 6px;
   border: none;
@@ -24,7 +25,18 @@
   height: max-content;
 }
 
+.rule-editor-help-close-btn.ant-btn {
+  padding: 2px;
+  color: var(--requestly-color-text-subtle, #bbb);
+}
+
+.rule-editor-help-close-btn.ant-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .rule-editor-help-back-btn.ant-btn:hover,
+.rule-editor-help-close-btn.ant-btn:hover,
 .rule-editor-docs-close-btn.ant-btn:hover {
   opacity: 0.7;
 }

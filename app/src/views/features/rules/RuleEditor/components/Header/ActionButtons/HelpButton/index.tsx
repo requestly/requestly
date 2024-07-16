@@ -14,16 +14,14 @@ export const HelpButton = () => {
 
   return (
     <>
-      <Drawer
-        className="rule-editor-help-drawer"
-        mask={null}
-        open={isHelpDrawerOpen}
-        onClose={() => {
-          trackDocsSidebarClosed(currentlySelectedRuleData.ruleType);
-          setIsHelpDrawerOpen(false);
-        }}
-      >
-        <Help ruleType={currentlySelectedRuleData.ruleType} />
+      <Drawer className="rule-editor-help-drawer" mask={null} open={isHelpDrawerOpen} closable={false}>
+        <Help
+          ruleType={currentlySelectedRuleData.ruleType}
+          onClose={() => {
+            trackDocsSidebarClosed(currentlySelectedRuleData.ruleType);
+            setIsHelpDrawerOpen(false);
+          }}
+        />
       </Drawer>
       <RQButton
         icon={<AiOutlineQuestionCircle />}
