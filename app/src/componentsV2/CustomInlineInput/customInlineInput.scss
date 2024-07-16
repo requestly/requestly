@@ -8,12 +8,17 @@
 
     .active-inline-input.ant-input {
       padding: 0;
-      border-bottom: 1px solid var(--requestly-color-primary);
+      border-bottom: 1px solid transparent;
       color: var(--requestly-color-text-default);
       font-size: var(--requestly-font-size-sm);
       font-weight: 500;
       border-radius: 0;
       padding: 0;
+
+      &:focus,
+      &:active {
+        border-bottom: 1px solid var(--requestly-color-primary);
+      }
     }
 
     .inactive-inline-input {
