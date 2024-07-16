@@ -15,6 +15,7 @@ import { Select, Switch } from "antd";
 import { PlayerState } from "features/sessionBook/types";
 import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
+import PlayerFrameOverlay from "./components/PlayerOverlay/PlayerOverlay";
 import "./sessionPlayer.scss";
 
 interface SessionPlayerProps {
@@ -191,6 +192,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
 
   return (
     <div ref={playerContainerRef} className="session-player-container">
+      <PlayerFrameOverlay playerContainer={playerRef.current} playerState={playerState} />
       <div ref={playerRef} className={`session-player ${isFullScreenMode ? "session-player-fullscreen" : ""}`}></div>
       <div className="session-player-controller">
         <div className="session-status-container">
