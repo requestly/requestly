@@ -1,11 +1,12 @@
-.download-session-btn-container {
+.save-session-btn-container {
   display: flex;
   align-items: center;
+  position: relative;
 
-  .download-session-btn.ant-btn {
+  .save-session-btn.ant-btn {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right: 1px solid #ffffff55;
+    border-right: 1px solid var(--requestly-color-white-t-20);
     gap: 6px;
 
     svg {
@@ -14,7 +15,7 @@
     }
   }
 
-  .download-popup-button {
+  .save-popup-button {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
