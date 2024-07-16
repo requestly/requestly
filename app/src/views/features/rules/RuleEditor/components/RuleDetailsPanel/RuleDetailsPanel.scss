@@ -9,6 +9,26 @@
   border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
   margin: 16px;
   margin-bottom: 0;
+  position: relative;
+
+  .close-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--requestly-color-white);
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
 
   .link {
     padding: 0;

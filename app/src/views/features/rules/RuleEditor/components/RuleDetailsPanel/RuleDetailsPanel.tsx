@@ -4,15 +4,19 @@ import { RuleType } from "types";
 import { Button } from "antd";
 import { MdMenuBook } from "@react-icons/all-files/md/MdMenuBook";
 import { MdOutlineFactCheck } from "@react-icons/all-files/md/MdOutlineFactCheck";
+import { MdClose } from "@react-icons/all-files/md/MdClose";
 import "./RuleDetailsPanel.scss";
 
 interface RuleDetailsPanelProps {
-  ruleType: RuleType;
+  ruleType: RuleType | undefined;
 }
 
 export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType }) => {
-  return (
+  return !ruleType ? null : (
     <div key={ruleType} className="rule-details-panel-container">
+      <span className="close-btn">
+        <MdClose className="anticon" />
+      </span>
       <div className="rule-details-container">
         <div className="title">{RULE_DETAILS[ruleType].name}</div>
         <div className="description">
