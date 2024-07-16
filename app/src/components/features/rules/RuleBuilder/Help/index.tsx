@@ -20,7 +20,8 @@ import {
   trackDocsSidebarContactUsClicked,
 } from "modules/analytics/events/common/rules";
 import { MdClose } from "@react-icons/all-files/md/MdClose";
-import "./Help.css";
+import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
+import "./Help.scss";
 import "react-notion/src/styles.css";
 import "prismjs/themes/prism-tomorrow.css";
 
@@ -161,6 +162,8 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
             <Button onClick={onClose} icon={<MdClose className="anticon" />} className="rule-editor-help-close-btn" />
           </Col>
         </Row>
+
+        <RuleDetailsPanel ruleType={ruleType} />
 
         {isDocsVisible ? (
           <>

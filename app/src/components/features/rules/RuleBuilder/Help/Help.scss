@@ -256,3 +256,44 @@
 .rule-editor-doc-skeleton .ant-skeleton-content .ant-skeleton-title {
   display: none;
 }
+
+.rule-editor-help-container {
+  .rule-details-panel-container {
+    margin: 0;
+    padding: 16px;
+
+    .close-btn {
+      display: none;
+    }
+
+    .details-panel {
+      gap: 0;
+      flex-direction: column;
+
+      .rule-details-container {
+        .use-cases-container {
+          ul.use-cases-list {
+            list-style: unset;
+
+            .use-case-list-item {
+              .use-case {
+                br {
+                  display: block;
+                }
+
+                .use-template-btn {
+                  margin-left: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .rule-templates {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+    }
+  }
+}
