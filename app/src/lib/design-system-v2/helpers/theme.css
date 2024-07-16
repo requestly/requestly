@@ -4,6 +4,7 @@
 
 :root {
   --requestly-color-primary: #004eeb;
+  --requestly-color-secondary: #a447f8;
   --requestly-color-neutral: #787878;
   --requestly-color-success: #0baa60;
   --requestly-color-error: #e43434;
@@ -19,6 +20,17 @@
   --requestly-color-primary-800: #001f88;
   --requestly-color-primary-900: #001670;
   --requestly-color-primary-1000: #111a2c;
+  --requestly-color-secondary-0: #eedcfa;
+  --requestly-color-secondary-100: #e2cofa;
+  --requestly-color-secondary-200: #d5a3fb;
+  --requestly-color-secondary-300: #c686fa;
+  --requestly-color-secondary-400: #b568f9;
+  --requestly-color-secondary-500: #a447f8;
+  --requestly-color-secondary-600: #750fcd;
+  --requestly-color-secondary-700: #680cb7;
+  --requestly-color-secondary-800: #2b084b;
+  --requestly-color-secondary-900: #420975;
+  --requestly-color-secondary-1000: #240342;
   --requestly-color-neutral-0: #e9e9e9;
   --requestly-color-neutral-100: #e9e9e9;
   --requestly-color-neutral-200: #d1d1d1;

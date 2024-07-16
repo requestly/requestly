@@ -19,7 +19,7 @@ Directly use CSS variables present in `./helpers/theme.css` file .
 }
 ```
 
-### In JS Files
+### In React Components
 
 Use `useTheme` hook provided by `styled-components`. This should return the theme automatically which can be used in JS/TS Files
 
@@ -32,4 +32,18 @@ const TestComponent = () => {
 };
 
 export default TestComponent;
+```
+
+### In JS Files
+
+
+```ts
+import { theme } from "lib/design-system-v2";
+
+// interface Theme {
+//   colors: ColorTokens;
+//   typography: TypographyTokens;
+// }
+
+const testColor = theme.colors["success-300"]
 ```
