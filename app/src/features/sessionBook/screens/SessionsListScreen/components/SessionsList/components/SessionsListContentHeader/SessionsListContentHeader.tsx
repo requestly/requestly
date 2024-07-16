@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ContentListHeader } from "componentsV2/ContentList";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { SettingOutlined } from "@ant-design/icons";
 import { redirectToSessionSettings } from "utils/RedirectionUtils";
 import { RQButton } from "lib/design-system/components";
 import { NewSessionModal } from "features/sessionBook/modals/NewSessionModal/NewSessionModal";
@@ -13,6 +12,9 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import FEATURES from "config/constants/sub/features";
 import { ImportSessionModal } from "features/sessionBook/modals/ImportSessionModal/ImportSessionModal";
+import { IoMdAdd } from "@react-icons/all-files/io/IoMdAdd";
+import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
+import { MdOutlineSettings } from "@react-icons/all-files/md/MdOutlineSettings";
 import "./sessionsListContentHeader.scss";
 
 interface SessionsListContentHeaderProps {
@@ -36,7 +38,7 @@ export const SessionsListContentHeader: React.FC<SessionsListContentHeaderProps>
     return isDesktopSessionsCompatible ? (
       <ImportWebSessionModalButton />
     ) : (
-      <RQButton type="default" onClick={() => setIsImportSessionModalOpen(true)}>
+      <RQButton type="default" icon={<MdOutlineFileDownload />} onClick={() => setIsImportSessionModalOpen(true)}>
         Upload & view downloaded sessions
       </RQButton>
     );
@@ -56,12 +58,13 @@ export const SessionsListContentHeader: React.FC<SessionsListContentHeaderProps>
             <RQButton
               type="default"
               onClick={() => redirectToSessionSettings(navigate, location.pathname)}
-              icon={<SettingOutlined />}
+              icon={<MdOutlineSettings />}
             >
               Settings
             </RQButton>,
             openDownloadedSessionModalBtn,
             <RQButton
+              icon={<IoMdAdd />}
               type="primary"
               onClick={() => {
                 setIsNewSessionModalOpen(true);
