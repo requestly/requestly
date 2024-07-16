@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Button, Divider } from "antd";
+import { Button, Divider, Tooltip } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
 import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
@@ -94,21 +94,21 @@ export const GettingStarted: React.FC = () => {
       title: "Redirect a request",
       icon: RULE_TYPES_CONFIG[RuleType.REDIRECT].ICON,
       link: PATHS.RULE_EDITOR.CREATE_RULE.REDIRECT_RULE.ABSOLUTE,
-      help: "",
+      help: "Redirect scripts, APIs, Stylesheets, or any other resource from one environment to another.",
     },
     {
       type: RuleType.RESPONSE,
       title: "Override API response",
       icon: RULE_TYPES_CONFIG[RuleType.RESPONSE].ICON,
       link: PATHS.RULE_EDITOR.CREATE_RULE.RESPONSE_RULE.ABSOLUTE,
-      help: "",
+      help: "Stub API responses to simulate required scenarios effectively.",
     },
     {
       type: RuleType.HEADERS,
       title: "Add/Remove header",
       icon: RULE_TYPES_CONFIG[RuleType.HEADERS].ICON,
       link: PATHS.RULE_EDITOR.CREATE_RULE.HEADERS_RULE.ABSOLUTE,
-      help: "",
+      help: "Modify HTTP headers based conditionally to test frontend or backend behavior.",
     },
   ];
 
@@ -151,9 +151,11 @@ export const GettingStarted: React.FC = () => {
                       <span className="icon">{icon()}</span>
                       <span className="title">{title}</span>
                       {help ? (
-                        <span className="help-icon">
-                          <MdOutlineHelpOutline />
-                        </span>
+                        <Tooltip title={help}>
+                          <span className="help-icon">
+                            <MdOutlineHelpOutline />
+                          </span>
+                        </Tooltip>
                       ) : null}
                     </Link>
                   );
