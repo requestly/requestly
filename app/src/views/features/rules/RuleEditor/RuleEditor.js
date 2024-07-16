@@ -8,6 +8,7 @@ import {
   getAppMode,
   getCurrentlySelectedRuleConfig,
   getCurrentlySelectedRuleData,
+  getIsCurrentlySelectedRuleDetailsPanelShown,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getIsExtensionEnabled,
 } from "store/selectors";
@@ -28,6 +29,7 @@ const RuleEditor = (props) => {
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
+  const isDetailsPanelShown = useSelector(getIsCurrentlySelectedRuleDetailsPanelShown);
   const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
@@ -89,7 +91,7 @@ const RuleEditor = (props) => {
         ) : null}
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <ProCard className="rule-editor-procard">
-            {MODE === RuleEditorMode.CREATE ? (
+            {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
               <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} />
             ) : null}
             <RuleBuilder />
@@ -97,7 +99,7 @@ const RuleEditor = (props) => {
         ) : (
           <BottomSheetLayout bottomSheet={<RuleEditorBottomSheet mode={MODE} />}>
             <ProCard className="rule-editor-procard">
-              {MODE === RuleEditorMode.CREATE ? (
+              {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
                 <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} />
               ) : null}
               <RuleBuilder />

@@ -34,6 +34,7 @@ const INITIAL_STATE = {
       data: false,
       config: false,
       hasUnsavedChanges: false,
+      showDetailsPanel: true,
       errors: {},
     },
     rulesToPopulate: [],
