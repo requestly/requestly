@@ -45,8 +45,6 @@ const testQueryRule = async (testScenarioData: QueryTestScenario & IBaseTestData
 
   const redirectedUrl = redirections.get(testPageUrl);
 
-  console.log("Redirected URL: ", redirectedUrl);
-  console.log("REdirections: ", redirections);
   // expect(redirectedUrl).toBeDefined();
   // const newUrl = new URL(redirectedUrl!);
 
