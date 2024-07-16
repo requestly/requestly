@@ -3,6 +3,7 @@ import { RuleSelectionList } from "features/rules/screens/rulesList/components/R
 import BotIcon from "assets/icons/bot.svg?react";
 import { RQButton } from "lib/design-system/components";
 import { trackRuleTypeSwitched } from "modules/analytics/events/common/rules";
+import { trackAskAIClicked } from "features/requestBot";
 import "./RulesCreateModeSidebar.scss";
 
 export const RulesCreateModeSidebar: React.FC = () => {
@@ -11,7 +12,7 @@ export const RulesCreateModeSidebar: React.FC = () => {
       <RQButton
         className="ask-ai-btn"
         onClick={() => {
-          // trackAskAIClicked();
+          trackAskAIClicked("rule_sidebar");
           // setIsRequestBotVisible(true);
         }}
       >
