@@ -1,15 +1,13 @@
-import { generateColorTokens } from "lib/design-system-v2/tokens/colors";
-
-const tokens = generateColorTokens("#004EEB", "A447F8", "#787878", "#0BAA60", "#E43434", "#E09400");
+import { theme } from "lib/design-system-v2";
 
 export const REQUEST_METHOD_COLORS = {
-  GET: tokens["success-300"],
-  POST: tokens["warning-300"],
-  PUT: tokens["primary-300"],
-  PATCH: tokens["secondary-300"],
-  DELETE: tokens["error-300"],
-  HEAD: tokens["success-100"],
-  OPTIONS: tokens["warning-100"],
+  GET: theme.colors["success-300"],
+  POST: theme.colors["warning-300"],
+  PUT: theme.colors["primary-300"],
+  PATCH: theme.colors["secondary-300"],
+  DELETE: theme.colors["error-300"],
+  HEAD: theme.colors["success-100"],
+  OPTIONS: theme.colors["warning-100"],
 };
 
 export type RequestMethod = keyof typeof REQUEST_METHOD_COLORS;
