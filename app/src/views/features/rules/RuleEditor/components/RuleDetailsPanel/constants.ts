@@ -10,7 +10,7 @@ export const RULE_DETAILS: Record<
     name: string;
     icon: () => ReactNode;
     description: string;
-    useCases?: { useCase: string; suggestedTemplateLink?: string }[];
+    useCases?: { useCase: string; suggestedTemplateId?: string }[];
     documentationLink: string;
   }
 > = {
@@ -22,15 +22,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "0",
       },
       {
         useCase: "Redirect to local System files (Map Local).",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "9",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -44,11 +44,11 @@ export const RULE_DETAILS: Record<
       {
         useCase:
           "Blocking Websites: You can use Cancel Rule to avoid distraction by blocking websites e.g. youtube, twitter, facebook.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
       {
         useCase: "Testing error scenarios: Test your app when certain resource is not loaded.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/cancel-rule/",
@@ -61,11 +61,11 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Test the performance of your web app on a slower network conditions.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
       {
         useCase: "Test the behaviour of your app when one or more APIs respond slowly (API Latency has gone up).",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/delay-request/",
@@ -79,12 +79,12 @@ export const RULE_DETAILS: Record<
       {
         useCase:
           "Open websites in an iframe for testing: Response headers like X-Frame-Options and Content-Security-Policy don't allow you to open pages in iframes to prevent clickjacking. Using Requestly, you can modify this header to allow the websites to be opened in an iframe",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
       {
         useCase:
           "Remove Content-Security-Policy: Content-Security-Policy response header is added to the website to prevent injection of external scripts. Requestly can be used to remove the CSP response header for testing purposes.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "5",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/modify-headers/",
@@ -97,16 +97,16 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Remove UTM tracking parameters.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "13",
       },
       {
         useCase: "Using query params, you can burst cache for a request by assigning it a newer version.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
       {
         useCase:
           "Sending additional Information to some API calls to inform your backend & database that this is internal testing.",
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/modify-query-params/",
@@ -119,11 +119,11 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: `Switch Domains: To test your app with the new changes done on the local server, you can use replace "my-app-server.com" with "localhost:4000" using Replace Rule. By this way, you can test your app without having to change any of your code.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
       {
         useCase: `Change Query Parameter Values: You can change the values of query parameters present in a URL. For example: Changing "?dl-0" to "?dl=1" in a dropbox URL downloads the file directly without going to the usual preview page.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/replace-strings/",
@@ -136,11 +136,11 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: `Primarily used in sending additional data in request payload to the API server: There might be situations where additional data needs to be sent in request payloads to the API server when making a POST or PUT request.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
       {
         useCase: `Modifying GraphQL Queries: GraphQL queries can be modified by modifying the request body of the request. This can be done by changing the query string or variables in the request body.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/modify-request-body/",
@@ -153,19 +153,19 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: `You want to work on front-end while back-end is not available or ready yet.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "4",
       },
       {
         useCase: `You want to test application behaviour when provided altered data.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
       {
         useCase: `You want to simulate errors by returning different status codes.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "6",
       },
       {
         useCase: `You want to modify API responses but don't have access to the back-end.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/modify-response-body/",
@@ -178,11 +178,11 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: `Inject popular libraries or hosted scripts or execute custom code-snippet before or after page load using a simple rule builder.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "1",
       },
       {
         useCase: `Themify Twitter according to you. Remove/hide unwanted sections from the page.`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/modify-dom-inject-scripts/",
@@ -195,7 +195,7 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: `Test different User-Agents for serving different content based on the type of device or browser`,
-        suggestedTemplateLink: "",
+        suggestedTemplateId: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/modify-user-agents/",
