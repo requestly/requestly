@@ -3,6 +3,7 @@ import { TemplateRecord } from "../types";
 
 const templateRecords: TemplateRecord[] = [
   {
+    id: "0",
     name: "Redirect JS from production to local environment",
     description: "Load local JS files instead of production for testing purposes.",
     isSharedList: false,
@@ -40,6 +41,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "1",
     name: "Inject JS into Customer Site",
     description: "Inject your JavaScript into a potential customer's website for testing purpose.",
     isSharedList: false,
@@ -84,6 +86,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "2",
     name: "Bypass CORS",
     description: "You can Bypass CORS by turning this on",
     imageURL:
@@ -147,6 +150,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "3",
     name: "Add Authorization Header to all localhost requests",
     description: "Add a custom value for the Authorization header for all requests to localhost",
     isSharedList: false,
@@ -192,6 +196,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "4",
     name: "Override response of an API",
     description: "Modify API response of an API call made at /exampleAPI endpoint in testheader.com",
     isSharedList: false,
@@ -234,6 +239,7 @@ const templateRecords: TemplateRecord[] = [
   },
 
   {
+    id: "5",
     name: "Remove Content-Security-Policy Header",
     description: "Turn this on and see content-security-policy header being removed",
     imageURL: "",
@@ -281,6 +287,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "6",
     name: "Simulate 404 status code",
     description: "Returning 404 status code in response of an API call made at /exampleAPI endpoint in testheader.com",
     isSharedList: false,
@@ -323,6 +330,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "7",
     name: "Toggle Feature Flags",
     description: "Override JSON API responses for toggling feature flags",
     isSharedList: false,
@@ -363,6 +371,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "8",
     name: "Mock Geolocation Header",
     description: "Simulate geolocation on specific websites.",
     isSharedList: false,
@@ -414,6 +423,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "9",
     name: "Redirect Google Queries to DuckDuckGo",
     description: "Turn it on and your chrome address bar will show results from DuckDuckGo",
     isSharedList: false,
@@ -451,6 +461,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "10",
     name: "Load Google Analytics in Debug Mode",
     description:
       "Prints useful information to the JavaScript console by enabling the debug version of the Google Analytics Javascript.",
@@ -465,6 +476,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "11",
     name: "Highlight Google Ads",
     description: "Highlights Ads in Google Search Result to avoid clicking on them",
     imageURL: "https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg",
@@ -513,6 +525,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "12",
     name: "Browse Quora Anonymously",
     description: "Can load Quora in Incognito Mode without signing in",
     imageURL: "https://www.vectorlogo.zone/logos/quora/quora-icon.svg",
@@ -560,6 +573,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "13",
     name: "Remove UTM Params",
     description: "Turn it on and try opening example.com?utm_source=gmail",
     imageURL: "",
@@ -628,6 +642,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "14",
     name: "Redirect Google Queries to Bing",
     description: "Turn it on and your chrome address bar will show results from Bing",
     imageURL: "https://www.vectorlogo.zone/logos/bing/bing-icon.svg",
@@ -665,6 +680,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "15",
     name: "Redirect Dictionary.com to Merriam-Webster in Adobe Acrobat Reader Lookup",
     description: "Change the Default Dictionary in Adobe Acrobat Reader to Merriam-Webster",
     imageURL: "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
@@ -702,6 +718,7 @@ const templateRecords: TemplateRecord[] = [
     },
   },
   {
+    id: "16",
     name: "Redirect Dictionary.com to dict.cc in Adobe Acrobat Reader Lookup",
     description: "Change the Default Dictionary in Adobe Acrobat Reader to Multilingual dictionary",
     imageURL: "https://www.vectorlogo.zone/logos/adobe_acrobat/adobe_acrobat-tile.svg",
