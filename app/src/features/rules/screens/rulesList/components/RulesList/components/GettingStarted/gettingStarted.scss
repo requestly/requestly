@@ -8,7 +8,7 @@
     padding: 48px 12px;
 
     .link-btn.ant-btn {
-      font-size: 13px;
+      font-size: 13px; /* TODO: use "--requestly-font-size-*" variable */
       line-height: 150%; /* 19.5px */
       color: var(--requestly-color-primary-text, #639ff9);
       padding: 0;
