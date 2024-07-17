@@ -24,6 +24,8 @@ export const SaveSessionButton = () => {
   const isDraftSession = location.pathname.includes("draft");
   const debugInfoToBeIncluded: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
+  // TODO: handle save session flow for draft session
+
   const handleSessionDownload = () => {
     const recordingOptions = getRecordingOptionsToSave(debugInfoToBeIncluded);
     downloadSessionFile(sessionEvents, sessionRecordingMetadata, recordingOptions)

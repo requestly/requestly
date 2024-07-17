@@ -1,8 +1,9 @@
 import { RQSessionEvents } from "@requestly/web-sdk";
-import { RecordingOptions, SessionRecordingMetadata } from "../types";
+import { DebugInfo, RecordingOptions, SessionRecordingMetadata } from "../types";
 import { compressEvents, getSessionEventsToSave } from "./sessionEvents";
 import { EXPORTED_SESSION_FILE_EXTENSION, SESSION_EXPORT_TYPE } from "../constants";
 import fileDownload from "js-file-download";
+import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import Logger from "lib/logger";
 
 const prepareSessionToExport = (events: string, metadata: SessionRecordingMetadata): Promise<string> => {
@@ -37,4 +38,22 @@ export const downloadSessionFile = async (
     .catch((error) => {
       Logger.error("Failed to download session file", error);
     });
+};
+
+export const getSessionRecordingOptions = (options: RecordingOptions): string[] => {
+  return Object.keys(options ?? {}).filter((key: DebugInfo) => options?.[key]);
+};
+
+export const getRecordingOptionsToSave = (includedDebugInfo: CheckboxValueType[]): RecordingOptions => {
+  const recordingOptions: RecordingOptions = {
+    includeConsoleLogs: true,
+    includeNetworkLogs: true,
+  };
+
+  let option: keyof RecordingOptions;
+  for (option in recordingOptions) {
+    recordingOptions[option] = includedDebugInfo.includes(option);
+  }
+
+  return recordingOptions;
 };

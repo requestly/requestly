@@ -1,8 +1,7 @@
 import { strFromU8, strToU8, zlibSync, unzlibSync } from "fflate";
 import { NetworkEventData, RQSessionEvents, RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
-import { ConsoleLog, DebugInfo, PageNavigationLog, RecordingOptions } from "../types";
+import { ConsoleLog, PageNavigationLog, RecordingOptions } from "../types";
 import { EventType, IncrementalSource, LogData } from "rrweb";
-import { CheckboxValueType } from "antd/lib/checkbox/Group";
 
 const MAX_ALLOWED_NETWORK_RESPONSE_SIZE = 20 * 1024; // 20KB
 
@@ -75,20 +74,6 @@ export const filterOutConsoleLogs = (rrwebEvents: RRWebEventData[]): RRWebEventD
   return rrwebEvents.filter((event) => !isConsoleLogEvent(event));
 };
 
-export const getRecordingOptionsToSave = (includedDebugInfo: CheckboxValueType[]): RecordingOptions => {
-  const recordingOptions: RecordingOptions = {
-    includeConsoleLogs: true,
-    includeNetworkLogs: true,
-  };
-
-  let option: keyof RecordingOptions;
-  for (option in recordingOptions) {
-    recordingOptions[option] = includedDebugInfo.includes(option);
-  }
-
-  return recordingOptions;
-};
-
 export const getSessionEventsToSave = (sessionEvents: RQSessionEvents, options: RecordingOptions): RQSessionEvents => {
   const filteredSessionEvents: RQSessionEvents = {
     [RQSessionEventType.RRWEB]: sessionEvents[RQSessionEventType.RRWEB],
@@ -105,10 +90,6 @@ export const getSessionEventsToSave = (sessionEvents: RQSessionEvents, options: 
   }
 
   return filteredSessionEvents;
-};
-
-export const getSessionRecordingOptions = (options: RecordingOptions): string[] => {
-  return Object.keys(options ?? {}).filter((key: DebugInfo) => options?.[key]);
 };
 
 export function isUserInteractionEvent(event: RRWebEventData): boolean {

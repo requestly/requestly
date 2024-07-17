@@ -18,16 +18,17 @@
     background-color: var(--component-dark-background);
 
     .header {
-      font-size: 14px;
+      font-size: var(--requestly-font-size-sm);
       font-weight: 700;
     }
 
     button.ant-btn {
       border: none;
       padding: 16px 11px;
+      border: none;
 
-      svg {
-        font-size: 15px;
+      &:hover {
+        border: none;
       }
     }
   }
@@ -46,7 +47,7 @@
     }
 
     .config-label {
-      font-size: 14px;
+      font-size: var(--requestly-font-size-sm);
       line-height: 25px;
       margin-bottom: 12px;
       color: var(--text-gray);

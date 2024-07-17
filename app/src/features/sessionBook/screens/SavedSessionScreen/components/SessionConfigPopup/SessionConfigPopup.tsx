@@ -7,7 +7,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Radio, Row } from "antd";
 import { DebugInfo, SessionSaveMode } from "../../../../types";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
-import { getRecordingOptionsToSave, getSessionRecordingOptions } from "../../../../utils/sessionEvents";
+import { getRecordingOptionsToSave, getSessionRecordingOptions } from "../../../../utils/sessionFile";
 import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
 import { getUserAttributes, getAppMode } from "store/selectors";
