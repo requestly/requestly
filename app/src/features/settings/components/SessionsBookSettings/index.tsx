@@ -8,7 +8,7 @@ import { isEqual } from "lodash";
 import { toast } from "utils/Toast";
 import { PageSourceRow } from "./components/PageSourceRow";
 import { SessionRecordingPageSource, SourceKey, SourceOperator } from "types";
-import { AutoRecordingMode, SessionRecordingConfig } from "../../../../views/features/sessions/types";
+import { AutoRecordingMode, SessionRecordingConfig } from "features/sessionBook";
 import { generateObjectId } from "utils/FormattingHelper";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
