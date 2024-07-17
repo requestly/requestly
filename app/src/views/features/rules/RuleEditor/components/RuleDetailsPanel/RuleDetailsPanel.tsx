@@ -8,6 +8,9 @@ import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 import { trackRuleDetailsPanelClosed, trackRuleDetailsPanelViewed } from "modules/analytics/events/common/rules";
+import { trackViewAllTemplatesClick } from "modules/analytics/events/features/templates";
+import { useNavigate } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 import "./RuleDetailsPanel.scss";
 
 interface RuleDetailsPanelProps {
@@ -17,10 +20,16 @@ interface RuleDetailsPanelProps {
 
 export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, source }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleCloseClick = () => {
     trackRuleDetailsPanelClosed(ruleType, source);
     dispatch(actions.closeCurrentlySelectedRuleDetailsPanel());
+  };
+
+  const handleAllTemplatesClick = () => {
+    trackViewAllTemplatesClick(source, ruleType);
+    navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
   };
 
   useEffect(() => {
@@ -83,7 +92,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
               <ellipse opacity="0.1" cx="34.0001" cy="2.52071" rx="33.0274" ry="1.98165" fill="#8F8F8F" />
             </svg>
           </div>
-          <Button block className="templates-btn">
+          <Button block className="templates-btn" onClick={handleAllTemplatesClick}>
             Explore all templates
           </Button>
         </div>
