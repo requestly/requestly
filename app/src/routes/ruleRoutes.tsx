@@ -12,6 +12,8 @@ import ImportSharedListIndexPage from "components/features/sharedLists/ImportSha
 import ProtectedRoute from "components/authentication/ProtectedRoute";
 import RootComponent from "../components/redirects/RootComponent";
 
+// no longer used, can we please clean this up!!
+
 export const ruleRoutes: RouteObject[] = [
   {
     path: PATHS.RULES.INDEX,
