@@ -255,7 +255,6 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
               iconOnly
               icon={<TbMinimize />}
               onClick={() => {
-                // playerContainerRef.current.requestFullscreen();
                 document.exitFullscreen();
                 setIsFullScreenMode(false);
               }}
