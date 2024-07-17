@@ -161,21 +161,20 @@ const Products: React.FC<ProductsProps> = (props) => {
     products.splice(5, 1);
   }
 
-  if (appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
-    return (
-      <div className="products-grid">
-        {products.map((product, index) => (
-          <ProductTile
-            key={index}
-            title={product.title}
-            icon={product.icon}
-            description={product.description}
-            handleClick={product.handleClick}
-          />
-        ))}
-        <DesktopAppPromoModal open={isDesktopAppPromoModalOpen} onCancel={handleDesktopAppPromoModalClose} />
-      </div>
-    );
+  return (
+    <div className="products-grid">
+      {products.map((product, index) => (
+        <ProductTile
+          key={index}
+          title={product.title}
+          icon={product.icon}
+          description={product.description}
+          handleClick={product.handleClick}
+        />
+      ))}
+      <DesktopAppPromoModal open={isDesktopAppPromoModalOpen} onCancel={handleDesktopAppPromoModalClose} />
+    </div>
+  );
 };
 
 const ProductsDropDown: React.FC<{}> = () => {
