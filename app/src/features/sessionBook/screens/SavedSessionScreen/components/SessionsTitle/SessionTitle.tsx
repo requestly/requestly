@@ -4,7 +4,7 @@ import {
   getSessionRecordingId,
   getSessionRecordingMetaData,
 } from "store/features/session-recording/selectors";
-import { CustomInlineInput } from "componentsV2/CustomInlineInput/CustomInlineInput";
+import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { updateSessionName } from "../utils";
 import { getUserAuthDetails } from "store/selectors";
@@ -28,7 +28,7 @@ export const SessionTitle = () => {
       <div className="session-header-breadcrumb">
         <span className="session-header-breadcrumb__parent-route">All sessions</span>
         <span className="session-header-breadcrumb__arrow">&gt;</span>
-        <CustomInlineInput
+        <InlineInput
           value={sessionMetadata?.name}
           placeholder="Session title"
           onChange={(value: string) => {

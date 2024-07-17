@@ -21,17 +21,22 @@ const SessionConsoleLogs: React.FC<SessionConsoleLogsProps> = ({ playerTimeOffse
     return getConsoleLogs(rrwebEvents, attributes?.startTime);
   }, [events, attributes?.startTime]);
 
-  return (
-    <div
-      className={`session-console-logs-container ${
-        sheetPlacement === BottomSheetPlacement.BOTTOM
-          ? "console-logs-container-bottom"
-          : "console-logs-container-right"
-      }`}
-    >
-      <ConsoleLogsPanel consoleLogs={consoleLogs} playerTimeOffset={playerTimeOffset} />
-    </div>
-  );
+  if (consoleLogs) {
+    return (
+      <div
+        className={`session-console-logs-container ${
+          sheetPlacement === BottomSheetPlacement.BOTTOM
+            ? "console-logs-container-bottom"
+            : "console-logs-container-right"
+        }`}
+      >
+        <ConsoleLogsPanel consoleLogs={consoleLogs} playerTimeOffset={playerTimeOffset} />
+      </div>
+    );
+  } else {
+    // TODO: ADD EMPTY STATE
+    return <>No Logs</>;
+  }
 };
 
 export default React.memo(SessionConsoleLogs);

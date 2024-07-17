@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Row, Input, Typography } from "antd";
 import { BiPencil } from "@react-icons/all-files/bi/BiPencil";
-import "./customInlineInput.scss";
+import "./inlineInput.scss";
 
 interface Props {
   value: string;
@@ -11,8 +11,8 @@ interface Props {
   onBlur?: () => void;
 }
 
-export const CustomInlineInput: React.FC<Props> = ({ value, placeholder, onChange, onBlur, disabled = false }) => {
-  const [isEditable, setIsEditable] = useState<boolean>(false);
+export const InlineInput: React.FC<Props> = ({ value, placeholder, onChange, onBlur, disabled = false }) => {
+  const [isEditable, setIsEditable] = useState(false);
 
   return (
     <div className="inline-input-container">
@@ -41,7 +41,7 @@ export const CustomInlineInput: React.FC<Props> = ({ value, placeholder, onChang
                 if (!disabled) setIsEditable(true);
               }}
             >
-              {value ?? placeholder}
+              {value || placeholder}
             </Typography.Text>
             {!disabled && <BiPencil onClick={() => setIsEditable(true)} />}
           </div>

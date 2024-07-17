@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tooltip } from "antd";
@@ -34,22 +34,26 @@ export const SavedSessionViewer = () => {
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
 
-  const handleCopySessionLink = () => {
+  const handleCopySessionLink = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
     setIsLinkCopied(true);
     setTimeout(() => {
       setIsLinkCopied(false);
     }, 1000);
-  };
+  }, []);
 
-  const handleShareModalVisibiliity = () => {
+  const handleShareModalVisibiliity = useCallback(() => {
     // TODO: ADD ANALYTICS
     setIsShareModalVisible((prev) => !prev);
-  };
+  }, []);
 
-  const handleSessionPlayerTimeOffsetChange = (offset: number) => {
+  const handleSessionPlayerTimeOffsetChange = useCallback((offset: number) => {
     setSessionPlayerOffset(offset);
-  };
+  }, []);
+
+  const handleDeleteSessionClick = useCallback(() => {
+    handleDeleteSessionAction(id, sessionMetadata?.eventsFilePath, () => redirectToSessionRecordingHome(navigate));
+  }, [handleDeleteSessionAction, id, navigate, sessionMetadata?.eventsFilePath]);
 
   return (
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
@@ -60,11 +64,7 @@ export const SavedSessionViewer = () => {
             <div className="saved-session-actions">
               <Tooltip title="Delete session">
                 <RQButton
-                  onClick={() =>
-                    handleDeleteSessionAction(id, sessionMetadata?.eventsFilePath, () =>
-                      redirectToSessionRecordingHome(navigate)
-                    )
-                  }
+                  onClick={handleDeleteSessionClick}
                   className="delete-session-btn"
                   iconOnly
                   icon={<RiDeleteBin6Line />}
