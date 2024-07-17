@@ -5,7 +5,6 @@ import { MdOutlineViewHeadline } from "@react-icons/all-files/md/MdOutlineViewHe
 import { IoIosGlobe } from "@react-icons/all-files/io/IoIosGlobe";
 import { IoMdTime } from "@react-icons/all-files/io/IoMdTime";
 import { MdToday } from "@react-icons/all-files/md/MdToday";
-import { MdOutlinePerson } from "@react-icons/all-files/md/MdOutlinePerson";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import {
   getSessionRecordingAttributes,
@@ -70,7 +69,7 @@ export const SessionInfo: React.FC = () => {
       { icon: <IoIosGlobe />, label: "Page URL", value: sessionAttributes?.url },
       { icon: <IoMdTime />, label: "Duration", value: msToHoursMinutesAndSeconds(sessionAttributes?.duration ?? 0) },
       { icon: <MdToday />, label: "Recorded at", value: epochToDateAndTimeString(sessionAttributes?.startTime) },
-      { icon: <MdOutlinePerson />, label: "Recorded by", value: "1:00 PM" },
+      // { icon: <MdOutlinePerson />, label: "Recorded by", value: "1:00 PM" },
     ];
   }, [
     sessionAttributes,
