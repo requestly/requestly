@@ -49,11 +49,11 @@ export const routesV2: RouteObject[] = [
         ],
       },
       /** Iframe paths  - Without Header, Footer **/
-      // {
-      //   path: "iframe",
-      //   element: <FullScreenLayout />,
-      //   children: [...ruleRoutes],
-      // },
+      {
+        path: "iframe",
+        element: <FullScreenLayout />,
+        children: [...sessionRoutes],
+      },
     ],
   },
 ];
