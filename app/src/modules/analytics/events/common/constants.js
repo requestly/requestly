@@ -110,6 +110,7 @@ export const SOURCE = {
   TEMPLATES_SCREEN: "templates_screen",
   PLAN_EXPIRED_BANNER: "plan_expired_banner",
   MV3_MODAL: "mv3_modal",
+  INCENTIVIZATION_TASK_LIST: "incentivization_task_list",
 };
 
 export const RULES = {

@@ -20,7 +20,10 @@ import Logger from "lib/logger";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import { actions } from "store";
 import { trackHomeRulesActionClicked } from "components/Home/analytics";
-import { trackRuleCreationWorkflowStartedEvent } from "modules/analytics/events/common/rules";
+import {
+  trackNewRuleButtonClicked,
+  trackRuleCreationWorkflowStartedEvent,
+} from "modules/analytics/events/common/rules";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { ruleIcons } from "components/common/RuleIcon/ruleIcons";
 import { RuleSelectionListDrawer } from "features/rules/screens/rulesList/components/RulesList/components";
@@ -101,6 +104,7 @@ export const RulesCard: React.FC = () => {
                   className="rules-card-create-btn"
                   onClick={() => {
                     trackHomeRulesActionClicked("new_rule_drawer");
+                    trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
                     setIsRulesDrawerOpen(true);
                   }}
                 >
@@ -157,6 +161,7 @@ export const RulesCard: React.FC = () => {
                   type="primary"
                   onClick={() => {
                     trackHomeRulesActionClicked("create_new_rule");
+                    trackNewRuleButtonClicked(SOURCE.HOME_SCREEN);
 
                     if (isExtensionInstalled()) {
                       setIsRulesDrawerOpen(true);

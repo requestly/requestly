@@ -13,7 +13,11 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import PersonaRecommendation from "./PersonaRecommendation";
 import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
-import { trackGettingStartedVideoPlayed, trackRulesEmptyStateClicked } from "modules/analytics/events/common/rules";
+import {
+  trackGettingStartedVideoPlayed,
+  trackNewRuleButtonClicked,
+  trackRulesEmptyStateClicked,
+} from "modules/analytics/events/common/rules";
 import {
   trackRulesImportStarted,
   trackUploadRulesButtonClicked,
@@ -71,6 +75,7 @@ export const GettingStarted: React.FC = () => {
   };
 
   const handleNewRuleClick = (source: string) => {
+    trackNewRuleButtonClicked(SOURCE.GETTING_STARTED);
     trackRulesEmptyStateClicked(source);
     setIsRulesListDrawerOpen(true);
   };
