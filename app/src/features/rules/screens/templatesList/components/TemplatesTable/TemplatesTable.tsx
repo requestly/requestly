@@ -2,26 +2,27 @@ import { ContentListTable, withContentListTableContext } from "componentsV2/Cont
 import { Empty } from "antd";
 import templateRecords from "./constants/templates";
 import useTemplatesTableColumns from "./hooks/useTemplatesTableColumns";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { TemplatePreviewModal } from "../../modals/TemplatePreviewModal/TemplatePreviewModal";
 import { TemplateRecord } from "./types";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import "./templatesTable.scss";
 import { useSelector } from "react-redux";
 import { getIsAppBannerVisible } from "store/selectors";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { trackTemplateImportStarted } from "../../analytics";
+import { redirectToSharedListViewer } from "utils/RedirectionUtils";
+import "./templatesTable.scss";
 
 interface TemplatesTableProps {
   searchValue: string;
 }
 const TemplatesTable: React.FC<TemplatesTableProps> = ({ searchValue }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isTemplatePreviewModalVisible, setIsTemplatePreviewModalVisible] = useState(false);
   const [templateToPreview, setTemplateToPreview] = useState(null);
   const isAppBannerVisible = useSelector(getIsAppBannerVisible);
-
-  const handlePreviewTemplateInModal = (template: TemplateRecord) => {
-    setTemplateToPreview(template.data);
-    setIsTemplatePreviewModalVisible(true);
-  };
+  const templateId = searchParams.get("id");
 
   const filteredRecords = useMemo(() => {
     return templateRecords.filter((record) => {
@@ -29,7 +30,33 @@ const TemplatesTable: React.FC<TemplatesTableProps> = ({ searchValue }) => {
     });
   }, [searchValue]);
 
-  const tableColumns = useTemplatesTableColumns({ handlePreviewTemplateInModal });
+  console.log("filteredRecords", filteredRecords);
+
+  const handlePreviewTemplate = useCallback(
+    (template: TemplateRecord) => {
+      trackTemplateImportStarted(template.name, SOURCE.TEMPLATES_SCREEN);
+      if (template.isSharedList) {
+        redirectToSharedListViewer(navigate, template.data.shareId, template.data.sharedListName, true);
+      } else {
+        setTemplateToPreview(template.data);
+        setIsTemplatePreviewModalVisible(true);
+      }
+    },
+    [navigate]
+  );
+
+  useEffect(() => {
+    if (!templateId) {
+      return;
+    }
+    const template = filteredRecords.find((template) => template.id === templateId);
+
+    if (template) {
+      handlePreviewTemplate(template);
+    }
+  }, [templateId, filteredRecords, handlePreviewTemplate]);
+
+  const tableColumns = useTemplatesTableColumns({ handlePreviewTemplate });
 
   return (
     <>

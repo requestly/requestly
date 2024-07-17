@@ -8,7 +8,7 @@ import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 import { trackRuleDetailsPanelClosed, trackRuleDetailsPanelViewed } from "modules/analytics/events/common/rules";
-import { trackViewAllTemplatesClick } from "modules/analytics/events/features/templates";
+import { trackUseTemplateClick, trackViewAllTemplatesClick } from "modules/analytics/events/features/templates";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./RuleDetailsPanel.scss";
@@ -30,6 +30,11 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
   const handleAllTemplatesClick = () => {
     trackViewAllTemplatesClick(source, ruleType);
     navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
+  };
+
+  const handleUseTemplateClick = (templateId: string) => {
+    trackUseTemplateClick(source, ruleType);
+    navigate(`${PATHS.RULES.TEMPLATES.ABSOLUTE}?id=${templateId}`);
   };
 
   useEffect(() => {
@@ -57,17 +62,18 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
 
             <ul className="use-cases-list">
               {RULE_DETAILS[ruleType].useCases?.length > 0 &&
-                RULE_DETAILS[ruleType].useCases?.map(({ useCase, suggestedTemplateLink }, index) => {
+                RULE_DETAILS[ruleType].useCases?.map(({ useCase, suggestedTemplateId }, index) => {
                   return (
                     <li key={index} className="use-case-list-item">
                       <div className="use-case">
                         {useCase}
                         <br />
-                        {suggestedTemplateLink ? (
+                        {suggestedTemplateId ? (
                           <Button
                             type="link"
                             className="link use-template-btn"
                             icon={<MdOutlineFactCheck className="anticon" />}
+                            onClick={() => handleUseTemplateClick(suggestedTemplateId)}
                           >
                             Use template
                           </Button>

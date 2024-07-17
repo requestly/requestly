@@ -259,6 +259,7 @@ export const TEMPLATES = {
   IMPORT_STARTED: "template_import_started",
   IMPORT_COMPLETED: "template_import_completed",
   VIEW_ALL_TEMPLATES_CLICK: "view_all_templates_click",
+  USE_TEMPLATE_CLICK: "use_template_click",
 };
 
 export const ECOSYSTEM = {
