@@ -22,15 +22,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
-        useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        useCase: "Redirect to local System files (Map Local).",
+        suggestedTemplateLink: "",
       },
       {
-        useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts.",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -43,15 +43,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -64,15 +64,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -85,15 +85,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -106,15 +106,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -127,15 +127,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -148,15 +148,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -169,15 +169,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -190,15 +190,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
@@ -211,15 +211,15 @@ export const RULE_DETAILS: Record<
     useCases: [
       {
         useCase: "Redirect Production to Local Environment.",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Redirect to local System files (Map Local)",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
       {
         useCase: "Fix Broken URLs, Redirect dead bookmarks, and Create URL shortcuts",
-        suggestedTemplateLink: "test",
+        suggestedTemplateLink: "",
       },
     ],
     documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
