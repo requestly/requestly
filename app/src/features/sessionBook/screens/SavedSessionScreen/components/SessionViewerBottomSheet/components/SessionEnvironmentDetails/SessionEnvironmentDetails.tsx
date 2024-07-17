@@ -14,7 +14,7 @@ import "./sessionEnvDetails.scss";
 export const SessionEnvironmentDetails = () => {
   const attributes = useSelector(getSessionRecordingAttributes);
 
-  const aggregate = (...values: (string | number)[]): string => {
+  const aggregateValues = (...values: (string | number)[]): string => {
     return values.filter((v) => !!v).join(" ");
   };
 
@@ -26,14 +26,14 @@ export const SessionEnvironmentDetails = () => {
       {
         label: "Browser",
         icon: <MdOutlineTravelExplore />,
-        value: aggregate(environment.browser.name, environment.browser.version),
+        value: aggregateValues(environment.browser.name, environment.browser.version),
       },
       {
         label: "Operating System",
         icon: <MdOutlineDisplaySettings />,
         value: (
           <>
-            {aggregate(environment.os.name, environment.os.versionName, environment.os.version)}
+            {aggregateValues(environment.os.name, environment.os.versionName, environment.os.version)}
             {environment.os.name === "macOS" && environment.os.version === "10.15.7" ? ` (or above)` : null}
           </>
         ),
@@ -41,7 +41,9 @@ export const SessionEnvironmentDetails = () => {
       {
         label: "Platform",
         icon: <MdOutlineDevices />,
-        value: <> {aggregate(environment.platform.vendor, environment.platform.type, environment.platform.model)}</>,
+        value: (
+          <> {aggregateValues(environment.platform.vendor, environment.platform.type, environment.platform.model)}</>
+        ),
       },
       {
         label: "Screen Dimensions",
