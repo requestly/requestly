@@ -1,0 +1,39 @@
+// SupportPanel.scss
+
+.support-panel-icon-style {
+  font-size: 1rem;
+}
+
+.support-panel-label-style {
+  margin-left: 6px;
+  width: 200px;
+  font-size: 0.9rem;
+}
+
+.support-panel-item-style {
+  padding: 2px 3px;
+  display: flex;
+  align-items: center;
+}
+#crisp-chatbox > div > a {
+  display: none !important;
+}
+
+.support-panel-upgrade-badge-style {
+  border: 2px solid #f2aa09;
+  padding: 4px 8px;
+  border-radius: 1rem;
+  color: #f2aa09;
+  margin-left: 8px;
+}
+
+.support-panel-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 20px;
+}
+
+.support-panel-item-disabled {
+  // color: #6d6d6d;
+  opacity: 0.5;
+}
