@@ -10,7 +10,7 @@ import { RQButton } from "lib/design-system/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOutlinePublic } from "@react-icons/all-files/md/MdOutlinePublic";
 import { MdOutlineLink } from "@react-icons/all-files/md/MdOutlineLink";
-// import SessionViewerBottomSheet from "features/sessionBook/screens/SavedSessionScreen/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
+import SessionViewerBottomSheet from "features/sessionBook/screens/SavedSessionScreen/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import { useSessionsActionContext } from "features/sessionBook/context/actions";
 import { getSessionRecordingMetaData, getSessionRecordingVisibility } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
@@ -20,7 +20,6 @@ import "./savedSessionViewer.scss";
 export const SavedSessionViewer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  // TODO: Add bottom sheet
 
   const { handleDeleteSessionAction } = useSessionsActionContext();
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
@@ -28,8 +27,7 @@ export const SavedSessionViewer = () => {
 
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
-  // Required for bottom sheet
-  const [, setSessionPlayerOffset] = useState(0);
+  const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
 
   const handleCopySessionLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -75,7 +73,7 @@ export const SavedSessionViewer = () => {
             <DownloadSessionButton />
           </div>
         </div>
-        <BottomSheetLayout bottomSheet={<>Session Bottom sheet here</>}>
+        <BottomSheetLayout bottomSheet={<SessionViewerBottomSheet playerTimeOffset={sessionPlayerOffset} />}>
           <div className="saved-session-viewer-body">
             <SessionPlayer onPlayerTimeOffsetChange={handleSessionPlayerTimeOffsetChange} />
           </div>
