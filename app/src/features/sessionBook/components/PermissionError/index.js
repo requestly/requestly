@@ -4,11 +4,13 @@ import ProCard from "@ant-design/pro-card";
 import { Button, Col, Row } from "antd";
 import AuthButtons from "components/authentication/LoginRequiredCTA/AuthButtons";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import img from "../../../../../assets/images/pages/error/403.svg";
+import img from "assets/images/pages/error/403.svg";
 import { getAppMode, getUserAuthDetails } from "store/selectors";
 import { handleLogoutButtonOnClick } from "features/onboarding/components/auth/components/Form/actions";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 
+// DUPLICATED
+// TODO: REMOVE OLD FILE
 const PermissionError = ({ isInsideIframe = false }) => {
   // Global State
   const user = useSelector(getUserAuthDetails);

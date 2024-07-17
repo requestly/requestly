@@ -3,6 +3,7 @@ import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDo
 import DownArrow from "assets/icons/down-arrow.svg?react";
 import "./downloadSessionButton.scss";
 
+// TODO: add actions
 export const DownloadSessionButton = () => {
   return (
     <div className="download-session-btn-container">

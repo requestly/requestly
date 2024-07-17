@@ -136,39 +136,42 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     player?.addEventListener("ui-update-player-state", playerStateChangeHandler);
   }, [player, playerStateChangeHandler, updateCurrentTimeHandler]);
 
-  const handleSessionPausePlayBtnClick = () => {
+  const handleSessionPausePlayBtnClick = useCallback(() => {
     if (playerState === PlayerState.PLAYING) {
       player?.pause();
     } else {
       player?.play();
     }
-  };
+  }, [player, playerState]);
 
-  const handleJumpForward = () => {
+  const handleJumpForward = useCallback(() => {
     if ((playerTimeOffset + 10) * 1000 < attributes?.duration) {
       player.goto((playerTimeOffset + 10) * 1000);
     } else {
       player.goto(attributes?.duration);
     }
-  };
+  }, [player, attributes?.duration, playerTimeOffset]);
 
-  const handleJumpBackward = () => {
+  const handleJumpBackward = useCallback(() => {
     if (playerTimeOffset > 10) {
-      player.goto((playerTimeOffset - 10) * 1000);
+      player?.goto((playerTimeOffset - 10) * 1000);
     } else {
-      player.goto(0);
+      player?.goto(0);
     }
-  };
+  }, [player, playerTimeOffset]);
 
   const handlePlayerSpeedChange = (speed: number) => {
     player?.setSpeed(speed);
   };
 
-  const handleChangeSkipInactive = (checked: boolean) => {
-    setIsSkipInactiveEnabled(checked);
-    skipInactiveSegments.current = checked;
-    player?.toggleSkipInactive();
-  };
+  const handleChangeSkipInactive = useCallback(
+    (checked: boolean) => {
+      setIsSkipInactiveEnabled(checked);
+      skipInactiveSegments.current = checked;
+      player?.toggleSkipInactive();
+    },
+    [player]
+  );
 
   return (
     <div className="session-player-container">
@@ -182,7 +185,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
             icon={playerState === PlayerState.PAUSED ? <MdOutlinePlayCircle /> : <MdPauseCircleOutline />}
           />
           <div className="session-player-duration-tracker">
-            00:2/ {msToMinutesAndSeconds(attributes?.duration || 0)}
+            {msToMinutesAndSeconds(playerTimeOffset * 1000 || 0)}/ {msToMinutesAndSeconds(attributes?.duration || 0)}
           </div>
         </div>
         <div className="session-player-jump-controllers">
@@ -218,6 +221,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
           <span>Skip inactive</span>
         </div>
         <div className="flex-1 session-player-fullscreen-controller-container">
+          {/* TODO: add full screen action */}
           <RQButton className="session-player-controller__btn " iconOnly icon={<MdFullscreen />} />
         </div>
       </div>

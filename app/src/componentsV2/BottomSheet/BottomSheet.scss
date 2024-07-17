@@ -29,12 +29,12 @@
   & .ant-tabs-tab {
     border-radius: 4px !important;
     padding: 4px 8px !important;
-    background: none !important;
-    border: none !important;
+    background: none;
+    border: none;
     transition: all 0.2s ease-out;
 
     &:hover,
-    &:hover,
+    &:focus,
     &:active {
       color: var(--requestly-color-text-default);
     }
