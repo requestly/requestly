@@ -5,9 +5,9 @@ import { MdOutlineViewHeadline } from "@react-icons/all-files/md/MdOutlineViewHe
 import { IoIosGlobe } from "@react-icons/all-files/io/IoIosGlobe";
 import { IoMdTime } from "@react-icons/all-files/io/IoMdTime";
 import { MdToday } from "@react-icons/all-files/md/MdToday";
-import { MdOutlinePerson } from "@react-icons/all-files/md/MdOutlinePerson";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import {
+  getIsRequestedByOwner,
   getSessionRecordingAttributes,
   getSessionRecordingId,
   getSessionRecordingMetaData,
@@ -24,6 +24,7 @@ export const SessionInfo: React.FC = () => {
   const recordingId = useSelector(getSessionRecordingId);
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
   const sessionAttributes = useSelector(getSessionRecordingAttributes);
+  const isRequestedByOwner = useSelector(getIsRequestedByOwner);
 
   const handleSessionNameUpdate = useCallback(() => {
     if (recordingId && sessionMetadata?.name) {
@@ -50,6 +51,7 @@ export const SessionInfo: React.FC = () => {
               dispatch(sessionRecordingActions.setName(value));
             }}
             onBlur={handleSessionNameUpdate}
+            disabled={!isRequestedByOwner}
           />
         ),
       },
@@ -64,13 +66,14 @@ export const SessionInfo: React.FC = () => {
               dispatch(sessionRecordingActions.setDescription(value));
             }}
             onBlur={handleSessionDescriptionUpdate}
+            disabled={!isRequestedByOwner}
           />
         ),
       },
       { icon: <IoIosGlobe />, label: "Page URL", value: sessionAttributes?.url },
       { icon: <IoMdTime />, label: "Duration", value: msToHoursMinutesAndSeconds(sessionAttributes?.duration ?? 0) },
       { icon: <MdToday />, label: "Recorded at", value: epochToDateAndTimeString(sessionAttributes?.startTime) },
-      { icon: <MdOutlinePerson />, label: "Recorded by", value: user?.details?.profile?.email },
+      // { icon: <MdOutlinePerson />, label: "Recorded by", value: user?.details?.profile?.email },
     ];
   }, [
     sessionAttributes,
@@ -79,7 +82,7 @@ export const SessionInfo: React.FC = () => {
     handleSessionNameUpdate,
     sessionMetadata?.description,
     sessionMetadata?.name,
-    user?.details?.profile?.email,
+    isRequestedByOwner,
   ]);
 
   return (

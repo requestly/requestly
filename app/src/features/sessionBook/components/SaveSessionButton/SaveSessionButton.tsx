@@ -7,7 +7,7 @@ import DownArrow from "assets/icons/down-arrow.svg?react";
 import { useLocation } from "react-router-dom";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { DebugInfo } from "features/sessionBook/types";
-import { getRecordingOptionsToSave } from "features/sessionBook/utils/sessionEvents";
+import { getRecordingOptionsToSave } from "features/sessionBook/utils/sessionFile";
 import { downloadSessionFile } from "features/sessionBook/utils/sessionFile";
 import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
