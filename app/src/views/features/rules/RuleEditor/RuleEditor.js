@@ -92,7 +92,7 @@ const RuleEditor = (props) => {
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <ProCard className="rule-editor-procard">
             {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
-              <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} />
+              <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
             ) : null}
             <RuleBuilder />
           </ProCard>
@@ -100,7 +100,7 @@ const RuleEditor = (props) => {
           <BottomSheetLayout bottomSheet={<RuleEditorBottomSheet mode={MODE} />}>
             <ProCard className="rule-editor-procard">
               {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
-                <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} />
+                <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
               ) : null}
               <RuleBuilder />
             </ProCard>

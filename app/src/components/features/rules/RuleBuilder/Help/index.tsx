@@ -164,7 +164,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
         </Row>
 
         <div className="rule-editor-help-content">
-          {!isDocsVisible ? <RuleDetailsPanel ruleType={ruleType} /> : null}
+          {!isDocsVisible ? <RuleDetailsPanel ruleType={ruleType} source="docs_sidebar" /> : null}
 
           {isDocsVisible ? (
             <>

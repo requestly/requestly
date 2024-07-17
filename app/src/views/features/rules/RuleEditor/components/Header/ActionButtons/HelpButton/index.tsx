@@ -27,7 +27,12 @@ export const HelpButton = () => {
         icon={<AiOutlineQuestionCircle />}
         className="header-rule-help-btn"
         type="text"
-        onClick={() => setIsHelpDrawerOpen((isOpen) => !isOpen)}
+        onClick={() => {
+          setIsHelpDrawerOpen((isOpen) => !isOpen);
+          if (isHelpDrawerOpen) {
+            trackDocsSidebarClosed(currentlySelectedRuleData?.ruleType);
+          }
+        }}
         size="small"
       >
         Help

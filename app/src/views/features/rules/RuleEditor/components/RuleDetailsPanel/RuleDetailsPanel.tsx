@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { RULE_DETAILS } from "./constants";
 import { RuleType } from "types";
 import { Button } from "antd";
@@ -7,18 +7,27 @@ import { MdOutlineFactCheck } from "@react-icons/all-files/md/MdOutlineFactCheck
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
+import { trackRuleDetailsPanelClosed, trackRuleDetailsPanelViewed } from "modules/analytics/events/common/rules";
 import "./RuleDetailsPanel.scss";
 
 interface RuleDetailsPanelProps {
   ruleType: RuleType | undefined;
+  source: "docs_sidebar" | "new_rule_editor";
 }
 
-export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType }) => {
+export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, source }) => {
   const dispatch = useDispatch();
 
   const handleCloseClick = () => {
+    trackRuleDetailsPanelClosed(ruleType, source);
     dispatch(actions.closeCurrentlySelectedRuleDetailsPanel());
   };
+
+  useEffect(() => {
+    if (ruleType && source) {
+      trackRuleDetailsPanelViewed(ruleType, source);
+    }
+  }, [ruleType, source]);
 
   return !ruleType ? null : (
     <div key={ruleType} className="rule-details-panel-container">
