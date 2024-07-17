@@ -1,12 +1,13 @@
+import React from "react";
 import ProCard from "@ant-design/pro-card";
 import { Button, Col, Row } from "antd";
 import Jumbotron from "components/bootstrap-legacy/jumbotron";
-import React from "react";
-
-import img from "../../../../../assets/images/pages/error/404.svg";
+import img from "assets/images/pages/error/403.svg";
 import { useNavigate } from "react-router-dom";
-import PATHS from "../../../../../config/constants/sub/paths";
+import PATHS from "config/constants/sub/paths";
 
+// DUPLICATED
+// TODO: REMOVE OLD FILE
 const NotFoundError = () => {
   const navigate = useNavigate();
 

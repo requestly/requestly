@@ -36,7 +36,7 @@ export const SavedSessionScreen: React.FC = () => {
 
     getRecording(id, user?.details?.profile?.uid, workspace?.id, user?.details?.profile?.email)
       .then((res) => {
-        // setShowPermissionError(false);
+        setShowPermissionError(false);
         dispatch(sessionRecordingActions.setSessionRecordingMetadata({ id, ...res.payload }));
         try {
           const recordedSessionEvents: RQSessionEvents = decompressEvents(res.events);

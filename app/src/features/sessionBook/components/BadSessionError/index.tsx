@@ -1,8 +1,10 @@
 import React from "react";
 import ProCard from "@ant-design/pro-card";
 import { Col, Row } from "antd";
-import img from "../../../../../assets/images/pages/error/403.svg";
+import img from "assets/images/pages/error/403.svg";
 
+// DUPLICATED
+// TODO: REMOVE OLD FILE
 const BadSessionError = () => {
   return (
     <React.Fragment>
