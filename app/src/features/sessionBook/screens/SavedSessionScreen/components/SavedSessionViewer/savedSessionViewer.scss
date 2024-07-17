@@ -30,3 +30,11 @@
   height: 100%;
   background: var(--requestly-color-background);
 }
+
+.saved-session-viewer-container {
+  .bottomsheet-layout-container {
+    .bottom-sheet-panel-container {
+      border-top-left-radius: 8px;
+    }
+  }
+}

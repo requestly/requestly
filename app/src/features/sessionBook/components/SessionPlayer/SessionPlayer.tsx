@@ -17,6 +17,7 @@ import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessi
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 import PlayerFrameOverlay from "./components/PlayerOverlay/PlayerOverlay";
 import "./sessionPlayer.scss";
+import { useTheme } from "styled-components";
 
 interface SessionPlayerProps {
   onPlayerTimeOffsetChange: (timeOffset: number) => void;
@@ -39,6 +40,8 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const isPlayerSkippingInactivity = useRef(false);
   const skipInactiveSegments = useRef(true);
   const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
+
+  const theme = useTheme();
 
   const inactiveSegments = useMemo(() => {
     if (events) {
@@ -140,39 +143,42 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     player?.addEventListener("ui-update-player-state", playerStateChangeHandler);
   }, [player, playerStateChangeHandler, updateCurrentTimeHandler]);
 
-  const handleSessionPausePlayBtnClick = () => {
+  const handleSessionPausePlayBtnClick = useCallback(() => {
     if (playerState === PlayerState.PLAYING) {
       player?.pause();
     } else {
       player?.play();
     }
-  };
+  }, [player, playerState]);
 
-  const handleJumpForward = () => {
+  const handleJumpForward = useCallback(() => {
     if ((playerTimeOffset + 10) * 1000 < attributes?.duration) {
       player.goto((playerTimeOffset + 10) * 1000);
     } else {
       player.goto(attributes?.duration);
     }
-  };
+  }, [player, attributes?.duration, playerTimeOffset]);
 
-  const handleJumpBackward = () => {
+  const handleJumpBackward = useCallback(() => {
     if (playerTimeOffset > 10) {
-      player.goto((playerTimeOffset - 10) * 1000);
+      player?.goto((playerTimeOffset - 10) * 1000);
     } else {
-      player.goto(0);
+      player?.goto(0);
     }
-  };
+  }, [player, playerTimeOffset]);
 
   const handlePlayerSpeedChange = (speed: number) => {
     player?.setSpeed(speed);
   };
 
-  const handleChangeSkipInactive = (checked: boolean) => {
-    setIsSkipInactiveEnabled(checked);
-    skipInactiveSegments.current = checked;
-    player?.toggleSkipInactive();
-  };
+  const handleChangeSkipInactive = useCallback(
+    (checked: boolean) => {
+      setIsSkipInactiveEnabled(checked);
+      skipInactiveSegments.current = checked;
+      player?.toggleSkipInactive();
+    },
+    [player]
+  );
 
   // NOTE: effect is not working as expected when in fullscreen mode
   // useEffect(() => {
@@ -222,6 +228,9 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
         </div>
         <div>
           <Select
+            dropdownStyle={{
+              background: theme?.colors?.black,
+            }}
             className="session-player-controller__speed-selector"
             defaultValue={1}
             style={{ width: 60 }}

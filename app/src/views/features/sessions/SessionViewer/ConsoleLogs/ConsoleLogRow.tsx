@@ -4,9 +4,6 @@ import LogIcon from "./LogIcon";
 import { ObjectInspector } from "@devtools-ds/object-inspector";
 import { Col, Collapse, Row, Space } from "antd";
 import { RQButton } from "lib/design-system/components";
-// import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
-// import { ClockCircleOutlined } from "@ant-design/icons";
-// import { secToMinutesAndSeconds } from "utils/DateTimeUtils";
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./console.scss";
 interface LogRowProps extends ConsoleLog {

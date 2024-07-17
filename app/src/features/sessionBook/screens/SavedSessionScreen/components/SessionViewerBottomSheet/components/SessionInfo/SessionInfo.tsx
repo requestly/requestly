@@ -6,7 +6,7 @@ import { IoIosGlobe } from "@react-icons/all-files/io/IoIosGlobe";
 import { IoMdTime } from "@react-icons/all-files/io/IoMdTime";
 import { MdToday } from "@react-icons/all-files/md/MdToday";
 import { MdOutlinePerson } from "@react-icons/all-files/md/MdOutlinePerson";
-import { CustomInlineInput } from "componentsV2/CustomInlineInput/CustomInlineInput";
+import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import {
   getSessionRecordingAttributes,
   getSessionRecordingId,
@@ -43,7 +43,7 @@ export const SessionInfo: React.FC = () => {
         icon: <CgAlignCenter />,
         label: "Name",
         value: (
-          <CustomInlineInput
+          <InlineInput
             value={sessionMetadata?.name}
             placeholder="Enter session name"
             onChange={(value: string) => {
@@ -57,7 +57,7 @@ export const SessionInfo: React.FC = () => {
         icon: <MdOutlineViewHeadline />,
         label: "Description",
         value: (
-          <CustomInlineInput
+          <InlineInput
             value={sessionMetadata?.description}
             placeholder="Enter session description"
             onChange={(value: string) => {
@@ -70,7 +70,7 @@ export const SessionInfo: React.FC = () => {
       { icon: <IoIosGlobe />, label: "Page URL", value: sessionAttributes?.url },
       { icon: <IoMdTime />, label: "Duration", value: msToHoursMinutesAndSeconds(sessionAttributes?.duration ?? 0) },
       { icon: <MdToday />, label: "Recorded at", value: epochToDateAndTimeString(sessionAttributes?.startTime) },
-      { icon: <MdOutlinePerson />, label: "Recorded by", value: "1:00 PM" },
+      { icon: <MdOutlinePerson />, label: "Recorded by", value: user?.details?.profile?.email },
     ];
   }, [
     sessionAttributes,
@@ -79,6 +79,7 @@ export const SessionInfo: React.FC = () => {
     handleSessionNameUpdate,
     sessionMetadata?.description,
     sessionMetadata?.name,
+    user?.details?.profile?.email,
   ]);
 
   return (
