@@ -18,7 +18,6 @@ import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEditorBottomSheet";
-import { trackRuleEditorViewed } from "modules/analytics/events/common/rules";
 import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
@@ -76,12 +75,6 @@ const RuleEditor = (props) => {
       setIsNewRuleCreated(true);
     }
   }, [state?.source, MODE]);
-
-  useEffect(() => {
-    if (state?.source) {
-      trackRuleEditorViewed(state?.source, currentlySelectedRuleData?.ruleType);
-    }
-  }, [state?.source, currentlySelectedRuleData?.ruleType]);
 
   const renderRuleEditor = () => {
     return (
