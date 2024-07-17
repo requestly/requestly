@@ -182,7 +182,7 @@ export const GettingStarted: React.FC = () => {
                   }}
                 >
                   <Button type="link" className="link-btn" onClick={() => handleNewRuleClick("view_all_rule_types")}>
-                    View all rules
+                    View all rule types
                   </Button>
                 </RuleSelectionListDrawer>
               </div>
@@ -273,8 +273,6 @@ export const GettingStarted: React.FC = () => {
                   e.g. How can I insert custom CSS code on a web page?
                 </div>
               </RQButton>
-
-              <div className="caption">Interact with our AI bot to get instant answers to your questions.</div>
             </div>
           </div>
         </div>
