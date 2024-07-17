@@ -12,6 +12,7 @@ import {
   getAppMode,
   getAppOnboardingDetails,
   getIsWorkspaceOnboardingCompleted,
+  getRequestBot,
 } from "store/selectors";
 import { getRouteFromCurrentPath } from "utils/URLUtils";
 import SyncConsentModal from "../../components/user/SyncConsentModal";
@@ -38,6 +39,7 @@ import { IncentiveTaskCompletedModal, IncentiveTasksListModal } from "features/i
 import { getIncentivizationActiveModals } from "store/features/incentivization/selectors";
 import { incentivizationActions } from "store/features/incentivization/slice";
 import { IncentivizationModal } from "store/features/incentivization/types";
+import { RequestBot } from "features/requestBot";
 
 const DashboardContent = () => {
   const location = useLocation();
@@ -54,6 +56,8 @@ const DashboardContent = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
   const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
+  const requestBotDetails = useSelector(getRequestBot);
+  const isRequestBotVisible = requestBotDetails?.isActive;
 
   const toggleIncentiveTasksListModal = () => {
     dispatch(incentivizationActions.toggleActiveModal({ modalName: IncentivizationModal.TASKS_LIST_MODAL }));
@@ -81,6 +85,10 @@ const DashboardContent = () => {
 
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive(isImportRulesModalActive ? false : true);
+  };
+
+  const closeRequestBot = () => {
+    dispatch(actions.updateRequestBot({ isActive: false }));
   };
 
   const prevProps = usePrevious({ location });
@@ -230,6 +238,8 @@ const DashboardContent = () => {
           appOnboardingDetails.isOnboardingCompleted ? (
             <RequestBillingTeamAccessReminder />
           ) : null}
+
+          <RequestBot isOpen={isRequestBotVisible} onClose={closeRequestBot} modelType={requestBotDetails?.modelType} />
         </>
       )}
     </>
