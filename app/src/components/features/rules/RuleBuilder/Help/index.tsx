@@ -94,7 +94,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
     if (target) {
       const { offsetTop } = target;
       const parentContainer = target.parentNode.parentNode as HTMLElement;
-      parentContainer.scrollTop = offsetTop - 87;
+      parentContainer.scrollTop = offsetTop - 100;
     }
   }, []);
 
@@ -150,7 +150,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
 
   return (
     <div className="rule-editor-help-container">
-      <div className="rule-editor-help-content">
+      <div className="rule-editor-help-content-container">
         <Row align="middle" justify="space-between" className="w-full rule-editor-help-header">
           <Col className="title items-center">
             {isDocsVisible && (
@@ -163,111 +163,113 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
           </Col>
         </Row>
 
-        <RuleDetailsPanel ruleType={ruleType} />
+        <div className="rule-editor-help-content">
+          {!isDocsVisible ? <RuleDetailsPanel ruleType={ruleType} /> : null}
 
-        {isDocsVisible ? (
-          <>
-            <div className="rule-editor-docs">
-              <NotionRenderer
-                blockMap={notionPageData}
-                customBlockComponents={{
-                  image: ({ blockValue }) => {
-                    return (
-                      <Zoom classDialog="rule-editor-docs-image">
-                        <img
-                          width="260px"
-                          height="100px"
-                          alt="rule editor example"
+          {isDocsVisible ? (
+            <>
+              <div className="rule-editor-docs">
+                <NotionRenderer
+                  blockMap={notionPageData}
+                  customBlockComponents={{
+                    image: ({ blockValue }) => {
+                      return (
+                        <Zoom classDialog="rule-editor-docs-image">
+                          <img
+                            width="260px"
+                            height="100px"
+                            alt="rule editor example"
+                            src={blockValue?.properties?.source[0][0]}
+                          />
+                        </Zoom>
+                      );
+                    },
+                    header: ({ blockValue }) => {
+                      return (
+                        <h1 className="notion-h1" id={blockValue?.id}>
+                          {blockValue?.properties?.title[0][0]}
+                        </h1>
+                      );
+                    },
+                    video: ({ blockValue }) => {
+                      return (
+                        <YouTubePlayer
+                          width="320"
+                          height="160"
+                          handleOnPlay={handleDemoVideoPlay}
                           src={blockValue?.properties?.source[0][0]}
                         />
-                      </Zoom>
-                    );
-                  },
-                  header: ({ blockValue }) => {
-                    return (
-                      <h1 className="notion-h1" id={blockValue?.id}>
-                        {blockValue?.properties?.title[0][0]}
-                      </h1>
-                    );
-                  },
-                  video: ({ blockValue }) => {
-                    return (
-                      <YouTubePlayer
-                        width="320"
-                        height="160"
-                        handleOnPlay={handleDemoVideoPlay}
-                        src={blockValue?.properties?.source[0][0]}
+                      );
+                    },
+                    toggle: ({ blockValue, blockMap }) => {
+                      return (
+                        <RQCollapse accordion className="rule-editor-docs-faqs-collapse">
+                          <Collapse.Panel key={0} header={blockValue?.properties?.title[0][0]}>
+                            <NotionRenderer blockMap={{ [blockValue?.content[0]]: blockMap[blockValue?.content[0]] }} />
+                          </Collapse.Panel>
+                        </RQCollapse>
+                      );
+                    },
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* internal links */}
+              <div ref={documentationListRef} className="rule-editor-help-lists">
+                <div className="caption text-gray text-bold rule-editor-help-title">
+                  <CompassOutlined />
+                  Documentation for {RULE_TYPES_CONFIG[ruleType].NAME}
+                </div>
+                <ul className="rule-editor-help-list">
+                  <>
+                    {tableOfContents?.length ? (
+                      <>
+                        {" "}
+                        {tableOfContents.map(({ title, id }: TocItem) => (
+                          <li
+                            key={id}
+                            id={id}
+                            onClick={() => handleDocumentationListItemClick(title, () => handleScrollToSection(id))}
+                          >
+                            <Button>{title}</Button>
+                          </li>
+                        ))}
+                      </>
+                    ) : (
+                      <Skeleton
+                        active
+                        paragraph={{ rows: 4, width: ["90%", "90%", "90%", "90%"] }}
+                        className="rule-editor-doc-skeleton"
                       />
-                    );
-                  },
-                  toggle: ({ blockValue, blockMap }) => {
-                    return (
-                      <RQCollapse accordion className="rule-editor-docs-faqs-collapse">
-                        <Collapse.Panel key={0} header={blockValue?.properties?.title[0][0]}>
-                          <NotionRenderer blockMap={{ [blockValue?.content[0]]: blockMap[blockValue?.content[0]] }} />
-                        </Collapse.Panel>
-                      </RQCollapse>
-                    );
-                  },
-                }}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            {/* internal links */}
-            <div ref={documentationListRef} className="rule-editor-help-lists">
-              <div className="caption text-gray text-bold rule-editor-help-title">
-                <CompassOutlined />
-                Documentation for {RULE_TYPES_CONFIG[ruleType].NAME}
-              </div>
-              <ul className="rule-editor-help-list">
-                <>
-                  {tableOfContents?.length ? (
-                    <>
-                      {" "}
-                      {tableOfContents.map(({ title, id }: TocItem) => (
-                        <li
-                          key={id}
-                          id={id}
-                          onClick={() => handleDocumentationListItemClick(title, () => handleScrollToSection(id))}
-                        >
-                          <Button>{title}</Button>
-                        </li>
-                      ))}
-                    </>
-                  ) : (
-                    <Skeleton
-                      active
-                      paragraph={{ rows: 4, width: ["90%", "90%", "90%", "90%"] }}
-                      className="rule-editor-doc-skeleton"
-                    />
-                  )}
-                </>
-              </ul>
+                    )}
+                  </>
+                </ul>
 
-              {/* external links */}
-              <div className="caption text-gray text-bold rule-editor-help-title">
-                <InfoCircleOutlined />
-                Help categories
+                {/* external links */}
+                <div className="caption text-gray text-bold rule-editor-help-title">
+                  <InfoCircleOutlined />
+                  Help categories
+                </div>
+                <ul className="rule-editor-help-list external-links">
+                  {externalLinks.map(({ title, link }) => (
+                    <li key={title}>
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => trackDocsSidebarSecondaryCategoryClicked(ruleType, title.toLowerCase())}
+                      >
+                        {title} <RightArrow />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="rule-editor-help-list external-links">
-                {externalLinks.map(({ title, link }) => (
-                  <li key={title}>
-                    <a
-                      href={link}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={() => trackDocsSidebarSecondaryCategoryClicked(ruleType, title.toLowerCase())}
-                    >
-                      {title} <RightArrow />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
       {/* footer */}
       <Row className="rule-editor-help-footer">

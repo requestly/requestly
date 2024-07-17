@@ -1,7 +1,12 @@
-.rule-editor-help-content {
+.rule-editor-help-content-container {
   font-size: 14px;
   line-height: 22px;
   padding: 1rem;
+}
+
+.rule-editor-help-content {
+  height: 80vh;
+  overflow: auto;
 }
 
 .rule-editor-help-header {
@@ -128,10 +133,6 @@
   padding: 8px 1.25rem;
 }
 /* docs */
-.rule-editor-docs {
-  height: 80vh;
-  overflow: auto;
-}
 .rule-editor-docs-intro {
   margin-top: 10px;
 }
@@ -260,6 +261,7 @@
 .rule-editor-help-container {
   .rule-details-panel-container {
     margin: 0;
+    margin-bottom: 16px;
     padding: 16px;
 
     .close-btn {

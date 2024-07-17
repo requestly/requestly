@@ -2,6 +2,7 @@ import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { ReactNode } from "react";
 
+// TODO: update details
 export const RULE_DETAILS: Record<
   RuleType,
   {
