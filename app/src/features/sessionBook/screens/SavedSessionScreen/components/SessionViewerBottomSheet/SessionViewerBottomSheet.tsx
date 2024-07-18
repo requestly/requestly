@@ -18,9 +18,13 @@ const BOTTOM_SHEET_TAB_KEYS = {
 
 interface SessionViewerBottomSheetProps {
   playerTimeOffset: number;
+  disableDocking?: boolean;
 }
 
-const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({ playerTimeOffset }) => {
+const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({
+  playerTimeOffset,
+  disableDocking = false,
+}) => {
   const bottomSheetTabItems = useMemo(() => {
     return [
       {
@@ -68,7 +72,13 @@ const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({ pla
     ];
   }, [playerTimeOffset]);
 
-  return <BottomSheet items={bottomSheetTabItems} defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.INFO} />;
+  return (
+    <BottomSheet
+      items={bottomSheetTabItems}
+      defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.INFO}
+      disableDocking={disableDocking}
+    />
+  );
 };
 
 export default React.memo(SessionViewerBottomSheet);
