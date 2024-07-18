@@ -1,9 +1,10 @@
-import { Col, Layout, Row } from "antd";
+import { Layout } from "antd";
 import Invite from "components/misc/Invite";
 import HeaderUser from "layouts/DashboardLayout/MenuHeader/HeaderUser";
 import { useNavigate, useParams } from "react-router-dom";
 import { redirectToRules } from "utils/RedirectionUtils";
 import RQLogo from "assets/img/brand/rq_logo_full.svg";
+import "./inviteView.scss";
 
 const InviteView = () => {
   const { inviteId } = useParams();
@@ -11,13 +12,9 @@ const InviteView = () => {
 
   return (
     <>
-      <Layout.Header className="pricing-navbar">
-        <Row className="w-full" justify="space-between" align="middle">
-          <Col>
-            <img className="logo" src={RQLogo} alt="requestly logo" onClick={() => redirectToRules(navigate)} />
-          </Col>
-          <HeaderUser />
-        </Row>
+      <Layout.Header className="invite-view-navbar">
+        <img className="logo" src={RQLogo} alt="requestly logo" onClick={() => redirectToRules(navigate)} />
+        <HeaderUser />
       </Layout.Header>
       <Invite inviteId={inviteId} />
     </>

@@ -9,7 +9,6 @@
 }
 
 .active-workspace-name {
-  display: inline-block;
   font-size: 13px;
   font-weight: 500;
   max-width: 25ch;
