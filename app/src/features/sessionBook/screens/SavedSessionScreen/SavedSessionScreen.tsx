@@ -13,7 +13,6 @@ import PermissionError from "features/sessionBook/components/PermissionError";
 import BadSessionError from "features/sessionBook/components/BadSessionError";
 import NotFoundError from "features/sessionBook/components/NotFoundError";
 import { isAppOpenedInIframe } from "utils/AppUtils";
-import "./savedSessionScreen.scss";
 
 export const SavedSessionScreen: React.FC = () => {
   const { id } = useParams();
