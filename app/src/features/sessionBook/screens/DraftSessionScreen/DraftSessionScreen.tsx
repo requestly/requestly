@@ -21,7 +21,6 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(null);
-  const [, setIsDiscardClicked] = useState(false);
 
   const tempTabId = useParams().tabId;
   const tabId = useMemo(() => (desktopMode ? "imported" : tempTabId), [desktopMode, tempTabId]);
@@ -42,15 +41,6 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
       return () => window.removeEventListener("beforeunload", unloadListener);
     }
   }, [desktopMode]);
-
-  // if (!desktopMode) {
-  //   console.log("added when should not added", desktopMode);
-
-  //   unstable_usePrompt({
-  //     when: !isDisardClicked,
-  //     message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
-  //   });
-  // }
 
   useEffect(
     () => () => {
@@ -117,5 +107,5 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
     <PageError error="Session Replay Loading Error" />;
   }
 
-  return <DraftSessionViewer onDiscard={() => setIsDiscardClicked(true)} />;
+  return <DraftSessionViewer isDesktopMode={desktopMode} />;
 };
