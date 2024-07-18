@@ -3,6 +3,9 @@ import { m } from "framer-motion";
 import { IoMdClose } from "@react-icons/all-files/io/IoMdClose";
 import { trackGetHumanSupportClicked } from "./analytics";
 import "./requestBot.css";
+import { getUserAuthDetails } from "store/selectors";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "store";
 
 interface RequestBotProps {
   isOpen: boolean;
@@ -10,10 +13,14 @@ interface RequestBotProps {
 }
 
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose }) => {
+  const user = useSelector(getUserAuthDetails);
+  const dispatch = useDispatch();
+  const paidUser = user.loggedIn && user?.details?.planDetails?.planName !== "free";
+
   return (
     <m.div
       initial={{ opacity: 0, right: -450 }}
-      animate={{ opacity: isOpen ? 1 : 0, right: isOpen ? 20 : -450 }}
+      animate={{ opacity: isOpen ? 1 : 0, right: isOpen ? 65 : -450 }}
       transition={{ duration: 0.2 }}
       className="request-bot"
     >
@@ -27,7 +34,17 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose }) => {
         className="get-human-support"
         onClick={() => {
           onClose();
-          window.$crisp?.push(["do", "chat:open"]);
+          paidUser
+            ? window.$crisp.push(["do", "chat:open"])
+            : dispatch(
+                // @ts-ignore
+                actions.toggleActiveModal({
+                  modalName: "pricingModal",
+                  newValue: true,
+                  newProps: { selectedPlan: null, source: "support_option_clicked" },
+                })
+              );
+
           trackGetHumanSupportClicked();
         }}
       >
