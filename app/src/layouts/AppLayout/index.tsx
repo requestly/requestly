@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import isEmpty from "is-empty";
-import APP_CONSTANTS from "./config/constants";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
 import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
@@ -30,6 +29,7 @@ import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestThisRule";
 import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 import { useFetchIncentivizationDetails } from "features/incentivization/hooks";
+import APP_CONSTANTS from "config/constants";
 
 const { PATHS } = APP_CONSTANTS;
 const App = () => {
@@ -77,25 +77,22 @@ const App = () => {
       <AppModeInitializer />
       <DBListeners />
       {/* <RuleExecutionsSyncer /> */}
+      {/* @ts-ignore */}
       <ActiveWorkspace />
+      {/* @ts-ignore */}
       <ThirdPartyIntegrationsHandler />
       <ThemeProvider>
         <ConfigProvider locale={enUS}>
           <GrowthBookProvider growthbook={growthbook}>
+            {/* @ts-ignore */}
             <InitImplicitWidgetConfigHandler />
             <LocalUserAttributesHelperComponent />
             <FeatureUsageEvent />
             <LazyMotion features={domMax} strict>
               <div id="requestly-dashboard-layout">
                 <CommandBar />
-                {"/" + location.pathname.split("/")[1] === PATHS.LANDING ? (
-                  <FullScreenLayout />
-                ) : (
-                  <>
-                    <UpdateDialog />
-                    <DashboardLayout />
-                  </>
-                )}
+                <UpdateDialog />
+                <Outlet />
               </div>
             </LazyMotion>
           </GrowthBookProvider>
