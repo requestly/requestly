@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ProCard from "@ant-design/pro-card";
 import { Col, Row } from "antd";
 import img from "assets/images/pages/error/403.svg";
+import { trackBadSessionRecordingViewed } from "features/sessionBook/analytics";
 
 // DUPLICATED
 // TODO: REMOVE OLD FILE
 const BadSessionError = () => {
+  useEffect(() => {
+    trackBadSessionRecordingViewed();
+  }, []);
+
   return (
     <React.Fragment>
       <ProCard className="primary-card github-like-border">

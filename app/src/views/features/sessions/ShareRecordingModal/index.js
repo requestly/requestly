@@ -12,10 +12,8 @@ import firebaseApp from "../../../../firebase";
 import { FiLock } from "@react-icons/all-files/fi/FiLock";
 import { FiUsers } from "@react-icons/all-files/fi/FiUsers";
 import SpinnerColumn from "components/misc/SpinnerColumn";
-import {
-  trackIframeEmbedCopied,
-  trackSessionRecordingShareLinkCopied,
-} from "modules/analytics/events/features/sessionRecording";
+import { trackSessionRecordingShareLinkCopied } from "features/sessionBook/analytics";
+import { trackIframeEmbedCopied } from "modules/analytics/events/features/sessionRecording";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { fetchCurrentEmails, updateVisibility } from "../api";
 import { Visibility } from "../SessionViewer/types";
