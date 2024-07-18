@@ -132,7 +132,9 @@ const SupportPanel = () => {
       ),
       icon: <MessageIcon />,
     },
-    user.loggedIn &&
+    !slackConnect &&
+      !slackInviteVisibilityStatus &&
+      user.loggedIn &&
       !paidUser && {
         key: "5",
         label: (
