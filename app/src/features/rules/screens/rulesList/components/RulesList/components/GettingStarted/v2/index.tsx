@@ -38,6 +38,7 @@ import BotIcon from "assets/icons/bot.svg?react";
 import { actions } from "store";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
 import { redirectToTeam } from "utils/RedirectionUtils";
+import { useIsRedirectFromCreateRulesRoute } from "../../../hooks/useIsRedirectFromCreateRulesRoute";
 import "./gettingStarted.scss";
 
 const { PATHS } = APP_CONSTANTS;
@@ -55,7 +56,7 @@ export const GettingStarted: React.FC = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
-  const isRedirectFromCreateRulesRoute = state?.from === PATHS.RULES.CREATE;
+  const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
   const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
   const onRulesListDrawerClose = () => {
