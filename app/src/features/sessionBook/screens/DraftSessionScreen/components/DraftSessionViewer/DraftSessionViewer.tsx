@@ -42,14 +42,16 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ onDiscar
           <SaveSessionButton />
         </div>
       </div>
-      <Row className="draft-session-viewer-body" gutter={8} justify="space-between">
-        <Col span={16}>
-          <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
-        </Col>
-        <Col span={8} className="flex-1">
-          <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
-        </Col>
-      </Row>
+      <div className="draft-session-viewer-body-wrapper">
+        <Row className="draft-session-viewer-body" gutter={8} justify="space-between">
+          <Col span={16}>
+            <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
+          </Col>
+          <Col span={8}>
+            <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
+          </Col>
+        </Row>
+      </div>
     </div>
   );
 };
