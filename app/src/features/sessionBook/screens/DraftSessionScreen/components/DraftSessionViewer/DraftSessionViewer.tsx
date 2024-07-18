@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Col, Row } from "antd";
+import { unstable_usePrompt, useNavigate } from "react-router-dom";
+import { Col, Modal, Row } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import SessionBearLogo from "src-SessionBear/assets/sessionBearLogoFull.svg";
 import RQLogo from "assets/img/brand/rq_logo_full.svg";
@@ -10,21 +10,50 @@ import { SaveSessionButton } from "features/sessionBook/components/SaveSessionBu
 import { getAppFlavour } from "utils/AppUtils";
 import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
 import DraftSessionDetailsPanel from "../DraftSessionDetailsPanel/DraftSessionDetailsPanel";
+import { trackDraftSessionDiscarded } from "modules/analytics/events/features/sessionRecording";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import "./draftSessionViewer.scss";
 
 interface DraftSessionViewerProps {
-  onDiscard: () => void;
+  isDesktopMode: boolean;
 }
 
-export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ onDiscard }) => {
+export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDesktopMode }) => {
   const navigate = useNavigate();
   const appFlavour = getAppFlavour();
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
+  const [isDiscardClicked, setIsDiscardClicked] = useState(false);
+  const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
+
+  if (!isDesktopMode) {
+    unstable_usePrompt({
+      when: !isDiscardClicked && !isSaveSessionClicked,
+      message: "Exiting without saving will discard the draft.\nAre you sure you want to exit?",
+    });
+  }
+
+  const handleSaveSessionClicked = useCallback(() => {
+    setIsSaveSessionClicked(true);
+  }, []);
 
   const handleDiscardSession = useCallback(() => {
-    onDiscard();
-    navigate(PATHS.SESSIONS.ABSOLUTE);
-  }, [onDiscard, navigate]);
+    setIsDiscardClicked(true);
+    Modal.confirm({
+      title: "Confirm Discard",
+      icon: <ExclamationCircleOutlined />,
+      content: "Are you sure you want to discard this draft recording?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk() {
+        trackDraftSessionDiscarded();
+
+        navigate(PATHS.SESSIONS.ABSOLUTE);
+      },
+      onCancel() {
+        setIsDiscardClicked(false);
+      },
+    });
+  }, [navigate]);
 
   return (
     <div className="draft-session-viewer-container">
@@ -39,7 +68,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ onDiscar
           <RQButton type="default" onClick={handleDiscardSession}>
             Discard
           </RQButton>
-          <SaveSessionButton />
+          <SaveSessionButton onSaveClick={handleSaveSessionClicked} />
         </div>
       </div>
       <div className="draft-session-viewer-body-wrapper">

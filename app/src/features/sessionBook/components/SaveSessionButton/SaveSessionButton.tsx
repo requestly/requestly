@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
@@ -21,7 +21,11 @@ import { useIncentiveActions } from "features/incentivization/hooks";
 import { actions } from "store";
 import "./saveSessionButton.scss";
 
-export const SaveSessionButton = () => {
+interface SaveSessionButtonProps {
+  onSaveClick?: () => void;
+}
+
+export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClick }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -79,6 +83,7 @@ export const SaveSessionButton = () => {
       toast.error("Name is required to save the recording.");
       return;
     }
+    onSaveClick?.();
 
     setIsLoading(true);
     saveDraftSession(
