@@ -56,8 +56,8 @@ export const SavedSessionViewer = () => {
   }, [handleDeleteSessionAction, id, navigate, sessionMetadata?.eventsFilePath]);
 
   return (
-    <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
-      <div className="saved-session-viewer-container">
+    <div className="saved-session-viewer-container">
+      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
         <div className="saved-session-header">
           <SessionTitle />
           {isRequestedByOwner ? (
@@ -85,16 +85,16 @@ export const SavedSessionViewer = () => {
             <SessionPlayer onPlayerTimeOffsetChange={handleSessionPlayerTimeOffsetChange} />
           </div>
         </BottomSheetLayout>
-      </div>
 
-      {isShareModalVisible ? (
-        <ShareRecordingModal
-          isVisible={isShareModalVisible}
-          setVisible={handleShareModalVisibiliity}
-          recordingId={id}
-          currentVisibility={currentVisibility}
-        />
-      ) : null}
-    </BottomSheetProvider>
+        {isShareModalVisible ? (
+          <ShareRecordingModal
+            isVisible={isShareModalVisible}
+            setVisible={handleShareModalVisibiliity}
+            recordingId={id}
+            currentVisibility={currentVisibility}
+          />
+        ) : null}
+      </BottomSheetProvider>
+    </div>
   );
 };
