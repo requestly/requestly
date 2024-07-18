@@ -55,7 +55,8 @@ export const GettingStarted: React.FC = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
-  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(false);
+  const isRedirectFromCreateRulesRoute = state?.from === PATHS.RULES.CREATE;
+  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
   const onRulesListDrawerClose = () => {
     setIsRulesListDrawerOpen(false);

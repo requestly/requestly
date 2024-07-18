@@ -30,6 +30,7 @@ import { ImportFromModheaderModal } from "../../ImporterComponents/ModheaderImpo
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { CreateTeamRuleCTA } from "../CreateTeamRuleCTA";
 import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
+import PATHS from "config/constants/sub/paths";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
@@ -44,7 +45,8 @@ export const GettingStarted: React.FC = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
-  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(false);
+  const isRedirectFromCreateRulesRoute = state?.from === PATHS.RULES.CREATE;
+  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
 
