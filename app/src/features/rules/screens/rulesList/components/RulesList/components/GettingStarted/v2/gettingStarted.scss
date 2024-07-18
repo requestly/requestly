@@ -1,4 +1,4 @@
-.getting-started-container {
+.v2.getting-started-container {
   display: flex;
   justify-content: center;
 
@@ -6,6 +6,14 @@
     width: 100%;
     max-width: 688px;
     padding: 48px 12px;
+
+    .workspace-title-container {
+      margin-bottom: 32px;
+
+      h1 {
+        line-height: 1rem;
+      }
+    }
 
     .link-btn.ant-btn {
       font-size: 13px; /* TODO: use "--requestly-font-size-*" variable */
