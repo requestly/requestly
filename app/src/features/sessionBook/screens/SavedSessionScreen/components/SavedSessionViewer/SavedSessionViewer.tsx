@@ -20,7 +20,6 @@ import "./savedSessionViewer.scss";
 export const SavedSessionViewer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const { handleDeleteSessionAction } = useSessionsActionContext();
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
   const currentVisibility = useSelector(getSessionRecordingVisibility);
