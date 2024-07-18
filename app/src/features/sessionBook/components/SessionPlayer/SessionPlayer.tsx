@@ -136,6 +136,20 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     player?.addEventListener("ui-update-player-state", playerStateChangeHandler);
   }, [player, playerStateChangeHandler, updateCurrentTimeHandler]);
 
+  useEffect(() => {
+    const togglePlay = (e: KeyboardEvent) => {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
+        player?.toggle();
+      }
+    };
+
+    document.addEventListener("keydown", togglePlay);
+    return () => {
+      document.removeEventListener("keydown", togglePlay);
+    };
+  }, [player]);
+
   const handleSessionPausePlayBtnClick = useCallback(() => {
     if (playerState === PlayerState.PLAYING) {
       player?.pause();
