@@ -32,6 +32,11 @@
 }
 
 .saved-session-viewer-container {
+  width: 100%;
+  height: 100%;
+  background: var(--requestly-color-background);
+  overflow: hidden;
+
   .bottomsheet-layout-container {
     .bottom-sheet-panel-container {
       border-top-left-radius: 8px;

@@ -16,7 +16,7 @@ import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/fe
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import PageError from "components/misc/PageError";
 import SaveRecordingConfigPopup from "./SaveRecordingConfigPopup";
-import { generateDraftSessionTitle, saveDraftSession } from "./utils";
+import { saveDraftSession, generateDraftSessionTitle } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import { actions } from "store";
 import PATHS from "config/constants/sub/paths";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
@@ -245,7 +245,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
       sessionEvents,
       [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS],
       source,
-      testRuleDraftSession,
       claimIncentiveRewards
     )
       .catch((err) => {
@@ -262,7 +261,6 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
     sessionEvents,
     sessionRecordingMetadata,
     source,
-    testRuleDraftSession,
     user,
     userAttributes,
     workspace?.id,
