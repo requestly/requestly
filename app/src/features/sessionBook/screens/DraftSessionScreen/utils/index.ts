@@ -93,7 +93,6 @@ export const saveDraftSession = async (
     } else {
       toast.error(response?.message);
       trackDraftSessionSaveFailed(response?.message);
-      // setIsSaving(false);
     }
   });
 };

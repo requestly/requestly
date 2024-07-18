@@ -32,7 +32,6 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
     };
 
     if (!desktopMode) {
-      console.log("added when should not added", desktopMode);
       // It is fired only if there was ANY interaction of the user with the site.
       // Without ANY interaction (even a click anywhere) event onbeforeunload won't be fired
       // https://stackoverflow.com/questions/24081699/why-onbeforeunload-event-is-not-firing

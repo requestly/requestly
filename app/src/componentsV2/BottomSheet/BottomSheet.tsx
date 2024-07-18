@@ -9,12 +9,12 @@ import { MdExpandMore } from "@react-icons/all-files/md/MdExpandMore";
 import { BottomSheetPlacement } from "./types";
 import "./BottomSheet.scss";
 
-export const BottomSheet: React.FC<TabsProps & { tourId?: string; disableDocking?: boolean }> = ({
-  items,
-  defaultActiveKey,
-  tourId = "",
-  disableDocking,
-}) => {
+interface BottomSheetProps extends TabsProps {
+  tourId?: string;
+  disableDocking?: boolean;
+}
+
+export const BottomSheet: React.FC<BottomSheetProps> = ({ items, defaultActiveKey, tourId = "", disableDocking }) => {
   const { isBottomSheetOpen, sheetPlacement, toggleBottomSheet, toggleSheetPlacement } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
