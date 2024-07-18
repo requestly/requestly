@@ -120,7 +120,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
       <RQButton type="primary" className="save-popup-button" onClick={() => setIsPopupVisible(true)}>
         <DownArrow />
       </RQButton>
-      {isPopupVisible && <SessionConfigPopup onClose={() => setIsPopupVisible(false)} />}
+      {isPopupVisible && <SessionConfigPopup onClose={() => setIsPopupVisible(false)} onSaveClick={onSaveClick} />}
     </div>
   );
 };

@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { unstable_usePrompt, useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -10,8 +11,12 @@ import { SaveSessionButton } from "features/sessionBook/components/SaveSessionBu
 import { getAppFlavour } from "utils/AppUtils";
 import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
 import DraftSessionDetailsPanel from "../DraftSessionDetailsPanel/DraftSessionDetailsPanel";
-import { trackDraftSessionDiscarded } from "modules/analytics/events/features/sessionRecording";
+import {
+  trackDraftSessionDiscarded,
+  trackDraftSessionViewed,
+} from "modules/analytics/events/features/sessionRecording";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import "./draftSessionViewer.scss";
 
 interface DraftSessionViewerProps {
@@ -24,6 +29,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
   const [isDiscardClicked, setIsDiscardClicked] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
+  const metadata = useSelector(getSessionRecordingMetaData);
 
   if (!isDesktopMode) {
     unstable_usePrompt({
@@ -38,6 +44,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
 
   const handleDiscardSession = useCallback(() => {
     setIsDiscardClicked(true);
+
     Modal.confirm({
       title: "Confirm Discard",
       icon: <ExclamationCircleOutlined />,
@@ -54,6 +61,10 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
       },
     });
   }, [navigate]);
+
+  useEffect(() => {
+    trackDraftSessionViewed(metadata?.recordingMode);
+  }, [metadata?.recordingMode]);
 
   return (
     <div className="draft-session-viewer-container">

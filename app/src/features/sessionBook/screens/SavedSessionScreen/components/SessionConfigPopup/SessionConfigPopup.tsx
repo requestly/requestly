@@ -25,18 +25,14 @@ import "./sessionConfigPopup.scss";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
-  setIsSaveSessionClicked?: (value: boolean) => void;
+  onSaveClick?: () => void;
   source?: string;
 }
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-export const SessionConfigPopup: React.FC<Props> = ({
-  onClose,
-  setIsSaveSessionClicked,
-  source = SOURCE.SAVE_DRAFT_SESSION,
-}) => {
+export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, source = SOURCE.SAVE_DRAFT_SESSION }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { tabId } = useParams();
@@ -115,7 +111,7 @@ export const SessionConfigPopup: React.FC<Props> = ({
       }
 
       setIsSaving(true);
-      setIsSaveSessionClicked?.(true);
+      onSaveClick?.();
       saveDraftSession(
         user,
         userAttributes,
@@ -143,7 +139,7 @@ export const SessionConfigPopup: React.FC<Props> = ({
       isSaving,
       sessionRecordingMetadata,
       includedDebugInfo,
-      setIsSaveSessionClicked,
+      onSaveClick,
       workspace?.id,
       sessionEvents,
       dispatch,

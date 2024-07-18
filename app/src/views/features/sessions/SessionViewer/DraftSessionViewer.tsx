@@ -175,7 +175,7 @@ const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({
   }, [dispatch, tabId, user?.details?.profile?.email, testRuleDraftSession, source]);
 
   useEffect(() => {
-    trackDraftSessionViewed(source, sessionRecordingMetadata?.recordingMode);
+    trackDraftSessionViewed(sessionRecordingMetadata?.recordingMode);
 
     if (testRuleDraftSession) {
       trackTestRuleSessionDraftViewed();
