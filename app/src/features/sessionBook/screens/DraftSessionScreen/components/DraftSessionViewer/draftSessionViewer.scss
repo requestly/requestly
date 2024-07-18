@@ -16,8 +16,14 @@
     }
   }
 
-  .draft-session-viewer-body {
+  .draft-session-viewer-body-wrapper {
+    display: flex;
     padding: 0 1rem;
-    width: 100%;
+
+    .draft-session-viewer-body {
+      width: 100%;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
   }
 }
