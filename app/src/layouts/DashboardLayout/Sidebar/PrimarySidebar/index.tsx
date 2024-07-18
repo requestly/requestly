@@ -21,12 +21,17 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { CreditsButton } from "./components/CreditsButton/CreditsButton";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
 import "./PrimarySidebar.css";
+import JoinSlackButton from "./components/JoinSlackButton/JoinSlackButton";
+import useSlackInviteVisibility from "components/misc/SupportPanel/useSlackInviteVisibility";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
 
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
+  const isSlackConnectEnabled = useFeatureIsOn("slack_connect");
+  const slackInviteVisibilityStatus = useSlackInviteVisibility();
+
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
@@ -126,6 +131,7 @@ export const PrimarySidebar: React.FC = () => {
       </ul>
       <div className="primary-sidebar-bottom-btns">
         {isIncentivizationEnabled ? <CreditsButton /> : null}
+        {isSlackConnectEnabled && slackInviteVisibilityStatus && <JoinSlackButton />}
         <InviteButton />
       </div>
     </div>

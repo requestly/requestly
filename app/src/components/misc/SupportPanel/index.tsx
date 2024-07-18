@@ -11,6 +11,9 @@ import { getIsSupportChatOpened, getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { RequestBot } from "features/requestBot";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import useSlackInviteVisibility from "./useSlackInviteVisibility";
+import sendSlackInvite from "./sendSlackInvite";
 
 const SupportPanel = () => {
   const user = useSelector(getUserAuthDetails);
@@ -18,24 +21,26 @@ const SupportPanel = () => {
   const [visible, setVisible] = useState(false);
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
   const paidUser = user.loggedIn && user?.details?.planDetails?.planName !== "free";
-
+  const slackConnect = useFeatureIsOn("slack_connect");
+  const slackInviteVisibilityStatus = useSlackInviteVisibility();
   const isSupportChatOpened = useSelector(getIsSupportChatOpened);
-
   const supportItems = [
-    paidUser && {
-      key: "1",
-      label: (
-        <div
-          className="support-panel-item-style"
-          onClick={() => {
-            setVisible(false);
-          }}
-        >
-          <span className="support-panel-label-style">Ask us on Slack</span>
-        </div>
-      ),
-      icon: <SlackOutlined />,
-    },
+    slackConnect &&
+      slackInviteVisibilityStatus && {
+        key: "1",
+        label: (
+          <div
+            className="support-panel-item-style"
+            onClick={() => {
+              setVisible(false);
+              sendSlackInvite();
+            }}
+          >
+            <span className="support-panel-label-style">Ask us on Slack</span>
+          </div>
+        ),
+        icon: <SlackOutlined />,
+      },
     {
       key: "2",
       label: (
