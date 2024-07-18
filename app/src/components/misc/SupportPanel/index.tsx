@@ -14,6 +14,7 @@ import { RequestBot } from "features/requestBot";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useSlackInviteVisibility from "./useSlackInviteVisibility";
 import sendSlackInvite from "./sendSlackInvite";
+import { trackEvent } from "modules/analytics";
 
 const SupportPanel = () => {
   const user = useSelector(getUserAuthDetails);
@@ -34,6 +35,12 @@ const SupportPanel = () => {
             onClick={() => {
               setVisible(false);
               sendSlackInvite();
+              trackEvent("support_option_clicked", {
+                type: "slack",
+              });
+              trackEvent("join_slack_connect_clicked", {
+                source: "support_option",
+              });
             }}
           >
             <span className="support-panel-label-style">Ask us on Slack</span>
@@ -51,6 +58,9 @@ const SupportPanel = () => {
           className="support-panel-item-style"
           onClick={() => {
             setVisible(false);
+            trackEvent("support_option_clicked", {
+              type: "reddit",
+            });
           }}
         >
           <span className="support-panel-label-style">Ask us on Reddit</span>
@@ -66,6 +76,9 @@ const SupportPanel = () => {
           onClick={() => {
             setVisible(false);
             setIsRequestBotVisible(true);
+            trackEvent("support_option_clicked", {
+              type: "ask_ai",
+            });
           }}
         >
           <span className="support-panel-label-style">
@@ -81,6 +94,24 @@ const SupportPanel = () => {
         <div
           className={`support-panel-item-style ${!paidUser && "support-panel-item-disabled"}`}
           onClick={() => {
+            if (paidUser) {
+              window.$crisp.push(["do", "chat:open"]);
+              trackEvent("support_option_clicked", {
+                type: "chat_with_us",
+              });
+            } else {
+              dispatch(
+                // @ts-ignore
+                actions.toggleActiveModal({
+                  modalName: "pricingModal",
+                  newValue: true,
+                  newProps: { selectedPlan: null, source: "support_option_clicked" },
+                })
+              );
+              trackEvent("support_option_clicked", {
+                type: "upgrade_to_chat_with_us",
+              });
+            }
             paidUser
               ? window.$crisp.push(["do", "chat:open"])
               : dispatch(
@@ -112,6 +143,9 @@ const SupportPanel = () => {
             className="support-panel-item-style"
             onClick={() => {
               setVisible(false);
+              trackEvent("support_option_clicked", {
+                type: "send_message",
+              });
             }}
           >
             <span className="support-panel-label-style ">Send Message</span>
