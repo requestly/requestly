@@ -29,6 +29,15 @@
   & .ant-tabs-tab {
     border-radius: 4px !important;
     padding: 4px 8px !important;
+    background: none;
+    border: none;
+    transition: all 0.2s ease-out;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: var(--requestly-color-text-default);
+    }
   }
 
   & .ant-tabs-tab.ant-tabs-tab-active {
