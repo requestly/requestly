@@ -15,7 +15,7 @@ import {
   trackDraftSessionDiscarded,
   trackDraftSessionViewed,
 } from "modules/analytics/events/features/sessionRecording";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import "./draftSessionViewer.scss";
 
@@ -47,7 +47,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
 
     Modal.confirm({
       title: "Confirm Discard",
-      icon: <ExclamationCircleOutlined />,
+      icon: <AiOutlineExclamationCircle />,
       content: "Are you sure you want to discard this draft recording?",
       okText: "Yes",
       cancelText: "No",
@@ -69,6 +69,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   return (
     <div className="draft-session-viewer-container">
       <div className="draft-session-viewer-header-container">
+        {/* TODO: SHOW LOGO ONLY WHEN LOADED IN IFRAME */}
         {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
           <img src={SessionBearLogo} alt="SessionBear Logo" width={130} />
         ) : (
