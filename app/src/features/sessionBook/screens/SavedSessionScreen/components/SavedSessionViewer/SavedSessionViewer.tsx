@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Tooltip } from "antd";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import { SaveSessionButton } from "features/sessionBook/components/SaveSessionButton/SaveSessionButton";
@@ -19,11 +19,19 @@ import {
 } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import ShareRecordingModal from "views/features/sessions/ShareRecordingModal";
+import { trackSavedSessionViewed, trackSessionRecordingShareClicked } from "features/sessionBook/analytics";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./savedSessionViewer.scss";
+
+interface NavigationState {
+  fromApp?: boolean;
+  viewAfterSave?: boolean;
+}
 
 export const SavedSessionViewer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { handleDeleteSessionAction } = useSessionsActionContext();
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
@@ -34,6 +42,8 @@ export const SavedSessionViewer = () => {
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
 
+  const isInsideIframe = useMemo(isAppOpenedInIframe, []);
+
   const handleCopySessionLink = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
     setIsLinkCopied(true);
@@ -43,7 +53,7 @@ export const SavedSessionViewer = () => {
   }, []);
 
   const handleShareModalVisibiliity = useCallback(() => {
-    // TODO: ADD ANALYTICS
+    trackSessionRecordingShareClicked();
     setIsShareModalVisible((prev) => !prev);
   }, []);
 
@@ -54,6 +64,19 @@ export const SavedSessionViewer = () => {
   const handleDeleteSessionClick = useCallback(() => {
     handleDeleteSessionAction(id, sessionMetadata?.eventsFilePath, () => redirectToSessionRecordingHome(navigate));
   }, [handleDeleteSessionAction, id, navigate, sessionMetadata?.eventsFilePath]);
+
+  useEffect(() => {
+    if (isInsideIframe) {
+      trackSavedSessionViewed("embed");
+      return;
+    }
+
+    if ((location.state as NavigationState)?.fromApp) {
+      trackSavedSessionViewed("app");
+    } else {
+      trackSavedSessionViewed("link");
+    }
+  }, [id, location.state, isInsideIframe]);
 
   return (
     <div className="saved-session-viewer-container">

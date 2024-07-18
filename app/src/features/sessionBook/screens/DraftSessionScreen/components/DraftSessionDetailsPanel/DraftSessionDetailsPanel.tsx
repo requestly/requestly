@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import "./draftSessionDetailsPanel.scss";
+import { useDebounce } from "hooks/useDebounce";
+import { trackDraftSessionNamed, trackSessionRecordingDescriptionUpdated } from "features/sessionBook/analytics";
 
 interface DraftSessionDetailsPanelProps {
   playerTimeOffset: number;
@@ -16,18 +18,24 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ pla
   const dispatch = useDispatch();
   const metadata = useSelector(getSessionRecordingMetaData);
 
+  const debouncedTrackDescriptionUpdated = useDebounce(trackSessionRecordingDescriptionUpdated);
+
+  const desbouncedTrackNameUpdated = useDebounce(trackDraftSessionNamed);
+
   const handleSessionNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       dispatch(sessionRecordingActions.setName(e.target.value));
+      debouncedTrackDescriptionUpdated();
     },
-    [dispatch]
+    [dispatch, debouncedTrackDescriptionUpdated]
   );
 
   const handleSessionDescriptionChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       dispatch(sessionRecordingActions.setDescription(e.target.value));
+      desbouncedTrackNameUpdated();
     },
-    [dispatch]
+    [dispatch, desbouncedTrackNameUpdated]
   );
 
   return (

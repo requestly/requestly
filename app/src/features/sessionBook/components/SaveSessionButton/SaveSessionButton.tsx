@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
 import { MdOutlineFileDownload } from "@react-icons/all-files/md/MdOutlineFileDownload";
-import { SessionConfigPopup } from "features/sessionBook/screens/SavedSessionScreen/components/SessionConfigPopup/SessionConfigPopup";
+import { SessionConfigPopup } from "features/sessionBook/components/SessionConfigPopup/SessionConfigPopup";
 import DownArrow from "assets/icons/down-arrow.svg?react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";

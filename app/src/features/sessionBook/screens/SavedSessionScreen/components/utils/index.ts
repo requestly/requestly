@@ -5,7 +5,7 @@ import { collection, doc, getFirestore, updateDoc } from "firebase/firestore";
 import {
   trackSessionRecordingDescriptionUpdated,
   trackSessionRecordingNameUpdated,
-} from "modules/analytics/events/features/sessionRecording";
+} from "features/sessionBook/analytics";
 import { toast } from "utils/Toast";
 
 export const updateSessionDescription = async (userId: string, id: string, description: string) => {
