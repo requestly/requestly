@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import CharlesIcon from "assets/icons/charlesIcon.svg?react";
@@ -15,7 +15,11 @@ import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
 import PersonaRecommendation from "../PersonaRecommendation";
 import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
-import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
+import {
+  trackGettingStartedVideoPlayed,
+  trackNewRuleButtonClicked,
+  trackRulesEmptyStateClicked,
+} from "modules/analytics/events/common/rules";
 import {
   trackRulesImportStarted,
   trackUploadRulesButtonClicked,
@@ -25,13 +29,11 @@ import "./gettingStarted.scss";
 import { ImportFromModheaderModal } from "../../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { CreateTeamRuleCTA } from "../CreateTeamRuleCTA";
-
-const { PATHS } = APP_CONSTANTS;
+import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
 export const GettingStarted: React.FC = () => {
-  const navigate = useNavigate();
   const { state } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
@@ -42,7 +44,13 @@ export const GettingStarted: React.FC = () => {
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
   const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
+  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(false);
+
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
+
+  const onRulesListDrawerClose = () => {
+    setIsRulesListDrawerOpen(false);
+  };
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
 
@@ -95,7 +103,8 @@ export const GettingStarted: React.FC = () => {
 
   const handleCreateMyFirstRuleClick = () => {
     trackNewRuleButtonClicked(SOURCE.GETTING_STARTED);
-    navigate(PATHS.RULES.CREATE);
+    trackRulesEmptyStateClicked("create_your_first_rule");
+    setIsRulesListDrawerOpen(true);
   };
 
   const handleUploadRulesClick = () => {
@@ -151,13 +160,23 @@ export const GettingStarted: React.FC = () => {
                 Create rules to modify HTTP requests & responses - URL redirects, Modify APIs, Modify Headers, etc.
               </p>
               <div className="getting-started-btns-wrapper">
-                <Button
-                  type="primary"
-                  onClick={handleCreateMyFirstRuleClick}
-                  className="getting-started-create-rule-btn"
+                <RuleSelectionListDrawer
+                  open={isRulesListDrawerOpen}
+                  onClose={onRulesListDrawerClose}
+                  source={SOURCE.GETTING_STARTED}
+                  onRuleItemClick={() => {
+                    onRulesListDrawerClose();
+                  }}
                 >
-                  Create your first rule
-                </Button>
+                  <Button
+                    type="primary"
+                    onClick={handleCreateMyFirstRuleClick}
+                    className="getting-started-create-rule-btn"
+                  >
+                    Create your first rule
+                  </Button>
+                </RuleSelectionListDrawer>
+
                 <AuthConfirmationPopover
                   title="You need to sign up to upload rules"
                   callback={handleUploadRulesClick}
