@@ -12,22 +12,22 @@ export const sessionRoutes: RouteObject[] = [
     element: <SessionsFeatureContainer />,
     children: [
       {
-        path: PATHS.SESSIONS.RELATIVE,
+        index: true,
         element: <SessionsListScreenContainer />,
       },
       {
-        path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
+        path: PATHS.SESSIONS.DRAFT.INDEX + "/:tabId",
         element: <DraftSessionViewer />,
       },
       {
-        path: PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
+        path: PATHS.SESSIONS.SAVED.INDEX + "/:id",
         element: <SavedSessionScreen />,
       },
+      {
+        path: PATHS.SESSIONS.SETTINGS.INDEX,
+        element: <Navigate to={PATHS.SETTINGS.SESSION_BOOK.RELATIVE} replace />,
+      },
     ],
-  },
-  {
-    path: PATHS.SESSIONS.SETTINGS.RELATIVE,
-    element: <Navigate to={PATHS.SETTINGS.SESSION_BOOK.RELATIVE} replace />,
   },
 
   {
@@ -44,7 +44,7 @@ export const sessionRoutes: RouteObject[] = [
     /**
      * Avoids circular redirects
      */
-    path: "/r" + PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
+    path: "r/" + PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
     element: <Navigate to={window.location.pathname.replace("/r", "")} />,
   },
 ];
