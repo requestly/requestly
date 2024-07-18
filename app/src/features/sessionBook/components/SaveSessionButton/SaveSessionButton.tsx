@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
@@ -25,6 +25,8 @@ interface SaveSessionButtonProps {
   onSaveClick?: () => void;
 }
 
+const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
+
 export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClick }) => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -44,8 +46,6 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
 
   const { claimIncentiveRewards } = useIncentiveActions();
 
-  const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
-
   const handleSessionDownload = () => {
     const recordingOptions = getRecordingOptionsToSave(debugInfoToBeIncluded);
     downloadSessionFile(sessionEvents, sessionRecordingMetadata, recordingOptions)
@@ -58,7 +58,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
       });
   };
 
-  const handleSaveSession = () => {
+  const handleSaveSession = useCallback(() => {
     if (!user?.loggedIn) {
       dispatch(
         // @ts-ignore
@@ -72,10 +72,6 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
           },
         })
       );
-      return;
-    }
-
-    if (isLoading) {
       return;
     }
 
@@ -105,11 +101,23 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [
+    user,
+    userAttributes,
+    appMode,
+    dispatch,
+    navigate,
+    workspace?.id,
+    sessionRecordingMetadata,
+    sessionEvents,
+    onSaveClick,
+    claimIncentiveRewards,
+  ]);
 
   return (
     <div className="save-session-btn-container">
       <RQButton
+        loading={isLoading}
         type="primary"
         className="save-session-btn"
         icon={<MdOutlineFileDownload />}

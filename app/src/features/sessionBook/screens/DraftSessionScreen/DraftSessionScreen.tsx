@@ -12,6 +12,8 @@ import { trackSessionRecordingFailed } from "modules/analytics/events/features/s
 import PageLoader from "components/misc/PageLoader";
 import PageError from "components/misc/PageError";
 import { DraftSessionViewer } from "./components/DraftSessionViewer/DraftSessionViewer";
+import Logger from "lib/logger";
+import { toast } from "utils/Toast";
 
 export interface DraftSessionViewerProps {
   desktopMode?: boolean;
@@ -30,6 +32,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
       e.preventDefault();
       e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
     };
+    dispatch(sessionRecordingActions.resetState());
 
     if (!desktopMode) {
       // It is fired only if there was ANY interaction of the user with the site.
@@ -39,14 +42,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
 
       return () => window.removeEventListener("beforeunload", unloadListener);
     }
-  }, [desktopMode]);
-
-  useEffect(
-    () => () => {
-      dispatch(sessionRecordingActions.resetState());
-    },
-    [dispatch]
-  );
+  }, [desktopMode, dispatch]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -64,31 +60,38 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
       dispatch(sessionRecordingActions.setEvents(mockSession.events));
       setIsLoading(false);
     } else {
-      getTabSession(parseInt(tabId)).then((payload: unknown) => {
-        if (typeof payload === "string") {
-          setLoadingError(payload);
-        } else {
-          const tabSession = payload as RQSession & { recordingMode?: SessionRecordingMode };
-          if (!tabSession) {
-            return;
-          }
-
-          if (tabSession.events.rrweb?.length < 2) {
-            setLoadingError("RRWeb events not captured");
+      getTabSession(parseInt(tabId))
+        .then((payload: unknown) => {
+          if (typeof payload === "string") {
+            setLoadingError(payload);
           } else {
-            dispatch(
-              sessionRecordingActions.setSessionRecordingMetadata({
-                sessionAttributes: tabSession.attributes,
-                name: generateDraftSessionTitle(tabSession.attributes?.url),
-                recordingMode: tabSession.recordingMode || null,
-              })
-            );
+            const tabSession = payload as RQSession & { recordingMode?: SessionRecordingMode };
+            if (!tabSession) {
+              return;
+            }
 
-            dispatch(sessionRecordingActions.setEvents(tabSession.events));
+            if (tabSession.events.rrweb?.length < 2) {
+              setLoadingError("RRWeb events not captured");
+            } else {
+              dispatch(
+                sessionRecordingActions.setSessionRecordingMetadata({
+                  sessionAttributes: tabSession.attributes,
+                  name: generateDraftSessionTitle(tabSession.attributes?.url),
+                  recordingMode: tabSession.recordingMode || null,
+                })
+              );
+
+              dispatch(sessionRecordingActions.setEvents(tabSession.events));
+            }
           }
-        }
-        setIsLoading(false);
-      });
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          Logger.log("Error while fetching tab session", error);
+          toast.error("Error while fetching your recorded session");
+          setIsLoading(false);
+          setLoadingError("Something went wrong while fetching your recorded session");
+        });
     }
   }, [dispatch, tabId]);
 
