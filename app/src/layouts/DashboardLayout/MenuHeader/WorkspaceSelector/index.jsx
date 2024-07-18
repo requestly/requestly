@@ -43,7 +43,6 @@ import { trackTopbarClicked } from "modules/analytics/events/common/onboarding/h
 import { getPendingInvites } from "backend/workspace";
 import "./WorkSpaceSelector.css";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import { useIsRedirectFromCreateRulesRoute } from "features/rules/screens/rulesList/components/RulesList/hooks/useIsRedirectFromCreateRulesRoute";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -125,7 +124,6 @@ const WorkspaceSelector = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
-  const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
 
   const isLimitToPrivateWorkspaceActive = useFeatureIsOn("limit_to_private_workspace");
 
@@ -303,14 +301,6 @@ const WorkspaceSelector = () => {
 
       if (path) {
         navigate(redirects[path]);
-      } else {
-        // TODO: remove this hack and fix it correct way
-        // If its a redirect from /rules/create route, rules dropdown or drawer will open
-        // depending upon the screen, once user closes that and switches the workspace
-        // rules dropdown or drawer again reopens's since navigation state is not cleared
-        if (isRedirectFromCreateRulesRoute) {
-          navigate(pathname, {});
-        }
       }
     };
 
