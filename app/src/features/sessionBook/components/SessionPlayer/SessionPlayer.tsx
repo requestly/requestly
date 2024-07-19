@@ -120,19 +120,19 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   }, [events, player]);
 
   useEffect(() => {
-    // const pauseVideo = () => {
-    //   player?.pause();
-    // };
+    const pauseVideo = () => {
+      player?.pause();
+    };
 
     // no rrweb listener on the player works when focus is shifted from the tab
     // The player keeps playing even when the tab is not in focus.
     // so we add a listener on the window to pause the player when the tab is blurred
-    // window.addEventListener("blur", pauseVideo);
+    window.addEventListener("blur", pauseVideo);
 
     return () => {
       // @ts-ignore
       player?.$destroy(); // destroy player on unmount
-      // window.removeEventListener("blur", pauseVideo);
+      window.removeEventListener("blur", pauseVideo);
     };
   }, [player]);
 
@@ -142,6 +142,20 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     player?.addEventListener("ui-update-current-time", updateCurrentTimeHandler);
     player?.addEventListener("ui-update-player-state", playerStateChangeHandler);
   }, [player, playerStateChangeHandler, updateCurrentTimeHandler]);
+
+  useEffect(() => {
+    const togglePlay = (e: KeyboardEvent) => {
+      if (e.code === "Space" && e.target === document.body) {
+        e.preventDefault();
+        player?.toggle();
+      }
+    };
+
+    document.addEventListener("keydown", togglePlay);
+    return () => {
+      document.removeEventListener("keydown", togglePlay);
+    };
+  }, [player]);
 
   const handleSessionPausePlayBtnClick = useCallback(() => {
     if (playerState === PlayerState.PLAYING) {
