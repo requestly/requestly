@@ -26,9 +26,9 @@
     margin-bottom: 0;
   }
 
-  & .ant-tabs-tab {
-    border-radius: 4px !important;
-    padding: 4px 8px !important;
+  & .ant-tabs-nav-list .ant-tabs-tab {
+    border-radius: 4px;
+    padding: 4px 8px;
     background: none;
     border: none;
     transition: all 0.2s ease-out;
