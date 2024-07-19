@@ -21,8 +21,8 @@ import ProductsDropDown from "./ProductsDropDown";
 import PremiumPlanBadge from "./PremiumPlanBadge/PremiumPlanBadge";
 import APP_CONSTANTS from "config/constants";
 import { PlanExpiredBadge } from "./PlanExpiredBadge";
-import { RequestBot, trackAskAIClicked } from "features/requestBot";
-import BotIcon from "./assets/bot.svg";
+import { trackAskAIClicked } from "features/requestBot";
+import BotIcon from "assets/icons/bot.svg?react";
 import "./MenuHeader.css";
 
 const { Header } = Layout;
@@ -40,8 +40,6 @@ const MenuHeader = () => {
   const isTabletView = useMediaQuery({ query: "(max-width: 1200px)" });
   const isPricingOrGoodbyePage = isPricingPage() || isGoodbyePage() || isInvitePage();
   const isPlanExpiredBannerClosed = useSelector(getIsPlanExpiredBannerClosed);
-
-  const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
 
   //don't show general app header component for editor screens
   const showMenuHeader = () => !PATHS_WITHOUT_HEADER.some((path) => pathname.includes(path));
@@ -117,12 +115,12 @@ const MenuHeader = () => {
                 <RQButton
                   className="ask-ai-btn"
                   onClick={() => {
-                    trackAskAIClicked();
-                    setIsRequestBotVisible(true);
+                    trackAskAIClicked("app_header");
+                    dispatch(actions.updateRequestBot({ isActive: true, modelType: "app" }));
                   }}
                 >
                   <div className="ask-ai-btn-content">
-                    <img src={BotIcon} alt="bot" />
+                    <BotIcon />
                     Ask AI
                   </div>
                 </RQButton>
@@ -157,8 +155,6 @@ const MenuHeader = () => {
           </Col>
         </Row>
       </Header>
-
-      <RequestBot isOpen={isRequestBotVisible} onClose={() => setIsRequestBotVisible(false)} />
     </>
   ) : null;
 };

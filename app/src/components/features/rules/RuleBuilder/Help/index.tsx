@@ -12,7 +12,7 @@ import { RuleType } from "types/rules";
 import { TocItem, ExternalLink } from "./types";
 import { snakeCase } from "lodash";
 import APP_CONSTANTS from "config/constants";
-import { rulesData } from "components/landing/ruleSelection/rules-data";
+import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import {
   trackDocsSidebarPrimaryCategoryClicked,
   trackDocsSidebarSecondaryCategoryClicked,
@@ -211,7 +211,7 @@ const Help: React.FC<HelpProps> = ({ ruleType }) => {
             <div ref={documentationListRef} className="rule-editor-help-lists">
               <div className="caption text-gray text-bold rule-editor-help-title">
                 <CompassOutlined />
-                Documentation for {rulesData[ruleType]?.name}
+                Documentation for {RULE_TYPES_CONFIG[ruleType].NAME}
               </div>
               <ul className="rule-editor-help-list">
                 <>

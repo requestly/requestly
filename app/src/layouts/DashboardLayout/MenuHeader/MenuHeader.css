@@ -212,6 +212,12 @@
   align-items: center;
   gap: 6px;
   z-index: 2;
+  color: 1px solid var(--requestly-color-white);
+}
+
+.ask-ai-btn-content svg {
+  width: 17px;
+  height: 17px;
 }
 
 .ask-ai-btn.ant-btn.ant-btn-default {

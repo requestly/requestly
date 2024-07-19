@@ -10,6 +10,7 @@ import * as sharedListActions from "./features/sharedListActions";
 import * as rulesActions from "./features/rulesActions";
 import * as appModeSpecificActions from "./features/appModeSpecificActions";
 import * as editorToastActions from "./features/editorToastActions";
+import * as requestBotActions from "./features/requestBotActions";
 import { incentivizationReducer } from "./features/incentivization/slice";
 import { sessionRecordingReducer } from "./features/session-recording/slice";
 import { teamsReducer } from "./features/teams/slice";
@@ -33,6 +34,7 @@ const globalSlice = createSlice({
     ...rulesActions,
     ...appModeSpecificActions,
     ...editorToastActions,
+    ...requestBotActions,
   },
 });
 

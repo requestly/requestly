@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip, Progress, Popconfirm } from "antd";
 import moment from "moment";
@@ -31,8 +31,10 @@ import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelec
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { useTheme } from "styled-components";
 import { WarningOutlined } from "@ant-design/icons";
+import { actions } from "store";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
+  const dispatch = useDispatch();
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
@@ -99,8 +101,12 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
             <div className="rule-name-container">
               <Link
                 className="rule-name"
-                to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`}
                 state={{ source: "my_rules" }}
+                to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`}
+                onClick={() => {
+                  //@ts-ignore
+                  dispatch(actions.updateSecondarySidebarCollapse(false));
+                }}
               >
                 {record.name}
               </Link>
