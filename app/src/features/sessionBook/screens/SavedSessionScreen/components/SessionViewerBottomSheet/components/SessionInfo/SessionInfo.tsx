@@ -73,7 +73,7 @@ export const SessionInfo: React.FC = () => {
       { icon: <IoIosGlobe />, label: "Page URL", value: sessionAttributes?.url },
       { icon: <IoMdTime />, label: "Duration", value: msToHoursMinutesAndSeconds(sessionAttributes?.duration ?? 0) },
       { icon: <MdToday />, label: "Recorded at", value: epochToDateAndTimeString(sessionAttributes?.startTime) },
-      // { icon: <MdOutlinePerson />, label: "Recorded by", value: user?.details?.profile?.email },
+      // { icon: <MdOutlinePerson />, label: "Recorded by", value: "1:00 PM" },
     ];
   }, [
     sessionAttributes,

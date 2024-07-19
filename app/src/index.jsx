@@ -1,70 +1,37 @@
 import React from "react";
 import * as Sentry from "@sentry/react";
 import { createRoot } from "react-dom/client";
-import { Navigate, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { persistStore } from "redux-persist";
 import { reduxStore } from "./store";
 import { PersistGate } from "redux-persist/integration/react";
-import App from "./App";
 
 import "./init";
 import "./assets/less/index.less";
 import "./styles/custom/custom.scss";
 
 import PageError from "components/misc/PageError";
-import { routes } from "routes";
-import { fullScreenRoutes } from "routes/fullScreenRoutes";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAppFlavour } from "utils/AppUtils";
-import { sessionBearRoutes } from "src-SessionBear/routes";
+import App from "./App";
 import SessionBearApp from "src-SessionBear/App";
-import PATHS from "config/constants/sub/paths";
-import SeleniumImporter from "views/misc/SeleniumImporter";
 
 const persistor = persistStore(reduxStore);
 const container = document.getElementById("root");
 const root = createRoot(container);
 const appFlavour = getAppFlavour();
 
-const router = createBrowserRouter([
-  {
-    path: PATHS.SELENIUM_IMPORTER.RELATIVE,
-    element:
-      appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY ? (
-        <SeleniumImporter />
-      ) : (
-        <Navigate to={PATHS.PAGE404.RELATIVE} />
-      ),
-  },
-  {
-    path: "/",
-    element: (
+root.render(
+  <Provider store={reduxStore}>
+    <PersistGate loading={null} persistor={persistor}>
       <Sentry.ErrorBoundary
         fallback={({ error, componentStack, resetError }) => (
           <PageError error={error} componentStack={componentStack} resetError={resetError} />
         )}
         showDialog
       >
-        {/* 
-          CREATING SEPARATE APPS FOR SESSIONBEAR AND REQUESTLY IN ORDER TO KEEP THE EXISTING REQUESTLY CODE AS CLEAN AS POSSIBLE
-          - THIS FILE IS THE ENRTY POINT FOR THE APP
-          - DEPENDING ON THE APP FLAVOUR, WE RENDER THE RESPECTIVE APP's ROOT COMPONENT
-          - COMPONENTS CAN BE REUSED FROM REQUESTLY TO SESSIONBEAR IF ANY TWEAKS ARE REQUIRED
-        
-        */}
         {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? <SessionBearApp /> : <App />}
       </Sentry.ErrorBoundary>
-    ),
-    children:
-      appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? sessionBearRoutes : [...routes, ...fullScreenRoutes],
-  },
-]);
-
-root.render(
-  <Provider store={reduxStore}>
-    <PersistGate loading={null} persistor={persistor}>
-      <RouterProvider router={router} />
     </PersistGate>
   </Provider>
 );
