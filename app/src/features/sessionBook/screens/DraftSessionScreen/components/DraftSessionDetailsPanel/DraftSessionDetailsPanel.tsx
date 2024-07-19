@@ -2,13 +2,13 @@ import React, { useCallback } from "react";
 import { RQInput } from "lib/design-system/components";
 import { Input } from "antd";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import SessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
+import SessionViewerBottomSheet from "features/sessionBook/screens/SavedSessionScreen/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
-import "./draftSessionDetailsPanel.scss";
 import { useDebounce } from "hooks/useDebounce";
 import { trackDraftSessionNamed, trackSessionRecordingDescriptionUpdated } from "features/sessionBook/analytics";
+import "./draftSessionDetailsPanel.scss";
 
 interface DraftSessionDetailsPanelProps {
   playerTimeOffset: number;
@@ -18,9 +18,9 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ pla
   const dispatch = useDispatch();
   const metadata = useSelector(getSessionRecordingMetaData);
 
-  const debouncedTrackDescriptionUpdated = useDebounce(trackSessionRecordingDescriptionUpdated);
+  const debouncedTrackDescriptionUpdated = useDebounce(trackSessionRecordingDescriptionUpdated, 1000);
 
-  const desbouncedTrackNameUpdated = useDebounce(trackDraftSessionNamed);
+  const desbouncedTrackNameUpdated = useDebounce(trackDraftSessionNamed, 1000);
 
   const handleSessionNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

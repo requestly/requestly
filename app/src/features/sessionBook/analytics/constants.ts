@@ -13,4 +13,5 @@ export const SESSIONS = {
   SESSION_RECORDING_DESCRIPTION_ADDED: "session_recording_description_added",
   SESSION_RECORDING_NAME_UPDATED: "session_recording_name_updated",
   BAD_SESSION_RECORDING_VIEWED: "bad_session_recording_viewed",
+  SESSION_RECORDING_BOTTOM_SHEET_TAB_CLICKED: "session_recording_bottom_sheet_tab_clicked",
 };

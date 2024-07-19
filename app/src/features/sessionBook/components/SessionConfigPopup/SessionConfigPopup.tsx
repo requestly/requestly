@@ -22,6 +22,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import "./sessionConfigPopup.scss";
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -49,7 +50,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
-  const isDraftSession = pathname.includes("draft") || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isDraftSession = pathname.includes(PATHS.SESSIONS.INDEX) || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const isSessionLogOptionsAlreadySaved =
     tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
