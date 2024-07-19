@@ -7,9 +7,10 @@ import "./BottomSheetLayout.scss";
 interface Props {
   bottomSheet: ReactNode;
   children: ReactNode;
+  initialOffset?: number;
 }
 
-export const BottomSheetLayout: React.FC<Props> = ({ bottomSheet, children }) => {
+export const BottomSheetLayout: React.FC<Props> = ({ bottomSheet, children, initialOffset = null }) => {
   const { sheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
 
@@ -20,7 +21,8 @@ export const BottomSheetLayout: React.FC<Props> = ({ bottomSheet, children }) =>
         span={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 10}
         className={`${isSheetPlacedAtBottom ? " bottom-sheet-container" : "bottom-sheet-panel-container"}`}
         style={{
-          bottom: sheetPlacement === BottomSheetPlacement.RIGHT ? 0 : isBottomSheetOpen ? 0 : `-335px`,
+          bottom:
+            sheetPlacement === BottomSheetPlacement.RIGHT ? 0 : isBottomSheetOpen ? 0 : `${initialOffset ?? -335}px`,
           height: isSheetPlacedAtBottom ? "440px" : `100%`,
         }}
       >

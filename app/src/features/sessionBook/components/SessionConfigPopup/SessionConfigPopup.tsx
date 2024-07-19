@@ -1,67 +1,57 @@
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Radio, Row } from "antd";
-import { DebugInfo, SessionSaveMode } from "../../../../types";
+import { DebugInfo, SessionSaveMode } from "../../types";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
-import { getRecordingOptionsToSave, getSessionRecordingOptions } from "../../../../utils/sessionFile";
+import { getRecordingOptionsToSave, getSessionRecordingOptions } from "../../utils/sessionFile";
 import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
-import { getUserAttributes, getAppMode } from "store/selectors";
-// import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
-// import { actions } from "store";
+import { getUserAttributes, getAppMode, getUserAuthDetails } from "store/selectors";
+import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
-// import { SOURCE } from "modules/analytics/events/common/constants";
-import { trackDraftSessionSaved } from "modules/analytics/events/features/sessionRecording";
+import { trackDraftSessionSaved } from "features/sessionBook/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { downloadSessionFile } from "features/sessionBook/utils/sessionFile";
+import { useIncentiveActions } from "features/incentivization/hooks";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import Logger from "lib/logger";
+import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import "./sessionConfigPopup.scss";
-// import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
-// import { DraftSessionViewerProps } from "./DraftSessionViewer";
-// import { useIncentiveActions } from "features/incentivization/hooks";
-// import { saveDraftSession } from "./utils";
-// import Logger from "lib/logger";
-
-// TODO: ADDRESS DRAFT SESSION VIEWER CHANGES
+import PATHS from "config/constants/sub/paths";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
-  setIsSaveSessionClicked?: (value: boolean) => void;
-  // testRuleDraftSession?: DraftSessionViewerProps["testRuleDraftSession"];
+  onSaveClick?: () => void;
   source?: string;
 }
 
-// const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
+const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
-export const SessionConfigPopup: React.FC<Props> = ({
-  onClose,
-  setIsSaveSessionClicked,
-  // testRuleDraftSession,
-  source,
-}) => {
-  // const dispatch = useDispatch();
+export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, source = SOURCE.SAVE_DRAFT_SESSION }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { tabId } = useParams();
   const { pathname } = useLocation();
-  // const user = useSelector(getUserAuthDetails);
+  const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-  // const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const appMode = useSelector(getAppMode);
 
-  // const { claimIncentiveRewards } = useIncentiveActions();
+  const { claimIncentiveRewards } = useIncentiveActions();
 
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
-  const isDraftSession =
-    pathname.includes("draft") ||
-    // !!testRuleDraftSession
-    appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isDraftSession = pathname.includes(PATHS.SESSIONS.INDEX) || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
   const isSessionLogOptionsAlreadySaved =
     tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
@@ -94,108 +84,80 @@ export const SessionConfigPopup: React.FC<Props> = ({
     [userAttributes?.num_sessions_saved_online, userAttributes?.num_sessions_saved_offline]
   );
 
-  // CURRENTLY THIS FUNCTION IS REDUNDANT, USED BY DRAFT SESSION VIEWER AND SAVE POPUP
-  // TODO: REFACTOR THIS WHEN REVAMP TASK IS PICKED
-  // const handleSaveDraftSession = useCallback(
-  //   (e: React.MouseEvent) => {
-  //     if (!user?.loggedIn) {
-  //       dispatch(
-  //         // @ts-ignore
-  //         actions.toggleActiveModal({
-  //           modalName: "authModal",
-  //           newValue: true,
-  //           newProps: {
-  //             authMode: AUTH_ACTION_LABELS.SIGN_UP,
-  //             src: window.location.href,
-  //             eventSource: SOURCE.SAVE_DRAFT_SESSION,
-  //           },
-  //         })
-  //       );
-  //       return;
-  //     }
+  const handleSaveDraftSession = useCallback(
+    (e: React.MouseEvent) => {
+      if (!user?.loggedIn) {
+        dispatch(
+          // @ts-ignore
+          actions.toggleActiveModal({
+            modalName: "authModal",
+            newValue: true,
+            newProps: {
+              authMode: AUTH_ACTION_LABELS.SIGN_UP,
+              src: window.location.href,
+              eventSource: SOURCE.SAVE_DRAFT_SESSION,
+            },
+          })
+        );
+        return;
+      }
 
-  //     if (isSaving) {
-  //       return;
-  //     }
+      if (isSaving) {
+        return;
+      }
 
-  //     if (!sessionRecordingMetadata?.name) {
-  //       toast.error("Name is required to save the recording.");
-  //       return;
-  //     }
+      if (!sessionRecordingMetadata?.name) {
+        toast.error("Name is required to save the recording.");
+        return;
+      }
 
-  //     setIsSaving(true);
-  //     setIsSaveSessionClicked?.(true);
-  // saveDraftSession(
-  //   user,
-  //   userAttributes,
-  //   appMode,
-  //   dispatch,
-  //   navigate,
-  //   workspace?.id,
-  //   sessionRecordingMetadata,
-  //   sessionEvents,
-  //   includedDebugInfo,
-  //   source,
-  //   testRuleDraftSession,
-  //   claimIncentiveRewards
-  // )
-  //   .then(() => {
-  //     onClose?.();
-  //   })
-  //   .catch((err) => {
-  //     Logger.log("Failed to save draft session", err);
-  //   })
-  //   .finally(() => {
-  //     setIsSaving(false);
-  //   });
-  //   },
-  //   [
-  //     user?.loggedIn,
-  //     isSaving,
-  //     sessionRecordingMetadata,
-  //     // includedDebugInfo,
-  //     setIsSaveSessionClicked,
-  //     // workspace?.id,
-  //     // sessionEvents,
-  //     dispatch,
-  //     // testRuleDraftSession,
-  //     // // appMode,
-  //     // navigate,
-  //     // // source,
-  //     // // userAttributes,
-  //     // onClose,
-  //     // // claimIncentiveRewards,
-  //   ]
-  // );
+      setIsSaving(true);
+      onSaveClick?.();
+      saveDraftSession(
+        user,
+        userAttributes,
+        appMode,
+        dispatch,
+        navigate,
+        workspace?.id,
+        sessionRecordingMetadata,
+        sessionEvents,
+        includedDebugInfo,
+        source,
+        claimIncentiveRewards
+      )
+        .then(() => {
+          onClose?.();
+        })
+        .catch((err: unknown) => {
+          Logger.log("Failed to save draft session", err);
+        })
+        .finally(() => {
+          setIsSaving(false);
+        });
+    },
+    [
+      isSaving,
+      sessionRecordingMetadata,
+      includedDebugInfo,
+      onSaveClick,
+      workspace?.id,
+      sessionEvents,
+      dispatch,
+      appMode,
+      navigate,
+      user,
+      source,
+      userAttributes,
+      onClose,
+      claimIncentiveRewards,
+    ]
+  );
 
   const handleDownloadFileClick = useCallback(
     (e: React.MouseEvent) => {
       setIsSaving(true);
       const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
-      // const events = compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave));
-      // const metadata = {
-      //   name: sessionRecordingMetadata.name,
-      //   options: { ...recordingOptionsToSave },
-      //   sessionAttributes: { ...sessionRecordingMetadata.sessionAttributes },
-      //   recordingMode: sessionRecordingMetadata?.recordingMode || null,
-      // };
-
-      // prepareSessionToExport(events, metadata)
-      //   .then((fileContent) => downloadSession(fileContent, sessionRecordingMetadata.name))
-      //   .finally(() => {
-      //     toast.success("Recording downloaded successfully.");
-      //     onClose();
-      //     setIsSaving(false);
-      //     trackDraftSessionSaved({
-      //       session_length: sessionRecordingMetadata?.sessionAttributes?.duration,
-      //       options: recordingOptionsToSave,
-      //       type: SessionSaveMode.LOCAL,
-      //       source,
-      //       recording_mode: sessionRecordingMetadata?.recordingMode,
-      //     });
-      //     // testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.LOCAL);
-      //     trackSessionsCreatedCount(true);
-      //   });
       downloadSessionFile(sessionEvents, sessionRecordingMetadata, recordingOptionsToSave).then(() => {
         toast.success("Recording downloaded successfully.");
         onClose();
@@ -207,19 +169,10 @@ export const SessionConfigPopup: React.FC<Props> = ({
           source,
           recording_mode: sessionRecordingMetadata?.recordingMode,
         });
-        // testRuleDraftSession && trackTestRuleSessionDraftSaved(SessionSaveMode.LOCAL);
         trackSessionsCreatedCount(true);
       });
     },
-    [
-      sessionEvents,
-      sessionRecordingMetadata,
-      includedDebugInfo,
-      onClose,
-      trackSessionsCreatedCount,
-      // testRuleDraftSession,
-      source,
-    ]
+    [sessionEvents, sessionRecordingMetadata, includedDebugInfo, onClose, trackSessionsCreatedCount, source]
   );
 
   return (
@@ -270,7 +223,11 @@ export const SessionConfigPopup: React.FC<Props> = ({
           type="primary"
           className="ml-auto"
           loading={isSaving}
-          onClick={isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? () => {} : handleDownloadFileClick}
+          onClick={
+            isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE
+              ? handleSaveDraftSession
+              : handleDownloadFileClick
+          }
         >
           {isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? "Save" : "Download"}
         </Button>

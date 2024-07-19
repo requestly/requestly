@@ -1,21 +1,20 @@
 .session-player-container {
   width: 100%;
+  height: fit-content;
   background: var(--requestly-color-black);
   border-radius: 8px;
   padding: 10px;
 
-  .session-player {
-    width: 100%;
-
-    &.session-player-fullscreen {
-      .rr-player__frame {
-        height: 92vh !important;
-      }
+  .session-player-fullscreen {
+    .rr-player__frame {
+      height: 92vh !important;
     }
+  }
 
+  .session-player {
     .rr-player {
       width: 100% !important;
-      height: calc(100% - 13px) !important;
+      height: auto !important;
     }
 
     .rr-controller {
@@ -55,8 +54,7 @@
     }
 
     .rr-player__frame {
-      width: 100% !important;
-      height: 530px !important;
+      width: auto !important;
       background: var(--requestly-color-black);
 
       .overlay-frame {
@@ -83,8 +81,6 @@
       }
 
       .replayer-wrapper {
-        transform: scale(0.65) translate(-50%, -50%) !important;
-
         iframe {
           border-radius: 8px;
         }
@@ -153,5 +149,12 @@
       display: flex;
       justify-content: flex-end;
     }
+  }
+}
+
+@media (min-width: 1240px) and (max-width: 1440px) {
+  // HACKY FIX FOR MAINTAING ASPECT RATIO OF PLAYER IN DESKTOP SCREEN
+  .rr-player__frame {
+    height: 530px !important;
   }
 }
