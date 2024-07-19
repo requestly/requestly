@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CgAlignCenter } from "@react-icons/all-files/cg/CgAlignCenter";
 import { MdOutlineViewHeadline } from "@react-icons/all-files/md/MdOutlineViewHeadline";
@@ -26,17 +26,26 @@ export const SessionInfo: React.FC = () => {
   const sessionAttributes = useSelector(getSessionRecordingAttributes);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
 
+  const [sessionName, setSessionName] = useState(sessionMetadata?.name);
+  const [sessionDescription, setSessionDescription] = useState(sessionMetadata?.description);
+
   const handleSessionNameUpdate = useCallback(() => {
     if (recordingId && sessionMetadata?.name) {
-      updateSessionName(user?.details?.profile?.uid, recordingId, sessionMetadata.name);
+      if (sessionMetadata?.name !== sessionName && sessionMetadata?.name.length > 0) {
+        updateSessionName(user?.details?.profile?.uid, recordingId, sessionName);
+        setSessionName(sessionMetadata?.name);
+      }
     }
-  }, [recordingId, sessionMetadata?.name, user?.details?.profile?.uid]);
+  }, [recordingId, sessionMetadata?.name, user?.details?.profile?.uid, sessionName]);
 
   const handleSessionDescriptionUpdate = useCallback(() => {
     if (recordingId && sessionMetadata?.description) {
-      updateSessionDescription(user?.details?.profile?.uid, recordingId, sessionMetadata.description);
+      if (sessionMetadata?.description !== sessionDescription && sessionMetadata?.description.length > 0) {
+        updateSessionDescription(user?.details?.profile?.uid, recordingId, sessionMetadata.description);
+        setSessionDescription(sessionMetadata?.description);
+      }
     }
-  }, [recordingId, sessionMetadata?.description, user?.details?.profile?.uid]);
+  }, [recordingId, sessionMetadata?.description, user?.details?.profile?.uid, sessionDescription]);
 
   const sessionInfoData = useMemo(() => {
     return [

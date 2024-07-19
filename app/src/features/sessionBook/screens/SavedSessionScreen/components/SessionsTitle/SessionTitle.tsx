@@ -1,3 +1,4 @@
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getIsRequestedByOwner,
@@ -20,11 +21,16 @@ export const SessionTitle = () => {
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
 
-  const handleSessionNameUpdate = () => {
+  const [sessionName, setSessionName] = useState(sessionMetadata?.name);
+
+  const handleSessionNameUpdate = useCallback(() => {
     if (recordingId && sessionMetadata?.name) {
-      updateSessionName(user?.details?.profile?.uid, recordingId, sessionMetadata.name);
+      if (sessionMetadata?.name !== sessionName && sessionMetadata?.name.length > 0) {
+        updateSessionName(user?.details?.profile?.uid, recordingId, sessionMetadata.name);
+        setSessionName(sessionMetadata?.name);
+      }
     }
-  };
+  }, [recordingId, sessionMetadata?.name, user?.details?.profile?.uid, sessionName]);
 
   return (
     <div className="session-title-container">
