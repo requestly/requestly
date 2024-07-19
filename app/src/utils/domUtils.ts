@@ -1,11 +1,11 @@
-export const removeElement = (className: string) => {
-  document.querySelector(className)?.remove?.();
+export const removeElement = (selectorQuery: string) => {
+  document.querySelector(selectorQuery)?.remove?.();
 };
 
-export const hideElement = (className: string) => {
-  document.querySelector(className)?.classList.add("hidden");
+export const hideElement = (selectorQuery: string) => {
+  document.querySelector(selectorQuery)?.classList.add("hidden");
 };
 
-export const showElement = (className: string) => {
-  document.querySelector(className)?.classList.remove("hidden");
+export const showElement = (selectorQuery: string) => {
+  document.querySelector(selectorQuery)?.classList.remove("hidden");
 };

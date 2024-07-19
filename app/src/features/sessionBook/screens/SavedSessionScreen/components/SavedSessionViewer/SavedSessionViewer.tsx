@@ -23,8 +23,8 @@ import { trackSavedSessionViewed, trackSessionRecordingShareClicked } from "feat
 import { isAppOpenedInIframe } from "utils/AppUtils";
 import { useMediaQuery } from "react-responsive";
 import { hideElement, showElement } from "utils/domUtils";
+import StaticSessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/StaticSessionViewerBottomSheet";
 import "./savedSessionViewer.scss";
-import StaticSessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/components/StaticSessionViewerBottomSheet";
 
 interface NavigationState {
   fromApp?: boolean;
