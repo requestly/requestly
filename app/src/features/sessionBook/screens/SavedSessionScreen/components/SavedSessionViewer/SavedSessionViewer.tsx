@@ -101,7 +101,7 @@ export const SavedSessionViewer = () => {
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
         <div className="saved-session-header">
           <SessionTitle />
-          {isRequestedByOwner ? (
+          {isRequestedByOwner && !isInsideIframe ? (
             <div className="saved-session-actions">
               <Tooltip title="Delete session">
                 <RQButton

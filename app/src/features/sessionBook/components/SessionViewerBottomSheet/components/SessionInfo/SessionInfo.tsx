@@ -16,6 +16,7 @@ import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/Date
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { updateSessionDescription, updateSessionName } from "../../../../screens/SavedSessionScreen/components/utils";
 import { getUserAuthDetails } from "store/selectors";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionInfo.scss";
 
 export const SessionInfo: React.FC = () => {
@@ -28,6 +29,8 @@ export const SessionInfo: React.FC = () => {
 
   const [sessionName, setSessionName] = useState(sessionMetadata?.name);
   const [sessionDescription, setSessionDescription] = useState(sessionMetadata?.description);
+
+  const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
   const handleSessionNameUpdate = useCallback(() => {
     if (recordingId && sessionMetadata?.name) {
@@ -60,7 +63,7 @@ export const SessionInfo: React.FC = () => {
               dispatch(sessionRecordingActions.setName(value));
             }}
             onBlur={handleSessionNameUpdate}
-            disabled={!isRequestedByOwner}
+            disabled={!isRequestedByOwner || isInsideIframe}
           />
         ),
       },
@@ -75,7 +78,7 @@ export const SessionInfo: React.FC = () => {
               dispatch(sessionRecordingActions.setDescription(value));
             }}
             onBlur={handleSessionDescriptionUpdate}
-            disabled={!isRequestedByOwner}
+            disabled={!isRequestedByOwner || isInsideIframe}
           />
         ),
       },
@@ -92,6 +95,7 @@ export const SessionInfo: React.FC = () => {
     sessionMetadata?.description,
     sessionMetadata?.name,
     isRequestedByOwner,
+    isInsideIframe,
   ]);
 
   return (

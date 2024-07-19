@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getIsRequestedByOwner,
@@ -11,6 +11,7 @@ import { updateSessionName } from "../utils";
 import { getUserAuthDetails } from "store/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./sessionsTitle.scss";
 
 export const SessionTitle = () => {
@@ -22,6 +23,8 @@ export const SessionTitle = () => {
   const isRequestedByOwner = useSelector(getIsRequestedByOwner);
 
   const [sessionName, setSessionName] = useState(sessionMetadata?.name);
+
+  const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
   const handleSessionNameUpdate = useCallback(() => {
     if (recordingId && sessionMetadata?.name) {
@@ -49,7 +52,7 @@ export const SessionTitle = () => {
             dispatch(sessionRecordingActions.setName(value));
           }}
           onBlur={handleSessionNameUpdate}
-          disabled={!isRequestedByOwner}
+          disabled={!isRequestedByOwner || isInsideIframe}
         />
       </div>
     </div>
