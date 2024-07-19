@@ -10,7 +10,7 @@ import { RQButton } from "lib/design-system/components";
 import { RiDeleteBin6Line } from "@react-icons/all-files/ri/RiDeleteBin6Line";
 import { MdOutlinePublic } from "@react-icons/all-files/md/MdOutlinePublic";
 import { MdOutlineLink } from "@react-icons/all-files/md/MdOutlineLink";
-import SessionViewerBottomSheet from "features/sessionBook/screens/SavedSessionScreen/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
+import SessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import { useSessionsActionContext } from "features/sessionBook/context/actions";
 import {
   getIsRequestedByOwner,
@@ -21,7 +21,10 @@ import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import ShareRecordingModal from "views/features/sessions/ShareRecordingModal";
 import { trackSavedSessionViewed, trackSessionRecordingShareClicked } from "features/sessionBook/analytics";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { useMediaQuery } from "react-responsive";
+import { hideElement, showElement } from "utils/domUtils";
 import "./savedSessionViewer.scss";
+import StaticSessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/components/StaticSessionViewerBottomSheet";
 
 interface NavigationState {
   fromApp?: boolean;
@@ -41,6 +44,9 @@ export const SavedSessionViewer = () => {
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
+
+  const isMobileView = useMediaQuery({ query: "(max-width: 768px)" });
+  const bottomSheetLayoutBreakpoint = useMediaQuery({ query: "(max-width: 940px)" });
 
   const isInsideIframe = useMemo(isAppOpenedInIframe, []);
 
@@ -78,6 +84,18 @@ export const SavedSessionViewer = () => {
     }
   }, [id, location.state, isInsideIframe]);
 
+  useEffect(() => {
+    if (isMobileView) {
+      hideElement(".app-sidebar");
+      hideElement(".app-header");
+      hideElement(".app-footer");
+    } else {
+      showElement(".app-sidebar");
+      showElement(".app-header");
+      showElement(".app-footer");
+    }
+  }, [isMobileView]);
+
   return (
     <div className="saved-session-viewer-container">
       <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
@@ -103,9 +121,13 @@ export const SavedSessionViewer = () => {
             </div>
           ) : null}
         </div>
-        <BottomSheetLayout bottomSheet={<SessionViewerBottomSheet playerTimeOffset={sessionPlayerOffset} />}>
+        <BottomSheetLayout
+          hideBottomSheet={bottomSheetLayoutBreakpoint}
+          bottomSheet={<SessionViewerBottomSheet playerTimeOffset={sessionPlayerOffset} />}
+        >
           <div className="saved-session-viewer-body">
             <SessionPlayer onPlayerTimeOffsetChange={handleSessionPlayerTimeOffsetChange} />
+            {bottomSheetLayoutBreakpoint && <StaticSessionViewerBottomSheet playerTimeOffset={sessionPlayerOffset} />}
           </div>
         </BottomSheetLayout>
 

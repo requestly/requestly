@@ -8,11 +8,21 @@ interface Props {
   bottomSheet: ReactNode;
   children: ReactNode;
   initialOffset?: number;
+  hideBottomSheet?: boolean;
 }
 
-export const BottomSheetLayout: React.FC<Props> = ({ bottomSheet, children, initialOffset = null }) => {
+export const BottomSheetLayout: React.FC<Props> = ({
+  bottomSheet,
+  children,
+  initialOffset = null,
+  hideBottomSheet = false,
+}) => {
   const { sheetPlacement, isBottomSheetOpen } = useBottomSheetContext();
   const isSheetPlacedAtBottom = sheetPlacement === BottomSheetPlacement.BOTTOM;
+
+  if (hideBottomSheet) {
+    return children;
+  }
 
   return (
     <Row className="bottomsheet-layout-container">

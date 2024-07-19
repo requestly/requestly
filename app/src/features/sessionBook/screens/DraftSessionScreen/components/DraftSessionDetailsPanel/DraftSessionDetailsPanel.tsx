@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { RQInput } from "lib/design-system/components";
 import { Input } from "antd";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import SessionViewerBottomSheet from "features/sessionBook/screens/SavedSessionScreen/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
+import SessionViewerBottomSheet from "features/sessionBook/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { sessionRecordingActions } from "store/features/session-recording/slice";

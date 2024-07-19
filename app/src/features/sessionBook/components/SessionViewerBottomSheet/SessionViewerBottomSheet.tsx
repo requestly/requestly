@@ -1,13 +1,15 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { MdNetworkCheck } from "@react-icons/all-files/md/MdNetworkCheck";
 import { MdConnectedTv } from "@react-icons/all-files/md/MdConnectedTv";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { BottomSheet } from "componentsV2/BottomSheet";
+import { BottomSheet, BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { SessionInfo } from "./components/SessionInfo/SessionInfo";
 import SessionNetworkLogs from "./components/SessionNetworkLogs/SessionNetworkLogs";
 import SessionConsoleLogs from "./components/SessionConsoleLogs/SessionConsoleLogs";
 import { SessionEnvironmentDetails } from "./components/SessionEnvironmentDetails/SessionEnvironmentDetails";
+import { useMediaQuery } from "react-responsive";
+import { useLocation } from "react-router-dom";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
@@ -25,6 +27,16 @@ const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({
   playerTimeOffset,
   disableDocking = false,
 }) => {
+  const location = useLocation();
+  const { toggleSheetPlacement } = useBottomSheetContext();
+  const bottomSheetBottomBreakpoint = useMediaQuery({ query: "(max-width: 1092px)" });
+
+  useEffect(() => {
+    if (bottomSheetBottomBreakpoint && location.pathname.includes("saved")) {
+      toggleSheetPlacement(BottomSheetPlacement.BOTTOM);
+    }
+  }, [bottomSheetBottomBreakpoint, toggleSheetPlacement, location.pathname]);
+
   const bottomSheetTabItems = useMemo(() => {
     return [
       {
@@ -76,7 +88,7 @@ const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({
     <BottomSheet
       items={bottomSheetTabItems}
       defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.INFO}
-      disableDocking={disableDocking}
+      disableDocking={disableDocking || bottomSheetBottomBreakpoint}
     />
   );
 };

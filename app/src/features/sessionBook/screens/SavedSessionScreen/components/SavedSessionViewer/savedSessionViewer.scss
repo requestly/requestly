@@ -32,6 +32,11 @@
   background: var(--requestly-color-background);
   height: calc(100vh - 154px);
   overflow-y: auto;
+
+  .bottom-sheet-without-context {
+    margin-top: 20px;
+    border-radius: 8px;
+  }
 }
 
 .saved-session-viewer-container {
@@ -43,6 +48,33 @@
   .bottomsheet-layout-container {
     .bottom-sheet-panel-container {
       border-top-left-radius: 8px;
+    }
+  }
+}
+
+@media (max-width: 1060px) {
+  .saved-session-header {
+    flex-wrap: wrap;
+    padding-bottom: 8px;
+
+    .inline-input-container {
+      .inactive-inline-input {
+        width: 250px;
+      }
+    }
+  }
+}
+
+@media (max-width: 550px) {
+  .saved-session-header {
+    .saved-session-actions {
+      display: none;
+    }
+  }
+  .session-header-breadcrumb {
+    &__parent-route,
+    &__arrow {
+      display: none;
     }
   }
 }

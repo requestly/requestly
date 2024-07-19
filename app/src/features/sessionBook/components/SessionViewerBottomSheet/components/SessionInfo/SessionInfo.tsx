@@ -14,7 +14,7 @@ import {
 } from "store/features/session-recording/selectors";
 import { epochToDateAndTimeString, msToHoursMinutesAndSeconds } from "utils/DateTimeUtils";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
-import { updateSessionDescription, updateSessionName } from "../../../utils";
+import { updateSessionDescription, updateSessionName } from "../../../../screens/SavedSessionScreen/components/utils";
 import { getUserAuthDetails } from "store/selectors";
 import "./sessionInfo.scss";
 
