@@ -3,8 +3,8 @@ import { RQSession } from "@requestly/web-sdk";
 import { getTabSession } from "actions/ExtensionActions";
 import { SessionRecordingMode } from "features/sessionBook/types";
 import { useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { generateDraftSessionTitle } from "./utils";
 import mockSession from "views/features/sessions/SessionViewer/mockData/mockSession";
@@ -14,25 +14,36 @@ import PageError from "components/misc/PageError";
 import { DraftSessionViewer } from "./components/DraftSessionViewer/DraftSessionViewer";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
+import PATHS from "config/constants/sub/paths";
+import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 
 export interface DraftSessionViewerProps {
   desktopMode?: boolean;
 }
 
 export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopMode = false }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(null);
+  const metadata = useSelector(getSessionRecordingMetaData);
 
   const tempTabId = useParams().tabId;
   const tabId = useMemo(() => (desktopMode ? "imported" : tempTabId), [desktopMode, tempTabId]);
+  const isImportedSession = tabId === "imported";
+
+  useEffect(() => {
+    if (isImportedSession && metadata === null && !desktopMode) {
+      navigate(PATHS.SESSIONS.ABSOLUTE);
+    }
+  }, [navigate, isImportedSession, metadata, desktopMode]);
 
   useEffect(() => {
     const unloadListener = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "Exiting without saving will discard the draft.\nAre you sure you want to exit?";
     };
-    dispatch(sessionRecordingActions.resetState());
+    if (!isImportedSession) dispatch(sessionRecordingActions.resetState());
 
     if (!desktopMode) {
       // It is fired only if there was ANY interaction of the user with the site.
@@ -42,7 +53,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
 
       return () => window.removeEventListener("beforeunload", unloadListener);
     }
-  }, [desktopMode, dispatch]);
+  }, [desktopMode, isImportedSession, dispatch]);
 
   useEffect(() => {
     setIsLoading(true);
