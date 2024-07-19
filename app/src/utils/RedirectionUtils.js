@@ -141,16 +141,16 @@ export const redirectToNetworkSessionHome = (navigate, isDesktopSessionsCompatib
 export const redirectToNetworkSession = (navigate, id, isDesktopSessionsCompatible = false) => {
   if (isDesktopSessionsCompatible) {
     if (id) {
-      const path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE + `/${id}`;
+      const path = "/" + PATHS.SESSIONS.DESKTOP.NETWORK.RELATIVE + `/${id}`;
       navigate(path);
       return;
     }
-    const path = PATHS.SESSIONS.DESKTOP.NETWORK.ABSOLUTE;
+    const path = "/" + PATHS.SESSIONS.DESKTOP.NETWORK.RELATIVE;
     navigate(path);
     return;
   } else {
     if (id) {
-      const path = PATHS.NETWORK_LOGS.VIEWER.RELATIVE + `/${id}`;
+      const path = "/" + PATHS.NETWORK_LOGS.VIEWER.RELATIVE + `/${id}`;
       navigate(path);
       return;
     }

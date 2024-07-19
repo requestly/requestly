@@ -1,7 +1,7 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
+import { DraftSessionScreen, SavedSessionScreen } from "features/sessionBook";
 import { SessionsListScreenContainer } from "features/sessionBook/screens/SessionsListScreen/SessionsListScreenContainer";
 import SessionsFeatureContainer from "features/sessionBook/container";
 
@@ -16,11 +16,11 @@ export const sessionRoutes: RouteObject[] = [
       },
       {
         path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
-        element: <DraftSessionViewer />,
+        element: <DraftSessionScreen />,
       },
       {
         path: PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
-        element: <SavedSessionViewer />,
+        element: <SavedSessionScreen />,
       },
     ],
   },

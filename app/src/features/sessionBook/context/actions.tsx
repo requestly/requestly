@@ -4,7 +4,7 @@ import { RiErrorWarningLine } from "@react-icons/all-files/ri/RiErrorWarningLine
 import { deleteRecording } from "views/features/sessions/api";
 
 type SessionsActionContextType = {
-  handleDeleteSessionAction: (id: string, eventsFilePath: string, handleForceRender: () => void) => void;
+  handleDeleteSessionAction: (id: string, eventsFilePath: string, callback?: () => void) => void;
 };
 
 const SessionsActionContext = createContext<SessionsActionContextType>(null);
@@ -14,12 +14,9 @@ interface RulesProviderProps {
 }
 
 export const SessionsActionContextProvider: React.FC<RulesProviderProps> = ({ children }) => {
-  const handleDeleteSessionAction = useCallback((id: string, eventsFilePath: string, handleForceRender: () => void) => {
+  const handleDeleteSessionAction = useCallback((id: string, eventsFilePath: string, callback?: () => void) => {
     Modal.confirm({
       title: "Confirm",
-      /* antD modal by default applied warining and size styles to antd icons
-      TODO: use react-icons instead of antd icons when revamping sessions UI
-      */
       icon: <RiErrorWarningLine className="anticon" />,
       content: (
         <div>
@@ -35,7 +32,7 @@ export const SessionsActionContextProvider: React.FC<RulesProviderProps> = ({ ch
       cancelText: "Cancel",
       onOk: async () => {
         await deleteRecording(id, eventsFilePath);
-        handleForceRender();
+        callback?.();
       },
     });
   }, []);

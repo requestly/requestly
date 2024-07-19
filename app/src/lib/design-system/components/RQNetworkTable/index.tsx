@@ -16,6 +16,7 @@ export interface RQNetworkTableProps {
   emptyView?: GenericNetworkTableProps<RQNetworkLog>["emptyView"];
   sessionCurrentOffset?: number;
   autoScroll?: boolean;
+  disableFilters?: boolean;
 }
 
 export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
@@ -26,6 +27,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   emptyView,
   sessionCurrentOffset,
   autoScroll = false,
+  disableFilters = false,
 }) => {
   const [activeLogId, setActiveLogId] = useState(null);
   const containerRef = useRef(null);
@@ -90,6 +92,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
         autoScroll={autoScroll}
         tableRef={containerRef}
         onTableScroll={onScroll}
+        disableFilters={disableFilters}
       />
     </div>
   );
