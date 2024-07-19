@@ -7,24 +7,22 @@ import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDe
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { FilterType } from "componentsV2/ContentList/";
-import { CreateTeamRuleCTA, GettingStarted } from "./components";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { GettingStarted } from "./components";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { isExtensionInstalled } from "actions/ExtensionActions";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
-import "./rulesList.scss";
 import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
 import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
+import "./rulesList.scss";
 
 interface Props {}
 
 const RulesList: React.FC<Props> = () => {
   const user = useSelector(getUserAuthDetails);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
@@ -41,10 +39,6 @@ const RulesList: React.FC<Props> = () => {
     activeFilter,
     searchValue,
   ]);
-
-  const CreateFirstRule = () => {
-    return isWorkspaceMode ? <CreateTeamRuleCTA /> : <GettingStarted />;
-  };
 
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
@@ -97,7 +91,7 @@ const RulesList: React.FC<Props> = () => {
             </div>
           </>
         ) : (
-          <CreateFirstRule />
+          <GettingStarted />
         )}
       </>
     );

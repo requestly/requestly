@@ -1,41 +1,58 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import ImportRulesModal from "../ImportRulesModal";
-import { ImportFromCharlesModal } from "features/rules/screens/rulesList/components/RulesList/components";
+import CharlesIcon from "assets/icons/charlesIcon.svg?react";
+import ModheaderIcon from "assets/icons/modheaderIcon.svg?react";
+import { ImportFromCharlesModal } from "../../ImporterComponents/CharlesImporter";
+import { ImportRulesModal } from "../../../../../../../modals/ImportRulesModal";
 import { AuthConfirmationPopover } from "components/hoc/auth/AuthConfirmationPopover";
-import APP_CONSTANTS from "../../../../config/constants";
+import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { getUserAuthDetails, getAppMode, getUserPersonaSurveyDetails } from "store/selectors";
 import { actions } from "store";
 import { RQButton } from "lib/design-system/components";
-import PersonaRecommendation from "./PersonaRecommendation";
-import { shouldShowRecommendationScreen } from "components/misc/PersonaSurvey/utils";
-import { trackGettingStartedVideoPlayed, trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
+import PersonaRecommendation from "../PersonaRecommendation";
+import { shouldShowRecommendationScreen } from "features/personaSurvey/utils";
+import {
+  trackGettingStartedVideoPlayed,
+  trackNewRuleButtonClicked,
+  trackRulesEmptyStateClicked,
+} from "modules/analytics/events/common/rules";
 import {
   trackRulesImportStarted,
   trackUploadRulesButtonClicked,
   trackCharlesSettingsImportStarted,
 } from "modules/analytics/events/features/rules";
-import "./gettingStarted.css";
-
-const { PATHS } = APP_CONSTANTS;
+import "./gettingStarted.scss";
+import { ImportFromModheaderModal } from "../../ImporterComponents/ModheaderImporter/ImportFromModheaderModal";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { CreateTeamRuleCTA } from "../CreateTeamRuleCTA";
+import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
+import { useIsRedirectFromCreateRulesRoute } from "../../../hooks/useIsRedirectFromCreateRulesRoute";
 
 const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 
-const GettingStarted = () => {
-  const navigate = useNavigate();
+export const GettingStarted: React.FC = () => {
   const { state } = useLocation();
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userPersona = useSelector(getUserPersonaSurveyDetails);
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const gettingStartedVideo = useRef(null);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
   const [isImportCharlesRulesModalActive, setIsImportCharlesRulesModalActive] = useState(false);
+  const [isImportModheaderRulesModalActive, setIsImportModheaderRulesModalActive] = useState(false);
+  const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
+  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(isRedirectFromCreateRulesRoute || false);
+
   const isCharlesImportFeatureFlagOn = useFeatureIsOn("import_rules_from_charles");
+
+  const onRulesListDrawerClose = () => {
+    setIsRulesListDrawerOpen(false);
+  };
 
   const showExistingRulesBanner = !user?.details?.isLoggedIn;
 
@@ -44,15 +61,35 @@ const GettingStarted = () => {
     [appMode, state?.src, userPersona]
   );
 
+  useEffect(() => {
+    if (isWorkspaceMode) {
+      return;
+    }
+
+    if (gettingStartedVideo.current) {
+      gettingStartedVideo.current.addEventListener("play", () => {
+        trackGettingStartedVideoPlayed();
+      });
+    }
+  }, [isWorkspaceMode]);
+
+  if (isWorkspaceMode) {
+    return <CreateTeamRuleCTA />;
+  }
+
   const toggleImportRulesModal = () => {
     setIsImportRulesModalActive((prev) => !prev);
   };
   const toggleImportCharlesRulesModal = () => {
     setIsImportCharlesRulesModalActive((prev) => !prev);
   };
+  const toggleImportModheaderRulesModal = () => {
+    setIsImportModheaderRulesModalActive((prev) => !prev);
+  };
 
   const handleLoginOnClick = () => {
     dispatch(
+      //@ts-ignore
       actions.toggleActiveModal({
         modalName: "authModal",
         newValue: true,
@@ -68,7 +105,8 @@ const GettingStarted = () => {
 
   const handleCreateMyFirstRuleClick = () => {
     trackNewRuleButtonClicked(SOURCE.GETTING_STARTED);
-    navigate(PATHS.RULES.CREATE);
+    trackRulesEmptyStateClicked("create_your_first_rule");
+    setIsRulesListDrawerOpen(true);
   };
 
   const handleUploadRulesClick = () => {
@@ -76,21 +114,13 @@ const GettingStarted = () => {
     trackRulesImportStarted();
   };
 
-  useEffect(() => {
-    if (gettingStartedVideo.current) {
-      gettingStartedVideo.current.addEventListener("play", () => {
-        trackGettingStartedVideoPlayed();
-      });
-    }
-  }, []);
-
   if (isRecommendationScreenVisible) {
     return <PersonaRecommendation handleUploadRulesClick={handleUploadRulesClick} />;
   }
 
   return (
     <>
-      <Row className="getting-started-container">
+      <Row className="v1 getting-started-container">
         <Col
           offset={1}
           span={22}
@@ -132,13 +162,23 @@ const GettingStarted = () => {
                 Create rules to modify HTTP requests & responses - URL redirects, Modify APIs, Modify Headers, etc.
               </p>
               <div className="getting-started-btns-wrapper">
-                <Button
-                  type="primary"
-                  onClick={handleCreateMyFirstRuleClick}
-                  className="getting-started-create-rule-btn"
+                <RuleSelectionListDrawer
+                  open={isRulesListDrawerOpen}
+                  onClose={onRulesListDrawerClose}
+                  source={SOURCE.GETTING_STARTED}
+                  onRuleItemClick={() => {
+                    onRulesListDrawerClose();
+                  }}
                 >
-                  Create your first rule
-                </Button>
+                  <Button
+                    type="primary"
+                    onClick={handleCreateMyFirstRuleClick}
+                    className="getting-started-create-rule-btn"
+                  >
+                    Create your first rule
+                  </Button>
+                </RuleSelectionListDrawer>
+
                 <AuthConfirmationPopover
                   title="You need to sign up to upload rules"
                   callback={handleUploadRulesClick}
@@ -158,15 +198,30 @@ const GettingStarted = () => {
 
                 {/* TODO: make desktop only */}
                 {isCharlesImportFeatureFlagOn ? (
-                  <RQButton
-                    type="default"
-                    onClick={() => {
-                      toggleImportCharlesRulesModal();
-                      trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
-                    }}
-                  >
-                    Import settings from Charles Proxy
-                  </RQButton>
+                  <div className="display-row-center">
+                    <RQButton
+                      type="link"
+                      size="small"
+                      onClick={() => {
+                        toggleImportCharlesRulesModal();
+                        trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
+                      }}
+                    >
+                      <CharlesIcon />
+                      &nbsp; Import from Charles
+                    </RQButton>
+                    <RQButton
+                      type="link"
+                      size="small"
+                      onClick={() => {
+                        toggleImportModheaderRulesModal();
+                        trackCharlesSettingsImportStarted(SOURCE.GETTING_STARTED);
+                      }}
+                    >
+                      <ModheaderIcon />
+                      &nbsp; Import from ModHeader
+                    </RQButton>
+                  </div>
                 ) : null}
               </div>
             </div>
@@ -191,11 +246,17 @@ const GettingStarted = () => {
         />
       ) : null}
 
+      {isImportModheaderRulesModalActive ? (
+        <ImportFromModheaderModal
+          isOpen={isImportModheaderRulesModalActive}
+          toggle={toggleImportModheaderRulesModal}
+          triggeredBy={SOURCE.GETTING_STARTED}
+        />
+      ) : null}
+
       {isImportRulesModalActive ? (
         <ImportRulesModal isOpen={isImportRulesModalActive} toggle={toggleImportRulesModal} />
       ) : null}
     </>
   );
 };
-
-export default GettingStarted;

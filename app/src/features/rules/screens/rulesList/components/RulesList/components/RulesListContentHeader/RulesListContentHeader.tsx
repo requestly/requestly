@@ -5,7 +5,7 @@ import AuthPopoverButton from "components/features/rules/RulesListContainer/Rule
 import { ContentListHeader, ContentListHeaderProps, FilterType } from "componentsV2/ContentList";
 import { RecordStatus, StorageRecord } from "features/rules/types/rules";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { isRule } from "features/rules/utils";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { MdAdd } from "@react-icons/all-files/md/MdAdd";
@@ -17,6 +17,7 @@ import { trackRulesListFilterApplied, trackRulesListSearched } from "features/ru
 import { useRulesActionContext } from "features/rules/context/actions";
 import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { RuleSelectionList } from "../RuleSelectionList/RuleSelectionList";
+import { useIsRedirectFromCreateRulesRoute } from "../../hooks/useIsRedirectFromCreateRulesRoute";
 
 interface Props {
   searchValue: string;
@@ -29,6 +30,8 @@ interface Props {
 const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, filter, setFilter, records }) => {
   const user = useSelector(getUserAuthDetails);
   const debouncedTrackRulesListSearched = useDebounce(trackRulesListSearched, 500);
+  const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
+  const [isRuleDropdownOpen, setIsRuleDropdownOpen] = useState(isRedirectFromCreateRulesRoute || false);
 
   const { createRuleAction, createGroupAction, importRecordsAction } = useRulesActionContext();
 
@@ -57,7 +60,10 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       isTooltipShown: false,
       buttonText: "New Rule",
       icon: <MdAdd className="anticon" />,
-      onClickHandler: () => createRuleAction("in_app"),
+      onClickHandler: () => {
+        setIsRuleDropdownOpen((prev) => !prev);
+        createRuleAction("in_app");
+      },
       isDropdown: true,
       overlay: (
         <div className="rules-dropdown-items-container">
@@ -86,6 +92,10 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           {isDropdown ? (
             // TODO: refactor this with common component RuleTypesDropdown
             <Dropdown
+              open={isRuleDropdownOpen}
+              onOpenChange={(isOpen) => {
+                setIsRuleDropdownOpen(isOpen);
+              }}
               trigger={["click"]}
               overlay={overlay}
               data-tour-id={tourId}
