@@ -105,7 +105,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
           target: playerRef.current,
           props: {
             events: rrwebEvents,
-            // width: playerContainer.current.clientWidth,
+            width: playerRef.current.clientWidth,
             autoPlay: true,
             // prevents elements inside rrweb-player to steal focus
             // The elements inside the player were stealing the focus from the inputs in the session viewer pages
@@ -195,95 +195,100 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   );
 
   // NOTE: effect is not working as expected when in fullscreen mode
-  // useEffect(() => {
-  //   // listen for esc key press to exit fullscreen mode
-  //   const handleEscKey = (event: KeyboardEvent) => {
-  //     if (event.key === "Escape" || event.key === "Esc") {
-  //       document.exitFullscreen();
-  //       setIsFullScreenMode(false);
-  //     }
-  //   };
-  //   document.addEventListener("keydown", handleEscKey);
+  useEffect(() => {
+    // listen for esc key press to exit fullscreen mode
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" || event.key === "Esc") {
+        setIsFullScreenMode(false);
+        document.exitFullscreen();
+      }
+    };
+    document.addEventListener("keydown", handleEscKey);
 
-  //   return () => {
-  //     document.removeEventListener("keydown", handleEscKey);
-  //   };
-  // }, []);
+    return () => {
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, []);
 
   return (
-    <div ref={playerContainerRef} className="session-player-container">
-      <PlayerFrameOverlay playerContainer={playerRef.current} playerState={playerState} />
-      <div ref={playerRef} className={`session-player ${isFullScreenMode ? "session-player-fullscreen" : ""}`}></div>
-      <div className="session-player-controller">
-        <div className="session-status-container">
-          <RQButton
-            onClick={handleSessionPausePlayBtnClick}
-            className="session-player-controller__btn session-pause-play-btn"
-            iconOnly
-            icon={playerState === PlayerState.PAUSED ? <MdOutlinePlayCircle /> : <MdPauseCircleOutline />}
-          />
-          <div className="session-player-duration-tracker">
-            {msToMinutesAndSeconds(playerTimeOffset * 1000 || 0)}/ {msToMinutesAndSeconds(attributes?.duration || 0)}
+    <div className="session-player-container">
+      <div
+        ref={playerContainerRef}
+        className={`session-player-row ${isFullScreenMode ? "session-player-fullscreen" : ""}`}
+      >
+        <div ref={playerRef} className="session-player"></div>
+        <PlayerFrameOverlay playerContainer={playerRef.current} playerState={playerState} />
+        <div className="session-player-controller">
+          <div className="session-status-container">
+            <RQButton
+              onClick={handleSessionPausePlayBtnClick}
+              className="session-player-controller__btn session-pause-play-btn"
+              iconOnly
+              icon={playerState === PlayerState.PAUSED ? <MdOutlinePlayCircle /> : <MdPauseCircleOutline />}
+            />
+            <div className="session-player-duration-tracker">
+              {msToMinutesAndSeconds(playerTimeOffset * 1000 || 0)}/ {msToMinutesAndSeconds(attributes?.duration || 0)}
+            </div>
           </div>
-        </div>
-        <div className="session-player-jump-controllers">
-          <RQButton
-            className="session-player-controller__btn"
-            iconOnly
-            icon={<RiReplay10Fill />}
-            onClick={handleJumpBackward}
-          />
-          <RQButton
-            className="session-player-controller__btn "
-            iconOnly
-            icon={<RiForward10Fill />}
-            onClick={handleJumpForward}
-          />
-        </div>
-        <div>
-          <Select
-            dropdownStyle={{
-              background: theme?.colors?.black,
-            }}
-            className="session-player-controller__speed-selector"
-            defaultValue={1}
-            style={{ width: 60 }}
-            options={[
-              { value: 1, label: "1x" },
-              { value: 2, label: "2x" },
-              { value: 4, label: "4x" },
-              { value: 8, label: "8x" },
-            ]}
-            onChange={handlePlayerSpeedChange}
-            placement="topRight"
-          />
-        </div>
-        <div className="session-player-skip-controller">
-          <Switch size="small" checked={isSkipInactiveEnabled} onChange={handleChangeSkipInactive} />{" "}
-          <span>Skip inactive</span>
-        </div>
-        <div className="flex-1 session-player-fullscreen-controller-container">
-          {isFullScreenMode ? (
+          <div className="session-player-jump-controllers">
+            <RQButton
+              className="session-player-controller__btn"
+              iconOnly
+              icon={<RiReplay10Fill />}
+              onClick={handleJumpBackward}
+            />
             <RQButton
               className="session-player-controller__btn "
               iconOnly
-              icon={<TbMinimize />}
-              onClick={() => {
-                document.exitFullscreen();
-                setIsFullScreenMode(false);
-              }}
+              icon={<RiForward10Fill />}
+              onClick={handleJumpForward}
             />
-          ) : (
-            <RQButton
-              className="session-player-controller__btn "
-              iconOnly
-              icon={<MdFullscreen />}
-              onClick={() => {
-                playerContainerRef.current.requestFullscreen();
-                setIsFullScreenMode(true);
+          </div>
+          <div>
+            <Select
+              dropdownStyle={{
+                background: theme?.colors?.black,
               }}
+              className="session-player-controller__speed-selector"
+              defaultValue={1}
+              style={{ width: 60 }}
+              options={[
+                { value: 1, label: "1x" },
+                { value: 2, label: "2x" },
+                { value: 4, label: "4x" },
+                { value: 8, label: "8x" },
+              ]}
+              onChange={handlePlayerSpeedChange}
+              placement="topRight"
             />
-          )}
+          </div>
+          <div className="session-player-skip-controller">
+            <Switch size="small" checked={isSkipInactiveEnabled} onChange={handleChangeSkipInactive} />{" "}
+            <span>Skip inactive</span>
+          </div>
+          <div className="flex-1 session-player-fullscreen-controller-container">
+            {isFullScreenMode ? (
+              <RQButton
+                className="session-player-controller__btn "
+                iconOnly
+                icon={<TbMinimize />}
+                onClick={() => {
+                  document.exitFullscreen();
+                  setIsFullScreenMode(false);
+                }}
+              />
+            ) : (
+              <RQButton
+                className="session-player-controller__btn "
+                iconOnly
+                icon={<MdFullscreen />}
+                onClick={() => {
+                  playerContainerRef.current.requestFullscreen();
+                  setIsFullScreenMode(true);
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

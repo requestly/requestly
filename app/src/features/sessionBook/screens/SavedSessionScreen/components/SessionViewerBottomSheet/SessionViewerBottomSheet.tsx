@@ -8,6 +8,7 @@ import { SessionInfo } from "./components/SessionInfo/SessionInfo";
 import SessionNetworkLogs from "./components/SessionNetworkLogs/SessionNetworkLogs";
 import SessionConsoleLogs from "./components/SessionConsoleLogs/SessionConsoleLogs";
 import { SessionEnvironmentDetails } from "./components/SessionEnvironmentDetails/SessionEnvironmentDetails";
+import { trackSessionRecordingBottomSheetTabClicked } from "features/sessionBook/analytics";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
@@ -18,9 +19,13 @@ const BOTTOM_SHEET_TAB_KEYS = {
 
 interface SessionViewerBottomSheetProps {
   playerTimeOffset: number;
+  disableDocking?: boolean;
 }
 
-const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({ playerTimeOffset }) => {
+const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({
+  playerTimeOffset,
+  disableDocking = false,
+}) => {
   const bottomSheetTabItems = useMemo(() => {
     return [
       {
@@ -68,7 +73,14 @@ const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({ pla
     ];
   }, [playerTimeOffset]);
 
-  return <BottomSheet items={bottomSheetTabItems} defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.INFO} />;
+  return (
+    <BottomSheet
+      items={bottomSheetTabItems}
+      defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.INFO}
+      disableDocking={disableDocking}
+      onTabClick={(key: string) => trackSessionRecordingBottomSheetTabClicked(key)}
+    />
+  );
 };
 
 export default React.memo(SessionViewerBottomSheet);
