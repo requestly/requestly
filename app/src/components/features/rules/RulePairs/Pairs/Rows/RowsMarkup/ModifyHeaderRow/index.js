@@ -11,7 +11,7 @@ const ModifyHeaderRow = ({ rowIndex, pair, pairIndex, isInputDisabled, ruleDetai
 
   return (
     <Row span={24} gutter={8} key={rowIndex} align="middle" className="margin-top-one">
-      {currentlySelectedRuleData.version > 1 ? (
+      {currentlySelectedRuleData.version > 1 || currentlySelectedRuleData?.schemaVersion ? (
         <HeadersRulePairV2
           pair={pair}
           pairIndex={pairIndex}
