@@ -13,6 +13,13 @@ import PermissionError from "features/sessionBook/components/PermissionError";
 import BadSessionError from "features/sessionBook/components/BadSessionError";
 import NotFoundError from "features/sessionBook/components/NotFoundError";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import "./savedSessionScreen.scss";
+
+enum SessionError {
+  PermissionDenied = "PermissionDenied",
+  NotFound = "NotFound",
+  BadSessionEvents = "BadSessionEvents",
+}
 
 export const SavedSessionScreen: React.FC = () => {
   const { id } = useParams();
@@ -42,7 +49,7 @@ export const SavedSessionScreen: React.FC = () => {
           dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
         } catch (e) {
           const err = new Error("Failed to decompress session events");
-          err.name = "BadSessionEvents";
+          err.name = SessionError.BadSessionEvents;
           throw err;
         } finally {
           setIsFetching(false);
@@ -50,13 +57,13 @@ export const SavedSessionScreen: React.FC = () => {
       })
       .catch((err) => {
         switch (err.name) {
-          case "NotFound":
+          case SessionError.NotFound:
             setShowNotFoundError(true);
             break;
-          case "BadSessionEvents":
+          case SessionError.BadSessionEvents:
             setShowBadSessionError(true);
             break;
-          case "PermissionDenied":
+          case SessionError.PermissionDenied:
           default:
             setShowPermissionError(true);
         }
