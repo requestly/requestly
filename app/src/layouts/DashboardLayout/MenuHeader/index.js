@@ -65,7 +65,7 @@ const MenuHeader = () => {
                 >
                   Tutorials
                 </a>
-                <ProductsDropDown />
+                {appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION && <ProductsDropDown />}
               </div>
             </Col>
           ) : null}
