@@ -9,11 +9,13 @@ import { MdPauseCircleOutline } from "@react-icons/all-files/md/MdPauseCircleOut
 import { RiReplay10Fill } from "@react-icons/all-files/ri/RiReplay10Fill";
 import { RiForward10Fill } from "@react-icons/all-files/ri/RiForward10Fill";
 import { MdFullscreen } from "@react-icons/all-files/md/MdFullscreen";
+import { TbMinimize } from "@react-icons/all-files/tb/TbMinimize";
 import { RQButton } from "lib/design-system/components";
 import { Select, Switch } from "antd";
 import { PlayerState } from "features/sessionBook/types";
 import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
+import PlayerFrameOverlay from "./components/PlayerOverlay/PlayerOverlay";
 import "./sessionPlayer.scss";
 import { useTheme } from "styled-components";
 
@@ -30,14 +32,16 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
   const [playerTimeOffset, setPlayerTimeOffset] = useState(0);
   const [isSkipInactiveEnabled, setIsSkipInactiveEnabled] = useState(true);
+  const [isFullScreenMode, setIsFullScreenMode] = useState(false);
 
-  const theme = useTheme();
-
-  const playerContainer = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
   const currentTimeRef = useRef<number>(0);
   const isPlayerSkippingInactivity = useRef(false);
   const skipInactiveSegments = useRef(true);
   const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
+
+  const theme = useTheme();
 
   const inactiveSegments = useMemo(() => {
     if (events) {
@@ -98,7 +102,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
 
       setPlayer(
         new Replayer({
-          target: playerContainer.current,
+          target: playerRef.current,
           props: {
             events: rrwebEvents,
             // width: playerContainer.current.clientWidth,
@@ -190,9 +194,26 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     [player]
   );
 
+  // NOTE: effect is not working as expected when in fullscreen mode
+  // useEffect(() => {
+  //   // listen for esc key press to exit fullscreen mode
+  //   const handleEscKey = (event: KeyboardEvent) => {
+  //     if (event.key === "Escape" || event.key === "Esc") {
+  //       document.exitFullscreen();
+  //       setIsFullScreenMode(false);
+  //     }
+  //   };
+  //   document.addEventListener("keydown", handleEscKey);
+
+  //   return () => {
+  //     document.removeEventListener("keydown", handleEscKey);
+  //   };
+  // }, []);
+
   return (
-    <div className="session-player-container">
-      <div ref={playerContainer} className="session-player"></div>
+    <div ref={playerContainerRef} className="session-player-container">
+      <PlayerFrameOverlay playerContainer={playerRef.current} playerState={playerState} />
+      <div ref={playerRef} className={`session-player ${isFullScreenMode ? "session-player-fullscreen" : ""}`}></div>
       <div className="session-player-controller">
         <div className="session-status-container">
           <RQButton
@@ -234,6 +255,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
               { value: 8, label: "8x" },
             ]}
             onChange={handlePlayerSpeedChange}
+            placement="topRight"
           />
         </div>
         <div className="session-player-skip-controller">
@@ -241,8 +263,27 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
           <span>Skip inactive</span>
         </div>
         <div className="flex-1 session-player-fullscreen-controller-container">
-          {/* TODO: add full screen action */}
-          <RQButton className="session-player-controller__btn " iconOnly icon={<MdFullscreen />} />
+          {isFullScreenMode ? (
+            <RQButton
+              className="session-player-controller__btn "
+              iconOnly
+              icon={<TbMinimize />}
+              onClick={() => {
+                document.exitFullscreen();
+                setIsFullScreenMode(false);
+              }}
+            />
+          ) : (
+            <RQButton
+              className="session-player-controller__btn "
+              iconOnly
+              icon={<MdFullscreen />}
+              onClick={() => {
+                playerContainerRef.current.requestFullscreen();
+                setIsFullScreenMode(true);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

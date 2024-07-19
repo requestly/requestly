@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tooltip } from "antd";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
-import { DownloadSessionButton } from "features/sessionBook/components/DownloadSessionButton/DownloadSessionButton";
+import { SaveSessionButton } from "features/sessionBook/components/SaveSessionButton/SaveSessionButton";
 import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
 import { SessionTitle } from "features/sessionBook/screens/SavedSessionScreen/components/SessionsTitle/SessionTitle";
 import { RQButton } from "lib/design-system/components";
@@ -12,7 +12,11 @@ import { MdOutlinePublic } from "@react-icons/all-files/md/MdOutlinePublic";
 import { MdOutlineLink } from "@react-icons/all-files/md/MdOutlineLink";
 import SessionViewerBottomSheet from "features/sessionBook/screens/SavedSessionScreen/components/SessionViewerBottomSheet/SessionViewerBottomSheet";
 import { useSessionsActionContext } from "features/sessionBook/context/actions";
-import { getSessionRecordingMetaData, getSessionRecordingVisibility } from "store/features/session-recording/selectors";
+import {
+  getIsRequestedByOwner,
+  getSessionRecordingMetaData,
+  getSessionRecordingVisibility,
+} from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import ShareRecordingModal from "views/features/sessions/ShareRecordingModal";
 import "./savedSessionViewer.scss";
@@ -20,9 +24,11 @@ import "./savedSessionViewer.scss";
 export const SavedSessionViewer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const { handleDeleteSessionAction } = useSessionsActionContext();
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
   const currentVisibility = useSelector(getSessionRecordingVisibility);
+  const isRequestedByOwner = useSelector(getIsRequestedByOwner);
 
   const [isLinkCopied, setIsLinkCopied] = useState(false);
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
@@ -54,23 +60,25 @@ export const SavedSessionViewer = () => {
       <div className="saved-session-viewer-container">
         <div className="saved-session-header">
           <SessionTitle />
-          <div className="saved-session-actions">
-            <Tooltip title="Delete session">
-              <RQButton
-                onClick={handleDeleteSessionClick}
-                className="delete-session-btn"
-                iconOnly
-                icon={<RiDeleteBin6Line />}
-              />
-            </Tooltip>
-            <RQButton className="share-session-btn" icon={<MdOutlinePublic />} onClick={handleShareModalVisibiliity}>
-              Share session
-            </RQButton>
-            <RQButton className="share-session-btn" icon={<MdOutlineLink />} onClick={handleCopySessionLink}>
-              {isLinkCopied ? "Copied!" : "Copy Link"}
-            </RQButton>
-            <DownloadSessionButton />
-          </div>
+          {isRequestedByOwner ? (
+            <div className="saved-session-actions">
+              <Tooltip title="Delete session">
+                <RQButton
+                  onClick={handleDeleteSessionClick}
+                  className="delete-session-btn"
+                  iconOnly
+                  icon={<RiDeleteBin6Line />}
+                />
+              </Tooltip>
+              <RQButton className="share-session-btn" icon={<MdOutlinePublic />} onClick={handleShareModalVisibiliity}>
+                Share session
+              </RQButton>
+              <RQButton className="share-session-btn" icon={<MdOutlineLink />} onClick={handleCopySessionLink}>
+                {isLinkCopied ? "Copied!" : "Copy Link"}
+              </RQButton>
+              <SaveSessionButton />
+            </div>
+          ) : null}
         </div>
         <BottomSheetLayout bottomSheet={<SessionViewerBottomSheet playerTimeOffset={sessionPlayerOffset} />}>
           <div className="saved-session-viewer-body">

@@ -7,6 +7,7 @@ import { IoMdTime } from "@react-icons/all-files/io/IoMdTime";
 import { MdToday } from "@react-icons/all-files/md/MdToday";
 import { InlineInput } from "componentsV2/InlineInput/InlineInput";
 import {
+  getIsRequestedByOwner,
   getSessionRecordingAttributes,
   getSessionRecordingId,
   getSessionRecordingMetaData,
@@ -23,6 +24,7 @@ export const SessionInfo: React.FC = () => {
   const recordingId = useSelector(getSessionRecordingId);
   const sessionMetadata = useSelector(getSessionRecordingMetaData);
   const sessionAttributes = useSelector(getSessionRecordingAttributes);
+  const isRequestedByOwner = useSelector(getIsRequestedByOwner);
 
   const handleSessionNameUpdate = useCallback(() => {
     if (recordingId && sessionMetadata?.name) {
@@ -49,6 +51,7 @@ export const SessionInfo: React.FC = () => {
               dispatch(sessionRecordingActions.setName(value));
             }}
             onBlur={handleSessionNameUpdate}
+            disabled={!isRequestedByOwner}
           />
         ),
       },
@@ -63,6 +66,7 @@ export const SessionInfo: React.FC = () => {
               dispatch(sessionRecordingActions.setDescription(value));
             }}
             onBlur={handleSessionDescriptionUpdate}
+            disabled={!isRequestedByOwner}
           />
         ),
       },
@@ -78,6 +82,7 @@ export const SessionInfo: React.FC = () => {
     handleSessionNameUpdate,
     sessionMetadata?.description,
     sessionMetadata?.name,
+    isRequestedByOwner,
   ]);
 
   return (
