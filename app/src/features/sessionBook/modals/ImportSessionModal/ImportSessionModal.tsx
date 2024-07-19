@@ -51,7 +51,7 @@ export const ImportSessionModal: React.FC<ImportSessionModalProps> = ({ isOpen, 
 
           toggleModal();
           trackSessionRecordingUpload("success");
-          navigate(`${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
+          navigate(`/${PATHS.SESSIONS.DRAFT.RELATIVE}/imported`);
         } catch (error) {
           trackSessionRecordingUpload("failed");
           alert("Imported file doesn't match Requestly format. Please choose another file.");
