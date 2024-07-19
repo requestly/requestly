@@ -12,6 +12,7 @@ import { downloadSessionFile } from "features/sessionBook/utils/sessionFile";
 import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
+import PATHS from "config/constants/sub/paths";
 import "./saveSessionButton.scss";
 
 export const SaveSessionButton = () => {
@@ -21,7 +22,7 @@ export const SaveSessionButton = () => {
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const isDraftSession = location.pathname.includes("draft");
+  const isDraftSession = location.pathname.includes(PATHS.SESSIONS.DRAFT.INDEX);
   const debugInfoToBeIncluded: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
   // TODO: handle save session flow for draft session
