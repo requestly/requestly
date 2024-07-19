@@ -1,0 +1,28 @@
+.session-details-panel-wrapper {
+  height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.session-details-panel-container {
+  background: var(--requestly-color-surface-0);
+  border-radius: 8px;
+  height: 100%;
+  padding: 12px;
+
+  .session-details-label {
+    color: var(--requestly-color-text-default);
+    font-size: var(--requestly-font-size-sm);
+    font-weight: 500;
+  }
+
+  .session-details-input,
+  .session-details-textarea {
+    border: 1px solid var(--requestly-color-white-t-20);
+    font-size: var(--requestly-font-size-sm);
+    color: var(--requestly-color-text-default);
+    resize: none;
+    background: transparent;
+    margin-top: 8px;
+  }
+}

@@ -27,7 +27,7 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { trackTestRuleSessionDraftSaved } from "modules/analytics/events/features/ruleEditor";
 import { DraftSessionViewerProps } from "./DraftSessionViewer";
 import { useIncentiveActions } from "features/incentivization/hooks";
-import { saveDraftSession } from "./utils";
+import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import Logger from "../../../../../../common/logger";
 
 interface Props {
@@ -138,7 +138,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
         sessionEvents,
         includedDebugInfo,
         source,
-        testRuleDraftSession,
         claimIncentiveRewards
       )
         .then(() => {
@@ -160,7 +159,6 @@ const SaveRecordingConfigPopup: React.FC<Props> = ({
       workspace?.id,
       sessionEvents,
       dispatch,
-      testRuleDraftSession,
       appMode,
       navigate,
       source,
