@@ -1,13 +1,12 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
+import { SessionInfo } from "../components/SessionInfo/SessionInfo";
+import SessionConsoleLogs from "../components/SessionConsoleLogs/SessionConsoleLogs";
+import SessionNetworkLogs from "../components/SessionNetworkLogs/SessionNetworkLogs";
+import { SessionEnvironmentDetails } from "../components/SessionEnvironmentDetails/SessionEnvironmentDetails";
 import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { MdNetworkCheck } from "@react-icons/all-files/md/MdNetworkCheck";
 import { MdConnectedTv } from "@react-icons/all-files/md/MdConnectedTv";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
-import { BottomSheetWithoutContext } from "componentsV2/BottomSheet";
-import { SessionInfo } from "./SessionInfo/SessionInfo";
-import SessionNetworkLogs from "./SessionNetworkLogs/SessionNetworkLogs";
-import SessionConsoleLogs from "./SessionConsoleLogs/SessionConsoleLogs";
-import { SessionEnvironmentDetails } from "./SessionEnvironmentDetails/SessionEnvironmentDetails";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
@@ -20,8 +19,8 @@ interface Props {
   playerTimeOffset: number;
 }
 
-const StaticSessionViewerBottomSheet: React.FC<Props> = ({ playerTimeOffset }) => {
-  const bottomSheetTabItems = useMemo(() => {
+export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
+  return useMemo(() => {
     return [
       {
         key: BOTTOM_SHEET_TAB_KEYS.INFO,
@@ -67,8 +66,4 @@ const StaticSessionViewerBottomSheet: React.FC<Props> = ({ playerTimeOffset }) =
       },
     ];
   }, [playerTimeOffset]);
-
-  return <BottomSheetWithoutContext items={bottomSheetTabItems} defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.INFO} />;
 };
-
-export default React.memo(StaticSessionViewerBottomSheet);
