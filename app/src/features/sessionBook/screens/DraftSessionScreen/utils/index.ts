@@ -2,10 +2,7 @@ import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { compressEvents, getSessionEventsToSave } from "../../../utils/sessionEvents";
 import { getRecordingOptionsToSave } from "features/sessionBook/utils/sessionFile";
 import { toast } from "utils/Toast";
-import {
-  trackDraftSessionSaveFailed,
-  trackDraftSessionSaved,
-} from "modules/analytics/events/features/sessionRecording";
+import { trackDraftSessionSaveFailed, trackDraftSessionSaved } from "features/sessionBook/analytics";
 import { SessionRecordingMetadata, SessionSaveMode } from "../../../types";
 import { IncentivizeEvent, UserIncentiveEvent } from "features/incentivization/types";
 import { Dispatch } from "@reduxjs/toolkit";

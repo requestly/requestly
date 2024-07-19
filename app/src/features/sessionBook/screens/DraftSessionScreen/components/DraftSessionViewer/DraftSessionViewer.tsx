@@ -11,10 +11,7 @@ import { SaveSessionButton } from "features/sessionBook/components/SaveSessionBu
 import { getAppFlavour } from "utils/AppUtils";
 import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
 import DraftSessionDetailsPanel from "../DraftSessionDetailsPanel/DraftSessionDetailsPanel";
-import {
-  trackDraftSessionDiscarded,
-  trackDraftSessionViewed,
-} from "modules/analytics/events/features/sessionRecording";
+import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/sessionBook/analytics";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import "./draftSessionViewer.scss";
