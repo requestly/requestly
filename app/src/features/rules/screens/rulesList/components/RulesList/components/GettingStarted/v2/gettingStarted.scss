@@ -1,0 +1,192 @@
+.v2.getting-started-container {
+  display: flex;
+  justify-content: center;
+
+  .getting-started-content {
+    width: 100%;
+    max-width: 688px;
+    padding: 48px 12px;
+
+    .workspace-title-container {
+      margin-bottom: 32px;
+
+      h1 {
+        line-height: 1rem;
+      }
+    }
+
+    .link-btn.ant-btn {
+      font-size: 13px; /* TODO: use "--requestly-font-size-*" variable */
+      line-height: 150%; /* 19.5px */
+      color: var(--requestly-color-primary-text, #639ff9);
+      padding: 0;
+
+      &:hover {
+        text-decoration-line: underline;
+      }
+    }
+
+    .create-new-rule-container {
+      font-family: Inter;
+
+      .create-new-rule-title {
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 150%; /* 22.5px */
+        margin-bottom: 16px;
+        color: var(--requestly-color-text-default, #fff);
+      }
+
+      .create-new-rule-content {
+        display: flex;
+        align-items: stretch;
+        gap: 32px;
+
+        .no-rules {
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          gap: 32px;
+          flex: 1 0 0;
+          border-radius: 8px;
+          background: var(--requestly-color-surface-0, #212121);
+
+          .empty-rules-image-container {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            gap: 16px;
+
+            img.empty-rules {
+              width: 72px;
+              height: 72px;
+            }
+          }
+        }
+
+        .rule-suggestions {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+          flex: 1 0 0;
+
+          .suggested-rule-link {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--requestly-color-text-subtle, #bbb);
+            background: var(--requestly-color-surface-0, #212121);
+
+            &:hover {
+              background: var(--requestly-color-surface-1, #282828);
+            }
+
+            .icon {
+              width: 20px;
+              height: 20px;
+              flex-shrink: 0;
+
+              .rule-type-icon {
+                padding: 2px;
+              }
+            }
+
+            .title {
+              font-size: 15px;
+              font-weight: 400;
+              line-height: 150%;
+              font-size: 15px;
+              font-weight: 400;
+              line-height: 150%; /* 22.5px */
+              color: var(--requestly-color-text-subtle, #bbb);
+            }
+
+            .help-icon {
+              margin-left: auto;
+              font-size: 16px;
+              line-height: 16px; /* 100% */
+              opacity: 0.5;
+              color: var(--requestly-color-text-subtle, #bbb);
+            }
+          }
+        }
+      }
+    }
+
+    .divider.ant-divider {
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+
+    .getting-started-actions {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+
+      .templates-btn {
+        margin-left: auto;
+      }
+    }
+
+    .ask-ai-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-self: stretch;
+      margin-top: 56px;
+
+      .title {
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 150%; /* 22.5px */
+        color: var(--requestly-color-text-default, #fff);
+      }
+
+      .ask-ai-btn.ant-btn.ant-btn-default {
+        height: 48px;
+        padding: 16px;
+        border-radius: 8px;
+        gap: 8px;
+
+        .ask-ai-btn-content {
+          font-size: 13px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 150%;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          width: 100%;
+          color: var(--requestly-color-text-placeholder, #8f8f8f);
+
+          svg {
+            width: 16px;
+            height: 16px;
+            color: inherit;
+          }
+        }
+
+        &::after {
+          border-radius: 8px;
+        }
+      }
+
+      .caption {
+        color: var(--requestly-color-text-placeholder, #8f8f8f);
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 130%; /* 14.3px */
+        margin-top: 8px;
+      }
+    }
+  }
+}

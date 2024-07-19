@@ -110,6 +110,7 @@ export const SOURCE = {
   TEMPLATES_SCREEN: "templates_screen",
   PLAN_EXPIRED_BANNER: "plan_expired_banner",
   MV3_MODAL: "mv3_modal",
+  INCENTIVIZATION_TASK_LIST: "incentivization_task_list",
 };
 
 export const RULES = {
@@ -143,6 +144,7 @@ export const RULES = {
   NEW_RULE_BUTTON_CLICKED: "new_rule_button_clicked",
   RULE_TYPE_SWITCHED: "rule_type_switched",
   RULE_DEMO_VIDEO_CLICKED: "rule_demo_video_clicked",
+  RULES_EMPTY_STATE_CLICKED: "rules_empty_state_clicked",
   GETTING_STARTED_VIDEO_PLAYED: "getting_started_video_played",
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
   RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",

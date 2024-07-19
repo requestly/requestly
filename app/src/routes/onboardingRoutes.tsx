@@ -1,7 +1,5 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import RuleSelection from "components/landing/ruleSelection";
-import GettingStarted from "components/features/rules/GettingStarted";
 import InviteView from "views/misc/Invite";
 
 export const onboardingRoutes: RouteObject[] = [
@@ -10,12 +8,12 @@ export const onboardingRoutes: RouteObject[] = [
     element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} />,
   },
   {
-    path: PATHS.RULES.CREATE,
-    element: <RuleSelection />,
+    path: PATHS.RULES.CREATE + "*",
+    element: <Navigate to={PATHS.RULES.MY_RULES.ABSOLUTE} state={{ from: PATHS.RULES.CREATE }} />,
   },
   {
     path: PATHS.GETTING_STARTED,
-    element: <GettingStarted />,
+    element: <Navigate to={PATHS.HOME.ABSOLUTE} state={{ from: PATHS.GETTING_STARTED }} />,
   },
   {
     path: PATHS.INVITE.RELATIVE,

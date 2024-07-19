@@ -181,9 +181,11 @@ const RuleBuilder = (props) => {
   useEffect(() => {
     const source = state?.source ?? null;
     const ruleType = currentlySelectedRuleConfig.TYPE;
-    if (!ruleType || !source) return;
-    trackRuleEditorViewed(source, ruleType);
-  }, [currentlySelectedRuleConfig.TYPE, state]);
+
+    if (ruleType && source) {
+      trackRuleEditorViewed(source, ruleType);
+    }
+  }, [currentlySelectedRuleConfig.TYPE, state?.source]);
 
   useEffect(() => {
     if (

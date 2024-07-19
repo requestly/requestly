@@ -310,3 +310,8 @@ export const getToastForEditor = (state, id) => {
 export const getIsAppBannerVisible = (state) => {
   return getGlobalState(state).misc.nonPersist?.isAppBannerVisible;
 };
+
+// request bot
+export const getRequestBot = (state) => {
+  return getGlobalState(state).misc.nonPersist?.requestBot;
+};

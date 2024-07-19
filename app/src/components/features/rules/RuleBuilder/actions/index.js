@@ -17,9 +17,7 @@ export const setIsCurrentlySelectedRuleHasUnsavedChanges = (dispatch, hasUnsaved
 };
 
 export const setCurrentlySelectedRule = (dispatch, newRule, warnForUnsavedChanges = false) => {
-  if (warnForUnsavedChanges) {
-    setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, true);
-  }
+  setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, warnForUnsavedChanges);
 
   dispatch(actions.updateCurrentlySelectedRuleData(newRule));
 };
