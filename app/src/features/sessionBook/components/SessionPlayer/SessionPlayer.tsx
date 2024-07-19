@@ -232,6 +232,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
           </div>
           <div>
             <Select
+              size="small"
               dropdownStyle={{
                 background: theme?.colors?.black,
               }}

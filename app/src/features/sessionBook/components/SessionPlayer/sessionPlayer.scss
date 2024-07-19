@@ -158,3 +158,76 @@
     height: 530px !important;
   }
 }
+
+@media (max-width: 1240px) {
+  .rr-player__frame {
+    height: 400px !important;
+  }
+  .replayer-wrapper {
+    transform: scale(0.440972) translate(-50%, -50%) !important;
+  }
+}
+
+@media (max-width: 690px) {
+  .replayer-wrapper {
+    transform: scale(0.360972) translate(-50%, -50%) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .session-player-container {
+    .session-player-controller {
+      gap: 8px;
+
+      .session-player-controller__btn.ant-btn {
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
+
+      .session-status-container {
+        gap: 2px;
+      }
+      .session-player-jump-controllers {
+        gap: 0px;
+      }
+    }
+    font-size: var(--requestly-font-size-xs);
+  }
+}
+
+@media (max-width: 582px) {
+  .replayer-wrapper {
+    transform: scale(0.28972) translate(-50%, -50%) !important;
+  }
+  .rr-player__frame {
+    height: 320px !important;
+  }
+}
+
+@media (max-width: 475px) {
+  .session-player-container {
+    .session-player-controller {
+      padding: 10px 2px;
+
+      .session-player-skip-controller {
+        flex-direction: column;
+      }
+
+      .session-player-controller__speed-selector.ant-select {
+        width: 50px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  @media (max-width: 582px) {
+    .replayer-wrapper {
+      transform: scale(0.25972) translate(-50%, -50%) !important;
+    }
+    .rr-player__frame {
+      height: 300px !important;
+    }
+  }
+}
