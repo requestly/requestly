@@ -34,7 +34,7 @@ export const RULE_DETAILS: RuleDetails = {
           type: RuleType.REDIRECT,
           title: RULE_TYPES_CONFIG[RuleType.REDIRECT].NAME,
           icon: RULE_TYPES_CONFIG[RuleType.REDIRECT].ICON,
-          description: RULE_TYPES_CONFIG[RuleType.REDIRECT].DESCRIPTION,
+          description: "Map Local or Redirect a matching pattern to a URL",
         },
         {
           type: RuleType.REPLACE,
@@ -58,7 +58,7 @@ export const RULE_DETAILS: RuleDetails = {
           type: RuleType.REQUEST,
           title: RULE_TYPES_CONFIG[RuleType.REQUEST].NAME,
           icon: RULE_TYPES_CONFIG[RuleType.REQUEST].ICON,
-          description: RULE_TYPES_CONFIG[RuleType.REQUEST].DESCRIPTION,
+          description: "Override Body of POST requests",
         },
         {
           type: RuleType.RESPONSE,
@@ -91,22 +91,22 @@ export const RULE_DETAILS: RuleDetails = {
       type: RuleCategories.OTHERS,
       rules: [
         {
+          type: RuleType.SCRIPT,
+          title: RULE_TYPES_CONFIG[RuleType.SCRIPT].NAME,
+          icon: RULE_TYPES_CONFIG[RuleType.SCRIPT].ICON,
+          description: "Inject Custom JS or CSS to any website",
+        },
+        {
           type: RuleType.CANCEL,
           title: RULE_TYPES_CONFIG[RuleType.CANCEL].NAME,
           icon: RULE_TYPES_CONFIG[RuleType.CANCEL].ICON,
           description: RULE_TYPES_CONFIG[RuleType.CANCEL].DESCRIPTION,
         },
         {
-          type: RuleType.SCRIPT,
-          title: RULE_TYPES_CONFIG[RuleType.SCRIPT].NAME,
-          icon: RULE_TYPES_CONFIG[RuleType.SCRIPT].ICON,
-          description: RULE_TYPES_CONFIG[RuleType.SCRIPT].DESCRIPTION,
-        },
-        {
           type: RuleType.DELAY,
           title: RULE_TYPES_CONFIG[RuleType.DELAY].NAME,
           icon: RULE_TYPES_CONFIG[RuleType.DELAY].ICON,
-          description: RULE_TYPES_CONFIG[RuleType.DELAY].DESCRIPTION,
+          description: "Introduce a lag to the response from specific URLs",
         },
       ],
     },
