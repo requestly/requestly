@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { generateDraftSessionTitle } from "./utils";
 import mockSession from "views/features/sessions/SessionViewer/mockData/mockSession";
-import { trackSessionRecordingFailed } from "modules/analytics/events/features/sessionRecording";
+import { trackSessionRecordingFailed } from "features/sessionBook/analytics";
 import PageLoader from "components/misc/PageLoader";
 import PageError from "components/misc/PageError";
 import { DraftSessionViewer } from "./components/DraftSessionViewer/DraftSessionViewer";
