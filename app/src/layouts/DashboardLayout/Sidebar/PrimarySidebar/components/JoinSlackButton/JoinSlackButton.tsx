@@ -1,24 +1,30 @@
 import { RQButton } from "lib/design-system/components";
 import SlackIcon from "assets/icons/slack.svg?react";
 import sendSlackInvite from "components/misc/SupportPanel/sendSlackInvite";
-import { useState } from "react";
+import React, { useState } from "react";
 import starAnimation from "assets/images/gifs/Stars.gif";
 import "./joinSlackButton.scss";
-import { trackEvent } from "modules/analytics";
+import { trackSlackConnectClicked } from "modules/analytics/events/misc/UnifiedSupport";
+
+const handleJoinSlack = async (setDisabled: React.Dispatch<React.SetStateAction<boolean>>) => {
+  setDisabled(true);
+  try {
+    await sendSlackInvite();
+    trackSlackConnectClicked("Sidebar");
+    setDisabled(false);
+  } catch (err) {
+    console.error(err);
+    setDisabled(false);
+  }
+};
+
 const JoinSlackButton = () => {
   const [disabled, setDisabled] = useState(false);
   return (
     <>
       <RQButton
         type="text"
-        onClick={async () => {
-          setDisabled(true);
-          await sendSlackInvite();
-          trackEvent("join_slack_connect_clicked", {
-            source: "sidebar",
-          });
-          setDisabled(false);
-        }}
+        onClick={() => handleJoinSlack(setDisabled)}
         className="primary-sidebar-link w-full"
         disabled={disabled}
       >
