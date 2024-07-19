@@ -15,6 +15,7 @@ import { PlayerState } from "features/sessionBook/types";
 import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 import "./sessionPlayer.scss";
+import { useTheme } from "styled-components";
 
 interface SessionPlayerProps {
   onPlayerTimeOffsetChange: (timeOffset: number) => void;
@@ -29,6 +30,8 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.PLAYING);
   const [playerTimeOffset, setPlayerTimeOffset] = useState(0);
   const [isSkipInactiveEnabled, setIsSkipInactiveEnabled] = useState(true);
+
+  const theme = useTheme();
 
   const playerContainer = useRef<HTMLDivElement>(null);
   const currentTimeRef = useRef<number>(0);
@@ -218,6 +221,9 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
         </div>
         <div>
           <Select
+            dropdownStyle={{
+              background: theme?.colors?.black,
+            }}
             className="session-player-controller__speed-selector"
             defaultValue={1}
             style={{ width: 60 }}

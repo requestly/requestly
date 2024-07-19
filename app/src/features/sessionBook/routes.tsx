@@ -23,10 +23,6 @@ export const sessionRoutes: RouteObject[] = [
         path: PATHS.SESSIONS.SAVED.INDEX + "/:id",
         element: <SavedSessionScreen />,
       },
-      {
-        path: PATHS.SESSIONS.SETTINGS.INDEX,
-        element: <Navigate to={PATHS.SETTINGS.SESSION_BOOK.RELATIVE} replace />,
-      },
     ],
   },
 
