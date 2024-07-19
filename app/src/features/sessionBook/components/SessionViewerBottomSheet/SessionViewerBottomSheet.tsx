@@ -3,6 +3,7 @@ import { BottomSheet, BottomSheetPlacement, useBottomSheetContext } from "compon
 import { useMediaQuery } from "react-responsive";
 import { useLocation } from "react-router-dom";
 import { useSessionBottomSheetTabItems } from "./hooks/useSessionBottomSheetTabItems";
+import PATHS from "config/constants/sub/paths";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
@@ -27,7 +28,7 @@ const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({
   const bottomSheetTabItems = useSessionBottomSheetTabItems({ playerTimeOffset });
 
   useEffect(() => {
-    if (bottomSheetBottomBreakpoint && location.pathname.includes("saved")) {
+    if (bottomSheetBottomBreakpoint && location.pathname.includes(PATHS.SESSIONS.INDEX)) {
       toggleSheetPlacement(BottomSheetPlacement.BOTTOM);
     }
   }, [bottomSheetBottomBreakpoint, toggleSheetPlacement, location.pathname]);

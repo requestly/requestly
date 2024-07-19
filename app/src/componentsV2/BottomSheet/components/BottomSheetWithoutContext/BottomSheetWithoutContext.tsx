@@ -2,6 +2,8 @@ import React from "react";
 import { Col, Tabs, TabsProps } from "antd";
 import "../../BottomSheet.scss";
 
+// Created a separate BottomSheet component to use without context
+
 interface BottomSheetProps extends TabsProps {
   onTabClick?: () => void;
 }
