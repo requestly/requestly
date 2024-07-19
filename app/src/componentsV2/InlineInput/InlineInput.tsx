@@ -6,11 +6,12 @@ import "./inlineInput.scss";
 interface Props {
   value: string;
   placeholder: string;
+  disabled?: boolean;
   onChange: (value: String) => void;
   onBlur?: () => void;
 }
 
-export const InlineInput: React.FC<Props> = ({ value, placeholder, onChange, onBlur }) => {
+export const InlineInput: React.FC<Props> = ({ value, placeholder, onChange, onBlur, disabled = false }) => {
   const [isEditable, setIsEditable] = useState(false);
 
   return (
@@ -37,12 +38,12 @@ export const InlineInput: React.FC<Props> = ({ value, placeholder, onChange, onB
             <Typography.Text
               ellipsis={true}
               onClick={() => {
-                setIsEditable(true);
+                if (!disabled) setIsEditable(true);
               }}
             >
               {value || placeholder}
             </Typography.Text>
-            <MdOutlineEdit onClick={() => setIsEditable(true)} />
+            {!disabled && <MdOutlineEdit onClick={() => setIsEditable(true)} />}
           </div>
         )}
       </Row>

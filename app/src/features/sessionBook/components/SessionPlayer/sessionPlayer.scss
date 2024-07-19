@@ -7,6 +7,12 @@
   .session-player {
     width: 100%;
 
+    &.session-player-fullscreen {
+      .rr-player__frame {
+        height: 92vh !important;
+      }
+    }
+
     .rr-player {
       width: 100% !important;
       height: calc(100% - 13px) !important;
@@ -52,6 +58,29 @@
       width: 100% !important;
       height: 530px !important;
       background: var(--requestly-color-black);
+
+      .overlay-frame {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 4rem;
+
+        .blur {
+          height: 100%;
+          width: 100%;
+          position: absolute;
+          backdrop-filter: blur(4px);
+          z-index: 1;
+          background-color: rgba(0, 0, 0, 0.4);
+        }
+        .overlay-content {
+          z-index: 10;
+        }
+      }
 
       .replayer-wrapper {
         transform: scale(0.65) translate(-50%, -50%) !important;
