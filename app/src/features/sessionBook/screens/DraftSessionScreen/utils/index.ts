@@ -80,11 +80,10 @@ export const saveDraftSession = async (
         });
       }
 
-      let path = PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId;
+      let path = "/" + PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId;
       if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
         path = PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + `/${response?.firestoreId}`;
       navigate(path, {
-        replace: true,
         state: { fromApp: true, viewAfterSave: true },
       });
     } else {

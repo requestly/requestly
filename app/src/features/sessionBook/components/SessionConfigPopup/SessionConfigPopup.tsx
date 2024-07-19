@@ -50,7 +50,8 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
-  const isDraftSession = pathname.includes(PATHS.SESSIONS.INDEX) || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+  const isDraftSession =
+    pathname.includes(PATHS.SESSIONS.DRAFT.INDEX) || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const isSessionLogOptionsAlreadySaved =
     tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;

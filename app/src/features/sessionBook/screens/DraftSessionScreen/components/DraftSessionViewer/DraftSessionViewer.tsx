@@ -14,8 +14,8 @@ import DraftSessionDetailsPanel from "../DraftSessionDetailsPanel/DraftSessionDe
 import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/sessionBook/analytics";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
-import "./draftSessionViewer.scss";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import "./draftSessionViewer.scss";
 
 interface DraftSessionViewerProps {
   isDesktopMode: boolean;
