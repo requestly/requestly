@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getSessionRecordingAttributes } from "store/features/session-recording/selectors";
 import { MdOutlineTravelExplore } from "@react-icons/all-files/md/MdOutlineTravelExplore";
@@ -8,7 +9,6 @@ import { PiBrowsers } from "@react-icons/all-files/pi/PiBrowsers";
 import { MdAspectRatio } from "@react-icons/all-files/md/MdAspectRatio";
 import { MdLanguage } from "@react-icons/all-files/md/MdLanguage";
 import { PiFrameCorners } from "@react-icons/all-files/pi/PiFrameCorners";
-import { useMemo } from "react";
 import "./sessionEnvDetails.scss";
 
 export const SessionEnvironmentDetails = () => {
