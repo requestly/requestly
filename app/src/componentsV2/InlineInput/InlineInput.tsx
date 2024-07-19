@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Row, Input, Typography } from "antd";
-import { BiPencil } from "@react-icons/all-files/bi/BiPencil";
+import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./inlineInput.scss";
 
 interface Props {
@@ -43,7 +43,7 @@ export const InlineInput: React.FC<Props> = ({ value, placeholder, onChange, onB
             >
               {value || placeholder}
             </Typography.Text>
-            {!disabled && <BiPencil onClick={() => setIsEditable(true)} />}
+            {!disabled && <MdOutlineEdit onClick={() => setIsEditable(true)} />}
           </div>
         )}
       </Row>
