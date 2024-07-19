@@ -8,6 +8,7 @@ import { SessionInfo } from "./components/SessionInfo/SessionInfo";
 import SessionNetworkLogs from "./components/SessionNetworkLogs/SessionNetworkLogs";
 import SessionConsoleLogs from "./components/SessionConsoleLogs/SessionConsoleLogs";
 import { SessionEnvironmentDetails } from "./components/SessionEnvironmentDetails/SessionEnvironmentDetails";
+import { trackSessionRecordingBottomSheetTabClicked } from "features/sessionBook/analytics";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
@@ -77,6 +78,7 @@ const SessionViewerBottomSheet: React.FC<SessionViewerBottomSheetProps> = ({
       items={bottomSheetTabItems}
       defaultActiveKey={BOTTOM_SHEET_TAB_KEYS.INFO}
       disableDocking={disableDocking}
+      onTabClick={(key: string) => trackSessionRecordingBottomSheetTabClicked(key)}
     />
   );
 };
