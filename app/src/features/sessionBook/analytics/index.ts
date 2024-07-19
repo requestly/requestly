@@ -71,3 +71,6 @@ export const trackSessionRecordingNameUpdated = () => {
 };
 
 export const trackBadSessionRecordingViewed = () => trackEvent(SESSIONS.BAD_SESSION_RECORDING_VIEWED);
+
+export const trackSessionRecordingBottomSheetTabClicked = (tab: string) =>
+  trackEvent(SESSIONS.SESSION_RECORDING_BOTTOM_SHEET_TAB_CLICKED, { tab });
