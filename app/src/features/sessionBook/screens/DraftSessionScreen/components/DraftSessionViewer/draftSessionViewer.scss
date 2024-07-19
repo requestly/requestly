@@ -24,4 +24,24 @@
       width: 100%;
     }
   }
+
+  .draft-session-header-breadcrumb {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--requestly-color-text-subtle);
+    font-size: var(--requestly-font-size-sm);
+
+    &__parent {
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    &__current {
+      color: var(--requestly-color-text-default);
+      font-weight: 500;
+    }
+  }
 }
