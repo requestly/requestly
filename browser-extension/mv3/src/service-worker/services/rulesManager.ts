@@ -124,7 +124,7 @@ const applyExtensionRules = async (): Promise<void> => {
 };
 
 export const initRulesManager = async (): Promise<void> => {
-  onRuleOrGroupChange(debounce(applyExtensionRules, 300));
+  onRuleOrGroupChange(debounce(applyExtensionRules, 500));
   onVariableChange(Variable.IS_EXTENSION_ENABLED, () => {
     applyExtensionRules();
     deleteAllSessionRules();

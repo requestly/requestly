@@ -11,6 +11,11 @@
     color: var(--requestly-color-text-subtle);
     font-size: var(--requestly-font-size-sm);
     font-weight: 400;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   &__arrow {

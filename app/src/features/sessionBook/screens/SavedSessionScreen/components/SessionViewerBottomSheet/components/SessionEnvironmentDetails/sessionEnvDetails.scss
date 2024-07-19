@@ -24,8 +24,7 @@
     &-value {
       color: var(--requestly-color-text-default);
       font-size: var(--requestly-font-size-xs);
-      text-overflow: ellipsis;
-      overflow: hidden;
+      white-space: pre-wrap;
       padding: 8px;
       flex: 1;
     }
