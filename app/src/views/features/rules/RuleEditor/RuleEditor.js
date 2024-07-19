@@ -78,7 +78,7 @@ const RuleEditor = (props) => {
 
   const renderRuleEditor = () => {
     return (
-      <Col className="overflow-hidden h-full">
+      <Col key={currentlySelectedRuleConfig?.TYPE} className="overflow-hidden h-full">
         {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
             mode={MODE}
