@@ -29,7 +29,7 @@ export const PrimarySidebar: React.FC = () => {
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
 
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
-  const isSlackConnectEnabled = useFeatureIsOn("slack_connect");
+  const isSlackConnectFeatureEnabled = useFeatureIsOn("slack_connect");
   const slackInviteVisibilityStatus = useSlackInviteVisibility();
 
   const isDesktopSessionsCompatible =
@@ -131,7 +131,7 @@ export const PrimarySidebar: React.FC = () => {
       </ul>
       <div className="primary-sidebar-bottom-btns">
         {isIncentivizationEnabled ? <CreditsButton /> : null}
-        {isSlackConnectEnabled && slackInviteVisibilityStatus && <JoinSlackButton />}
+        {isSlackConnectFeatureEnabled && slackInviteVisibilityStatus && <JoinSlackButton />}
         <InviteButton />
       </div>
     </div>

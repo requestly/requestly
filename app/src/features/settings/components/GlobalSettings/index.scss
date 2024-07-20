@@ -36,3 +36,13 @@
   background-color: var(--body-background);
   padding: 1rem 1.5rem 0 1.5rem;
 }
+
+#crisp-chatbox > div > a {
+  display: none !important;
+}
+
+.slack-connect-toast > .ant-message-notice-content {
+  background: #212121;
+  border: solid 1px #2e2e2e;
+  top: 100px;
+}

@@ -35,7 +35,7 @@ export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose }) => {
         onClick={() => {
           onClose();
           paidUser
-            ? window.$crisp.push(["do", "chat:open"])
+            ? window?.$crisp?.push(["do", "chat:open"])
             : dispatch(
                 // @ts-ignore
                 actions.toggleActiveModal({
