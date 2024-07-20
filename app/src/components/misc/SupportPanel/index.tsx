@@ -151,7 +151,14 @@ const SupportPanel = () => {
   );
   return (
     <div className="support-panel-container">
-      <Dropdown menu={{ items: supportItems }} trigger={["click"]} onOpenChange={(state) => setVisible(state)}>
+      <Dropdown
+        menu={{ items: supportItems }}
+        trigger={["click"]}
+        onOpenChange={(state) => setVisible(state)}
+        dropdownRender={(menu) => {
+          return <div className="support-panel-dropown-container">{menu}</div>;
+        }}
+      >
         <Badge dot={!isSupportChatOpened} size="small">
           <Button
             type="primary"
