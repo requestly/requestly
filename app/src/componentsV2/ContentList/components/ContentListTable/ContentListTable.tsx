@@ -10,20 +10,6 @@ import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import "./contentListTable.scss";
 
-export interface ContentListTableProps<DataType> extends TableProps<DataType> {
-  id: string;
-  columns: ColumnsType<DataType>;
-  data: DataType[];
-  rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
-  loading?: boolean;
-  customRowClassName?: (record: DataType) => string;
-  bulkActionBarConfig?: BulkActionBarConfig<DataType>;
-  locale: TableProps<DataType>["locale"];
-  onRecordSelection?: (selectedRows: DataType[]) => void;
-  dragAndDrop?: boolean;
-  onRowMove?: (dragRowId: string, hoverRowId: string, prevData: DataType[]) => void;
-}
-
 const EXPANDED_ROWS_LOCAL_STORAGE_KEY = "content-list-table-expanded-rows";
 
 interface DraggableBodyRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
@@ -40,7 +26,7 @@ const DraggableBodyRow = ({ index, moveRow, className, style, recordId, ...restP
     accept: DRAGGABLE_ELEMENT_TYPE,
 
     collect: (monitor) => {
-      const { index: dragIndex, recordId: dragRecordId } =
+      const { recordId: dragRecordId } =
         monitor.getItem<{
           index: number;
           recordId: string;
@@ -52,7 +38,7 @@ const DraggableBodyRow = ({ index, moveRow, className, style, recordId, ...restP
 
       return {
         isOver: monitor.isOver(),
-        dropClassName: dragIndex < index ? " drop-over-downward" : " drop-over-upward",
+        dropClassName: " rq-droppped-row",
       };
     },
 
@@ -81,6 +67,20 @@ const DraggableBodyRow = ({ index, moveRow, className, style, recordId, ...restP
   );
 };
 
+export interface ContentListTableProps<DataType> extends TableProps<DataType> {
+  id: string;
+  columns: ColumnsType<DataType>;
+  data: DataType[];
+  rowKey?: string; // Primary Key of the Table Row Data. Use for selection of row. Defaults to 'key'
+  loading?: boolean;
+  customRowClassName?: (record: DataType) => string;
+  bulkActionBarConfig?: BulkActionBarConfig<DataType>;
+  locale: TableProps<DataType>["locale"];
+  onRecordSelection?: (selectedRows: DataType[]) => void;
+  dragAndDrop?: boolean;
+  onRowMove?: (dragRowId: string, hoverRowId: string, expandRow: (id: string) => void) => void;
+}
+
 const ContentListTable = <DataType extends { [key: string]: any }>({
   id,
   columns,
@@ -96,7 +96,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   className = "",
   onRow: onRowCallback = (record: DataType) => ({}),
   dragAndDrop = false,
-  onRowMove = (dragRowId: string, hoverRowId: string, prevData: DataType[]) => {},
+  onRowMove = () => {},
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -139,11 +139,20 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     },
   };
 
+  const expandRow = useCallback(
+    (id: string) => {
+      let updatedExpandedRowKeys = new Set(expandedRowKeys);
+      updatedExpandedRowKeys = updatedExpandedRowKeys.add(id);
+      setExpandedRowsKeys(Array.from(updatedExpandedRowKeys));
+    },
+    [expandedRowKeys]
+  );
+
   const moveRow = useCallback(
     (dragRowId: string, hoverRowId: string) => {
-      onRowMove(dragRowId, hoverRowId, data);
+      onRowMove(dragRowId, hoverRowId, expandRow);
     },
-    [data, onRowMove]
+    [data, onRowMove, expandRow]
   );
 
   const commonProps: TableProps<DataType> = {

@@ -37,7 +37,7 @@ type RulesActionContextType = {
   recordRenameAction: (record: StorageRecord) => void;
   groupDeleteAction: (group: Group) => void;
   recordsPinAction: (records: StorageRecord[]) => void;
-  updateGroupOnDrop: (record: RuleTableRecord, groupId: string) => void;
+  updateGroupOnDrop: (record: RuleTableRecord, groupId: string, onSuccess?: () => void) => void;
 };
 
 const RulesActionContext = createContext<RulesActionContextType>(null);
@@ -323,13 +323,14 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   );
 
   const updateGroupOnDrop = useCallback(
-    (record: RuleTableRecord, groupId: string = "") => {
+    (record: RuleTableRecord, groupId: string = "", onSuccess = () => {}) => {
       if (!record) {
         return;
       }
 
       updateGroupOfSelectedRules(appMode, [record.id], groupId, user).then(() => {
         trackGroupChangedEvent("rules_list_drag_and_drop");
+        onSuccess();
         // @ts-ignore
         dispatch(actions.updateRefreshPendingStatus({ type: "rules", newValue: !isRulesListRefreshPending }));
       });

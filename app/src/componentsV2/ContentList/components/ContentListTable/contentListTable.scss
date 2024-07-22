@@ -9,6 +9,10 @@
     border: 1px solid var(--requestly-color-white-t-10);
     border-radius: 4px;
 
+    .rq-droppped-row {
+      opacity: 0.7;
+    }
+
     .rq-content-list-table-header {
       th,
       &:hover th {
