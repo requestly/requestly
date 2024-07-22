@@ -157,6 +157,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       {/* Add Modals Required in Rules List here */}
 
       <ContentListTable
+        dragAndDrop
         id="rules-list-table"
         className="rules-list-table"
         size="middle"
