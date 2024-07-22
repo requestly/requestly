@@ -33,3 +33,15 @@
     opacity: 0.5;
   }
 }
+
+// hiding crisp chat widget to control the visibility of chat widget from unified support panel
+#crisp-chatbox > div > a {
+  display: none !important;
+}
+
+// Override styles for slack connect toast
+.slack-connect-toast > .ant-message-notice-content {
+  background: #212121 !important;
+  border: solid 1px #2e2e2e !important;
+  top: 100px !important;
+}
