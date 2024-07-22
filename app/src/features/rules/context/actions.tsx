@@ -8,7 +8,7 @@ import {
 import { useRulesModalsContext } from "./modals";
 import { isGroup, isRule } from "../utils";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
-import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { recordsActions } from "store/features/rules/slice";
 import { StorageService } from "init";
@@ -16,9 +16,11 @@ import { trackShareButtonClicked } from "modules/analytics/events/misc/sharing";
 import { actions } from "store";
 import Logger from "lib/logger";
 import { toast } from "utils/Toast";
-import { trackGroupPinToggled, trackGroupStatusToggled } from "../analytics";
+import { trackGroupChangedEvent, trackGroupPinToggled, trackGroupStatusToggled } from "../analytics";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
+import { RuleTableRecord } from "../screens/rulesList/components/RulesList/components/RulesTable/types";
+import { updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
@@ -35,6 +37,7 @@ type RulesActionContextType = {
   recordRenameAction: (record: StorageRecord) => void;
   groupDeleteAction: (group: Group) => void;
   recordsPinAction: (records: StorageRecord[]) => void;
+  updateGroupOnDrop: (record: RuleTableRecord, groupId: string) => void;
 };
 
 const RulesActionContext = createContext<RulesActionContextType>(null);
@@ -51,6 +54,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
 
   const {
     openCreateGroupModalAction,
@@ -318,6 +322,21 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [updateRecordInStorage, user?.details?.profile?.uid]
   );
 
+  const updateGroupOnDrop = useCallback(
+    (record: RuleTableRecord, groupId: string = "") => {
+      if (!record) {
+        return;
+      }
+
+      updateGroupOfSelectedRules(appMode, [record.id], groupId, user).then(() => {
+        trackGroupChangedEvent("rules_list_drag_and_drop");
+        // @ts-ignore
+        dispatch(actions.updateRefreshPendingStatus({ type: "rules", newValue: !isRulesListRefreshPending }));
+      });
+    },
+    [appMode, user, isRulesListRefreshPending]
+  );
+
   const value = {
     createRuleAction,
     createGroupAction,
@@ -332,6 +351,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     recordRenameAction,
     groupDeleteAction,
     recordsPinAction,
+    updateGroupOnDrop,
   };
 
   return <RulesActionContext.Provider value={value}>{children}</RulesActionContext.Provider>;

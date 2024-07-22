@@ -8,7 +8,6 @@ import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevro
 import Logger from "lib/logger";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import update from "immutability-helper";
 import "./contentListTable.scss";
 
 export interface ContentListTableProps<DataType> extends TableProps<DataType> {
@@ -22,41 +21,49 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   locale: TableProps<DataType>["locale"];
   onRecordSelection?: (selectedRows: DataType[]) => void;
   dragAndDrop?: boolean;
+  onRowMove?: (dragRowId: string, hoverRowId: string, prevData: DataType[]) => void;
 }
 
 const EXPANDED_ROWS_LOCAL_STORAGE_KEY = "content-list-table-expanded-rows";
 
-let i = 0;
-
 interface DraggableBodyRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   index: number;
-  moveRow: (dragIndex: number, hoverIndex: number) => void;
+  recordId: string;
+  moveRow: (dragRowId: string, hoverRowId: string) => void;
 }
 
 const DRAGGABLE_ELEMENT_TYPE = "DraggableContentListRow";
 
-const DraggableBodyRow = ({ index, moveRow, className, style, ...restProps }: DraggableBodyRowProps) => {
+const DraggableBodyRow = ({ index, moveRow, className, style, recordId, ...restProps }: DraggableBodyRowProps) => {
   const ref = useRef<HTMLTableRowElement>(null);
   const [{ isOver, dropClassName }, drop] = useDrop({
     accept: DRAGGABLE_ELEMENT_TYPE,
+
     collect: (monitor) => {
-      const { index: dragIndex } = monitor.getItem() || {};
-      if (dragIndex === index) {
+      const { index: dragIndex, recordId: dragRecordId } =
+        monitor.getItem<{
+          index: number;
+          recordId: string;
+        }>() || {};
+
+      if (recordId === dragRecordId) {
         return {};
       }
+
       return {
         isOver: monitor.isOver(),
         dropClassName: dragIndex < index ? " drop-over-downward" : " drop-over-upward",
       };
     },
-    drop: (item: { index: number }) => {
-      moveRow(item.index, index);
+
+    drop: (item: { index: number; recordId: string }) => {
+      moveRow(item.recordId, recordId);
     },
   });
 
   const [, drag] = useDrag({
     type: DRAGGABLE_ELEMENT_TYPE,
-    item: { index },
+    item: { index, recordId },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -77,7 +84,7 @@ const DraggableBodyRow = ({ index, moveRow, className, style, ...restProps }: Dr
 const ContentListTable = <DataType extends { [key: string]: any }>({
   id,
   columns,
-  data: tableData,
+  data,
   rowKey = "key",
   loading = false,
   customRowClassName = (record: DataType) => "",
@@ -89,15 +96,10 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   className = "",
   onRow: onRowCallback = (record: DataType) => ({}),
   dragAndDrop = false,
+  onRowMove = (dragRowId: string, hoverRowId: string, prevData: DataType[]) => {},
 }: ContentListTableProps<DataType>): ReactElement => {
-  const [data, setData] = useState(tableData);
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
-
-  useEffect(() => {
-    console.log("table rendering...", ++i);
-    setData(tableData);
-  }, [tableData]);
 
   const handleOnExpandClick = useCallback(
     (expanded: boolean, record: DataType) => {
@@ -138,18 +140,10 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   };
 
   const moveRow = useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      const dragRow = data[dragIndex];
-      setData(
-        update(data, {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, dragRow],
-          ],
-        })
-      );
+    (dragRowId: string, hoverRowId: string) => {
+      onRowMove(dragRowId, hoverRowId, data);
     },
-    [data]
+    [data, onRowMove]
   );
 
   const commonProps: TableProps<DataType> = {
@@ -211,6 +205,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
               const attr = {
                 index,
                 moveRow,
+                recordId: record.id,
               };
 
               return attr as React.HTMLAttributes<any>;

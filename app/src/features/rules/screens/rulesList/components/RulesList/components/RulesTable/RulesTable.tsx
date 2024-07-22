@@ -5,7 +5,7 @@ import { Empty } from "antd";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
 import { recordsToContentTableDataAdapter } from "./utils";
 import { isRule, isGroup } from "features/rules/utils";
-import { RecordStatus, StorageRecord } from "features/rules/types/rules";
+import { RecordStatus, RecordType, StorageRecord } from "features/rules/types/rules";
 import { RuleTableRecord } from "./types";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
 import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
@@ -18,7 +18,12 @@ import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/
 import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import { enhanceRecords, normalizeRecords } from "./utils/rules";
-import { ContentListTable, useContentListTableContext, withContentListTableContext } from "componentsV2/ContentList";
+import {
+  ContentListTable,
+  ContentListTableProps,
+  useContentListTableContext,
+  withContentListTableContext,
+} from "componentsV2/ContentList";
 import { useRulesActionContext } from "features/rules/context/actions";
 import "./rulesTable.css";
 
@@ -49,6 +54,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     recordsShareAction,
     recordsDeleteAction,
     recordsStatusUpdateAction,
+    updateGroupOnDrop,
   } = useRulesActionContext();
 
   useEffect(() => {
@@ -152,12 +158,41 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     return classNames;
   };
 
+  const onRowMove: ContentListTableProps<RuleTableRecord>["onRowMove"] = useCallback(
+    (dragRowId, targetRowId, data) => {
+      if (!dragRowId || !targetRowId) {
+        return;
+      }
+
+      const dragRow = allRecordsMap[dragRowId];
+      const targetRow = allRecordsMap[targetRowId];
+
+      if (dragRow?.objectType === RecordType.GROUP) {
+        return;
+      }
+
+      if (dragRow?.objectType === RecordType.RULE) {
+        if (targetRow?.objectType === RecordType.GROUP) {
+          if (dragRow?.groupId !== targetRow?.id) {
+            updateGroupOnDrop(dragRow, targetRow?.id);
+          }
+        } else if (targetRow?.objectType === RecordType.RULE) {
+          if ((dragRow?.groupId !== targetRow?.groupId, dragRow)) {
+            updateGroupOnDrop(dragRow, targetRow?.groupId);
+          }
+        }
+      }
+    },
+    [records, allRecordsMap]
+  );
+
   return (
     <>
       {/* Add Modals Required in Rules List here */}
 
       <ContentListTable
         dragAndDrop
+        onRowMove={onRowMove}
         id="rules-list-table"
         className="rules-list-table"
         size="middle"
