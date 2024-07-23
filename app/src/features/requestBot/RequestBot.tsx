@@ -15,7 +15,7 @@ interface RequestBotProps {
 export const RequestBot: React.FC<RequestBotProps> = ({ isOpen, onClose }) => {
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
-  const paidUser = user.loggedIn && user?.details?.planDetails?.planName !== "free";
+  const paidUser = user.loggedIn && user.details?.isPremium;
 
   return (
     <m.div

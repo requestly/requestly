@@ -2,11 +2,15 @@
   position: fixed;
   bottom: 2rem;
   right: 20px;
+
+  .ant-btn.ant-btn-primary > .support-panel-icon-style {
+    font-size: var(--requestly-font-size-2xl);
+  }
 }
 
 .support-panel-dropown-container {
   .support-panel-icon-style {
-    font-size: var(requestly-font-size-sm);
+    font-size: var(--requestly-font-size-lg);
   }
 
   .support-panel-label-style {

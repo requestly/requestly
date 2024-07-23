@@ -1,10 +1,11 @@
-import { CloseOutlined, RedditOutlined, SlackOutlined } from "@ant-design/icons";
+import { CloseOutlined, SlackOutlined } from "@ant-design/icons";
 import { Badge, Button, Dropdown } from "antd";
 import { useMemo, useState } from "react";
-import ChatIcon from "assets/icons/chat.svg?react";
-import MessageIcon from "assets/icons/message.svg?react";
-import AILogo from "assets/icons/ai-logo.svg?react";
-import SendMessage from "assets/icons/send-message.svg?react";
+import { PiChatTeardropTextFill } from "@react-icons/all-files/pi/PiChatTeardropTextFill";
+import { BsFillChatLeftTextFill } from "@react-icons/all-files/bs/BsFillChatLeftTextFill";
+import { PiRedditLogo } from "@react-icons/all-files/pi/PiRedditLogo";
+import BotIcon from "layouts/DashboardLayout/MenuHeader/assets/bot.svg?react";
+import { TbMailForward } from "@react-icons/all-files/tb/TbMailForward";
 
 import "./supportPanel.scss";
 import { getIsSupportChatOpened, getUserAuthDetails } from "store/selectors";
@@ -47,7 +48,7 @@ const SupportPanel = () => {
                 <span className="support-panel-label-style">Ask us on Slack</span>
               </div>
             ),
-            icon: <SlackOutlined />,
+            icon: <SlackOutlined className="support-panel-icon-style" />,
           },
         {
           key: "2",
@@ -65,7 +66,7 @@ const SupportPanel = () => {
               <span className="support-panel-label-style">Ask us on Reddit</span>
             </a>
           ),
-          icon: <RedditOutlined />,
+          icon: <PiRedditLogo className="support-panel-icon-style" />,
         },
         {
           key: "3",
@@ -83,7 +84,7 @@ const SupportPanel = () => {
               </span>
             </div>
           ),
-          icon: <AILogo />,
+          icon: <BotIcon className="support-panel-icon-style" />,
         },
         {
           key: "4",
@@ -123,10 +124,10 @@ const SupportPanel = () => {
               </span>
             </div>
           ),
-          icon: <MessageIcon />,
+          icon: <BsFillChatLeftTextFill className="support-panel-icon-style" />,
         },
-        !slackConnect &&
-          !slackInviteVisibilityStatus &&
+
+        !slackInviteVisibilityStatus &&
           user.loggedIn &&
           !paidUser && {
             key: "5",
@@ -144,7 +145,7 @@ const SupportPanel = () => {
                 <span className="support-panel-label-style ">Send Message</span>
               </a>
             ),
-            icon: <SendMessage />,
+            icon: <TbMailForward className="support-panel-icon-style" />,
           },
       ].filter(Boolean),
     [dispatch, paidUser, slackConnect, slackInviteVisibilityStatus, user.loggedIn]
@@ -165,7 +166,11 @@ const SupportPanel = () => {
             size="large"
             shape="circle"
             icon={
-              visible || isRequestBotVisible ? <CloseOutlined /> : <ChatIcon className="support-panel-icon-style " />
+              visible || isRequestBotVisible ? (
+                <CloseOutlined />
+              ) : (
+                <PiChatTeardropTextFill className="support-panel-icon-style " />
+              )
             }
             onClick={() => {
               if (visible) window?.$crisp.push(["do", "chat:close"]);
