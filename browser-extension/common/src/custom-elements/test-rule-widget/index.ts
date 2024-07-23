@@ -6,6 +6,7 @@ import RQLogoSmall from "../../../resources/icons/rqLogo-white.svg";
 import MinimizeIcon from "../../../resources/icons/minimze.svg";
 import InfoIcon from "../../../resources/icons/info.svg";
 import VisibilityIcon from "../../../resources/icons/visibility.svg";
+import CloseIcon from "../../../resources/icons/close.svg";
 
 const DEFAULT_POSITION = { right: 16, top: 16 };
 
@@ -86,6 +87,7 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
             <div id="actions-container">
                 <button id="settings-button" class="hidden" data-tooltip="Hide widget in app settings">${VisibilityIcon}</button>
                 <button id="minimize-button">${MinimizeIcon}</buttton>
+                <button id="close-button" class="hidden">${CloseIcon}</buttton>
             </div>
         </div>
         <div id="test-rule-container"></div>

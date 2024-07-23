@@ -1,15 +1,16 @@
 import { RQTestRuleWidget } from "..";
 import { registerCustomElement, setInnerHTML, getRuleTypeIcon } from "../../utils";
 import CheckIcon from "../../../../resources/icons/check.svg";
-import CloseIcon from "../../../resources/icons/close.svg";
 import arrowRightIcon from "../../../../resources/icons/arrowRight.svg";
 import { RuleType } from "../../../types";
 
 const TAG_NAME = "rq-implicit-test-rule-widget";
 const IMPLICIT_WIDGET_DISPLAY_TIME = 3 * 1000; // 3secs
 
+type AppliedRule = { ruleId: string; ruleName: string; ruleType: RuleType; seen?: boolean };
+
 class RQImplicitTestRuleWidget extends RQTestRuleWidget {
-  #appliedRules: { ruleId: string; ruleName: string; ruleType: RuleType }[] = [];
+  #appliedRules: AppliedRule[] = [];
   #widgetDisplayTimerId: NodeJS.Timeout | null;
 
   connectedCallback() {
@@ -19,7 +20,7 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     const minimizedStatusBtn = this.shadowRoot.getElementById("test-rule-minimized-btn");
     const widgetContent = `
     <div id="implicit-widget-container">
-      <div id="applied-rules-list-header">Rules applied on this page --- </div>
+      <div id="applied-rules-list-header">Rules applied on this page</div>
       <div id="applied-rules-list"></div>
     </div>`;
     setInnerHTML(minimizedStatusBtn, `<span class="success">${CheckIcon}</span>`);
@@ -27,6 +28,13 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
     const settingsButton = this.shadowRoot.getElementById("settings-button");
     settingsButton.classList.remove("hidden");
+
+    const minimizeButton = this.shadowRoot.getElementById("minimize-button");
+    minimizeButton.classList.add("hidden");
+
+    const closeButton = this.shadowRoot.getElementById("close-button");
+    closeButton.classList.remove("hidden");
+
     this.addWidgetListeners();
 
     const appliedRules = JSON.parse(this.attributes.getNamedItem("applied-rules")?.value || "[]");
@@ -54,6 +62,10 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
       this.dispatchEvent(new CustomEvent("open_app_settings"));
     });
 
+    this.shadowRoot.getElementById("close-button").addEventListener("click", () => {
+      this.hide();
+    });
+
     this.dispatchEvent(new CustomEvent("rule_applied_listener_active"));
   }
 
@@ -63,8 +75,13 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     super.show();
 
     this.#widgetDisplayTimerId = setTimeout(() => {
-      // super.hide();
+      super.hide();
     }, IMPLICIT_WIDGET_DISPLAY_TIME);
+  }
+
+  hide() {
+    clearTimeout(this.#widgetDisplayTimerId);
+    super.hide();
   }
 
   triggerAppliedRuleClickedEvent(detail: any) {
@@ -73,6 +90,12 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
   renderAppliedRules() {
     const appliedRulesList = this.shadowRoot.getElementById("applied-rules-list");
+
+    console.log("this.#appliedRules", this.#appliedRules);
+
+    // remove previous seen rules
+    this.#appliedRules = this.#appliedRules.filter((rule) => !rule.seen);
+    this.#appliedRules = this.#appliedRules.map((rule) => ({ ...rule, seen: true }));
 
     const appliedRulesMarkup = this.#appliedRules.map((rule) => {
       return `

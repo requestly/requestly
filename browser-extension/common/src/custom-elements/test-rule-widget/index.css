@@ -71,6 +71,8 @@
 }
 
 #actions-container button {
+  width: 32px;
+  height: 32px;
   background: none;
   border: none;
   color: #fff;
@@ -81,6 +83,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-shrink: 0;
+}
+
+#actions-container #close-button svg {
+  width: 10px;
+  height: 10px;
 }
 
 #actions-container button:hover {
