@@ -7,7 +7,7 @@ import { RuleType } from "../../../types";
 const TAG_NAME = "rq-implicit-test-rule-widget";
 const IMPLICIT_WIDGET_DISPLAY_TIME = 3 * 1000; // 3secs
 
-type AppliedRule = { ruleId: string; ruleName: string; ruleType: RuleType; seen?: boolean };
+type AppliedRule = { ruleId: string; ruleName: string; ruleType: RuleType; seen: boolean };
 
 class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   #appliedRules: AppliedRule[] = [];
@@ -50,6 +50,7 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
       if (isRuleAlreadyApplied) return;
 
       this.#appliedRules.push({
+        seen: false,
         ruleId: evt.detail.appliedRuleId,
         ruleName: evt.detail.appliedRuleName,
         ruleType: evt.detail.appliedRuleType,
@@ -81,6 +82,7 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
   hide() {
     clearTimeout(this.#widgetDisplayTimerId);
+    this.#appliedRules = this.#appliedRules.map((rule) => ({ ...rule, seen: true }));
     super.hide();
   }
 
@@ -91,15 +93,9 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   renderAppliedRules() {
     const appliedRulesList = this.shadowRoot.getElementById("applied-rules-list");
 
-    console.log("this.#appliedRules", this.#appliedRules);
-
-    // remove previous seen rules
-    this.#appliedRules = this.#appliedRules.filter((rule) => !rule.seen);
-    this.#appliedRules = this.#appliedRules.map((rule) => ({ ...rule, seen: true }));
-
     const appliedRulesMarkup = this.#appliedRules.map((rule) => {
       return `
-        <div class="applied-rule-list-item">
+        <div class="applied-rule-list-item ${rule.seen ? "hidden" : ""}">
           <div class="applied-rule-item-details">
             <span class="applied-rule-icon">${getRuleTypeIcon(rule.ruleType)}</span>
             <span class="applied-rule-name">${rule.ruleName}</span>
