@@ -3,7 +3,6 @@ import { getRecord } from "../../storage";
 import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } from "../../types";
 import { matchSourceUrl } from "./ruleMatcher";
 import { injectWebAccessibleScript } from "./utils";
-// import config from "../../config";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import extensionIconManager from "./extensionIconManager";
 import { isExtensionEnabled } from "../../utils";
@@ -70,7 +69,6 @@ export const getTabSession = (tabId: number, callback: () => void) => {
 };
 
 export const watchRecording = (tabId: number) => {
-  // chrome.tabs.create({ url: `${config.WEB_URL}/sessions/draft/${tabId}` });
   chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.VIEW_RECORDING });
 };
 
