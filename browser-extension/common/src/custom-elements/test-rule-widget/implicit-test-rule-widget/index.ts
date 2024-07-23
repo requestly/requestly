@@ -1,23 +1,25 @@
 import { RQTestRuleWidget } from "..";
 import { registerCustomElement, setInnerHTML, getRuleTypeIcon } from "../../utils";
 import CheckIcon from "../../../../resources/icons/check.svg";
+import CloseIcon from "../../../resources/icons/close.svg";
 import arrowRightIcon from "../../../../resources/icons/arrowRight.svg";
 import { RuleType } from "../../../types";
 
 const TAG_NAME = "rq-implicit-test-rule-widget";
+const IMPLICIT_WIDGET_DISPLAY_TIME = 3 * 1000; // 3secs
 
 class RQImplicitTestRuleWidget extends RQTestRuleWidget {
   #appliedRules: { ruleId: string; ruleName: string; ruleType: RuleType }[] = [];
+  #widgetDisplayTimerId: NodeJS.Timeout | null;
 
   connectedCallback() {
     super.connectedCallback();
 
-    this.toggleMinimize(true);
     const contentContainer = this.shadowRoot.getElementById("test-rule-container");
     const minimizedStatusBtn = this.shadowRoot.getElementById("test-rule-minimized-btn");
     const widgetContent = `
     <div id="implicit-widget-container">
-      <div id="applied-rules-list-header">Rules applied on this page</div>
+      <div id="applied-rules-list-header">Rules applied on this page --- </div>
       <div id="applied-rules-list"></div>
     </div>`;
     setInnerHTML(minimizedStatusBtn, `<span class="success">${CheckIcon}</span>`);
@@ -55,6 +57,16 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
     this.dispatchEvent(new CustomEvent("rule_applied_listener_active"));
   }
 
+  show() {
+    clearTimeout(this.#widgetDisplayTimerId);
+
+    super.show();
+
+    this.#widgetDisplayTimerId = setTimeout(() => {
+      // super.hide();
+    }, IMPLICIT_WIDGET_DISPLAY_TIME);
+  }
+
   triggerAppliedRuleClickedEvent(detail: any) {
     this.dispatchEvent(new CustomEvent("view_rule_in_editor", { detail }));
   }
@@ -82,6 +94,8 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
         });
       });
     });
+
+    this.show();
   }
 }
 
