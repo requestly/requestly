@@ -56,7 +56,53 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   }, [desktopMode, isImportedSession, dispatch]);
 
   useEffect(() => {
+    if (tabId === "iframe") {
+      const handleViewDraftMessage = (event: any) => {
+        if (event.data.action === "view-draft-session") {
+          setIsLoading(true);
+          const tabSession = event.data.payload as RQSession;
+
+          if (!tabSession) {
+            return;
+          }
+          if (tabSession.events.rrweb?.length < 2) {
+            setLoadingError("RRWeb events not captured");
+          } else {
+            dispatch(
+              sessionRecordingActions.setSessionRecordingMetadata({
+                sessionAttributes: tabSession.attributes,
+                name: generateDraftSessionTitle(tabSession.attributes?.url),
+                recordingMode: null,
+              })
+            );
+
+            dispatch(sessionRecordingActions.setEvents(tabSession.events));
+          }
+          setIsLoading(false);
+        }
+      };
+
+      const handleDiscardDraftMessage = (event: any) => {
+        if (event.data.action === "discard-draft-session") {
+          setIsLoading(true);
+        }
+      };
+
+      // Add event listener
+      window.addEventListener("message", handleViewDraftMessage);
+      window.addEventListener("message", handleDiscardDraftMessage);
+
+      // Clean up the event listener on component unmount
+      return () => {
+        window.removeEventListener("message", handleViewDraftMessage);
+        window.removeEventListener("message", handleDiscardDraftMessage);
+      };
+    }
+  }, [dispatch, tabId]);
+
+  useEffect(() => {
     setIsLoading(true);
+    if (tabId === "iframe") return;
 
     if (tabId === "imported") {
       setIsLoading(false);
