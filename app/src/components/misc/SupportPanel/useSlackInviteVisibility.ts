@@ -3,21 +3,25 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getUserAuthDetails } from "store/selectors";
 
-export default function useSlackInviteVisibility() {
-  const [visible, setVisible] = useState(false);
+export default function useFetchSlackInviteVisibility() {
+  const [isVisible, setIsVisible] = useState(false);
   const user = useSelector(getUserAuthDetails);
 
   useEffect(() => {
-    if (!user.loggedIn) return;
-    const showSlackButton = httpsCallable<null, boolean>(getFunctions(), "slackConnect-showSlackButton");
+    if (!user.loggedIn) {
+      setIsVisible(false);
+      return;
+    }
+    const showSlackButton = httpsCallable(getFunctions(), "slackConnect-showSlackButton");
     showSlackButton()
       .then((res) => {
-        setVisible(Boolean(res?.data));
+        setIsVisible(Boolean(res?.data));
       })
       .catch((err) => {
         console.error("Error fetching slack invite visibility", err);
+        setIsVisible(false);
       });
   }, [user.loggedIn]);
 
-  return visible;
+  return isVisible;
 }

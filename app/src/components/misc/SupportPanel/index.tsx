@@ -8,12 +8,13 @@ import BotIcon from "layouts/DashboardLayout/MenuHeader/assets/bot.svg?react";
 import { TbMailForward } from "@react-icons/all-files/tb/TbMailForward";
 
 import "./supportPanel.scss";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getIsSupportChatOpened, getUserAuthDetails } from "store/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { RequestBot } from "features/requestBot";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
-import useSlackInviteVisibility from "./useSlackInviteVisibility";
+import useFetchSlackInviteVisibility from "./useSlackInviteVisibility";
 import sendSlackInvite from "./sendSlackInvite";
 import { trackEvent } from "modules/analytics";
 import { trackSupportOptionClicked } from "modules/analytics/events/misc/UnifiedSupport";
@@ -21,23 +22,23 @@ import { trackSupportOptionClicked } from "modules/analytics/events/misc/Unified
 const SupportPanel = () => {
   const user = useSelector(getUserAuthDetails);
   const dispatch = useDispatch();
-  const [visible, setVisible] = useState(false);
+  const [isPanelVisible, setIsPanelVisible] = useState(false);
   const [isRequestBotVisible, setIsRequestBotVisible] = useState(false);
   const paidUser = user.loggedIn && user.details?.isPremium;
-  const slackConnect = useFeatureIsOn("slack_connect");
-  const slackInviteVisibilityStatus = useSlackInviteVisibility();
+  const isSlackConnectOn = useFeatureIsOn("slack_connect");
+  const isSlackInviteVisible = useFetchSlackInviteVisibility();
   const isSupportChatOpened = useSelector(getIsSupportChatOpened);
   const supportItems = useMemo(
     () =>
       [
-        slackConnect &&
-          slackInviteVisibilityStatus && {
+        isSlackConnectOn &&
+          isSlackInviteVisible && {
             key: "1",
             label: (
               <div
                 className="support-panel-item-style"
                 onClick={() => {
-                  setVisible(false);
+                  setIsPanelVisible(false);
                   sendSlackInvite();
                   trackSupportOptionClicked("slack");
                   trackEvent("join_slack_connect_clicked", {
@@ -59,7 +60,7 @@ const SupportPanel = () => {
               rel="noreferrer"
               className="support-panel-item-style"
               onClick={() => {
-                setVisible(false);
+                setIsPanelVisible(false);
                 trackSupportOptionClicked("reddit");
               }}
             >
@@ -74,13 +75,13 @@ const SupportPanel = () => {
             <div
               className="support-panel-item-style"
               onClick={() => {
-                setVisible(false);
+                setIsPanelVisible(false);
                 setIsRequestBotVisible(true);
                 trackSupportOptionClicked("ask_ai");
               }}
             >
               <span className="support-panel-label-style">
-                Ask AI<i style={{ color: "#bbbbbb" }}> 24x7 Support</i>
+                Ask AI<i className="grey-text"> 24x7 Support</i>
               </span>
             </div>
           ),
@@ -93,7 +94,7 @@ const SupportPanel = () => {
               className={`support-panel-item-style ${!paidUser && "support-panel-item-disabled"}`}
               onClick={() => {
                 if (paidUser) {
-                  window.$crisp.push(["do", "chat:open"]);
+                  window?.$crisp?.push(["do", "chat:open"]);
                   trackSupportOptionClicked("chat_with_us");
                 } else {
                   dispatch(
@@ -107,7 +108,7 @@ const SupportPanel = () => {
                   trackSupportOptionClicked("upgrade_to_chat_with_us");
                 }
                 paidUser
-                  ? window.$crisp.push(["do", "chat:open"])
+                  ? window?.$crisp?.push(["do", "chat:open"])
                   : dispatch(
                       // @ts-ignore
                       actions.toggleActiveModal({
@@ -127,18 +128,18 @@ const SupportPanel = () => {
           icon: <BsFillChatLeftTextFill className="support-panel-icon-style" />,
         },
 
-        !slackInviteVisibilityStatus &&
+        !isSlackInviteVisible &&
           user.loggedIn &&
           !paidUser && {
             key: "5",
             label: (
               <a
-                href="mailto:contact@requestly.io"
+                href={GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}
                 target="_blank"
                 rel="noreferrer"
                 className="support-panel-item-style"
                 onClick={() => {
-                  setVisible(false);
+                  setIsPanelVisible(false);
                   trackSupportOptionClicked("send_message");
                 }}
               >
@@ -148,14 +149,14 @@ const SupportPanel = () => {
             icon: <TbMailForward className="support-panel-icon-style" />,
           },
       ].filter(Boolean),
-    [dispatch, paidUser, slackConnect, slackInviteVisibilityStatus, user.loggedIn]
+    [dispatch, paidUser, isSlackConnectOn, isSlackInviteVisible, user.loggedIn]
   );
   return (
     <div className="support-panel-container">
       <Dropdown
         menu={{ items: supportItems }}
         trigger={["click"]}
-        onOpenChange={(state) => setVisible(state)}
+        onOpenChange={(state) => setIsPanelVisible(state)}
         dropdownRender={(menu) => {
           return <div className="support-panel-dropown-container">{menu}</div>;
         }}
@@ -166,14 +167,14 @@ const SupportPanel = () => {
             size="large"
             shape="circle"
             icon={
-              visible || isRequestBotVisible ? (
+              isPanelVisible || isRequestBotVisible ? (
                 <CloseOutlined />
               ) : (
                 <PiChatTeardropTextFill className="support-panel-icon-style " />
               )
             }
             onClick={() => {
-              if (visible) window?.$crisp.push(["do", "chat:close"]);
+              if (isPanelVisible) window?.$crisp?.push(["do", "chat:close"]);
               if (isRequestBotVisible) setIsRequestBotVisible(false);
               dispatch(
                 // @ts-ignore

@@ -17,6 +17,9 @@
     margin-left: 6px;
     width: 200px;
   }
+  .grey-text {
+    color: var(--requestly-color-grey-600);
+  }
 
   .support-panel-item-style {
     padding: 2px 3px;
@@ -45,7 +48,7 @@
 
 // Override styles for slack connect toast
 .slack-connect-toast > .ant-message-notice-content {
-  background: #212121 !important;
-  border: solid 1px #2e2e2e !important;
+  background: var(--requestly-color-surface-0) !important;
+  border: solid 1px var(--requestly-color-white-t-10) !important;
   top: 100px !important;
 }

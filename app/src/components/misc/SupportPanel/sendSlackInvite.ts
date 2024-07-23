@@ -7,21 +7,18 @@ export default async function sendSlackInvite() {
     className: "slack-connect-toast",
     duration: 0,
   });
-  const sendSlackInviation = httpsCallable<null, boolean>(getFunctions(), "slackConnect-sendSlackInvitation");
+  const sendSlackInviation = httpsCallable(getFunctions(), "slackConnect-sendSlackInvitation");
   sendSlackInviation()
     .then((res) => {
       if (res.data) {
-        hide();
         message.success({
           content: "Slack invitation sent successfully",
           className: "slack-connect-toast",
         });
-      } else if (!res.data) {
-        hide();
       }
     })
     .catch((err) => {
-      hide();
       console.error("Error sending slack invite", err);
-    });
+    })
+    .finally(hide);
 }
