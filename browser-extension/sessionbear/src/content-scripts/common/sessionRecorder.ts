@@ -1,4 +1,4 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
+import { CLIENT_MESSAGES, CUSTOM_ELEMENTS, EXTENSION_MESSAGES } from "../../constants";
 import { SessionRecordingConfig } from "../../types";
 
 type SendResponseCallback = (payload: unknown) => void;
@@ -110,7 +110,7 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
     hideAutoModeWidget();
   }
 
-  injectDraftSessionIframe();
+  injectDraftSessionViewer();
 };
 
 const addListeners = () => {
@@ -315,25 +315,19 @@ const showToast = () => {
   document.documentElement.appendChild(rqToast);
 };
 
-const injectDraftSessionIframe = () => {
-  // TODO: handle mounting the listeners again in the app loaded in the iframe when recording is stopped
-  const exisitingSessionViewer = document.querySelector("rq-draft-session-viewer");
+const injectDraftSessionViewer = () => {
+  const exisitingSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   if (exisitingSessionViewer) {
     exisitingSessionViewer.remove();
   }
 
-  const newSessionViewer = document.createElement("rq-draft-session-viewer");
+  const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   document.documentElement.appendChild(newSessionViewer);
 };
 
 const viewDraftSession = () => {
   sendMessageToClient("getSessionData", null, (session) => {
-    // const iframe = sessionDraftViewer.querySelector("#rq-session-draft-viewer-iframe") as HTMLIFrameElement;
-    // iframe.contentWindow.postMessage(
-    //   { source: "pookie", action: "load_draft_session", type: "DRAFT_SESSION", payload: session },
-    //   "*"
-    // );
-    const draftSessionViewer = document.querySelector("rq-draft-session-viewer");
+    const draftSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
     draftSessionViewer.dispatchEvent(
       new CustomEvent("view-draft-session", {
         detail: {

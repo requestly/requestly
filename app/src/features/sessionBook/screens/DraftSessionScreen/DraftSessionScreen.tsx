@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { RQSession } from "@requestly/web-sdk";
 import { getTabSession } from "actions/ExtensionActions";
 import { SessionRecordingMode } from "features/sessionBook/types";
@@ -21,6 +21,12 @@ export interface DraftSessionViewerProps {
   desktopMode?: boolean;
 }
 
+enum TabId {
+  IMPORTED = "imported",
+  MOCK = "mock",
+  IFRAME = "iframe",
+}
+
 export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopMode = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -29,8 +35,32 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   const metadata = useSelector(getSessionRecordingMetaData);
 
   const tempTabId = useParams().tabId;
-  const tabId = useMemo(() => (desktopMode ? "imported" : tempTabId), [desktopMode, tempTabId]);
-  const isImportedSession = tabId === "imported";
+  const tabId = useMemo(() => (desktopMode ? TabId.IMPORTED : tempTabId), [desktopMode, tempTabId]);
+  const isImportedSession = tabId === TabId.IMPORTED;
+
+  const populateSessionDataInStore = useCallback(
+    (session: unknown) => {
+      const tabSession = session as RQSession & { recordingMode?: SessionRecordingMode };
+      if (!tabSession) {
+        return;
+      }
+
+      if (tabSession.events.rrweb?.length < 2) {
+        setLoadingError("RRWeb events not captured");
+      } else {
+        dispatch(
+          sessionRecordingActions.setSessionRecordingMetadata({
+            sessionAttributes: tabSession.attributes,
+            name: generateDraftSessionTitle(tabSession.attributes?.url),
+            recordingMode: tabSession.recordingMode || null,
+          })
+        );
+
+        dispatch(sessionRecordingActions.setEvents(tabSession.events));
+      }
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     if (isImportedSession && metadata === null && !desktopMode) {
@@ -56,28 +86,11 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   }, [desktopMode, isImportedSession, dispatch]);
 
   useEffect(() => {
-    if (tabId === "iframe") {
+    if (tabId === TabId.IFRAME) {
       const handleViewDraftMessage = (event: any) => {
         if (event.data.action === "view-draft-session") {
           setIsLoading(true);
-          const tabSession = event.data.payload as RQSession;
-
-          if (!tabSession) {
-            return;
-          }
-          if (tabSession.events.rrweb?.length < 2) {
-            setLoadingError("RRWeb events not captured");
-          } else {
-            dispatch(
-              sessionRecordingActions.setSessionRecordingMetadata({
-                sessionAttributes: tabSession.attributes,
-                name: generateDraftSessionTitle(tabSession.attributes?.url),
-                recordingMode: null,
-              })
-            );
-
-            dispatch(sessionRecordingActions.setEvents(tabSession.events));
-          }
+          populateSessionDataInStore(event.data.payload);
           setIsLoading(false);
         }
       };
@@ -88,25 +101,25 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
         }
       };
 
-      // Add event listener
+      // Add event listeners
       window.addEventListener("message", handleViewDraftMessage);
       window.addEventListener("message", handleDiscardDraftMessage);
 
-      // Clean up the event listener on component unmount
+      // Clean up the event listeners on component unmount
       return () => {
         window.removeEventListener("message", handleViewDraftMessage);
         window.removeEventListener("message", handleDiscardDraftMessage);
       };
     }
-  }, [dispatch, tabId]);
+  }, [dispatch, tabId, populateSessionDataInStore]);
 
   useEffect(() => {
     setIsLoading(true);
-    if (tabId === "iframe") return;
+    if (tabId === TabId.IFRAME) return;
 
-    if (tabId === "imported") {
+    if (tabId === TabId.IMPORTED) {
       setIsLoading(false);
-    } else if (tabId === "mock") {
+    } else if (tabId === TabId.MOCK) {
       // TODO: remove mock flow
       dispatch(
         sessionRecordingActions.setSessionRecordingMetadata({
@@ -122,24 +135,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
           if (typeof payload === "string") {
             setLoadingError(payload);
           } else {
-            const tabSession = payload as RQSession & { recordingMode?: SessionRecordingMode };
-            if (!tabSession) {
-              return;
-            }
-
-            if (tabSession.events.rrweb?.length < 2) {
-              setLoadingError("RRWeb events not captured");
-            } else {
-              dispatch(
-                sessionRecordingActions.setSessionRecordingMetadata({
-                  sessionAttributes: tabSession.attributes,
-                  name: generateDraftSessionTitle(tabSession.attributes?.url),
-                  recordingMode: tabSession.recordingMode || null,
-                })
-              );
-
-              dispatch(sessionRecordingActions.setEvents(tabSession.events));
-            }
+            populateSessionDataInStore(payload);
           }
           setIsLoading(false);
         })
@@ -150,7 +146,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
           setLoadingError("Something went wrong while fetching your recorded session");
         });
     }
-  }, [dispatch, tabId]);
+  }, [dispatch, tabId, populateSessionDataInStore]);
 
   useEffect(() => {
     if (loadingError) {

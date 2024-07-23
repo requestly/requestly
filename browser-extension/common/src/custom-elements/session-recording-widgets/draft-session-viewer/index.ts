@@ -19,10 +19,6 @@ class RQDraftSessionViewer extends HTMLElement {
     this.addViewerListeners();
   }
 
-  // connectedCallback() {
-  //   console.log("RQDraftSessionViewer connected");
-  // }
-
   _getDefaultMarkup() {
     // TODO: handle iframe src
     return `
@@ -44,16 +40,24 @@ class RQDraftSessionViewer extends HTMLElement {
     draftViewCloseBtn.addEventListener("click", () => {
       draftSessionWindow.classList.add("hidden");
       iframe.contentWindow.postMessage({ source: "extension", action: "discard-draft-session" }, "*");
+      this.sendMessageToIframe(iframe, { source: "extension", action: "discard-draft-session" });
     });
 
     this.addEventListener("view-draft-session", (event: CustomEvent) => {
       draftSessionWindow.classList.remove("hidden");
-      iframe.contentWindow.postMessage(
-        { source: "extension", action: "view-draft-session", payload: event.detail.session },
-        "*"
-      );
+      this.sendMessageToIframe(iframe, {
+        source: "extension",
+        action: "view-draft-session",
+        payload: event.detail.session,
+      });
     });
   }
+
+  sendMessageToIframe = (iframe: HTMLIFrameElement, message: unknown, targetOrigin: string = "*") => {
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(message, targetOrigin);
+    }
+  };
 }
 
 registerCustomElement(TAG_NAME, RQDraftSessionViewer);

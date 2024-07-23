@@ -72,3 +72,7 @@ export const LINKS = {
   REQUESTLY_EXTENSION_TROUBLESHOOTING:
     "https://docs.requestly.io/browser-extension/chrome/category/troubleshooting?source=popup",
 };
+
+export const CUSTOM_ELEMENTS = {
+  DRAFT_SESSION_VIEWER: "rq-draft-session-viewer",
+};
