@@ -95,20 +95,20 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
         }
       };
 
-      const handleDiscardDraftMessage = (event: any) => {
-        if (event.data.action === "discard-draft-session") {
+      const handleResetDraftMessage = (event: any) => {
+        if (event.data.action === "reset-draft-session-viewer") {
           setIsLoading(true);
         }
       };
 
       // Add event listeners
       window.addEventListener("message", handleViewDraftMessage);
-      window.addEventListener("message", handleDiscardDraftMessage);
+      window.addEventListener("message", handleResetDraftMessage);
 
       // Clean up the event listeners on component unmount
       return () => {
         window.removeEventListener("message", handleViewDraftMessage);
-        window.removeEventListener("message", handleDiscardDraftMessage);
+        window.removeEventListener("message", handleResetDraftMessage);
       };
     }
   }, [dispatch, tabId, populateSessionDataInStore]);
