@@ -5,7 +5,7 @@ import arrowRightIcon from "../../../../resources/icons/arrowRight.svg";
 import { RuleType } from "../../../types";
 
 const TAG_NAME = "rq-implicit-test-rule-widget";
-const IMPLICIT_WIDGET_DISPLAY_TIME = 5 * 1000; // 3secs
+const IMPLICIT_WIDGET_DISPLAY_TIME = 5 * 1000; // secs
 
 type AppliedRule = { ruleId: string; ruleName: string; ruleType: RuleType; seen: boolean };
 
