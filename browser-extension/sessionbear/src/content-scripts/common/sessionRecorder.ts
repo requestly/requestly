@@ -109,6 +109,8 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
     sessionRecorderState.recordingStartTime = recordingStartTime;
     hideAutoModeWidget();
   }
+
+  injectDraftSessionIframe();
 };
 
 const addListeners = () => {
@@ -133,6 +135,11 @@ const addListeners = () => {
 
       case CLIENT_MESSAGES.STOP_RECORDING:
         sendMessageToClient("stopRecording", null);
+        break;
+
+      case CLIENT_MESSAGES.VIEW_RECORDING:
+        viewDraftSession();
+        break;
     }
 
     return false;
@@ -306,4 +313,33 @@ const showToast = () => {
   }
 
   document.documentElement.appendChild(rqToast);
+};
+
+const injectDraftSessionIframe = () => {
+  // TODO: handle mounting the listeners again in the app loaded in the iframe when recording is stopped
+  const exisitingSessionViewer = document.querySelector("rq-draft-session-viewer");
+  if (exisitingSessionViewer) {
+    exisitingSessionViewer.remove();
+  }
+
+  const newSessionViewer = document.createElement("rq-draft-session-viewer");
+  document.documentElement.appendChild(newSessionViewer);
+};
+
+const viewDraftSession = () => {
+  sendMessageToClient("getSessionData", null, (session) => {
+    // const iframe = sessionDraftViewer.querySelector("#rq-session-draft-viewer-iframe") as HTMLIFrameElement;
+    // iframe.contentWindow.postMessage(
+    //   { source: "pookie", action: "load_draft_session", type: "DRAFT_SESSION", payload: session },
+    //   "*"
+    // );
+    const draftSessionViewer = document.querySelector("rq-draft-session-viewer");
+    draftSessionViewer.dispatchEvent(
+      new CustomEvent("view-draft-session", {
+        detail: {
+          session,
+        },
+      })
+    );
+  });
 };

@@ -46,6 +46,7 @@ export const CLIENT_MESSAGES = {
   UPDATE_APPLIED_SCRIPT_RULES: "updateAppliedScriptRules",
   START_RECORDING: "startRecording",
   STOP_RECORDING: "stopRecording",
+  VIEW_RECORDING: "viewRecording",
   IS_EXPLICIT_RECORDING_SESSION: "isExplicitRecordingSession",
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   NOTIFY_PAGE_LOADED_FROM_CACHE: "notifyPageLoadedFromCache",
