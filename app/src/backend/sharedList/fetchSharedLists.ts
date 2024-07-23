@@ -1,4 +1,4 @@
-import { getTeamFromOwnerId, isOwnerTeam } from "backend/utils";
+import { getTeamFromOwnerId, isTeamOwner } from "backend/utils";
 import DataStoreUtils from "utils/DataStoreUtils";
 import { getTeamSharedListsPath, getUserSharedListsPath } from "utils/db/UserModel";
 
@@ -11,7 +11,7 @@ import { getTeamSharedListsPath, getUserSharedListsPath } from "utils/db/UserMod
  * @param {number|string} ownerId - The user id | team-teamId
  */
 export const fetchSharedLists = (ownerId: string) => {
-  if (isOwnerTeam(ownerId)) {
+  if (isTeamOwner(ownerId)) {
     const teamId = getTeamFromOwnerId(ownerId);
     const teamSharedListsPath = getTeamSharedListsPath(teamId);
     return DataStoreUtils.getValue(teamSharedListsPath);

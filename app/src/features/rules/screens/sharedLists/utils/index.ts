@@ -30,7 +30,6 @@ export const getSharedListIdFromURL = (url: string) => {
 
 export const fetchSharedListData = (sharedListId: string) => {
   const publicSharedListPath = getPublicSharedListPath(sharedListId);
-  console.log("publicSharedListPath", publicSharedListPath);
   return DataStoreUtils.getValue(publicSharedListPath);
 };
 

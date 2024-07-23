@@ -5,12 +5,12 @@ export const getOwnerId = (uid: string, teamId?: string) => {
   return uid;
 };
 
-export const isOwnerTeam = (ownerId: string) => {
+export const isTeamOwner = (ownerId: string) => {
   return ownerId.startsWith("team-");
 };
 
 export const getTeamFromOwnerId = (ownerId: string) => {
-  if (isOwnerTeam(ownerId)) {
+  if (isTeamOwner(ownerId)) {
     return ownerId.split("-")[1];
   } else return null;
 };
