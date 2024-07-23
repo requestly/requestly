@@ -7,7 +7,7 @@ import { IBaseTestData } from "../types";
 
 test.describe("Response Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test.only(`${i + 1}. Response rule`, async ({ appPage, context }) => {
+    test(`${i + 1}. Response rule`, async ({ appPage, context }) => {
       await testResponseRule({ appPage, context, ...scenario });
     });
   });
@@ -46,7 +46,12 @@ const testResponseRule = async (testScenarioData: ResponseRuleTestScenarioData &
     const interceptedResponse = interceptedResponses[expectedResponseModification.testUrl];
     expect(interceptedResponse).toBeDefined();
     // expect(interceptedResponse.status).toBe(expectedResponseModification.expectedStatusCode ?? 200);
-    expect(interceptedResponse.response).toEqual(JSON.stringify(expectedResponseModification.expectedResponseBody));
+
+    const expectedResponseBody =
+      typeof expectedResponseModification.expectedResponseBody === "string"
+        ? expectedResponseModification.expectedResponseBody
+        : JSON.stringify(expectedResponseModification.expectedResponseBody);
+    expect(interceptedResponse.response).toEqual(expectedResponseBody);
   }
 };
 

@@ -25,7 +25,7 @@ const testScenarios: ResponseRuleTestScenarioData[] = [
     expectedResponseModifications: [
       {
         testUrl: "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz",
-        expectedResponseBody: { response_modified: true },
+        expectedResponseBody: "{ response_modified: true }",
       },
     ],
   },
