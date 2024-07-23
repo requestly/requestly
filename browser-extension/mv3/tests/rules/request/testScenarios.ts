@@ -1,4 +1,5 @@
 export interface RequestRuleTestScenarioData {
+  description: string;
   ruleIds: string[];
   testPageURL: string;
   pageActions?: () => void;
@@ -10,6 +11,7 @@ export interface RequestRuleTestScenarioData {
 
 const testScenarios: RequestRuleTestScenarioData[] = [
   {
+    description: "XHR static request modification",
     ruleIds: ["Request_1"],
     testPageURL: "https://example.com/",
     pageActions: () => {
@@ -26,6 +28,7 @@ const testScenarios: RequestRuleTestScenarioData[] = [
     ],
   },
   {
+    description: "XHR dynamic request modification",
     ruleIds: ["Request_2"],
     testPageURL: "https://example.com/",
     pageActions: () => {

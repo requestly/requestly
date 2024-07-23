@@ -1,6 +1,7 @@
 import { Page } from "@playwright/test";
 
 export interface ResponseRuleTestScenarioData {
+  description: string;
   ruleIds: string[];
   testPageURL: string;
   pageActions?: () => void;
@@ -14,6 +15,7 @@ export interface ResponseRuleTestScenarioData {
 
 const testScenarios: ResponseRuleTestScenarioData[] = [
   {
+    description: "XHR static response modification",
     ruleIds: ["Response_1"],
     testPageURL: "https://example.com/",
     pageActions: () => {
@@ -25,11 +27,12 @@ const testScenarios: ResponseRuleTestScenarioData[] = [
     expectedResponseModifications: [
       {
         testUrl: "https://requestly.tech/api/mockv2/response_rule?teamId=9sBQkTnxaMlBY6kWHpoz",
-        expectedResponseBody: "{ response_modified: true }",
+        expectedResponseBody: { response_modified: true },
       },
     ],
   },
   {
+    description: "XHR static response modification",
     ruleIds: ["Response_2"],
     testPageURL: "https://example.com/",
     pageActions: () => {
@@ -47,6 +50,7 @@ const testScenarios: ResponseRuleTestScenarioData[] = [
     ],
   },
   {
+    description: "XHR without hitting server response modification",
     ruleIds: ["Response_3"],
     testPageURL: "https://example.com/",
     pageActions: () => {
@@ -65,6 +69,7 @@ const testScenarios: ResponseRuleTestScenarioData[] = [
     ],
   },
   {
+    description: "XHR dynamic response modification",
     ruleIds: ["Response_4"],
     testPageURL: "https://example.com/",
     pageActions: () => {
