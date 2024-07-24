@@ -24,6 +24,7 @@ import {
   getCurrentlySelectedRuleData,
   getCurrentlySelectedRuleConfig,
   getIsRuleEditorTourCompleted,
+  getIsCurrentlySelectedRuleDetailsPanelShown,
 } from "../../../../store/selectors";
 import * as RedirectionUtils from "../../../../utils/RedirectionUtils";
 import useExternalRuleCreation from "./useExternalRuleCreation";
@@ -37,6 +38,8 @@ import { getRuleConfigInEditMode, isDesktopOnlyRule } from "utils/rules/misc";
 import { ProductWalkthrough } from "components/misc/ProductWalkthrough";
 import { useHasChanged } from "hooks";
 import { m } from "framer-motion";
+import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
+import { RuleEditorMode } from "features/rules";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -54,6 +57,7 @@ const RuleBuilder = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
+  const isDetailsPanelShown = useSelector(getIsCurrentlySelectedRuleDetailsPanelShown);
 
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
@@ -245,9 +249,13 @@ const RuleBuilder = (props) => {
         context={currentlySelectedRuleData}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
       />
+
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">
+          {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
+            <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
+          ) : null}
           <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
         </Col>
       </Row>

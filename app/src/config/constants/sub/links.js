@@ -50,6 +50,17 @@ const LINKS = {
 
   REQUESTLY_API_DOCS: "https://developers.requestly.io/api/overview/",
 
+  REQUESTLY_REDIRECT_RULE_DOCS: "https://developers.requestly.com/http-rules/map-local-url-redirect",
+  REQUESTLY_CANCEL_RULE_DOCS: "https://developers.requestly.com/http-rules/cancel-rule/",
+  REQUESTLY_DELAY_RULE_DOCS: "https://developers.requestly.com/http-rules/delay-request/",
+  REQUESTLY_HEADERS_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-headers/",
+  REQUESTLY_QUERYPARAM_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-query-params/",
+  REQUESTLY_REPLACE_RULE_DOCS: "https://developers.requestly.com/http-rules/replace-strings/",
+  REQUESTLY_REQUEST_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-request-body/",
+  REQUESTLY_RESPONSE_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-response-body/",
+  REQUESTLY_SCRIPT_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-dom-inject-scripts/",
+  REQUESTLY_USERAGENT_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-user-agents/",
+
   /** LANDING PAGES **/
 
   // Home
