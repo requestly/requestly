@@ -106,9 +106,8 @@ const updateCache = (obj: Record<string, any>) => {
   // Cannot use outside variable in this function as this is executed in the context of the page
   // Reference: https://developer.chrome.com/docs/extensions/reference/api/scripting#:~:text=A%20JavaScript%20function%20to%20inject.,or%20func%20must%20be%20specified.
 
-  console.log("[updateCache]", obj);
+  // console.log("[updateCache]", { obj });
   const PUBLIC_NAMESPACE = "__REQUESTLY__";
-  console.log("!!!debug", "publicNamespace", window[PUBLIC_NAMESPACE]);
   window[PUBLIC_NAMESPACE] = window[PUBLIC_NAMESPACE] || {};
   Object.keys(obj).map((key) => {
     window[PUBLIC_NAMESPACE][key] = obj[key];
