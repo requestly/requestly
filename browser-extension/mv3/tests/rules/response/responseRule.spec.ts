@@ -45,7 +45,8 @@ const testResponseRule = async (testScenarioData: ResponseRuleTestScenarioData &
   for (const expectedResponseModification of testScenarioData.expectedResponseModifications) {
     const interceptedResponse = interceptedResponses[expectedResponseModification.testUrl];
     expect(interceptedResponse).toBeDefined();
-    // expect(interceptedResponse.status).toBe(expectedResponseModification.expectedStatusCode ?? 200);
+    //To be debugged why getting status code to be 0 for modified responses
+    // expect(interceptedResponse.status).toBe(parseInt(expectedResponseModification.expectedStatusCode as string) ?? 200);
 
     const expectedResponseBody =
       typeof expectedResponseModification.expectedResponseBody === "string"
