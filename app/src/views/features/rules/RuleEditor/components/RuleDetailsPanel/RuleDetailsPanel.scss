@@ -1,11 +1,13 @@
 .rule-details-panel-container {
+  width: 100%;
+  max-width: 1200px;
   padding: 16px 24px;
   border-radius: 8px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.16);
   background: var(--requestly-color-surface-1, #282828);
   border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
-  margin: 16px;
-  margin-bottom: 0;
+  margin: auto;
+  margin-top: 16px;
   position: relative;
 
   .link {
@@ -71,6 +73,7 @@
         line-height: 130%; /* 14.3px */
         color: var(--requestly-color-text-subtle, #bbb);
         display: -webkit-box;
+        line-clamp: 5;
         -webkit-line-clamp: 5;
         -webkit-box-orient: vertical;
         overflow: hidden;
@@ -96,6 +99,7 @@
 
             .use-case {
               display: -webkit-box;
+              line-clamp: 3;
               -webkit-line-clamp: 3;
               -webkit-box-orient: vertical;
               overflow: hidden;
