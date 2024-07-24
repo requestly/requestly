@@ -33,7 +33,7 @@ export const test = base.extend<{
     const appPage = await context.newPage();
     await appPage.goto(WEB_URL, { waitUntil: "domcontentloaded" });
     await appPage.waitForFunction(() => !!document?.documentElement?.getAttribute("rq-ext-version"));
-    await appPage.waitForTimeout(4000); //Important to wait otherwise some tests fail in production
+    await appPage.waitForTimeout(3000); //Important to wait otherwise some tests fail in production
     await use(appPage);
     await clearRules(appPage);
   },
