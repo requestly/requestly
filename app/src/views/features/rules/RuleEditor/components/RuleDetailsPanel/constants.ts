@@ -1,8 +1,8 @@
+import { ReactNode } from "react";
 import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
-import { ReactNode } from "react";
+import LINKS from "config/constants/sub/links";
 
-// TODO: update details
 export const RULE_DETAILS: Record<
   RuleType,
   {
@@ -33,7 +33,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "9",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/map-local-url-redirect",
+    documentationLink: LINKS.REQUESTLY_REDIRECT_RULE_DOCS,
   },
   [RuleType.CANCEL]: {
     type: RuleType.CANCEL,
@@ -51,7 +51,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/cancel-rule/",
+    documentationLink: LINKS.REQUESTLY_CANCEL_RULE_DOCS,
   },
   [RuleType.DELAY]: {
     type: RuleType.DELAY,
@@ -68,7 +68,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/delay-request/",
+    documentationLink: LINKS.REQUESTLY_DELAY_RULE_DOCS,
   },
   [RuleType.HEADERS]: {
     type: RuleType.HEADERS,
@@ -87,7 +87,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "5",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/modify-headers/",
+    documentationLink: LINKS.REQUESTLY_HEADERS_RULE_DOCS,
   },
   [RuleType.QUERYPARAM]: {
     type: RuleType.QUERYPARAM,
@@ -109,7 +109,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/modify-query-params/",
+    documentationLink: LINKS.REQUESTLY_QUERYPARAM_RULE_DOCS,
   },
   [RuleType.REPLACE]: {
     type: RuleType.REPLACE,
@@ -126,7 +126,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/replace-strings/",
+    documentationLink: LINKS.REQUESTLY_REPLACE_RULE_DOCS,
   },
   [RuleType.REQUEST]: {
     type: RuleType.REQUEST,
@@ -143,7 +143,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/modify-request-body/",
+    documentationLink: LINKS.REQUESTLY_REQUEST_RULE_DOCS,
   },
   [RuleType.RESPONSE]: {
     type: RuleType.RESPONSE,
@@ -168,7 +168,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/modify-response-body/",
+    documentationLink: LINKS.REQUESTLY_RESPONSE_RULE_DOCS,
   },
   [RuleType.SCRIPT]: {
     type: RuleType.SCRIPT,
@@ -185,7 +185,7 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/modify-dom-inject-scripts/",
+    documentationLink: LINKS.REQUESTLY_SCRIPT_RULE_DOCS,
   },
   [RuleType.USERAGENT]: {
     type: RuleType.USERAGENT,
@@ -198,6 +198,6 @@ export const RULE_DETAILS: Record<
         suggestedTemplateId: "",
       },
     ],
-    documentationLink: "https://developers.requestly.com/http-rules/modify-user-agents/",
+    documentationLink: LINKS.REQUESTLY_USERAGENT_RULE_DOCS,
   },
 };
