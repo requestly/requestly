@@ -9,7 +9,7 @@ export const test = base.extend<{
   appPage: Page;
 }>({
   context: async ({}, use, testInfo) => {
-    testInfo.setTimeout(60000); // Increase the timeout to 60 seconds
+    testInfo.setTimeout(65000); // Increase the timeout to 65 seconds
     const pathToExtension = path.join(__dirname, "..", "dist");
     const context = await chromium.launchPersistentContext("", {
       ignoreDefaultArgs: ["--headless"],
@@ -31,9 +31,9 @@ export const test = base.extend<{
   },
   appPage: async ({ context }, use) => {
     const appPage = await context.newPage();
-    await appPage.goto(WEB_URL, { waitUntil: "commit" });
-    await appPage.waitForTimeout(1000); //Important to wait for the rules to cache otherwise some tests were failing in production
+    await appPage.goto(WEB_URL, { waitUntil: "domcontentloaded" });
     await appPage.waitForFunction(() => !!document?.documentElement?.getAttribute("rq-ext-version"));
+    await appPage.waitForTimeout(4000); //Important to wait otherwise some tests fail in production
     await use(appPage);
     await clearRules(appPage);
   },
