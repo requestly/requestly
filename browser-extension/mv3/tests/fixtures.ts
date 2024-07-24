@@ -32,6 +32,7 @@ export const test = base.extend<{
   appPage: async ({ context }, use) => {
     const appPage = await context.newPage();
     await appPage.goto(WEB_URL, { waitUntil: "commit" });
+    await appPage.waitForTimeout(1000); //Important to wait for the rules to cache otherwise some tests were failing in production
     await appPage.waitForFunction(() => !!document?.documentElement?.getAttribute("rq-ext-version"));
     await use(appPage);
     await clearRules(appPage);

@@ -7,7 +7,7 @@ import { IBaseTestData } from "../types";
 
 test.describe("Response Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(`${i + 1}. ${scenario.description}`, async ({ appPage, context }) => {
+    test(`${i + 1}. @ResponseRule: ${scenario.description}`, async ({ appPage, context }) => {
       await testResponseRule({ appPage, context, ...scenario });
     });
   });
