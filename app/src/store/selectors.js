@@ -77,6 +77,11 @@ export const getCurrentlySelectedRuleErrors = (state) => {
   return currentlySelectedRule["errors"];
 };
 
+export const getIsCurrentlySelectedRuleDetailsPanelShown = (state) => {
+  const currentlySelectedRule = getCurrentlySelectedRule(state);
+  return currentlySelectedRule["showDetailsPanel"];
+};
+
 // response rule resource type
 export const getResponseRuleResourceType = (state) => {
   const rule = getCurrentlySelectedRuleData(state);

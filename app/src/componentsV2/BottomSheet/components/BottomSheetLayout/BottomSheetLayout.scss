@@ -1,4 +1,9 @@
 .bottomsheet-layout-container {
   height: inherit;
   position: relative;
+
+  .content {
+    height: 100%;
+    overflow: auto;
+  }
 }

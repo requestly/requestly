@@ -16,6 +16,7 @@ export type TemplateData = {
 };
 
 export type TemplateRecord = {
+  id: string;
   name: string;
   description: string;
   isSharedList: boolean;

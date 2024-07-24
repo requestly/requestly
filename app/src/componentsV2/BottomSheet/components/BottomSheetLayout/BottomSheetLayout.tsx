@@ -26,7 +26,9 @@ export const BottomSheetLayout: React.FC<Props> = ({
 
   return (
     <Row className="bottomsheet-layout-container">
-      <Col span={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 14}>{children}</Col>
+      <Col className="content" span={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 14}>
+        {children}
+      </Col>
       <Col
         span={sheetPlacement === BottomSheetPlacement.BOTTOM ? 24 : 10}
         className={`${isSheetPlacedAtBottom ? " bottom-sheet-container" : "bottom-sheet-panel-container"}`}
