@@ -16,6 +16,7 @@ import { actions } from "store";
 import "./DashboardLayout.css";
 import Logger from "lib/logger";
 import { PlanExpiredBanner } from "componentsV2/banners/PlanExpiredBanner";
+import SupportPanel from "components/misc/SupportPanel";
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -74,7 +75,7 @@ const DashboardLayout = () => {
         <div className="app-main-content">
           <DashboardContent />
         </div>
-
+        <SupportPanel />
         <div className="app-footer">
           <Footer />
         </div>

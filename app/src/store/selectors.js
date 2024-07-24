@@ -311,6 +311,10 @@ export const getIsAppBannerVisible = (state) => {
   return getGlobalState(state).misc.nonPersist?.isAppBannerVisible;
 };
 
+export const getIsSupportChatOpened = (state) => {
+  return getGlobalState(state).misc.persist?.isSupportChatOpened;
+};
+
 // request bot
 export const getRequestBot = (state) => {
   return getGlobalState(state).misc.nonPersist?.requestBot;
