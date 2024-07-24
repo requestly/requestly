@@ -210,6 +210,7 @@ const INITIAL_STATE = {
       timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
       isAppBannerVisible: false,
+      requestBot: { isActive: false, modelType: "app" },
     },
   },
 };

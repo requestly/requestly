@@ -110,7 +110,7 @@ const RuleBuilder = (props) => {
       if (MODE === RULE_EDITOR_CONFIG.MODES.CREATE) {
         stableInitiateBlankCurrentlySelectedRule(
           dispatch,
-          currentlySelectedRuleConfig,
+          RULE_TYPES_CONFIG[RULE_TYPE_TO_CREATE],
           RULE_TYPE_TO_CREATE,
           setCurrentlySelectedRule,
           ruleGroupId
@@ -181,9 +181,11 @@ const RuleBuilder = (props) => {
   useEffect(() => {
     const source = state?.source ?? null;
     const ruleType = currentlySelectedRuleConfig.TYPE;
-    if (!ruleType || !source) return;
-    trackRuleEditorViewed(source, ruleType);
-  }, [currentlySelectedRuleConfig.TYPE, state]);
+
+    if (ruleType && source) {
+      trackRuleEditorViewed(source, ruleType);
+    }
+  }, [currentlySelectedRuleConfig.TYPE, state?.source]);
 
   useEffect(() => {
     if (

@@ -1,9 +1,9 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import { DraftSessionViewer, SavedSessionViewer } from "views/features/sessions/SessionViewer";
 import NetworkSessionViewer from "views/features/sessions/SessionsIndexPageContainer/NetworkSessions/NetworkSessionViewer";
 import { SessionsListScreenContainer } from "./screens/SessionsListScreen/SessionsListScreenContainer";
 import SessionsFeatureContainer from "./container";
+import { DraftSessionScreen, SavedSessionScreen } from "features/sessionBook";
 
 export const sessionRoutes: RouteObject[] = [
   {
@@ -11,22 +11,18 @@ export const sessionRoutes: RouteObject[] = [
     element: <SessionsFeatureContainer />,
     children: [
       {
-        path: PATHS.SESSIONS.RELATIVE,
+        index: true,
         element: <SessionsListScreenContainer />,
       },
       {
-        path: PATHS.SESSIONS.DRAFT.RELATIVE + "/:tabId",
-        element: <DraftSessionViewer />,
+        path: PATHS.SESSIONS.DRAFT.INDEX + "/:tabId",
+        element: <DraftSessionScreen />,
       },
       {
-        path: PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
-        element: <SavedSessionViewer />,
+        path: PATHS.SESSIONS.SAVED.INDEX + "/:id",
+        element: <SavedSessionScreen />,
       },
     ],
-  },
-  {
-    path: PATHS.SESSIONS.SETTINGS.RELATIVE,
-    element: <Navigate to={PATHS.SETTINGS.SESSION_BOOK.RELATIVE} replace />,
   },
 
   {
@@ -43,7 +39,7 @@ export const sessionRoutes: RouteObject[] = [
     /**
      * Avoids circular redirects
      */
-    path: "/r" + PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
+    path: "r/" + PATHS.SESSIONS.SAVED.RELATIVE + "/:id",
     element: <Navigate to={window.location.pathname.replace("/r", "")} />,
   },
 ];

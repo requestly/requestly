@@ -251,7 +251,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                 {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
                   <Tooltip
                     placement="right"
-                    title="Use your work email to use team workspaces, session replay and orgazniation-level access controls."
+                    title="Use your work email to use team workspaces, session replay and organization-level access controls."
                     color="var(--black)"
                   >
                     <Col className="why-work-email">Why work email?</Col>
@@ -382,7 +382,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
               {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
                 <Tooltip
                   placement="right"
-                  title="Use your work email to use team workspaces, session replay and orgazniation-level access controls."
+                  title="Use your work email to use team workspaces, session replay and organization-level access controls."
                   color="var(--black)"
                 >
                   <Col className="why-work-email">Why work email?</Col>
