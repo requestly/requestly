@@ -253,7 +253,7 @@ const RuleBuilder = (props) => {
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">
-          {MODE === RuleEditorMode.CREATE && !isDetailsPanelShown ? (
+          {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
             <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
           ) : null}
           <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
