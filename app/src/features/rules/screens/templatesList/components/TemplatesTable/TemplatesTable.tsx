@@ -30,8 +30,6 @@ const TemplatesTable: React.FC<TemplatesTableProps> = ({ searchValue }) => {
     });
   }, [searchValue]);
 
-  console.log("filteredRecords", filteredRecords);
-
   const handlePreviewTemplate = useCallback(
     (template: TemplateRecord) => {
       trackTemplateImportStarted(template.name, SOURCE.TEMPLATES_SCREEN);
