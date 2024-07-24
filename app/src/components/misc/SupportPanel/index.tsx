@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { PiChatTeardropTextFill } from "@react-icons/all-files/pi/PiChatTeardropTextFill";
 import { BsFillChatLeftTextFill } from "@react-icons/all-files/bs/BsFillChatLeftTextFill";
 import { PiRedditLogo } from "@react-icons/all-files/pi/PiRedditLogo";
-import BotIcon from "layouts/DashboardLayout/MenuHeader/assets/bot.svg?react";
+import BotIcon from "assets/icons/bot.svg?react";
 import { TbMailForward } from "@react-icons/all-files/tb/TbMailForward";
 
 import "./supportPanel.scss";
