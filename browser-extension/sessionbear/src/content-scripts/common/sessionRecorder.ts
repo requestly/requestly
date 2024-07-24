@@ -1,4 +1,6 @@
-import { CLIENT_MESSAGES, CUSTOM_ELEMENTS, EXTENSION_MESSAGES } from "../../constants";
+import config from "../../config";
+import { CLIENT_MESSAGES, CUSTOM_ELEMENTS, EXTENSION_MESSAGES, STORAGE_KEYS } from "../../constants";
+import { getRecord } from "../../storage";
 import { SessionRecordingConfig } from "../../types";
 
 type SendResponseCallback = (payload: unknown) => void;
@@ -315,13 +317,22 @@ const showToast = () => {
   document.documentElement.appendChild(rqToast);
 };
 
-const injectDraftSessionViewer = () => {
+const injectDraftSessionViewer = async () => {
   const exisitingSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   if (exisitingSessionViewer) {
     exisitingSessionViewer.remove();
   }
 
+  const authToken = await getRecord(STORAGE_KEYS.USER_TOKEN);
+
   const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  newSessionViewer.classList.add("rq-element");
+
+  newSessionViewer.setAttribute(
+    "session-src",
+    `${config.WEB_URL}/iframe/sessions/draft/iframe?${authToken ? `auth_token=${authToken}` : ""}`
+  );
+
   document.documentElement.appendChild(newSessionViewer);
 };
 

@@ -7,10 +7,15 @@ const TAG_NAME = "rq-draft-session-viewer";
 
 class RQDraftSessionViewer extends HTMLElement {
   shadowRoot: HTMLElement["shadowRoot"];
+  #iframeSource: string;
 
   constructor() {
     super();
     this.shadowRoot = this.attachShadow({ mode: "closed" });
+  }
+
+  connectedCallback() {
+    this.#iframeSource = this.attributes.getNamedItem("session-src")?.value;
     setInnerHTML(this.shadowRoot, this._getDefaultMarkup());
 
     const draftSessionWindow = this.shadowRoot.getElementById("draft-session-window");
@@ -26,7 +31,7 @@ class RQDraftSessionViewer extends HTMLElement {
       <div id="draft-session-window">
       <div id="draft-session-view">
       <div id="draft-view-close-btn">${closeIcon}</div>
-      <iframe id="draft-session-iframe" src="http://localhost:3000/iframe/sessions/draft/iframe"></iframe>
+      <iframe id="draft-session-iframe" src=${this.#iframeSource}></iframe>
       </div>
       </div>
     `;

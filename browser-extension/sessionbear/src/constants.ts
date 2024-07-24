@@ -66,6 +66,7 @@ export const STORAGE_KEYS = {
   LAST_SYNCED_TS: "last-synced-ts",
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
+  USER_TOKEN: "user_token",
 };
 
 export const LINKS = {

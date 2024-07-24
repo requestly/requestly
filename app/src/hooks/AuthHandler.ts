@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import { checkUserBackupState, getAuthData, getOrUpdateUserSyncState } from "actions/FirebaseActions";
 import firebaseApp from "firebase.js";
-import { User, getAuth, onAuthStateChanged } from "firebase/auth";
+import { User, getAuth, onAuthStateChanged, signInWithCustomToken } from "firebase/auth";
 import { actions } from "store";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getDomainFromEmail, getEmailType, isCompanyEmail } from "utils/FormattingHelper";
@@ -16,6 +17,8 @@ import { newSchemaToOldSchemaAdapter } from "./DbListenerInit/userSubscriptionDo
 import APP_CONSTANTS from "config/constants";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUser } from "backend/user/getUser";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { StorageService } from "init";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -23,6 +26,8 @@ let hasAuthHandlerBeenSet = false;
 const AuthHandler: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
+  const location = useLocation();
+  const queryPrarams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const userAttributes = useSelector(getUserAttributes);
 
   const getEnterpriseAdminDetails = useMemo(() => httpsCallable(getFunctions(), "getEnterpriseAdminDetails"), []);
@@ -172,6 +177,28 @@ const AuthHandler: React.FC<{}> = () => {
   );
 
   useEffect(() => {
+    if (queryPrarams.get("auth_token")) {
+      const authToken = queryPrarams.get("auth_token");
+      const getCustomToken = httpsCallable(getFunctions(), "users-generateCustomToken");
+      getCustomToken({ authToken }).then((res: any) => {
+        if (res.data.success) {
+          const auth = getAuth(firebaseApp);
+          signInWithCustomToken(auth, res.data.result.customToken)
+            .then((user) => {
+              // Signed in
+              Logger.log("User signed in with custom token", user);
+            })
+            .catch((error) => {
+              console.error("Error signing in with custom token:", error.message);
+            });
+        } else {
+          console.error("Error generating custom token:", res.data.result.message);
+        }
+      });
+    }
+  }, [queryPrarams]);
+
+  useEffect(() => {
     if (hasAuthHandlerBeenSet) return;
     hasAuthHandlerBeenSet = true;
 
@@ -182,7 +209,11 @@ const AuthHandler: React.FC<{}> = () => {
 
       if (user) {
         Logger.timeLog("AuthHandler-preloader", "User found");
-
+        user.getIdToken(true).then((token) => {
+          StorageService(appMode).saveRecord({
+            [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: token,
+          });
+        });
         blockingOperations(user).then((success: boolean) => {
           if (success) {
             nonBlockingOperations(user).then(() => {
@@ -197,7 +228,7 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
         localStorage.removeItem("__rq_uid");
-
+        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN);
         // set amplitude anon id to local storage:
 
         dispatch(
