@@ -1,0 +1,56 @@
+.support-panel-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 20px;
+
+  .ant-btn.ant-btn-primary > .support-panel-icon-style {
+    font-size: var(--requestly-font-size-2xl);
+  }
+}
+
+.support-panel-dropown-container {
+  .support-panel-icon-style {
+    font-size: var(--requestly-font-size-lg);
+  }
+
+  .support-panel-label-style {
+    margin-left: 6px;
+    width: 200px;
+  }
+
+  .grey-text {
+    color: var(--requestly-color-grey-600);
+  }
+
+  .support-panel-item-style {
+    padding: 2px 3px;
+    display: flex;
+    align-items: center;
+    height: 1.5rem;
+  }
+
+  .support-panel-upgrade-badge-style {
+    border: 2px solid var(--requestly-color-warning-600);
+    padding: 4px 8px;
+    border-radius: 1rem;
+    color: var(--requestly-color-warning-600);
+    margin-left: 8px;
+  }
+
+  .support-panel-item-disabled {
+    opacity: 0.5;
+  }
+}
+
+// hiding crisp chat widget to control the visibility of chat widget from unified support panel
+#crisp-chatbox > div > a {
+  display: none !important;
+}
+
+// Override styles for slack connect toast
+.slack-connect-toast.ant-message-notice {
+  .ant-message-notice-content {
+    background: var(--requestly-color-surface-0);
+    border: solid 1px var(--requestly-color-white-t-10);
+  }
+}

@@ -133,3 +133,8 @@ export const MONETIZATION_EXPERIMENT = {
 export const SUBSCRIPTION = {
   PERSONAL_SUBSCRIPTION_INVOICE_CLICKED: "personal_subscription_invoice_clicked",
 };
+
+export const SUPPORT_OPTION = {
+  CLICKED: "support_option_clicked",
+  JOIN_SLACK_CLICKED: "join_slack_connect_clicked",
+};
