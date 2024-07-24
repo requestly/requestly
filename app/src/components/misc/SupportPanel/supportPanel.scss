@@ -17,6 +17,7 @@
     margin-left: 6px;
     width: 200px;
   }
+
   .grey-text {
     color: var(--requestly-color-grey-600);
   }
@@ -47,8 +48,9 @@
 }
 
 // Override styles for slack connect toast
-.slack-connect-toast > .ant-message-notice-content {
-  background: var(--requestly-color-surface-0) !important;
-  border: solid 1px var(--requestly-color-white-t-10) !important;
-  top: 100px !important;
+.slack-connect-toast.ant-message-notice {
+  .ant-message-notice-content {
+    background: var(--requestly-color-surface-0);
+    border: solid 1px var(--requestly-color-white-t-10);
+  }
 }

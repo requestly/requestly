@@ -134,7 +134,7 @@ const SupportPanel = () => {
             key: "5",
             label: (
               <a
-                href={GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}
+                href={"mailto:" + GLOBAL_CONSTANTS.COMPANY_INFO.SUPPORT_EMAIL}
                 target="_blank"
                 rel="noreferrer"
                 className="support-panel-item-style"
