@@ -200,3 +200,7 @@ export const updateIsManageBillingTeamAlertVisible = (prevState, action) => {
 export const updateIsAppBannerVisible = (prevState, action) => {
   prevState.misc.nonPersist.isAppBannerVisible = action.payload;
 };
+
+export const updateIsSupportChatOpened = (prevState, action) => {
+  prevState.misc.persist.isSupportChatOpened = action.payload;
+};

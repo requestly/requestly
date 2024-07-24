@@ -203,6 +203,7 @@ const INITIAL_STATE = {
       lastSeenInviteTs: 0,
       isJoinWorkspaceCardVisible: true,
       isManageBillingTeamAlertVisible: true,
+      isSupportChatOpened: false,
     },
     nonPersist: {
       networkSessionSaveInProgress: false, // todo: check if requried
