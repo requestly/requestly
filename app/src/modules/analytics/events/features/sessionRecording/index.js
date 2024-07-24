@@ -19,8 +19,8 @@ export const trackInstallExtensionDialogShown = (params) =>
 export const trackSessionRecordingFailed = (reason) =>
   trackEvent(SESSION_RECORDING.session_recording_failed, { reason });
 
-export const trackDraftSessionViewed = (source, recording_mode) => {
-  trackEvent(SESSION_RECORDING.draft_session_recording_viewed, { source, recording_mode });
+export const trackDraftSessionViewed = (recording_mode) => {
+  trackEvent(SESSION_RECORDING.draft_session_recording_viewed, { recording_mode });
   trackRQLastActivity(SESSION_RECORDING.draft_session_recording_viewed);
 };
 

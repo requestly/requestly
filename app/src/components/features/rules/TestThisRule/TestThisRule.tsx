@@ -8,7 +8,7 @@ import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/Bottom
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { TestReport } from "./types";
 import { getTestReportById, getTestReportsByRuleId, saveTestReport, deleteTestReport } from "./utils/testReports";
-import { generateDraftSessionTitle } from "views/features/sessions/SessionViewer/utils";
+import { generateDraftSessionTitle } from "features/sessionBook/screens/DraftSessionScreen/utils";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import {

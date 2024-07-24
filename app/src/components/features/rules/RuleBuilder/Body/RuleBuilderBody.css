@@ -3,7 +3,7 @@
 }
 
 .ant-row.rule-builder-body {
-  height: calc(100vh - 180px);
+  height: calc(100vh - 250px);
   overflow: auto !important;
   padding-right: 8px;
   padding-bottom: 6rem;

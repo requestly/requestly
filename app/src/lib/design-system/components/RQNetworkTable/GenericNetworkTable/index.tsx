@@ -47,6 +47,8 @@ export interface GenericNetworkTableProps<NetworkLog> {
   tableRef?: RefObject<HTMLDivElement>;
 
   onTableScroll?: UIEventHandler<HTMLElement>;
+
+  disableFilters?: boolean;
 }
 
 /**
@@ -65,6 +67,7 @@ export const GenericNetworkTable = <NetworkLog,>({
   autoScroll = false,
   tableRef,
   onTableScroll,
+  disableFilters = false,
 }: GenericNetworkTableProps<NetworkLog>): ReactElement => {
   const [, setSelectedLog] = useState<NetworkLog | null>(null);
   const [filters, setFilters] = useState<NetworkFilters>({ search: "", method: [], statusCode: [] });
@@ -122,7 +125,7 @@ export const GenericNetworkTable = <NetworkLog,>({
 
   return (
     <div className="network-container">
-      <FiltersToolbar filters={filters} setFilters={setFilters} />
+      <FiltersToolbar filters={filters} setFilters={setFilters} disabled={disableFilters} />
       <div className="rq-resource-table-wrapper">
         <ResourceTable
           resources={logs}

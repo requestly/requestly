@@ -1,0 +1,233 @@
+.session-player-container {
+  width: 100%;
+  height: fit-content;
+  background: var(--requestly-color-black);
+  border-radius: 8px;
+  padding: 10px;
+
+  .session-player-fullscreen {
+    .rr-player__frame {
+      height: 92vh !important;
+    }
+  }
+
+  .session-player {
+    .rr-player {
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    .rr-controller {
+      height: auto !important;
+
+      .rr-timeline {
+        width: 100%;
+      }
+
+      .rr-controller__btns {
+        display: none;
+      }
+
+      .rr-timeline__time {
+        display: none;
+      }
+
+      .rr-progress {
+        margin-top: -8px;
+        background: var(--requestly-color-text-placeholder);
+        border: none;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 6px;
+        height: 8px;
+
+        .rr-progress__step {
+          background: var(--requestly-color-primary);
+        }
+
+        .rr-progress__handler {
+          background: var(--requestly-color-primary);
+          width: 1rem;
+          height: 1rem;
+          top: 4px;
+        }
+      }
+    }
+
+    .rr-player__frame {
+      width: auto !important;
+      background: var(--requestly-color-black);
+
+      .overlay-frame {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 4rem;
+
+        .blur {
+          height: 100%;
+          width: 100%;
+          position: absolute;
+          backdrop-filter: blur(4px);
+          z-index: 1;
+          background-color: rgba(0, 0, 0, 0.4);
+        }
+        .overlay-content {
+          z-index: 10;
+        }
+      }
+
+      .replayer-wrapper {
+        iframe {
+          border-radius: 8px;
+        }
+      }
+    }
+  }
+
+  .session-player-controller {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 10px 8px;
+    position: relative;
+    top: 6px;
+
+    &__btn.ant-btn {
+      color: var(--requestly-color-text-default);
+      background: none;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background: none;
+      }
+
+      svg {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    .session-status-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .session-player-jump-controllers {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .session-player-controller__speed-selector {
+      .ant-select-selector {
+        border: none;
+        background: none;
+
+        .ant-select-selection-item {
+          color: var(--requestly-color-text-default);
+        }
+      }
+      .ant-select-arrow {
+        color: var(--requestly-color-text-default);
+      }
+    }
+
+    .session-player-skip-controller {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--requestly-color-text-default);
+    }
+
+    .session-player-fullscreen-controller-container {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
+
+@media (min-width: 1240px) and (max-width: 1440px) {
+  // HACKY FIX FOR MAINTAING ASPECT RATIO OF PLAYER IN DESKTOP SCREEN
+  .rr-player__frame {
+    height: 530px !important;
+  }
+}
+
+@media (max-width: 1240px) {
+  .rr-player__frame {
+    height: 400px !important;
+  }
+  .replayer-wrapper {
+    transform: scale(0.440972) translate(-50%, -50%) !important;
+  }
+}
+
+@media (max-width: 690px) {
+  .replayer-wrapper {
+    transform: scale(0.360972) translate(-50%, -50%) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .session-player-container {
+    .session-player-controller {
+      gap: 8px;
+
+      .session-player-controller__btn.ant-btn {
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
+
+      .session-status-container {
+        gap: 2px;
+      }
+      .session-player-jump-controllers {
+        gap: 0px;
+      }
+    }
+    font-size: var(--requestly-font-size-xs);
+  }
+}
+
+@media (max-width: 582px) {
+  .replayer-wrapper {
+    transform: scale(0.28972) translate(-50%, -50%) !important;
+  }
+  .rr-player__frame {
+    height: 320px !important;
+  }
+}
+
+@media (max-width: 475px) {
+  .session-player-container {
+    .session-player-controller {
+      padding: 10px 2px;
+
+      .session-player-skip-controller {
+        flex-direction: column;
+      }
+
+      .session-player-controller__speed-selector.ant-select {
+        width: 50px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  @media (max-width: 582px) {
+    .replayer-wrapper {
+      transform: scale(0.25972) translate(-50%, -50%) !important;
+    }
+    .rr-player__frame {
+      height: 300px !important;
+    }
+  }
+}
