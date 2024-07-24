@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { unstable_usePrompt, useNavigate } from "react-router-dom";
+import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
-// import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-// import SessionBearLogo from "src-SessionBear/assets/sessionBearLogoFull.svg";
-// import RQLogo from "assets/img/brand/rq_logo_full.svg";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import SessionBearLogo from "src-SessionBear/assets/sessionBearLogoFull.svg";
+import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import PATHS from "config/constants/sub/paths";
 import { RQButton } from "lib/design-system/components";
 import { SaveSessionButton } from "features/sessionBook/components/SaveSessionButton/SaveSessionButton";
-// import { getAppFlavour } from "utils/AppUtils";
+import { getAppFlavour } from "utils/AppUtils";
 import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/SessionPlayer";
 import DraftSessionDetailsPanel from "../DraftSessionDetailsPanel/DraftSessionDetailsPanel";
 import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/sessionBook/analytics";
@@ -23,11 +23,13 @@ interface DraftSessionViewerProps {
 
 export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDesktopMode }) => {
   const navigate = useNavigate();
-  // const appFlavour = getAppFlavour();
+  const location = useLocation();
+  const appFlavour = getAppFlavour();
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
   const [isDiscardClicked, setIsDiscardClicked] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
+  const isOpenedInIframe = location.pathname.includes("iframe");
 
   if (!isDesktopMode) {
     unstable_usePrompt({
@@ -68,27 +70,36 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
     <div className="draft-session-viewer-container">
       <div className="draft-session-viewer-header-container">
         {/* TODO: SHOW LOGO ONLY WHEN LOADED IN IFRAME */}
-        {/* {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
-          <img src={SessionBearLogo} alt="SessionBear Logo" width={130} />
+        {isOpenedInIframe ? (
+          <>
+            {" "}
+            {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
+              <img src={SessionBearLogo} alt="SessionBear Logo" width={150} />
+            ) : (
+              <img src={RQLogo} alt="Requestly Logo" width={120} />
+            )}
+          </>
         ) : (
-          <img src={RQLogo} alt="Requestly Logo" width={120} />
-        )} */}
-        {/* TEMP */}
-        <div className="draft-session-header-breadcrumb">
-          <span
-            className="draft-session-header-breadcrumb__parent"
-            onClick={() => redirectToSessionRecordingHome(navigate)}
-          >
-            All sessions
-          </span>
-          <span>&gt;</span>
-          <span className="draft-session-header-breadcrumb__current">Draft session</span>
-        </div>
-
+          <>
+            <div className="draft-session-header-breadcrumb">
+              <span
+                className="draft-session-header-breadcrumb__parent"
+                onClick={() => redirectToSessionRecordingHome(navigate)}
+              >
+                All sessions
+              </span>
+              <span>&gt;</span>
+              <span className="draft-session-header-breadcrumb__current">Draft session</span>
+            </div>
+          </>
+        )}
         <div className="draft-session-viewer-actions">
-          <RQButton type="default" onClick={handleDiscardSession}>
-            Discard
-          </RQButton>
+          {!isOpenedInIframe && (
+            <RQButton type="default" onClick={handleDiscardSession}>
+              Discard
+            </RQButton>
+          )}
+
           <SaveSessionButton onSaveClick={handleSaveSessionClicked} />
         </div>
       </div>
