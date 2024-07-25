@@ -13,7 +13,7 @@ import { StatsCard } from "./components/StatsCard/StatsCard";
 import HowToClaimVolumeDiscounts from "./components/HowToClaimVolumeDiscounts";
 import OtherWaysToMakePurchase from "./components/OtherWaysToMakePurchase";
 import LicensingAndSavings from "./components/LicensingAndSavings";
-import { CustomerReviews } from "./components/CustomerReviews/CustomerReviews";
+// import { CustomerReviews } from "./components/CustomerReviews/CustomerReviews";
 import PricingFAQs from "./components/FAQs";
 import PricingPageFooter from "./components/PricingPageFooter";
 import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
@@ -67,7 +67,7 @@ export const PricingIndexPage = () => {
               <HowToClaimVolumeDiscounts />
             </div>
             <LicensingAndSavings />
-            <CustomerReviews />
+            {/* <CustomerReviews /> */}
             <PricingFAQs />
           </div>
           <PricingPageFooter />

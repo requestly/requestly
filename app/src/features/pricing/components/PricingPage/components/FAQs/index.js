@@ -1,5 +1,6 @@
 import React from "react";
 import { Collapse } from "antd";
+import { MdOutlineExpandLess } from "@react-icons/all-files/md/MdOutlineExpandLess";
 import "./index.css";
 
 const PricingFAQs = () => {
@@ -63,9 +64,18 @@ const PricingFAQs = () => {
   ];
   return (
     <>
-      <div className="faq-heading">Frequently Asked Questions</div>
+      <div className="faq-heading">Frequently asked questions</div>
       <div className="faq-collapse-container">
-        <Collapse expandIconPosition="right" ghost className="faq-collapse">
+        <Collapse
+          ghost
+          className="faq-collapse"
+          expandIconPosition="right"
+          expandIcon={(panelprops) => {
+            return (
+              <MdOutlineExpandLess className={`anticon faq-collapse-icon  ${panelprops?.isActive ? "active" : ""}`} />
+            );
+          }}
+        >
           {FAQs.map((faq, index) => (
             <Collapse.Panel key={index} header={<div className="faq-question">{faq.question}</div>}>
               <div className="faq-answer">{faq.answer}</div>
