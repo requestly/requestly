@@ -24,7 +24,13 @@ class RQPostSessionSaveWidget extends HTMLElement {
     return `
       <style>${styles}</style>
         <div class="post-session-save-widget-container">
-            <div class="session-saving-view">Saving session...</div>
+            <div class="session-saving-view">
+            <div class="session-saving-title-container">
+            <div class="session-saving-loader"><div></div><div></div><div></div><div></div></div>
+            <div class="session-saving-title">Saving session</div>
+            </div>
+            <div class="session-saving-description">Please wait as we save the session. This process may take a few seconds.</div>
+            </div>
             <div class="session-saved-view">Session Saved!</div>
         </div>
       </div>
