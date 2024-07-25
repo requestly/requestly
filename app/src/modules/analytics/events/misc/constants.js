@@ -137,4 +137,5 @@ export const SUBSCRIPTION = {
 export const SUPPORT_OPTION = {
   CLICKED: "support_option_clicked",
   JOIN_SLACK_CLICKED: "join_slack_connect_clicked",
+  OPENED: "support_options_opened",
 };
