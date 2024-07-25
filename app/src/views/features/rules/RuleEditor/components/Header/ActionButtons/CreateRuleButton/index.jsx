@@ -362,7 +362,6 @@ const CreateRuleButton = ({
           });
       } else {
         toast.warn(ruleValidation.message);
-        setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, true);
         trackErrorInRuleCreation(snakeCase(ruleValidation.error), currentlySelectedRuleData.ruleType);
       }
     }
