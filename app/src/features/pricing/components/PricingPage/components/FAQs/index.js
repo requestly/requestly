@@ -6,6 +6,42 @@ import "./index.css";
 const PricingFAQs = () => {
   const FAQs = [
     {
+      question: <React.Fragment>How Requestly License Works?</React.Fragment>,
+      answer: (
+        <React.Fragment>
+          Requestly has a subscription license, and after your initial term, it automatically renews either yearly or
+          monthly, depending on your plan. Each license allows one user to work with the product.
+        </React.Fragment>
+      ),
+    },
+    {
+      question: <React.Fragment>Is it possible to transfer a purchased license to another person?</React.Fragment>,
+      answer: (
+        <React.Fragment>
+          You can purchase a license and assign the seat to someone else via Dashboard. If you're managing billing only
+          and not using the product, you won't be charged.
+        </React.Fragment>
+      ),
+    },
+    // {
+    //   question: <React.Fragment>How can I claim volume discounts?</React.Fragment>,
+    //   answer: (
+    //     <React.Fragment>
+    //       You can purchase a license and assign the seat to someone else via Dashboard. If you're managing billing only
+    //       and not using the product, you won't be charged.
+    //     </React.Fragment>
+    //   ),
+    // },
+    {
+      question: <React.Fragment>How is my payment information handled and secured?</React.Fragment>,
+      answer: (
+        <React.Fragment>
+          Your transaction is processed securely through Stripe. All payments are encrypted, and your credentials and
+          payment method are isolated for security. We do not save any card info.
+        </React.Fragment>
+      ),
+    },
+    {
       question: <React.Fragment>Do individual developers need to pay for Requestly?</React.Fragment>,
       answer: (
         <React.Fragment>
