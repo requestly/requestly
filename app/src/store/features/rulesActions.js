@@ -83,9 +83,17 @@ export const updateCurrentlySelectedRuleErrors = (prevState, action) => {
 
 export const clearCurrentlySelectedRuleAndConfig = (prevState) => {
   prevState.rules.currentlySelectedRule = {
+    ...prevState.rules.currentlySelectedRule,
     config: false,
     data: false,
     hasUnsavedChanges: false,
+  };
+};
+
+export const closeCurrentlySelectedRuleDetailsPanel = (prevState) => {
+  prevState.rules.currentlySelectedRule = {
+    ...prevState.rules.currentlySelectedRule,
+    showDetailsPanel: false,
   };
 };
 

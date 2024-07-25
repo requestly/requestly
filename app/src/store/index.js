@@ -45,8 +45,6 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   "appMode",
   "appTheme",
   "isExtensionEnabled",
-  // "rules",
-  // "desktopSpecificDetails.appsList",
   "hasConnectedApp",
   "workspaceOnboarding",
   "appOnboarding",
@@ -55,6 +53,7 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   "userPreferences",
   "userAttributes",
   "misc.persist",
+  "rules.currentlySelectedRule.showDetailsPanel",
 ]);
 
 export const reduxStore = configureStore({
