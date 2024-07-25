@@ -11,6 +11,8 @@ import { isFeatureCompatible } from "utils/CompatibilityUtils";
 import FEATURES from "config/constants/sub/features";
 import { countCapturingGroups } from "modules/extension/mv3RuleParser/utils";
 import { RE2JS } from "re2js";
+import { prettifyCode } from "componentsV2/CodeEditor/utils";
+import { EditorLanguage } from "componentsV2/CodeEditor";
 
 /**
  * In case of a few rules, input from the rule editor does not directly map to rule schema.
@@ -434,6 +436,23 @@ export const validateRule = (rule, dispatch, appMode) => {
           error: "file not selected",
         };
       }
+      // Response body shouldn't have invalid syntax
+      else {
+        const language =
+          pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
+            ? EditorLanguage.JAVASCRIPT
+            : EditorLanguage.JSON;
+
+        const result = prettifyCode(pair.response.value, language);
+
+        if (!result.success) {
+          output = {
+            result: false,
+            message: "Response body contains invalid syntax!",
+            error: "invalid syntax",
+          };
+        }
+      }
     });
   }
 
@@ -456,6 +475,23 @@ export const validateRule = (rule, dispatch, appMode) => {
           message: message,
           error: "missing request body",
         };
+      }
+      // Request body shouldn't have invalid syntax
+      else {
+        const language =
+          pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
+            ? EditorLanguage.JAVASCRIPT
+            : EditorLanguage.JSON;
+
+        const result = prettifyCode(pair.request.value, language);
+
+        if (!result.success) {
+          output = {
+            result: false,
+            message: "Request body contains invalid syntax!",
+            error: "invalid syntax",
+          };
+        }
       }
     });
   }
