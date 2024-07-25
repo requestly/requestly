@@ -80,7 +80,7 @@
 
 .rq-network-table-container .rq-resource-table-wrapper {
   overflow-y: auto;
-  height: calc(100% - 56px); /* deducting filter input height */
+  height: calc(100% - 88px); /* deducting filter input height */
   margin-top: 8px;
 }
 

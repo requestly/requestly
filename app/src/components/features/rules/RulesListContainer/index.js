@@ -18,7 +18,7 @@ import {
 } from "../../../../store/selectors";
 import { submitAttrUtil, trackRQLastActivity } from "../../../../utils/AnalyticsUtils";
 //ACTIONS
-import { fetchSharedLists } from "backend/sharedList/deleteSharedList";
+import { fetchSharedLists } from "backend/sharedList/fetchSharedLists";
 //CONSTANTS
 import APP_CONSTANTS from "../../../../config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";

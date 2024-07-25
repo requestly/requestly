@@ -7,7 +7,7 @@ import { IBaseTestData } from "../types";
 
 test.describe("Replace Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(scenario.description, async ({ appPage, context }) => {
+    test(`${i + 1}. @ReplaceRule: ${scenario.description}`, async ({ appPage, context }) => {
       await testReplace({ appPage, context, ...scenario });
     });
   });

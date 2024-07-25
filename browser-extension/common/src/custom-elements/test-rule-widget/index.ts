@@ -5,7 +5,8 @@ import RQLogo from "../../../resources/icons/rqLogo-blue.svg";
 import RQLogoSmall from "../../../resources/icons/rqLogo-white.svg";
 import MinimizeIcon from "../../../resources/icons/minimze.svg";
 import InfoIcon from "../../../resources/icons/info.svg";
-import SettingsIcon from "../../../resources/icons/settings.svg";
+import VisibilityIcon from "../../../resources/icons/visibility.svg";
+import CloseIcon from "../../../resources/icons/close.svg";
 
 const DEFAULT_POSITION = { right: 16, top: 16 };
 
@@ -32,6 +33,23 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
       event.stopPropagation();
       this.toggleMinimize(false);
     });
+  }
+
+  getContainer() {
+    return this.shadowRoot.getElementById("container");
+  }
+
+  show(position = DEFAULT_POSITION) {
+    this.moveToPostion(position);
+    this.setAttribute("draggable", "true");
+    const container = this.getContainer();
+    container.classList.remove("hidden");
+    container.classList.add("visible");
+  }
+
+  hide() {
+    this.getContainer().classList.add("hidden");
+    this.getContainer().classList.remove("visible");
   }
 
   toggleMinimize(minimize: boolean) {
@@ -62,13 +80,14 @@ export abstract class RQTestRuleWidget extends RQDraggableWidget {
             <button id="test-rule-minimized-btn"></button>
         </div>
         <div id="heading-container">
-            <div id="logo-container"> 
+            <div id="logo-container">
                 <span id="heading-logo">${RQLogo}</span>
                 <span id="logo-text">requestly</span>
             </div>
             <div id="actions-container">
-                <button id="settings-button" class="hidden">${SettingsIcon}</button>
+                <button id="settings-button" class="hidden" data-tooltip="Hide widget in app settings">${VisibilityIcon}</button>
                 <button id="minimize-button">${MinimizeIcon}</buttton>
+                <button id="close-button" class="hidden">${CloseIcon}</buttton>
             </div>
         </div>
         <div id="test-rule-container"></div>

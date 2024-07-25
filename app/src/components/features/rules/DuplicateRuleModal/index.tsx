@@ -3,8 +3,9 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Col, Input, Modal, Row, Select, Space } from "antd";
 import { StorageService } from "../../../../init";
-import { getAppMode, getUserAttributes } from "store/selectors";
+import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
+import { transformAndValidateRuleFields } from "views/features/rules/RuleEditor/components/Header/ActionButtons/CreateRuleButton/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleDuplicatedEvent } from "modules/analytics/events/common/rules";
@@ -34,6 +35,7 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
   const navigate = useNavigate();
   const availableWorkspaces: TeamWorkspace[] = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
+  const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
   const [newRuleName, setNewRuleName] = useState<string>();
@@ -67,10 +69,14 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
 
   const duplicateRule = useCallback(async () => {
     const isOperationInSameWorkspace = selectedWorkspaceId === currentlyActiveWorkspace.id;
+    const parsedRuleData = await transformAndValidateRuleFields(rule);
+
+    const finalRuleData = parsedRuleData.success ? (parsedRuleData.ruleData as Rule) : rule;
 
     const newRule: Rule = {
-      ...rule,
+      ...finalRuleData,
       creationDate: generateObjectCreationDate(),
+      createdBy: user?.details?.profile?.uid || null,
       name: newRuleName,
       id: rule.ruleType + "_" + generateObjectId(),
       isSample: false,
@@ -104,6 +110,7 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
     onDuplicate(newRule);
     close();
   }, [
+    user?.details?.profile?.uid,
     rule,
     newRuleName,
     appMode,

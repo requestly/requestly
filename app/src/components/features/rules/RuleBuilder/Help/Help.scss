@@ -1,11 +1,16 @@
-.rule-editor-help-content {
+.rule-editor-help-content-container {
   font-size: 14px;
   line-height: 22px;
   padding: 1rem;
 }
 
+.rule-editor-help-content {
+  height: 80vh;
+  overflow: auto;
+}
+
 .rule-editor-help-header {
-  padding: 0 1.25rem 8px 0;
+  padding: 0 4px 8px 0;
 }
 
 .rule-editor-help-back-btn.ant-btn {
@@ -17,6 +22,7 @@
 }
 
 .rule-editor-help-back-btn.ant-btn,
+.rule-editor-help-close-btn.ant-btn,
 .rule-editor-docs-close-btn.ant-btn {
   padding: 6px;
   border: none;
@@ -24,7 +30,18 @@
   height: max-content;
 }
 
+.rule-editor-help-close-btn.ant-btn {
+  padding: 2px;
+  color: var(--requestly-color-text-subtle, #bbb);
+}
+
+.rule-editor-help-close-btn.ant-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .rule-editor-help-back-btn.ant-btn:hover,
+.rule-editor-help-close-btn.ant-btn:hover,
 .rule-editor-docs-close-btn.ant-btn:hover {
   opacity: 0.7;
 }
@@ -116,10 +133,6 @@
   padding: 8px 1.25rem;
 }
 /* docs */
-.rule-editor-docs {
-  height: 80vh;
-  overflow: auto;
-}
 .rule-editor-docs-intro {
   margin-top: 10px;
 }
@@ -243,4 +256,46 @@
 
 .rule-editor-doc-skeleton .ant-skeleton-content .ant-skeleton-title {
   display: none;
+}
+
+.rule-editor-help-container {
+  .rule-details-panel-container {
+    margin: 0;
+    margin-bottom: 16px;
+    padding: 16px;
+
+    .close-btn {
+      display: none;
+    }
+
+    .details-panel {
+      gap: 0;
+      flex-direction: column;
+
+      .rule-details-container {
+        .use-cases-container {
+          ul.use-cases-list {
+            list-style: unset;
+
+            .use-case-list-item {
+              .use-case {
+                br {
+                  display: block;
+                }
+
+                .use-template-btn {
+                  margin-left: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .rule-templates {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+    }
+  }
 }

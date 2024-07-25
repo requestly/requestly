@@ -10,11 +10,9 @@ import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { EnterprisePlanCard } from "./components/EnterprisePlanCard/EnterprisePlanCard";
 import { CompaniesSection } from "./components/CompaniesSection/CompaniesSection";
 import { StatsCard } from "./components/StatsCard/StatsCard";
-import BuyAdditionalSeats from "./components/BuyAdditionalSeats";
 import HowToClaimVolumeDiscounts from "./components/HowToClaimVolumeDiscounts";
 import OtherWaysToMakePurchase from "./components/OtherWaysToMakePurchase";
-import LicensingAndSavings from "./components/LicensingAndSavings";
-import { CustomerReviews } from "./components/CustomerReviews/CustomerReviews";
+// import { CustomerReviews } from "./components/CustomerReviews/CustomerReviews";
 import PricingFAQs from "./components/FAQs";
 import PricingPageFooter from "./components/PricingPageFooter";
 import EnterpriseRequestBanner from "./components/EnterpriseRequestBanner";
@@ -23,6 +21,7 @@ import "./pricingIndexPage.scss";
 export const PricingIndexPage = () => {
   const navigate = useNavigate();
   const [duration, setDuration] = useState(PRICING.DURATION.ANNUALLY);
+
   return (
     <div className="pricing-page-wrapper">
       <div className="pricing-page-container">
@@ -61,14 +60,11 @@ export const PricingIndexPage = () => {
             <EnterprisePlanCard />
             <CompaniesSection />
             <StatsCard />
+            <OtherWaysToMakePurchase />
             <div className="pricing-page-other-actions-container">
-              {/* TODO: A COMMON COMPONENT TO BE CREATED FOR BELOW 2 COMPONENTS */}
-              <BuyAdditionalSeats />
               <HowToClaimVolumeDiscounts />
             </div>
-            <LicensingAndSavings />
-            <OtherWaysToMakePurchase />
-            <CustomerReviews />
+            {/* <CustomerReviews /> */}
             <PricingFAQs />
           </div>
           <PricingPageFooter />
