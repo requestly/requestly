@@ -23,10 +23,10 @@ export const PurchaseOption: React.FC<PurchaseOptionProps> = ({ title = "", desc
         <Button
           className="purchase-option-action-btn"
           onClick={() => {
-            action.handler?.();
+            action?.handler?.();
           }}
         >
-          {action.text}
+          {action?.text}
         </Button>
       ) : null}
     </div>
