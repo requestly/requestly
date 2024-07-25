@@ -29,6 +29,7 @@ export const SharedListsTable: React.FC<SharedListsTableProps> = ({ sharedLists 
     handleDeleteSharedListClick,
   });
 
+  // todo: add createdBy
   return (
     <>
       <div className="sharedlists-table-container">
