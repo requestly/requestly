@@ -24,6 +24,7 @@
     "build:current": "rm -rf dist && rollup -c",
     "build:common": "cd ../common && npm run build && cd ../mv3",
     "watch": "rm -rf dist && rollup -cw",
+    "pretest": "npm run build",
     "test": "playwright test"
   },
   "devDependencies": {
