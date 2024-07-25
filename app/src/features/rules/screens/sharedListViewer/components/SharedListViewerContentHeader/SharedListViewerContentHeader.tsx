@@ -22,7 +22,7 @@ import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeat
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Group, Rule } from "types";
 import { actions } from "store";
-
+import Logger from "lib/logger";
 import "./sharedListViewerContentHeader.scss";
 
 interface ContentHeaderProps {
@@ -103,16 +103,23 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
       console.error(err);
     });
 
-    //process Data
-    processDataToImport([...sharedListRules, ...sharedListGroups], user, allRules).then((result) => {
-      const processedRulesToImport = result.data;
+    try {
+      //process Data
+      processDataToImport([...sharedListRules, ...sharedListGroups], user, allRules).then((result) => {
+        const processedRulesToImport = result.data;
 
-      addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
-        toast.info(`Successfully imported rules`);
-        trackSharedListImportCompleted(sharedListId, sharedListRules.length);
-        redirectToRules(navigate);
+        addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
+          toast.info(`Successfully imported rules`);
+          trackSharedListImportCompleted(sharedListId, sharedListRules.length);
+          redirectToRules(navigate);
+        });
       });
-    });
+    } catch (error) {
+      setAreRulesImporting(false);
+      trackSharedListImportFailed(sharedListId, sharedListRules.length);
+      toast.error("Unable to import invalid shared list!");
+      Logger.log("Error while processing sharedlist", error);
+    }
   }, [
     sharedListRules,
     sharedListGroups,
