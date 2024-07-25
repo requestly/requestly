@@ -19,6 +19,7 @@ import { onboardingRoutes } from "./onboardingRoutes";
 import { settingRoutes } from "features/settings/routes";
 import { miscRoutes } from "./miscRoutes";
 import { desktopSessionsRoutes } from "./desktopSessionRoutes";
+import { inviteRoutes } from "./inviteRoutes";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -43,6 +44,7 @@ export const routesV2: RouteObject[] = [
           ...desktopRoutes,
           ...mockServerRoutes,
           ...onboardingRoutes,
+          ...inviteRoutes,
           ...settingRoutes,
           ...miscRoutes,
           ...desktopSessionsRoutes,
