@@ -41,8 +41,8 @@ export const trackDraftSessionSaved = ({
 export const trackDraftSessionSaveFailed = (reason: string) =>
   trackEvent(SESSIONS.DRAFT_SESSION_RECORDING_SAVE_FAILED, { reason });
 
-export const trackSavedSessionViewed = (source: string) =>
-  trackEvent(SESSIONS.SAVED_SESSION_RECORDING_VIEWED, { source });
+export const trackSavedSessionViewed = (source: string, session_id: string) =>
+  trackEvent(SESSIONS.SAVED_SESSION_RECORDING_VIEWED, { source, session_id });
 
 export const trackSessionRecordingShareClicked = () => {
   trackEvent(SESSIONS.SESSION_RECORDING_SHARE_CLICKED);

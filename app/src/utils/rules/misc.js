@@ -260,7 +260,7 @@ export function runMinorFixesOnRule(dispatch, rule) {
     pairs: rulePairs,
   };
 
-  setCurrentlySelectedRule(dispatch, fixedRule);
+  setCurrentlySelectedRule(dispatch, fixedRule, true);
 
   return fixedRule;
 }
