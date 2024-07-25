@@ -6,7 +6,7 @@ import { IBaseTestData } from "../types";
 
 test.describe("Cancel Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(scenario.description, async ({ appPage, context }) => {
+    test(`${i + 1}. @CancelRule: ${scenario.description}`, async ({ appPage, context }) => {
       await testCancelRule({ appPage, context, ...scenario });
     });
   });

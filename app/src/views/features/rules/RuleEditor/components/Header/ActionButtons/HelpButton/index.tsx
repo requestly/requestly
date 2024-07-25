@@ -14,22 +14,25 @@ export const HelpButton = () => {
 
   return (
     <>
-      <Drawer
-        className="rule-editor-help-drawer"
-        mask={null}
-        open={isHelpDrawerOpen}
-        onClose={() => {
-          trackDocsSidebarClosed(currentlySelectedRuleData.ruleType);
-          setIsHelpDrawerOpen(false);
-        }}
-      >
-        <Help ruleType={currentlySelectedRuleData.ruleType} />
+      <Drawer className="rule-editor-help-drawer" mask={null} open={isHelpDrawerOpen} closable={false}>
+        <Help
+          ruleType={currentlySelectedRuleData.ruleType}
+          onClose={() => {
+            trackDocsSidebarClosed(currentlySelectedRuleData.ruleType);
+            setIsHelpDrawerOpen(false);
+          }}
+        />
       </Drawer>
       <RQButton
         icon={<AiOutlineQuestionCircle />}
         className="header-rule-help-btn"
         type="text"
-        onClick={() => setIsHelpDrawerOpen((isOpen) => !isOpen)}
+        onClick={() => {
+          setIsHelpDrawerOpen((isOpen) => !isOpen);
+          if (isHelpDrawerOpen) {
+            trackDocsSidebarClosed(currentlySelectedRuleData?.ruleType);
+          }
+        }}
         size="small"
       >
         Help

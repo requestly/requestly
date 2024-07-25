@@ -7,6 +7,7 @@ import { MdOutlineTerminal } from "@react-icons/all-files/md/MdOutlineTerminal";
 import { MdNetworkCheck } from "@react-icons/all-files/md/MdNetworkCheck";
 import { MdConnectedTv } from "@react-icons/all-files/md/MdConnectedTv";
 import { MdOutlineInfo } from "@react-icons/all-files/md/MdOutlineInfo";
+import { useLocation } from "react-router-dom";
 
 const BOTTOM_SHEET_TAB_KEYS = {
   INFO: "info",
@@ -20,19 +21,11 @@ interface Props {
 }
 
 export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
+  const location = useLocation();
+  const isDraftSession = location.pathname.includes("draft");
+
   return useMemo(() => {
-    return [
-      {
-        key: BOTTOM_SHEET_TAB_KEYS.INFO,
-        label: (
-          <div className="bottom-sheet-tab">
-            <MdOutlineInfo />
-            <span>Info</span>
-          </div>
-        ),
-        children: <SessionInfo />,
-        forceRender: true,
-      },
+    const tabItems = [
       {
         key: BOTTOM_SHEET_TAB_KEYS.CONSOLE,
         label: (
@@ -65,5 +58,20 @@ export const useSessionBottomSheetTabItems = ({ playerTimeOffset }: Props) => {
         children: <SessionEnvironmentDetails />,
       },
     ];
-  }, [playerTimeOffset]);
+
+    if (!isDraftSession) {
+      tabItems.unshift({
+        key: BOTTOM_SHEET_TAB_KEYS.INFO,
+        label: (
+          <div className="bottom-sheet-tab">
+            <MdOutlineInfo />
+            <span>Info</span>
+          </div>
+        ),
+        children: <SessionInfo />,
+      });
+    }
+
+    return tabItems;
+  }, [playerTimeOffset, isDraftSession]);
 };

@@ -3,4 +3,5 @@ export type SharedList = {
   importCount: number;
   listName: string;
   shareId: string;
+  createdBy?: string;
 };
