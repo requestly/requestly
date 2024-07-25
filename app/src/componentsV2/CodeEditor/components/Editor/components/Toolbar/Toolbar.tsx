@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import prettier from "prettier";
-import parserBabel from "prettier/parser-babel";
-import parserHtml from "prettier/parser-html";
-import parserCss from "prettier/parser-postcss";
 import { RQButton } from "lib/design-system/components";
 import { IoMdCopy } from "@react-icons/all-files/io/IoMdCopy";
 import { PiBracketsCurlyBold } from "@react-icons/all-files/pi/PiBracketsCurlyBold";
 import { BsFiletypeRaw } from "@react-icons/all-files/bs/BsFiletypeRaw";
 import { EditorLanguage, EditorCustomToolbar } from "componentsV2/CodeEditor/types";
-import Logger from "../../../../../../../../common/logger";
 import { Tooltip } from "antd";
 import { useTheme } from "styled-components";
 import "./toolbar.scss";
+import { prettifyCode } from "componentsV2/CodeEditor/utils";
 import {
   trackCodeEditorCodePrettified,
   trackCodeEditorCodeMinified,
@@ -38,48 +34,21 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({ language, code, o
     }
   };
 
-  const getEditorParserConfig = (language: EditorLanguage) => {
-    let parser = "babel";
-    let parserPlugin = parserBabel;
-
-    switch (language) {
-      case EditorLanguage.HTML:
-        parser = "html";
-        parserPlugin = parserHtml;
-        break;
-      case EditorLanguage.CSS:
-        parser = "css";
-        parserPlugin = parserCss;
-        break;
-      case EditorLanguage.JSON:
-        parser = "json";
-        break;
-      default:
-        break;
-    }
-    return { parser, parserPlugin };
-  };
-
   // This function is used for all languages except JSON
   const handlePrettifyCode = () => {
-    const { parser, parserPlugin } = getEditorParserConfig(language);
-    try {
-      let prettifiedCode = prettier.format(code, {
-        parser: parser,
-        plugins: [parserPlugin],
-      });
-      onCodeFormat(prettifiedCode);
+    const result = prettifyCode(code, language);
+
+    if (result.success) {
+      onCodeFormat(result.code);
       trackCodeEditorCodePrettified();
-    } catch (error) {
-      Logger.log("Error in prettifying code", error);
     }
   };
 
   // This function is only used for JSON code
   const handlePrettifyToggle = () => {
     if (isCodePrettified) {
-      let minifiedCode = JSON.stringify(JSON.parse(code));
-      onCodeFormat(minifiedCode);
+      const result = prettifyCode(code, EditorLanguage.JSON);
+      onCodeFormat(result.code);
       trackCodeEditorCodeMinified();
       setIsCodePrettified(false);
     } else {
