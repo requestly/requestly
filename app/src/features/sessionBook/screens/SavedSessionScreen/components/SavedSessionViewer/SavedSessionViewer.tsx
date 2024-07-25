@@ -73,14 +73,14 @@ export const SavedSessionViewer = () => {
 
   useEffect(() => {
     if (isInsideIframe) {
-      trackSavedSessionViewed("embed");
+      trackSavedSessionViewed("embed", id);
       return;
     }
 
     if ((location.state as NavigationState)?.fromApp) {
-      trackSavedSessionViewed("app");
+      trackSavedSessionViewed("app", id);
     } else {
-      trackSavedSessionViewed("link");
+      trackSavedSessionViewed("link", id);
     }
   }, [id, location.state, isInsideIframe]);
 

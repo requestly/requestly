@@ -1,9 +1,15 @@
 import React, { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import RulesTable from "./components/RulesTable/RulesTable";
 import { getAllRecordsMap, getAllRecords } from "store/features/rules/selectors";
 import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
-import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
+import {
+  getAppMode,
+  getIsExtensionEnabled,
+  getIsRulesListLoading,
+  getIsSecondarySidebarCollapsed,
+  getUserAuthDetails,
+} from "store/selectors";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { FilterType } from "componentsV2/ContentList/";
@@ -17,17 +23,23 @@ import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
 import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
+import { Button, Tooltip } from "antd";
+import { PicRightOutlined } from "@ant-design/icons";
 import "./rulesList.scss";
+import { actions } from "store";
+import { trackFooterClicked } from "modules/analytics/events/common/onboarding/footer";
 
 interface Props {}
 
 const RulesList: React.FC<Props> = () => {
+  const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
+  const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
 
   useFetchAndUpdateRules({ setIsLoading: setIsLoading });
 
@@ -42,6 +54,12 @@ const RulesList: React.FC<Props> = () => {
 
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
+
+  const handleSecondarySidebarToggle = (e: React.MouseEvent) => {
+    // @ts-ignore
+    dispatch(actions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
+    trackFooterClicked("secondary_sidebar_toggle_from_rules_list");
+  };
 
   if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP || appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
     if (appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) {
@@ -71,8 +89,20 @@ const RulesList: React.FC<Props> = () => {
 
               {/* TODO: Temp Breadcrumb */}
               <div className="rq-rules-table-breadcrumb">
-                <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">All</span>
+                {/* TODO: this is temp fix */}
+                <Tooltip title={`${isSecondarySidebarCollapsed ? "Expand" : "Collapse"} sidebar`} placement="bottom">
+                  <Button
+                    type="text"
+                    icon={<PicRightOutlined />}
+                    className="sidebar-toggle-btn"
+                    onClick={handleSecondarySidebarToggle}
+                  />
+                </Tooltip>
+                <div>
+                  <span className="breadcrumb-1">Rules</span> {" > "} <span className="breadcrumb-2">All</span>
+                </div>
               </div>
+
               <RulesListContentHeader
                 searchValue={searchValue}
                 setSearchValue={setSearchValue}
