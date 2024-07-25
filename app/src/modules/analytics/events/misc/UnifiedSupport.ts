@@ -13,4 +13,8 @@ const trackSlackConnectClicked = (source: string) => {
   });
 };
 
-export { trackSupportOptionClicked, trackSlackConnectClicked };
+const trackSupportOptionOpened = () => {
+  trackEvent(SUPPORT_OPTION.OPENED);
+};
+
+export { trackSupportOptionClicked, trackSlackConnectClicked, trackSupportOptionOpened };
