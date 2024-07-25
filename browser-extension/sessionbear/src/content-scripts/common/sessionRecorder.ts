@@ -329,6 +329,10 @@ const injectDraftSessionViewer = async () => {
   if (exisitingSessionViewer) {
     exisitingSessionViewer.remove();
   }
+  const postSaveSessionWidget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  if (postSaveSessionWidget) {
+    postSaveSessionWidget.remove();
+  }
 
   const authToken = await getRecord(STORAGE_KEYS.USER_TOKEN);
 
