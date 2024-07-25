@@ -69,10 +69,8 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   return (
     <div className="draft-session-viewer-container">
       <div className="draft-session-viewer-header-container">
-        {/* TODO: SHOW LOGO ONLY WHEN LOADED IN IFRAME */}
         {isOpenedInIframe ? (
           <>
-            {" "}
             {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
               <img src={SessionBearLogo} alt="SessionBear Logo" width={150} />
             ) : (

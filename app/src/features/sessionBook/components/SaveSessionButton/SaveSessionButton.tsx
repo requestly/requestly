@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { RQButton } from "lib/design-system/components";
@@ -41,6 +41,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const isDraftSession = location.pathname.includes("draft");
+  const isOpenedInIframe = useMemo(() => location.pathname.includes("iframe"), [location.pathname]);
   const debugInfoToBeIncluded: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
   const [isLoading, setIsLoading] = useState(false);
 
@@ -94,7 +95,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
       [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS],
       SOURCE.SAVE_DRAFT_SESSION,
       claimIncentiveRewards,
-      true
+      isOpenedInIframe
     )
       .catch((err) => {
         Logger.log("Error while saving draft session", err);
@@ -113,6 +114,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
     sessionEvents,
     onSaveClick,
     claimIncentiveRewards,
+    isOpenedInIframe,
   ]);
 
   return (

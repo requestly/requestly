@@ -214,6 +214,7 @@ const AuthHandler: React.FC<{}> = () => {
             [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: token,
           });
         });
+
         blockingOperations(user).then((success: boolean) => {
           if (success) {
             nonBlockingOperations(user).then(() => {

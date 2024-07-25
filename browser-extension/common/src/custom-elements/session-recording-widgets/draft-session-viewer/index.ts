@@ -44,14 +44,14 @@ class RQDraftSessionViewer extends HTMLElement {
 
     draftViewCloseBtn.addEventListener("click", () => {
       draftSessionWindow.classList.add("hidden");
-      this.sendMessageToIframe(iframe, { source: "extension", action: "reset-draft-session-viewer" });
+      this.sendMessageToIframe(iframe, { source: "extension", action: "resetDraftSessionViewer" });
     });
 
     this.addEventListener("view-draft-session", (event: CustomEvent) => {
       draftSessionWindow.classList.remove("hidden");
       this.sendMessageToIframe(iframe, {
         source: "extension",
-        action: "view-draft-session",
+        action: "viewDraftSession",
         payload: event.detail.session,
       });
     });
