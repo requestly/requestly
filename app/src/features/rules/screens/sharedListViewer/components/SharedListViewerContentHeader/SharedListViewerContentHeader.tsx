@@ -116,6 +116,7 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
       });
     } catch (error) {
       setAreRulesImporting(false);
+      trackSharedListImportFailed(sharedListId, sharedListRules.length);
       toast.error("Unable to import invalid shared list!");
       Logger.log("Error while processing sharedlist", error);
     }
