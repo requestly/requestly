@@ -193,7 +193,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
               className="mode-radio-group"
               onChange={(e) => setSessionSaveMode(e.target.value)}
             >
-              <Radio value={SessionSaveMode.ONLINE}>Save online</Radio>
+              <Radio value={SessionSaveMode.ONLINE}>Generate link</Radio>
               <Radio value={SessionSaveMode.LOCAL}>Download as a file</Radio>
             </Radio.Group>
           </div>

@@ -8,6 +8,16 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.7.23",
+    logs: [
+      "fix: increase debounce time while updating dnrs (#1964)",
+      "test mv3: all rules (#1893)",
+      "[ENGG-1960 ENGG-1991] feat: extension should not work on the defined blockedList (#1885)",
+      "[ENGG-1853] fix: popup showing rule executions when disabled (#1925)",
+      "[ENGG-1860] update popup changes in webApp in realtime (#1831)",
+    ],
+  },
+  {
     version: "24.7.7",
     logs: ["fix: Non async XHR breaking websites (#1920)"],
   },

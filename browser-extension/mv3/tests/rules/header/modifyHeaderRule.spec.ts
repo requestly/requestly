@@ -7,7 +7,7 @@ import testScenarios from "./testScenarios";
 
 test.describe("Modify Header Rule", () => {
   testScenarios.forEach((scenario: HeaderRuleTestScenario, i) => {
-    test(`${i + 1}. Modify header rule`, async ({ appPage, context }) => {
+    test(`${i + 1}. @HeaderRule:`, async ({ appPage, context }) => {
       await testHeaderRule({ ...scenario, appPage, context });
     });
   });
