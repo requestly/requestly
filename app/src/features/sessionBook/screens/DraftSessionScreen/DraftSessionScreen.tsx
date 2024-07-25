@@ -88,7 +88,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   useEffect(() => {
     if (tabId === TabId.IFRAME) {
       const handleViewDraftMessage = (event: any) => {
-        if (event.data.action === "view-draft-session") {
+        if (event.data.action === "viewDraftSession") {
           setIsLoading(true);
           populateSessionDataInStore(event.data.payload);
           setIsLoading(false);
@@ -96,7 +96,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
       };
 
       const handleResetDraftMessage = (event: any) => {
-        if (event.data.action === "reset-draft-session-viewer") {
+        if (event.data.action === "resetDraftSessionViewer") {
           setIsLoading(true);
         }
       };
