@@ -101,11 +101,9 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
         }
       };
 
-      // Add event listeners
       window.addEventListener("message", handleViewDraftMessage);
       window.addEventListener("message", handleResetDraftMessage);
 
-      // Clean up the event listeners on component unmount
       return () => {
         window.removeEventListener("message", handleViewDraftMessage);
         window.removeEventListener("message", handleResetDraftMessage);
