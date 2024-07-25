@@ -213,7 +213,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
                   </Row>
                 )}
                 <Typography.Title level={5} style={{ marginTop: user.loggedIn ? "24px" : 0, fontWeight: 500 }}>
-                  Helps us in optimizing your experience
+                  Help us in optimizing your experience
                 </Typography.Title>
                 {shouldShowPersonaInput && (
                   <Col className="mt-16">
