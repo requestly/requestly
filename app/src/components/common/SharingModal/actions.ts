@@ -15,6 +15,7 @@ export const createSharedList = async (
   sharedListRecipients: unknown
 ) => {
   const { rules, groups } = await getRulesAndGroupsFromRuleIds(appMode, rulesIdsToShare);
+  const currentWorkspaceId = window.currentlyActiveWorkspaceTeamId;
 
   const updatedGroups: NewGroup[] = groups.map((group) => ({
     ...group,
@@ -27,6 +28,7 @@ export const createSharedList = async (
     sharedListName,
     sharedListVisibility,
     sharedListRecipients,
+    teamId: currentWorkspaceId,
   };
 
   const sharedList = (await generateSharedList(sharedListData)) as any;
