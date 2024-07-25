@@ -6,7 +6,7 @@ import testScenarios from "./testScenarios";
 
 test.describe("Redirect Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(`${i + 1}. Redirect rule`, async ({ appPage, context }) => {
+    test(`${i + 1}. @RedirectRule`, async ({ appPage, context }) => {
       await testRedirection({ appPage, context, ...scenario });
     });
   });

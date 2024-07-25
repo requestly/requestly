@@ -1,6 +1,6 @@
 {
   "name": "@requestly/browser-extension-mv3",
-  "version": "24.7.7",
+  "version": "24.7.23",
   "description": "Browser extension acting as Web Debugging Proxy to Intercept & Modify HTTP(s) Requests",
   "homepage": "https://requestly.com",
   "private": true,
@@ -24,6 +24,7 @@
     "build:current": "rm -rf dist && rollup -c",
     "build:common": "cd ../common && npm run build && cd ../mv3",
     "watch": "rm -rf dist && rollup -cw",
+    "pretest": "npm run build",
     "test": "playwright test"
   },
   "devDependencies": {

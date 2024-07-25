@@ -6,7 +6,7 @@ import { Group, Rule } from "types";
 interface Props {
   sharedListId: string;
 }
-
+// nsr: generally curious, why do we need a hook for this fetching? why not just a function?
 export const useFetchSharedListData = ({ sharedListId }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sharedListGroups, setSharedListGroups] = useState<Group[]>([]);

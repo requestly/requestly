@@ -77,6 +77,11 @@ export const getCurrentlySelectedRuleErrors = (state) => {
   return currentlySelectedRule["errors"];
 };
 
+export const getIsCurrentlySelectedRuleDetailsPanelShown = (state) => {
+  const currentlySelectedRule = getCurrentlySelectedRule(state);
+  return currentlySelectedRule["showDetailsPanel"];
+};
+
 // response rule resource type
 export const getResponseRuleResourceType = (state) => {
   const rule = getCurrentlySelectedRuleData(state);
@@ -309,6 +314,10 @@ export const getToastForEditor = (state, id) => {
 
 export const getIsAppBannerVisible = (state) => {
   return getGlobalState(state).misc.nonPersist?.isAppBannerVisible;
+};
+
+export const getIsSupportChatOpened = (state) => {
+  return getGlobalState(state).misc.persist?.isSupportChatOpened;
 };
 
 // request bot

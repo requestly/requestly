@@ -9,7 +9,7 @@ import { IBaseTestData } from "../types";
 
 test.describe("Query Rule", () => {
   testScenarios.forEach((scenario, i) => {
-    test(scenario.description, async ({ appPage, context }) => {
+    test(`${i + 1}. @QueryRule: ${scenario.description}`, async ({ appPage, context }) => {
       await testQueryRule({ appPage, context, ...scenario });
     });
   });
