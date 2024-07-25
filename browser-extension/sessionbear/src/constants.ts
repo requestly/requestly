@@ -76,4 +76,5 @@ export const LINKS = {
 
 export const CUSTOM_ELEMENTS = {
   DRAFT_SESSION_VIEWER: "rq-draft-session-viewer",
+  POST_SESSION_SAVE_WIDGET: "rq-post-session-save-widget",
 };

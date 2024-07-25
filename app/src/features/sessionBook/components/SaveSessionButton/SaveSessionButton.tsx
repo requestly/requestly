@@ -93,7 +93,8 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
       sessionEvents,
       [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS],
       SOURCE.SAVE_DRAFT_SESSION,
-      claimIncentiveRewards
+      claimIncentiveRewards,
+      true
     )
       .catch((err) => {
         Logger.log("Error while saving draft session", err);
