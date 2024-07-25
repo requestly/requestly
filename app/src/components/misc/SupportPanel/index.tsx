@@ -17,7 +17,7 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useFetchSlackInviteVisibility from "./useSlackInviteVisibility";
 import sendSlackInvite from "./sendSlackInvite";
 import { trackEvent } from "modules/analytics";
-import { trackSupportOptionClicked } from "modules/analytics/events/misc/UnifiedSupport";
+import { trackSupportOptionClicked, trackSupportOptionOpened } from "modules/analytics/events/misc/UnifiedSupport";
 
 const SupportPanel = () => {
   const user = useSelector(getUserAuthDetails);
@@ -176,6 +176,7 @@ const SupportPanel = () => {
             onClick={() => {
               if (isPanelVisible) window?.$crisp?.push(["do", "chat:close"]);
               if (isRequestBotVisible) setIsRequestBotVisible(false);
+              trackSupportOptionOpened();
               dispatch(
                 // @ts-ignore
                 actions.updateIsSupportChatOpened(true)

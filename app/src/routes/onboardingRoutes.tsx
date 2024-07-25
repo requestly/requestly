@@ -1,6 +1,5 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
-import InviteView from "views/misc/Invite";
 
 export const onboardingRoutes: RouteObject[] = [
   {
@@ -14,9 +13,5 @@ export const onboardingRoutes: RouteObject[] = [
   {
     path: PATHS.GETTING_STARTED,
     element: <Navigate to={PATHS.HOME.ABSOLUTE} state={{ from: PATHS.GETTING_STARTED }} />,
-  },
-  {
-    path: PATHS.INVITE.RELATIVE,
-    element: <InviteView />,
   },
 ];

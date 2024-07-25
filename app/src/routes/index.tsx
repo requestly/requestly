@@ -19,6 +19,8 @@ import { onboardingRoutes } from "./onboardingRoutes";
 import { settingRoutes } from "features/settings/routes";
 import { miscRoutes } from "./miscRoutes";
 import { desktopSessionsRoutes } from "./desktopSessionRoutes";
+import { inviteRoutes } from "./inviteRoutes";
+import MinimalLayout from "layouts/MinimalLayout";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -47,6 +49,11 @@ export const routesV2: RouteObject[] = [
           ...miscRoutes,
           ...desktopSessionsRoutes,
         ],
+      },
+      {
+        path: "",
+        element: <MinimalLayout />,
+        children: [...inviteRoutes],
       },
       /** Iframe paths  - Without Header, Footer **/
       {

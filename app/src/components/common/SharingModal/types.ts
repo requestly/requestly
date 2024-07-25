@@ -18,6 +18,7 @@ export type SharedListData = {
   sharedListName: string;
   sharedListVisibility: SharedLinkVisibility;
   sharedListRecipients: unknown;
+  teamId?: string;
 };
 
 export enum WorkspaceSharingTypes {

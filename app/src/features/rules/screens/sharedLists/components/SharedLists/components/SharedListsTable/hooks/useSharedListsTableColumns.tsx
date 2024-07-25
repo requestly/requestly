@@ -13,6 +13,9 @@ import { trackSharedListUrlCopied } from "../../../analytics";
 import { trackRQLastActivity } from "utils/AnalyticsUtils";
 import { redirectToSharedListViewer } from "utils/RedirectionUtils";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { UserIcon } from "components/common/UserIcon";
 
 interface Props {
   handleDeleteSharedListClick: (sharedListId: string) => void;
@@ -20,6 +23,7 @@ interface Props {
 
 export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Props) => {
   const navigate = useNavigate();
+  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const [copiedSharedListId, setCopiedSharedListId] = useState("");
 
   const handleOnURLCopy = useCallback((id: string) => {
@@ -80,7 +84,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
       title: "",
       width: 300,
       render: (_: any, record: SharedList) => {
-        const sharedListURL = getSharedListURL(record.shareId, record.listName);
+        const sharedListURL = getSharedListURL(record.shareId, record.listName); // change here
 
         return (
           <div className="sharedlist-table-actions-container">
@@ -101,6 +105,22 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
       },
     },
   ];
+
+  if (isWorkspaceMode) {
+    columns.splice(3, 0, {
+      key: "createdBy",
+      title: <div className="text-center">Created by</div>,
+      width: 65,
+      className: "text-gray",
+      render: (_: any, record: SharedList) => {
+        return (
+          <div className="mock-table-user-icon">
+            <UserIcon uid={record.createdBy} />
+          </div>
+        );
+      },
+    });
+  }
 
   return columns;
 };
