@@ -40,7 +40,6 @@ export const saveDraftSession = async (
   const recordingOptionsToSave = getRecordingOptionsToSave(recordingOptions);
 
   if (isOpenedInIframe) {
-    console.log("Sending message to parent window to save draft session");
     window.parent.postMessage({ action: "draftSessionSaveClicked", source: "requestly:client" }, "*");
   }
 
@@ -87,6 +86,7 @@ export const saveDraftSession = async (
       }
 
       if (isOpenedInIframe) {
+        // TEMP DELAY
         setTimeout(() => {
           window.parent.postMessage({ action: "draftSessionSaved", source: "requestly:client" }, "*");
         }, 4000);

@@ -21,8 +21,8 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
 import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
-import "./sessionConfigPopup.scss";
 import PATHS from "config/constants/sub/paths";
+import "./sessionConfigPopup.scss";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -52,6 +52,8 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
   const isDraftSession =
     pathname.includes(PATHS.SESSIONS.DRAFT.INDEX) || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
+  const isOpenedInIframe = useMemo(() => pathname.includes("iframe"), [pathname]);
 
   const isSessionLogOptionsAlreadySaved =
     tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
@@ -126,7 +128,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
         includedDebugInfo,
         source,
         claimIncentiveRewards,
-        true
+        isOpenedInIframe
       )
         .then(() => {
           onClose?.();
@@ -153,6 +155,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
       userAttributes,
       onClose,
       claimIncentiveRewards,
+      isOpenedInIframe,
     ]
   );
 
