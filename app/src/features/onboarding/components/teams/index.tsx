@@ -35,6 +35,8 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
     []
   );
 
+  const getUserTeams = useMemo(() => httpsCallable(getFunctions(), "teams-getUserTeams"), []);
+
   const handleSwitchWorkspace = useCallback(
     (teamId: string, newTeamName: string) => {
       switchWorkspace(
@@ -71,15 +73,33 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         if (res?.pendingInvites?.length > 0) setIsLoading(false);
         else {
           if (!appOnboardingDetails.createdWorkspace) {
-            const newTeamName = `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
-              getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
-            })`;
-            createTeam({ teamName: newTeamName, generatePublicLink: false })
-              .then((response: any) => {
-                trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "app_onboarding", false);
-                handleSwitchWorkspace(response?.data?.teamId, newTeamName);
-                dispatch(actions.updateAppOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
-                setIsLoading(false);
+            getUserTeams()
+              .then((result) => {
+                // @ts-ignore
+                if (result?.data?.teams?.length > 0) {
+                  dispatch(actions.updateAppOnboardingCompleted());
+
+                  // @ts-ignore
+                  dispatch(actions.toggleActiveModal({ modalName: "appOnboardingModal", newValue: false }));
+                  setIsLoading(false);
+                  return;
+                }
+
+                const newTeamName = `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
+                  getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
+                })`;
+
+                createTeam({ teamName: newTeamName, generatePublicLink: false })
+                  .then((response: any) => {
+                    trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "app_onboarding", false);
+                    handleSwitchWorkspace(response?.data?.teamId, newTeamName);
+                    dispatch(actions.updateAppOnboardingTeamDetails({ name: newTeamName, ...response?.data }));
+                    setIsLoading(false);
+                  })
+                  .catch((e) => {
+                    Logger.error(e);
+                    setIsLoading(false);
+                  });
               })
               .catch((e) => {
                 Logger.error(e);
@@ -100,6 +120,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
     user.loggedIn,
     dispatch,
     createTeam,
+    getUserTeams,
     appOnboardingDetails.createdWorkspace,
     handleSwitchWorkspace,
   ]);
