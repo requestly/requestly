@@ -125,7 +125,8 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
         sessionEvents,
         includedDebugInfo,
         source,
-        claimIncentiveRewards
+        claimIncentiveRewards,
+        true
       )
         .then(() => {
           onClose?.();

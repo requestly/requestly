@@ -148,7 +148,7 @@ const addListeners = () => {
   });
 
   window.addEventListener("message", function (event) {
-    if (event.source !== window || event.data.source !== "requestly:client") {
+    if (event.data.source !== "requestly:client") {
       return;
     }
 
@@ -181,6 +181,13 @@ const addListeners = () => {
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
+    } else if (event.data.action === "draftSessionSaveClicked") {
+      console.log("Draft session save clicked");
+      hideDraftSessionViewer();
+      showPostSessionSaveWidget();
+    } else if (event.data.action === "draftSessionSaved") {
+      console.log("Draft session saved");
+      showDraftSessionSavedWidget();
     }
   });
 
@@ -347,4 +354,22 @@ const viewDraftSession = () => {
       })
     );
   });
+};
+
+const hideDraftSessionViewer = () => {
+  const draftSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  if (draftSessionViewer) {
+    draftSessionViewer.dispatchEvent(new CustomEvent("hide-draft-session-viewer"));
+  }
+};
+
+const showPostSessionSaveWidget = () => {
+  const postSessionSaveWidget = document.createElement(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  postSessionSaveWidget.classList.add("rq-element");
+  document.documentElement.appendChild(postSessionSaveWidget);
+};
+
+const showDraftSessionSavedWidget = () => {
+  const postSessionSaveWidget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  postSessionSaveWidget.dispatchEvent(new CustomEvent("show-draft-session-saved-widget"));
 };

@@ -1,0 +1,19 @@
+.post-session-save-widget-container {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #1a1a1a;
+  box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);
+  padding: 1rem;
+  position: fixed;
+  top: 320px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  /* temp */
+  color: #fff;
+  width: 320px;
+}
+
+.hidden {
+  display: none !important;
+}

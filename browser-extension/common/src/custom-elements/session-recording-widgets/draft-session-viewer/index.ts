@@ -55,6 +55,10 @@ class RQDraftSessionViewer extends HTMLElement {
         payload: event.detail.session,
       });
     });
+
+    this.addEventListener("hide-draft-session-viewer", () => {
+      draftSessionWindow.classList.add("hidden");
+    });
   }
 
   sendMessageToIframe = (iframe: HTMLIFrameElement, message: unknown, targetOrigin: string = "*") => {
