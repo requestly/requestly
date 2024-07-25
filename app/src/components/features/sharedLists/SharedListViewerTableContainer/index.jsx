@@ -34,6 +34,7 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { trackUpgradeToastViewed } from "features/pricing/components/PremiumFeature/analytics";
 import { useFeatureValue } from "@growthbook/growthbook-react";
 
+// no longer used, should be cleaned up!
 const SharedListViewerTableContainer = ({ id, rules, groups }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
