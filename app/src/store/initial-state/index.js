@@ -34,6 +34,7 @@ const INITIAL_STATE = {
       data: false,
       config: false,
       hasUnsavedChanges: false,
+      showDetailsPanel: true,
       errors: {},
     },
     rulesToPopulate: [],
@@ -203,12 +204,14 @@ const INITIAL_STATE = {
       lastSeenInviteTs: 0,
       isJoinWorkspaceCardVisible: true,
       isManageBillingTeamAlertVisible: true,
+      isSupportChatOpened: false,
     },
     nonPersist: {
       networkSessionSaveInProgress: false, // todo: check if requried
       timeToResendEmailLogin: 0,
       isCommandBarOpen: false,
       isAppBannerVisible: false,
+      requestBot: { isActive: false, modelType: "app" },
     },
   },
 };

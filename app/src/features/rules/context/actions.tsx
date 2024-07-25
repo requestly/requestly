@@ -92,7 +92,6 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     },
     [appMode, dispatch]
   );
-  /*****/
 
   const createRuleAction = useCallback((source = "") => {
     Logger.log("[DEBUG]", "createRuleAction");

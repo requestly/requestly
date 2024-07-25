@@ -10,20 +10,46 @@ export default defineConfig({
 
   // Reporter to use
   reporter: "list",
-
-  use: {
-    // Base URL to use in actions like `await page.goto('/')`.
-    // baseURL: WEB_URL,
-
-    // Collect trace when retrying the failed test.
-    trace: "on-first-retry",
-  },
-  // Configure projects for major browsers.
   projects: [
     {
-      name: "chromium",
+      name: "Cancel Rule",
       use: { ...devices["Desktop Chrome"] },
+      testDir: "tests/rules/cancel",
     },
+    {
+      name: "Header Rule",
+      use: { ...devices["Desktop Chrome"] },
+      testDir: "tests/rules/header",
+    },
+    {
+      name: "Query Rule",
+      use: { ...devices["Desktop Chrome"] },
+      testDir: "tests/rules/query",
+    },
+    {
+      name: "Redirect Rule",
+      use: { ...devices["Desktop Chrome"] },
+      testDir: "tests/rules/redirect",
+    },
+    {
+      name: "Replace Rule",
+      use: { ...devices["Desktop Chrome"] },
+      testDir: "tests/rules/replace",
+    },
+    {
+      name: "Request Rule",
+      use: { ...devices["Desktop Chrome"] },
+      testDir: "tests/rules/request",
+    },
+    {
+      name: "Response Rule",
+      use: { ...devices["Desktop Chrome"] },
+      testDir: "tests/rules/response",
+    },
+    // {
+    //   name: "Rule",
+    //   use: { ...devices["Desktop Chrome"] },
+    // },
   ],
   // Run your local dev server before starting the tests.
   // webServer: {

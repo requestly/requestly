@@ -204,8 +204,8 @@ export const trackNewRuleButtonClicked = (source) => {
   trackEvent(RULES.NEW_RULE_BUTTON_CLICKED, params);
 };
 
-export const trackRuleTypeSwitched = (ruleType) => {
-  const params = { ruleType };
+export const trackRuleTypeSwitched = (ruleType, source) => {
+  const params = { ruleType, source };
   trackEvent(RULES.RULE_TYPE_SWITCHED, params);
 };
 
@@ -233,6 +233,17 @@ export const trackDesktopRuleViewedOnExtension = (rule_type) => {
   const params = { rule_type };
   trackEvent(RULES.DESKTOP_RULE_VIEWED_ON_EXTENSION, params);
 };
+
+export const trackRuleDetailsPanelViewed = (rule_type, source) => {
+  const params = { rule_type, source };
+  trackEvent(RULES.RULE_DETAILS_PANEL_VIEWED, params);
+};
+
+export const trackRuleDetailsPanelClosed = (rule_type, source) => {
+  const params = { rule_type, source };
+  trackEvent(RULES.RULE_DETAILS_PANEL_CLOSED, params);
+};
+
 // rule editor docs
 export const trackDocsSidebarViewed = (rule_type) => {
   const params = { rule_type };
@@ -266,4 +277,9 @@ export const trackDocsSidebarContactUsClicked = (rule_type) => {
 
 export const trackRuleSaveClicked = (mode) => {
   trackEvent(RULES.RULE_SAVE_CLICKED, { mode });
+};
+
+export const trackRulesEmptyStateClicked = (action) => {
+  const params = { action };
+  trackEvent(RULES.RULES_EMPTY_STATE_CLICKED, params);
 };

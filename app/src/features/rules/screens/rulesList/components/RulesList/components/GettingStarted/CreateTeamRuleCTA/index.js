@@ -11,6 +11,9 @@ import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import APP_CONSTANTS from "config/constants";
 import TeamSolvingPuzzleAnimation from "componentsV2/LottieAnimation/TeamSolvingPuzzleAnimation";
 import { actions } from "store";
+import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
+import { SOURCE } from "modules/analytics/events/common/constants";
+import { trackNewRuleButtonClicked, trackRulesEmptyStateClicked } from "modules/analytics/events/common/rules";
 import "./CreateTeamRuleCTA.css";
 
 export const CreateTeamRuleCTA = () => {
@@ -21,6 +24,17 @@ export const CreateTeamRuleCTA = () => {
   //Component State
   const [isNewRuleSelectorModalActive, setIsNewRuleSelectorModalActive] = useState(false);
   const [isImportRulesModalActive, setIsImportRulesModalActive] = useState(false);
+  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(false);
+
+  const onRulesListDrawerClose = () => {
+    setIsRulesListDrawerOpen(false);
+  };
+
+  const handleNewRuleClick = () => {
+    trackNewRuleButtonClicked(SOURCE.GETTING_STARTED);
+    trackRulesEmptyStateClicked("create_your_first_rule");
+    setIsRulesListDrawerOpen(true);
+  };
 
   const toggleNewRuleSelectorModal = () => {
     setIsNewRuleSelectorModalActive(isNewRuleSelectorModalActive ? false : true);
@@ -57,14 +71,19 @@ export const CreateTeamRuleCTA = () => {
               </p>
 
               <Space>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    navigate(APP_CONSTANTS.PATHS.RULES.CREATE);
+                <RuleSelectionListDrawer
+                  open={isRulesListDrawerOpen}
+                  onClose={onRulesListDrawerClose}
+                  source={SOURCE.GETTING_STARTED}
+                  onRuleItemClick={() => {
+                    onRulesListDrawerClose();
                   }}
                 >
-                  Create your first rule
-                </Button>
+                  <Button type="primary" onClick={handleNewRuleClick}>
+                    Create your first rule
+                  </Button>
+                </RuleSelectionListDrawer>
+
                 <Button color="secondary" onClick={() => setIsImportRulesModalActive(true)}>
                   Upload Rules
                 </Button>

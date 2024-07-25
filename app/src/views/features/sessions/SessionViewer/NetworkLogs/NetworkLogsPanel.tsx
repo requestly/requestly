@@ -22,9 +22,10 @@ interface Props {
   startTime: number;
   networkLogs: RQNetworkLog[];
   playerTimeOffset: number;
+  disableFilters?: boolean;
 }
 
-const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset }) => {
+const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeOffset, disableFilters = false }) => {
   const dispatch = useDispatch();
   const { ruleEditorModal } = useSelector(getActiveModals);
   const [isApiClientModalOpen, setIsApiClientModalOpen] = useState(false);
@@ -178,6 +179,7 @@ const NetworkLogsPanel: React.FC<Props> = ({ startTime, networkLogs, playerTimeO
             }}
             emptyView={emptyTableView}
             autoScroll
+            disableFilters={disableFilters}
           />
 
           {isApiClientModalOpen && (

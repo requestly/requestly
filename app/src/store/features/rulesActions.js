@@ -83,9 +83,17 @@ export const updateCurrentlySelectedRuleErrors = (prevState, action) => {
 
 export const clearCurrentlySelectedRuleAndConfig = (prevState) => {
   prevState.rules.currentlySelectedRule = {
+    ...prevState.rules.currentlySelectedRule,
     config: false,
     data: false,
     hasUnsavedChanges: false,
+  };
+};
+
+export const closeCurrentlySelectedRuleDetailsPanel = (prevState) => {
+  prevState.rules.currentlySelectedRule = {
+    ...prevState.rules.currentlySelectedRule,
+    showDetailsPanel: false,
   };
 };
 
@@ -133,4 +141,13 @@ export const addValueInRulePairArray = (prevState, action) => {
   set(prevState.rules.currentlySelectedRule.data.pairs[pairIndex], arrayPath, [...(targetArray || []), value]);
 
   prevState.rules.currentlySelectedRule.hasUnsavedChanges = true;
+
+  // Don't block navigation when its initial state
+  if (
+    (prevState.rules.currentlySelectedRule?.data?.pairs?.length === 1 &&
+      prevState.rules.currentlySelectedRule?.data?.pairs?.[0]?.modifications?.length === 1) ||
+    prevState.rules.currentlySelectedRule?.data?.pairs?.[0]?.scripts?.length === 1
+  ) {
+    prevState.rules.currentlySelectedRule.hasUnsavedChanges = false;
+  }
 };
