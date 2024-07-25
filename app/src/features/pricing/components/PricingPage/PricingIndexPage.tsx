@@ -12,7 +12,6 @@ import { CompaniesSection } from "./components/CompaniesSection/CompaniesSection
 import { StatsCard } from "./components/StatsCard/StatsCard";
 import HowToClaimVolumeDiscounts from "./components/HowToClaimVolumeDiscounts";
 import OtherWaysToMakePurchase from "./components/OtherWaysToMakePurchase";
-import LicensingAndSavings from "./components/LicensingAndSavings";
 // import { CustomerReviews } from "./components/CustomerReviews/CustomerReviews";
 import PricingFAQs from "./components/FAQs";
 import PricingPageFooter from "./components/PricingPageFooter";
@@ -63,10 +62,8 @@ export const PricingIndexPage = () => {
             <StatsCard />
             <OtherWaysToMakePurchase />
             <div className="pricing-page-other-actions-container">
-              {/* TODO: A COMMON COMPONENT TO BE CREATED FOR BELOW 2 COMPONENTS */}
               <HowToClaimVolumeDiscounts />
             </div>
-            <LicensingAndSavings />
             {/* <CustomerReviews /> */}
             <PricingFAQs />
           </div>
