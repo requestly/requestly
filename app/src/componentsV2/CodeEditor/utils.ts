@@ -47,7 +47,7 @@ export const prettifyCode = (code: string, language: EditorLanguage) => {
 
     return { code: prettifiedCode, success: true, language };
   } catch (error) {
-    console.log("Error in prettifying code", error);
+    Logger.log("Error in prettifying code", error);
     return { code: code, success: false, language };
   }
 };
