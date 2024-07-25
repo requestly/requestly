@@ -186,8 +186,8 @@ const addListeners = () => {
       hideDraftSessionViewer();
       showPostSessionSaveWidget();
     } else if (event.data.action === "draftSessionSaved") {
-      console.log("Draft session saved");
-      showDraftSessionSavedWidget();
+      const { payload } = event.data;
+      showDraftSessionSavedWidget(payload.sessionId);
     }
   });
 
@@ -364,12 +364,26 @@ const hideDraftSessionViewer = () => {
 };
 
 const showPostSessionSaveWidget = () => {
+  const widget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  if (widget) {
+    widget.remove();
+  }
+
   const postSessionSaveWidget = document.createElement(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
   postSessionSaveWidget.classList.add("rq-element");
   document.documentElement.appendChild(postSessionSaveWidget);
+
+  postSessionSaveWidget.addEventListener("view-saved-session-clicked", (event: CustomEvent) => {
+    const sessionURL = `${config.WEB_URL}/sessions/saved/${event.detail.sessionId}`;
+    window.open(sessionURL, "_blank");
+  });
+
+  postSessionSaveWidget.addEventListener("close-post-session-save-widget-clicked", () => {
+    postSessionSaveWidget.remove();
+  });
 };
 
-const showDraftSessionSavedWidget = () => {
+const showDraftSessionSavedWidget = (sessionId: string) => {
   const postSessionSaveWidget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
-  postSessionSaveWidget.dispatchEvent(new CustomEvent("show-draft-session-saved-widget"));
+  postSessionSaveWidget.dispatchEvent(new CustomEvent("show-draft-session-saved-widget", { detail: { sessionId } }));
 };
