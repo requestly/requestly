@@ -196,7 +196,7 @@ const CreateRuleButton = ({
         }
       });
     }
-  }, [currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
+  }, [dispatch, currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
 
   const handleFirstRuleCreationEvent = useCallback(async () => {
     claimIncentiveRewards({
@@ -222,7 +222,7 @@ const CreateRuleButton = ({
         );
       }
     });
-  }, [currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
+  }, [dispatch, currentlySelectedRuleData.ruleType, claimIncentiveRewards]);
 
   const claimRuleCreationRewards = async () => {
     if (isNewUserForIncentivization) {
