@@ -1,4 +1,4 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
+import { CLIENT_MESSAGES, CUSTOM_ELEMENTS, EXTENSION_MESSAGES } from "../../constants";
 import { SessionRecordingConfig } from "../../types";
 
 type SendResponseCallback = (payload: unknown) => void;
@@ -109,6 +109,8 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
     sessionRecorderState.recordingStartTime = recordingStartTime;
     hideAutoModeWidget();
   }
+
+  injectDraftSessionViewer();
 };
 
 const addListeners = () => {
@@ -133,6 +135,11 @@ const addListeners = () => {
 
       case CLIENT_MESSAGES.STOP_RECORDING:
         sendMessageToClient("stopRecording", null);
+        break;
+
+      case CLIENT_MESSAGES.VIEW_RECORDING:
+        viewDraftSession();
+        break;
     }
 
     return false;
@@ -306,4 +313,27 @@ const showToast = () => {
   }
 
   document.documentElement.appendChild(rqToast);
+};
+
+const injectDraftSessionViewer = () => {
+  const exisitingSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  if (exisitingSessionViewer) {
+    exisitingSessionViewer.remove();
+  }
+
+  const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  document.documentElement.appendChild(newSessionViewer);
+};
+
+const viewDraftSession = () => {
+  sendMessageToClient("getSessionData", null, (session) => {
+    const draftSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+    draftSessionViewer.dispatchEvent(
+      new CustomEvent("view-draft-session", {
+        detail: {
+          session,
+        },
+      })
+    );
+  });
 };
