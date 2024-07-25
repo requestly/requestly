@@ -5,14 +5,17 @@ import arrowRightIcon from "../../../../resources/icons/arrowRight.svg";
 import { RuleType } from "../../../types";
 
 const TAG_NAME = "rq-implicit-test-rule-widget";
+const IMPLICIT_WIDGET_DISPLAY_TIME = 5 * 1000; // secs
+
+type AppliedRule = { ruleId: string; ruleName: string; ruleType: RuleType };
 
 class RQImplicitTestRuleWidget extends RQTestRuleWidget {
-  #appliedRules: { ruleId: string; ruleName: string; ruleType: RuleType }[] = [];
+  #appliedRules: AppliedRule[] = [];
+  #widgetDisplayTimerId: NodeJS.Timeout | null;
 
   connectedCallback() {
     super.connectedCallback();
 
-    this.toggleMinimize(true);
     const contentContainer = this.shadowRoot.getElementById("test-rule-container");
     const minimizedStatusBtn = this.shadowRoot.getElementById("test-rule-minimized-btn");
     const widgetContent = `
@@ -25,6 +28,13 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
 
     const settingsButton = this.shadowRoot.getElementById("settings-button");
     settingsButton.classList.remove("hidden");
+
+    const minimizeButton = this.shadowRoot.getElementById("minimize-button");
+    minimizeButton.classList.add("hidden");
+
+    const closeButton = this.shadowRoot.getElementById("close-button");
+    closeButton.classList.remove("hidden");
+
     this.addWidgetListeners();
 
     const appliedRules = JSON.parse(this.attributes.getNamedItem("applied-rules")?.value || "[]");
@@ -52,7 +62,26 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
       this.dispatchEvent(new CustomEvent("open_app_settings"));
     });
 
+    this.shadowRoot.getElementById("close-button").addEventListener("click", () => {
+      this.hide();
+    });
+
     this.dispatchEvent(new CustomEvent("rule_applied_listener_active"));
+  }
+
+  show() {
+    clearTimeout(this.#widgetDisplayTimerId);
+
+    super.show();
+
+    this.#widgetDisplayTimerId = setTimeout(() => {
+      super.hide();
+    }, IMPLICIT_WIDGET_DISPLAY_TIME);
+  }
+
+  hide() {
+    clearTimeout(this.#widgetDisplayTimerId);
+    super.hide();
   }
 
   triggerAppliedRuleClickedEvent(detail: any) {
@@ -82,6 +111,8 @@ class RQImplicitTestRuleWidget extends RQTestRuleWidget {
         });
       });
     });
+
+    this.show();
   }
 }
 

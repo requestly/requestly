@@ -1,34 +1,15 @@
-import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button, Table } from "antd";
 import RuleTypeTag from "components/common/RuleTypeTag";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { TemplateRecord } from "../types";
-import { redirectToSharedListViewer } from "utils/RedirectionUtils";
-import { trackTemplateImportStarted } from "../../../analytics";
-import { SOURCE } from "modules/analytics/events/common/constants";
 
 interface Props {
-  handlePreviewTemplateInModal: (template: TemplateRecord) => void;
+  handlePreviewTemplate: (template: TemplateRecord) => void;
 }
 
 const useTemplatesTableColumns: (props: Props) => ContentListTableProps<TemplateRecord>["columns"] = ({
-  handlePreviewTemplateInModal,
+  handlePreviewTemplate,
 }) => {
-  const navigate = useNavigate();
-
-  const handlePreviewTemplate = useCallback(
-    (template: TemplateRecord) => {
-      trackTemplateImportStarted(template.name, SOURCE.TEMPLATES_SCREEN);
-      if (template.isSharedList) {
-        redirectToSharedListViewer(navigate, template.data.shareId, template.data.sharedListName, true);
-      } else {
-        handlePreviewTemplateInModal(template);
-      }
-    },
-    [navigate, handlePreviewTemplateInModal]
-  );
-
   const columns: ContentListTableProps<TemplateRecord>["columns"] = [
     Table.SELECTION_COLUMN,
     {

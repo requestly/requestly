@@ -1,6 +1,5 @@
 .filters-toolbar {
   display: flex;
-  // justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
@@ -12,11 +11,15 @@
     border-left: 1px solid var(--border);
   }
 
-  .search-filter {
+  .search-filter.ant-input-affix-wrapper {
     width: 200px;
     padding: 2px 4px;
     font-size: 13px;
     align-self: flex-end;
+
+    input.ant-input {
+      padding: 4px;
+    }
   }
   .btn-group-filters-wrapper {
     .status-code-filter-btns {
@@ -26,7 +29,7 @@
   }
   .filter-btn.rq-btn,
   .filter-btn.rq-btn:focus {
-    font-size: 12px;
+    font-size: 11px;
     padding: 0 4px;
     color: var(--text-gray);
     height: 22px;
