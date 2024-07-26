@@ -47,10 +47,14 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({ language, code, o
   // This function is only used for JSON code
   const handlePrettifyToggle = () => {
     if (isCodePrettified) {
-      const result = prettifyCode(code, EditorLanguage.JSON);
-      onCodeFormat(result.code);
-      trackCodeEditorCodeMinified();
-      setIsCodePrettified(false);
+      try {
+        const prettifiedCode = JSON.stringify(JSON.parse(code));
+        onCodeFormat(prettifiedCode);
+        trackCodeEditorCodeMinified();
+        setIsCodePrettified(false);
+      } catch (error) {
+        // NOOP
+      }
     } else {
       handlePrettifyCode();
       setIsCodePrettified(true);
