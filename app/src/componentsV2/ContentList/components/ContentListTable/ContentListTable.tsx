@@ -8,9 +8,8 @@ import { MdOutlineChevronRight } from "@react-icons/all-files/md/MdOutlineChevro
 import Logger from "lib/logger";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./contentListTable.scss";
-
-const EXPANDED_ROWS_LOCAL_STORAGE_KEY = "content-list-table-expanded-rows";
 
 interface DraggableBodyRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   index: number;
@@ -67,6 +66,8 @@ const DraggableBodyRow = ({ index, moveRow, className, style, recordId, ...restP
   );
 };
 
+const EXPANDED_ROWS_LOCAL_STORAGE_KEY = "content-list-table-expanded-rows";
+
 export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   id: string;
   columns: ColumnsType<DataType>;
@@ -100,6 +101,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
+  const isDragAndDropEnabled = useFeatureIsOn("content_table_drag_and_drop_support");
 
   const handleOnExpandClick = useCallback(
     (expanded: boolean, record: DataType) => {
@@ -203,7 +205,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   return (
     <div className="rq-content-list-table-container">
       {bulkActionBarConfig && <BulkActionBar config={bulkActionBarConfig} selectedRows={selectedRows} />}
-      {dragAndDrop ? (
+      {isDragAndDropEnabled && dragAndDrop ? (
         <DndProvider backend={HTML5Backend}>
           <Table
             {...commonProps}
