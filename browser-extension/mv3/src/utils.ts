@@ -116,8 +116,9 @@ export const onBlockListChange = (callback: () => void) => {
       changeTypes: [ChangeType.MODIFIED],
     },
     () => {
-      cacheBlockedDomains();
-      callback?.();
+      cacheBlockedDomains().then(() => {
+        callback?.();
+      });
     }
   );
 };
