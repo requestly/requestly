@@ -117,6 +117,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     return `${collectionString}${collectionString && mockString ? " and " : ""}${mockString} selected`;
   }, []);
 
+  // TODO: move into actions
   const updateCollectionOnDrop = useCallback(
     (mockId: string, collectionId: string) => {
       const mockIds = [mockId];
