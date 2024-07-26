@@ -8,6 +8,8 @@ import { settingsRoutes } from "./settingsRoutes";
 import { accountRoutes } from "routes/accountRoutes";
 import DashboardLayout from "src-SessionBear/layouts/DashboardLayout";
 import FullScreenLayout from "layouts/FullScreenLayout";
+import { inviteRoutes } from "routes/inviteRoutes";
+import MinimalLayout from "src-SessionBear/layouts/MinimalLayout";
 
 export const sessionBearRoutes: RouteObject[] = [
   {
@@ -19,6 +21,11 @@ export const sessionBearRoutes: RouteObject[] = [
         path: "",
         element: <DashboardLayout />,
         children: [...sessionRoutes, ...miscRoutes, ...authRoutes, ...settingsRoutes, ...accountRoutes],
+      },
+      {
+        path: "",
+        element: <MinimalLayout />,
+        children: [...inviteRoutes],
       },
       /** Iframe paths  - Without Header, Footer **/
       {

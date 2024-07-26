@@ -1,0 +1,9 @@
+.minimal-layout-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .logo {
+    width: 110px;
+  }
+}
