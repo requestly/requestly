@@ -52,10 +52,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
       <div className="details-panel">
         <div className="rule-details-container">
           <div className="title">{RULE_DETAILS[ruleType].name}</div>
-          <div className="description">
-            {RULE_DETAILS[ruleType].description} Redirect scripts, APIs, Stylesheets, or any other resource from one
-            environment to another. Use Modify API Response rule to debug & modify API responses on the fly.
-          </div>
+          <div className="description">{RULE_DETAILS[ruleType].description}</div>
 
           <div className="use-cases-container">
             <div className="title">Use cases</div>

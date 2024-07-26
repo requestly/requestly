@@ -56,7 +56,6 @@
 
   .details-panel {
     display: flex;
-    align-items: center;
     gap: 32px;
 
     .rule-details-container {
@@ -118,6 +117,7 @@
     }
 
     .rule-templates {
+      margin-left: auto;
       flex-shrink: 0;
       display: flex;
       width: 240px;
