@@ -25,15 +25,15 @@ const PricingFAQs = () => {
         </React.Fragment>
       ),
     },
-    // {
-    //   question: <React.Fragment>How can I claim volume discounts?</React.Fragment>,
-    //   answer: (
-    //     <React.Fragment>
-    //       You can purchase a license and assign the seat to someone else via Dashboard. If you're managing billing only
-    //       and not using the product, you won't be charged.
-    //     </React.Fragment>
-    //   ),
-    // },
+    {
+      question: <React.Fragment>How can I claim volume discounts?</React.Fragment>,
+      answer: (
+        <React.Fragment>
+          Enjoy flexible pricing tailored to your needs. For discounts on 50+ licenses, email us at{" "}
+          <a href="mailto:sales@requestly.io">sales@requestly.io</a>. Get the best pricing with our volume discount.
+        </React.Fragment>
+      ),
+    },
     {
       question: <React.Fragment>How is my payment information handled and secured?</React.Fragment>,
       answer: (
