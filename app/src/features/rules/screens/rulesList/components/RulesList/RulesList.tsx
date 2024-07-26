@@ -35,7 +35,6 @@ const RulesList: React.FC<Props> = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUserAuthDetails);
   const isRuleListLoading = useSelector(getIsRulesListLoading);
-  const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
