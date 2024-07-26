@@ -1,6 +1,8 @@
 import React from "react";
-import { Collapse } from "antd";
+import { Button, Collapse } from "antd";
 import { MdOutlineExpandLess } from "@react-icons/all-files/md/MdOutlineExpandLess";
+import { trackContactUsClicked } from "./analytics";
+import LINKS from "config/constants/sub/links";
 import "./index.css";
 
 const PricingFAQs = () => {
@@ -118,6 +120,19 @@ const PricingFAQs = () => {
             </Collapse.Panel>
           ))}
         </Collapse>
+      </div>
+      <div className="faq-footer">
+        Still have more questions?
+        <Button
+          type="link"
+          className="link"
+          onClick={() => {
+            trackContactUsClicked("pricing_page");
+            window.open(LINKS.CONTACT_US_PAGE, "_blank");
+          }}
+        >
+          Contact us
+        </Button>
       </div>
     </>
   );
