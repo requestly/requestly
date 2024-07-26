@@ -20,7 +20,7 @@ export const validateEndpoint = (endpoint: string, messagePrefix = "Endpoint") =
     return `${messagePrefix} cannot end with '/'`;
   }
 
-  const pattern = /^[A-Za-z0-9_.\-/]+$/;
+  const pattern = /^[A-Za-z0-9_:.\-/]+$/;
   if (endpoint.match(pattern)) {
     return null;
   } else {
