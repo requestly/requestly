@@ -244,6 +244,11 @@ export const trackRuleDetailsPanelClosed = (rule_type, source) => {
   trackEvent(RULES.RULE_DETAILS_PANEL_CLOSED, params);
 };
 
+export const trackRuleDetailsPanelDocsClicked = (rule_type, source) => {
+  const params = { rule_type, source };
+  trackEvent(RULES.RULE_DETAILS_PANEL_DOCS_CLICKED, params);
+};
+
 // rule editor docs
 export const trackDocsSidebarViewed = (rule_type) => {
   const params = { rule_type };
