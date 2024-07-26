@@ -32,18 +32,12 @@ export const getEditorParserConfig = (language: EditorLanguage) => {
 
 export const prettifyCode = (code: string, language: EditorLanguage) => {
   try {
-    let prettifiedCode = code;
+    const { parser, parserPlugin } = getEditorParserConfig(language);
 
-    if (language === EditorLanguage.JSON) {
-      prettifiedCode = JSON.stringify(JSON.parse(code));
-    } else {
-      const { parser, parserPlugin } = getEditorParserConfig(language);
-
-      prettifiedCode = prettier.format(code, {
-        parser: parser,
-        plugins: [parserPlugin],
-      }) as string;
-    }
+    const prettifiedCode = prettier.format(code, {
+      parser: parser,
+      plugins: [parserPlugin],
+    }) as string;
 
     return { code: prettifiedCode, success: true, language };
   } catch (error) {
