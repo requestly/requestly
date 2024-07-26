@@ -13,10 +13,21 @@ class RuleExecutionHandler {
   constructor() {}
 
   getExecutedRules = async (tabId: number) => {
-    const rulesExecutionLogs: RulesExecutionLog[] =
-      tabService.getPageData(tabId, TAB_SERVICE_DATA.RULES_EXECUTION_LOGS, []) || [];
+    const rulesExecutionLogs: RulesExecutionLog[] = tabService.getPageData(
+      tabId,
+      TAB_SERVICE_DATA.RULES_EXECUTION_LOGS,
+      []
+    );
 
-    const appliedRuleIds = rulesExecutionLogs.map((executionLog) => executionLog.ruleId).filter((id) => !!id);
+    const mainFrameRulesExecutionLogs: RulesExecutionLog[] = tabService.getData(
+      tabId,
+      TAB_SERVICE_DATA.RULES_EXECUTION_LOGS,
+      []
+    );
+
+    const appliedRuleIds = [...rulesExecutionLogs, ...mainFrameRulesExecutionLogs]
+      .map((executionLog) => executionLog.ruleId)
+      .filter((id) => !!id);
     const uniqueAppliedRuleIds = Array.from(new Set(appliedRuleIds));
     const appliedRules = await rulesStorageService.getRules(uniqueAppliedRuleIds);
 
