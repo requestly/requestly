@@ -255,102 +255,119 @@ export const initXhrInterceptor = (debug) => {
 
   const open = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function (method, url, async = true) {
-    this.rqProxyXhr._method = method;
-    this.rqProxyXhr._requestURL = getAbsoluteUrl(url);
-    this.rqProxyXhr._async = async;
-    open.apply(this.rqProxyXhr, arguments);
     open.apply(this, arguments);
+    try {
+      this.rqProxyXhr._method = method;
+      this.rqProxyXhr._requestURL = getAbsoluteUrl(url);
+      this.rqProxyXhr._async = async;
+      open.apply(this.rqProxyXhr, arguments);
+    } catch (err) {
+      debug && console.log("[rqProxyXhr.open] error", err);
+    }
   };
 
   const abort = XMLHttpRequest.prototype.abort;
   XMLHttpRequest.prototype.abort = function () {
     debug && console.log("abort called");
-    this.rqProxyXhr._abort = true;
     abort.apply(this, arguments);
-    abort.apply(this.rqProxyXhr, arguments);
+    try {
+      this.rqProxyXhr._abort = true;
+      abort.apply(this.rqProxyXhr, arguments);
+    } catch (err) {
+      debug && console.log("[rqProxyXhr.abort] error", err);
+    }
   };
 
   let setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
   XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-    this.rqProxyXhr._requestHeaders = this.rqProxyXhr._requestHeaders || {};
-    this.rqProxyXhr._requestHeaders[header] = value;
-    setRequestHeader.apply(this.rqProxyXhr, arguments);
     setRequestHeader.apply(this, arguments);
+    try {
+      this.rqProxyXhr._requestHeaders = this.rqProxyXhr._requestHeaders || {};
+      this.rqProxyXhr._requestHeaders[header] = value;
+      setRequestHeader.apply(this.rqProxyXhr, arguments);
+    } catch (err) {
+      debug && console.log("[rqProxyXhr.setRequestHeader] error", err);
+    }
   };
 
   const send = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = async function (data) {
-    if (!this.rqProxyXhr._async) {
-      debug && console.log("Async disabled");
-      return send.call(this, data);
-    }
-
-    this.rqProxyXhr._requestData = data;
-
-    const matchedDelayRulePair = getMatchedDelayRule({
-      url: this.rqProxyXhr._requestURL,
-      method: this.rqProxyXhr._method,
-      type: "xmlhttprequest",
-      initiator: location.origin, // initiator=origin. Should now contain port and protocol
-    });
-    if (matchedDelayRulePair) {
-      debug && console.log("[xhrInterceptor] matchedDelayRulePair", { matchedDelayRulePair });
-      await applyDelay(matchedDelayRulePair.delay);
-    }
-
-    const requestRule = getMatchedRequestRule({
-      url: this.rqProxyXhr._requestURL,
-      method: this.rqProxyXhr._method,
-      type: "xmlhttprequest",
-      initiator: location.origin, // initiator=origin. Should now contain port and protocol
-    });
-
-    if (requestRule) {
-      debug && console.log("[xhrInterceptor] matchedRequestRule", { requestRule });
-      this.rqProxyXhr._requestData = getCustomRequestBody(requestRule, {
-        method: this.rqProxyXhr._method,
-        url: this.rqProxyXhr._requestURL,
-        body: data,
-        bodyAsJson: jsonifyValidJSONString(data, true),
-      });
-
-      notifyRequestRuleApplied({
-        ruleDetails: requestRule,
-        requestDetails: {
-          url: this.rqProxyXhr._requestURL,
-          method: this.rqProxyXhr._method,
-          type: "xmlhttprequest",
-          timeStamp: Date.now(),
-        },
-      });
-    }
-
-    await notifyOnBeforeRequest({
-      url: this.rqProxyXhr._requestURL,
-      method: this.rqProxyXhr._method,
-      type: "xmlhttprequest",
-      initiator: location.origin,
-      requestHeaders: this.rqProxyXhr._requestHeaders ?? {},
-    });
-
-    this.responseRule = getMatchedResponseRule({
-      url: this.rqProxyXhr._requestURL,
-      requestData: jsonifyValidJSONString(this.rqProxyXhr._requestData),
-      method: this.rqProxyXhr._method,
-    });
-    this.rqProxyXhr.responseRule = this.responseRule;
-
-    if (this.responseRule) {
-      debug && console.log("[xhrInterceptor]", "send and response rule matched", this.responseRule);
-      if (shouldServeResponseWithoutRequest(this.responseRule)) {
-        debug && console.log("[xhrInterceptor]", "send and response rule matched and serveWithoutRequest is true");
-        resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
-      } else {
-        send.call(this.rqProxyXhr, this.rqProxyXhr._requestData);
+    try {
+      if (!this.rqProxyXhr._async) {
+        debug && console.log("Async disabled");
+        return send.call(this, data);
       }
-      return;
-    }
 
-    send.call(this, this.rqProxyXhr._requestData);
+      this.rqProxyXhr._requestData = data;
+
+      const matchedDelayRulePair = getMatchedDelayRule({
+        url: this.rqProxyXhr._requestURL,
+        method: this.rqProxyXhr._method,
+        type: "xmlhttprequest",
+        initiator: location.origin, // initiator=origin. Should now contain port and protocol
+      });
+      if (matchedDelayRulePair) {
+        debug && console.log("[xhrInterceptor] matchedDelayRulePair", { matchedDelayRulePair });
+        await applyDelay(matchedDelayRulePair.delay);
+      }
+
+      const requestRule = getMatchedRequestRule({
+        url: this.rqProxyXhr._requestURL,
+        method: this.rqProxyXhr._method,
+        type: "xmlhttprequest",
+        initiator: location.origin, // initiator=origin. Should now contain port and protocol
+      });
+
+      if (requestRule) {
+        debug && console.log("[xhrInterceptor] matchedRequestRule", { requestRule });
+        this.rqProxyXhr._requestData = getCustomRequestBody(requestRule, {
+          method: this.rqProxyXhr._method,
+          url: this.rqProxyXhr._requestURL,
+          body: data,
+          bodyAsJson: jsonifyValidJSONString(data, true),
+        });
+
+        notifyRequestRuleApplied({
+          ruleDetails: requestRule,
+          requestDetails: {
+            url: this.rqProxyXhr._requestURL,
+            method: this.rqProxyXhr._method,
+            type: "xmlhttprequest",
+            timeStamp: Date.now(),
+          },
+        });
+      }
+
+      await notifyOnBeforeRequest({
+        url: this.rqProxyXhr._requestURL,
+        method: this.rqProxyXhr._method,
+        type: "xmlhttprequest",
+        initiator: location.origin,
+        requestHeaders: this.rqProxyXhr._requestHeaders ?? {},
+      });
+
+      this.responseRule = getMatchedResponseRule({
+        url: this.rqProxyXhr._requestURL,
+        requestData: jsonifyValidJSONString(this.rqProxyXhr._requestData),
+        method: this.rqProxyXhr._method,
+      });
+      this.rqProxyXhr.responseRule = this.responseRule;
+
+      if (this.responseRule) {
+        debug && console.log("[xhrInterceptor]", "send and response rule matched", this.responseRule);
+        if (shouldServeResponseWithoutRequest(this.responseRule)) {
+          debug && console.log("[xhrInterceptor]", "send and response rule matched and serveWithoutRequest is true");
+          resolveXHR(this.rqProxyXhr, this.responseRule.pairs[0].response.value);
+        } else {
+          send.call(this.rqProxyXhr, this.rqProxyXhr._requestData);
+        }
+        return;
+      }
+
+      send.call(this, this.rqProxyXhr._requestData);
+    } catch (err) {
+      debug && console.log("[rqProxyXhr.send] error", err);
+      send.call(this, data);
+    }
   };
 };
