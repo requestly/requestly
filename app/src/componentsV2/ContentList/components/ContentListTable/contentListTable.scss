@@ -75,6 +75,10 @@
     .rq-content-list-table-row {
       background: var(--requestly-color-background);
 
+      &.ant-table-row-level-0 {
+        cursor: auto !important;
+      }
+
       .ant-table-cell-with-append {
         .group-expand-icon {
           flex-shrink: 0;
