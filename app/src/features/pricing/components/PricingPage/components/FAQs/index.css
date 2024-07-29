@@ -61,3 +61,34 @@
 .faq-collapse.ant-collapse > .ant-collapse-item:last-child {
   border-radius: 0;
 }
+
+.faq-footer {
+  text-align: center;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 19.5px */
+  color: var(--requestly-color-text-default, #fff);
+  font-family: var(--font-family-family-default, Inter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 24px;
+}
+
+.faq-footer .ant-btn.link {
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  color: var(--requestly-color-primary-text, #639ff9);
+  align-self: flex-end;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%; /* 14.3px */
+}
+
+.faq-footer .ant-btn.link:hover {
+  text-decoration: underline;
+}

@@ -10,7 +10,7 @@ import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import { EnterprisePlanCard } from "./components/EnterprisePlanCard/EnterprisePlanCard";
 import { CompaniesSection } from "./components/CompaniesSection/CompaniesSection";
 import { StatsCard } from "./components/StatsCard/StatsCard";
-import HowToClaimVolumeDiscounts from "./components/HowToClaimVolumeDiscounts";
+// import HowToClaimVolumeDiscounts from "./components/HowToClaimVolumeDiscounts";
 import OtherWaysToMakePurchase from "./components/OtherWaysToMakePurchase";
 // import { CustomerReviews } from "./components/CustomerReviews/CustomerReviews";
 import PricingFAQs from "./components/FAQs";
@@ -61,9 +61,9 @@ export const PricingIndexPage = () => {
             <CompaniesSection />
             <StatsCard />
             <OtherWaysToMakePurchase />
-            <div className="pricing-page-other-actions-container">
+            {/* <div className="pricing-page-other-actions-container">
               <HowToClaimVolumeDiscounts />
-            </div>
+            </div> */}
             {/* <CustomerReviews /> */}
             <PricingFAQs />
           </div>
