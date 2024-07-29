@@ -13,7 +13,7 @@ import { trackNewRuleButtonClicked } from "modules/analytics/events/common/rules
 import { useDispatch } from "react-redux";
 import { actions } from "store";
 
-const RulesColumn: React.FC<{
+const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
 }> = ({ record }) => {
   const dispatch = useDispatch();
@@ -106,4 +106,4 @@ const RulesColumn: React.FC<{
   }
 };
 
-export default RulesColumn;
+export default RuleNameColumn;

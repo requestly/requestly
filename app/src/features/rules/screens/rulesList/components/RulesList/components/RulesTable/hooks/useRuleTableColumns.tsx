@@ -24,7 +24,7 @@ import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
 import { WarningOutlined } from "@ant-design/icons";
-import RulesColumn from "../../RulesColumn/RulesColumn";
+import RuleNameColumn from "../../RulesColumn/RulesColumn";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -82,7 +82,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (record: RuleTableRecord) => {
-        return <RulesColumn record={record} />;
+        return <RuleNameColumn record={record} />;
       },
       onCell: (record: RuleTableRecord) => {
         if (isGroup(record)) {
