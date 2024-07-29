@@ -69,7 +69,7 @@ export const getTabSession = (tabId: number, callback: () => void) => {
 };
 
 export const watchRecording = (tabId: number) => {
-  chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.VIEW_RECORDING });
+  chrome.tabs.sendMessage(tabId, { action: CLIENT_MESSAGES.VIEW_RECORDING, tabId });
 };
 
 const startRecording = (tabId: number, config: Record<string, any>) => {
