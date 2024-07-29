@@ -1,7 +1,5 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip, Progress, Popconfirm } from "antd";
+import { useSelector } from "react-redux";
+import { Button, Dropdown, MenuProps, Row, Switch, Table, Tooltip, Popconfirm } from "antd";
 import moment from "moment";
 import { ContentListTableProps } from "componentsV2/ContentList";
 import { RuleTableRecord } from "../types";
@@ -14,27 +12,21 @@ import { MdOutlineShare } from "@react-icons/all-files/md/MdOutlineShare";
 import { MdOutlineMoreHoriz } from "@react-icons/all-files/md/MdOutlineMoreHoriz";
 import { RiFileCopy2Line } from "@react-icons/all-files/ri/RiFileCopy2Line";
 import { RiEdit2Line } from "@react-icons/all-files/ri/RiEdit2Line";
-import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
-import PATHS from "config/constants/sub/paths";
 import { isRule, isGroup } from "features/rules/utils";
 import { trackRulesListActionsClicked } from "features/rules/analytics";
 import { checkIsRuleGroupDisabled, normalizeRecord } from "../utils/rules";
-import { trackNewRuleButtonClicked, trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
+import { trackRuleToggleAttempted } from "modules/analytics/events/common/rules";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import APP_CONSTANTS from "config/constants";
 import { useRulesActionContext } from "features/rules/context/actions";
-import { SOURCE } from "modules/analytics/events/common/constants";
-import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import { MdOutlinePushPin } from "@react-icons/all-files/md/MdOutlinePushPin";
-import { useTheme } from "styled-components";
 import { WarningOutlined } from "@ant-design/icons";
-import { actions } from "store";
+import RulesColumn from "../../RulesColumn/RulesColumn";
 
 const useRuleTableColumns = (options: Record<string, boolean>) => {
-  const dispatch = useDispatch();
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const allRecordsMap = useSelector(getAllRecordsMap);
@@ -49,12 +41,6 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordsPinAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
-  const theme = useTheme();
-  const [isRulesListDrawerOpen, setIsRulesListDrawerOpen] = useState(false);
-
-  const onRulesListDrawerClose = () => {
-    setIsRulesListDrawerOpen(false);
-  };
 
   const columns: ContentListTableProps<RuleTableRecord>["columns"] = [
     Table.SELECTION_COLUMN,
@@ -96,86 +82,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
       width: isWorkspaceMode ? 322 : 376,
       ellipsis: true,
       render: (record: RuleTableRecord) => {
-        if (isRule(record)) {
-          return (
-            <div className="rule-name-container">
-              <Link
-                className="rule-name"
-                state={{ source: "my_rules" }}
-                to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`}
-                onClick={() => {
-                  //@ts-ignore
-                  dispatch(actions.updateSecondarySidebarCollapse(false));
-                }}
-              >
-                {record.name}
-              </Link>
-
-              {record?.description ? (
-                <Tooltip title={record?.description} placement="right" showArrow={false}>
-                  <span className="rule-description-icon">
-                    <RiInformationLine />
-                  </span>
-                </Tooltip>
-              ) : null}
-            </div>
-          );
-        } else {
-          const group = record;
-          const totalRules = group.children?.length ?? 0;
-
-          const activeRulesCount = (group.children || []).reduce((count, rule) => {
-            return count + (rule.status === RecordStatus.ACTIVE ? 1 : 0);
-          }, 0);
-
-          return (
-            <div className="group-name-container">
-              <div className="group-name">{group.name}</div>
-
-              {totalRules > 0 ? (
-                <Tooltip
-                  placement="top"
-                  title={
-                    <>
-                      <div>Active rules: {activeRulesCount}</div>
-                      <div>Total rules: {totalRules}</div>
-                    </>
-                  }
-                >
-                  <div className="group-rules-count-details">
-                    <Progress
-                      strokeWidth={16}
-                      strokeColor={theme?.colors?.success}
-                      showInfo={false}
-                      type="circle"
-                      percent={(activeRulesCount / totalRules) * 100}
-                      size="small"
-                    />
-                    {activeRulesCount} / {totalRules}
-                  </div>
-                </Tooltip>
-              ) : null}
-
-              <RuleSelectionListDrawer
-                groupId={group.id}
-                open={isRulesListDrawerOpen}
-                onClose={onRulesListDrawerClose}
-                source={SOURCE.RULE_GROUP}
-              >
-                <Button
-                  className="add-rule-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsRulesListDrawerOpen(true);
-                    trackNewRuleButtonClicked(SOURCE.RULE_GROUP);
-                  }}
-                >
-                  <span>+</span> <span>Add rule</span>
-                </Button>
-              </RuleSelectionListDrawer>
-            </div>
-          );
-        }
+        return <RulesColumn record={record} />;
       },
       onCell: (record: RuleTableRecord) => {
         if (isGroup(record)) {
