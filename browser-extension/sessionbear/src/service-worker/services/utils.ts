@@ -2,6 +2,8 @@ import { ScriptAttributes, ScriptCodeType, ScriptObject, ScriptType } from "../.
 import { setVariable, Variable } from "../variable";
 import { getAllSupportedWebURLs, isExtensionEnabled } from "../../utils";
 import { stopRecordingOnAllTabs } from "./sessionRecording";
+import { getRecord } from "../../storage";
+import { STORAGE_KEYS } from "../../constants";
 
 /* Do not refer any external variable in below function other than arguments */
 const addInlineJS = (
@@ -185,4 +187,9 @@ export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
   }
 
   return appTabs;
+};
+
+export const getIsUserLoggedIn = async () => {
+  const userToken = await getRecord(STORAGE_KEYS.USER_TOKEN);
+  return !!userToken;
 };
