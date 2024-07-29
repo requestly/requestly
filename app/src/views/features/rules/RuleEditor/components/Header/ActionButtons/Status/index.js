@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentlySelectedRule } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
+import {
+  setCurrentlySelectedRule,
+  setIsCurrentlySelectedRuleHasUnsavedChanges,
+} from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "../../../../../../../../store/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { Switch } from "antd";
 import { toast } from "utils/Toast.js";
-import { StorageService } from "init";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import "./RuleEditorStatus.css";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PREMIUM_RULE_TYPES } from "features/rules";
 import APP_CONSTANTS from "config/constants";
+import { saveRule } from "../actions";
 
 const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   //Global State
@@ -39,19 +42,16 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
     const isCreateMode = location.pathname.indexOf("create") !== -1;
 
     !isCreateMode &&
-      StorageService(appMode)
-        .saveRuleOrGroup(
-          {
-            ...currentlySelectedRuleData,
-            status: newValue,
-          },
-          false
-        )
+      saveRule(appMode, dispatch, {
+        ...currentlySelectedRuleData,
+        status: newValue,
+      })
         .then(() =>
           newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
             ? toast.success("Rule saved and activated")
             : toast.success("Rule saved and deactivated")
-        );
+        )
+        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
   };
 
   const stableChangeRuleStatus = useCallback(changeRuleStatus, [

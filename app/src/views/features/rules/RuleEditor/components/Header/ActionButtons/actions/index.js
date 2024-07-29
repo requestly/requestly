@@ -9,12 +9,29 @@ import Logger from "lib/logger";
 import * as Sentry from "@sentry/react";
 import { detectUnsettledPromise } from "utils/FunctionUtils";
 import { migrateRuleToMV3 } from "modules/extension/utils";
+import { runMinorFixesOnRule } from "utils/rules/misc";
+import { transformAndValidateRuleFields } from "../CreateRuleButton/actions";
+import { HTML_ERRORS } from "../CreateRuleButton/actions/insertScriptValidators";
+import { actions } from "store";
+import { ToastType } from "componentsV2/CodeEditor/components/EditorToast/types";
+import { toast } from "utils/Toast";
 
-export const saveRule = async (appMode, ruleObject, callback) => {
+export const saveRule = async (appMode, dispatch, ruleObject) => {
   let ruleToSave = cloneDeep(ruleObject);
-
   delete ruleToSave["schemaVersion"];
-  ruleToSave = migrateRuleToMV3(ruleToSave).rule;
+
+  //Pre-validation: regex fix + trim whitespaces
+  const fixedRuleData = runMinorFixesOnRule(dispatch, ruleToSave);
+  //Syntactic Validation
+  const syntaxValidatedRule = await validateSyntaxInRule(dispatch, fixedRuleData);
+
+  if (!syntaxValidatedRule) {
+    return;
+  }
+
+  const parsedRuleData = syntaxValidatedRule || fixedRuleData;
+
+  ruleToSave = migrateRuleToMV3(parsedRuleData).rule;
   // TODO: Remove above and uncomment below after all users migrated to MV3. This is just to maintain backward compatibility for path URL filter
   // ruleToSave.extensionRules = parseDNRRules(ruleToSave);
 
@@ -45,10 +62,6 @@ export const saveRule = async (appMode, ruleObject, callback) => {
           });
       }
     })
-    .then(() => {
-      // Execute callback
-      callback && callback();
-    })
     .catch((error) => {
       Logger.log("Error in saving rule:", error);
       trackErrorInRuleCreation("save_rule_error", ruleToSave.ruleType);
@@ -64,4 +77,35 @@ export const saveRule = async (appMode, ruleObject, callback) => {
 export const closeBtnOnClickHandler = (dispatch, navigate, ruleType, mode) => {
   trackRuleEditorClosed("cancel_button", ruleType, snakeCase(mode));
   redirectToRules(navigate);
+};
+
+const validateSyntaxInRule = async (dispatch, ruleToSave) => {
+  const syntaxValidatedObject = await transformAndValidateRuleFields(ruleToSave);
+
+  if (!syntaxValidatedObject.success) {
+    const validationError = syntaxValidatedObject.validationError;
+    switch (validationError.error) {
+      case HTML_ERRORS.COULD_NOT_PARSE:
+      case HTML_ERRORS.UNCLOSED_TAGS:
+      case HTML_ERRORS.UNCLOSED_ATTRIBUTES:
+      case HTML_ERRORS.UNSUPPORTED_TAGS:
+      case HTML_ERRORS.MULTIPLE_TAGS:
+      case HTML_ERRORS.NO_TAGS:
+        dispatch(
+          actions.triggerToastForEditor({
+            id: validationError.id,
+            message: validationError.message,
+            type: ToastType.ERROR,
+            autoClose: 4500,
+          })
+        );
+        break;
+      default:
+        toast.error(validationError.message || "Could Not Parse rule");
+        break;
+    }
+    return null;
+  }
+
+  return syntaxValidatedObject.ruleData;
 };
