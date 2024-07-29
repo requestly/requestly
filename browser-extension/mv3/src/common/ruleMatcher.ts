@@ -150,12 +150,21 @@ const matchRequestPayload = (requestPayloadFilter: RequestPayloadFilter, request
     const valueInRequestData = traverseJsonByPath(requestData, targetedKey);
     const operator = requestPayloadFilter?.operator;
 
+    let valueInRequestDataString = "";
+
+    if (typeof valueInRequestData === "object") {
+      // Do nothing for now.
+      // valueInRequestDataString = JSON.stringify(valueInRequestData);
+    } else {
+      valueInRequestDataString = valueInRequestData?.toString();
+    }
+
     if (!operator || operator === "Equals") {
-      return valueInRequestData === targetedValue;
+      return valueInRequestDataString === targetedValue;
     }
 
     if (operator === "Contains") {
-      return valueInRequestData.includes(targetedValue);
+      return valueInRequestDataString.includes(targetedValue);
     }
   }
 
