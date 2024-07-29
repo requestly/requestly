@@ -8,6 +8,18 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.7.29",
+    logs: [
+      "add failsafe for fetch interceptor (#2022)",
+      "fix: graphQl payload filtering not working for numbers (#2021)",
+      "[ENGG-1956] fix: extension icon not turning grey (#2018)",
+      "fix: failsafe for xhr interceptor (#2016)",
+      "[ENGG-1958] fix: main_frame request rules from appearing on executed rules popup ",
+      "[ENGG-2097] fix: DNRs not being refreshed with blocklist change (#2000)",
+      "[ENGG-2094] added playwright testcases for request and response (XHR) rules (#1989)",
+    ],
+  },
+  {
     version: "24.7.23",
     logs: [
       "fix: increase debounce time while updating dnrs (#1964)",
