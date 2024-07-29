@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { isRule } from "features/rules/utils";
-import { RuleTableRecord } from "../RulesTable/types";
+import { RuleTableRecord } from "../../types";
 import { Link } from "react-router-dom";
 import { Button, Progress, Tooltip } from "antd";
 import { RiInformationLine } from "@react-icons/all-files/ri/RiInformationLine";
-import { RuleSelectionListDrawer } from "../RuleSelectionListDrawer/RuleSelectionListDrawer";
+import { RuleSelectionListDrawer } from "../../../RuleSelectionListDrawer/RuleSelectionListDrawer";
 import PATHS from "config/constants/sub/paths";
 import { RecordStatus } from "features/rules/types/rules";
 import { useTheme } from "styled-components";
@@ -33,6 +33,7 @@ const RuleNameColumn: React.FC<{
           state={{ source: "my_rules" }}
           to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`}
           onClick={() => {
+            //@ts-ignore
             dispatch(actions.updateSecondarySidebarCollapse(false));
           }}
         >
