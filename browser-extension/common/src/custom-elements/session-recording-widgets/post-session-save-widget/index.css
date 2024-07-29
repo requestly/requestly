@@ -7,7 +7,7 @@
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 99999;
+  z-index: 2147483647;
   color: #fff;
   width: 320px;
   font-family: system-ui;

@@ -4,16 +4,16 @@ import { PUBLIC_NAMESPACE } from "../constants";
   window[namespace] = window[namespace] || {};
 
   const sendMessageToExtension = (action, payload) => {
-    window.postMessage({ source: "requestly:client", action, payload }, window.location.href);
+    window.postMessage({ source: "sessionbear:client", action, payload }, window.location.href);
   };
 
   const sendResponseToExtension = (action, payload) => {
-    window.postMessage({ source: "requestly:client", response: true, action, payload }, window.location.href);
+    window.postMessage({ source: "sessionbear:client", response: true, action, payload }, window.location.href);
   };
 
   window.addEventListener("message", function (event) {
     // We only accept messages from ourselves
-    if (event.source !== window || event.data.source !== "requestly:extension") {
+    if (event.source !== window || event.data.source !== "sessionbear:extension") {
       return;
     }
 
