@@ -4,13 +4,16 @@ import { EVENTS, trackAddToChromeClicked, trackRequestDocumentClicked } from "./
 import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import backedBy from "./assets/backed-by.png";
-import RQLogo from "assets/img/brand/rq_logo_full.svg";
-import ChromeLogo from "./assets/chrome.svg";
-import Mascot from "./assets/mascot.svg";
+import rqLogo from "assets/img/brand/rq_logo_full.svg";
+import mediumLogo from "assets/icons/medium-logo.svg";
+import twitterLogo from "assets/icons/twitter-logo.svg";
+import linkedInLogo from "assets/icons/linkedin-logo.svg";
+import chromeLogo from "./assets/chrome.svg";
+import mascot from "./assets/mascot.svg";
 import LINKS from "config/constants/sub/links";
 import "./PricingPageFooter.scss";
 
-const { Title, Text, Link } = Typography;
+const { Title, Link } = Typography;
 
 const PricingPageFooter: React.FC = () => {
   const [isRequestDocsModalOpen, setisRequestDocsModalOpen] = useState(false);
@@ -34,10 +37,10 @@ const PricingPageFooter: React.FC = () => {
         <img className="backed-by" width={880} height={142} src={backedBy} alt="Backed by the best" />
       </div>
       <div className="footer">
-        <img className="mascot" width={290} height={208} src={Mascot} alt="Requestly mascot" />
+        <img className="mascot" width={290} height={208} src={mascot} alt="Requestly mascot" />
         <div className="header">
           <div className="rq-logo-container">
-            <img className="rq-logo" width={200} height={48} src={RQLogo} alt="Requestly logo" />
+            <img className="rq-logo" width={200} height={48} src={rqLogo} alt="Requestly logo" />
             <div className="caption">
               Loved by <span className="highlight">200,000+</span> developers at{" "}
               <span className="highlight">10,000+</span> companies
@@ -53,14 +56,16 @@ const PricingPageFooter: React.FC = () => {
                 window.open(LINKS.CHROME_EXTENSION, "_blank");
               }}
             >
-              <img width={17} height={17} src={ChromeLogo} alt="Chrome" className="chrome-logo" /> Add to chrome
+              <img width={17} height={17} src={chromeLogo} alt="Chrome" className="chrome-logo" /> Add to chrome
             </Button>
           </div>
         </div>
         <div className="content">
-          <Row justify="space-between" align="top" gutter={[16, 16]}>
+          <Row className="links-container" justify="space-between" align="top" gutter={[16, 16]}>
             <Col xs={24} md={6}>
-              <Title level={4}>Get Requestly</Title>
+              <Title className="title" level={4}>
+                Get
+              </Title>
               <Space direction="vertical">
                 <Link target="_blank" href="https://requestly.com/desktop/">
                   Desktop app
@@ -80,7 +85,9 @@ const PricingPageFooter: React.FC = () => {
               </Space>
             </Col>
             <Col xs={24} md={6}>
-              <Title level={4}>Resources</Title>
+              <Title className="title" level={4}>
+                Resources
+              </Title>
               <Space direction="vertical">
                 <Link target="_blank" href="https://requestly.com/privacy/">
                   Privacy Policy
@@ -103,7 +110,9 @@ const PricingPageFooter: React.FC = () => {
               </Space>
             </Col>
             <Col xs={24} md={6}>
-              <Title level={4}>More Resources</Title>
+              <Title className="title" level={4}>
+                More Resources
+              </Title>
               <Space direction="vertical">
                 <Link onClick={handleDocRequiredOnClick}>SOC 2 Report</Link>
                 <Link onClick={handleDocRequiredOnClick}>Pen testing Report</Link>
@@ -113,7 +122,9 @@ const PricingPageFooter: React.FC = () => {
               </Space>
             </Col>
             <Col xs={24} md={6}>
-              <Title level={4}>Comparisons</Title>
+              <Title className="title" level={4}>
+                Comparisons
+              </Title>
               <Space direction="vertical">
                 <Link href="https://requestly.com/alternatives/a-better-alternate-to-charles-proxy/">
                   Charles Proxy VS Requestly
@@ -127,20 +138,23 @@ const PricingPageFooter: React.FC = () => {
               </Space>
             </Col>
           </Row>
-          <br />
-          <Row justify="center">
-            <Col xs={24} md={18}>
-              <Text>&copy; 2024 RQ Labs, Inc. All Rights Reserved.</Text>
-              <br />
-              <Text>355 Braynt St, Unit 403, San Francisco, CA</Text>
-              <br />
-              <Text>Email: contact@requestly.io | Phone: (302) 476-2431</Text>
-              <br />
-              <Text>DUNS Number: 11-877-3057</Text>
-              <br />
-              <Text>Tax ID: 87-3981979</Text>
-            </Col>
-          </Row>
+
+          <div className="socials-continer">
+            <div className="copyright">Copyright © 2024 RQ Labs, Inc. All rights reserved.</div>
+
+            <div className="socials">
+              <span className="follow-us">Follow us on</span>
+              <Link href="https://medium.com/requestly" target="_blank">
+                <img src={mediumLogo} alt="Medium logo" />
+              </Link>
+              <Link href="https://medium.com/requestly" target="_blank">
+                <img src={twitterLogo} alt="Twitter logo" />
+              </Link>
+              <Link href="https://medium.com/requestly" target="_blank">
+                <img src={linkedInLogo} alt="LinkedIn logo" />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
       <RequestDocsModal
