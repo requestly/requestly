@@ -89,7 +89,8 @@ const LINKS = {
   /** EXTENSIONS */
 
   //Chrome
-  CHROME_EXTENSION: "https://chrome.google.com/webstore/detail/requestly/mdnleldcmiljblolnjhpnblkcekpdkpa",
+  CHROME_EXTENSION:
+    "https://chromewebstore.google.com/detail/requestly-intercept-modif/mdnleldcmiljblolnjhpnblkcekpdkpa",
 
   CHROME_STORE_REVIEWS:
     "https://chromewebstore.google.com/detail/requestly-intercept-modif/mdnleldcmiljblolnjhpnblkcekpdkpa/reviews",
