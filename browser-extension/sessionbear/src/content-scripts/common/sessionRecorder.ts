@@ -148,7 +148,7 @@ const addListeners = () => {
   });
 
   window.addEventListener("message", function (event) {
-    if (event.data.source !== "requestly:client") {
+    if (event.data.source !== "sessionbear:client") {
       return;
     }
 
@@ -212,7 +212,7 @@ const sendResponseToRuntime = (action: string, payload: unknown) => {
 };
 
 const sendMessageToClient = (action: string, payload: unknown, sendResponseCallback?: SendResponseCallback) => {
-  window.postMessage({ source: "requestly:extension", action, payload }, window.location.href);
+  window.postMessage({ source: "sessionbear:extension", action, payload }, window.location.href);
   if (sendResponseCallback) {
     sendResponseCallbacks[action] = sendResponseCallback;
   }
