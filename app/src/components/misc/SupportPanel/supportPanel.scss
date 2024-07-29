@@ -47,6 +47,10 @@
   display: none !important;
 }
 
+#crisp-chatbox > div > div {
+  transform: translate(-40px);
+}
+
 // Override styles for slack connect toast
 .slack-connect-toast.ant-message-notice {
   .ant-message-notice-content {
