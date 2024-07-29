@@ -26,6 +26,8 @@ const sessionRecorderState: SessionRecorderState = {
   showWidget: false,
 };
 
+let isDraftSessionLoadedInIframe = false;
+
 export const initSessionRecording = () => {
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
@@ -140,7 +142,11 @@ const addListeners = () => {
         break;
 
       case CLIENT_MESSAGES.VIEW_RECORDING:
-        viewDraftSession();
+        if (isDraftSessionLoadedInIframe) {
+          viewDraftSession();
+        } else {
+          window.open(`${config.WEB_URL}/sessions/draft/${message.tabId}`, "_blank");
+        }
         break;
     }
 
@@ -182,12 +188,13 @@ const addListeners = () => {
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
     } else if (event.data.action === "draftSessionSaveClicked") {
-      console.log("Draft session save clicked");
       hideDraftSessionViewer();
       showPostSessionSaveWidget();
     } else if (event.data.action === "draftSessionSaved") {
       const { payload } = event.data;
       showDraftSessionSavedWidget(payload.sessionId);
+    } else if (event.data.action === "draftSessionViewerLoaded") {
+      isDraftSessionLoadedInIframe = true;
     }
   });
 
@@ -335,7 +342,6 @@ const injectDraftSessionViewer = async () => {
   }
 
   const authToken = await getRecord(STORAGE_KEYS.USER_TOKEN);
-
   const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   newSessionViewer.classList.add("rq-element");
 
