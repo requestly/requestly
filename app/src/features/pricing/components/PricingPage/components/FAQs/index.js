@@ -1,6 +1,8 @@
 import React from "react";
-import { Collapse } from "antd";
+import { Button, Collapse } from "antd";
 import { MdOutlineExpandLess } from "@react-icons/all-files/md/MdOutlineExpandLess";
+import { trackContactUsClicked } from "./analytics";
+import LINKS from "config/constants/sub/links";
 import "./index.css";
 
 const PricingFAQs = () => {
@@ -23,15 +25,15 @@ const PricingFAQs = () => {
         </React.Fragment>
       ),
     },
-    // {
-    //   question: <React.Fragment>How can I claim volume discounts?</React.Fragment>,
-    //   answer: (
-    //     <React.Fragment>
-    //       You can purchase a license and assign the seat to someone else via Dashboard. If you're managing billing only
-    //       and not using the product, you won't be charged.
-    //     </React.Fragment>
-    //   ),
-    // },
+    {
+      question: <React.Fragment>How can I claim volume discounts?</React.Fragment>,
+      answer: (
+        <React.Fragment>
+          Enjoy flexible pricing tailored to your needs. For discounts on 50+ licenses, email us at{" "}
+          <a href="mailto:sales@requestly.io">sales@requestly.io</a>. Get the best pricing with our volume discount.
+        </React.Fragment>
+      ),
+    },
     {
       question: <React.Fragment>How is my payment information handled and secured?</React.Fragment>,
       answer: (
@@ -118,6 +120,19 @@ const PricingFAQs = () => {
             </Collapse.Panel>
           ))}
         </Collapse>
+      </div>
+      <div className="faq-footer">
+        Still have more questions?
+        <Button
+          type="link"
+          className="link"
+          onClick={() => {
+            trackContactUsClicked("pricing_page");
+            window.open(LINKS.CONTACT_US_PAGE, "_blank");
+          }}
+        >
+          Contact us
+        </Button>
       </div>
     </>
   );
