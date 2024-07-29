@@ -86,13 +86,10 @@ export const saveDraftSession = async (
       }
 
       if (isOpenedInIframe) {
-        // TEMP DELAY
-        setTimeout(() => {
-          window.parent.postMessage(
-            { action: "draftSessionSaved", source: "requestly:client", payload: { sessionId: response?.firestoreId } },
-            "*"
-          );
-        }, 4000);
+        window.parent.postMessage(
+          { action: "draftSessionSaved", source: "requestly:client", payload: { sessionId: response?.firestoreId } },
+          "*"
+        );
       } else {
         let path = "/" + PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId;
         if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)

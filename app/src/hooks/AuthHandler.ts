@@ -189,10 +189,10 @@ const AuthHandler: React.FC<{}> = () => {
               Logger.log("User signed in with custom token", user);
             })
             .catch((error) => {
-              console.error("Error signing in with custom token:", error.message);
+              Logger.log("Error signing in with custom token:", error.message);
             });
         } else {
-          console.error("Error generating custom token:", res.data.result.message);
+          Logger.log("Error generating custom token:", res.data.result.message);
         }
       });
     }
@@ -208,12 +208,13 @@ const AuthHandler: React.FC<{}> = () => {
       Logger.time("AuthHandler-preloader");
 
       if (user) {
+        console.log("User found", user);
         Logger.timeLog("AuthHandler-preloader", "User found");
-        user.getIdToken(true).then((token) => {
-          StorageService(appMode).saveRecord({
-            [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: token,
-          });
+        // user.getIdToken(true).then((token) => {
+        StorageService(appMode).saveRecord({
+          [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: user.refreshToken,
         });
+        // });
 
         blockingOperations(user).then((success: boolean) => {
           if (success) {
