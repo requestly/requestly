@@ -1,0 +1,96 @@
+.pricing-page-footer {
+  width: 100%;
+  margin-top: 60px;
+
+  .banner {
+    margin-bottom: 12px;
+
+    .backed-by {
+      width: 880px;
+      height: 142px;
+      block-size: auto;
+      max-inline-size: 100%;
+      margin-left: 48px;
+      border-radius: 8px;
+    }
+  }
+
+  .footer {
+    padding: 48px;
+    gap: 48px;
+
+    width: 100%;
+    background: var(--requestly-color-black, #000);
+    border-top: var(--seats, 1px) solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+
+    .header {
+      display: flex;
+
+      .rq-logo-container {
+        .rq-logo {
+          width: 200px;
+          height: 48px;
+          block-size: auto;
+          max-inline-size: 100%;
+        }
+
+        .caption {
+          margin-top: 24px;
+          color: #fff;
+          font-size: 17px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 28px; /* 164.706% */
+          letter-spacing: 0.25px;
+
+          .highlight {
+            color: #00dec4;
+            font-size: 17px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 28px;
+            letter-spacing: 0.25px;
+          }
+        }
+      }
+
+      .add-to-chrome-container {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+
+        .get-started {
+          color: var(--requestly-color-text-default, #fff);
+          font-size: 17px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px; /* 164.706% */
+          letter-spacing: 0.25px;
+        }
+
+        .add-to-chrome-btn.ant-btn {
+          height: 32px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--requestly-color-text-default, #fff);
+          text-align: center;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 21px; /* 150% */
+          padding: 4px 12px;
+
+          .chrome-logo {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+
+    .content {
+      margin: 48px 0;
+    }
+  }
+}

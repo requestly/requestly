@@ -1,24 +1,17 @@
 import React, { useState } from "react";
-import { Row, Col, Typography, Space } from "antd";
+import { Row, Col, Typography, Space, Button } from "antd";
 import { EVENTS, trackRequestDocumentClicked } from "./analytics";
 import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import backedBy from "./assets/backed-by.png";
+import RQLogo from "assets/img/brand/rq_logo_full.svg";
+import ChromeLogo from "./assets/chrome.svg";
+import LINKS from "config/constants/sub/links";
+import "./PricingPageFooter.scss";
 
 const { Title, Text, Link } = Typography;
-// TODO: REFACTOR THIS COMPONENT WHEN PICKED UP FOR REDESIGN
-const styles = {
-  footer: {
-    marginTop: "40px",
-    padding: "40px 20px",
-    background: "var(--requestly-color-surface-0)",
-    borderTop: "1px solid var(--requestly-color-white-t-20)",
-    width: "100%",
-  },
-  container: {
-    maxWidth: "90vw",
-    margin: "0 auto",
-  },
-  title: {},
+
+const styles: Record<string, React.CSSProperties> = {
   companyInfo: {
     marginTop: "20px",
     textAlign: "center",
@@ -26,7 +19,7 @@ const styles = {
   },
 };
 
-const PricingPageFooter = () => {
+const PricingPageFooter: React.FC = () => {
   const [isRequestDocsModalOpen, setisRequestDocsModalOpen] = useState(false);
 
   const handleDocRequiredOnClick = () => {
@@ -41,10 +34,35 @@ const PricingPageFooter = () => {
     }
     setisRequestDocsModalOpen(true);
   };
+
   return (
-    <>
-      <div style={styles.footer}>
-        <div style={styles.container}>
+    <div className="pricing-page-footer">
+      <div className="banner">
+        <img className="backed-by" width={880} height={142} src={backedBy} alt="Backed by the best" />
+      </div>
+      <div className="footer" style={styles.footer}>
+        <div className="header">
+          <div className="rq-logo-container">
+            <img className="rq-logo" width={200} height={48} src={RQLogo} alt="Requestly logo" />
+            <div className="caption">
+              Loved by <span className="highlight">200,000+</span> developers at{" "}
+              <span className="highlight">10,000+</span> companies
+            </div>
+          </div>
+          <div className="add-to-chrome-container">
+            <span className="get-started">Get started</span>
+            <Button
+              type="primary"
+              className="add-to-chrome-btn"
+              onClick={() => {
+                window.open(LINKS.CHROME_EXTENSION, "blank");
+              }}
+            >
+              <img width={17} height={17} src={ChromeLogo} alt="Chrome" className="chrome-logo" /> Add to chrome
+            </Button>
+          </div>
+        </div>
+        <div className="content" style={styles.container}>
           <Row justify="space-between" align="top" gutter={[16, 16]}>
             <Col xs={24} md={6}>
               <Title level={4} style={styles.title}>
@@ -144,7 +162,7 @@ const PricingPageFooter = () => {
           setisRequestDocsModalOpen(!isRequestDocsModalOpen);
         }}
       />
-    </>
+    </div>
   );
 };
 
