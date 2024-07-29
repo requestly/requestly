@@ -145,13 +145,13 @@ const PricingPageFooter: React.FC = () => {
             <div className="socials">
               <span className="follow-us">Follow us on</span>
               <Link href="https://medium.com/requestly" target="_blank">
-                <img src={mediumLogo} alt="Medium logo" />
+                <img width={48} height={48} src={mediumLogo} alt="Medium logo" />
               </Link>
-              <Link href="https://medium.com/requestly" target="_blank">
-                <img src={twitterLogo} alt="Twitter logo" />
+              <Link href="https://twitter.com/requestlyio?lang=en" target="_blank">
+                <img width={48} height={48} src={twitterLogo} alt="Twitter logo" />
               </Link>
-              <Link href="https://medium.com/requestly" target="_blank">
-                <img src={linkedInLogo} alt="LinkedIn logo" />
+              <Link href="https://www.linkedin.com/company/requestly" target="_blank">
+                <img width={48} height={48} src={linkedInLogo} alt="LinkedIn logo" />
               </Link>
             </div>
           </div>
