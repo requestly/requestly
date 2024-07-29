@@ -1,23 +1,16 @@
 import React, { useState } from "react";
 import { Row, Col, Typography, Space, Button } from "antd";
-import { EVENTS, trackRequestDocumentClicked } from "./analytics";
+import { EVENTS, trackAddToChromeClicked, trackRequestDocumentClicked } from "./analytics";
 import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import backedBy from "./assets/backed-by.png";
 import RQLogo from "assets/img/brand/rq_logo_full.svg";
 import ChromeLogo from "./assets/chrome.svg";
+import Mascot from "./assets/mascot.svg";
 import LINKS from "config/constants/sub/links";
 import "./PricingPageFooter.scss";
 
 const { Title, Text, Link } = Typography;
-
-const styles: Record<string, React.CSSProperties> = {
-  companyInfo: {
-    marginTop: "20px",
-    textAlign: "center",
-    color: "var(--neutrals-gray-300)",
-  },
-};
 
 const PricingPageFooter: React.FC = () => {
   const [isRequestDocsModalOpen, setisRequestDocsModalOpen] = useState(false);
@@ -40,7 +33,8 @@ const PricingPageFooter: React.FC = () => {
       <div className="banner">
         <img className="backed-by" width={880} height={142} src={backedBy} alt="Backed by the best" />
       </div>
-      <div className="footer" style={styles.footer}>
+      <div className="footer">
+        <img className="mascot" width={290} height={208} src={Mascot} alt="Requestly mascot" />
         <div className="header">
           <div className="rq-logo-container">
             <img className="rq-logo" width={200} height={48} src={RQLogo} alt="Requestly logo" />
@@ -55,19 +49,18 @@ const PricingPageFooter: React.FC = () => {
               type="primary"
               className="add-to-chrome-btn"
               onClick={() => {
-                window.open(LINKS.CHROME_EXTENSION, "blank");
+                trackAddToChromeClicked("pricing_page");
+                window.open(LINKS.CHROME_EXTENSION, "_blank");
               }}
             >
               <img width={17} height={17} src={ChromeLogo} alt="Chrome" className="chrome-logo" /> Add to chrome
             </Button>
           </div>
         </div>
-        <div className="content" style={styles.container}>
+        <div className="content">
           <Row justify="space-between" align="top" gutter={[16, 16]}>
             <Col xs={24} md={6}>
-              <Title level={4} style={styles.title}>
-                Get Requestly
-              </Title>
+              <Title level={4}>Get Requestly</Title>
               <Space direction="vertical">
                 <Link target="_blank" href="https://requestly.com/desktop/">
                   Desktop app
@@ -87,9 +80,7 @@ const PricingPageFooter: React.FC = () => {
               </Space>
             </Col>
             <Col xs={24} md={6}>
-              <Title level={4} style={styles.title}>
-                Resources
-              </Title>
+              <Title level={4}>Resources</Title>
               <Space direction="vertical">
                 <Link target="_blank" href="https://requestly.com/privacy/">
                   Privacy Policy
@@ -112,9 +103,7 @@ const PricingPageFooter: React.FC = () => {
               </Space>
             </Col>
             <Col xs={24} md={6}>
-              <Title level={4} style={styles.title}>
-                More Resources
-              </Title>
+              <Title level={4}>More Resources</Title>
               <Space direction="vertical">
                 <Link onClick={handleDocRequiredOnClick}>SOC 2 Report</Link>
                 <Link onClick={handleDocRequiredOnClick}>Pen testing Report</Link>
@@ -124,9 +113,7 @@ const PricingPageFooter: React.FC = () => {
               </Space>
             </Col>
             <Col xs={24} md={6}>
-              <Title level={4} style={styles.title}>
-                Comparisons
-              </Title>
+              <Title level={4}>Comparisons</Title>
               <Space direction="vertical">
                 <Link href="https://requestly.com/alternatives/a-better-alternate-to-charles-proxy/">
                   Charles Proxy VS Requestly
@@ -141,7 +128,7 @@ const PricingPageFooter: React.FC = () => {
             </Col>
           </Row>
           <br />
-          <Row justify="center" style={styles.companyInfo}>
+          <Row justify="center">
             <Col xs={24} md={18}>
               <Text>&copy; 2024 RQ Labs, Inc. All Rights Reserved.</Text>
               <br />
