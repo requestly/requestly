@@ -41,6 +41,7 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
 
     const isCreateMode = location.pathname.indexOf("create") !== -1;
 
+    // Toggling the status also saves the rule by running all the validations. Any unsaved change is saved when the status is toggled.
     !isCreateMode &&
       saveRule(appMode, dispatch, {
         ...currentlySelectedRuleData,
