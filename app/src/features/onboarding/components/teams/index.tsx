@@ -8,7 +8,7 @@ import { getPendingInvites } from "backend/workspace";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { trackNewTeamCreateSuccess } from "modules/analytics/events/features/teams";
 import { switchWorkspace } from "actions/TeamWorkspaceActions";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { getAvailableTeams, getIsWorkspaceMode } from "store/features/teams/selectors";
 import Logger from "lib/logger";
 import { actions } from "store";
 import { OnboardingLoader } from "../loader";
@@ -29,6 +29,9 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
   const user = useSelector(getUserAuthDetails);
   const [pendingInvites, setPendingInvites] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const availableTeams = useSelector(getAvailableTeams);
+  const ownedTeams = availableTeams?.filter((team: { owner: string }) => team?.owner === user?.details?.profile?.uid);
+  const isTeamExist = !!ownedTeams?.length;
 
   const createTeam = useMemo(
     () => httpsCallable<{ teamName: string; generatePublicLink: boolean }>(getFunctions(), "teams-createTeam"),
@@ -71,9 +74,19 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         if (res?.pendingInvites?.length > 0) setIsLoading(false);
         else {
           if (!appOnboardingDetails.createdWorkspace) {
+            if (isTeamExist) {
+              dispatch(actions.updateAppOnboardingCompleted());
+
+              // @ts-ignore
+              dispatch(actions.toggleActiveModal({ modalName: "appOnboardingModal", newValue: false }));
+              setIsLoading(false);
+              return;
+            }
+
             const newTeamName = `${user.details?.profile?.displayName?.split(" ")[0]}'s team (${
               getDomainFromEmail(user?.details?.profile?.email).split(".")[0]
             })`;
+
             createTeam({ teamName: newTeamName, generatePublicLink: false })
               .then((response: any) => {
                 trackNewTeamCreateSuccess(response?.data?.teamId, newTeamName, "app_onboarding", false);
@@ -100,6 +113,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
     user.loggedIn,
     dispatch,
     createTeam,
+    isTeamExist,
     appOnboardingDetails.createdWorkspace,
     handleSwitchWorkspace,
   ]);
