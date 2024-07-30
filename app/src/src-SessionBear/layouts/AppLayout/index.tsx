@@ -18,6 +18,7 @@ import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { useInitializeNewUserSessionRecordingConfig } from "features/settings/components/SessionsBookSettings/hooks";
 import DBListeners from "hooks/DbListenerInit/DBListeners";
 import { Outlet } from "react-router-dom";
+import { GlobalModals } from "./GlobalModals";
 
 const App = () => {
   useEffect(() => {
@@ -47,6 +48,7 @@ const App = () => {
             <LocalUserAttributesHelperComponent />
             <LazyMotion features={domMax} strict>
               <div id="requestly-dashboard-layout">
+                <GlobalModals />
                 <Outlet />
               </div>
             </LazyMotion>
