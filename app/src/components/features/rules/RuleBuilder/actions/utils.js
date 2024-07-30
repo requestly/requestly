@@ -33,12 +33,12 @@ const generate_blank_rule_format = (rule_type, rule_id = null) => {
   return blankRuleFormat;
 };
 
-export const createResponseRule = (appMode, source_url, response_body) => {
+export const createResponseRule = (appMode, source_url, response_body, dispatch) => {
   const rule_type = GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE;
 
   let rule = generate_blank_rule_format(rule_type);
   rule.pairs.push(createResponseRulePair(source_url, response_body));
-  saveRule(appMode, rule).catch((e) => {
+  saveRule(appMode, dispatch, rule).catch((e) => {
     Logger.log("createResponseRule:Error in create rule:", e);
   });
   return rule;
@@ -58,12 +58,12 @@ const createResponseRulePair = (source_url, response_body) => {
   return pair;
 };
 
-export const updateResponseRule = (appMode, rule_id, source_url, response_body) => {
+export const updateResponseRule = (appMode, rule_id, source_url, response_body, dispatch) => {
   const rule_type = GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE;
 
   let rule = generate_blank_rule_format(rule_type, rule_id);
   rule.pairs.push(createResponseRulePair(source_url, response_body));
-  saveRule(appMode, rule).catch((e) => {
+  saveRule(appMode, dispatch, rule).catch((e) => {
     Logger.log("updateResponseRule: Error in saving rule:", e);
   });
 };

@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentlySelectedRule } from "../../../../../../../../components/features/rules/RuleBuilder/actions";
+import {
+  setCurrentlySelectedRule,
+  setIsCurrentlySelectedRuleHasUnsavedChanges,
+} from "../../../../../../../../components/features/rules/RuleBuilder/actions";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { getAppMode, getCurrentlySelectedRuleData, getUserAuthDetails } from "../../../../../../../../store/selectors";
 import { getAllRules } from "store/features/rules/selectors";
 import { Switch } from "antd";
 import { toast } from "utils/Toast.js";
-import { StorageService } from "init";
 import { trackRuleEditorHeaderClicked } from "modules/analytics/events/common/rules";
 import "./RuleEditorStatus.css";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PREMIUM_RULE_TYPES } from "features/rules";
 import APP_CONSTANTS from "config/constants";
+import { saveRule, validateSyntaxInRule as validateAndTransformSyntaxInRule } from "../actions";
 
 const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   //Global State
@@ -29,29 +32,34 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
     return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
   };
 
-  const changeRuleStatus = (newValue) => {
-    if (newValue !== currentlySelectedRuleData.status)
-      setCurrentlySelectedRule(dispatch, {
-        ...currentlySelectedRuleData,
-        status: newValue,
-      });
+  const changeRuleStatus = async (newValue) => {
+    const ruleData = {
+      ...currentlySelectedRuleData,
+      status: newValue,
+    };
+
+    //Syntactic Validation
+    const syntaxValidatedAndTransformedRule = await validateAndTransformSyntaxInRule(dispatch, ruleData);
+
+    if (!syntaxValidatedAndTransformedRule) {
+      return;
+    }
+
+    if (newValue !== currentlySelectedRuleData.status) {
+      setCurrentlySelectedRule(dispatch, ruleData);
+    }
 
     const isCreateMode = location.pathname.indexOf("create") !== -1;
 
+    // Toggling the status also saves the rule by running all the validations. Any unsaved change is saved when the status is toggled.
     !isCreateMode &&
-      StorageService(appMode)
-        .saveRuleOrGroup(
-          {
-            ...currentlySelectedRuleData,
-            status: newValue,
-          },
-          false
-        )
+      saveRule(appMode, dispatch, syntaxValidatedAndTransformedRule)
         .then(() =>
           newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
             ? toast.success("Rule saved and activated")
             : toast.success("Rule saved and deactivated")
-        );
+        )
+        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
   };
 
   const stableChangeRuleStatus = useCallback(changeRuleStatus, [
