@@ -82,7 +82,7 @@ const SessionRecordingView: React.FC = () => {
 
   const handleConfigureBtnClick = useCallback(() => {
     sendEvent(EVENT.SESSION_RECORDINGS_CONFIG_OPENED);
-    window.open(`${config.WEB_URL}/sessions/settings?source=popup`, "_blank");
+    window.open(`${config.WEB_URL}/settings/sessions-settings?source=popup`, "_blank");
   }, []);
 
   const handleViewLastFiveMinReplay = useCallback(() => {
