@@ -208,7 +208,6 @@ const AuthHandler: React.FC<{}> = () => {
       Logger.time("AuthHandler-preloader");
 
       if (user) {
-        console.log("User found", user);
         Logger.timeLog("AuthHandler-preloader", "User found");
         // user.getIdToken(true).then((token) => {
         StorageService(appMode).saveRecord({
