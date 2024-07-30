@@ -28,7 +28,7 @@ import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestT
 import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 import { useFetchIncentivizationDetails } from "features/incentivization/hooks";
 import APP_CONSTANTS from "config/constants";
-import { GlobalModals } from "./GlobalModals";
+import { GlobalModals } from "components/common/GlobalModals";
 
 const { PATHS } = APP_CONSTANTS;
 
