@@ -18,9 +18,9 @@ import ThemeProvider from "lib/design-system-v2/helpers/ThemeProvider";
 import { useInitializeNewUserSessionRecordingConfig } from "features/settings/components/SessionsBookSettings/hooks";
 import DBListeners from "hooks/DbListenerInit/DBListeners";
 import { Outlet } from "react-router-dom";
-import { GlobalModals } from "components/common/GlobalModals";
+import { GlobalModals } from "src-SessionBear/layouts/AppLayout/GlobalModals";
 
-const App = () => {
+const App: React.FC = () => {
   useEffect(() => {
     // Load features asynchronously when the app renders
     growthbook.loadFeatures({ autoRefresh: true });
