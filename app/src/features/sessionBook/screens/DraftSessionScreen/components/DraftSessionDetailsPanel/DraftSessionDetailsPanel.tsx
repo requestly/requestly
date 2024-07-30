@@ -8,6 +8,7 @@ import { getSessionRecordingMetaData } from "store/features/session-recording/se
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { useDebounce } from "hooks/useDebounce";
 import { trackDraftSessionNamed, trackSessionRecordingDescriptionUpdated } from "features/sessionBook/analytics";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import "./draftSessionDetailsPanel.scss";
 
 interface DraftSessionDetailsPanelProps {
@@ -17,6 +18,8 @@ interface DraftSessionDetailsPanelProps {
 const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ playerTimeOffset }) => {
   const dispatch = useDispatch();
   const metadata = useSelector(getSessionRecordingMetaData);
+
+  const isOpenedInIframe = isAppOpenedInIframe();
 
   const debouncedTrackDescriptionUpdated = useDebounce(trackSessionRecordingDescriptionUpdated, 1000);
 
@@ -42,6 +45,7 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ pla
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
       <div className="session-details-panel-wrapper">
         <BottomSheetLayout
+          hideBottomSheet={isOpenedInIframe}
           initialOffset={-390}
           bottomSheet={<SessionViewerBottomSheet playerTimeOffset={playerTimeOffset} disableDocking />}
         >
