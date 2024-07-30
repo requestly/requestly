@@ -11,9 +11,9 @@
 #draft-session-view {
   position: relative;
   width: 90vw;
-  height: 95vh;
-  max-width: 1300px;
-  max-height: 700px;
+  height: 94vh;
+  max-width: 1480px;
+  max-height: 780px;
 }
 
 #draft-view-close-btn {

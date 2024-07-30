@@ -67,49 +67,51 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   }, [metadata?.recordingMode]);
 
   return (
-    <div className="draft-session-viewer-container">
-      <div className="draft-session-viewer-header-container">
-        {isOpenedInIframe ? (
-          <>
-            {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
-              <img src={SessionBearLogo} alt="SessionBear Logo" width={150} />
-            ) : (
-              <img src={RQLogo} alt="Requestly Logo" width={120} />
-            )}
-          </>
-        ) : (
-          <>
-            <div className="draft-session-header-breadcrumb">
-              <span
-                className="draft-session-header-breadcrumb__parent"
-                onClick={() => redirectToSessionRecordingHome(navigate)}
-              >
-                All sessions
-              </span>
-              <span>&gt;</span>
-              <span className="draft-session-header-breadcrumb__current">Draft session</span>
-            </div>
-          </>
-        )}
-        <div className="draft-session-viewer-actions">
-          {!isOpenedInIframe && (
-            <RQButton type="default" onClick={handleDiscardSession}>
-              Discard
-            </RQButton>
+    <div className="draft-session-viewer-wrapper">
+      <div className="draft-session-viewer-container">
+        <div className="draft-session-viewer-header-container">
+          {isOpenedInIframe ? (
+            <>
+              {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? (
+                <img src={SessionBearLogo} alt="SessionBear Logo" width={150} />
+              ) : (
+                <img src={RQLogo} alt="Requestly Logo" width={120} />
+              )}
+            </>
+          ) : (
+            <>
+              <div className="draft-session-header-breadcrumb">
+                <span
+                  className="draft-session-header-breadcrumb__parent"
+                  onClick={() => redirectToSessionRecordingHome(navigate)}
+                >
+                  All sessions
+                </span>
+                <span>&gt;</span>
+                <span className="draft-session-header-breadcrumb__current">Draft session</span>
+              </div>
+            </>
           )}
+          <div className="draft-session-viewer-actions">
+            {!isOpenedInIframe && (
+              <RQButton type="default" onClick={handleDiscardSession}>
+                Discard
+              </RQButton>
+            )}
 
-          <SaveSessionButton onSaveClick={handleSaveSessionClicked} />
+            <SaveSessionButton onSaveClick={handleSaveSessionClicked} />
+          </div>
         </div>
-      </div>
-      <div className="draft-session-viewer-body-wrapper">
-        <Row className="draft-session-viewer-body" gutter={8} justify="space-between">
-          <Col span={16}>
-            <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
-          </Col>
-          <Col span={8}>
-            <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
-          </Col>
-        </Row>
+        <div className="draft-session-viewer-body-wrapper">
+          <Row className="draft-session-viewer-body" gutter={8} justify="space-between">
+            <Col span={16}>
+              <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
+            </Col>
+            <Col span={8}>
+              <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
+            </Col>
+          </Row>
+        </div>
       </div>
     </div>
   );
