@@ -22,16 +22,8 @@ export const saveRule = async (appMode, dispatch, ruleObject) => {
 
   //Pre-validation: regex fix + trim whitespaces
   const fixedRuleData = runMinorFixesOnRule(dispatch, ruleToSave);
-  //Syntactic Validation
-  const syntaxValidatedRule = await validateSyntaxInRule(dispatch, fixedRuleData);
 
-  if (!syntaxValidatedRule) {
-    return;
-  }
-
-  const parsedRuleData = syntaxValidatedRule || fixedRuleData;
-
-  ruleToSave = migrateRuleToMV3(parsedRuleData).rule;
+  ruleToSave = migrateRuleToMV3(fixedRuleData).rule;
   // TODO: Remove above and uncomment below after all users migrated to MV3. This is just to maintain backward compatibility for path URL filter
   // ruleToSave.extensionRules = parseDNRRules(ruleToSave);
 
@@ -79,7 +71,7 @@ export const closeBtnOnClickHandler = (dispatch, navigate, ruleType, mode) => {
   redirectToRules(navigate);
 };
 
-const validateSyntaxInRule = async (dispatch, ruleToSave) => {
+export const validateSyntaxInRule = async (dispatch, ruleToSave) => {
   const syntaxValidatedObject = await transformAndValidateRuleFields(ruleToSave);
 
   if (!syntaxValidatedObject.success) {

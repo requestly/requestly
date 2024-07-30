@@ -15,7 +15,7 @@ import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PREMIUM_RULE_TYPES } from "features/rules";
 import APP_CONSTANTS from "config/constants";
-import { saveRule } from "../actions";
+import { saveRule, validateSyntaxInRule as validateAndTransformSyntaxInRule } from "../actions";
 
 const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
   //Global State
@@ -32,21 +32,28 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
     return currentlySelectedRuleData.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
   };
 
-  const changeRuleStatus = (newValue) => {
-    if (newValue !== currentlySelectedRuleData.status)
-      setCurrentlySelectedRule(dispatch, {
-        ...currentlySelectedRuleData,
-        status: newValue,
-      });
+  const changeRuleStatus = async (newValue) => {
+    const ruleData = {
+      ...currentlySelectedRuleData,
+      status: newValue,
+    };
+
+    //Syntactic Validation
+    const syntaxValidatedAndTransformedRule = await validateAndTransformSyntaxInRule(dispatch, ruleData);
+
+    if (!syntaxValidatedAndTransformedRule) {
+      return;
+    }
+
+    if (newValue !== currentlySelectedRuleData.status) {
+      setCurrentlySelectedRule(dispatch, ruleData);
+    }
 
     const isCreateMode = location.pathname.indexOf("create") !== -1;
 
     // Toggling the status also saves the rule by running all the validations. Any unsaved change is saved when the status is toggled.
     !isCreateMode &&
-      saveRule(appMode, dispatch, {
-        ...currentlySelectedRuleData,
-        status: newValue,
-      })
+      saveRule(appMode, dispatch, syntaxValidatedAndTransformedRule)
         .then(() =>
           newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
             ? toast.success("Rule saved and activated")

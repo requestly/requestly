@@ -13,7 +13,7 @@ import {
 } from "../../../../../../../../store/selectors";
 import { trackRQLastActivity } from "../../../../../../../../utils/AnalyticsUtils";
 //Actions
-import { saveRule } from "../actions";
+import { saveRule, validateSyntaxInRule } from "../actions";
 import {
   getModeData,
   setIsCurrentlySelectedRuleHasUnsavedChanges,
@@ -247,6 +247,14 @@ const CreateRuleButton = ({
 
     //Validation
     const ruleValidation = validateRule(currentlySelectedRuleData, dispatch, appMode);
+
+    //Syntactic Validation
+    const syntaxValidatedRule = await validateSyntaxInRule(dispatch, { ...currentlySelectedRuleData });
+
+    if (!syntaxValidatedRule) {
+      return;
+    }
+
     if (ruleValidation.result) {
       saveRule(appMode, dispatch, {
         ...currentlySelectedRuleData,
