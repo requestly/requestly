@@ -1,5 +1,5 @@
 import config from "../../config";
-import { CLIENT_MESSAGES, CUSTOM_ELEMENTS, EXTENSION_MESSAGES, STORAGE_KEYS } from "../../constants";
+import { CLIENT_MESSAGES, CLIENT_SOURCE, CUSTOM_ELEMENTS, EXTENSION_MESSAGES, STORAGE_KEYS } from "../../constants";
 import { getRecord } from "../../storage";
 import { SessionRecordingConfig } from "../../types";
 
@@ -154,7 +154,7 @@ const addListeners = () => {
   });
 
   window.addEventListener("message", function (event) {
-    if (event.data.source !== "sessionbear:client") {
+    if (event.data.source !== CLIENT_SOURCE.SESSIONBEAR) {
       return;
     }
 
@@ -341,13 +341,14 @@ const injectDraftSessionViewer = async () => {
     postSaveSessionWidget.remove();
   }
 
-  const authToken = await getRecord(STORAGE_KEYS.USER_TOKEN);
+  const userId = await getRecord(STORAGE_KEYS.USER_ID);
+
   const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   newSessionViewer.classList.add("rq-element");
 
   newSessionViewer.setAttribute(
     "session-src",
-    `${config.WEB_URL}/iframe/sessions/draft/iframe?${authToken ? `auth_token=${authToken}` : ""}`
+    `${config.WEB_URL}/iframe/sessions/draft/iframe?${userId ? `userId=${userId}` : ""}`
   );
 
   document.documentElement.appendChild(newSessionViewer);

@@ -1,8 +1,8 @@
-import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "../../constants";
+import { CLIENT_MESSAGES, CLIENT_SOURCE, EXTENSION_MESSAGES } from "../../constants";
 
 export const initPageScriptMessageListener = () => {
   window.addEventListener("message", function (event) {
-    if (event.source !== window || event.data.source !== "sessionbear:client") {
+    if (event.source !== window || event.data.source !== CLIENT_SOURCE.SESSIONBEAR) {
       return;
     }
 
@@ -20,7 +20,7 @@ export const initPageScriptMessageListener = () => {
         chrome.runtime.sendMessage(event.data, () => {
           window.postMessage(
             {
-              source: "sessionbear:client",
+              source: CLIENT_SOURCE.SESSIONBEAR,
               action: CLIENT_MESSAGES.ON_BEFORE_AJAX_REQUEST_PROCESSED,
             },
             window.location.href
@@ -31,7 +31,7 @@ export const initPageScriptMessageListener = () => {
         chrome.runtime.sendMessage(event.data, () => {
           window.postMessage(
             {
-              source: "sessionbear:client",
+              source: CLIENT_SOURCE.SESSIONBEAR,
               action: CLIENT_MESSAGES.ON_ERROR_OCCURRED_PROCESSED,
             },
             window.location.href
