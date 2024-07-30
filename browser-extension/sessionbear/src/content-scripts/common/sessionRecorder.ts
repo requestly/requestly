@@ -334,14 +334,14 @@ const injectDraftSessionViewer = async () => {
     postSaveSessionWidget.remove();
   }
 
-  const authToken = await getRecord(STORAGE_KEYS.USER_TOKEN);
+  const userId = await getRecord(STORAGE_KEYS.USER_ID);
 
   const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   newSessionViewer.classList.add("rq-element");
 
   newSessionViewer.setAttribute(
     "session-src",
-    `${config.WEB_URL}/iframe/sessions/draft/iframe?${authToken ? `auth_token=${authToken}` : ""}`
+    `${config.WEB_URL}/iframe/sessions/draft/iframe?${userId ? `userId=${userId}` : ""}`
   );
 
   document.documentElement.appendChild(newSessionViewer);
