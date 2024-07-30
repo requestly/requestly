@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import isEmpty from "is-empty";
 import { submitAppDetailAttributes } from "utils/AnalyticsUtils.js";
 import { ConfigProvider } from "antd";
 import enUS from "antd/lib/locale/en_US";
 import useGeoLocation from "hooks/useGeoLocation";
-import DashboardLayout from "layouts/DashboardLayout";
-import FullScreenLayout from "layouts/FullScreenLayout";
 import UpdateDialog from "components/mode-specific/desktop/UpdateDialog";
 import ThirdPartyIntegrationsHandler from "hooks/ThirdPartyIntegrationsHandler";
 import { CommandBar } from "components/misc/CommandBar";
@@ -30,11 +28,11 @@ import { InitImplicitWidgetConfigHandler } from "components/features/rules/TestT
 import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 import { useFetchIncentivizationDetails } from "features/incentivization/hooks";
 import APP_CONSTANTS from "config/constants";
+import { GlobalModals } from "./GlobalModals";
 
 const { PATHS } = APP_CONSTANTS;
-const App = () => {
-  const location = useLocation();
 
+const App: React.FC = () => {
   useEffect(() => {
     // Load features asynchronously when the app renders
     growthbook.loadFeatures({ autoRefresh: true });
@@ -92,6 +90,7 @@ const App = () => {
               <div id="requestly-dashboard-layout">
                 <CommandBar />
                 <UpdateDialog />
+                <GlobalModals />
                 <Outlet />
               </div>
             </LazyMotion>
