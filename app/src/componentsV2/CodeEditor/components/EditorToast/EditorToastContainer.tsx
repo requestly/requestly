@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import "./editorToast.scss";
-import { toastType } from "./types";
+import { ToastType } from "./types";
 
 interface IEditorToastProps {
   message: string;
-  type: toastType;
+  type: ToastType;
   isVisible: boolean;
   autoClose?: number;
   onClose?: () => void;
