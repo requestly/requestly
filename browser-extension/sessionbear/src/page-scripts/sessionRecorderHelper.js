@@ -1,14 +1,14 @@
-import { PUBLIC_NAMESPACE } from "../constants";
+import { CLIENT_SOURCE, PUBLIC_NAMESPACE } from "../constants";
 
 ((namespace) => {
   window[namespace] = window[namespace] || {};
 
   const sendMessageToExtension = (action, payload) => {
-    window.postMessage({ source: "sessionbear:client", action, payload }, window.location.href);
+    window.postMessage({ source: CLIENT_SOURCE.SESSIONBEAR, action, payload }, window.location.href);
   };
 
   const sendResponseToExtension = (action, payload) => {
-    window.postMessage({ source: "sessionbear:client", response: true, action, payload }, window.location.href);
+    window.postMessage({ source: CLIENT_SOURCE.SESSIONBEAR, response: true, action, payload }, window.location.href);
   };
 
   window.addEventListener("message", function (event) {

@@ -67,7 +67,7 @@ export const STORAGE_KEYS = {
   LAST_SYNCED_TS: "last-synced-ts",
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
-  USER_TOKEN: "user_token",
+  USER_ID: "userId",
 };
 
 export const LINKS = {
@@ -78,4 +78,8 @@ export const LINKS = {
 export const CUSTOM_ELEMENTS = {
   DRAFT_SESSION_VIEWER: "rq-draft-session-viewer",
   POST_SESSION_SAVE_WIDGET: "rq-post-session-save-widget",
+};
+
+export const CLIENT_SOURCE = {
+  SESSIONBEAR: "sessionbear:client",
 };

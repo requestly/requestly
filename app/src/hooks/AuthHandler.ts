@@ -19,6 +19,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { getUser } from "backend/user/getUser";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { StorageService } from "init";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 
 const TRACKING = APP_CONSTANTS.GA_EVENTS;
 let hasAuthHandlerBeenSet = false;
@@ -177,10 +178,10 @@ const AuthHandler: React.FC<{}> = () => {
   );
 
   useEffect(() => {
-    if (queryPrarams.get("auth_token")) {
-      const authToken = queryPrarams.get("auth_token");
-      const getCustomToken = httpsCallable(getFunctions(), "users-generateCustomToken");
-      getCustomToken({ authToken }).then((res: any) => {
+    if (queryPrarams.get("userId") && isAppOpenedInIframe()) {
+      const userId = queryPrarams.get("userId");
+      const getCustomToken = httpsCallable(getFunctions(), "auth-generateCustomToken");
+      getCustomToken({ userId }).then((res: any) => {
         if (res.data.success) {
           const auth = getAuth(firebaseApp);
           signInWithCustomToken(auth, res.data.result.customToken)
@@ -209,11 +210,9 @@ const AuthHandler: React.FC<{}> = () => {
 
       if (user) {
         Logger.timeLog("AuthHandler-preloader", "User found");
-        // user.getIdToken(true).then((token) => {
         StorageService(appMode).saveRecord({
-          [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: user.refreshToken,
+          [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_ID]: user.uid,
         });
-        // });
 
         blockingOperations(user).then((success: boolean) => {
           if (success) {
@@ -229,7 +228,7 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
         localStorage.removeItem("__rq_uid");
-        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN);
+        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.USER_ID);
         // set amplitude anon id to local storage:
 
         dispatch(
