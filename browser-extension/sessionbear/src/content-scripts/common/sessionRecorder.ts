@@ -1,5 +1,5 @@
 import config from "../../config";
-import { CLIENT_MESSAGES, CUSTOM_ELEMENTS, EXTENSION_MESSAGES, STORAGE_KEYS } from "../../constants";
+import { CLIENT_MESSAGES, CLIENT_SOURCE, CUSTOM_ELEMENTS, EXTENSION_MESSAGES, STORAGE_KEYS } from "../../constants";
 import { getRecord } from "../../storage";
 import { SessionRecordingConfig } from "../../types";
 
@@ -148,7 +148,7 @@ const addListeners = () => {
   });
 
   window.addEventListener("message", function (event) {
-    if (event.data.source !== "sessionbear:client") {
+    if (event.data.source !== CLIENT_SOURCE.SESSIONBEAR) {
       return;
     }
 
