@@ -149,7 +149,7 @@ const SessionRecordingView: React.FC = () => {
           title={watchReplayBtnTooltipContent}
           overlayClassName="action-btn-tooltip watch-replay-btn"
         >
-          <span>
+          <span className="buttonWrapper">
             <PrimaryActionButton
               block
               icon={<ReplayLastFiveMinuteIcon />}
