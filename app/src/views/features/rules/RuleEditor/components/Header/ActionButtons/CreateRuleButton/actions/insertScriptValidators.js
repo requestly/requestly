@@ -94,7 +94,11 @@ export const HTML_ERRORS = {
  */
 export async function validateHTMLTag(str, htmlNodeName) {
   const HTMLLinterResult = await htmlValidateRawCodeString(str);
-  if (!HTMLLinterResult.isValid) {
+
+  if (
+    !HTMLLinterResult.isValid &&
+    !HTMLLinterResult.validationErrors.find((ele) => ele.errorType === "unclosed_tags")
+  ) {
     return {
       isValid: false,
       validationError: HTMLLinterResult.validationErrors[0].errorType,
@@ -305,12 +309,48 @@ function extractDOMNodeDetails(htmlCodeString, nodeName) {
   const doc = parser.parseFromString(htmlCodeString, "text/html");
   const blocks = doc.getElementsByTagName(nodeName) ?? [];
   return Array.from(blocks).map((htmlBlock) => {
+    const innerText = getInnerMostText(htmlBlock.innerText, nodeName);
     return {
-      innerText: htmlBlock.innerText,
+      innerText,
       attributes: Array.from(htmlBlock.attributes).map((attr) => ({ name: attr.name, value: attr.value })),
       parent: htmlBlock.parentNode,
       html: htmlBlock.outerHTML,
       originalCode: htmlCodeString,
     };
   });
+}
+
+function getInnerMostText(caseString, htmlElementName) {
+  const openingTag = `<${htmlElementName}`;
+  const openingTagStartIndex = caseString.lastIndexOf(openingTag);
+  let innerTextStart = 0;
+  if (openingTagStartIndex !== -1) {
+    const openingTagEndIndex = caseString.indexOf(">", openingTagStartIndex);
+    if (openingTagEndIndex === -1) {
+      console.error("Unexpected error, no closing tag delimiter found");
+      innerTextStart = openingTagStartIndex + openingTag.length + 1;
+    } else {
+      innerTextStart = openingTagEndIndex + 1;
+    }
+  }
+
+  let innerTextEnd = caseString.length;
+  const closingTag = `</${htmlElementName}>`;
+  const closingTagIndex = caseString.indexOf(closingTag);
+  if (closingTagIndex !== -1) {
+    innerTextEnd = closingTagIndex;
+  }
+
+  if (innerTextEnd < innerTextStart) {
+    console.error(
+      "Unexpected Nesting case, basic sanitization cannot fix this, please ask user to fix",
+      caseString,
+      htmlElementName
+    );
+    // returning unprocessed string
+    return caseString;
+  }
+
+  const innerText = caseString.slice(innerTextStart, innerTextEnd);
+  return innerText;
 }
