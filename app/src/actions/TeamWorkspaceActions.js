@@ -104,6 +104,15 @@ export const switchWorkspace = async (
     })
   );
 
+  StorageService(appMode).saveRecord({
+    [GLOBAL_CONSTANTS.STORAGE_KEYS.ACTIVE_WORKSPACE_ID]: teamId,
+  });
+
+  // SWITCHNG WORKSPACE CLEARS THE EXTENSION STORAGE
+  StorageService(appMode).saveRecord({
+    [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_ID]: window.uid,
+  });
+
   //Refresh Rules List
   dispatch(actions.updateHardRefreshPendingStatus({ type: "rules" }));
 
