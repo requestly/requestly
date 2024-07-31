@@ -27,6 +27,7 @@ const sessionRecorderState: SessionRecorderState = {
 };
 
 let isDraftSessionLoadedInIframe = false;
+let isListenersInitialized = false;
 
 export const initSessionRecording = () => {
   chrome.runtime.onMessage.addListener((message) => {
@@ -88,8 +89,9 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
 
   const isIFrame = isIframe();
 
-  if (!isIFrame) {
+  if (!isIFrame && !isListenersInitialized) {
     addListeners();
+    isListenersInitialized = true;
   }
   sendMessageToClient("startRecording", {
     relayEventsToTop: isIFrame,
