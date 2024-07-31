@@ -36,15 +36,54 @@ const getReplaceMatchingRegex = (rulePair: ReplaceRulePair): ExtensionRuleCondit
   }
 };
 
+const getReplacementExtensionRule = (rulePair: ReplaceRulePair): ExtensionRule => {
+  const commonExtensionCondition = parseConditionFromSource(rulePair.source, true, false);
+  const fromRegex = parseRegex(rulePair.from);
+  let replacementRegex = "";
+  let regexSubstitution = "";
+
+  if (fromRegex?.pattern) {
+    const num_capturing_groups = countCapturingGroups(fromRegex.pattern);
+
+    if (num_capturing_groups === 0) {
+      replacementRegex = `(.*?)${fromRegex.pattern}(.*)`;
+      regexSubstitution = `\\1${rulePair.to}\\2`;
+    } else {
+      replacementRegex = `(.*?)${fromRegex.pattern}(.*)`;
+      const s1 = getRegexSubstitutionStringWithIncrementedIndex(rulePair.to, 1);
+      const s2 = convertRegexSubstitutionStringToDNRSubstitutionString(s1);
+
+      regexSubstitution = `\\1${s2}\\${num_capturing_groups + 2}`;
+    }
+  } else {
+    replacementRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
+    regexSubstitution = `\\1${rulePair.to}\\2`;
+  }
+
+  return {
+    priority: 1,
+    condition: {
+      ...commonExtensionCondition,
+      regexFilter: replacementRegex,
+    },
+    action: {
+      type: RuleActionType.REDIRECT,
+      redirect: {
+        regexSubstitution: regexSubstitution,
+      },
+    },
+  };
+};
+
 const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule[] => {
-  // Case 1 - Replace from in URL source condition
+  // Case 1 and 2 - Replace from in URL source condition
   // Edgecase: Will not replace `from` if not present in the source condition url
   if (
     rulePair.source.key === SourceKey.URL &&
     (rulePair.source.operator === SourceOperator.CONTAINS || rulePair.source.operator === SourceOperator.EQUALS) &&
     rulePair.source.value.includes(rulePair.from)
   ) {
-    Logger.log("Replace Rule: Case 1");
+    Logger.log("Replace Rule: Case 1 and 2");
     let regexFilter = "";
     let regexSubstitution = "";
     let currentSubstitutionIndex = 1;
@@ -96,10 +135,14 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
         },
       },
     ];
+  } else if (!rulePair.source.value) {
+    // Case 3
+    Logger.log("Replace Rule: Case 3");
+    return [getReplacementExtensionRule(rulePair)];
   }
   // REST of the Cases
   else {
-    Logger.log("Replace Rule: Case 2");
+    Logger.log("Replace Rule: Rest of the cases");
     const matchingCondition = getReplaceMatchingRegex(rulePair);
 
     const redirectForSubstitutionRule: ExtensionRule = {
@@ -131,31 +174,10 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
       },
     };
 
-    const fromRegex = parseRegex(rulePair.from);
-    let replacementRegex = "";
-    let regexSubstitution = "";
+    const replacementRule = getReplacementExtensionRule(rulePair);
+    const finalRegex = `^${replacementRule.condition.regexFilter}#__rq_marker=(?:${matchingCondition.regexFilter})$`;
 
-    if (fromRegex?.pattern) {
-      const num_capturing_groups = countCapturingGroups(fromRegex.pattern);
-
-      if (num_capturing_groups === 0) {
-        replacementRegex = `(.*?)${fromRegex.pattern}(.*)`;
-        regexSubstitution = `\\1${rulePair.to}\\2`;
-      } else {
-        replacementRegex = `(.*?)${fromRegex.pattern}(.*)`;
-        const s1 = getRegexSubstitutionStringWithIncrementedIndex(rulePair.to, 1);
-        const s2 = convertRegexSubstitutionStringToDNRSubstitutionString(s1);
-
-        regexSubstitution = `\\1${s2}\\${num_capturing_groups + 2}`;
-      }
-    } else {
-      replacementRegex = `(.*)${escapeRegExp(rulePair.from)}(.*)`;
-      regexSubstitution = `\\1${rulePair.to}\\2`;
-    }
-
-    const finalRegex = `^${replacementRegex}#__rq_marker=(?:${matchingCondition.regexFilter})$`;
-
-    let replacementRule: ExtensionRule = {
+    let replacementRuleWithMarker: ExtensionRule = {
       priority: 2,
       condition: {
         ...matchingCondition,
@@ -164,12 +186,12 @@ const generateReplaceExtensionRules = (rulePair: ReplaceRulePair): ExtensionRule
       action: {
         type: RuleActionType.REDIRECT,
         redirect: {
-          regexSubstitution: regexSubstitution,
+          regexSubstitution: replacementRule.action.redirect.regexSubstitution,
         },
       },
     };
 
-    return [redirectForSubstitutionRule, replacementRule];
+    return [redirectForSubstitutionRule, replacementRuleWithMarker];
   }
 };
 
