@@ -16,6 +16,7 @@ const SessionRecordingView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<chrome.tabs.Tab>();
   const [isRecordingSession, setIsRecordingSession] = useState<boolean>();
   const [isManualMode, setIsManualMode] = useState<boolean>();
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
   const currentTabId = activeTab?.id;
   const isRecordingInManualMode = isRecordingSession && isManualMode;
 
@@ -73,10 +74,36 @@ const SessionRecordingView: React.FC = () => {
     }
   }, [currentTabId]);
 
+  useEffect(() => {
+    chrome.runtime.sendMessage({ action: EXTENSION_MESSAGES.GET_IS_USER_LOGGED_IN }, (isLoggedIn) => {
+      setIsUserLoggedIn(isLoggedIn);
+    });
+  }, []);
+
   const handleConfigureBtnClick = useCallback(() => {
     sendEvent(EVENT.SESSION_RECORDINGS_CONFIG_OPENED);
     window.open(`${config.WEB_URL}/settings/sessions-settings?source=popup`, "_blank");
   }, []);
+
+  const handleViewLastFiveMinReplay = useCallback(() => {
+    if (!isUserLoggedIn) {
+      window.open(`${config.WEB_URL}/sessions?loginRequired`, "_blank");
+      return;
+    }
+    viewRecordingOnClick();
+  }, [isUserLoggedIn, viewRecordingOnClick]);
+
+  const handleManualRecordingButtonClick = useCallback(() => {
+    if (!isUserLoggedIn) {
+      window.open(`${config.WEB_URL}/sessions?loginRequired`, "_blank");
+      return;
+    }
+    if (isRecordingInManualMode) {
+      viewRecordingOnClick();
+    } else {
+      startRecordingOnClick();
+    }
+  }, [isRecordingInManualMode, isUserLoggedIn, startRecordingOnClick, viewRecordingOnClick]);
 
   const watchReplayBtnTooltipContent =
     isRecordingInManualMode || !isRecordingSession ? (
@@ -94,7 +121,7 @@ const SessionRecordingView: React.FC = () => {
   return (
     <div className="session-view-content">
       <Row align="middle" justify="space-between">
-        <div className="title">Create bug reports that developers love!</div>
+        <div className="title">Record session for sharing & debugging</div>
         <div className="configure-btn" onClick={handleConfigureBtnClick}>
           <SettingIcon /> Configure
         </div>
@@ -103,19 +130,17 @@ const SessionRecordingView: React.FC = () => {
         <Tooltip
           placement="top"
           color="#000000"
-          title="Capture screen, console logs, network logs and more."
+          title="Capture mouse movement, console, network and more."
           overlayClassName="action-btn-tooltip"
         >
-          <span className="buttonWrapper">
-            <PrimaryActionButton
-              block
-              className={isRecordingInManualMode ? "stop-btn" : ""}
-              icon={isRecordingInManualMode ? <StopRecordingIcon /> : <PlayRecordingIcon />}
-              onClick={isRecordingInManualMode ? viewRecordingOnClick : startRecordingOnClick}
-            >
-              {isRecordingInManualMode ? "Stop Recording" : "Record this tab"}
-            </PrimaryActionButton>
-          </span>
+          <PrimaryActionButton
+            block
+            className={isRecordingInManualMode ? "stop-btn" : ""}
+            icon={isRecordingInManualMode ? <StopRecordingIcon /> : <PlayRecordingIcon />}
+            onClick={handleManualRecordingButtonClick}
+          >
+            {isRecordingInManualMode ? "Stop and watch" : " Record this tab"}
+          </PrimaryActionButton>
         </Tooltip>
 
         <Tooltip
@@ -129,7 +154,7 @@ const SessionRecordingView: React.FC = () => {
               block
               icon={<ReplayLastFiveMinuteIcon />}
               disabled={isRecordingInManualMode || !isRecordingSession}
-              onClick={viewRecordingOnClick}
+              onClick={handleViewLastFiveMinReplay}
             >
               Watch last 5 min replay
             </PrimaryActionButton>

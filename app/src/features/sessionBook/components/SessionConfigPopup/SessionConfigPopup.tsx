@@ -1,8 +1,9 @@
 //@ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useSaveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/hooks/useSaveDraftSession";
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Radio, Row } from "antd";
 import { DebugInfo, SessionSaveMode } from "../../types";
@@ -16,13 +17,11 @@ import APP_CONSTANTS from "config/constants";
 import { trackDraftSessionSaved } from "features/sessionBook/analytics";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { downloadSessionFile } from "features/sessionBook/utils/sessionFile";
-import { useIncentiveActions } from "features/incentivization/hooks";
-import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import Logger from "lib/logger";
-import { saveDraftSession } from "features/sessionBook/screens/DraftSessionScreen/utils";
-import "./sessionConfigPopup.scss";
+import { isAppOpenedInIframe } from "utils/AppUtils";
 import PATHS from "config/constants/sub/paths";
+import "./sessionConfigPopup.scss";
 
 interface Props {
   onClose: (e?: React.MouseEvent) => void;
@@ -34,24 +33,23 @@ const { ACTION_LABELS: AUTH_ACTION_LABELS } = APP_CONSTANTS.AUTH;
 const defaultDebugInfo: CheckboxValueType[] = [DebugInfo.INCLUDE_NETWORK_LOGS, DebugInfo.INCLUDE_CONSOLE_LOGS];
 
 export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, source = SOURCE.SAVE_DRAFT_SESSION }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { tabId } = useParams();
   const { pathname } = useLocation();
   const user = useSelector(getUserAuthDetails);
   const userAttributes = useSelector(getUserAttributes);
-  const workspace = useSelector(getCurrentlyActiveWorkspace);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const appMode = useSelector(getAppMode);
-
-  const { claimIncentiveRewards } = useIncentiveActions();
+  const { saveDraftSession } = useSaveDraftSession();
 
   const [isSaving, setIsSaving] = useState(false);
   const [sessionSaveMode, setSessionSaveMode] = useState<SessionSaveMode>(SessionSaveMode.ONLINE);
   const [includedDebugInfo, setIncludedDebugInfo] = useState<CheckboxValueType[]>(defaultDebugInfo);
   const isDraftSession =
     pathname.includes(PATHS.SESSIONS.DRAFT.INDEX) || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
+  const isOpenedInIframe = useMemo(() => pathname.includes("iframe") && isAppOpenedInIframe(), [pathname]);
 
   const isSessionLogOptionsAlreadySaved =
     tabId === "imported" || !isDraftSession || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
@@ -114,19 +112,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
 
       setIsSaving(true);
       onSaveClick?.();
-      saveDraftSession(
-        user,
-        userAttributes,
-        appMode,
-        dispatch,
-        navigate,
-        workspace?.id,
-        sessionRecordingMetadata,
-        sessionEvents,
-        includedDebugInfo,
-        source,
-        claimIncentiveRewards
-      )
+      saveDraftSession(includedDebugInfo as DebugInfo[], isOpenedInIframe, source)
         .then(() => {
           onClose?.();
         })
@@ -140,18 +126,14 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
     [
       isSaving,
       sessionRecordingMetadata,
-      includedDebugInfo,
       onSaveClick,
-      workspace?.id,
-      sessionEvents,
       dispatch,
-      appMode,
-      navigate,
-      user,
       source,
-      userAttributes,
       onClose,
-      claimIncentiveRewards,
+      isOpenedInIframe,
+      includedDebugInfo,
+      saveDraftSession,
+      user.loggedIn,
     ]
   );
 
@@ -230,7 +212,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
               : handleDownloadFileClick
           }
         >
-          {isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? "Save" : "Download"}
+          {isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? "Generate link" : "Download"}
         </Button>
       </Row>
     </div>

@@ -103,7 +103,7 @@ export const AuthScreen: React.FC<Props> = ({
                 warningMessage={warningMessage}
               />
             </m.div>
-            {authMode === AUTH.ACTION_LABELS.SIGN_UP && (
+            {authMode === AUTH.ACTION_LABELS.SIGN_UP && appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.REQUESTLY && (
               <m.div transition={{ type: "linear" }} layout className="companies-logo-banner">
                 <CompaniesLogoBanner />
               </m.div>

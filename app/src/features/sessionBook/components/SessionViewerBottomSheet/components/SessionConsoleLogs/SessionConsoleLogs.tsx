@@ -33,9 +33,6 @@ const SessionConsoleLogs: React.FC<SessionConsoleLogsProps> = ({ playerTimeOffse
         <ConsoleLogsPanel consoleLogs={consoleLogs} playerTimeOffset={playerTimeOffset} />
       </div>
     );
-  } else {
-    // TODO: ADD EMPTY STATE
-    return <>No Logs</>;
   }
 };
 

@@ -47,9 +47,6 @@ const SessionNetworkLogs: React.FC<SessionNetworkLogsProps> = ({ playerTimeOffse
         />
       </div>
     );
-  } else {
-    // TODO: ADD EMPTY STATE
-    return <>No Logs</>;
   }
 };
 

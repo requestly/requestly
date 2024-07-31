@@ -32,11 +32,16 @@ export const saveDraftSession = async (
   sessionEvents: any,
   recordingOptions: CheckboxValueType[],
   source: string,
-  claimIncentiveRewards: (event: UserIncentiveEvent) => Promise<unknown>
+  claimIncentiveRewards: (event: UserIncentiveEvent) => Promise<unknown>,
+  isOpenedInIframe?: boolean
 ) => {
   const isDraftSession = window.location.pathname.includes("draft") || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
   const recordingOptionsToSave = getRecordingOptionsToSave(recordingOptions);
+
+  if (isOpenedInIframe) {
+    window.parent.postMessage({ action: "draftSessionSaveClicked", source: "requestly:client" }, "*");
+  }
 
   return saveRecording(
     user?.details?.profile?.uid,
@@ -80,12 +85,19 @@ export const saveDraftSession = async (
         });
       }
 
-      let path = "/" + PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId;
-      if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
-        path = PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + `/${response?.firestoreId}`;
-      navigate(path, {
-        state: { fromApp: true, viewAfterSave: true },
-      });
+      if (isOpenedInIframe) {
+        window.parent.postMessage(
+          { action: "draftSessionSaved", source: "requestly:client", payload: { sessionId: response?.firestoreId } },
+          "*"
+        );
+      } else {
+        let path = "/" + PATHS.SESSIONS.RELATIVE + "/saved/" + response?.firestoreId;
+        if (appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP)
+          path = PATHS.SESSIONS.DESKTOP.SAVED_WEB_SESSION_VIEWER.ABSOLUTE + `/${response?.firestoreId}`;
+        navigate(path, {
+          state: { fromApp: true, viewAfterSave: true },
+        });
+      }
     } else {
       toast.error(response?.message);
       trackDraftSessionSaveFailed(response?.message);

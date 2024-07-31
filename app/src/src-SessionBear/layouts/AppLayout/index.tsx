@@ -19,6 +19,7 @@ import { useInitializeNewUserSessionRecordingConfig } from "features/settings/co
 import DBListeners from "hooks/DbListenerInit/DBListeners";
 import { Outlet } from "react-router-dom";
 import { GlobalModals } from "./GlobalModals";
+import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -48,6 +49,7 @@ const App: React.FC = () => {
             <LocalUserAttributesHelperComponent />
             <LazyMotion features={domMax} strict>
               <div id="requestly-dashboard-layout">
+                <LoginRequiredHandler />
                 <GlobalModals />
                 <Outlet />
               </div>
