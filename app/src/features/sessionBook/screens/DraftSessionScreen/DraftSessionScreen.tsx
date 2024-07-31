@@ -40,6 +40,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   const tempTabId = useParams().tabId;
   const tabId = useMemo(() => (desktopMode ? TabId.IMPORTED : tempTabId), [desktopMode, tempTabId]);
   const isImportedSession = tabId === TabId.IMPORTED;
+
   const isOpenedInIframe = useMemo(() => location.pathname.includes("iframe") && isAppOpenedInIframe(), [
     location.pathname,
   ]);
