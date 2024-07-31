@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Divider, Row, Col, Tooltip, Button } from "antd";
 import { RQButton } from "lib/design-system/components";
@@ -27,6 +27,7 @@ import { trackLoginWithSSOClicked, trackSignUpSignInSwitched } from "../../analy
 import { AuthWarningBanner } from "./components/AuthWarningBanner";
 import { isDisposableEmail } from "utils/AuthUtils";
 import { useFeatureValue } from "@growthbook/growthbook-react";
+import { getAppFlavour } from "utils/AppUtils";
 import "./index.scss";
 
 interface AuthFormProps {
@@ -66,6 +67,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
   const [isInputEmailDisposable, setIsInputEmailDisposable] = useState(false);
   const onboardingVariation = useFeatureValue("onboarding_activation_v2", "variant1");
+  const appFlavour = getAppFlavour();
+  const postAuthGreeting = useMemo(
+    () =>
+      appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? "Welcome to SessionBear" : "Welcome to Requestly",
+    [appFlavour]
+  );
 
   const handleSignupSigninSwitch = useCallback(() => {
     const finalState = authMode === AUTH.ACTION_LABELS.SIGN_UP ? AUTH.ACTION_LABELS.LOG_IN : AUTH.ACTION_LABELS.SIGN_UP;
@@ -94,7 +101,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           setIsNewUser(result?.isNewUser || false);
         }
         const greatingName = result.displayName?.split(" ")?.[0];
-        !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
+        !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : postAuthGreeting);
 
         callback?.();
       })
@@ -104,7 +111,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsGoogleSignInLoading(false);
       });
-  }, [authMode, source, appMode, isOnboarding, callback]);
+  }, [authMode, source, appMode, isOnboarding, callback, postAuthGreeting]);
 
   const handleMagicLinkAuthClick = useCallback(() => {
     if (authMode === AUTH.ACTION_LABELS.LOG_IN || authMode === AUTH.ACTION_LABELS.SIGN_UP) {
@@ -138,8 +145,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             .then(({ result }) => {
               if (result.user.uid) {
                 const greatingName = result.user.displayName?.split(" ")?.[0];
-                !isOnboarding &&
-                  toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
+                !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : postAuthGreeting);
                 setEmail("");
                 setPassword("");
                 callback?.();
@@ -158,7 +164,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [email, password, source, isOnboarding, setEmail, setPassword, callback]);
+  }, [email, password, source, isOnboarding, setEmail, setPassword, callback, postAuthGreeting]);
 
   const handleEmailPasswordSignIn = useCallback(() => {
     setIsLoading(true);
@@ -166,7 +172,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .then(({ result }) => {
         if (result.user.uid) {
           const greatingName = result.user.displayName?.split(" ")?.[0];
-          !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : "Welcome to Requestly");
+          !isOnboarding && toast.info(greatingName ? `${getGreeting()}, ${greatingName}` : postAuthGreeting);
           setEmail("");
           setPassword("");
           callback?.();
@@ -182,7 +188,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [email, password, source, isOnboarding, setEmail, setPassword, callback]);
+  }, [email, password, source, isOnboarding, setEmail, setPassword, callback, postAuthGreeting]);
 
   useEffect(() => {
     if (user.loggedIn && isOnboarding) {

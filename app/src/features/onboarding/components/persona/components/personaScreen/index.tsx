@@ -23,6 +23,8 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { isCompanyEmail } from "utils/FormattingHelper";
 import { getUserPersona, setUserPersona } from "backend/onboarding";
+import { getAppFlavour } from "utils/AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./index.scss";
 
 interface Props {
@@ -41,6 +43,13 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   const [shouldShowFullNameInput, setShouldShowFullNameInput] = useState(false);
 
   const handleMoveToNextStep = useCallback(() => {
+    const appFlavour = getAppFlavour();
+
+    if (appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR) {
+      dispatch(actions.updateAppOnboardingCompleted());
+      return;
+    }
+
     if (user?.loggedIn && isCompanyEmail(user?.details?.profile?.email) && user?.details?.profile?.isEmailVerified) {
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.TEAMS));
     } else {

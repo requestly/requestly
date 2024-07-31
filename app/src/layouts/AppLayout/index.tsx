@@ -29,6 +29,7 @@ import useAppUpdateChecker from "hooks/appUpdateChecker/useAppUpdateChecker";
 import { useFetchIncentivizationDetails } from "features/incentivization/hooks";
 import APP_CONSTANTS from "config/constants";
 import { GlobalModals } from "./GlobalModals";
+import { LoginRequiredHandler } from "hooks/LoginRequiredHandler";
 
 const { PATHS } = APP_CONSTANTS;
 
@@ -88,6 +89,7 @@ const App: React.FC = () => {
             <FeatureUsageEvent />
             <LazyMotion features={domMax} strict>
               <div id="requestly-dashboard-layout">
+                <LoginRequiredHandler />
                 <CommandBar />
                 <UpdateDialog />
                 <GlobalModals />
