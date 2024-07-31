@@ -55,7 +55,6 @@ class RQPostSessionSaveWidget extends HTMLElement {
 
   addWidgetListeners() {
     this.addEventListener("show-draft-session-saved-widget", (event: CustomEvent) => {
-      console.log("show-draft-session-saved-widget event received");
       this.#sessionId = event.detail.sessionId;
       const sessionSavingView = this.shadowRoot.querySelector(".session-saving-view");
       const sessionSavedView = this.shadowRoot.querySelector(".session-saved-view");
@@ -65,7 +64,6 @@ class RQPostSessionSaveWidget extends HTMLElement {
 
     const copyLinkButton = this.shadowRoot.querySelector(".session-copy-link-btn");
     copyLinkButton.addEventListener("click", () => {
-      console.log("Copy link button clicked");
       copyLinkButton.innerHTML = "Link copied!";
       navigator.clipboard.writeText(`${config.WEB_URL}/sessions/saved/${this.#sessionId}`);
       setTimeout(() => {
