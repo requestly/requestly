@@ -5,10 +5,15 @@ import { Empty } from "antd";
 import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
-import { MockRecordType, MockType, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
+import { MockRecordType, MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
 import { generateFinalUrl } from "components/features/mocksV2/utils";
-import { ContentListTable, useContentListTableContext, withContentListTableContext } from "componentsV2/ContentList";
+import {
+  ContentListTable,
+  ContentListTableProps,
+  useContentListTableContext,
+  withContentListTableContext,
+} from "componentsV2/ContentList";
 import { useMocksTableColumns } from "./hooks/useMocksTableColumns";
 import { enhanceRecords, isRecordMockCollection, recordsToContentTableDataAdapter } from "./utils";
 import { RiDeleteBin2Line } from "@react-icons/all-files/ri/RiDeleteBin2Line";
@@ -18,6 +23,7 @@ import { useMocksActionContext } from "features/mocks/contexts/actions";
 import PATHS from "config/constants/sub/paths";
 import { trackMocksListBulkActionPerformed } from "modules/analytics/events/features/mocksV2";
 import "./mocksTable.scss";
+import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 
 export interface MocksTableProps {
   isLoading?: boolean;
@@ -50,6 +56,9 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
   const user = useSelector(getUserAuthDetails);
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
+  const workspace = useSelector(getCurrentlyActiveWorkspace);
+  const uid = user?.details?.profile?.uid;
+  const teamId = workspace?.id;
 
   useEffect(() => {
     if (!isWorkspaceMode) {
@@ -108,8 +117,51 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     return `${collectionString}${collectionString && mockString ? " and " : ""}${mockString} selected`;
   }, []);
 
+  // TODO: move into actions
+  const updateCollectionOnDrop = useCallback(
+    (mockId: string, collectionId: string) => {
+      const mockIds = [mockId];
+      const collectionPath = ((allRecordsMap[collectionId] as unknown) as RQMockCollection)?.path ?? "";
+
+      updateMocksCollection(uid, mockIds, collectionId, collectionPath, teamId).then(() => {
+        forceRender();
+      });
+    },
+    [uid, teamId, forceRender, allRecordsMap]
+  );
+
+  const onRowDropped: ContentListTableProps<RQMockMetadataSchema>["onRowDropped"] = useCallback(
+    (dragRecordId, targetRecordId) => {
+      if (!dragRecordId || !targetRecordId) {
+        return;
+      }
+
+      const dragRecord = allRecordsMap[dragRecordId];
+      const targetRecord = allRecordsMap[targetRecordId];
+
+      if (dragRecord?.recordType === MockRecordType.COLLECTION) {
+        return;
+      }
+
+      if (dragRecord?.recordType === MockRecordType.MOCK) {
+        if (targetRecord?.recordType === MockRecordType.COLLECTION) {
+          if (dragRecord?.collectionId !== targetRecord?.id) {
+            updateCollectionOnDrop(dragRecord.id, targetRecord?.id);
+          }
+        } else if (targetRecord?.recordType === MockRecordType.MOCK) {
+          if ((dragRecord?.collectionId !== targetRecord?.collectionId, dragRecord)) {
+            updateCollectionOnDrop(dragRecord.id, targetRecord?.collectionId);
+          }
+        }
+      }
+    },
+    [allRecordsMap, updateCollectionOnDrop]
+  );
+
   return (
     <ContentListTable
+      dragAndDrop
+      onRowDropped={onRowDropped}
       loading={isLoading}
       id="mock-list-table"
       pagination={false}

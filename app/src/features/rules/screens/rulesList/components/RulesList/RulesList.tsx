@@ -46,11 +46,10 @@ const RulesList: React.FC<Props> = () => {
   const allRecords = useSelector(getAllRecords);
   const allRecordsMap = useSelector(getAllRecordsMap);
 
-  const filteredRecords = useMemo(() => getFilteredRecords(allRecords, activeFilter, searchValue), [
-    allRecords,
-    activeFilter,
-    searchValue,
-  ]);
+  const filteredRecords = useMemo(
+    () => getFilteredRecords(allRecords, activeFilter, searchValue),
+    [allRecords, activeFilter, searchValue]
+  );
 
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
