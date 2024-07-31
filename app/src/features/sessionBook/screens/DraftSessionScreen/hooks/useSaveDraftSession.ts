@@ -1,6 +1,6 @@
 import { useIncentiveActions } from "features/incentivization/hooks";
 import { getRecordingOptionsToSave } from "features/sessionBook/utils/sessionFile";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -28,6 +28,7 @@ export const useSaveDraftSession = () => {
   const { claimIncentiveRewards } = useIncentiveActions();
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
+  const [searchParams] = useState(new URLSearchParams(window.location.search));
 
   const saveDraftSessionHandler = useCallback(
     async (recordingOptions: DebugInfo[], isOpenedInIframe: boolean, source: string) => {
@@ -56,9 +57,11 @@ export const useSaveDraftSession = () => {
         );
       }
 
+      const workspaceId = isOpenedInIframe ? searchParams.get("workspaceId") : currentlyActiveWorkspace?.id;
+
       return saveRecording(
         user?.details?.profile?.uid,
-        currentlyActiveWorkspace?.id,
+        workspaceId ?? null,
         sessionRecordingMetadata,
         compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
         recordingOptionsToSave,
@@ -131,6 +134,7 @@ export const useSaveDraftSession = () => {
       userAttributes,
       sessionEvents,
       sessionRecordingMetadata,
+      searchParams,
     ]
   );
 
