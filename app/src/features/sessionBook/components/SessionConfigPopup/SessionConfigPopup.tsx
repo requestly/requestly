@@ -212,7 +212,7 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
               : handleDownloadFileClick
           }
         >
-          {isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? "Save" : "Download"}
+          {isDraftSession && sessionSaveMode === SessionSaveMode.ONLINE ? "Generate link" : "Download"}
         </Button>
       </Row>
     </div>
