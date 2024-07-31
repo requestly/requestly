@@ -68,6 +68,7 @@ export const STORAGE_KEYS = {
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
   USER_ID: "userId",
+  ACTIVE_WORKSPACE_ID: "activeWorkspaceId",
 };
 
 export const LINKS = {
