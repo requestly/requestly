@@ -5,6 +5,14 @@
   background: var(--requestly-color-background);
   width: 100%;
   overflow: hidden;
+
+  a {
+    color: var(--requestly-color-primary-text, #639ff9);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .pricing-page-container {

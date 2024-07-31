@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useSearchParams, Outlet } from "react-router-dom";
 import SpinnerModal from "components/misc/SpinnerModal";
-import AuthModal from "components/authentication/AuthModal";
 import { actions } from "store";
 //UTILS
 import {
@@ -70,9 +69,7 @@ const DashboardContent = () => {
   const toggleSpinnerModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "loadingModal" }));
   };
-  const toggleAuthModal = () => {
-    dispatch(actions.toggleActiveModal({ modalName: "authModal" }));
-  };
+
   const toggleExtensionModal = () => {
     dispatch(actions.toggleActiveModal({ modalName: "extensionModal" }));
   };
@@ -134,13 +131,6 @@ const DashboardContent = () => {
           ) : null}
           {activeModals.loadingModal.isActive ? (
             <SpinnerModal isOpen={activeModals.loadingModal.isActive} toggle={() => toggleSpinnerModal()} />
-          ) : null}
-          {activeModals.authModal.isActive ? (
-            <AuthModal
-              isOpen={activeModals.authModal.isActive}
-              toggle={() => toggleAuthModal()}
-              {...activeModals.authModal.props}
-            />
           ) : null}
           {activeModals.extensionModal.isActive ? (
             <InstallExtensionModal

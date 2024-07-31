@@ -243,12 +243,12 @@ const RuleBuilder = (props) => {
 
   return (
     <m.div layout transition={{ type: "linear", duration: 0.2 }} style={{ height: "inherit" }}>
-      <ProductWalkthrough
+      {/* <ProductWalkthrough
         tourFor={RULE_TYPE_TO_CREATE}
         startWalkthrough={startWalkthrough}
         context={currentlySelectedRuleData}
         onTourComplete={() => dispatch(actions.updateProductTourCompleted({ tour: TOUR_TYPES.RULE_EDITOR }))}
-      />
+      /> */}
 
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
