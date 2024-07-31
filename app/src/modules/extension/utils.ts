@@ -21,7 +21,7 @@ export enum RuleMigrationChange {
 export const LATEST_RULES_SCHEMA_VERSION = {
   [RuleType.REDIRECT]: "3.0.0",
   [RuleType.CANCEL]: "3.0.0",
-  [RuleType.REPLACE]: "3.0.1",
+  [RuleType.REPLACE]: "3.0.2",
   [RuleType.HEADERS]: "3.0.0",
   [RuleType.USERAGENT]: "3.0.0",
   [RuleType.SCRIPT]: "3.0.0",
