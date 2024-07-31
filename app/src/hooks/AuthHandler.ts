@@ -178,24 +178,34 @@ const AuthHandler: React.FC<{}> = () => {
   );
 
   useEffect(() => {
-    if (queryPrarams.get("userId") && isAppOpenedInIframe()) {
-      const userId = queryPrarams.get("userId");
+    if (queryPrarams.get("userToken") && isAppOpenedInIframe()) {
+      const userToken = queryPrarams.get("userToken");
       const getCustomToken = httpsCallable(getFunctions(), "auth-generateCustomToken");
-      getCustomToken({ userId }).then((res: any) => {
-        if (res.data.success) {
-          const auth = getAuth(firebaseApp);
-          signInWithCustomToken(auth, res.data.result.customToken)
-            .then((user) => {
-              // Signed in
-              Logger.log("User signed in with custom token", user);
-            })
-            .catch((error) => {
-              Logger.log("Error signing in with custom token:", error.message);
-            });
-        } else {
-          Logger.log("Error generating custom token:", res.data.result.message);
+      getCustomToken({ userToken }).then(
+        (res: {
+          data: {
+            success: boolean;
+            result: {
+              customToken: string;
+              message: string;
+            };
+          };
+        }) => {
+          if (res.data.success) {
+            const auth = getAuth(firebaseApp);
+            signInWithCustomToken(auth, res.data.result.customToken)
+              .then((user) => {
+                // Signed in
+                Logger.log("User signed in with custom token", user);
+              })
+              .catch((error) => {
+                Logger.log("Error signing in with custom token:", error.message);
+              });
+          } else {
+            Logger.log("Error generating custom token:", res.data.result.message);
+          }
         }
-      });
+      );
     }
   }, [queryPrarams]);
 
@@ -211,7 +221,7 @@ const AuthHandler: React.FC<{}> = () => {
       if (user) {
         Logger.timeLog("AuthHandler-preloader", "User found");
         StorageService(appMode).saveRecord({
-          [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_ID]: user.uid,
+          [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: user.refreshToken,
         });
 
         blockingOperations(user).then((success: boolean) => {
@@ -228,7 +238,7 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
         localStorage.removeItem("__rq_uid");
-        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.USER_ID);
+        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN);
         // set amplitude anon id to local storage:
 
         dispatch(
