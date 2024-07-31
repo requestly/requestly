@@ -7,7 +7,11 @@ import { MdOutlineFactCheck } from "@react-icons/all-files/md/MdOutlineFactCheck
 import { MdClose } from "@react-icons/all-files/md/MdClose";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
-import { trackRuleDetailsPanelClosed, trackRuleDetailsPanelViewed } from "modules/analytics/events/common/rules";
+import {
+  trackRuleDetailsPanelClosed,
+  trackRuleDetailsPanelDocsClicked,
+  trackRuleDetailsPanelViewed,
+} from "modules/analytics/events/common/rules";
 import { trackUseTemplateClick, trackViewAllTemplatesClick } from "modules/analytics/events/features/templates";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
@@ -52,10 +56,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
       <div className="details-panel">
         <div className="rule-details-container">
           <div className="title">{RULE_DETAILS[ruleType].name}</div>
-          <div className="description">
-            {RULE_DETAILS[ruleType].description} Redirect scripts, APIs, Stylesheets, or any other resource from one
-            environment to another. Use Modify API Response rule to debug & modify API responses on the fly.
-          </div>
+          <div className="description">{RULE_DETAILS[ruleType].description}</div>
 
           <div className="use-cases-container">
             <div className="title">Use cases</div>
@@ -111,6 +112,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
         className="link documentation-link"
         href={RULE_DETAILS[ruleType].documentationLink}
         icon={<MdMenuBook className="anticon" />}
+        onClick={() => trackRuleDetailsPanelDocsClicked(ruleType, source)}
       >
         Read complete documentation
       </Button>

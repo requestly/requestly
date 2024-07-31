@@ -1,7 +1,7 @@
 import config from "common/config";
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { onVariableChange, Variable } from "../variable";
-import { debounce, getBlockedDomains, isExtensionEnabled } from "../../utils";
+import { debounce, getBlockedDomains, isExtensionEnabled, onBlockListChange } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
 import { sendMessageToApp } from "./messageHandler";
@@ -130,6 +130,10 @@ export const initRulesManager = async (): Promise<void> => {
     deleteAllSessionRules();
   });
   applyExtensionRules();
+
+  onBlockListChange(() => {
+    applyExtensionRules();
+  });
 };
 
 export const updateRequestSpecificRules = async (

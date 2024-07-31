@@ -437,7 +437,7 @@ export const validateRule = (rule, dispatch, appMode) => {
         };
       }
       // Response body shouldn't have invalid syntax
-      else {
+      else if (pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE) {
         const language =
           pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
             ? EditorLanguage.JAVASCRIPT
@@ -477,7 +477,7 @@ export const validateRule = (rule, dispatch, appMode) => {
         };
       }
       // Request body shouldn't have invalid syntax
-      else {
+      else if (pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE) {
         const language =
           pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
             ? EditorLanguage.JAVASCRIPT

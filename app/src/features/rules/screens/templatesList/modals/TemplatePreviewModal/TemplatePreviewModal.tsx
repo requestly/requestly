@@ -61,7 +61,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({ rule
 
     //triggering started event here for home screen because started event is triggered from templates list page.g
     if (source === SOURCE.HOME_SCREEN) trackTemplateImportStarted(snakeCase(ruleToSave.name), source);
-    saveRule(appMode, ruleToSave)
+    saveRule(appMode, dispatch, ruleToSave)
       .then(() => {
         trackTemplateImportCompleted(snakeCase(ruleToSave.name), source);
         redirectToRuleEditor(navigate, ruleToSave.id, "templates");
