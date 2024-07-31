@@ -343,14 +343,19 @@ const injectDraftSessionViewer = async () => {
     postSaveSessionWidget.remove();
   }
 
-  const userId = await getRecord(STORAGE_KEYS.USER_ID);
+  const userId: string = await getRecord(STORAGE_KEYS.USER_ID);
+  const activeWorkspaceId: string = await getRecord(STORAGE_KEYS.ACTIVE_WORKSPACE_ID);
 
   const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   newSessionViewer.classList.add("rq-element");
 
+  const iframeUrlParams = new URLSearchParams();
+  if (userId) iframeUrlParams.set("userId", userId);
+  if (activeWorkspaceId) iframeUrlParams.set("workspaceId", activeWorkspaceId);
+
   newSessionViewer.setAttribute(
     "session-src",
-    `${config.WEB_URL}/iframe/sessions/draft/iframe?${userId ? `userId=${userId}` : ""}`
+    `${config.WEB_URL}/iframe/sessions/draft/iframe?${iframeUrlParams.toString()}`
   );
 
   document.documentElement.appendChild(newSessionViewer);
