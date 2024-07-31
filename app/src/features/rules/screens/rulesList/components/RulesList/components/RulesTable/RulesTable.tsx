@@ -158,32 +158,32 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     return classNames;
   };
 
-  const onRowMove: ContentListTableProps<RuleTableRecord>["onRowMove"] = useCallback(
-    (dragRowId, targetRowId, expandRow) => {
-      if (!dragRowId || !targetRowId) {
+  const onRowDropped: ContentListTableProps<RuleTableRecord>["onRowDropped"] = useCallback(
+    (sourceRecordId, targetRecordId, expandRow) => {
+      if (!sourceRecordId || !targetRecordId) {
         return;
       }
 
-      const dragRow = allRecordsMap[dragRowId];
-      const targetRow = allRecordsMap[targetRowId];
+      const dragRecord = allRecordsMap[sourceRecordId];
+      const targetRecord = allRecordsMap[targetRecordId];
 
-      if (dragRow?.objectType === RecordType.GROUP) {
+      if (dragRecord?.objectType === RecordType.GROUP) {
         return;
       }
 
-      if (dragRow?.objectType === RecordType.RULE) {
-        if (targetRow?.objectType === RecordType.GROUP) {
-          if (dragRow?.groupId !== targetRow?.id) {
-            updateGroupOnDrop(dragRow, targetRow?.id, () => expandRow(targetRow?.id));
+      if (dragRecord?.objectType === RecordType.RULE) {
+        if (targetRecord?.objectType === RecordType.GROUP) {
+          if (dragRecord?.groupId !== targetRecord?.id) {
+            updateGroupOnDrop(dragRecord, targetRecord?.id, () => expandRow(targetRecord?.id));
           }
-        } else if (targetRow?.objectType === RecordType.RULE) {
-          if ((dragRow?.groupId !== targetRow?.groupId, dragRow)) {
-            updateGroupOnDrop(dragRow, targetRow?.groupId, () => expandRow(targetRow?.groupId));
+        } else if (targetRecord?.objectType === RecordType.RULE) {
+          if ((dragRecord?.groupId !== targetRecord?.groupId, dragRecord)) {
+            updateGroupOnDrop(dragRecord, targetRecord?.groupId, () => expandRow(targetRecord?.groupId));
           }
         }
       }
     },
-    [records, allRecordsMap]
+    [allRecordsMap, updateGroupOnDrop]
   );
 
   return (
@@ -192,7 +192,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
 
       <ContentListTable
         dragAndDrop
-        onRowMove={onRowMove}
+        onRowDropped={onRowDropped}
         id="rules-list-table"
         className="rules-list-table"
         size="middle"

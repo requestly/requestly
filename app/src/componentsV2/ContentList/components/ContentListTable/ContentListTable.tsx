@@ -14,12 +14,12 @@ import "./contentListTable.scss";
 interface DraggableBodyRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   index: number;
   recordId: string;
-  moveRow: (dragRowId: string, hoverRowId: string) => void;
+  onRowDrop: (sourceRecordId: string, targetRecordId: string) => void;
 }
 
 const DRAGGABLE_ELEMENT_TYPE = "DraggableContentListRow";
 
-const DraggableBodyRow = ({ index, moveRow, className, style, recordId, ...restProps }: DraggableBodyRowProps) => {
+const DraggableBodyRow = ({ index, onRowDrop, className, style, recordId, ...restProps }: DraggableBodyRowProps) => {
   const ref = useRef<HTMLTableRowElement>(null);
   const [{ isOver, dropClassName }, drop] = useDrop({
     accept: DRAGGABLE_ELEMENT_TYPE,
@@ -37,12 +37,12 @@ const DraggableBodyRow = ({ index, moveRow, className, style, recordId, ...restP
 
       return {
         isOver: monitor.isOver(),
-        dropClassName: " rq-droppped-row",
+        dropClassName: " rq-dnd-target-row",
       };
     },
 
-    drop: (item: { index: number; recordId: string }) => {
-      moveRow(item.recordId, recordId);
+    drop: (sourceItem: { index: number; recordId: string }) => {
+      onRowDrop(sourceItem.recordId, recordId);
     },
   });
 
@@ -79,7 +79,7 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   locale: TableProps<DataType>["locale"];
   onRecordSelection?: (selectedRows: DataType[]) => void;
   dragAndDrop?: boolean;
-  onRowMove?: (dragRowId: string, hoverRowId: string, expandRow: (id: string) => void) => void;
+  onRowDropped?: (sourceRecordId: string, targetRecordId: string, expandRow: (id: string) => void) => void;
 }
 
 const ContentListTable = <DataType extends { [key: string]: any }>({
@@ -97,7 +97,7 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   className = "",
   onRow: onRowCallback = (record: DataType) => ({}),
   dragAndDrop = false,
-  onRowMove = () => {},
+  onRowDropped = () => {},
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
@@ -150,11 +150,11 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     [expandedRowKeys]
   );
 
-  const moveRow = useCallback(
-    (dragRowId: string, hoverRowId: string) => {
-      onRowMove(dragRowId, hoverRowId, expandRow);
+  const onRowDrop = useCallback(
+    (sourceRecordId: string, targetRecordId: string) => {
+      onRowDropped(sourceRecordId, targetRecordId, expandRow);
     },
-    [data, onRowMove, expandRow]
+    [onRowDropped, expandRow]
   );
 
   const commonProps: TableProps<DataType> = {
@@ -211,12 +211,13 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
             {...commonProps}
             components={components}
             onRow={(record, index) => {
-              onRowCallback(record);
+              const onRowAttr = onRowCallback(record);
 
               const attr = {
                 index,
-                moveRow,
+                onRowDrop,
                 recordId: record.id,
+                ...onRowAttr,
               };
 
               return attr as React.HTMLAttributes<any>;

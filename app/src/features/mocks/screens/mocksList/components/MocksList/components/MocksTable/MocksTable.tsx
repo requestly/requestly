@@ -130,38 +130,38 @@ export const MocksTable: React.FC<MocksTableProps> = ({
     [uid, teamId, forceRender, allRecordsMap]
   );
 
-  const onRowMove: ContentListTableProps<RQMockMetadataSchema>["onRowMove"] = useCallback(
-    (dragRowId, targetRowId, expandRow) => {
-      if (!dragRowId || !targetRowId) {
+  const onRowDropped: ContentListTableProps<RQMockMetadataSchema>["onRowDropped"] = useCallback(
+    (dragRecordId, targetRecordId, expandRow) => {
+      if (!dragRecordId || !targetRecordId) {
         return;
       }
 
-      const dragRow = allRecordsMap[dragRowId];
-      const targetRow = allRecordsMap[targetRowId];
+      const dragRecord = allRecordsMap[dragRecordId];
+      const targetRecord = allRecordsMap[targetRecordId];
 
-      if (dragRow?.recordType === MockRecordType.COLLECTION) {
+      if (dragRecord?.recordType === MockRecordType.COLLECTION) {
         return;
       }
 
-      if (dragRow?.recordType === MockRecordType.MOCK) {
-        if (targetRow?.recordType === MockRecordType.COLLECTION) {
-          if (dragRow?.collectionId !== targetRow?.id) {
-            updateCollectionOnDrop(dragRow.id, targetRow?.id);
+      if (dragRecord?.recordType === MockRecordType.MOCK) {
+        if (targetRecord?.recordType === MockRecordType.COLLECTION) {
+          if (dragRecord?.collectionId !== targetRecord?.id) {
+            updateCollectionOnDrop(dragRecord.id, targetRecord?.id);
           }
-        } else if (targetRow?.recordType === MockRecordType.MOCK) {
-          if ((dragRow?.collectionId !== targetRow?.collectionId, dragRow)) {
-            updateCollectionOnDrop(dragRow.id, targetRow?.collectionId);
+        } else if (targetRecord?.recordType === MockRecordType.MOCK) {
+          if ((dragRecord?.collectionId !== targetRecord?.collectionId, dragRecord)) {
+            updateCollectionOnDrop(dragRecord.id, targetRecord?.collectionId);
           }
         }
       }
     },
-    [records, allRecordsMap, updateCollectionOnDrop]
+    [allRecordsMap, updateCollectionOnDrop]
   );
 
   return (
     <ContentListTable
       dragAndDrop
-      onRowMove={onRowMove}
+      onRowDropped={onRowDropped}
       loading={isLoading}
       id="mock-list-table"
       pagination={false}
