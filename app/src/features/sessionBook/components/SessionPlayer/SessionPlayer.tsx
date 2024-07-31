@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
@@ -16,14 +17,15 @@ import { PlayerState } from "features/sessionBook/types";
 import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessionEventsUtils";
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 import PlayerFrameOverlay from "./components/PlayerOverlay/PlayerOverlay";
-import "./sessionPlayer.scss";
 import { useTheme } from "styled-components";
+import "./sessionPlayer.scss";
 
 interface SessionPlayerProps {
   onPlayerTimeOffsetChange: (timeOffset: number) => void;
 }
 
 export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffsetChange }) => {
+  const location = useLocation();
   const events = useSelector(getSessionRecordingEvents);
   const attributes = useSelector(getSessionRecordingAttributes);
   const startTime = attributes?.startTime;
@@ -42,6 +44,8 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
 
   const theme = useTheme();
+
+  const isOpenedInIframe = location.pathname.includes("iframe");
 
   const inactiveSegments = useMemo(() => {
     if (events) {
@@ -267,29 +271,31 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
             <Switch size="small" checked={isSkipInactiveEnabled} onChange={handleChangeSkipInactive} />{" "}
             <span>Skip inactive</span>
           </div>
-          <div className="flex-1 session-player-fullscreen-controller-container">
-            {isFullScreenMode ? (
-              <RQButton
-                className="session-player-controller__btn "
-                iconOnly
-                icon={<TbMinimize />}
-                onClick={() => {
-                  document.exitFullscreen();
-                  setIsFullScreenMode(false);
-                }}
-              />
-            ) : (
-              <RQButton
-                className="session-player-controller__btn "
-                iconOnly
-                icon={<MdFullscreen />}
-                onClick={() => {
-                  playerContainerRef.current.requestFullscreen();
-                  setIsFullScreenMode(true);
-                }}
-              />
-            )}
-          </div>
+          {!isOpenedInIframe && (
+            <div className="flex-1 session-player-fullscreen-controller-container">
+              {isFullScreenMode ? (
+                <RQButton
+                  className="session-player-controller__btn "
+                  iconOnly
+                  icon={<TbMinimize />}
+                  onClick={() => {
+                    document.exitFullscreen();
+                    setIsFullScreenMode(false);
+                  }}
+                />
+              ) : (
+                <RQButton
+                  className="session-player-controller__btn "
+                  iconOnly
+                  icon={<MdFullscreen />}
+                  onClick={() => {
+                    playerContainerRef.current.requestFullscreen();
+                    setIsFullScreenMode(true);
+                  }}
+                />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -249,15 +249,15 @@ const CreateRuleButton = ({
     const ruleValidation = validateRule(currentlySelectedRuleData, dispatch, appMode);
 
     //Syntactic Validation
-    const syntaxValidatedRule = await validateSyntaxInRule(dispatch, { ...currentlySelectedRuleData });
+    const finalRuleData = await validateSyntaxInRule(dispatch, { ...currentlySelectedRuleData });
 
-    if (!syntaxValidatedRule) {
+    if (!finalRuleData) {
       return;
     }
 
     if (ruleValidation.result) {
       saveRule(appMode, dispatch, {
-        ...currentlySelectedRuleData,
+        ...finalRuleData,
         createdBy,
         currentOwner,
         lastModifiedBy,
@@ -269,7 +269,7 @@ const CreateRuleButton = ({
           }
 
           if (isRuleEditorModal) {
-            ruleCreatedFromEditorModalCallback(currentlySelectedRuleData.id);
+            ruleCreatedFromEditorModalCallback(finalRuleData.id);
           } else {
             toast.success(`Successfully ${currentActionText.toLowerCase()}d the rule`);
           }
@@ -278,43 +278,43 @@ const CreateRuleButton = ({
 
           let rule_type = null;
 
-          if (currentlySelectedRuleData && currentlySelectedRuleData.ruleType) {
-            rule_type = currentlySelectedRuleData.ruleType;
+          if (finalRuleData && finalRuleData.ruleType) {
+            rule_type = finalRuleData.ruleType;
           }
           if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isRuleEditorModal) {
             trackRuleCreatedEvent({
               rule_type,
-              description: currentlySelectedRuleData.description,
+              description: finalRuleData.description,
               destination_types:
-                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-                  ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+                finalRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+                  ? getAllRedirectDestinationTypes(finalRuleData)
                   : null,
               source: ruleCreatedEventSource,
               body_types:
-                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
-                  ? getAllResponseBodyTypes(currentlySelectedRuleData)
+                finalRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE
+                  ? getAllResponseBodyTypes(finalRuleData)
                   : null,
-              ...getEventParams(currentlySelectedRuleData),
+              ...getEventParams(finalRuleData),
               save_type: saveType,
             });
           } else if (MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT) {
             trackRuleEditedEvent({
               rule_type,
-              description: currentlySelectedRuleData.description,
+              description: finalRuleData.description,
               destination_types:
-                currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
-                  ? getAllRedirectDestinationTypes(currentlySelectedRuleData)
+                finalRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REDIRECT
+                  ? getAllRedirectDestinationTypes(finalRuleData)
                   : null,
               source: ruleCreatedEventSource,
-              ...getEventParams(currentlySelectedRuleData),
+              ...getEventParams(finalRuleData),
               save_type: saveType,
             });
           }
           ruleModifiedAnalytics(user);
           trackRQLastActivity("rule_saved");
 
-          if (currentlySelectedRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
-            const resourceType = currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
+          if (finalRuleData?.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE) {
+            const resourceType = finalRuleData?.pairs?.[0]?.response?.resourceType;
 
             if (resourceType && resourceType !== ResponseRuleResourceType.UNKNOWN) {
               trackRuleResourceTypeSelected(GLOBAL_CONSTANTS.RULE_TYPES.RESPONSE, snakeCase(resourceType));
@@ -324,7 +324,7 @@ const CreateRuleButton = ({
         .then(() => {
           if (!isRuleEditorModal && MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE) {
             dispatch(actions.updateSecondarySidebarCollapse(true));
-            redirectToRuleEditor(navigate, currentlySelectedRuleData.id, MODE);
+            redirectToRuleEditor(navigate, finalRuleData.id, MODE);
           }
         })
         .catch(() => {
