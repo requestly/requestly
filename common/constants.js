@@ -219,7 +219,7 @@ CONSTANTS.STORAGE_KEYS = {
   TEST_REPORTS: "testReports",
   IMPLICIT_RULE_TESTING_WIDGET_CONFIG: "implicit_rule_testing_widget_config",
   BLOCKED_DOMAINS: "blocked_domains",
-  USER_ID: "userId",
+  USER_TOKEN: "userToken",
   ACTIVE_WORKSPACE_ID: "activeWorkspaceId",
 };
 

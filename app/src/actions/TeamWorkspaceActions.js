@@ -34,6 +34,7 @@ export const switchWorkspace = async (
   const { teamId, teamName, teamMembersCount } = newWorkspaceDetails;
   let needToMergeRecords = false;
 
+  const userToken = await StorageService(appMode).getRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN);
   await StorageService(appMode).waitForAllTransactions();
 
   if (teamId !== null) {
@@ -110,7 +111,7 @@ export const switchWorkspace = async (
 
   // SWITCHNG WORKSPACE CLEARS THE EXTENSION STORAGE
   StorageService(appMode).saveRecord({
-    [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_ID]: window.uid,
+    [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: userToken,
   });
 
   //Refresh Rules List
