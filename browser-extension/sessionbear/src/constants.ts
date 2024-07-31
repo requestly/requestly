@@ -13,6 +13,7 @@ export const EXTENSION_MESSAGES = {
   CLEAR_LOGS_FOR_DOMAIN: "clearLogsForDomain",
   GET_RULES_AND_GROUPS: "getRulesAndGroups",
   GET_TAB_SESSION: "getTabSession",
+  GET_IS_USER_LOGGED_IN: "getIsUserLoggedIn",
   HANDSHAKE_CLIENT: "handshakeClient",
   GET_API_RESPONSE: "getAPIResponse",
   GET_EXECUTED_RULES: "getExecutedRules",
@@ -67,6 +68,7 @@ export const STORAGE_KEYS = {
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
   USER_ID: "userId",
+  ACTIVE_WORKSPACE_ID: "activeWorkspaceId",
 };
 
 export const LINKS = {

@@ -2,6 +2,20 @@
   height: 100%;
   overflow: hidden;
   border-radius: 8px;
+
+  .bottom-sheet-container {
+    .ant-tabs,
+    .ant-tabs-content-holder,
+    .session-console-logs-container {
+      height: inherit;
+    }
+
+    .network-container {
+      .rq-resource-table-wrapper {
+        height: inherit;
+      }
+    }
+  }
 }
 
 .session-details-panel-container {

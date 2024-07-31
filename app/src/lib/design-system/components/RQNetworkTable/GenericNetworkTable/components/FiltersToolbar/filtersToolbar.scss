@@ -7,13 +7,13 @@
 
   .filters-divider {
     height: 1.4rem;
-    align-self: flex-end;
     border-left: 1px solid var(--border);
+    margin: 0 2px;
   }
 
   .search-filter.ant-input-affix-wrapper {
     width: 200px;
-    padding: 2px 4px;
+    padding: 0 4px;
     font-size: 13px;
     align-self: flex-end;
 
@@ -22,6 +22,10 @@
     }
   }
   .btn-group-filters-wrapper {
+    align-self: center;
+    position: relative;
+    top: -2px;
+
     .status-code-filter-btns {
       gap: 3px;
       margin-top: 4px;
@@ -43,7 +47,7 @@
   .active-filter-btn.rq-btn.ant-btn:focus,
   .active-filter-btn.rq-btn.ant-btn:hover {
     color: #fff;
-    background: var(--primary);
-    border-color: var(--primary);
+    background: var(--requestly-color-surface-2);
+    border-color: var(--requestly-color-surface-3);
   }
 }

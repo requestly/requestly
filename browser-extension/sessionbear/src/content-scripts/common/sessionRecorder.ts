@@ -26,6 +26,9 @@ const sessionRecorderState: SessionRecorderState = {
   showWidget: false,
 };
 
+let isDraftSessionLoadedInIframe = false;
+let isListenersInitialized = false;
+
 export const initSessionRecording = () => {
   chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
@@ -86,8 +89,9 @@ const sendStartRecordingEvent = async (sessionRecordingConfig: SessionRecordingC
 
   const isIFrame = isIframe();
 
-  if (!isIFrame) {
+  if (!isIFrame && !isListenersInitialized) {
     addListeners();
+    isListenersInitialized = true;
   }
   sendMessageToClient("startRecording", {
     relayEventsToTop: isIFrame,
@@ -140,7 +144,11 @@ const addListeners = () => {
         break;
 
       case CLIENT_MESSAGES.VIEW_RECORDING:
-        viewDraftSession();
+        if (isDraftSessionLoadedInIframe) {
+          viewDraftSession();
+        } else {
+          window.open(`${config.WEB_URL}/sessions/draft/${message.tabId}`, "_blank");
+        }
         break;
     }
 
@@ -182,12 +190,13 @@ const addListeners = () => {
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
     } else if (event.data.action === "draftSessionSaveClicked") {
-      console.log("Draft session save clicked");
       hideDraftSessionViewer();
       showPostSessionSaveWidget();
     } else if (event.data.action === "draftSessionSaved") {
       const { payload } = event.data;
       showDraftSessionSavedWidget(payload.sessionId);
+    } else if (event.data.action === "draftSessionViewerLoaded") {
+      isDraftSessionLoadedInIframe = true;
     }
   });
 
@@ -334,14 +343,19 @@ const injectDraftSessionViewer = async () => {
     postSaveSessionWidget.remove();
   }
 
-  const userId = await getRecord(STORAGE_KEYS.USER_ID);
+  const userId: string = await getRecord(STORAGE_KEYS.USER_ID);
+  const activeWorkspaceId: string = await getRecord(STORAGE_KEYS.ACTIVE_WORKSPACE_ID);
 
   const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   newSessionViewer.classList.add("rq-element");
 
+  const iframeUrlParams = new URLSearchParams();
+  if (userId) iframeUrlParams.set("userId", userId);
+  if (activeWorkspaceId) iframeUrlParams.set("workspaceId", activeWorkspaceId);
+
   newSessionViewer.setAttribute(
     "session-src",
-    `${config.WEB_URL}/iframe/sessions/draft/iframe?${userId ? `userId=${userId}` : ""}`
+    `${config.WEB_URL}/iframe/sessions/draft/iframe?${iframeUrlParams.toString()}`
   );
 
   document.documentElement.appendChild(newSessionViewer);

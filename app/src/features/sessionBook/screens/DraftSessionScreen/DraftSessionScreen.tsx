@@ -17,6 +17,7 @@ import { toast } from "utils/Toast";
 import PATHS from "config/constants/sub/paths";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 
 export interface DraftSessionViewerProps {
   desktopMode?: boolean;
@@ -39,6 +40,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
   const tempTabId = useParams().tabId;
   const tabId = useMemo(() => (desktopMode ? TabId.IMPORTED : tempTabId), [desktopMode, tempTabId]);
   const isImportedSession = tabId === TabId.IMPORTED;
+
   const isOpenedInIframe = useMemo(() => location.pathname.includes("iframe") && isAppOpenedInIframe(), [
     location.pathname,
   ]);
@@ -156,6 +158,18 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
       trackSessionRecordingFailed(loadingError);
     }
   }, [loadingError]);
+
+  useEffect(() => {
+    if (isOpenedInIframe) {
+      window.parent.postMessage(
+        {
+          action: "draftSessionViewerLoaded",
+          source: GLOBAL_CONSTANTS.CLIENT_SOURCE.SESSIONBEAR,
+        },
+        "*"
+      );
+    }
+  }, [isOpenedInIframe]);
 
   if (isLoading) {
     return <PageLoader message="Loading draft session..." />;
