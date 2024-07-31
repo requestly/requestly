@@ -5,6 +5,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 2147483647;
 }
 
 #draft-session-view {
@@ -19,10 +20,10 @@
 
 #draft-view-close-btn {
   position: absolute;
-  top: 3vh;
-  right: 6.5vw;
-  width: 40px;
-  height: 40px;
+  top: 4vh;
+  right: 4vw;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -36,9 +37,10 @@
 }
 
 #draft-session-iframe {
-  width: 85vw;
-  height: 90vh;
-  border: none;
+  width: 90vw;
+  height: 95vh;
+  max-width: 1300px;
+  max-height: 700px;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0px 16px 24px -4px rgba(0, 0, 0, 0.32);

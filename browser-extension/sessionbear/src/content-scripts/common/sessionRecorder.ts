@@ -1,4 +1,6 @@
-import { CLIENT_MESSAGES, CUSTOM_ELEMENTS, EXTENSION_MESSAGES } from "../../constants";
+import config from "../../config";
+import { CLIENT_MESSAGES, CLIENT_SOURCE, CUSTOM_ELEMENTS, EXTENSION_MESSAGES, STORAGE_KEYS } from "../../constants";
+import { getRecord } from "../../storage";
 import { SessionRecordingConfig } from "../../types";
 
 type SendResponseCallback = (payload: unknown) => void;
@@ -146,7 +148,7 @@ const addListeners = () => {
   });
 
   window.addEventListener("message", function (event) {
-    if (event.source !== window || event.data.source !== "requestly:client") {
+    if (event.data.source !== CLIENT_SOURCE.SESSIONBEAR) {
       return;
     }
 
@@ -179,6 +181,13 @@ const addListeners = () => {
       chrome.runtime.sendMessage({
         action: CLIENT_MESSAGES.NOTIFY_SESSION_RECORDING_STOPPED,
       });
+    } else if (event.data.action === "draftSessionSaveClicked") {
+      console.log("Draft session save clicked");
+      hideDraftSessionViewer();
+      showPostSessionSaveWidget();
+    } else if (event.data.action === "draftSessionSaved") {
+      const { payload } = event.data;
+      showDraftSessionSavedWidget(payload.sessionId);
     }
   });
 
@@ -203,7 +212,7 @@ const sendResponseToRuntime = (action: string, payload: unknown) => {
 };
 
 const sendMessageToClient = (action: string, payload: unknown, sendResponseCallback?: SendResponseCallback) => {
-  window.postMessage({ source: "requestly:extension", action, payload }, window.location.href);
+  window.postMessage({ source: "sessionbear:extension", action, payload }, window.location.href);
   if (sendResponseCallback) {
     sendResponseCallbacks[action] = sendResponseCallback;
   }
@@ -315,13 +324,26 @@ const showToast = () => {
   document.documentElement.appendChild(rqToast);
 };
 
-const injectDraftSessionViewer = () => {
+const injectDraftSessionViewer = async () => {
   const exisitingSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   if (exisitingSessionViewer) {
     exisitingSessionViewer.remove();
   }
+  const postSaveSessionWidget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  if (postSaveSessionWidget) {
+    postSaveSessionWidget.remove();
+  }
+
+  const userId = await getRecord(STORAGE_KEYS.USER_ID);
 
   const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  newSessionViewer.classList.add("rq-element");
+
+  newSessionViewer.setAttribute(
+    "session-src",
+    `${config.WEB_URL}/iframe/sessions/draft/iframe?${userId ? `userId=${userId}` : ""}`
+  );
+
   document.documentElement.appendChild(newSessionViewer);
 };
 
@@ -336,4 +358,36 @@ const viewDraftSession = () => {
       })
     );
   });
+};
+
+const hideDraftSessionViewer = () => {
+  const draftSessionViewer = document.querySelector(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
+  if (draftSessionViewer) {
+    draftSessionViewer.dispatchEvent(new CustomEvent("hide-draft-session-viewer"));
+  }
+};
+
+const showPostSessionSaveWidget = () => {
+  const widget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  if (widget) {
+    widget.remove();
+  }
+
+  const postSessionSaveWidget = document.createElement(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  postSessionSaveWidget.classList.add("rq-element");
+  document.documentElement.appendChild(postSessionSaveWidget);
+
+  postSessionSaveWidget.addEventListener("view-saved-session-clicked", (event: CustomEvent) => {
+    const sessionURL = `${config.WEB_URL}/sessions/saved/${event.detail.sessionId}`;
+    window.open(sessionURL, "_blank");
+  });
+
+  postSessionSaveWidget.addEventListener("close-post-session-save-widget-clicked", () => {
+    postSessionSaveWidget.remove();
+  });
+};
+
+const showDraftSessionSavedWidget = (sessionId: string) => {
+  const postSessionSaveWidget = document.querySelector(CUSTOM_ELEMENTS.POST_SESSION_SAVE_WIDGET);
+  postSessionSaveWidget.dispatchEvent(new CustomEvent("show-draft-session-saved-widget", { detail: { sessionId } }));
 };
