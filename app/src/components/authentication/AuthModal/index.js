@@ -46,6 +46,7 @@ const AuthModal = ({
         wrapClassName="auth-modal-wrapper"
         closable={false}
         width={920}
+        maskClosable={false}
       >
         <AuthScreen
           isOpen={false}

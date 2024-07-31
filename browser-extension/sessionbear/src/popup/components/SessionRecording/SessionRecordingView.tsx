@@ -87,7 +87,7 @@ const SessionRecordingView: React.FC = () => {
 
   const handleViewLastFiveMinReplay = useCallback(() => {
     if (!isUserLoggedIn) {
-      window.open(`${config.WEB_URL}/sessions`, "_blank");
+      window.open(`${config.WEB_URL}/sessions?loginRequired`, "_blank");
       return;
     }
     viewRecordingOnClick();
@@ -95,7 +95,7 @@ const SessionRecordingView: React.FC = () => {
 
   const handleManualRecordingButtonClick = useCallback(() => {
     if (!isUserLoggedIn) {
-      window.open(`${config.WEB_URL}/sessions`, "_blank");
+      window.open(`${config.WEB_URL}/sessions?loginRequired`, "_blank");
       return;
     }
     if (isRecordingInManualMode) {
