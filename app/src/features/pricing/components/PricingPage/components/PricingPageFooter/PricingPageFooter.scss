@@ -1,0 +1,179 @@
+.pricing-page-footer {
+  width: 100%;
+  margin-top: 60px;
+
+  .banner {
+    padding: 0 48px;
+    margin-bottom: 12px;
+
+    .backed-by {
+      width: 880px;
+      height: 142px;
+      block-size: auto;
+      max-inline-size: 100%;
+      border-radius: 8px;
+    }
+  }
+
+  .footer {
+    padding: 48px;
+    gap: 48px;
+
+    width: 100%;
+    background: #000000;
+    border-top: var(--seats, 1px) solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+    position: relative;
+
+    .mascot {
+      display: none;
+      width: 290px;
+      height: 208px;
+      block-size: auto;
+      max-inline-size: 100%;
+      position: absolute;
+      top: 46px;
+      transform: translateY(-100%);
+      right: 0px;
+      z-index: 1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+
+      .rq-logo-container {
+        .rq-logo {
+          width: 200px;
+          height: 48px;
+          block-size: auto;
+          max-inline-size: 100%;
+        }
+
+        .caption {
+          margin-top: 24px;
+          color: #fff;
+          font-size: 17px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 28px; /* 164.706% */
+          letter-spacing: 0.25px;
+
+          .highlight {
+            color: #00dec4;
+            font-size: 17px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 28px;
+            letter-spacing: 0.25px;
+          }
+        }
+      }
+
+      .add-to-chrome-container {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+
+        .get-started {
+          color: var(--requestly-color-text-default, #fff);
+          font-size: 17px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 28px; /* 164.706% */
+          letter-spacing: 0.25px;
+        }
+
+        .add-to-chrome-btn.ant-btn {
+          height: 32px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--requestly-color-text-default, #fff);
+          text-align: center;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 21px; /* 150% */
+          padding: 4px 12px;
+
+          .chrome-logo {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+
+    .content {
+      .ant-row.links-container {
+        margin: 48px 0;
+
+        .title {
+          color: var(--requestly-color-white, #fff);
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 21px; /* 150% */
+          letter-spacing: 0.25px;
+          margin-bottom: 24px;
+        }
+
+        a.ant-typography {
+          color: var(--requestly-color-text-subtle);
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 21px; /* 150% */
+        }
+      }
+
+      .socials-continer {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        color: var(--requestly-color-white, #fff);
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 21px; /* 150% */
+        letter-spacing: 0.25px;
+
+        .socials {
+          margin-left: auto;
+          flex-shrink: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: var(--space-6, 16px);
+
+          .follow-us {
+            margin-right: 16px;
+          }
+
+          a.ant-typography img {
+            display: flex;
+            width: 48px;
+            height: 48px;
+            padding: 8px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .pricing-page-footer .footer .header {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 1000px) {
+  .pricing-page-footer .footer .mascot {
+    display: block;
+  }
+}
