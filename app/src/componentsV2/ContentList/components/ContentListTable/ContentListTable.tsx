@@ -11,15 +11,24 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import "./contentListTable.scss";
 
-interface DraggableBodyRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+interface DraggableBodyRowProps<DataType> extends React.HTMLAttributes<HTMLTableRowElement> {
   index: number;
   recordId: string;
-  onRowDrop: (sourceRecordId: string, targetRecordId: string) => void;
+  record: DataType;
+  onRowDrop: (sourceRecord: DataType, targetRecord: DataType) => void;
 }
 
 const DRAGGABLE_ELEMENT_TYPE = "DraggableContentListRow";
 
-const DraggableBodyRow = ({ index, onRowDrop, className, style, recordId, ...restProps }: DraggableBodyRowProps) => {
+const DraggableBodyRow = <DataType extends { [key: string]: any }>({
+  index,
+  onRowDrop,
+  className,
+  style,
+  recordId,
+  record,
+  ...restProps
+}: DraggableBodyRowProps<DataType>) => {
   const ref = useRef<HTMLTableRowElement>(null);
   const [{ isOver, dropClassName }, drop] = useDrop({
     accept: DRAGGABLE_ELEMENT_TYPE,
@@ -41,14 +50,14 @@ const DraggableBodyRow = ({ index, onRowDrop, className, style, recordId, ...res
       };
     },
 
-    drop: (sourceItem: { index: number; recordId: string }) => {
-      onRowDrop(sourceItem.recordId, recordId);
+    drop: (sourceItem: { index: number; recordId: string; record: DataType }) => {
+      onRowDrop(sourceItem.record, record);
     },
   });
 
   const [, drag] = useDrag({
     type: DRAGGABLE_ELEMENT_TYPE,
-    item: { index, recordId },
+    item: { index, recordId, record },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -79,7 +88,7 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   locale: TableProps<DataType>["locale"];
   onRecordSelection?: (selectedRows: DataType[]) => void;
   dragAndDrop?: boolean;
-  onRowDropped?: (sourceRecordId: string, targetRecordId: string, expandRow: (id: string) => void) => void;
+  onRowDropped?: (sourceRecordId: string, targetRecordId: string) => void;
 }
 
 const ContentListTable = <DataType extends { [key: string]: any }>({
@@ -103,9 +112,8 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
   const isDragAndDropEnabled = useFeatureIsOn("content_table_drag_and_drop_support");
 
-  const handleOnExpandClick = useCallback(
+  const expandRow = useCallback(
     (expanded: boolean, record: DataType) => {
-      Logger.log("handleOnExpandClick", expanded, record);
       let updatedExpandedRowKeys = new Set(expandedRowKeys);
       if (expanded) {
         updatedExpandedRowKeys = updatedExpandedRowKeys.add(record[rowKey]);
@@ -127,6 +135,14 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     [expandedRowKeys, id, rowKey]
   );
 
+  const handleOnExpandClick = useCallback(
+    (expanded: boolean, record: DataType) => {
+      Logger.log("handleOnExpandClick", expanded, record);
+      expandRow(expanded, record);
+    },
+    [expandRow]
+  );
+
   useEffect(() => {
     const expandedRowsData = localStorage.getItem(EXPANDED_ROWS_LOCAL_STORAGE_KEY);
     const currentListTableExpandedRows = expandedRowsData ? JSON.parse(expandedRowsData)[id] : [];
@@ -141,20 +157,14 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
     },
   };
 
-  const expandRow = useCallback(
-    (id: string) => {
-      let updatedExpandedRowKeys = new Set(expandedRowKeys);
-      updatedExpandedRowKeys = updatedExpandedRowKeys.add(id);
-      setExpandedRowsKeys(Array.from(updatedExpandedRowKeys));
-    },
-    [expandedRowKeys]
-  );
-
   const onRowDrop = useCallback(
-    (sourceRecordId: string, targetRecordId: string) => {
-      onRowDropped(sourceRecordId, targetRecordId, expandRow);
+    (sourceRecord: DataType, targetRecord: DataType) => {
+      onRowDropped(sourceRecord?.[rowKey], targetRecord?.[rowKey]);
+      if (targetRecord?.children) {
+        expandRow(true, targetRecord);
+      }
     },
-    [onRowDropped, expandRow]
+    [onRowDropped, rowKey, expandRow]
   );
 
   const commonProps: TableProps<DataType> = {
@@ -216,7 +226,8 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
               const attr = {
                 index,
                 onRowDrop,
-                recordId: record.id,
+                recordId: record[rowKey],
+                record: record,
                 ...onRowAttr,
               };
 

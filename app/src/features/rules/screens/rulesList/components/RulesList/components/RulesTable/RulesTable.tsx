@@ -159,7 +159,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   };
 
   const onRowDropped: ContentListTableProps<RuleTableRecord>["onRowDropped"] = useCallback(
-    (sourceRecordId, targetRecordId, expandRow) => {
+    (sourceRecordId, targetRecordId) => {
       if (!sourceRecordId || !targetRecordId) {
         return;
       }
@@ -174,11 +174,11 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       if (dragRecord?.objectType === RecordType.RULE) {
         if (targetRecord?.objectType === RecordType.GROUP) {
           if (dragRecord?.groupId !== targetRecord?.id) {
-            updateGroupOnDrop(dragRecord, targetRecord?.id, () => expandRow(targetRecord?.id));
+            updateGroupOnDrop(dragRecord, targetRecord?.id);
           }
         } else if (targetRecord?.objectType === RecordType.RULE) {
           if ((dragRecord?.groupId !== targetRecord?.groupId, dragRecord)) {
-            updateGroupOnDrop(dragRecord, targetRecord?.groupId, () => expandRow(targetRecord?.groupId));
+            updateGroupOnDrop(dragRecord, targetRecord?.groupId);
           }
         }
       }

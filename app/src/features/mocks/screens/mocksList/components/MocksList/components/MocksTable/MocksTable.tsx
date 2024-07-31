@@ -131,7 +131,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
   );
 
   const onRowDropped: ContentListTableProps<RQMockMetadataSchema>["onRowDropped"] = useCallback(
-    (dragRecordId, targetRecordId, expandRow) => {
+    (dragRecordId, targetRecordId) => {
       if (!dragRecordId || !targetRecordId) {
         return;
       }
