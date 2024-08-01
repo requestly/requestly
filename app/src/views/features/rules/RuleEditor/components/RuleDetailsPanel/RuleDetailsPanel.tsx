@@ -71,7 +71,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ source, isSa
           <div className="description">{description}</div>
 
           <div className="use-cases-container">
-            <div className="title">Use cases</div>
+            {isSample ? null : <div className="title">Use cases</div>}
 
             <ul className="use-cases-list">
               {useCases?.length > 0 &&
