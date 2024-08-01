@@ -24,6 +24,7 @@ import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/Rul
 import "./Help.scss";
 import "react-notion/src/styles.css";
 import "prismjs/themes/prism-tomorrow.css";
+import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
 
 const externalLinks: ExternalLink[] = [
   {
@@ -166,7 +167,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
         </Row>
 
         <div className="rule-editor-help-content">
-          {!isDocsVisible ? <RuleDetailsPanel ruleType={ruleType} source="docs_sidebar" /> : null}
+          {!isDocsVisible ? <RuleDetailsPanel ruleDetails={RULE_DETAILS[ruleType]} source="docs_sidebar" /> : null}
 
           {isDocsVisible ? (
             <>
