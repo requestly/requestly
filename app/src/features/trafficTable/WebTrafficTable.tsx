@@ -3,6 +3,7 @@ import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { startInterception } from "actions/ExtensionActions";
 import { RQNetworkTable } from "lib/design-system/components";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
+import "./webNetworkTable.scss";
 
 const WebTrafficTable: React.FC = () => {
   const [logs, setLogs] = useState<RQNetworkLog[]>([]);
@@ -19,8 +20,7 @@ const WebTrafficTable: React.FC = () => {
             {
               id: message.details.requestId,
               entry: {
-                time: message.details.timestamp,
-                startedDateTime: String(message.details.timestamp),
+                time: message.details.timeStamp,
                 request: {
                   url: message.details.url,
                   method: message.details.method,
@@ -36,7 +36,15 @@ const WebTrafficTable: React.FC = () => {
     });
   }, []);
 
-  return <RQNetworkTable logs={logs} />;
+  return (
+    <div
+      style={{
+        height: "100%",
+      }}
+    >
+      <RQNetworkTable logs={logs} />
+    </div>
+  );
 };
 
 export default WebTrafficTable;
