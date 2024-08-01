@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFeatureIsOn, useFeatureValue } from "@growthbook/growthbook-react";
 import { Empty } from "antd";
 import useRuleTableColumns from "./hooks/useRuleTableColumns";
@@ -12,7 +12,13 @@ import { RiUserSharedLine } from "@react-icons/all-files/ri/RiUserSharedLine";
 import { RiFolderSharedLine } from "@react-icons/all-files/ri/RiFolderSharedLine";
 import { MdOutlineToggleOn } from "@react-icons/all-files/md/MdOutlineToggleOn";
 import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
-import { getIsAppBannerVisible, getUserAuthDetails } from "store/selectors";
+import {
+  getAppMode,
+  getIsAppBannerVisible,
+  getIsImportSampleRules,
+  getIsRefreshRulesPending,
+  getUserAuthDetails,
+} from "store/selectors";
 import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
 import { getAllRecords } from "store/features/rules/selectors";
@@ -25,6 +31,8 @@ import {
   withContentListTableContext,
 } from "componentsV2/ContentList";
 import { useRulesActionContext } from "features/rules/context/actions";
+import { importSampleRules } from "../../utils";
+import { actions } from "store";
 import "./rulesTable.css";
 
 interface Props {
@@ -37,9 +45,13 @@ interface Props {
 const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecordsMap }) => {
   const { selectedRows, clearSelectedRows } = useContentListTableContext();
 
+  const dispatch = useDispatch();
+  const appMode = useSelector(getAppMode);
   const user = useSelector(getUserAuthDetails);
   const allRecords = useSelector(getAllRecords);
   const isAppBannerVisible = useSelector(getIsAppBannerVisible);
+  const isImportSampleRules = useSelector(getIsImportSampleRules);
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
 
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
   const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
@@ -56,6 +68,30 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
     recordsStatusUpdateAction,
     updateGroupOnDrop,
   } = useRulesActionContext();
+
+  const isRuleExist = allRecords?.length > 0;
+  useEffect(() => {
+    if (!isImportSampleRules) {
+      return;
+    }
+
+    if (!isRuleExist) {
+      return;
+    }
+
+    importSampleRules(user, appMode).then(() => {
+      // @ts-ignore
+      dispatch(actions.updateIsImportSampleRules(false));
+
+      dispatch(
+        // @ts-ignore
+        actions.updateRefreshPendingStatus({
+          type: "rules",
+          newValue: !isRulesListRefreshPending,
+        })
+      );
+    });
+  }, [user, appMode, isRuleExist, isImportSampleRules, isRulesListRefreshPending]);
 
   useEffect(() => {
     const enhancedRecords = enhanceRecords(records, allRecordsMap);
