@@ -1,5 +1,5 @@
 import { FilterType } from "componentsV2/ContentList";
-import { Group, RecordStatus, StorageRecord } from "features/rules/types/rules";
+import { RecordStatus, StorageRecord } from "features/rules/types/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { Rule } from "../../../../../types/rules";
@@ -94,10 +94,7 @@ export const importSampleRules = async (user: User, appMode: AppMode) => {
 
   processDataToImport(sampleRules, user)
     .then((result) => {
-      const processedRulesToImport = (result.data as (Rule | Group)[]).map((record) => ({
-        ...record,
-        status: RecordStatus.ACTIVE,
-      }));
+      const processedRulesToImport = result.data;
 
       addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
         // NOOP
