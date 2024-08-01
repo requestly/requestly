@@ -62,6 +62,9 @@ const RuleBuilder = (props) => {
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
 
+  const isSampleRule = currentlySelectedRuleData?.isSample;
+  const isReadOnly = currentlySelectedRuleData?.isReadOnly;
+
   const enableDocs = useMemo(() => {
     return !props.isSharedListViewRule;
   }, [props.isSharedListViewRule]);
@@ -253,8 +256,8 @@ const RuleBuilder = (props) => {
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">
-          {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
-            <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
+          {isSampleRule || (MODE === RuleEditorMode.CREATE && isDetailsPanelShown) ? (
+            <RuleDetailsPanel isSample ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
           ) : null}
 
           <Body
