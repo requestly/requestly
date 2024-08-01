@@ -5,17 +5,16 @@ import { Row, Col } from "antd";
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 import APP_CONSTANTS from "../../../../../config/constants";
-import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
 import "./RuleBuilderBody.css";
 
-const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
+const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
 

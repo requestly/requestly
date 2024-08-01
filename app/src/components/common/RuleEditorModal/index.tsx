@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, Row, message, Dropdown, Menu, Typography } from "antd";
 import { MoreOutlined, CloseCircleOutlined } from "@ant-design/icons";
@@ -50,7 +50,6 @@ interface props {
 const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEventEditorViewedSource }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation();
   const appMode = useSelector(getAppMode);
   const { ruleEditorModal } = useSelector(getActiveModals);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -208,7 +207,7 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
               />
               <Col span={7}>
                 <Row align="middle" justify="end" wrap={false} className="rule-editor-modal-actions">
-                  <RuleStatusButton location={window.location} isRuleEditorModal={true} />
+                  <RuleStatusButton isRuleEditorModal={true} />
                   {mode === EditorMode.EDIT && (
                     <>
                       <DeleteButton
@@ -225,7 +224,6 @@ const RuleEditorModal: React.FC<props> = ({ isOpen, handleModalClose, analyticEv
                   )}
 
                   <CreateRuleButton
-                    location={location}
                     isRuleEditorModal={true}
                     ruleEditorModalMode={mode}
                     analyticEventRuleCreatedSource={"rule_editor_modal_header"}
