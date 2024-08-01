@@ -12,15 +12,17 @@
   }
 
   .search-filter.ant-input-affix-wrapper {
-    width: 200px;
+    width: 170px;
     padding: 0 4px;
     font-size: 13px;
     align-self: flex-end;
 
     input.ant-input {
       padding: 4px;
+      height: 24px;
     }
   }
+
   .btn-group-filters-wrapper {
     align-self: center;
     position: relative;
