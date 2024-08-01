@@ -24,6 +24,7 @@ import {
 } from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
+import { startSendingInterceptedLogs, stopSendingInterceptedLogs } from "./webRequestInterceptor";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -147,21 +148,12 @@ export const initMessageHandler = () => {
         break;
 
       case "startInterception":
-        const port = chrome.tabs.connect(sender.tab.id);
-        const onCompletedListerner = (details: any) => {
-          port.postMessage({ action: "onCompleted", details });
-          chrome.runtime.lastError;
-        };
+        startSendingInterceptedLogs(sender.tab.id);
+        break;
 
-        if (!chrome.webRequest.onCompleted.hasListener(onCompletedListerner)) {
-          chrome.webRequest.onCompleted.addListener(onCompletedListerner, { urls: ["<all_urls>"] });
-        }
-
-        chrome.tabs.onRemoved.addListener((tabId) => {
-          if (tabId === sender.tab.id) {
-            chrome.webRequest.onCompleted.removeListener(onCompletedListerner);
-          }
-        });
+      case "stopInterception":
+        stopSendingInterceptedLogs();
+        break;
     }
 
     return false;

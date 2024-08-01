@@ -133,3 +133,9 @@ export const startInterception = () => {
     action: "startInterception",
   });
 };
+
+export const stopInterception = () => {
+  return sendMessage({
+    action: "stopInterception",
+  });
+};
