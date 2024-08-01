@@ -24,7 +24,7 @@ const RuleEditor = (props) => {
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
-  const { MODE } = useMemo(() => getModeData(location, props.isSharedListViewRule), [
+  const { MODE, RULE_TYPE_TO_CREATE } = useMemo(() => getModeData(location, props.isSharedListViewRule), [
     location,
     props.isSharedListViewRule,
   ]);
@@ -72,7 +72,7 @@ const RuleEditor = (props) => {
 
   const ruleEditor = useMemo(() => {
     return (
-      <Col className="overflow-hidden h-full">
+      <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full">
         {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? <EditorHeader mode={MODE} /> : null}
 
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
@@ -99,7 +99,7 @@ const RuleEditor = (props) => {
         )}
       </Col>
     );
-  }, [MODE, appMode]);
+  }, [MODE, RULE_TYPE_TO_CREATE, appMode]);
 
   switch (appMode) {
     case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:
