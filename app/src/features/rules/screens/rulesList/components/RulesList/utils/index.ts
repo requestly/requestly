@@ -94,7 +94,7 @@ export const getSampleRules = async () => {
       .filter((template) => sampleRuleTemplateIds.includes(template.id))
       .map((template) => ({
         ...template.data.ruleData,
-        isEditable: false,
+        isReadOnly: true,
         isSample: true,
         lastModifiedBy: null,
         createdBy: null,

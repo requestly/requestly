@@ -20,12 +20,14 @@ interface TitleProps {
   mode?: "create" | "edit";
   tagText?: string;
   defaultName?: string;
+  disabled?: boolean;
 }
 
 const { TextArea } = Input;
 
 export const RQEditorTitle: React.FC<TitleProps> = ({
   name,
+  disabled = false,
   showDocs = false,
   description,
   nameChangeCallback,
@@ -70,6 +72,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
           {name.length === 0 || isNameEditable ? (
             <div className="editor-title-name-wrapper">
               <Input
+                disabled={disabled}
                 ref={nameInputRef}
                 data-tour-id="rule-editor-title"
                 className={`${errors?.name && !name ? "error" : null} editor-title-input`}
@@ -90,18 +93,23 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
               <Typography.Text
                 ellipsis={true}
                 onClick={() => {
+                  if (disabled) {
+                    return;
+                  }
+
                   setIsNameEditable(true);
                 }}
               >
                 {name ? name : namePlaceholder}
               </Typography.Text>
-              <BiPencil onClick={() => setIsNameEditable(true)} />
+              {disabled ? null : <BiPencil onClick={() => setIsNameEditable(true)} />}
             </div>
           )}
         </Row>
         <Row className="editor-title-description">
           {isDescriptionEditable ? (
             <TextArea
+              disabled={disabled}
               ref={textAreaRef}
               autoSize={{ minRows: 1, maxRows: 3 }}
               // onFocus={() => setIsDescriptionEditable(true)}
@@ -124,7 +132,13 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                   icon:
                     description.length > 0 ? (
                       <RQButton
-                        onClick={() => setIsDescriptionEditable(true)}
+                        onClick={() => {
+                          if (disabled) {
+                            return;
+                          }
+
+                          setIsDescriptionEditable(true);
+                        }}
                         className="edit-description-btn"
                         type="text"
                       >
@@ -135,7 +149,13 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                     ),
                   tooltip: false,
                 }}
-                onClick={() => setIsDescriptionEditable(true)}
+                onClick={() => {
+                  if (disabled) {
+                    return;
+                  }
+
+                  setIsDescriptionEditable(true);
+                }}
               >
                 <span>{description ? description : descriptionPlaceholder}</span>
               </Typography.Paragraph>
