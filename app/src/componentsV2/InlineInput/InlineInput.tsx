@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Row, Input, Typography } from "antd";
 import { MdOutlineEdit } from "@react-icons/all-files/md/MdOutlineEdit";
 import "./inlineInput.scss";
@@ -22,6 +22,21 @@ export const InlineInput: React.FC<Props> = ({
 }) => {
   const [isEditable, setIsEditable] = useState(false);
 
+  const commonInputProps = useMemo(() => {
+    return {
+      autoFocus: true,
+      spellCheck: false,
+      placeholder: placeholder,
+      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(e.target.value),
+      onPressEnter: () => setIsEditable(false),
+      onFocus: () => setIsEditable(true),
+      onBlur: () => {
+        setIsEditable(false);
+        onBlur?.();
+      },
+    };
+  }, [placeholder, onChange, onBlur]);
+
   return (
     <div className="inline-input-container">
       <Row className="inline-input-row">
@@ -29,36 +44,13 @@ export const InlineInput: React.FC<Props> = ({
           <>
             {textarea ? (
               <Input.TextArea
+                {...commonInputProps}
                 className="active-inline-textarea"
                 value={value}
-                spellCheck={false}
-                autoFocus={true}
-                placeholder={placeholder}
                 autoSize={{ minRows: 2, maxRows: 4 }}
-                onChange={(e) => onChange(e.target.value)}
-                onPressEnter={() => setIsEditable(false)}
-                onFocus={() => setIsEditable(true)}
-                onBlur={() => {
-                  setIsEditable(false);
-                  onBlur?.();
-                }}
               />
             ) : (
-              <Input
-                className="active-inline-input"
-                onFocus={() => setIsEditable(true)}
-                onBlur={() => {
-                  setIsEditable(false);
-                  onBlur?.();
-                }}
-                bordered={false}
-                autoFocus={true}
-                spellCheck={false}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-                onPressEnter={() => setIsEditable(false)}
-              />
+              <Input {...commonInputProps} className="active-inline-input" bordered={false} value={value} />
             )}
           </>
         ) : (
