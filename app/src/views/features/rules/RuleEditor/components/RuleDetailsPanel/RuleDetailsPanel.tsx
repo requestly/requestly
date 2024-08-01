@@ -18,11 +18,12 @@ import PATHS from "config/constants/sub/paths";
 import "./RuleDetailsPanel.scss";
 
 interface RuleDetailsPanelProps {
+  isSample?: boolean;
   ruleType: RuleType | undefined;
   source: "docs_sidebar" | "new_rule_editor";
 }
 
-export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, source }) => {
+export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, source, isSample = false }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -49,9 +50,11 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
 
   return !ruleType ? null : (
     <div key={ruleType} className="rule-details-panel-container">
-      <span className="close-btn" onClick={handleCloseClick}>
-        <MdClose className="anticon" />
-      </span>
+      {!isSample ? (
+        <span className="close-btn" onClick={handleCloseClick}>
+          <MdClose className="anticon" />
+        </span>
+      ) : null}
 
       <div className="details-panel">
         <div className="rule-details-container">

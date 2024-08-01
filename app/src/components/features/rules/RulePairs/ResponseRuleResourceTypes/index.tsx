@@ -32,6 +32,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
   const { getFeatureLimitValue } = useFeatureLimiter();
+  const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const requestPayloadFilter = currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
 
@@ -79,6 +80,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
         <Radio.Group
+          disabled={isSampleRule}
           value={responseRuleResourceType}
           onChange={(e) => {
             if (e.target.value !== ResponseRuleResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);

@@ -55,7 +55,7 @@ interface RecordMetaData {
   lastModifiedBy: string;
   modificationDate: number;
   isSample?: boolean;
-  isEditable?: boolean;
+  isReadOnly?: boolean;
 }
 
 export interface RuleRecord extends RecordMetaData {

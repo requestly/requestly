@@ -39,12 +39,14 @@ interface GraphqlRequestPayloadProps {
   pairIndex: number;
   gqlOperationFilter: RequestPayload;
   setGqlOperationFilter: React.Dispatch<React.SetStateAction<RequestPayload>>;
+  isInputDisabled?: boolean;
 }
 
 const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
   pairIndex,
   gqlOperationFilter,
   setGqlOperationFilter,
+  isInputDisabled = false,
 }) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -146,6 +148,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
         <Row wrap={true} gutter={[4, 8]}>
           <Col span={24} lg={8}>
             <Input
+              disabled={isInputDisabled}
               name="key"
               type="text"
               autoComplete="off"
@@ -158,6 +161,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           {isFeatureCompatible(FEATURES.GRAPHQL_PAYLOAD_FILTER_OPERATOR) && (
             <Col span={24} sm={14} md={8} lg={5}>
               <Select
+                disabled={isInputDisabled}
                 className="graphql-operation-filter-operator"
                 options={[
                   { value: "Equals", label: "Equals" },
@@ -170,6 +174,7 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
           )}
           <Col span={24} lg={9}>
             <Input
+              disabled={isInputDisabled}
               name="value"
               type="text"
               autoComplete="off"
@@ -180,7 +185,12 @@ const GraphqlRequestPayload: React.FC<GraphqlRequestPayloadProps> = ({
             />
           </Col>
           <Col span={1}>
-            <Button type="link" className="graphql-operation-filter-reset-button" onClick={clearRequestPayload}>
+            <Button
+              type="link"
+              disabled={isInputDisabled}
+              className="graphql-operation-filter-reset-button"
+              onClick={clearRequestPayload}
+            >
               Reset
             </Button>
           </Col>
