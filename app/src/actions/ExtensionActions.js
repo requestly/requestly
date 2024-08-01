@@ -127,3 +127,9 @@ export function testRuleOnUrl(testOptions) {
     record,
   });
 }
+
+export const startInterception = () => {
+  return sendMessage({
+    action: "startInterception",
+  });
+};
