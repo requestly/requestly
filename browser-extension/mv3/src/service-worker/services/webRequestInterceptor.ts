@@ -93,9 +93,10 @@ const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDe
   }
 
   if (webAppPort && interceptedRequestLogs[details.requestId]) {
+    console.log("!!!debug", "details.statuscode", details.statusCode, details.statusLine);
     interceptedRequestLogs[details.requestId] = {
       ...interceptedRequestLogs[details.requestId],
-      details,
+      ...details,
     };
 
     sendInterceptedLog(interceptedRequestLogs[details.requestId]);
