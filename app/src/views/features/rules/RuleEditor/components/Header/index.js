@@ -38,8 +38,6 @@ const Header = ({ mode }) => {
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const allRecordsMap = useSelector(getAllRecordsMap);
 
-  console.log("currentlySelectedRuleData", currentlySelectedRuleData);
-
   const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const { recordStatusToggleAction } = useRulesActionContext();
