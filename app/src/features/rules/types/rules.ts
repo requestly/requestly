@@ -54,6 +54,8 @@ interface RecordMetaData {
   currentOwner: string;
   lastModifiedBy: string;
   modificationDate: number;
+  isSample?: boolean;
+  isEditable?: boolean;
 }
 
 export interface RuleRecord extends RecordMetaData {
@@ -284,3 +286,12 @@ export type Rule =
 export interface Group extends GroupRecord {}
 
 export type StorageRecord = Rule | Group; // todo: rename
+
+export type RuleTemplate = {
+  id: string;
+  name: string;
+  description: string;
+  data: {
+    ruleData: Rule | Group;
+  };
+};
