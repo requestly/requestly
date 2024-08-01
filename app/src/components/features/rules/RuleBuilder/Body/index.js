@@ -17,6 +17,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
   const appMode = useSelector(getAppMode);
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
+  const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
@@ -50,6 +51,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
       <div className="rule-editor-title-container">
         {!isSharedListView && (
           <RQEditorTitle
+            disabled={isSampleRule}
             mode={mode}
             errors={ruleErrors}
             showDocs={showDocs}
@@ -78,7 +80,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
               <Row justify="end">
                 <Col span={24}>
                   {mode !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
-                    <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+                    <AddPairButton disabled={isSampleRule} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
                   ) : null}
                 </Col>
               </Row>
