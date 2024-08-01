@@ -256,7 +256,13 @@ const RuleBuilder = (props) => {
           {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
             <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
           ) : null}
-          <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+
+          <Body
+            mode={MODE}
+            showDocs={isDocsVisible}
+            currentlySelectedRuleData={currentlySelectedRuleData}
+            currentlySelectedRuleConfig={currentlySelectedRuleConfig}
+          />
         </Col>
       </Row>
 
