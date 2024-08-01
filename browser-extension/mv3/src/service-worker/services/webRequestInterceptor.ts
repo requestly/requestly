@@ -5,6 +5,10 @@ import rulesStorageService from "../../rulesStorageService";
 import { isUrlInBlockList, isExtensionEnabled } from "../../utils";
 import { Variable, onVariableChange } from "../variable";
 
+let webAppPort: chrome.runtime.Port | null = null;
+let webAppPortTabId: number | null = null;
+const interceptedRequestLogs: Record<string, any> = {};
+
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {
   // @ts-ignore
   if (details?.documentLifecycle !== "active") {
@@ -15,6 +19,10 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
 
   if ((await isUrlInBlockList(details.initiator)) || (await isUrlInBlockList(details.url))) {
     return;
+  }
+
+  if (webAppPort) {
+    interceptedRequestLogs[details.requestId] = details;
   }
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {
@@ -49,6 +57,10 @@ const onBeforeSendHeaders = async (details: chrome.webRequest.WebRequestHeadersD
     return;
   }
 
+  if (webAppPort && interceptedRequestLogs[details.requestId]) {
+    interceptedRequestLogs[details.requestId].requestHeaders = details.requestHeaders;
+  }
+
   rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
@@ -80,6 +92,17 @@ const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDe
     return;
   }
 
+  if (webAppPort && interceptedRequestLogs[details.requestId]) {
+    interceptedRequestLogs[details.requestId] = {
+      ...interceptedRequestLogs[details.requestId],
+      details,
+    };
+
+    sendInterceptedLog(interceptedRequestLogs[details.requestId]);
+
+    delete interceptedRequestLogs[details.requestId];
+  }
+
   rulesStorageService.getEnabledRules().then((enabledRules) => {
     enabledRules.forEach((rule) => {
       switch (rule.ruleType) {
@@ -102,11 +125,12 @@ const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDe
   });
 };
 
-export const addListeners = () => {
+const addListeners = () => {
   //@ts-ignore
   if (!chrome.webRequest.onBeforeRequest.hasListener(onBeforeRequest)) {
+    const onBeforeRequestOptions = ["requestBody"];
     //@ts-ignore
-    chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ["<all_urls>"] });
+    chrome.webRequest.onBeforeRequest.addListener(onBeforeRequest, { urls: ["<all_urls>"] }, onBeforeRequestOptions);
   }
 
   //@ts-ignore
@@ -141,6 +165,31 @@ const removeListeners = () => {
   chrome.webRequest.onBeforeSendHeaders.removeListener(onBeforeSendHeaders);
   //@ts-ignore
   chrome.webRequest.onHeadersReceived.removeListener(onHeadersReceived);
+};
+
+const sendInterceptedLog = (requestDetails: any) => {
+  webAppPort?.postMessage({ action: "webRequestIntercepted", requestDetails });
+};
+
+export const startSendingInterceptedLogs = (tabId: chrome.tabs.Tab["id"]) => {
+  console.log("!!!debug", "startSendingInterceptedLogs");
+  if (!webAppPort) {
+    webAppPort = chrome.tabs.connect(tabId, { name: "rq-web-request-interceptor" });
+    webAppPortTabId = tabId;
+  }
+
+  chrome.tabs.onRemoved.addListener((id) => {
+    if (webAppPortTabId === id) {
+      stopSendingInterceptedLogs();
+    }
+  });
+};
+
+export const stopSendingInterceptedLogs = () => {
+  if (webAppPort) {
+    webAppPort.disconnect();
+    webAppPort = null;
+  }
 };
 
 export const initWebRequestInterceptor = () => {

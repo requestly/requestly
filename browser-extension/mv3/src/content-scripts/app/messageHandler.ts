@@ -126,6 +126,7 @@ export const initMessageHandler = () => {
           case EXTENSION_MESSAGES.START_RECORDING_ON_URL:
           case EXTENSION_MESSAGES.TEST_RULE_ON_URL:
           case "startInterception":
+          case "stopInterception":
             delegateMessageToBackground(event.data);
         }
       }
