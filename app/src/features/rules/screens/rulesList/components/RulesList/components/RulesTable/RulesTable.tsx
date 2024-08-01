@@ -23,15 +23,14 @@ import { toast } from "utils/Toast";
 import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
 import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
-import { enhanceRecords, normalizeRecords } from "./utils/rules";
 import {
   ContentListTable,
   ContentListTableProps,
   useContentListTableContext,
   withContentListTableContext,
 } from "componentsV2/ContentList";
+import { enhanceRecords, importSampleRules, normalizeRecords } from "./utils/rules";
 import { useRulesActionContext } from "features/rules/context/actions";
-import { importSampleRules } from "../../utils";
 import { actions } from "store";
 import "./rulesTable.css";
 

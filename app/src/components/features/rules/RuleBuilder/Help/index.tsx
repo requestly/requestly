@@ -25,7 +25,7 @@ import "./Help.scss";
 import "react-notion/src/styles.css";
 import "prismjs/themes/prism-tomorrow.css";
 import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
-import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/constants";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { useSelector } from "react-redux";
 

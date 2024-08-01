@@ -1,13 +1,7 @@
 import { FilterType } from "componentsV2/ContentList";
-import { Group, RecordStatus, RecordType, Rule, StorageRecord } from "features/rules/types/rules";
+import { RecordStatus, Rule, StorageRecord } from "features/rules/types/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import Logger from "lib/logger";
-import { getTemplates } from "backend/rules";
-import { User } from "types";
-import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/modals/ImportRulesModal/actions";
-import { AppMode } from "utils/syncing/SyncUtils";
-import { sampleRuleDetails } from "../constants";
 
 // FIXME: Performance Improvements
 // TODO: REname
@@ -61,48 +55,4 @@ export const sendIndividualRuleTypesCountAttributes = (rules: Rule[]) => {
       submitAttrUtil(ruleType + "_rules", ruleTypesCountMap[ruleType]);
     });
   }
-};
-
-export const getSampleRules = async () => {
-  try {
-    const templates = await getTemplates();
-
-    const sampleRules = templates
-      .filter((template) => !!sampleRuleDetails[template.id])
-      .map((template) => ({
-        ...template.data.ruleData,
-        sampleId: template.id,
-        isReadOnly: true,
-        isSample: true,
-        lastModifiedBy: null,
-        createdBy: null,
-        currentOwner: null,
-      }));
-
-    return sampleRules;
-  } catch (error) {
-    Logger.log("Something went wrong while fetching sample rules!", error);
-    return null;
-  }
-};
-
-export const importSampleRules = async (user: User, appMode: AppMode) => {
-  const sampleRules = await getSampleRules();
-
-  return processDataToImport(sampleRules, user)
-    .then((result) => {
-      const processedRulesToImport = result.data as (Rule | Group)[];
-
-      return addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
-        const groupIdsToExpand = processedRulesToImport.reduce(
-          (result, record) => (record.objectType === RecordType.GROUP ? [...result, record.id] : result),
-          []
-        );
-
-        return groupIdsToExpand;
-      });
-    })
-    .catch((error) => {
-      Logger.log("Something went wrong while importing sample rules!", error);
-    });
 };
