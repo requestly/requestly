@@ -137,7 +137,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@requestly-ui/resource-table": "^0.1.7",
+    "@requestly-ui/resource-table": "^0.1.8",
     "@requestly/web-sdk": "0.14.3",
     "@types/chrome": "^0.0.217",
     "@types/file-saver": "^2.0.5",
