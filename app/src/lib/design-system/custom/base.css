@@ -150,6 +150,10 @@
   align-self: center;
 }
 
+.align-self-start {
+  align-self: flex-start;
+}
+
 .items-center {
   display: flex;
   align-items: center;

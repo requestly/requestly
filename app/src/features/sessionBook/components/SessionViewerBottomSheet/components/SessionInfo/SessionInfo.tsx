@@ -72,6 +72,7 @@ export const SessionInfo: React.FC = () => {
         label: "Description",
         value: (
           <InlineInput
+            textarea
             value={sessionMetadata?.description}
             placeholder="Enter session description"
             onChange={(value: string) => {

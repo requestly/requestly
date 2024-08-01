@@ -33,15 +33,18 @@
       }
 
       svg {
-        align-self: center;
         cursor: pointer;
-        width: 1rem;
-        height: 1rem;
+        width: 14px;
+        height: 14px;
         min-width: 14px;
         color: var(--requestly-color-text-subtle);
         transition: color 0.2s;
         position: relative;
         top: -1px;
+
+        &.align-self-start {
+          top: 3px;
+        }
 
         &:hover {
           color: var(--requestly-color-text-default);
