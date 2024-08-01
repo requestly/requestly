@@ -80,10 +80,8 @@ export const getSampleRules = async () => {
         currentOwner: null,
       }));
 
-    console.log("sampleRules", sampleRules);
     return sampleRules;
   } catch (error) {
-    console.log("Something went wrong while fetching sample rules!", error);
     Logger.log("Something went wrong while fetching sample rules!", error);
     return null;
   }
@@ -92,16 +90,13 @@ export const getSampleRules = async () => {
 export const importSampleRules = async (user: User, appMode: AppMode) => {
   const sampleRules = await getSampleRules();
 
-  processDataToImport(sampleRules, user)
+  return processDataToImport(sampleRules, user)
     .then((result) => {
       const processedRulesToImport = result.data;
 
-      addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
-        // NOOP
-      });
+      return addRulesAndGroupsToStorage(appMode, processedRulesToImport);
     })
     .catch((error) => {
-      console.log("Something went wrong while importing sample rules!", error);
       Logger.log("Something went wrong while importing sample rules!", error);
     });
 };
