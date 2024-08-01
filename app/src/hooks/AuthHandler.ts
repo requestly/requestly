@@ -178,10 +178,10 @@ const AuthHandler: React.FC<{}> = () => {
   );
 
   useEffect(() => {
-    if (queryPrarams.get("userToken") && isAppOpenedInIframe()) {
-      const userToken = queryPrarams.get("userToken");
+    if (queryPrarams.get("refreshToken") && isAppOpenedInIframe()) {
+      const refreshToken = queryPrarams.get("refreshToken");
       const getCustomToken = httpsCallable(getFunctions(), "auth-generateCustomToken");
-      getCustomToken({ userToken }).then(
+      getCustomToken({ refreshToken }).then(
         (res: {
           data: {
             success: boolean;
@@ -221,7 +221,7 @@ const AuthHandler: React.FC<{}> = () => {
       if (user) {
         Logger.timeLog("AuthHandler-preloader", "User found");
         StorageService(appMode).saveRecord({
-          [GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN]: user.refreshToken,
+          [GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN]: user.refreshToken,
         });
 
         blockingOperations(user).then((success: boolean) => {
@@ -238,7 +238,7 @@ const AuthHandler: React.FC<{}> = () => {
         window.isSyncEnabled = null;
         window.keySetDoneisSyncEnabled = true;
         localStorage.removeItem("__rq_uid");
-        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.USER_TOKEN);
+        StorageService(appMode).removeRecord(GLOBAL_CONSTANTS.STORAGE_KEYS.REFRESH_TOKEN);
         // set amplitude anon id to local storage:
 
         dispatch(
