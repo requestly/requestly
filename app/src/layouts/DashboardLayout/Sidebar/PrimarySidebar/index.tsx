@@ -47,6 +47,13 @@ export const PrimarySidebar: React.FC = () => {
         display: appMode !== GLOBAL_CONSTANTS.APP_MODES.DESKTOP,
       },
       {
+        id: 89,
+        title: "Web traffic",
+        path: PATHS.WEB_TRAFFIC_TABLE.RELATIVE,
+        icon: <NetworkTrafficIcon />,
+        display: true,
+      },
+      {
         id: 1,
         title: "Network traffic",
         path: PATHS.DESKTOP.INTERCEPT_TRAFFIC.RELATIVE,

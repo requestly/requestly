@@ -145,6 +145,23 @@ export const initMessageHandler = () => {
       case EXTENSION_MESSAGES.NOTIFY_RECORD_UPDATED_IN_POPUP:
         sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED });
         break;
+
+      case "startInterception":
+        const port = chrome.tabs.connect(sender.tab.id);
+        const onCompletedListerner = (details: any) => {
+          port.postMessage({ action: "onCompleted", details });
+          chrome.runtime.lastError;
+        };
+
+        if (!chrome.webRequest.onCompleted.hasListener(onCompletedListerner)) {
+          chrome.webRequest.onCompleted.addListener(onCompletedListerner, { urls: ["<all_urls>"] });
+        }
+
+        chrome.tabs.onRemoved.addListener((tabId) => {
+          if (tabId === sender.tab.id) {
+            chrome.webRequest.onCompleted.removeListener(onCompletedListerner);
+          }
+        });
     }
 
     return false;

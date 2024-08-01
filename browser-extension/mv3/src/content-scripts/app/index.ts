@@ -20,3 +20,10 @@ isExtensionEnabled().then((isExtensionStatusEnabled) => {
     initSessionRecording();
   }
 });
+
+chrome.runtime.onConnect.addListener((port) => {
+  port.onMessage.addListener((message) => {
+    const requestDetails = message.details;
+    window.top.postMessage({ action: "rq-web-request", details: requestDetails }, window.origin);
+  });
+});

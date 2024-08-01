@@ -15,6 +15,7 @@ import { IncentiveTasksListScreen } from "features/incentivization";
 import { ImportFromCharlesWrapperView } from "features/rules/screens/rulesList/components/RulesList/components";
 import { ImportFromModheaderWrapperView } from "features/rules/screens/rulesList/components/RulesList/components/ImporterComponents/ModheaderImporter/ImportFromModheaderScreen";
 import SeleniumImporter from "views/misc/SeleniumImporter";
+import WebTrafficTable from "features/trafficTable/WebTrafficTable";
 
 export const miscRoutes: RouteObject[] = [
   {
@@ -69,6 +70,10 @@ export const miscRoutes: RouteObject[] = [
   {
     path: PATHS.HOME.RELATIVE,
     element: <Home />,
+  },
+  {
+    path: PATHS.WEB_TRAFFIC_TABLE.RELATIVE,
+    element: <WebTrafficTable />,
   },
   {
     path: PATHS.APPSUMO.RELATIVE,
