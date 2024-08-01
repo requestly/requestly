@@ -8,6 +8,7 @@ import { getTemplates } from "backend/rules";
 import { User } from "types";
 import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/modals/ImportRulesModal/actions";
 import { AppMode } from "utils/syncing/SyncUtils";
+import { sampleRuleDetails } from "../constants";
 
 // FIXME: Performance Improvements
 // TODO: REname
@@ -65,35 +66,13 @@ export const sendIndividualRuleTypesCountAttributes = (rules: Rule[]) => {
 
 export const getSampleRules = async () => {
   try {
-    // LOCAL
-    // TODO: move this into constants file as a map
-    const sampleRuleTemplateIds = [
-      "9ywxyfxsaaVbfBAJN24f",
-      "BpDkxdUAdbSdOJLriwxp",
-      "G2EXbUD9B2QiOhgsrtHl",
-      "OqFoyPdEUPnQrBEkqjxR",
-      "bSEtct1DF1Xgn1Y7okas",
-      "jR46qxwfXEMT9SrPzC8L",
-      "z6FShnq5xbbnAu8H4JS0",
-    ];
-
-    // // PROD
-    // const sampleRuleTemplateIds = [
-    //   "9ywxyfxsaaVbfBAJN24f",
-    //   "BpDkxdUAdbSdOJLriwxp",
-    //   "G2EXbUD9B2QiOhgsrtHl",
-    //   "OqFoyPdEUPnQrBEkqjxR",
-    //   "bSEtct1DF1Xgn1Y7okas",
-    //   "jR46qxwfXEMT9SrPzC8L",
-    //   "z6FShnq5xbbnAu8H4JS0",
-    // ];
-
     const templates = await getTemplates();
 
     const sampleRules = templates
-      .filter((template) => sampleRuleTemplateIds.includes(template.id))
+      .filter((template) => !!sampleRuleDetails[template.id])
       .map((template) => ({
         ...template.data.ruleData,
+        sampleId: template.id,
         isReadOnly: true,
         isSample: true,
         lastModifiedBy: null,
