@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tooltip } from "antd";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "utils/Toast.js";
 //UTILS
 import {
@@ -99,7 +99,6 @@ const getEventParams = (rule) => {
 
 // This is also the save rule button
 const CreateRuleButton = ({
-  location,
   isDisabled = false,
   isRuleEditorModal = false, // indicates if rendered from rule editor modal
   analyticEventRuleCreatedSource = "rule_editor_screen_header",
@@ -107,6 +106,7 @@ const CreateRuleButton = ({
   ruleEditorModalMode = APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE,
 }) => {
   //Constants
+  const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const ruleCreatedEventSource =

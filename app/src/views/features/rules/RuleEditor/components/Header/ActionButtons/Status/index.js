@@ -16,9 +16,10 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PREMIUM_RULE_TYPES } from "features/rules";
 import APP_CONSTANTS from "config/constants";
 import { saveRule, validateSyntaxInRule as validateAndTransformSyntaxInRule } from "../actions";
+import { useLocation } from "react-router-dom";
 
-const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
-  //Global State
+const Status = ({ isDisabled = false, isRuleEditorModal }) => {
+  const location = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const allRules = useSelector(getAllRules);
