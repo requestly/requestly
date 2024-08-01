@@ -22,7 +22,17 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
   }
 
   if (webAppPort) {
-    interceptedRequestLogs[details.requestId] = details;
+    let rqRequestBody: string | Record<any, any> = details.requestBody?.formData;
+
+    if (details.requestBody?.raw?.[0]?.bytes) {
+      rqRequestBody = new TextDecoder("utf-8").decode(details.requestBody.raw[0].bytes);
+    }
+    // console.log("!!!debug", "onBeforeRequest", details.requestBody, details.url, JSONRequestBody);
+
+    interceptedRequestLogs[details.requestId] = {
+      ...details,
+      rqRequestBody,
+    };
   }
 
   rulesStorageService.getEnabledRules().then((enabledRules) => {
@@ -93,7 +103,6 @@ const onHeadersReceived = async (details: chrome.webRequest.WebResponseHeadersDe
   }
 
   if (webAppPort && interceptedRequestLogs[details.requestId]) {
-    console.log("!!!debug", "details.statuscode", details.statusCode, details.statusLine);
     interceptedRequestLogs[details.requestId] = {
       ...interceptedRequestLogs[details.requestId],
       ...details,

@@ -45,8 +45,7 @@ const WebTrafficTable: React.FC = () => {
                 headers: requestDetails.requestHeaders ?? [],
                 queryString: [],
                 postData: {
-                  text:
-                    JSON.stringify(requestDetails.requestBody?.formData ?? {}) || requestDetails.requestBody?.raw || "",
+                  text: JSON.stringify(requestDetails.rqRequestBody),
                 },
               },
               response: {
