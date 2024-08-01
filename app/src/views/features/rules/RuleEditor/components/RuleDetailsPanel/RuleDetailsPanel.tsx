@@ -23,7 +23,7 @@ import { ExampleType, UseCaseExample } from "./types";
 import "./RuleDetailsPanel.scss";
 
 export type RuleDetails = {
-  type: RuleType;
+  type: RuleType | string;
   name: string;
   icon?: () => ReactNode;
   description: string;
