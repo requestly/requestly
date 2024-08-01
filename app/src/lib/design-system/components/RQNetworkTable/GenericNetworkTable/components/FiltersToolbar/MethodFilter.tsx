@@ -2,7 +2,7 @@ import React from "react";
 import { Col, Row } from "antd";
 import { RQButton } from "lib/design-system/components/RQButton";
 
-const methods = ["GET", "POST", "PUT"];
+const methods = ["GET", "POST", "PUT", "PATCH"];
 
 interface MethodFilterProps {
   methodFilters: string[];
