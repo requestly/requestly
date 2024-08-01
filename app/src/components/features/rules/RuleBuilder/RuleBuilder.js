@@ -41,7 +41,7 @@ import { m } from "framer-motion";
 import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
 import { RuleEditorMode } from "features/rules";
 import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
-import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/constants";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -65,7 +65,6 @@ const RuleBuilder = (props) => {
   const appMode = useSelector(getAppMode);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const isReadOnly = currentlySelectedRuleData?.isReadOnly;
 
   const enableDocs = useMemo(() => {
     return !props.isSharedListViewRule;

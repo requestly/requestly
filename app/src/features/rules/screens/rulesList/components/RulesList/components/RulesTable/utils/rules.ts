@@ -1,6 +1,12 @@
 import { isGroup, isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../types";
-import { Rule, StorageRecord, RecordStatus, Group } from "features/rules";
+import { Rule, StorageRecord, RecordStatus, Group, RecordType } from "features/rules";
+import Logger from "lib/logger";
+import { getTemplates } from "backend/rules";
+import { User } from "types";
+import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/modals/ImportRulesModal/actions";
+import { AppMode } from "utils/syncing/SyncUtils";
+import { sampleRuleDetails } from "../constants";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
@@ -95,4 +101,48 @@ export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRe
   if (record.groupId?.length && allRecordsMap[record.groupId]?.status === RecordStatus.INACTIVE) {
     return true;
   } else return false;
+};
+
+export const getSampleRules = async () => {
+  try {
+    const templates = await getTemplates();
+
+    const sampleRules = templates
+      .filter((template) => !!sampleRuleDetails[template.id])
+      .map((template) => ({
+        ...template.data.ruleData,
+        sampleId: template.id,
+        isReadOnly: true,
+        isSample: true,
+        lastModifiedBy: null,
+        createdBy: null,
+        currentOwner: null,
+      }));
+
+    return sampleRules;
+  } catch (error) {
+    Logger.log("Something went wrong while fetching sample rules!", error);
+    return null;
+  }
+};
+
+export const importSampleRules = async (user: User, appMode: AppMode) => {
+  const sampleRules = await getSampleRules();
+
+  return processDataToImport(sampleRules, user)
+    .then((result) => {
+      const processedRulesToImport = result.data as (Rule | Group)[];
+
+      return addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
+        const groupIdsToExpand = processedRulesToImport.reduce(
+          (result, record) => (record.objectType === RecordType.GROUP ? [...result, record.id] : result),
+          []
+        );
+
+        return groupIdsToExpand;
+      });
+    })
+    .catch((error) => {
+      Logger.log("Something went wrong while importing sample rules!", error);
+    });
 };
