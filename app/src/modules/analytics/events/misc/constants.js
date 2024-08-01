@@ -138,4 +138,5 @@ export const SUPPORT_OPTION = {
   CLICKED: "support_option_clicked",
   JOIN_SLACK_CLICKED: "join_slack_connect_clicked",
   OPENED: "support_options_opened",
+  SLACK_CONNECT_VISIBLE: "join_slack_connect_viewed",
 };

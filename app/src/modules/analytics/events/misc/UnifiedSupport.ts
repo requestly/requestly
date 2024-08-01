@@ -17,4 +17,8 @@ const trackSupportOptionOpened = () => {
   trackEvent(SUPPORT_OPTION.OPENED);
 };
 
-export { trackSupportOptionClicked, trackSlackConnectClicked, trackSupportOptionOpened };
+const trackSlackButtonVisible = () => {
+  trackEvent(SUPPORT_OPTION.SLACK_CONNECT_VISIBLE);
+};
+
+export { trackSupportOptionClicked, trackSlackConnectClicked, trackSupportOptionOpened, trackSlackButtonVisible };

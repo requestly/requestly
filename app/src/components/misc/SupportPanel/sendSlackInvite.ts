@@ -12,8 +12,9 @@ export default async function sendSlackInvite() {
     .then((res) => {
       if (res.data) {
         message.success({
-          content: "Slack invitation sent successfully",
+          content: "Please check your email and accept the Slack invite!",
           className: "slack-connect-toast",
+          duration: 4,
         });
       }
     })
