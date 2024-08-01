@@ -41,7 +41,7 @@ import { m } from "framer-motion";
 import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
 import { RuleEditorMode } from "features/rules";
 import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
-import { sampleRulesData } from "features/rules/screens/rulesList/components/RulesList/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -264,7 +264,7 @@ const RuleBuilder = (props) => {
               source="new_rule_editor"
               ruleDetails={
                 isSampleRule
-                  ? sampleRulesData[currentlySelectedRuleData.sampleId].details
+                  ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details
                   : RULE_DETAILS[currentlySelectedRuleData?.ruleType]
               }
             />

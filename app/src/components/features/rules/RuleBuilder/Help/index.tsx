@@ -25,7 +25,7 @@ import "./Help.scss";
 import "react-notion/src/styles.css";
 import "prismjs/themes/prism-tomorrow.css";
 import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
-import { sampleRulesData } from "features/rules/screens/rulesList/components/RulesList/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import { getCurrentlySelectedRuleData } from "store/selectors";
 import { useSelector } from "react-redux";
 
@@ -176,7 +176,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
             <RuleDetailsPanel
               isSample={isSampleRule}
               ruleDetails={
-                isSampleRule ? sampleRulesData[currentlySelectedRuleData.sampleId].details : RULE_DETAILS[ruleType]
+                isSampleRule ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details : RULE_DETAILS[ruleType]
               }
               source="docs_sidebar"
             />
