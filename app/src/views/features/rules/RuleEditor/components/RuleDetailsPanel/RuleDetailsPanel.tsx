@@ -17,7 +17,7 @@ import PATHS from "config/constants/sub/paths";
 import "./RuleDetailsPanel.scss";
 
 export type RuleDetails = {
-  type: RuleType;
+  type: RuleType | string;
   name: string;
   icon?: () => ReactNode;
   description: string;
