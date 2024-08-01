@@ -89,6 +89,7 @@ export interface ContentListTableProps<DataType> extends TableProps<DataType> {
   onRecordSelection?: (selectedRows: DataType[]) => void;
   dragAndDrop?: boolean;
   onRowDropped?: (sourceRecordId: string, targetRecordId: string) => void;
+  defaultExpandedRowKeys?: string[];
 }
 
 const ContentListTable = <DataType extends { [key: string]: any }>({
@@ -107,9 +108,10 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   onRow: onRowCallback = (record: DataType) => ({}),
   dragAndDrop = false,
   onRowDropped = () => {},
+  defaultExpandedRowKeys = [],
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
-  const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
+  const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([...defaultExpandedRowKeys]);
   const isDragAndDropEnabled = useFeatureIsOn("content_table_drag_and_drop_support");
 
   const expandRow = useCallback(

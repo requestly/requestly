@@ -1,8 +1,7 @@
 import { FilterType } from "componentsV2/ContentList";
-import { RecordStatus, StorageRecord } from "features/rules/types/rules";
+import { Group, RecordStatus, RecordType, Rule, StorageRecord } from "features/rules/types/rules";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { Rule } from "../../../../../types/rules";
 import Logger from "lib/logger";
 import { getTemplates } from "backend/rules";
 import { User } from "types";
@@ -92,9 +91,16 @@ export const importSampleRules = async (user: User, appMode: AppMode) => {
 
   return processDataToImport(sampleRules, user)
     .then((result) => {
-      const processedRulesToImport = result.data;
+      const processedRulesToImport = result.data as (Rule | Group)[];
 
-      return addRulesAndGroupsToStorage(appMode, processedRulesToImport);
+      return addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
+        const groupIdsToExpand = processedRulesToImport.reduce(
+          (result, record) => (record.objectType === RecordType.GROUP ? [...result, record.id] : result),
+          []
+        );
+
+        return groupIdsToExpand;
+      });
     })
     .catch((error) => {
       Logger.log("Something went wrong while importing sample rules!", error);

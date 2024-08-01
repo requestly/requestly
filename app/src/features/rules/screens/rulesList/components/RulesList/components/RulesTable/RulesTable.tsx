@@ -53,6 +53,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const isImportSampleRules = useSelector(getIsImportSampleRules);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
 
+  const [groupIdsToExpand, setGroupIdsToExpand] = useState<string[]>([]);
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
   const [isPremiumRulesToggleChecked, setIsPremiumRulesToggleChecked] = useState(false);
   const [isBulkRecordsStatusUpdating, setIsBulkRecordsStatusUpdating] = useState(false);
@@ -79,7 +80,11 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       return;
     }
 
-    importSampleRules(user, appMode).then(() => {
+    importSampleRules(user, appMode).then((groupIdsToExpand: string[]) => {
+      if (groupIdsToExpand?.length > 0) {
+        setGroupIdsToExpand(groupIdsToExpand);
+      }
+
       // @ts-ignore
       dispatch(actions.updateIsImportSampleRules(false));
 
@@ -231,6 +236,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
         onRowDropped={onRowDropped}
         id="rules-list-table"
         className="rules-list-table"
+        defaultExpandedRowKeys={groupIdsToExpand}
         size="middle"
         scroll={{ y: getTableScrollHeight() }}
         columns={columns}
