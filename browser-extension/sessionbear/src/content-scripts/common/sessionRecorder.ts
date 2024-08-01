@@ -343,14 +343,14 @@ const injectDraftSessionViewer = async () => {
     postSaveSessionWidget.remove();
   }
 
-  const userToken: string = await getRecord(STORAGE_KEYS.USER_TOKEN);
+  const refreshToken: string = await getRecord(STORAGE_KEYS.REFRESH_TOKEN);
   const activeWorkspaceId: string = await getRecord(STORAGE_KEYS.ACTIVE_WORKSPACE_ID);
 
   const newSessionViewer = document.createElement(CUSTOM_ELEMENTS.DRAFT_SESSION_VIEWER);
   newSessionViewer.classList.add("rq-element");
 
   const iframeUrlParams = new URLSearchParams();
-  if (userToken) iframeUrlParams.set("userToken", userToken);
+  if (refreshToken) iframeUrlParams.set("refreshToken", refreshToken);
   if (activeWorkspaceId) iframeUrlParams.set("workspaceId", activeWorkspaceId);
 
   newSessionViewer.setAttribute(

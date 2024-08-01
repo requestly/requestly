@@ -190,6 +190,6 @@ export const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
 };
 
 export const getIsUserLoggedIn = async () => {
-  const userToken = await getRecord(STORAGE_KEYS.USER_TOKEN);
-  return !!userToken;
+  const refreshToken = await getRecord(STORAGE_KEYS.REFRESH_TOKEN);
+  return !!refreshToken;
 };
