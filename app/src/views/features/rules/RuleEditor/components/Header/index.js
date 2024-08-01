@@ -1,7 +1,11 @@
 import { useEffect, useMemo } from "react";
 import { Row, Col, Layout, Divider, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { getGroupwiseRulesToPopulate } from "store/selectors";
+import {
+  getCurrentlySelectedRuleConfig,
+  getCurrentlySelectedRuleData,
+  getGroupwiseRulesToPopulate,
+} from "store/selectors";
 import { actions } from "store";
 import Status from "./ActionButtons/Status";
 import ActionButtons from "./ActionButtons";
@@ -21,10 +25,13 @@ import {
 import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { RQButton } from "lib/design-system/components";
+import { useLocation } from "react-router-dom";
 
-const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
+const Header = ({ mode }) => {
   const dispatch = useDispatch();
-
+  const location = useLocation();
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const allRecordsMap = useSelector(getAllRecordsMap);
 
@@ -74,7 +81,7 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
               <HelpButton />
             </Col>
             <Col>
-              <Status location={location} />
+              <Status />
             </Col>
             {isRuleGroupDisabled && (
               <Col className="rule-editor-header-disabled-group-warning">
@@ -107,7 +114,7 @@ const Header = ({ mode, location, currentlySelectedRuleData, currentlySelectedRu
               <TestRuleButton />
             </Col>
             <Col>
-              <ActionButtons location={location} />
+              <ActionButtons mode={mode} />
             </Col>
           </Row>
         </Col>
