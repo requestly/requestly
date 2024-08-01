@@ -1,6 +1,6 @@
 import { CloseOutlined, SlackOutlined } from "@ant-design/icons";
 import { Badge, Button, Dropdown } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PiChatTeardropTextFill } from "@react-icons/all-files/pi/PiChatTeardropTextFill";
 import { BsFillChatLeftTextFill } from "@react-icons/all-files/bs/BsFillChatLeftTextFill";
 import { PiRedditLogo } from "@react-icons/all-files/pi/PiRedditLogo";
@@ -17,7 +17,11 @@ import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import useFetchSlackInviteVisibility from "./useSlackInviteVisibility";
 import sendSlackInvite from "./sendSlackInvite";
 import { trackEvent } from "modules/analytics";
-import { trackSupportOptionClicked, trackSupportOptionOpened } from "modules/analytics/events/misc/UnifiedSupport";
+import {
+  trackSlackButtonVisible,
+  trackSupportOptionClicked,
+  trackSupportOptionOpened,
+} from "modules/analytics/events/misc/UnifiedSupport";
 
 const SupportPanel = () => {
   const user = useSelector(getUserAuthDetails);
@@ -28,6 +32,9 @@ const SupportPanel = () => {
   const isSlackConnectOn = useFeatureIsOn("slack_connect");
   const isSlackInviteVisible = useFetchSlackInviteVisibility();
   const isSupportChatOpened = useSelector(getIsSupportChatOpened);
+  useEffect(() => {
+    isSlackConnectOn && isSlackInviteVisible && trackSlackButtonVisible();
+  }, [isSlackInviteVisible, isSlackConnectOn]);
   const supportItems = useMemo(
     () =>
       [
