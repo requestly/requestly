@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation } from "react-router-dom";
 import { Col } from "antd";
 import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
 import ProCard from "@ant-design/pro-card";
-import {
-  getAppMode,
-  getCurrentlySelectedRuleConfig,
-  getCurrentlySelectedRuleData,
-  getIsCurrentlySelectedRuleHasUnsavedChanges,
-  getIsExtensionEnabled,
-} from "store/selectors";
+import { getAppMode, getIsCurrentlySelectedRuleHasUnsavedChanges, getIsExtensionEnabled } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import ExtensionDeactivationMessage from "components/misc/ExtensionDeactivationMessage";
 import EditorHeader from "./components/Header";
@@ -26,14 +20,14 @@ const RuleEditor = (props) => {
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
   const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
-  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
-  const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
-  const { MODE } = getModeData(location, props.isSharedListViewRule);
+  const { MODE } = useMemo(() => getModeData(location, props.isSharedListViewRule), [
+    location,
+    props.isSharedListViewRule,
+  ]);
 
   useEffect(() => {
     const unloadListener = (e) => {
@@ -76,17 +70,11 @@ const RuleEditor = (props) => {
     }
   }, [state?.source, MODE]);
 
-  const renderRuleEditor = () => {
+  const ruleEditor = useMemo(() => {
     return (
       <Col className="overflow-hidden h-full">
-        {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
-          <EditorHeader
-            mode={MODE}
-            location={location}
-            currentlySelectedRuleData={currentlySelectedRuleData}
-            currentlySelectedRuleConfig={currentlySelectedRuleConfig}
-          />
-        ) : null}
+        {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? <EditorHeader mode={MODE} /> : null}
+
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
           <ProCard
             className={`rule-editor-procard ${
@@ -111,22 +99,18 @@ const RuleEditor = (props) => {
         )}
       </Col>
     );
-  };
+  }, [MODE, appMode]);
 
-  const handleDeviceView = () => {
-    switch (appMode) {
-      case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:
-        if (!isExtensionEnabled) {
-          return <ExtensionDeactivationMessage />;
-        }
-        return renderRuleEditor();
-      case GLOBAL_CONSTANTS.APP_MODES.DESKTOP:
-      default:
-        return renderRuleEditor();
-    }
-  };
-
-  return handleDeviceView();
+  switch (appMode) {
+    case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:
+      if (!isExtensionEnabled) {
+        return <ExtensionDeactivationMessage />;
+      }
+      return ruleEditor;
+    case GLOBAL_CONSTANTS.APP_MODES.DESKTOP:
+    default:
+      return ruleEditor;
+  }
 };
 
 export default RuleEditor;
