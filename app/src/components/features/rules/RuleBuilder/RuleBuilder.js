@@ -40,6 +40,7 @@ import { useHasChanged } from "hooks";
 import { m } from "framer-motion";
 import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
 import { RuleEditorMode } from "features/rules";
+import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -257,7 +258,11 @@ const RuleBuilder = (props) => {
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">
           {isSampleRule || (MODE === RuleEditorMode.CREATE && isDetailsPanelShown) ? (
-            <RuleDetailsPanel isSample ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
+            <RuleDetailsPanel
+              isSample
+              source="new_rule_editor"
+              ruleDetails={RULE_DETAILS[currentlySelectedRuleData?.ruleType]}
+            />
           ) : null}
 
           <Body
