@@ -114,7 +114,10 @@ export const SessionsOnboardingView: React.FC<SessionOnboardingViewProps> = ({ i
         <Row justify="space-between" className="onboarding-banner">
           <Col span={isModalView ? 24 : 12} className="banner-text-container">
             <Row className="banner-header">
-              <Title className="banner-title">Debug issues faster with SessionBook</Title>
+              <Title className="banner-title">
+                Debug issues faster with{" "}
+                {appFlavour === GLOBAL_CONSTANTS.APP_FLAVOURS.SESSIONBEAR ? "SessionBear" : "SessionBook"}
+              </Title>
             </Row>
             <Row className="banner-description">
               <Text type="secondary" className="banner-text w-full">
