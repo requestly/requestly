@@ -1,5 +1,4 @@
 .rule-selection-list-container {
-  font-family: Inter;
   width: 100%;
   max-width: 400px;
   display: flex;
@@ -65,7 +64,6 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
-        font-family: Inter;
         overflow: hidden;
 
         .title {
