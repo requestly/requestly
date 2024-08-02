@@ -32,3 +32,7 @@ export enum RuleActionType {
   MODIFY_HEADERS = "modifyHeaders",
   ALLOW_ALL_REQUESTS = "allowAllRequests",
 }
+
+export type ChromeWebRequestLog = chrome.webRequest.WebRequestBodyDetails &
+  chrome.webRequest.WebRequestHeadersDetails &
+  chrome.webRequest.WebResponseHeadersDetails;

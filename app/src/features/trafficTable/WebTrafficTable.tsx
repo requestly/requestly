@@ -16,6 +16,7 @@ import { copyToClipBoard } from "utils/Misc";
 import { RuleType } from "types";
 import { RQNetworkTableProps } from "lib/design-system/components/RQNetworkTable";
 import RuleEditorModal from "components/common/RuleEditorModal";
+import { convertWebRequestLogToRQNetworkLog } from "./utils";
 
 const extraColumns: GenericNetworkTableProps<RQNetworkLog>["extraColumns"] = [
   {
@@ -54,9 +55,6 @@ const WebTrafficTable: React.FC = () => {
           newProps: { ruleData, ruleType: key },
         })
       );
-
-      // trackRuleCreationWorkflowStartedEvent(key, "modal");
-      // trackSessionRecordingNetworkLogContextMenuOptionClicked(`${snakeCase(key as string)}_rule`);
     },
     [dispatch]
   );
@@ -178,32 +176,7 @@ const WebTrafficTable: React.FC = () => {
     PageScriptMessageHandler.addMessageListener("webRequestIntercepted", (message) => {
       const { requestDetails } = message;
       setLogs((prevLogs) => {
-        return [
-          ...prevLogs,
-          {
-            id: requestDetails.requestId,
-            entry: {
-              startedDateTime: new Date(requestDetails.timeStamp).toLocaleTimeString(),
-              request: {
-                url: requestDetails.url,
-                method: requestDetails.method,
-                headers: requestDetails.requestHeaders ?? [],
-                queryString: [],
-                postData: {
-                  text: JSON.stringify(requestDetails.rqRequestBody),
-                },
-              },
-              response: {
-                headers: requestDetails.responseHeaders ?? [],
-                status: requestDetails.statusCode,
-                content: {
-                  text: requestDetails.responseBody || "",
-                },
-                type: requestDetails.type,
-              },
-            },
-          },
-        ];
+        return [...prevLogs, convertWebRequestLogToRQNetworkLog(requestDetails)];
       });
     });
 

@@ -33,10 +33,6 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
       }
     }
 
-    if (details.url.includes("graphql")) {
-      console.log("!!!debug", "graphql", details, rqRequestBody);
-    }
-
     interceptedRequestLogs[details.requestId] = {
       ...details,
       rqRequestBody,
