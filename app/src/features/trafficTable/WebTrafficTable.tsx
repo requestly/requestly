@@ -24,7 +24,7 @@ const extraColumns: GenericNetworkTableProps<RQNetworkLog>["extraColumns"] = [
     width: 7,
     priority: 4,
     render: (log) => {
-      return <span>{log.entry.response.content.mimeType}</span>;
+      return <span>{log.entry.response.type}</span>;
     },
   },
 ];
@@ -164,15 +164,15 @@ const WebTrafficTable: React.FC = () => {
     setSelectedRequestData(null);
   }, []);
 
-  const handleStartInterception = () => {
+  const handleStartInterception = useCallback(() => {
     startInterception();
     setIsInterceptionStarted(true);
-  };
+  }, []);
 
-  const handleStopInterception = () => {
+  const handleStopInterception = useCallback(() => {
     stopInterception();
     setIsInterceptionStarted(false);
-  };
+  }, []);
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("webRequestIntercepted", (message) => {
@@ -199,8 +199,8 @@ const WebTrafficTable: React.FC = () => {
                 status: requestDetails.statusCode,
                 content: {
                   text: requestDetails.responseBody || "",
-                  mimeType: requestDetails.type,
                 },
+                type: requestDetails.type,
               },
             },
           },
@@ -228,7 +228,6 @@ const WebTrafficTable: React.FC = () => {
             danger={isInterceptionStarted}
           >{`${isInterceptionStarted ? "Stop" : "Start"} Interception`}</Button>
         </div>
-        {/* <RQNetworkTable logs={logs} /> */}
         <div className="web-traffic-table-container rq-network-table-container">
           <GenericNetworkTable
             logs={logs}
