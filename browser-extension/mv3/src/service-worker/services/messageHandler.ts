@@ -147,11 +147,11 @@ export const initMessageHandler = () => {
         sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED });
         break;
 
-      case "startInterception":
+      case EXTENSION_MESSAGES.START_INTERCEPTION:
         startSendingInterceptedLogs(sender.tab.id);
         break;
 
-      case "stopInterception":
+      case EXTENSION_MESSAGES.STOP_INTERCEPTION:
         stopSendingInterceptedLogs();
         break;
     }

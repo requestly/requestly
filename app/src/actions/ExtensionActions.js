@@ -130,12 +130,12 @@ export function testRuleOnUrl(testOptions) {
 
 export const startInterception = () => {
   return sendMessage({
-    action: "startInterception",
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.START_INTERCEPTION,
   });
 };
 
 export const stopInterception = () => {
   return sendMessage({
-    action: "stopInterception",
+    action: GLOBAL_CONSTANTS.EXTENSION_MESSAGES.STOP_INTERCEPTION,
   });
 };
