@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { startInterception, stopInterception } from "actions/ExtensionActions";
-import { RQNetworkTable } from "lib/design-system/components";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 import "./webNetworkTable.scss";
-import { Button } from "antd";
+import { Button, Space } from "antd";
 import {
   GenericNetworkTable,
   GenericNetworkTableProps,
 } from "lib/design-system/components/RQNetworkTable/GenericNetworkTable";
 
 const WebTrafficTable: React.FC = () => {
+  const [isInterceptionStarted, setIsInterceptionStarted] = useState(false);
   const [logs, setLogs] = useState<RQNetworkLog[]>([]);
 
   const extraColumns: GenericNetworkTableProps<RQNetworkLog>["extraColumns"] = useMemo(
@@ -61,12 +61,36 @@ const WebTrafficTable: React.FC = () => {
         ];
       });
     });
+
+    return () => {
+      stopInterception();
+      PageScriptMessageHandler.removeMessageListener("webRequestIntercepted");
+    };
   }, []);
+
+  const handleStartInterception = () => {
+    startInterception();
+    setIsInterceptionStarted(true);
+  };
+
+  const handleStopInterception = () => {
+    stopInterception();
+    setIsInterceptionStarted(false);
+  };
 
   return (
     <div className="web-traffic-table-screen">
-      <Button onClick={startInterception}>Start Interception</Button>
-      <Button onClick={stopInterception}>Stop Interception</Button>
+      <div className="header-row">
+        <Space>
+          <span className="title">Network Traffic</span>
+          <span>{`Showing ${logs?.length ?? 0} logs`}</span>
+        </Space>
+        <Button
+          onClick={isInterceptionStarted ? handleStopInterception : handleStartInterception}
+          type={"primary"}
+          danger={isInterceptionStarted}
+        >{`${isInterceptionStarted ? "Stop" : "Start"} Interception`}</Button>
+      </div>
       {/* <RQNetworkTable logs={logs} /> */}
       <div className="web-traffic-table-container rq-network-table-container">
         <GenericNetworkTable
