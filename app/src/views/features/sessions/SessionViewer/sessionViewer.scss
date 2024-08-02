@@ -296,10 +296,8 @@
     .primary-message,
     .secondary-message {
       white-space: pre-wrap;
-      font-family: Menlo, monospace;
-
-      span {
-        font-family: Menlo, monospace;
+      font-family: var(--requestly-font-family-code, monospace), span {
+        font-family: var(--requestly-font-family-code, monospace);
       }
     }
 
