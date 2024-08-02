@@ -67,7 +67,7 @@ export const STORAGE_KEYS = {
   LAST_SYNCED_TS: "last-synced-ts",
   LAST_UPDATED_TS: "last-updated-ts",
   TEST_REPORTS: "testReports",
-  USER_ID: "userId",
+  REFRESH_TOKEN: "refreshToken",
   ACTIVE_WORKSPACE_ID: "activeWorkspaceId",
 };
 
