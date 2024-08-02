@@ -78,6 +78,10 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const isRuleExist = allRecords?.length > 0;
 
   useEffect(() => {
+    if (!user.loggedIn) {
+      return;
+    }
+
     if (!isImportSampleRules) {
       return;
     }
