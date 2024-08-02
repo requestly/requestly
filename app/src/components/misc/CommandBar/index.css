@@ -47,7 +47,6 @@ div[cmdk-dialog] {
 }
 
 .dialog [cmdk-input] {
-  font-family: var(--font-sans);
   border: none;
   width: 100%;
   padding: 8px;
