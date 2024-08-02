@@ -24,7 +24,7 @@ const industryOptions = [
 
 // TODO: Refactor it into a reusable component
 export const IndustryInput: React.FC<Props> = ({ onValueChange, value }) => {
-  const [industries, setIndustries] = useState(industryOptions);
+  const [industries, setIndustries] = useState([...industryOptions]);
   return (
     <Col>
       <label htmlFor="industry-input" className="industry-input-label">
