@@ -64,28 +64,26 @@ const WebTrafficTable: React.FC = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        height: "100%",
-      }}
-    >
+    <div className="web-traffic-table-screen">
       <Button onClick={startInterception}>Start Interception</Button>
       <Button onClick={stopInterception}>Stop Interception</Button>
       {/* <RQNetworkTable logs={logs} /> */}
-      <GenericNetworkTable
-        logs={logs}
-        extraColumns={extraColumns}
-        excludeColumns={["startedDateTime", "contentType", "time"]}
-        networkEntrySelector={(log: RQNetworkLog) => log.entry}
-        // contextMenuOptions={contextMenuOptions}
-        // onContextMenuOpenChange={onContextMenuOpenChange}
-        // emptyView={emptyView}
-        // rowStyle={(log: RQNetworkLog) => (isLogPending(log) ? { opacity: 0.45 } : {})}
-        // autoScroll={autoScroll}
-        // tableRef={containerRef}
-        // onTableScroll={onScroll}
-        // disableFilters={disableFilters}
-      />
+      <div className="web-traffic-table-container rq-network-table-container">
+        <GenericNetworkTable
+          logs={logs}
+          extraColumns={extraColumns}
+          excludeColumns={["startedDateTime", "contentType", "time"]}
+          networkEntrySelector={(log: RQNetworkLog) => log.entry}
+          // contextMenuOptions={contextMenuOptions}
+          // onContextMenuOpenChange={onContextMenuOpenChange}
+          // emptyView={emptyView}
+          // rowStyle={(log: RQNetworkLog) => (isLogPending(log) ? { opacity: 0.45 } : {})}
+          // autoScroll={autoScroll}
+          // tableRef={containerRef}
+          // onTableScroll={onScroll}
+          // disableFilters={disableFilters}
+        />
+      </div>
     </div>
   );
 };
