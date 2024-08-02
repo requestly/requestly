@@ -20,7 +20,11 @@ import {
   getUserAuthDetails,
 } from "store/selectors";
 import { toast } from "utils/Toast";
-import { trackRulesListBulkActionPerformed, trackRulesSelected } from "features/rules/analytics";
+import {
+  trackRulesListBulkActionPerformed,
+  trackRulesSelected,
+  trackSampleRulesImported,
+} from "features/rules/analytics";
 import { getAllRecords } from "store/features/rules/selectors";
 import { PREMIUM_RULE_TYPES } from "features/rules/constants";
 import {
@@ -90,6 +94,8 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       if (groupIdsToExpand?.length > 0) {
         setGroupIdsToExpand(groupIdsToExpand);
       }
+
+      trackSampleRulesImported();
 
       // @ts-ignore
       dispatch(actions.updateIsImportSampleRules(false));

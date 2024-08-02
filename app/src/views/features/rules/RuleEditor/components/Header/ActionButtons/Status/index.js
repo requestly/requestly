@@ -17,6 +17,7 @@ import { PREMIUM_RULE_TYPES } from "features/rules";
 import APP_CONSTANTS from "config/constants";
 import { saveRule, validateSyntaxInRule as validateAndTransformSyntaxInRule } from "../actions";
 import { useLocation } from "react-router-dom";
+import { trackSampleRuleToggled } from "features/rules/analytics";
 
 const Status = ({ isDisabled = false, isRuleEditorModal }) => {
   const location = useLocation();
@@ -38,6 +39,18 @@ const Status = ({ isDisabled = false, isRuleEditorModal }) => {
       ...currentlySelectedRuleData,
       status: newValue,
     };
+
+    if (ruleData.isSample) {
+      setCurrentlySelectedRule(dispatch, ruleData);
+      saveRule(appMode, dispatch, ruleData)
+        .then(() =>
+          newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+            ? toast.success("Rule activated")
+            : toast.success("Rule deactivated")
+        )
+        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
+      return;
+    }
 
     //Syntactic Validation
     const syntaxValidatedAndTransformedRule = await validateAndTransformSyntaxInRule(dispatch, ruleData);
@@ -101,6 +114,16 @@ const Status = ({ isDisabled = false, isRuleEditorModal }) => {
         popoverPlacement="bottom"
         onContinue={() => {
           toggleRuleStatus();
+
+          if (currentlySelectedRuleData?.isSample) {
+            trackSampleRuleToggled(
+              currentlySelectedRuleData?.name,
+              currentlySelectedRuleData?.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+                ? GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
+                : GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+            );
+          }
+
           trackRuleEditorHeaderClicked(
             "toggle_status",
             currentlySelectedRuleData.ruleType,
