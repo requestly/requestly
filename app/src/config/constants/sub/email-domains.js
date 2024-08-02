@@ -18,6 +18,7 @@ EMAIL_DOMAINS.PERSONAL.push("qq.com");
 EMAIL_DOMAINS.PERSONAL.push("163.com");
 EMAIL_DOMAINS.PERSONAL.push("yahoo.co.jp");
 EMAIL_DOMAINS.PERSONAL.push("icloud.com");
+EMAIL_DOMAINS.PERSONAL.push("rambler.ru");
 
 EMAIL_DOMAINS.DESTROYABLE = [];
 
