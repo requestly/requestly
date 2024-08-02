@@ -1,5 +1,11 @@
-.rq-network-table-container {
-  .network-container {
-    height: calc(100% - 15px);
+.web-traffic-table-screen {
+  height: 100%;
+  overflow: hidden;
+  .web-traffic-table-container.rq-network-table-container {
+    margin: 8px 16px;
+
+    .network-container {
+      height: calc(100% - 8px);
+    }
   }
 }
