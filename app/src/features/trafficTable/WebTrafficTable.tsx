@@ -3,7 +3,7 @@ import PageScriptMessageHandler from "config/PageScriptMessageHandler";
 import { startInterception, stopInterception } from "actions/ExtensionActions";
 import { RQNetworkLog } from "lib/design-system/components/RQNetworkTable/types";
 import "./webNetworkTable.scss";
-import { Button, Space } from "antd";
+import { Button, Empty, Space } from "antd";
 import {
   GenericNetworkTable,
   GenericNetworkTableProps,
@@ -237,7 +237,7 @@ const WebTrafficTable: React.FC = () => {
             contextMenuOptions={options}
             autoScroll={true}
             // onContextMenuOpenChange={onContextMenuOpenChange}
-            // emptyView={emptyView}
+            emptyView={<Empty description="No logs to show" />}
             // rowStyle={(log: RQNetworkLog) => (isLogPending(log) ? { opacity: 0.45 } : {})}
             // autoScroll={autoScroll}
             // tableRef={containerRef}
