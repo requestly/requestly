@@ -1,21 +1,10 @@
 import LINKS from "config/constants/sub/links";
 import { RuleType } from "types";
 import { RuleDetails } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
-// // PROD
-// const sampleRuleTemplateIds = [
-//   "9ywxyfxsaaVbfBAJN24f",
-//   "BpDkxdUAdbSdOJLriwxp",
-//   "G2EXbUD9B2QiOhgsrtHl",
-//   "OqFoyPdEUPnQrBEkqjxR",
-//   "bSEtct1DF1Xgn1Y7okas",
-//   "jR46qxwfXEMT9SrPzC8L",
-//   "z6FShnq5xbbnAu8H4JS0",
-// ];
 
-// LOCAL
 export const sampleRuleDetails: Record<string, { id: string; demoLink: string; details: RuleDetails }> = {
-  "9ywxyfxsaaVbfBAJN24f": {
-    id: "9ywxyfxsaaVbfBAJN24f",
+  OUz7jnsyudGhmAW2U6vy: {
+    id: "OUz7jnsyudGhmAW2U6vy",
     demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=inject-scripts",
     details: {
       type: RuleType.SCRIPT,
@@ -34,8 +23,8 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       documentationLink: LINKS.REQUESTLY_SCRIPT_RULE_DOCS,
     },
   },
-  BpDkxdUAdbSdOJLriwxp: {
-    id: "BpDkxdUAdbSdOJLriwxp",
+  Dfj22UZieI0OvHxBg3xO: {
+    id: "Dfj22UZieI0OvHxBg3xO",
     demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=override-api-response-graphql",
     details: {
       type: RuleType.RESPONSE,
@@ -55,8 +44,8 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       documentationLink: LINKS.REQUESTLY_RESPONSE_RULE_DOCS,
     },
   },
-  G2EXbUD9B2QiOhgsrtHl: {
-    id: "G2EXbUD9B2QiOhgsrtHl",
+  fHdTHi18fWcnPAhUOeL7: {
+    id: "fHdTHi18fWcnPAhUOeL7",
     demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=redirect",
     details: {
       type: RuleType.REDIRECT,
@@ -81,8 +70,8 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       documentationLink: LINKS.REQUESTLY_REDIRECT_RULE_DOCS,
     },
   },
-  OqFoyPdEUPnQrBEkqjxR: {
-    id: "OqFoyPdEUPnQrBEkqjxR",
+  "2Awil1731PYPaZDyPIIF": {
+    id: "2Awil1731PYPaZDyPIIF",
     demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=modify-http-status-code-rest",
     details: {
       type: RuleType.RESPONSE,
@@ -102,8 +91,8 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       documentationLink: LINKS.REQUESTLY_RESPONSE_RULE_DOCS,
     },
   },
-  bSEtct1DF1Xgn1Y7okas: {
-    id: "bSEtct1DF1Xgn1Y7okas",
+  "6aET04CqE6UVKZmm5y32": {
+    id: "6aET04CqE6UVKZmm5y32",
     demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=replace",
     details: {
       type: RuleType.REPLACE,
@@ -126,8 +115,8 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       documentationLink: LINKS.REQUESTLY_REPLACE_RULE_DOCS,
     },
   },
-  jR46qxwfXEMT9SrPzC8L: {
-    id: "jR46qxwfXEMT9SrPzC8L",
+  wfa2nnDPUJJXQ5RL7ufD: {
+    id: "wfa2nnDPUJJXQ5RL7ufD",
     demoLink: "",
     details: {
       type: "",
@@ -137,8 +126,8 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       documentationLink: "",
     },
   },
-  z6FShnq5xbbnAu8H4JS0: {
-    id: "z6FShnq5xbbnAu8H4JS0",
+  YOZANnLUk144snA755Lh: {
+    id: "YOZANnLUk144snA755Lh",
     demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=override-api-response-rest",
     details: {
       type: RuleType.RESPONSE,
