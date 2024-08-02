@@ -1,11 +1,19 @@
 .web-traffic-table-screen {
   height: 100%;
   overflow: hidden;
+
+  .header-row {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   .web-traffic-table-container.rq-network-table-container {
     margin: 8px 16px;
 
     .network-container {
-      height: calc(100% - 8px);
+      height: calc(100% - 16px);
     }
   }
 }
