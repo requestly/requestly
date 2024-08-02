@@ -32,6 +32,7 @@ import {
 import { enhanceRecords, importSampleRules, normalizeRecords } from "./utils/rules";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { actions } from "store";
+import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import "./rulesTable.css";
 
 interface Props {
@@ -51,6 +52,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const isAppBannerVisible = useSelector(getIsAppBannerVisible);
   const isImportSampleRules = useSelector(getIsImportSampleRules);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
+  const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
   const [groupIdsToExpand, setGroupIdsToExpand] = useState<string[]>([]);
   const [contentTableData, setContentTableData] = useState<RuleTableRecord[]>([]);
@@ -70,12 +72,17 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   } = useRulesActionContext();
 
   const isRuleExist = allRecords?.length > 0;
+
   useEffect(() => {
     if (!isImportSampleRules) {
       return;
     }
 
     if (!isRuleExist) {
+      return;
+    }
+
+    if (!currentlyActiveWorkspace || currentlyActiveWorkspace?.id) {
       return;
     }
 
@@ -95,7 +102,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
         })
       );
     });
-  }, [user, appMode, isRuleExist, isImportSampleRules, isRulesListRefreshPending]);
+  }, [user, appMode, isRuleExist, isImportSampleRules, currentlyActiveWorkspace?.id, isRulesListRefreshPending]);
 
   useEffect(() => {
     const enhancedRecords = enhanceRecords(records, allRecordsMap);
