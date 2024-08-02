@@ -176,7 +176,6 @@ const WebTrafficTable: React.FC = () => {
 
   useEffect(() => {
     PageScriptMessageHandler.addMessageListener("webRequestIntercepted", (message) => {
-      console.log("!!!debug", "message in port webApp", message);
       const { requestDetails } = message;
       setLogs((prevLogs) => {
         return [

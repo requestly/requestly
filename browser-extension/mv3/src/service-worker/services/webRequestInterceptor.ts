@@ -27,7 +27,6 @@ const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails)
     if (details.requestBody?.raw?.[0]?.bytes) {
       rqRequestBody = new TextDecoder("utf-8").decode(details.requestBody.raw[0].bytes);
     }
-    // console.log("!!!debug", "onBeforeRequest", details.requestBody, details.url, JSONRequestBody);
 
     interceptedRequestLogs[details.requestId] = {
       ...details,
@@ -182,7 +181,6 @@ const sendInterceptedLog = (requestDetails: any) => {
 };
 
 export const startSendingInterceptedLogs = (tabId: chrome.tabs.Tab["id"]) => {
-  console.log("!!!debug", "startSendingInterceptedLogs");
   if (!webAppPort) {
     webAppPort = chrome.tabs.connect(tabId, { name: "rq-web-request-interceptor" });
     webAppPortTabId = tabId;
