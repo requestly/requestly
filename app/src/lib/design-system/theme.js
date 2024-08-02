@@ -1,11 +1,12 @@
 import { colors } from "./colors";
 import { utils } from "./utils";
+import { theme as themeV2 } from "../../lib/design-system-v2";
 
 // ant-design overrides
 // NOTE: DO NOT USE THIS VALUES DIRECTLY IN ANY FILE
 export const theme = {
   // font
-  "@font-family": "Roboto, sans-serif",
+  "@font-family": themeV2.typography["family-default"],
 
   // colors
   "@primary-color": colors.primary,
