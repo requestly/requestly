@@ -17,6 +17,15 @@ export const RULES = {
   RULES_LIST_LOADED: "rules_list_loaded",
 };
 
+export const SAMPLE_RULES = {
+  SAMPLE_RULES_IMPORTED: "sample_rules_imported",
+  SAMPLE_RULE_EDITOR_VIEWED: "sample_rule_editor_viewed",
+  SAMPLE_RULE_TESTED: "sample_rule_tested",
+  SAMPLE_RULES_TOGGLED: "sample_rules_toggled",
+  SAMPLE_RULE_CREATE_RULE_CLICKED: "sample_rule_create_rule_clicked",
+  SAMPLE_RULE_DELETED: "sample_rule_deleted",
+};
+
 export const MIGRATION_NOTIFICATION_SHOWN = "migration_notification_shown";
 export const MIGRATION_NOTIFICATION_CLICKED = "migration_notification_clicked";
 export const MIGRATION_NOTIFICATION_CLOSED = "migration_notification_closed";

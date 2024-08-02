@@ -28,6 +28,7 @@ import { RQButton } from "lib/design-system/components";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/constants";
 import PATHS from "config/constants/sub/paths";
+import { trackSampleRuleCreateRuleClicked, trackSampleRuleTested } from "features/rules/analytics";
 
 const Header = ({ mode }) => {
   const navigate = useNavigate();
@@ -111,6 +112,10 @@ const Header = ({ mode }) => {
               <Col>
                 <Button
                   onClick={() => {
+                    trackSampleRuleCreateRuleClicked(
+                      currentlySelectedRuleData?.name,
+                      currentlySelectedRuleData?.ruleType
+                    );
                     navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${currentlySelectedRuleData?.ruleType}`);
                   }}
                 >
@@ -122,6 +127,7 @@ const Header = ({ mode }) => {
                 <Button
                   type="primary"
                   onClick={() => {
+                    trackSampleRuleTested(currentlySelectedRuleData?.name);
                     window.open(sampleRuleDetails[currentlySelectedRuleData.sampleId].demoLink, "_blank");
                   }}
                 >
