@@ -40,7 +40,9 @@ const Status = ({ isDisabled = false, isRuleEditorModal }) => {
       status: newValue,
     };
 
-    if (ruleData.isSample) {
+    const isCreateMode = location.pathname.indexOf("create") !== -1;
+
+    if (ruleData.isSample && !isCreateMode) {
       setCurrentlySelectedRule(dispatch, ruleData);
       saveRule(appMode, dispatch, ruleData)
         .then(() =>
@@ -62,8 +64,6 @@ const Status = ({ isDisabled = false, isRuleEditorModal }) => {
     if (newValue !== currentlySelectedRuleData.status) {
       setCurrentlySelectedRule(dispatch, ruleData);
     }
-
-    const isCreateMode = location.pathname.indexOf("create") !== -1;
 
     // Toggling the status also saves the rule by running all the validations. Any unsaved change is saved when the status is toggled.
     !isCreateMode &&
