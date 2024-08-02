@@ -162,6 +162,8 @@ CONSTANTS.EXTENSION_MESSAGES = {
   TEST_RULE_ON_URL: "testRuleOnUrl",
   SAVE_TEST_RULE_RESULT: "saveTestRuleResult",
   NOTIFY_TEST_RULE_REPORT_UPDATED: "notifyTestRuleReportUpdated",
+  START_INTERCEPTION: "startInterception",
+  STOP_INTERCEPTION: "stopInterception",
 };
 
 CONSTANTS.HEADERS_TARGET = {
