@@ -194,11 +194,14 @@ const WebTrafficTable: React.FC = () => {
             <span className="title">Network Traffic</span>
             <span>{`Showing ${logs?.length ?? 0} logs`}</span>
           </Space>
-          <Button
-            onClick={isInterceptionStarted ? handleStopInterception : handleStartInterception}
-            type={"primary"}
-            danger={isInterceptionStarted}
-          >{`${isInterceptionStarted ? "Stop" : "Start"} Interception`}</Button>
+          <Space>
+            <Button onClick={() => setLogs([])}>Clear Logs</Button>
+            <Button
+              onClick={isInterceptionStarted ? handleStopInterception : handleStartInterception}
+              type={"primary"}
+              danger={isInterceptionStarted}
+            >{`${isInterceptionStarted ? "Stop" : "Start"} Interception`}</Button>
+          </Space>
         </div>
         <div className="web-traffic-table-container rq-network-table-container">
           <GenericNetworkTable
