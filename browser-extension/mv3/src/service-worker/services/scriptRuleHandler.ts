@@ -1,9 +1,20 @@
-import { RuleType, ScriptObject, ScriptRulePair } from "common/types";
+import { ResourceType, RuleSourceFilter, RuleType, ScriptObject, ScriptRulePair } from "common/types";
 import { isBlacklistedURL } from "../../utils";
 import { matchSourceUrl } from "../../common/ruleMatcher";
 import { injectScript } from "./utils";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
+
+const matchResourceTypeFilterWithFrameId = (sourceFilters: RuleSourceFilter[], frameId: number) => {
+  const sourceObject = Array.isArray(sourceFilters) ? sourceFilters[0] : sourceFilters;
+  // If the resourceType is main_frame,
+  // then it should be applied only to the main frame otherwise it should be applied to all frames and return true always
+  if (sourceObject?.resourceType?.includes(ResourceType.MainDocument)) {
+    return frameId === 0;
+  }
+
+  return true;
+};
 
 export const applyScriptRules = async (tabId: number, frameId: number, url: string) => {
   if (isBlacklistedURL(url)) {
@@ -17,7 +28,10 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
 
   scriptRules.forEach((scriptRule) => {
     scriptRule.pairs.forEach((scriptRulePair: ScriptRulePair) => {
-      if (matchSourceUrl(scriptRulePair.source, url)) {
+      if (
+        matchSourceUrl(scriptRulePair.source, url) &&
+        matchResourceTypeFilterWithFrameId(scriptRulePair.source.filters, frameId)
+      ) {
         scriptRulePair.scripts.forEach((script) => {
           scripts.push(script);
         });
