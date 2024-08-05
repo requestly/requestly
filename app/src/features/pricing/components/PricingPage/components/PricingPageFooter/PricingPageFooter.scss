@@ -1,12 +1,14 @@
 .pricing-page-footer {
   width: 100%;
+  max-width: 1280px;
+  gap: 16px;
+  padding: 0 12px;
   margin-top: 60px;
 
   .banner {
-    padding: 0 48px;
     margin-bottom: 12px;
-
     .backed-by {
+      padding: 10px 12px;
       width: 880px;
       height: 142px;
       block-size: auto;
@@ -18,11 +20,12 @@
   .footer {
     padding: 48px;
     gap: 48px;
-
     width: 100%;
-    background: #000000;
-    border-top: var(--seats, 1px) solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+    background: #ffffff0a;
+    border: var(--seats, 1px) solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+    border-bottom: 0px;
     position: relative;
+    border-radius: 8px 8px 0 0;
 
     .mascot {
       display: none;
