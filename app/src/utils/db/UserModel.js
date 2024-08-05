@@ -50,3 +50,7 @@ export const getUserSpecificFilePath = (uid, fileId) => {
 export const getMigrationPath = (uid) => {
   return ["customProfile", uid];
 };
+
+export function getUserProfilePath(userId) {
+  return "users/" + userId + "/profile";
+}
