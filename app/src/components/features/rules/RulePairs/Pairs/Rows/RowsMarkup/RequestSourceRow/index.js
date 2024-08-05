@@ -22,6 +22,8 @@ import {
 } from "modules/analytics/events/features/testUrlModal";
 import { trackRuleFilterModalToggled } from "modules/analytics/events/common/rules/filters";
 import "./RequestSourceRow.css";
+import { isFeatureCompatible } from "utils/CompatibilityUtils";
+import FEATURES from "config/constants/sub/features";
 
 const { Text } = Typography;
 
@@ -172,6 +174,14 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
     );
   }, [dispatch, sourceOperators, pairIndex]);
 
+  const shouldShowFilterIcon = useMemo(() => {
+    if (ruleDetails.TYPE === GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT) {
+      return isFeatureCompatible(FEATURES.SCRIPT_RULE_SOURCE_FILTER);
+    }
+
+    return ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS;
+  }, [ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS, ruleDetails.TYPE]);
+
   const updateSourceFromTestURLModal = (newSource) => {
     const updatedSource = { ...pair.source, ...newSource };
 
@@ -300,7 +310,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
             }}
           />
         </Row>
-        {ruleDetails.ALLOW_REQUEST_SOURCE_FILTERS ? (
+        {shouldShowFilterIcon ? (
           <Col
             align="right"
             className="source-filter-col"
