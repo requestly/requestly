@@ -61,15 +61,13 @@ import Logger from "lib/logger";
 import { StorageService } from "init";
 import APP_CONSTANTS from "config/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
-import { DB_UTILS } from "@requestly/rq-common";
 import {
   trackLogoutAttempted,
   trackLogoutFailed,
   trackLogoutSuccess,
 } from "modules/analytics/events/common/auth/logout";
 import { toast } from "utils/Toast";
-
-const { getUserProfilePath } = DB_UTILS;
+import { getUserProfilePath } from "utils/db/UserModel";
 
 const dummyUserImg = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
 /**
