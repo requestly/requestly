@@ -5,7 +5,7 @@ import { injectScript } from "./utils";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
 
-export const applyScriptRules = async (tabId: number, frameId: number, url: string, origin: string) => {
+export const applyScriptRules = async (tabId: number, frameId: number, url: string, pageUrl: string) => {
   if (isBlacklistedURL(url)) {
     return;
   }
@@ -21,7 +21,7 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
         url,
         type: frameId === 0 ? ResourceType.MainDocument : ResourceType.IFrameDocument,
         method: "GET",
-        initiator: origin,
+        initiator: pageUrl,
       }).isApplied
     ) {
       scriptRule.pairs.forEach((scriptRulePair: ScriptRulePair) => {
