@@ -21,6 +21,10 @@ export const trackAppOnboardingPersonaUpdated = (persona: string) => {
   trackEvent(APP_ONBOARDING.APP_ONBOARDING_PERSONA_UPDATED, { persona });
 };
 
+export const trackAppOnboardingIndustryUpdated = (industry: string) => {
+  trackEvent(APP_ONBOARDING.APP_ONBOARDING_INDUSTRY_UPDATED, { industry });
+};
+
 export const trackAppOnboardingNameUpdated = () => {
   trackEvent(APP_ONBOARDING.APP_ONBOARDING_NAME_UPDATED);
 };

@@ -146,6 +146,7 @@ export const GA_EVENTS = {
     SESSION_REPLAY_ENABLED: "session_replay_enabled",
 
     PERSONA: "persona",
+    INDUSTRY: "industry",
 
     SIGNUP_DATE: "SIGNUP_DATE",
     DAYS_SINCE_SIGNUP: "days_since_signup",
