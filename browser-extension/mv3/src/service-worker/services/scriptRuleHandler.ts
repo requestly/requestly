@@ -13,6 +13,10 @@ const matchResourceTypeFilterWithFrameId = (sourceFilters: RuleSourceFilter[], f
     return frameId === 0;
   }
 
+  if (sourceObject?.resourceType?.includes(ResourceType.IFrameDocument)) {
+    return frameId !== 0;
+  }
+
   return true;
 };
 

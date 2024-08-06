@@ -382,7 +382,7 @@ const Filters = (props) => {
             options={
               !isScriptRule
                 ? RESOURCE_TYPE_OPTIONS
-                : RESOURCE_TYPE_OPTIONS.filter((option) => option.value === "main_frame")
+                : RESOURCE_TYPE_OPTIONS.filter((option) => ["main_frame", "sub_frame"].includes(option.value))
             }
             isDisabled={props.isInputDisabled}
             placeholder="All (default)"
