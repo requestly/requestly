@@ -14,6 +14,7 @@ import { getValueAsPromise, updateUserInFirebaseAuthUser, updateValueAsPromise }
 import { OnboardingLoader } from "features/onboarding/components/loader";
 import { m, AnimatePresence } from "framer-motion";
 import {
+  trackAppOnboardingIndustryUpdated,
   trackAppOnboardingNameUpdated,
   trackAppOnboardingPersonaUpdated,
   trackAppOnboardingStepCompleted,
@@ -22,9 +23,10 @@ import {
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { isCompanyEmail } from "utils/FormattingHelper";
-import { getUserPersona, setUserPersona } from "backend/onboarding";
+import { getUserPersona, setUserPersona, updateUserIndustry } from "backend/onboarding";
 import { getAppFlavour } from "utils/AppUtils";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
+import { IndustryInput } from "../IndustryInput";
 import "./index.scss";
 
 interface Props {
@@ -38,6 +40,7 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [persona, setPersona] = useState("");
+  const [industry, setIndustry] = useState("");
   const [fullName, setFullName] = useState("");
   const [shouldShowPersonaInput, setShouldShowPersonaInput] = useState(false);
   const [shouldShowFullNameInput, setShouldShowFullNameInput] = useState(false);
@@ -81,6 +84,36 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     } else return Promise.resolve();
   }, [persona, dispatch, user.details?.profile?.uid, user.loggedIn]);
 
+  const handleUpdateIndustry = useCallback(() => {
+    if (!industry) {
+      return Promise.resolve();
+    }
+
+    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.INDUSTRY, industry);
+
+    // @ts-ignore
+    dispatch(actions.updateAppOnboardingIndustry(industry));
+
+    if (!user.loggedIn) {
+      trackAppOnboardingIndustryUpdated(industry);
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+      updateUserIndustry(user.details?.profile?.uid, industry)
+        .then((res: any) => {
+          if (res.success) {
+            trackAppOnboardingIndustryUpdated(industry);
+            resolve(res);
+          }
+        })
+        .catch((error) => {
+          Logger.log(error);
+          reject(error);
+        });
+    });
+  }, [industry, dispatch, user.details?.profile?.uid, user.loggedIn]);
+
   const handleSetFullName = useCallback(() => {
     if (fullName) {
       dispatch(actions.updateAppOnboardingFullName(fullName));
@@ -100,19 +133,25 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
 
   const handleSaveClick = useCallback(() => {
     //VALIDATION
+    if (shouldShowFullNameInput && !fullName) {
+      toast.error("Please enter your full name");
+      return;
+    }
+
     if (shouldShowPersonaInput && !persona) {
       toast.error("Please select a persona");
       return;
     }
 
-    if (shouldShowFullNameInput && !fullName) {
-      toast.error("Please enter your full name");
+    if (!industry) {
+      toast.error("Please select a industry");
       return;
     }
 
     setIsSaving(true);
     Promise.all([
       handleSetPersona(),
+      handleUpdateIndustry(),
       handleSetFullName(),
       updateUserInFirebaseAuthUser({ displayName: fullName || user.details?.profile?.displayName }),
     ])
@@ -136,8 +175,10 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
     shouldShowFullNameInput,
     shouldShowPersonaInput,
     persona,
+    industry,
     fullName,
     handleSetPersona,
+    handleUpdateIndustry,
     handleSetFullName,
     user.details?.profile?.displayName,
     user.loggedIn,
@@ -224,11 +265,6 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
                 <Typography.Title level={5} style={{ marginTop: user.loggedIn ? "24px" : 0, fontWeight: 500 }}>
                   Help us in optimizing your experience
                 </Typography.Title>
-                {shouldShowPersonaInput && (
-                  <Col className="mt-16">
-                    <PersonaInput value={persona} onValueChange={(value) => setPersona(value)} />
-                  </Col>
-                )}
 
                 {shouldShowFullNameInput && (
                   <div className="onboarding-form-input mt-8">
@@ -243,6 +279,17 @@ export const PersonaScreen: React.FC<Props> = ({ isOpen }) => {
                     />
                   </div>
                 )}
+
+                {shouldShowPersonaInput && (
+                  <Col className="mt-16">
+                    <PersonaInput value={persona} onValueChange={(value) => setPersona(value)} />
+                  </Col>
+                )}
+
+                <Col className="mt-16">
+                  <IndustryInput value={industry} onValueChange={(value) => setIndustry(value)} />
+                </Col>
+
                 <RQButton
                   loading={isSaving}
                   onClick={handleSaveClick}

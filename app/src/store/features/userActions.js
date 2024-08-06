@@ -142,6 +142,10 @@ export const updateAppOnboardingPersona = (prevState, action) => {
   prevState.appOnboarding.persona = action.payload;
 };
 
+export const updateAppOnboardingIndustry = (prevState, action) => {
+  prevState.appOnboarding.industry = action.payload;
+};
+
 export const updateAppOnboardingFullName = (prevState, action) => {
   prevState.appOnboarding.fullName = action.payload;
 };
