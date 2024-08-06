@@ -1,3 +1,8 @@
+.rule-editor-procard {
+  height: inherit;
+  overflow-y: auto;
+}
+
 .rule-editor-procard .ant-pro-card-body {
   padding: 0 0 1.5rem 0;
 }
