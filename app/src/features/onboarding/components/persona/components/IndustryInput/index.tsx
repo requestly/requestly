@@ -50,7 +50,7 @@ export const IndustryInput: React.FC<Props> = ({ onValueChange, value }) => {
             );
             setIndustries(filtered);
           } else {
-            setIndustries(industries);
+            setIndustries(industryOptions);
           }
         }}
         placeholder="Start typing or select from the list"

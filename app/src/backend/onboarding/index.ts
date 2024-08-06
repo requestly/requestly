@@ -40,7 +40,7 @@ export const setUserPersona = async (uid: string, persona: string) => {
 
 export const updateUserIndustry = async (uid: string, industry: string) => {
   if (!uid || !industry) {
-    throw new Error("UID or persona is missing.");
+    throw new Error("UID or industry is missing.");
   }
 
   const db = getFirestore();
