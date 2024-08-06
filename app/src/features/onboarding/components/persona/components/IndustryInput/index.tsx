@@ -8,18 +8,19 @@ interface Props {
 }
 
 const industryOptions = [
-  { value: "IT Services" },
   { value: "SaaS" },
   { value: "E-commerce" },
   { value: "Financial Services" },
   { value: "Education" },
   { value: "Travel" },
   { value: "Advertising Tech" },
+  { value: "Marketing Tech" },
   { value: "Game Development" },
   { value: "Gaming" },
   { value: "Media & Entertainment" },
   { value: "Publishing" },
   { value: "Healthcare" },
+  { value: "IT Services" },
 ];
 
 // TODO: Refactor it into a reusable component
