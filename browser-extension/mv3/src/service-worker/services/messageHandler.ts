@@ -38,7 +38,7 @@ export const initMessageHandler = () => {
         isExtensionEnabled().then((isExtensionStatusEnabled) => {
           if (!isExtensionStatusEnabled) return;
           initCustomWidgets(sender.tab?.id, sender.frameId);
-          applyScriptRules(sender.tab?.id, sender.frameId, sender.url);
+          applyScriptRules(sender.tab?.id, sender.frameId, sender.url, sender.origin);
         });
         break;
 
