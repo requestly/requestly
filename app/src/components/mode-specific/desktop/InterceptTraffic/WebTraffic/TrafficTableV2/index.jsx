@@ -152,6 +152,7 @@ const CurrentTrafficTable = ({
     dispatch(desktopTrafficTableActions.logsClearAll());
     setDomainList(new Set([...trafficTableFilters.domain]));
     setAppList(new Set([...trafficTableFilters.app]));
+    setIsPreviewOpen(false);
     trackTrafficTableLogsCleared(getConnectedAppsCount(Object.values(desktopSpecificDetails.appsList)) > 0);
     trackRQDesktopLastActivity(TRAFFIC_TABLE.TRAFFIC_TABLE_LOGS_CLEARED);
 
