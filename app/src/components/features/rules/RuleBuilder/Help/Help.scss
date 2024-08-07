@@ -260,40 +260,25 @@
 .rule-editor-help-container {
   .rule-details-panel-container {
     margin: 0;
+    padding: 16px 4px 0 0;
     margin-bottom: 16px;
-    padding: 16px;
+    background-color: transparent;
 
     .close-btn {
       display: none;
     }
 
     .details-panel {
-      gap: 0;
-      flex-direction: column;
-
       .rule-details-container {
-        .use-cases-container {
-          ul.use-cases-list {
-            list-style: unset;
+        .links {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
 
-            .use-case-list-item {
-              .use-case {
-                br {
-                  display: block;
-                }
-
-                .use-template-btn {
-                  margin-left: 0;
-                }
-              }
-            }
+          .ant-btn {
+            margin-right: auto;
           }
         }
-      }
-
-      .rule-templates {
-        width: 100%;
-        margin-bottom: 16px;
       }
     }
   }
