@@ -12,8 +12,6 @@ import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEditorBottomSheet";
-import { RuleEditorMode } from "features/rules";
-import { RuleDetailsPanel } from "./components/RuleDetailsPanel/RuleDetailsPanel";
 import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
@@ -82,7 +80,10 @@ const RuleEditor = (props) => {
             <RuleBuilder />
           </ProCard>
         ) : (
-          <BottomSheetLayout bottomSheet={<RuleEditorBottomSheet mode={MODE} />}>
+          <BottomSheetLayout
+            bottomSheet={<RuleEditorBottomSheet mode={MODE} />}
+            hideBottomSheet={MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE}
+          >
             <ProCard className="rule-editor-procard">
               <RuleBuilder />
             </ProCard>

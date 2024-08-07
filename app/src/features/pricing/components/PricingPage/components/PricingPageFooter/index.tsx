@@ -3,7 +3,7 @@ import { Row, Col, Typography, Space, Button } from "antd";
 import { EVENTS, trackAddToChromeClicked, trackRequestDocumentClicked } from "./analytics";
 import RequestDocsModal from "./RequestDocsModal";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import backedBy from "./assets/backed-by.png";
+import backedBy from "./assets/backed-by.webp";
 import rqLogo from "assets/img/brand/rq_logo_full.svg";
 import mediumLogo from "assets/icons/medium-logo.svg";
 import twitterLogo from "assets/icons/twitter-logo.svg";

@@ -11,35 +11,48 @@ const FONT_WEIGHT_TOKENS = {
 };
 
 const FONT_SIZE_TOKENS = {
-  "size-xs": "0.75rem",
-  "size-sm": "0.875rem",
-  "size-base": "1rem",
-  "size-lg": "1.125rem",
-  "size-xl": "1.25rem",
-  "size-2xl": "1.5rem",
-  "size-3xl": "1.875rem",
-  "size-4xl": "2.25rem",
-  "size-5xl": "3rem",
-  "size-6xl": "3.75rem",
+  "size-2xs": "0.563rem", // 9px
+  "size-xs": "0.688rem", // 11px
+  "size-sm": "0.813rem", // 13px
+  "size-md": "0.938rem", // 15px
+  "size-base": "1rem", // 16px
+  "size-lg": "1.25rem", // 20px
+  "size-xl": "1.5rem", // 24px
+  "size-2xl": "1.875rem", // 30px
+  "size-3xl": "2.25rem", // 36px
+  "size-4xl": "3rem", // 48px
+  "size-5xl": "3.75rem", // 60px
 };
 
 const LINE_HEIGHT_TOKENS = {
-  "line-height-xs": "1rem",
-  "line-height-sm": "1.25rem",
-  "line-height-base": "1.5rem",
-  "line-height-lg": "1.75rem",
-  "line-height-xl": "1.75rem",
-  "line-height-2xl": "2rem",
-  "line-height-3xl": "2.25rem",
-  "line-height-4xl": "2.5rem",
+  "line-height-2xs": "0.75rem", // 12px
+  "line-height-xs": "0.875rem", // 14px
+  "line-height-sm": "1.25rem", // 20px
+  "line-height-md": "1.438rem", // 23px
+  "line-height-base": "1.5rem", // 24px
+  "line-height-lg": "1.875rem", // 30px
+  "line-height-xl": "2.25rem", // 36px
+  "line-height-2xl": "2.813rem", // 45px
+  "line-height-3xl": "3.375rem", // 54px
+  "line-height-4xl": "4.5rem", // 72px
+  "line-height-5xl": "5.625rem", // 90px
 };
 
-export type TypographyTokens = typeof FONT_SIZE_TOKENS & typeof LINE_HEIGHT_TOKENS & typeof FONT_WEIGHT_TOKENS;
+const FONT_FAMILY_TOKENS = {
+  "family-code": "Roboto Mono",
+  "family-default": "Inter",
+};
+
+export type TypographyTokens = typeof FONT_SIZE_TOKENS &
+  typeof LINE_HEIGHT_TOKENS &
+  typeof FONT_WEIGHT_TOKENS &
+  typeof FONT_FAMILY_TOKENS;
 
 export const generateTypographyTokens = () => {
   return {
     ...FONT_WEIGHT_TOKENS,
     ...FONT_SIZE_TOKENS,
     ...LINE_HEIGHT_TOKENS,
+    ...FONT_FAMILY_TOKENS,
   };
 };
