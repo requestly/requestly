@@ -13,8 +13,9 @@ import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/Ses
 import DraftSessionDetailsPanel from "../DraftSessionDetailsPanel/DraftSessionDetailsPanel";
 import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/sessionBook/analytics";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
-import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
+import { getSessionRecordingAttributes, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import { SessionTrimmer } from "../SessionTrimmer/SessionTrimmer";
 import "./draftSessionViewer.scss";
 
 interface DraftSessionViewerProps {
@@ -29,6 +30,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const [isDiscardClicked, setIsDiscardClicked] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
+  const attributes = useSelector(getSessionRecordingAttributes);
   const isOpenedInIframe = location.pathname.includes("iframe");
 
   if (!isDesktopMode) {
@@ -106,6 +108,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
           <Row className="draft-session-viewer-body" gutter={8} justify="space-between">
             <Col span={16}>
               <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
+              <SessionTrimmer duration={attributes?.duration} />
             </Col>
             <Col span={8}>
               <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
