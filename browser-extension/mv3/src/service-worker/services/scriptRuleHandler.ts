@@ -1,11 +1,11 @@
-import { RuleType, ScriptObject, ScriptRulePair } from "common/types";
+import { ResourceType, Rule, RuleType, ScriptObject, ScriptRulePair } from "common/types";
 import { isBlacklistedURL } from "../../utils";
-import { matchSourceUrl } from "../../common/ruleMatcher";
+import { matchRuleWithRequest } from "../../common/ruleMatcher";
 import { injectScript } from "./utils";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
 
-export const applyScriptRules = async (tabId: number, frameId: number, url: string) => {
+export const applyScriptRules = async (tabId: number, frameId: number, url: string, pageUrl: string) => {
   if (isBlacklistedURL(url)) {
     return;
   }
@@ -13,26 +13,33 @@ export const applyScriptRules = async (tabId: number, frameId: number, url: stri
   const scriptRules = await rulesStorageService.getEnabledRules(RuleType.SCRIPT);
   const scripts: ScriptObject[] = [];
 
-  const appliedScriptRuleIds = new Set<string>();
+  const appliedScriptRules: Rule[] = [];
 
-  scriptRules.forEach((scriptRule) => {
-    scriptRule.pairs.forEach((scriptRulePair: ScriptRulePair) => {
-      if (matchSourceUrl(scriptRulePair.source, url)) {
-        scriptRulePair.scripts.forEach((script) => {
+  scriptRules.forEach((rule) => {
+    const isRuleApplied = matchRuleWithRequest(rule, {
+      url,
+      type: frameId === 0 ? ResourceType.MainDocument : ResourceType.IFrameDocument,
+      method: "GET",
+      initiator: pageUrl,
+    }).isApplied;
+
+    if (isRuleApplied) {
+      appliedScriptRules.push(rule);
+      rule.pairs.forEach((pair: ScriptRulePair) => {
+        pair.scripts.forEach((script) => {
           scripts.push(script);
         });
-        appliedScriptRuleIds.add(scriptRule.id);
-      }
-    });
+      });
+    }
   });
 
   for (let script of scripts) {
     await injectScript(script, { tabId, frameIds: [frameId] });
   }
 
-  if (appliedScriptRuleIds.size > 0) {
+  if (appliedScriptRules.length > 0) {
     // FIXME: Performance can be improved
-    scriptRules.forEach((rule) => {
+    appliedScriptRules.forEach((rule) => {
       ruleExecutionHandler.onRuleExecuted(rule, {
         url: url,
         tabId: tabId,

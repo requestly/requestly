@@ -71,14 +71,18 @@ const Filters = (props) => {
     return currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.REQUEST;
   }, [currentlySelectedRuleData.ruleType]);
 
+  const isScriptRule = useMemo(() => {
+    return currentlySelectedRuleData.ruleType === GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT;
+  }, [currentlySelectedRuleData.ruleType]);
+
   const hasLegacyPayloadFilter = () => {
     return ResponseRuleResourceType.UNKNOWN === currentlySelectedRuleData?.pairs?.[0]?.response?.resourceType;
   };
 
   const isRequestPayloadFilterCompatible = isResponseRule && hasLegacyPayloadFilter();
 
-  const isHTTPMethodFilterCompatible = true;
-  const isPayloadUrlFilterCompatible = !isResponseRule && !isRequestRule && !isDesktopMode();
+  const isHTTPMethodFilterCompatible = !isScriptRule;
+  const isPayloadUrlFilterCompatible = !isScriptRule && !isResponseRule && !isRequestRule && !isDesktopMode();
   const isResourceTypeFilterCompatible = !isResponseRule && !isRequestRule && !isDesktopMode(); // this partially works on desktop
 
   const clearRequestPayload = (value) => {
@@ -375,7 +379,11 @@ const Filters = (props) => {
                 dangerLight: "#323337", // tag cancel background color
               },
             })}
-            options={RESOURCE_TYPE_OPTIONS}
+            options={
+              !isScriptRule
+                ? RESOURCE_TYPE_OPTIONS
+                : RESOURCE_TYPE_OPTIONS.filter((option) => ["main_frame", "sub_frame"].includes(option.value))
+            }
             isDisabled={props.isInputDisabled}
             placeholder="All (default)"
             value={getReactSelectValue(

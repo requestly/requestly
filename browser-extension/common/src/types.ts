@@ -71,7 +71,7 @@ export interface RequestPayloadFilter {
   value: string;
 }
 
-enum ResourceType {
+export enum ResourceType {
   XHR = "xmlhttprequest",
   JS = "script",
   CSS = "stylesheet",
