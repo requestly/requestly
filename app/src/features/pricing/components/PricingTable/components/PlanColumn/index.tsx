@@ -96,7 +96,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   };
 
   const handlePricingQuantityChanged = useCallback(() => {
-    const addToApolloSequence = httpsCallable(getFunctions(), "pricing-addToPricingFiddleApolloSequence");
+    const addToApolloSequence = httpsCallable(getFunctions(), "pricing-addToApolloPricingFiddleSequence");
     addToApolloSequence().catch((error) => {
       Logger.log("Error adding user to apollo sequence", error);
     });
