@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { RULE_DETAILS } from "./constants";
+import { ExampleType, RULE_DETAILS } from "./constants";
 import { RuleType } from "types";
 import { Button } from "antd";
 import { MdMenuBook } from "@react-icons/all-files/md/MdMenuBook";
@@ -63,25 +63,72 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
 
             <ul className="use-cases-list">
               {RULE_DETAILS[ruleType].useCases?.length > 0 &&
-                RULE_DETAILS[ruleType].useCases?.map(({ useCase, suggestedTemplateId }, index) => {
-                  return (
-                    <li key={index} className="use-case-list-item">
-                      <div className="use-case">
-                        {useCase}
-                        <br />
-                        {suggestedTemplateId ? (
-                          <Button
-                            type="link"
-                            className="link use-template-btn"
-                            icon={<MdOutlineFactCheck className="anticon" />}
-                            onClick={() => handleUseTemplateClick(suggestedTemplateId)}
-                          >
-                            Use template
-                          </Button>
-                        ) : null}
-                      </div>
-                    </li>
-                  );
+                RULE_DETAILS[ruleType].useCases?.map(({ useCase, example }, index) => {
+                  switch (example?.type) {
+                    case ExampleType.USE_TEMPLATE:
+                      return (
+                        <li key={index} className="use-case-list-item">
+                          <div className="use-case">
+                            {useCase}
+                            <br />
+
+                            <Button
+                              type="link"
+                              className="link use-template-btn"
+                              icon={<MdOutlineFactCheck className="anticon" />}
+                              onClick={() => handleUseTemplateClick(example.suggestedTemplateId)}
+                            >
+                              Use template
+                            </Button>
+                          </div>
+                        </li>
+                      );
+                    case ExampleType.DOWNLOAD_DESKTOP_APP:
+                      return (
+                        <li key={index} className="use-case-list-item">
+                          <div className="use-case">
+                            {useCase}
+                            <br />
+                            <Button
+                              type="link"
+                              className="link use-template-btn"
+                              icon={<MdOutlineFactCheck className="anticon" />}
+                              onClick={() => {
+                                // TODO: send event
+                              }}
+                            >
+                              Download Desktop App
+                            </Button>
+                          </div>
+                        </li>
+                      );
+                    case ExampleType.PLAYGROUND_LINK:
+                      return (
+                        <li key={index} className="use-case-list-item">
+                          <div className="use-case">
+                            {useCase}
+                            <br />
+
+                            <Button
+                              type="link"
+                              className="link use-template-btn"
+                              icon={<MdOutlineFactCheck className="anticon" />}
+                              onClick={() => {
+                                // send event
+                              }}
+                            >
+                              Try this on Requestly Playground
+                            </Button>
+                          </div>
+                        </li>
+                      );
+                    default:
+                      return (
+                        <li key={index} className="use-case-list-item">
+                          <div className="use-case">{useCase}</div>
+                        </li>
+                      );
+                  }
                 })}
             </ul>
           </div>
