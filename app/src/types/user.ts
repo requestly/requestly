@@ -5,4 +5,5 @@ export interface User {
   isVerified: boolean;
   signupTs: number;
   username?: string;
+  profile: Record<string, unknown>;
 }

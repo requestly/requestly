@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { RULE_DETAILS } from "./constants";
+import React, { ReactNode, useEffect } from "react";
 import { RuleType } from "types";
 import { Button } from "antd";
 import { MdMenuBook } from "@react-icons/all-files/md/MdMenuBook";
@@ -17,14 +16,25 @@ import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./RuleDetailsPanel.scss";
 
+export type RuleDetails = {
+  type: RuleType | string;
+  name: string;
+  icon?: () => ReactNode;
+  description: string;
+  useCases?: { useCase: string; suggestedTemplateId?: string }[];
+  documentationLink: string;
+};
+
 interface RuleDetailsPanelProps {
-  ruleType: RuleType | undefined;
+  isSample?: boolean;
+  ruleDetails: RuleDetails;
   source: "docs_sidebar" | "new_rule_editor";
 }
 
-export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, source }) => {
+export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ source, isSample = false, ruleDetails }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { type: ruleType, name, description, useCases, documentationLink } = ruleDetails;
 
   const handleCloseClick = () => {
     trackRuleDetailsPanelClosed(ruleType, source);
@@ -49,21 +59,23 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
 
   return !ruleType ? null : (
     <div key={ruleType} className="rule-details-panel-container">
-      <span className="close-btn" onClick={handleCloseClick}>
-        <MdClose className="anticon" />
-      </span>
+      {!isSample ? (
+        <span className="close-btn" onClick={handleCloseClick}>
+          <MdClose className="anticon" />
+        </span>
+      ) : null}
 
       <div className="details-panel">
         <div className="rule-details-container">
-          <div className="title">{RULE_DETAILS[ruleType].name}</div>
-          <div className="description">{RULE_DETAILS[ruleType].description}</div>
+          <div className="title">{name}</div>
+          <div className="description">{description}</div>
 
           <div className="use-cases-container">
-            <div className="title">Use cases</div>
+            {isSample ? null : <div className="title">Use cases</div>}
 
             <ul className="use-cases-list">
-              {RULE_DETAILS[ruleType].useCases?.length > 0 &&
-                RULE_DETAILS[ruleType].useCases?.map(({ useCase, suggestedTemplateId }, index) => {
+              {useCases?.length > 0 &&
+                useCases?.map(({ useCase, suggestedTemplateId }, index) => {
                   return (
                     <li key={index} className="use-case-list-item">
                       <div className="use-case">
@@ -110,7 +122,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
         target="_blank"
         rel="noreferrer"
         className="link documentation-link"
-        href={RULE_DETAILS[ruleType].documentationLink}
+        href={documentationLink}
         icon={<MdMenuBook className="anticon" />}
         onClick={() => trackRuleDetailsPanelDocsClicked(ruleType, source)}
       >

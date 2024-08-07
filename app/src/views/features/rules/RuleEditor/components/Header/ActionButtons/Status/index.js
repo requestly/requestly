@@ -16,9 +16,11 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PREMIUM_RULE_TYPES } from "features/rules";
 import APP_CONSTANTS from "config/constants";
 import { saveRule, validateSyntaxInRule as validateAndTransformSyntaxInRule } from "../actions";
+import { useLocation } from "react-router-dom";
+import { trackSampleRuleToggled } from "features/rules/analytics";
 
-const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
-  //Global State
+const Status = ({ isDisabled = false, isRuleEditorModal }) => {
+  const location = useLocation();
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const allRules = useSelector(getAllRules);
@@ -38,6 +40,20 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
       status: newValue,
     };
 
+    const isCreateMode = location.pathname.indexOf("create") !== -1;
+
+    if (ruleData.isSample && !isCreateMode) {
+      setCurrentlySelectedRule(dispatch, ruleData);
+      saveRule(appMode, dispatch, ruleData)
+        .then(() =>
+          newValue === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+            ? toast.success("Rule activated")
+            : toast.success("Rule deactivated")
+        )
+        .then(() => setIsCurrentlySelectedRuleHasUnsavedChanges(dispatch, false));
+      return;
+    }
+
     //Syntactic Validation
     const syntaxValidatedAndTransformedRule = await validateAndTransformSyntaxInRule(dispatch, ruleData);
 
@@ -48,8 +64,6 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
     if (newValue !== currentlySelectedRuleData.status) {
       setCurrentlySelectedRule(dispatch, ruleData);
     }
-
-    const isCreateMode = location.pathname.indexOf("create") !== -1;
 
     // Toggling the status also saves the rule by running all the validations. Any unsaved change is saved when the status is toggled.
     !isCreateMode &&
@@ -100,6 +114,16 @@ const Status = ({ isDisabled = false, location, isRuleEditorModal }) => {
         popoverPlacement="bottom"
         onContinue={() => {
           toggleRuleStatus();
+
+          if (currentlySelectedRuleData?.isSample) {
+            trackSampleRuleToggled(
+              currentlySelectedRuleData?.name,
+              currentlySelectedRuleData?.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+                ? GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
+                : GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
+            );
+          }
+
           trackRuleEditorHeaderClicked(
             "toggle_status",
             currentlySelectedRuleData.ruleType,
