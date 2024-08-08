@@ -1,3 +1,4 @@
+import { PUBLIC_NAMESPACE } from "common/constants";
 import {
   applyDelay,
   getAbsoluteUrl,
@@ -104,18 +105,18 @@ export const initXhrInterceptor = (debug) => {
 
         let customResponse =
           responseModification.type === "code"
-            ? getFunctionFromCode(
-                responseModification.value,
-                "response"
-              )({
-                method: this._method,
-                url: this._requestURL,
-                requestHeaders: this._requestHeaders,
-                requestData: jsonifyValidJSONString(this._requestData),
-                responseType: contentType,
-                response: this.response,
-                responseJSON: jsonifyValidJSONString(this.response, true),
-              })
+            ? getFunctionFromCode(responseModification.value, "response")(
+                {
+                  method: this._method,
+                  url: this._requestURL,
+                  requestHeaders: this._requestHeaders,
+                  requestData: jsonifyValidJSONString(this._requestData),
+                  responseType: contentType,
+                  response: this.response,
+                  responseJSON: jsonifyValidJSONString(this.response, true),
+                },
+                window.top[PUBLIC_NAMESPACE]?.sharedState ?? {}
+              )
             : responseModification.value;
 
         if (typeof customResponse === "undefined") {

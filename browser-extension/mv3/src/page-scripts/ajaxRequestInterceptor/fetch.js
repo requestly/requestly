@@ -1,3 +1,4 @@
+import { PUBLIC_NAMESPACE } from "common/constants";
 import {
   applyDelay,
   getAbsoluteUrl,
@@ -171,6 +172,7 @@ export const initFetchInterceptor = (debug) => {
           const responseType = fetchedResponse.headers.get("content-type");
           const fetchedResponseDataAsJson = jsonifyValidJSONString(fetchedResponseData, true);
 
+          console.log("!!!debug", "fetchedResponse", fetchedResponse, window?.["__REQUESTLY__"]);
           evaluatorArgs = {
             ...evaluatorArgs,
             responseType,
@@ -179,7 +181,14 @@ export const initFetchInterceptor = (debug) => {
           };
         }
 
-        customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
+        console.log("!!!debug", "function", getFunctionFromCode(responseModification.value, "response"));
+
+        customResponse = getFunctionFromCode(responseModification.value, "response")(
+          evaluatorArgs,
+          window.top[PUBLIC_NAMESPACE]?.sharedState ?? {}
+        );
+
+        console.log("!!!debug", "customResponse", customResponse);
 
         if (typeof customResponse === "undefined") {
           return fetchedResponse;

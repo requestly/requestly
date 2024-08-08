@@ -6,7 +6,7 @@ let logShown = false;
 
 export const getFunctionFromCode = (code, ruleType) => {
   try {
-    return new Function("args", `return (${code})(args);`);
+    return new Function("args,sharedState", `return (${code})(args,sharedState);`);
   } catch (e) {
     notifyOnErrorOccurred({
       initiator: location.origin,
