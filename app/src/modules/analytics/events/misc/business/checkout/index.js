@@ -14,3 +14,29 @@ export const trackEnterpriseRequestEvent = (company) => {
   const params = { company };
   trackEvent(BUSINESS.CHECKOUT.ENTERPRISE_REQUESTED, params);
 };
+
+export const trackCheckoutInitiated = ({
+  plan_name,
+  duration,
+  currency,
+  quantity,
+  is_user_on_trial = false,
+  source,
+}) => {
+  const params = {
+    plan_name,
+    duration,
+    currency,
+    quantity,
+    is_user_on_trial,
+    source,
+  };
+
+  trackEvent(BUSINESS.CHECKOUT.CHECKOUT_INITIATIED, params);
+};
+
+export const trackCheckoutCompleted = (is_user_on_trial = false) => {
+  const params = { is_user_on_trial };
+
+  trackEvent(BUSINESS.CHECKOUT.CHECKOUT_COMPLETED, params);
+};
