@@ -126,6 +126,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
     dispatch(
       actions.updateRulePairAtGivenPath({
         pairIndex,
+        triggerUnsavedChangesIndication: false,
         updates: {
           destination: "",
           destinationType: destinationPopupSelection,
