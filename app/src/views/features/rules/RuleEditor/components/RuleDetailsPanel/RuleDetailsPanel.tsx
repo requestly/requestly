@@ -14,9 +14,10 @@ import { actions } from "store";
 import {
   trackRuleDetailsPanelClosed,
   trackRuleDetailsPanelDocsClicked,
+  trackRuleDetailsPanelUseCaseClicked,
   trackRuleDetailsPanelViewed,
 } from "modules/analytics/events/common/rules";
-import { trackUseTemplateClick, trackViewAllTemplatesClick } from "modules/analytics/events/features/templates";
+import { trackViewAllTemplatesClick } from "modules/analytics/events/features/templates";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
 import "./RuleDetailsPanel.scss";
@@ -40,8 +41,8 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
     navigate(PATHS.RULES.TEMPLATES.ABSOLUTE);
   };
 
-  const handleUseTemplateClick = (templateId: string) => {
-    trackUseTemplateClick(source, ruleType);
+  const handleUseTemplateClick = (templateId: string, useCase: string) => {
+    trackRuleDetailsPanelUseCaseClicked(ruleType, source, useCase, "use_template");
     navigate(`${PATHS.RULES.TEMPLATES.ABSOLUTE}?id=${templateId}`);
   };
 
@@ -98,7 +99,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
                               type="link"
                               className="link use-template-btn"
                               icon={<MdOutlineFactCheck className="anticon" />}
-                              onClick={() => handleUseTemplateClick(example.suggestedTemplateId)}
+                              onClick={() => handleUseTemplateClick(example.suggestedTemplateId, useCase)}
                             >
                               Use template
                             </Button>
@@ -112,7 +113,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
                               className="link use-template-btn"
                               icon={<MdOutlineFileDownload className="anticon" />}
                               onClick={() => {
-                                // TODO: send event
+                                trackRuleDetailsPanelUseCaseClicked(ruleType, source, useCase, "dowload_desktop_app");
                               }}
                             >
                               Download Desktop App
@@ -127,7 +128,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
                               className="link use-template-btn"
                               icon={<MdOutlineOpenInNew className="anticon" />}
                               onClick={() => {
-                                // send event
+                                trackRuleDetailsPanelUseCaseClicked(ruleType, source, useCase, "try_this_rule");
                               }}
                             >
                               Try this rule
