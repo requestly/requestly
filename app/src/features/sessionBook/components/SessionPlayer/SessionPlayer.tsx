@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/features/session-recording/selectors";
+import {
+  getSessionRecordingAttributes,
+  getSessionRecordingEvents,
+  getTrimmedSessionData,
+} from "store/features/session-recording/selectors";
 import { RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
 import Replayer from "rrweb-player";
 import { cloneDeep } from "lodash";
@@ -18,6 +22,7 @@ import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessi
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 import PlayerFrameOverlay from "./components/PlayerOverlay/PlayerOverlay";
 import { useTheme } from "styled-components";
+import { useHasChanged } from "hooks";
 import "./sessionPlayer.scss";
 
 interface SessionPlayerProps {
@@ -42,6 +47,8 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const isPlayerSkippingInactivity = useRef(false);
   const skipInactiveSegments = useRef(true);
   const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
+  const trimmedSessionData = useSelector(getTrimmedSessionData);
+  const useSessionTrimDataChanged = useHasChanged(trimmedSessionData);
 
   const theme = useTheme();
 
@@ -100,9 +107,25 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   );
 
   useEffect(() => {
+    if (useSessionTrimDataChanged) {
+      console.log("useHasTrimmedSessionDataChanged effect");
+      setPlayer(null);
+    }
+  }, [useSessionTrimDataChanged]);
+
+  useEffect(() => {
     if (events?.rrweb?.length && !player) {
       // rrweb mutates events object whereas redux does not allow mutating state, so cloning.
-      const rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      let rrwebEvents;
+
+      if (trimmedSessionData) {
+        console.log("trimmedSessionData effect");
+        rrwebEvents = cloneDeep(trimmedSessionData.events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      } else {
+        rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      }
+
+      console.log("rrwebEvents effect");
 
       setPlayer(
         new Replayer({
@@ -121,7 +144,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
         })
       );
     }
-  }, [events, player]);
+  }, [events, player, trimmedSessionData]);
 
   useEffect(() => {
     // const pauseVideo = () => {
@@ -231,7 +254,8 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
               icon={playerState === PlayerState.PAUSED ? <MdOutlinePlayCircle /> : <MdPauseCircleOutline />}
             />
             <div className="session-player-duration-tracker">
-              {msToMinutesAndSeconds(playerTimeOffset * 1000 || 0)}/ {msToMinutesAndSeconds(attributes?.duration || 0)}
+              {msToMinutesAndSeconds(playerTimeOffset * 1000 || 0)}/{" "}
+              {msToMinutesAndSeconds(trimmedSessionData?.duration || attributes?.duration || 0)}
             </div>
           </div>
           <div className="session-player-jump-controllers">
