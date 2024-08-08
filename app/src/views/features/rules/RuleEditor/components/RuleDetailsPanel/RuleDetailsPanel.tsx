@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { ExampleType, RULE_DETAILS } from "./constants";
+import { RULE_DETAILS } from "./constants";
 import { RuleType } from "types";
 import { Button } from "antd";
 import { MdMenuBook } from "@react-icons/all-files/md/MdMenuBook";
@@ -20,6 +20,7 @@ import {
 import { trackViewAllTemplatesClick } from "modules/analytics/events/features/templates";
 import { useNavigate } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { ExampleType, UseCaseExample } from "./types";
 import "./RuleDetailsPanel.scss";
 
 interface RuleDetailsPanelProps {
@@ -51,6 +52,67 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
       trackRuleDetailsPanelViewed(ruleType, source);
     }
   }, [ruleType, source]);
+
+  const getActionButton = (useCase: string, example: UseCaseExample) => {
+    switch (example?.type) {
+      case ExampleType.USE_TEMPLATE: {
+        return (
+          <>
+            <Button
+              type="link"
+              className="link use-template-btn"
+              icon={<MdOutlineFactCheck className="anticon" />}
+              onClick={() => handleUseTemplateClick(example.suggestedTemplateId, useCase)}
+            >
+              Use template
+            </Button>
+          </>
+        );
+      }
+
+      case ExampleType.DOWNLOAD_DESKTOP_APP: {
+        return (
+          <>
+            <Button
+              type="link"
+              target="_blank"
+              href={example.link}
+              className="link use-template-btn"
+              icon={<MdOutlineFileDownload className="anticon" />}
+              onClick={() => {
+                trackRuleDetailsPanelUseCaseClicked(ruleType, source, useCase, "dowload_desktop_app");
+              }}
+            >
+              Download Desktop App
+            </Button>
+          </>
+        );
+      }
+
+      case ExampleType.PLAYGROUND_LINK: {
+        return (
+          <>
+            <Button
+              type="link"
+              target="_blank"
+              href={example.link}
+              className="link use-template-btn"
+              icon={<MdOutlineOpenInNew className="anticon" />}
+              onClick={() => {
+                trackRuleDetailsPanelUseCaseClicked(ruleType, source, useCase, "try_this_rule");
+              }}
+            >
+              Try this rule
+            </Button>
+          </>
+        );
+      }
+
+      default: {
+        return null;
+      }
+    }
+  };
 
   return !ruleType ? null : (
     <div key={ruleType} className="rule-details-panel-container">
@@ -86,6 +148,8 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
           <ul className="use-cases-list">
             {RULE_DETAILS[ruleType].useCases?.length > 0 &&
               RULE_DETAILS[ruleType].useCases?.map(({ useCase, example }, index) => {
+                const action = getActionButton(useCase, example);
+
                 return (
                   <>
                     <li key={index} className="use-case-list-item">
@@ -93,48 +157,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
                       <div className="use-case">
                         {useCase} {"  "}
                         <br />
-                        {example?.type === ExampleType.USE_TEMPLATE ? (
-                          <>
-                            <Button
-                              type="link"
-                              className="link use-template-btn"
-                              icon={<MdOutlineFactCheck className="anticon" />}
-                              onClick={() => handleUseTemplateClick(example.suggestedTemplateId, useCase)}
-                            >
-                              Use template
-                            </Button>
-                          </>
-                        ) : example?.type === ExampleType.DOWNLOAD_DESKTOP_APP ? (
-                          <>
-                            <Button
-                              type="link"
-                              target="_blank"
-                              href={example.link}
-                              className="link use-template-btn"
-                              icon={<MdOutlineFileDownload className="anticon" />}
-                              onClick={() => {
-                                trackRuleDetailsPanelUseCaseClicked(ruleType, source, useCase, "dowload_desktop_app");
-                              }}
-                            >
-                              Download Desktop App
-                            </Button>
-                          </>
-                        ) : example?.type === ExampleType.PLAYGROUND_LINK ? (
-                          <>
-                            <Button
-                              type="link"
-                              target="_blank"
-                              href={example.link}
-                              className="link use-template-btn"
-                              icon={<MdOutlineOpenInNew className="anticon" />}
-                              onClick={() => {
-                                trackRuleDetailsPanelUseCaseClicked(ruleType, source, useCase, "try_this_rule");
-                              }}
-                            >
-                              Try this rule
-                            </Button>
-                          </>
-                        ) : null}
+                        {action}
                       </div>
                     </li>
                   </>
