@@ -107,16 +107,16 @@ export const CancelPlanModal: React.FC<Props> = ({ isOpen, closeModal, subscript
       <Col className="cancel-plan-modal-description">
         {isIndividualPlanType ? (
           <>
-            Your <span className="text-white">{getPrettyPlanName(subscriptionDetails?.plan)} plan</span> will remain
+            Your <span className="text-white">{getPrettyPlanName(subscriptionDetails?.planName)} plan</span> will remain
             active until {getLongFormatDateString(new Date(endDate))}. You won't be charged for the next billing cycle
             and will automatically be switched to the Free plan thereafter.
           </>
         ) : (
           <>
-            Once cancelled, your <span className="text-white">{getPrettyPlanName(subscriptionDetails?.plan)} plan</span>{" "}
-            stays active until{" "}
-            {getLongFormatDateString(new Date(subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000))}. After that,
-            all premium features won't be accessible to you.
+            Once cancelled, your{" "}
+            <span className="text-white">{getPrettyPlanName(subscriptionDetails?.planName)} plan</span> stays active
+            until {getLongFormatDateString(new Date(subscriptionDetails?.subscriptionCurrentPeriodEnd * 1000))}. After
+            that, all premium features won't be accessible to you.
           </>
         )}
       </Col>
