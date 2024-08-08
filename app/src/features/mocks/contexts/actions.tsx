@@ -142,7 +142,7 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
         return redirectToMockEditorCreateMock(navigate, true, collectionId);
       }
       if (type === MockType.FILE) {
-        return openNewFileModalAction();
+        return openNewFileModalAction(collectionId);
       }
       trackNewMockButtonClicked(type, "mock_list");
       return redirectToMockEditorCreateMock(navigate, false, collectionId);

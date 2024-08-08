@@ -474,8 +474,12 @@ export const redirectToMockEditorCreateMock = (navigate, newTab = false, collect
   navigate(URL);
 };
 
-export const redirectToFileMockEditorCreateMock = (navigate, fileType) => {
-  const queryParam = fileType ? "file_type=" + fileType : "";
+export const redirectToFileMockEditorCreateMock = (navigate, fileType, collectionId = "") => {
+  let queryParam = "";
+
+  queryParam += fileType ? `file_type=${fileType}` : "";
+  queryParam += collectionId ? `&collectionId=${collectionId}` : "";
+
   navigate(`${PATHS.FILE_SERVER_V2.CREATE.ABSOLUTE}?${queryParam}`);
 };
 

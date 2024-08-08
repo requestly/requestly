@@ -4,11 +4,13 @@ import { NewFileModal } from "./NewFileModal";
 
 export const NewFileModalWrapper: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [collectionId, setCollectionId] = useState("");
 
   const { setOpenNewFileModalAction } = useMocksModalsContext();
 
   useEffect(() => {
-    const openModal = () => {
+    const openModal = (collectionId: string = "") => {
+      setCollectionId(collectionId);
       setIsVisible(true);
     };
 
@@ -19,5 +21,7 @@ export const NewFileModalWrapper: React.FC = () => {
     setIsVisible(false);
   };
 
-  return isVisible ? <NewFileModal visible={isVisible} toggleModalVisiblity={onClose} /> : null;
+  return isVisible ? (
+    <NewFileModal collectionId={collectionId} visible={isVisible} toggleModalVisiblity={onClose} />
+  ) : null;
 };
