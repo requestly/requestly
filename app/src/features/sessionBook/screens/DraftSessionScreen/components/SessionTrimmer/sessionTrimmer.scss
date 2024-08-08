@@ -54,6 +54,13 @@
     min-width: 200px;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 8px;
+  }
+
+  .session-trim-divider {
+    margin: 0 1rem;
+    height: 2rem;
+    border-color: var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.06));
   }
 }
