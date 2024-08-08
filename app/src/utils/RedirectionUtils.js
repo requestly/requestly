@@ -461,12 +461,17 @@ export const redirectToFileMockEditorEditMock = (navigate, mockId) => {
   navigate(mockEditUrl);
 };
 
-export const redirectToMockEditorCreateMock = (navigate, newTab = false) => {
+export const redirectToMockEditorCreateMock = (navigate, newTab = false, collectionId = "") => {
+  const URL = collectionId
+    ? `${PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE}?collectionId=${collectionId}`
+    : PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE;
+
   if (newTab) {
-    window.open(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE, "_blank");
+    window.open(URL, "_blank");
     return;
   }
-  navigate(PATHS.MOCK_SERVER_V2.CREATE.ABSOLUTE);
+
+  navigate(URL);
 };
 
 export const redirectToFileMockEditorCreateMock = (navigate, fileType) => {

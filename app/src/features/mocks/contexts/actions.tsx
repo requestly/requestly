@@ -34,7 +34,7 @@ type MocksActionContextType = {
   toggleMockStarAction: (record: RQMockSchema, onSuccess?: () => void) => void;
   uploadMockAction: (mockType: MockType) => void;
   createNewFileAction: () => void;
-  createNewMockAction: (mockType: MockType, source: MockListSource) => void;
+  createNewMockAction: (mockType: MockType, source: MockListSource, collectionId?: string) => void;
   removeMocksFromCollectionAction: (records: RQMockMetadataSchema[], onSuccess?: () => void) => void;
 };
 
@@ -134,18 +134,18 @@ export const MocksActionContextProvider: React.FC<RulesProviderProps> = ({ child
   }, [openNewFileModalAction]);
 
   const createNewMockAction = useCallback(
-    (type: MockType, source: MockListSource) => {
+    (type: MockType, source: MockListSource, collectionId: string = "") => {
       Logger.log("[DEBUG]", "createNewMockAction", { source, type });
 
       if (source === MockListSource.PICKER_MODAL) {
         trackNewMockButtonClicked(type, "picker_modal");
-        return redirectToMockEditorCreateMock(navigate, true);
+        return redirectToMockEditorCreateMock(navigate, true, collectionId);
       }
       if (type === MockType.FILE) {
         return openNewFileModalAction();
       }
       trackNewMockButtonClicked(type, "mock_list");
-      return redirectToMockEditorCreateMock(navigate);
+      return redirectToMockEditorCreateMock(navigate, false, collectionId);
     },
     [openNewFileModalAction, navigate]
   );
