@@ -38,6 +38,9 @@ export const initPageScriptMessageListener = () => {
           );
         });
         break;
+      case "cacheSharedState":
+        chrome.runtime.sendMessage(event.data);
+        break;
     }
   });
 };

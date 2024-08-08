@@ -10,6 +10,17 @@ const initAjaxRequestInterceptor = () => {
 
   initXhrInterceptor(isDebugMode);
   initFetchInterceptor(isDebugMode);
+
+  window.addEventListener("beforeunload", (event) => {
+    window.postMessage(
+      {
+        action: "cacheSharedState",
+        source: "requestly:client",
+        sharedState: window.top[PUBLIC_NAMESPACE]?.sharedState,
+      },
+      window.location.href
+    );
+  });
 };
 
 initAjaxRequestInterceptor();

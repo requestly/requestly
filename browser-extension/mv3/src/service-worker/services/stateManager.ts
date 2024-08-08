@@ -1,11 +1,12 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
+import { TAB_SERVICE_DATA, tabService } from "./tabService";
 // import { tabService } from "./tabService";
 
 class StateManager {
   private variables: Record<string, any>;
 
   private cacheSharedStateOnPage(tabId: number) {
-    const sharedState = {};
+    const sharedState = tabService.getData(tabId, TAB_SERVICE_DATA.SHARED_STATE, {});
 
     chrome.scripting.executeScript({
       target: { tabId, frameIds: [0] },
@@ -19,13 +20,13 @@ class StateManager {
     });
   }
 
-  // private updateSharedStateInStorage(tabId: number, sharedState: Record<string, any>) {
-  //   tabService.setData(tabId, "sharedState", sharedState);
-  // }
-
   constructor() {
     this.variables = {};
     this.addListenerForSharedState();
+  }
+
+  updateSharedStateInStorage(tabId: number, sharedState: Record<string, any>) {
+    tabService.setData(tabId, "sharedState", sharedState);
   }
 
   setVariables(newVariables: Record<string, any>) {
@@ -46,6 +47,7 @@ class StateManager {
 
   addListenerForSharedState() {
     chrome.webNavigation.onCommitted.addListener((tabData) => {
+      console.log("!!!debug", "onCommitted", tabData);
       this.cacheSharedStateOnPage(tabData.tabId);
     });
   }
