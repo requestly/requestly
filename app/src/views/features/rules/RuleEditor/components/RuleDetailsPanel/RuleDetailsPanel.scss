@@ -68,9 +68,16 @@
 
     .rule-details-container {
       flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       width: 100%;
       max-width: 480px;
-      border-right: 1px solid var(--requestly-colorr-white-t-20, rgba(255, 255, 255, 0.12));
+      border-right: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+
+      .title {
+        margin-bottom: 0;
+      }
 
       .description {
         font-size: var(--requestly-font-size-xs);
@@ -84,7 +91,7 @@
       }
 
       .links {
-        margin-top: 8px;
+        margin-top: auto;
 
         display: flex;
         align-items: center;

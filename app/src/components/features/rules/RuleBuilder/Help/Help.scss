@@ -270,6 +270,8 @@
 
     .details-panel {
       .rule-details-container {
+        border-right: none;
+
         .links {
           display: flex;
           flex-direction: column;
