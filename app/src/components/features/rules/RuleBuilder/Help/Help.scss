@@ -64,7 +64,7 @@
 }
 
 .rule-editor-help-lists {
-  height: 80vh;
+  // height: 80vh;
   overflow: hidden;
 }
 
@@ -81,6 +81,10 @@
 }
 
 .rule-editor-help-title {
+  font-weight: 500;
+  line-height: 150%; /* 19.5px */
+  font-size: var(--requestly-font-size-sm);
+  color: var(--requestly-color-text-default, #fff);
   margin: 1.25rem 0 12px 0;
 }
 
@@ -97,8 +101,8 @@
 }
 
 .rule-editor-help-list.external-links a {
-  font-size: 12px;
-  color: var(--white);
+  font-size: var(--requestly-font-size-xs);
+  color: var(--requestly-color-text-default);
   line-height: 14.06px;
   display: inline-flex;
   align-items: center;

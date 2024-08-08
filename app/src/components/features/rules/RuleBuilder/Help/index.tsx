@@ -148,6 +148,8 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
       });
   }, [ruleType]);
 
+  // TODO: cleanup
+
   return (
     <div className="rule-editor-help-container">
       <div className="rule-editor-help-content-container">
@@ -168,7 +170,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
 
           {isDocsVisible ? (
             <>
-              <div className="rule-editor-docs">
+              {/* <div className="rule-editor-docs">
                 <NotionRenderer
                   blockMap={notionPageData}
                   customBlockComponents={{
@@ -212,17 +214,17 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
                     },
                   }}
                 />
-              </div>
+              </div> */}
             </>
           ) : (
             <>
               {/* internal links */}
               <div ref={documentationListRef} className="rule-editor-help-lists">
-                <div className="caption text-gray text-bold rule-editor-help-title">
+                {/* <div className="caption text-gray text-bold rule-editor-help-title">
                   <CompassOutlined />
                   Documentation for {RULE_TYPES_CONFIG[ruleType].NAME}
-                </div>
-                <ul className="rule-editor-help-list">
+                </div> */}
+                {/* <ul className="rule-editor-help-list">
                   <>
                     {tableOfContents?.length ? (
                       <>
@@ -245,7 +247,7 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
                       />
                     )}
                   </>
-                </ul>
+                </ul> */}
 
                 {/* external links */}
                 <div className="caption text-gray text-bold rule-editor-help-title">
