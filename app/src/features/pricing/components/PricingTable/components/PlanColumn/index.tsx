@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Col, InputNumber, Row, Space, Tooltip, Typography } from "antd";
 import { PricingTableButtons } from "../../PricingTableButtons";
 import { CloseOutlined } from "@ant-design/icons";
@@ -9,7 +9,6 @@ import underlineIcon from "features/pricing/assets/yellow-highlight.svg";
 import checkIcon from "assets/img/icons/common/check.svg";
 import { trackPricingPlansQuantityChanged } from "features/pricing/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { useDebounce } from "hooks/useDebounce";
 import Logger from "lib/logger";
 
 interface PlanColumnProps {
@@ -35,6 +34,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
+  const hasFiddledWithQuantity = useRef(false);
 
   const getHeaderPlanName = () => {
     const pricingPlansOrder = [
@@ -95,32 +95,31 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
     PRICING_QUANTITY_CHANGED: "pricing_quantity_changed",
   };
 
-  const handlePricingQuantityChanged = useCallback(() => {
-    const addToApolloSequence = httpsCallable(getFunctions(), "pricing-addToApolloPricingFiddleSequence");
-    addToApolloSequence().catch((error) => {
-      Logger.log("Error adding user to apollo sequence", error);
-    });
-  }, []);
-
-  const debouncedHandlePricingQuantityChanged = useDebounce(handlePricingQuantityChanged, 10000);
-
-  const handleQuantityChange = (value: number) => {
-    if (value < 1 || value > 1000) {
-      setDisbaleUpgradeButton(true);
-    } else setDisbaleUpgradeButton(false);
-    setQuantity(value);
-    debouncedHandlePricingQuantityChanged();
-    trackPricingPlansQuantityChanged(value, planName, source);
-
-    const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
-    try {
-      salesInboundNotification({
-        notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} trigged with quantity ${value} for plan ${planName} and source ${source}`,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const handleQuantityChange = useCallback(
+    (value: number) => {
+      if (value < 1 || value > 1000) {
+        setDisbaleUpgradeButton(true);
+      } else setDisbaleUpgradeButton(false);
+      setQuantity(value);
+      trackPricingPlansQuantityChanged(value, planName, source);
+      if (!hasFiddledWithQuantity.current) {
+        const addToApolloSequence = httpsCallable(getFunctions(), "pricing-addToApolloPricingFiddleSequence");
+        addToApolloSequence().catch((error) => {
+          Logger.log("Error adding user to apollo sequence", error);
+        });
+        hasFiddledWithQuantity.current = true;
+      }
+      const salesInboundNotification = httpsCallable(getFunctions(), "premiumNotifications-salesInboundNotification");
+      try {
+        salesInboundNotification({
+          notificationText: `${EVENTS.PRICING_QUANTITY_CHANGED} trigged with quantity ${value} for plan ${planName} and source ${source}`,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [planName, source]
+  );
 
   return (
     <Col
