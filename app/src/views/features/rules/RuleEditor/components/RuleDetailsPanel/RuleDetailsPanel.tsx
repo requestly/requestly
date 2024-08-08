@@ -130,7 +130,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
                                 // send event
                               }}
                             >
-                              Try this on Requestly Playground
+                              Try this rule
                             </Button>
                           </>
                         ) : null}
