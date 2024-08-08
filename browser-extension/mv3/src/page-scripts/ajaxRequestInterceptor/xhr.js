@@ -103,6 +103,13 @@ export const initXhrInterceptor = (debug) => {
         const responseType = this.responseType;
         const contentType = this.getResponseHeader("content-type");
 
+        let sharedState;
+        try {
+          sharedState = window.top[PUBLIC_NAMESPACE]?.sharedState ?? {};
+        } catch (e) {
+          sharedState = {};
+        }
+
         let customResponse =
           responseModification.type === "code"
             ? getFunctionFromCode(responseModification.value, "response")(
@@ -115,7 +122,7 @@ export const initXhrInterceptor = (debug) => {
                   response: this.response,
                   responseJSON: jsonifyValidJSONString(this.response, true),
                 },
-                window.top[PUBLIC_NAMESPACE]?.sharedState ?? {}
+                sharedState
               )
             : responseModification.value;
 
