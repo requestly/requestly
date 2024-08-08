@@ -26,6 +26,7 @@ import { REQUEST_METHOD_COLORS } from "../../../../../../../../../constants/requ
 import PATHS from "config/constants/sub/paths";
 
 export const useMocksTableColumns = ({
+  source,
   mockType,
   handleNameClick,
   handleEditAction,
@@ -41,6 +42,7 @@ export const useMocksTableColumns = ({
   const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const {
+    createNewMockAction,
     updateCollectionNameAction,
     deleteCollectionAction,
     deleteRecordsAction,
@@ -107,6 +109,20 @@ export const useMocksTableColumns = ({
                 </span>
               </Tooltip>
             ) : null}
+
+            {isRuleEditor ? null : (
+              <>
+                <Button
+                  className="add-mock-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    createNewMockAction(mockType, source, record.id);
+                  }}
+                >
+                  <span>+</span> <span>Add {mockType === MockType.API ? "mock" : "file"}</span>
+                </Button>
+              </>
+            )}
           </div>
         ) : (
           <div className="mock-name-details-container">
