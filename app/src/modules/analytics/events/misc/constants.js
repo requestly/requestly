@@ -37,7 +37,7 @@ export const BUSINESS = {
     COMPLETED: "checkout_completed",
     ENTERPRISE_REQUESTED: "enterprise_requested",
 
-    // Suffice "frontend" to differentiate events from backend
+    // Suffix "frontend" to differentiate events from backend
     CHECKOUT_INITIATIED: "checkout_initiated_frontend",
     CHECKOUT_COMPLETED: "checkout_completed_frontend",
   },
