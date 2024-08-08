@@ -10,8 +10,8 @@ class StateManager {
     chrome.scripting.executeScript({
       target: { tabId, frameIds: [0] },
       func: (sharedState, PUBLIC_NAMESPACE) => {
-        window.top[PUBLIC_NAMESPACE] = window.top[PUBLIC_NAMESPACE] || {};
-        window.top[PUBLIC_NAMESPACE].sharedState = sharedState;
+        window[PUBLIC_NAMESPACE] = window[PUBLIC_NAMESPACE] || {};
+        window[PUBLIC_NAMESPACE].sharedState = sharedState;
       },
       args: [sharedState, PUBLIC_NAMESPACE],
       injectImmediately: true,
@@ -45,8 +45,8 @@ class StateManager {
   }
 
   addListenerForSharedState() {
-    chrome.tabs.onCreated.addListener((tabData) => {
-      this.cacheSharedStateOnPage(tabData.id);
+    chrome.webNavigation.onCommitted.addListener((tabData) => {
+      this.cacheSharedStateOnPage(tabData.tabId);
     });
   }
 }
