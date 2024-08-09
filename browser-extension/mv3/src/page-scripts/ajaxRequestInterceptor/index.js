@@ -11,12 +11,12 @@ const initAjaxRequestInterceptor = () => {
   initXhrInterceptor(isDebugMode);
   initFetchInterceptor(isDebugMode);
 
-  window.addEventListener("beforeunload", (event) => {
-    window.postMessage(
+  window.top.addEventListener("beforeunload", (event) => {
+    window.top.postMessage(
       {
         action: "cacheSharedState",
         source: "requestly:client",
-        sharedState: window.top[PUBLIC_NAMESPACE]?.sharedState,
+        sharedState: window[PUBLIC_NAMESPACE]?.sharedState,
       },
       window.location.href
     );

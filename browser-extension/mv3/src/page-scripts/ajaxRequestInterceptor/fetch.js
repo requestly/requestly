@@ -185,7 +185,7 @@ export const initFetchInterceptor = (debug) => {
         try {
           sharedState = window.top[PUBLIC_NAMESPACE]?.sharedState ?? {};
         } catch (e) {
-          sharedState = {};
+          sharedState = window[PUBLIC_NAMESPACE]?.sharedState ?? {};
         }
 
         customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs, sharedState);

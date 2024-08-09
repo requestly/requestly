@@ -107,7 +107,7 @@ export const initXhrInterceptor = (debug) => {
         try {
           sharedState = window.top[PUBLIC_NAMESPACE]?.sharedState ?? {};
         } catch (e) {
-          sharedState = {};
+          sharedState = window[PUBLIC_NAMESPACE]?.sharedState ?? {};
         }
 
         let customResponse =
