@@ -1,4 +1,4 @@
-import { PUBLIC_NAMESPACE } from "common/constants";
+import { EXTENSION_MESSAGES, PUBLIC_NAMESPACE } from "common/constants";
 import { matchRuleWithRequest, matchSourceUrl } from "../../common/ruleMatcher";
 import { SourceKey, SourceOperator } from "common/types";
 
@@ -136,6 +136,17 @@ export const notifyRequestRuleApplied = (message) => {
       action: "request_rule_applied",
       rule: message.ruleDetails,
       requestDetails: message["requestDetails"],
+    },
+    window.location.href
+  );
+};
+
+export const sendCacheSharedStateMessage = () => {
+  window.top.postMessage(
+    {
+      source: "requestly:client",
+      action: EXTENSION_MESSAGES.CACHE_SHARED_STATE,
+      sharedState: window[PUBLIC_NAMESPACE]?.sharedState,
     },
     window.location.href
   );

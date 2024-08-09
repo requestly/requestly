@@ -1,9 +1,12 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
-// import { tabService } from "./tabService";
 
-class StateManager {
-  private variables: Record<string, any>;
+declare const window: {
+  [key: string]: any;
+};
+
+class GlobalStateManager {
+  // private variables: Record<string, any>;
 
   private cacheSharedStateOnPage(tabId: number) {
     const sharedState = tabService.getData(tabId, TAB_SERVICE_DATA.SHARED_STATE, {});
@@ -21,36 +24,29 @@ class StateManager {
   }
 
   constructor() {
-    this.variables = {};
-    this.addListenerForSharedState();
+    // this.variables = {};
   }
 
   updateSharedStateInStorage(tabId: number, sharedState: Record<string, any>) {
     tabService.setData(tabId, "sharedState", sharedState);
   }
 
-  setVariables(newVariables: Record<string, any>) {
-    this.variables = newVariables;
-  }
+  // For future use - global state variables
+  // setVariables(newVariables: Record<string, any>) {
+  //   this.variables = newVariables;
+  // }
 
-  getVariable(key: string) {
-    return this.variables[key];
-  }
+  // getVariable(key: string) {
+  //   return this.variables[key];
+  // }
 
-  getVariables() {
-    return this.variables;
-  }
+  // getVariables() {
+  //   return this.variables;
+  // }
 
   initSharedStateCaching(tabId: number) {
     this.cacheSharedStateOnPage(tabId);
   }
-
-  addListenerForSharedState() {
-    chrome.webNavigation.onCommitted.addListener((tabData) => {
-      console.log("!!!debug", "onCommitted", tabData);
-      this.cacheSharedStateOnPage(tabData.tabId);
-    });
-  }
 }
 
-export const stateManager = new StateManager();
+export const globalStateManager = new GlobalStateManager();

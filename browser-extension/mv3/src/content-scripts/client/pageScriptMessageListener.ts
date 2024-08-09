@@ -38,7 +38,7 @@ export const initPageScriptMessageListener = () => {
           );
         });
         break;
-      case "cacheSharedState":
+      case EXTENSION_MESSAGES.CACHE_SHARED_STATE:
         chrome.runtime.sendMessage(event.data);
         break;
     }

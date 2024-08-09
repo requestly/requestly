@@ -1,6 +1,7 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
 import { initFetchInterceptor } from "./fetch";
 import { initXhrInterceptor } from "./xhr";
+import { sendCacheSharedStateMessage } from "./utils";
 
 const initAjaxRequestInterceptor = () => {
   let isDebugMode;
@@ -11,15 +12,8 @@ const initAjaxRequestInterceptor = () => {
   initXhrInterceptor(isDebugMode);
   initFetchInterceptor(isDebugMode);
 
-  window.top.addEventListener("beforeunload", (event) => {
-    window.top.postMessage(
-      {
-        action: "cacheSharedState",
-        source: "requestly:client",
-        sharedState: window[PUBLIC_NAMESPACE]?.sharedState,
-      },
-      window.location.href
-    );
+  window.top.addEventListener("beforeunload", () => {
+    sendCacheSharedStateMessage();
   });
 };
 

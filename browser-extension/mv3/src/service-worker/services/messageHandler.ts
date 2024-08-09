@@ -24,7 +24,7 @@ import {
 } from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
-import { stateManager } from "./stateManager";
+import { globalStateManager } from "./globalStateManager";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
@@ -147,8 +147,8 @@ export const initMessageHandler = () => {
         sendMessageToApp({ action: CLIENT_MESSAGES.NOTIFY_RECORD_UPDATED });
         break;
 
-      case "cacheSharedState":
-        stateManager.updateSharedStateInStorage(sender.tab.id, message.sharedState);
+      case EXTENSION_MESSAGES.CACHE_SHARED_STATE:
+        globalStateManager.updateSharedStateInStorage(sender.tab.id, message.sharedState);
     }
 
     return false;
