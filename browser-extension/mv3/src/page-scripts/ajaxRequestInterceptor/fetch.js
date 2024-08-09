@@ -172,7 +172,6 @@ export const initFetchInterceptor = (debug) => {
           const responseType = fetchedResponse.headers.get("content-type");
           const fetchedResponseDataAsJson = jsonifyValidJSONString(fetchedResponseData, true);
 
-          console.log("!!!debug", "fetchedResponse", fetchedResponse, window?.["__REQUESTLY__"]);
           evaluatorArgs = {
             ...evaluatorArgs,
             responseType,
@@ -189,8 +188,6 @@ export const initFetchInterceptor = (debug) => {
         }
 
         customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs, sharedState);
-
-        console.log("!!!debug", "customResponse", customResponse);
 
         if (typeof customResponse === "undefined") {
           return fetchedResponse;
