@@ -36,7 +36,10 @@ const FILE_TYPES_CONFIG = {
   },
 };
 
-const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => void }> = ({ handleTypeSelection }) => {
+const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => void; collectionId?: string }> = ({
+  collectionId = "",
+  handleTypeSelection,
+}) => {
   const navigate = useNavigate();
   const user = useSelector(getUserAuthDetails);
 
@@ -51,14 +54,18 @@ const NewFileTypeSelector: React.FC<{ handleTypeSelection?: (type: string) => vo
             <AuthConfirmationPopover
               title={`You need to sign up to create a ${data.TYPE} file`}
               callback={() =>
-                handleTypeSelection ? handleTypeSelection(type) : redirectToFileMockEditorCreateMock(navigate, type)
+                handleTypeSelection
+                  ? handleTypeSelection(type)
+                  : redirectToFileMockEditorCreateMock(navigate, type, collectionId)
               }
               source={SOURCE.CREATE_FILE_MOCK}
             >
               <Button
                 onClick={() =>
                   user?.details?.isLoggedIn &&
-                  (handleTypeSelection ? handleTypeSelection(type) : redirectToFileMockEditorCreateMock(navigate, type))
+                  (handleTypeSelection
+                    ? handleTypeSelection(type)
+                    : redirectToFileMockEditorCreateMock(navigate, type, collectionId))
                 }
                 className="create-file-btn"
                 type="primary"
