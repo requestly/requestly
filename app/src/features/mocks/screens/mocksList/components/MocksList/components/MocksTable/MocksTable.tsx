@@ -6,7 +6,13 @@ import APP_CONSTANTS from "config/constants";
 import { getUserAuthDetails } from "store/selectors";
 import { submitAttrUtil } from "utils/AnalyticsUtils";
 import { getCurrentlyActiveWorkspace, getIsWorkspaceMode } from "store/features/teams/selectors";
-import { MockRecordType, MockType, RQMockCollection, RQMockMetadataSchema } from "components/features/mocksV2/types";
+import {
+  MockListSource,
+  MockRecordType,
+  MockType,
+  RQMockCollection,
+  RQMockMetadataSchema,
+} from "components/features/mocksV2/types";
 import { generateFinalUrl } from "components/features/mocksV2/utils";
 import {
   ContentListTable,
@@ -26,6 +32,7 @@ import "./mocksTable.scss";
 import { updateMocksCollection } from "backend/mocks/updateMocksCollection";
 
 export interface MocksTableProps {
+  source: MockListSource;
   isLoading?: boolean;
   records: RQMockMetadataSchema[];
   filteredRecords: RQMockMetadataSchema[];
@@ -40,6 +47,7 @@ export interface MocksTableProps {
 }
 
 export const MocksTable: React.FC<MocksTableProps> = ({
+  source,
   records,
   filteredRecords,
   mockType,
@@ -87,6 +95,7 @@ export const MocksTable: React.FC<MocksTableProps> = ({
 
   // TODO: move all actions in a hook and use that
   const columns = useMocksTableColumns({
+    source,
     mockType,
     handleNameClick,
     handleEditAction,

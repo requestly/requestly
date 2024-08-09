@@ -4,11 +4,12 @@ import NewFileTypeSelector from "./NewFileTypeSelector";
 import "./NewFileModal.css";
 
 interface Props {
+  collectionId: string;
   toggleModalVisiblity: (visible: boolean) => void;
   visible?: boolean;
 }
 
-export const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity }) => {
+export const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity, collectionId = "" }) => {
   return (
     <RQModal
       open={visible}
@@ -20,7 +21,7 @@ export const NewFileModal: React.FC<Props> = ({ visible, toggleModalVisiblity })
       bodyStyle={{ padding: "1.875rem" }}
       width={800}
     >
-      <NewFileTypeSelector />
+      <NewFileTypeSelector collectionId={collectionId} />
     </RQModal>
   );
 };
