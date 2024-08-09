@@ -94,6 +94,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
 
   useEffect(() => {
     if (tabId === TabId.IFRAME) {
+      dispatch(sessionRecordingActions.setTrimmedSessiondata(null));
       const handleViewDraftMessage = (event: any) => {
         if (event.data.action === "viewDraftSession") {
           setIsLoading(true);
@@ -135,6 +136,7 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
       dispatch(sessionRecordingActions.setEvents(mockSession.events));
       setIsLoading(false);
     } else {
+      dispatch(sessionRecordingActions.setTrimmedSessiondata(null));
       getTabSession(parseInt(tabId))
         .then((payload: unknown) => {
           if (typeof payload === "string") {

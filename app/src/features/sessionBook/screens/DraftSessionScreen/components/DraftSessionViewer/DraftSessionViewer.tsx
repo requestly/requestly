@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -17,6 +17,7 @@ import { getSessionRecordingAttributes, getSessionRecordingMetaData } from "stor
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { SessionTrimmer } from "../SessionTrimmer/SessionTrimmer";
 import "./draftSessionViewer.scss";
+import { sessionRecordingActions } from "store/features/session-recording/slice";
 
 interface DraftSessionViewerProps {
   isDesktopMode: boolean;
@@ -25,6 +26,7 @@ interface DraftSessionViewerProps {
 export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDesktopMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const appFlavour = getAppFlavour();
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
   const [isDiscardClicked, setIsDiscardClicked] = useState(false);
@@ -55,14 +57,14 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
       cancelText: "No",
       onOk() {
         trackDraftSessionDiscarded();
-
+        dispatch(sessionRecordingActions.setTrimmedSessiondata(null));
         navigate(PATHS.SESSIONS.ABSOLUTE);
       },
       onCancel() {
         setIsDiscardClicked(false);
       },
     });
-  }, [navigate]);
+  }, [navigate, dispatch]);
 
   useEffect(() => {
     trackDraftSessionViewed(metadata?.recordingMode);
