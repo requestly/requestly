@@ -1,3 +1,4 @@
+import { PUBLIC_NAMESPACE } from "common/constants";
 import {
   applyDelay,
   getAbsoluteUrl,
@@ -148,7 +149,7 @@ export const initFetchInterceptor = (debug) => {
           fetchedResponse,
         });
 
-      let customResponse;
+      let customResponse, sharedState;
       const responseModification = responseRule.pairs[0].response;
 
       if (responseModification.type === "code") {
@@ -179,7 +180,13 @@ export const initFetchInterceptor = (debug) => {
           };
         }
 
-        customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
+        try {
+          sharedState = window.top[PUBLIC_NAMESPACE]?.sharedState ?? {};
+        } catch (e) {
+          sharedState = window[PUBLIC_NAMESPACE]?.sharedState ?? {};
+        }
+
+        customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs, sharedState);
 
         if (typeof customResponse === "undefined") {
           return fetchedResponse;
@@ -213,6 +220,8 @@ export const initFetchInterceptor = (debug) => {
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
       const finalStatusCode = parseInt(responseModification.statusCode || fetchedResponse?.status) || 200;
       const requiresNullResponseBody = [204, 205, 304].includes(finalStatusCode);
+
+      debug && console.log("[RQ.fetch]", { sharedState, isTopLevelFrame: window.self === window.top });
 
       return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
         status: finalStatusCode,
