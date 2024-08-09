@@ -57,6 +57,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
+            triggerUnsavedChangesIndication: false,
             updates: {
               "response.type": responseBodyType,
               "response.value": value,
