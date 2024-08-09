@@ -1,4 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
+import { getUserAuthDetails } from "store/selectors";
+import { useSelector } from "react-redux";
 import { Col, InputNumber, Row, Space, Tooltip, Typography } from "antd";
 import { PricingTableButtons } from "../../PricingTableButtons";
 import { CloseOutlined } from "@ant-design/icons";
@@ -32,6 +34,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
   isOpenedFromModal,
   setIsContactUsModalOpen,
 }) => {
+  const user = useSelector(getUserAuthDetails);
   const [quantity, setQuantity] = useState(1);
   const [disbaleUpgradeButton, setDisbaleUpgradeButton] = useState(false);
   const hasFiddledWithQuantity = useRef(false);
@@ -102,7 +105,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
       } else setDisbaleUpgradeButton(false);
       setQuantity(value);
       trackPricingPlansQuantityChanged(value, planName, source);
-      if (!hasFiddledWithQuantity.current) {
+      if (!hasFiddledWithQuantity.current && user.loggedIn) {
         const addToApolloSequence = httpsCallable(getFunctions(), "pricing-addToApolloPricingFiddleSequence");
         addToApolloSequence().catch((error) => {
           Logger.log("Error adding user to apollo sequence", error);
@@ -118,7 +121,7 @@ export const PlanColumn: React.FC<PlanColumnProps> = ({
         console.error(error);
       }
     },
-    [planName, source]
+    [planName, source, user.loggedIn]
   );
 
   return (
