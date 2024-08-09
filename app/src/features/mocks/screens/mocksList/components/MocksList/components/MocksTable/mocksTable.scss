@@ -55,6 +55,20 @@
     }
 
     &.collection-row {
+      .add-mock-btn {
+        display: none;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        height: 24px;
+      }
+
+      &:hover {
+        .add-mock-btn {
+          display: flex;
+        }
+      }
+
       .mock-collection-details-container {
         padding: 7px 0;
       }
