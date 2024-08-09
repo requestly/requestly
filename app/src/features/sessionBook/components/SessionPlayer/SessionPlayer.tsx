@@ -108,7 +108,6 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
 
   useEffect(() => {
     if (useSessionTrimDataChanged) {
-      console.log("useHasTrimmedSessionDataChanged effect");
       setPlayer(null);
     }
   }, [useSessionTrimDataChanged]);
@@ -119,13 +118,10 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
       let rrwebEvents;
 
       if (trimmedSessionData) {
-        console.log("trimmedSessionData effect");
         rrwebEvents = cloneDeep(trimmedSessionData.events[RQSessionEventType.RRWEB] as RRWebEventData[]);
       } else {
         rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
       }
-
-      console.log("rrwebEvents effect");
 
       setPlayer(
         new Replayer({

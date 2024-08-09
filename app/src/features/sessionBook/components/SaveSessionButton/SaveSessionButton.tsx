@@ -53,7 +53,7 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
 
   const handleSessionDownload = () => {
     const recordingOptions = getRecordingOptionsToSave(debugInfoToBeIncluded);
-    const sessionEventsToDownload = trimmedSessionData ? trimmedSessionData.events : sessionEvents;
+    const sessionEventsToDownload = trimmedSessionData.events ?? sessionEvents;
     const attributes = { ...sessionAttributes, duration: trimmedSessionData?.duration ?? sessionAttributes?.duration };
     const metadata = { ...sessionRecordingMetadata, sessionAttributes: attributes };
 

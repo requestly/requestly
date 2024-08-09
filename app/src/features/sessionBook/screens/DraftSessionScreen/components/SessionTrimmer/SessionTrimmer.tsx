@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/features/session-recording/selectors";
+import { getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { RQButton } from "lib/design-system/components";
 import "./sessionTrimmer.scss";
 import { EventType, eventWithTime } from "rrweb";
@@ -14,16 +14,16 @@ import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 
 interface SessionTrimmerProps {
   duration: number;
+  sessionStartTime: number;
 }
 
-export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration }) => {
+export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessionStartTime }) => {
   const dispatch = useDispatch();
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(duration);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isSessionTrimmed, setIsSessionTrimmed] = useState(false);
   const events = useSelector(getSessionRecordingEvents);
-  const attributes = useSelector(getSessionRecordingAttributes);
 
   const handleDrag = useCallback(
     (event: MouseEvent, isStart: boolean) => {
@@ -68,14 +68,12 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration }) => {
     const sessionEvents = events[RQSessionEventType.RRWEB] as eventWithTime[];
     const networkEvents = events[RQSessionEventType.NETWORK] as NetworkEventData[];
 
-    const sessionStartTimeFromEpoch = attributes.startTime;
+    const sessionStartTimeFromEpoch = sessionStartTime;
     const newStartTime = sessionStartTimeFromEpoch + startTime;
     const newEndTime = sessionStartTimeFromEpoch + endTime;
 
     const [beforeStartCut, afterStartCut] = partition(sessionEvents, (event) => event.timestamp < newStartTime);
-    const trimmedRRWebEvents = afterStartCut.filter(
-      (event) => event.timestamp >= newStartTime && event.timestamp <= newEndTime
-    );
+    const trimmedRRWebEvents = afterStartCut.filter((event) => event.timestamp <= newEndTime);
 
     const snapshots = beforeStartCut.filter(
       (event) => event.timestamp < newStartTime && event.type === EventType.FullSnapshot
@@ -102,7 +100,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration }) => {
       (event) =>
         !(event.type === EventType.IncrementalSnapshot && [IncrementalSource.Scroll].includes(event.data.source))
     );
-
+    // Type 4 event is required to be at the start of session's rrweb events
     const metaEvents = beforeStartCut.filter((event) => event.type === EventType.Meta);
     const lastMetaEvent = metaEvents[metaEvents.length - 1];
 
@@ -128,7 +126,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration }) => {
         },
       })
     );
-  }, [attributes, startTime, endTime, dispatch, events]);
+  }, [startTime, endTime, dispatch, events, sessionStartTime]);
 
   return (
     <div className="session-trimmer-container">
