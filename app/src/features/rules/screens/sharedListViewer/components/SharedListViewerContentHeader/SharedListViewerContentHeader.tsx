@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllRules, getAppMode, getUserAuthDetails } from "store/selectors";
-import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { useFeatureLimiter } from "hooks/featureLimiter/useFeatureLimiter";
 import { useFeatureValue } from "@growthbook/growthbook-react";
@@ -44,7 +43,6 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const allRules = useSelector(getAllRules);
-  const isWorkspaceMode = useSelector(getIsWorkspaceMode);
   const navigate = useNavigate();
   const location = useLocation();
   const { getFeatureLimitValue } = useFeatureLimiter();
@@ -82,14 +80,6 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
       );
       trackUpgradeToastViewed(sharedListRules.length, "shared_list_import");
       return;
-    }
-
-    if (isWorkspaceMode) {
-      const message =
-        "Do you really want to import this shared list to current workspace? It will be available for every team member.";
-      if (!window.confirm(message) === true) {
-        return;
-      }
     }
 
     setAreRulesImporting(true);
@@ -130,7 +120,6 @@ export const SharedListsContentHeader: React.FC<ContentHeaderProps> = ({
     isImportLimitReached,
     isBackgateRestrictionEnabled,
     isUpgradePopoverEnabled,
-    isWorkspaceMode,
     appMode,
     dispatch,
     navigate,
