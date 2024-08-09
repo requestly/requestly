@@ -2,7 +2,6 @@ import React, { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import { RQButton } from "lib/design-system/components";
-import { MdPause } from "@react-icons/all-files/md/MdPause";
 import "./sessionTrimmer.scss";
 import { EventType, eventWithTime } from "rrweb";
 import { fullSnapshotEvent, IncrementalSource } from "@rrweb/types";
@@ -10,6 +9,8 @@ import { NetworkEventData, RQSessionEventType } from "@requestly/web-sdk";
 import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { partition } from "lodash";
 import { Divider } from "antd";
+import { TrimHandle } from "./components/TrimHandle/TrimHandle";
+import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 
 interface SessionTrimmerProps {
   duration: number;
@@ -102,8 +103,11 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration }) => {
         !(event.type === EventType.IncrementalSnapshot && [IncrementalSource.Scroll].includes(event.data.source))
     );
 
+    const metaEvents = beforeStartCut.filter((event) => event.type === EventType.Meta);
+    const lastMetaEvent = metaEvents[metaEvents.length - 1];
+
     const finalTrimmedRRWebEvents = [
-      { ...sessionEvents[0], timestamp: newStartTime - 1000 },
+      { ...lastMetaEvent, timestamp: newStartTime - 1000 },
       { ...lastSnapshot!, timestamp: newStartTime - 1000 },
       ...Array.from(discardedScrolls)
         .concat(beforeCutExcludingScrolls)
@@ -129,16 +133,13 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration }) => {
   return (
     <div className="session-trimmer-container">
       <div className="session-trimmer-area" ref={containerRef}>
-        <div
-          className="session-trimmer-handle handle-left"
+        <TrimHandle
+          direction="left"
           onMouseDown={() => startDrag(true)}
-          style={{
-            left: `${(startTime / duration) * 100}%`,
-            marginLeft: "-8px",
-          }}
-        >
-          <MdPause />
-        </div>
+          value={msToMinutesAndSeconds(startTime)}
+          time={startTime}
+          duration={duration}
+        />
         <div
           className="session-trimmer-bar"
           style={{
@@ -146,16 +147,13 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration }) => {
             width: `${((endTime - startTime) / duration) * 100}%`,
           }}
         />
-        <div
-          className="session-trimmer-handle handle-right"
+        <TrimHandle
+          direction="right"
           onMouseDown={() => startDrag(false)}
-          style={{
-            left: `${(endTime / duration) * 100}%`,
-            marginRight: "-8px",
-          }}
-        >
-          <MdPause />
-        </div>
+          value={msToMinutesAndSeconds(endTime)}
+          time={endTime}
+          duration={duration}
+        />
       </div>
       <div className="session-trim-actions">
         <Divider type="vertical" className="session-trim-divider" />
