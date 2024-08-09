@@ -149,7 +149,7 @@ export const initFetchInterceptor = (debug) => {
           fetchedResponse,
         });
 
-      let customResponse;
+      let customResponse, sharedState;
       const responseModification = responseRule.pairs[0].response;
 
       if (responseModification.type === "code") {
@@ -180,7 +180,6 @@ export const initFetchInterceptor = (debug) => {
           };
         }
 
-        let sharedState;
         try {
           sharedState = window.top[PUBLIC_NAMESPACE]?.sharedState ?? {};
         } catch (e) {
@@ -221,6 +220,8 @@ export const initFetchInterceptor = (debug) => {
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
       const finalStatusCode = parseInt(responseModification.statusCode || fetchedResponse?.status) || 200;
       const requiresNullResponseBody = [204, 205, 304].includes(finalStatusCode);
+
+      debug && console.log("[RQ.fetch]", { sharedState, isTopLevelFrame: window.self === window.top });
 
       return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
         status: finalStatusCode,

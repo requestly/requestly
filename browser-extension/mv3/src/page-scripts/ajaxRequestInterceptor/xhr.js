@@ -130,6 +130,8 @@ export const initXhrInterceptor = (debug) => {
           return;
         }
 
+        debug && console.log("[RQ.XHR]", { sharedState, isTopLevelFrame: window.self === window.top });
+
         // Convert customResponse back to rawText
         // response.value is String and evaluator method might return string/object
         if (isPromise(customResponse)) {
