@@ -39,7 +39,7 @@ export const useMocksTableColumns = ({
   const workspace = useSelector(getCurrentlyActiveWorkspace);
   const teamId = workspace?.id;
   const { pathname } = useLocation();
-  const isRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
+  const isOpenedInRuleEditor = pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
 
   const {
     createNewMockAction,
@@ -58,7 +58,7 @@ export const useMocksTableColumns = ({
       dataIndex: "isFavourite",
       width: 30,
       render: (_: any, record: RQMockSchema) => {
-        return isRuleEditor ? null : (
+        return isOpenedInRuleEditor ? null : (
           <Button
             type="text"
             onClick={(e) => {
@@ -78,7 +78,7 @@ export const useMocksTableColumns = ({
       title: <div className="rq-col-title">Name</div>,
       dataIndex: "name",
       ellipsis: true,
-      width: isWorkspaceMode ? (isRuleEditor ? 110 : 290) : isRuleEditor ? 290 : 360,
+      width: isWorkspaceMode ? (isOpenedInRuleEditor ? 110 : 290) : isOpenedInRuleEditor ? 290 : 360,
       render: (_: any, record: RQMockSchema) => {
         const isCollection = isRecordMockCollection(record);
         const collectionPath = ((record as unknown) as RQMockCollection)?.path ?? "";
@@ -110,7 +110,7 @@ export const useMocksTableColumns = ({
               </Tooltip>
             ) : null}
 
-            {isRuleEditor ? null : (
+            {isOpenedInRuleEditor ? null : (
               <>
                 <Button
                   className="add-mock-btn"
@@ -208,7 +208,7 @@ export const useMocksTableColumns = ({
     {
       key: "actions",
       align: "right",
-      width: isWorkspaceMode ? (isRuleEditor ? 50 : 90) : 90,
+      width: isWorkspaceMode ? (isOpenedInRuleEditor ? 50 : 90) : 90,
       render: (_: any, record: RQMockSchema) => {
         const collectionPath =
           isRecordMock(record) && record.collectionId
@@ -381,7 +381,7 @@ export const useMocksTableColumns = ({
     columns.splice(4, 1);
   }
 
-  if (isRuleEditor) {
+  if (isOpenedInRuleEditor) {
     // remove star mock column in modal view
     columns.splice(2, 1);
   }
