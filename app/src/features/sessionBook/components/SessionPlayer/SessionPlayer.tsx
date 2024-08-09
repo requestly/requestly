@@ -130,6 +130,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
             events: rrwebEvents,
             width: playerRef.current.clientWidth,
             autoPlay: true,
+            mouseTail: false,
             // prevents elements inside rrweb-player to steal focus
             // The elements inside the player were stealing the focus from the inputs in the session viewer pages
             // The drawback is that it doesn't allow the focus styles to be applied: https://github.com/rrweb-io/rrweb/issues/876
