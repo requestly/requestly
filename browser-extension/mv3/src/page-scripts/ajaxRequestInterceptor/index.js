@@ -13,7 +13,7 @@ const initAjaxRequestInterceptor = () => {
   initFetchInterceptor(isDebugMode);
 
   if (window.top === window.self) {
-    window.top.addEventListener("beforeunload", () => {
+    window.addEventListener("beforeunload", () => {
       sendCacheSharedStateMessage();
     });
   }
