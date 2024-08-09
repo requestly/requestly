@@ -43,7 +43,7 @@ export const useSaveDraftSession = () => {
       const isDraftSession =
         window.location.pathname.includes("draft") || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
 
-      const sessionEventsToSave = trimmedSessionData ? trimmedSessionData.events : sessionEvents;
+      const sessionEventsToSave = trimmedSessionData?.events ?? sessionEvents;
       const attributes = {
         ...sessionAttributes,
         duration: trimmedSessionData?.duration ?? sessionAttributes?.duration,
