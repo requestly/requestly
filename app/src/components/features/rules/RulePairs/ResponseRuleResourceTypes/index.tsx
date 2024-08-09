@@ -26,7 +26,7 @@ const DownloadDesktopAppLink: React.FC = () => (
   </a>
 );
 
-const ResponseRuleResourceTypes: React.FC = () => {
+const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown> }> = ({ ruleDetails }) => {
   const dispatch = useDispatch();
   const isDesktop = useMemo(isDesktopMode, []);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
@@ -52,9 +52,13 @@ const ResponseRuleResourceTypes: React.FC = () => {
         pairs: [{ ...updatedPair }],
       };
 
-      setCurrentlySelectedRule(dispatch, updatedRule, resourceType !== ResponseRuleResourceType.UNKNOWN);
+      const responseValue = updatedRule?.pairs?.[pairIndex]?.response?.value;
+
+      const isDefaultValue = ["", "{}", ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"]].includes(responseValue);
+
+      setCurrentlySelectedRule(dispatch, updatedRule, !isDefaultValue);
     },
-    [dispatch, currentlySelectedRuleData]
+    [dispatch, currentlySelectedRuleData, ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"]]
   );
 
   const isNewResponseRule = "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});

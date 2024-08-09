@@ -57,7 +57,9 @@ const RulePairs = (props) => {
 
   return (
     <>
-      {props.currentlySelectedRuleConfig.TYPE === "Response" ? <ResponseRuleResourceTypes /> : null}
+      {props.currentlySelectedRuleConfig.TYPE === "Response" ? (
+        <ResponseRuleResourceTypes ruleDetails={props.currentlySelectedRuleConfig} />
+      ) : null}
 
       {props.currentlySelectedRuleConfig.TYPE !== "Response" || responseRuleResourceType !== "" ? (
         <Collapse
