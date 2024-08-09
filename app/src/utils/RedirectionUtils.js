@@ -475,12 +475,17 @@ export const redirectToMockEditorCreateMock = (navigate, newTab = false, collect
 };
 
 export const redirectToFileMockEditorCreateMock = (navigate, fileType, collectionId = "") => {
-  let queryParam = "";
+  const queryParams = new URLSearchParams();
 
-  queryParam += fileType ? `file_type=${fileType}` : "";
-  queryParam += collectionId ? `&collectionId=${collectionId}` : "";
+  if (fileType) {
+    queryParams.set("file_type", fileType);
+  }
 
-  navigate(`${PATHS.FILE_SERVER_V2.CREATE.ABSOLUTE}?${queryParam}`);
+  if (collectionId) {
+    queryParams.set("collectionId", collectionId);
+  }
+
+  navigate(`${PATHS.FILE_SERVER_V2.CREATE.ABSOLUTE}?${queryParams.toString()}`);
 };
 
 export const redirectToMocksList = (navigate, newTab = false) => {
