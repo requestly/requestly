@@ -127,13 +127,32 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ source, isSa
     }
   };
 
-  return !ruleType ? null : (
-    <div key={ruleType} className={`rule-details-panel-container ${isSample ? "sample-rule" : ""}`}>
-      {!isSample ? (
-        <span className="close-btn" onClick={handleCloseClick}>
-          <MdClose className="anticon" />
-        </span>
-      ) : null}
+  return !ruleType ? null : isSample ? (
+    <div key={ruleType} className={`rule-details-panel-container sample-rule`}>
+      <div className="details-panel">
+        <div className="rule-details-container">
+          <div className="title">{name}</div>
+          <div className="description">{description}</div>
+          <div className="links">
+            <Button
+              type="link"
+              target="_blank"
+              rel="noreferrer"
+              className="link documentation-link"
+              href={documentationLink}
+              onClick={() => trackRuleDetailsPanelDocsClicked(ruleType, source)}
+            >
+              <MdMenuBook /> Read complete documentation <MdOutlineOpenInNew />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div key={ruleType} className={`rule-details-panel-container`}>
+      <span className="close-btn" onClick={handleCloseClick}>
+        <MdClose className="anticon" />
+      </span>
 
       <div className="details-panel">
         <div className="rule-details-container">

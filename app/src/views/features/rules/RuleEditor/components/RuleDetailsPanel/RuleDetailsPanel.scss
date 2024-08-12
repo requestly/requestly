@@ -8,6 +8,60 @@
   margin-top: 16px;
   position: relative;
 
+  &.sample-rule {
+    background: var(--requestly-color-surface-1, #282828);
+
+    .details-panel {
+      .rule-details-container {
+        border: none;
+        max-width: 100%;
+
+        .title {
+          color: var(--requestly-color-text-default, #fff);
+
+          font-style: normal;
+          font-weight: 500;
+          font-size: var(--requestly-font-size-sm);
+          line-height: var(--line-height-sm, 20px); /* 153.846% */
+          display: flex;
+          align-items: center;
+
+          &::after {
+            content: "SAMPLE RULE";
+
+            display: inline-flex;
+            padding: var(--space-3, 6px);
+            align-items: center;
+            gap: var(--space-0, 0px);
+            color: var(--requestly-color-primary-0);
+            text-align: center;
+            font-size: var(--requestly-font-size-2xs);
+            font-style: normal;
+            font-weight: 500;
+            line-height: 9px; /* 90% */
+            letter-spacing: 1px;
+            text-transform: uppercase;
+
+            border-radius: var(--space-2, 4px);
+            background: rgba(0, 78, 235, 0.4);
+            margin-left: 8px;
+          }
+        }
+
+        .description {
+          color: var(--requestly-color-text-subtle, #bbb);
+
+          font-style: normal;
+          font-weight: 400;
+          font-size: var(--requestly-font-size-sm);
+          line-height: var(--line-height-sm, 20px); /* 153.846% */
+          line-clamp: 4;
+          -webkit-line-clamp: 4;
+        }
+      }
+    }
+  }
+
   .link.ant-btn {
     padding: 0;
     height: 14px;
