@@ -126,24 +126,6 @@ export const injectScript = (script: ScriptObject, target: chrome.scripting.Inje
   });
 };
 
-export const injectWebAccessibleScript = (
-  scriptPath: string,
-  target: chrome.scripting.InjectionTarget
-): Promise<unknown> => {
-  return new Promise((resolve) => {
-    chrome.scripting.executeScript(
-      {
-        target,
-        files: [scriptPath],
-        world: "MAIN",
-        // @ts-ignore
-        injectImmediately: true,
-      },
-      resolve
-    );
-  });
-};
-
 export const injectJSAtRequestSource = (code: string, requestDetails: chrome.webRequest.WebRequestDetails) => {
   injectScript(
     {
