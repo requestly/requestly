@@ -3,7 +3,6 @@ import { CLIENT_MESSAGES, EXTENSION_MESSAGES, STORAGE_KEYS } from "common/consta
 import rulesStorageService from "../../rulesStorageService";
 import { getRecord } from "common/storage";
 import { Rule } from "common/types";
-import RuleExecutionHandler from "./ruleExecutionHandler";
 
 let implicitTestRuleFlowEnabled = false;
 let explicitTestRuleFlowEnabled = false;
@@ -63,7 +62,7 @@ const showExplicitTestRuleWidget = async (ruleId: string) => {
     });
   });
 
-  const appliedRules = await RuleExecutionHandler.getExecutedRules();
+  const appliedRules = await getExecutedRules();
 
   if (appliedRules) {
     appliedRules?.forEach((rule: Rule) => {
@@ -145,7 +144,7 @@ export const showImplicitTestRuleWidget = async () => {
 
   document.documentElement.appendChild(testRuleWidget);
 
-  const appliedRules = await RuleExecutionHandler.getExecutedRules();
+  const appliedRules = await getExecutedRules();
 
   if (appliedRules) {
     appliedRules?.forEach((rule: Rule) => {
@@ -200,6 +199,11 @@ export const handleAppliedRuleNotification = async (rule: Rule) => {
   }
 };
 
+enum ImplicitWidgetVisibility {
+  ALL = "all",
+  SPECIFIC = "specific",
+}
+
 const shouldShowImplicitWidget = (ruleType: string) => {
   const implicitConfig = implictTestRuleWidgetConfig;
 
@@ -216,7 +220,8 @@ const shouldShowImplicitWidget = (ruleType: string) => {
   return true;
 };
 
-enum ImplicitWidgetVisibility {
-  ALL = "all",
-  SPECIFIC = "specific",
-}
+const getExecutedRules = async () => {
+  return chrome.runtime.sendMessage({
+    action: EXTENSION_MESSAGES.GET_EXECUTED_RULES,
+  });
+};
