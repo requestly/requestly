@@ -119,7 +119,7 @@ const Header = ({ mode }) => {
                     navigate(`${PATHS.RULE_EDITOR.CREATE_RULE.ABSOLUTE}/${currentlySelectedRuleData?.ruleType}`);
                   }}
                 >
-                  Create a {currentlySelectedRuleConfig.NAME} rule
+                  Create {currentlySelectedRuleConfig.NAME?.toLowerCase()} rule
                 </Button>
               </Col>
 
