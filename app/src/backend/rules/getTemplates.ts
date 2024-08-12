@@ -1,15 +1,16 @@
 import firebaseApp from "../../firebase";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import { RuleTemplate } from "features/rules";
 
-export const getTemplates = async (): Promise<RuleTemplate[]> => {
-  const templates = await getTemplatesFromFirebase();
+export const getTemplates = async (templateIds: string[]): Promise<RuleTemplate[]> => {
+  const templates = await getTemplatesFromFirebase(templateIds);
   return templates;
 };
 
-const getTemplatesFromFirebase = async (): Promise<RuleTemplate[]> => {
+const getTemplatesFromFirebase = async (templateIds: string[]): Promise<RuleTemplate[]> => {
   const db = getFirestore(firebaseApp);
-  const querySnapshot = await getDocs(collection(db, "templates"));
+  const templateQuery = query(collection(db, "templates"), where("id", "in", templateIds));
+  const querySnapshot = await getDocs(templateQuery);
 
   if (!querySnapshot.empty) {
     const templates: RuleTemplate[] = [];

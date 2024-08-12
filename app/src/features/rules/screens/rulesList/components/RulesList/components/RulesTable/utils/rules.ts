@@ -105,19 +105,19 @@ export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRe
 
 export const getSampleRules = async () => {
   try {
-    const templates = await getTemplates();
+    const sampleRuleIds = Object.keys(sampleRuleDetails);
 
-    const sampleRules = templates
-      .filter((template) => !!sampleRuleDetails[template.id])
-      .map((template) => ({
-        ...template.data.ruleData,
-        sampleId: template.id,
-        isReadOnly: true,
-        isSample: true,
-        lastModifiedBy: null,
-        createdBy: null,
-        currentOwner: null,
-      }));
+    const templates = await getTemplates(sampleRuleIds);
+
+    const sampleRules = templates.map((template) => ({
+      ...template.data.ruleData,
+      sampleId: template.id,
+      isReadOnly: true,
+      isSample: true,
+      lastModifiedBy: null,
+      createdBy: null,
+      currentOwner: null,
+    }));
 
     return sampleRules;
   } catch (error) {
