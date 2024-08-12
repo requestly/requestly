@@ -131,7 +131,9 @@ export const importSampleRules = async (user: User, appMode: AppMode) => {
 
   return processDataToImport(sampleRules, user)
     .then((result) => {
-      const processedRulesToImport = result.data as (Rule | Group)[];
+      const processedRulesToImport = (result.data as (Rule | Group)[]).map((record) => {
+        return record.objectType === RecordType.GROUP ? { ...record, status: RecordStatus.ACTIVE } : record;
+      });
 
       return addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
         const groupIdsToExpand = processedRulesToImport.reduce(
