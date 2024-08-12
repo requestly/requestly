@@ -8,7 +8,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
     demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=inject-scripts",
     details: {
       type: RuleType.SCRIPT,
-      name: "Inject Scripts",
+      name: "Inject CSS/JS on a website",
       description:
         "The Insert Script rule allows you to inject custom JavaScript or styles into any website. With this rule, the background of the items is changed by injecting custom CSS. Toggle the rule on and off and reload the website to observe the differences.",
       documentationLink: LINKS.REQUESTLY_SCRIPT_RULE_DOCS,
