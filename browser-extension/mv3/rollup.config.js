@@ -53,6 +53,19 @@ if (isProductionBuildMode) {
   commonPlugins.push(terser());
 }
 
+const onWarnHandler = (warning, defaultHandler) => {
+  // Fail build on certain warnings
+  switch (warning.code) {
+    case "CIRCULAR_DEPENDENCY": {
+      console.error("\x1b[31m%s\x1b[0s", `[Build Failed] ${warning.message}`);
+      process.exit(-1);
+    }
+
+    default:
+      defaultHandler(warning);
+  }
+};
+
 export default [
   {
     input: "src/service-worker/index.ts",
@@ -83,6 +96,7 @@ export default [
         ],
       }),
     ],
+    onwarn: onWarnHandler,
   },
   {
     input: "src/content-scripts/app/index.ts",
@@ -91,6 +105,7 @@ export default [
       format: "iife",
     },
     plugins: commonPlugins,
+    onwarn: onWarnHandler,
   },
   {
     input: "src/content-scripts/client/index.ts",
@@ -99,6 +114,7 @@ export default [
       format: "iife",
     },
     plugins: commonPlugins,
+    onwarn: onWarnHandler,
   },
   {
     input: "src/page-scripts/sessionRecorderHelper.js",
@@ -107,6 +123,7 @@ export default [
       format: "iife",
     },
     plugins: commonPlugins,
+    onwarn: onWarnHandler,
   },
   {
     input: "src/page-scripts/ajaxRequestInterceptor/index.js",
@@ -115,6 +132,7 @@ export default [
       format: "iife",
     },
     plugins: commonPlugins,
+    onwarn: onWarnHandler,
   },
   {
     input: "src/utility-scripts/cacheJson/cacheJsonOnPage.js",
@@ -123,5 +141,6 @@ export default [
       format: "iife",
     },
     plugins: commonPlugins,
+    onwarn: onWarnHandler,
   },
 ];
