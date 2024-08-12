@@ -27,7 +27,10 @@ export type RuleDetails = {
   name: string;
   icon?: () => ReactNode;
   description: string;
-  useCases?: { useCase: string; suggestedTemplateId?: string }[];
+  useCases?: {
+    useCase: string;
+    example?: UseCaseExample;
+  }[];
   documentationLink: string;
 };
 
@@ -125,7 +128,7 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ source, isSa
   };
 
   return !ruleType ? null : (
-    <div key={ruleType} className="rule-details-panel-container">
+    <div key={ruleType} className={`rule-details-panel-container ${isSample ? "sample-rule" : ""}`}>
       {!isSample ? (
         <span className="close-btn" onClick={handleCloseClick}>
           <MdClose className="anticon" />
@@ -134,15 +137,15 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ source, isSa
 
       <div className="details-panel">
         <div className="rule-details-container">
-          <div className="title">{RULE_DETAILS[ruleType].name}</div>
-          <div className="description">{RULE_DETAILS[ruleType].description}</div>
+          <div className="title">{name}</div>
+          <div className="description">{description}</div>
           <div className="links">
             <Button
               type="link"
               target="_blank"
               rel="noreferrer"
               className="link documentation-link"
-              href={RULE_DETAILS[ruleType].documentationLink}
+              href={documentationLink}
               onClick={() => trackRuleDetailsPanelDocsClicked(ruleType, source)}
             >
               <MdMenuBook /> Read complete documentation <MdOutlineOpenInNew />
@@ -158,8 +161,8 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ source, isSa
           <div className="title">Popular use cases</div>
 
           <ul className="use-cases-list">
-            {RULE_DETAILS[ruleType].useCases?.length > 0 &&
-              RULE_DETAILS[ruleType].useCases?.map(({ useCase, example }, index) => {
+            {useCases?.length > 0 &&
+              useCases?.map(({ useCase, example }, index) => {
                 const action = getActionButton(useCase, example);
 
                 return (
