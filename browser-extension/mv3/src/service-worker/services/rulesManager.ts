@@ -1,10 +1,9 @@
 import config from "common/config";
 import { getEnabledRules, onRuleOrGroupChange } from "common/rulesStore";
 import { onVariableChange, Variable } from "../variable";
-import { debounce, isExtensionEnabled } from "../../utils";
+import { debounce, isExtensionEnabled, sendMessageToApp } from "../../utils";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import { SessionRuleType } from "./requestProcessor/types";
-import { sendMessageToApp } from "./messageHandler";
 import { EXTENSION_MESSAGES } from "common/constants";
 import { UpdateDynamicRuleOptions } from "common/types";
 import { getBlockedDomains, onBlockListChange } from "../../common/ruleMatcher";

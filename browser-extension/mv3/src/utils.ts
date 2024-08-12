@@ -1,5 +1,5 @@
 import config from "common/config";
-import { Variable, getVariable } from "./service-worker/variable";
+import { Variable, getVariable, setVariable } from "./service-worker/variable";
 
 export const formatDate = (dateInMillis: number, format: string): string => {
   if (dateInMillis && format === "yyyy-mm-dd") {
@@ -56,4 +56,32 @@ export const debounce = (func: Function, wait: number) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
+};
+
+export const toggleExtensionStatus = async (onStatusChangeCallback?: (updatedStatus: boolean) => void) => {
+  const extensionEnabledStatus = await isExtensionEnabled();
+
+  const updatedStatus = !extensionEnabledStatus;
+  setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, updatedStatus);
+
+  onStatusChangeCallback?.(updatedStatus);
+
+  return updatedStatus;
+};
+
+const getAppTabs = async (): Promise<chrome.tabs.Tab[]> => {
+  const webURLs = getAllSupportedWebURLs();
+  let appTabs: chrome.tabs.Tab[] = [];
+
+  for (const webURL of webURLs) {
+    const tabs = await chrome.tabs.query({ url: webURL + "/*" });
+    appTabs = [...appTabs, ...tabs];
+  }
+
+  return appTabs;
+};
+
+export const sendMessageToApp = async (messageObject: unknown) => {
+  const appTabs = await getAppTabs();
+  return Promise.all(appTabs.map(({ id }) => chrome.tabs.sendMessage(id, messageObject)));
 };

@@ -1,8 +1,8 @@
 import { ResourceType, Rule, RuleType, ScriptObject, ScriptRulePair } from "common/types";
-import { isBlacklistedURL, isUrlInBlockList, matchRuleWithRequest } from "../../common/ruleMatcher";
-import { injectScript } from "./utils";
-import ruleExecutionHandler from "./ruleExecutionHandler";
-import rulesStorageService from "../../rulesStorageService";
+import { isBlacklistedURL, isUrlInBlockList, matchRuleWithRequest } from "../../../common/ruleMatcher";
+import { injectScript } from "./scriptRuleUtils";
+import ruleExecutionHandler from "../ruleExecutionHandler";
+import rulesStorageService from "../../../rulesStorageService";
 
 export const applyScriptRules = async (tabId: number, frameId: number, url: string, pageUrl: string) => {
   if (isBlacklistedURL(url)) {

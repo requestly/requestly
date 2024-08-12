@@ -1,9 +1,5 @@
-import { onVariableChange, setVariable, Variable } from "../variable";
+import { getVariable, onVariableChange, setVariable, Variable } from "../variable";
 import extensionIconManager from "./extensionIconManager";
-import { isExtensionEnabled } from "../../utils";
-
-// TODO: fix circular dependency
-// import { sendMessageToApp } from "./messageHandler";
 
 enum MenuItem {
   TOGGLE_ACTIVATION_STATUS = "toggle-activation-status",
@@ -24,8 +20,6 @@ export const updateActivationStatus = (isExtensionEnabled: boolean) => {
   } else {
     extensionIconManager.markExtensionDisabled();
   }
-
-  // sendMessageToApp({ isExtensionEnabled });
 };
 
 export const initContextMenu = async () => {
@@ -38,13 +32,13 @@ export const initContextMenu = async () => {
   });
 
   chrome.contextMenus.onClicked.addListener(async (info) => {
-    const isExtensionStatusEnabled = await isExtensionEnabled();
+    const isExtensionStatusEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
     if (info.menuItemId === MenuItem.TOGGLE_ACTIVATION_STATUS) {
       setVariable<boolean>(Variable.IS_EXTENSION_ENABLED, !isExtensionStatusEnabled);
     }
   });
 
-  const isExtensionStatusEnabled = await isExtensionEnabled();
+  const isExtensionStatusEnabled = await getVariable<boolean>(Variable.IS_EXTENSION_ENABLED, true);
   updateActivationStatus(isExtensionStatusEnabled);
 
   onVariableChange<boolean>(Variable.IS_EXTENSION_ENABLED, updateActivationStatus);

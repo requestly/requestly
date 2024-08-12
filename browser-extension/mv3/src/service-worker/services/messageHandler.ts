@@ -1,7 +1,6 @@
 import { CLIENT_MESSAGES, EXTENSION_MESSAGES } from "common/constants";
 import { checkIfNoRulesPresent, getRulesAndGroups } from "common/rulesStore";
-import { getAppTabs, toggleExtensionStatus } from "./utils";
-import { applyScriptRules } from "./scriptRuleHandler";
+import { applyScriptRules } from "./scriptRuleHandler/scriptRuleHandler";
 import {
   cacheRecordedSessionOnClientPageUnload,
   getTabSession,
@@ -12,6 +11,7 @@ import {
   onSessionRecordingStoppedNotification,
   startRecordingExplicitly,
   stopRecording,
+  stopRecordingOnAllTabs,
   watchRecording,
 } from "./sessionRecording";
 import { initCustomWidgets } from "./customWidgets";
@@ -23,13 +23,9 @@ import {
   saveTestRuleResult,
 } from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
-import { isExtensionEnabled } from "../../utils";
+import { isExtensionEnabled, sendMessageToApp, toggleExtensionStatus } from "../../utils";
 import { isUrlInBlockList } from "../../common/ruleMatcher";
-
-export const sendMessageToApp = async (messageObject: unknown) => {
-  const appTabs = await getAppTabs();
-  return Promise.all(appTabs.map(({ id }) => chrome.tabs.sendMessage(id, messageObject)));
-};
+import { updateActivationStatus } from "./contextMenu";
 
 export const initMessageHandler = () => {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -98,7 +94,10 @@ export const initMessageHandler = () => {
         return true;
 
       case EXTENSION_MESSAGES.TOGGLE_EXTENSION_STATUS:
-        toggleExtensionStatus().then(sendResponse);
+        toggleExtensionStatus((updatedStatus) => {
+          updateActivationStatus(updatedStatus);
+          if (!updatedStatus) stopRecordingOnAllTabs();
+        }).then(sendResponse);
         return true;
 
       case EXTENSION_MESSAGES.WATCH_RECORDING:
