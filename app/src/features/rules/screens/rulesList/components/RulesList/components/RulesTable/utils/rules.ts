@@ -6,7 +6,7 @@ import { getTemplates } from "backend/rules";
 import { User } from "types";
 import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/modals/ImportRulesModal/actions";
 import { AppMode } from "utils/syncing/SyncUtils";
-import { sampleRuleDetails } from "../constants";
+import { localSampleRules, sampleRuleDetails } from "../constants";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
@@ -103,11 +103,16 @@ export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRe
   } else return false;
 };
 
-export const getSampleRules = async () => {
+export const getSampleRules = async (fromDb: boolean = true) => {
   try {
     const sampleRuleIds = Object.keys(sampleRuleDetails);
 
-    const templates = await getTemplates(sampleRuleIds);
+    let templates;
+    if (!fromDb) {
+      templates = localSampleRules;
+    } else {
+      templates = await getTemplates(sampleRuleIds);
+    }
 
     const sampleRules = templates.map((template) => ({
       ...template.data.ruleData,
