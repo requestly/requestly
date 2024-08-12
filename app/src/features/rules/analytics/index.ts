@@ -111,8 +111,8 @@ export const trackSampleRuleEditorViewed = (rule_name: string) => {
   trackEvent(SAMPLE_RULES.SAMPLE_RULE_EDITOR_VIEWED, params);
 };
 
-export const trackSampleRuleTested = (rule_name: string) => {
-  const params = { rule_name };
+export const trackSampleRuleTested = (rule_name: string, rule_status: string) => {
+  const params = { rule_name, rule_status };
   trackEvent(SAMPLE_RULES.SAMPLE_RULE_TESTED, params);
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Row, Col, Layout, Divider, Tooltip, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -29,6 +29,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/constants";
 import PATHS from "config/constants/sub/paths";
 import { trackSampleRuleCreateRuleClicked, trackSampleRuleTested } from "features/rules/analytics";
+import { RecordStatus } from "features/rules";
 
 const Header = ({ mode }) => {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ const Header = ({ mode }) => {
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const allRecordsMap = useSelector(getAllRecordsMap);
+  const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
+  const tryThisRuleTooltipTimerRef = useRef(null);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
 
@@ -86,7 +89,7 @@ const Header = ({ mode }) => {
           <Col span={18} align="right" className="ml-auto rule-editor-header-actions-container">
             <Row gutter={8} wrap={false} justify="end" align="middle">
               <Col>
-                <Status />
+                <Status isSampleRule showEnableRuleTooltip={showEnableRuleTooltip} />
               </Col>
 
               {isRuleGroupDisabled && (
@@ -127,7 +130,22 @@ const Header = ({ mode }) => {
                 <Button
                   type="primary"
                   onClick={() => {
-                    trackSampleRuleTested(currentlySelectedRuleData?.name);
+                    trackSampleRuleTested(currentlySelectedRuleData?.name, currentlySelectedRuleData.status);
+
+                    if (currentlySelectedRuleData.status === RecordStatus.INACTIVE) {
+                      setShowEnableRuleTooltip(true);
+
+                      if (tryThisRuleTooltipTimerRef.current) {
+                        clearTimeout(tryThisRuleTooltipTimerRef.current);
+                      }
+
+                      tryThisRuleTooltipTimerRef.current = setTimeout(() => {
+                        setShowEnableRuleTooltip(false);
+                      }, 3 * 1000);
+
+                      return;
+                    }
+
                     window.open(sampleRuleDetails[currentlySelectedRuleData.sampleId].demoLink, "_blank");
                   }}
                 >
