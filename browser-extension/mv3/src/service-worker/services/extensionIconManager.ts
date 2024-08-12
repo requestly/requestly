@@ -1,4 +1,4 @@
-import { isUrlInBlockList } from "../../utils";
+import { isUrlInBlockList } from "../../common/ruleMatcher";
 import { tabService } from "./tabService";
 
 interface ExtensionIconConfig {

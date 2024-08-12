@@ -23,7 +23,8 @@ import {
   saveTestRuleResult,
 } from "./testThisRuleHandler";
 import ruleExecutionHandler from "./ruleExecutionHandler";
-import { isExtensionEnabled, isUrlInBlockList } from "../../utils";
+import { isExtensionEnabled } from "../../utils";
+import { isUrlInBlockList } from "../../common/ruleMatcher";
 
 export const sendMessageToApp = async (messageObject: unknown) => {
   const appTabs = await getAppTabs();
