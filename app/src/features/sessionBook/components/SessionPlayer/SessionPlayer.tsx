@@ -48,7 +48,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const skipInactiveSegments = useRef(true);
   const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
   const trimmedSessionData = useSelector(getTrimmedSessionData);
-  const useSessionTrimDataChanged = useHasChanged(trimmedSessionData);
+  const hasSessionTrimmedDataChanged = useHasChanged(trimmedSessionData);
 
   const theme = useTheme();
 
@@ -107,21 +107,15 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   );
 
   useEffect(() => {
-    if (useSessionTrimDataChanged) {
+    if (hasSessionTrimmedDataChanged) {
       setPlayer(null);
     }
-  }, [useSessionTrimDataChanged]);
+  }, [hasSessionTrimmedDataChanged]);
 
   useEffect(() => {
-    if (events?.rrweb?.length && !player) {
+    if (!player && trimmedSessionData) {
       // rrweb mutates events object whereas redux does not allow mutating state, so cloning.
-      let rrwebEvents;
-
-      if (trimmedSessionData) {
-        rrwebEvents = cloneDeep(trimmedSessionData.events[RQSessionEventType.RRWEB] as RRWebEventData[]);
-      } else {
-        rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
-      }
+      const rrwebEvents = cloneDeep(trimmedSessionData.events[RQSessionEventType.RRWEB] as RRWebEventData[]);
 
       setPlayer(
         new Replayer({
@@ -141,7 +135,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
         })
       );
     }
-  }, [events, player, trimmedSessionData]);
+  }, [player, trimmedSessionData]);
 
   useEffect(() => {
     // const pauseVideo = () => {

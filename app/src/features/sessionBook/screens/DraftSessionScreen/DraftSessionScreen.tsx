@@ -64,6 +64,12 @@ export const DraftSessionScreen: React.FC<DraftSessionViewerProps> = ({ desktopM
         );
 
         dispatch(sessionRecordingActions.setEvents(tabSession.events));
+        dispatch(
+          sessionRecordingActions.setTrimmedSessiondata({
+            duration: tabSession.attributes?.duration,
+            events: tabSession.events,
+          })
+        );
       }
     },
     [dispatch]

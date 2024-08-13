@@ -13,6 +13,13 @@
     position: relative;
     height: 50px;
 
+    &:hover {
+      .session-trimmer-bar,
+      .session-trimmer-handle {
+        border-color: var(--requestly-color-primary);
+      }
+    }
+
     .session-trimmer-handle {
       position: absolute;
       border-radius: 4px;
@@ -25,7 +32,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
+      z-index: 2;
 
       & svg {
         width: 20px;
@@ -65,7 +72,7 @@
     }
   }
   .session-trim-actions {
-    min-width: 200px;
+    min-width: 260px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -96,7 +103,7 @@
       transition: opacity 0.2s ease-in-out;
       user-select: none;
       -ms-user-select: none;
-      z-index: 99999;
+      z-index: 2;
 
       &.tooltip-left {
         left: -45px;

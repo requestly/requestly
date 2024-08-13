@@ -66,5 +66,5 @@ export const getTrimmedSessionData = (
   duration: number;
   events?: RQSessionEvents;
 } => {
-  return getSessionRecordingState(state).trimmedData;
+  return getSessionRecordingState(state).trimmedSessionData;
 };

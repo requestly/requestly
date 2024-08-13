@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
@@ -13,7 +13,7 @@ import { SessionPlayer } from "features/sessionBook/components/SessionPlayer/Ses
 import DraftSessionDetailsPanel from "../DraftSessionDetailsPanel/DraftSessionDetailsPanel";
 import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/sessionBook/analytics";
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
-import { getSessionRecordingAttributes, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
+import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
 import { SessionTrimmer } from "../SessionTrimmer/SessionTrimmer";
 import "./draftSessionViewer.scss";
@@ -32,8 +32,8 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
   const [isDiscardClicked, setIsDiscardClicked] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
-  const attributes = useSelector(getSessionRecordingAttributes);
   const isOpenedInIframe = location.pathname.includes("iframe");
+  const attributes = useMemo(() => metadata.sessionAttributes, [metadata]);
 
   if (!isDesktopMode) {
     unstable_usePrompt({
