@@ -43,7 +43,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
   // Global state
   const user = useSelector(getUserAuthDetails);
   const loggedInUserId = user?.details?.profile?.uid;
-  const isLoggedInUserAdmin = useSelector(getUserTeamRole) === "admin";
+  const userTeamRole = useSelector(getUserTeamRole);
+  const isLoggedInUserAdmin = userTeamRole === "admin" || userTeamRole === "owner";
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
   const availableTeams = useSelector(getAvailableTeams);
