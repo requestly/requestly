@@ -106,6 +106,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
         !(event.type === EventType.IncrementalSnapshot && [IncrementalSource.Scroll].includes(event.data.source))
     );
 
+    // Type 4 event is required to be at the start of session's rrweb events
     const metaEvents = beforeStartCut.filter((event) => event.type === EventType.Meta);
     const lastMetaEvent = metaEvents[metaEvents.length - 1];
 
