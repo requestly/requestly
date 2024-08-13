@@ -8,6 +8,14 @@ const changeLogs: VersionedChangeLogs[] = [
     logs: [],
   },
   {
+    version: "24.8.13",
+    logs: [
+      "fix: blocklist check in script rule (#2074)",
+      "fix: script rule execution event only on applied rules (#2060)",
+      "[ENGG-2135] feat: option to inject script rules only in the main document (#2054)",
+    ],
+  },
+  {
     version: "24.7.29",
     logs: [
       "add failsafe for fetch interceptor (#2022)",
