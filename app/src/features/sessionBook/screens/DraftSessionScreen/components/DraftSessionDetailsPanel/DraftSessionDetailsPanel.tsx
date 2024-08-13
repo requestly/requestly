@@ -45,6 +45,7 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ pla
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
       <div className="session-details-panel-wrapper">
         <BottomSheetLayout
+          layout="drawer"
           hideBottomSheet={isOpenedInIframe}
           initialOffset={-390}
           bottomSheet={<SessionViewerBottomSheet playerTimeOffset={playerTimeOffset} disableDocking />}
