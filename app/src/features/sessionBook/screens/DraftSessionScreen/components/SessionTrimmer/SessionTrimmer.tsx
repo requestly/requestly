@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getSessionRecordingEvents } from "store/features/session-recording/selectors";
+import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { RQButton } from "lib/design-system/components";
 import "./sessionTrimmer.scss";
 import { EventType, eventWithTime } from "rrweb";
@@ -24,6 +24,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
   const containerRef = useRef<HTMLDivElement>(null);
   const [isSessionTrimmed, setIsSessionTrimmed] = useState(false);
   const events = useSelector(getSessionRecordingEvents);
+  const metadata = useSelector(getSessionRecordingMetaData);
 
   const handleDrag = useCallback(
     (event: MouseEvent, isStart: boolean) => {
@@ -40,7 +41,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
         setEndTime(Math.min(duration, Math.max(newTime, startTime + 1)));
       }
     },
-    [duration, startTime, endTime]
+    [duration, startTime, endTime, isSessionTrimmed]
   );
 
   const startDrag = useCallback(
@@ -61,10 +62,15 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
     setIsSessionTrimmed(false);
     setStartTime(0);
     setEndTime(duration);
-    dispatch(sessionRecordingActions.setTrimmedSessiondata(null));
+    dispatch(
+      sessionRecordingActions.setTrimmedSessiondata({
+        duration: metadata.sessionAttributes?.duration,
+        events: events,
+      })
+    );
   };
 
-  const handleTrim = useCallback(() => {
+  const trimSessionEvents = useCallback(() => {
     const sessionEvents = events[RQSessionEventType.RRWEB] as eventWithTime[];
     const networkEvents = events[RQSessionEventType.NETWORK] as NetworkEventData[];
 
@@ -91,7 +97,6 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
         if (event.type === EventType.IncrementalSnapshot && event.data.source === IncrementalSource.Scroll) {
           map.set(event.data.id, event);
         }
-
         return map;
       }, new Map())
       .values();
@@ -100,7 +105,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
       (event) =>
         !(event.type === EventType.IncrementalSnapshot && [IncrementalSource.Scroll].includes(event.data.source))
     );
-    // Type 4 event is required to be at the start of session's rrweb events
+
     const metaEvents = beforeStartCut.filter((event) => event.type === EventType.Meta);
     const lastMetaEvent = metaEvents[metaEvents.length - 1];
 
@@ -117,16 +122,19 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
       (event) => event.timestamp >= newStartTime && event.timestamp <= newEndTime
     );
 
-    dispatch(
-      sessionRecordingActions.setTrimmedSessiondata({
-        duration: endTime - startTime,
-        events: {
-          [RQSessionEventType.RRWEB]: finalTrimmedRRWebEvents,
-          [RQSessionEventType.NETWORK]: trimmedNetworkLogs,
-        },
-      })
-    );
-  }, [startTime, endTime, dispatch, events, sessionStartTime]);
+    return {
+      duration: endTime - startTime,
+      events: {
+        [RQSessionEventType.RRWEB]: finalTrimmedRRWebEvents,
+        [RQSessionEventType.NETWORK]: trimmedNetworkLogs,
+      },
+    };
+  }, [startTime, endTime, events, sessionStartTime]);
+
+  const handleTrim = useCallback(() => {
+    const trimmedData = trimSessionEvents();
+    dispatch(sessionRecordingActions.setTrimmedSessiondata(trimmedData));
+  }, [trimSessionEvents, dispatch]);
 
   return (
     <div className="session-trimmer-container">
@@ -159,7 +167,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
           Discard
         </RQButton>
         <RQButton type="primary" disabled={!isSessionTrimmed} onClick={handleTrim}>
-          Trim
+          Trim & Preview
         </RQButton>
       </div>
     </div>
