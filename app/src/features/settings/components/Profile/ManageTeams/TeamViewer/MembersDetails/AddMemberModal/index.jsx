@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useIsTeamAdmin } from "../../hooks/useIsTeamAdmin";
 import { toast } from "utils/Toast.js";
 import { Row, Col, Checkbox, Typography } from "antd";
-import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
+import { getAvailableTeams, getCurrentlyActiveWorkspace, getUserTeamRole } from "store/features/teams/selectors";
 import { getUserAuthDetails } from "store/selectors";
 import isEmail from "validator/lib/isEmail";
 import { getFunctions, httpsCallable } from "firebase/functions";
@@ -42,6 +42,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
 
   // Global state
   const user = useSelector(getUserAuthDetails);
+  const loggedInUserId = user?.details?.profile?.uid;
+  const isLoggedInUserAdmin = useSelector(getUserTeamRole) === "admin";
   const isAppSumoDeal = user?.details?.planDetails?.type === "appsumo";
 
   const availableTeams = useSelector(getAvailableTeams);
@@ -267,6 +269,8 @@ const AddMemberModal = ({ isOpen, toggleModal, callback, teamId: currentTeamId, 
                           <MemberRoleDropdown
                             placement="bottomRight"
                             isAdmin={makeUserAdmin}
+                            isLoggedInUserAdmin={isLoggedInUserAdmin}
+                            loggedInUserId={loggedInUserId}
                             handleMemberRoleChange={(isAdmin) => setMakeUserAdmin(isAdmin)}
                           />
                         </div>
