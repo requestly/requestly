@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation, useNavigate } from "react-router-dom";
 import { Col, Modal, Row } from "antd";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
@@ -15,7 +15,9 @@ import { trackDraftSessionDiscarded, trackDraftSessionViewed } from "features/se
 import { AiOutlineExclamationCircle } from "@react-icons/all-files/ai/AiOutlineExclamationCircle";
 import { getSessionRecordingMetaData } from "store/features/session-recording/selectors";
 import { redirectToSessionRecordingHome } from "utils/RedirectionUtils";
+import { SessionTrimmer } from "../SessionTrimmer/SessionTrimmer";
 import "./draftSessionViewer.scss";
+import { sessionRecordingActions } from "store/features/session-recording/slice";
 
 interface DraftSessionViewerProps {
   isDesktopMode: boolean;
@@ -24,12 +26,14 @@ interface DraftSessionViewerProps {
 export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDesktopMode }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const appFlavour = getAppFlavour();
   const [sessionPlayerOffset, setSessionPlayerOffset] = useState(0);
   const [isDiscardClicked, setIsDiscardClicked] = useState(false);
   const [isSaveSessionClicked, setIsSaveSessionClicked] = useState(false);
   const metadata = useSelector(getSessionRecordingMetaData);
   const isOpenedInIframe = location.pathname.includes("iframe");
+  const attributes = useMemo(() => metadata.sessionAttributes, [metadata]);
 
   if (!isDesktopMode) {
     unstable_usePrompt({
@@ -53,14 +57,14 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
       cancelText: "No",
       onOk() {
         trackDraftSessionDiscarded();
-
+        dispatch(sessionRecordingActions.setTrimmedSessiondata(null));
         navigate(PATHS.SESSIONS.ABSOLUTE);
       },
       onCancel() {
         setIsDiscardClicked(false);
       },
     });
-  }, [navigate]);
+  }, [navigate, dispatch]);
 
   useEffect(() => {
     trackDraftSessionViewed(metadata?.recordingMode);
@@ -106,6 +110,7 @@ export const DraftSessionViewer: React.FC<DraftSessionViewerProps> = ({ isDeskto
           <Row className="draft-session-viewer-body" gutter={8} justify="space-between">
             <Col span={16}>
               <SessionPlayer onPlayerTimeOffsetChange={setSessionPlayerOffset} />
+              <SessionTrimmer duration={attributes?.duration} sessionStartTime={attributes?.startTime} />
             </Col>
             <Col span={8}>
               <DraftSessionDetailsPanel playerTimeOffset={sessionPlayerOffset} />
