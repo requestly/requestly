@@ -11,7 +11,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       type: RuleType.SCRIPT,
       name: "Inject CSS/JS on a website",
       description:
-        "The Insert Script rule allows you to inject custom JavaScript or styles into any website. With this rule, the background of the items is changed by injecting custom CSS.",
+        "The Insert Script rule allows you to inject custom JavaScript or styles into any website. With this rule, after the page is loaded you will see an custom alert.",
       documentationLink: LINKS.REQUESTLY_SCRIPT_RULE_DOCS,
     },
   },
@@ -33,7 +33,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       type: RuleType.REDIRECT,
       name: "Redirect URL to another URL",
       description:
-        "The Redirect Rule changes the HTTP request location to a new destination, serving the response from the new location transparently. With this rule, we redirect the API that fetches bakery items to the one that fetches gadgets and electronic items. This changes the listed items in the store from juices and bread to gaming consoles and computers.",
+        "The Redirect Rule changes the HTTP request location to a new destination, serving the response from the new location transparently. With this rule, we redirect original javascript with the modified javascript by adding an alert in it.",
       documentationLink: LINKS.REQUESTLY_REDIRECT_RULE_DOCS,
     },
   },
@@ -277,14 +277,13 @@ export const localSampleRules = [
             },
             scripts: [
               {
+                codeType: "js",
                 fileName: "",
-                loadTime: "afterPageLoad",
-                codeType: "css",
                 id: "v7ha8",
-                type: "code",
-                value:
-                  "\t.product-card {\n\t\t background-color: #e0ffe5;\n\t}\n\t  .product-image{\n\t    mix-blend-mode: darken\n\t  }",
                 isCompressed: false,
+                loadTime: "afterPageLoad",
+                type: "code",
+                value: '\t  alert("This banner is injected on the page by Requestly")',
               },
             ],
           },
@@ -345,52 +344,49 @@ export const localSampleRules = [
   {
     data: {
       ruleData: {
-        isSample: false,
-        schemaVersion: "3.0.0",
-        groupId: "Group_rg78s",
-        lastModifiedBy: null,
+        createdBy: null,
+        creationDate: 1723631960856,
+        currentOwner: null,
+        description: "",
         extensionRules: [
           {
-            condition: {
-              isUrlFilterCaseSensitive: true,
-              excludedInitiatorDomains: ["requestly.io"],
-              excludedRequestDomains: ["requestly.io"],
-              urlFilter:
-                "https://mock.redq.io/api/products?searchJoin=and&with=type%3Bauthor&limit=30&language=en&search=type.slug:bakery%3Bstatus:publish",
-            },
             action: {
               redirect: {
-                url:
-                  "https://mock.redq.io/api/products?searchJoin=and&with=type%3Bauthor&limit=30&language=en&search=type.slug:gadget%3Bstatus:publish",
+                url: "https://user21579.requestly.tech/internal/build?",
               },
               type: "redirect",
             },
-          },
-        ],
-        description: "",
-        creationDate: 1720340144660,
-        pairs: [
-          {
-            destination:
-              "https://mock.redq.io/api/products?searchJoin=and&with=type%3Bauthor&limit=30&language=en&search=type.slug:gadget%3Bstatus:publish",
-            destinationType: "url",
-            id: "esfg9",
-            source: {
-              value:
-                "https://mock.redq.io/api/products?searchJoin=and&with=type%3Bauthor&limit=30&language=en&search=type.slug:bakery%3Bstatus:publish",
-              key: "Url",
-              operator: "Contains",
+            condition: {
+              excludedInitiatorDomains: ["requestly.io"],
+              excludedRequestDomains: ["requestly.io"],
+              isUrlFilterCaseSensitive: true,
+              urlFilter: "https://www.requestly-playground.com/_next/static/Oh7Cq1GJMWkgJh_0tQXWX/_buildManifest.js",
             },
           },
         ],
-        objectType: "rule",
-        modificationDate: 1721994687709,
-        createdBy: null,
-        currentOwner: null,
-        ruleType: "Redirect",
+        groupId: "Group_rg78s",
+        id: "Redirect_lvucg",
+        isFavourite: false,
+        isSample: false,
+        lastModifiedBy: null,
+        modificationDate: 1723631999797,
         name: "Redirect URL to another URL",
-        id: "Redirect_kfxyi",
+        objectType: "rule",
+        pairs: [
+          {
+            destination: "https://user21579.requestly.tech/internal/build?",
+            destinationType: "url",
+            id: "esfg9",
+            source: {
+              key: "Url",
+              operator: "Contains",
+              value: "https://www.requestly-playground.com/_next/static/Oh7Cq1GJMWkgJh_0tQXWX/_buildManifest.js",
+            },
+          },
+        ],
         preserveCookie: false,
+        ruleType: "Redirect",
+        schemaVersion: "3.0.0",
         status: "Inactive",
       },
     },
