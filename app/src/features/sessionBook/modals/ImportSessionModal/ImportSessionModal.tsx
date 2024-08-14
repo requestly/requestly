@@ -48,6 +48,12 @@ export const ImportSessionModal: React.FC<ImportSessionModalProps> = ({ isOpen, 
 
           const recordedSessionEvents = decompressEvents(parsedData.data.events);
           dispatch(sessionRecordingActions.setEvents(recordedSessionEvents));
+          dispatch(
+            sessionRecordingActions.setTrimmedSessiondata({
+              duration: parsedData.data.metadata.sessionAttributes.duration,
+              events: recordedSessionEvents,
+            })
+          );
 
           toggleModal();
           trackSessionRecordingUpload("success");
