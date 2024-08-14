@@ -146,7 +146,7 @@ const Header = ({ mode }) => {
                       return;
                     }
 
-                    window.open(sampleRuleDetails[currentlySelectedRuleData.sampleId].demoLink, "_blank");
+                    window.open("https://www.requestly-playground.com/", "_blank");
                   }}
                 >
                   Try this rule
