@@ -111,8 +111,14 @@ const ContentListTable = <DataType extends { [key: string]: any }>({
   defaultExpandedRowKeys = [],
 }: ContentListTableProps<DataType>): ReactElement => {
   const { selectedRows, setSelectedRows } = useContentListTableContext();
-  const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([...defaultExpandedRowKeys]);
+  const [expandedRowKeys, setExpandedRowsKeys] = useState<string[]>([]);
   const isDragAndDropEnabled = useFeatureIsOn("content_table_drag_and_drop_support");
+
+  useEffect(() => {
+    if (defaultExpandedRowKeys.length > 0) {
+      setExpandedRowsKeys(defaultExpandedRowKeys);
+    }
+  }, [defaultExpandedRowKeys.length]);
 
   const expandRow = useCallback(
     (expanded: boolean, record: DataType) => {
