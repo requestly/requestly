@@ -1,5 +1,6 @@
 import { ReducerKeys } from "store/constants";
 import { getUserAuthDetails } from "store/selectors";
+import { TeamRole } from "types";
 
 export const getTeamsState = (state) => {
   return state[ReducerKeys.TEAMS];
@@ -29,7 +30,6 @@ export const getUserTeamRole = (state) => {
   const memberData = getCurrentlyActiveWorkspaceMembers(state)[userId];
 
   if (!memberData) return null;
-  if (memberData.isOwner) return "owner";
-  if (memberData.isAdmin) return "admin";
-  return "member";
+  if (memberData.isOwner || memberData.isAdmin) return TeamRole.admin;
+  return TeamRole.write;
 };
