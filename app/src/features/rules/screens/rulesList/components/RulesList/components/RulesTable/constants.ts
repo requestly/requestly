@@ -33,7 +33,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
       type: RuleType.REDIRECT,
       name: "Redirect URL to another URL",
       description:
-        "The Redirect Rule changes the HTTP request location to a new destination, serving the response from the new location transparently. With this rule, we redirect original javascript with the modified javascript by adding an alert in it.",
+        "The Redirect Rule changes the HTTP request location to a new destination, serving the response from the new location transparently. With this rule, we redirect the original javascript to another javascript which would trigger a alert.",
       documentationLink: LINKS.REQUESTLY_REDIRECT_RULE_DOCS,
     },
   },
