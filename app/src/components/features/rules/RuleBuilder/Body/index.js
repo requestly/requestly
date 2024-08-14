@@ -51,6 +51,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
       <div className="rule-editor-title-container">
         {!isSharedListView && (
           <RQEditorTitle
+            isSampleRule={isSampleRule}
             disabled={isSampleRule}
             mode={mode}
             errors={ruleErrors}

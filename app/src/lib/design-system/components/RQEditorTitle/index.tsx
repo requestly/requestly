@@ -21,6 +21,7 @@ interface TitleProps {
   tagText?: string;
   defaultName?: string;
   disabled?: boolean;
+  isSampleRule?: boolean;
 }
 
 const { TextArea } = Input;
@@ -28,6 +29,7 @@ const { TextArea } = Input;
 export const RQEditorTitle: React.FC<TitleProps> = ({
   name,
   disabled = false,
+  isSampleRule = false,
   showDocs = false,
   description,
   nameChangeCallback,
@@ -106,62 +108,64 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
             </div>
           )}
         </Row>
-        <Row className="editor-title-description">
-          {isDescriptionEditable ? (
-            <TextArea
-              disabled={disabled}
-              ref={textAreaRef}
-              autoSize={{ minRows: 1, maxRows: 3 }}
-              // onFocus={() => setIsDescriptionEditable(true)}
-              onBlur={() => setIsDescriptionEditable(false)}
-              bordered={false}
-              maxLength={180}
-              value={description}
-              onChange={(e) => descriptionChangeCallback(e.target.value)}
-              placeholder={descriptionPlaceholder}
-              onPressEnter={() => setIsDescriptionEditable(false)}
-            />
-          ) : (
-            <div className="editor-description">
-              <Typography.Paragraph
-                style={{ width: "100%" }}
-                ellipsis={{
-                  rows: 3,
-                }}
-                editable={{
-                  icon:
-                    description.length > 0 ? (
-                      <RQButton
-                        onClick={() => {
-                          if (disabled) {
-                            return;
-                          }
+        {isSampleRule ? null : (
+          <Row className="editor-title-description">
+            {isDescriptionEditable ? (
+              <TextArea
+                disabled={disabled}
+                ref={textAreaRef}
+                autoSize={{ minRows: 1, maxRows: 3 }}
+                // onFocus={() => setIsDescriptionEditable(true)}
+                onBlur={() => setIsDescriptionEditable(false)}
+                bordered={false}
+                maxLength={180}
+                value={description}
+                onChange={(e) => descriptionChangeCallback(e.target.value)}
+                placeholder={descriptionPlaceholder}
+                onPressEnter={() => setIsDescriptionEditable(false)}
+              />
+            ) : (
+              <div className="editor-description">
+                <Typography.Paragraph
+                  style={{ width: "100%" }}
+                  ellipsis={{
+                    rows: 3,
+                  }}
+                  editable={{
+                    icon:
+                      description.length > 0 ? (
+                        <RQButton
+                          onClick={() => {
+                            if (disabled) {
+                              return;
+                            }
 
-                          setIsDescriptionEditable(true);
-                        }}
-                        className="edit-description-btn"
-                        type="text"
-                      >
-                        Edit description
-                      </RQButton>
-                    ) : (
-                      <></>
-                    ),
-                  tooltip: false,
-                }}
-                onClick={() => {
-                  if (disabled) {
-                    return;
-                  }
+                            setIsDescriptionEditable(true);
+                          }}
+                          className="edit-description-btn"
+                          type="text"
+                        >
+                          Edit description
+                        </RQButton>
+                      ) : (
+                        <></>
+                      ),
+                    tooltip: false,
+                  }}
+                  onClick={() => {
+                    if (disabled) {
+                      return;
+                    }
 
-                  setIsDescriptionEditable(true);
-                }}
-              >
-                <span>{description ? description : descriptionPlaceholder}</span>
-              </Typography.Paragraph>
-            </div>
-          )}
-        </Row>
+                    setIsDescriptionEditable(true);
+                  }}
+                >
+                  <span>{description ? description : descriptionPlaceholder}</span>
+                </Typography.Paragraph>
+              </div>
+            )}
+          </Row>
+        )}
       </Col>
       <Row justify="end">{tagText?.length && <Col className="mock-tag editor-title-tag">{tagText}</Col>}</Row>
     </Row>
