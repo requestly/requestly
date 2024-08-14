@@ -162,6 +162,26 @@
           width: min-content;
         }
       }
+
+      .actions {
+        margin-top: auto;
+
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .ant-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+
+          color: var(--requestly-color-text-default, #fff);
+          font-size: var(--requestly-font-size-xs, 11px);
+          font-style: normal;
+          font-weight: 500;
+          line-height: var(--line-height-xs, 15px); /* 136.364% */
+        }
+      }
     }
 
     .use-cases-container {

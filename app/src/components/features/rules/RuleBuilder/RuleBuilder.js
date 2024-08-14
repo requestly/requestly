@@ -257,10 +257,12 @@ const RuleBuilder = (props) => {
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">
-          {isSampleRule || (MODE === RuleEditorMode.CREATE && isDetailsPanelShown) ? (
+          {(isSampleRule && appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) ||
+          (MODE === RuleEditorMode.CREATE && isDetailsPanelShown) ? (
             <RuleDetailsPanel
               isSample={isSampleRule}
               source="new_rule_editor"
+              handleSeeLiveRuleDemoClick={props.handleSeeLiveRuleDemoClick}
               ruleDetails={
                 isSampleRule
                   ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details

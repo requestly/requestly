@@ -31,7 +31,7 @@ import PATHS from "config/constants/sub/paths";
 import { trackSampleRuleCreateRuleClicked, trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "features/rules";
 
-const Header = ({ mode }) => {
+const Header = ({ mode, handleSeeLiveRuleDemoClick = () => {}, showEnableRuleTooltip = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -39,8 +39,6 @@ const Header = ({ mode }) => {
   const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
   const groupwiseRulesToPopulate = useSelector(getGroupwiseRulesToPopulate);
   const allRecordsMap = useSelector(getAllRecordsMap);
-  const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
-  const tryThisRuleTooltipTimerRef = useRef(null);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
 
@@ -127,29 +125,8 @@ const Header = ({ mode }) => {
               </Col>
 
               <Col>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    trackSampleRuleTested(currentlySelectedRuleData?.name, currentlySelectedRuleData.status);
-
-                    if (currentlySelectedRuleData.status === RecordStatus.INACTIVE) {
-                      setShowEnableRuleTooltip(true);
-
-                      if (tryThisRuleTooltipTimerRef.current) {
-                        clearTimeout(tryThisRuleTooltipTimerRef.current);
-                      }
-
-                      tryThisRuleTooltipTimerRef.current = setTimeout(() => {
-                        setShowEnableRuleTooltip(false);
-                      }, 3 * 1000);
-
-                      return;
-                    }
-
-                    window.open("https://www.requestly-playground.com/", "_blank");
-                  }}
-                >
-                  Try this rule
+                <Button type="primary" onClick={handleSeeLiveRuleDemoClick}>
+                  See live rule demo
                 </Button>
               </Col>
             </Row>

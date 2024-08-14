@@ -38,9 +38,15 @@ interface RuleDetailsPanelProps {
   isSample?: boolean;
   ruleDetails: RuleDetails;
   source: "docs_sidebar" | "new_rule_editor";
+  handleSeeLiveRuleDemoClick: () => void;
 }
 
-export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ source, isSample = false, ruleDetails }) => {
+export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({
+  source,
+  isSample = false,
+  ruleDetails,
+  handleSeeLiveRuleDemoClick = () => {},
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { type: ruleType, name, description, useCases, documentationLink } = ruleDetails;
@@ -133,16 +139,19 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ source, isSa
         <div className="rule-details-container">
           <div className="title">{name}</div>
           <div className="description">{description}</div>
-          <div className="links">
+          <div className="actions">
             <Button
-              type="link"
-              target="_blank"
-              rel="noreferrer"
-              className="link documentation-link"
-              href={documentationLink}
-              onClick={() => trackRuleDetailsPanelDocsClicked(ruleType, source)}
+              className="documentation-link"
+              onClick={() => {
+                trackRuleDetailsPanelDocsClicked(ruleType, source);
+                window.open(documentationLink, "_blank");
+              }}
             >
-              <MdMenuBook /> Read complete documentation <MdOutlineOpenInNew />
+              <MdMenuBook /> Read complete documentation
+            </Button>
+
+            <Button type="primary" className="documentation-link" onClick={handleSeeLiveRuleDemoClick}>
+              See live rule demo
             </Button>
           </div>
         </div>
