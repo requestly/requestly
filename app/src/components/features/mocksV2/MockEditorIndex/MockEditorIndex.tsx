@@ -1,6 +1,6 @@
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   redirectToFileMockEditorEditMock,
   redirectToFileMocksList,
@@ -59,6 +59,8 @@ const MockEditorIndex: React.FC<Props> = ({
   const [isMockCollectionLoading, setIsMockCollectionLoading] = useState<boolean>(false);
 
   const { claimIncentiveRewards } = useIncentiveActions();
+  const [searchParams] = useSearchParams();
+  const collectionId = searchParams.get("collectionId") || "";
 
   useEffect(() => {
     if (!mockId) {
@@ -102,7 +104,7 @@ const MockEditorIndex: React.FC<Props> = ({
 
     const finalMockData = editorDataToMockDataConverter(data);
     if (isNew) {
-      return createMock(uid, finalMockData, teamId).then((mockId) => {
+      return createMock(uid, { ...finalMockData, collectionId }, teamId).then((mockId) => {
         setSavingInProgress(false);
         if (mockId) {
           toast.success("Mock Created Successfully");
