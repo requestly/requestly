@@ -6,7 +6,7 @@ import { RuleDetails } from "views/features/rules/RuleEditor/components/RuleDeta
 export const sampleRuleDetails: Record<string, { id: string; demoLink: string; details: RuleDetails }> = {
   OUz7jnsyudGhmAW2U6vy: {
     id: "OUz7jnsyudGhmAW2U6vy",
-    demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=inject-scripts",
+    demoLink: "https://www.requestly-playground.com/",
     details: {
       type: RuleType.SCRIPT,
       name: "Inject CSS/JS on a website",
@@ -28,7 +28,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
   },
   fHdTHi18fWcnPAhUOeL7: {
     id: "fHdTHi18fWcnPAhUOeL7",
-    demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=redirect",
+    demoLink: "https://www.requestly-playground.com/",
     details: {
       type: RuleType.REDIRECT,
       name: "Redirect URL to another URL",
@@ -39,7 +39,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
   },
   "2Awil1731PYPaZDyPIIF": {
     id: "2Awil1731PYPaZDyPIIF",
-    demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=modify-http-status-code-rest",
+    demoLink: "https://www.requestly-playground.com/",
     details: {
       type: RuleType.RESPONSE,
       name: "Modify HTTP Status Code",
@@ -50,7 +50,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
   },
   "6aET04CqE6UVKZmm5y32": {
     id: "6aET04CqE6UVKZmm5y32",
-    demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=replace",
+    demoLink: "https://www.requestly-playground.com/",
     details: {
       type: RuleType.REPLACE,
       name: "Replace a part of the URL",
@@ -70,7 +70,7 @@ export const sampleRuleDetails: Record<string, { id: string; demoLink: string; d
   },
   YOZANnLUk144snA755Lh: {
     id: "YOZANnLUk144snA755Lh",
-    demoLink: "https://requestly-demo-website-frontend.vercel.app/?rq-category=override-api-response-rest",
+    demoLink: "https://www.requestly-playground.com/",
     details: {
       type: RuleType.RESPONSE,
       name: "Override REST API Response",

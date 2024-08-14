@@ -26,7 +26,6 @@ import { getAllRecordsMap } from "store/features/rules/selectors";
 import { useRulesActionContext } from "features/rules/context/actions";
 import { RQButton } from "lib/design-system/components";
 import { useLocation, useNavigate } from "react-router-dom";
-import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/constants";
 import PATHS from "config/constants/sub/paths";
 import { trackSampleRuleCreateRuleClicked, trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "features/rules";
