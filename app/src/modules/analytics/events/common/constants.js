@@ -41,6 +41,7 @@ export const AUTH = {
   EMAIL_LINK_SIGNIN_FORM: {
     SEEN: "email_link_signin_form_seen",
     SUBMITTED: "email_link_signin_form_submitted",
+    LINK_RESEND_REQUESTED: "magic_link_resend_requested",
   },
 
   VERIFY_OOBCODE: {
