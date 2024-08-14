@@ -111,8 +111,8 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
     const lastMetaEvent = metaEvents[metaEvents.length - 1];
 
     const finalTrimmedRRWebEvents = [
-      { ...lastMetaEvent, timestamp: newStartTime - 1000 },
-      { ...lastSnapshot!, timestamp: newStartTime - 1000 },
+      { ...lastMetaEvent, timestamp: newStartTime - 500 },
+      { ...lastSnapshot!, timestamp: newStartTime - 500 },
       ...Array.from(discardedScrolls)
         .concat(beforeCutExcludingScrolls)
         .map((event) => ({ ...event, timestamp: newStartTime })),

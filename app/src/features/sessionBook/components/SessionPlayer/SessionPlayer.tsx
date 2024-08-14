@@ -81,8 +81,8 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     ({ payload: currentPlayerTime }: { payload: number }) => {
       const currentTime = startTime + currentPlayerTime;
       currentTimeRef.current = currentTime;
-      setPlayerTimeOffset(currentPlayerTime / 1000); // millis -> secs
-      onPlayerTimeOffsetChange(currentPlayerTime / 1000);
+      setPlayerTimeOffset(Math.floor(currentPlayerTime / 1000)); // millis -> secs
+      onPlayerTimeOffsetChange(Math.floor(currentPlayerTime / 1000));
 
       if (!skipInactiveSegments.current) return;
 
