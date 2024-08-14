@@ -240,19 +240,12 @@ export const localSampleRules = [
   {
     data: {
       ruleData: {
-        isSample: false,
-        schemaVersion: "3.0.0",
-        groupId: "Group_rg78s",
-        lastModifiedBy: null,
+        createdBy: null,
+        creationDate: 1723646185896,
+        currentOwner: null,
+        description: "",
         extensionRules: [
           {
-            condition: {
-              isUrlFilterCaseSensitive: true,
-              resourceTypes: ["main_frame", "sub_frame"],
-              excludedInitiatorDomains: ["requestly.io"],
-              excludedRequestDomains: ["requestly.io"],
-              urlFilter: "requestly-playground.com",
-            },
             action: {
               responseHeaders: [
                 {
@@ -262,39 +255,52 @@ export const localSampleRules = [
               ],
               type: "modifyHeaders",
             },
+            condition: {
+              excludedInitiatorDomains: ["requestly.io"],
+              excludedRequestDomains: ["requestly.io"],
+              isUrlFilterCaseSensitive: true,
+              resourceTypes: ["main_frame", "sub_frame"],
+              urlFilter: "requestly-playground.com",
+            },
           },
         ],
-        removeCSPHeader: true,
-        description: "",
-        creationDate: 1720339242328,
+        groupId: "Group_rg78s",
+        id: "Script_2c6rd",
+        isSample: false,
+        lastModifiedBy: null,
+        modificationDate: 1723646226395,
+        name: "Inject CSS/JS on a website",
+        objectType: "rule",
         pairs: [
           {
-            id: "ga46v",
-            source: {
-              value: "requestly-playground.com",
-              key: "Url",
-              operator: "Contains",
-            },
+            id: "i4ast",
             scripts: [
               {
+                attributes: [
+                  {
+                    name: "type",
+                    value: "text/javascript",
+                  },
+                ],
                 codeType: "js",
                 fileName: "",
-                id: "v7ha8",
+                id: "eugs8",
                 isCompressed: false,
                 loadTime: "afterPageLoad",
                 type: "code",
                 value: '\t  alert("This banner is injected on the page by Requestly")',
               },
             ],
+            source: {
+              key: "Url",
+              operator: "Contains",
+              value: "requestly-playground.com",
+            },
           },
         ],
-        objectType: "rule",
-        modificationDate: 1721978580742,
-        createdBy: null,
-        currentOwner: null,
+        removeCSPHeader: true,
         ruleType: "Script",
-        name: "Inject CSS/JS on a website",
-        id: "Script_oyiv1",
+        schemaVersion: "3.0.0",
         status: "Inactive",
       },
     },
