@@ -23,6 +23,7 @@ import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 import PlayerFrameOverlay from "./components/PlayerOverlay/PlayerOverlay";
 import { useTheme } from "styled-components";
 import { useHasChanged } from "hooks";
+import PATHS from "config/constants/sub/paths";
 import "./sessionPlayer.scss";
 
 interface SessionPlayerProps {
@@ -49,6 +50,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
   const trimmedSessionData = useSelector(getTrimmedSessionData);
   const hasSessionTrimmedDataChanged = useHasChanged(trimmedSessionData);
+  const isDraftSession = useMemo(() => location.pathname.includes(PATHS.SESSIONS.DRAFT.INDEX), [location.pathname]);
 
   const theme = useTheme();
 
@@ -113,9 +115,15 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   }, [hasSessionTrimmedDataChanged]);
 
   useEffect(() => {
-    if (!player && trimmedSessionData) {
+    if ((events?.rrweb?.length || trimmedSessionData) && !player) {
       // rrweb mutates events object whereas redux does not allow mutating state, so cloning.
-      const rrwebEvents = cloneDeep(trimmedSessionData.events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      let rrwebEvents: RRWebEventData[] = [];
+
+      if (isDraftSession) {
+        rrwebEvents = cloneDeep(trimmedSessionData.events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      } else {
+        rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      }
 
       setPlayer(
         new Replayer({
@@ -135,7 +143,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
         })
       );
     }
-  }, [player, trimmedSessionData]);
+  }, [player, trimmedSessionData, events, isDraftSession]);
 
   useEffect(() => {
     // const pauseVideo = () => {

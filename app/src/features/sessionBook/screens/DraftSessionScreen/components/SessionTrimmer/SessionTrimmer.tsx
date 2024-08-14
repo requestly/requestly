@@ -141,21 +141,19 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
     <div className="session-trimmer-container">
       <div className="session-trimmer-area" ref={containerRef}>
         <TrimHandle
-          direction="left"
           onMouseDown={() => startDrag(true)}
           value={msToMinutesAndSeconds(startTime)}
           time={startTime}
           duration={duration}
         />
         <div
-          className="session-trimmer-bar"
+          className="session-trimmer-bar trimmer-drag-element"
           style={{
             left: `${(startTime / duration) * 100}%`,
             width: `${((endTime - startTime) / duration) * 100}%`,
           }}
         />
         <TrimHandle
-          direction="right"
           onMouseDown={() => startDrag(false)}
           value={msToMinutesAndSeconds(endTime)}
           time={endTime}
@@ -165,7 +163,7 @@ export const SessionTrimmer: React.FC<SessionTrimmerProps> = ({ duration, sessio
       <div className="session-trim-actions">
         <Divider type="vertical" className="session-trim-divider" />
         <RQButton type="default" onClick={handleDiscardTrim} disabled={!isSessionTrimmed}>
-          Discard
+          Revert
         </RQButton>
         <RQButton type="primary" disabled={!isSessionTrimmed} onClick={handleTrim}>
           Trim & Preview
