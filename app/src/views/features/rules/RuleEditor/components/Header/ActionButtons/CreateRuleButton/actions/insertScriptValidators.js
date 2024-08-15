@@ -224,7 +224,7 @@ function isHTMLString(str, generatedDocument) {
 
   return (
     // nodeType 1 is for element nodes
-    Array.from(generatedDocument.body.childNodes).some((node) => node.nodeType === 1) || // most nodes end up in body
+    /* Array.from(generatedDocument.body.childNodes).some((node) => node.nodeType === 1) || // most nodes end up in body */ // commenting since being this thorough is causing issues
     Array.from(generatedDocument.head.childNodes).some((node) => node.nodeType === 1) // special nodes like link and style end up in head
   );
 }
@@ -309,7 +309,9 @@ function extractDOMNodeDetails(htmlCodeString, nodeName) {
   const doc = parser.parseFromString(htmlCodeString, "text/html");
   const blocks = doc.getElementsByTagName(nodeName) ?? [];
   return Array.from(blocks).map((htmlBlock) => {
+    console.log("DBG: extractDOMNodeDetails: htmlBlock", htmlBlock);
     const innerText = getInnerMostText(htmlBlock.innerText, nodeName);
+    console.log("DBG: extractDOMNodeDetails: innerText", innerText);
     return {
       innerText,
       attributes: Array.from(htmlBlock.attributes).map((attr) => ({ name: attr.name, value: attr.value })),

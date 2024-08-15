@@ -13,6 +13,7 @@ const personaOptions = [
   { value: "QA Engineer" },
   { value: "Product Manager" },
   { value: "Engineering Lead/Manager" },
+  { value: "Solutions Engineer" },
   { value: "Founder/CEO" },
   { value: "Sales" },
   { value: "IT Procurement/Administrator" },
