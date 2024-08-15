@@ -15,7 +15,6 @@ const industryOptions = [
   { value: "Travel" },
   { value: "Advertising Tech" },
   { value: "Marketing Tech" },
-  { value: "Game Development" },
   { value: "Gaming" },
   { value: "Media & Entertainment" },
   { value: "Publishing" },

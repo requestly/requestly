@@ -59,3 +59,12 @@ export const getIncludeConsoleLogs = (state: RootState): boolean => {
 export const getIncludeNetworkLogs = (state: RootState): boolean => {
   return getSessionRecordingMetaData(state)?.options?.includeNetworkLogs ?? true;
 };
+
+export const getTrimmedSessionData = (
+  state: RootState
+): {
+  duration: number;
+  events?: RQSessionEvents;
+} => {
+  return getSessionRecordingState(state).trimmedSessionData;
+};
