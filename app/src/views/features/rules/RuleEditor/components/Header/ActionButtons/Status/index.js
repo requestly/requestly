@@ -18,6 +18,7 @@ import APP_CONSTANTS from "config/constants";
 import { saveRule, validateSyntaxInRule as validateAndTransformSyntaxInRule } from "../actions";
 import { useLocation } from "react-router-dom";
 import { trackSampleRuleToggled } from "features/rules/analytics";
+import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
 
 const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, showEnableRuleTooltip = false }) => {
   const location = useLocation();
@@ -40,7 +41,7 @@ const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, s
       status: newValue,
     };
 
-    const isCreateMode = location.pathname.indexOf("create") !== -1;
+    const isCreateMode = location.pathname.indexOf(RULE_EDITOR_CONFIG.MODES.CREATE) !== -1;
 
     if (ruleData.isSample && !isCreateMode) {
       setCurrentlySelectedRule(dispatch, ruleData);
