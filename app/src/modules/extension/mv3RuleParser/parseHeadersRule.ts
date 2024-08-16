@@ -2,7 +2,33 @@ import { HeadersRule, HeaderRuleActionType, HeadersRuleModificationData } from "
 import { ExtensionRule, ExtensionRuleAction, HeadersRuleOperation, ModifyHeaderInfo, RuleActionType } from "../types";
 import { parseConditionFromSource } from "./utils";
 
-const parseHeaders = (headers: HeadersRuleModificationData[]): ModifyHeaderInfo[] => {
+const APPEND_SUPPORTED_HEADERS = [
+  "accept",
+  "accept-encoding",
+  "accept-language",
+  "access-control-request-headers",
+  "cache-control",
+  "connection",
+  "content-language",
+  "cookie",
+  "forwarded",
+  "if-match",
+  "if-none-match",
+  "keep-alive",
+  "range",
+  "te",
+  "trailer",
+  "transfer-encoding",
+  "upgrade",
+  "via",
+  "want-digest",
+  "x-forwarded-for",
+];
+
+const parseHeaders = (
+  headers: HeadersRuleModificationData[],
+  headerType: "Request" | "Response"
+): ModifyHeaderInfo[] => {
   return headers
     .map((header) => {
       if (header.value === "rq_request_initiator_origin()") {
@@ -13,6 +39,16 @@ const parseHeaders = (headers: HeadersRuleModificationData[]): ModifyHeaderInfo[
         return {
           header: header.header,
           operation: "remove" as HeadersRuleOperation,
+        };
+      } else if (
+        header.type === HeaderRuleActionType.ADD &&
+        (headerType === "Response" ||
+          (headerType === "Request" && APPEND_SUPPORTED_HEADERS.includes(header.header.toLowerCase()))) // Append is supported only for specific request headers
+      ) {
+        return {
+          header: header.header.toLowerCase(),
+          value: header.value,
+          operation: "append" as HeadersRuleOperation,
         };
       } else {
         return {
@@ -35,11 +71,11 @@ const parseHeadersRule = (rule: HeadersRule): ExtensionRule[] => {
         };
 
         if (rulePair.modifications?.Request?.length) {
-          action.requestHeaders = parseHeaders(rulePair.modifications?.Request);
+          action.requestHeaders = parseHeaders(rulePair.modifications?.Request, "Request");
         }
 
         if (rulePair.modifications?.Response?.length) {
-          action.responseHeaders = parseHeaders(rulePair.modifications?.Response);
+          action.responseHeaders = parseHeaders(rulePair.modifications?.Response, "Response");
         }
 
         if (!(action.requestHeaders?.length || action.responseHeaders?.length)) {
