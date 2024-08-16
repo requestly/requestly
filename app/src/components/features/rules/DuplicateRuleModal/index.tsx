@@ -19,7 +19,7 @@ import { RQButton } from "lib/design-system/components";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { Group, isGroup, isRule, RecordStatus, StorageRecord, Rule } from "features/rules";
-import { getAllRulesOfGroup } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/utils/rules";
+import { getAllRulesOfGroup } from "utils/rules/misc";
 import Logger from "lib/logger";
 import { actions } from "store";
 import "./duplicateRuleModal.scss";
@@ -160,7 +160,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
       };
 
       const groupRules = await getAllRulesOfGroup(appMode, record.id);
-      const duplicatedGroupRulesPromise = groupRules.map(async (rule) => {
+      const duplicatedGroupRulesPromise = groupRules.map(async (rule: Rule) => {
         const newRule = await getNewDuplicatedRule(rule, newGroup.id, true);
         return newRule;
       });
