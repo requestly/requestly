@@ -52,9 +52,9 @@ export const getGroupsSelection = (state) => {
   return rulesNode["selectedGroups"];
 };
 
-export const getIsImportSampleRules = (state) => {
+export const getIsSampleRulesImported = (state) => {
   const rulesNode = getRulesNode(state);
-  return rulesNode["isImportSampleRules"];
+  return rulesNode["isSampleRulesImported"];
 };
 
 export const getCurrentlySelectedRule = (state) => {

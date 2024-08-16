@@ -32,8 +32,8 @@ export const updateIsRulesListLoading = (prevState, action) => {
   prevState.rules.isRulesListLoading = action.payload;
 };
 
-export const updateIsImportSampleRules = (prevState, action) => {
-  prevState.rules.isImportSampleRules = action.payload;
+export const updateIsSampleRulesImported = (prevState, action) => {
+  prevState.rules.isSampleRulesImported = action.payload;
 };
 
 export const updateRefreshPendingStatus = (prevState, action) => {

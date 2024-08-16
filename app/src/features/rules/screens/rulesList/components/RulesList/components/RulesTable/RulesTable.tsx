@@ -15,7 +15,7 @@ import { ImUngroup } from "@react-icons/all-files/im/ImUngroup";
 import {
   getAppMode,
   getIsAppBannerVisible,
-  getIsImportSampleRules,
+  getIsSampleRulesImported,
   getIsRefreshRulesPending,
   getUserAuthDetails,
 } from "store/selectors";
@@ -54,7 +54,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
   const user = useSelector(getUserAuthDetails);
   const allRecords = useSelector(getAllRecords);
   const isAppBannerVisible = useSelector(getIsAppBannerVisible);
-  const isImportSampleRules = useSelector(getIsImportSampleRules);
+  const isSampleRulesImported = useSelector(getIsSampleRulesImported);
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
 
@@ -82,7 +82,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       return;
     }
 
-    if (!isImportSampleRules) {
+    if (isSampleRulesImported) {
       return;
     }
 
@@ -102,7 +102,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
       trackSampleRulesImported();
 
       // @ts-ignore
-      dispatch(actions.updateIsImportSampleRules(false));
+      dispatch(actions.updateIsSampleRulesImported(true));
 
       dispatch(
         // @ts-ignore
@@ -112,7 +112,7 @@ const RulesTable: React.FC<Props> = ({ records, loading, searchValue, allRecords
         })
       );
     });
-  }, [user, appMode, isRuleExist, isImportSampleRules, currentlyActiveWorkspace?.id, isRulesListRefreshPending]);
+  }, [user, appMode, isRuleExist, isSampleRulesImported, currentlyActiveWorkspace?.id, isRulesListRefreshPending]);
 
   useEffect(() => {
     const enhancedRecords = enhanceRecords(records, allRecordsMap);

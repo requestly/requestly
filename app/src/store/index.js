@@ -54,7 +54,7 @@ const globalReducer = getReducerWithLocalStorageSync("root", globalSlice.reducer
   "userAttributes",
   "misc.persist",
   "rules.currentlySelectedRule.showDetailsPanel",
-  "rules.isImportSampleRules",
+  "rules.isSampleRulesImported",
 ]);
 
 export const reduxStore = configureStore({
