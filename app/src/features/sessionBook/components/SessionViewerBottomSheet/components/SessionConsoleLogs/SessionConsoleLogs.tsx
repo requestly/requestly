@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/features/session-recording/selectors";
 import ConsoleLogsPanel from "views/features/sessions/SessionViewer/ConsoleLogs/ConsoleLogsPanel";
 import { getConsoleLogs } from "views/features/sessions/SessionViewer/sessionEventsUtils";
-import { BottomSheetPlacement, useBottomSheetContext } from "componentsV2/BottomSheet";
 import "./sessionConsoleLogs.scss";
 
 interface SessionConsoleLogsProps {
@@ -14,7 +13,6 @@ interface SessionConsoleLogsProps {
 const SessionConsoleLogs: React.FC<SessionConsoleLogsProps> = ({ playerTimeOffset }) => {
   const events = useSelector(getSessionRecordingEvents);
   const attributes = useSelector(getSessionRecordingAttributes);
-  const { sheetPlacement } = useBottomSheetContext();
 
   const consoleLogs = useMemo<ConsoleLog[]>(() => {
     const rrwebEvents = (events?.[RQSessionEventType.RRWEB] as RRWebEventData[]) || [];
@@ -23,13 +21,7 @@ const SessionConsoleLogs: React.FC<SessionConsoleLogsProps> = ({ playerTimeOffse
 
   if (consoleLogs) {
     return (
-      <div
-        className={`session-console-logs-container ${
-          sheetPlacement === BottomSheetPlacement.BOTTOM
-            ? "console-logs-container-bottom"
-            : "console-logs-container-right"
-        }`}
-      >
+      <div className="session-console-logs-container">
         <ConsoleLogsPanel consoleLogs={consoleLogs} playerTimeOffset={playerTimeOffset} />
       </div>
     );
