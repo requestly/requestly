@@ -6,11 +6,16 @@ import { SessionRecordingMetadata, Visibility } from "views/features/sessions/Se
 export interface SessionRecordingState {
   metadata?: SessionRecordingMetadata;
   events?: RQSessionEvents;
+  trimmedSessionData?: {
+    duration: number;
+    events: RQSessionEvents;
+  };
 }
 
 const initialState: SessionRecordingState = {
   metadata: null,
   events: null,
+  trimmedSessionData: null,
 };
 
 const slice = createSlice({
@@ -35,6 +40,9 @@ const slice = createSlice({
     },
     setDescription: (state, action: PayloadAction<string>) => {
       state.metadata.description = action.payload;
+    },
+    setTrimmedSessiondata: (state, action: PayloadAction<{ duration: number; events: RQSessionEvents }>) => {
+      state.trimmedSessionData = action.payload;
     },
   },
 });
