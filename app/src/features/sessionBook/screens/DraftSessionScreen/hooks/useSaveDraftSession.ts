@@ -6,7 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
+import {
+  getSessionRecordingAttributes,
+  getSessionRecordingEvents,
+  getSessionRecordingMetaData,
+  getTrimmedSessionData,
+} from "store/features/session-recording/selectors";
+import { sessionRecordingActions } from "store/features/session-recording/slice";
 import { saveRecording } from "backend/sessionRecording/saveRecording";
 import { compressEvents, getSessionEventsToSave } from "features/sessionBook/utils/sessionEvents";
 import { trackDraftSessionSaved, trackDraftSessionSaveFailed } from "features/sessionBook/analytics";
@@ -27,13 +33,22 @@ export const useSaveDraftSession = () => {
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const { claimIncentiveRewards } = useIncentiveActions();
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
+  const sessionAttributes = useSelector(getSessionRecordingAttributes);
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const [searchParams] = useState(new URLSearchParams(window.location.search));
+  const trimmedSessionData = useSelector(getTrimmedSessionData);
 
   const saveDraftSessionHandler = useCallback(
     async (recordingOptions: DebugInfo[], isOpenedInIframe: boolean, source: string) => {
       const isDraftSession =
         window.location.pathname.includes("draft") || appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP;
+
+      const sessionEventsToSave = trimmedSessionData?.events ?? sessionEvents;
+      const attributes = {
+        ...sessionAttributes,
+        duration: trimmedSessionData?.duration ?? sessionAttributes?.duration,
+      };
+      const sessionMetadata = { ...sessionRecordingMetadata, sessionAttributes: attributes };
 
       const recordingOptionsToSave = getRecordingOptionsToSave(recordingOptions);
       const appFlavour = getAppFlavour();
@@ -62,8 +77,8 @@ export const useSaveDraftSession = () => {
       return saveRecording(
         user?.details?.profile?.uid,
         workspaceId ?? null,
-        sessionRecordingMetadata,
-        compressEvents(getSessionEventsToSave(sessionEvents, recordingOptionsToSave)),
+        sessionMetadata,
+        compressEvents(getSessionEventsToSave(sessionEventsToSave, recordingOptionsToSave)),
         recordingOptionsToSave,
         source,
         null
@@ -122,6 +137,7 @@ export const useSaveDraftSession = () => {
           toast.error(response?.message);
           trackDraftSessionSaveFailed(response?.message);
         }
+        dispatch(sessionRecordingActions.setTrimmedSessiondata(null));
       });
     },
     [
@@ -135,6 +151,8 @@ export const useSaveDraftSession = () => {
       sessionEvents,
       sessionRecordingMetadata,
       searchParams,
+      trimmedSessionData,
+      sessionAttributes,
     ]
   );
 
