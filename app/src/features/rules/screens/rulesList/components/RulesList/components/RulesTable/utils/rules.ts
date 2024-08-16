@@ -1,6 +1,6 @@
 import { isGroup, isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../types";
-import { Rule, StorageRecord, RecordStatus, Group } from "features/rules/types/rules";
+import { Rule, StorageRecord, RecordStatus, Group } from "features/rules";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
