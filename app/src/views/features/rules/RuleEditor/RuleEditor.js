@@ -88,7 +88,11 @@ const RuleEditor = (props) => {
           />
         ) : null}
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-          <ProCard className="rule-editor-procard">
+          <ProCard
+            className={`rule-editor-procard ${
+              MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "rules-edit-mode" : "rules-create-mode"
+            }`}
+          >
             <RuleBuilder />
           </ProCard>
         ) : (
@@ -96,7 +100,11 @@ const RuleEditor = (props) => {
             bottomSheet={<RuleEditorBottomSheet mode={MODE} />}
             hideBottomSheet={MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE}
           >
-            <ProCard className="rule-editor-procard">
+            <ProCard
+              className={`rule-editor-procard ${
+                MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "rules-edit-mode" : "rules-create-mode"
+              }`}
+            >
               <RuleBuilder />
             </ProCard>
           </BottomSheetLayout>
