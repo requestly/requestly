@@ -209,6 +209,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
           ...record,
           status: newStatus,
         };
+        const isSampleRule = updatedRecord.isSample;
 
         Logger.log("Writing storage in RulesTable changeRuleStatus");
 
@@ -226,11 +227,18 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
 
           if (newStatus.toLowerCase() === "active") {
             trackRQLastActivity("rule_activated");
-            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules + 1);
+
+            submitAttrUtil(
+              APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES,
+              userAttributes.num_active_rules + (isSampleRule ? 0 : 1)
+            );
             trackRuleToggled(record.ruleType, "rules_list", newStatus);
           } else {
             trackRQLastActivity("rule_deactivated");
-            submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES, userAttributes.num_active_rules - 1);
+            submitAttrUtil(
+              APP_CONSTANTS.GA_EVENTS.ATTR.NUM_ACTIVE_RULES,
+              userAttributes.num_active_rules - (isSampleRule ? 0 : 1)
+            );
             trackRuleToggled(record.ruleType, "rules_list", newStatus);
           }
         });
