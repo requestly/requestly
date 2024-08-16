@@ -78,9 +78,9 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
   }, []);
 
   const getNewDuplicatedRule = useCallback(
-    async (rule: Rule, groupId?: string, isGroupBeingDuplicated: boolean = false) => {
+    async (rule: Rule, groupId?: string, isGroupBeingDuplicated: boolean = false): Promise<Rule> => {
       const parsedRuleData = await transformAndValidateRuleFields(rule);
-      const finalRuleData = parsedRuleData.success ? parsedRuleData.ruleData : rule;
+      const finalRuleData = (parsedRuleData.success ? parsedRuleData.ruleData : rule) as Rule;
 
       const newRule = {
         ...finalRuleData,
@@ -88,12 +88,10 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
         createdBy: user?.details?.profile?.uid || null,
         name: isGroupBeingDuplicated ? generateCopiedRuleName(rule.name) : newRecordName,
         id: rule.ruleType + "_" + generateObjectId(),
-        isSample: false,
         isFavourite: false,
         status: RecordStatus.INACTIVE,
       };
       if (groupId && isGroupBeingDuplicated) {
-        // @ts-ignore
         newRule.groupId = groupId;
       }
 
@@ -106,7 +104,6 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
     if (isGroup(record)) {
       return;
     }
-    // @ts-ignore
     const newRule = (await getNewDuplicatedRule(record)) as Rule;
 
     if (!isDuplicationInSameWorkspace) {
