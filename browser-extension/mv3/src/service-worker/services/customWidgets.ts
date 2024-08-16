@@ -4,7 +4,7 @@ export const initCustomWidgets = (tabId: number, frameId: number) => {
       tabId,
       frameIds: [frameId],
     },
-    files: ["libs/customWidgets.js"],
+    files: ["libs/customElements.js"],
     world: "MAIN",
     injectImmediately: true,
   });
