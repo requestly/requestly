@@ -5,7 +5,7 @@ import { CreateNewRuleGroupModalWrapper } from "./modals/CreateNewRuleGroupModal
 import { ImportRulesModalWrapper } from "./modals/ImportRulesModal/ImportRulesModalWrapper";
 import { ChangeRuleGroupModalWrapper } from "./modals/ChangeRuleGroupModalWrapper";
 import { DeleteRecordsModalWrapper } from "./modals/DeleteRecordsModalWrapper";
-import { DuplicateRuleModalWrapper } from "./modals/DuplicateRuleModalWrapper";
+import { DuplicateRecordModalWrapper } from "./modals/DuplicateRuleModalWrapper";
 import { UngroupOrDeleteRulesModalWrapper } from "./modals/UngroupOrDeleteRulesModalWrapper";
 import { RenameGroupModalWrapper } from "./modals/RenameGroupModalWrapper";
 import { MV3MigrationModal, NotificationCard } from "./modals/MV3MigrationModal";
@@ -81,7 +81,7 @@ const RulesFeatureContainer = () => {
         <>
           <RenameGroupModalWrapper />
           <UngroupOrDeleteRulesModalWrapper />
-          <DuplicateRuleModalWrapper />
+          <DuplicateRecordModalWrapper />
           <ImportRulesModalWrapper />
           <ChangeRuleGroupModalWrapper />
           <CreateNewRuleGroupModalWrapper />
