@@ -15,7 +15,7 @@ const RulePairs = (props) => {
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
 
   const isSampleRule = currentlySelectedRuleData?.isSample;
-  const isInputDisabled = props.mode === "shared-list-rule-view" || isSampleRule ? true : false;
+  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule;
 
   const getPairMarkup = (pair, pairIndex) => {
     const commonProps = {
