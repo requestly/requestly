@@ -4,6 +4,8 @@ import { NetworkEntry } from "./types";
 import { NetworkLogProperty } from "./components/NetworkLogProperty";
 import { NetworkStatusField } from "./components/NetworkStatusField";
 import { NetworkPayload } from "./components/NetworkPayload";
+// fix-me @nsr: firebase imports should not be here, but couldn't any other way, without a lot of props drilling
+import { getFile } from "services/firebaseStorageService";
 
 export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: NetworkLog) => NetworkEntry) => {
   const detailsTabs: DetailsTab<NetworkLog>[] = [
@@ -64,6 +66,8 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
       render: (log: NetworkLog) => {
         const harEntry = networkEntrySelector(log);
 
+        console.log("DBG-4: harEntry", harEntry);
+
         return (
           <Collapse defaultActiveKey={[0, 1]}>
             {harEntry.request.queryString.length > 0 && (
@@ -75,11 +79,27 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
                 ))}
               </Collapse.Panel>
             )}
-            {harEntry.request.postData && harEntry.request.postData.text && (
+            {(harEntry.request.postData && harEntry.request.postData.text && (
               <Collapse.Panel header="Request Payload" key={1}>
                 <NetworkPayload payload={harEntry.request.postData.text} />
               </Collapse.Panel>
-            )}
+            )) ||
+              (harEntry._RQ && harEntry._RQ.requestBodyPath && (
+                <Collapse.Panel header="Request Payload" key={1}>
+                  <NetworkPayload
+                    fetchPayload={() =>
+                      getFile(harEntry._RQ.requestBodyPath).then((data) => {
+                        try {
+                          return JSON.parse(JSON.parse(data));
+                        } catch {
+                          console.log("DBG-3 returned from catch");
+                          return data;
+                        }
+                      })
+                    }
+                  />
+                </Collapse.Panel>
+              ))}
           </Collapse>
         );
       },
@@ -97,7 +117,12 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
               <NetworkLogProperty label="Response Time">{responseTimeInSeconds} sec</NetworkLogProperty>
             )}
 
-            <NetworkPayload label="Body" payload={harEntry.response.content.text} />
+            {(harEntry.response.content.text && (
+              <NetworkPayload label="Body" payload={harEntry.response.content.text} />
+            )) ||
+              (harEntry._RQ && harEntry._RQ.responseBodyPath && (
+                <NetworkPayload label="Body" fetchPayload={() => getFile(harEntry._RQ.responseBodyPath)} />
+              ))}
           </>
         );
       },
