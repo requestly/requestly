@@ -9,6 +9,7 @@ import { sessionRecordingActions } from "store/features/session-recording/slice"
 import { useDebounce } from "hooks/useDebounce";
 import { trackDraftSessionNamed, trackSessionRecordingDescriptionUpdated } from "features/sessionBook/analytics";
 import { isAppOpenedInIframe } from "utils/AppUtils";
+import { SheetLayout } from "componentsV2/BottomSheet/types";
 import "./draftSessionDetailsPanel.scss";
 
 interface DraftSessionDetailsPanelProps {
@@ -45,7 +46,7 @@ const DraftSessionDetailsPanel: React.FC<DraftSessionDetailsPanelProps> = ({ pla
     <BottomSheetProvider defaultPlacement={BottomSheetPlacement.BOTTOM}>
       <div className="session-details-panel-wrapper">
         <BottomSheetLayout
-          layout="drawer"
+          layout={SheetLayout.DRAWER}
           hideBottomSheet={isOpenedInIframe}
           initialOffset={-390}
           bottomSheet={<SessionViewerBottomSheet playerTimeOffset={playerTimeOffset} disableDocking />}
