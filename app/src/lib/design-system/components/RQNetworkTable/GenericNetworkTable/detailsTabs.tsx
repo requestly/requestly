@@ -92,7 +92,6 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
                         try {
                           return JSON.parse(JSON.parse(data));
                         } catch {
-                          console.log("DBG-3 returned from catch");
                           return data;
                         }
                       })
@@ -121,7 +120,18 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
               <NetworkPayload label="Body" payload={harEntry.response.content.text} />
             )) ||
               (harEntry._RQ && harEntry._RQ.responseBodyPath && (
-                <NetworkPayload label="Body" fetchPayload={() => getFile(harEntry._RQ.responseBodyPath)} />
+                <NetworkPayload
+                  label="Body"
+                  fetchPayload={() =>
+                    getFile(harEntry._RQ.responseBodyPath).then((data) => {
+                      try {
+                        return JSON.parse(JSON.parse(data));
+                      } catch {
+                        return data;
+                      }
+                    })
+                  }
+                />
               ))}
           </>
         );
