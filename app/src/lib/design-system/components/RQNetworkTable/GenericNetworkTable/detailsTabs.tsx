@@ -66,8 +66,6 @@ export const getDefaultDetailsTabs = <NetworkLog,>(networkEntrySelector: (log: N
       render: (log: NetworkLog) => {
         const harEntry = networkEntrySelector(log);
 
-        console.log("DBG-4: harEntry", harEntry);
-
         return (
           <Collapse defaultActiveKey={[0, 1]}>
             {harEntry.request.queryString.length > 0 && (
