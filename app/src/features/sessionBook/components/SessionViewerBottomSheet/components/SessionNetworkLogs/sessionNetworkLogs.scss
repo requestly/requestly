@@ -7,19 +7,7 @@
     }
   }
 
-  &.network-logs-container-bottom {
-    .rq-network-table-container {
-      .network-container {
-        height: 360px;
-      }
-    }
-  }
-
-  &.network-logs-container-right {
-    .rq-network-table-container {
-      .network-container {
-        height: calc(100% - 15px);
-      }
-    }
+  .network-container {
+    height: calc(100% - 15px);
   }
 }
