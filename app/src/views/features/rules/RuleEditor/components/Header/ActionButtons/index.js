@@ -1,18 +1,14 @@
-//Sub-components
 import CreateRuleButton from "./CreateRuleButton";
 import ShareRuleButton from "./ShareRuleButton";
-import { getModeData } from "../../../../../../../components/features/rules/RuleBuilder/actions";
 import APP_CONSTANTS from "config/constants";
 import "./RuleEditorActionButtons.css";
 
-const ActionButtons = (props) => {
-  const { MODE } = getModeData(props.location);
-
+const ActionButtons = ({ mode }) => {
   return (
     <div className="rule-editor-header-action-btns">
-      {MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? <ShareRuleButton /> : null}
+      {mode === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? <ShareRuleButton /> : null}
 
-      <CreateRuleButton location={props.location} />
+      <CreateRuleButton />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackNewRuleButtonClicked } from "modules/analytics/events/common/rules";
 import { useDispatch } from "react-redux";
 import { actions } from "store";
+import { trackSampleRuleEditorViewed } from "features/rules/analytics";
 
 const RuleNameColumn: React.FC<{
   record: RuleTableRecord;
@@ -33,6 +34,10 @@ const RuleNameColumn: React.FC<{
           state={{ source: "my_rules" }}
           to={`${PATHS.RULE_EDITOR.EDIT_RULE.ABSOLUTE}/${record.id}`}
           onClick={() => {
+            if (record.isSample) {
+              trackSampleRuleEditorViewed(record.name);
+            }
+
             //@ts-ignore
             dispatch(actions.updateSecondarySidebarCollapse(false));
           }}

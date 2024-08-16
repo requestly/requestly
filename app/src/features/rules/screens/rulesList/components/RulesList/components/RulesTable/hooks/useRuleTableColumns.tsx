@@ -182,7 +182,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           } else {
             return (
               <PremiumFeature
-                disabled={record.status === RecordStatus.ACTIVE}
+                disabled={record.status === RecordStatus.ACTIVE || record.isSample}
                 features={
                   PREMIUM_RULE_TYPES.includes(record.ruleType)
                     ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
