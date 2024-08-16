@@ -122,7 +122,9 @@ const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, s
     trackRuleEditorHeaderClicked(
       "toggle_status",
       currentlySelectedRuleData.ruleType,
-      location.pathname.indexOf("create") !== -1 ? "create" : "edit",
+      location.pathname.indexOf(RULE_EDITOR_CONFIG.MODES.CREATE) !== -1
+        ? RULE_EDITOR_CONFIG.MODES.CREATE
+        : RULE_EDITOR_CONFIG.MODES.EDIT,
       isRuleEditorModal ? "rule_editor_modal_header" : "rule_editor_screen_header"
     );
   };
