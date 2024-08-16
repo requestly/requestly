@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
-import DuplicateRuleModal from "components/features/rules/DuplicateRuleModal";
-import { Rule as RuleOld } from "types";
-import { Rule } from "features/rules/types/rules";
+import { StorageRecord } from "features/rules/types/rules";
+import DuplicateRecordModal from "components/features/rules/DuplicateRuleModal";
 import { useRulesModalsContext } from "features/rules/context/modals";
 
-export const DuplicateRuleModalWrapper: React.FC = () => {
+export const DuplicateRecordModalWrapper: React.FC = () => {
   const { setOpenDuplicateRecordModalAction } = useRulesModalsContext();
 
   const [isModalActive, setIdModalActive] = useState(false);
-  const [ruleToDuplicate, setRuleToDuplicate] = useState<Rule | null>(null);
+  const [recordToDuplicate, setRecordToDuplicate] = useState<StorageRecord | null>(null);
 
   useEffect(() => {
-    const openModal = (rule: Rule) => {
-      setRuleToDuplicate(rule);
+    const openModal = (record: StorageRecord) => {
+      setRecordToDuplicate(record);
       setIdModalActive(true);
     };
 
@@ -20,16 +19,16 @@ export const DuplicateRuleModalWrapper: React.FC = () => {
   }, [setOpenDuplicateRecordModalAction]);
 
   const onClose = () => {
-    setRuleToDuplicate(null);
+    setRecordToDuplicate(null);
     setIdModalActive(false);
   };
 
   return isModalActive ? (
-    <DuplicateRuleModal
+    <DuplicateRecordModal
       close={onClose}
       onDuplicate={onClose}
       isOpen={isModalActive}
-      rule={(ruleToDuplicate as unknown) as RuleOld}
+      record={recordToDuplicate}
       analyticEventSource="rules_list"
     />
   ) : null;

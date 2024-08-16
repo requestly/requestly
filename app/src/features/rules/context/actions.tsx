@@ -262,9 +262,6 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
   const recordDuplicateAction = useCallback(
     (record: StorageRecord) => {
       Logger.log("[DEBUG]", "recordDuplicateAction", record);
-      if (isGroup(record)) {
-        return;
-      }
 
       openDuplicateRecordModalAction(record);
     },

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Col, Input, Modal, Row, Select, Space } from "antd";
 import { StorageService } from "../../../../init";
-import { getAppMode, getUserAttributes, getUserAuthDetails } from "store/selectors";
+import { getAppMode, getIsRefreshRulesPending, getUserAttributes, getUserAuthDetails } from "store/selectors";
 import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { transformAndValidateRuleFields } from "views/features/rules/RuleEditor/components/Header/ActionButtons/CreateRuleButton/actions";
 import { generateObjectId } from "utils/FormattingHelper";
@@ -11,7 +11,6 @@ import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { trackRuleDuplicatedEvent } from "modules/analytics/events/common/rules";
 import { toast } from "utils/Toast";
 import type { InputRef } from "antd";
-import { Rule, Status } from "types/rules";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
 import { TeamWorkspace } from "types/teamWorkspace";
 import { redirectToRuleEditor } from "utils/RedirectionUtils";
@@ -19,26 +18,33 @@ import APP_CONSTANTS from "config/constants";
 import { RQButton } from "lib/design-system/components";
 import { PremiumFeature } from "features/pricing";
 import { FeatureLimitType } from "hooks/featureLimiter/types";
+import { Group, isGroup, isRule, RecordStatus, StorageRecord, Rule } from "features/rules";
+import { getAllRulesOfGroup } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/utils/rules";
+import Logger from "lib/logger";
+import { actions } from "store";
 import "./duplicateRuleModal.scss";
 
 interface Props {
   isOpen: boolean;
   close: () => void;
-  rule: Rule;
+  record: StorageRecord;
   onDuplicate: (newRule: Rule) => void;
   analyticEventSource?: string;
 }
 
 const generateCopiedRuleName = (ruleName: string): string => ruleName + " Copy";
 
-const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate, analyticEventSource = "" }) => {
+const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplicate, analyticEventSource = "" }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
+  const isRecordRule = useMemo(() => isRule(record), [record]);
   const availableWorkspaces: TeamWorkspace[] = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
   const appMode = useSelector(getAppMode);
   const userAttributes = useSelector(getUserAttributes);
-  const [newRuleName, setNewRuleName] = useState<string>();
+  const [newRecordName, setNewRecordName] = useState<string>();
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(null);
   const ruleNameInputRef = useRef<InputRef>(null);
 
@@ -63,26 +69,42 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
     ];
   }, [availableWorkspaces, isUsingWorkspaces]);
 
-  const onRuleNameChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
-    setNewRuleName(evt.target.value);
+  const onRecordNameChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
+    setNewRecordName(evt.target.value);
   }, []);
 
+  const getNewDuplicatedRule = useCallback(
+    async (rule: Rule, groupId?: string, isGroupBeingDuplicated: boolean = false) => {
+      const parsedRuleData = await transformAndValidateRuleFields(rule);
+      const finalRuleData = parsedRuleData.success ? parsedRuleData.ruleData : rule;
+
+      const newRule = {
+        ...finalRuleData,
+        creationDate: generateObjectCreationDate(),
+        createdBy: user?.details?.profile?.uid || null,
+        name: isGroupBeingDuplicated ? generateCopiedRuleName(rule.name) : newRecordName,
+        id: rule.ruleType + "_" + generateObjectId(),
+        isSample: false,
+        isFavourite: false,
+        status: RecordStatus.INACTIVE,
+      };
+      if (groupId && isGroupBeingDuplicated) {
+        // @ts-ignore
+        newRule.groupId = groupId;
+      }
+
+      return newRule;
+    },
+    [user?.details?.profile?.uid, newRecordName]
+  );
+
   const duplicateRule = useCallback(async () => {
+    if (isGroup(record)) {
+      return;
+    }
     const isOperationInSameWorkspace = selectedWorkspaceId === currentlyActiveWorkspace.id;
-    const parsedRuleData = await transformAndValidateRuleFields(rule);
-
-    const finalRuleData = parsedRuleData.success ? (parsedRuleData.ruleData as Rule) : rule;
-
-    const newRule: Rule = {
-      ...finalRuleData,
-      creationDate: generateObjectCreationDate(),
-      createdBy: user?.details?.profile?.uid || null,
-      name: newRuleName,
-      id: rule.ruleType + "_" + generateObjectId(),
-      isSample: false,
-      isFavourite: false,
-      status: Status.INACTIVE,
-    };
+    // @ts-ignore
+    const newRule = (await getNewDuplicatedRule(record)) as Rule;
 
     if (!isOperationInSameWorkspace) {
       newRule.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
@@ -105,14 +127,12 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
     }
 
     trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(rule.ruleType, isOperationInSameWorkspace ? "same" : "different", analyticEventSource);
+    trackRuleDuplicatedEvent(record.ruleType, isOperationInSameWorkspace ? "same" : "different", analyticEventSource);
     submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
     onDuplicate(newRule);
     close();
   }, [
-    user?.details?.profile?.uid,
-    rule,
-    newRuleName,
+    record,
     appMode,
     selectedWorkspaceId,
     currentlyActiveWorkspace.id,
@@ -121,6 +141,71 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
     navigate,
     userAttributes.num_rules,
     analyticEventSource,
+    getNewDuplicatedRule,
+  ]);
+
+  const duplicateGroup = useCallback(async () => {
+    if (isGroup(record)) {
+      const isOperationInSameWorkspace = selectedWorkspaceId === currentlyActiveWorkspace.id;
+      const newGroup: Group = {
+        ...record,
+        id: record.id + "_copy",
+        name: newRecordName,
+        creationDate: generateObjectCreationDate(),
+        createdBy: user?.details?.profile?.uid || null,
+        status: RecordStatus.INACTIVE,
+        isFavourite: false,
+      };
+
+      const groupRules = await getAllRulesOfGroup(appMode, record.id);
+      const duplicatedGroupRulesPromise = groupRules.map(async (rule) => {
+        const newRule = await getNewDuplicatedRule(rule, newGroup.id, true);
+        return newRule;
+      });
+
+      Promise.all(duplicatedGroupRulesPromise).then((duplicatedGroupRules) => {
+        StorageService(appMode)
+          .saveMultipleRulesOrGroups([newGroup, ...duplicatedGroupRules], {
+            workspaceId: selectedWorkspaceId,
+          })
+          .then(() => {
+            if (isOperationInSameWorkspace) {
+              toast.success("Duplicated the group successfully.");
+              dispatch(
+                // @ts-ignore
+                actions.updateRefreshPendingStatus({
+                  type: "rules",
+                  newValue: !isRulesListRefreshPending,
+                })
+              );
+            } else {
+              toast.success("Duplicated the group in the selected workspace successfully.");
+            }
+            trackRQLastActivity("group_duplicated");
+            submitAttrUtil(
+              APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES,
+              userAttributes.num_rules + duplicatedGroupRules.length + 1
+            );
+            close();
+          })
+          .catch(() => {
+            toast.error("Something went wrong!");
+            Logger.error("Error while duplicating group");
+          });
+      });
+    }
+  }, [
+    dispatch,
+    user?.details?.profile?.uid,
+    record,
+    appMode,
+    newRecordName,
+    getNewDuplicatedRule,
+    close,
+    selectedWorkspaceId,
+    userAttributes.num_rules,
+    isRulesListRefreshPending,
+    currentlyActiveWorkspace.id,
   ]);
 
   useEffect(() => {
@@ -130,20 +215,20 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
   }, [isOpen]);
 
   useEffect(() => {
-    setNewRuleName(generateCopiedRuleName(rule.name));
-  }, [rule]);
+    setNewRecordName(generateCopiedRuleName(record.name));
+  }, [record]);
 
   useEffect(() => {
     if (isUsingWorkspaces) {
       setSelectedWorkspaceId(currentlyActiveWorkspace.id);
     }
-  }, [availableWorkspaces, currentlyActiveWorkspace, isUsingWorkspaces]);
+  }, [availableWorkspaces, currentlyActiveWorkspace, isUsingWorkspaces, isRecordRule]);
 
-  return !rule ? null : (
+  return (
     <Modal
       className="modal-dialog-centered modal-danger"
       open={isOpen}
-      title="Duplicate rule"
+      title={isRecordRule ? "Duplicate rule" : "Duplicate group"}
       onCancel={close}
       footer={
         <Row justify="end" align="middle">
@@ -153,11 +238,11 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
             </RQButton>
             <PremiumFeature
               popoverPlacement="top"
-              onContinue={duplicateRule}
+              onContinue={isRecordRule ? duplicateRule : duplicateGroup}
               features={[FeatureLimitType.num_rules]}
               source="duplicate_rule"
             >
-              <RQButton disabled={!newRuleName} type="primary">
+              <RQButton disabled={!newRecordName} type="primary">
                 Duplicate
               </RQButton>
             </PremiumFeature>
@@ -168,13 +253,13 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
       <div className="modal-body">
         <div className="duplicate-rule-modal-body">
           <Row align="middle">
-            <Col span={8}>Rule name</Col>
+            <Col span={8}>{isRecordRule ? "Rule name" : "Group name"}</Col>
             <Col span={16}>
               <Input
                 ref={ruleNameInputRef}
                 placeholder="Enter name of the new rule"
-                value={newRuleName}
-                onChange={onRuleNameChange}
+                value={newRecordName}
+                onChange={onRecordNameChange}
               />
             </Col>
           </Row>
@@ -197,4 +282,4 @@ const DuplicateRuleModal: React.FC<Props> = ({ isOpen, close, rule, onDuplicate,
   );
 };
 
-export default DuplicateRuleModal;
+export default DuplicateRecordModal;
