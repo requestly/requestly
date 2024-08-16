@@ -289,6 +289,19 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           },
           {
             key: 2,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              recordDuplicateAction(normalizeRecord(record));
+            },
+            label: (
+              <Row>
+                <RiFileCopy2Line />
+                Duplicate
+              </Row>
+            ),
+          },
+          {
+            key: 3,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
