@@ -5,6 +5,7 @@ import {
   MIGRATION_NOTIFICATION_CLOSED,
   MIGRATION_NOTIFICATION_SHOWN,
   RULES,
+  SAMPLE_RULES,
 } from "./constants";
 
 // groups
@@ -97,4 +98,35 @@ export const trackMigrationNotificationClicked = () => {
 export const trackMigrationNotificationClosed = () => {
   const params = {};
   trackEvent(MIGRATION_NOTIFICATION_CLOSED, params);
+};
+
+// sample rules
+export const trackSampleRulesImported = () => {
+  const params = {};
+  trackEvent(SAMPLE_RULES.SAMPLE_RULES_IMPORTED, params);
+};
+
+export const trackSampleRuleEditorViewed = (rule_name: string) => {
+  const params = { rule_name };
+  trackEvent(SAMPLE_RULES.SAMPLE_RULE_EDITOR_VIEWED, params);
+};
+
+export const trackSampleRuleTested = (rule_name: string, rule_status: string) => {
+  const params = { rule_name, rule_status };
+  trackEvent(SAMPLE_RULES.SAMPLE_RULE_TESTED, params);
+};
+
+export const trackSampleRuleToggled = (rule_name: string, status: string) => {
+  const params = { rule_name, status };
+  trackEvent(SAMPLE_RULES.SAMPLE_RULES_TOGGLED, params);
+};
+
+export const trackSampleRuleCreateRuleClicked = (rule_name: string, rule_type: string) => {
+  const params = { rule_name, rule_type };
+  trackEvent(SAMPLE_RULES.SAMPLE_RULE_CREATE_RULE_CLICKED, params);
+};
+
+export const trackSampleRuleDeleted = () => {
+  const params = {};
+  trackEvent(SAMPLE_RULES.SAMPLE_RULE_DELETED, params);
 };

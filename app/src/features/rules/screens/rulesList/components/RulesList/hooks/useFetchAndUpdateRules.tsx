@@ -47,7 +47,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
     const rulesPromise = StorageService(appMode).getRecords(RecordType.RULE);
     Promise.all([groupsPromise, rulesPromise])
       .then(async (data) => {
-        const groups = data[0] as Group[];
+        let groups = data[0] as Group[];
         let rules = data[1] as Rule[];
 
         //@ts-ignore
@@ -67,6 +67,10 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         // TODO: Cleanup
         //ANALYTICS
 
+        // Remove sample rules and groups
+        rules = rules.filter((rule) => !rule.isSample);
+        groups = groups.filter((group) => !group.isSample);
+
         Logger.log("DBG: submitting num_rules as - ", rules.length);
 
         const ruleTypes = rules.reduce((result, { ruleType }) => result.add(ruleType), new Set());
@@ -75,6 +79,7 @@ const useFetchAndUpdateRules = ({ setIsLoading }: Props) => {
         );
         const numRuleTypes = parseInt(window.localStorage.getItem("num_rule_types") || "0");
         const activeRulesCount = rules.filter((rule) => rule.status === RecordStatus.ACTIVE).length;
+
         submitAttrUtil(TRACKING.ATTR.NUM_RULE_TYPES_TRIED, Math.max(numRuleTypes, ruleTypes.size));
         submitAttrUtil(TRACKING.ATTR.NUM_RULES, rules.length);
         submitAttrUtil(TRACKING.ATTR.NUM_PREMIUM_ACTIVE_RULES, activePremiumRules.length);

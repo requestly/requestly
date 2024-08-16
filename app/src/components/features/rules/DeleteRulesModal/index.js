@@ -12,6 +12,7 @@ import { trackRulesTrashedEvent, trackRulesDeletedEvent } from "modules/analytic
 import { deleteTestReportByRuleId } from "../TestThisRule/utils/testReports";
 import RULES_LIST_TABLE_CONSTANTS from "config/constants/sub/rules-list-table-constants";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
+import { trackSampleRuleDeleted } from "features/rules/analytics";
 
 const DeleteRulesModal = ({
   toggle: toggleDeleteRulesModal,
@@ -49,6 +50,11 @@ const DeleteRulesModal = ({
 
     //clear search
     clearSearch?.();
+
+    const isSampleRules = rulesToDelete.some((rule) => rule.isSample);
+    if (isSampleRules) {
+      trackSampleRuleDeleted();
+    }
 
     //Close Modal
     toggleDeleteRulesModal();

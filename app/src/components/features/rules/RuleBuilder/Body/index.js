@@ -5,19 +5,19 @@ import { Row, Col } from "antd";
 import RulePairs from "../../RulePairs";
 import AddPairButton from "./Columns/AddPairButton";
 import APP_CONSTANTS from "../../../../../config/constants";
-import { getAppMode, getCurrentlySelectedRuleData, getCurrentlySelectedRuleErrors } from "store/selectors";
+import { getAppMode, getCurrentlySelectedRuleErrors } from "store/selectors";
 import { RQEditorTitle } from "lib/design-system/components/RQEditorTitle";
 import { onChangeHandler } from "./actions";
 import RuleInfoBanner from "./RuleInfoBanner";
 import "./RuleBuilderBody.css";
 
-const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
+const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRuleConfig }) => {
   //Global State
   const dispatch = useDispatch();
   const appMode = useSelector(getAppMode);
-  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const ruleErrors = useSelector(getCurrentlySelectedRuleErrors);
   const isSharedListView = mode === "shared-list-rule-view";
+  const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const getEventObject = (name, value) => ({ target: { name, value } });
 
@@ -51,6 +51,8 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
       <div className="rule-editor-title-container">
         {!isSharedListView && (
           <RQEditorTitle
+            isSampleRule={isSampleRule}
+            disabled={isSampleRule}
             mode={mode}
             errors={ruleErrors}
             showDocs={showDocs}
@@ -79,7 +81,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleConfig }) => {
               <Row justify="end">
                 <Col span={24}>
                   {mode !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
-                    <AddPairButton currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+                    <AddPairButton disabled={isSampleRule} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
                   ) : null}
                 </Col>
               </Row>

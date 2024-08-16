@@ -40,6 +40,8 @@ import { useHasChanged } from "hooks";
 import { m } from "framer-motion";
 import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
 import { RuleEditorMode } from "features/rules";
+import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import "./RuleBuilder.css";
 
 //CONSTANTS
@@ -61,6 +63,8 @@ const RuleBuilder = (props) => {
 
   const allRules = useSelector(getAllRules);
   const appMode = useSelector(getAppMode);
+
+  const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const enableDocs = useMemo(() => {
     return !props.isSharedListViewRule;
@@ -253,10 +257,26 @@ const RuleBuilder = (props) => {
       {/* TODO: NEEDS REFACTORING */}
       <Row className="w-full relative rule-builder-container">
         <Col span={24} className="rule-builder-body-wrapper">
-          {MODE === RuleEditorMode.CREATE && isDetailsPanelShown ? (
-            <RuleDetailsPanel ruleType={currentlySelectedRuleData?.ruleType} source="new_rule_editor" />
+          {(isSampleRule && appMode === GLOBAL_CONSTANTS.APP_MODES.EXTENSION) ||
+          (MODE === RuleEditorMode.CREATE && isDetailsPanelShown) ? (
+            <RuleDetailsPanel
+              isSample={isSampleRule}
+              source="new_rule_editor"
+              handleSeeLiveRuleDemoClick={props.handleSeeLiveRuleDemoClick}
+              ruleDetails={
+                isSampleRule
+                  ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details
+                  : RULE_DETAILS[currentlySelectedRuleData?.ruleType]
+              }
+            />
           ) : null}
-          <Body mode={MODE} showDocs={isDocsVisible} currentlySelectedRuleConfig={currentlySelectedRuleConfig} />
+
+          <Body
+            mode={MODE}
+            showDocs={isDocsVisible}
+            currentlySelectedRuleData={currentlySelectedRuleData}
+            currentlySelectedRuleConfig={currentlySelectedRuleConfig}
+          />
         </Col>
       </Row>
 

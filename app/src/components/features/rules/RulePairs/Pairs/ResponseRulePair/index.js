@@ -59,6 +59,7 @@ const ResponseRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => 
               pairIndex={pairIndex}
               gqlOperationFilter={gqlOperationFilter}
               setGqlOperationFilter={setGqlOperationFilter}
+              isInputDisabled={isInputDisabled}
             />
           </Col>
         </Row>
