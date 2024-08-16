@@ -38,7 +38,6 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isRulesListRefreshPending = useSelector(getIsRefreshRulesPending);
-  const isRecordRule = useMemo(() => isRule(record), [record]);
   const availableWorkspaces: TeamWorkspace[] = useSelector(getAvailableTeams);
   const currentlyActiveWorkspace = useSelector(getCurrentlyActiveWorkspace);
   const user = useSelector(getUserAuthDetails);
@@ -46,6 +45,11 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
   const userAttributes = useSelector(getUserAttributes);
   const [newRecordName, setNewRecordName] = useState<string>();
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>(null);
+  const isRecordRule = useMemo(() => isRule(record), [record]);
+  const isDuplicationInSameWorkspace = useMemo(() => selectedWorkspaceId === currentlyActiveWorkspace.id, [
+    selectedWorkspaceId,
+    currentlyActiveWorkspace.id,
+  ]);
   const ruleNameInputRef = useRef<InputRef>(null);
 
   const isUsingWorkspaces = useMemo(() => {
@@ -98,15 +102,14 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
     [user?.details?.profile?.uid, newRecordName]
   );
 
-  const duplicateRule = useCallback(async () => {
+  const handleDuplicateRule = useCallback(async () => {
     if (isGroup(record)) {
       return;
     }
-    const isOperationInSameWorkspace = selectedWorkspaceId === currentlyActiveWorkspace.id;
     // @ts-ignore
     const newRule = (await getNewDuplicatedRule(record)) as Rule;
 
-    if (!isOperationInSameWorkspace) {
+    if (!isDuplicationInSameWorkspace) {
       newRule.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
     }
 
@@ -119,7 +122,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
       return;
     }
 
-    if (isOperationInSameWorkspace) {
+    if (isDuplicationInSameWorkspace) {
       toast.success("Duplicated the rule successfully.");
       redirectToRuleEditor(navigate, newRule.id);
     } else {
@@ -127,26 +130,25 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
     }
 
     trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(record.ruleType, isOperationInSameWorkspace ? "same" : "different", analyticEventSource);
+    trackRuleDuplicatedEvent(record.ruleType, isDuplicationInSameWorkspace ? "same" : "different", analyticEventSource);
     submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
     onDuplicate(newRule);
     close();
   }, [
     record,
     appMode,
-    selectedWorkspaceId,
-    currentlyActiveWorkspace.id,
     onDuplicate,
     close,
     navigate,
     userAttributes.num_rules,
     analyticEventSource,
     getNewDuplicatedRule,
+    isDuplicationInSameWorkspace,
+    selectedWorkspaceId,
   ]);
 
-  const duplicateGroup = useCallback(async () => {
+  const handleDuplicateGroup = useCallback(async () => {
     if (isGroup(record)) {
-      const isOperationInSameWorkspace = selectedWorkspaceId === currentlyActiveWorkspace.id;
       const newGroup: Group = {
         ...record,
         id: record.id + "_copy",
@@ -169,7 +171,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
             workspaceId: selectedWorkspaceId,
           })
           .then(() => {
-            if (isOperationInSameWorkspace) {
+            if (isDuplicationInSameWorkspace) {
               toast.success("Duplicated the group successfully.");
               dispatch(
                 // @ts-ignore
@@ -202,10 +204,10 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
     newRecordName,
     getNewDuplicatedRule,
     close,
-    selectedWorkspaceId,
     userAttributes.num_rules,
     isRulesListRefreshPending,
-    currentlyActiveWorkspace.id,
+    selectedWorkspaceId,
+    isDuplicationInSameWorkspace,
   ]);
 
   useEffect(() => {
@@ -238,7 +240,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
             </RQButton>
             <PremiumFeature
               popoverPlacement="top"
-              onContinue={isRecordRule ? duplicateRule : duplicateGroup}
+              onContinue={isRecordRule ? handleDuplicateRule : handleDuplicateGroup}
               features={[FeatureLimitType.num_rules]}
               source="duplicate_rule"
             >
