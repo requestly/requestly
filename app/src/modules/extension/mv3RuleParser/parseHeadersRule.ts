@@ -43,7 +43,7 @@ const parseHeaders = (
       } else if (
         header.type === HeaderRuleActionType.ADD &&
         (headerType === "Response" ||
-          (headerType === "Request" && APPEND_SUPPORTED_HEADERS.includes(header.header.toLowerCase())))
+          (headerType === "Request" && APPEND_SUPPORTED_HEADERS.includes(header.header.toLowerCase()))) // Append is supported only for specific request headers
       ) {
         return {
           header: header.header.toLowerCase(),
