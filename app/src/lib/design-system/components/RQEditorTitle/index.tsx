@@ -127,6 +127,7 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
             ) : (
               <div className="editor-description">
                 <Typography.Paragraph
+                  disabled={disabled}
                   style={{ width: "100%" }}
                   ellipsis={{
                     rows: 3,
@@ -135,11 +136,8 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                     icon:
                       description.length > 0 ? (
                         <RQButton
+                          disabled={disabled}
                           onClick={() => {
-                            if (disabled) {
-                              return;
-                            }
-
                             setIsDescriptionEditable(true);
                           }}
                           className="edit-description-btn"
@@ -153,10 +151,6 @@ export const RQEditorTitle: React.FC<TitleProps> = ({
                     tooltip: false,
                   }}
                   onClick={() => {
-                    if (disabled) {
-                      return;
-                    }
-
                     setIsDescriptionEditable(true);
                   }}
                 >
