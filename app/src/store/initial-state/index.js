@@ -43,6 +43,7 @@ const INITIAL_STATE = {
     selectedGroups: {},
     lastBackupTimeStamp: "",
     isRulesListLoading: false,
+    isSampleRulesImported: false,
   },
 
   /* Search */

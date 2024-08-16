@@ -24,6 +24,10 @@ import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/Rul
 import "./Help.scss";
 import "react-notion/src/styles.css";
 import "prismjs/themes/prism-tomorrow.css";
+import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
+import { getCurrentlySelectedRuleData } from "store/selectors";
+import { useSelector } from "react-redux";
 
 const externalLinks: ExternalLink[] = [
   {
@@ -88,6 +92,8 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
   const [notionPageData, setNotionPageData] = useState(null);
   const [tableOfContents, setTableOfContents] = useState(null);
   const documentationListRef = useRef<HTMLDivElement | null>(null);
+  const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
+  const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const handleScrollToSection = useCallback((id: string) => {
     const target = document.getElementById(id);
@@ -166,7 +172,15 @@ const Help: React.FC<HelpProps> = ({ ruleType, onClose }) => {
         </Row>
 
         <div className="rule-editor-help-content">
-          {!isDocsVisible ? <RuleDetailsPanel ruleType={ruleType} source="docs_sidebar" /> : null}
+          {!isDocsVisible ? (
+            <RuleDetailsPanel
+              isSample={isSampleRule}
+              ruleDetails={
+                isSampleRule ? sampleRuleDetails[currentlySelectedRuleData.sampleId].details : RULE_DETAILS[ruleType]
+              }
+              source="docs_sidebar"
+            />
+          ) : null}
 
           {isDocsVisible ? (
             <>
