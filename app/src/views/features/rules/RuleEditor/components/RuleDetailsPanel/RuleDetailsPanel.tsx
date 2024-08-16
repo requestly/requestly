@@ -38,7 +38,7 @@ interface RuleDetailsPanelProps {
   isSample?: boolean;
   ruleDetails: RuleDetails;
   source: "docs_sidebar" | "new_rule_editor";
-  handleSeeLiveRuleDemoClick: () => void;
+  handleSeeLiveRuleDemoClick?: () => void;
 }
 
 export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({

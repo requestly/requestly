@@ -41,7 +41,7 @@ import { m } from "framer-motion";
 import { RuleDetailsPanel } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/RuleDetailsPanel";
 import { RuleEditorMode } from "features/rules";
 import { RULE_DETAILS } from "views/features/rules/RuleEditor/components/RuleDetailsPanel/constants";
-import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import "./RuleBuilder.css";
 
 //CONSTANTS

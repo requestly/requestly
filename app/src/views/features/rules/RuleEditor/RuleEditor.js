@@ -19,7 +19,7 @@ import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomShe
 import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEditorBottomSheet";
 import { trackSampleRuleTested } from "features/rules/analytics";
 import { RecordStatus } from "features/rules";
-import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/components/RulesTable/constants";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import "./RuleEditor.css";
 
 const RuleEditor = (props) => {

@@ -6,7 +6,7 @@ import { getTemplates } from "backend/rules";
 import { User } from "types";
 import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/modals/ImportRulesModal/actions";
 import { AppMode } from "utils/syncing/SyncUtils";
-import { localSampleRules, sampleRuleDetails } from "../constants";
+import { localSampleRules, sampleRuleDetails } from "../../../constants";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
