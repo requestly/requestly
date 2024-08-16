@@ -7,6 +7,7 @@ import { User } from "types";
 import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/modals/ImportRulesModal/actions";
 import { AppMode } from "utils/syncing/SyncUtils";
 import { localSampleRules, sampleRuleDetails } from "../../../constants";
+import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
@@ -122,6 +123,8 @@ export const getSampleRules = async (fromDb: boolean = true) => {
       lastModifiedBy: null,
       createdBy: null,
       currentOwner: null,
+      creationDate: generateObjectCreationDate(),
+      modificationDate: generateObjectCreationDate(),
     }));
 
     return sampleRules;
