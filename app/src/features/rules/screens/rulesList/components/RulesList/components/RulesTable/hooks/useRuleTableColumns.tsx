@@ -39,6 +39,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordRenameAction,
     groupDeleteAction,
     recordsPinAction,
+    groupShareAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
 
@@ -276,6 +277,18 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           },
           {
             key: 1,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              groupShareAction(record as Group);
+            },
+            label: (
+              <Row>
+                <MdOutlineShare /> Share
+              </Row>
+            ),
+          },
+          {
+            key: 2,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();
