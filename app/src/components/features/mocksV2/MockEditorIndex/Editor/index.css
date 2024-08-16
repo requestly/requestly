@@ -1,9 +1,13 @@
+.mock-parent {
+  height: 100vh;
+}
+
 .mock-editor-wrapper {
   display: flex;
   justify-content: center;
   width: 100%;
   overflow-y: auto;
-  height: calc(100vh - 225px); /* 225px is the height of the header, title and the footer */
+  /*height: calc(100vh - 225px); /* 225px is the height of the header, title and the footer */
   padding: 1rem;
 }
 

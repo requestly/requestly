@@ -25,6 +25,8 @@ import MockEditorEndpoint from "./Endpoint";
 import { trackRQDesktopLastActivity, trackRQLastActivity } from "utils/AnalyticsUtils";
 import { MOCKSV2 } from "modules/analytics/events/features/constants";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
+import MockLogs from "./BottomSheet/MockLogs";
 
 interface Props {
   isNew?: boolean;
@@ -388,47 +390,51 @@ const MockEditor: React.FC<Props> = ({
   };
 
   return (
-    <div className="overflow-hidden">
-      <MockEditorHeader
-        isNewMock={isNew}
-        mockType={mockType}
-        savingInProgress={savingInProgress}
-        handleClose={onClose}
-        handleSave={handleOnSave}
-        handleTest={handleTest}
-        setPassword={setPassword}
-        password={password}
-      />
-      <Col className="mock-editor-title-container">
-        <RQEditorTitle
-          name={name}
-          mode={isNew ? "create" : "edit"}
-          description={desc}
-          namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
-          descriptionPlaceholder="Add your description here."
-          nameChangeCallback={onNameChange}
-          descriptionChangeCallback={onDescriptionChange}
-          tagText={fileType}
-          errors={errors}
+    <div className="mock-parent">
+      <BottomSheetProvider defaultPlacement={BottomSheetPlacement.RIGHT}>
+        <MockEditorHeader
+          isNewMock={isNew}
+          mockType={mockType}
+          savingInProgress={savingInProgress}
+          handleClose={onClose}
+          handleSave={handleOnSave}
+          handleTest={handleTest}
+          setPassword={setPassword}
+          password={password}
         />
-      </Col>
-      <div className="mock-editor-wrapper">
-        <div className="mock-editor-container">
-          <Row className="mock-editor-body">
-            {renderMetadataRow()}
-            {renderMockCodeEditor()}
-          </Row>
-        </div>
-      </div>
-      {!isNew ? (
-        <APIClient
-          request={apiRequest}
-          openInModal
-          modalTitle="Test mock endpoint"
-          isModalOpen={isTestModalOpen}
-          onModalClose={() => setIsTestModalOpen(false)}
-        />
-      ) : null}
+        <BottomSheetLayout layout="split" bottomSheet={<MockLogs mockId={id} />} minSize={0}>
+          <Col className="mock-editor-title-container">
+            <RQEditorTitle
+              name={name}
+              mode={isNew ? "create" : "edit"}
+              description={desc}
+              namePlaceholder={mockType === MockType.API ? "Mock name" : "File name"}
+              descriptionPlaceholder="Add your description here."
+              nameChangeCallback={onNameChange}
+              descriptionChangeCallback={onDescriptionChange}
+              tagText={fileType}
+              errors={errors}
+            />
+          </Col>
+          <div className="mock-editor-wrapper">
+            <div className="mock-editor-container">
+              <Row className="mock-editor-body">
+                {renderMetadataRow()}
+                {renderMockCodeEditor()}
+              </Row>
+            </div>
+          </div>
+        </BottomSheetLayout>
+        {!isNew ? (
+          <APIClient
+            request={apiRequest}
+            openInModal
+            modalTitle="Test mock endpoint"
+            isModalOpen={isTestModalOpen}
+            onModalClose={() => setIsTestModalOpen(false)}
+          />
+        ) : null}
+      </BottomSheetProvider>
     </div>
   );
 };
