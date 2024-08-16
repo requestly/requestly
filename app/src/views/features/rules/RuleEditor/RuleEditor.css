@@ -1,4 +1,4 @@
-.rule-editor-procard {
+.rule-editor-procard.rules-create-mode {
   height: calc(100vh - 130px);
   overflow-y: auto;
 }
