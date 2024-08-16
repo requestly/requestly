@@ -1,6 +1,9 @@
 import { isGroup, isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../types";
 import { Rule, StorageRecord, RecordStatus, Group } from "features/rules/types/rules";
+import { StorageService } from "init";
+import { AppMode } from "utils/syncing/SyncUtils";
+import Logger from "lib/logger";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
@@ -95,4 +98,23 @@ export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRe
   if (record.groupId?.length && allRecordsMap[record.groupId]?.status === RecordStatus.INACTIVE) {
     return true;
   } else return false;
+};
+
+export const getAllRulesOfGroup = (appMode: AppMode, groupId: string): Promise<Group[]> => {
+  if (!groupId) return Promise.resolve([]);
+
+  return new Promise<Group[]>((resolve) => {
+    StorageService(appMode)
+      .getAllRecords()
+      .then((allRecords) => {
+        const groupRules = Object.values(allRecords).filter(
+          (record: StorageRecord) => isRule(record) && record?.groupId === groupId
+        );
+        resolve(groupRules as Group[]);
+      })
+      .catch((error) => {
+        Logger.log(error);
+        resolve([]);
+      });
+  });
 };
