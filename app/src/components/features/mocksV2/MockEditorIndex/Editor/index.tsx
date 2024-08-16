@@ -402,7 +402,7 @@ const MockEditor: React.FC<Props> = ({
           setPassword={setPassword}
           password={password}
         />
-        <BottomSheetLayout layout="split" bottomSheet={<MockLogs mockId={id} />} minSize={0}>
+        <BottomSheetLayout layout="split" bottomSheet={<MockLogs mockId={id} />} minSize={0} hideBottomSheet={!id}>
           <Col className="mock-editor-title-container">
             <RQEditorTitle
               name={name}
