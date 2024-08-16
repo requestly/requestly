@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext } from "react";
-import { Group, RecordStatus, StorageRecord } from "features/rules/types/rules";
+import { Group, RecordStatus, Rule, StorageRecord } from "features/rules/types/rules";
 import {
   trackNewRuleButtonClicked,
   trackRulePinToggled,
@@ -21,6 +21,7 @@ import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { RuleTableRecord } from "../screens/rulesList/components/RulesList/components/RulesTable/types";
 import { updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
+import { getAllRulesOfGroup } from "utils/rules/misc";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
@@ -38,6 +39,7 @@ type RulesActionContextType = {
   groupDeleteAction: (group: Group) => void;
   recordsPinAction: (records: StorageRecord[]) => void;
   updateGroupOnDrop: (record: RuleTableRecord, groupId: string, onSuccess?: () => void) => void;
+  groupShareAction: (group: Group, onSuccess?: () => void) => void;
 };
 
 const RulesActionContext = createContext<RulesActionContextType>(null);
@@ -338,6 +340,44 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     [appMode, user, isRulesListRefreshPending]
   );
 
+  const groupShareAction = useCallback(
+    async (group: Group, onSuccess?: () => void) => {
+      if (!group) return;
+      if (user.loggedIn) {
+        const groupRules = await getAllRulesOfGroup(appMode, group.id);
+        const ruleIds = groupRules.map((rule: Rule) => rule.id);
+
+        dispatch(
+          // @ts-ignore
+          actions.toggleActiveModal({
+            modalName: "sharingModal",
+            newValue: true,
+            newProps: {
+              callback: onSuccess,
+              selectedRules: ruleIds,
+            },
+          })
+        );
+      } else {
+        dispatch(
+          // @ts-ignore
+          actions.toggleActiveModal({
+            modalName: "authModal",
+            newValue: true,
+            newProps: {
+              redirectURL: window.location.href,
+              src: APP_CONSTANTS.FEATURES.RULES,
+              userActionMessage: "Sign up to generate a public shareable link",
+              authMode: APP_CONSTANTS.AUTH.ACTION_LABELS.SIGN_UP,
+              eventSource: "rules_list",
+            },
+          })
+        );
+      }
+    },
+    [appMode, user, isRulesListRefreshPending]
+  );
+
   const value = {
     createRuleAction,
     createGroupAction,
@@ -353,6 +393,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
     groupDeleteAction,
     recordsPinAction,
     updateGroupOnDrop,
+    groupShareAction,
   };
 
   return <RulesActionContext.Provider value={value}>{children}</RulesActionContext.Provider>;
