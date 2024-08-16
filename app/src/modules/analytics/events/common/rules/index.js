@@ -91,6 +91,15 @@ export const trackRuleDuplicatedEvent = (rule_type, workspace, source) => {
   trackEvent(RULES.RULE_DUPLICATED, params);
 };
 
+export const trackGroupDuplicatedEvent = (num_rules, workspace, source) => {
+  const params = {
+    num_rules,
+    workspace,
+    source,
+  };
+  trackEvent(RULES.GROUP_DUPLICATED, params);
+};
+
 export const trackRulePinToggled = (rule_id, rule_type, updated_value) => {
   const params = { rule_id, rule_type, updated_value };
   trackEvent(RULES.RULE_PIN_TOGGLED, params);
