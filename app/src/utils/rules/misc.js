@@ -6,6 +6,7 @@ import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import { RedirectDestinationType } from "types/rules";
 import Logger from "lib/logger";
 import { setCurrentlySelectedRule } from "components/features/rules/RuleBuilder/actions";
+import { isRule } from "features/rules";
 
 const { RULE_TYPES_CONFIG, RULES_LIST_TABLE_CONSTANTS } = APP_CONSTANTS;
 const GROUP_DETAILS = RULES_LIST_TABLE_CONSTANTS.GROUP_DETAILS;
@@ -264,3 +265,20 @@ export function runMinorFixesOnRule(dispatch, rule) {
 
   return fixedRule;
 }
+
+export const getAllRulesOfGroup = (appMode, groupId) => {
+  if (!groupId) return Promise.resolve([]);
+
+  return new Promise((resolve) => {
+    StorageService(appMode)
+      .getAllRecords()
+      .then((allRecords) => {
+        const groupRules = Object.values(allRecords).filter((record) => isRule(record) && record?.groupId === groupId);
+        resolve(groupRules);
+      })
+      .catch((error) => {
+        Logger.log(error);
+        resolve([]);
+      });
+  });
+};

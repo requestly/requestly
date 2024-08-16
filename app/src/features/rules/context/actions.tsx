@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext } from "react";
-import { Group, RecordStatus, StorageRecord } from "features/rules/types/rules";
+import { Group, RecordStatus, Rule, StorageRecord } from "features/rules/types/rules";
 import {
   trackNewRuleButtonClicked,
   trackRulePinToggled,
@@ -21,7 +21,7 @@ import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { RuleTableRecord } from "../screens/rulesList/components/RulesList/components/RulesTable/types";
 import { updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
-import { getAllRulesOfGroup } from "../screens/rulesList/components/RulesList/components/RulesTable/utils/rules";
+import { getAllRulesOfGroup } from "utils/rules/misc";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
@@ -345,7 +345,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
       if (!group) return;
       if (user.loggedIn) {
         const groupRules = await getAllRulesOfGroup(appMode, group.id);
-        const ruleIds = groupRules.map((rule) => rule.id);
+        const ruleIds = groupRules.map((rule: Rule) => rule.id);
 
         dispatch(
           // @ts-ignore
