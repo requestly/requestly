@@ -91,7 +91,9 @@ const ScriptRulePair = ({ pair, pairIndex, ruleDetails, isInputDisabled }) => {
           isInputDisabled={isInputDisabled}
         />
       ))}
-      <AddCustomScriptRow addEmptyScript={addEmptyScript} />
+
+      {isInputDisabled ? null : <AddCustomScriptRow addEmptyScript={addEmptyScript} />}
+
       {isExtensionManifestVersion3() ? (
         <div className="csp-header-removal-notice">
           <Checkbox
