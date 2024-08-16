@@ -122,6 +122,7 @@ export const RULES = {
   RULE_TOGGLED: "rule_toggled",
   RULE_TOGGLE_ATTEMPTED: "rule_toggle_attempted",
   RULE_DUPLICATED: "rule_duplicated",
+  GROUP_DUPLICATED: "group_duplicated",
   RULE_PIN_TOGGLED: "rule_pin_toggled",
   RULE_EXPORTED: "rule_exported",
   RULE_PAIR_CREATION_ATTEMPTED: "rule_pair_creation_attempted",

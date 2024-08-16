@@ -8,7 +8,7 @@ import { generateObjectCreationDate } from "utils/DateTimeUtils";
 import { transformAndValidateRuleFields } from "views/features/rules/RuleEditor/components/Header/ActionButtons/CreateRuleButton/actions";
 import { generateObjectId } from "utils/FormattingHelper";
 import { submitAttrUtil, trackRQLastActivity } from "utils/AnalyticsUtils";
-import { trackRuleDuplicatedEvent } from "modules/analytics/events/common/rules";
+import { trackRuleDuplicatedEvent, trackGroupDuplicatedEvent } from "modules/analytics/events/common/rules";
 import { toast } from "utils/Toast";
 import type { InputRef } from "antd";
 import { getAvailableTeams, getCurrentlyActiveWorkspace } from "store/features/teams/selectors";
@@ -32,7 +32,7 @@ interface Props {
   analyticEventSource?: string;
 }
 
-const generateCopiedRuleName = (ruleName: string): string => ruleName + " Copy";
+const generateCopiedRuleName = (recordName: string): string => recordName + " Copy";
 
 const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplicate, analyticEventSource = "" }) => {
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
     selectedWorkspaceId,
     currentlyActiveWorkspace.id,
   ]);
-  const ruleNameInputRef = useRef<InputRef>(null);
+  const recordNameInputRef = useRef<InputRef>(null);
 
   const isUsingWorkspaces = useMemo(() => {
     return availableWorkspaces?.length > 0;
@@ -101,36 +101,39 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
   );
 
   const handleDuplicateRule = useCallback(async () => {
-    if (isGroup(record)) {
-      return;
-    }
-    const newRule = (await getNewDuplicatedRule(record)) as Rule;
+    if (isRule(record)) {
+      const newRule = await getNewDuplicatedRule(record);
 
-    if (!isDuplicationInSameWorkspace) {
-      newRule.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
-    }
+      if (!isDuplicationInSameWorkspace) {
+        newRule.groupId = APP_CONSTANTS.RULES_LIST_TABLE_CONSTANTS.UNGROUPED_GROUP_ID;
+      }
 
-    try {
-      await StorageService(appMode).saveRuleOrGroup(newRule, {
-        workspaceId: selectedWorkspaceId,
-      });
-    } catch (err) {
-      toast.error("Something went wrong!");
-      return;
-    }
+      try {
+        await StorageService(appMode).saveRuleOrGroup(newRule, {
+          workspaceId: selectedWorkspaceId,
+        });
+      } catch (err) {
+        toast.error("Something went wrong!");
+        return;
+      }
 
-    if (isDuplicationInSameWorkspace) {
-      toast.success("Duplicated the rule successfully.");
-      redirectToRuleEditor(navigate, newRule.id);
-    } else {
-      toast.success("Duplicated the rule in the selected workspace successfully.");
-    }
+      if (isDuplicationInSameWorkspace) {
+        toast.success("Duplicated the rule successfully.");
+        redirectToRuleEditor(navigate, newRule.id);
+      } else {
+        toast.success("Duplicated the rule in the selected workspace successfully.");
+      }
 
-    trackRQLastActivity("rule_duplicated");
-    trackRuleDuplicatedEvent(record.ruleType, isDuplicationInSameWorkspace ? "same" : "different", analyticEventSource);
-    submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
-    onDuplicate(newRule);
-    close();
+      trackRQLastActivity("rule_duplicated");
+      trackRuleDuplicatedEvent(
+        record.ruleType,
+        isDuplicationInSameWorkspace ? "same" : "different",
+        analyticEventSource
+      );
+      submitAttrUtil(APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES, userAttributes.num_rules + 1);
+      onDuplicate(newRule);
+      close();
+    }
   }, [
     record,
     appMode,
@@ -148,7 +151,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
     if (isGroup(record)) {
       const newGroup: Group = {
         ...record,
-        id: record.id + "_copy",
+        id: "Group_" + generateObjectId(),
         name: newRecordName,
         creationDate: generateObjectCreationDate(),
         createdBy: user?.details?.profile?.uid || null,
@@ -181,15 +184,20 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
               toast.success("Duplicated the group in the selected workspace successfully.");
             }
             trackRQLastActivity("group_duplicated");
+            trackGroupDuplicatedEvent(
+              duplicatedGroupRules.length,
+              isDuplicationInSameWorkspace ? "same" : "different",
+              analyticEventSource
+            );
             submitAttrUtil(
               APP_CONSTANTS.GA_EVENTS.ATTR.NUM_RULES,
               userAttributes.num_rules + duplicatedGroupRules.length + 1
             );
             close();
           })
-          .catch(() => {
+          .catch((err) => {
             toast.error("Something went wrong!");
-            Logger.error("Error while duplicating group");
+            Logger.error("Error while duplicating group", err);
           });
       });
     }
@@ -209,7 +217,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
 
   useEffect(() => {
     if (isOpen) {
-      ruleNameInputRef.current!.focus({ cursor: "all" });
+      recordNameInputRef.current!.focus({ cursor: "all" });
     }
   }, [isOpen]);
 
@@ -255,7 +263,7 @@ const DuplicateRecordModal: React.FC<Props> = ({ isOpen, close, record, onDuplic
             <Col span={8}>{isRecordRule ? "Rule name" : "Group name"}</Col>
             <Col span={16}>
               <Input
-                ref={ruleNameInputRef}
+                ref={recordNameInputRef}
                 placeholder="Enter name of the new rule"
                 value={newRecordName}
                 onChange={onRecordNameChange}
