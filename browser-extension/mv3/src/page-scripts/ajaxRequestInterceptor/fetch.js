@@ -1,6 +1,7 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
 import {
   applyDelay,
+  generateUserFunctionWithSharedState,
   getAbsoluteUrl,
   getCustomRequestBody,
   getFunctionFromCode,
@@ -149,7 +150,7 @@ export const initFetchInterceptor = (debug) => {
           fetchedResponse,
         });
 
-      let customResponse, sharedState;
+      let customResponse;
       const responseModification = responseRule.pairs[0].response;
 
       if (responseModification.type === "code") {
@@ -180,13 +181,11 @@ export const initFetchInterceptor = (debug) => {
           };
         }
 
-        try {
-          sharedState = window.top[PUBLIC_NAMESPACE]?.sharedState ?? {};
-        } catch (e) {
-          sharedState = window[PUBLIC_NAMESPACE]?.sharedState ?? {};
-        }
+        const isUserFunctionValid = getFunctionFromCode(responseModification.value, "response");
 
-        customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs, sharedState);
+        if (isUserFunctionValid) {
+          customResponse = generateUserFunctionWithSharedState(responseModification.value)(evaluatorArgs);
+        }
 
         if (typeof customResponse === "undefined") {
           return fetchedResponse;
@@ -220,8 +219,6 @@ export const initFetchInterceptor = (debug) => {
       // For network failures, fetchedResponse is undefined but we still return customResponse with status=200
       const finalStatusCode = parseInt(responseModification.statusCode || fetchedResponse?.status) || 200;
       const requiresNullResponseBody = [204, 205, 304].includes(finalStatusCode);
-
-      debug && console.log("[RQ.fetch]", { sharedState, isTopLevelFrame: window.self === window.top });
 
       return new Response(requiresNullResponseBody ? null : new Blob([customResponse]), {
         status: finalStatusCode,

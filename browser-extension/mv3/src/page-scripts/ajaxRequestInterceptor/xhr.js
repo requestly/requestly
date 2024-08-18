@@ -103,34 +103,31 @@ export const initXhrInterceptor = (debug) => {
         const responseType = this.responseType;
         const contentType = this.getResponseHeader("content-type");
 
-        let sharedState;
-        try {
-          sharedState = window.top[PUBLIC_NAMESPACE]?.sharedState ?? {};
-        } catch (e) {
-          sharedState = window[PUBLIC_NAMESPACE]?.sharedState ?? {};
-        }
+        let customResponse;
 
-        let customResponse =
-          responseModification.type === "code"
-            ? getFunctionFromCode(responseModification.value, "response")(
-                {
-                  method: this._method,
-                  url: this._requestURL,
-                  requestHeaders: this._requestHeaders,
-                  requestData: jsonifyValidJSONString(this._requestData),
-                  responseType: contentType,
-                  response: this.response,
-                  responseJSON: jsonifyValidJSONString(this.response, true),
-                },
-                sharedState
-              )
-            : responseModification.value;
+        if (responseModification.type === "code") {
+          const isUserFunctionValid = getFunctionFromCode(responseModification.value, "response");
+
+          if (isUserFunctionValid) {
+            const evaluatorArgs = {
+              method: this._method,
+              url: this._requestURL,
+              requestHeaders: this._requestHeaders,
+              requestData: jsonifyValidJSONString(this._requestData),
+              responseType: contentType,
+              response: this.response,
+              responseJSON: jsonifyValidJSONString(this.response, true),
+            };
+
+            customResponse = generateUserFunctionWithSharedState(responseModification.value)(evaluatorArgs);
+          }
+        } else {
+          customResponse = responseModification.value;
+        }
 
         if (typeof customResponse === "undefined") {
           return;
         }
-
-        debug && console.log("[RQ.XHR]", { sharedState, isTopLevelFrame: window.self === window.top });
 
         // Convert customResponse back to rawText
         // response.value is String and evaluator method might return string/object
