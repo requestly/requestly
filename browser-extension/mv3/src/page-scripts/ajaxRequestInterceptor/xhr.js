@@ -1,6 +1,7 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
 import {
   applyDelay,
+  generateUserFunctionWithSharedState,
   getAbsoluteUrl,
   getCustomRequestBody,
   getFunctionFromCode,
@@ -119,7 +120,7 @@ export const initXhrInterceptor = (debug) => {
               responseJSON: jsonifyValidJSONString(this.response, true),
             };
 
-            customResponse = generateUserFunctionWithSharedState(responseModification.value)(evaluatorArgs);
+            customResponse = generateUserFunctionWithSharedState(responseModification.value, debug)(evaluatorArgs);
           }
         } else {
           customResponse = responseModification.value;

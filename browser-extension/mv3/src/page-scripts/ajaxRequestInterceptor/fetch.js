@@ -184,7 +184,7 @@ export const initFetchInterceptor = (debug) => {
         const isUserFunctionValid = getFunctionFromCode(responseModification.value, "response");
 
         if (isUserFunctionValid) {
-          customResponse = generateUserFunctionWithSharedState(responseModification.value)(evaluatorArgs);
+          customResponse = generateUserFunctionWithSharedState(responseModification.value, debug)(evaluatorArgs);
         }
 
         if (typeof customResponse === "undefined") {
