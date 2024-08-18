@@ -28,7 +28,7 @@ class GlobalStateManager {
   }
 
   updateSharedStateInStorage(tabId: number, sharedState: Record<string, any>) {
-    tabService.setData(tabId, "sharedState", sharedState);
+    tabService.setData(tabId, TAB_SERVICE_DATA.SHARED_STATE, sharedState);
   }
 
   // For future use - global state variables
