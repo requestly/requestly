@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { unstable_usePrompt, useLocation } from "react-router-dom";
 import { Col } from "antd";
@@ -6,7 +6,6 @@ import RuleBuilder from "../../../../components/features/rules/RuleBuilder";
 import ProCard from "@ant-design/pro-card";
 import {
   getAppMode,
-  getCurrentlySelectedRuleConfig,
   getCurrentlySelectedRuleData,
   getIsCurrentlySelectedRuleHasUnsavedChanges,
   getIsExtensionEnabled,
@@ -18,6 +17,9 @@ import APP_CONSTANTS from "config/constants";
 import { getModeData } from "components/features/rules/RuleBuilder/actions";
 import { BottomSheetLayout, useBottomSheetContext } from "componentsV2/BottomSheet";
 import { RuleEditorBottomSheet } from "./components/RuleEditorBottomSheet/RuleEditorBottomSheet";
+import { trackSampleRuleTested } from "features/rules/analytics";
+import { RecordStatus } from "features/rules";
+import { sampleRuleDetails } from "features/rules/screens/rulesList/components/RulesList/constants";
 import "./RuleEditor.css";
 
 const RuleEditor = (props) => {
@@ -25,15 +27,38 @@ const RuleEditor = (props) => {
   const { state } = location;
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
-  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
-  const currentlySelectedRuleConfig = useSelector(getCurrentlySelectedRuleConfig);
+  const isCurrentlySelectedRuleHasUnsavedChanges = useSelector(getIsCurrentlySelectedRuleHasUnsavedChanges);
   const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
+  const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
+  const tryThisRuleTooltipTimerRef = useRef(null);
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
-  const { RULE_EDITOR_CONFIG } = APP_CONSTANTS;
-  const { MODE } = getModeData(location, props.isSharedListViewRule);
+  const { MODE, RULE_TYPE_TO_CREATE } = useMemo(
+    () => getModeData(location, props.isSharedListViewRule),
+    [location, props.isSharedListViewRule]
+  );
+
+  const handleSeeLiveRuleDemoClick = useCallback(() => {
+    trackSampleRuleTested(currentlySelectedRuleData?.name, currentlySelectedRuleData.status);
+
+    if (currentlySelectedRuleData.status === RecordStatus.INACTIVE) {
+      setShowEnableRuleTooltip(true);
+
+      if (tryThisRuleTooltipTimerRef.current) {
+        clearTimeout(tryThisRuleTooltipTimerRef.current);
+      }
+
+      tryThisRuleTooltipTimerRef.current = setTimeout(() => {
+        setShowEnableRuleTooltip(false);
+      }, 3 * 1000);
+
+      return;
+    }
+
+    window.open(sampleRuleDetails[currentlySelectedRuleData.sampleId].demoLink, "_blank");
+  }, [currentlySelectedRuleData?.name, currentlySelectedRuleData?.status]);
 
   useEffect(() => {
     const unloadListener = (e) => {
@@ -76,19 +101,23 @@ const RuleEditor = (props) => {
     }
   }, [state?.source, MODE]);
 
-  const renderRuleEditor = () => {
+  const ruleEditor = useMemo(() => {
     return (
-      <Col className="overflow-hidden h-full">
-        {MODE !== RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
+      <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full">
+        {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
             mode={MODE}
-            location={location}
-            currentlySelectedRuleData={currentlySelectedRuleData}
-            currentlySelectedRuleConfig={currentlySelectedRuleConfig}
+            showEnableRuleTooltip={showEnableRuleTooltip}
+            handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick}
           />
         ) : null}
+
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-          <ProCard className="rule-editor-procard">
+          <ProCard
+            className={`rule-editor-procard ${
+              MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "rules-edit-mode" : "rules-create-mode"
+            }`}
+          >
             <RuleBuilder />
           </ProCard>
         ) : (
@@ -96,29 +125,29 @@ const RuleEditor = (props) => {
             bottomSheet={<RuleEditorBottomSheet mode={MODE} />}
             hideBottomSheet={MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE}
           >
-            <ProCard className="rule-editor-procard">
-              <RuleBuilder />
+            <ProCard
+              className={`rule-editor-procard ${
+                MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "rules-edit-mode" : "rules-create-mode"
+              }`}
+            >
+              <RuleBuilder handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick} />
             </ProCard>
           </BottomSheetLayout>
         )}
       </Col>
     );
-  };
+  }, [MODE, RULE_TYPE_TO_CREATE, appMode, showEnableRuleTooltip, handleSeeLiveRuleDemoClick]);
 
-  const handleDeviceView = () => {
-    switch (appMode) {
-      case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:
-        if (!isExtensionEnabled) {
-          return <ExtensionDeactivationMessage />;
-        }
-        return renderRuleEditor();
-      case GLOBAL_CONSTANTS.APP_MODES.DESKTOP:
-      default:
-        return renderRuleEditor();
-    }
-  };
-
-  return handleDeviceView();
+  switch (appMode) {
+    case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:
+      if (!isExtensionEnabled) {
+        return <ExtensionDeactivationMessage />;
+      }
+      return ruleEditor;
+    case GLOBAL_CONSTANTS.APP_MODES.DESKTOP:
+    default:
+      return ruleEditor;
+  }
 };
 
 export default RuleEditor;

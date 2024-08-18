@@ -17,7 +17,7 @@ type MocksModalsContextType = {
   openMockUploaderModalAction: (mockType: MockType) => void;
   setOpenMockUploaderModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 
-  openNewFileModalAction: () => void;
+  openNewFileModalAction: (collectionId?: string) => void;
   setOpenNewFileModalAction: React.Dispatch<React.SetStateAction<() => void>>;
 };
 

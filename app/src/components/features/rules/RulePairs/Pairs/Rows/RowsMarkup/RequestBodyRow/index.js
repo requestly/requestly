@@ -40,6 +40,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
         dispatch(
           actions.updateRulePairAtGivenPath({
             pairIndex,
+            triggerUnsavedChangesIndication: false,
             updates: {
               "request.type": requestType,
               "request.value": value,

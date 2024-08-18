@@ -110,6 +110,7 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
 
         <div className="mocks-table-container">
           <MocksTable
+            source={source}
             isLoading={isLoading}
             mockType={type}
             records={mockRecords}

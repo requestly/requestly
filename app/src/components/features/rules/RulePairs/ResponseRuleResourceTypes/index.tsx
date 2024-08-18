@@ -26,12 +26,13 @@ const DownloadDesktopAppLink: React.FC = () => (
   </a>
 );
 
-const ResponseRuleResourceTypes: React.FC = () => {
+const ResponseRuleResourceTypes: React.FC<{ ruleDetails: Record<string, unknown> }> = ({ ruleDetails }) => {
   const dispatch = useDispatch();
   const isDesktop = useMemo(isDesktopMode, []);
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
   const { getFeatureLimitValue } = useFeatureLimiter();
+  const isSampleRule = currentlySelectedRuleData?.isSample;
 
   const requestPayloadFilter = currentlySelectedRuleData.pairs?.[0].source?.filters?.[0]?.requestPayload;
 
@@ -52,9 +53,13 @@ const ResponseRuleResourceTypes: React.FC = () => {
         pairs: [{ ...updatedPair }],
       };
 
-      setCurrentlySelectedRule(dispatch, updatedRule, resourceType !== ResponseRuleResourceType.UNKNOWN);
+      const responseValue = updatedRule?.pairs?.[pairIndex]?.response?.value;
+
+      const isDefaultValue = ["", "{}", ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"]].includes(responseValue);
+
+      setCurrentlySelectedRule(dispatch, updatedRule, !isDefaultValue);
     },
-    [dispatch, currentlySelectedRuleData]
+    [dispatch, currentlySelectedRuleData, ruleDetails["RESPONSE_BODY_JAVASCRIPT_DEFAULT_VALUE"]]
   );
 
   const isNewResponseRule = "resourceType" in (currentlySelectedRuleData?.pairs?.[0]?.response ?? {});
@@ -79,6 +84,7 @@ const ResponseRuleResourceTypes: React.FC = () => {
       <div className="subtitle">Select Resource Type</div>
       <div className="resource-types-radio-group">
         <Radio.Group
+          disabled={isSampleRule}
           value={responseRuleResourceType}
           onChange={(e) => {
             if (e.target.value !== ResponseRuleResourceType.GRAPHQL_API) handleResourceTypeChange(e.target.value);

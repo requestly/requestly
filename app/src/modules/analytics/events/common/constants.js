@@ -41,6 +41,7 @@ export const AUTH = {
   EMAIL_LINK_SIGNIN_FORM: {
     SEEN: "email_link_signin_form_seen",
     SUBMITTED: "email_link_signin_form_submitted",
+    LINK_RESEND_REQUESTED: "magic_link_resend_requested",
   },
 
   VERIFY_OOBCODE: {
@@ -121,6 +122,7 @@ export const RULES = {
   RULE_TOGGLED: "rule_toggled",
   RULE_TOGGLE_ATTEMPTED: "rule_toggle_attempted",
   RULE_DUPLICATED: "rule_duplicated",
+  GROUP_DUPLICATED: "group_duplicated",
   RULE_PIN_TOGGLED: "rule_pin_toggled",
   RULE_EXPORTED: "rule_exported",
   RULE_PAIR_CREATION_ATTEMPTED: "rule_pair_creation_attempted",
@@ -149,9 +151,12 @@ export const RULES = {
   RULE_SIMULATOR_TRIED: "rule_simulator_tried",
   RULE_RESOURCE_TYPE_SELECTED: "rule_resource_type_selected",
   DESKTOP_RULE_VIEWED_ON_EXTENSION: "desktop_rule_viewed_on_extension",
+
+  // rule details panel
   RULE_DETAILS_PANEL_VIEWED: "rule_details_panel_viewed",
   RULE_DETAILS_PANEL_CLOSED: "rule_details_panel_closed",
   RULE_DETAILS_PANEL_DOCS_CLICKED: "rule_details_panel_docs_clicked",
+  RULE_DETAILS_USE_CASE_CLICKED: "rule_details_use_case_clicked",
 
   // rule editor docs
   DOCS_SIDEBAR_VIEWED: "docs_sidebar_viewed",

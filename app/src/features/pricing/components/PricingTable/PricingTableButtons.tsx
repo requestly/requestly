@@ -5,7 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { PRICING } from "features/pricing/constants/pricing";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { RQButton } from "lib/design-system/components";
-import { trackCheckoutFailedEvent, trackCheckoutButtonClicked } from "modules/analytics/events/misc/business/checkout";
+import {
+  trackCheckoutFailedEvent,
+  trackCheckoutButtonClicked,
+  trackCheckoutInitiated,
+} from "modules/analytics/events/misc/business/checkout";
 import { useState } from "react";
 import { actions } from "store";
 import { getUserAuthDetails } from "store/selectors";
@@ -234,6 +238,15 @@ export const PricingTableButtons: React.FC<PricingTableButtonsProps> = ({
           .then((res: any) => {
             if (res?.data?.success) {
               window.location.href = res?.data?.data?.portalUrl;
+
+              trackCheckoutInitiated({
+                plan_name: columnPlanName,
+                duration,
+                currency: "usd",
+                quantity: quantity,
+                is_user_on_trial: isUserTrialing,
+                source,
+              });
             }
           })
           .catch((err) => {

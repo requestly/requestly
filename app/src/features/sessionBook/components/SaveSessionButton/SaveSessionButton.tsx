@@ -10,7 +10,12 @@ import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { DebugInfo } from "features/sessionBook/types";
 import { getRecordingOptionsToSave } from "features/sessionBook/utils/sessionFile";
 import { downloadSessionFile } from "features/sessionBook/utils/sessionFile";
-import { getSessionRecordingEvents, getSessionRecordingMetaData } from "store/features/session-recording/selectors";
+import {
+  getSessionRecordingAttributes,
+  getSessionRecordingEvents,
+  getSessionRecordingMetaData,
+  getTrimmedSessionData,
+} from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
 import Logger from "lib/logger";
 import { SOURCE } from "modules/analytics/events/common/constants";
@@ -33,6 +38,8 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
 
   const sessionEvents = useSelector(getSessionRecordingEvents);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
+  const sessionAttributes = useSelector(getSessionRecordingAttributes);
+  const trimmedSessionData = useSelector(getTrimmedSessionData);
 
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const isDraftSession = location.pathname.includes("draft");
@@ -46,7 +53,11 @@ export const SaveSessionButton: React.FC<SaveSessionButtonProps> = ({ onSaveClic
 
   const handleSessionDownload = () => {
     const recordingOptions = getRecordingOptionsToSave(debugInfoToBeIncluded);
-    downloadSessionFile(sessionEvents, sessionRecordingMetadata, recordingOptions)
+    const sessionEventsToDownload = trimmedSessionData.events ?? sessionEvents;
+    const attributes = { ...sessionAttributes, duration: trimmedSessionData?.duration ?? sessionAttributes?.duration };
+    const metadata = { ...sessionRecordingMetadata, sessionAttributes: attributes };
+
+    downloadSessionFile(sessionEventsToDownload, metadata, recordingOptions)
       .then(() => {
         toast.success("Session downloaded successfully");
       })

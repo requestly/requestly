@@ -12,7 +12,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { Checkout } from "./Checkout";
 import { trackPricingModalPlansViewed } from "features/pricing/analytics";
 import { redirectToUrl } from "utils/RedirectionUtils";
-import { trackCheckoutFailedEvent } from "modules/analytics/events/misc/business/checkout";
+import { trackCheckoutFailedEvent, trackCheckoutInitiated } from "modules/analytics/events/misc/business/checkout";
 import { PricingModalFooterBanner } from "./components/FooterBanner";
 import "./index.scss";
 
@@ -60,6 +60,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         planName: planName,
         duration: duration,
       };
+
       createSubscriptionUsingCheckout(subscriptionData)
         .then((res: any) => {
           if (res?.data?.payload?.url) {
@@ -68,6 +69,14 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           } else setStripeClientSecret(res?.data?.payload?.clientSecret);
 
           setIsLoading(false);
+
+          trackCheckoutInitiated({
+            plan_name: subscriptionData.planName,
+            duration: subscriptionData.duration,
+            currency: subscriptionData.currency,
+            quantity: subscriptionData.quantity,
+            source,
+          });
         })
         .catch((err) => {
           setStripeError(err);
