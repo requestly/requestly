@@ -100,8 +100,12 @@ const Editor: React.FC<EditorProps> = ({
   return isFullScreen ? (
     <>
       <Modal
+        keyboard
         open={isFullScreen}
         destroyOnClose
+        onCancel={() => {
+          setIsFullScreen(false);
+        }}
         closable={false}
         closeIcon={null}
         maskClosable={false}

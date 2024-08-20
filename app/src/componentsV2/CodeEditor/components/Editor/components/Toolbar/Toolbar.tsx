@@ -121,7 +121,8 @@ const CodeEditorToolbar: React.FC<CodeEditorToolbarProps> = ({
         <Tooltip
           mouseEnterDelay={0.6}
           color={theme.colors.black}
-          title={isFullScreen ? "Exit full screen" : "Full screen"}
+          title={isFullScreen ? "Exit full screen (esc)" : "Full screen"}
+          placement="bottomLeft"
         >
           <RQButton
             type="text"
