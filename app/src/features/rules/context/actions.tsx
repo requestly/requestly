@@ -217,7 +217,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
           const isRecordRule = isRule(record);
 
           if (record.isSample) {
-            trackSampleRuleToggled(record.name, newStatus);
+            trackSampleRuleToggled(record.name, newStatus, "rules_list");
           }
 
           if (!isRecordRule) {

@@ -111,12 +111,12 @@ const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, s
     toggleRuleStatus();
 
     if (currentlySelectedRuleData?.isSample) {
-      trackSampleRuleToggled(
-        currentlySelectedRuleData?.name,
+      const updatedValue =
         currentlySelectedRuleData?.status === GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
           ? GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
-          : GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE
-      );
+          : GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
+
+      trackSampleRuleToggled(currentlySelectedRuleData?.name, updatedValue, "rule_editor");
     }
 
     trackRuleEditorHeaderClicked(
