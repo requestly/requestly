@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Tooltip } from "antd";
-import { getAppMode, getNetworkSessionSaveInProgress } from "store/selectors";
+import { getAppMode, getIsSecondarySidebarCollapsed, getNetworkSessionSaveInProgress } from "store/selectors";
 import { ApiOutlined, HomeOutlined } from "@ant-design/icons";
 import NetworkTrafficIcon from "assets/icons/network-traffic.svg?react";
 import HttpRulesIcon from "assets/icons/http-rules.svg?react";
@@ -20,13 +20,15 @@ import FEATURES from "config/constants/sub/features";
 import { useFeatureIsOn } from "@growthbook/growthbook-react";
 import { CreditsButton } from "./components/CreditsButton/CreditsButton";
 import { useIsIncentivizationEnabled } from "features/incentivization/hooks";
-import "./PrimarySidebar.css";
 import JoinSlackButton from "./components/JoinSlackButton/JoinSlackButton";
 import useFetchSlackInviteVisibility from "components/misc/SupportPanel/useSlackInviteVisibility";
+import { SidebarToggleButton } from "componentsV2/SecondarySidebar/components/SidebarToggleButton/SidebarToggleButton";
+import "./PrimarySidebar.css";
 
 export const PrimarySidebar: React.FC = () => {
   const appMode = useSelector(getAppMode);
   const isSavingNetworkSession = useSelector(getNetworkSessionSaveInProgress);
+  const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
 
   const isIncentivizationEnabled = useIsIncentivizationEnabled();
   const isSlackConnectFeatureEnabled = useFeatureIsOn("slack_connect");
@@ -120,6 +122,7 @@ export const PrimarySidebar: React.FC = () => {
 
   return (
     <div className="primary-sidebar-container">
+      {isSecondarySidebarCollapsed && <SidebarToggleButton />}
       <ul>
         {sidebarItems
           .filter((item) => item.display)
