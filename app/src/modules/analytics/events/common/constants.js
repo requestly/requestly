@@ -88,6 +88,7 @@ export const SOURCE = {
   COMMAND_BAR: "command_bar",
   WORKSPACE_SIDEBAR: "workspace_sidebar",
   RULES_LIST: "rules_list",
+  RULE_EDITOR: "rule_editor",
   PERSONA_SURVEY: "persona-survey",
   PERSONA_RECOMMENDATION_SCREEN: "persona_recommendation_screen",
   PRICING_PAGE: "pricing_page",
