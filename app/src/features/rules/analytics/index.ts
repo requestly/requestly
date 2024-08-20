@@ -116,8 +116,8 @@ export const trackSampleRuleTested = (rule_name: string, rule_status: string) =>
   trackEvent(SAMPLE_RULES.SAMPLE_RULE_TESTED, params);
 };
 
-export const trackSampleRuleToggled = (rule_name: string, status: string) => {
-  const params = { rule_name, status };
+export const trackSampleRuleToggled = (rule_name: string, status: string, source: string) => {
+  const params = { rule_name, status, source };
   trackEvent(SAMPLE_RULES.SAMPLE_RULES_TOGGLED, params);
 };
 
