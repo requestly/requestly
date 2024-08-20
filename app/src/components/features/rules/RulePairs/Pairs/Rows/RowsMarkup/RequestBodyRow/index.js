@@ -188,7 +188,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
           >
             <Col xl="12" span={24}>
               <CodeEditor
-                key={pair.request.type}
+                // key={pair.request.type}
                 language={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
                     ? EditorLanguage.JAVASCRIPT

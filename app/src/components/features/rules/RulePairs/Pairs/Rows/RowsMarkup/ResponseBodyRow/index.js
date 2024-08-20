@@ -299,7 +299,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           >
             <Col xl="12" span={24}>
               <CodeEditor
-                key={pair.response.type}
+                // key={pair.response.type}
                 language={
                   pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
                     ? EditorLanguage.JAVASCRIPT
