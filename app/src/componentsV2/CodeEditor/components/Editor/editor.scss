@@ -50,3 +50,35 @@
   color: var(--requestly-color-text-subtle);
   font-size: var(--requestly-font-size-xs);
 }
+
+.code-editor-fullscreen-modal {
+  .ant-modal {
+    width: 100% !important;
+    max-width: 100vw;
+    top: 0px;
+    padding: 8px;
+    margin: 0;
+
+    .ant-modal-content {
+      border-radius: var(--space-4, 8px);
+      border: 1px solid var(--requestly-color-white-t-10, rgba(255, 255, 255, 0.06));
+
+      .ant-modal-body {
+        padding: 8px 8px 24px 8px !important;
+        height: calc(100vh - 54px) !important; // 54px -> vertical padding + footer height
+
+        .code-editor {
+          border: none;
+          border-radius: 4px;
+          height: calc(100% - 20px);
+          background: var(--requestly-color-surface-0, #212121);
+        }
+      }
+
+      .ant-modal-footer {
+        padding: 8px;
+        border: none;
+      }
+    }
+  }
+}

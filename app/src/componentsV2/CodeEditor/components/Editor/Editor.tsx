@@ -13,6 +13,7 @@ import { getAllEditorToast } from "store/selectors";
 import { EditorToastContainer } from "../EditorToast/EditorToastContainer";
 import { getByteSize } from "utils/FormattingHelper";
 import CodeEditorToolbar from "./components/Toolbar/Toolbar";
+import { Modal } from "antd";
 import "./editor.scss";
 
 interface EditorProps {
@@ -43,12 +44,17 @@ const Editor: React.FC<EditorProps> = ({
   const dispatch = useDispatch();
   const [editorHeight, setEditorHeight] = useState(height);
   const [editorContent, setEditorContent] = useState(value);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
 
   const handleResize = (event: any, { element, size, handle }: any) => {
     setEditorHeight(size.height);
+  };
+
+  const handleFullScreenToggle = () => {
+    setIsFullScreen((prev) => !prev);
   };
 
   const editorLanguage = useMemo(() => {
@@ -91,14 +97,71 @@ const Editor: React.FC<EditorProps> = ({
     [handleChange]
   );
 
-  return (
+  return isFullScreen ? (
+    <>
+      <Modal
+        open={isFullScreen}
+        destroyOnClose
+        closable={false}
+        closeIcon={null}
+        maskClosable={false}
+        wrapClassName="code-editor-fullscreen-modal"
+        maskStyle={{ background: "var(--requestly-color-surface-0, #212121)" }}
+        footer={<div className="code-editor-character-count">{getByteSize(value)} characters</div>}
+      >
+        <CodeEditorToolbar
+          language={language}
+          code={editorContent}
+          isFullScreen={isFullScreen}
+          onCodeFormat={(formattedCode: string) => {
+            setEditorContent(formattedCode);
+          }}
+          handleFullScreenToggle={handleFullScreenToggle}
+          customOptions={toolbarOptions}
+        />
+
+        <>
+          {toastOverlay && (
+            <EditorToastContainer
+              message={toastOverlay.message}
+              type={toastOverlay.type}
+              onClose={() => handleEditorClose(toastOverlay.id)}
+              isVisible={toastOverlay}
+              autoClose={toastOverlay.autoClose}
+            />
+          )}
+          <CodeMirror
+            className="code-editor"
+            width="100%"
+            readOnly={isReadOnly}
+            value={editorContent ?? ""}
+            defaultValue={defaultValue}
+            onChange={handleEditorBodyChange}
+            theme={vscodeDark}
+            extensions={[editorLanguage, EditorView.lineWrapping]}
+            basicSetup={{
+              highlightActiveLine: false,
+              bracketMatching: true,
+              closeBrackets: true,
+              allowMultipleSelections: true,
+            }}
+            data-enable-grammarly="false"
+            data-gramm_editor="false"
+            data-gramm="false"
+          />
+        </>
+      </Modal>
+    </>
+  ) : (
     <>
       <CodeEditorToolbar
         language={language}
         code={editorContent}
+        isFullScreen={isFullScreen}
         onCodeFormat={(formattedCode: string) => {
           setEditorContent(formattedCode);
         }}
+        handleFullScreenToggle={handleFullScreenToggle}
         customOptions={toolbarOptions}
       />
       <ResizableBox
