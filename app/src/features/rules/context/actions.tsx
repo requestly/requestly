@@ -27,6 +27,7 @@ import APP_CONSTANTS from "config/constants";
 import { RuleTableRecord } from "../screens/rulesList/components/RulesList/components/RulesTable/types";
 import { updateGroupOfSelectedRules } from "components/features/rules/ChangeRuleGroupModal/actions";
 import { getAllRulesOfGroup } from "utils/rules/misc";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 // FIXME: Make all bulk actions async to handle loading state properly
 type RulesActionContextType = {
@@ -217,7 +218,7 @@ export const RulesActionContextProvider: React.FC<RulesProviderProps> = ({ child
           const isRecordRule = isRule(record);
 
           if (record.isSample) {
-            trackSampleRuleToggled(record.name, newStatus, "rules_list");
+            trackSampleRuleToggled(record.name, newStatus, SOURCE.RULES_LIST);
           }
 
           if (!isRecordRule) {

@@ -19,6 +19,7 @@ import { saveRule, validateSyntaxInRule as validateAndTransformSyntaxInRule } fr
 import { useLocation } from "react-router-dom";
 import { trackSampleRuleToggled } from "features/rules/analytics";
 import RULE_EDITOR_CONFIG from "config/constants/sub/rule-editor";
+import { SOURCE } from "modules/analytics/events/common/constants";
 
 const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, showEnableRuleTooltip = false }) => {
   const location = useLocation();
@@ -116,7 +117,7 @@ const Status = ({ isDisabled = false, isRuleEditorModal, isSampleRule = false, s
           ? GLOBAL_CONSTANTS.RULE_STATUS.INACTIVE
           : GLOBAL_CONSTANTS.RULE_STATUS.ACTIVE;
 
-      trackSampleRuleToggled(currentlySelectedRuleData?.name, updatedValue, "rule_editor");
+      trackSampleRuleToggled(currentlySelectedRuleData?.name, updatedValue, SOURCE.RULE_EDITOR);
     }
 
     trackRuleEditorHeaderClicked(
