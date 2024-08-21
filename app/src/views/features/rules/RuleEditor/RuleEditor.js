@@ -103,7 +103,7 @@ const RuleEditor = (props) => {
 
   const ruleEditor = useMemo(() => {
     return (
-      <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full rule-editor-layout-container">
+      <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full">
         {MODE !== APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.SHARED_LIST_RULE_VIEW ? (
           <EditorHeader
             mode={MODE}
