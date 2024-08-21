@@ -54,10 +54,10 @@
 .code-editor-fullscreen-modal {
   .ant-modal {
     width: 100% !important;
-    max-width: 100vw;
+    max-width: 1440px;
     top: 0px;
     padding: 8px;
-    margin: 0;
+    margin: 0 auto;
 
     .ant-modal-content {
       border-radius: var(--space-4, 8px);
