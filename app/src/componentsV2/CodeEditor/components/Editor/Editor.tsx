@@ -5,7 +5,7 @@ import { json } from "@codemirror/lang-json";
 import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import { EditorLanguage, EditorCustomToolbar } from "componentsV2/CodeEditor/types";
+import { EditorLanguage, EditorCustomToolbar, AnalyticEventProperties } from "componentsV2/CodeEditor/types";
 import { ResizableBox } from "react-resizable";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
@@ -17,6 +17,7 @@ import { Modal } from "antd";
 import { toast } from "utils/Toast";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { trackCodeEditorCollapsedClick, trackCodeEditorExpandedClick } from "../analytics";
 import "./editor.scss";
 
 interface EditorProps {
@@ -30,6 +31,7 @@ interface EditorProps {
   toolbarOptions?: EditorCustomToolbar;
   hideCharacterCount?: boolean;
   handleChange?: (value: string) => void;
+  analyticEventProperties?: AnalyticEventProperties;
 }
 
 const Editor: React.FC<EditorProps> = ({
@@ -43,6 +45,7 @@ const Editor: React.FC<EditorProps> = ({
   handleChange = () => {},
   toolbarOptions,
   id = "",
+  analyticEventProperties = {},
 }) => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -62,6 +65,8 @@ const Editor: React.FC<EditorProps> = ({
     setIsFullScreen((prev) => !prev);
 
     if (!isFullScreen) {
+      trackCodeEditorExpandedClick(analyticEventProperties);
+
       if (!isFullScreenModeOnboardingCompleted) {
         // TODO: @rohanmathur to remove this check after adding shortcut in mocks save button
         const isRuleEditor = location?.pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
@@ -72,6 +77,8 @@ const Editor: React.FC<EditorProps> = ({
           dispatch(actions.updateIsCodeEditorFullScreenModeOnboardingCompleted(true));
         }
       }
+    } else {
+      trackCodeEditorCollapsedClick(analyticEventProperties);
     }
   };
 
