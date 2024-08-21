@@ -34,13 +34,15 @@ export const getEditorLanguageFromContentType = (contentType: string): EditorLan
 
 export type AnalyticEventProperties =
   | {
-      source?: "rule_editor";
-      rule_type?: RuleType;
+      source: "rule_editor";
+      rule_type: RuleType;
     }
   | {
-      source?: "mocks";
-      mock_type?: MockType;
+      source: "mocks";
+      mock_type: MockType;
     }
   | {
-      source?: "api_client";
-    };
+      source: "api_client";
+    }
+  | { source: "traffic_table" }
+  | Record<string, unknown>;
