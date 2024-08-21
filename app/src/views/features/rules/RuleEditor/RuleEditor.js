@@ -35,10 +35,10 @@ const RuleEditor = (props) => {
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
-  const { MODE, RULE_TYPE_TO_CREATE } = useMemo(
-    () => getModeData(location, props.isSharedListViewRule),
-    [location, props.isSharedListViewRule]
-  );
+  const { MODE, RULE_TYPE_TO_CREATE } = useMemo(() => getModeData(location, props.isSharedListViewRule), [
+    location,
+    props.isSharedListViewRule,
+  ]);
 
   const handleSeeLiveRuleDemoClick = useCallback(() => {
     trackSampleRuleTested(currentlySelectedRuleData?.name, currentlySelectedRuleData.status);
@@ -113,11 +113,7 @@ const RuleEditor = (props) => {
         ) : null}
 
         {appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP ? (
-          <ProCard
-            className={`rule-editor-procard ${
-              MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "rules-edit-mode" : "rules-create-mode"
-            }`}
-          >
+          <ProCard className="rule-editor-procard rule-editor-body-scroll">
             <RuleBuilder />
           </ProCard>
         ) : (
