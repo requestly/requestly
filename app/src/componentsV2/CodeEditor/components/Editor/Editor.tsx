@@ -9,11 +9,14 @@ import { EditorLanguage, EditorCustomToolbar } from "componentsV2/CodeEditor/typ
 import { ResizableBox } from "react-resizable";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
-import { getAllEditorToast } from "store/selectors";
+import { getAllEditorToast, getIsCodeEditorFullScreenModeOnboardingCompleted } from "store/selectors";
 import { EditorToastContainer } from "../EditorToast/EditorToastContainer";
 import { getByteSize } from "utils/FormattingHelper";
 import CodeEditorToolbar from "./components/Toolbar/Toolbar";
 import { Modal } from "antd";
+import { toast } from "utils/Toast";
+import { useLocation } from "react-router-dom";
+import PATHS from "config/constants/sub/paths";
 import "./editor.scss";
 
 interface EditorProps {
@@ -41,10 +44,12 @@ const Editor: React.FC<EditorProps> = ({
   toolbarOptions,
   id = "",
 }) => {
+  const location = useLocation();
   const dispatch = useDispatch();
   const [editorHeight, setEditorHeight] = useState(height);
   const [editorContent, setEditorContent] = useState(value);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const isFullScreenModeOnboardingCompleted = useSelector(getIsCodeEditorFullScreenModeOnboardingCompleted);
 
   const allEditorToast = useSelector(getAllEditorToast);
   const toastOverlay = useMemo(() => allEditorToast[id], [allEditorToast, id]); // todo: rename
@@ -55,6 +60,19 @@ const Editor: React.FC<EditorProps> = ({
 
   const handleFullScreenToggle = () => {
     setIsFullScreen((prev) => !prev);
+
+    if (!isFullScreen) {
+      if (!isFullScreenModeOnboardingCompleted) {
+        // TODO: @rohanmathur to remove this check after adding shortcut in mocks save button
+        const isRuleEditor = location?.pathname.includes(PATHS.RULE_EDITOR.RELATIVE);
+
+        if (isRuleEditor) {
+          toast.info(`Use '⌘+S' or 'ctrl+S' to save the rule`, 3);
+          // @ts-ignore
+          dispatch(actions.updateIsCodeEditorFullScreenModeOnboardingCompleted(true));
+        }
+      }
+    }
   };
 
   const editorLanguage = useMemo(() => {

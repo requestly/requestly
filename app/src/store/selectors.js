@@ -237,6 +237,10 @@ export const getIsRuleEditorTourCompleted = (state) => {
   );
 };
 
+export const getIsCodeEditorFullScreenModeOnboardingCompleted = (state) => {
+  return getGlobalState(state).misc.persist?.isCodeEditorFullScreenModeOnboardingCompleted;
+};
+
 export const getIsMiscTourCompleted = (state) => {
   return getGlobalState(state).misc.persist?.isMiscTourCompleted;
 };
