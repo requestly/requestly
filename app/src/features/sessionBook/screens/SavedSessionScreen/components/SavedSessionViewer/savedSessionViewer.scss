@@ -3,6 +3,9 @@
   align-items: center;
   justify-content: space-between;
   padding-inline: 1rem;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 
   .saved-session-actions {
     display: flex;
@@ -32,6 +35,9 @@
   background: var(--requestly-color-background);
   height: calc(100vh - 154px);
   overflow-y: auto;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 
   .bottom-sheet-without-context {
     margin-top: 20px;
@@ -40,9 +46,6 @@
 }
 
 .saved-session-viewer-container {
-  width: 100%;
-  max-width: 1600px;
-  margin: 0 auto;
   height: 100%;
   background: var(--requestly-color-background);
   overflow: hidden;
