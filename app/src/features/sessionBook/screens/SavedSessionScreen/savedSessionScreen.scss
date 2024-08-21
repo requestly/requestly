@@ -1,5 +1,7 @@
 .saved-session-viewer-container {
   width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
   height: 100%;
   background: var(--requestly-color-background);
   overflow: hidden;
