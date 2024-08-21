@@ -42,7 +42,7 @@
   padding: 0;
 }
 
-.rule-editor-header-disabled-group-warning.ant-col @media only screen and (max-width: 1200px) {
+@media only screen and (max-width: 1200px) {
   .rule-editor-back-btn {
     visibility: visible;
   }
