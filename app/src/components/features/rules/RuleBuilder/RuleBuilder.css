@@ -40,3 +40,10 @@
   height: 7px;
   color: var(--text-gray);
 }
+
+/* TODO: update layout and remove avoid this */
+@media (min-width: 1900px) {
+  .rule-builder-body-wrapper {
+    padding: 0;
+  }
+}
