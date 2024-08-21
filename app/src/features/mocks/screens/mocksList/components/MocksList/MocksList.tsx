@@ -90,38 +90,36 @@ const MockList: React.FC<Props> = ({ source, mockSelectionCallback, type }) => {
     </>
   ) : mockRecords.length > 0 ? (
     <>
-      <div className="rq-mocks-list-view">
-        <div className="rq-mocks-list-container">
-          {/* TODO: Temp Breadcrumb */}
-          <div className="rq-mocks-table-breadcrumb">
-            <span className="breadcrumb-1"> {type === MockType.API ? "Mocks" : "Files"}</span> {" > "}{" "}
-            <span className="breadcrumb-2">All</span>
-          </div>
+      <div className="rq-mocks-list-container">
+        {/* TODO: Temp Breadcrumb */}
+        <div className="rq-mocks-table-breadcrumb">
+          <span className="breadcrumb-1"> {type === MockType.API ? "Mocks" : "Files"}</span> {" > "}{" "}
+          <span className="breadcrumb-2">All</span>
+        </div>
 
-          <MocksListContentHeader
+        <MocksListContentHeader
+          source={source}
+          records={mockRecords}
+          mockRecords={filteredRecords}
+          mockType={type}
+          searchValue={searchValue}
+          setSearchValue={handleSearch}
+          filter={filter}
+          setFilter={setFilter}
+        />
+
+        <div className="mocks-table-container">
+          <MocksTable
             source={source}
-            records={mockRecords}
-            mockRecords={filteredRecords}
+            isLoading={isLoading}
             mockType={type}
-            searchValue={searchValue}
-            setSearchValue={handleSearch}
-            filter={filter}
-            setFilter={setFilter}
+            records={mockRecords}
+            filteredRecords={filteredRecords}
+            handleItemSelect={handleItemSelect}
+            handleNameClick={handleNameClick}
+            handleEditAction={handleEditAction}
+            forceRender={_forceRender}
           />
-
-          <div className="mocks-table-container">
-            <MocksTable
-              source={source}
-              isLoading={isLoading}
-              mockType={type}
-              records={mockRecords}
-              filteredRecords={filteredRecords}
-              handleItemSelect={handleItemSelect}
-              handleNameClick={handleNameClick}
-              handleEditAction={handleEditAction}
-              forceRender={_forceRender}
-            />
-          </div>
         </div>
       </div>
 
