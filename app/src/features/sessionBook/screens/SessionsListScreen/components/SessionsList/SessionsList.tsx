@@ -10,7 +10,6 @@ import { submitAttrUtil } from "utils/AnalyticsUtils";
 import APP_CONSTANTS from "config/constants";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
 import ShareRecordingModal from "views/features/sessions/ShareRecordingModal";
-import { ContentListScreen } from "componentsV2/ContentList";
 
 export const SessionsList = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -56,7 +55,7 @@ export const SessionsList = () => {
 
   if (user.loggedIn && sessions.length) {
     return (
-      <ContentListScreen>
+      <>
         <SessionsListContentHeader searchValue={searchValue} handleSearchValueUpdate={setSearchValue} />
         <SessionsTable
           sessions={searchedSessions}
@@ -75,7 +74,7 @@ export const SessionsList = () => {
             onVisibilityChange={_forceRender}
           />
         ) : null}
-      </ContentListScreen>
+      </>
     );
   } else return <SessionsOnboardingView />;
 };

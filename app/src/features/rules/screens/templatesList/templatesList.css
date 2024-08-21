@@ -1,17 +1,3 @@
-.templates-list-screen-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  overflow-y: hidden;
-}
-
-.templates-list-screen {
-  width: 100%;
-  max-width: 1600px;
-  padding: 0 1rem;
-}
-
 .templates-list-header {
   width: 100%;
   background: var(--requestly-color-background);
