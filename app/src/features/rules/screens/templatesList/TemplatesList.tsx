@@ -7,12 +7,14 @@ export const TemplatesList = () => {
   const [searchValue, setSearchValue] = useState<string>("");
 
   return (
-    <div className="templates-list-screen">
-      <TemplatesTableContentHeader
-        searchValue={searchValue}
-        handleSearchValueUpdate={(value: string) => setSearchValue(value)}
-      />
-      <TemplatesTable searchValue={searchValue} />
+    <div className="templates-list-screen-container">
+      <div className="templates-list-screen">
+        <TemplatesTableContentHeader
+          searchValue={searchValue}
+          handleSearchValueUpdate={(value: string) => setSearchValue(value)}
+        />
+        <TemplatesTable searchValue={searchValue} />
+      </div>
     </div>
   );
 };
