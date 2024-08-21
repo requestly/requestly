@@ -7,6 +7,7 @@ import { RQNetworkLog } from "./types";
 import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
 import useFocusedAutoScroll from "./useFocusedAutoScroll";
 import "./RQNetworkTable.css";
+import { getFile } from "services/firebaseStorageService";
 
 export interface RQNetworkTableProps {
   logs: RQNetworkLog[];
@@ -30,6 +31,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   disableFilters = false,
 }) => {
   const [activeLogId, setActiveLogId] = useState(null);
+  const [selectedLog, setSelectedLog] = useState<RQNetworkLog | null>(null);
   const containerRef = useRef(null);
   const onScroll = useFocusedAutoScroll(containerRef, activeLogId);
 
@@ -78,10 +80,40 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
     setActiveLogId(closestLog?.log?.id);
   }, [logs, sessionCurrentOffset, sessionRecordingStartTime]);
 
+  const finalLogs = useMemo(() => {
+    let finalLogs = logs;
+    if (selectedLog) {
+      const logIndex = logs.findIndex((log) => log.id === selectedLog.id);
+      if (logIndex !== -1) {
+        if (finalLogs[logIndex].entry._RQ) {
+          if ((finalLogs[logIndex].entry._RQ as any)?.responseBodyPath) {
+            getFile((finalLogs[logIndex].entry._RQ as any).responseBodyPath)
+              .then((response) => {
+                finalLogs[logIndex].entry.response.content.text = response;
+              })
+              .catch((error) => {
+                console.error("Error fetching response body:", error);
+              });
+          }
+
+          if ((finalLogs[logIndex].entry._RQ as any)?.requestBodyPath) {
+            getFile((finalLogs[logIndex].entry._RQ as any).requestBodyPath)
+              .then((request) => {
+                finalLogs[logIndex].entry.request.postData.text = request;
+              })
+              .catch((error) => {
+                console.error("Error fetching request body:", error);
+              });
+          }
+        }
+      }
+    }
+    return finalLogs;
+  }, [logs, selectedLog]);
   return (
     <div className="rq-network-table-container">
       <GenericNetworkTable
-        logs={logs}
+        logs={finalLogs}
         extraColumns={extraColumns}
         excludeColumns={["startedDateTime", "contentType"]}
         networkEntrySelector={(log: RQNetworkLog) => log.entry}
@@ -93,6 +125,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
         tableRef={containerRef}
         onTableScroll={onScroll}
         disableFilters={disableFilters}
+        onRowClick={setSelectedLog}
       />
     </div>
   );
