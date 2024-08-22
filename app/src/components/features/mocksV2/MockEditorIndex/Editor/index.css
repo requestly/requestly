@@ -1,3 +1,9 @@
+.mock-editor-layout-container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
 .mock-editor-wrapper {
   display: flex;
   justify-content: center;
@@ -9,7 +15,6 @@
 
 .mock-editor-container {
   width: 100%;
-  max-width: 1200px;
   height: 100%;
 }
 
@@ -21,7 +26,6 @@
 }
 
 .mock-editor-title-container .editor-title-container {
-  max-width: 1200px;
   width: 100%;
 }
 
