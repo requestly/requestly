@@ -3,6 +3,7 @@ import { Button, Col, Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { Filter, FilterType } from "./type";
 import "./contentListHeader.scss";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export interface ContentListHeaderProps {
   title?: ReactNode;
@@ -22,8 +23,17 @@ const ContentListHeader: React.FC<ContentListHeaderProps> = ({
   searchValue,
   setSearchValue,
   filters = [],
-  activeFilter,
 }) => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const activeFilter = searchParams.get("filter") || "all";
+
+  const setFilter = (newFilter: FilterType) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("filter", newFilter);
+    navigate(`?${newSearchParams.toString()}`, { replace: true });
+  };
+
   return (
     <div className="rq-content-list-header">
       <div className="rq-content-list-header-filters">
@@ -43,7 +53,10 @@ const ContentListHeader: React.FC<ContentListHeaderProps> = ({
                 <Button
                   className={`filter-btn ${key === activeFilter ? "active" : ""}`}
                   key={key}
-                  onClick={onClick}
+                  onClick={() => {
+                    onClick?.();
+                    setFilter(key as FilterType);
+                  }}
                   type={key === activeFilter ? "default" : "text"}
                 >
                   {label}
