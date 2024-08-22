@@ -15,6 +15,7 @@ import { getDefaultScriptRender, createRenderedScript } from "./utils";
 import { isExtensionManifestVersion3 } from "actions/ExtensionActions";
 import { MockPickerModal } from "features/mocks/modals";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { RuleType } from "features/rules";
 
 const { Text } = Typography;
 
@@ -246,6 +247,7 @@ const CustomScriptRow = ({
               value={initialCodeEditorValue}
               handleChange={handleEditorUpdate}
               isReadOnly={isInputDisabled}
+              analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.SCRIPT }}
               toolbarOptions={{
                 title: "Code",
               }}

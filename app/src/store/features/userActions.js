@@ -208,3 +208,7 @@ export const updateIsAppBannerVisible = (prevState, action) => {
 export const updateIsSupportChatOpened = (prevState, action) => {
   prevState.misc.persist.isSupportChatOpened = action.payload;
 };
+
+export const updateIsCodeEditorFullScreenModeOnboardingCompleted = (prevState, action) => {
+  prevState.misc.persist.isCodeEditorFullScreenModeOnboardingCompleted = action.payload;
+};

@@ -168,6 +168,7 @@ const LogPane = ({ log_id, title, requestState, timestamp, data: request_data })
             language={EditorLanguage.JSON}
             isReadOnly
             isResizable={false}
+            analyticEventProperties={{ source: "traffic_table" }}
           />
         </div>
       ),
