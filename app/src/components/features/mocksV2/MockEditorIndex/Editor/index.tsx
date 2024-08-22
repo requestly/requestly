@@ -390,7 +390,7 @@ const MockEditor: React.FC<Props> = ({
   };
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden mock-editor-layout-container">
       <MockEditorHeader
         isNewMock={isNew}
         mockType={mockType}
