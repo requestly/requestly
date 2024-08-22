@@ -23,11 +23,10 @@ interface Props {
   searchValue: string;
   setSearchValue: (value: string) => void;
   filter: FilterType;
-  setFilter: (filter: FilterType) => void;
   records: StorageRecord[];
 }
 
-const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, filter, setFilter, records }) => {
+const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, filter, records }) => {
   const user = useSelector(getUserAuthDetails);
   const debouncedTrackRulesListSearched = useDebounce(trackRulesListSearched, 500);
   const isRedirectFromCreateRulesRoute = useIsRedirectFromCreateRulesRoute();
@@ -128,7 +127,6 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           </div>
         ),
         onClick: () => {
-          setFilter("all");
           trackRulesListFilterApplied("all", records.length, records.length);
         },
       },
@@ -148,7 +146,6 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           </div>
         ),
         onClick: () => {
-          setFilter("pinned");
           // FIXME: 0 is not correct
           trackRulesListFilterApplied("pinned", records.length, 0);
         },
@@ -168,13 +165,12 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
           </div>
         ),
         onClick: () => {
-          setFilter("active");
           // FIXME: 0 is not correct
           trackRulesListFilterApplied("active", records.length, 0);
         },
       },
     ],
-    [records, setFilter]
+    [records]
   );
 
   return (
@@ -184,7 +180,6 @@ const RulesListContentHeader: React.FC<Props> = ({ searchValue, setSearchValue, 
       actions={contentHeaderActions}
       searchValue={searchValue}
       setSearchValue={handleSearchValueUpdate}
-      activeFilter={filter}
       filters={contentHeaderFilters}
     />
   );

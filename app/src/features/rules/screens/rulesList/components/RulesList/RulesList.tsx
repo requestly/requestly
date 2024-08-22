@@ -12,7 +12,6 @@ import {
 } from "store/selectors";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { FilterType } from "componentsV2/ContentList/";
 import { GettingStarted } from "./components";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
@@ -25,9 +24,10 @@ import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
 import { Button, Tooltip } from "antd";
 import { PicRightOutlined } from "@ant-design/icons";
-import "./rulesList.scss";
 import { actions } from "store";
 import { trackFooterClicked } from "modules/analytics/events/common/onboarding/footer";
+import { useSearchParams } from "react-router-dom";
+import "./rulesList.scss";
 
 interface Props {}
 
@@ -37,19 +37,21 @@ const RulesList: React.FC<Props> = () => {
   const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
   const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
+  const [searchParams] = useSearchParams();
+  const activeFilter = useMemo(() => searchParams.get("filter") || "all", [searchParams]);
 
   useFetchAndUpdateRules({ setIsLoading: setIsLoading });
 
   const allRecords = useSelector(getAllRecords);
   const allRecordsMap = useSelector(getAllRecordsMap);
 
-  const filteredRecords = useMemo(
-    () => getFilteredRecords(allRecords, activeFilter, searchValue),
-    [allRecords, activeFilter, searchValue]
-  );
+  const filteredRecords = useMemo(() => getFilteredRecords(allRecords, activeFilter, searchValue), [
+    allRecords,
+    activeFilter,
+    searchValue,
+  ]);
 
   const appMode = useSelector(getAppMode);
   const isExtensionEnabled = useSelector(getIsExtensionEnabled);
@@ -106,7 +108,6 @@ const RulesList: React.FC<Props> = () => {
                 searchValue={searchValue}
                 setSearchValue={setSearchValue}
                 filter={activeFilter}
-                setFilter={setActiveFilter}
                 records={allRecords}
               />
               <div className="rq-rules-table">

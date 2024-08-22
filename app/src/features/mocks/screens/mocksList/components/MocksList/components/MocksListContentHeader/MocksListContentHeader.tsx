@@ -28,7 +28,6 @@ interface Props {
   searchValue?: string;
   setSearchValue?: (s: string) => void;
   filter?: MockTableHeaderFilter;
-  setFilter?: (filter: MockTableHeaderFilter) => void;
   handleCreateNewMockFromPickerModal?: () => void;
 }
 
@@ -39,7 +38,6 @@ export const MocksListContentHeader: React.FC<Props> = ({
   mockType,
   filter,
   searchValue,
-  setFilter,
   setSearchValue = () => {},
   handleCreateNewMockFromPickerModal = () => {},
 }) => {
@@ -154,9 +152,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
             ) : null}
           </div>
         ),
-        onClick: () => {
-          setFilter("all");
-        },
+        onClick: () => {},
       },
       {
         key: "starred",
@@ -172,12 +168,10 @@ export const MocksListContentHeader: React.FC<Props> = ({
             ) : null}
           </div>
         ),
-        onClick: () => {
-          setFilter("starred");
-        },
+        onClick: () => {},
       },
     ],
-    [mockRecords, setFilter]
+    [mockRecords]
   );
 
   const contentListHeaderSearchProps = mockType
