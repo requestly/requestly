@@ -1,7 +1,6 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
 import {
   applyDelay,
-  generateUserFunctionWithSharedState,
   getAbsoluteUrl,
   getCustomRequestBody,
   getFunctionFromCode,
@@ -107,21 +106,17 @@ export const initXhrInterceptor = (debug) => {
         let customResponse;
 
         if (responseModification.type === "code") {
-          const isUserFunctionValid = getFunctionFromCode(responseModification.value, "response");
+          const evaluatorArgs = {
+            method: this._method,
+            url: this._requestURL,
+            requestHeaders: this._requestHeaders,
+            requestData: jsonifyValidJSONString(this._requestData),
+            responseType: contentType,
+            response: this.response,
+            responseJSON: jsonifyValidJSONString(this.response, true),
+          };
 
-          if (isUserFunctionValid) {
-            const evaluatorArgs = {
-              method: this._method,
-              url: this._requestURL,
-              requestHeaders: this._requestHeaders,
-              requestData: jsonifyValidJSONString(this._requestData),
-              responseType: contentType,
-              response: this.response,
-              responseJSON: jsonifyValidJSONString(this.response, true),
-            };
-
-            customResponse = generateUserFunctionWithSharedState(responseModification.value, debug)(evaluatorArgs);
-          }
+          customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
         } else {
           customResponse = responseModification.value;
         }

@@ -6,7 +6,7 @@ let logShown = false;
 
 export const getFunctionFromCode = (code, ruleType) => {
   try {
-    return new Function(`return (${code})`)();
+    return generateUserFunctionWithSharedState(code);
   } catch (e) {
     notifyOnErrorOccurred({
       initiator: location.origin,
@@ -21,11 +21,11 @@ export const getFunctionFromCode = (code, ruleType) => {
         );
       }
     });
-    return null;
+    return () => {};
   }
 };
 
-export const generateUserFunctionWithSharedState = function (functionStringEscaped, isDebugMode = false) {
+const generateUserFunctionWithSharedState = function (functionStringEscaped) {
   const SHARED_STATE_VAR_NAME = "$sharedState";
 
   let sharedState;
@@ -39,12 +39,6 @@ export const generateUserFunctionWithSharedState = function (functionStringEscap
     `${SHARED_STATE_VAR_NAME}`,
     `return { func: ${functionStringEscaped}, updatedSharedState: ${SHARED_STATE_VAR_NAME}}`
   )(sharedState);
-
-  isDebugMode &&
-    console.log("[RQ.generateUserFunctionWithSharedState]", {
-      updatedSharedState,
-      isTopLevelFrame: window.self === window.top,
-    });
 
   return generatedFunction;
 };
@@ -66,13 +60,7 @@ export const getCustomRequestBody = (requestRule, args) => {
   if (modification.type === "static") {
     requestBody = modification.value;
   } else {
-    const userFunction = getFunctionFromCode(modification.value, "request");
-
-    if (userFunction) {
-      requestBody = generateUserFunctionWithSharedState(modification.value)(args);
-    } else {
-      requestBody = undefined;
-    }
+    requestBody = getFunctionFromCode(modification.value, "request")(args);
   }
 
   if (typeof requestBody !== "object" || isNonJsonObject(requestBody)) {

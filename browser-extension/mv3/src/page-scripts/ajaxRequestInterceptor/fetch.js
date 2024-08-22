@@ -1,7 +1,6 @@
 import { PUBLIC_NAMESPACE } from "common/constants";
 import {
   applyDelay,
-  generateUserFunctionWithSharedState,
   getAbsoluteUrl,
   getCustomRequestBody,
   getFunctionFromCode,
@@ -181,11 +180,7 @@ export const initFetchInterceptor = (debug) => {
           };
         }
 
-        const isUserFunctionValid = getFunctionFromCode(responseModification.value, "response");
-
-        if (isUserFunctionValid) {
-          customResponse = generateUserFunctionWithSharedState(responseModification.value, debug)(evaluatorArgs);
-        }
+        customResponse = getFunctionFromCode(responseModification.value, "response")(evaluatorArgs);
 
         if (typeof customResponse === "undefined") {
           return fetchedResponse;
