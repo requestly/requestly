@@ -20,7 +20,7 @@
 }
 
 .layout-header-signup-btn.ant-btn {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .header-left-section {
@@ -33,7 +33,7 @@
 .header-left-section a {
   height: 30px;
   flex-shrink: 0;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 22px;
   padding: 4px 11px;
   color: var(--white);
@@ -57,7 +57,7 @@
 
 .header-middle-section {
   margin: 8px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   display: flex;
   align-items: center;
   justify-content: center;

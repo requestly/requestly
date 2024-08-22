@@ -59,7 +59,7 @@
 }
 
 .rq-network-table-container .ant-collapse .ant-collapse-header .ant-collapse-header-text {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 1.6;
   font-weight: 500;
 }

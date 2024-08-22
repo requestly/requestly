@@ -15,7 +15,7 @@
 }
 
 .onboarding-auth-mode-switch-wrapper {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   color: var(--text-light);
 
   .onboarding-auth-mode-switcher {
@@ -72,7 +72,7 @@
 .onboarding-form-input {
   & label {
     font-weight: 500;
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
   }
   & input::placeholder {
     font-weight: 500;

@@ -67,7 +67,7 @@
         overflow: hidden;
 
         .title {
-          font-size: 13px;
+          font-size: var(--requestly-font-size-sm, 13px);
           font-weight: 500;
           line-height: 150%;
           color: var(--requestly-color-text-default);

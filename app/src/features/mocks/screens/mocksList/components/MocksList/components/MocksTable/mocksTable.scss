@@ -29,7 +29,7 @@
   }
 
   .rq-mocks-list-table-row {
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
     cursor: pointer;
 
     &.mock-row {
@@ -124,7 +124,7 @@
       .mock-collection-name {
         cursor: pointer;
         color: var(--white);
-        font-size: 13px;
+        font-size: var(--requestly-font-size-sm, 13px);
         font-weight: 500;
         line-height: 18px;
         letter-spacing: 0.25px;
@@ -155,7 +155,7 @@
           .mock-name {
             cursor: pointer;
             color: var(--white);
-            font-size: 13px;
+            font-size: var(--requestly-font-size-sm, 13px);
             font-weight: 500;
             line-height: 18px;
             letter-spacing: 0.25px;
@@ -224,7 +224,7 @@
 }
 
 .mock-description {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 14px;
 }
 

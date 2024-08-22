@@ -1,5 +1,5 @@
 .rule-editor-header-action-btns .ant-btn {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .rule-editor-header-action-btns {

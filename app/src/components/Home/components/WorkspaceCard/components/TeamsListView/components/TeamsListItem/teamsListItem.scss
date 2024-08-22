@@ -24,7 +24,7 @@
   }
 
   & span {
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
     font-weight: 500;
   }
 }

@@ -30,7 +30,7 @@
       span {
         color: var(--requestly-color-text-default);
         text-align: center;
-        font-size: 13px;
+        font-size: var(--requestly-font-size-sm, 13px);
         line-height: 150%;
       }
 

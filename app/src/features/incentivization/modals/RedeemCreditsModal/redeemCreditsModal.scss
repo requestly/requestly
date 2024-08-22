@@ -95,7 +95,7 @@
         border-radius: 4px;
         background: var(--requestly-color-surface-1);
         border: 1px solid var(--requestly-color-white-t-10);
-        font-size: 13px;
+        font-size: var(--requestly-font-size-sm, 13px);
         display: flex;
         flex-direction: column;
         gap: 16px;
@@ -104,7 +104,7 @@
           display: flex;
           align-items: center;
           justify-content: space-between;
-          font-size: 13px;
+          font-size: var(--requestly-font-size-sm, 13px);
 
           .plan-details {
             display: flex;
@@ -134,7 +134,7 @@
 
             .label {
               color: var(--text-subtle);
-              font-size: 13px;
+              font-size: var(--requestly-font-size-sm, 13px);
               line-height: 14.3px;
             }
 

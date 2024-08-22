@@ -73,7 +73,7 @@
 }
 
 .plan-description {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   color: var(--text-light);
 }
 
