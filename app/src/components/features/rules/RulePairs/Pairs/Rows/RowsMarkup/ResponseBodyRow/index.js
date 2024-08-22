@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { Row, Col, Radio, Popover, Popconfirm, Space, Checkbox } from "antd";
+import { Row, Col, Radio, Popover, Popconfirm, Space, Checkbox, Tooltip } from "antd";
 import { actions } from "store";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import {
@@ -22,6 +22,8 @@ import { FeatureLimitType } from "hooks/featureLimiter/types";
 import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { RuleType } from "features/rules";
 import "./ResponseBodyRow.css";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
@@ -214,7 +216,25 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           data-tour-id="rule-editor-responsebody-types"
           size="small"
         >
-          <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>Static Data</Radio>
+          <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.STATIC}>
+            <Row align="middle">
+              Static Data{" "}
+              <Tooltip
+                title={
+                  <>
+                    Enter the response body that you want as a response to the request.{" "}
+                    {/* <a href={LINKS.REQUESTLY_RESPONSE_RULE_DOCS} target="_blank" rel="noreferrer">
+                      Click here
+                    </a>{" "}
+                    to know more. */}
+                  </>
+                }
+                overlayClassName="rq-tooltip"
+              >
+                <MdInfoOutline className="response-body-type-info-icon" />
+              </Tooltip>
+            </Row>
+          </Radio>
           <PremiumFeature
             features={[FeatureLimitType.dynamic_response_body]}
             featureName="Dynamic Response Body"
@@ -224,7 +244,21 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           >
             <Radio value={GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE}>
               <Row align="middle">
-                Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}
+                Dynamic (JavaScript){isPremiumFeature ? <PremiumIcon featureType="dynamic_response_body" /> : null}{" "}
+                <Tooltip
+                  title={
+                    <>
+                      Write JavaScript code to modify the existing response body.{" "}
+                      {/* <a href={LINKS.REQUESTLY_RESPONSE_RULE_DOCS} target="_blank" rel="noreferrer">
+                        Click here
+                      </a>{" "}
+                      to know more. */}
+                    </>
+                  }
+                  overlayClassName="rq-tooltip"
+                >
+                  <MdInfoOutline className="response-body-type-info-icon" />
+                </Tooltip>
               </Row>
             </Radio>
           </PremiumFeature>
@@ -266,7 +300,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           >
             <Col xl="12" span={24}>
               <CodeEditor
-                key={pair.response.type}
+                // key={pair.response.type}
                 language={
                   pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
                     ? EditorLanguage.JAVASCRIPT
@@ -281,6 +315,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 isReadOnly={isInputDisabled}
                 handleChange={responseBodyChangeHandler}
                 isResizable
+                analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.RESPONSE }}
                 toolbarOptions={{
                   title: "Response Body",
                   options: [EditorRadioGroupOptions],

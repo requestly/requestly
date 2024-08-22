@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { redirectToTraffic } from "../../../../../../../utils/RedirectionUtils";
 import { isDesktopMode } from "../../../../../../../utils/AppUtils";
 import { actions } from "store";
+import LINKS from "config/constants/sub/links";
 
 const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) => {
   const dispatch = useDispatch();
@@ -85,7 +86,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                   {pair.modifications[modificationType]?.length ? (
                     <Col
                       lg={{
-                        offset: 4,
+                        offset: 3,
                       }}
                       xs={{
                         offset: 0,
@@ -133,7 +134,16 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
                   <Row className="margin-top-one line-clamp">
                     <Alert
                       className="alert"
-                      message="Response Headers modification done by Requestly are not visible in Browsers devtool but they are actually modified."
+                      message={
+                        <>
+                          Response Headers modification done by Requestly are not visible in Browsers devtool but they
+                          are actually modified.{" "}
+                          <a target="_blank" href={LINKS.REQUESTLY_HEADERS_RULE_FAQ_LINK} rel="noreferrer">
+                            click here
+                          </a>{" "}
+                          to know more.
+                        </>
+                      }
                       type="info"
                       showIcon
                       style={{
