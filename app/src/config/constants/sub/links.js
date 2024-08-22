@@ -38,7 +38,8 @@ const LINKS = {
   REQUESTLY_DOCS_HTTP_MODIFICATIONS: "https://docs.requestly.io/browser-extension/chrome/http-modifications/overview",
 
   // Docs - Source Filters
-  REQUESTLY_DOCS_SOURCE_FILTERS: "https://docs.requestly.io/browser-extension/chrome/features/advance-targeting",
+  REQUESTLY_DOCS_SOURCE_FILTERS:
+    "https://docs.requestly.com/general/http-rules-(modify-traffic)/advanced-usage/advance-targeting",
 
   // Docs - Import rules from charles proxy
   REQUESTLY_DOCS_IMPORT_SETTINGS_FROM_CHARLES: "https://developers.requestly.com/http-rules/import-from-charles/",
@@ -60,6 +61,9 @@ const LINKS = {
   REQUESTLY_RESPONSE_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-response-body/",
   REQUESTLY_SCRIPT_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-dom-inject-scripts/",
   REQUESTLY_USERAGENT_RULE_DOCS: "https://developers.requestly.com/http-rules/modify-user-agents/",
+
+  REQUESTLY_HEADERS_RULE_FAQ_LINK:
+    "https://docs.requestly.com/general/http-rules-(modify-traffic)/rule-types/modify-headers#faqs",
 
   /** LANDING PAGES **/
 
