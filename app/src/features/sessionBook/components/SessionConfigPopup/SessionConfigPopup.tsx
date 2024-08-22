@@ -9,7 +9,12 @@ import { Button, Checkbox, Radio, Row } from "antd";
 import { DebugInfo, SessionSaveMode } from "../../types";
 import { CheckboxValueType } from "antd/lib/checkbox/Group";
 import { getRecordingOptionsToSave, getSessionRecordingOptions } from "../../utils/sessionFile";
-import { getSessionRecordingMetaData, getSessionRecordingEvents } from "store/features/session-recording/selectors";
+import {
+  getSessionRecordingMetaData,
+  getSessionRecordingEvents,
+  getTrimmedSessionData,
+  getSessionRecordingAttributes,
+} from "store/features/session-recording/selectors";
 import { toast } from "utils/Toast";
 import { getUserAttributes, getAppMode, getUserAuthDetails } from "store/selectors";
 import { actions } from "store";
@@ -40,7 +45,9 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
   const userAttributes = useSelector(getUserAttributes);
   const sessionRecordingMetadata = useSelector(getSessionRecordingMetaData);
   const sessionEvents = useSelector(getSessionRecordingEvents);
+  const sessionAttributes = useSelector(getSessionRecordingAttributes);
   const appMode = useSelector(getAppMode);
+  const trimmedSessionData = useSelector(getTrimmedSessionData);
   const { saveDraftSession } = useSaveDraftSession();
 
   const [isSaving, setIsSaving] = useState(false);
@@ -141,7 +148,14 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
     (e: React.MouseEvent) => {
       setIsSaving(true);
       const recordingOptionsToSave = getRecordingOptionsToSave(includedDebugInfo);
-      downloadSessionFile(sessionEvents, sessionRecordingMetadata, recordingOptionsToSave).then(() => {
+      const sessionEventsToSave = trimmedSessionData?.events ?? sessionEvents;
+      const attributes = {
+        ...sessionAttributes,
+        duration: trimmedSessionData?.duration ?? sessionAttributes?.duration,
+      };
+      const metadata = { ...sessionRecordingMetadata, sessionAttributes: attributes };
+
+      downloadSessionFile(sessionEventsToSave, metadata, recordingOptionsToSave).then(() => {
         toast.success("Recording downloaded successfully.");
         onClose();
         setIsSaving(false);
@@ -155,7 +169,16 @@ export const SessionConfigPopup: React.FC<Props> = ({ onClose, onSaveClick, sour
         trackSessionsCreatedCount(true);
       });
     },
-    [sessionEvents, sessionRecordingMetadata, includedDebugInfo, onClose, trackSessionsCreatedCount, source]
+    [
+      sessionEvents,
+      sessionRecordingMetadata,
+      includedDebugInfo,
+      onClose,
+      trackSessionsCreatedCount,
+      source,
+      trimmedSessionData,
+      sessionAttributes,
+    ]
   );
 
   return (

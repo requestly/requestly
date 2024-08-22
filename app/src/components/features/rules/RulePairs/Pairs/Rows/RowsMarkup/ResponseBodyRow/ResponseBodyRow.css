@@ -6,8 +6,10 @@
   display: inline-block;
 }
 
-.response-body-type-radio-group.ant-radio-group .ant-radio-wrapper .ant-radio {
-  padding-right: 4px;
+.response-body-type-info-icon {
+  font-size: 15px;
+  margin-right: 5px;
+  margin-left: 4px;
 }
 
 .ant-row .local-file-selector-row {

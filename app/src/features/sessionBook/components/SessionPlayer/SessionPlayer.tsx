@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { getSessionRecordingAttributes, getSessionRecordingEvents } from "store/features/session-recording/selectors";
+import {
+  getSessionRecordingAttributes,
+  getSessionRecordingEvents,
+  getTrimmedSessionData,
+} from "store/features/session-recording/selectors";
 import { RQSessionEventType, RRWebEventData } from "@requestly/web-sdk";
 import Replayer from "rrweb-player";
 import { cloneDeep } from "lodash";
@@ -18,6 +22,8 @@ import { getInactiveSegments } from "views/features/sessions/SessionViewer/sessi
 import { msToMinutesAndSeconds } from "utils/DateTimeUtils";
 import PlayerFrameOverlay from "./components/PlayerOverlay/PlayerOverlay";
 import { useTheme } from "styled-components";
+import { useHasChanged } from "hooks";
+import PATHS from "config/constants/sub/paths";
 import "./sessionPlayer.scss";
 
 interface SessionPlayerProps {
@@ -42,6 +48,9 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   const isPlayerSkippingInactivity = useRef(false);
   const skipInactiveSegments = useRef(true);
   const skippingTimeoutRef = useRef<NodeJS.Timeout>(null);
+  const trimmedSessionData = useSelector(getTrimmedSessionData);
+  const hasSessionTrimmedDataChanged = useHasChanged(trimmedSessionData);
+  const isDraftSession = useMemo(() => location.pathname.includes(PATHS.SESSIONS.DRAFT.INDEX), [location.pathname]);
 
   const theme = useTheme();
 
@@ -72,8 +81,8 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
     ({ payload: currentPlayerTime }: { payload: number }) => {
       const currentTime = startTime + currentPlayerTime;
       currentTimeRef.current = currentTime;
-      setPlayerTimeOffset(currentPlayerTime / 1000); // millis -> secs
-      onPlayerTimeOffsetChange(currentPlayerTime / 1000);
+      setPlayerTimeOffset(Math.floor(currentPlayerTime / 1000)); // millis -> secs
+      onPlayerTimeOffsetChange(Math.floor(currentPlayerTime / 1000));
 
       if (!skipInactiveSegments.current) return;
 
@@ -100,9 +109,21 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
   );
 
   useEffect(() => {
-    if (events?.rrweb?.length && !player) {
+    if (hasSessionTrimmedDataChanged) {
+      setPlayer(null);
+    }
+  }, [hasSessionTrimmedDataChanged]);
+
+  useEffect(() => {
+    if ((events?.rrweb?.length || trimmedSessionData) && !player) {
       // rrweb mutates events object whereas redux does not allow mutating state, so cloning.
-      const rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      let rrwebEvents: RRWebEventData[] = [];
+
+      if (isDraftSession) {
+        rrwebEvents = cloneDeep(trimmedSessionData.events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      } else {
+        rrwebEvents = cloneDeep(events[RQSessionEventType.RRWEB] as RRWebEventData[]);
+      }
 
       setPlayer(
         new Replayer({
@@ -111,6 +132,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
             events: rrwebEvents,
             width: playerRef.current.clientWidth,
             autoPlay: true,
+            mouseTail: false,
             // prevents elements inside rrweb-player to steal focus
             // The elements inside the player were stealing the focus from the inputs in the session viewer pages
             // The drawback is that it doesn't allow the focus styles to be applied: https://github.com/rrweb-io/rrweb/issues/876
@@ -121,7 +143,7 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
         })
       );
     }
-  }, [events, player]);
+  }, [player, trimmedSessionData, events, isDraftSession]);
 
   useEffect(() => {
     // const pauseVideo = () => {
@@ -231,7 +253,8 @@ export const SessionPlayer: React.FC<SessionPlayerProps> = ({ onPlayerTimeOffset
               icon={playerState === PlayerState.PAUSED ? <MdOutlinePlayCircle /> : <MdPauseCircleOutline />}
             />
             <div className="session-player-duration-tracker">
-              {msToMinutesAndSeconds(playerTimeOffset * 1000 || 0)}/ {msToMinutesAndSeconds(attributes?.duration || 0)}
+              {msToMinutesAndSeconds(playerTimeOffset * 1000 || 0)}/{" "}
+              {msToMinutesAndSeconds(trimmedSessionData?.duration || attributes?.duration || 0)}
             </div>
           </div>
           <div className="session-player-jump-controllers">

@@ -18,6 +18,7 @@ import { AUTH_PROVIDERS } from "modules/analytics/constants";
 import { SOURCE } from "modules/analytics/events/common/constants";
 import { trackLoginAttemptedEvent } from "modules/analytics/events/common/auth/login";
 import { trackSignUpAttemptedEvent } from "modules/analytics/events/common/auth/signup";
+import { trackMagicLinkResendRequested } from "modules/analytics/events/common/auth/emailLinkSignin";
 
 // HACKY WAY FOR CHECKING IF USER EXISTS
 async function doesUserExist(email) {
@@ -57,6 +58,7 @@ export default function MagicLinkModalContent({ email, authMode, eventSource }) 
 
   const handleEmailSend = () => {
     setIsSendingMail(true);
+    trackMagicLinkResendRequested();
     sendEmailLinkForSignin(email, "resend-from-modal", "The email has been resent.")
       .then(() => {
         updateTimeToResendEmailLogin(dispatch, 30);

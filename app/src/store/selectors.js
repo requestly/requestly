@@ -52,6 +52,11 @@ export const getGroupsSelection = (state) => {
   return rulesNode["selectedGroups"];
 };
 
+export const getIsSampleRulesImported = (state) => {
+  const rulesNode = getRulesNode(state);
+  return rulesNode["isSampleRulesImported"];
+};
+
 export const getCurrentlySelectedRule = (state) => {
   const rulesNode = getRulesNode(state);
   return rulesNode["currentlySelectedRule"];
@@ -230,6 +235,10 @@ export const getIsRuleEditorTourCompleted = (state) => {
     getGlobalState(state).misc.persist?.isRuleEditorTourCompleted ||
     getGlobalState(state).misc.persist?.isRedirectRuleTourCompleted
   );
+};
+
+export const getIsCodeEditorFullScreenModeOnboardingCompleted = (state) => {
+  return getGlobalState(state).misc.persist?.isCodeEditorFullScreenModeOnboardingCompleted;
 };
 
 export const getIsMiscTourCompleted = (state) => {

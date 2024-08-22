@@ -41,6 +41,7 @@ export const AUTH = {
   EMAIL_LINK_SIGNIN_FORM: {
     SEEN: "email_link_signin_form_seen",
     SUBMITTED: "email_link_signin_form_submitted",
+    LINK_RESEND_REQUESTED: "magic_link_resend_requested",
   },
 
   VERIFY_OOBCODE: {
@@ -87,6 +88,7 @@ export const SOURCE = {
   COMMAND_BAR: "command_bar",
   WORKSPACE_SIDEBAR: "workspace_sidebar",
   RULES_LIST: "rules_list",
+  RULE_EDITOR: "rule_editor",
   PERSONA_SURVEY: "persona-survey",
   PERSONA_RECOMMENDATION_SCREEN: "persona_recommendation_screen",
   PRICING_PAGE: "pricing_page",
@@ -121,6 +123,7 @@ export const RULES = {
   RULE_TOGGLED: "rule_toggled",
   RULE_TOGGLE_ATTEMPTED: "rule_toggle_attempted",
   RULE_DUPLICATED: "rule_duplicated",
+  GROUP_DUPLICATED: "group_duplicated",
   RULE_PIN_TOGGLED: "rule_pin_toggled",
   RULE_EXPORTED: "rule_exported",
   RULE_PAIR_CREATION_ATTEMPTED: "rule_pair_creation_attempted",

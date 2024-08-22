@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Collapse, Tooltip } from "antd";
+import { Collapse, Popconfirm, Tooltip } from "antd";
 import { actions } from "store";
 import { addEmptyPair } from "../RuleBuilder/Body/Columns/AddPairButton/actions";
 import { getCurrentlySelectedRuleData, getResponseRuleResourceType } from "../../../../store/selectors";
@@ -13,7 +13,9 @@ const RulePairs = (props) => {
   const dispatch = useDispatch();
   const currentlySelectedRuleData = useSelector(getCurrentlySelectedRuleData);
   const responseRuleResourceType = useSelector(getResponseRuleResourceType);
-  const isInputDisabled = props.mode === "shared-list-rule-view" ? true : false;
+
+  const isSampleRule = currentlySelectedRuleData?.isSample;
+  const isInputDisabled = props.mode === "shared-list-rule-view" || !!isSampleRule;
 
   const getPairMarkup = (pair, pairIndex) => {
     const commonProps = {
@@ -33,16 +35,28 @@ const RulePairs = (props) => {
     }
   }, [dispatch, currentlySelectedRuleData, props.currentlySelectedRuleConfig]);
 
-  const deleteButton = (pairIndex) =>
-    (props.currentlySelectedRuleConfig.TYPE === "Replace" && !isInputDisabled) ||
-    (props.currentlySelectedRuleConfig.SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW && !isInputDisabled) ? (
-      <Tooltip title="Remove Pair">
-        <FaTrash
-          className="delete-pair-icon cursor-pointer text-gray"
-          onClick={(e) => dispatch(actions.removeRulePairByIndex({ pairIndex }))}
-        />
-      </Tooltip>
+  const deleteButton = (pairIndex) => {
+    if (pairIndex === 0) {
+      return null;
+    }
+    return (props.currentlySelectedRuleConfig.TYPE === "Replace" && !isInputDisabled) ||
+      (props.currentlySelectedRuleConfig.SHOW_DELETE_PAIR_ICON_ON_SOURCE_ROW && !isInputDisabled) ? (
+      <Popconfirm
+        placement="left"
+        title="Are you sure you want to delete this rule pair?"
+        onConfirm={() => dispatch(actions.removeRulePairByIndex({ pairIndex }))}
+      >
+        <Tooltip title="Remove Pair" placement="bottom" overlayClassName="rq-tooltip">
+          <FaTrash
+            className="delete-pair-icon cursor-pointer text-gray"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          />
+        </Tooltip>
+      </Popconfirm>
     ) : null;
+  };
 
   const getFirstFiveRuleIds = (rules = []) => {
     const ids = [];

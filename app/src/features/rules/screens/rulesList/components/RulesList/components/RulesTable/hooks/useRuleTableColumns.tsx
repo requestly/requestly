@@ -39,6 +39,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
     recordRenameAction,
     groupDeleteAction,
     recordsPinAction,
+    groupShareAction,
   } = useRulesActionContext();
   const isEditingEnabled = !(options && options.disableEditing);
 
@@ -181,7 +182,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           } else {
             return (
               <PremiumFeature
-                disabled={record.status === RecordStatus.ACTIVE}
+                disabled={record.status === RecordStatus.ACTIVE || record.isSample}
                 features={
                   PREMIUM_RULE_TYPES.includes(record.ruleType)
                     ? [FeatureLimitType.num_active_rules, FeatureLimitType.response_rule]
@@ -276,6 +277,31 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
           },
           {
             key: 1,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              groupShareAction(record as Group);
+            },
+            label: (
+              <Row>
+                <MdOutlineShare /> Share
+              </Row>
+            ),
+          },
+          {
+            key: 2,
+            onClick: (info) => {
+              info.domEvent?.stopPropagation?.();
+              recordDuplicateAction(normalizeRecord(record));
+            },
+            label: (
+              <Row>
+                <RiFileCopy2Line />
+                Duplicate
+              </Row>
+            ),
+          },
+          {
+            key: 3,
             danger: true,
             onClick: (info) => {
               info.domEvent?.stopPropagation?.();

@@ -83,11 +83,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ isOpen }) => {
       <div className="onboarding-modal-body-wrapper">
         <div className="onboarding-modal-body">
           <Row justify="space-between" className="w-full onboarding-modal-header">
-            {onboardingVariation !== "variant3" ? (
-              <Col>
-                <img src={RQLogo} alt="requestly logo" style={{ width: "90px" }} />
-              </Col>
-            ) : null}
+            <Col>
+              <img src={RQLogo} alt="requestly logo" style={{ width: "90px" }} />
+            </Col>
 
             {step === ONBOARDING_STEPS.PERSONA ||
             disableSkip ||
