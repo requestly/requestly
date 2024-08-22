@@ -73,6 +73,7 @@
     }
 
     .rq-content-list-table-row {
+      font-size: var(--requestly-font-size-sm, 13px);
       background: var(--requestly-color-background);
 
       &.ant-table-row-level-0 {
