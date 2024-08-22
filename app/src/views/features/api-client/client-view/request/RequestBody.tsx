@@ -23,6 +23,7 @@ const RequestBody: React.FC<Props> = ({ body, contentType, setBody, setContentTy
             handleChange={setBody}
             isResizable={false}
             hideCharacterCount
+            analyticEventProperties={{ source: "api_client" }}
           />
         );
 

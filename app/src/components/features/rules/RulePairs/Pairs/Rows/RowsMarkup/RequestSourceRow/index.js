@@ -2,14 +2,13 @@ import React, { useState, useMemo, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "store";
 import { getCurrentlySelectedRuleConfig, getCurrentlySelectedRuleData } from "store/selectors";
-import { Row, Col, Input, Badge, Menu, Typography } from "antd";
+import { Row, Col, Input, Badge, Menu, Typography, Tooltip } from "antd";
 import { FaFilter } from "@react-icons/all-files/fa/FaFilter";
 import { ExperimentOutlined } from "@ant-design/icons";
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import APP_CONSTANTS from "config/constants";
 import { DownOutlined } from "@ant-design/icons";
 import { RQDropdown, RQButton } from "lib/design-system/components";
-import { MoreInfo } from "components/misc/MoreInfo";
 import { TestURLModal } from "components/common/TestURLModal";
 import PATHS from "config/constants/sub/paths";
 import { generatePlaceholderText } from "components/features/rules/RulePairs/utils";
@@ -298,17 +297,26 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
               data-selectionid="source-value"
             />
           </Col>
-          <RQButton
-            className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
-            iconOnly
-            icon={<ExperimentOutlined />}
-            type="default"
-            disabled={!pair.source.value || isInputDisabled}
-            onClick={() => {
-              setIsTestURLClicked(true);
-              setIsTestURLModalVisible(true);
-            }}
-          />
+          <Tooltip
+            overlayClassName="rq-tooltip"
+            title={"Enter the source condition first"}
+            placement="left"
+            trigger={isInputDisabled ? ["hover"] : []}
+          >
+            <span>
+              <RQButton
+                className={`test-url-btn  ${shouldStartTestURLRippleEffect() && "ripple-animation"}`}
+                iconOnly
+                icon={<ExperimentOutlined />}
+                type="default"
+                disabled={!pair.source.value || isInputDisabled}
+                onClick={() => {
+                  setIsTestURLClicked(true);
+                  setIsTestURLModalVisible(true);
+                }}
+              />
+            </span>
+          </Tooltip>
         </Row>
         {shouldShowFilterIcon ? (
           <Col
@@ -319,8 +327,10 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
             }}
           >
             {!isInputDisabled && (
-              <MoreInfo
-                text={
+              <Tooltip
+                placement="left"
+                overlayClassName="rq-tooltip"
+                title={
                   <>
                     Advanced filters like resource type, request method to target requests when rule should be applied.{" "}
                     <a
@@ -346,7 +356,7 @@ const RequestSourceRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisab
                     <Badge style={{ color: "#465967", backgroundColor: "#E5EAEF" }}>{getFilterCount(pairIndex)}</Badge>
                   ) : null}
                 </span>
-              </MoreInfo>
+              </Tooltip>
             )}
           </Col>
         ) : null}

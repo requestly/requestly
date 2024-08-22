@@ -64,7 +64,7 @@ const HeadersPairModificationRowV2 = ({
 
   return (
     <Row gutter={16} align="middle" data-tour-id="rule-editor-header-modification-row">
-      <Col span={2} align="right" className="min-dropdown-tile-width modification-type-dropdown margin-bottom-one">
+      <Col span={3} align="right" className="min-dropdown-tile-width modification-type-dropdown margin-bottom-one">
         <Dropdown overlay={pairTypeMenu} disabled={isInputDisabled}>
           <Text strong className="ant-dropdown-link cursor-pointer uppercase" onClick={(e) => e.preventDefault()}>
             {modification.type === GLOBAL_CONSTANTS.MODIFICATION_TYPES.MODIFY ? "Override" : modification.type}{" "}

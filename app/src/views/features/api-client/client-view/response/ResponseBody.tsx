@@ -37,7 +37,15 @@ const ResponseBody: React.FC<Props> = ({ responseText, contentTypeHeader }) => {
     const editorLanguage = getEditorLanguageFromContentType(contentTypeHeader);
 
     if (editorLanguage) {
-      return <Editor value={responseText} defaultValue={responseText} language={editorLanguage} isReadOnly />;
+      return (
+        <Editor
+          value={responseText}
+          defaultValue={responseText}
+          language={editorLanguage}
+          isReadOnly
+          analyticEventProperties={{ source: "api_client" }}
+        />
+      );
     }
 
     return null;
