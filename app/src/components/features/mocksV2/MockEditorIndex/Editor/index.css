@@ -44,7 +44,8 @@
 
 .meta-data-option .meta-data-option-label {
   color: var(--white);
-  font-weight: 500;
+  font-size: var(--requestly-font-size-sm);
+  font-weight: var(--requestly-font-weight-medium);
 }
 
 .meta-data-option .ant-select-selector,
@@ -54,6 +55,7 @@
   border-radius: var(--border-radius-sm);
   box-shadow: var(--input-box-shadow);
   color: var(--white);
+  font-size: var(--requestly-font-size-sm);
 }
 
 .mock-editor-body .addon-option {
@@ -64,6 +66,11 @@
 .mock-editor-body .ant-input-number-group-addon {
   background: #3e3f42;
   color: var(--text-gray);
+  font-size: var(--requestly-font-size-sm);
+}
+
+.mock-editor-body .ant-input-wrapper input.ant-input {
+  font-size: var(--requestly-font-size-sm);
 }
 
 .mock-editor-body .ant-tabs {
@@ -76,6 +83,10 @@
 
 .mock-editor-body .ant-tabs-tab:hover {
   color: var(--text-gray);
+}
+
+.mock-editor-body .ant-tabs-tab .ant-tabs-tab-btn {
+  font-size: var(--requestly-font-size-sm);
 }
 
 .mock-editor-body .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
