@@ -19,6 +19,7 @@ import { isRecordMock } from "../MocksTable/utils";
 import { useMocksActionContext } from "features/mocks/contexts/actions";
 import { useLocation } from "react-router-dom";
 import PATHS from "config/constants/sub/paths";
+import { trackMocksListFilterChanged } from "modules/analytics/events/features/mocksV2";
 
 interface Props {
   source?: MockListSource;
@@ -152,7 +153,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
             ) : null}
           </div>
         ),
-        onClick: () => {},
+        onClick: () => trackMocksListFilterChanged("all"),
       },
       {
         key: "starred",
@@ -168,7 +169,7 @@ export const MocksListContentHeader: React.FC<Props> = ({
             ) : null}
           </div>
         ),
-        onClick: () => {},
+        onClick: () => trackMocksListFilterChanged("starred"),
       },
     ],
     [mockRecords]
