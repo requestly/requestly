@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { Row, Col, Input } from "antd";
 import { actions } from "store";
+import "./ReplacePartRow.css";
 
 const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
   );
 
   return (
-    <Row align="middle" key={rowIndex} span={24} gutter={16} className="margin-top-one">
+    <Row align="middle" key={rowIndex} span={24} gutter={16} className="margin-top-one replace-part-row">
       <Col span={12} data-tour-id="rule-editor-replace-from">
         <Input
           type="text"
@@ -33,6 +34,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           disabled={isInputDisabled}
           onChange={(e) => handleInputChange(e, "from")}
           data-selectionid="replace-from-in-url"
+          className="replace-from"
         />
       </Col>
       <Col span={12} data-tour-id="rule-editor-replace-to">
@@ -44,6 +46,7 @@ const ReplacePartRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
           disabled={isInputDisabled}
           onChange={(e) => handleInputChange(e, "to")}
           data-selectionid="replace-to-in-url"
+          className="replace-to"
         />
       </Col>
     </Row>
