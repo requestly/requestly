@@ -27,6 +27,7 @@ import { MOCKSV2 } from "modules/analytics/events/features/constants";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { BottomSheetLayout, BottomSheetPlacement, BottomSheetProvider } from "componentsV2/BottomSheet";
 import MockLogs from "./BottomSheet/MockLogs";
+import { SheetLayout } from "componentsV2/BottomSheet/types";
 
 interface Props {
   isNew?: boolean;
@@ -404,7 +405,12 @@ const MockEditor: React.FC<Props> = ({
           setPassword={setPassword}
           password={password}
         />
-        <BottomSheetLayout layout="split" bottomSheet={<MockLogs mockId={id} />} minSize={0} hideBottomSheet={!id}>
+        <BottomSheetLayout
+          layout={SheetLayout.SPLIT}
+          bottomSheet={<MockLogs mockId={id} />}
+          minSize={0}
+          hideBottomSheet={!id}
+        >
           <Col className="mock-editor-title-container">
             <RQEditorTitle
               name={name}
