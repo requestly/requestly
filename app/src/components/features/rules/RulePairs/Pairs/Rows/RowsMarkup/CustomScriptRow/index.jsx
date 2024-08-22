@@ -5,6 +5,7 @@ import { Row, Col, Input, Tooltip, Typography, Menu, Dropdown, Popconfirm } from
 import { actions } from "store";
 //Icons
 import { DeleteOutlined, DownOutlined, FolderOpenOutlined } from "@ant-design/icons";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 //Constants
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
 import "./CustomScriptRow.css";
@@ -262,7 +263,26 @@ const CustomScriptRow = ({
         type: GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AFTER_PAGE_LOAD,
       },
       {
-        title: isExtensionManifestVersion3() ? "As Soon As Possible" : "Before Page Load",
+        title: isExtensionManifestVersion3() ? (
+          <div
+            className="display-flex items-center"
+            style={{
+              gap: "6px",
+            }}
+          >
+            As Soon As Possible{" "}
+            <Tooltip
+              overlayClassName="rq-tooltip"
+              placement="right"
+              title="Injects script as soon as page starts loading."
+              trigger={["hover"]}
+            >
+              <MdInfoOutline />
+            </Tooltip>
+          </div>
+        ) : (
+          "Before Page Load"
+        ),
         type: isExtensionManifestVersion3()
           ? GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.AS_SOON_AS_POSSIBLE
           : GLOBAL_CONSTANTS.SCRIPT_LOAD_TIME.BEFORE_PAGE_LOAD,
