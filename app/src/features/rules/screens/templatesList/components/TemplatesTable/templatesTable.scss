@@ -7,6 +7,7 @@
   .template-name {
     color: var(--link-color);
     cursor: pointer;
+    font-size: var(--requestly-font-size-sm);
 
     &:hover {
       text-decoration: underline;
