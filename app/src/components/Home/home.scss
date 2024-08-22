@@ -27,8 +27,8 @@
     padding: 1rem;
 
     & .primary-card-header {
-      font-weight: 700;
-      font-size: var(--requestly-font-size-sm, 13px);
+      font-size: var(--requestly-font-size-md, 15px);
+      font-weight: var(--requestly-font-weight-medium);
       letter-spacing: 0.25px;
     }
   }
