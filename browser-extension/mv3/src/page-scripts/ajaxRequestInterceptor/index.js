@@ -1,4 +1,3 @@
-import { PUBLIC_NAMESPACE } from "common/constants";
 import { initFetchInterceptor } from "./fetch";
 import { initXhrInterceptor } from "./xhr";
 import { sendCacheSharedStateMessage } from "./utils";
