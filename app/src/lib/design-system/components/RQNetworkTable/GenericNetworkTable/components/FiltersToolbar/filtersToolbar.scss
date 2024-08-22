@@ -35,7 +35,7 @@
   }
   .filter-btn.rq-btn,
   .filter-btn.rq-btn:focus {
-    font-size: 11px;
+    font-size: var(--requestly-font-size-xs, 11px);
     padding: 0 4px;
     color: var(--text-gray);
     height: 22px;

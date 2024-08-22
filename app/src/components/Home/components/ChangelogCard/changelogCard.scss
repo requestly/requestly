@@ -19,7 +19,7 @@
 }
 
 .changelog-card-log-date {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
 }
 
 .changelog-card-log-title {
@@ -32,7 +32,7 @@
 }
 
 .changelog-card-log-description {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   line-height: 14px;
   letter-spacing: 0.4px;
   color: var(--neutrals-gray-300);

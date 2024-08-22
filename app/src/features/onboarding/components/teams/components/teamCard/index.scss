@@ -27,7 +27,7 @@
   }
 
   .team-card-team-members-count {
-    font-size: 11px;
+    font-size: var(--requestly-font-size-xs, 11px);
     color: var(--neutrals-gray-300);
   }
 }

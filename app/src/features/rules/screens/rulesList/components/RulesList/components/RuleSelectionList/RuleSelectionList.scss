@@ -18,7 +18,7 @@
     .title {
       flex-shrink: 0;
       text-align: left;
-      font-size: 11px;
+      font-size: var(--requestly-font-size-xs, 11px);
       font-style: normal;
       font-weight: 400;
       line-height: 130%; /* 14.3px */
@@ -80,7 +80,7 @@
           text-overflow: ellipsis;
           white-space: nowrap;
 
-          font-size: 11px;
+          font-size: var(--requestly-font-size-xs, 11px);
           font-style: normal;
           font-weight: 400;
           line-height: 130%;

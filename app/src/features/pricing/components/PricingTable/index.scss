@@ -17,7 +17,7 @@
     background: var(--success);
     font-weight: 700;
     color: var(--black);
-    font-size: 11px;
+    font-size: var(--requestly-font-size-xs, 11px);
   }
 
   & .ant-input-number-handler-wrap {

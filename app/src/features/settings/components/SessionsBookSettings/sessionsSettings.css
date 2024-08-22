@@ -63,7 +63,7 @@
 
 .automatic-recording-radio-group .learn-more-link {
   padding: 1rem;
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   margin-left: auto;
   color: var(--link-color);
 }

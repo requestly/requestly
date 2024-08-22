@@ -66,7 +66,7 @@
 
 .why-work-email {
   color: var(--text-light);
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
 }
 
 .onboarding-form-input {
@@ -87,13 +87,13 @@
 }
 
 .persona-input-byline {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   color: var(--neutrals-gray-300);
   margin-top: 4px;
 }
 
 .onboarding-terms-text {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   color: var(--text-light);
   margin-top: 1rem;
   & a {

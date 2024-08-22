@@ -54,7 +54,7 @@
 }
 
 .rq-network-table-container .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   margin-right: 8px;
 }
 
