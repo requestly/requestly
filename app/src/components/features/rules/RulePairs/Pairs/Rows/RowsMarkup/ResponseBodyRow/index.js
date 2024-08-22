@@ -23,6 +23,7 @@ import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { RuleType } from "features/rules";
 import "./ResponseBodyRow.css";
 
 const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
@@ -299,7 +300,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
           >
             <Col xl="12" span={24}>
               <CodeEditor
-                key={pair.response.type}
+                // key={pair.response.type}
                 language={
                   pair.response.type === GLOBAL_CONSTANTS.RESPONSE_BODY_TYPES.CODE
                     ? EditorLanguage.JAVASCRIPT
@@ -314,6 +315,7 @@ const ResponseBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabl
                 isReadOnly={isInputDisabled}
                 handleChange={responseBodyChangeHandler}
                 isResizable
+                analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.RESPONSE }}
                 toolbarOptions={{
                   title: "Response Body",
                   options: [EditorRadioGroupOptions],

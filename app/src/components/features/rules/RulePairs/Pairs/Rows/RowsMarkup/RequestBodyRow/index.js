@@ -13,6 +13,7 @@ import { PremiumIcon } from "components/common/PremiumIcon";
 import { PremiumFeature } from "features/pricing";
 import CodeEditor, { EditorLanguage } from "componentsV2/CodeEditor";
 import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
+import { RuleType } from "features/rules";
 
 const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisabled }) => {
   const dispatch = useDispatch();
@@ -188,7 +189,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
           >
             <Col xl="12" span={24}>
               <CodeEditor
-                key={pair.request.type}
+                // key={pair.request.type}
                 language={
                   pair.request.type === GLOBAL_CONSTANTS.REQUEST_BODY_TYPES.CODE
                     ? EditorLanguage.JAVASCRIPT
@@ -202,6 +203,7 @@ const RequestBodyRow = ({ rowIndex, pair, pairIndex, ruleDetails, isInputDisable
                 }
                 handleChange={requestBodyChangeHandler}
                 isReadOnly={isInputDisabled}
+                analyticEventProperties={{ source: "rule_editor", rule_type: RuleType.REQUEST }}
                 toolbarOptions={{
                   title: "Request Body",
                   options: [EditorRadioGroupOptions],
