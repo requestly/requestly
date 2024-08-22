@@ -23,7 +23,7 @@
 }
 
 .editor-title-container .editor-title-name {
-  min-height: 33px;
+  min-height: 28px;
 }
 
 .editor-title-container .editor-title-name .editor-title-input.ant-input {
@@ -86,8 +86,8 @@
 .editor-title-name .ant-input,
 .editor-title-name .editor-title {
   color: var(--white);
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: var(--requestly-font-size-md);
+  font-weight: var(--requestly-font-weight-medium);
 }
 .editor-title-container .editor-description {
   max-width: 600px;
