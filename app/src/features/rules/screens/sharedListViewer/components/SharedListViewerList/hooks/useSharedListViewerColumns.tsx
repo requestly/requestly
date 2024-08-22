@@ -45,7 +45,7 @@ export const useSharedListViewerColumns = ({ handleViewSharedListRule }: Props) 
         if (isRule(record)) {
           const beautifiedDate = moment(record.modificationDate).format("MMM DD, YYYY");
 
-          return <div>{beautifiedDate}</div>;
+          return <div className="shared-list-last-modified-date">{beautifiedDate}</div>;
         } else return null;
       },
     },
