@@ -1,17 +1,21 @@
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 //Actions
 import { RQButton } from "lib/design-system/components";
-import { closeBtnOnClickHandler } from "../actions";
 import { Tooltip } from "antd";
+import { navigateBack, redirectToRules } from "utils/RedirectionUtils";
+import { snakeCase } from "lodash";
+import { trackRuleEditorClosed } from "modules/analytics/events/common/rules";
 
 const CloseButton = ({ ruleType, mode }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const closeButtonHandler = useCallback(() => {
-    closeBtnOnClickHandler(dispatch, navigate, ruleType, mode);
+    trackRuleEditorClosed("cancel_button", ruleType, snakeCase(mode));
+    navigateBack(navigate, location, () => redirectToRules(navigate));
   }, [dispatch, mode, navigate, ruleType]);
 
   return (
