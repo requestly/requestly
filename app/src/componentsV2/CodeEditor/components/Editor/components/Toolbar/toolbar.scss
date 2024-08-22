@@ -25,7 +25,7 @@
     display: flex;
     align-items: center;
     margin-top: 8px;
-    gap: 8px;
+    gap: 1rem;
 
     .code-editor-custom-options-title {
       color: var(--requestly-color-text-placeholder);
@@ -35,6 +35,8 @@
     .code-editor-custom-options-block {
       .code-editor-custom-option span {
         font-size: var(--requestly-font-size-xs);
+        position: relative;
+        bottom: 2px;
       }
     }
   }
