@@ -1,10 +1,7 @@
 import React, { useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { actions } from "store";
-import { Typography, Row, Col, Button, Tooltip } from "antd";
-import { getIsSecondarySidebarCollapsed } from "store/selectors";
-import { PicRightOutlined, ReadOutlined, CalendarOutlined, ApiOutlined } from "@ant-design/icons";
+import { Typography, Row, Col } from "antd";
+import { ReadOutlined, CalendarOutlined, ApiOutlined } from "@ant-design/icons";
 import { FaYCombinator } from "@react-icons/all-files/fa/FaYCombinator";
 import { redirectToUrl } from "utils/RedirectionUtils";
 import APP_CONSTANTS from "config/constants";
@@ -18,20 +15,9 @@ const { PATHS } = APP_CONSTANTS;
 const PAGES_WITHOUT_FOOTER = [PATHS.SETTINGS.RELATIVE];
 
 const AppFooter: React.FC = () => {
-  const dispatch = useDispatch();
   const { pathname } = useLocation();
   const SHOW_YC_BRANDING = false;
-  const isSecondarySidebarCollapsed = useSelector(getIsSecondarySidebarCollapsed);
-  const isSidebarToggleAllowed = useMemo(
-    () =>
-      [APP_CONSTANTS.PATHS.RULES.INDEX, APP_CONSTANTS.PATHS.MOCK_SERVER.INDEX].some((path) => pathname.includes(path)),
-    [pathname]
-  );
 
-  const handleSecondarySidebarToggle = (e: React.MouseEvent) => {
-    dispatch(actions.updateSecondarySidebarCollapse(!isSecondarySidebarCollapsed));
-    trackFooterClicked("secondary_sidebar_toggle");
-  };
   const footerLinksConfig = useMemo(
     () => ({
       "Book a demo": {
@@ -90,18 +76,6 @@ const AppFooter: React.FC = () => {
       <Footer className="app-layout-footer">
         <Row align="middle" justify="space-between" className="w-full">
           <div className="display-flex items-center">
-            {isSidebarToggleAllowed && (
-              <Col>
-                <Tooltip title={`${isSecondarySidebarCollapsed ? "Expand" : "Collapse"} sidebar`} placement="topRight">
-                  <Button
-                    type="text"
-                    icon={<PicRightOutlined />}
-                    className="footer-sidebar-toggle-btn"
-                    onClick={handleSecondarySidebarToggle}
-                  />
-                </Tooltip>
-              </Col>
-            )}
             {isExtensionInstalled() && <span className="extension-version">v{getExtensionVersion()}</span>}
           </div>
 
