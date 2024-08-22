@@ -31,10 +31,10 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   autoScroll = false,
   disableFilters = false,
 }) => {
-  const [activeLogId, setActiveLogId] = useState(null);
-  const [selectedLog, setSelectedLog] = useState<RQNetworkLog | null>(null);
+  const [currentTimeLogId, setCurrentTimeLogId] = useState(null);
+  const [expandedLog, setExpandedLog] = useState<RQNetworkLog | null>(null);
   const containerRef = useRef(null);
-  const onScroll = useFocusedAutoScroll(containerRef, activeLogId);
+  const onScroll = useFocusedAutoScroll(containerRef, currentTimeLogId);
 
   const extraColumns: GenericNetworkTableProps<RQNetworkLog>["extraColumns"] = useMemo(
     () => [
@@ -47,14 +47,16 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
           const offset = Math.floor(getOffset(log, sessionRecordingStartTime));
           return (
             <div className="offset-cell">
-              <span className="row-pointer">{activeLogId === log.id && <AiFillCaretRight color="var(--white)" />}</span>
+              <span className="row-pointer">
+                {currentTimeLogId === log.id && <AiFillCaretRight color="var(--white)" />}
+              </span>
               <span>{secToMinutesAndSeconds(offset)}</span>
             </div>
           );
         },
       },
     ],
-    [sessionRecordingStartTime, activeLogId]
+    [sessionRecordingStartTime, currentTimeLogId]
   );
 
   const isLogPending = (log: RQNetworkLog) => {
@@ -78,13 +80,13 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
       { log: null, minTimeDifference: Infinity }
     );
 
-    setActiveLogId(closestLog?.log?.id);
+    setCurrentTimeLogId(closestLog?.log?.id);
   }, [logs, sessionCurrentOffset, sessionRecordingStartTime]);
 
   const finalLogs = useMemo(() => {
     let finalLogs = [...logs];
-    if (selectedLog) {
-      const logIndex = logs.findIndex((log) => log.id === selectedLog.id);
+    if (expandedLog) {
+      const logIndex = logs.findIndex((log) => log.id === expandedLog.id);
       if (logIndex !== -1) {
         if (finalLogs[logIndex].entry._RQ) {
           if ((finalLogs[logIndex].entry._RQ as any)?.responseBodyPath) {
@@ -110,7 +112,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
       }
     }
     return finalLogs;
-  }, [logs, selectedLog]);
+  }, [logs, expandedLog]);
   return (
     <div className="rq-network-table-container">
       <GenericNetworkTable
@@ -126,7 +128,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
         tableRef={containerRef}
         onTableScroll={onScroll}
         disableFilters={disableFilters}
-        onRowClick={setSelectedLog}
+        onRowClick={setExpandedLog}
       />
     </div>
   );
