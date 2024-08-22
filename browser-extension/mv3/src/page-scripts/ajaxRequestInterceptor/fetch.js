@@ -1,4 +1,3 @@
-import { PUBLIC_NAMESPACE } from "common/constants";
 import {
   applyDelay,
   getAbsoluteUrl,
