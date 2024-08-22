@@ -1,0 +1,36 @@
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Card, Result } from "antd";
+import PageLoader from "components/misc/PageLoader";
+import { getUserAuthDetails } from "store/selectors";
+import { getBillingTeamRedirectURL } from "backend/billing";
+import PATHS from "config/constants/sub/paths";
+
+export const UpgradeSuccess: React.FC = () => {
+  const navigate = useNavigate();
+  const user = useSelector(getUserAuthDetails);
+
+  useEffect(() => {
+    if (user.loggedIn) {
+      getBillingTeamRedirectURL(user?.details?.profile?.uid).then((redirectUrl) => {
+        if (!redirectUrl) {
+          navigate(PATHS.SETTINGS.BILLING.RELATIVE);
+        } else {
+          navigate(redirectUrl);
+        }
+      });
+    }
+  }, [navigate, user?.details?.profile?.uid, user.loggedIn]);
+
+  return (
+    <Card>
+      <Result
+        status="success"
+        title="Successfully upgraded your plan!"
+        subTitle="Account activation takes 1-2 minutes, please wait."
+        extra={[<PageLoader message="" />]}
+      />
+    </Card>
+  );
+};
