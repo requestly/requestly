@@ -40,8 +40,10 @@ export const PrimarySidebar: React.FC = () => {
   const isDesktopSessionsCompatible =
     useFeatureIsOn("desktop-sessions") && isFeatureCompatible(FEATURES.DESKTOP_SESSIONS);
 
-  const isSecondarySidebarToggleAllowed = () =>
-    [APP_CONSTANTS.PATHS.RULES.INDEX, APP_CONSTANTS.PATHS.MOCK_SERVER.INDEX].some((path) => pathname.includes(path));
+  const isSecondarySidebarToggleAllowed = [
+    APP_CONSTANTS.PATHS.RULES.INDEX,
+    APP_CONSTANTS.PATHS.MOCK_SERVER.INDEX,
+  ].some((path) => pathname.includes(path));
 
   const sidebarItems: PrimarySidebarItem[] = useMemo(() => {
     const showTooltipForSessionIcon = appMode === GLOBAL_CONSTANTS.APP_MODES.DESKTOP && isSavingNetworkSession;
