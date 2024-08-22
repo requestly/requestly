@@ -1,8 +1,10 @@
 .rule-editor-header.ant-layout-header {
   display: flex;
   align-items: center;
-  background-color: var(--body-background);
-  border-bottom: 1px solid var(--border-dark);
+  background-color: var(--requestly-color-background);
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .rule-editor-row.ant-row {
@@ -43,7 +45,7 @@
   padding: 0;
 }
 
-.rule-editor-header-disabled-group-warning.ant-col @media only screen and (max-width: 1200px) {
+@media only screen and (max-width: 1200px) {
   .rule-editor-back-btn {
     visibility: visible;
   }
