@@ -101,6 +101,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: var(--requestly-font-size-sm);
 }
 
 .rule-name-container .rule-description-icon {
@@ -122,6 +123,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: var(--requestly-font-size-sm);
 }
 
 .group-name-container .group-rules-count-details {
@@ -163,6 +165,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: var(--requestly-font-size-sm);
 }
 
 tr.rq-content-list-table-row.ant-table-row:hover .group-name-container .add-rule-btn {
