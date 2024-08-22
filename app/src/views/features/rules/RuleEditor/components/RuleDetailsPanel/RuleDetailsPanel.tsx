@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { RULE_DETAILS } from "./constants";
+import React, { ReactNode, useEffect } from "react";
 import { RuleType } from "types";
 import { Button } from "antd";
 import { MdMenuBook } from "@react-icons/all-files/md/MdMenuBook";
@@ -23,14 +22,34 @@ import PATHS from "config/constants/sub/paths";
 import { ExampleType, UseCaseExample } from "./types";
 import "./RuleDetailsPanel.scss";
 
+export type RuleDetails = {
+  type: RuleType | string;
+  name: string;
+  icon?: () => ReactNode;
+  description: string;
+  useCases?: {
+    useCase: string;
+    example?: UseCaseExample;
+  }[];
+  documentationLink: string;
+};
+
 interface RuleDetailsPanelProps {
-  ruleType: RuleType | undefined;
+  isSample?: boolean;
+  ruleDetails: RuleDetails;
   source: "docs_sidebar" | "new_rule_editor";
+  handleSeeLiveRuleDemoClick?: () => void;
 }
 
-export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, source }) => {
+export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({
+  source,
+  isSample = false,
+  ruleDetails,
+  handleSeeLiveRuleDemoClick = () => {},
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { type: ruleType, name, description, useCases, documentationLink } = ruleDetails;
 
   const handleCloseClick = () => {
     trackRuleDetailsPanelClosed(ruleType, source);
@@ -114,23 +133,47 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
     }
   };
 
-  return !ruleType ? null : (
-    <div key={ruleType} className="rule-details-panel-container">
+  return !ruleType ? null : isSample ? (
+    <div key={ruleType} className={`rule-details-panel-container sample-rule`}>
+      <div className="details-panel">
+        <div className="rule-details-container">
+          <div className="title">{name}</div>
+          <div className="description">{description}</div>
+          <div className="actions">
+            <Button
+              className="documentation-link"
+              onClick={() => {
+                trackRuleDetailsPanelDocsClicked(ruleType, source);
+                window.open(documentationLink, "_blank");
+              }}
+            >
+              <MdMenuBook /> Read complete documentation
+            </Button>
+
+            <Button type="primary" className="documentation-link" onClick={handleSeeLiveRuleDemoClick}>
+              See live rule demo
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div key={ruleType} className={`rule-details-panel-container`}>
       <span className="close-btn" onClick={handleCloseClick}>
         <MdClose className="anticon" />
       </span>
 
       <div className="details-panel">
         <div className="rule-details-container">
-          <div className="title">{RULE_DETAILS[ruleType].name}</div>
-          <div className="description">{RULE_DETAILS[ruleType].description}</div>
+          <div className="title">{name}</div>
+          <div className="description">{description}</div>
           <div className="links">
             <Button
               type="link"
               target="_blank"
               rel="noreferrer"
               className="link documentation-link"
-              href={RULE_DETAILS[ruleType].documentationLink}
+              href={documentationLink}
               onClick={() => trackRuleDetailsPanelDocsClicked(ruleType, source)}
             >
               <MdMenuBook /> Read complete documentation <MdOutlineOpenInNew />
@@ -146,8 +189,8 @@ export const RuleDetailsPanel: React.FC<RuleDetailsPanelProps> = ({ ruleType, so
           <div className="title">Popular use cases</div>
 
           <ul className="use-cases-list">
-            {RULE_DETAILS[ruleType].useCases?.length > 0 &&
-              RULE_DETAILS[ruleType].useCases?.map(({ useCase, example }, index) => {
+            {useCases?.length > 0 &&
+              useCases?.map(({ useCase, example }, index) => {
                 const action = getActionButton(useCase, example);
 
                 return (

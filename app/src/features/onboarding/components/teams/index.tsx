@@ -62,7 +62,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
       return;
     }
 
-    if (!isCompanyEmail(user?.details?.profile?.email) && !user?.details?.profile?.isEmailVerified) {
+    if (!isCompanyEmail(user?.details?.profile?.email) || !user?.details?.profile?.isEmailVerified) {
       setIsLoading(false);
       dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
       return;
@@ -75,10 +75,7 @@ export const WorkspaceOnboardingView: React.FC<WorkspaceOnboardingViewProps> = (
         else {
           if (!appOnboardingDetails.createdWorkspace) {
             if (isTeamExist) {
-              dispatch(actions.updateAppOnboardingCompleted());
-
-              // @ts-ignore
-              dispatch(actions.toggleActiveModal({ modalName: "appOnboardingModal", newValue: false }));
+              dispatch(actions.updateAppOnboardingStep(ONBOARDING_STEPS.RECOMMENDATIONS));
               setIsLoading(false);
               return;
             }

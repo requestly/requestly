@@ -30,7 +30,15 @@ import { EditorLanguage } from "componentsV2/CodeEditor";
  *  }
  * }>}
  */
-export const transformAndValidateRuleFields = (ruleData) => {
+export const transformAndValidateRuleFields = (rule) => {
+  const ruleData = { ...rule };
+
+  if (ruleData.isSample) {
+    delete ruleData.isReadOnly;
+    delete ruleData.sampleId;
+    delete ruleData.isSample;
+  }
+
   switch (ruleData.ruleType) {
     case GLOBAL_CONSTANTS.RULE_TYPES.SCRIPT: {
       if (!isFeatureCompatible(FEATURES.SCRIPT_RULE.ATTRIBUTES_SUPPORT)) {

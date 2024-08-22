@@ -23,7 +23,7 @@ export enum RuleType {
   REQUEST = "Request",
   DELAY = "Delay",
 }
-
+// REDUNDANT COPY OF FEATURES/RULES/TYPES/RULES.TS
 export interface Rule extends Record<string, unknown> {
   id: string;
   name: string;

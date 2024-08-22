@@ -2,6 +2,7 @@ import React, { ReactNode } from "react";
 import { DrawerLayout } from "./components/DrawerLayout/DrawerLayout";
 import { SplitPaneLayout } from "./components/SplitPaneLayout/SplitPaneLayout";
 import "./BottomSheetLayout.scss";
+import { SheetLayout } from "componentsV2/BottomSheet/types";
 
 type BottomSheetLayoutProps = {
   bottomSheet: ReactNode;
@@ -10,25 +11,25 @@ type BottomSheetLayoutProps = {
 };
 
 type SplitLayoutProps = BottomSheetLayoutProps & {
-  layout: "split";
+  layout: SheetLayout.SPLIT;
   minSize?: number;
 };
 
 type DrawerLayoutProps = BottomSheetLayoutProps & {
-  layout: "drawer";
+  layout: SheetLayout.DRAWER;
   initialOffset?: number;
 };
 
 type Props = SplitLayoutProps | DrawerLayoutProps;
 
 export const BottomSheetLayout: React.FC<Props> = (props) => {
-  const { bottomSheet, children, hideBottomSheet = false, layout = "split" } = props;
+  const { bottomSheet, children, hideBottomSheet = false, layout = SheetLayout.SPLIT } = props;
 
   if (hideBottomSheet) {
     return children;
   }
 
-  if (layout === "drawer") {
+  if (layout === SheetLayout.DRAWER) {
     return (
       <DrawerLayout
         bottomSheet={bottomSheet}
@@ -38,7 +39,7 @@ export const BottomSheetLayout: React.FC<Props> = (props) => {
     );
   }
 
-  if (layout === "split") {
+  if (layout === SheetLayout.SPLIT) {
     return (
       <SplitPaneLayout
         bottomSheet={bottomSheet}

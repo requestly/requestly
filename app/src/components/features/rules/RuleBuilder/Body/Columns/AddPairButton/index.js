@@ -13,7 +13,7 @@ import { trackRulePairCreated, trackRulePairCreationAttempted } from "modules/an
 import "./AddPairButton.css";
 
 const AddPairButton = (props) => {
-  const { currentlySelectedRuleConfig } = props;
+  const { disabled = false, currentlySelectedRuleConfig } = props;
 
   //Global State
   const dispatch = useDispatch();
@@ -47,7 +47,7 @@ const AddPairButton = (props) => {
       source="add_new_rule_pair"
       onClickCallback={() => trackRulePairCreationAttempted(currentlySelectedRuleData.ruleType)}
     >
-      <Button block type="dashed" className="add-pair-btn" icon={<PlusOutlined />}>
+      <Button disabled={disabled} block type="dashed" className="add-pair-btn" icon={<PlusOutlined />}>
         <span>
           <Row align="middle" wrap={false} className="shrink-0">
             Add a new condition{isPremiumFeature ? <PremiumIcon /> : null}

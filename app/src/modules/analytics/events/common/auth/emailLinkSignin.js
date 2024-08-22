@@ -8,3 +8,7 @@ export const trackSignInWithLinkCustomFormSeen = () => {
 export const trackSignInWithLinkCustomFormSubmitted = () => {
   trackEvent(AUTH.EMAIL_LINK_SIGNIN_FORM.SUBMITTED);
 };
+
+export const trackMagicLinkResendRequested = () => {
+  trackEvent(AUTH.EMAIL_LINK_SIGNIN_FORM.LINK_RESEND_REQUESTED);
+};

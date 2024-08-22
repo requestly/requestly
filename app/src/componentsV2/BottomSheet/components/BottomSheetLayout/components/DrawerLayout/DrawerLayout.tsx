@@ -23,7 +23,7 @@ export const DrawerLayout: React.FC<Props> = ({ bottomSheet, children, initialOf
         className={`${isSheetPlacedAtBottom ? " bottom-sheet-container" : "bottom-sheet-panel-container"}`}
         style={{
           bottom:
-            sheetPlacement === BottomSheetPlacement.RIGHT ? 0 : isBottomSheetOpen ? 0 : `${initialOffset ?? -335}px`,
+            sheetPlacement === BottomSheetPlacement.RIGHT ? 0 : isBottomSheetOpen ? 0 : `${initialOffset ?? -337}px`,
           height: isSheetPlacedAtBottom ? "440px" : `100%`,
         }}
       >

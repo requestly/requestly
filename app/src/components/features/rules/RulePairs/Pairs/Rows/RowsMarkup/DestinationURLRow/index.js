@@ -293,13 +293,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                 open={destinationTypePopupVisible}
               >
                 <Radio.Group value={destinationType} onChange={showPopup} disabled={isInputDisabled}>
-                  <MoreInfo
-                    text="Redirect URL to another URL"
-                    analyticsContext="url_destination"
-                    source={currentlySelectedRuleConfig.TYPE}
-                  >
-                    <Radio value={RedirectDestinationType.URL}>URL</Radio>
-                  </MoreInfo>
+                  <Radio value={RedirectDestinationType.URL}>Another URL</Radio>
                   <MoreInfo
                     trigger={!isFeatureCompatible(FEATURES.REDIRECT_MAP_LOCAL)}
                     tooltipOpenedCallback={() => trackDesktopActionInterestCaptured("map_local")}
@@ -327,13 +321,7 @@ const DestinationURLRow = ({ rowIndex, pair, pairIndex, isInputDisabled }) => {
                       Local file
                     </Radio>
                   </MoreInfo>
-                  <MoreInfo
-                    text=" Redirect to endpoint from Requestly Mock Server or File Server"
-                    analyticsContext="pick_mock_or_file_destination"
-                    source={currentlySelectedRuleConfig.TYPE}
-                  >
-                    <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
-                  </MoreInfo>
+                  <Radio value={RedirectDestinationType.MOCK_OR_FILE_PICKER}>Pick from Files/Mock server</Radio>
                 </Radio.Group>
               </Popconfirm>
             </Col>

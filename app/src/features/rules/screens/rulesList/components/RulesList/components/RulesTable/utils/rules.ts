@@ -1,6 +1,13 @@
 import { isGroup, isRule } from "features/rules/utils";
 import { RuleTableRecord } from "../types";
-import { Rule, StorageRecord, RecordStatus, Group } from "features/rules/types/rules";
+import { Rule, StorageRecord, RecordStatus, Group, RecordType } from "features/rules";
+import Logger from "lib/logger";
+import { getTemplates } from "backend/rules";
+import { User } from "types";
+import { addRulesAndGroupsToStorage, processDataToImport } from "features/rules/modals/ImportRulesModal/actions";
+import { AppMode } from "utils/syncing/SyncUtils";
+import { localSampleRules, sampleRuleDetails } from "../../../constants";
+import { generateObjectCreationDate } from "utils/DateTimeUtils";
 
 // Assumes that if groupId is present then it's a rule
 export const isRecordWithGroupId = (record: StorageRecord): record is Rule => {
@@ -95,4 +102,57 @@ export const checkIsRuleGroupDisabled = (allRecordsMap: Record<string, StorageRe
   if (record.groupId?.length && allRecordsMap[record.groupId]?.status === RecordStatus.INACTIVE) {
     return true;
   } else return false;
+};
+
+export const getSampleRules = async (fromDb: boolean = true) => {
+  try {
+    const sampleRuleIds = Object.keys(sampleRuleDetails);
+
+    let templates;
+    if (!fromDb) {
+      templates = localSampleRules;
+    } else {
+      templates = await getTemplates(sampleRuleIds);
+    }
+
+    const sampleRules = templates.map((template) => ({
+      ...template.data.ruleData,
+      sampleId: template.id,
+      isReadOnly: true,
+      isSample: true,
+      lastModifiedBy: null,
+      createdBy: null,
+      currentOwner: null,
+      creationDate: generateObjectCreationDate(),
+      modificationDate: generateObjectCreationDate(),
+    }));
+
+    return sampleRules;
+  } catch (error) {
+    Logger.log("Something went wrong while fetching sample rules!", error);
+    return null;
+  }
+};
+
+export const importSampleRules = async (user: User, appMode: AppMode) => {
+  const sampleRules = await getSampleRules();
+
+  return processDataToImport(sampleRules, user)
+    .then((result) => {
+      const processedRulesToImport = (result.data as (Rule | Group)[]).map((record) => {
+        return record.objectType === RecordType.GROUP ? { ...record, status: RecordStatus.ACTIVE } : record;
+      });
+
+      return addRulesAndGroupsToStorage(appMode, processedRulesToImport).then(() => {
+        const groupIdsToExpand = processedRulesToImport.reduce(
+          (result, record) => (record.objectType === RecordType.GROUP ? [...result, record.id] : result),
+          []
+        );
+
+        return groupIdsToExpand;
+      });
+    })
+    .catch((error) => {
+      Logger.log("Something went wrong while importing sample rules!", error);
+    });
 };
