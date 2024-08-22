@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
+import { SidebarToggleButton } from "./components/SidebarToggleButton/SidebarToggleButton";
 import { SecondarySidebarItem } from "./components/SecondarySidebarItem/SecondarySidebarItem";
 import { getIsSecondarySidebarCollapsed } from "store/selectors";
 
@@ -32,6 +33,7 @@ const SecondarySidebar: React.FC<SecondarySidebarProps> = ({ items }) => {
           }}
           className="secondary-sidebar-container"
         >
+          <SidebarToggleButton />
           <ul>
             {items.map(({ path, title, icon }) => {
               return (
