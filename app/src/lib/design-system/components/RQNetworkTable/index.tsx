@@ -8,6 +8,7 @@ import { AiFillCaretRight } from "@react-icons/all-files/ai/AiFillCaretRight";
 import useFocusedAutoScroll from "./useFocusedAutoScroll";
 import "./RQNetworkTable.css";
 import { getFile } from "services/firebaseStorageService";
+import Logger from "lib/logger";
 
 export interface RQNetworkTableProps {
   logs: RQNetworkLog[];
@@ -81,7 +82,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
   }, [logs, sessionCurrentOffset, sessionRecordingStartTime]);
 
   const finalLogs = useMemo(() => {
-    let finalLogs = logs;
+    let finalLogs = [...logs];
     if (selectedLog) {
       const logIndex = logs.findIndex((log) => log.id === selectedLog.id);
       if (logIndex !== -1) {
@@ -92,7 +93,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
                 finalLogs[logIndex].entry.response.content.text = response;
               })
               .catch((error) => {
-                console.error("Error fetching response body:", error);
+                Logger.error("Error fetching response body:", error);
               });
           }
 
@@ -102,7 +103,7 @@ export const RQNetworkTable: React.FC<RQNetworkTableProps> = ({
                 finalLogs[logIndex].entry.request.postData.text = request;
               })
               .catch((error) => {
-                console.error("Error fetching request body:", error);
+                Logger.error("Error fetching request body:", error);
               });
           }
         }
