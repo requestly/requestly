@@ -1,6 +1,0 @@
-.replace-part-row .replace-from .ant-input-wrapper.ant-input-group .ant-input,
-.replace-part-row .replace-to .ant-input-wrapper.ant-input-group .ant-input,
-.replace-part-row .replace-from .ant-input-wrapper.ant-input-group .ant-input-group-addon,
-.replace-part-row .replace-to .ant-input-wrapper.ant-input-group .ant-input-group-addon {
-  font-size: var(--requestly-font-size-sm);
-}

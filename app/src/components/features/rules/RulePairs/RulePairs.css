@@ -74,12 +74,22 @@
   background-color: var(--component-background);
 }
 
+.rule-pairs-collapse .ant-input-wrapper.ant-input-group .ant-input,
+.rule-pairs-collapse .ant-input-wrapper.ant-input-group .ant-input-group-addon {
+  font-size: var(--requestly-font-size-sm);
+}
+
 .ant-select.ant-select-lg {
   font-size: 14px;
 }
 
 .rule-pairs-panel .modification-type-dropdown {
   text-align: right;
+  font-size: var(--requestly-font-size-sm);
+}
+
+.rule-pairs-panel .ant-dropdown-trigger.ant-dropdown-link {
+  font-size: var(--requestly-font-size-sm);
 }
 
 @media (max-width: 1208px) {
