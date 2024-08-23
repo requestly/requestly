@@ -62,7 +62,9 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
       title: "Created on ",
       width: 150,
       render: (_: any, record: SharedList) => {
-        return <div className="text-center">{moment(record.creationDate).format("DD MMM YYYY")}</div>;
+        return (
+          <div className="text-center shared-list-created-on">{moment(record.creationDate).format("DD MMM YYYY")}</div>
+        );
       },
     },
     {
@@ -71,7 +73,7 @@ export const useSharedListsTableColumns = ({ handleDeleteSharedListClick }: Prop
 
       render: (_: any, record: SharedList) => {
         return (
-          <div className="text-center">
+          <div className="text-center shared-list-import-count">
             {record.importCount > 0
               ? `${record.importCount} ${record.importCount === 1 ? "time" : "times"}`
               : "Not yet"}

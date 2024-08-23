@@ -11,7 +11,7 @@ const FONT_WEIGHT_TOKENS = {
 };
 
 const FONT_SIZE_TOKENS = {
-  "size-2xs": "0.563rem", // 9px
+  "size-2xs": "0.625rem", // 10px
   "size-xs": "0.688rem", // 11px
   "size-sm": "0.813rem", // 13px
   "size-md": "0.938rem", // 15px

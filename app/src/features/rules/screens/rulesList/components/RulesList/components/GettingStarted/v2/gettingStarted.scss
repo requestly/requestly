@@ -8,21 +8,38 @@
     padding: 48px 12px;
 
     .workspace-title-container {
+      color: var(--requestly-color-text-default);
       margin-bottom: 32px;
+      border-radius: 4px;
+      font-size: var(--requestly-font-size-sm);
+      padding: var(--space-5, 12px) var(--space-9, 32px) var(--space-5, 12px) var(--space-6, 16px);
+      border: 1px solid var(--requestly-color-white-t-20, rgba(255, 255, 255, 0.12));
+      background: var(--requestly-color-surface-1);
 
-      h1 {
-        line-height: 1rem;
+      .workspace-title {
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        & svg {
+          font-size: 1rem;
+        }
       }
     }
 
-    .link-btn.ant-btn {
-      font-size: 13px; /* TODO: use "--requestly-font-size-*" variable */
-      line-height: 150%; /* 19.5px */
-      color: var(--requestly-color-primary-text, #639ff9);
-      padding: 0;
+    .lead {
+      padding-left: 24px;
+      margin-top: 4px;
 
-      &:hover {
-        text-decoration-line: underline;
+      a {
+        line-height: 150%; /* 19.5px */
+        color: var(--requestly-color-primary-text, #639ff9);
+        padding: 0;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
 
@@ -156,7 +173,7 @@
         gap: 8px;
 
         .ask-ai-btn-content {
-          font-size: 13px;
+          font-size: var(--requestly-font-size-sm, 13px);
           font-style: normal;
           font-weight: 400;
           line-height: 150%;
@@ -180,7 +197,7 @@
 
       .caption {
         color: var(--requestly-color-text-placeholder, #8f8f8f);
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs, 11px);
         font-weight: 400;
         line-height: 130%; /* 14.3px */
         margin-top: 8px;

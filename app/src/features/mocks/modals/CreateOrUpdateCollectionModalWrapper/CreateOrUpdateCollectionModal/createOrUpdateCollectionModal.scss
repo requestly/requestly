@@ -37,7 +37,7 @@
 
       span {
         color: var(--white);
-        font-size: 13px;
+        font-size: var(--requestly-font-size-sm, 13px);
         font-weight: 500;
         line-height: 18px;
         letter-spacing: 0.25px;
@@ -46,7 +46,7 @@
           display: inline-block;
           margin-left: 8px;
           color: var(--requestly-color-neutral-400);
-          font-size: 11px;
+          font-size: var(--requestly-font-size-xs, 11px);
           line-height: 14px;
           letter-spacing: 0.4px;
         }

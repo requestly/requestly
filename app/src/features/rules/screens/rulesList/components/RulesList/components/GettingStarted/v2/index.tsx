@@ -29,6 +29,7 @@ import { MdOutlineAddCircleOutline } from "@react-icons/all-files/md/MdOutlineAd
 import { MdOutlineHelpOutline } from "@react-icons/all-files/md/MdOutlineHelpOutline";
 import { MdOutlineFileUpload } from "@react-icons/all-files/md/MdOutlineFileUpload";
 import { HiOutlineTemplate } from "@react-icons/all-files/hi/HiOutlineTemplate";
+import { MdInfoOutline } from "@react-icons/all-files/md/MdInfoOutline";
 import { RuleType } from "types";
 import RULE_TYPES_CONFIG from "config/constants/sub/rule-types";
 import { RuleSelectionListDrawer } from "../../RuleSelectionListDrawer/RuleSelectionListDrawer";
@@ -133,9 +134,12 @@ export const GettingStarted: React.FC = () => {
         <div className="getting-started-content">
           {isWorkspaceMode ? (
             <div className="workspace-title-container">
-              <h1>This is a shared workspace</h1>
+              <div className="workspace-title">
+                <MdInfoOutline />
+                This is a shared workspace
+              </div>
               <div className="lead">
-                Rules created here can be accessed by your teammates. To manage your teammates click{" "}
+                Rules created here can be accessed by your teammates. To manage your teammates{" "}
                 <a
                   href="https://requestly.com/"
                   className="cursor-pointer"
@@ -144,7 +148,7 @@ export const GettingStarted: React.FC = () => {
                     redirectToTeam(navigate, currentlyActiveWorkspace.id);
                   }}
                 >
-                  here
+                  click here
                 </a>
                 .
               </div>

@@ -92,7 +92,7 @@
 }
 
 .text-sm {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 14.06px;
 }
 
