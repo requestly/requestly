@@ -1,4 +1,6 @@
+import { MockType } from "components/features/mocksV2/types";
 import { ReactNode } from "react";
+import { RuleType } from "types";
 
 export enum EditorLanguage {
   JAVASCRIPT = "javascript",
@@ -29,3 +31,18 @@ export const getEditorLanguageFromContentType = (contentType: string): EditorLan
     return EditorLanguage.CSS;
   }
 };
+
+export type AnalyticEventProperties =
+  | {
+      source: "rule_editor";
+      rule_type: RuleType;
+    }
+  | {
+      source: "mocks";
+      mock_type: MockType;
+    }
+  | {
+      source: "api_client";
+    }
+  | { source: "traffic_table" }
+  | Record<string, unknown>;

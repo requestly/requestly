@@ -16,7 +16,7 @@
 }
 
 .faq-answer {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-style: normal;
   font-weight: 400;
   line-height: 150%; /* 19.5px */
@@ -62,7 +62,7 @@
 
 .faq-footer {
   text-align: center;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-style: normal;
   font-weight: 400;
   line-height: 150%; /* 19.5px */
@@ -80,7 +80,7 @@
   align-items: center;
   color: var(--requestly-color-primary-text, #639ff9);
   align-self: flex-end;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-style: normal;
   font-weight: 400;
   line-height: 130%; /* 14.3px */

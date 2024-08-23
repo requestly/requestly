@@ -1,5 +1,5 @@
 .editor-group-dropdown-trigger {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   cursor: pointer;
   user-select: none;
   padding: 7px 8px 6px 8px;
@@ -91,7 +91,7 @@
 }
 
 .editor-group-empty-message {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   padding-left: 12px;
   color: var(--text-dark-gray);
 }
@@ -121,7 +121,7 @@
 
 .editor-group-dropdown-input-container {
   padding: 6px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .editor-group-input-title {
@@ -139,12 +139,12 @@
 }
 
 .editor-group-dropdown-actions {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   margin: 12px 6px 0px auto;
 }
 
 .editor-group-dropdown-actions .ant-btn {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .editor-group-dropdown-cancel-btn {

@@ -17,7 +17,7 @@
 
 .btn-icon-only.ant-btn {
   border: none;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   color: var(--text-gray);
   border-radius: var(--border-radius-sm);
 }

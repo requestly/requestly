@@ -7,7 +7,7 @@
 
 .widget-visibility-radio-group {
   & .ant-radio-wrapper span {
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
   }
 }
 
@@ -18,12 +18,12 @@
   margin-top: 8px;
 
   & .ant-checkbox-group-item span {
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
   }
 }
 
 .implicit-test-rule-settings-label {
   font-weight: 500;
   color: var(--text-default);
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }

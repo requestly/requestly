@@ -15,7 +15,7 @@
 }
 
 .onboarding-auth-mode-switch-wrapper {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   color: var(--text-light);
 
   .onboarding-auth-mode-switcher {
@@ -66,13 +66,13 @@
 
 .why-work-email {
   color: var(--text-light);
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
 }
 
 .onboarding-form-input {
   & label {
     font-weight: 500;
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
   }
   & input::placeholder {
     font-weight: 500;
@@ -87,13 +87,13 @@
 }
 
 .persona-input-byline {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   color: var(--neutrals-gray-300);
   margin-top: 4px;
 }
 
 .onboarding-terms-text {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   color: var(--text-light);
   margin-top: 1rem;
   & a {

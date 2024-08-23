@@ -331,6 +331,7 @@ const MockEditor: React.FC<Props> = ({
             defaultValue={headersString}
             handleChange={setHeadersString}
             language={EditorLanguage.JSON}
+            analyticEventProperties={{ source: "mocks", mock_type: type }}
           />
         </Col>
       </Row>
@@ -349,6 +350,7 @@ const MockEditor: React.FC<Props> = ({
             handleChange={setBody}
             language={getEditorLanguage(fileType)}
             isReadOnly={isEditorReadOnly}
+            analyticEventProperties={{ source: "mocks", mock_type: mockType }}
             toolbarOptions={{
               title: mockType === MockType.FILE ? "File content" : "",
               options: null,
@@ -388,7 +390,7 @@ const MockEditor: React.FC<Props> = ({
   };
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden mock-editor-layout-container">
       <MockEditorHeader
         isNewMock={isNew}
         mockType={mockType}
