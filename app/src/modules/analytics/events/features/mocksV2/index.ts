@@ -1,6 +1,6 @@
 import { trackEvent } from "modules/analytics";
 import { MOCKSV2 } from "../constants";
-import { MockRecordType, MockType } from "components/features/mocksV2/types";
+import { MockRecordType, MockTableHeaderFilter, MockType } from "components/features/mocksV2/types";
 
 export const trackCreateMockEvent = (
   id: string,
@@ -174,4 +174,9 @@ export const trackMockCollectionDeleted = (
 export const trackMocksListBulkActionPerformed = (action: string, mockType: MockType) => {
   const params = { action, mockType };
   trackEvent(MOCKSV2.MOCKS_LIST_BULK_ACTION_PERFORMED, params);
+};
+
+export const trackMocksListFilterChanged = (filter: MockTableHeaderFilter) => {
+  const params = { filter };
+  trackEvent(MOCKSV2.MOCKS_LIST_FILTER_CHANGED, params);
 };
