@@ -1,5 +1,6 @@
 .teams-list-item {
   padding: 8px 4px;
+  font-size: var(--requestly-font-size-sm);
 }
 
 .teams-list-item-title {
@@ -24,8 +25,7 @@
   }
 
   & span {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--requestly-font-size-sm, 13px);
   }
 }
 

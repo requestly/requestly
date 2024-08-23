@@ -47,7 +47,7 @@
 }
 
 .app-layout-footer .footer-sidebar-toggle-btn svg {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
 }
 
 .app-layout-footer .extension-version {

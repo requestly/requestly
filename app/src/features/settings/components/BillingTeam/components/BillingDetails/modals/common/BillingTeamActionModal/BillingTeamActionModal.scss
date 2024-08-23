@@ -59,7 +59,7 @@
 
 .billing-team-action-result-text {
   color: var(--text-subtle);
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 18px;
   letter-spacing: 0.25px;
   padding-right: 18px;

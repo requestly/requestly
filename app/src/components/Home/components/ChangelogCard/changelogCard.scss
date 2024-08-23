@@ -1,6 +1,7 @@
 .changelog-card-title.ant-typography {
   margin-bottom: 12px;
-  font-weight: 500;
+  font-size: var(--requestly-font-size-md);
+  font-weight: var(--requestly-font-weight-medium);
   color: var(--white);
 }
 
@@ -19,11 +20,12 @@
 }
 
 .changelog-card-log-date {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
 }
 
 .changelog-card-log-title {
   color: var(--white);
+  font-size: var(--requestly-font-size-sm);
 
   &:hover {
     color: var(--white);
@@ -32,7 +34,7 @@
 }
 
 .changelog-card-log-description {
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   line-height: 14px;
   letter-spacing: 0.4px;
   color: var(--neutrals-gray-300);

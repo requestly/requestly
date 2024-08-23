@@ -9,7 +9,7 @@
 }
 
 .active-workspace-name {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-weight: 500;
   max-width: 25ch;
   overflow: hidden;
@@ -70,7 +70,7 @@
 }
 
 .workspaces-menu.ant-dropdown-menu .ant-dropdown-menu-item-group-title {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .workspaces-menu.ant-dropdown-menu .workspace-menu-item {
@@ -91,7 +91,7 @@
 }
 
 .workspace-name-container {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 14.06px;
 }
 
@@ -119,7 +119,7 @@
 
 .join-workspace-menu-dropdown-trigger {
   padding: 6px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   display: flex;
   align-items: center;
   justify-content: space-between;
