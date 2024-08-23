@@ -21,6 +21,7 @@ import { miscRoutes } from "./miscRoutes";
 import { desktopSessionsRoutes } from "./desktopSessionRoutes";
 import { inviteRoutes } from "./inviteRoutes";
 import MinimalLayout from "layouts/MinimalLayout";
+import { paymentRoutes } from "./paymentRoutes";
 
 export const routesV2: RouteObject[] = [
   /** Misc **/
@@ -53,7 +54,7 @@ export const routesV2: RouteObject[] = [
       {
         path: "",
         element: <MinimalLayout />,
-        children: [...inviteRoutes],
+        children: [...inviteRoutes, ...paymentRoutes],
       },
       /** Iframe paths  - Without Header, Footer **/
       {

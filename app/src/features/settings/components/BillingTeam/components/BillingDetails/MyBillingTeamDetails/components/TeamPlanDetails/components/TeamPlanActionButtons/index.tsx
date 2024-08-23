@@ -18,9 +18,10 @@ import { CancelPlanModal } from "../../../../../modals/common/CancelPlanModal";
 
 interface Props {
   subscriptionDetails: any;
+  isAnnualPlan?: boolean;
 }
 
-export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails }) => {
+export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails, isAnnualPlan }) => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const redirectedFromCheckout = searchParams.get("redirectedFromCheckout");
@@ -49,22 +50,28 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails }) 
     } else {
       if (planName === PRICING.PLAN_NAMES.BASIC_V2 || planName === PRICING.PLAN_NAMES.BASIC) {
         Modal.confirm({
-          title: "Switch Plan",
-          content: `You are about to switch from ${getPrettyPlanName(planName)} plan to ${getPrettyPlanName(
+          title: "Upgrade Your Plan",
+          content: `You are about to upgrade from ${getPrettyPlanName(planName)} to ${getPrettyPlanName(
             PRICING.PLAN_NAMES.PROFESSIONAL
           )} plan.`,
-          okText: "Yes",
+          okText: "Upgrade Now",
           okType: "primary",
-          cancelText: "No",
+          cancelText: "Stay Basic",
           onOk: () => {
             setIsSwitchPlanModalOpen(true);
             setIsSwitchPlanModalLoading(true);
-            const requestPlanSwitch = httpsCallable(getFunctions(), "premiumNotifications-requestPlanSwitch");
-            requestPlanSwitch({
-              currentPlan: planName,
-              planToSwitch: PRICING.PLAN_NAMES.PROFESSIONAL,
-              currentPlanType: "team",
+
+            const manageSubscription = httpsCallable(getFunctions(), "subscription-manageSubscription");
+            manageSubscription({
+              planName: PRICING.PLAN_NAMES.PROFESSIONAL,
+              duration: isAnnualPlan ? PRICING.DURATION.ANNUALLY : PRICING.DURATION.MONTHLY,
+              portalFlowType: "update_subscription",
             })
+              .then((res: any) => {
+                if (res?.data?.success) {
+                  window.open(res?.data?.data?.portalUrl, "_blank");
+                }
+              })
               .catch(() => {
                 toast.error("Error in switching plan. Please contact support");
                 setIsSwitchPlanModalOpen(false);
@@ -87,7 +94,7 @@ export const TeamPlanActionButtons: React.FC<Props> = ({ subscriptionDetails }) 
         );
       }
     }
-  }, [dispatch, planStatus, subscriptionDetails?.plan]);
+  }, [dispatch, isAnnualPlan, planStatus, subscriptionDetails?.plan]);
 
   return (
     <>
