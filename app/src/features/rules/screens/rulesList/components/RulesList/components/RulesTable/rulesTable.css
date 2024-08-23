@@ -101,6 +101,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: var(--requestly-font-size-sm);
 }
 
 .rule-name-container .rule-description-icon {
@@ -122,6 +123,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: var(--requestly-font-size-sm);
 }
 
 .group-name-container .group-rules-count-details {
@@ -129,7 +131,7 @@
   align-items: center;
   gap: 6px;
   color: var(--requestly-color-text-subtle);
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   font-weight: 500;
   letter-spacing: 0.4px;
   flex-shrink: 0;
@@ -163,6 +165,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: var(--requestly-font-size-sm);
 }
 
 tr.rq-content-list-table-row.ant-table-row:hover .group-name-container .add-rule-btn {

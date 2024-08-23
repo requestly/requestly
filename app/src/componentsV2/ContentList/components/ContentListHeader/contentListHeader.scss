@@ -42,7 +42,7 @@
 
         &.ant-btn {
           color: var(--requestly-color-text-subtle);
-          font-size: 13px;
+          font-size: var(--requestly-font-size-sm, 13px);
           line-height: 20px;
           letter-spacing: 0.25px;
           height: 32px;

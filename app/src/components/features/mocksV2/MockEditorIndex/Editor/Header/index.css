@@ -36,7 +36,7 @@
 }
 
 .mock-editor-options-dropdown-trigger {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   cursor: pointer;
   user-select: none;
   padding: 7px 8px 6px 8px;

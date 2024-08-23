@@ -8,10 +8,16 @@
     color: var(--link-color);
     cursor: pointer;
     transition: 0.2s all;
+    font-size: var(--requestly-font-size-sm);
 
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  .shared-list-created-on,
+  .shared-list-import-count {
+    font-size: var(--requestly-font-size-sm);
   }
 
   .sharedlist-table-actions-container {

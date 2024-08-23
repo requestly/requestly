@@ -13,7 +13,8 @@
 
 .rule-editor-header-title {
   flex-shrink: 0;
-  margin-left: 8px;
+  margin-left: 4px;
+  font-size: var(--requestly-font-size-xs);
 }
 
 .rule-editor-header-actions {
