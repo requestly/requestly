@@ -162,48 +162,57 @@ async function htmlValidateRawCodeString(codeString) {
   });
   const htmlvalidate = new HtmlValidate(loader);
 
-  const report = await htmlvalidate.validateString(codeString);
+  return htmlvalidate
+    .validateString(codeString)
+    .then((report) => {
+      if (report.valid) {
+        return {
+          isValid: true,
+          validationErrors: [],
+        };
+      }
 
-  if (report.valid) {
-    return {
-      isValid: true,
-      validationErrors: [],
-    };
-  }
+      const validationErrors = [];
 
-  const validationErrors = [];
+      /* CURRENTLY WE ARE ONLY CONCERNED WITH SPECIFIC ERRORS */
 
-  /* CURRENTLY WE ARE ONLY CONCERNED WITH SPECIFIC ERRORS */
-
-  report.results.forEach((result) => {
-    if (result.errorCount > 0) {
-      result.messages.forEach((errMessage) => {
-        if (errMessage.ruleId === "parser-error") {
-          validationErrors.push({
-            message: errMessage.message,
-            errorType: HTML_ERRORS.COULD_NOT_PARSE,
-          });
-        }
-        if (errMessage.ruleId === "close-order" || errMessage.ruleId === "script-element") {
-          validationErrors.push({
-            message: errMessage.message,
-            errorType: HTML_ERRORS.UNCLOSED_TAGS,
-          });
-        }
-        if (errMessage.ruleId === "close-attr") {
-          validationErrors.push({
-            message: errMessage.message,
-            errorType: HTML_ERRORS.UNCLOSED_ATTRIBUTES,
+      report.results.forEach((result) => {
+        if (result.errorCount > 0) {
+          result.messages.forEach((errMessage) => {
+            if (errMessage.ruleId === "parser-error") {
+              validationErrors.push({
+                message: errMessage.message,
+                errorType: HTML_ERRORS.COULD_NOT_PARSE,
+              });
+            }
+            if (errMessage.ruleId === "close-order" || errMessage.ruleId === "script-element") {
+              validationErrors.push({
+                message: errMessage.message,
+                errorType: HTML_ERRORS.UNCLOSED_TAGS,
+              });
+            }
+            if (errMessage.ruleId === "close-attr") {
+              validationErrors.push({
+                message: errMessage.message,
+                errorType: HTML_ERRORS.UNCLOSED_ATTRIBUTES,
+              });
+            }
           });
         }
       });
-    }
-  });
 
-  return {
-    isValid: validationErrors.length === 0,
-    validationErrors,
-  };
+      return {
+        isValid: validationErrors.length === 0,
+        validationErrors,
+      };
+    })
+    .catch((error) => {
+      console.error("Error validating HTML string:", error);
+      return {
+        isValid: true, // htmlValidate Errors out sometimes, so we return true
+        validationErrors: [{ message: "Error validating HTML string", errorType: HTML_ERRORS.COULD_NOT_PARSE }],
+      };
+    });
 }
 
 /**

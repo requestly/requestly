@@ -1,4 +1,11 @@
-.rule-editor-procard.rules-create-mode {
+.rule-editor-procard {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.rule-editor-procard.rules-create-mode,
+.rule-editor-body-scroll {
   height: calc(100vh - 130px);
   overflow-y: auto;
 }

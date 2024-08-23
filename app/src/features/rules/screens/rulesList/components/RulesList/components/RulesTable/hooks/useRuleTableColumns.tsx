@@ -234,7 +234,7 @@ const useRuleTableColumns = (options: Record<string, boolean>) => {
               {beautifiedDate} <UserIcon uid={record.lastModifiedBy} />
             </span>
           );
-        } else return beautifiedDate;
+        } else return <span className="rule-updated-on-cell">{beautifiedDate}</span>;
       },
       defaultSortOrder: "ascend",
       sortDirections: ["ascend", "descend", "ascend"],

@@ -14,7 +14,7 @@
   .search-filter.ant-input-affix-wrapper {
     width: 170px;
     padding: 0 4px;
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
     align-self: flex-end;
 
     input.ant-input {
@@ -35,7 +35,7 @@
   }
   .filter-btn.rq-btn,
   .filter-btn.rq-btn:focus {
-    font-size: 11px;
+    font-size: var(--requestly-font-size-xs, 11px);
     padding: 0 4px;
     color: var(--text-gray);
     height: 22px;

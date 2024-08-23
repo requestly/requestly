@@ -31,7 +31,7 @@ div.team-delete-title {
 
 .team-settings-name-input-label,
 .team-settings-description-label {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-weight: 500;
   margin-bottom: 8px;
   color: var(--white);

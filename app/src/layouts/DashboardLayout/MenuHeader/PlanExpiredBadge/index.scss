@@ -12,7 +12,7 @@
 .header-plan-expired-badge {
   padding: 4px 6px;
   border-radius: 2rem;
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   display: flex;
   align-items: center;
   gap: 4px;

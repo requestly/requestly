@@ -18,7 +18,7 @@
 }
 
 .persona-recommendation-container .section-header {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-weight: 500;
   line-height: 15px;
   margin-bottom: 12px;
@@ -52,7 +52,7 @@
 }
 
 .persona-recommendation-footer .upload-rule-message {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 20px;
   margin-top: 1.25rem;
   margin-bottom: 12px;
