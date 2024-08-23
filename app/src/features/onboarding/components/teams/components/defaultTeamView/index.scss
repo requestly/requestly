@@ -15,7 +15,7 @@
 }
 .getting-started-default-team-description {
   color: var(--neutrals-gray-300);
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   margin-top: 1rem;
 
   & span {
@@ -28,7 +28,7 @@
   color: var(--white);
   display: inline-flex;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 
   & svg {
     width: 1rem;

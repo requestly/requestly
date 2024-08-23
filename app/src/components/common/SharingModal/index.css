@@ -23,7 +23,7 @@
 
 .sharing-modal-body {
   padding: 1.2rem;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .sharing-modal-wrapper .ant-tabs {
@@ -32,7 +32,7 @@
 
 .sharing-modal-wrapper .sharing-primary-btn.ant-btn {
   font-weight: 500;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-top .ant-tabs-nav {
@@ -50,11 +50,11 @@
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-tabs-tab .ant-tabs-tab-btn {
   color: var(--white);
   font-weight: 500;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .share-link-radio-btn-label {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .share-link-radio-btn-label + .success-message {
@@ -83,7 +83,7 @@
 
 .sharing-modal-wrapper .ant-modal-body .rq-modal-content .ant-radio-wrapper > span:nth-child(2) {
   width: 100%;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .sharing-modal-wrapper .shared-list-name-input-wrapper {
@@ -96,14 +96,14 @@
 .sharing-modal-email-input-wrapper .ant-btn {
   font-size: 0.875rem;
   font-weight: 500;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .sharing-modal-email-input {
   width: 100%;
   height: 40px;
   margin-top: 4px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .sharing-modal-wrapper .sharing-modal-email-input.react-multi-email {
@@ -118,7 +118,7 @@
   border: 1px solid transparent;
   box-shadow: var(--input-box-shadow);
   background-color: var(--component-dark-background);
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 .sharing-modal-empty-view {
   display: flex;
@@ -141,7 +141,7 @@
   padding: 12px;
   color: var(--text-gray);
   background: var(--component-background);
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   border-top: 1px solid var(--border);
   opacity: 0.8;
   border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);

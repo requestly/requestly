@@ -4,7 +4,8 @@
 }
 
 .home-templates-title.ant-typography {
-  font-weight: 500;
+  font-size: var(--requestly-font-size-md);
+  font-weight: var(--requestly-font-weight-medium);
   margin-bottom: 4px;
   color: var(--white);
 }
@@ -40,6 +41,7 @@
   }
 
   & .home-templates-row-card-title {
+    font-size: var(--requestly-font-size-sm);
     font-weight: 500;
     color: var(--white);
     line-height: 18px;

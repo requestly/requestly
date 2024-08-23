@@ -1,10 +1,11 @@
-.graphql-operation-label {
-  font-weight: 500;
+label.graphql-operation-label {
   margin-bottom: 12px;
   color: var(--white);
   display: inline-flex;
   align-items: center;
   column-gap: 6px;
+  font-size: var(--requestly-font-size-sm);
+  font-weight: var(--requestly-font-weight-medium);
 }
 
 .graphql-operation-label .anticon {
@@ -15,16 +16,22 @@
 
 .graphql-operation-key-input.ant-input {
   margin-right: 5px;
+  font-size: var(--requestly-font-size-sm);
 }
 
 .graphql-operation-key-input.ant-input,
 .graphql-operation-name-input.ant-input {
+  font-size: var(--requestly-font-size-sm);
   background-color: var(--component-dark-background);
 }
 
 .graphql-operation-filter-operator {
   height: 100%;
   width: 100%;
+}
+
+.graphql-operation-filter-operator .ant-select-selector {
+  font-size: var(--requestly-font-size-sm);
 }
 
 .graphql-operation-filter-reset-button.ant-btn {

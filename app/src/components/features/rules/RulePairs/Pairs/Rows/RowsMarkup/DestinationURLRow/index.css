@@ -9,12 +9,20 @@
   padding: 22px;
 }
 
+.redirect-destination-container.ant-row .destination-options .ant-radio-group .ant-radio-wrapper {
+  font-size: var(--requestly-font-size-sm);
+}
+
 .redirect-destination-container.ant-row .destination-action {
   padding: 20px;
   box-shadow: var(--input-box-shadow);
   border-top: 1px solid var(--border-dark);
   background: var(--component-dark-background);
   border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
+}
+
+.redirect-destination-container.ant-row .destination-action .ant-input {
+  font-size: var(--requestly-font-size-sm);
 }
 
 .destination-file-path {
@@ -43,4 +51,8 @@
 .tooltip-link:hover {
   color: var(--white);
   text-decoration: underline;
+}
+
+.redirect-rule-destination-label {
+  font-size: var(--requestly-font-size-sm);
 }

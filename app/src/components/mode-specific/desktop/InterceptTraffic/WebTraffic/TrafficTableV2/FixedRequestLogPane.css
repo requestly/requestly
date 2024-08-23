@@ -12,7 +12,7 @@
 }
 
 .request-log-pane {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   background-color: transparent;
   border: 1px solid var(--border-dark);
   border-radius: var(--border-radius-md);
@@ -27,7 +27,7 @@
 .request-log-pane div[class*="Navigation-controls"] button[class*="Navigation-button"] {
   border: none;
   margin-right: 2px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-weight: normal;
   color: var(--white);
   border-radius: var(--border-radius-sm);
@@ -79,7 +79,7 @@
 
 .request-log-pane-url {
   width: 800px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 @media only screen and (max-width: 1200px) {
