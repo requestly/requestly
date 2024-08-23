@@ -35,6 +35,7 @@ export const EXTENSION_MESSAGES = {
   NOTIFY_RECORD_UPDATED_IN_POPUP: "notifyRecordUpdatedInPopup",
   RULE_SAVE_ERROR: "ruleSaveError",
   IS_EXTENSION_BLOCKED_ON_TAB: "isExtensionBlockedOnTab",
+  CACHE_SHARED_STATE: "cacheSharedState",
 };
 
 export const CLIENT_MESSAGES = {
