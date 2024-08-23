@@ -1,10 +1,16 @@
 .primary-sidebar-container {
+  position: relative;
   width: 100%;
   max-width: 5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin-bottom: 2rem; /*Bottom margin to prevent overlapping from Saturn widget */
+}
+
+.primary-sidebar-container:hover .secondary-sidebar-toggle-btn {
+  opacity: 1;
+  visibility: visible;
 }
 
 .primary-sidebar-container > button:last-child {
@@ -64,8 +70,8 @@
 }
 
 .primary-sidebar-link .link-title {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--requestly-font-size-2xs);
+  font-weight: var(--requestly-font-weight-medium);
   line-height: 15.92px;
   text-align: center;
 }

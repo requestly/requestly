@@ -1,6 +1,6 @@
 .share-in-workspaces-wrapper {
   .workspace-card-description {
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
     margin-left: 8px;
   }
 
@@ -50,7 +50,7 @@
   margin-top: 4px;
 
   & .workspace-card-description {
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
     margin-left: 8px;
   }
 

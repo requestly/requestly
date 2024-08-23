@@ -40,7 +40,7 @@
 
   .billing-team-members-drawer-help {
     color: var(--neutrals-gray-300);
-    font-size: 13px;
+    font-size: var(--requestly-font-size-sm, 13px);
     position: absolute;
     bottom: 10px;
     width: 100%;

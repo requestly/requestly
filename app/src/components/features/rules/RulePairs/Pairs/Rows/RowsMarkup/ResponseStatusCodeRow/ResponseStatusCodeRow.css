@@ -8,6 +8,7 @@
 }
 
 .response-status-code-select.ant-select.ant-select-auto-complete .ant-select-selector {
+  font-size: var(--requestly-font-size-sm);
   background-color: var(--component-dark-background);
 }
 
@@ -20,9 +21,10 @@
   background-color: var(--component-dark-background);
 }
 
-.response-status-code-label {
+label.response-status-code-label {
   font-weight: 500;
   margin-bottom: 12px;
   color: var(--white);
   display: inline-block;
+  font-size: var(--requestly-font-size-sm);
 }

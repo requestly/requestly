@@ -5,7 +5,7 @@
 }
 
 .setting-item-caption {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 23px;
   max-width: 37.5rem;
   margin: 8px 0 1.25rem 0;

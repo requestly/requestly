@@ -29,7 +29,7 @@ input.ant-input:not(.ant-input-sm):not(.ant-input-lg) {
 }
 
 button.ant-btn {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -259,7 +259,7 @@ button.ant-input-search-button {
 // Dropdown
 .ant-dropdown-menu-item .ant-dropdown-menu-title-content span {
   display: inline-block;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .ant-table-tbody > tr.ant-table-row-selected > td {

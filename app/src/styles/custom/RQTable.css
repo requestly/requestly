@@ -4,7 +4,7 @@
 }
 .rq-table-row {
   background: var(--component-background);
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   cursor: pointer;
 }
 
