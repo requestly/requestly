@@ -1,5 +1,6 @@
 import { initFetchInterceptor } from "./fetch";
 import { initXhrInterceptor } from "./xhr";
+import { sendCacheSharedStateMessage } from "./utils";
 
 const initAjaxRequestInterceptor = () => {
   let isDebugMode;
@@ -9,6 +10,12 @@ const initAjaxRequestInterceptor = () => {
 
   initXhrInterceptor(isDebugMode);
   initFetchInterceptor(isDebugMode);
+
+  if (window.top === window.self) {
+    window.addEventListener("beforeunload", () => {
+      sendCacheSharedStateMessage();
+    });
+  }
 };
 
 initAjaxRequestInterceptor();

@@ -280,4 +280,5 @@ export const TAB_SERVICE_DATA = {
   TEST_RULE_DATA: "testRuleData",
   APPLIED_RULE_DETAILS: "appliedRuleDetails",
   RULES_EXECUTION_LOGS: "rulesExecutionLogs",
+  SHARED_STATE: "sharedState",
 };
