@@ -24,7 +24,7 @@ export const UpgradeSuccess: React.FC = () => {
       sendPlanUpgradedNotification({
         planName: getPrettyPlanName(userPlanName),
       }).catch((e) => {
-        Logger.log(e);
+        Logger.error(e);
       });
 
       getBillingTeamRedirectURL(user?.details?.profile?.uid).then((redirectUrl) => {
