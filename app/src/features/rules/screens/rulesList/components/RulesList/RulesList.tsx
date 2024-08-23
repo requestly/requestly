@@ -6,7 +6,6 @@ import useFetchAndUpdateRules from "./hooks/useFetchAndUpdateRules";
 import { getAppMode, getIsExtensionEnabled, getIsRulesListLoading, getUserAuthDetails } from "store/selectors";
 // @ts-ignore
 import { CONSTANTS as GLOBAL_CONSTANTS } from "@requestly/requestly-core";
-import { FilterType } from "componentsV2/ContentList/";
 import { GettingStarted } from "./components";
 import SpinnerColumn from "components/misc/SpinnerColumn";
 import FeatureLimiterBanner from "components/common/FeatureLimiterBanner/featureLimiterBanner";
@@ -17,6 +16,7 @@ import InstallExtensionCTA from "components/misc/InstallExtensionCTA";
 import MonitorMountedTime from "components/common/SentryMonitoring/MonitorMountedTime";
 import { getFilteredRecords } from "./utils";
 import RulesListContentHeader from "./components/RulesListContentHeader/RulesListContentHeader";
+import { useSearchParams } from "react-router-dom";
 import "./rulesList.scss";
 
 interface Props {}
@@ -26,8 +26,9 @@ const RulesList: React.FC<Props> = () => {
   const isRuleListLoading = useSelector(getIsRulesListLoading);
   const [isLoading, setIsLoading] = useState(true);
   const [searchValue, setSearchValue] = useState("");
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const isFeatureLimiterOn = useFeatureIsOn("show_feature_limit_banner");
+  const [searchParams] = useSearchParams();
+  const activeFilter = useMemo(() => searchParams.get("filter") || "all", [searchParams]);
 
   useFetchAndUpdateRules({ setIsLoading: setIsLoading });
 
@@ -81,7 +82,6 @@ const RulesList: React.FC<Props> = () => {
                 searchValue={searchValue}
                 setSearchValue={setSearchValue}
                 filter={activeFilter}
-                setFilter={setActiveFilter}
                 records={allRecords}
               />
               <div className="rq-rules-table">

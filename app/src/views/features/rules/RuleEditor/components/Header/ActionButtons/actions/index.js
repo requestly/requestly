@@ -66,11 +66,6 @@ export const saveRule = async (appMode, dispatch, ruleObject) => {
     });
 };
 
-export const closeBtnOnClickHandler = (dispatch, navigate, ruleType, mode) => {
-  trackRuleEditorClosed("cancel_button", ruleType, snakeCase(mode));
-  redirectToRules(navigate);
-};
-
 export const validateSyntaxInRule = async (dispatch, ruleToSave) => {
   const syntaxValidatedObject = await transformAndValidateRuleFields(ruleToSave);
 

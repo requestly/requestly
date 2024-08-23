@@ -141,6 +141,7 @@ export const MOCKSV2 = {
   MOCK_UPLOADED: "mock_uploaded",
   MOCK_UPLOAD_FAILED: "mock_upload_failed",
   TEST_MOCK_CLICKED: "test_mock_clicked",
+  MOCKS_LIST_FILTER_CHANGED: "mocks_list_filter_changed",
 
   AI_MOCK_RESPONSE_BUTTON_CLICKED: "ai_mock_response_button_clicked",
   AI_MOCK_RESPONSE_GENERATE_CLICKED: "ai_mock_response_generate_clicked",
