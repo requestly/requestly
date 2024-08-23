@@ -15,6 +15,7 @@ import { actions } from "store";
 import APP_CONSTANTS from "config/constants";
 import PATHS from "config/constants/sub/paths";
 import "./sharedListViewerScreen.css";
+import { ContentListScreen } from "componentsV2/ContentList";
 
 export const SharedListViewerScreen = () => {
   const sharedListId = getSharedListIdFromURL(window.location.pathname);
@@ -57,7 +58,7 @@ export const SharedListViewerScreen = () => {
 
   if (isSharedListPresent && !isEmpty(sharedListRules) && !isDeleted) {
     return (
-      <>
+      <ContentListScreen>
         <SharedListsContentHeader
           searchValue={searchValue}
           handleSearchValueUpdate={(value: string) => setSearchValue(value)}
@@ -66,7 +67,7 @@ export const SharedListViewerScreen = () => {
           sharedListId={sharedListId}
         />
         <SharedListViewerList records={filteredRecords} recordsMap={sharedListRecordsMap} isLoading={isLoading} />
-      </>
+      </ContentListScreen>
     );
   } else {
     return (

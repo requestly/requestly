@@ -4,6 +4,7 @@ import { isExtensionInstalled, isExtensionVersionCompatible } from "actions/Exte
 import { useSelector } from "react-redux";
 import APP_CONSTANTS from "config/constants";
 import { getIsWorkspaceMode } from "store/features/teams/selectors";
+import { ContentListScreen } from "componentsV2/ContentList";
 
 export const SessionsListScreen = () => {
   const isWorkspaceMode = useSelector(getIsWorkspaceMode);
@@ -12,5 +13,9 @@ export const SessionsListScreen = () => {
     return <ExtensionVersionError />;
   }
 
-  return <SessionsList />;
+  return (
+    <ContentListScreen>
+      <SessionsList />
+    </ContentListScreen>
+  );
 };
