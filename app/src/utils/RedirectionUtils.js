@@ -506,3 +506,12 @@ export const redirectToUrl = (url, newTab = false) => {
 
   return window.open(url);
 };
+
+export const navigateBack = (navigate, location, fallback) => {
+  // if the location key is not default, it means that the user has navigated to the page within the app and we can navigate back
+  if (location.key !== "default") {
+    navigate(-1);
+  } else {
+    fallback();
+  }
+};
