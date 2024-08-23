@@ -10,6 +10,7 @@ import { redirectToTraffic } from "../../../../../../../utils/RedirectionUtils";
 import { isDesktopMode } from "../../../../../../../utils/AppUtils";
 import { actions } from "store";
 import LINKS from "config/constants/sub/links";
+import "./HeadersRulePairV2.css";
 
 const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) => {
   const dispatch = useDispatch();
@@ -56,6 +57,7 @@ const HeadersRulePairV2 = ({ pair, pairIndex, isInputDisabled, ruleDetails }) =>
           onChange={setActiveTab}
           tabBarStyle={{ margin: 0 }}
           data-tour-id="rule-editor-header-modification-types"
+          className="rule-editor-header-modification-types-tabs"
         >
           {["Request", "Response"].map((modificationType) => (
             <Tabs.TabPane

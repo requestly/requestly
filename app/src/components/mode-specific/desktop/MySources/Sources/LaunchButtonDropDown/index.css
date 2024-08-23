@@ -4,7 +4,7 @@
 
 .launch-options-dropdown-input-container {
   padding: 6px;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   min-width: 150px;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .launch-options-dropdown-actions {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   margin: 12px 6px 0px auto;
 }
 

@@ -1,5 +1,6 @@
 .help-card-title {
-  font-weight: 500;
+  font-size: var(--requestly-font-size-md);
+  font-weight: var(--requestly-font-weight-medium);
   color: var(--white);
 }
 
@@ -13,6 +14,7 @@
   transition: 0.2s ease-in-out;
   color: var(--white);
   text-decoration-color: #ffffff00;
+  font-size: var(--requestly-font-size-sm);
 
   & .help-card-link-icon,
   .help-card-react-icon {

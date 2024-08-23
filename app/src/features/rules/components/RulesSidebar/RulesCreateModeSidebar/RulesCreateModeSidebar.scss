@@ -12,7 +12,7 @@
 
     .ask-ai-btn-content {
       color: var(--requestly-color-text-placeholder, #8f8f8f);
-      font-size: 11px;
+      font-size: var(--requestly-font-size-xs, 11px);
       font-style: normal;
       line-height: 130%;
       border-radius: 4px;
@@ -70,7 +70,7 @@
         }
 
         .title {
-          font-size: 11px;
+          font-size: var(--requestly-font-size-xs, 11px);
         }
 
         .description {

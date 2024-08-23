@@ -24,9 +24,10 @@
 }
 
 .resource-types-container .subtitle {
-  font-weight: 500;
   padding: 1rem 1.25rem;
   color: var(--white);
+  font-size: var(--requestly-font-size-md);
+  font-weight: var(--requestly-font-weight-medium);
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
   background-color: var(--component-header-background);
@@ -49,6 +50,7 @@
 
 .resource-types-radio-group .ant-radio-group .ant-radio-wrapper {
   margin-right: 1.75rem;
+  font-size: var(--requestly-font-size-sm);
 }
 
 .resource-types-radio-group .ant-radio-group .ant-radio-wrapper .ant-radio {

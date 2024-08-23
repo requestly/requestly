@@ -11,6 +11,7 @@
 }
 
 .rule-pair-source-dropdown {
+  font-size: var(--requestly-font-size-sm);
   background-color: var(--input-background);
 }
 
@@ -20,6 +21,7 @@
   border: none;
   box-shadow: none;
   background-color: transparent;
+  font-size: var(--requestly-font-size-sm);
 }
 
 .source-filter-col.ant-col {

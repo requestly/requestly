@@ -3,7 +3,7 @@
 }
 
 .feature-banner-caption {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 22px;
   margin: 8px 0 16px 0;
 }
