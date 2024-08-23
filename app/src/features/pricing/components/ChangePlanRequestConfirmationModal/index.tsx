@@ -15,10 +15,10 @@ export const ChangePlanRequestConfirmationModal: React.FC<{
           <PageLoader />
         ) : (
           <>
-            <Typography.Title level={4}>
-              The team has been notified and they will help with the process further.
-            </Typography.Title>
-            <Typography.Text>Please check your email for ongoing conversations and updates.</Typography.Text>
+            <Typography.Title level={4}>Please confirm your plan change request in the Stripe portal.</Typography.Title>
+            <Typography.Text>
+              The team has been notified. Please check your email for ongoing conversations and updates.
+            </Typography.Text>
           </>
         )}
       </div>
