@@ -2,7 +2,6 @@ import { CLIENT_MESSAGES } from "common/constants";
 import { getRecord } from "common/storage";
 import { AutoRecordingMode, SessionRecordingConfig, SourceKey, SourceOperator } from "common/types";
 import { matchSourceUrl } from "../../common/ruleMatcher";
-import { injectWebAccessibleScript } from "./utils";
 import config from "common/config";
 import { TAB_SERVICE_DATA, tabService } from "./tabService";
 import extensionIconManager from "./extensionIconManager";
@@ -44,9 +43,14 @@ const getSessionRecordingConfig = async (url: string): Promise<SessionRecordingC
 };
 
 export const initSessionRecordingSDK = async (tabId: number, frameId: number) => {
-  await injectWebAccessibleScript("libs/requestly-web-sdk.js", {
-    tabId,
-    frameIds: [frameId],
+  return chrome.scripting.executeScript({
+    target: {
+      tabId,
+      frameIds: [frameId],
+    },
+    files: ["libs/requestly-web-sdk.js"],
+    world: "MAIN",
+    injectImmediately: true,
   });
 };
 

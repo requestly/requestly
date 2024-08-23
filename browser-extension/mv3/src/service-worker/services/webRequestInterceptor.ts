@@ -1,8 +1,8 @@
 import { RuleType } from "common/types";
-import { matchRuleWithRequest } from "../../common/ruleMatcher";
+import { isUrlInBlockList, matchRuleWithRequest } from "../../common/ruleMatcher";
 import ruleExecutionHandler from "./ruleExecutionHandler";
 import rulesStorageService from "../../rulesStorageService";
-import { isUrlInBlockList, isExtensionEnabled } from "../../utils";
+import { isExtensionEnabled } from "../../utils";
 import { Variable, onVariableChange } from "../variable";
 
 const onBeforeRequest = async (details: chrome.webRequest.WebRequestBodyDetails) => {

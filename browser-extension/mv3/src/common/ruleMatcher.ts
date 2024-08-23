@@ -10,7 +10,9 @@ import {
   RequestPayloadFilter,
 } from "common/types";
 import { AJAXRequestDetails } from "../service-worker/services/requestProcessor/types";
-import { getUrlObject, isBlacklistedURL } from "../utils";
+import { getAllSupportedWebURLs, getUrlObject } from "../utils";
+import { ChangeType, getRecord, onRecordChange } from "common/storage";
+import { STORAGE_KEYS } from "common/constants";
 
 const toRegex = (regexStr: string): RegExp => {
   const matchRegExp = regexStr.match(new RegExp("^/(.+)/(|i|g|ig|gi)$"));
@@ -291,4 +293,65 @@ export const traverseJsonByPath = (jsonObject: Record<any, any>, path: string) =
   } catch (e) {
     /* Do nothing */
   }
+};
+
+export const isBlacklistedURL = (url: string): boolean => {
+  const blacklistedSources: UrlSource[] = [
+    ...getAllSupportedWebURLs().map((webUrl) => ({
+      key: SourceKey.URL,
+      operator: SourceOperator.CONTAINS,
+      value: webUrl,
+    })),
+    {
+      key: SourceKey.URL,
+      operator: SourceOperator.CONTAINS,
+      value: "__rq", // you can use __rq in the url to blacklist it
+    },
+  ];
+
+  return blacklistedSources.some((source) => matchSourceUrl(source, url));
+};
+
+let cachedBlockedDomains: string[] | null = null;
+
+const cacheBlockedDomains = async () => {
+  const blockedDomains = await getRecord<string[]>(STORAGE_KEYS.BLOCKED_DOMAINS);
+  cachedBlockedDomains = blockedDomains ?? [];
+};
+
+export const getBlockedDomains = async () => {
+  if (cachedBlockedDomains) {
+    return cachedBlockedDomains;
+  }
+
+  await cacheBlockedDomains();
+  return cachedBlockedDomains;
+};
+
+export const isUrlInBlockList = async (url: string) => {
+  const blockedDomains = await getBlockedDomains();
+  return blockedDomains?.some((domain) => {
+    return matchSourceUrl(
+      {
+        key: SourceKey.HOST,
+        value: `/^(.+\.)?${domain}$/i`, // to match the domain and all its subdomains
+        operator: SourceOperator.MATCHES,
+      },
+      url
+    );
+  });
+};
+
+export const onBlockListChange = (callback: () => void) => {
+  onRecordChange<string[]>(
+    {
+      keyFilter: STORAGE_KEYS.BLOCKED_DOMAINS,
+      changeTypes: [ChangeType.MODIFIED],
+    },
+    () => {
+      cacheBlockedDomains().then(() => {
+        callback?.();
+      });
+    }
+  );
 };
