@@ -119,7 +119,9 @@ const RuleEditor = (props) => {
         ) : (
           <BottomSheetLayout
             bottomSheet={<RuleEditorBottomSheet mode={MODE} />}
-            hideBottomSheet={MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE}
+            hideBottomSheet={
+              MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || currentlySelectedRuleData?.isSample
+            }
           >
             <ProCard
               className={`rule-editor-procard ${
