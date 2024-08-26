@@ -32,6 +32,7 @@ const RuleEditor = (props) => {
   const [isNewRuleCreated, setIsNewRuleCreated] = useState(false);
   const [showEnableRuleTooltip, setShowEnableRuleTooltip] = useState(false);
   const tryThisRuleTooltipTimerRef = useRef(null);
+  const [isSampleRule, setIsSampleRule] = useState(false);
 
   const { toggleBottomSheet, isBottomSheetOpen } = useBottomSheetContext();
 
@@ -101,6 +102,17 @@ const RuleEditor = (props) => {
     }
   }, [state?.source, MODE]);
 
+  useEffect(() => {
+    /* 
+    HOTIFIX FOR INFINITE RERENDER:
+    This is a temporary fix to handle the case where bottom sheet should not be visible for sample rules
+    TODO: REMOVE THIS WHEN REFACTORING RULE EDITOR
+    */
+    if (currentlySelectedRuleData?.isSample) {
+      setIsSampleRule(true);
+    }
+  }, [currentlySelectedRuleData?.isSample]);
+
   const ruleEditor = useMemo(() => {
     return (
       <Col key={MODE + RULE_TYPE_TO_CREATE} className="overflow-hidden h-full">
@@ -119,13 +131,13 @@ const RuleEditor = (props) => {
         ) : (
           <BottomSheetLayout
             bottomSheet={<RuleEditorBottomSheet mode={MODE} />}
-            hideBottomSheet={
-              MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || currentlySelectedRuleData?.isSample
-            }
+            hideBottomSheet={MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.CREATE || isSampleRule}
           >
             <ProCard
               className={`rule-editor-procard ${
-                MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT ? "rules-edit-mode" : "rules-create-mode"
+                MODE === APP_CONSTANTS.RULE_EDITOR_CONFIG.MODES.EDIT && !isSampleRule
+                  ? "rules-edit-mode"
+                  : "rules-create-mode"
               }`}
             >
               <RuleBuilder handleSeeLiveRuleDemoClick={handleSeeLiveRuleDemoClick} />
@@ -134,7 +146,7 @@ const RuleEditor = (props) => {
         )}
       </Col>
     );
-  }, [MODE, RULE_TYPE_TO_CREATE, appMode, showEnableRuleTooltip, handleSeeLiveRuleDemoClick]);
+  }, [MODE, RULE_TYPE_TO_CREATE, appMode, showEnableRuleTooltip, handleSeeLiveRuleDemoClick, isSampleRule]);
 
   switch (appMode) {
     case GLOBAL_CONSTANTS.APP_MODES.EXTENSION:
