@@ -5,7 +5,7 @@
 }
 
 .request-new-password-screen-text {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   color: var(--neutrals-gray-300);
   margin-top: 12px;
 }

@@ -18,7 +18,7 @@
     .title {
       flex-shrink: 0;
       text-align: left;
-      font-size: 11px;
+      font-size: var(--requestly-font-size-xs, 11px);
       font-style: normal;
       font-weight: 400;
       line-height: 130%; /* 14.3px */
@@ -67,7 +67,7 @@
         overflow: hidden;
 
         .title {
-          font-size: 13px;
+          font-size: var(--requestly-font-size-sm, 13px);
           font-weight: 500;
           line-height: 150%;
           color: var(--requestly-color-text-default);
@@ -80,7 +80,7 @@
           text-overflow: ellipsis;
           white-space: nowrap;
 
-          font-size: 11px;
+          font-size: var(--requestly-font-size-xs, 11px);
           font-style: normal;
           font-weight: 400;
           line-height: 130%;

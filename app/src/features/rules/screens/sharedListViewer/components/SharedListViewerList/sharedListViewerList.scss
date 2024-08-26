@@ -2,7 +2,6 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 1rem;
 }
 
 .shared-list-viewer-record-name {
@@ -14,11 +13,17 @@
 .shared-list-viewer-rule-name {
   color: var(--link-color);
   cursor: pointer;
+  font-size: var(--requestly-font-size-sm);
 
   &:hover {
     text-decoration: underline;
   }
 }
+
+.shared-list-last-modified-date {
+  font-size: var(--requestly-font-size-sm);
+}
+
 .shared-list-viewer-table {
   tr .ant-table-row-expand-icon {
     display: none;

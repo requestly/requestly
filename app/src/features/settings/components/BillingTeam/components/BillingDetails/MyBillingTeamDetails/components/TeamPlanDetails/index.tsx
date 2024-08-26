@@ -42,7 +42,12 @@ export const TeamPlanDetails: React.FC<{ billingTeamDetails: BillingTeamDetails 
             Your Plan{" "}
             <TeamPlanStatus subscriptionStatus={billingTeamDetails?.subscriptionDetails?.subscriptionStatus} />
           </Col>
-          {isUserManager && <TeamPlanActionButtons subscriptionDetails={billingTeamDetails?.subscriptionDetails} />}
+          {isUserManager && (
+            <TeamPlanActionButtons
+              subscriptionDetails={billingTeamDetails?.subscriptionDetails}
+              isAnnualPlan={isAnnualPlan}
+            />
+          )}
         </Row>
         <div className="team-plan-details-sections-wrapper">
           <div className="team-plan-details-section">

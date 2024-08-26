@@ -19,7 +19,7 @@
 }
 .traffic-table-context-menu .ant-dropdown-menu-submenu span,
 .ant-dropdown-menu-submenu ul[id*="more_options"] .ant-dropdown-menu-item {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 .traffic-table-context-menu .ant-dropdown-menu-submenu-title,
 .ant-dropdown-menu-submenu ul[id*="more_options"] .ant-dropdown-menu-item {

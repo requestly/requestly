@@ -1,4 +1,4 @@
-import { PUBLIC_NAMESPACE } from "common/constants";
+import { EXTENSION_MESSAGES, PUBLIC_NAMESPACE } from "common/constants";
 import { matchRuleWithRequest, matchSourceUrl } from "../../common/ruleMatcher";
 import { SourceKey, SourceOperator } from "common/types";
 
@@ -6,7 +6,7 @@ let logShown = false;
 
 export const getFunctionFromCode = (code, ruleType) => {
   try {
-    return new Function("args", `return (${code})(args);`);
+    return generateUserFunctionWithSharedState(code);
   } catch (e) {
     notifyOnErrorOccurred({
       initiator: location.origin,
@@ -23,6 +23,24 @@ export const getFunctionFromCode = (code, ruleType) => {
     });
     return () => {};
   }
+};
+
+const generateUserFunctionWithSharedState = function (functionStringEscaped) {
+  const SHARED_STATE_VAR_NAME = "$sharedState";
+
+  let sharedState;
+  try {
+    sharedState = window.top[PUBLIC_NAMESPACE]?.sharedState ?? {};
+  } catch (e) {
+    sharedState = window[PUBLIC_NAMESPACE]?.sharedState ?? {};
+  }
+
+  const { func: generatedFunction, updatedSharedState } = new Function(
+    `${SHARED_STATE_VAR_NAME}`,
+    `return { func: ${functionStringEscaped}, updatedSharedState: ${SHARED_STATE_VAR_NAME}}`
+  )(sharedState);
+
+  return generatedFunction;
 };
 
 const isNonJsonObject = (obj) => {
@@ -136,6 +154,17 @@ export const notifyRequestRuleApplied = (message) => {
       action: "request_rule_applied",
       rule: message.ruleDetails,
       requestDetails: message["requestDetails"],
+    },
+    window.location.href
+  );
+};
+
+export const sendCacheSharedStateMessage = () => {
+  window.top.postMessage(
+    {
+      source: "requestly:client",
+      action: EXTENSION_MESSAGES.CACHE_SHARED_STATE,
+      sharedState: window[PUBLIC_NAMESPACE]?.sharedState,
     },
     window.location.href
   );

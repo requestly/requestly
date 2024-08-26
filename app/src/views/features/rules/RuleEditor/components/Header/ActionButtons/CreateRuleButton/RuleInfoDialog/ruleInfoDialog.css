@@ -9,7 +9,7 @@
 }
 
 .rule-info-dialog-container.ant-row .rule-info-dialog-description {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   font-weight: 400;
   line-height: 21px;
   color: var(--text-gray);

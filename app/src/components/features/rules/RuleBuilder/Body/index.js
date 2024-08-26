@@ -70,7 +70,7 @@ const Body = ({ mode, showDocs, currentlySelectedRuleData, currentlySelectedRule
         className={`rule-builder-body ${isSharedListView ? "preview-rule-builder-body" : ""}`}
         id="rule-builder-body"
       >
-        <Col span={24} style={{ maxWidth: "1200px", minWidth: "300px" }}>
+        <Col span={24} style={{ minWidth: "300px" }}>
           <CardBody>
             {/* Info for some specific rule types */}
             <RuleInfoBanner appMode={appMode} ruleType={currentlySelectedRuleConfig.TYPE} />

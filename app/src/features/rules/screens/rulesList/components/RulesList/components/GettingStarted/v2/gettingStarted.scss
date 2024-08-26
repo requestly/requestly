@@ -173,7 +173,7 @@
         gap: 8px;
 
         .ask-ai-btn-content {
-          font-size: 13px;
+          font-size: var(--requestly-font-size-sm, 13px);
           font-style: normal;
           font-weight: 400;
           line-height: 150%;
@@ -197,7 +197,7 @@
 
       .caption {
         color: var(--requestly-color-text-placeholder, #8f8f8f);
-        font-size: 11px;
+        font-size: var(--requestly-font-size-xs, 11px);
         font-weight: 400;
         line-height: 130%; /* 14.3px */
         margin-top: 8px;

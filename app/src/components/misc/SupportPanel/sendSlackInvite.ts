@@ -1,7 +1,8 @@
 import { message } from "antd";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { throttle } from "lodash";
 
-export default async function sendSlackInvite() {
+async function sendSlackInvite() {
   const hide = message.loading({
     content: "Sending Slack Connect Invitation",
     className: "slack-connect-toast",
@@ -23,3 +24,5 @@ export default async function sendSlackInvite() {
     })
     .finally(hide);
 }
+
+export default throttle(sendSlackInvite, 5000);

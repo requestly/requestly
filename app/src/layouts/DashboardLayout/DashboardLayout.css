@@ -49,7 +49,7 @@
 
 .app-layout .ant-layout-footer {
   height: 1.5rem;
-  font-size: 11px;
+  font-size: var(--requestly-font-size-xs, 11px);
   display: flex;
   align-items: center;
   padding: 0 2px;

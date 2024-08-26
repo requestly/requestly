@@ -5,7 +5,7 @@
 }
 
 .learn-more-icon {
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
 }
 
 .learn-more-link,

@@ -66,7 +66,7 @@
 .traffic-table-sidebar .ant-menu.ant-menu-dark .ant-menu-item {
   width: 96%;
   height: 1.875rem;
-  font-size: 13px;
+  font-size: var(--requestly-font-size-sm, 13px);
   line-height: 20px;
   margin: 0 4px 2px 4px;
   background-color: transparent;
