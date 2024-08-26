@@ -99,7 +99,7 @@ const MockEditorIndex: React.FC<Props> = ({
       .finally(() => {
         setIsMockCollectionLoading(false);
       });
-  }, [mockEditorData?.collectionId]);
+  }, [mockEditorData.collectionId, teamId, uid]);
 
   const onMockSave = (data: MockEditorDataSchema) => {
     setSavingInProgress(true);
