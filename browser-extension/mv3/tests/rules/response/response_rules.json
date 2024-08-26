@@ -315,5 +315,38 @@
     "ruleType": "Response",
     "schemaVersion": "3.0.0",
     "status": "Active"
+  },
+  "Response_8": {
+    "createdBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "creationDate": 1724666497201,
+    "currentOwner": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "description": "",
+    "groupId": "",
+    "id": "Response_8",
+    "isSample": false,
+    "lastModifiedBy": "BZCVNattZfUeqe0t78mwgxC5cQx1",
+    "modificationDate": 1724666967446,
+    "name": "[XHR] response-sharedState",
+    "objectType": "rule",
+    "pairs": [
+      {
+        "id": "0ciik",
+        "response": {
+          "resourceType": "restApi",
+          "statusCode": "",
+          "type": "code",
+          "value": "function modifyResponse(args) {\n  const {method, url, response, responseType, requestHeaders, requestData, responseJSON} = args;\n  // Change response below depending upon request attributes received in args\n  if($sharedState.count>1){\n    return {isSharedStateCountGteOne:true}\n  }\n  let count=$sharedState.count??0;\n  count++;\n  $sharedState.count=count;\n  return response;\n}"
+        },
+        "source": {
+          "filters": [],
+          "key": "Url",
+          "operator": "Contains",
+          "value": "https://requestly.tech/api/mockv2/"
+        }
+      }
+    ],
+    "ruleType": "Response",
+    "schemaVersion": "3.0.0",
+    "status": "Active"
   }
 }
